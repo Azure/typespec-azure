@@ -140,5 +140,6 @@
       "column": 3,
       "emittedName": "persistOnSuccess"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

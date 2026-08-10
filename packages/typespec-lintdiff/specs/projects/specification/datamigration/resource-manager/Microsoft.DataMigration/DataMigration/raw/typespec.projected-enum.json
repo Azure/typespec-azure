@@ -452,5 +452,126 @@
       "column": 7,
       "emittedName": "deleteRunningTasks"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "DatabaseMigrationCosmosDbMongo.tsp",
+      "line": 90,
+      "column": 7,
+      "name": "force",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "DatabaseMigrationCosmosDbMongo.tsp",
+      "line": 166,
+      "column": 7,
+      "name": "force",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "DatabaseMigrationSqlDb.tsp",
+      "line": 106,
+      "column": 7,
+      "name": "migrationOperationId",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DatabaseMigrationSqlDb.tsp",
+      "line": 112,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DatabaseMigrationSqlDb.tsp",
+      "line": 138,
+      "column": 7,
+      "name": "force",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "DatabaseMigrationSqlMi.tsp",
+      "line": 71,
+      "column": 7,
+      "name": "migrationOperationId",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DatabaseMigrationSqlMi.tsp",
+      "line": 77,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DatabaseMigrationSqlMi.tsp",
+      "line": 102,
+      "column": 7,
+      "name": "force",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "DatabaseMigrationSqlVm.tsp",
+      "line": 71,
+      "column": 7,
+      "name": "migrationOperationId",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DatabaseMigrationSqlVm.tsp",
+      "line": 77,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DatabaseMigrationSqlVm.tsp",
+      "line": 102,
+      "column": 7,
+      "name": "force",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "DataMigrationService.tsp",
+      "line": 136,
+      "column": 7,
+      "name": "deleteRunningTasks",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "Project.tsp",
+      "line": 116,
+      "column": 7,
+      "name": "deleteRunningTasks",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "ProjectTask.tsp",
+      "line": 86,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "ProjectTask.tsp",
+      "line": 126,
+      "column": 7,
+      "name": "deleteRunningTasks",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "ProjectTask.tsp",
+      "line": 221,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "ProjectTask.tsp",
+      "line": 261,
+      "column": 7,
+      "name": "deleteRunningTasks",
+      "verb": "delete"
+    }
   ]
 }

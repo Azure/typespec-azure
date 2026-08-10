@@ -368,5 +368,6 @@
       "column": 7,
       "emittedName": "$count"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

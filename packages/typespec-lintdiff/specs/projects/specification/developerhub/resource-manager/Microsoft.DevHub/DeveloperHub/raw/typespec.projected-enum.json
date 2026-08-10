@@ -14,5 +14,21 @@
       "column": 3,
       "emittedName": "required"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "GitHubOAuthResponse.tsp",
+      "line": 63,
+      "column": 7,
+      "name": "code",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "GitHubOAuthResponse.tsp",
+      "line": 69,
+      "column": 7,
+      "name": "state",
+      "verb": "get"
+    }
   ]
 }

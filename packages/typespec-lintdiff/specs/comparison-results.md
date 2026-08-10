@@ -4,7 +4,7 @@ Specs commit: `f6b53f105b95da05276530a0754a1c71b4f16397`
 
 Scope: full (462/468 projects)
 
-Analysis duration: 1488689 ms
+Analysis duration: 1393248 ms
 
 Only successfully compiled TypeSpec projects are included in validator and TypeSpec counts.
 
@@ -128,7 +128,7 @@ Coverage is observed only when a mapped TypeSpec diagnostic fires in the same in
 | ParameterNotDefinedInGlobalParameters | unknown | 8 | 0 | 0 | 8 | 0 | 0.0% | no | — | — | 23 | 0 |
 | ParameterNotUsingCommonTypes | template | 70 | 0 | 0 | 70 | 0 | 0.0% | no | — | — | 463 | 0 |
 | ParameterOrder | unknown | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |
-| ParametersInPointGet | lint | 40 | 65 | 40 | 0 | 25 | 100.0% | no | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | 189 | 749 |
+| ParametersInPointGet | lint | 40 | 62 | 40 | 0 | 22 | 100.0% | no | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | 189 | 724 |
 | ParametersInPost | unknown | 32 | 24 | 24 | 8 | 0 | 75.0% | no | tsp-lintdiff-local-linter/parameters-in-post | tsp-lintdiff-local-linter/parameters-in-post | 424 | 167 |
 | ParametersOrder | unknown | 9 | 0 | 0 | 9 | 0 | 0.0% | no | — | — | 54 | 0 |
 | ParametersSchemaAsTypeObject | unknown | 9 | 10 | 4 | 5 | 6 | 44.4% | no | tsp-lintdiff-local-linter/parameters-schema-as-type-object | tsp-lintdiff-local-linter/parameters-schema-as-type-object | 18 | 63 |
@@ -209,7 +209,7 @@ Coverage is observed only when a mapped TypeSpec diagnostic fires in the same in
 | UniqueXmsExample | unknown | 86 | 0 | 0 | 86 | 0 | 0.0% | no | — | — | 495 | 0 |
 | UnSupportedPatchProperties | lint | 45 | 24 | 7 | 38 | 17 | 15.6% | no | tsp-lintdiff-local-linter/unsupported-patch-properties | tsp-lintdiff-local-linter/unsupported-patch-properties | 107 | 131 |
 | ValidFormats | unknown | 6 | 0 | 0 | 6 | 0 | 0.0% | no | — | — | 123 | 0 |
-| ValidQueryParametersForPointOperations | unknown | 0 | 65 | 0 | 0 | 65 | — | no | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | 0 | 749 |
+| ValidQueryParametersForPointOperations | unknown | 0 | 62 | 0 | 0 | 62 | — | no | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | 0 | 724 |
 | ValidResponseCodeRequired | unknown | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |
 | VersionConvention | unknown | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |
 | VersionPolicy | lint | 0 | 0 | 0 | 0 | 0 | — | yes | — | @azure-tools/typespec-azure-core/operation-missing-api-version<br>tsp-lintdiff-local-linter/version-policy | 0 | 0 |

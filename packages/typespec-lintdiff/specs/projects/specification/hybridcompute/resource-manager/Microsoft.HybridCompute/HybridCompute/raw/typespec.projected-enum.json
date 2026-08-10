@@ -86,5 +86,21 @@
       "column": 3,
       "emittedName": "asyncExecution"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Machine.tsp",
+      "line": 108,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Machine.tsp",
+      "line": 124,
+      "column": 7,
+      "name": "$expand",
+      "verb": "put"
+    }
   ]
 }

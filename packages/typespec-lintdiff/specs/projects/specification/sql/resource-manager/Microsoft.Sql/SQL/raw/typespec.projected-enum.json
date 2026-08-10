@@ -788,5 +788,112 @@
       "column": 7,
       "emittedName": "onlyLatestPerDatabase"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Database.tsp",
+      "line": 83,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Database.tsp",
+      "line": 89,
+      "column": 7,
+      "name": "$filter",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DatabaseSqlVulnerabilityAssessmentBaselineSet.tsp",
+      "line": 138,
+      "column": 7,
+      "name": "systemDatabaseName",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DatabaseSqlVulnerabilityAssessmentBaselineSet.tsp",
+      "line": 154,
+      "column": 7,
+      "name": "systemDatabaseName",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "DatabaseSqlVulnerabilityAssessmentRuleBaseline.tsp",
+      "line": 151,
+      "column": 7,
+      "name": "systemDatabaseName",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DatabaseSqlVulnerabilityAssessmentRuleBaseline.tsp",
+      "line": 167,
+      "column": 7,
+      "name": "systemDatabaseName",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "DatabaseSqlVulnerabilityAssessmentRuleBaseline.tsp",
+      "line": 182,
+      "column": 7,
+      "name": "systemDatabaseName",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "ManagedInstance.tsp",
+      "line": 56,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "RecoverableDatabase.tsp",
+      "line": 44,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "RecoverableDatabase.tsp",
+      "line": 50,
+      "column": 7,
+      "name": "$filter",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "RestorableDroppedDatabase.tsp",
+      "line": 60,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "RestorableDroppedDatabase.tsp",
+      "line": 66,
+      "column": 7,
+      "name": "$filter",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Server.tsp",
+      "line": 55,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "SqlVulnerabilityAssessmentScanRecord.tsp",
+      "line": 130,
+      "column": 7,
+      "name": "systemDatabaseName",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "SqlVulnerabilityAssessmentScanResults.tsp",
+      "line": 137,
+      "column": 7,
+      "name": "systemDatabaseName",
+      "verb": "get"
+    }
   ]
 }

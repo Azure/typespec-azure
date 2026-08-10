@@ -14,5 +14,21 @@
       "column": 3,
       "emittedName": "nameAvailable"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "HeatMapModel.tsp",
+      "line": 68,
+      "column": 7,
+      "name": "topLeft",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "HeatMapModel.tsp",
+      "line": 76,
+      "column": 7,
+      "name": "botRight",
+      "verb": "get"
+    }
   ]
 }

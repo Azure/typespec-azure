@@ -134,5 +134,14 @@
       "column": 7,
       "emittedName": "force"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Workspace.tsp",
+      "line": 205,
+      "column": 7,
+      "name": "force",
+      "verb": "delete"
+    }
   ]
 }

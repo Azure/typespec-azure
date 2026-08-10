@@ -3874,6 +3874,7 @@
       "rawFiles": [
         "projects/specification/appcomplianceautomation/AppComplianceAutomation.Management/raw/resource-manager/Microsoft.AppComplianceAutomation/stable/2024-06-27/appcomplianceautomation.jsonl",
         "projects/specification/appcomplianceautomation/AppComplianceAutomation.Management/raw/resource-manager/Microsoft.AppComplianceAutomation/stable/2024-06-27/appcomplianceautomation.stderr.txt",
+        "projects/specification/appcomplianceautomation/AppComplianceAutomation.Management/raw/typespec.projected-enum.json",
         "projects/specification/appcomplianceautomation/AppComplianceAutomation.Management/raw/typespec.stderr.txt",
         "projects/specification/appcomplianceautomation/AppComplianceAutomation.Management/raw/typespec.stdout.txt"
       ],
@@ -70177,6 +70178,7 @@
       "rawFiles": [
         "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentScripts/raw/stable/2023-08-01/deploymentScripts.jsonl",
         "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentScripts/raw/stable/2023-08-01/deploymentScripts.stderr.txt",
+        "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentScripts/raw/typespec.projected-enum.json",
         "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentScripts/raw/typespec.stderr.txt",
         "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentScripts/raw/typespec.stdout.txt"
       ],
@@ -70557,6 +70559,7 @@
       "rawFiles": [
         "projects/specification/scvmm/ScVmm.Management/raw/resource-manager/Microsoft.ScVmm/stable/2025-03-13/scvmm.jsonl",
         "projects/specification/scvmm/ScVmm.Management/raw/resource-manager/Microsoft.ScVmm/stable/2025-03-13/scvmm.stderr.txt",
+        "projects/specification/scvmm/ScVmm.Management/raw/typespec.projected-enum.json",
         "projects/specification/scvmm/ScVmm.Management/raw/typespec.stderr.txt",
         "projects/specification/scvmm/ScVmm.Management/raw/typespec.stdout.txt"
       ],
@@ -84846,11 +84849,11 @@
     "common-types/resource-management/v6/types.json"
   ],
   "typespecAnalysis": {
-    "schemaVersion": 5,
-    "generatedAt": "2026-08-10T06:49:00.682Z",
-    "durationMs": 1488689,
+    "schemaVersion": 6,
+    "generatedAt": "2026-08-10T09:38:18.108Z",
+    "durationMs": 1393248,
     "ruleset": "tsp-lintdiff-local-linter/all",
-    "localLinterFingerprint": "sha256:8e13b36ff9756e301d1054fc4657861279953144b057fe67bd36d2a75b7884a3",
+    "localLinterFingerprint": "sha256:91e22d0097ea3c03c47b19da7e00a38308ffdc72fcbc35b7637f21973f403fc4",
     "localLinterFingerprintFiles": [
       "package.json",
       "src/index.ts",
@@ -84895,6 +84898,7 @@
       "src/rules/path-parameter-names.ts",
       "src/rules/path-parameter-schema.ts",
       "src/rules/path-resource-provider-name-pascal-case.ts",
+      "src/rules/point-operation-path.ts",
       "src/rules/post-201-response.ts",
       "src/rules/post-operation-id-contains-url-verb.ts",
       "src/rules/preview-version-over-one-year.ts",
@@ -84926,13 +84930,13 @@
       "tsconfig.build.json",
       "tsconfig.json"
     ],
-    "localLinterGitCommit": "3d4f57c74cc86694289b4e424c2fdf993b0fe169",
+    "localLinterGitCommit": "64a4ab9bb8aa7fc5b84f6c31a8d44500cd96ef9e",
     "localLinterGitBranch": "feature/lintdiff-spec-dataset-new",
     "partial": false,
     "sourceProjectCount": 468,
     "projectCount": 468,
     "filters": {},
-    "diagnosticCount": 51089,
+    "diagnosticCount": 51064,
     "ruleCount": 62,
     "failedProjectCount": 6,
     "resultFiles": [
@@ -85040,6 +85044,7 @@
       "projects/specification/app/resource-manager/Microsoft.App/SreAgent/raw/typespec.projected-enum.json",
       "projects/specification/app/resource-manager/Microsoft.App/SreAgent/raw/typespec.stderr.txt",
       "projects/specification/app/resource-manager/Microsoft.App/SreAgent/raw/typespec.stdout.txt",
+      "projects/specification/appcomplianceautomation/AppComplianceAutomation.Management/raw/typespec.projected-enum.json",
       "projects/specification/appcomplianceautomation/AppComplianceAutomation.Management/raw/typespec.stderr.txt",
       "projects/specification/appcomplianceautomation/AppComplianceAutomation.Management/raw/typespec.stdout.txt",
       "projects/specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration/raw/typespec.projected-enum.json",
@@ -86046,6 +86051,7 @@
       "projects/specification/resources/resource-manager/Microsoft.Resources/bicep/raw/typespec.stdout.txt",
       "projects/specification/resources/resource-manager/Microsoft.Resources/databoundaries/raw/typespec.stderr.txt",
       "projects/specification/resources/resource-manager/Microsoft.Resources/databoundaries/raw/typespec.stdout.txt",
+      "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentScripts/raw/typespec.projected-enum.json",
       "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentScripts/raw/typespec.stderr.txt",
       "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentScripts/raw/typespec.stdout.txt",
       "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentStacks/raw/typespec.projected-enum.json",
@@ -86062,6 +86068,7 @@
       "projects/specification/resources/resource-manager/Microsoft.Resources/subscriptions/raw/typespec.projected-enum.json",
       "projects/specification/resources/resource-manager/Microsoft.Resources/subscriptions/raw/typespec.stderr.txt",
       "projects/specification/resources/resource-manager/Microsoft.Resources/subscriptions/raw/typespec.stdout.txt",
+      "projects/specification/scvmm/ScVmm.Management/raw/typespec.projected-enum.json",
       "projects/specification/scvmm/ScVmm.Management/raw/typespec.stderr.txt",
       "projects/specification/scvmm/ScVmm.Management/raw/typespec.stdout.txt",
       "projects/specification/search/resource-manager/Microsoft.Search/Search/raw/typespec.projected-enum.json",

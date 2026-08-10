@@ -116,5 +116,28 @@
       "column": 3,
       "emittedName": "hasBgpOverride"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "NetworkInterface.tsp",
+      "line": 58,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "NetworkInterfaceIPConfiguration.tsp",
+      "line": 66,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "PublicIPAddress.tsp",
+      "line": 70,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
   ]
 }

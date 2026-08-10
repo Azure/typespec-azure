@@ -386,5 +386,6 @@
       "column": 3,
       "emittedName": "isDeleted"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

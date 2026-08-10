@@ -26,5 +26,28 @@
       "column": 3,
       "emittedName": "nameAvailable"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "ManagementGroup.tsp",
+      "line": 29,
+      "column": 3,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "ManagementGroup.tsp",
+      "line": 35,
+      "column": 3,
+      "name": "$recurse",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "ManagementGroup.tsp",
+      "line": 41,
+      "column": 3,
+      "name": "$filter",
+      "verb": "get"
+    }
   ]
 }

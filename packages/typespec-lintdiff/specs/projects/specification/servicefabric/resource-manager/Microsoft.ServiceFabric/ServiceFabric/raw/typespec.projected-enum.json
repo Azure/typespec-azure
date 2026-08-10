@@ -128,5 +128,6 @@
       "column": 3,
       "emittedName": "hasPersistedState"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

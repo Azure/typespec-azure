@@ -92,5 +92,14 @@
       "column": 3,
       "emittedName": "optional"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "FluxConfiguration.tsp",
+      "line": 160,
+      "column": 7,
+      "name": "forceDelete",
+      "verb": "delete"
+    }
   ]
 }

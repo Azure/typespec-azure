@@ -68,5 +68,21 @@
       "column": 3,
       "emittedName": "ignoreFirstRecord"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Database.tsp",
+      "line": 68,
+      "column": 7,
+      "name": "callerRole",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "Database.tsp",
+      "line": 98,
+      "column": 7,
+      "name": "callerRole",
+      "verb": "patch"
+    }
   ]
 }

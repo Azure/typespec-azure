@@ -20,5 +20,28 @@
       "column": 7,
       "emittedName": "canFetchContent"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Workbook.tsp",
+      "line": 72,
+      "column": 7,
+      "name": "canFetchContent",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Workbook.tsp",
+      "line": 86,
+      "column": 7,
+      "name": "sourceId",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "Workbook.tsp",
+      "line": 102,
+      "column": 7,
+      "name": "sourceId",
+      "verb": "patch"
+    }
   ]
 }

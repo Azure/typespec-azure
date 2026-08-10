@@ -8,5 +8,14 @@
       "column": 3,
       "emittedName": "isHiddenSaaS"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "NewRelicMonitorResource.tsp",
+      "line": 65,
+      "column": 7,
+      "name": "userEmail",
+      "verb": "delete"
+    }
   ]
 }

@@ -296,5 +296,6 @@
       "column": 3,
       "emittedName": "isDataAction"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

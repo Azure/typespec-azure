@@ -860,5 +860,147 @@
       "column": 7,
       "emittedName": "skipShutdown"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "CapacityReservation.tsp",
+      "line": 50,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "CapacityReservationGroup.tsp",
+      "line": 40,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DedicatedHost.tsp",
+      "line": 48,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DedicatedHostGroup.tsp",
+      "line": 40,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Image.tsp",
+      "line": 44,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "InterconnectBlock.tsp",
+      "line": 55,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "ProximityPlacementGroup.tsp",
+      "line": 40,
+      "column": 7,
+      "name": "includeColocationStatus",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "RestorePoint.tsp",
+      "line": 41,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "RestorePointCollection.tsp",
+      "line": 39,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "VirtualMachine.tsp",
+      "line": 88,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "VirtualMachine.tsp",
+      "line": 153,
+      "column": 7,
+      "name": "forceDeletion",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "VirtualMachineExtension.tsp",
+      "line": 66,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "VirtualMachineRunCommand.tsp",
+      "line": 69,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "VirtualMachineRunCommand.tsp",
+      "line": 170,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "VirtualMachineScaleSet.tsp",
+      "line": 93,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "VirtualMachineScaleSet.tsp",
+      "line": 160,
+      "column": 7,
+      "name": "forceDeletion",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "VirtualMachineScaleSetExtension.tsp",
+      "line": 64,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "VirtualMachineScaleSetVM.tsp",
+      "line": 117,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "VirtualMachineScaleSetVM.tsp",
+      "line": 166,
+      "column": 7,
+      "name": "forceDeletion",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "VirtualMachineScaleSetVMExtension.tsp",
+      "line": 104,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
   ]
 }

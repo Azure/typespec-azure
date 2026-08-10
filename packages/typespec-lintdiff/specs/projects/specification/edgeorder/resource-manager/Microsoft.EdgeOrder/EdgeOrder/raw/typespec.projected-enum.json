@@ -20,5 +20,14 @@
       "column": 3,
       "emittedName": "shippingBoxRequired"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "OrderItemResource.tsp",
+      "line": 46,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
   ]
 }

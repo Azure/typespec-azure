@@ -236,5 +236,21 @@
       "column": 3,
       "emittedName": "isPrimarySideScript"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Fabric.tsp",
+      "line": 78,
+      "column": 7,
+      "name": "$filter",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "MigrationItem.tsp",
+      "line": 84,
+      "column": 7,
+      "name": "deleteOption",
+      "verb": "delete"
+    }
   ]
 }

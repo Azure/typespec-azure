@@ -4,7 +4,7 @@ Specs commit: `f6b53f105b95da05276530a0754a1c71b4f16397`
 
 Scope: full (462/468 projects)
 
-Analysis duration: 1488689 ms
+Analysis duration: 1393248 ms
 
 Only successfully compiled TypeSpec projects are included in validator and TypeSpec counts.
 
@@ -51,7 +51,7 @@ Categories are investigative views and may overlap (for example, an unmapped rul
 | LroExtension | lint | 14 | 14 | 14 | 0 | 0 | 100.0% | no | tsp-lintdiff-local-linter/lro-extension | tsp-lintdiff-local-linter/lro-extension | 39 | 39 |
 | NoErrorCodeResponses | lint | 20 | 20 | 20 | 0 | 0 | 100.0% | yes | tsp-lintdiff-local-linter/no-error-code-responses | @azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes<br>tsp-lintdiff-local-linter/no-error-code-responses | 144 | 146 |
 | NonApplicationJsonType | unknown | 3 | 3 | 3 | 0 | 0 | 100.0% | no | tsp-lintdiff-local-linter/non-application-json-type | tsp-lintdiff-local-linter/non-application-json-type | 20 | 19 |
-| ParametersInPointGet | lint | 40 | 65 | 40 | 0 | 25 | 100.0% | no | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | 189 | 749 |
+| ParametersInPointGet | lint | 40 | 62 | 40 | 0 | 22 | 100.0% | no | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | 189 | 724 |
 | PatchInOperationName | lint | 14 | 24 | 14 | 0 | 10 | 100.0% | no | tsp-lintdiff-local-linter/patch-in-operation-name | tsp-lintdiff-local-linter/patch-in-operation-name | 14 | 63 |
 | PreviewVersionOverOneYear | lint | 108 | 173 | 108 | 0 | 65 | 100.0% | no | tsp-lintdiff-local-linter/preview-version-over-one-year | tsp-lintdiff-local-linter/preview-version-over-one-year | 358 | 248 |
 | PutInOperationName | lint | 52 | 55 | 52 | 0 | 3 | 100.0% | no | tsp-lintdiff-local-linter/put-in-operation-name | tsp-lintdiff-local-linter/put-in-operation-name | 133 | 186 |
@@ -335,7 +335,7 @@ Categories are investigative views and may overlap (for example, an unmapped rul
 | UniqueClientParameterName | unknown | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |
 | UniqueModelName | unknown | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |
 | UniqueXmsEnumName | unknown | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |
-| ValidQueryParametersForPointOperations | unknown | 0 | 65 | 0 | 0 | 65 | — | no | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | 0 | 749 |
+| ValidQueryParametersForPointOperations | unknown | 0 | 62 | 0 | 0 | 62 | — | no | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | 0 | 724 |
 | ValidResponseCodeRequired | unknown | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |
 | VersionConvention | unknown | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |
 | VersionPolicy | lint | 0 | 0 | 0 | 0 | 0 | — | yes | — | @azure-tools/typespec-azure-core/operation-missing-api-version<br>tsp-lintdiff-local-linter/version-policy | 0 | 0 |

@@ -194,5 +194,6 @@
       "column": 3,
       "emittedName": "nameAvailable"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

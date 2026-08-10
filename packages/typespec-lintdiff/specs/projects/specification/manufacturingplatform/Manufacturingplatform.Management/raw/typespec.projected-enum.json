@@ -32,5 +32,6 @@
       "column": 3,
       "emittedName": "isDeprecated"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

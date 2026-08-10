@@ -1,5 +1,6 @@
 {
   "apiVersion": "2026-06-15-preview",
   "serviceCount": 1,
-  "locations": []
+  "locations": [],
+  "queryParameterLocations": []
 }

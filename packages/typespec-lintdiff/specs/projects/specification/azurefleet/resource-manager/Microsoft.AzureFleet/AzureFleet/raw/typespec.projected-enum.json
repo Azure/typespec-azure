@@ -212,5 +212,6 @@
       "column": 3,
       "emittedName": "hibernationEnabled"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

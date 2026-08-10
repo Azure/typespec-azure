@@ -8,5 +8,14 @@
       "column": 3,
       "emittedName": "isValid"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "RoleAssignment.tsp",
+      "line": 83,
+      "column": 5,
+      "name": "tenantId",
+      "verb": "delete"
+    }
   ]
 }

@@ -8,5 +8,14 @@
       "column": 3,
       "emittedName": "isDataAction"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "ProviderOperationsMetadata.tsp",
+      "line": 85,
+      "column": 3,
+      "name": "$expand",
+      "verb": "get"
+    }
   ]
 }

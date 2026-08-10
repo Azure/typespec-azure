@@ -8,5 +8,6 @@
       "column": 3,
       "emittedName": "managedByFirewallManager"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

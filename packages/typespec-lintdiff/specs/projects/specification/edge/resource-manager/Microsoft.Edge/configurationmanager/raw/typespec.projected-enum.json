@@ -26,5 +26,14 @@
       "column": 3,
       "emittedName": "forceDelete"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Target.tsp",
+      "line": 242,
+      "column": 3,
+      "name": "forceDelete",
+      "verb": "delete"
+    }
   ]
 }

@@ -20,5 +20,42 @@
       "column": 3,
       "emittedName": "applyToChildScopes"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 245,
+      "column": 3,
+      "name": "unmanageAction.Resources",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 251,
+      "column": 3,
+      "name": "unmanageAction.ResourceGroups",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 257,
+      "column": 3,
+      "name": "unmanageAction.ManagementGroups",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 264,
+      "column": 3,
+      "name": "unmanageAction.ResourcesWithoutDeleteSupport",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 271,
+      "column": 3,
+      "name": "bypassStackOutOfSyncError",
+      "verb": "delete"
+    }
   ]
 }

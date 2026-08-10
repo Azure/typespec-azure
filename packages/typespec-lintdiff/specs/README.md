@@ -81,8 +81,8 @@ pnpm specs:typespec `
 
 For the pinned 468-project corpus at
 `f6b53f105b95da05276530a0754a1c71b4f16397`, the full run with concurrency 6
-took 1,488,689 ms (24 minutes 48.7 seconds) inside the harness with the
-projected `EnumInsteadOfBoolean` pass enabled. Six projects had compile errors
+took 1,393,248 ms (23 minutes 13.2 seconds) inside the harness with the
+projected lint pass enabled. Six projects had compile errors
 and were excluded from both validator and TypeSpec comparison counts. The
 earlier unprojected run took approximately
 11 minutes 36 seconds, so the additional in-process compilation is a material
@@ -113,14 +113,19 @@ Compilation uses `--no-emit`, so Swagger generation and validation are not
 repeated. Temporary configs are deleted and the specs clone's original ref is
 restored.
 
-`EnumInsteadOfBoolean` receives an additional real-project analysis pass. When
-the ordinary linter reports that rule, the harness projects the service to the
-dataset's selected API version using the same versioning mutator approach as the
-AutoRest emitter. It retains only projected source targets whose encoded
-property name is also emitted as a boolean schema in the selected Swagger. This
-removes older-version and non-emitted source models without dropping current
-emitted properties. Other rule diagnostics remain unchanged. The projected
-target set is stored as
+`EnumInsteadOfBoolean` and
+`valid-query-parameters-for-point-operations` receive an additional
+real-project analysis pass. When the ordinary linter reports either rule, the
+harness projects the service to the dataset's selected API version using the
+same versioning mutator approach as the AutoRest emitter.
+
+For `EnumInsteadOfBoolean`, it retains only projected source targets whose
+encoded property name is also emitted as a boolean schema in the selected
+Swagger. For `valid-query-parameters-for-point-operations`, it retains only
+query parameters on projected GET, PUT, PATCH, and DELETE operations whose
+provider-resource path matches the Swagger point-operation classifier. This
+removes older-version and non-emitted source declarations without changing the
+ordinary CLI output. The projected target set is stored as
 `projects/<spec-path>/raw/typespec.projected-enum.json`; the CLI stdout remains
 unmodified for debugging.
 

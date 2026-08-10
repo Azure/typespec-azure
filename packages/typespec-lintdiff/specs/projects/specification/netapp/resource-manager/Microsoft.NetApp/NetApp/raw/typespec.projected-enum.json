@@ -326,5 +326,14 @@
       "column": 7,
       "emittedName": "forceDelete"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 2424,
+      "column": 7,
+      "name": "forceDelete",
+      "verb": "delete"
+    }
   ]
 }

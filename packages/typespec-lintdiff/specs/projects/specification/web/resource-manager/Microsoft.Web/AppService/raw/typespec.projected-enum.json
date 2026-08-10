@@ -1556,5 +1556,161 @@
       "column": 7,
       "emittedName": "isForced"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "AppServiceEnvironmentResource.tsp",
+      "line": 114,
+      "column": 7,
+      "name": "forceDelete",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "DetectorResponse.tsp",
+      "line": 73,
+      "column": 7,
+      "name": "startTime",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DetectorResponse.tsp",
+      "line": 79,
+      "column": 7,
+      "name": "endTime",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DetectorResponse.tsp",
+      "line": 86,
+      "column": 7,
+      "name": "timeGrain",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DetectorResponse.tsp",
+      "line": 139,
+      "column": 7,
+      "name": "startTime",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DetectorResponse.tsp",
+      "line": 145,
+      "column": 7,
+      "name": "endTime",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DetectorResponse.tsp",
+      "line": 152,
+      "column": 7,
+      "name": "timeGrain",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DetectorResponse.tsp",
+      "line": 212,
+      "column": 7,
+      "name": "startTime",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DetectorResponse.tsp",
+      "line": 218,
+      "column": 7,
+      "name": "endTime",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DetectorResponse.tsp",
+      "line": 225,
+      "column": 7,
+      "name": "timeGrain",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "RecommendationRule.tsp",
+      "line": 71,
+      "column": 7,
+      "name": "updateSeen",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "RecommendationRule.tsp",
+      "line": 77,
+      "column": 7,
+      "name": "recommendationId",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "RecommendationRule.tsp",
+      "line": 141,
+      "column": 7,
+      "name": "updateSeen",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "RecommendationRule.tsp",
+      "line": 147,
+      "column": 7,
+      "name": "recommendationId",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Site.tsp",
+      "line": 164,
+      "column": 7,
+      "name": "deleteMetrics",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "Site.tsp",
+      "line": 170,
+      "column": 7,
+      "name": "deleteEmptyServerFarm",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "Site.tsp",
+      "line": 1616,
+      "column": 7,
+      "name": "deleteMetrics",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "Site.tsp",
+      "line": 1622,
+      "column": 7,
+      "name": "deleteEmptyServerFarm",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "StaticSiteLinkedBackendARMResource.tsp",
+      "line": 99,
+      "column": 7,
+      "name": "isCleaningAuthConfig",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "StaticSiteLinkedBackendARMResource.tsp",
+      "line": 199,
+      "column": 7,
+      "name": "isCleaningAuthConfig",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "StaticSiteUserProvidedFunctionAppARMResource.tsp",
+      "line": 93,
+      "column": 7,
+      "name": "isForced",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "StaticSiteUserProvidedFunctionAppARMResource.tsp",
+      "line": 175,
+      "column": 7,
+      "name": "isForced",
+      "verb": "put"
+    }
   ]
 }

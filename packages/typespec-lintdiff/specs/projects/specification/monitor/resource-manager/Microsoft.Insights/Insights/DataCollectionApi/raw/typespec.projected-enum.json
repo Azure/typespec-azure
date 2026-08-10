@@ -38,5 +38,14 @@
       "column": 3,
       "emittedName": "captureOverflow"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "DataCollectionRuleResource.tsp",
+      "line": 95,
+      "column": 7,
+      "name": "deleteAssociations",
+      "verb": "delete"
+    }
   ]
 }

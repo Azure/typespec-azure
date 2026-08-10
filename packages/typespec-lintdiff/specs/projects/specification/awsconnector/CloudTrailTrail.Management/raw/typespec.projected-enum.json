@@ -38,5 +38,6 @@
       "column": 3,
       "emittedName": "includeManagementEvents"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

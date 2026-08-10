@@ -128,5 +128,21 @@
       "column": 3,
       "emittedName": "runDiskConfigRules"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "AvailabilityGroupListener.tsp",
+      "line": 40,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "SqlVirtualMachine.tsp",
+      "line": 46,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
   ]
 }

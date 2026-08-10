@@ -380,5 +380,21 @@
       "column": 3,
       "emittedName": "confirmDeletion"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Offer.tsp",
+      "line": 39,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Sku.tsp",
+      "line": 39,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
   ]
 }

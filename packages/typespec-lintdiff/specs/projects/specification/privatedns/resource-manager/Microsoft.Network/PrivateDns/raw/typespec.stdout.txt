@@ -22,8 +22,6 @@ RecordSet.tsp:141:3 - warning tsp-lintdiff-local-linter/xms-examples-required: P
 RecordSet.tsp:73:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
 RecordSet.tsp:80:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
 RecordSet.tsp:86:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
-RecordSet.tsp:164:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$top' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
-RecordSet.tsp:170:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$recordsetnamesuffix' should be removed. Point operation 'get' MUST not have query parameters other than api-version.
 RecordSet.tsp:157:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 RecordSet.tsp:47:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
 RecordSet.tsp:54:9 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
@@ -61,5 +59,5 @@ VirtualNetworkLink.tsp:130:3 - warning tsp-lintdiff-local-linter/xms-examples-re
 VirtualNetworkLink.tsp:137:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
 VirtualNetworkLink.tsp:137:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
 
-Found 58 warnings.
+Found 56 warnings.
 

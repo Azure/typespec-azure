@@ -26,5 +26,56 @@
       "column": 3,
       "emittedName": "isBuiltInOnly"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "PolicyAssignment.tsp",
+      "line": 119,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "PolicySetDefinition.tsp",
+      "line": 115,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "PolicySetDefinition.tsp",
+      "line": 167,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "PolicySetDefinition.tsp",
+      "line": 209,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "PolicySetDefinitionVersion.tsp",
+      "line": 141,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "PolicySetDefinitionVersion.tsp",
+      "line": 187,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "PolicySetDefinitionVersion.tsp",
+      "line": 223,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
   ]
 }

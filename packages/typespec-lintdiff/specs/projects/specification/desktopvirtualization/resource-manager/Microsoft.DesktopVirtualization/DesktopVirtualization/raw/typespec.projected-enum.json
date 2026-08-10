@@ -380,5 +380,42 @@
       "column": 7,
       "emittedName": "isDescending"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "AppAttachPackage.tsp",
+      "line": 63,
+      "column": 7,
+      "name": "force",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "HostPool.tsp",
+      "line": 159,
+      "column": 7,
+      "name": "force",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "SessionHost.tsp",
+      "line": 51,
+      "column": 7,
+      "name": "force",
+      "verb": "patch"
+    },
+    {
+      "sourceFile": "SessionHost.tsp",
+      "line": 65,
+      "column": 7,
+      "name": "force",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "UserSession.tsp",
+      "line": 44,
+      "column": 7,
+      "name": "force",
+      "verb": "delete"
+    }
   ]
 }

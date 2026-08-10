@@ -158,5 +158,6 @@
       "column": 3,
       "emittedName": "enabled"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

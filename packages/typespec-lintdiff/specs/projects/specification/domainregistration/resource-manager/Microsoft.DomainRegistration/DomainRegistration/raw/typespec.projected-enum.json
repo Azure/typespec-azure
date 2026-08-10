@@ -104,5 +104,14 @@
       "column": 3,
       "emittedName": "forTransfer"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Domain.tsp",
+      "line": 86,
+      "column": 7,
+      "name": "forceHardDeleteDomain",
+      "verb": "delete"
+    }
   ]
 }

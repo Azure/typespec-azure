@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 5,
+  "schemaVersion": 6,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-10T06:49:00.682Z",
+  "generatedAt": "2026-08-10T09:38:18.108Z",
   "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
   "count": 696,
   "levels": {

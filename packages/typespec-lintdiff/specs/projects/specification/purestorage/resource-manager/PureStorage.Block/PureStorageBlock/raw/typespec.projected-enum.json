@@ -62,5 +62,6 @@
       "column": 3,
       "emittedName": "createdByPolicy"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

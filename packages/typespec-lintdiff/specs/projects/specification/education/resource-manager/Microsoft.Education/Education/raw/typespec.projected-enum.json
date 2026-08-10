@@ -62,5 +62,21 @@
       "column": 7,
       "emittedName": "includeDeleted"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "GrantDetails.tsp",
+      "line": 88,
+      "column": 7,
+      "name": "includeAllocatedBudget",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "LabDetails.tsp",
+      "line": 112,
+      "column": 7,
+      "name": "includeBudget",
+      "verb": "get"
+    }
   ]
 }

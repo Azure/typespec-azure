@@ -80,5 +80,28 @@
       "column": 3,
       "emittedName": "toBeExportedForShoebox"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "DetectorResponse.tsp",
+      "line": 39,
+      "column": 3,
+      "name": "startTime",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DetectorResponse.tsp",
+      "line": 45,
+      "column": 3,
+      "name": "endTime",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DetectorResponse.tsp",
+      "line": 52,
+      "column": 3,
+      "name": "timeGrain",
+      "verb": "get"
+    }
   ]
 }

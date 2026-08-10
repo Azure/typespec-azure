@@ -68,5 +68,14 @@
       "column": 3,
       "emittedName": "preferContainerTags"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Export.tsp",
+      "line": 75,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
   ]
 }

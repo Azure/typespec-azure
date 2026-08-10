@@ -56,5 +56,21 @@
       "column": 3,
       "emittedName": "isSucceeded"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "ReservationOrderResponse.tsp",
+      "line": 46,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "ReservationResponse.tsp",
+      "line": 67,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
   ]
 }

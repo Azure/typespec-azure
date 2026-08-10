@@ -98,5 +98,6 @@
       "column": 3,
       "emittedName": "hibernate"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

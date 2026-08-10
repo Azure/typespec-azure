@@ -584,5 +584,35 @@
       "column": 3,
       "emittedName": "testConnection"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "FileShare.tsp",
+      "line": 46,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "FileShare.tsp",
+      "line": 68,
+      "column": 7,
+      "name": "$expand",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "FileShare.tsp",
+      "line": 100,
+      "column": 7,
+      "name": "$include",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "StorageAccount.tsp",
+      "line": 99,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
   ]
 }

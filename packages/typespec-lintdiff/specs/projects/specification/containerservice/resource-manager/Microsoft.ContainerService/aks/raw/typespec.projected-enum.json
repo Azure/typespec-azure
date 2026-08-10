@@ -590,5 +590,21 @@
       "column": 3,
       "emittedName": "enableFIPS"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "AgentPool.tsp",
+      "line": 68,
+      "column": 7,
+      "name": "ignore-pod-disruption-budget",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 328,
+      "column": 7,
+      "name": "ignore-pod-disruption-budget",
+      "verb": "delete"
+    }
   ]
 }

@@ -290,5 +290,21 @@
       "column": 3,
       "emittedName": "addProxyAgentExtension"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "bulkCreateCustom.tsp",
+      "line": 49,
+      "column": 3,
+      "name": "deleteInstances",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "launchBulkInstancesOperation.tsp",
+      "line": 48,
+      "column": 3,
+      "name": "deleteInstances",
+      "verb": "delete"
+    }
   ]
 }

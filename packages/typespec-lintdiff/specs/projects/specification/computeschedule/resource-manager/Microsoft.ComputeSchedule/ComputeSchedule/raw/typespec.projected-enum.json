@@ -266,5 +266,6 @@
       "column": 3,
       "emittedName": "addProxyAgentExtension"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

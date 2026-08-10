@@ -308,5 +308,6 @@
       "column": 3,
       "emittedName": "logProgress"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

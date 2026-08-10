@@ -74,5 +74,14 @@
       "column": 3,
       "emittedName": "autoDownloadCertificate"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "StorageTarget.tsp",
+      "line": 70,
+      "column": 7,
+      "name": "force",
+      "verb": "delete"
+    }
   ]
 }

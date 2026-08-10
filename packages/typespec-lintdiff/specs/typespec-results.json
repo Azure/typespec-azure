@@ -1,15 +1,15 @@
 {
-  "schemaVersion": 5,
+  "schemaVersion": 6,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-10T06:49:00.682Z",
-  "durationMs": 1488689,
+  "generatedAt": "2026-08-10T09:38:18.108Z",
+  "durationMs": 1393248,
   "ruleset": "tsp-lintdiff-local-linter/all",
   "partial": false,
   "sourceProjectCount": 468,
   "projectCount": 468,
   "filters": {},
   "failedProjectCount": 6,
-  "totalDiagnostics": 51089,
+  "totalDiagnostics": 51064,
   "rules": {
     "@typespec/http/duplicate-body": {
       "count": 26,
@@ -468,11 +468,11 @@
       "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2funsupported-patch-properties.json"
     },
     "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations": {
-      "count": 866,
+      "count": 841,
       "levels": {
-        "warning": 866
+        "warning": 841
       },
-      "projectCount": 67,
+      "projectCount": 64,
       "resultsFile": "results/by-typespec-rule/tsp-lintdiff-local-linter_2fvalid-query-parameters-for-point-operations.json"
     },
     "tsp-lintdiff-local-linter/xms-examples-required": {
@@ -512,7 +512,7 @@
     {
       "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
       "status": "success",
-      "durationMs": 23072,
+      "durationMs": 24679,
       "diagnosticCount": 114,
       "rawFiles": [
         "projects/specification/advisor/resource-manager/Microsoft.Advisor/Advisor/raw/typespec.stdout.txt",
@@ -523,7 +523,7 @@
     {
       "project": "specification/agricultureplatform/AgriculturePlatform.Management",
       "status": "success",
-      "durationMs": 17716,
+      "durationMs": 21105,
       "diagnosticCount": 19,
       "rawFiles": [
         "projects/specification/agricultureplatform/AgriculturePlatform.Management/raw/typespec.stdout.txt",
@@ -534,7 +534,7 @@
     {
       "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertProcessingRules",
       "status": "success",
-      "durationMs": 17666,
+      "durationMs": 21241,
       "diagnosticCount": 9,
       "rawFiles": [
         "projects/specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertProcessingRules/raw/typespec.stdout.txt",
@@ -545,7 +545,7 @@
     {
       "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertRuleRecommendations",
       "status": "success",
-      "durationMs": 8358,
+      "durationMs": 13249,
       "diagnosticCount": 4,
       "rawFiles": [
         "projects/specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertRuleRecommendations/raw/typespec.stdout.txt",
@@ -555,7 +555,7 @@
     {
       "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertsManagement",
       "status": "success",
-      "durationMs": 18779,
+      "durationMs": 21553,
       "diagnosticCount": 78,
       "rawFiles": [
         "projects/specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertsManagement/raw/typespec.stdout.txt",
@@ -566,7 +566,7 @@
     {
       "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/PreviewAlertRule",
       "status": "success",
-      "durationMs": 17350,
+      "durationMs": 20564,
       "diagnosticCount": 6,
       "rawFiles": [
         "projects/specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/PreviewAlertRule/raw/typespec.stdout.txt",
@@ -577,7 +577,7 @@
     {
       "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/PrometheusRuleGroups",
       "status": "success",
-      "durationMs": 19339,
+      "durationMs": 16463,
       "diagnosticCount": 11,
       "rawFiles": [
         "projects/specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/PrometheusRuleGroups/raw/typespec.stdout.txt",
@@ -588,7 +588,7 @@
     {
       "project": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/TenantActivityLogAlerts",
       "status": "success",
-      "durationMs": 22443,
+      "durationMs": 16149,
       "diagnosticCount": 25,
       "rawFiles": [
         "projects/specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/TenantActivityLogAlerts/raw/typespec.stdout.txt",
@@ -599,7 +599,7 @@
     {
       "project": "specification/apicenter/ApiCenter.Management",
       "status": "success",
-      "durationMs": 25350,
+      "durationMs": 19296,
       "diagnosticCount": 132,
       "rawFiles": [
         "projects/specification/apicenter/ApiCenter.Management/raw/typespec.stdout.txt",
@@ -610,7 +610,7 @@
     {
       "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
       "status": "success",
-      "durationMs": 72152,
+      "durationMs": 61826,
       "diagnosticCount": 2102,
       "rawFiles": [
         "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/raw/typespec.stdout.txt",
@@ -621,8 +621,8 @@
     {
       "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
       "status": "success",
-      "durationMs": 40567,
-      "diagnosticCount": 589,
+      "durationMs": 34376,
+      "diagnosticCount": 583,
       "rawFiles": [
         "projects/specification/app/resource-manager/Microsoft.App/ContainerApps/raw/typespec.stdout.txt",
         "projects/specification/app/resource-manager/Microsoft.App/ContainerApps/raw/typespec.stderr.txt",
@@ -632,7 +632,7 @@
     {
       "project": "specification/app/resource-manager/Microsoft.App/SreAgent",
       "status": "success",
-      "durationMs": 22507,
+      "durationMs": 18427,
       "diagnosticCount": 33,
       "rawFiles": [
         "projects/specification/app/resource-manager/Microsoft.App/SreAgent/raw/typespec.stdout.txt",
@@ -643,17 +643,18 @@
     {
       "project": "specification/appcomplianceautomation/AppComplianceAutomation.Management",
       "status": "success",
-      "durationMs": 14090,
+      "durationMs": 18836,
       "diagnosticCount": 180,
       "rawFiles": [
         "projects/specification/appcomplianceautomation/AppComplianceAutomation.Management/raw/typespec.stdout.txt",
-        "projects/specification/appcomplianceautomation/AppComplianceAutomation.Management/raw/typespec.stderr.txt"
+        "projects/specification/appcomplianceautomation/AppComplianceAutomation.Management/raw/typespec.stderr.txt",
+        "projects/specification/appcomplianceautomation/AppComplianceAutomation.Management/raw/typespec.projected-enum.json"
       ]
     },
     {
       "project": "specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration",
       "status": "success",
-      "durationMs": 20248,
+      "durationMs": 20138,
       "diagnosticCount": 63,
       "rawFiles": [
         "projects/specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration/raw/typespec.stdout.txt",
@@ -664,7 +665,7 @@
     {
       "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/AnalyticsItems",
       "status": "success",
-      "durationMs": 16221,
+      "durationMs": 15687,
       "diagnosticCount": 9,
       "rawFiles": [
         "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/AnalyticsItems/raw/typespec.stdout.txt",
@@ -675,7 +676,7 @@
     {
       "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
       "status": "success",
-      "durationMs": 16610,
+      "durationMs": 16521,
       "diagnosticCount": 72,
       "rawFiles": [
         "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs/raw/typespec.stdout.txt",
@@ -686,7 +687,7 @@
     {
       "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentLinkedStorageAccountApi",
       "status": "success",
-      "durationMs": 8782,
+      "durationMs": 7643,
       "diagnosticCount": 14,
       "rawFiles": [
         "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentLinkedStorageAccountApi/raw/typespec.stdout.txt",
@@ -696,7 +697,7 @@
     {
       "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/Components",
       "status": "success",
-      "durationMs": 15455,
+      "durationMs": 15803,
       "diagnosticCount": 22,
       "rawFiles": [
         "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/Components/raw/typespec.stdout.txt",
@@ -707,7 +708,7 @@
     {
       "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/DeletedWorkbookApi",
       "status": "success",
-      "durationMs": 7876,
+      "durationMs": 8273,
       "diagnosticCount": 3,
       "rawFiles": [
         "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/DeletedWorkbookApi/raw/typespec.stdout.txt",
@@ -717,7 +718,7 @@
     {
       "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/Favorites",
       "status": "success",
-      "durationMs": 15529,
+      "durationMs": 15294,
       "diagnosticCount": 11,
       "rawFiles": [
         "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/Favorites/raw/typespec.stdout.txt",
@@ -728,7 +729,7 @@
     {
       "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/LiveTokenApi",
       "status": "success",
-      "durationMs": 7835,
+      "durationMs": 8199,
       "diagnosticCount": 3,
       "rawFiles": [
         "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/LiveTokenApi/raw/typespec.stdout.txt",
@@ -738,7 +739,7 @@
     {
       "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WebTestLocation",
       "status": "success",
-      "durationMs": 7856,
+      "durationMs": 8029,
       "diagnosticCount": 3,
       "rawFiles": [
         "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WebTestLocation/raw/typespec.stdout.txt",
@@ -748,7 +749,7 @@
     {
       "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WebTestsApi",
       "status": "success",
-      "durationMs": 15699,
+      "durationMs": 15481,
       "diagnosticCount": 23,
       "rawFiles": [
         "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WebTestsApi/raw/typespec.stdout.txt",
@@ -759,7 +760,7 @@
     {
       "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkBookOperations",
       "status": "success",
-      "durationMs": 7658,
+      "durationMs": 7147,
       "diagnosticCount": 1,
       "rawFiles": [
         "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkBookOperations/raw/typespec.stdout.txt",
@@ -769,7 +770,7 @@
     {
       "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi",
       "status": "success",
-      "durationMs": 15988,
+      "durationMs": 15192,
       "diagnosticCount": 42,
       "rawFiles": [
         "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi/raw/typespec.stdout.txt",
@@ -780,7 +781,7 @@
     {
       "project": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbookTemplatesApi",
       "status": "success",
-      "durationMs": 8199,
+      "durationMs": 7847,
       "diagnosticCount": 8,
       "rawFiles": [
         "projects/specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbookTemplatesApi/raw/typespec.stdout.txt",
@@ -790,7 +791,7 @@
     {
       "project": "specification/applink/AppLink.Management",
       "status": "success",
-      "durationMs": 8538,
+      "durationMs": 8615,
       "diagnosticCount": 23,
       "rawFiles": [
         "projects/specification/applink/AppLink.Management/raw/typespec.stdout.txt",
@@ -800,7 +801,7 @@
     {
       "project": "specification/attestation/resource-manager/Microsoft.Attestation/Attestation",
       "status": "success",
-      "durationMs": 8226,
+      "durationMs": 8288,
       "diagnosticCount": 23,
       "rawFiles": [
         "projects/specification/attestation/resource-manager/Microsoft.Attestation/Attestation/raw/typespec.stdout.txt",
@@ -810,7 +811,7 @@
     {
       "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
       "status": "success",
-      "durationMs": 17603,
+      "durationMs": 17968,
       "diagnosticCount": 239,
       "rawFiles": [
         "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview/raw/typespec.stdout.txt",
@@ -821,7 +822,7 @@
     {
       "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AttributeNamespaces",
       "status": "success",
-      "durationMs": 7836,
+      "durationMs": 7735,
       "diagnosticCount": 4,
       "rawFiles": [
         "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AttributeNamespaces/raw/typespec.stdout.txt",
@@ -831,7 +832,7 @@
     {
       "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/Authorization",
       "status": "success",
-      "durationMs": 17606,
+      "durationMs": 18479,
       "diagnosticCount": 55,
       "rawFiles": [
         "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/Authorization/raw/typespec.stdout.txt",
@@ -842,7 +843,7 @@
     {
       "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/ClassicAdmin",
       "status": "success",
-      "durationMs": 7678,
+      "durationMs": 7824,
       "diagnosticCount": 2,
       "rawFiles": [
         "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/ClassicAdmin/raw/typespec.stdout.txt",
@@ -852,7 +853,7 @@
     {
       "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment",
       "status": "success",
-      "durationMs": 14841,
+      "durationMs": 15439,
       "diagnosticCount": 27,
       "rawFiles": [
         "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/DenyAssignment/raw/typespec.stdout.txt",
@@ -863,7 +864,7 @@
     {
       "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/ProviderOperations",
       "status": "success",
-      "durationMs": 13870,
+      "durationMs": 14765,
       "diagnosticCount": 12,
       "rawFiles": [
         "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/ProviderOperations/raw/typespec.stdout.txt",
@@ -874,8 +875,8 @@
     {
       "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
       "status": "success",
-      "durationMs": 14581,
-      "diagnosticCount": 49,
+      "durationMs": 15017,
+      "diagnosticCount": 47,
       "rawFiles": [
         "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment/raw/typespec.stdout.txt",
         "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment/raw/typespec.stderr.txt",
@@ -885,7 +886,7 @@
     {
       "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleDefinitions",
       "status": "success",
-      "durationMs": 7424,
+      "durationMs": 7781,
       "diagnosticCount": 19,
       "rawFiles": [
         "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleDefinitions/raw/typespec.stdout.txt",
@@ -895,7 +896,7 @@
     {
       "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleManagementAlerts",
       "status": "success",
-      "durationMs": 15640,
+      "durationMs": 16581,
       "diagnosticCount": 23,
       "rawFiles": [
         "projects/specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleManagementAlerts/raw/typespec.stdout.txt",
@@ -906,7 +907,7 @@
     {
       "project": "specification/automation/Automation.Management",
       "status": "success",
-      "durationMs": 27946,
+      "durationMs": 30357,
       "diagnosticCount": 489,
       "rawFiles": [
         "projects/specification/automation/Automation.Management/raw/typespec.stdout.txt",
@@ -917,7 +918,7 @@
     {
       "project": "specification/awsconnector/AccessAnalyzerAnalyzer.Management",
       "status": "success",
-      "durationMs": 14182,
+      "durationMs": 15279,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/awsconnector/AccessAnalyzerAnalyzer.Management/raw/typespec.stdout.txt",
@@ -928,7 +929,7 @@
     {
       "project": "specification/awsconnector/AcmCertificateSummary.Management",
       "status": "success",
-      "durationMs": 14440,
+      "durationMs": 15013,
       "diagnosticCount": 19,
       "rawFiles": [
         "projects/specification/awsconnector/AcmCertificateSummary.Management/raw/typespec.stdout.txt",
@@ -939,7 +940,7 @@
     {
       "project": "specification/awsconnector/ApiGatewayRestApi.Management",
       "status": "success",
-      "durationMs": 14445,
+      "durationMs": 15128,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/awsconnector/ApiGatewayRestApi.Management/raw/typespec.stdout.txt",
@@ -950,7 +951,7 @@
     {
       "project": "specification/awsconnector/ApiGatewayStage.Management",
       "status": "success",
-      "durationMs": 14496,
+      "durationMs": 16113,
       "diagnosticCount": 23,
       "rawFiles": [
         "projects/specification/awsconnector/ApiGatewayStage.Management/raw/typespec.stdout.txt",
@@ -961,7 +962,7 @@
     {
       "project": "specification/awsconnector/AppSyncGraphqlApi.Management",
       "status": "success",
-      "durationMs": 14784,
+      "durationMs": 16632,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/awsconnector/AppSyncGraphqlApi.Management/raw/typespec.stdout.txt",
@@ -972,7 +973,7 @@
     {
       "project": "specification/awsconnector/AutoScalingAutoScalingGroup.Management",
       "status": "success",
-      "durationMs": 14893,
+      "durationMs": 16454,
       "diagnosticCount": 20,
       "rawFiles": [
         "projects/specification/awsconnector/AutoScalingAutoScalingGroup.Management/raw/typespec.stdout.txt",
@@ -983,7 +984,7 @@
     {
       "project": "specification/awsconnector/Awsconnector.Management",
       "status": "success",
-      "durationMs": 7118,
+      "durationMs": 7929,
       "diagnosticCount": 1,
       "rawFiles": [
         "projects/specification/awsconnector/Awsconnector.Management/raw/typespec.stdout.txt",
@@ -993,7 +994,7 @@
     {
       "project": "specification/awsconnector/CloudFormationStack.Management",
       "status": "success",
-      "durationMs": 15189,
+      "durationMs": 16321,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/awsconnector/CloudFormationStack.Management/raw/typespec.stdout.txt",
@@ -1004,7 +1005,7 @@
     {
       "project": "specification/awsconnector/CloudFormationStackSet.Management",
       "status": "success",
-      "durationMs": 15400,
+      "durationMs": 15809,
       "diagnosticCount": 19,
       "rawFiles": [
         "projects/specification/awsconnector/CloudFormationStackSet.Management/raw/typespec.stdout.txt",
@@ -1015,7 +1016,7 @@
     {
       "project": "specification/awsconnector/CloudFrontDistribution.Management",
       "status": "success",
-      "durationMs": 16219,
+      "durationMs": 15677,
       "diagnosticCount": 28,
       "rawFiles": [
         "projects/specification/awsconnector/CloudFrontDistribution.Management/raw/typespec.stdout.txt",
@@ -1026,7 +1027,7 @@
     {
       "project": "specification/awsconnector/CloudTrailTrail.Management",
       "status": "success",
-      "durationMs": 16195,
+      "durationMs": 15177,
       "diagnosticCount": 22,
       "rawFiles": [
         "projects/specification/awsconnector/CloudTrailTrail.Management/raw/typespec.stdout.txt",
@@ -1037,7 +1038,7 @@
     {
       "project": "specification/awsconnector/CloudWatchAlarm.Management",
       "status": "success",
-      "durationMs": 16223,
+      "durationMs": 15077,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/awsconnector/CloudWatchAlarm.Management/raw/typespec.stdout.txt",
@@ -1048,7 +1049,7 @@
     {
       "project": "specification/awsconnector/CodeBuildProject.Management",
       "status": "success",
-      "durationMs": 17032,
+      "durationMs": 16034,
       "diagnosticCount": 26,
       "rawFiles": [
         "projects/specification/awsconnector/CodeBuildProject.Management/raw/typespec.stdout.txt",
@@ -1059,7 +1060,7 @@
     {
       "project": "specification/awsconnector/CodeBuildSourceCredentialsInfo.Management",
       "status": "success",
-      "durationMs": 8268,
+      "durationMs": 7622,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/CodeBuildSourceCredentialsInfo.Management/raw/typespec.stdout.txt",
@@ -1069,7 +1070,7 @@
     {
       "project": "specification/awsconnector/ConfigServiceConfigurationRecorder.Management",
       "status": "success",
-      "durationMs": 16219,
+      "durationMs": 15407,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/awsconnector/ConfigServiceConfigurationRecorder.Management/raw/typespec.stdout.txt",
@@ -1080,7 +1081,7 @@
     {
       "project": "specification/awsconnector/ConfigServiceConfigurationRecorderStatus.Management",
       "status": "success",
-      "durationMs": 16085,
+      "durationMs": 15329,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/awsconnector/ConfigServiceConfigurationRecorderStatus.Management/raw/typespec.stdout.txt",
@@ -1091,7 +1092,7 @@
     {
       "project": "specification/awsconnector/ConfigServiceDeliveryChannel.Management",
       "status": "success",
-      "durationMs": 8103,
+      "durationMs": 8032,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/ConfigServiceDeliveryChannel.Management/raw/typespec.stdout.txt",
@@ -1101,7 +1102,7 @@
     {
       "project": "specification/awsconnector/DatabaseMigrationServiceReplicationInstance.Management",
       "status": "success",
-      "durationMs": 15509,
+      "durationMs": 15606,
       "diagnosticCount": 20,
       "rawFiles": [
         "projects/specification/awsconnector/DatabaseMigrationServiceReplicationInstance.Management/raw/typespec.stdout.txt",
@@ -1112,7 +1113,7 @@
     {
       "project": "specification/awsconnector/DaxCluster.Management",
       "status": "success",
-      "durationMs": 8126,
+      "durationMs": 8198,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/DaxCluster.Management/raw/typespec.stdout.txt",
@@ -1122,7 +1123,7 @@
     {
       "project": "specification/awsconnector/DynamoDBContinuousBackupsDescription.Management",
       "status": "success",
-      "durationMs": 8123,
+      "durationMs": 7916,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/DynamoDBContinuousBackupsDescription.Management/raw/typespec.stdout.txt",
@@ -1132,7 +1133,7 @@
     {
       "project": "specification/awsconnector/DynamoDBTable.Management",
       "status": "success",
-      "durationMs": 14929,
+      "durationMs": 15831,
       "diagnosticCount": 21,
       "rawFiles": [
         "projects/specification/awsconnector/DynamoDBTable.Management/raw/typespec.stdout.txt",
@@ -1143,7 +1144,7 @@
     {
       "project": "specification/awsconnector/Ec2AccountAttribute.Management",
       "status": "success",
-      "durationMs": 7764,
+      "durationMs": 7818,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2AccountAttribute.Management/raw/typespec.stdout.txt",
@@ -1153,7 +1154,7 @@
     {
       "project": "specification/awsconnector/Ec2Address.Management",
       "status": "success",
-      "durationMs": 7798,
+      "durationMs": 7938,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2Address.Management/raw/typespec.stdout.txt",
@@ -1163,7 +1164,7 @@
     {
       "project": "specification/awsconnector/Ec2FlowLog.Management",
       "status": "success",
-      "durationMs": 14878,
+      "durationMs": 15545,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2FlowLog.Management/raw/typespec.stdout.txt",
@@ -1174,7 +1175,7 @@
     {
       "project": "specification/awsconnector/Ec2Image.Management",
       "status": "success",
-      "durationMs": 15108,
+      "durationMs": 15875,
       "diagnosticCount": 20,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2Image.Management/raw/typespec.stdout.txt",
@@ -1185,7 +1186,7 @@
     {
       "project": "specification/awsconnector/Ec2Instance.Management",
       "status": "success",
-      "durationMs": 15468,
+      "durationMs": 16497,
       "diagnosticCount": 25,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2Instance.Management/raw/typespec.stdout.txt",
@@ -1196,7 +1197,7 @@
     {
       "project": "specification/awsconnector/Ec2InstanceStatus.Management",
       "status": "success",
-      "durationMs": 7235,
+      "durationMs": 8158,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2InstanceStatus.Management/raw/typespec.stdout.txt",
@@ -1206,7 +1207,7 @@
     {
       "project": "specification/awsconnector/Ec2Ipam.Management",
       "status": "success",
-      "durationMs": 7394,
+      "durationMs": 8080,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2Ipam.Management/raw/typespec.stdout.txt",
@@ -1216,7 +1217,7 @@
     {
       "project": "specification/awsconnector/Ec2KeyPair.Management",
       "status": "success",
-      "durationMs": 7662,
+      "durationMs": 8071,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2KeyPair.Management/raw/typespec.stdout.txt",
@@ -1226,7 +1227,7 @@
     {
       "project": "specification/awsconnector/Ec2NetworkAcl.Management",
       "status": "success",
-      "durationMs": 7757,
+      "durationMs": 8289,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2NetworkAcl.Management/raw/typespec.stdout.txt",
@@ -1236,7 +1237,7 @@
     {
       "project": "specification/awsconnector/Ec2NetworkInterface.Management",
       "status": "success",
-      "durationMs": 15206,
+      "durationMs": 15944,
       "diagnosticCount": 19,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2NetworkInterface.Management/raw/typespec.stdout.txt",
@@ -1247,7 +1248,7 @@
     {
       "project": "specification/awsconnector/Ec2RouteTable.Management",
       "status": "success",
-      "durationMs": 7572,
+      "durationMs": 8446,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2RouteTable.Management/raw/typespec.stdout.txt",
@@ -1257,7 +1258,7 @@
     {
       "project": "specification/awsconnector/Ec2SecurityGroup.Management",
       "status": "success",
-      "durationMs": 7848,
+      "durationMs": 8394,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2SecurityGroup.Management/raw/typespec.stdout.txt",
@@ -1267,7 +1268,7 @@
     {
       "project": "specification/awsconnector/Ec2Snapshot.Management",
       "status": "success",
-      "durationMs": 14808,
+      "durationMs": 15929,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2Snapshot.Management/raw/typespec.stdout.txt",
@@ -1278,7 +1279,7 @@
     {
       "project": "specification/awsconnector/Ec2Subnet.Management",
       "status": "success",
-      "durationMs": 14732,
+      "durationMs": 15600,
       "diagnosticCount": 22,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2Subnet.Management/raw/typespec.stdout.txt",
@@ -1289,7 +1290,7 @@
     {
       "project": "specification/awsconnector/Ec2Volume.Management",
       "status": "success",
-      "durationMs": 14564,
+      "durationMs": 15605,
       "diagnosticCount": 19,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2Volume.Management/raw/typespec.stdout.txt",
@@ -1300,7 +1301,7 @@
     {
       "project": "specification/awsconnector/Ec2Vpc.Management",
       "status": "success",
-      "durationMs": 14872,
+      "durationMs": 15636,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2Vpc.Management/raw/typespec.stdout.txt",
@@ -1311,7 +1312,7 @@
     {
       "project": "specification/awsconnector/Ec2VPCEndpoint.Management",
       "status": "success",
-      "durationMs": 14676,
+      "durationMs": 15745,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2VPCEndpoint.Management/raw/typespec.stdout.txt",
@@ -1322,7 +1323,7 @@
     {
       "project": "specification/awsconnector/Ec2VPCPeeringConnection.Management",
       "status": "success",
-      "durationMs": 7338,
+      "durationMs": 8135,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/Ec2VPCPeeringConnection.Management/raw/typespec.stdout.txt",
@@ -1332,7 +1333,7 @@
     {
       "project": "specification/awsconnector/EcrImageDetail.Management",
       "status": "success",
-      "durationMs": 7515,
+      "durationMs": 8184,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/EcrImageDetail.Management/raw/typespec.stdout.txt",
@@ -1342,7 +1343,7 @@
     {
       "project": "specification/awsconnector/EcrRepository.Management",
       "status": "success",
-      "durationMs": 14406,
+      "durationMs": 15337,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/awsconnector/EcrRepository.Management/raw/typespec.stdout.txt",
@@ -1353,7 +1354,7 @@
     {
       "project": "specification/awsconnector/EcsCluster.Management",
       "status": "success",
-      "durationMs": 14345,
+      "durationMs": 15147,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/awsconnector/EcsCluster.Management/raw/typespec.stdout.txt",
@@ -1364,7 +1365,7 @@
     {
       "project": "specification/awsconnector/EcsService.Management",
       "status": "success",
-      "durationMs": 14623,
+      "durationMs": 14970,
       "diagnosticCount": 24,
       "rawFiles": [
         "projects/specification/awsconnector/EcsService.Management/raw/typespec.stdout.txt",
@@ -1375,7 +1376,7 @@
     {
       "project": "specification/awsconnector/EcsTaskDefinition.Management",
       "status": "success",
-      "durationMs": 14562,
+      "durationMs": 14837,
       "diagnosticCount": 27,
       "rawFiles": [
         "projects/specification/awsconnector/EcsTaskDefinition.Management/raw/typespec.stdout.txt",
@@ -1386,7 +1387,7 @@
     {
       "project": "specification/awsconnector/EfsFileSystem.Management",
       "status": "success",
-      "durationMs": 14371,
+      "durationMs": 14603,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/awsconnector/EfsFileSystem.Management/raw/typespec.stdout.txt",
@@ -1397,7 +1398,7 @@
     {
       "project": "specification/awsconnector/EfsMountTarget.Management",
       "status": "success",
-      "durationMs": 7198,
+      "durationMs": 7553,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/EfsMountTarget.Management/raw/typespec.stdout.txt",
@@ -1407,7 +1408,7 @@
     {
       "project": "specification/awsconnector/EksCluster.Management",
       "status": "success",
-      "durationMs": 13970,
+      "durationMs": 14064,
       "diagnosticCount": 11,
       "rawFiles": [
         "projects/specification/awsconnector/EksCluster.Management/raw/typespec.stdout.txt",
@@ -1418,7 +1419,7 @@
     {
       "project": "specification/awsconnector/EksNodegroup.Management",
       "status": "success",
-      "durationMs": 13851,
+      "durationMs": 14192,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/awsconnector/EksNodegroup.Management/raw/typespec.stdout.txt",
@@ -1429,7 +1430,7 @@
     {
       "project": "specification/awsconnector/ElasticBeanstalkApplication.Management",
       "status": "success",
-      "durationMs": 13764,
+      "durationMs": 14118,
       "diagnosticCount": 20,
       "rawFiles": [
         "projects/specification/awsconnector/ElasticBeanstalkApplication.Management/raw/typespec.stdout.txt",
@@ -1440,7 +1441,7 @@
     {
       "project": "specification/awsconnector/ElasticBeanstalkConfigurationTemplate.Management",
       "status": "success",
-      "durationMs": 7470,
+      "durationMs": 7179,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/ElasticBeanstalkConfigurationTemplate.Management/raw/typespec.stdout.txt",
@@ -1450,7 +1451,7 @@
     {
       "project": "specification/awsconnector/ElasticBeanstalkEnvironment.Management",
       "status": "success",
-      "durationMs": 7467,
+      "durationMs": 7171,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/ElasticBeanstalkEnvironment.Management/raw/typespec.stdout.txt",
@@ -1460,7 +1461,7 @@
     {
       "project": "specification/awsconnector/ElasticLoadBalancingV2Listener.Management",
       "status": "success",
-      "durationMs": 13760,
+      "durationMs": 14128,
       "diagnosticCount": 19,
       "rawFiles": [
         "projects/specification/awsconnector/ElasticLoadBalancingV2Listener.Management/raw/typespec.stdout.txt",
@@ -1471,7 +1472,7 @@
     {
       "project": "specification/awsconnector/ElasticLoadBalancingV2LoadBalancer.Management",
       "status": "success",
-      "durationMs": 6889,
+      "durationMs": 7233,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/ElasticLoadBalancingV2LoadBalancer.Management/raw/typespec.stdout.txt",
@@ -1481,7 +1482,7 @@
     {
       "project": "specification/awsconnector/ElasticLoadBalancingV2TargetGroup.Management",
       "status": "success",
-      "durationMs": 13753,
+      "durationMs": 14008,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/awsconnector/ElasticLoadBalancingV2TargetGroup.Management/raw/typespec.stdout.txt",
@@ -1492,7 +1493,7 @@
     {
       "project": "specification/awsconnector/ElasticLoadBalancingv2TargetHealthDescription.Management",
       "status": "success",
-      "durationMs": 6940,
+      "durationMs": 7274,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/ElasticLoadBalancingv2TargetHealthDescription.Management/raw/typespec.stdout.txt",
@@ -1502,7 +1503,7 @@
     {
       "project": "specification/awsconnector/EmrCluster.Management",
       "status": "success",
-      "durationMs": 14027,
+      "durationMs": 14381,
       "diagnosticCount": 20,
       "rawFiles": [
         "projects/specification/awsconnector/EmrCluster.Management/raw/typespec.stdout.txt",
@@ -1513,7 +1514,7 @@
     {
       "project": "specification/awsconnector/GuardDutyDetector.Management",
       "status": "success",
-      "durationMs": 13666,
+      "durationMs": 14129,
       "diagnosticCount": 20,
       "rawFiles": [
         "projects/specification/awsconnector/GuardDutyDetector.Management/raw/typespec.stdout.txt",
@@ -1524,7 +1525,7 @@
     {
       "project": "specification/awsconnector/IamAccessKeyLastUsed.Management",
       "status": "success",
-      "durationMs": 7111,
+      "durationMs": 7224,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/IamAccessKeyLastUsed.Management/raw/typespec.stdout.txt",
@@ -1534,7 +1535,7 @@
     {
       "project": "specification/awsconnector/IamAccessKeyMetadata.Management",
       "status": "success",
-      "durationMs": 7009,
+      "durationMs": 7200,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/IamAccessKeyMetadata.Management/raw/typespec.stdout.txt",
@@ -1544,7 +1545,7 @@
     {
       "project": "specification/awsconnector/IamGroup.Management",
       "status": "success",
-      "durationMs": 7030,
+      "durationMs": 7180,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/IamGroup.Management/raw/typespec.stdout.txt",
@@ -1554,7 +1555,7 @@
     {
       "project": "specification/awsconnector/IamInstanceProfile.Management",
       "status": "success",
-      "durationMs": 6998,
+      "durationMs": 7205,
       "diagnosticCount": 15,
       "rawFiles": [
         "projects/specification/awsconnector/IamInstanceProfile.Management/raw/typespec.stdout.txt",
@@ -1564,7 +1565,7 @@
     {
       "project": "specification/awsconnector/IamMFADevice.Management",
       "status": "success",
-      "durationMs": 7067,
+      "durationMs": 7359,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/IamMFADevice.Management/raw/typespec.stdout.txt",
@@ -1574,7 +1575,7 @@
     {
       "project": "specification/awsconnector/IamPasswordPolicy.Management",
       "status": "success",
-      "durationMs": 13577,
+      "durationMs": 14264,
       "diagnosticCount": 23,
       "rawFiles": [
         "projects/specification/awsconnector/IamPasswordPolicy.Management/raw/typespec.stdout.txt",
@@ -1585,7 +1586,7 @@
     {
       "project": "specification/awsconnector/IamPolicyVersion.Management",
       "status": "success",
-      "durationMs": 13605,
+      "durationMs": 13984,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/awsconnector/IamPolicyVersion.Management/raw/typespec.stdout.txt",
@@ -1596,7 +1597,7 @@
     {
       "project": "specification/awsconnector/IamRole.Management",
       "status": "success",
-      "durationMs": 7060,
+      "durationMs": 7379,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/IamRole.Management/raw/typespec.stdout.txt",
@@ -1606,7 +1607,7 @@
     {
       "project": "specification/awsconnector/IamServerCertificate.Management",
       "status": "success",
-      "durationMs": 7020,
+      "durationMs": 7291,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/IamServerCertificate.Management/raw/typespec.stdout.txt",
@@ -1616,7 +1617,7 @@
     {
       "project": "specification/awsconnector/IamVirtualMFADevice.Management",
       "status": "success",
-      "durationMs": 7026,
+      "durationMs": 7329,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/IamVirtualMFADevice.Management/raw/typespec.stdout.txt",
@@ -1626,7 +1627,7 @@
     {
       "project": "specification/awsconnector/KmsAlias.Management",
       "status": "success",
-      "durationMs": 6979,
+      "durationMs": 7267,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/KmsAlias.Management/raw/typespec.stdout.txt",
@@ -1636,7 +1637,7 @@
     {
       "project": "specification/awsconnector/KmsKey.Management",
       "status": "success",
-      "durationMs": 13723,
+      "durationMs": 15035,
       "diagnosticCount": 20,
       "rawFiles": [
         "projects/specification/awsconnector/KmsKey.Management/raw/typespec.stdout.txt",
@@ -1647,7 +1648,7 @@
     {
       "project": "specification/awsconnector/LambdaFunction.Management",
       "status": "success",
-      "durationMs": 13953,
+      "durationMs": 15123,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/awsconnector/LambdaFunction.Management/raw/typespec.stdout.txt",
@@ -1658,7 +1659,7 @@
     {
       "project": "specification/awsconnector/LambdaFunctionCodeLocation.Management",
       "status": "success",
-      "durationMs": 7084,
+      "durationMs": 7656,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/LambdaFunctionCodeLocation.Management/raw/typespec.stdout.txt",
@@ -1668,7 +1669,7 @@
     {
       "project": "specification/awsconnector/LightsailBucket.Management",
       "status": "success",
-      "durationMs": 14216,
+      "durationMs": 15129,
       "diagnosticCount": 19,
       "rawFiles": [
         "projects/specification/awsconnector/LightsailBucket.Management/raw/typespec.stdout.txt",
@@ -1679,7 +1680,7 @@
     {
       "project": "specification/awsconnector/LightsailInstance.Management",
       "status": "success",
-      "durationMs": 14248,
+      "durationMs": 15166,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/awsconnector/LightsailInstance.Management/raw/typespec.stdout.txt",
@@ -1690,7 +1691,7 @@
     {
       "project": "specification/awsconnector/LogsLogGroup.Management",
       "status": "success",
-      "durationMs": 7125,
+      "durationMs": 7761,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/LogsLogGroup.Management/raw/typespec.stdout.txt",
@@ -1700,7 +1701,7 @@
     {
       "project": "specification/awsconnector/LogsLogStream.Management",
       "status": "success",
-      "durationMs": 7167,
+      "durationMs": 7838,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/LogsLogStream.Management/raw/typespec.stdout.txt",
@@ -1710,7 +1711,7 @@
     {
       "project": "specification/awsconnector/LogsMetricFilter.Management",
       "status": "success",
-      "durationMs": 7451,
+      "durationMs": 7577,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/LogsMetricFilter.Management/raw/typespec.stdout.txt",
@@ -1720,7 +1721,7 @@
     {
       "project": "specification/awsconnector/LogsSubscriptionFilter.Management",
       "status": "success",
-      "durationMs": 7338,
+      "durationMs": 7865,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/LogsSubscriptionFilter.Management/raw/typespec.stdout.txt",
@@ -1730,7 +1731,7 @@
     {
       "project": "specification/awsconnector/Macie2JobSummary.Management",
       "status": "success",
-      "durationMs": 7347,
+      "durationMs": 7852,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/Macie2JobSummary.Management/raw/typespec.stdout.txt",
@@ -1740,7 +1741,7 @@
     {
       "project": "specification/awsconnector/MacieAllowList.Management",
       "status": "success",
-      "durationMs": 7262,
+      "durationMs": 7802,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/MacieAllowList.Management/raw/typespec.stdout.txt",
@@ -1750,7 +1751,7 @@
     {
       "project": "specification/awsconnector/NetworkFirewallFirewall.Management",
       "status": "success",
-      "durationMs": 13393,
+      "durationMs": 14766,
       "diagnosticCount": 19,
       "rawFiles": [
         "projects/specification/awsconnector/NetworkFirewallFirewall.Management/raw/typespec.stdout.txt",
@@ -1761,7 +1762,7 @@
     {
       "project": "specification/awsconnector/NetworkFirewallFirewallPolicy.Management",
       "status": "success",
-      "durationMs": 6880,
+      "durationMs": 7786,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/NetworkFirewallFirewallPolicy.Management/raw/typespec.stdout.txt",
@@ -1771,7 +1772,7 @@
     {
       "project": "specification/awsconnector/NetworkFirewallRuleGroup.Management",
       "status": "success",
-      "durationMs": 6929,
+      "durationMs": 7792,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/NetworkFirewallRuleGroup.Management/raw/typespec.stdout.txt",
@@ -1781,7 +1782,7 @@
     {
       "project": "specification/awsconnector/OpenSearchDomainStatus.Management",
       "status": "success",
-      "durationMs": 14111,
+      "durationMs": 15016,
       "diagnosticCount": 42,
       "rawFiles": [
         "projects/specification/awsconnector/OpenSearchDomainStatus.Management/raw/typespec.stdout.txt",
@@ -1792,7 +1793,7 @@
     {
       "project": "specification/awsconnector/OrganizationsAccount.Management",
       "status": "success",
-      "durationMs": 6680,
+      "durationMs": 7417,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/OrganizationsAccount.Management/raw/typespec.stdout.txt",
@@ -1802,7 +1803,7 @@
     {
       "project": "specification/awsconnector/OrganizationsOrganization.Management",
       "status": "success",
-      "durationMs": 6867,
+      "durationMs": 7482,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/OrganizationsOrganization.Management/raw/typespec.stdout.txt",
@@ -1812,7 +1813,7 @@
     {
       "project": "specification/awsconnector/RdsDBCluster.Management",
       "status": "success",
-      "durationMs": 15128,
+      "durationMs": 14778,
       "diagnosticCount": 28,
       "rawFiles": [
         "projects/specification/awsconnector/RdsDBCluster.Management/raw/typespec.stdout.txt",
@@ -1823,7 +1824,7 @@
     {
       "project": "specification/awsconnector/RdsDBInstance.Management",
       "status": "success",
-      "durationMs": 15323,
+      "durationMs": 14814,
       "diagnosticCount": 31,
       "rawFiles": [
         "projects/specification/awsconnector/RdsDBInstance.Management/raw/typespec.stdout.txt",
@@ -1834,7 +1835,7 @@
     {
       "project": "specification/awsconnector/RdsDBSnapshot.Management",
       "status": "success",
-      "durationMs": 15164,
+      "durationMs": 14361,
       "diagnosticCount": 20,
       "rawFiles": [
         "projects/specification/awsconnector/RdsDBSnapshot.Management/raw/typespec.stdout.txt",
@@ -1845,7 +1846,7 @@
     {
       "project": "specification/awsconnector/RdsDBSnapshotAttributesResult.Management",
       "status": "success",
-      "durationMs": 7754,
+      "durationMs": 7192,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/RdsDBSnapshotAttributesResult.Management/raw/typespec.stdout.txt",
@@ -1855,7 +1856,7 @@
     {
       "project": "specification/awsconnector/RdsEventSubscription.Management",
       "status": "success",
-      "durationMs": 15831,
+      "durationMs": 14236,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/awsconnector/RdsEventSubscription.Management/raw/typespec.stdout.txt",
@@ -1866,7 +1867,7 @@
     {
       "project": "specification/awsconnector/RdsExportTask.Management",
       "status": "success",
-      "durationMs": 8621,
+      "durationMs": 7415,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/RdsExportTask.Management/raw/typespec.stdout.txt",
@@ -1876,7 +1877,7 @@
     {
       "project": "specification/awsconnector/RedshiftCluster.Management",
       "status": "success",
-      "durationMs": 15212,
+      "durationMs": 14939,
       "diagnosticCount": 27,
       "rawFiles": [
         "projects/specification/awsconnector/RedshiftCluster.Management/raw/typespec.stdout.txt",
@@ -1887,7 +1888,7 @@
     {
       "project": "specification/awsconnector/RedshiftClusterParameterGroup.Management",
       "status": "success",
-      "durationMs": 7871,
+      "durationMs": 7584,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/RedshiftClusterParameterGroup.Management/raw/typespec.stdout.txt",
@@ -1897,7 +1898,7 @@
     {
       "project": "specification/awsconnector/Route53DomainsDomainSummary.Management",
       "status": "success",
-      "durationMs": 14657,
+      "durationMs": 14772,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/awsconnector/Route53DomainsDomainSummary.Management/raw/typespec.stdout.txt",
@@ -1908,7 +1909,7 @@
     {
       "project": "specification/awsconnector/Route53HostedZone.Management",
       "status": "success",
-      "durationMs": 7735,
+      "durationMs": 7823,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/Route53HostedZone.Management/raw/typespec.stdout.txt",
@@ -1918,7 +1919,7 @@
     {
       "project": "specification/awsconnector/Route53ResourceRecordSet.Management",
       "status": "success",
-      "durationMs": 14541,
+      "durationMs": 15183,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/awsconnector/Route53ResourceRecordSet.Management/raw/typespec.stdout.txt",
@@ -1929,7 +1930,7 @@
     {
       "project": "specification/awsconnector/S3AccessControlPolicy.Management",
       "status": "success",
-      "durationMs": 7145,
+      "durationMs": 7531,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/S3AccessControlPolicy.Management/raw/typespec.stdout.txt",
@@ -1939,7 +1940,7 @@
     {
       "project": "specification/awsconnector/S3AccessPoint.Management",
       "status": "success",
-      "durationMs": 14728,
+      "durationMs": 15084,
       "diagnosticCount": 20,
       "rawFiles": [
         "projects/specification/awsconnector/S3AccessPoint.Management/raw/typespec.stdout.txt",
@@ -1950,7 +1951,7 @@
     {
       "project": "specification/awsconnector/S3Bucket.Management",
       "status": "success",
-      "durationMs": 14872,
+      "durationMs": 15621,
       "diagnosticCount": 25,
       "rawFiles": [
         "projects/specification/awsconnector/S3Bucket.Management/raw/typespec.stdout.txt",
@@ -1961,7 +1962,7 @@
     {
       "project": "specification/awsconnector/S3BucketPolicy.Management",
       "status": "success",
-      "durationMs": 7844,
+      "durationMs": 7749,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/S3BucketPolicy.Management/raw/typespec.stdout.txt",
@@ -1971,7 +1972,7 @@
     {
       "project": "specification/awsconnector/S3ControlMultiRegionAccessPointPolicyDocument.Management",
       "status": "success",
-      "durationMs": 7866,
+      "durationMs": 7752,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/S3ControlMultiRegionAccessPointPolicyDocument.Management/raw/typespec.stdout.txt",
@@ -1981,7 +1982,7 @@
     {
       "project": "specification/awsconnector/SageMakerApp.Management",
       "status": "success",
-      "durationMs": 7576,
+      "durationMs": 7885,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/SageMakerApp.Management/raw/typespec.stdout.txt",
@@ -1991,7 +1992,7 @@
     {
       "project": "specification/awsconnector/SageMakerNotebookInstanceSummary.Management",
       "status": "success",
-      "durationMs": 7533,
+      "durationMs": 8016,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/SageMakerNotebookInstanceSummary.Management/raw/typespec.stdout.txt",
@@ -2001,7 +2002,7 @@
     {
       "project": "specification/awsconnector/SecretsManagerResourcePolicy.Management",
       "status": "success",
-      "durationMs": 13732,
+      "durationMs": 14972,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/awsconnector/SecretsManagerResourcePolicy.Management/raw/typespec.stdout.txt",
@@ -2012,7 +2013,7 @@
     {
       "project": "specification/awsconnector/SecretsManagerSecret.Management",
       "status": "success",
-      "durationMs": 13841,
+      "durationMs": 15134,
       "diagnosticCount": 22,
       "rawFiles": [
         "projects/specification/awsconnector/SecretsManagerSecret.Management/raw/typespec.stdout.txt",
@@ -2023,7 +2024,7 @@
     {
       "project": "specification/awsconnector/SnsSubscription.Management",
       "status": "success",
-      "durationMs": 7023,
+      "durationMs": 8042,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/SnsSubscription.Management/raw/typespec.stdout.txt",
@@ -2033,7 +2034,7 @@
     {
       "project": "specification/awsconnector/SnsTopic.Management",
       "status": "success",
-      "durationMs": 14407,
+      "durationMs": 15245,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/awsconnector/SnsTopic.Management/raw/typespec.stdout.txt",
@@ -2044,7 +2045,7 @@
     {
       "project": "specification/awsconnector/SqsQueue.Management",
       "status": "success",
-      "durationMs": 14753,
+      "durationMs": 15028,
       "diagnosticCount": 19,
       "rawFiles": [
         "projects/specification/awsconnector/SqsQueue.Management/raw/typespec.stdout.txt",
@@ -2055,7 +2056,7 @@
     {
       "project": "specification/awsconnector/SsmInstanceInformation.Management",
       "status": "success",
-      "durationMs": 14735,
+      "durationMs": 15134,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/awsconnector/SsmInstanceInformation.Management/raw/typespec.stdout.txt",
@@ -2066,7 +2067,7 @@
     {
       "project": "specification/awsconnector/SsmParameter.Management",
       "status": "success",
-      "durationMs": 7162,
+      "durationMs": 7505,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/SsmParameter.Management/raw/typespec.stdout.txt",
@@ -2076,7 +2077,7 @@
     {
       "project": "specification/awsconnector/SsmResourceComplianceSummaryItem.Management",
       "status": "success",
-      "durationMs": 8823,
+      "durationMs": 7840,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/SsmResourceComplianceSummaryItem.Management/raw/typespec.stdout.txt",
@@ -2086,7 +2087,7 @@
     {
       "project": "specification/awsconnector/Wafv2LoggingConfiguration.Management",
       "status": "success",
-      "durationMs": 15881,
+      "durationMs": 14732,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/awsconnector/Wafv2LoggingConfiguration.Management/raw/typespec.stdout.txt",
@@ -2097,7 +2098,7 @@
     {
       "project": "specification/awsconnector/WafWebACLSummary.Management",
       "status": "success",
-      "durationMs": 9067,
+      "durationMs": 7795,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/awsconnector/WafWebACLSummary.Management/raw/typespec.stdout.txt",
@@ -2107,7 +2108,7 @@
     {
       "project": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto",
       "status": "success",
-      "durationMs": 22108,
+      "durationMs": 21703,
       "diagnosticCount": 217,
       "rawFiles": [
         "projects/specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/raw/typespec.stdout.txt",
@@ -2118,7 +2119,7 @@
     {
       "project": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData",
       "status": "success",
-      "durationMs": 22472,
+      "durationMs": 22863,
       "diagnosticCount": 157,
       "rawFiles": [
         "projects/specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData/raw/typespec.stdout.txt",
@@ -2129,7 +2130,7 @@
     {
       "project": "specification/azuredatatransfer/resource-manager/Microsoft.AzureDataTransfer/AzureDataTransfer",
       "status": "success",
-      "durationMs": 11387,
+      "durationMs": 11491,
       "diagnosticCount": 60,
       "rawFiles": [
         "projects/specification/azuredatatransfer/resource-manager/Microsoft.AzureDataTransfer/AzureDataTransfer/raw/typespec.stdout.txt",
@@ -2139,7 +2140,7 @@
     {
       "project": "specification/azuredependencymap/resource-manager/Microsoft.DependencyMap/DependencyMap",
       "status": "success",
-      "durationMs": 7993,
+      "durationMs": 8492,
       "diagnosticCount": 64,
       "rawFiles": [
         "projects/specification/azuredependencymap/resource-manager/Microsoft.DependencyMap/DependencyMap/raw/typespec.stdout.txt",
@@ -2149,7 +2150,7 @@
     {
       "project": "specification/azurefleet/resource-manager/Microsoft.AzureFleet/AzureFleet",
       "status": "success",
-      "durationMs": 15598,
+      "durationMs": 16387,
       "diagnosticCount": 68,
       "rawFiles": [
         "projects/specification/azurefleet/resource-manager/Microsoft.AzureFleet/AzureFleet/raw/typespec.stdout.txt",
@@ -2160,7 +2161,7 @@
     {
       "project": "specification/azurelargeinstance/resource-manager/Microsoft.AzureLargeInstance/AzureLargeInstance",
       "status": "success",
-      "durationMs": 7446,
+      "durationMs": 7973,
       "diagnosticCount": 43,
       "rawFiles": [
         "projects/specification/azurelargeinstance/resource-manager/Microsoft.AzureLargeInstance/AzureLargeInstance/raw/typespec.stdout.txt",
@@ -2170,7 +2171,7 @@
     {
       "project": "specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement",
       "status": "success",
-      "durationMs": 26753,
+      "durationMs": 28150,
       "diagnosticCount": 783,
       "rawFiles": [
         "projects/specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement/raw/typespec.stdout.txt",
@@ -2181,7 +2182,7 @@
     {
       "project": "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI",
       "status": "success",
-      "durationMs": 28273,
+      "durationMs": 28382,
       "diagnosticCount": 259,
       "rawFiles": [
         "projects/specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI/raw/typespec.stdout.txt",
@@ -2192,7 +2193,7 @@
     {
       "project": "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCIVM",
       "status": "success",
-      "durationMs": 25880,
+      "durationMs": 25871,
       "diagnosticCount": 397,
       "rawFiles": [
         "projects/specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCIVM/raw/typespec.stdout.txt",
@@ -2203,7 +2204,7 @@
     {
       "project": "specification/batch/resource-manager/Microsoft.Batch/Batch",
       "status": "success",
-      "durationMs": 20170,
+      "durationMs": 19267,
       "diagnosticCount": 140,
       "rawFiles": [
         "projects/specification/batch/resource-manager/Microsoft.Batch/Batch/raw/typespec.stdout.txt",
@@ -2214,7 +2215,7 @@
     {
       "project": "specification/billing/resource-manager/Microsoft.Billing/Billing",
       "status": "success",
-      "durationMs": 31873,
+      "durationMs": 29045,
       "diagnosticCount": 855,
       "rawFiles": [
         "projects/specification/billing/resource-manager/Microsoft.Billing/Billing/raw/typespec.stdout.txt",
@@ -2225,7 +2226,7 @@
     {
       "project": "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
       "status": "success",
-      "durationMs": 24375,
+      "durationMs": 22671,
       "diagnosticCount": 133,
       "rawFiles": [
         "projects/specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits/raw/typespec.stdout.txt",
@@ -2236,7 +2237,7 @@
     {
       "project": "specification/billingtrust/resource-manager/Microsoft.BillingTrust/BillingTrust",
       "status": "success",
-      "durationMs": 7555,
+      "durationMs": 7804,
       "diagnosticCount": 24,
       "rawFiles": [
         "projects/specification/billingtrust/resource-manager/Microsoft.BillingTrust/BillingTrust/raw/typespec.stdout.txt",
@@ -2246,7 +2247,7 @@
     {
       "project": "specification/botservice/resource-manager/Microsoft.BotService/BotService",
       "status": "success",
-      "durationMs": 19085,
+      "durationMs": 18034,
       "diagnosticCount": 116,
       "rawFiles": [
         "projects/specification/botservice/resource-manager/Microsoft.BotService/BotService/raw/typespec.stdout.txt",
@@ -2257,7 +2258,7 @@
     {
       "project": "specification/carbon/resource-manager/Microsoft.Carbon/Carbon",
       "status": "success",
-      "durationMs": 7843,
+      "durationMs": 7210,
       "diagnosticCount": 3,
       "rawFiles": [
         "projects/specification/carbon/resource-manager/Microsoft.Carbon/Carbon/raw/typespec.stdout.txt",
@@ -2267,7 +2268,7 @@
     {
       "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
       "status": "success",
-      "durationMs": 32338,
+      "durationMs": 29471,
       "diagnosticCount": 232,
       "rawFiles": [
         "projects/specification/cdn/resource-manager/Microsoft.Cdn/Cdn/raw/typespec.stdout.txt",
@@ -2278,7 +2279,7 @@
     {
       "project": "specification/cdn/resource-manager/Microsoft.Cdn/EdgeActions",
       "status": "success",
-      "durationMs": 9511,
+      "durationMs": 8390,
       "diagnosticCount": 24,
       "rawFiles": [
         "projects/specification/cdn/resource-manager/Microsoft.Cdn/EdgeActions/raw/typespec.stdout.txt",
@@ -2288,7 +2289,7 @@
     {
       "project": "specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration",
       "status": "success",
-      "durationMs": 17730,
+      "durationMs": 15996,
       "diagnosticCount": 56,
       "rawFiles": [
         "projects/specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration/raw/typespec.stdout.txt",
@@ -2299,7 +2300,7 @@
     {
       "project": "specification/chaos/resource-manager/Microsoft.Chaos/Chaos",
       "status": "success",
-      "durationMs": 25547,
+      "durationMs": 23724,
       "diagnosticCount": 139,
       "rawFiles": [
         "projects/specification/chaos/resource-manager/Microsoft.Chaos/Chaos/raw/typespec.stdout.txt",
@@ -2310,7 +2311,7 @@
     {
       "project": "specification/cloudhealth/resource-manager/Microsoft.CloudHealth/CloudHealth",
       "status": "success",
-      "durationMs": 18164,
+      "durationMs": 17217,
       "diagnosticCount": 195,
       "rawFiles": [
         "projects/specification/cloudhealth/resource-manager/Microsoft.CloudHealth/CloudHealth/raw/typespec.stdout.txt",
@@ -2321,7 +2322,7 @@
     {
       "project": "specification/codesigning/resource-manager/Microsoft.CodeSigning/CodeSigning",
       "status": "success",
-      "durationMs": 15983,
+      "durationMs": 15187,
       "diagnosticCount": 54,
       "rawFiles": [
         "projects/specification/codesigning/resource-manager/Microsoft.CodeSigning/CodeSigning/raw/typespec.stdout.txt",
@@ -2332,7 +2333,7 @@
     {
       "project": "specification/cognitiveservices/CognitiveServices.Management",
       "status": "success",
-      "durationMs": 32374,
+      "durationMs": 30457,
       "diagnosticCount": 377,
       "rawFiles": [
         "projects/specification/cognitiveservices/CognitiveServices.Management/raw/typespec.stdout.txt",
@@ -2343,7 +2344,7 @@
     {
       "project": "specification/commerce/resource-manager/Microsoft.Commerce/Commerce",
       "status": "success",
-      "durationMs": 15694,
+      "durationMs": 14286,
       "diagnosticCount": 13,
       "rawFiles": [
         "projects/specification/commerce/resource-manager/Microsoft.Commerce/Commerce/raw/typespec.stdout.txt",
@@ -2354,7 +2355,7 @@
     {
       "project": "specification/communication/Communication.Management",
       "status": "success",
-      "durationMs": 18941,
+      "durationMs": 17920,
       "diagnosticCount": 42,
       "rawFiles": [
         "projects/specification/communication/Communication.Management/raw/typespec.stdout.txt",
@@ -2365,7 +2366,7 @@
     {
       "project": "specification/communitytraining/resource-manager/Microsoft.Community/Community",
       "status": "success",
-      "durationMs": 15355,
+      "durationMs": 14328,
       "diagnosticCount": 24,
       "rawFiles": [
         "projects/specification/communitytraining/resource-manager/Microsoft.Community/Community/raw/typespec.stdout.txt",
@@ -2376,7 +2377,7 @@
     {
       "project": "specification/compute/resource-manager/Microsoft.Compute/Bulkactions",
       "status": "success",
-      "durationMs": 21292,
+      "durationMs": 19087,
       "diagnosticCount": 155,
       "rawFiles": [
         "projects/specification/compute/resource-manager/Microsoft.Compute/Bulkactions/raw/typespec.stdout.txt",
@@ -2387,7 +2388,7 @@
     {
       "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
       "status": "success",
-      "durationMs": 38285,
+      "durationMs": 34332,
       "diagnosticCount": 1142,
       "rawFiles": [
         "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/Compute/raw/typespec.stdout.txt",
@@ -2398,7 +2399,7 @@
     {
       "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk",
       "status": "success",
-      "durationMs": 21426,
+      "durationMs": 19861,
       "diagnosticCount": 191,
       "rawFiles": [
         "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk/raw/typespec.stdout.txt",
@@ -2409,7 +2410,7 @@
     {
       "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery",
       "status": "success",
-      "durationMs": 26567,
+      "durationMs": 23957,
       "diagnosticCount": 397,
       "rawFiles": [
         "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery/raw/typespec.stdout.txt",
@@ -2420,7 +2421,7 @@
     {
       "project": "specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeSku",
       "status": "success",
-      "durationMs": 8586,
+      "durationMs": 7400,
       "diagnosticCount": 3,
       "rawFiles": [
         "projects/specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeSku/raw/typespec.stdout.txt",
@@ -2430,7 +2431,7 @@
     {
       "project": "specification/compute/resource-manager/Microsoft.Compute/Recommender",
       "status": "success",
-      "durationMs": 16248,
+      "durationMs": 14729,
       "diagnosticCount": 11,
       "rawFiles": [
         "projects/specification/compute/resource-manager/Microsoft.Compute/Recommender/raw/typespec.stdout.txt",
@@ -2441,7 +2442,7 @@
     {
       "project": "specification/computebulkactions/ComputeBulkActions.Management",
       "status": "success",
-      "durationMs": 17387,
+      "durationMs": 16274,
       "diagnosticCount": 92,
       "rawFiles": [
         "projects/specification/computebulkactions/ComputeBulkActions.Management/raw/typespec.stdout.txt",
@@ -2452,7 +2453,7 @@
     {
       "project": "specification/computelimit/resource-manager/Microsoft.ComputeLimit/ComputeLimit",
       "status": "success",
-      "durationMs": 17490,
+      "durationMs": 16332,
       "diagnosticCount": 37,
       "rawFiles": [
         "projects/specification/computelimit/resource-manager/Microsoft.ComputeLimit/ComputeLimit/raw/typespec.stdout.txt",
@@ -2463,7 +2464,7 @@
     {
       "project": "specification/computeschedule/resource-manager/Microsoft.ComputeSchedule/ComputeSchedule",
       "status": "success",
-      "durationMs": 18681,
+      "durationMs": 17624,
       "diagnosticCount": 99,
       "rawFiles": [
         "projects/specification/computeschedule/resource-manager/Microsoft.ComputeSchedule/ComputeSchedule/raw/typespec.stdout.txt",
@@ -2474,7 +2475,7 @@
     {
       "project": "specification/confidentialledger/resource-manager/Microsoft.ConfidentialLedger/ConfidentialLedger",
       "status": "success",
-      "durationMs": 17223,
+      "durationMs": 16317,
       "diagnosticCount": 32,
       "rawFiles": [
         "projects/specification/confidentialledger/resource-manager/Microsoft.ConfidentialLedger/ConfidentialLedger/raw/typespec.stdout.txt",
@@ -2485,7 +2486,7 @@
     {
       "project": "specification/confluent/resource-manager/Microsoft.Confluent/Confluent",
       "status": "success",
-      "durationMs": 21240,
+      "durationMs": 19699,
       "diagnosticCount": 109,
       "rawFiles": [
         "projects/specification/confluent/resource-manager/Microsoft.Confluent/Confluent/raw/typespec.stdout.txt",
@@ -2496,7 +2497,7 @@
     {
       "project": "specification/connectedcache/resource-manager/Microsoft.ConnectedCache/ConnectedCache",
       "status": "success",
-      "durationMs": 20547,
+      "durationMs": 18864,
       "diagnosticCount": 62,
       "rawFiles": [
         "projects/specification/connectedcache/resource-manager/Microsoft.ConnectedCache/ConnectedCache/raw/typespec.stdout.txt",
@@ -2507,7 +2508,7 @@
     {
       "project": "specification/consumption/resource-manager/Microsoft.Consumption/Consumption",
       "status": "success",
-      "durationMs": 17862,
+      "durationMs": 16095,
       "diagnosticCount": 108,
       "rawFiles": [
         "projects/specification/consumption/resource-manager/Microsoft.Consumption/Consumption/raw/typespec.stdout.txt",
@@ -2518,7 +2519,7 @@
     {
       "project": "specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance",
       "status": "success",
-      "durationMs": 20401,
+      "durationMs": 18445,
       "diagnosticCount": 104,
       "rawFiles": [
         "projects/specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance/raw/typespec.stdout.txt",
@@ -2529,7 +2530,7 @@
     {
       "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
       "status": "success",
-      "durationMs": 25931,
+      "durationMs": 23046,
       "diagnosticCount": 122,
       "rawFiles": [
         "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry/raw/typespec.stdout.txt",
@@ -2540,7 +2541,7 @@
     {
       "project": "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks",
       "status": "success",
-      "durationMs": 18797,
+      "durationMs": 16650,
       "diagnosticCount": 57,
       "rawFiles": [
         "projects/specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks/raw/typespec.stdout.txt",
@@ -2551,7 +2552,7 @@
     {
       "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aimanager",
       "status": "success",
-      "durationMs": 19129,
+      "durationMs": 16130,
       "diagnosticCount": 27,
       "rawFiles": [
         "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/aimanager/raw/typespec.stdout.txt",
@@ -2562,7 +2563,7 @@
     {
       "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/aks",
       "status": "success",
-      "durationMs": 31912,
+      "durationMs": 26631,
       "diagnosticCount": 266,
       "rawFiles": [
         "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/aks/raw/typespec.stdout.txt",
@@ -2573,7 +2574,7 @@
     {
       "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/deploymentsafeguards",
       "status": "success",
-      "durationMs": 8012,
+      "durationMs": 6986,
       "diagnosticCount": 8,
       "rawFiles": [
         "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/deploymentsafeguards/raw/typespec.stdout.txt",
@@ -2583,7 +2584,7 @@
     {
       "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/fleet",
       "status": "success",
-      "durationMs": 21569,
+      "durationMs": 18642,
       "diagnosticCount": 129,
       "rawFiles": [
         "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/fleet/raw/typespec.stdout.txt",
@@ -2594,7 +2595,7 @@
     {
       "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/nodecustomization",
       "status": "success",
-      "durationMs": 16265,
+      "durationMs": 14287,
       "diagnosticCount": 13,
       "rawFiles": [
         "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/nodecustomization/raw/typespec.stdout.txt",
@@ -2605,7 +2606,7 @@
     {
       "project": "specification/containerservice/resource-manager/Microsoft.ContainerService/preparedimagespecification",
       "status": "success",
-      "durationMs": 8787,
+      "durationMs": 7464,
       "diagnosticCount": 11,
       "rawFiles": [
         "projects/specification/containerservice/resource-manager/Microsoft.ContainerService/preparedimagespecification/raw/typespec.stdout.txt",
@@ -2615,7 +2616,7 @@
     {
       "project": "specification/containerstorage/resource-manager/Microsoft.ContainerStorage/ContainerStorage",
       "status": "success",
-      "durationMs": 9543,
+      "durationMs": 8074,
       "diagnosticCount": 23,
       "rawFiles": [
         "projects/specification/containerstorage/resource-manager/Microsoft.ContainerStorage/ContainerStorage/raw/typespec.stdout.txt",
@@ -2625,7 +2626,7 @@
     {
       "project": "specification/contosowidgetmanager/Contoso.Management",
       "status": "success",
-      "durationMs": 7693,
+      "durationMs": 7265,
       "diagnosticCount": 9,
       "rawFiles": [
         "projects/specification/contosowidgetmanager/Contoso.Management/raw/typespec.stdout.txt",
@@ -2635,7 +2636,7 @@
     {
       "project": "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
       "status": "success",
-      "durationMs": 47222,
+      "durationMs": 43859,
       "diagnosticCount": 793,
       "rawFiles": [
         "projects/specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB/raw/typespec.stdout.txt",
@@ -2646,7 +2647,7 @@
     {
       "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
       "status": "success",
-      "durationMs": 20852,
+      "durationMs": 19407,
       "diagnosticCount": 206,
       "rawFiles": [
         "projects/specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement/raw/typespec.stdout.txt",
@@ -2657,7 +2658,7 @@
     {
       "project": "specification/dashboard/resource-manager/Microsoft.Dashboard/Dashboard",
       "status": "success",
-      "durationMs": 19482,
+      "durationMs": 18329,
       "diagnosticCount": 57,
       "rawFiles": [
         "projects/specification/dashboard/resource-manager/Microsoft.Dashboard/Dashboard/raw/typespec.stdout.txt",
@@ -2668,7 +2669,7 @@
     {
       "project": "specification/databasefleetmanager/resource-manager/Microsoft.DatabaseFleetManager/DatabaseFleetManager",
       "status": "success",
-      "durationMs": 18510,
+      "durationMs": 17659,
       "diagnosticCount": 91,
       "rawFiles": [
         "projects/specification/databasefleetmanager/resource-manager/Microsoft.DatabaseFleetManager/DatabaseFleetManager/raw/typespec.stdout.txt",
@@ -2679,7 +2680,7 @@
     {
       "project": "specification/databasewatcher/resource-manager/Microsoft.DatabaseWatcher/DatabaseWatcher",
       "status": "success",
-      "durationMs": 17487,
+      "durationMs": 17945,
       "diagnosticCount": 100,
       "rawFiles": [
         "projects/specification/databasewatcher/resource-manager/Microsoft.DatabaseWatcher/DatabaseWatcher/raw/typespec.stdout.txt",
@@ -2690,7 +2691,7 @@
     {
       "project": "specification/databox/resource-manager/Microsoft.DataBox/DataBox",
       "status": "success",
-      "durationMs": 17454,
+      "durationMs": 17263,
       "diagnosticCount": 71,
       "rawFiles": [
         "projects/specification/databox/resource-manager/Microsoft.DataBox/DataBox/raw/typespec.stdout.txt",
@@ -2701,7 +2702,7 @@
     {
       "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
       "status": "success",
-      "durationMs": 25509,
+      "durationMs": 23732,
       "diagnosticCount": 585,
       "rawFiles": [
         "projects/specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge/raw/typespec.stdout.txt",
@@ -2712,7 +2713,7 @@
     {
       "project": "specification/databricks/resource-manager/Microsoft.Databricks/Databricks",
       "status": "success",
-      "durationMs": 18479,
+      "durationMs": 16540,
       "diagnosticCount": 51,
       "rawFiles": [
         "projects/specification/databricks/resource-manager/Microsoft.Databricks/Databricks/raw/typespec.stdout.txt",
@@ -2723,7 +2724,7 @@
     {
       "project": "specification/datadog/resource-manager/Microsoft.Datadog/Datadog",
       "status": "success",
-      "durationMs": 18429,
+      "durationMs": 16465,
       "diagnosticCount": 94,
       "rawFiles": [
         "projects/specification/datadog/resource-manager/Microsoft.Datadog/Datadog/raw/typespec.stdout.txt",
@@ -2734,7 +2735,7 @@
     {
       "project": "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
       "status": "success",
-      "durationMs": 24785,
+      "durationMs": 23163,
       "diagnosticCount": 207,
       "rawFiles": [
         "projects/specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory/raw/typespec.stdout.txt",
@@ -2745,7 +2746,7 @@
     {
       "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
       "status": "success",
-      "durationMs": 23138,
+      "durationMs": 21165,
       "diagnosticCount": 499,
       "rawFiles": [
         "projects/specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration/raw/typespec.stdout.txt",
@@ -2756,7 +2757,7 @@
     {
       "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
       "status": "success",
-      "durationMs": 21075,
+      "durationMs": 21126,
       "diagnosticCount": 163,
       "rawFiles": [
         "projects/specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection/raw/typespec.stdout.txt",
@@ -2767,7 +2768,7 @@
     {
       "project": "specification/dell/resource-manager/Dell.Storage/DellStorage",
       "status": "success",
-      "durationMs": 7970,
+      "durationMs": 8054,
       "diagnosticCount": 9,
       "rawFiles": [
         "projects/specification/dell/resource-manager/Dell.Storage/DellStorage/raw/typespec.stdout.txt",
@@ -2777,7 +2778,7 @@
     {
       "project": "specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization",
       "status": "success",
-      "durationMs": 24928,
+      "durationMs": 24283,
       "diagnosticCount": 322,
       "rawFiles": [
         "projects/specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization/raw/typespec.stdout.txt",
@@ -2788,7 +2789,7 @@
     {
       "project": "specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter",
       "status": "success",
-      "durationMs": 26076,
+      "durationMs": 25099,
       "diagnosticCount": 237,
       "rawFiles": [
         "projects/specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter/raw/typespec.stdout.txt",
@@ -2799,7 +2800,7 @@
     {
       "project": "specification/developerhub/resource-manager/Microsoft.DevHub/DeveloperHub",
       "status": "success",
-      "durationMs": 17321,
+      "durationMs": 16904,
       "diagnosticCount": 67,
       "rawFiles": [
         "projects/specification/developerhub/resource-manager/Microsoft.DevHub/DeveloperHub/raw/typespec.stdout.txt",
@@ -2810,9 +2811,9 @@
     {
       "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
       "status": "failed",
-      "durationMs": 9011,
+      "durationMs": 8926,
       "diagnosticCount": 226,
-      "error": "Command failed: C:\\dev\\azure-rest-api-specs\\node_modules\\.bin\\tsp.cmd compile main.tsp --no-emit --warn-as-error=false --pretty false --config C:\\dev\\azure-rest-api-specs\\specification\\deviceprovisioningservices\\resource-manager\\Microsoft.Devices\\DeviceProvisioningServices\\.tspconfig.lintdiff-46124-50a9efd1-89fb-47ba-a569-0e3e2149627a.yaml\n- Compiling...\n\u001b[31m×\u001b[39m Compiling\n",
+      "error": "Command failed: C:\\dev\\azure-rest-api-specs\\node_modules\\.bin\\tsp.cmd compile main.tsp --no-emit --warn-as-error=false --pretty false --config C:\\dev\\azure-rest-api-specs\\specification\\deviceprovisioningservices\\resource-manager\\Microsoft.Devices\\DeviceProvisioningServices\\.tspconfig.lintdiff-38328-a5b7ab5a-1677-4ce5-ae68-e6adf7d3a120.yaml\n- Compiling...\n\u001b[31m×\u001b[39m Compiling\n",
       "rawFiles": [
         "projects/specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices/raw/typespec.stdout.txt",
         "projects/specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices/raw/typespec.stderr.txt"
@@ -2821,7 +2822,7 @@
     {
       "project": "specification/deviceregistry/DeviceRegistry.Management",
       "status": "success",
-      "durationMs": 25039,
+      "durationMs": 24940,
       "diagnosticCount": 209,
       "rawFiles": [
         "projects/specification/deviceregistry/DeviceRegistry.Management/raw/typespec.stdout.txt",
@@ -2832,7 +2833,7 @@
     {
       "project": "specification/devopsinfrastructure/resource-manager/Microsoft.DevOpsInfrastructure/DevOpsInfrastructure",
       "status": "success",
-      "durationMs": 14784,
+      "durationMs": 14891,
       "diagnosticCount": 38,
       "rawFiles": [
         "projects/specification/devopsinfrastructure/resource-manager/Microsoft.DevOpsInfrastructure/DevOpsInfrastructure/raw/typespec.stdout.txt",
@@ -2843,7 +2844,7 @@
     {
       "project": "specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs",
       "status": "success",
-      "durationMs": 28366,
+      "durationMs": 27122,
       "diagnosticCount": 506,
       "rawFiles": [
         "projects/specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs/raw/typespec.stdout.txt",
@@ -2854,7 +2855,7 @@
     {
       "project": "specification/discovery/Discovery.Management",
       "status": "success",
-      "durationMs": 14850,
+      "durationMs": 14311,
       "diagnosticCount": 147,
       "rawFiles": [
         "projects/specification/discovery/Discovery.Management/raw/typespec.stdout.txt",
@@ -2864,7 +2865,7 @@
     {
       "project": "specification/dns/resource-manager/Microsoft.Network/Dns",
       "status": "success",
-      "durationMs": 9185,
+      "durationMs": 8463,
       "diagnosticCount": 45,
       "rawFiles": [
         "projects/specification/dns/resource-manager/Microsoft.Network/Dns/raw/typespec.stdout.txt",
@@ -2874,7 +2875,7 @@
     {
       "project": "specification/dnsresolver/resource-manager/Microsoft.Network/DnsResolver",
       "status": "success",
-      "durationMs": 12833,
+      "durationMs": 11720,
       "diagnosticCount": 126,
       "rawFiles": [
         "projects/specification/dnsresolver/resource-manager/Microsoft.Network/DnsResolver/raw/typespec.stdout.txt",
@@ -2884,7 +2885,7 @@
     {
       "project": "specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration",
       "status": "success",
-      "durationMs": 17998,
+      "durationMs": 16330,
       "diagnosticCount": 69,
       "rawFiles": [
         "projects/specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration/raw/typespec.stdout.txt",
@@ -2895,7 +2896,7 @@
     {
       "project": "specification/domainservices/resource-manager/Microsoft.AAD/DomainServices",
       "status": "success",
-      "durationMs": 9742,
+      "durationMs": 8921,
       "diagnosticCount": 37,
       "rawFiles": [
         "projects/specification/domainservices/resource-manager/Microsoft.AAD/DomainServices/raw/typespec.stdout.txt",
@@ -2905,7 +2906,7 @@
     {
       "project": "specification/durabletask/resource-manager/Microsoft.DurableTask/DurableTask",
       "status": "success",
-      "durationMs": 9299,
+      "durationMs": 9295,
       "diagnosticCount": 31,
       "rawFiles": [
         "projects/specification/durabletask/resource-manager/Microsoft.DurableTask/DurableTask/raw/typespec.stdout.txt",
@@ -2915,7 +2916,7 @@
     {
       "project": "specification/dynatrace/resource-manager/Dynatrace.Observability/DynatraceObservability",
       "status": "success",
-      "durationMs": 17523,
+      "durationMs": 18074,
       "diagnosticCount": 38,
       "rawFiles": [
         "projects/specification/dynatrace/resource-manager/Dynatrace.Observability/DynatraceObservability/raw/typespec.stdout.txt",
@@ -2926,8 +2927,8 @@
     {
       "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
       "status": "success",
-      "durationMs": 39045,
-      "diagnosticCount": 477,
+      "durationMs": 36864,
+      "diagnosticCount": 471,
       "rawFiles": [
         "projects/specification/edge/resource-manager/Microsoft.Edge/configurationmanager/raw/typespec.stdout.txt",
         "projects/specification/edge/resource-manager/Microsoft.Edge/configurationmanager/raw/typespec.stderr.txt",
@@ -2937,7 +2938,7 @@
     {
       "project": "specification/edge/resource-manager/Microsoft.Edge/configurations",
       "status": "success",
-      "durationMs": 8775,
+      "durationMs": 9452,
       "diagnosticCount": 79,
       "rawFiles": [
         "projects/specification/edge/resource-manager/Microsoft.Edge/configurations/raw/typespec.stdout.txt",
@@ -2947,7 +2948,7 @@
     {
       "project": "specification/edge/resource-manager/Microsoft.Edge/disconnectedOperations",
       "status": "success",
-      "durationMs": 8597,
+      "durationMs": 9106,
       "diagnosticCount": 56,
       "rawFiles": [
         "projects/specification/edge/resource-manager/Microsoft.Edge/disconnectedOperations/raw/typespec.stdout.txt",
@@ -2957,7 +2958,7 @@
     {
       "project": "specification/edge/resource-manager/Microsoft.Edge/edge",
       "status": "success",
-      "durationMs": 7042,
+      "durationMs": 7468,
       "diagnosticCount": 4,
       "rawFiles": [
         "projects/specification/edge/resource-manager/Microsoft.Edge/edge/raw/typespec.stdout.txt",
@@ -2967,7 +2968,7 @@
     {
       "project": "specification/edge/resource-manager/Microsoft.Edge/sites",
       "status": "success",
-      "durationMs": 8467,
+      "durationMs": 8549,
       "diagnosticCount": 24,
       "rawFiles": [
         "projects/specification/edge/resource-manager/Microsoft.Edge/sites/raw/typespec.stdout.txt",
@@ -2977,7 +2978,7 @@
     {
       "project": "specification/edgemarketplace/Microsoft.EdgeMarketPlace.Management",
       "status": "success",
-      "durationMs": 8361,
+      "durationMs": 8065,
       "diagnosticCount": 30,
       "rawFiles": [
         "projects/specification/edgemarketplace/Microsoft.EdgeMarketPlace.Management/raw/typespec.stdout.txt",
@@ -2987,7 +2988,7 @@
     {
       "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
       "status": "success",
-      "durationMs": 17871,
+      "durationMs": 16315,
       "diagnosticCount": 105,
       "rawFiles": [
         "projects/specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder/raw/typespec.stdout.txt",
@@ -2998,7 +2999,7 @@
     {
       "project": "specification/edgezones/resource-manager/Microsoft.EdgeZones/EdgeZones",
       "status": "success",
-      "durationMs": 7724,
+      "durationMs": 7417,
       "diagnosticCount": 11,
       "rawFiles": [
         "projects/specification/edgezones/resource-manager/Microsoft.EdgeZones/EdgeZones/raw/typespec.stdout.txt",
@@ -3008,7 +3009,7 @@
     {
       "project": "specification/education/resource-manager/Microsoft.Education/Education",
       "status": "success",
-      "durationMs": 17198,
+      "durationMs": 15608,
       "diagnosticCount": 122,
       "rawFiles": [
         "projects/specification/education/resource-manager/Microsoft.Education/Education/raw/typespec.stdout.txt",
@@ -3019,7 +3020,7 @@
     {
       "project": "specification/elastic/resource-manager/Microsoft.Elastic/Elastic",
       "status": "success",
-      "durationMs": 19288,
+      "durationMs": 17627,
       "diagnosticCount": 101,
       "rawFiles": [
         "projects/specification/elastic/resource-manager/Microsoft.Elastic/Elastic/raw/typespec.stdout.txt",
@@ -3030,7 +3031,7 @@
     {
       "project": "specification/elasticsan/resource-manager/Microsoft.ElasticSan/ElasticSan",
       "status": "success",
-      "durationMs": 18728,
+      "durationMs": 16943,
       "diagnosticCount": 45,
       "rawFiles": [
         "projects/specification/elasticsan/resource-manager/Microsoft.ElasticSan/ElasticSan/raw/typespec.stdout.txt",
@@ -3041,7 +3042,7 @@
     {
       "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
       "status": "success",
-      "durationMs": 31719,
+      "durationMs": 29883,
       "diagnosticCount": 627,
       "rawFiles": [
         "projects/specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid/raw/typespec.stdout.txt",
@@ -3052,7 +3053,7 @@
     {
       "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
       "status": "success",
-      "durationMs": 21800,
+      "durationMs": 20865,
       "diagnosticCount": 176,
       "rawFiles": [
         "projects/specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub/raw/typespec.stdout.txt",
@@ -3063,7 +3064,7 @@
     {
       "project": "specification/ews/resource-manager/Microsoft.SecretSyncController/SecretSyncController",
       "status": "success",
-      "durationMs": 8220,
+      "durationMs": 8114,
       "diagnosticCount": 14,
       "rawFiles": [
         "projects/specification/ews/resource-manager/Microsoft.SecretSyncController/SecretSyncController/raw/typespec.stdout.txt",
@@ -3073,7 +3074,7 @@
     {
       "project": "specification/extendedlocation/resource-manager/Microsoft.ExtendedLocation/CustomLocations",
       "status": "success",
-      "durationMs": 15672,
+      "durationMs": 15207,
       "diagnosticCount": 23,
       "rawFiles": [
         "projects/specification/extendedlocation/resource-manager/Microsoft.ExtendedLocation/CustomLocations/raw/typespec.stdout.txt",
@@ -3084,7 +3085,7 @@
     {
       "project": "specification/fabric/resource-manager/Microsoft.Fabric/Fabric",
       "status": "success",
-      "durationMs": 7830,
+      "durationMs": 7574,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/fabric/resource-manager/Microsoft.Fabric/Fabric/raw/typespec.stdout.txt",
@@ -3094,7 +3095,7 @@
     {
       "project": "specification/fileshares/resource-manager/Microsoft.FileShares/FileShares",
       "status": "success",
-      "durationMs": 8580,
+      "durationMs": 8055,
       "diagnosticCount": 54,
       "rawFiles": [
         "projects/specification/fileshares/resource-manager/Microsoft.FileShares/FileShares/raw/typespec.stdout.txt",
@@ -3104,7 +3105,7 @@
     {
       "project": "specification/fist/resource-manager/Microsoft.IoTFirmwareDefense/IoTFirmwareDefense",
       "status": "success",
-      "durationMs": 17640,
+      "durationMs": 17164,
       "diagnosticCount": 109,
       "rawFiles": [
         "projects/specification/fist/resource-manager/Microsoft.IoTFirmwareDefense/IoTFirmwareDefense/raw/typespec.stdout.txt",
@@ -3115,7 +3116,7 @@
     {
       "project": "specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor",
       "status": "success",
-      "durationMs": 19293,
+      "durationMs": 18131,
       "diagnosticCount": 143,
       "rawFiles": [
         "projects/specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor/raw/typespec.stdout.txt",
@@ -3126,7 +3127,7 @@
     {
       "project": "specification/github-network/GitHub.Network.Management",
       "status": "success",
-      "durationMs": 7482,
+      "durationMs": 7458,
       "diagnosticCount": 21,
       "rawFiles": [
         "projects/specification/github-network/GitHub.Network.Management/raw/typespec.stdout.txt",
@@ -3136,7 +3137,7 @@
     {
       "project": "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
       "status": "success",
-      "durationMs": 17930,
+      "durationMs": 17044,
       "diagnosticCount": 191,
       "rawFiles": [
         "projects/specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments/raw/typespec.stdout.txt",
@@ -3147,7 +3148,7 @@
     {
       "project": "specification/hanaonazure/resource-manager/Microsoft.HanaOnAzure/HanaOnAzure",
       "status": "success",
-      "durationMs": 16127,
+      "durationMs": 15650,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/hanaonazure/resource-manager/Microsoft.HanaOnAzure/HanaOnAzure/raw/typespec.stdout.txt",
@@ -3158,7 +3159,7 @@
     {
       "project": "specification/hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules",
       "status": "success",
-      "durationMs": 10545,
+      "durationMs": 9738,
       "diagnosticCount": 70,
       "rawFiles": [
         "projects/specification/hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules/raw/typespec.stdout.txt",
@@ -3168,7 +3169,7 @@
     {
       "project": "specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight",
       "status": "success",
-      "durationMs": 18952,
+      "durationMs": 18301,
       "diagnosticCount": 160,
       "rawFiles": [
         "projects/specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight/raw/typespec.stdout.txt",
@@ -3179,7 +3180,7 @@
     {
       "project": "specification/healthbot/resource-manager/Microsoft.HealthBot/HealthBot",
       "status": "success",
-      "durationMs": 15524,
+      "durationMs": 15322,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/healthbot/resource-manager/Microsoft.HealthBot/HealthBot/raw/typespec.stdout.txt",
@@ -3190,7 +3191,7 @@
     {
       "project": "specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis",
       "status": "success",
-      "durationMs": 18812,
+      "durationMs": 19133,
       "diagnosticCount": 114,
       "rawFiles": [
         "projects/specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis/raw/typespec.stdout.txt",
@@ -3201,7 +3202,7 @@
     {
       "project": "specification/healthdataaiservices/HealthDataAIServices.Management",
       "status": "success",
-      "durationMs": 7552,
+      "durationMs": 7844,
       "diagnosticCount": 31,
       "rawFiles": [
         "projects/specification/healthdataaiservices/HealthDataAIServices.Management/raw/typespec.stdout.txt",
@@ -3211,7 +3212,7 @@
     {
       "project": "specification/help/resource-manager/Microsoft.Help/Help",
       "status": "success",
-      "durationMs": 15748,
+      "durationMs": 15867,
       "diagnosticCount": 30,
       "rawFiles": [
         "projects/specification/help/resource-manager/Microsoft.Help/Help/raw/typespec.stdout.txt",
@@ -3222,7 +3223,7 @@
     {
       "project": "specification/horizondb/resource-manager/Microsoft.HorizonDb/HorizonDb",
       "status": "success",
-      "durationMs": 15890,
+      "durationMs": 15881,
       "diagnosticCount": 44,
       "rawFiles": [
         "projects/specification/horizondb/resource-manager/Microsoft.HorizonDb/HorizonDb/raw/typespec.stdout.txt",
@@ -3233,7 +3234,7 @@
     {
       "project": "specification/hybridaks/resource-manager/Microsoft.HybridContainerService/HybridContainerService",
       "status": "success",
-      "durationMs": 18328,
+      "durationMs": 16998,
       "diagnosticCount": 98,
       "rawFiles": [
         "projects/specification/hybridaks/resource-manager/Microsoft.HybridContainerService/HybridContainerService/raw/typespec.stdout.txt",
@@ -3244,7 +3245,7 @@
     {
       "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
       "status": "success",
-      "durationMs": 25678,
+      "durationMs": 20395,
       "diagnosticCount": 153,
       "rawFiles": [
         "projects/specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute/raw/typespec.stdout.txt",
@@ -3255,7 +3256,7 @@
     {
       "project": "specification/hybridconnectivity/HybridConnectivity.Management",
       "status": "success",
-      "durationMs": 17107,
+      "durationMs": 15835,
       "diagnosticCount": 77,
       "rawFiles": [
         "projects/specification/hybridconnectivity/HybridConnectivity.Management/raw/typespec.stdout.txt",
@@ -3266,7 +3267,7 @@
     {
       "project": "specification/hybridkubernetes/resource-manager/Microsoft.Kubernetes/HybridKubernetes",
       "status": "success",
-      "durationMs": 20816,
+      "durationMs": 15345,
       "diagnosticCount": 20,
       "rawFiles": [
         "projects/specification/hybridkubernetes/resource-manager/Microsoft.Kubernetes/HybridKubernetes/raw/typespec.stdout.txt",
@@ -3277,7 +3278,7 @@
     {
       "project": "specification/imagebuilder/resource-manager/Microsoft.VirtualMachineImages/ImageBuilder",
       "status": "success",
-      "durationMs": 21033,
+      "durationMs": 15913,
       "diagnosticCount": 28,
       "rawFiles": [
         "projects/specification/imagebuilder/resource-manager/Microsoft.VirtualMachineImages/ImageBuilder/raw/typespec.stdout.txt",
@@ -3288,7 +3289,7 @@
     {
       "project": "specification/impact/Impact.Management",
       "status": "success",
-      "durationMs": 21167,
+      "durationMs": 15865,
       "diagnosticCount": 63,
       "rawFiles": [
         "projects/specification/impact/Impact.Management/raw/typespec.stdout.txt",
@@ -3299,7 +3300,7 @@
     {
       "project": "specification/informatica/resource-manager/Informatica.DataManagement/Informatica",
       "status": "success",
-      "durationMs": 12385,
+      "durationMs": 8033,
       "diagnosticCount": 51,
       "rawFiles": [
         "projects/specification/informatica/resource-manager/Informatica.DataManagement/Informatica/raw/typespec.stdout.txt",
@@ -3309,7 +3310,7 @@
     {
       "project": "specification/iothub/resource-manager/Microsoft.Devices/IoTHub",
       "status": "success",
-      "durationMs": 25098,
+      "durationMs": 17846,
       "diagnosticCount": 109,
       "rawFiles": [
         "projects/specification/iothub/resource-manager/Microsoft.Devices/IoTHub/raw/typespec.stdout.txt",
@@ -3320,7 +3321,7 @@
     {
       "project": "specification/iotoperations/resource-manager/Microsoft.IoTOperations/IoTOperations",
       "status": "success",
-      "durationMs": 24967,
+      "durationMs": 20520,
       "diagnosticCount": 86,
       "rawFiles": [
         "projects/specification/iotoperations/resource-manager/Microsoft.IoTOperations/IoTOperations/raw/typespec.stdout.txt",
@@ -3331,7 +3332,7 @@
     {
       "project": "specification/iotoperationsdataprocessor/IoTOperationsDataProcessor.Management",
       "status": "success",
-      "durationMs": 19085,
+      "durationMs": 15071,
       "diagnosticCount": 67,
       "rawFiles": [
         "projects/specification/iotoperationsdataprocessor/IoTOperationsDataProcessor.Management/raw/typespec.stdout.txt",
@@ -3342,7 +3343,7 @@
     {
       "project": "specification/iotoperationsmq/IoTOperationsMQ.Management",
       "status": "success",
-      "durationMs": 23584,
+      "durationMs": 19957,
       "diagnosticCount": 556,
       "rawFiles": [
         "projects/specification/iotoperationsmq/IoTOperationsMQ.Management/raw/typespec.stdout.txt",
@@ -3353,7 +3354,7 @@
     {
       "project": "specification/iotoperationsorchestrator/IoTOperationsOrchestrator.Management",
       "status": "success",
-      "durationMs": 10059,
+      "durationMs": 8070,
       "diagnosticCount": 44,
       "rawFiles": [
         "projects/specification/iotoperationsorchestrator/IoTOperationsOrchestrator.Management/raw/typespec.stdout.txt",
@@ -3363,7 +3364,7 @@
     {
       "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
       "status": "success",
-      "durationMs": 22021,
+      "durationMs": 18850,
       "diagnosticCount": 183,
       "rawFiles": [
         "projects/specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault/raw/typespec.stdout.txt",
@@ -3374,7 +3375,7 @@
     {
       "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensions",
       "status": "success",
-      "durationMs": 16200,
+      "durationMs": 14455,
       "diagnosticCount": 44,
       "rawFiles": [
         "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensions/raw/typespec.stdout.txt",
@@ -3385,7 +3386,7 @@
     {
       "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensionTypes",
       "status": "success",
-      "durationMs": 15432,
+      "durationMs": 14498,
       "diagnosticCount": 60,
       "rawFiles": [
         "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensionTypes/raw/typespec.stdout.txt",
@@ -3396,7 +3397,7 @@
     {
       "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/fluxConfigurations",
       "status": "success",
-      "durationMs": 15138,
+      "durationMs": 14903,
       "diagnosticCount": 53,
       "rawFiles": [
         "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/fluxConfigurations/raw/typespec.stdout.txt",
@@ -3407,7 +3408,7 @@
     {
       "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/kubernetesResources",
       "status": "success",
-      "durationMs": 14934,
+      "durationMs": 14320,
       "diagnosticCount": 32,
       "rawFiles": [
         "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/kubernetesResources/raw/typespec.stdout.txt",
@@ -3418,7 +3419,7 @@
     {
       "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/operations",
       "status": "success",
-      "durationMs": 15264,
+      "durationMs": 14247,
       "diagnosticCount": 10,
       "rawFiles": [
         "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/operations/raw/typespec.stdout.txt",
@@ -3429,7 +3430,7 @@
     {
       "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/privateLinkScopes",
       "status": "success",
-      "durationMs": 7849,
+      "durationMs": 7848,
       "diagnosticCount": 14,
       "rawFiles": [
         "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/privateLinkScopes/raw/typespec.stdout.txt",
@@ -3439,7 +3440,7 @@
     {
       "project": "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/upgradeAssessments",
       "status": "success",
-      "durationMs": 7324,
+      "durationMs": 7112,
       "diagnosticCount": 11,
       "rawFiles": [
         "projects/specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/upgradeAssessments/raw/typespec.stdout.txt",
@@ -3449,7 +3450,7 @@
     {
       "project": "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
       "status": "success",
-      "durationMs": 8458,
+      "durationMs": 8041,
       "diagnosticCount": 70,
       "rawFiles": [
         "projects/specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime/raw/typespec.stdout.txt",
@@ -3459,7 +3460,7 @@
     {
       "project": "specification/liftrarize/resource-manager/ArizeAi.ObservabilityEval/ObservabilityEval",
       "status": "success",
-      "durationMs": 8672,
+      "durationMs": 7881,
       "diagnosticCount": 10,
       "rawFiles": [
         "projects/specification/liftrarize/resource-manager/ArizeAi.ObservabilityEval/ObservabilityEval/raw/typespec.stdout.txt",
@@ -3469,7 +3470,7 @@
     {
       "project": "specification/liftrastronomer/resource-manager/Astronomer.Astro/AstronomerAstro",
       "status": "success",
-      "durationMs": 8469,
+      "durationMs": 7940,
       "diagnosticCount": 20,
       "rawFiles": [
         "projects/specification/liftrastronomer/resource-manager/Astronomer.Astro/AstronomerAstro/raw/typespec.stdout.txt",
@@ -3479,7 +3480,7 @@
     {
       "project": "specification/liftrcommvault/Commvault.ContentStore.Management",
       "status": "success",
-      "durationMs": 17047,
+      "durationMs": 16226,
       "diagnosticCount": 62,
       "rawFiles": [
         "projects/specification/liftrcommvault/Commvault.ContentStore.Management/raw/typespec.stdout.txt",
@@ -3490,7 +3491,7 @@
     {
       "project": "specification/liftrhyperexecute/resource-manager/LambdaTest.HyperExecute/HyperExecute",
       "status": "success",
-      "durationMs": 7870,
+      "durationMs": 7915,
       "diagnosticCount": 10,
       "rawFiles": [
         "projects/specification/liftrhyperexecute/resource-manager/LambdaTest.HyperExecute/HyperExecute/raw/typespec.stdout.txt",
@@ -3500,7 +3501,7 @@
     {
       "project": "specification/liftrmongodb/MongoDB.Atlas.Management",
       "status": "success",
-      "durationMs": 15523,
+      "durationMs": 15327,
       "diagnosticCount": 28,
       "rawFiles": [
         "projects/specification/liftrmongodb/MongoDB.Atlas.Management/raw/typespec.stdout.txt",
@@ -3511,7 +3512,7 @@
     {
       "project": "specification/liftrpinecone/resource-manager/Pinecone.VectorDb/PineconeVectorDb",
       "status": "success",
-      "durationMs": 7746,
+      "durationMs": 7754,
       "diagnosticCount": 8,
       "rawFiles": [
         "projects/specification/liftrpinecone/resource-manager/Pinecone.VectorDb/PineconeVectorDb/raw/typespec.stdout.txt",
@@ -3521,7 +3522,7 @@
     {
       "project": "specification/liftrqumulo/resource-manager/Qumulo.Storage/QumuloStorage",
       "status": "success",
-      "durationMs": 7848,
+      "durationMs": 7452,
       "diagnosticCount": 22,
       "rawFiles": [
         "projects/specification/liftrqumulo/resource-manager/Qumulo.Storage/QumuloStorage/raw/typespec.stdout.txt",
@@ -3531,7 +3532,7 @@
     {
       "project": "specification/liftrweightsandbiases/resource-manager/Microsoft.WeightsAndBiases/WeightsAndBiases",
       "status": "success",
-      "durationMs": 7865,
+      "durationMs": 7266,
       "diagnosticCount": 9,
       "rawFiles": [
         "projects/specification/liftrweightsandbiases/resource-manager/Microsoft.WeightsAndBiases/WeightsAndBiases/raw/typespec.stdout.txt",
@@ -3541,7 +3542,7 @@
     {
       "project": "specification/loadtestservice/resource-manager/Microsoft.LoadTestService/loadtesting",
       "status": "success",
-      "durationMs": 16752,
+      "durationMs": 15107,
       "diagnosticCount": 71,
       "rawFiles": [
         "projects/specification/loadtestservice/resource-manager/Microsoft.LoadTestService/loadtesting/raw/typespec.stdout.txt",
@@ -3552,7 +3553,7 @@
     {
       "project": "specification/loadtestservice/resource-manager/Microsoft.LoadTestService/playwright",
       "status": "success",
-      "durationMs": 7901,
+      "durationMs": 7520,
       "diagnosticCount": 8,
       "rawFiles": [
         "projects/specification/loadtestservice/resource-manager/Microsoft.LoadTestService/playwright/raw/typespec.stdout.txt",
@@ -3562,7 +3563,7 @@
     {
       "project": "specification/logic/resource-manager/Microsoft.Logic/Logic",
       "status": "success",
-      "durationMs": 8162,
+      "durationMs": 7188,
       "diagnosticCount": 6,
       "rawFiles": [
         "projects/specification/logic/resource-manager/Microsoft.Logic/Logic/raw/typespec.stdout.txt",
@@ -3572,7 +3573,7 @@
     {
       "project": "specification/machinelearningservices/MachineLearningServices.Management",
       "status": "success",
-      "durationMs": 49862,
+      "durationMs": 43037,
       "diagnosticCount": 1467,
       "rawFiles": [
         "projects/specification/machinelearningservices/MachineLearningServices.Management/raw/typespec.stdout.txt",
@@ -3583,7 +3584,7 @@
     {
       "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
       "status": "success",
-      "durationMs": 18098,
+      "durationMs": 16437,
       "diagnosticCount": 126,
       "rawFiles": [
         "projects/specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance/raw/typespec.stdout.txt",
@@ -3594,7 +3595,7 @@
     {
       "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
       "status": "success",
-      "durationMs": 38499,
+      "durationMs": 33944,
       "diagnosticCount": 888,
       "rawFiles": [
         "projects/specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric/raw/typespec.stdout.txt",
@@ -3605,7 +3606,7 @@
     {
       "project": "specification/managedoperations/ManagedOps.Management",
       "status": "success",
-      "durationMs": 8097,
+      "durationMs": 7314,
       "diagnosticCount": 14,
       "rawFiles": [
         "projects/specification/managedoperations/ManagedOps.Management/raw/typespec.stdout.txt",
@@ -3615,7 +3616,7 @@
     {
       "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
       "status": "success",
-      "durationMs": 16567,
+      "durationMs": 15776,
       "diagnosticCount": 84,
       "rawFiles": [
         "projects/specification/management/resource-manager/Microsoft.Management/ManagementGroups/raw/typespec.stdout.txt",
@@ -3626,7 +3627,7 @@
     {
       "project": "specification/management/resource-manager/Microsoft.Management/ServiceGroups",
       "status": "success",
-      "durationMs": 7770,
+      "durationMs": 7512,
       "diagnosticCount": 11,
       "rawFiles": [
         "projects/specification/management/resource-manager/Microsoft.Management/ServiceGroups/raw/typespec.stdout.txt",
@@ -3636,7 +3637,7 @@
     {
       "project": "specification/manufacturingplatform/Manufacturingplatform.Management",
       "status": "success",
-      "durationMs": 16072,
+      "durationMs": 14540,
       "diagnosticCount": 31,
       "rawFiles": [
         "projects/specification/manufacturingplatform/Manufacturingplatform.Management/raw/typespec.stdout.txt",
@@ -3647,7 +3648,7 @@
     {
       "project": "specification/maps/resource-manager/Microsoft.Maps/Maps",
       "status": "success",
-      "durationMs": 18150,
+      "durationMs": 16080,
       "diagnosticCount": 26,
       "rawFiles": [
         "projects/specification/maps/resource-manager/Microsoft.Maps/Maps/raw/typespec.stdout.txt",
@@ -3658,7 +3659,7 @@
     {
       "project": "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
       "status": "success",
-      "durationMs": 19270,
+      "durationMs": 16725,
       "diagnosticCount": 97,
       "rawFiles": [
         "projects/specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace/raw/typespec.stdout.txt",
@@ -3669,7 +3670,7 @@
     {
       "project": "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Products",
       "status": "success",
-      "durationMs": 17103,
+      "durationMs": 14292,
       "diagnosticCount": 150,
       "rawFiles": [
         "projects/specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Products/raw/typespec.stdout.txt",
@@ -3680,7 +3681,7 @@
     {
       "project": "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Reviews",
       "status": "success",
-      "durationMs": 15049,
+      "durationMs": 13616,
       "diagnosticCount": 4,
       "rawFiles": [
         "projects/specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Reviews/raw/typespec.stdout.txt",
@@ -3691,7 +3692,7 @@
     {
       "project": "specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Skus",
       "status": "success",
-      "durationMs": 14956,
+      "durationMs": 14408,
       "diagnosticCount": 56,
       "rawFiles": [
         "projects/specification/marketplacecatalog/resource-manager/Microsoft.Marketplace/Skus/raw/typespec.stdout.txt",
@@ -3702,7 +3703,7 @@
     {
       "project": "specification/migrate/resource-manager/Microsoft.Migrate/AKSAssessments",
       "status": "success",
-      "durationMs": 16543,
+      "durationMs": 16813,
       "diagnosticCount": 78,
       "rawFiles": [
         "projects/specification/migrate/resource-manager/Microsoft.Migrate/AKSAssessments/raw/typespec.stdout.txt",
@@ -3713,7 +3714,7 @@
     {
       "project": "specification/migrate/resource-manager/Microsoft.Migrate/AssessmentProjects",
       "status": "success",
-      "durationMs": 8064,
+      "durationMs": 8243,
       "diagnosticCount": 53,
       "rawFiles": [
         "projects/specification/migrate/resource-manager/Microsoft.Migrate/AssessmentProjects/raw/typespec.stdout.txt",
@@ -3723,7 +3724,7 @@
     {
       "project": "specification/migrate/resource-manager/Microsoft.Migrate/AvsAssessments",
       "status": "success",
-      "durationMs": 15911,
+      "durationMs": 15852,
       "diagnosticCount": 66,
       "rawFiles": [
         "projects/specification/migrate/resource-manager/Microsoft.Migrate/AvsAssessments/raw/typespec.stdout.txt",
@@ -3734,7 +3735,7 @@
     {
       "project": "specification/migrate/resource-manager/Microsoft.Migrate/BusinessCases",
       "status": "success",
-      "durationMs": 9919,
+      "durationMs": 10439,
       "diagnosticCount": 153,
       "rawFiles": [
         "projects/specification/migrate/resource-manager/Microsoft.Migrate/BusinessCases/raw/typespec.stdout.txt",
@@ -3744,7 +3745,7 @@
     {
       "project": "specification/migrate/resource-manager/Microsoft.Migrate/Collectors",
       "status": "success",
-      "durationMs": 9112,
+      "durationMs": 8862,
       "diagnosticCount": 126,
       "rawFiles": [
         "projects/specification/migrate/resource-manager/Microsoft.Migrate/Collectors/raw/typespec.stdout.txt",
@@ -3754,7 +3755,7 @@
     {
       "project": "specification/migrate/resource-manager/Microsoft.Migrate/HeterogenousAssessments",
       "status": "success",
-      "durationMs": 15991,
+      "durationMs": 14654,
       "diagnosticCount": 32,
       "rawFiles": [
         "projects/specification/migrate/resource-manager/Microsoft.Migrate/HeterogenousAssessments/raw/typespec.stdout.txt",
@@ -3765,7 +3766,7 @@
     {
       "project": "specification/migrate/resource-manager/Microsoft.Migrate/MachineAssessments",
       "status": "success",
-      "durationMs": 17097,
+      "durationMs": 15542,
       "diagnosticCount": 64,
       "rawFiles": [
         "projects/specification/migrate/resource-manager/Microsoft.Migrate/MachineAssessments/raw/typespec.stdout.txt",
@@ -3776,7 +3777,7 @@
     {
       "project": "specification/migrate/resource-manager/Microsoft.Migrate/SqlAssessments",
       "status": "success",
-      "durationMs": 18051,
+      "durationMs": 16471,
       "diagnosticCount": 114,
       "rawFiles": [
         "projects/specification/migrate/resource-manager/Microsoft.Migrate/SqlAssessments/raw/typespec.stdout.txt",
@@ -3787,7 +3788,7 @@
     {
       "project": "specification/migrate/resource-manager/Microsoft.Migrate/Waves",
       "status": "success",
-      "durationMs": 17548,
+      "durationMs": 16309,
       "diagnosticCount": 94,
       "rawFiles": [
         "projects/specification/migrate/resource-manager/Microsoft.Migrate/Waves/raw/typespec.stdout.txt",
@@ -3798,7 +3799,7 @@
     {
       "project": "specification/migrate/resource-manager/Microsoft.Migrate/WebAppAssessments",
       "status": "success",
-      "durationMs": 16808,
+      "durationMs": 15604,
       "diagnosticCount": 72,
       "rawFiles": [
         "projects/specification/migrate/resource-manager/Microsoft.Migrate/WebAppAssessments/raw/typespec.stdout.txt",
@@ -3809,7 +3810,7 @@
     {
       "project": "specification/migrate/resource-manager/Microsoft.Migrate/WebAppCompoundAssessments",
       "status": "success",
-      "durationMs": 15377,
+      "durationMs": 14859,
       "diagnosticCount": 38,
       "rawFiles": [
         "projects/specification/migrate/resource-manager/Microsoft.Migrate/WebAppCompoundAssessments/raw/typespec.stdout.txt",
@@ -3820,7 +3821,7 @@
     {
       "project": "specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure",
       "status": "success",
-      "durationMs": 33319,
+      "durationMs": 33380,
       "diagnosticCount": 350,
       "rawFiles": [
         "projects/specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure/raw/typespec.stdout.txt",
@@ -3831,7 +3832,7 @@
     {
       "project": "specification/mission/resource-manager/Microsoft.Mission/Mission",
       "status": "success",
-      "durationMs": 21799,
+      "durationMs": 21870,
       "diagnosticCount": 292,
       "rawFiles": [
         "projects/specification/mission/resource-manager/Microsoft.Mission/Mission/raw/typespec.stdout.txt",
@@ -3842,7 +3843,7 @@
     {
       "project": "specification/mongocluster/resource-manager/Microsoft.DocumentDB/MongoCluster",
       "status": "success",
-      "durationMs": 16034,
+      "durationMs": 15790,
       "diagnosticCount": 44,
       "rawFiles": [
         "projects/specification/mongocluster/resource-manager/Microsoft.DocumentDB/MongoCluster/raw/typespec.stdout.txt",
@@ -3853,7 +3854,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/DataCollectionRuleConfigurationMetadata",
       "status": "success",
-      "durationMs": 13590,
+      "durationMs": 13202,
       "diagnosticCount": 3,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/DataCollectionRuleConfigurationMetadata/raw/typespec.stdout.txt",
@@ -3864,7 +3865,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActionGroupsApi",
       "status": "success",
-      "durationMs": 14737,
+      "durationMs": 14510,
       "diagnosticCount": 30,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/ActionGroupsApi/raw/typespec.stdout.txt",
@@ -3875,7 +3876,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogAlertsApi",
       "status": "success",
-      "durationMs": 14500,
+      "durationMs": 14139,
       "diagnosticCount": 11,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogAlertsApi/raw/typespec.stdout.txt",
@@ -3886,7 +3887,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogsApi",
       "status": "success",
-      "durationMs": 14402,
+      "durationMs": 14694,
       "diagnosticCount": 8,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogsApi/raw/typespec.stdout.txt",
@@ -3897,7 +3898,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/AlertRulesIncidentsApi",
       "status": "success",
-      "durationMs": 14200,
+      "durationMs": 14464,
       "diagnosticCount": 8,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/AlertRulesIncidentsApi/raw/typespec.stdout.txt",
@@ -3908,7 +3909,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/AutoScaleApi",
       "status": "success",
-      "durationMs": 14524,
+      "durationMs": 14883,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/AutoScaleApi/raw/typespec.stdout.txt",
@@ -3919,7 +3920,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/DataCollectionApi",
       "status": "success",
-      "durationMs": 15322,
+      "durationMs": 15724,
       "diagnosticCount": 55,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/DataCollectionApi/raw/typespec.stdout.txt",
@@ -3930,7 +3931,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/DiagnosticsSettings",
       "status": "success",
-      "durationMs": 14308,
+      "durationMs": 15130,
       "diagnosticCount": 11,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/DiagnosticsSettings/raw/typespec.stdout.txt",
@@ -3941,7 +3942,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/LogProfilesApi",
       "status": "success",
-      "durationMs": 14024,
+      "durationMs": 15094,
       "diagnosticCount": 12,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/LogProfilesApi/raw/typespec.stdout.txt",
@@ -3952,7 +3953,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricAlertApi",
       "status": "success",
-      "durationMs": 15187,
+      "durationMs": 15392,
       "diagnosticCount": 27,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricAlertApi/raw/typespec.stdout.txt",
@@ -3963,7 +3964,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricBaselinesApi",
       "status": "success",
-      "durationMs": 14470,
+      "durationMs": 14928,
       "diagnosticCount": 3,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricBaselinesApi/raw/typespec.stdout.txt",
@@ -3974,7 +3975,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
       "status": "success",
-      "durationMs": 15167,
+      "durationMs": 15015,
       "diagnosticCount": 35,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi/raw/typespec.stdout.txt",
@@ -3985,7 +3986,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/NetworkSecurityPerimeterApi",
       "status": "success",
-      "durationMs": 6964,
+      "durationMs": 7622,
       "diagnosticCount": 19,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/NetworkSecurityPerimeterApi/raw/typespec.stdout.txt",
@@ -3995,7 +3996,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/PrivateLinkScopesApi",
       "status": "success",
-      "durationMs": 7672,
+      "durationMs": 8633,
       "diagnosticCount": 24,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/PrivateLinkScopesApi/raw/typespec.stdout.txt",
@@ -4005,7 +4006,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ScheduledQueryRuleApi",
       "status": "success",
-      "durationMs": 17483,
+      "durationMs": 14935,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/ScheduledQueryRuleApi/raw/typespec.stdout.txt",
@@ -4016,7 +4017,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi",
       "status": "success",
-      "durationMs": 17965,
+      "durationMs": 14631,
       "diagnosticCount": 9,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi/raw/typespec.stdout.txt",
@@ -4027,9 +4028,9 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups",
       "status": "failed",
-      "durationMs": 9394,
+      "durationMs": 7982,
       "diagnosticCount": 33,
-      "error": "Command failed: C:\\dev\\azure-rest-api-specs\\node_modules\\.bin\\tsp.cmd compile main.tsp --no-emit --warn-as-error=false --pretty false --config C:\\dev\\azure-rest-api-specs\\specification\\monitor\\resource-manager\\Microsoft.Insights\\Insights\\TenantActionGroups\\.tspconfig.lintdiff-46124-1871a4e0-d245-42a1-8f70-3f2a050d694e.yaml\n- Compiling...\n\u001b[31m×\u001b[39m Compiling\n",
+      "error": "Command failed: C:\\dev\\azure-rest-api-specs\\node_modules\\.bin\\tsp.cmd compile main.tsp --no-emit --warn-as-error=false --pretty false --config C:\\dev\\azure-rest-api-specs\\specification\\monitor\\resource-manager\\Microsoft.Insights\\Insights\\TenantActionGroups\\.tspconfig.lintdiff-38328-9be82d01-9e5f-41ad-b40e-75e8c0860c3e.yaml\n- Compiling...\n\u001b[31m×\u001b[39m Compiling\n",
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups/raw/typespec.stdout.txt",
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups/raw/typespec.stderr.txt"
@@ -4038,7 +4039,7 @@
     {
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/VmInsightsOnboarding",
       "status": "success",
-      "durationMs": 8801,
+      "durationMs": 7423,
       "diagnosticCount": 3,
       "rawFiles": [
         "projects/specification/monitor/resource-manager/Microsoft.Insights/Insights/VmInsightsOnboarding/raw/typespec.stdout.txt",
@@ -4048,8 +4049,8 @@
     {
       "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts",
       "status": "success",
-      "durationMs": 22668,
-      "diagnosticCount": 159,
+      "durationMs": 18009,
+      "diagnosticCount": 157,
       "rawFiles": [
         "projects/specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts/raw/typespec.stdout.txt",
         "projects/specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts/raw/typespec.stderr.txt",
@@ -4059,7 +4060,7 @@
     {
       "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/Agents",
       "status": "success",
-      "durationMs": 17787,
+      "durationMs": 14635,
       "diagnosticCount": 8,
       "rawFiles": [
         "projects/specification/monitoringservice/resource-manager/Microsoft.Monitor/Agents/raw/typespec.stdout.txt",
@@ -4070,7 +4071,7 @@
     {
       "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/PipelineGroups",
       "status": "success",
-      "durationMs": 18164,
+      "durationMs": 14849,
       "diagnosticCount": 29,
       "rawFiles": [
         "projects/specification/monitoringservice/resource-manager/Microsoft.Monitor/PipelineGroups/raw/typespec.stdout.txt",
@@ -4081,7 +4082,7 @@
     {
       "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/Slis",
       "status": "success",
-      "durationMs": 19987,
+      "durationMs": 15061,
       "diagnosticCount": 25,
       "rawFiles": [
         "projects/specification/monitoringservice/resource-manager/Microsoft.Monitor/Slis/raw/typespec.stdout.txt",
@@ -4092,7 +4093,7 @@
     {
       "project": "specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity",
       "status": "success",
-      "durationMs": 9732,
+      "durationMs": 7992,
       "diagnosticCount": 28,
       "rawFiles": [
         "projects/specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity/raw/typespec.stdout.txt",
@@ -4102,7 +4103,7 @@
     {
       "project": "specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers",
       "status": "success",
-      "durationMs": 26554,
+      "durationMs": 21477,
       "diagnosticCount": 110,
       "rawFiles": [
         "projects/specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers/raw/typespec.stdout.txt",
@@ -4113,7 +4114,7 @@
     {
       "project": "specification/napster/Napster.CompanionAPI.Management",
       "status": "success",
-      "durationMs": 18452,
+      "durationMs": 14265,
       "diagnosticCount": 13,
       "rawFiles": [
         "projects/specification/napster/Napster.CompanionAPI.Management/raw/typespec.stdout.txt",
@@ -4124,7 +4125,7 @@
     {
       "project": "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
       "status": "success",
-      "durationMs": 39025,
+      "durationMs": 30351,
       "diagnosticCount": 285,
       "rawFiles": [
         "projects/specification/netapp/resource-manager/Microsoft.NetApp/NetApp/raw/typespec.stdout.txt",
@@ -4135,9 +4136,9 @@
     {
       "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
       "status": "failed",
-      "durationMs": 64034,
+      "durationMs": 53435,
       "diagnosticCount": 4107,
-      "error": "Command failed: C:\\dev\\azure-rest-api-specs\\node_modules\\.bin\\tsp.cmd compile main.tsp --no-emit --warn-as-error=false --pretty false --config C:\\dev\\azure-rest-api-specs\\specification\\network\\resource-manager\\Microsoft.Network\\Network\\Network\\.tspconfig.lintdiff-46124-a9f1a653-74bf-4bd6-92a8-497003d957c7.yaml\n- Compiling...\n\u001b[31m×\u001b[39m Compiling\n",
+      "error": "Command failed: C:\\dev\\azure-rest-api-specs\\node_modules\\.bin\\tsp.cmd compile main.tsp --no-emit --warn-as-error=false --pretty false --config C:\\dev\\azure-rest-api-specs\\specification\\network\\resource-manager\\Microsoft.Network\\Network\\Network\\.tspconfig.lintdiff-38328-cce176bf-a9de-4c00-af09-e69582b63e54.yaml\n- Compiling...\n\u001b[31m×\u001b[39m Compiling\n",
       "rawFiles": [
         "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/raw/typespec.stdout.txt",
         "projects/specification/network/resource-manager/Microsoft.Network/Network/Network/raw/typespec.stderr.txt"
@@ -4146,7 +4147,7 @@
     {
       "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
       "status": "success",
-      "durationMs": 23179,
+      "durationMs": 18634,
       "diagnosticCount": 61,
       "rawFiles": [
         "projects/specification/network/resource-manager/Microsoft.Network/Network/Vmss/raw/typespec.stdout.txt",
@@ -4157,7 +4158,7 @@
     {
       "project": "specification/networkcloud/resource-manager/Microsoft.NetworkCloud/NetworkCloud",
       "status": "success",
-      "durationMs": 21548,
+      "durationMs": 18613,
       "diagnosticCount": 349,
       "rawFiles": [
         "projects/specification/networkcloud/resource-manager/Microsoft.NetworkCloud/NetworkCloud/raw/typespec.stdout.txt",
@@ -4167,7 +4168,7 @@
     {
       "project": "specification/networkfunction/resource-manager/Microsoft.NetworkFunction/TrafficCollector",
       "status": "success",
-      "durationMs": 17534,
+      "durationMs": 14511,
       "diagnosticCount": 19,
       "rawFiles": [
         "projects/specification/networkfunction/resource-manager/Microsoft.NetworkFunction/TrafficCollector/raw/typespec.stdout.txt",
@@ -4178,7 +4179,7 @@
     {
       "project": "specification/newrelic/NewRelicObservability.Management",
       "status": "success",
-      "durationMs": 18637,
+      "durationMs": 15665,
       "diagnosticCount": 48,
       "rawFiles": [
         "projects/specification/newrelic/NewRelicObservability.Management/raw/typespec.stdout.txt",
@@ -4189,7 +4190,7 @@
     {
       "project": "specification/nginx/resource-manager/Nginx.NginxPlus/NginxPlus",
       "status": "success",
-      "durationMs": 18663,
+      "durationMs": 16004,
       "diagnosticCount": 40,
       "rawFiles": [
         "projects/specification/nginx/resource-manager/Nginx.NginxPlus/NginxPlus/raw/typespec.stdout.txt",
@@ -4200,7 +4201,7 @@
     {
       "project": "specification/notificationhubs/resource-manager/Microsoft.NotificationHubs/NotificationHubs",
       "status": "success",
-      "durationMs": 19683,
+      "durationMs": 17122,
       "diagnosticCount": 123,
       "rawFiles": [
         "projects/specification/notificationhubs/resource-manager/Microsoft.NotificationHubs/NotificationHubs/raw/typespec.stdout.txt",
@@ -4211,7 +4212,7 @@
     {
       "project": "specification/onlineexperimentation/OnlineExperimentation.Management",
       "status": "success",
-      "durationMs": 8771,
+      "durationMs": 7809,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/onlineexperimentation/OnlineExperimentation.Management/raw/typespec.stdout.txt",
@@ -4221,7 +4222,7 @@
     {
       "project": "specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights",
       "status": "success",
-      "durationMs": 23515,
+      "durationMs": 20093,
       "diagnosticCount": 181,
       "rawFiles": [
         "projects/specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights/raw/typespec.stdout.txt",
@@ -4232,7 +4233,7 @@
     {
       "project": "specification/oracle/resource-manager/Oracle.Database/OracleDatabase",
       "status": "success",
-      "durationMs": 27713,
+      "durationMs": 24150,
       "diagnosticCount": 278,
       "rawFiles": [
         "projects/specification/oracle/resource-manager/Oracle.Database/OracleDatabase/raw/typespec.stdout.txt",
@@ -4243,7 +4244,7 @@
     {
       "project": "specification/orbitalplanetarycomputer/Orbital.Management",
       "status": "success",
-      "durationMs": 8827,
+      "durationMs": 7253,
       "diagnosticCount": 22,
       "rawFiles": [
         "projects/specification/orbitalplanetarycomputer/Orbital.Management/raw/typespec.stdout.txt",
@@ -4253,7 +4254,7 @@
     {
       "project": "specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw",
       "status": "success",
-      "durationMs": 13863,
+      "durationMs": 12420,
       "diagnosticCount": 178,
       "rawFiles": [
         "projects/specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw/raw/typespec.stdout.txt",
@@ -4263,7 +4264,7 @@
     {
       "project": "specification/peering/resource-manager/Microsoft.Peering/Peering",
       "status": "success",
-      "durationMs": 18467,
+      "durationMs": 16713,
       "diagnosticCount": 63,
       "rawFiles": [
         "projects/specification/peering/resource-manager/Microsoft.Peering/Peering/raw/typespec.stdout.txt",
@@ -4274,7 +4275,7 @@
     {
       "project": "specification/playwrighttesting/PlaywrightTesting.Management",
       "status": "success",
-      "durationMs": 7643,
+      "durationMs": 7203,
       "diagnosticCount": 19,
       "rawFiles": [
         "projects/specification/playwrighttesting/PlaywrightTesting.Management/raw/typespec.stdout.txt",
@@ -4284,7 +4285,7 @@
     {
       "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
       "status": "success",
-      "durationMs": 21004,
+      "durationMs": 17897,
       "diagnosticCount": 287,
       "rawFiles": [
         "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi/raw/typespec.stdout.txt",
@@ -4295,7 +4296,7 @@
     {
       "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyTrackedResourcesApi",
       "status": "success",
-      "durationMs": 7996,
+      "durationMs": 7030,
       "diagnosticCount": 13,
       "rawFiles": [
         "projects/specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyTrackedResourcesApi/raw/typespec.stdout.txt",
@@ -4305,7 +4306,7 @@
     {
       "project": "specification/portal/Dashboard.Management",
       "status": "success",
-      "durationMs": 8399,
+      "durationMs": 7451,
       "diagnosticCount": 13,
       "rawFiles": [
         "projects/specification/portal/Dashboard.Management/raw/typespec.stdout.txt",
@@ -4315,7 +4316,7 @@
     {
       "project": "specification/portal/TenantConfiguration.Management",
       "status": "success",
-      "durationMs": 17914,
+      "durationMs": 14831,
       "diagnosticCount": 15,
       "rawFiles": [
         "projects/specification/portal/TenantConfiguration.Management/raw/typespec.stdout.txt",
@@ -4326,7 +4327,7 @@
     {
       "project": "specification/portalservices/CopilotSettings.Management",
       "status": "success",
-      "durationMs": 17139,
+      "durationMs": 14832,
       "diagnosticCount": 12,
       "rawFiles": [
         "projects/specification/portalservices/CopilotSettings.Management/raw/typespec.stdout.txt",
@@ -4337,7 +4338,7 @@
     {
       "project": "specification/portalservices/Extension.Management",
       "status": "success",
-      "durationMs": 16781,
+      "durationMs": 14519,
       "diagnosticCount": 4,
       "rawFiles": [
         "projects/specification/portalservices/Extension.Management/raw/typespec.stdout.txt",
@@ -4348,7 +4349,7 @@
     {
       "project": "specification/postgresql/DBforPostgreSQL.Management",
       "status": "success",
-      "durationMs": 23656,
+      "durationMs": 21030,
       "diagnosticCount": 112,
       "rawFiles": [
         "projects/specification/postgresql/DBforPostgreSQL.Management/raw/typespec.stdout.txt",
@@ -4359,7 +4360,7 @@
     {
       "project": "specification/postgresqlhsc/resource-manager/Microsoft.DBforPostgreSQL/PostgresqlHsc",
       "status": "success",
-      "durationMs": 20249,
+      "durationMs": 18350,
       "diagnosticCount": 54,
       "rawFiles": [
         "projects/specification/postgresqlhsc/resource-manager/Microsoft.DBforPostgreSQL/PostgresqlHsc/raw/typespec.stdout.txt",
@@ -4370,7 +4371,7 @@
     {
       "project": "specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated",
       "status": "success",
-      "durationMs": 15938,
+      "durationMs": 15845,
       "diagnosticCount": 30,
       "rawFiles": [
         "projects/specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated/raw/typespec.stdout.txt",
@@ -4381,7 +4382,7 @@
     {
       "project": "specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform",
       "status": "success",
-      "durationMs": 8333,
+      "durationMs": 8318,
       "diagnosticCount": 50,
       "rawFiles": [
         "projects/specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform/raw/typespec.stdout.txt",
@@ -4391,8 +4392,8 @@
     {
       "project": "specification/privatedns/resource-manager/Microsoft.Network/PrivateDns",
       "status": "success",
-      "durationMs": 16071,
-      "diagnosticCount": 58,
+      "durationMs": 15674,
+      "diagnosticCount": 56,
       "rawFiles": [
         "projects/specification/privatedns/resource-manager/Microsoft.Network/PrivateDns/raw/typespec.stdout.txt",
         "projects/specification/privatedns/resource-manager/Microsoft.Network/PrivateDns/raw/typespec.stderr.txt",
@@ -4402,7 +4403,7 @@
     {
       "project": "specification/programenrollment/resource-manager/Microsoft.ProgramEnrollment/ProgramEnrollment",
       "status": "success",
-      "durationMs": 7221,
+      "durationMs": 6975,
       "diagnosticCount": 15,
       "rawFiles": [
         "projects/specification/programenrollment/resource-manager/Microsoft.ProgramEnrollment/ProgramEnrollment/raw/typespec.stdout.txt",
@@ -4412,7 +4413,7 @@
     {
       "project": "specification/programmableconnectivity/ProgrammableConnectivity.Management",
       "status": "success",
-      "durationMs": 16084,
+      "durationMs": 16129,
       "diagnosticCount": 60,
       "rawFiles": [
         "projects/specification/programmableconnectivity/ProgrammableConnectivity.Management/raw/typespec.stdout.txt",
@@ -4423,7 +4424,7 @@
     {
       "project": "specification/providerhub/ProviderHub.Management",
       "status": "success",
-      "durationMs": 20277,
+      "durationMs": 19733,
       "diagnosticCount": 222,
       "rawFiles": [
         "projects/specification/providerhub/ProviderHub.Management/raw/typespec.stdout.txt",
@@ -4434,7 +4435,7 @@
     {
       "project": "specification/purestorage/resource-manager/PureStorage.Block/PureStorageBlock",
       "status": "success",
-      "durationMs": 19198,
+      "durationMs": 18487,
       "diagnosticCount": 184,
       "rawFiles": [
         "projects/specification/purestorage/resource-manager/PureStorage.Block/PureStorageBlock/raw/typespec.stdout.txt",
@@ -4445,7 +4446,7 @@
     {
       "project": "specification/purview/resource-manager/Microsoft.Purview/Purview",
       "status": "success",
-      "durationMs": 17120,
+      "durationMs": 16791,
       "diagnosticCount": 65,
       "rawFiles": [
         "projects/specification/purview/resource-manager/Microsoft.Purview/Purview/raw/typespec.stdout.txt",
@@ -4456,7 +4457,7 @@
     {
       "project": "specification/purviewpolicy/resource-manager/Microsoft.Purview/PurviewPolicy",
       "status": "success",
-      "durationMs": 7175,
+      "durationMs": 7511,
       "diagnosticCount": 6,
       "rawFiles": [
         "projects/specification/purviewpolicy/resource-manager/Microsoft.Purview/PurviewPolicy/raw/typespec.stdout.txt",
@@ -4466,7 +4467,7 @@
     {
       "project": "specification/quantum/resource-manager/Microsoft.Quantum/Quantum",
       "status": "success",
-      "durationMs": 16266,
+      "durationMs": 15076,
       "diagnosticCount": 24,
       "rawFiles": [
         "projects/specification/quantum/resource-manager/Microsoft.Quantum/Quantum/raw/typespec.stdout.txt",
@@ -4477,9 +4478,9 @@
     {
       "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
       "status": "failed",
-      "durationMs": 11195,
+      "durationMs": 10201,
       "diagnosticCount": 183,
-      "error": "Command failed: C:\\dev\\azure-rest-api-specs\\node_modules\\.bin\\tsp.cmd compile main.tsp --no-emit --warn-as-error=false --pretty false --config C:\\dev\\azure-rest-api-specs\\specification\\quota\\resource-manager\\Microsoft.Quota\\Quota\\.tspconfig.lintdiff-46124-ef48c99a-0fde-4def-a241-7daf9379aba7.yaml\n- Compiling...\n\u001b[31m×\u001b[39m Compiling\n",
+      "error": "Command failed: C:\\dev\\azure-rest-api-specs\\node_modules\\.bin\\tsp.cmd compile main.tsp --no-emit --warn-as-error=false --pretty false --config C:\\dev\\azure-rest-api-specs\\specification\\quota\\resource-manager\\Microsoft.Quota\\Quota\\.tspconfig.lintdiff-38328-b8873493-71bc-4386-9aad-693388623df2.yaml\n- Compiling...\n\u001b[31m×\u001b[39m Compiling\n",
       "rawFiles": [
         "projects/specification/quota/resource-manager/Microsoft.Quota/Quota/raw/typespec.stdout.txt",
         "projects/specification/quota/resource-manager/Microsoft.Quota/Quota/raw/typespec.stderr.txt"
@@ -4488,7 +4489,7 @@
     {
       "project": "specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
       "status": "success",
-      "durationMs": 18595,
+      "durationMs": 16835,
       "diagnosticCount": 58,
       "rawFiles": [
         "projects/specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices/raw/typespec.stdout.txt",
@@ -4499,7 +4500,7 @@
     {
       "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
       "status": "success",
-      "durationMs": 24771,
+      "durationMs": 22709,
       "diagnosticCount": 741,
       "rawFiles": [
         "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/raw/typespec.stdout.txt",
@@ -4510,7 +4511,7 @@
     {
       "project": "specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication",
       "status": "success",
-      "durationMs": 20040,
+      "durationMs": 18866,
       "diagnosticCount": 115,
       "rawFiles": [
         "projects/specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication/raw/typespec.stdout.txt",
@@ -4521,7 +4522,7 @@
     {
       "project": "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
       "status": "success",
-      "durationMs": 29200,
+      "durationMs": 27754,
       "diagnosticCount": 369,
       "rawFiles": [
         "projects/specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery/raw/typespec.stdout.txt",
@@ -4532,7 +4533,7 @@
     {
       "project": "specification/redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/OpenShiftClusters",
       "status": "success",
-      "durationMs": 8597,
+      "durationMs": 8100,
       "diagnosticCount": 15,
       "rawFiles": [
         "projects/specification/redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/OpenShiftClusters/raw/typespec.stdout.txt",
@@ -4542,7 +4543,7 @@
     {
       "project": "specification/redis/resource-manager/Microsoft.Cache/Redis",
       "status": "success",
-      "durationMs": 17991,
+      "durationMs": 17864,
       "diagnosticCount": 65,
       "rawFiles": [
         "projects/specification/redis/resource-manager/Microsoft.Cache/Redis/raw/typespec.stdout.txt",
@@ -4553,7 +4554,7 @@
     {
       "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
       "status": "success",
-      "durationMs": 17567,
+      "durationMs": 17976,
       "diagnosticCount": 49,
       "rawFiles": [
         "projects/specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise/raw/typespec.stdout.txt",
@@ -4564,7 +4565,7 @@
     {
       "project": "specification/relationships/resource-manager/Microsoft.Relationships/Relationships",
       "status": "success",
-      "durationMs": 7211,
+      "durationMs": 7383,
       "diagnosticCount": 22,
       "rawFiles": [
         "projects/specification/relationships/resource-manager/Microsoft.Relationships/Relationships/raw/typespec.stdout.txt",
@@ -4574,7 +4575,7 @@
     {
       "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
       "status": "success",
-      "durationMs": 18499,
+      "durationMs": 18904,
       "diagnosticCount": 79,
       "rawFiles": [
         "projects/specification/relay/resource-manager/Microsoft.Relay/Relay/raw/typespec.stdout.txt",
@@ -4585,7 +4586,7 @@
     {
       "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Quota",
       "status": "success",
-      "durationMs": 7459,
+      "durationMs": 7721,
       "diagnosticCount": 38,
       "rawFiles": [
         "projects/specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Quota/raw/typespec.stdout.txt",
@@ -4595,7 +4596,7 @@
     {
       "project": "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
       "status": "success",
-      "durationMs": 16228,
+      "durationMs": 16360,
       "diagnosticCount": 67,
       "rawFiles": [
         "projects/specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations/raw/typespec.stdout.txt",
@@ -4606,7 +4607,7 @@
     {
       "project": "specification/resourceconnector/resource-manager/Microsoft.ResourceConnector/ResourceConnector",
       "status": "success",
-      "durationMs": 15455,
+      "durationMs": 15677,
       "diagnosticCount": 19,
       "rawFiles": [
         "projects/specification/resourceconnector/resource-manager/Microsoft.ResourceConnector/ResourceConnector/raw/typespec.stdout.txt",
@@ -4617,7 +4618,7 @@
     {
       "project": "specification/resourcegraph/resource-manager/Microsoft.ResourceGraph/ResourceGraph/GraphQueryApi",
       "status": "success",
-      "durationMs": 7619,
+      "durationMs": 7915,
       "diagnosticCount": 7,
       "rawFiles": [
         "projects/specification/resourcegraph/resource-manager/Microsoft.ResourceGraph/ResourceGraph/GraphQueryApi/raw/typespec.stdout.txt",
@@ -4627,7 +4628,7 @@
     {
       "project": "specification/resourcegraph/resource-manager/Microsoft.ResourceGraph/ResourceGraph/ResourceChanges",
       "status": "success",
-      "durationMs": 14497,
+      "durationMs": 15056,
       "diagnosticCount": 6,
       "rawFiles": [
         "projects/specification/resourcegraph/resource-manager/Microsoft.ResourceGraph/ResourceGraph/ResourceChanges/raw/typespec.stdout.txt",
@@ -4638,7 +4639,7 @@
     {
       "project": "specification/resourcegraph/resource-manager/Microsoft.ResourceGraph/ResourceGraph/ResourceGraphApi",
       "status": "success",
-      "durationMs": 14567,
+      "durationMs": 15034,
       "diagnosticCount": 3,
       "rawFiles": [
         "projects/specification/resourcegraph/resource-manager/Microsoft.ResourceGraph/ResourceGraph/ResourceGraphApi/raw/typespec.stdout.txt",
@@ -4649,7 +4650,7 @@
     {
       "project": "specification/resourcegraph/resource-manager/Microsoft.ResourceGraph/ResourceGraph/ResourceHistory",
       "status": "success",
-      "durationMs": 7484,
+      "durationMs": 7671,
       "diagnosticCount": 3,
       "rawFiles": [
         "projects/specification/resourcegraph/resource-manager/Microsoft.ResourceGraph/ResourceGraph/ResourceHistory/raw/typespec.stdout.txt",
@@ -4659,7 +4660,7 @@
     {
       "project": "specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth",
       "status": "success",
-      "durationMs": 16250,
+      "durationMs": 16782,
       "diagnosticCount": 77,
       "rawFiles": [
         "projects/specification/resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth/raw/typespec.stdout.txt",
@@ -4670,7 +4671,7 @@
     {
       "project": "specification/resources/resource-manager/Microsoft.Authorization/policy",
       "status": "success",
-      "durationMs": 22447,
+      "durationMs": 21372,
       "diagnosticCount": 356,
       "rawFiles": [
         "projects/specification/resources/resource-manager/Microsoft.Authorization/policy/raw/typespec.stdout.txt",
@@ -4681,7 +4682,7 @@
     {
       "project": "specification/resources/resource-manager/Microsoft.Resources/bicep",
       "status": "success",
-      "durationMs": 7428,
+      "durationMs": 7579,
       "diagnosticCount": 3,
       "rawFiles": [
         "projects/specification/resources/resource-manager/Microsoft.Resources/bicep/raw/typespec.stdout.txt",
@@ -4691,7 +4692,7 @@
     {
       "project": "specification/resources/resource-manager/Microsoft.Resources/databoundaries",
       "status": "success",
-      "durationMs": 7222,
+      "durationMs": 7943,
       "diagnosticCount": 6,
       "rawFiles": [
         "projects/specification/resources/resource-manager/Microsoft.Resources/databoundaries/raw/typespec.stdout.txt",
@@ -4701,9 +4702,9 @@
     {
       "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
       "status": "failed",
-      "durationMs": 10032,
+      "durationMs": 10503,
       "diagnosticCount": 174,
-      "error": "Command failed: C:\\dev\\azure-rest-api-specs\\node_modules\\.bin\\tsp.cmd compile main.tsp --no-emit --warn-as-error=false --pretty false --config C:\\dev\\azure-rest-api-specs\\specification\\resources\\resource-manager\\Microsoft.Resources\\deployments\\.tspconfig.lintdiff-46124-b0e702c8-16bf-454d-89e0-4182ee25ff8c.yaml\n- Compiling...\n\u001b[31m×\u001b[39m Compiling\n",
+      "error": "Command failed: C:\\dev\\azure-rest-api-specs\\node_modules\\.bin\\tsp.cmd compile main.tsp --no-emit --warn-as-error=false --pretty false --config C:\\dev\\azure-rest-api-specs\\specification\\resources\\resource-manager\\Microsoft.Resources\\deployments\\.tspconfig.lintdiff-38328-12c805ae-be4c-4b22-9765-e3438da6707c.yaml\n- Compiling...\n\u001b[31m×\u001b[39m Compiling\n",
       "rawFiles": [
         "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/raw/typespec.stdout.txt",
         "projects/specification/resources/resource-manager/Microsoft.Resources/deployments/raw/typespec.stderr.txt"
@@ -4712,17 +4713,18 @@
     {
       "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentScripts",
       "status": "success",
-      "durationMs": 7513,
+      "durationMs": 15170,
       "diagnosticCount": 42,
       "rawFiles": [
         "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentScripts/raw/typespec.stdout.txt",
-        "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentScripts/raw/typespec.stderr.txt"
+        "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentScripts/raw/typespec.stderr.txt",
+        "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentScripts/raw/typespec.projected-enum.json"
       ]
     },
     {
       "project": "specification/resources/resource-manager/Microsoft.Resources/deploymentStacks",
       "status": "success",
-      "durationMs": 23231,
+      "durationMs": 19487,
       "diagnosticCount": 283,
       "rawFiles": [
         "projects/specification/resources/resource-manager/Microsoft.Resources/deploymentStacks/raw/typespec.stdout.txt",
@@ -4733,8 +4735,8 @@
     {
       "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
       "status": "success",
-      "durationMs": 23804,
-      "diagnosticCount": 126,
+      "durationMs": 16562,
+      "diagnosticCount": 125,
       "rawFiles": [
         "projects/specification/resources/resource-manager/Microsoft.Resources/resources/raw/typespec.stdout.txt",
         "projects/specification/resources/resource-manager/Microsoft.Resources/resources/raw/typespec.stderr.txt",
@@ -4744,7 +4746,7 @@
     {
       "project": "specification/resources/resource-manager/Microsoft.Resources/resourceValidator",
       "status": "success",
-      "durationMs": 18537,
+      "durationMs": 14267,
       "diagnosticCount": 3,
       "rawFiles": [
         "projects/specification/resources/resource-manager/Microsoft.Resources/resourceValidator/raw/typespec.stdout.txt",
@@ -4755,7 +4757,7 @@
     {
       "project": "specification/resources/resource-manager/Microsoft.Resources/subscriptions",
       "status": "success",
-      "durationMs": 25753,
+      "durationMs": 14509,
       "diagnosticCount": 9,
       "rawFiles": [
         "projects/specification/resources/resource-manager/Microsoft.Resources/subscriptions/raw/typespec.stdout.txt",
@@ -4766,17 +4768,18 @@
     {
       "project": "specification/scvmm/ScVmm.Management",
       "status": "success",
-      "durationMs": 13922,
+      "durationMs": 18687,
       "diagnosticCount": 106,
       "rawFiles": [
         "projects/specification/scvmm/ScVmm.Management/raw/typespec.stdout.txt",
-        "projects/specification/scvmm/ScVmm.Management/raw/typespec.stderr.txt"
+        "projects/specification/scvmm/ScVmm.Management/raw/typespec.stderr.txt",
+        "projects/specification/scvmm/ScVmm.Management/raw/typespec.projected-enum.json"
       ]
     },
     {
       "project": "specification/search/resource-manager/Microsoft.Search/Search",
       "status": "success",
-      "durationMs": 29534,
+      "durationMs": 17730,
       "diagnosticCount": 183,
       "rawFiles": [
         "projects/specification/search/resource-manager/Microsoft.Search/Search/raw/typespec.stdout.txt",
@@ -4787,7 +4790,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/AlertsAPI",
       "status": "success",
-      "durationMs": 31399,
+      "durationMs": 15325,
       "diagnosticCount": 40,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/AlertsAPI/raw/typespec.stdout.txt",
@@ -4798,7 +4801,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/AlertsSuppressionRulesAPI",
       "status": "success",
-      "durationMs": 15595,
+      "durationMs": 7319,
       "diagnosticCount": 10,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/AlertsSuppressionRulesAPI/raw/typespec.stdout.txt",
@@ -4808,7 +4811,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/ApiCollectionsAPI",
       "status": "success",
-      "durationMs": 15442,
+      "durationMs": 7549,
       "diagnosticCount": 14,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/ApiCollectionsAPI/raw/typespec.stdout.txt",
@@ -4818,7 +4821,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/ApplicationsAPI",
       "status": "success",
-      "durationMs": 12823,
+      "durationMs": 7325,
       "diagnosticCount": 24,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/ApplicationsAPI/raw/typespec.stdout.txt",
@@ -4828,7 +4831,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/AssessmentAPI",
       "status": "success",
-      "durationMs": 26936,
+      "durationMs": 15519,
       "diagnosticCount": 22,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/AssessmentAPI/raw/typespec.stdout.txt",
@@ -4839,7 +4842,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/ATPSettingsAPI",
       "status": "success",
-      "durationMs": 27726,
+      "durationMs": 14858,
       "diagnosticCount": 8,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/ATPSettingsAPI/raw/typespec.stdout.txt",
@@ -4850,7 +4853,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/AutomationsAPI",
       "status": "success",
-      "durationMs": 27969,
+      "durationMs": 15717,
       "diagnosticCount": 17,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/AutomationsAPI/raw/typespec.stdout.txt",
@@ -4861,7 +4864,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/ComplianceResultsAPI",
       "status": "success",
-      "durationMs": 14207,
+      "durationMs": 7756,
       "diagnosticCount": 5,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/ComplianceResultsAPI/raw/typespec.stdout.txt",
@@ -4871,7 +4874,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/DataScannersAPI",
       "status": "success",
-      "durationMs": 13006,
+      "durationMs": 7765,
       "diagnosticCount": 12,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/DataScannersAPI/raw/typespec.stdout.txt",
@@ -4881,7 +4884,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/DefenderForStorageAPI",
       "status": "success",
-      "durationMs": 23717,
+      "durationMs": 15513,
       "diagnosticCount": 23,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/DefenderForStorageAPI/raw/typespec.stdout.txt",
@@ -4892,7 +4895,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/GovernanceAPI",
       "status": "success",
-      "durationMs": 23523,
+      "durationMs": 15751,
       "diagnosticCount": 38,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/GovernanceAPI/raw/typespec.stdout.txt",
@@ -4903,7 +4906,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/HealthReportsAPI",
       "status": "success",
-      "durationMs": 11155,
+      "durationMs": 7591,
       "diagnosticCount": 6,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/HealthReportsAPI/raw/typespec.stdout.txt",
@@ -4913,7 +4916,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/IoTSecurityAPI",
       "status": "success",
-      "durationMs": 24079,
+      "durationMs": 16661,
       "diagnosticCount": 38,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/IoTSecurityAPI/raw/typespec.stdout.txt",
@@ -4924,7 +4927,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/LegacySettingsAPI",
       "status": "success",
-      "durationMs": 22975,
+      "durationMs": 15922,
       "diagnosticCount": 23,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/LegacySettingsAPI/raw/typespec.stdout.txt",
@@ -4935,7 +4938,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/LocationsAPI",
       "status": "success",
-      "durationMs": 10405,
+      "durationMs": 7724,
       "diagnosticCount": 4,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/LocationsAPI/raw/typespec.stdout.txt",
@@ -4945,7 +4948,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/MdeOnboardingAPI",
       "status": "success",
-      "durationMs": 10098,
+      "durationMs": 7763,
       "diagnosticCount": 5,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/MdeOnboardingAPI/raw/typespec.stdout.txt",
@@ -4955,7 +4958,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/OperationsAPI",
       "status": "success",
-      "durationMs": 11033,
+      "durationMs": 7425,
       "diagnosticCount": 4,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/OperationsAPI/raw/typespec.stdout.txt",
@@ -4965,7 +4968,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/PricingsAPI",
       "status": "success",
-      "durationMs": 20249,
+      "durationMs": 14358,
       "diagnosticCount": 15,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/PricingsAPI/raw/typespec.stdout.txt",
@@ -4976,7 +4979,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/PrivateLinksAPI",
       "status": "success",
-      "durationMs": 11662,
+      "durationMs": 8030,
       "diagnosticCount": 14,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/PrivateLinksAPI/raw/typespec.stdout.txt",
@@ -4986,7 +4989,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/RegulatoryComplianceAPI",
       "status": "success",
-      "durationMs": 11131,
+      "durationMs": 7647,
       "diagnosticCount": 14,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/RegulatoryComplianceAPI/raw/typespec.stdout.txt",
@@ -4996,7 +4999,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/SecureScoreAPI",
       "status": "success",
-      "durationMs": 10977,
+      "durationMs": 7594,
       "diagnosticCount": 9,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/SecureScoreAPI/raw/typespec.stdout.txt",
@@ -5006,7 +5009,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/SecurityConnectorsAPI",
       "status": "success",
-      "durationMs": 18974,
+      "durationMs": 15194,
       "diagnosticCount": 35,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/SecurityConnectorsAPI/raw/typespec.stdout.txt",
@@ -5017,7 +5020,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/SecurityConnectorsDevOpsAPI",
       "status": "success",
-      "durationMs": 12049,
+      "durationMs": 9579,
       "diagnosticCount": 140,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/SecurityConnectorsDevOpsAPI/raw/typespec.stdout.txt",
@@ -5027,7 +5030,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/SecurityOperatorsAPI",
       "status": "success",
-      "durationMs": 9470,
+      "durationMs": 7508,
       "diagnosticCount": 8,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/SecurityOperatorsAPI/raw/typespec.stdout.txt",
@@ -5037,7 +5040,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI",
       "status": "success",
-      "durationMs": 20004,
+      "durationMs": 17925,
       "diagnosticCount": 88,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI/raw/typespec.stdout.txt",
@@ -5048,7 +5051,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/SecurityStandardsAPI",
       "status": "success",
-      "durationMs": 9902,
+      "durationMs": 8575,
       "diagnosticCount": 13,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/SecurityStandardsAPI/raw/typespec.stdout.txt",
@@ -5058,7 +5061,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/SensitivitySettingsAPI",
       "status": "success",
-      "durationMs": 8870,
+      "durationMs": 7977,
       "diagnosticCount": 11,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/SensitivitySettingsAPI/raw/typespec.stdout.txt",
@@ -5068,7 +5071,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/ServerVulnerabilityAssessmentsSettingsAPI",
       "status": "success",
-      "durationMs": 8555,
+      "durationMs": 7879,
       "diagnosticCount": 5,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/ServerVulnerabilityAssessmentsSettingsAPI/raw/typespec.stdout.txt",
@@ -5078,7 +5081,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/SettingsAPI",
       "status": "success",
-      "durationMs": 15498,
+      "durationMs": 15520,
       "diagnosticCount": 7,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/SettingsAPI/raw/typespec.stdout.txt",
@@ -5089,8 +5092,8 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/SqlVulnerabilityAssessmentsAPI",
       "status": "success",
-      "durationMs": 16847,
-      "diagnosticCount": 77,
+      "durationMs": 16345,
+      "diagnosticCount": 76,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/SqlVulnerabilityAssessmentsAPI/raw/typespec.stdout.txt",
         "projects/specification/security/resource-manager/Microsoft.Security/Security/SqlVulnerabilityAssessmentsAPI/raw/typespec.stderr.txt",
@@ -5100,7 +5103,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/StandardsAPI",
       "status": "success",
-      "durationMs": 8488,
+      "durationMs": 8547,
       "diagnosticCount": 14,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/StandardsAPI/raw/typespec.stdout.txt",
@@ -5110,7 +5113,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/SubAssessmentsAPI",
       "status": "success",
-      "durationMs": 15471,
+      "durationMs": 15414,
       "diagnosticCount": 12,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/SubAssessmentsAPI/raw/typespec.stdout.txt",
@@ -5121,7 +5124,7 @@
     {
       "project": "specification/security/resource-manager/Microsoft.Security/Security/TasksAPI",
       "status": "success",
-      "durationMs": 8053,
+      "durationMs": 8290,
       "diagnosticCount": 26,
       "rawFiles": [
         "projects/specification/security/resource-manager/Microsoft.Security/Security/TasksAPI/raw/typespec.stdout.txt",
@@ -5131,7 +5134,7 @@
     {
       "project": "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
       "status": "success",
-      "durationMs": 37407,
+      "durationMs": 33054,
       "diagnosticCount": 724,
       "rawFiles": [
         "projects/specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights/raw/typespec.stdout.txt",
@@ -5142,7 +5145,7 @@
     {
       "project": "specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole",
       "status": "success",
-      "durationMs": 17087,
+      "durationMs": 15090,
       "diagnosticCount": 59,
       "rawFiles": [
         "projects/specification/serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole/raw/typespec.stdout.txt",
@@ -5153,7 +5156,7 @@
     {
       "project": "specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus",
       "status": "success",
-      "durationMs": 23584,
+      "durationMs": 20610,
       "diagnosticCount": 195,
       "rawFiles": [
         "projects/specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus/raw/typespec.stdout.txt",
@@ -5164,7 +5167,7 @@
     {
       "project": "specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric",
       "status": "success",
-      "durationMs": 20840,
+      "durationMs": 18269,
       "diagnosticCount": 108,
       "rawFiles": [
         "projects/specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric/raw/typespec.stdout.txt",
@@ -5175,7 +5178,7 @@
     {
       "project": "specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters",
       "status": "success",
-      "durationMs": 24004,
+      "durationMs": 20772,
       "diagnosticCount": 137,
       "rawFiles": [
         "projects/specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters/raw/typespec.stdout.txt",
@@ -5186,9 +5189,9 @@
     {
       "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
       "status": "failed",
-      "durationMs": 10580,
+      "durationMs": 9098,
       "diagnosticCount": 83,
-      "error": "Command failed: C:\\dev\\azure-rest-api-specs\\node_modules\\.bin\\tsp.cmd compile main.tsp --no-emit --warn-as-error=false --pretty false --config C:\\dev\\azure-rest-api-specs\\specification\\servicelinker\\resource-manager\\Microsoft.ServiceLinker\\ServiceLinker\\.tspconfig.lintdiff-46124-4443d447-e889-498e-8f1b-82957b190a5a.yaml\n- Compiling...\n\u001b[31m×\u001b[39m Compiling\n",
+      "error": "Command failed: C:\\dev\\azure-rest-api-specs\\node_modules\\.bin\\tsp.cmd compile main.tsp --no-emit --warn-as-error=false --pretty false --config C:\\dev\\azure-rest-api-specs\\specification\\servicelinker\\resource-manager\\Microsoft.ServiceLinker\\ServiceLinker\\.tspconfig.lintdiff-38328-9cec3677-9e26-458c-a741-29a0978448c3.yaml\n- Compiling...\n\u001b[31m×\u001b[39m Compiling\n",
       "rawFiles": [
         "projects/specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker/raw/typespec.stdout.txt",
         "projects/specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker/raw/typespec.stderr.txt"
@@ -5197,7 +5200,7 @@
     {
       "project": "specification/servicenetworking/resource-manager/Microsoft.ServiceNetworking/ServiceNetworking",
       "status": "success",
-      "durationMs": 9574,
+      "durationMs": 8545,
       "diagnosticCount": 107,
       "rawFiles": [
         "projects/specification/servicenetworking/resource-manager/Microsoft.ServiceNetworking/ServiceNetworking/raw/typespec.stdout.txt",
@@ -5207,7 +5210,7 @@
     {
       "project": "specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService",
       "status": "success",
-      "durationMs": 21011,
+      "durationMs": 18390,
       "diagnosticCount": 126,
       "rawFiles": [
         "projects/specification/signalr/resource-manager/Microsoft.SignalRService/SignalRService/raw/typespec.stdout.txt",
@@ -5218,7 +5221,7 @@
     {
       "project": "specification/solutions/Solutions.Management",
       "status": "success",
-      "durationMs": 19003,
+      "durationMs": 18028,
       "diagnosticCount": 96,
       "rawFiles": [
         "projects/specification/solutions/Solutions.Management/raw/typespec.stdout.txt",
@@ -5229,7 +5232,7 @@
     {
       "project": "specification/sovereign/resource-manager/Microsoft.Sovereign/Sovereign",
       "status": "success",
-      "durationMs": 17506,
+      "durationMs": 16772,
       "diagnosticCount": 115,
       "rawFiles": [
         "projects/specification/sovereign/resource-manager/Microsoft.Sovereign/Sovereign/raw/typespec.stdout.txt",
@@ -5240,7 +5243,7 @@
     {
       "project": "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
       "status": "success",
-      "durationMs": 19818,
+      "durationMs": 17852,
       "diagnosticCount": 335,
       "rawFiles": [
         "projects/specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere/raw/typespec.stdout.txt",
@@ -5251,7 +5254,7 @@
     {
       "project": "specification/splitio/SplitIO.Experimentation.Management",
       "status": "success",
-      "durationMs": 16397,
+      "durationMs": 15104,
       "diagnosticCount": 18,
       "rawFiles": [
         "projects/specification/splitio/SplitIO.Experimentation.Management/raw/typespec.stdout.txt",
@@ -5262,8 +5265,8 @@
     {
       "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
       "status": "success",
-      "durationMs": 75094,
-      "diagnosticCount": 1659,
+      "durationMs": 62160,
+      "diagnosticCount": 1656,
       "rawFiles": [
         "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/raw/typespec.stdout.txt",
         "projects/specification/sql/resource-manager/Microsoft.Sql/SQL/raw/typespec.stderr.txt",
@@ -5273,7 +5276,7 @@
     {
       "project": "specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine",
       "status": "success",
-      "durationMs": 18947,
+      "durationMs": 16581,
       "diagnosticCount": 51,
       "rawFiles": [
         "projects/specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine/raw/typespec.stdout.txt",
@@ -5284,7 +5287,7 @@
     {
       "project": "specification/standbypool/resource-manager/Microsoft.StandbyPool/StandbyPool",
       "status": "success",
-      "durationMs": 18485,
+      "durationMs": 16050,
       "diagnosticCount": 74,
       "rawFiles": [
         "projects/specification/standbypool/resource-manager/Microsoft.StandbyPool/StandbyPool/raw/typespec.stdout.txt",
@@ -5295,7 +5298,7 @@
     {
       "project": "specification/storage/Storage.Management",
       "status": "success",
-      "durationMs": 30116,
+      "durationMs": 24791,
       "diagnosticCount": 350,
       "rawFiles": [
         "projects/specification/storage/Storage.Management/raw/typespec.stdout.txt",
@@ -5306,7 +5309,7 @@
     {
       "project": "specification/storageactions/resource-manager/Microsoft.StorageActions/StorageActions",
       "status": "success",
-      "durationMs": 17786,
+      "durationMs": 14869,
       "diagnosticCount": 26,
       "rawFiles": [
         "projects/specification/storageactions/resource-manager/Microsoft.StorageActions/StorageActions/raw/typespec.stdout.txt",
@@ -5317,7 +5320,7 @@
     {
       "project": "specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache",
       "status": "success",
-      "durationMs": 24030,
+      "durationMs": 19372,
       "diagnosticCount": 116,
       "rawFiles": [
         "projects/specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache/raw/typespec.stdout.txt",
@@ -5328,7 +5331,7 @@
     {
       "project": "specification/storagediscovery/resource-manager/Microsoft.StorageDiscovery/StorageDiscovery",
       "status": "success",
-      "durationMs": 8923,
+      "durationMs": 7927,
       "diagnosticCount": 14,
       "rawFiles": [
         "projects/specification/storagediscovery/resource-manager/Microsoft.StorageDiscovery/StorageDiscovery/raw/typespec.stdout.txt",
@@ -5338,7 +5341,7 @@
     {
       "project": "specification/storagemover/resource-manager/Microsoft.StorageMover/StorageMover",
       "status": "success",
-      "durationMs": 20032,
+      "durationMs": 17648,
       "diagnosticCount": 49,
       "rawFiles": [
         "projects/specification/storagemover/resource-manager/Microsoft.StorageMover/StorageMover/raw/typespec.stdout.txt",
@@ -5349,7 +5352,7 @@
     {
       "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
       "status": "success",
-      "durationMs": 21849,
+      "durationMs": 18972,
       "diagnosticCount": 89,
       "rawFiles": [
         "projects/specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync/raw/typespec.stdout.txt",
@@ -5360,7 +5363,7 @@
     {
       "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
       "status": "success",
-      "durationMs": 17833,
+      "durationMs": 15674,
       "diagnosticCount": 47,
       "rawFiles": [
         "projects/specification/subscription/resource-manager/Microsoft.Subscription/Subscription/raw/typespec.stdout.txt",
@@ -5371,7 +5374,7 @@
     {
       "project": "specification/support/resource-manager/Microsoft.Support/Support",
       "status": "success",
-      "durationMs": 20052,
+      "durationMs": 17607,
       "diagnosticCount": 69,
       "rawFiles": [
         "projects/specification/support/resource-manager/Microsoft.Support/Support/raw/typespec.stdout.txt",
@@ -5382,7 +5385,7 @@
     {
       "project": "specification/terraform/resource-manager/Microsoft.AzureTerraform/AzureTerraform",
       "status": "success",
-      "durationMs": 15669,
+      "durationMs": 13856,
       "diagnosticCount": 15,
       "rawFiles": [
         "projects/specification/terraform/resource-manager/Microsoft.AzureTerraform/AzureTerraform/raw/typespec.stdout.txt",
@@ -5393,7 +5396,7 @@
     {
       "project": "specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager",
       "status": "success",
-      "durationMs": 19363,
+      "durationMs": 15219,
       "diagnosticCount": 57,
       "rawFiles": [
         "projects/specification/trafficmanager/resource-manager/Microsoft.Network/TrafficManager/raw/typespec.stdout.txt",
@@ -5404,7 +5407,7 @@
     {
       "project": "specification/verifiedid/resource-manager/Microsoft.VerifiedId/VerifiedId",
       "status": "success",
-      "durationMs": 8580,
+      "durationMs": 7270,
       "diagnosticCount": 16,
       "rawFiles": [
         "projects/specification/verifiedid/resource-manager/Microsoft.VerifiedId/VerifiedId/raw/typespec.stdout.txt",
@@ -5414,7 +5417,7 @@
     {
       "project": "specification/vmware/resource-manager/Microsoft.AVS/AVS",
       "status": "success",
-      "durationMs": 28377,
+      "durationMs": 22522,
       "diagnosticCount": 661,
       "rawFiles": [
         "projects/specification/vmware/resource-manager/Microsoft.AVS/AVS/raw/typespec.stdout.txt",
@@ -5425,8 +5428,8 @@
     {
       "project": "specification/web/resource-manager/Microsoft.Web/AppService",
       "status": "success",
-      "durationMs": 63663,
-      "diagnosticCount": 4794,
+      "durationMs": 48980,
+      "diagnosticCount": 4792,
       "rawFiles": [
         "projects/specification/web/resource-manager/Microsoft.Web/AppService/raw/typespec.stdout.txt",
         "projects/specification/web/resource-manager/Microsoft.Web/AppService/raw/typespec.stderr.txt",
@@ -5436,7 +5439,7 @@
     {
       "project": "specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService",
       "status": "success",
-      "durationMs": 23544,
+      "durationMs": 18623,
       "diagnosticCount": 129,
       "rawFiles": [
         "projects/specification/webpubsub/resource-manager/Microsoft.SignalRService/SignalRService/raw/typespec.stdout.txt",
@@ -5447,7 +5450,7 @@
     {
       "project": "specification/widget/resource-manager/Microsoft.Widget/Widget",
       "status": "success",
-      "durationMs": 9200,
+      "durationMs": 7094,
       "diagnosticCount": 9,
       "rawFiles": [
         "projects/specification/widget/resource-manager/Microsoft.Widget/Widget/raw/typespec.stdout.txt",
@@ -5457,7 +5460,7 @@
     {
       "project": "specification/workloads/Workloads.Operations.Management",
       "status": "success",
-      "durationMs": 8229,
+      "durationMs": 6990,
       "diagnosticCount": 7,
       "rawFiles": [
         "projects/specification/workloads/Workloads.Operations.Management/raw/typespec.stdout.txt",
@@ -5467,7 +5470,7 @@
     {
       "project": "specification/workloads/Workloads.SAPDiscoverySite.Management",
       "status": "success",
-      "durationMs": 9921,
+      "durationMs": 8148,
       "diagnosticCount": 85,
       "rawFiles": [
         "projects/specification/workloads/Workloads.SAPDiscoverySite.Management/raw/typespec.stdout.txt",
@@ -5477,7 +5480,7 @@
     {
       "project": "specification/workloads/Workloads.SAPMonitor.Management",
       "status": "success",
-      "durationMs": 10154,
+      "durationMs": 7749,
       "diagnosticCount": 93,
       "rawFiles": [
         "projects/specification/workloads/Workloads.SAPMonitor.Management/raw/typespec.stdout.txt",
@@ -5487,7 +5490,7 @@
     {
       "project": "specification/workloads/Workloads.SAPVirtualInstance.Management",
       "status": "success",
-      "durationMs": 17466,
+      "durationMs": 13484,
       "diagnosticCount": 57,
       "rawFiles": [
         "projects/specification/workloads/Workloads.SAPVirtualInstance.Management/raw/typespec.stdout.txt",

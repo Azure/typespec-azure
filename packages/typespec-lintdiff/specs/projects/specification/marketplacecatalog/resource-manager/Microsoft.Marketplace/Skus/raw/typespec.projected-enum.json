@@ -50,5 +50,49 @@
       "column": 3,
       "emittedName": "hasFreeTrials"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 134,
+      "column": 5,
+      "name": "language",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 138,
+      "column": 5,
+      "name": "includeStopSold",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 142,
+      "column": 5,
+      "name": "includeFutureAvailabilities",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 163,
+      "column": 5,
+      "name": "language",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 167,
+      "column": 5,
+      "name": "includeStopSold",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 171,
+      "column": 5,
+      "name": "includeFutureAvailabilities",
+      "verb": "get"
+    }
   ]
 }

@@ -104,5 +104,14 @@
       "column": 3,
       "emittedName": "isHiddenSaaS"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "routes.tsp",
+      "line": 83,
+      "column": 7,
+      "name": "datadogOrganizationId",
+      "verb": "get"
+    }
   ]
 }

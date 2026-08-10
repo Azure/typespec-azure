@@ -68,5 +68,49 @@
       "column": 5,
       "emittedName": "useMarkupIfPartner"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "PriceSheetResult.tsp",
+      "line": 56,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "PriceSheetResult.tsp",
+      "line": 62,
+      "column": 7,
+      "name": "$skiptoken",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "PriceSheetResult.tsp",
+      "line": 70,
+      "column": 7,
+      "name": "$top",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "PriceSheetResult.tsp",
+      "line": 99,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "PriceSheetResult.tsp",
+      "line": 105,
+      "column": 7,
+      "name": "$skiptoken",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "PriceSheetResult.tsp",
+      "line": 113,
+      "column": 7,
+      "name": "$top",
+      "verb": "get"
+    }
   ]
 }

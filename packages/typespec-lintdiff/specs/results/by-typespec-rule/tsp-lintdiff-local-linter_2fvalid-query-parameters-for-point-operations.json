@@ -1,13 +1,13 @@
 {
-  "schemaVersion": 5,
+  "schemaVersion": 6,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-10T06:49:00.682Z",
+  "generatedAt": "2026-08-10T09:38:18.108Z",
   "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-  "count": 866,
+  "count": 841,
   "levels": {
-    "warning": 866
+    "warning": 841
   },
-  "projectCount": 67,
+  "projectCount": 64,
   "results": [
     {
       "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
@@ -643,66 +643,6 @@
       "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
       "level": "warning",
       "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "SourceControl.tsp",
-      "line": 78,
-      "column": 7,
-      "message": "Query parameter 'ignoreWorkflowDeletionFailure' should be removed. Point operation 'delete' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "SourceControl.tsp",
-      "line": 85,
-      "column": 7,
-      "message": "Query parameter 'deleteWorkflow' should be removed. Point operation 'delete' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "SourceControl.tsp",
-      "line": 78,
-      "column": 7,
-      "message": "Query parameter 'ignoreWorkflowDeletionFailure' should be removed. Point operation 'delete' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "SourceControl.tsp",
-      "line": 85,
-      "column": 7,
-      "message": "Query parameter 'deleteWorkflow' should be removed. Point operation 'delete' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "SourceControl.tsp",
-      "line": 78,
-      "column": 7,
-      "message": "Query parameter 'ignoreWorkflowDeletionFailure' should be removed. Point operation 'delete' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "SourceControl.tsp",
-      "line": 85,
-      "column": 7,
-      "message": "Query parameter 'deleteWorkflow' should be removed. Point operation 'delete' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
       "project": "specification/appcomplianceautomation/AppComplianceAutomation.Management",
       "sourceFile": "models/models.tsp",
       "line": 1866,
@@ -857,26 +797,6 @@
       "sourceFile": "RoleAssignment.tsp",
       "line": 83,
       "column": 5,
-      "message": "Query parameter 'tenantId' should be removed. Point operation 'delete' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
-      "sourceFile": "RoleAssignment.tsp",
-      "line": 301,
-      "column": 7,
-      "message": "Query parameter 'tenantId' should be removed. Point operation 'get' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
-      "sourceFile": "RoleAssignment.tsp",
-      "line": 325,
-      "column": 7,
       "message": "Query parameter 'tenantId' should be removed. Point operation 'delete' MUST not have query parameters other than api-version."
     },
     {
@@ -3523,66 +3443,6 @@
       "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
       "level": "warning",
       "origin": "local",
-      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
-      "sourceFile": "UpdateType.tsp",
-      "line": 35,
-      "column": 3,
-      "message": "Query parameter 'updateType' should be removed. Point operation 'put' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
-      "sourceFile": "UpdateType.tsp",
-      "line": 35,
-      "column": 3,
-      "message": "Query parameter 'updateType' should be removed. Point operation 'put' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
-      "sourceFile": "UpdateType.tsp",
-      "line": 35,
-      "column": 3,
-      "message": "Query parameter 'updateType' should be removed. Point operation 'put' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
-      "sourceFile": "UpdateType.tsp",
-      "line": 35,
-      "column": 3,
-      "message": "Query parameter 'updateType' should be removed. Point operation 'patch' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
-      "sourceFile": "UpdateType.tsp",
-      "line": 35,
-      "column": 3,
-      "message": "Query parameter 'updateType' should be removed. Point operation 'patch' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
-      "sourceFile": "UpdateType.tsp",
-      "line": 35,
-      "column": 3,
-      "message": "Query parameter 'updateType' should be removed. Point operation 'patch' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
       "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
       "sourceFile": "OrderItemResource.tsp",
       "line": 46,
@@ -4535,29 +4395,9 @@
       "origin": "local",
       "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts",
       "sourceFile": "typespec/issues/issues.tsp",
-      "line": 53,
-      "column": 7,
-      "message": "Query parameter 'startInvestigation' should be removed. Point operation 'put' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts",
-      "sourceFile": "typespec/issues/issues.tsp",
       "line": 48,
       "column": 7,
       "message": "Query parameter 'related' should be removed. Point operation 'put' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts",
-      "sourceFile": "typespec/issues/issues.tsp",
-      "line": 53,
-      "column": 7,
-      "message": "Query parameter 'startInvestigation' should be removed. Point operation 'put' MUST not have query parameters other than api-version."
     },
     {
       "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
@@ -5693,26 +5533,6 @@
       "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
       "level": "warning",
       "origin": "local",
-      "project": "specification/privatedns/resource-manager/Microsoft.Network/PrivateDns",
-      "sourceFile": "RecordSet.tsp",
-      "line": 164,
-      "column": 7,
-      "message": "Query parameter '$top' should be removed. Point operation 'get' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/privatedns/resource-manager/Microsoft.Network/PrivateDns",
-      "sourceFile": "RecordSet.tsp",
-      "line": 170,
-      "column": 7,
-      "message": "Query parameter '$recordsetnamesuffix' should be removed. Point operation 'get' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
       "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
       "sourceFile": "ProtectedItemResource.tsp",
       "line": 52,
@@ -7333,16 +7153,6 @@
       "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
       "level": "warning",
       "origin": "local",
-      "project": "specification/resources/resource-manager/Microsoft.Resources/resources",
-      "sourceFile": "ResourceGroup.tsp",
-      "line": 87,
-      "column": 7,
-      "message": "Query parameter 'forceDeletionTypes' should be removed. Point operation 'delete' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
       "project": "specification/scvmm/ScVmm.Management",
       "sourceFile": "models.tsp",
       "line": 33,
@@ -7634,16 +7444,6 @@
       "level": "warning",
       "origin": "local",
       "project": "specification/security/resource-manager/Microsoft.Security/Security/SqlVulnerabilityAssessmentsAPI",
-      "sourceFile": "SqlVulnerabilityAssessmentSettings.tsp",
-      "line": 181,
-      "column": 7,
-      "message": "Query parameter 'databaseName' should be removed. Point operation 'get' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/security/resource-manager/Microsoft.Security/Security/SqlVulnerabilityAssessmentsAPI",
       "sourceFile": "ScanV2.tsp",
       "line": 76,
       "column": 7,
@@ -7898,36 +7698,6 @@
       "line": 56,
       "column": 7,
       "message": "Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
-      "sourceFile": "MaintenanceWindowOptions.tsp",
-      "line": 46,
-      "column": 7,
-      "message": "Query parameter 'maintenanceWindowOptionsName' should be removed. Point operation 'get' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
-      "sourceFile": "MaintenanceWindows.tsp",
-      "line": 47,
-      "column": 7,
-      "message": "Query parameter 'maintenanceWindowName' should be removed. Point operation 'get' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/sql/resource-manager/Microsoft.Sql/SQL",
-      "sourceFile": "MaintenanceWindows.tsp",
-      "line": 64,
-      "column": 7,
-      "message": "Query parameter 'maintenanceWindowName' should be removed. Point operation 'put' MUST not have query parameters other than api-version."
     },
     {
       "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
@@ -8648,26 +8418,6 @@
       "line": 199,
       "column": 7,
       "message": "Query parameter 'isCleaningAuthConfig' should be removed. Point operation 'delete' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
-      "sourceFile": "SiteSourceControl.tsp",
-      "line": 140,
-      "column": 7,
-      "message": "Query parameter 'additionalFlags' should be removed. Point operation 'delete' MUST not have query parameters other than api-version."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
-      "sourceFile": "SiteSourceControl.tsp",
-      "line": 245,
-      "column": 7,
-      "message": "Query parameter 'additionalFlags' should be removed. Point operation 'delete' MUST not have query parameters other than api-version."
     }
   ]
 }

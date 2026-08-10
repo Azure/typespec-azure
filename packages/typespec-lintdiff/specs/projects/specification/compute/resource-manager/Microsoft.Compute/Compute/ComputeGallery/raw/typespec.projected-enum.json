@@ -92,5 +92,35 @@
       "column": 3,
       "emittedName": "excludeFromLatest"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Gallery.tsp",
+      "line": 45,
+      "column": 7,
+      "name": "$select",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Gallery.tsp",
+      "line": 51,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "GalleryApplicationVersion.tsp",
+      "line": 41,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "GalleryImageVersion.tsp",
+      "line": 41,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
   ]
 }

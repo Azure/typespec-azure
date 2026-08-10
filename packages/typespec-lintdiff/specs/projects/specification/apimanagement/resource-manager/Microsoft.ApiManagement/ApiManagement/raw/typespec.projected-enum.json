@@ -578,5 +578,161 @@
       "column": 7,
       "emittedName": "expandGroups"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "ApiContract.tsp",
+      "line": 159,
+      "column": 7,
+      "name": "deleteRevisions",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "ApiContract.tsp",
+      "line": 461,
+      "column": 7,
+      "name": "deleteRevisions",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "IssueContract.tsp",
+      "line": 78,
+      "column": 7,
+      "name": "expandCommentsAttachments",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "PolicyContract.tsp",
+      "line": 20,
+      "column": 3,
+      "name": "format",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "PolicyFragmentContract.tsp",
+      "line": 71,
+      "column": 7,
+      "name": "format",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "PolicyFragmentContract.tsp",
+      "line": 256,
+      "column": 7,
+      "name": "format",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "ProductContract.tsp",
+      "line": 250,
+      "column": 7,
+      "name": "deleteSubscriptions",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "ProductContract.tsp",
+      "line": 627,
+      "column": 7,
+      "name": "deleteSubscriptions",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "SchemaContract.tsp",
+      "line": 138,
+      "column": 7,
+      "name": "force",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "SchemaContract.tsp",
+      "line": 298,
+      "column": 7,
+      "name": "force",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "SubscriptionContract.tsp",
+      "line": 101,
+      "column": 7,
+      "name": "notify",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "SubscriptionContract.tsp",
+      "line": 114,
+      "column": 7,
+      "name": "appType",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "SubscriptionContract.tsp",
+      "line": 147,
+      "column": 7,
+      "name": "notify",
+      "verb": "patch"
+    },
+    {
+      "sourceFile": "SubscriptionContract.tsp",
+      "line": 160,
+      "column": 7,
+      "name": "appType",
+      "verb": "patch"
+    },
+    {
+      "sourceFile": "SubscriptionContract.tsp",
+      "line": 413,
+      "column": 7,
+      "name": "notify",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "SubscriptionContract.tsp",
+      "line": 426,
+      "column": 7,
+      "name": "appType",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "SubscriptionContract.tsp",
+      "line": 459,
+      "column": 7,
+      "name": "notify",
+      "verb": "patch"
+    },
+    {
+      "sourceFile": "SubscriptionContract.tsp",
+      "line": 472,
+      "column": 7,
+      "name": "appType",
+      "verb": "patch"
+    },
+    {
+      "sourceFile": "UserContract.tsp",
+      "line": 69,
+      "column": 7,
+      "name": "notify",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "UserContract.tsp",
+      "line": 129,
+      "column": 7,
+      "name": "deleteSubscriptions",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "UserContract.tsp",
+      "line": 135,
+      "column": 7,
+      "name": "notify",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "UserContract.tsp",
+      "line": 148,
+      "column": 7,
+      "name": "appType",
+      "verb": "delete"
+    }
   ]
 }

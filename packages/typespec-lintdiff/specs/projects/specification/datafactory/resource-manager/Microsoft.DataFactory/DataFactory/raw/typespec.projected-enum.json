@@ -182,5 +182,6 @@
       "column": 7,
       "emittedName": "startFromFailure"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

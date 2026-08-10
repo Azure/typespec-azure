@@ -20,5 +20,6 @@
       "column": 3,
       "emittedName": "isRequired"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

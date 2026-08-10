@@ -20,5 +20,14 @@
       "column": 3,
       "emittedName": "enforceDataIntegrityCheckForIscsi"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 80,
+      "column": 7,
+      "name": "deleteType",
+      "verb": "delete"
+    }
   ]
 }

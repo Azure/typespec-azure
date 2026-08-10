@@ -68,5 +68,6 @@
       "column": 3,
       "emittedName": "useCommonAlertSchema"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

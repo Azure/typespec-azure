@@ -116,5 +116,14 @@
       "column": 3,
       "emittedName": "isDataAction"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "JobResource.tsp",
+      "line": 52,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
   ]
 }

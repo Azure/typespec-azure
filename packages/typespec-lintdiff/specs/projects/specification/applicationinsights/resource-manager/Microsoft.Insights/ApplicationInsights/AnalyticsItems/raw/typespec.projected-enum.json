@@ -14,5 +14,6 @@
       "column": 5,
       "emittedName": "overrideItem"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

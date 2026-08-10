@@ -8,5 +8,14 @@
       "column": 5,
       "emittedName": "enableAccessUsingResourcePermissions"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "typespec/issues/issues.tsp",
+      "line": 48,
+      "column": 7,
+      "name": "related",
+      "verb": "put"
+    }
   ]
 }

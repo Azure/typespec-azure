@@ -452,5 +452,63 @@
       "column": 7,
       "emittedName": "count"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "BillingProperty.tsp",
+      "line": 68,
+      "column": 3,
+      "name": "includeBillingCountry",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "BillingProperty.tsp",
+      "line": 74,
+      "column": 3,
+      "name": "includeTransitionStatus",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "BillingSubscription.tsp",
+      "line": 84,
+      "column": 7,
+      "name": "expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "BillingSubscription.tsp",
+      "line": 142,
+      "column": 7,
+      "name": "expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Reservation.tsp",
+      "line": 63,
+      "column": 7,
+      "name": "expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "ReservationOrder.tsp",
+      "line": 54,
+      "column": 7,
+      "name": "expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "SavingsPlanModel.tsp",
+      "line": 56,
+      "column": 7,
+      "name": "expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "SavingsPlanOrderModel.tsp",
+      "line": 56,
+      "column": 7,
+      "name": "expand",
+      "verb": "get"
+    }
   ]
 }

@@ -236,5 +236,196 @@
       "column": 3,
       "emittedName": "isPiRequired"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 208,
+      "column": 5,
+      "name": "market",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 212,
+      "column": 5,
+      "name": "includeStopSoldPlans",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 216,
+      "column": 5,
+      "name": "language",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 220,
+      "column": 5,
+      "name": "pricingAudience",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 224,
+      "column": 5,
+      "name": "includeHiddenPlans",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 228,
+      "column": 5,
+      "name": "includeServiceInstructionTemplates",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 232,
+      "column": 5,
+      "name": "planId",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 236,
+      "column": 5,
+      "name": "skuId",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 250,
+      "column": 5,
+      "name": "includeStopSoldPlans",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 254,
+      "column": 5,
+      "name": "language",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 258,
+      "column": 5,
+      "name": "includeHiddenPlans",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 262,
+      "column": 5,
+      "name": "includeServiceInstructionTemplates",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 266,
+      "column": 5,
+      "name": "planId",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 270,
+      "column": 5,
+      "name": "skuId",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 274,
+      "column": 5,
+      "name": "lookUpOfferInTenantLevel",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 288,
+      "column": 5,
+      "name": "includeStopSoldPlans",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 292,
+      "column": 5,
+      "name": "language",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 296,
+      "column": 5,
+      "name": "includeHiddenPlans",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 300,
+      "column": 5,
+      "name": "includeServiceInstructionTemplates",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 304,
+      "column": 5,
+      "name": "planId",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 308,
+      "column": 5,
+      "name": "skuId",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 323,
+      "column": 5,
+      "name": "includeStopSoldPlans",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 327,
+      "column": 5,
+      "name": "language",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 331,
+      "column": 5,
+      "name": "includeHiddenPlans",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 335,
+      "column": 5,
+      "name": "includeServiceInstructionTemplates",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 339,
+      "column": 5,
+      "name": "planId",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 343,
+      "column": 5,
+      "name": "skuId",
+      "verb": "get"
+    }
   ]
 }

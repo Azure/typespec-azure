@@ -38,5 +38,35 @@
       "column": 3,
       "emittedName": "published"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Event.tsp",
+      "line": 61,
+      "column": 7,
+      "name": "$filter",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 67,
+      "column": 7,
+      "name": "queryStartTime",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 177,
+      "column": 7,
+      "name": "$filter",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 183,
+      "column": 7,
+      "name": "queryStartTime",
+      "verb": "get"
+    }
   ]
 }

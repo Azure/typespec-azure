@@ -476,5 +476,6 @@
       "column": 3,
       "emittedName": "isSoftDeleted"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

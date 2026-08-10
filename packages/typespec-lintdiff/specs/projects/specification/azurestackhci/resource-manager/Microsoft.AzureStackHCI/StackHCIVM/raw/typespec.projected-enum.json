@@ -122,5 +122,6 @@
       "column": 3,
       "emittedName": "skipShutdown"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

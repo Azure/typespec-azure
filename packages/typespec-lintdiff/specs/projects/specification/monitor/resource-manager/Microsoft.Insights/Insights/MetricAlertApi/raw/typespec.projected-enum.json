@@ -50,5 +50,6 @@
       "column": 3,
       "emittedName": "skipMetricValidation"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

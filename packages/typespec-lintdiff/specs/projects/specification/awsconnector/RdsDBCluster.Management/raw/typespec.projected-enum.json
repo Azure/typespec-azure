@@ -74,5 +74,6 @@
       "column": 3,
       "emittedName": "autoPause"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

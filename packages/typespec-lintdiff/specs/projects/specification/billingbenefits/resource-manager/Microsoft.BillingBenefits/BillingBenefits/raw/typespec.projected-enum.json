@@ -74,5 +74,21 @@
       "column": 3,
       "emittedName": "valid"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "SavingsPlanModel.tsp",
+      "line": 48,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "SavingsPlanOrderModel.tsp",
+      "line": 46,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
   ]
 }

@@ -224,5 +224,14 @@
       "column": 7,
       "emittedName": "forceDelete"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "ProtectedItemModel.tsp",
+      "line": 71,
+      "column": 7,
+      "name": "forceDelete",
+      "verb": "delete"
+    }
   ]
 }

@@ -44,5 +44,6 @@
       "column": 3,
       "emittedName": "enableCrossTenantTransfer"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

@@ -14,5 +14,6 @@
       "column": 7,
       "emittedName": "canFetchContent"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

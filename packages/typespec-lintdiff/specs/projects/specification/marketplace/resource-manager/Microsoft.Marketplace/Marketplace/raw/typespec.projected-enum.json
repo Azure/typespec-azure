@@ -116,5 +116,14 @@
       "column": 3,
       "emittedName": "isDataAction"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "AdminRequestApprovalsResource.tsp",
+      "line": 42,
+      "column": 7,
+      "name": "publisherId",
+      "verb": "get"
+    }
   ]
 }

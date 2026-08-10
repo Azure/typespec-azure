@@ -38,5 +38,14 @@
       "column": 7,
       "emittedName": "consolidate"
     }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "PeeringServicePrefix.tsp",
+      "line": 38,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
   ]
 }

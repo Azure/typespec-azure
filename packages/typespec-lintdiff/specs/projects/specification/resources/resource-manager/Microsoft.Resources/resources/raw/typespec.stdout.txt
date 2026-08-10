@@ -20,7 +20,6 @@ ResourceGroup.tsp:67:3 - warning tsp-lintdiff-local-linter/subscriptions-and-res
 ResourceGroup.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ResourceGroup.tsp:80:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
 ResourceGroup.tsp:80:3 - warning tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing: The path segment resourcegroups should be resourceGroups.
-ResourceGroup.tsp:87:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'forceDeletionTypes' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
 ResourceGroup.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ResourceGroup.tsp:99:3 - warning tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing: The path segment resourcegroups should be resourceGroups.
 ResourceGroup.tsp:112:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
@@ -129,5 +128,5 @@ routes.tsp:279:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Plea
 routes.tsp:302:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:323:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 126 warnings.
+Found 125 warnings.
 

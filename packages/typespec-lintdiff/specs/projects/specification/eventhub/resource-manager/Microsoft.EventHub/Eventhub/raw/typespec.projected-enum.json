@@ -110,5 +110,6 @@
       "column": 3,
       "emittedName": "inProgress"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

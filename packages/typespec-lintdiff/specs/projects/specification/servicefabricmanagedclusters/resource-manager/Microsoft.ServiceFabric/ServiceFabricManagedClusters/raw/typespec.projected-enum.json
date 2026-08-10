@@ -320,5 +320,6 @@
       "column": 3,
       "emittedName": "forceRestart"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }

@@ -80,5 +80,6 @@
       "column": 3,
       "emittedName": "noCache"
     }
-  ]
+  ],
+  "queryParameterLocations": []
 }
