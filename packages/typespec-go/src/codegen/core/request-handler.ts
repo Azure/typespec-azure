@@ -41,6 +41,18 @@ export function createRequestHandler(
   text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${name}(${helpers.getCreateRequestParametersSig(method)}) (${returns.join(", ")}) {\n`;
 
   // BEGIN create request
+  // pageable methods that use nextLink require special handling (e.g. reinjectable query params)
+  const forNextLinkPager =
+    (method.kind === "pageableMethod" || method.kind === "lroPageableMethod") &&
+    method.strategy?.kind === "nextLink";
+  if (forNextLinkPager) {
+    text += `${indent.get()}firstPage := nextLink == ""\n`;
+    text += `${indent.get()}var req *policy.Request\n`;
+    text += `${indent.get()}var err error\n`;
+    text += `${indent.get()}if firstPage {\n`;
+    indent.push();
+  }
+
   const hostParams = new Array<go.URIParameter>();
   for (const parameter of method.receiver.type.parameters) {
     if (parameter.kind === "uriParam") {
@@ -86,10 +98,11 @@ export function createRequestHandler(
   // so, if a path contains tokens but there are no path params, skip emitting the path.
   const pathStr = method.httpPath;
   const pathContainsParms = pathStr.includes("{");
+  let opEndpoint = hostParam;
   if (hasPathParams || (!pathContainsParms && pathStr.length > 1)) {
     // there are path params, or the path doesn't contain tokens and is not "/" so emit it
     text += `${indent.get()}urlPath := "${method.httpPath}"\n`;
-    hostParam = `runtime.JoinPaths(${hostParam}, urlPath)`;
+    opEndpoint = `runtime.JoinPaths(${hostParam}, urlPath)`;
   }
 
   if (hasPathParams) {
@@ -175,7 +188,12 @@ export function createRequestHandler(
     }
   }
 
-  text += `${indent.get()}req, err := runtime.NewRequest(ctx, http.Method${naming.capitalize(method.httpMethod)}, ${hostParam})\n`;
+  text += `${indent.get()}req, err ${forNextLinkPager ? "=" : ":="} runtime.NewRequest(ctx, http.Method${naming.capitalize(method.httpMethod)}, ${opEndpoint})\n`;
+  if (forNextLinkPager) {
+    text += `${indent.pop().get()}} else {\n`;
+    text += `${indent.push().get()}req, err = runtime.NewRequestForNextLink(ctx, http.Method${naming.capitalize(method.nextLinkVerb)}, ${hostParam}, nextLink)\n`;
+    text += `${indent.pop().get()}}\n`;
+  }
   text += `${indent.get()}if err != nil {\n`;
   text += `${indent.push().get()}return nil, err\n`;
   text += `${indent.pop().get()}}\n`;
@@ -185,9 +203,41 @@ export function createRequestHandler(
   const encodedParams = methodParamGroups.encodedQueryParams;
   const unencodedParams = methodParamGroups.unencodedQueryParams;
 
+  // check for any params that require reinjection
+  const reinjectedParams = new Array<go.QueryParameter>();
+  if (forNextLinkPager && method.strategy?.kind === "nextLink") {
+    reinjectedParams.push(...method.strategy.reinjectedParams);
+  }
+
+  // tracks if we're inside an "if firstPage {}" block so we can close it at the end
+  let inIfFirstPage = false;
+
   // emit encoded params first
   if (encodedParams.length > 0) {
+    // determine the query params for reinjection.
+    // default to "all" to cover the non-pager case.
+    let forReinjection: "all" | "none" | "some" = "all";
+    if (forNextLinkPager) {
+      if (reinjectedParams.length === 0) {
+        forReinjection = "none";
+      } else if (reinjectedParams.length < encodedParams.length) {
+        forReinjection = "some";
+      }
+    }
+
+    if (forReinjection === "none") {
+      // no params to be reinjected, shove everything into "if firstPage {}" block
+      text += `${indent.get()}if firstPage {\n`;
+      indent.push();
+      inIfFirstPage = true;
+    }
+
     text += `${indent.get()}reqQP := req.Raw().URL.Query()\n`;
+
+    // this will accumulate any non-reinjected params code
+    let nonReinjectedParamsText = "";
+
+    // we emit all reinjected params in the loop, and collect the code for non-reinjected params
     for (const qp of encodedParams.sort((a: go.QueryParameter, b: go.QueryParameter) => {
       return helpers.sortAscending(a.queryParameter, b.queryParameter);
     })) {
@@ -223,7 +273,26 @@ export function createRequestHandler(
         // cannot initialize setter to this value as helpers.formatParamValue() can change imports
         setter = `reqQP.Set("${qp.queryParameter}", ${helpers.formatParamValue(qp, imports, indent)})`;
       }
-      text += emitQueryParam(qp, imports, indent, setter);
+
+      const qpText = emitQueryParam(qp, imports, indent, setter);
+
+      // if we're not reinjecting any params, or this param is for reinjection
+      // then emit it now, else collect it for the non-reinjected case.
+      if (forReinjection !== "some" || reinjectedParams.includes(qp)) {
+        text += qpText;
+      } else {
+        nonReinjectedParamsText += qpText;
+      }
+    }
+
+    if (forReinjection === "some") {
+      if (nonReinjectedParamsText.length === 0) {
+        throw new CodegenError("InternalError", "missing query parameters for reinjection");
+      }
+      // the indentation for nonReinjectedParamsText won't line up but gofmt fixes it
+      text += `${indent.get()}if firstPage {\n`;
+      text += nonReinjectedParamsText;
+      text += `${indent.get()}}\n`;
     }
 
     // reqQP.Encode() encodes space chars as '+' which is application/x-www-form-urlencoded
@@ -232,9 +301,26 @@ export function createRequestHandler(
     // see https://www.rfc-editor.org/rfc/rfc3986 sections 2.1, 2.2, and 3.4
     imports.add("strings");
     text += `${indent.get()}req.Raw().URL.RawQuery = strings.ReplaceAll(reqQP.Encode(), "+", "%20")\n`;
+
+    // don't close it yet if there are header/body params as those don't get reinjected
+    const bodyParam = methodParamGroups.bodyParam;
+    const formBodyParams = methodParamGroups.formBodyParams;
+    const multipartBodyParams = methodParamGroups.multipartBodyParams;
+    const partialBodyParams = methodParamGroups.partialBodyParams;
+    const hasBodyParam =
+      bodyParam ||
+      formBodyParams.length > 0 ||
+      multipartBodyParams.length > 0 ||
+      partialBodyParams.length > 0;
+    if (forReinjection === "none" && methodParamGroups.headerParams.length === 0 && !hasBodyParam) {
+      // closing brace for the "if firstPage {}" block
+      text += `${indent.pop().get()}}\n`;
+      inIfFirstPage = false;
+    }
   }
 
   // tack on any unencoded params to the end
+  // TODO: this was from OpenAPI support as tsp can't describe this at present. remove?
   if (unencodedParams.length > 0) {
     if (encodedParams.length > 0) {
       text += `${indent.get()}unencodedParams := []string{req.Raw().URL.RawQuery}\n`;
@@ -265,6 +351,13 @@ export function createRequestHandler(
   }
 
   // BEGIN specific request headers
+  if (forNextLinkPager && methodParamGroups.headerParams.length > 0 && !inIfFirstPage) {
+    // header params are never reinjected
+    text += `${indent.get()}if firstPage {\n`;
+    indent.push();
+    inIfFirstPage = true;
+  }
+
   let contentType: string | undefined;
   for (const param of methodParamGroups.headerParams.sort(
     (a: go.HeaderParameter, b: go.HeaderParameter) => {
@@ -327,12 +420,41 @@ export function createRequestHandler(
   // END specific request headers
 
   // BEGIN set body
+  const body = emitBody(method, methodParamGroups, imports, indent, contentType);
+  if (body) {
+    if (forNextLinkPager && !inIfFirstPage) {
+      // body params are never reinjected
+      text += `${indent.get()}if firstPage {\n`;
+      indent.push();
+      inIfFirstPage = true;
+    }
+    text += `${indent.get()}${body}`;
+  }
+  // END set body
+
+  if (inIfFirstPage) {
+    text += `${indent.pop().get()}}\n`;
+  }
+
+  text += `${indent.get()}return req, nil\n`;
+  text += "}\n\n";
+  return text;
+}
+
+function emitBody(
+  method: go.MethodType | go.NextPageMethod,
+  methodParamGroups: helpers.MethodParamGroups,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+  contentType?: string,
+): string | undefined {
   // note that these are mutually exclusive
   const bodyParam = methodParamGroups.bodyParam;
   const formBodyParams = methodParamGroups.formBodyParams;
   const multipartBodyParams = methodParamGroups.multipartBodyParams;
   const partialBodyParams = methodParamGroups.partialBodyParams;
 
+  let text = "";
   if (bodyParam) {
     if (bodyParam.bodyFormat === "JSON" || bodyParam.bodyFormat === "XML") {
       // default to the body param name
@@ -417,6 +539,7 @@ export function createRequestHandler(
         text += `${indent.get()}}\n`;
         body = "aux";
       }
+
       let setBody = `runtime.MarshalAs${helpers.getMediaFormat(bodyParam.type, bodyParam.bodyFormat, `req, ${body}`)}`;
       if (bodyParam.type.kind === "rawJSON") {
         imports.add("bytes");
@@ -425,7 +548,6 @@ export function createRequestHandler(
       }
       if (go.isRequiredParameter(bodyParam.style) || go.isLiteralParameter(bodyParam.style)) {
         text += emitSetBodyWithErrCheck(setBody, indent, contentType);
-        text += `${indent.get()}return req, nil\n`;
       } else {
         text += emitParamGroupCheck(bodyParam, indent);
         indent.push();
@@ -433,7 +555,6 @@ export function createRequestHandler(
         text += `${indent.get()}return req, nil\n`;
         indent.pop();
         text += `${indent.get()}}\n`;
-        text += `${indent.get()}return req, nil\n`;
       }
     } else if (bodyParam.bodyFormat === "binary") {
       if (go.isRequiredParameter(bodyParam.style)) {
@@ -442,7 +563,6 @@ export function createRequestHandler(
           indent,
           contentType,
         );
-        text += `${indent.get()}return req, nil\n`;
       } else {
         text += emitParamGroupCheck(bodyParam, indent);
         indent.push();
@@ -454,7 +574,6 @@ export function createRequestHandler(
         text += `${indent.get()}return req, nil\n`;
         indent.pop();
         text += `${indent.get()}}\n`;
-        text += `${indent.get()}return req, nil\n`;
       }
     } else if (bodyParam.bodyFormat === "Text") {
       imports.add("strings");
@@ -466,7 +585,6 @@ export function createRequestHandler(
           indent,
           contentType,
         );
-        text += `${indent.get()}return req, nil\n`;
       } else {
         text += emitParamGroupCheck(bodyParam, indent);
         indent.push();
@@ -479,9 +597,9 @@ export function createRequestHandler(
         text += `${indent.get()}return req, nil\n`;
         indent.pop();
         text += `${indent.get()}}\n`;
-        text += `${indent.get()}return req, nil\n`;
       }
     }
+    return text;
   } else if (partialBodyParams.length > 0) {
     // partial body params are discrete params that are all fields within an internal struct.
     // define and instantiate an instance of the wire type, using the values from each param.
@@ -514,7 +632,7 @@ export function createRequestHandler(
     text += `${indent.get()}if err := runtime.MarshalAsJSON(req, body); err != nil {\n`;
     text += `${indent.push().get()}return nil, err\n`;
     text += `${indent.pop().get()}}\n`;
-    text += `${indent.get()}return req, nil\n`;
+    return text;
   } else if (multipartBodyParams.length > 0) {
     // emit content type setters for direct MultipartContent params with a fixed content type.
     // this handles the case where the param itself is a MultipartContent or a slice of them
@@ -561,7 +679,7 @@ export function createRequestHandler(
     text += `${indent.get()}if err := runtime.SetMultipartFormData(req, formData); err != nil {\n`;
     text += `${indent.push().get()}return nil, err\n`;
     text += `${indent.pop().get()}}\n`;
-    text += `${indent.get()}return req, nil\n`;
+    return text;
   } else if (formBodyParams.length > 0) {
     imports.add("net/url");
     imports.add("strings");
@@ -583,15 +701,11 @@ export function createRequestHandler(
       'req.SetBody(body, "application/x-www-form-urlencoded")',
       indent,
     );
-    text += `${indent.get()}return req, nil\n`;
+    return text;
   } else {
     // no body
-    text += `${indent.get()}return req, nil\n`;
+    return undefined;
   }
-  // END set body
-
-  text += "}\n\n";
-  return text;
 }
 
 /**
@@ -836,7 +950,10 @@ function getClientSideDefaultVarName(
  * @param src the source containing the value
  * @returns the code containing the Content-Type value
  */
-function getContentTypeValue(method: go.MethodType | go.NextPageMethod, src: go.BodyParameterContentTypeKind): string {
+function getContentTypeValue(
+  method: go.MethodType | go.NextPageMethod,
+  src: go.BodyParameterContentTypeKind,
+): string {
   switch (src.kind) {
     case "literal":
       return helpers.formatLiteralValue(src, false);
