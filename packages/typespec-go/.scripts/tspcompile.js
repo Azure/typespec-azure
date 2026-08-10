@@ -3,6 +3,10 @@
 import { loadSpectorConfig, resolveSpecs } from "@azure-tools/spector-runner";
 import { exec, execSync } from "child_process";
 import { existsSync, opendirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
+import {
+  applyGoUnionCustomizations,
+  getCustomizedSpecPath,
+} from "./apply-go-union-customizations.js";
 import { semaphore } from "./semaphore.js";
 import { syncAzureRestApiSpecs } from "./sync-azure-rest-api-specs.js";
 
@@ -23,6 +27,11 @@ const compiler = pkgRoot + "node_modules/@typespec/compiler/cmd/tsp.js";
 // (e.g. those shipped with azure-rest-api-specs) don't bleed emitter options
 // from azure-sdk-for-go into our regenerated test fixtures.
 const stubConfig = pkgRoot + ".scripts/tspconfig.yaml";
+
+// Apply the temporary go-only union customizations before resolving and compiling
+// Spector specs. This keeps the workaround local to typespec-go.
+// TODO: Remove this customization once Go supports union types.
+applyGoUnionCustomizations();
 
 // Spec selection lives in the opt-in `spector.config.*.yaml` files (see
 // Azure/typespec-azure#4997), parsed by the shared @azure-tools/spector-runner
@@ -213,6 +222,7 @@ function generate(moduleName, input, outputDir, perTestOptions) {
         input += "/main.tsp";
       }
     }
+    input = getCustomizedSpecPath(input);
     console.log("generating " + input);
     const options = [];
     for (const option of allOptions) {

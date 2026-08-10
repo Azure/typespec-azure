@@ -35,6 +35,7 @@ specs:
   "server/versions/not-versioned": { options: { module: unversionedgroup } }
   "server/versions/versioned": { options: { module: versionedgroup } }
   "special-headers/conditional-request": { options: { module: condreqgroup } }
+  "special-headers/repeatability": { options: { module: repeatabilitygroup } }
   special-words: { options: { module: specialwordsgroup } }
   "type/array": { options: { module: arraygroup, slice-elements-byval: true } }
   "type/dictionary": { options: { module: dictionarygroup } }
@@ -49,11 +50,17 @@ specs:
   "type/model/usage": { options: { module: usagegroup } }
   "type/model/visibility": { options: { module: visibilitygroup } }
   "type/property/nullable": { options: { module: nullablegroup } }
+  "type/property/additional-properties": { options: { module: addlpropsgroup } }
   # missing plain time support: https://github.com/Azure/autorest.go/issues/1732
   "type/property/optionality": { options: { module: optionalitygroup, slice-elements-byval: true } }
+  "type/union": { options: { module: uniongroup } }
+  "type/union/discriminated": { options: { module: discriminatedgroup } }
   "type/property/value-types": { options: { module: valuetypesgroup, slice-elements-byval: true } }
   "type/scalar": { options: { module: scalargroup, slice-elements-byval: true } }
+  "versioning/added": { options: { module: addedgroup } }
   "versioning/madeOptional": { options: { module: madeoptionalgroup } }
+  "versioning/removed": { options: { module: removedgroup } }
+  "versioning/renamedFrom": { options: { module: renamedfromgroup } }
   "versioning/returnTypeChangedFrom": { options: { module: rettypechangedfromgroup } }
   "versioning/typeChangedFrom": { options: { module: typechangedfromgroup } }
 
@@ -66,21 +73,7 @@ specs:
   "response/status-code-range": false
   # TODO: https://github.com/Azure/autorest.go/issues/1730
   routes: false
-  # requires union support
-  "special-headers/repeatability": false
   # TODO: https://github.com/Azure/autorest.go/issues/1594
   "streaming/jsonl": false
   # not a real scenario
   "type/model/inheritance/nested-discriminator": false
-  # requires union support
-  "type/property/additional-properties": false
-  # requires union support
-  "type/union": false
-  # requires union support
-  "type/union/discriminated": false
-  # requires union support
-  "versioning/added": false
-  # requires union support
-  "versioning/removed": false
-  # requires union support
-  "versioning/renamedFrom": false
