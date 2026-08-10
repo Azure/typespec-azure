@@ -12,7 +12,7 @@ A missing or invalid provisioning state violates the RPC and RPaaS contracts.
 
 ## LintDiff Equivalent
 
-This rule corresponds to the LintDiff rule [ProvisioningStateValidation](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md) (also ProvisioningStateSpecifiedForLROPut, ProvisioningStateSpecifiedForLROPatch, and RpaaS_ResourceProvisioningState).
+This rule corresponds to the LintDiff rule [ProvisioningStateValidation](https://github.com/Azure/azure-openapi-validator/blob/main/docs/provisioning-state-validation.md) (also ProvisioningStateSpecifiedForLROPut, ProvisioningStateSpecifiedForLROPatch, and RpaaS_ResourceProvisioningState).
 
 ## ❌ Incorrect
 

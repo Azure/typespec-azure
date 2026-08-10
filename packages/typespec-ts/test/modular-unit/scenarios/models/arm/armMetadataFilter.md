@@ -40,7 +40,7 @@ model PrivateLinkParameters {
   privateLinkName: string;
 }
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "test"
+#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "test"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "test"
 op getPrivateLink(
   ...ApiVersionParameter,
@@ -111,7 +111,7 @@ model ParamBagReadCreate {
   resourceName: string;
 }
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "test"
+#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "test"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "test"
 op getResource(params?: ParamBagReadCreate): ArmResponse<{}> | ErrorResponse;
 ```
@@ -176,7 +176,7 @@ model ParamBagReadOnly {
   resourceName: string;
 }
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "test"
+#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "test"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "test"
 op getResource(params?: ParamBagReadOnly): ArmResponse<{}> | ErrorResponse;
 ```
@@ -239,7 +239,7 @@ model ParamBagReadUpdateCreate {
   resourceName: string;
 }
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "test"
+#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "test"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "test"
 op getResource(params?: ParamBagReadUpdateCreate): ArmResponse<{}> | ErrorResponse;
 ```

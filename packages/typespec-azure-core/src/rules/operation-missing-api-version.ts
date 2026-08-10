@@ -1,4 +1,4 @@
-import { ModelProperty, Operation, createRule, fileRef } from "@typespec/compiler";
+import { type ModelProperty, type Operation, createRule, fileRef } from "@typespec/compiler";
 import { getVersions } from "@typespec/versioning";
 
 function isApiVersionParam(prop: ModelProperty): boolean {

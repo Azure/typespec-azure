@@ -8,7 +8,6 @@ import * as naming from "../../naming/naming.js";
 import { CodegenError } from "../core/errors.js";
 import * as helpers from "../core/helpers.js";
 import { ImportManager } from "../core/imports.js";
-import { fixUpMethodName } from "../core/operations.js";
 import { generateServerInternal, RequiredHelpers } from "./internal.js";
 
 // contains the generated content for all servers and the required helpers
@@ -117,7 +116,7 @@ export function generateServers(pkg: go.FakePackage, target: go.CodeModelType): 
           break;
       }
 
-      const operationName = fixUpMethodName(method);
+      const operationName = helpers.fixUpMethodName(method);
       content += `${indent.get()}// ${operationName} is the fake for method ${client.name}.${operationName}\n`;
       const successCodes = new Array<string>();
       if (method.returns.result?.kind === "anyResult") {
@@ -181,11 +180,11 @@ export function generateServers(pkg: go.FakePackage, target: go.CodeModelType): 
               respType = `azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]`;
             }
             requiredHelpers.tracker = true;
-            content += `${indent.get()}${naming.uncapitalize(fixUpMethodName(method))}: newTracker[azfake.PollerResponder[${respType}]](),\n`;
+            content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))}: newTracker[azfake.PollerResponder[${respType}]](),\n`;
             break;
           case "pageableMethod":
             requiredHelpers.tracker = true;
-            content += `${indent.get()}${naming.uncapitalize(fixUpMethodName(method))}: newTracker[azfake.PagerResponder[${respType}]](),\n`;
+            content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))}: newTracker[azfake.PagerResponder[${respType}]](),\n`;
             break;
         }
       }
@@ -219,11 +218,11 @@ export function generateServers(pkg: go.FakePackage, target: go.CodeModelType): 
             respType = `azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]`;
           }
           requiredHelpers.tracker = true;
-          content += `${indent.get()}${naming.uncapitalize(fixUpMethodName(method))} *tracker[azfake.PollerResponder[${respType}]]\n`;
+          content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))} *tracker[azfake.PollerResponder[${respType}]]\n`;
           break;
         case "pageableMethod":
           requiredHelpers.tracker = true;
-          content += `${indent.get()}${naming.uncapitalize(fixUpMethodName(method))} *tracker[azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]]\n`;
+          content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))} *tracker[azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]]\n`;
           break;
       }
     }
@@ -400,7 +399,7 @@ function generateServerTransportMethodDispatch(
   content += `${indent.get()}switch method {\n`;
 
   for (const method of finalMethods) {
-    const operationName = fixUpMethodName(method);
+    const operationName = helpers.fixUpMethodName(method);
     content += `${indent.get()}case "${client.name}.${operationName}":\n`;
     content += `${indent.push().get()}res.resp, res.err = ${receiverName}.dispatch${operationName}(req)\n`;
     indent.pop();
@@ -454,9 +453,9 @@ function generateServerTransportMethods(
 
   let content = "";
   for (const method of finalMethods) {
-    content += `func (${receiverName} *${serverTransport}) dispatch${fixUpMethodName(method)}(req *http.Request) (*http.Response, error) {\n`;
-    content += `${indent.get()}if ${receiverName}.srv.${fixUpMethodName(method)} == nil {\n`;
-    content += `${indent.push().get()}return nil, &nonRetriableError{errors.New("fake for method ${fixUpMethodName(method)} not implemented")}\n`;
+    content += `func (${receiverName} *${serverTransport}) dispatch${helpers.fixUpMethodName(method)}(req *http.Request) (*http.Response, error) {\n`;
+    content += `${indent.get()}if ${receiverName}.srv.${helpers.fixUpMethodName(method)} == nil {\n`;
+    content += `${indent.push().get()}return nil, &nonRetriableError{errors.New("fake for method ${helpers.fixUpMethodName(method)} not implemented")}\n`;
     content += `${indent.pop().get()}}\n`;
 
     switch (method.kind) {
@@ -562,7 +561,7 @@ function generateServerTransportMethods(
             content += `${indent.pop().get()}}\n`;
           } else {
             content += `${indent.get()}if val := server.GetResponse(respr).${header.fieldName}; val != nil {\n`;
-            content += `${indent.push().get()}resp.Header.Set("${header.headerName}", ${helpers.formatValue("val", header.type, imports, true)})\n`;
+            content += `${indent.push().get()}resp.Header.Set("${helpers.canonicalizeHeaderName(header.headerName)}", ${helpers.formatValue("val", header.type, imports, true)})\n`;
             content += `${indent.pop().get()}}\n`;
           }
         }
@@ -919,7 +918,7 @@ function dispatchForOperationBody(
     );
   }
 
-  const apiCall = `:= ${receiverName}.srv.${fixUpMethodName(method)}(${populateApiParams(pkg, method, result.params, imports)})`;
+  const apiCall = `:= ${receiverName}.srv.${helpers.fixUpMethodName(method)}(${populateApiParams(pkg, method, result.params, imports)})`;
   if (method.kind === "pageableMethod") {
     content += `resp ${apiCall}\n`;
     return content;
@@ -966,7 +965,7 @@ function dispatchForLROBody(
   imports: ImportManager,
   indent: helpers.Indentation,
 ): string {
-  const operationName = fixUpMethodName(method);
+  const operationName = helpers.fixUpMethodName(method);
   const localVarName = naming.uncapitalize(operationName);
   const operationStateMachine = `${receiverName}.${naming.uncapitalize(operationName)}`;
   let content = `${indent.get()}${localVarName} := ${operationStateMachine}.get(req)\n`;
@@ -1013,7 +1012,7 @@ function dispatchForPagerBody(
   imports: ImportManager,
   indent: helpers.Indentation,
 ): string {
-  const operationName = fixUpMethodName(method);
+  const operationName = helpers.fixUpMethodName(method);
   const localVarName = naming.uncapitalize(operationName);
   const operationStateMachine = `${receiverName}.${naming.uncapitalize(operationName)}`;
   let content = `${indent.get()}${localVarName} := ${operationStateMachine}.get(req)\n`;
@@ -1277,7 +1276,8 @@ function parseHeaderPathQueryParams(
             imports.add("strconv");
             content += `${indent.get()}p, parseErr := strconv.ParseInt(${paramValue}[i], 10, 64)\n`;
             content += `${indent.get()}if parseErr != nil {\n${indent.push().get()}return nil, parseErr\n${indent.pop().get()}}\n`;
-            content += `${indent.get()}${fromVar} := time.Unix(p, 0).UTC()\n`;
+            // Unix times are absolute epoch seconds; no .UTC() needed (time.Unix's Local zone is irrelevant).
+            content += `${indent.get()}${fromVar} := time.Unix(p, 0)\n`;
           } else {
             let format = "time.RFC3339Nano";
             if (elementFormat === "RFC1123" || elementFormat === "RFC7231") {
@@ -1342,7 +1342,8 @@ function parseHeaderPathQueryParams(
         content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := ${parser}(${paramValue}, func (v string) (time.Time, error) {\n`;
         content += `${indent.push().get()}p, parseErr := strconv.ParseInt(v, 10, 64)\n`;
         content += `${indent.get()}if parseErr != nil {\n${indent.push().get()}return time.Time{}, parseErr\n${indent.pop().get()}}\n`;
-        content += `${indent.get()}return time.Unix(p, 0).UTC(), nil\n${indent.pop().get()}})\n`;
+        // Unix times are absolute epoch seconds; no .UTC() needed (time.Unix's Local zone is irrelevant).
+        content += `${indent.get()}return time.Unix(p, 0), nil\n${indent.pop().get()}})\n`;
         content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
       }
     } else if (

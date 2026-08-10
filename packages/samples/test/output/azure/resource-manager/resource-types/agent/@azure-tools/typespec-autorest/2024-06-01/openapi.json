@@ -1891,6 +1891,10 @@
       "type": "object",
       "description": "The updatable properties of the ApplianceConversation.",
       "properties": {
+        "input": {
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.InputItem",
+          "description": "Content input to the conversation. Required on create."
+        },
         "instructions": {
           "type": "string",
           "description": "System prompt / behavioral instructions for this conversation."
@@ -1952,7 +1956,7 @@
           "description": "Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET."
         },
         "input": {
-          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.ConversationItem",
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.InputItem",
           "description": "Content input to the model. Required on create."
         }
       }
@@ -1995,7 +1999,7 @@
         "name"
       ]
     },
-    "Azure.ResourceManager.BaseTypes.Agents.ConversationItem": {
+    "Azure.ResourceManager.BaseTypes.Agents.InputItem": {
       "type": "object",
       "description": "A single item exchanged within a conversation.\n\nThe `type` discriminator selects the item variant. Only the fields relevant to\nthat variant are populated, so all variant-specific fields are optional:\n- `Message`: `role`, `content`\n- `FunctionCall`: `callId`, `name`, `arguments`\n- `FunctionCallOutput`: `callId`, `output`\n- `Compaction`: `summary`",
       "properties": {
@@ -2010,11 +2014,13 @@
         },
         "role": {
           "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.MessageRole",
-          "description": "The role of the message author. Applies to `Message` items."
+          "description": "The role of the message author. Applies to `Message` items. Read-only.",
+          "readOnly": true
         },
         "content": {
-          "type": "string",
-          "description": "The text content of the message. Applies to `Message` items."
+          "type": "object",
+          "description": "The content of the message. Applies to `Message` items.",
+          "additionalProperties": {}
         },
         "callId": {
           "type": "string",
@@ -2279,7 +2285,7 @@
     },
     "ContosoApplianceAgentProperties": {
       "type": "object",
-      "description": "Appliance deployment model of AgentProperties.\nAll properties are read-only (the appliance owns and reports state).",
+      "description": "Appliance deployment model of AgentProperties.\nAll properties are read-only (the appliance owns and reports state), except the `definition`\ncontainer itself: it stays writable so the client can send the fields the agent definition\nmarks as writable, such as `modelDeploymentRef`. Every service-owned field inside the\ndefinition remains read-only.",
       "properties": {
         "baseTypes": {
           "type": "array",
@@ -2301,8 +2307,7 @@
         },
         "definition": {
           "$ref": "#/definitions/ContosoApplianceDefinition",
-          "description": "Inline agent definition.",
-          "readOnly": true
+          "description": "Inline agent definition. The container is writable so the client can set the definition fields that are not service-owned."
         },
         "tools": {
           "type": "array",
@@ -2340,7 +2345,7 @@
     },
     "ContosoApplianceDefinition": {
       "type": "object",
-      "description": "Appliance deployment model of AgentDefinition.\nProperties controlled by `@baseTypeOptional` are invisible when the corresponding\ntemplate parameter is false, or read-only when present.",
+      "description": "Appliance deployment model of AgentDefinition.\nProperties controlled by `@baseTypeOptional` are invisible when the corresponding\ntemplate parameter is false. When present, `instructions` is read-only while\n`modelDeploymentRef` stays writable so the client can point the agent at a model deployment.",
       "properties": {
         "model": {
           "type": "string",
@@ -2354,8 +2359,7 @@
         },
         "modelDeploymentRef": {
           "type": "string",
-          "description": "Optional RP-specific reference to an underlying model deployment.",
-          "readOnly": true
+          "description": "Optional RP-specific reference to an underlying model deployment. Writable in both deployment models."
         }
       },
       "required": [
@@ -2373,6 +2377,10 @@
           "description": "Timestamp of when the conversation was created. Read-only.",
           "readOnly": true
         },
+        "input": {
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.InputItem",
+          "description": "Content input to the conversation. Required on create."
+        },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
           "description": "The provisioning state of the resource.",
@@ -2382,7 +2390,10 @@
           "type": "string",
           "description": "System prompt / behavioral instructions for this conversation."
         }
-      }
+      },
+      "required": [
+        "input"
+      ]
     },
     "ContosoPlatformAgent": {
       "type": "object",
@@ -2519,7 +2530,7 @@
           "readOnly": true
         },
         "input": {
-          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.ConversationItem",
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.InputItem",
           "description": "Content input to the model. Required on create."
         },
         "previousResponseId": {
@@ -2587,6 +2598,10 @@
       "type": "object",
       "description": "The updatable properties of the PlatformConversation.",
       "properties": {
+        "input": {
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.InputItem",
+          "description": "Content input to the conversation. Required on create."
+        },
         "instructions": {
           "type": "string",
           "description": "System prompt / behavioral instructions for this conversation."
@@ -2648,7 +2663,7 @@
           "description": "Model ID used to generate the response. May be specified on request to override the agent default; read-only in GET."
         },
         "input": {
-          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.ConversationItem",
+          "$ref": "#/definitions/Azure.ResourceManager.BaseTypes.Agents.InputItem",
           "description": "Content input to the model. Required on create."
         }
       }

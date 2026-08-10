@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
+import { createTypeSpecLibrary, type JSONSchemaType, paramMessage } from "@typespec/compiler";
 
 export interface GoEmitterOptions {
   "azcore-version"?: string;

@@ -80,7 +80,7 @@ alias ResourceCreatedOrOkResponse<Resource extends TypeSpec.Reflection.Model> =
 
 /**
  * Response describing the location of a created resource.
- * @template T The type of the created resource.
+ * @template Resource The type of the created resource.
  */
 model LocationOfCreatedResourceResponse<Resource extends TypeSpec.Reflection.Model>
   is TypeSpec.Http.CreatedResponse {
@@ -91,7 +91,7 @@ model LocationOfCreatedResourceResponse<Resource extends TypeSpec.Reflection.Mod
 
 /**
  * Response describing the location of a resource created with a service-provided name.
- * @template T The type of the created resource.
+ * @template Resource The type of the created resource.
  */
 model LocationOfCreatedResourceWithServiceProvidedNameResponse<Resource extends TypeSpec.Reflection.Model>
   is TypeSpec.Http.AcceptedResponse {

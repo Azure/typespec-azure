@@ -1,9 +1,15 @@
-import { CompilerHost, getDirectoryPath, joinPaths, NoTarget, Program } from "@typespec/compiler";
+import {
+  type CompilerHost,
+  getDirectoryPath,
+  joinPaths,
+  NoTarget,
+  type Program,
+} from "@typespec/compiler";
 import { format } from "prettier";
 import prettierPluginBabel from "prettier/plugins/babel";
 import prettierPluginEstree from "prettier/plugins/estree";
 import prettierPluginTypescript from "prettier/plugins/typescript";
-import { ClientModel, ContentBuilder, File } from "../interfaces.js";
+import type { ClientModel, ContentBuilder, File } from "../interfaces.js";
 import { prettierJSONOptions, prettierTypeScriptOptions, reportDiagnostic } from "../lib.js";
 
 export async function emitContentByBuilder(

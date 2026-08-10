@@ -1,4 +1,4 @@
-import { Operation, createRule, fileRef } from "@typespec/compiler";
+import { type Operation, createRule, fileRef } from "@typespec/compiler";
 import { getOperationVerb } from "@typespec/http";
 
 import { getActionDetails } from "@typespec/rest";

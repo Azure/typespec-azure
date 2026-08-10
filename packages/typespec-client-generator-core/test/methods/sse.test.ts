@@ -566,6 +566,157 @@ describe("sse usage and access propagation", () => {
   });
 });
 
+describe("sse model shared with non-streaming response (search-like scenario)", () => {
+  it("model used as both a regular response body and a terminal SSE event gets correct usage", async () => {
+    const { program } = await StreamsTesterWithBuiltInService.compile(
+      `
+        model RetrievalRequest {
+          query: string;
+        }
+
+        model RetrievalResponse {
+          messages: string[];
+          references: string[];
+        }
+
+        model ActivityRecord {
+          id: string;
+          status: string;
+        }
+
+        model AnswerDelta {
+          delta: string;
+        }
+
+        @Events.events
+        union RetrievalStreamEvents {
+          @Events.contentType("application/json")
+          \`activity.completed\`: ActivityRecord,
+
+          @Events.contentType("application/json")
+          \`answer.delta\`: AnswerDelta,
+
+          @Events.contentType("application/json")
+          @terminalEvent
+          \`response.completed\`: RetrievalResponse,
+        }
+
+        @route("/retrieve")
+        @post
+        op retrieve(@body request: RetrievalRequest): RetrievalResponse;
+
+        @route("/retrieveStream")
+        @post
+        op retrieveStream(@body request: RetrievalRequest): SSEStream<RetrievalStreamEvents>;
+      `,
+    );
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
+
+    // Non-streaming retrieve method
+    const retrieveMethod = getServiceMethodOfClient(sdkPackage, 2, 0);
+    strictEqual(retrieveMethod.operation.responses[0].type?.kind, "model");
+    strictEqual(retrieveMethod.operation.responses[0].type?.name, "RetrievalResponse");
+
+    // Streaming retrieveStream method
+    const streamMethod = getServiceMethodOfClient(sdkPackage, 2, 1);
+    const responseSse = streamMethod.operation.responses[0].sseMetadata;
+    ok(responseSse);
+    strictEqual(responseSse.events.length, 3);
+
+    // The terminal event uses the same RetrievalResponse model
+    const terminalEvent = responseSse.events[2];
+    strictEqual(terminalEvent.eventType, "response.completed");
+    strictEqual(terminalEvent.isTerminalEvent, true);
+    strictEqual(terminalEvent.type.kind, "model");
+    strictEqual(terminalEvent.type.name, "RetrievalResponse");
+    strictEqual(terminalEvent.contentType, "application/json");
+
+    // The shared model gets Output + Json usage from BOTH the regular response and the SSE event
+    const retrievalResponseModel = sdkPackage.models.find((m) => m.name === "RetrievalResponse");
+    ok(retrievalResponseModel);
+    strictEqual(retrievalResponseModel.usage, UsageFlags.Output | UsageFlags.Json);
+
+    // The SSE-only models also get Output + Json usage
+    const activityModel = sdkPackage.models.find((m) => m.name === "ActivityRecord");
+    ok(activityModel);
+    strictEqual(activityModel.usage, UsageFlags.Output | UsageFlags.Json);
+
+    const deltaModel = sdkPackage.models.find((m) => m.name === "AnswerDelta");
+    ok(deltaModel);
+    strictEqual(deltaModel.usage, UsageFlags.Output | UsageFlags.Json);
+
+    // The request model is Input + Json (shared across both operations)
+    const requestModel = sdkPackage.models.find((m) => m.name === "RetrievalRequest");
+    ok(requestModel);
+    strictEqual(requestModel.usage, UsageFlags.Input | UsageFlags.Json);
+
+    // All models have serialization options
+    ok(retrievalResponseModel.serializationOptions.json);
+    ok(activityModel.serializationOptions.json);
+    ok(deltaModel.serializationOptions.json);
+    ok(requestModel.serializationOptions.json);
+  });
+
+  it("model used as both a regular response body and an SSE event (non-terminal) gets correct usage", async () => {
+    const { program } = await StreamsTesterWithBuiltInService.compile(
+      `
+        model SharedResult {
+          id: string;
+          content: string;
+        }
+
+        model ProgressUpdate {
+          progress: int32;
+        }
+
+        @Events.events
+        union StreamEvents {
+          @Events.contentType("application/json")
+          progress: ProgressUpdate,
+
+          @Events.contentType("application/json")
+          result: SharedResult,
+
+          @Events.contentType("text/plain")
+          @terminalEvent
+          "[DONE]",
+        }
+
+        @route("/get")
+        op getResult(): SharedResult;
+
+        @route("/stream")
+        @post
+        op streamResult(): SSEStream<StreamEvents>;
+      `,
+    );
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
+
+    // Verify the shared model has correct usage from both paths
+    const sharedModel = sdkPackage.models.find((m) => m.name === "SharedResult");
+    ok(sharedModel);
+    strictEqual(sharedModel.usage, UsageFlags.Output | UsageFlags.Json);
+    ok(sharedModel.serializationOptions.json);
+
+    // It appears in SSE metadata for the stream method
+    const streamMethod = getServiceMethodOfClient(sdkPackage, 2, 1);
+    const responseSse = streamMethod.operation.responses[0].sseMetadata;
+    ok(responseSse);
+    const resultEvent = responseSse.events[1];
+    strictEqual(resultEvent.eventType, "result");
+    strictEqual(resultEvent.isTerminalEvent, false);
+    strictEqual(resultEvent.type.kind, "model");
+    strictEqual(resultEvent.type.name, "SharedResult");
+
+    // It also appears as the regular response type of the non-stream method
+    const getMethod = getServiceMethodOfClient(sdkPackage, 2, 0);
+    strictEqual(getMethod.operation.responses[0].type?.kind, "model");
+    strictEqual(getMethod.operation.responses[0].type?.name, "SharedResult");
+  });
+});
+
 describe("sse with HttpStream", () => {
   it("HttpStream with text/event-stream content type and @events union", async () => {
     const { program } = await StreamsTesterWithBuiltInService.compile(

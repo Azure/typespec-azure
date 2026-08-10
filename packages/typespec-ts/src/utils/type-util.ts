@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { Schema } from "../interfaces.js";
+import type { Schema } from "../interfaces.js";
 
 export function isRecord(type: string) {
   return /^Record<([a-zA-Z]+),(\s*)(?<type>.+)>$/.test(type);

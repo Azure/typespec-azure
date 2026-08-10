@@ -1,23 +1,23 @@
-import { UnionEnum, getLroMetadata, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
+import { type UnionEnum, getLroMetadata, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
-  BooleanLiteral,
-  Diagnostic,
-  EncodeData,
-  Enum,
-  EnumMember,
-  IntrinsicScalarName,
-  IntrinsicType,
-  Model,
-  ModelProperty,
-  Namespace,
-  NumericLiteral,
-  Operation,
-  Program,
-  Scalar,
-  StringLiteral,
-  Tuple,
-  Type,
-  Union,
+  type BooleanLiteral,
+  type Diagnostic,
+  type EncodeData,
+  type Enum,
+  type EnumMember,
+  type IntrinsicScalarName,
+  type IntrinsicType,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type NumericLiteral,
+  type Operation,
+  type Program,
+  type Scalar,
+  type StringLiteral,
+  type Tuple,
+  type Type,
+  type Union,
   compilerAssert,
   createDiagnosticCollector,
   getDiscriminator,
@@ -36,10 +36,10 @@ import {
 import { isEvents } from "@typespec/events";
 import { unsafe_getEventDefinitions as getEventDefinitions } from "@typespec/events/experimental";
 import {
-  Authentication,
-  HttpOperationFileBody,
-  HttpOperationMultipartBody,
-  HttpPayloadBody,
+  type Authentication,
+  type HttpOperationFileBody,
+  type HttpOperationMultipartBody,
+  type HttpPayloadBody,
   Visibility,
   getAuthentication,
   getServers,
@@ -67,35 +67,35 @@ import {
   shouldGenerateConvenient,
 } from "./decorators.js";
 import {
-  AccessFlags,
-  ArrayKnownEncoding,
-  SdkArrayType,
-  SdkBuiltInKinds,
-  SdkBuiltInType,
-  SdkClientType,
-  SdkConstantType,
-  SdkCredentialParameter,
-  SdkCredentialType,
-  SdkDateTimeType,
-  SdkDictionaryType,
-  SdkDurationType,
-  SdkEnumType,
-  SdkEnumValueType,
-  SdkHeaderParameter,
-  SdkHttpOperation,
-  SdkModelPropertyType,
-  SdkModelPropertyTypeBase,
-  SdkModelType,
-  SdkNullableType,
-  SdkTupleType,
-  SdkType,
-  SdkUnionType,
-  TCGCContext,
+  type AccessFlags,
+  type ArrayKnownEncoding,
+  type SdkArrayType,
+  type SdkBuiltInKinds,
+  type SdkBuiltInType,
+  type SdkClientType,
+  type SdkConstantType,
+  type SdkCredentialParameter,
+  type SdkCredentialType,
+  type SdkDateTimeType,
+  type SdkDictionaryType,
+  type SdkDurationType,
+  type SdkEnumType,
+  type SdkEnumValueType,
+  type SdkHeaderParameter,
+  type SdkHttpOperation,
+  type SdkModelPropertyType,
+  type SdkModelPropertyTypeBase,
+  type SdkModelType,
+  type SdkNullableType,
+  type SdkTupleType,
+  type SdkType,
+  type SdkUnionType,
+  type TCGCContext,
   UsageFlags,
   isSdkIntKind,
 } from "./interfaces.js";
 import {
-  ContextNode,
+  type ContextNode,
   createGeneratedName,
   filterPreviewVersion,
   getAvailableApiVersions,
@@ -222,17 +222,30 @@ export function addEncodeInfo(
       // for model property bytes with specific content type, will change to bytes for non-text content type
       innerType.encode = "bytes";
     }
+    if (encodeData?.type) {
+      innerType.wireType = getSdkBuiltInType(context, encodeData.type) as SdkBuiltInType;
+    }
   }
-  if (isSdkIntKind(innerType.kind) || innerType.kind === "boolean") {
-    // integer and boolean types are allowed to be encoded as string
+  if (
+    isSdkIntKind(innerType.kind) ||
+    innerType.kind === "boolean" ||
+    innerType.kind === "string" ||
+    innerType.kind === "url"
+  ) {
+    // built-in types can be encoded as other types (e.g., string encoded as int32, int encoded as string)
+    const builtInType = innerType as SdkBuiltInType;
     if (encodeData) {
       if (encodeData?.encoding) {
-        (innerType as any).encode = encodeData.encoding;
+        builtInType.encode = encodeData.encoding;
       }
       if (encodeData?.type) {
+        const wireType = getSdkBuiltInType(context, encodeData.type) as SdkBuiltInType;
         // if we specify the encoding type in the decorator, we set the `.encode` string
-        // to the kind of the encoding type
-        (innerType as any).encode = getSdkBuiltInType(context, encodeData.type).kind;
+        // to the kind of the encoding type when there's no explicit encoding name
+        if (!encodeData.encoding) {
+          builtInType.encode = wireType.kind;
+        }
+        builtInType.wireType = wireType;
       }
     }
   }

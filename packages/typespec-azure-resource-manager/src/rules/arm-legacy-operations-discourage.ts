@@ -1,4 +1,4 @@
-import { createRule, getNamespaceFullName, Interface } from "@typespec/compiler";
+import { createRule, getNamespaceFullName, type Interface } from "@typespec/compiler";
 
 export const armLegacyOperationsDiscourage = createRule({
   name: "arm-legacy-operations-discourage",

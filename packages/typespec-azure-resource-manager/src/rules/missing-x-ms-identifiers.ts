@@ -1,7 +1,7 @@
 import {
-  ArrayModelType,
-  ModelProperty,
-  Program,
+  type ArrayModelType,
+  type ModelProperty,
+  type Program,
   createAddDecoratorCodeFix,
   createRule,
   fileRef,

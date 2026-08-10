@@ -1,7 +1,7 @@
 import {
-  DiagnosticTarget,
-  ModelProperty,
-  Program,
+  type DiagnosticTarget,
+  type ModelProperty,
+  type Program,
   createAddDecoratorCodeFix,
   createRule,
   fileRef,

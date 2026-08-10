@@ -1,13 +1,13 @@
 import { ok } from "assert";
 import { describe, expect, it } from "vitest";
-import { ArmOperationKind, ArmResourceOperation } from "../src/operations.js";
+import type { ArmOperationKind, ArmResourceOperation } from "../src/operations.js";
 import {
   isResourceOperationMatch,
   parseArmResourceInstancePath,
   resolveArmResources,
-  ResolvedResource,
-  ResourcePathInfo,
-  ResourceType,
+  type ResolvedResource,
+  type ResourcePathInfo,
+  type ResourceType,
 } from "../src/resource.js";
 import { Tester } from "./tester.js";
 

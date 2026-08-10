@@ -86,6 +86,7 @@ words:
   - mobo
   - msazure
   - msdata
+  - msinternal
   - mylocation
   - nsps
   - nupkg
@@ -93,6 +94,7 @@ words:
   - Onco
   - oncophenotype
   - PAYG
+  - pipx
   - popd
   - prismjs
   - psscriptanalyzer
@@ -102,6 +104,7 @@ words:
   - qnas
   - regionality
   - responseasbool
+  - retarget
   - reinjected
   - Reranker
   - rpaasoneboxacr
@@ -115,6 +118,7 @@ words:
   - tsmv
   - userrp
   - vnet
+  - VMSS
   - WINDOWSVMIMAGE
   - azcore
   - azkeys

@@ -1,4 +1,4 @@
-import { TypeSpecTestLibrary, findTestPackageRoot } from "@typespec/compiler/testing";
+import { type TypeSpecTestLibrary, findTestPackageRoot } from "@typespec/compiler/testing";
 
 /** @deprecated Use `createTester` from `@typespec/compiler/testing` instead */
 /* eslint-disable @typescript-eslint/no-deprecated */

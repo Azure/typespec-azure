@@ -1,4 +1,4 @@
-import { Operation, createRule, fileRef } from "@typespec/compiler";
+import { type Operation, createRule, fileRef } from "@typespec/compiler";
 import { isBody, isBodyRoot } from "@typespec/http";
 
 export const bodyArrayRule = createRule({

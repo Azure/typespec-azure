@@ -1,5 +1,10 @@
-import { createTypeSpecLibrary, fileRef, JSONSchemaType, paramMessage } from "@typespec/compiler";
 import {
+  createTypeSpecLibrary,
+  fileRef,
+  type JSONSchemaType,
+  paramMessage,
+} from "@typespec/compiler";
+import type {
   BrandedSdkEmitterOptionsInterface,
   TCGCEmitterOptions,
   UnbrandedSdkEmitterOptionsInterface,
@@ -594,6 +599,13 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: "Auto-merging service client must be empty.",
+      },
+    },
+    "client-default-value-type-mismatch": {
+      ...doc("client-default-value-type-mismatch"),
+      severity: "warning",
+      messages: {
+        default: paramMessage`Client default value type "${"valueType"}" does not match property type "${"propertyType"}". The default value type should match the property type.`,
       },
     },
   },

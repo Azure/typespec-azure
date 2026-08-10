@@ -1,4 +1,4 @@
-import { Interface, createRule, fileRef } from "@typespec/compiler";
+import { type Interface, createRule, fileRef } from "@typespec/compiler";
 
 import { isArmOperationsListInterface } from "../private.decorators.js";
 import { isInternalTypeSpec } from "./utils.js";

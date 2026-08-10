@@ -1,4 +1,4 @@
-import { Operation, createRule, fileRef, paramMessage } from "@typespec/compiler";
+import { type Operation, createRule, fileRef, paramMessage } from "@typespec/compiler";
 import { getHttpOperation, isBodyIgnore } from "@typespec/http";
 
 export const rpcOperationRequestBodyRule = createRule({

@@ -1,8 +1,8 @@
 import {
-  DiagnosticMessages,
-  LinterRuleContext,
-  Model,
-  Operation,
+  type DiagnosticMessages,
+  type LinterRuleContext,
+  type Model,
+  type Operation,
   createRule,
   fileRef,
   getEffectiveModelType,
@@ -10,7 +10,7 @@ import {
   isType,
 } from "@typespec/compiler";
 
-import { ArmLifecycleOperationKind, resolveResourceOperations } from "../operations.js";
+import { type ArmLifecycleOperationKind, resolveResourceOperations } from "../operations.js";
 import { getArmResource } from "../resource.js";
 import { isInternalTypeSpec } from "./utils.js";
 

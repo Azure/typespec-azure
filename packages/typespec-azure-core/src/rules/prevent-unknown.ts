@@ -1,4 +1,4 @@
-import { ModelProperty, createRule, fileRef, isUnknownType } from "@typespec/compiler";
+import { type ModelProperty, createRule, fileRef, isUnknownType } from "@typespec/compiler";
 
 export const preventUnknownType = createRule({
   name: "no-unknown",
