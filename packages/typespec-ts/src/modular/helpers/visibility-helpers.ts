@@ -3,6 +3,7 @@ import {
   SdkModelPropertyType,
   SdkModelType,
   SdkServiceMethod,
+  SdkType,
 } from "@azure-tools/typespec-client-generator-core";
 import {
   MetadataInfo,
@@ -22,7 +23,7 @@ interface SplitState {
   metadata: MetadataInfo;
   /**
    * Every reachable `(model, visibility)` pair in the write-body graph, keyed by
-   * `${crossLanguageDefinitionId}|${visibility}`. Built in the collect phase;
+   * an emitter-local model identity plus visibility. Built in the collect phase;
    * carries the reference edges and per-node analysis flags.
    */
   nodes: Map<string, ModelNode>;
@@ -32,6 +33,9 @@ interface SplitState {
    * model).
    */
   cloneByKey: Map<string, SdkModelType>;
+  /** Stable emitter-local IDs preserving `SdkModelType` object identity. */
+  modelIds: WeakMap<SdkModelType, number>;
+  nextModelId: number;
 }
 
 /**
@@ -41,10 +45,11 @@ interface ModelNode {
   model: SdkModelType;
   visibility: Visibility;
   /**
-   * Keys of the nodes this node references: its model-typed properties plus, for
-   * a discriminated hierarchy, its base and direct subtypes. Edges are what the
-   * needs-clone propagation walks; the discriminated links are bidirectional so
-   * a whole hierarchy needs cloning together.
+   * Keys of the nodes this node references: direct model properties, model
+   * elements nested in arrays, and, for a discriminated hierarchy, its base and
+   * direct subtypes. Edges are what the needs-clone propagation walks; the
+   * discriminated links are bidirectional so a whole hierarchy needs cloning
+   * together.
    */
   refKeys: Set<string>;
   /** True if the model drops at least one of its own properties under `visibility`. */
@@ -70,18 +75,20 @@ interface ModelNode {
  *  1. **Collect** — from every HTTP operation's model request body (resolving
  *     the write visibility from the verb: `POST` -> Create, `PUT` -> Create|Update,
  *     ...), walk the reachable `(model, visibility)` graph, recording reference
- *     edges (model-typed properties plus, for discriminated bases, their whole
- *     subtype hierarchy) and which nodes drop a property under that visibility.
+ *     edges (direct models, array element models, and, for discriminated bases,
+ *     their whole subtype hierarchy) and which nodes drop a property under that
+ *     visibility.
  *  2. **Mark** — a node *needs a clone* iff it can reach any drop (transitive
  *     closure). Computed by reverse-propagating from the drop nodes, so cycles
  *     and mutual recursion fall out naturally with no special-casing.
  *  3. **Materialize + wire** — clone every node that needs one (suffixed, dropped
  *     properties removed) and, in a uniform sweep, repoint every clone's
- *     model-typed properties, `baseModel`, and `discriminatedSubtypes` at the
- *     matching clones. Because all clones exist before any wiring, self-cycles
- *     (`NodeCreate.next` -> `NodeCreate`), mutual recursion, and discriminated
- *     hierarchies are all handled by the same code. The original graph is never
- *     mutated, so response types keep the full (read) model.
+ *     direct model and array element references, `baseModel`, and
+ *     `discriminatedSubtypes` at the matching clones. Because all clones exist
+ *     before any wiring, self-cycles (`NodeCreate.next` -> `NodeCreate`), mutual
+ *     recursion, and discriminated hierarchies are all handled by the same
+ *     code. The original graph is never mutated, so response types keep the
+ *     full (read) model.
  *  4. **Repoint operations** — walk `bodyParam.methodParameterSegments` (which
  *     map each client-method parameter to the HTTP payload) and point every
  *     model-typed parameter (plus the payload side — the whole `bodyParam.type`
@@ -99,7 +106,6 @@ interface ModelNode {
  * NOTE: name collisions between a synthesized split (`FooCreate`) and a
  * user-declared model of the same name are intentionally NOT resolved here in
  * this PoC — the emitter binder falls back to a positional `FooCreate_1` rename.
- * See the "Open question — collision-aware naming" section in the design doc.
  */
 export function applyVisibilityModelSplit(context: SdkContext): void {
   if (!context.emitterOptions?.experimentalSplitModelsByVisibility) {
@@ -140,12 +146,19 @@ function createSplitState(context: SdkContext): SplitState {
     metadata: createMetadataInfo(context.program, { canonicalVisibility: Visibility.Read }),
     nodes: new Map<string, ModelNode>(),
     cloneByKey: new Map<string, SdkModelType>(),
+    modelIds: new WeakMap<SdkModelType, number>(),
+    nextModelId: 0,
   };
 }
 
 /** Stable key identifying a `(model, visibility)` node (and its clone). */
-function nodeKeyFor(model: SdkModelType, visibility: Visibility): string {
-  return `${model.crossLanguageDefinitionId}|${visibility}`;
+function nodeKeyFor(state: SplitState, model: SdkModelType, visibility: Visibility): string {
+  let modelId = state.modelIds.get(model);
+  if (modelId === undefined) {
+    modelId = state.nextModelId++;
+    state.modelIds.set(model, modelId);
+  }
+  return `${modelId}|${visibility}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -158,10 +171,7 @@ function nodeKeyFor(model: SdkModelType, visibility: Visibility): string {
  * segment's root is a client-method parameter) and collects every model-typed
  * parameter as a graph root.
  */
-function collectMethodRoots(
-  state: SplitState,
-  method: SdkServiceMethod<SdkHttpOperation>,
-): void {
+function collectMethodRoots(state: SplitState, method: SdkServiceMethod<SdkHttpOperation>): void {
   const operation = method.operation;
   const bodyParam = operation?.bodyParam;
   if (!bodyParam || bodyParam.type.kind !== "model") {
@@ -199,12 +209,8 @@ function collectMethodRoots(
  * `ownPropertyDropped` is set when the model omits at least one own property under this
  * visibility (a dropped payload property or metadata).
  */
-function collectNode(
-  state: SplitState,
-  model: SdkModelType,
-  visibility: Visibility,
-): string {
-  const key = nodeKeyFor(model, visibility);
+function collectNode(state: SplitState, model: SdkModelType, visibility: Visibility): string {
+  const key = nodeKeyFor(state, model, visibility);
   if (state.nodes.has(key)) {
     return key;
   }
@@ -231,8 +237,8 @@ function collectNode(
       node.ownPropertyDropped = true;
       continue;
     }
-    if (property.kind === "property" && property.type.kind === "model") {
-      node.refKeys.add(collectNode(state, property.type, visibility));
+    if (property.kind === "property") {
+      collectReferencedModels(state, property.type, visibility, node.refKeys);
     }
   }
 
@@ -247,6 +253,19 @@ function collectNode(
   }
 
   return key;
+}
+
+function collectReferencedModels(
+  state: SplitState,
+  type: SdkType,
+  visibility: Visibility,
+  refKeys: Set<string>,
+): void {
+  if (type.kind === "model") {
+    refKeys.add(collectNode(state, type, visibility));
+  } else if (type.kind === "array") {
+    collectReferencedModels(state, type.valueType, visibility, refKeys);
+  }
 }
 
 /** The base model and direct subtypes that share a node's discriminated tree. */
@@ -342,8 +361,8 @@ function markNodesNeedingClones(state: SplitState): void {
  *
  * Wiring covers both:
  *  - own properties: dropped payload/metadata properties are removed, and each
- *    surviving model-typed property is repointed at its target's clone (if the
- *    target needs one);
+ *    surviving direct model or array element reference is repointed at its
+ *    target's clone (if the target needs one);
  *  - discriminated hierarchy: `baseModel` and `discriminatedSubtypes` are
  *    repointed at the clones so a subtype re-parents to the projected base and
  *    `getDirectSubtypes` still finds the projected subtypes (driving the
@@ -381,10 +400,10 @@ function buildClones(state: SplitState): void {
         continue;
       }
       let wiredProperty = property;
-      if (property.kind === "property" && property.type.kind === "model") {
-        const nestedClone = state.cloneByKey.get(nodeKeyFor(property.type, visibility));
-        if (nestedClone) {
-          wiredProperty = { ...property, type: nestedClone };
+      if (property.kind === "property") {
+        const projectedType = projectTypeReferences(state, property.type, visibility);
+        if (projectedType !== property.type) {
+          wiredProperty = { ...property, type: projectedType };
         }
       }
       properties.push(wiredProperty);
@@ -394,24 +413,38 @@ function buildClones(state: SplitState): void {
     if (findDiscriminatedRoot(model)) {
       if (model.baseModel) {
         clone.baseModel =
-          state.cloneByKey.get(nodeKeyFor(model.baseModel, visibility)) ?? model.baseModel;
+          state.cloneByKey.get(nodeKeyFor(state, model.baseModel, visibility)) ?? model.baseModel;
       }
       if (model.discriminatedSubtypes) {
         clone.discriminatedSubtypes = Object.fromEntries(
           Object.entries(model.discriminatedSubtypes).map(([discriminatorValue, subtype]) => [
             discriminatorValue,
-            state.cloneByKey.get(nodeKeyFor(subtype, visibility)) ?? subtype,
+            state.cloneByKey.get(nodeKeyFor(state, subtype, visibility)) ?? subtype,
           ]),
         );
       }
     }
   }
+
+  function projectTypeReferences(
+    state: SplitState,
+    type: SdkType,
+    visibility: Visibility,
+  ): SdkType {
+    if (type.kind === "model") {
+      return state.cloneByKey.get(nodeKeyFor(state, type, visibility)) ?? type;
+    }
+    if (type.kind === "array") {
+      const projectedValueType = projectTypeReferences(state, type.valueType, visibility);
+      return projectedValueType === type.valueType
+        ? type
+        : { ...type, valueType: projectedValueType };
+    }
+    return type;
+  }
 }
 
-function repointMethodBody(
-  state: SplitState,
-  method: SdkServiceMethod<SdkHttpOperation>,
-): void {
+function repointMethodBody(state: SplitState, method: SdkServiceMethod<SdkHttpOperation>): void {
   const operation = method.operation;
   const bodyParam = operation?.bodyParam;
   if (!bodyParam || bodyParam.type.kind !== "model") {
@@ -444,7 +477,7 @@ function repointMethodBody(
       continue;
     }
 
-    const clone = state.cloneByKey.get(nodeKeyFor(methodParam.type, visibility));
+    const clone = state.cloneByKey.get(nodeKeyFor(state, methodParam.type, visibility));
     if (!clone) {
       // The write view is identical to the read model (collapse).
       continue;

@@ -25,7 +25,7 @@ describe("visibility model split (experimental)", () => {
 
       @post op create(@body body: Widget): Widget;
       `,
-      { },
+      {},
     );
     assert.ok(models);
     const text = models.getFullText();
@@ -100,6 +100,71 @@ describe("visibility model split (experimental)", () => {
     assert.isTrue(/interface B\b/.test(text), text);
   });
 
+  it("keeps distinct generic model instantiations separate", async () => {
+    const files = await emitModularOperationsFromTypeSpec(
+      `
+      model Patch<T> {
+        properties?: T;
+      }
+
+      model FooProperties {
+        value: string;
+        @visibility(Lifecycle.Read)
+        fooStatus: string;
+      }
+
+      model BarProperties {
+        count: int32;
+        @visibility(Lifecycle.Read)
+        barStatus: string;
+      }
+
+      @route("/foo") @patch op updateFoo(@body body: Patch<FooProperties>): void;
+      @route("/bar") @patch op updateBar(@body body: Patch<BarProperties>): void;
+      `,
+      { experimentalSplitModelsByVisibility: true } as any,
+    );
+    assert.ok(files);
+    const text = files.map((f) => f.getFullText()).join("\n");
+    const fooType = /function updateFoo\([\s\S]*?body:\s*(\w+)/.exec(text)?.[1];
+    const barType = /function updateBar\([\s\S]*?body:\s*(\w+)/.exec(text)?.[1];
+    assert.ok(fooType, text);
+    assert.ok(barType, text);
+    assert.notEqual(fooType, barType, text);
+  });
+
+  it("projects model elements nested in arrays", async () => {
+    const models = await emitModularModelsFromTypeSpec(
+      `
+      model Item {
+        @visibility(Lifecycle.Read)
+        id: string;
+        value: string;
+      }
+
+      model Batch {
+        items: Item[];
+      }
+
+      @post op createBatch(@body body: Batch): Batch;
+      `,
+      { experimentalSplitModelsByVisibility: true } as any,
+    );
+    assert.ok(models);
+    const text = models.getFullText();
+    assert.isTrue(/interface ItemCreate\b/.test(text), text);
+    const batchCreate = text.slice(
+      text.indexOf("interface BatchCreate"),
+      text.indexOf("}", text.indexOf("interface BatchCreate")),
+    );
+    assert.isTrue(/"?items"?:\s*\(?ItemCreate\)?\[\]/.test(batchCreate), batchCreate);
+    const itemCreate = text.slice(
+      text.indexOf("interface ItemCreate"),
+      text.indexOf("}", text.indexOf("interface ItemCreate")),
+    );
+    assert.isFalse(/\bid\b/.test(itemCreate), itemCreate);
+  });
+
   it("projects a discriminated hierarchy (PetCreate + Cat/DogCreate + PetCreateUnion)", async () => {
     const models = await emitModularModelsFromTypeSpec(
       `
@@ -135,7 +200,10 @@ describe("visibility model split (experimental)", () => {
     // Dog re-parents even though it adds no read-only props of its own.
     assert.isTrue(/interface DogCreate extends PetCreate\b/.test(text), text);
     // The polymorphic union alias is emitted over the projected subtypes...
-    assert.isTrue(/type PetCreateUnion =[^;]*CatCreate[^;]*DogCreate[^;]*PetCreate/.test(text), text);
+    assert.isTrue(
+      /type PetCreateUnion =[^;]*CatCreate[^;]*DogCreate[^;]*PetCreate/.test(text),
+      text,
+    );
     // ...and there is no unresolved polymorphic placeholder.
     assert.isFalse(/__PLACEHOLDER/.test(text), text);
     // The base's read-only petId and Cat's read-only livesLeft are dropped.
@@ -214,7 +282,10 @@ describe("visibility model split (experimental)", () => {
     // the read model, so a nested create at any depth also sheds nodeId.
     assert.isTrue(/"?next"?\?:\s*NodeCreate\b/.test(createBody), createBody);
     // The corresponding serializer delegates `next` to nodeCreateSerializer.
-    assert.isTrue(/nodeCreateSerializer[\s\S]*?next[\s\S]*?nodeCreateSerializer\(/.test(text), text);
+    assert.isTrue(
+      /nodeCreateSerializer[\s\S]*?next[\s\S]*?nodeCreateSerializer\(/.test(text),
+      text,
+    );
     // The read model keeps the read-only nodeId and its next stays Node.
     assert.isTrue(/interface Node\b[\s\S]*?readonly "?nodeId"?/.test(text), text);
   });
