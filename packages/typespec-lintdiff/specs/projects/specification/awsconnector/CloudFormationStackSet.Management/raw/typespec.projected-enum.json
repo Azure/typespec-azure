@@ -1,0 +1,24 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 140,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 143,
+      "column": 3,
+      "emittedName": "retainStacksOnAccountRemoval"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 165,
+      "column": 3,
+      "emittedName": "active"
+    }
+  ]
+}

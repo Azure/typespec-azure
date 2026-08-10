@@ -1,0 +1,126 @@
+{
+  "apiVersion": "2026-04-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 1184,
+      "column": 3,
+      "emittedName": "createFromLocal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1199,
+      "column": 3,
+      "emittedName": "bypassSdnPolicies"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1948,
+      "column": 3,
+      "emittedName": "bypassSdnPolicies"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2095,
+      "column": 3,
+      "emittedName": "dynamic"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2118,
+      "column": 3,
+      "emittedName": "createFromLocal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2291,
+      "column": 3,
+      "emittedName": "createFromLocal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2365,
+      "column": 3,
+      "emittedName": "strictPlacementPolicy"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2427,
+      "column": 3,
+      "emittedName": "disablePasswordAuthentication"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2434,
+      "column": 3,
+      "emittedName": "provisionVMAgent"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2438,
+      "column": 3,
+      "emittedName": "provisionVMConfigAgent"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2460,
+      "column": 3,
+      "emittedName": "enableAutomaticUpdates"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2470,
+      "column": 3,
+      "emittedName": "provisionVMAgent"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2474,
+      "column": 3,
+      "emittedName": "provisionVMConfigAgent"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2481,
+      "column": 3,
+      "emittedName": "enableTPM"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2493,
+      "column": 3,
+      "emittedName": "secureBootEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2731,
+      "column": 3,
+      "emittedName": "provisionVMAgent"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2735,
+      "column": 3,
+      "emittedName": "provisionVMConfigAgent"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2742,
+      "column": 3,
+      "emittedName": "provisionVMAgent"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2746,
+      "column": 3,
+      "emittedName": "provisionVMConfigAgent"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2844,
+      "column": 3,
+      "emittedName": "skipShutdown"
+    }
+  ]
+}

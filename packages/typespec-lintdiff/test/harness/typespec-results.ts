@@ -9,12 +9,16 @@ import * as path from "path";
 import { pathToFileURL } from "url";
 import { promisify } from "util";
 import YAML from "yaml";
+import type { ProjectedEnumResult } from "./projected-enum-worker.js";
 
 const execFileAsync = promisify(execFile);
-const ANALYSIS_SCHEMA_VERSION = 2;
+const ANALYSIS_SCHEMA_VERSION = 5;
 const DATASET_SCHEMA_VERSION = 4;
 const LOCAL_RULESET = "tsp-lintdiff-local-linter/all";
 const LOCAL_RULE_PREFIX = "tsp-lintdiff-local-linter/";
+const ENUM_INSTEAD_OF_BOOLEAN_RULE =
+  "tsp-lintdiff-local-linter/enum-instead-of-boolean";
+const TSX_ESM_LOADER = import.meta.resolve("tsx/esm");
 const MAX_BUFFER = 256 * 1024 * 1024;
 
 interface Config {
@@ -28,6 +32,8 @@ interface Config {
 export interface DatasetProject {
   sourcePath: string;
   typespecPath: string;
+  apiVersion?: string;
+  swaggerFiles?: string[];
   rawFiles: string[];
 }
 
@@ -53,8 +59,15 @@ interface ValidatorIndex {
   >;
 }
 
+export interface ValidatorDiagnostic {
+  project: string;
+  swaggerFile?: string;
+  message: string;
+  path: Array<string | number>;
+}
+
 interface ValidatorShard {
-  results: Array<{ project: string }>;
+  results: ValidatorDiagnostic[];
 }
 
 export type DiagnosticOrigin = "local" | "official" | "compiler";
@@ -125,6 +138,7 @@ interface TypeSpecIndex {
 export interface ValidatorRuleData {
   count: number;
   projects: string[];
+  results?: ValidatorDiagnostic[];
 }
 
 export interface ValidatorFixtureMetadata {
@@ -158,6 +172,10 @@ export interface ComparisonEntry {
   observedCoveragePercent: number | null;
   validatorDiagnosticCount: number;
   typeSpecDiagnosticCount: number;
+  normalizedValidatorDiagnosticCount: number | null;
+  normalizedTypeSpecDiagnosticCount: number | null;
+  diagnosticConsistencyPercent: number | null;
+  normalizationMethod: string | null;
   validatorProjects: string[];
   assessableValidatorProjects: string[];
   typeSpecProjects: string[];
@@ -545,6 +563,84 @@ export function parseTypeSpecDiagnostics(
   return diagnostics;
 }
 
+function diagnosticLocationKey(
+  diagnostic: Pick<TypeSpecDiagnostic, "sourceFile" | "line" | "column">,
+): string | undefined {
+  return diagnostic.sourceFile && diagnostic.line && diagnostic.column
+    ? `${diagnostic.sourceFile}\0${diagnostic.line}\0${diagnostic.column}`
+    : undefined;
+}
+
+export function filterProjectedEnumDiagnostics(
+  diagnostics: TypeSpecDiagnostic[],
+  projected: ProjectedEnumResult,
+  emittedBooleanNames?: Set<string>,
+): TypeSpecDiagnostic[] {
+  const projectedLocations = new Map(
+    projected.locations.map((location) => [diagnosticLocationKey(location)!, location]),
+  );
+  return diagnostics.filter((diagnostic) => {
+    if (diagnostic.rule !== ENUM_INSTEAD_OF_BOOLEAN_RULE) {
+      return true;
+    }
+    const key = diagnosticLocationKey(diagnostic);
+    if (key === undefined) {
+      return false;
+    }
+    const location = projectedLocations.get(key);
+    return (
+      location !== undefined &&
+      (emittedBooleanNames === undefined || emittedBooleanNames.has(location.emittedName))
+    );
+  });
+}
+
+function collectBooleanSchemaNames(document: unknown): Set<string> {
+  const names = new Set<string>();
+
+  function visit(value: unknown, currentPath: Array<string | number>): void {
+    if (Array.isArray(value)) {
+      value.forEach((item, index) => visit(item, [...currentPath, index]));
+      return;
+    }
+    if (value === null || typeof value !== "object") {
+      return;
+    }
+
+    const record = value as Record<string, unknown>;
+    if (record.type === "boolean") {
+      if (typeof record.name === "string") {
+        names.add(record.name);
+      } else {
+        const propertiesIndex = currentPath.lastIndexOf("properties");
+        names.add(
+          propertiesIndex >= 0 && propertiesIndex + 1 < currentPath.length
+            ? String(currentPath[propertiesIndex + 1])
+            : "$direct",
+        );
+      }
+    }
+    for (const [key, child] of Object.entries(record)) {
+      visit(child, [...currentPath, key]);
+    }
+  }
+
+  visit(document, []);
+  return names;
+}
+
+function loadEmittedBooleanNames(datasetDir: string, project: DatasetProject): Set<string> {
+  const names = new Set<string>();
+  for (const swaggerFile of project.swaggerFiles ?? []) {
+    for (const name of collectBooleanSchemaNames(
+      readJson(assertDatasetPath(datasetDir, swaggerFile)),
+    )) {
+      names.add(name);
+    }
+  }
+  return names;
+}
+
 export function aggregateTypeSpecResults(
   specsCommit: string,
   generatedAt: string,
@@ -593,6 +689,131 @@ function intersection(left: Set<string>, right: Set<string>): string[] {
   return [...left].filter((value) => right.has(value)).sort();
 }
 
+interface DiagnosticNormalization {
+  validatorKeys: Set<string>;
+  typeSpecKeys: Set<string>;
+  method: string;
+}
+
+export interface DiagnosticNormalizationContext {
+  selectedApiVersions: Map<string, string | undefined>;
+  loadSwaggerDocument: (relativePath: string) => unknown;
+  loadTypeSpecSource: (project: string, relativePath: string) => string;
+}
+
+function jsonPathValue(document: unknown, jsonPath: Array<string | number>): unknown {
+  let current = document;
+  for (const segment of jsonPath) {
+    if (current === null || typeof current !== "object") {
+      return undefined;
+    }
+    current = (current as Record<string | number, unknown>)[segment];
+  }
+  return current;
+}
+
+function commonTypesVersion(value: string): string | undefined {
+  return /(?:^|\/)resource-management\/(v\d+)\/types\.json(?:#|$)/i.exec(value)?.[1]
+    .toLowerCase();
+}
+
+export function normalizeLatestCommonTypesValidatorDiagnostic(
+  diagnostic: ValidatorDiagnostic,
+  swaggerDocument: unknown,
+  selectedApiVersion?: string,
+): string | undefined {
+  const reference = jsonPathValue(swaggerDocument, diagnostic.path);
+  if (typeof reference !== "string") {
+    return undefined;
+  }
+  const version = commonTypesVersion(reference);
+  return version
+    ? `${diagnostic.project}\0${selectedApiVersion ?? "unversioned"}\0${version}`
+    : undefined;
+}
+
+export function normalizeLatestCommonTypesTypeSpecDiagnostic(
+  diagnostic: TypeSpecDiagnostic,
+  selectedApiVersion?: string,
+  sourceText?: string,
+): string | undefined {
+  if (selectedApiVersion && sourceText && diagnostic.line) {
+    const targetLine = sourceText.split(/\r?\n/)[diagnostic.line - 1];
+    const targetApiVersion = /:\s*"(\d{4}-\d{2}-\d{2}(?:-preview)?)"/i.exec(
+      targetLine,
+    )?.[1];
+    if (targetApiVersion && targetApiVersion !== selectedApiVersion) {
+      return undefined;
+    }
+  }
+  const version = /instead of '(v\d+)'/i.exec(diagnostic.message)?.[1].toLowerCase();
+  return version
+    ? `${diagnostic.project}\0${selectedApiVersion ?? "unversioned"}\0${version}`
+    : undefined;
+}
+
+function normalizeDiagnostics(
+  validatorRule: string,
+  validatorDiagnostics: ValidatorDiagnostic[],
+  typeSpecDiagnostics: TypeSpecDiagnostic[],
+  failedProjects: Set<string>,
+  context?: DiagnosticNormalizationContext,
+): DiagnosticNormalization | undefined {
+  if (validatorRule !== "LatestVersionOfCommonTypesMustBeUsed" || context === undefined) {
+    return undefined;
+  }
+
+  const validatorKeys = new Set<string>();
+  for (const diagnostic of validatorDiagnostics) {
+    if (failedProjects.has(diagnostic.project) || !diagnostic.swaggerFile) {
+      continue;
+    }
+    const selectedApiVersion = context.selectedApiVersions.get(diagnostic.project);
+    const key = normalizeLatestCommonTypesValidatorDiagnostic(
+      diagnostic,
+      context.loadSwaggerDocument(diagnostic.swaggerFile),
+      selectedApiVersion,
+    );
+    if (key) {
+      validatorKeys.add(key);
+    }
+  }
+
+  const typeSpecKeys = new Set<string>();
+  for (const diagnostic of typeSpecDiagnostics) {
+    if (failedProjects.has(diagnostic.project)) {
+      continue;
+    }
+    const selectedApiVersion = context.selectedApiVersions.get(diagnostic.project);
+    const sourceText =
+      diagnostic.sourceFile === undefined
+        ? undefined
+        : context.loadTypeSpecSource(diagnostic.project, diagnostic.sourceFile);
+    const key = normalizeLatestCommonTypesTypeSpecDiagnostic(
+      diagnostic,
+      selectedApiVersion,
+      sourceText,
+    );
+    if (key) {
+      typeSpecKeys.add(key);
+    }
+  }
+
+  return {
+    validatorKeys,
+    typeSpecKeys,
+    method: "project + selected API version + ARM common-types version",
+  };
+}
+
+function consistencyPercent(left: Set<string>, right: Set<string>): number | null {
+  const union = new Set([...left, ...right]);
+  if (union.size === 0) {
+    return null;
+  }
+  return (intersection(left, right).length / union.size) * 100;
+}
+
 export function compareResults(
   specsCommit: string,
   generatedAt: string,
@@ -605,6 +826,7 @@ export function compareResults(
     failedProjects?: Set<string>;
     knownValidatorRules?: Iterable<string>;
     fixtureMetadata?: Map<string, ValidatorFixtureMetadata>;
+    normalizationContext?: DiagnosticNormalizationContext;
   } = {},
 ): ComparisonResults {
   const failedProjects = options.failedProjects ?? new Set<string>();
@@ -618,12 +840,20 @@ export function compareResults(
     .map((validatorRule) => {
       const validator = validatorRules[validatorRule] ?? { count: 0, projects: [] };
       const mappedTypeSpecRules = [...(mappings.get(validatorRule) ?? [])].sort();
-      const validatorProjects = new Set(validator.projects);
-      const unassessedProjects = intersection(validatorProjects, failedProjects);
-      const assessableValidatorProjects = difference(validatorProjects, failedProjects);
+      const validatorResults = validator.results?.filter(
+        (diagnostic) => !failedProjects.has(diagnostic.project),
+      );
+      const validatorProjects = new Set(
+        validatorResults
+          ? validatorResults.map((diagnostic) => diagnostic.project)
+          : difference(new Set(validator.projects), failedProjects),
+      );
+      const unassessedProjects: string[] = [];
+      const assessableValidatorProjects = [...validatorProjects].sort();
       const assessableValidatorProjectSet = new Set(assessableValidatorProjects);
       const typeSpecProjects = new Set<string>();
       const firedTypeSpecRules: string[] = [];
+      const mappedTypeSpecDiagnostics: TypeSpecDiagnostic[] = [];
       let typeSpecDiagnosticCount = 0;
 
       for (const typeSpecRule of mappedTypeSpecRules) {
@@ -638,6 +868,7 @@ export function compareResults(
           }
           fired = true;
           typeSpecDiagnosticCount++;
+          mappedTypeSpecDiagnostics.push(diagnostic);
           typeSpecProjects.add(diagnostic.project);
         }
         if (fired) {
@@ -652,6 +883,13 @@ export function compareResults(
         assessableValidatorProjects.length === 0
           ? null
           : (overlapProjects.length / assessableValidatorProjects.length) * 100;
+      const normalization = normalizeDiagnostics(
+        validatorRule,
+        validator.results ?? [],
+        mappedTypeSpecDiagnostics,
+        failedProjects,
+        options.normalizationContext,
+      );
       return {
         validatorRule,
         coverageKind: options.fixtureMetadata?.get(validatorRule)?.coverageKind ?? "unknown",
@@ -663,11 +901,17 @@ export function compareResults(
         typeSpecProjectCount: typeSpecProjects.size,
         overlapProjectCount: overlapProjects.length,
         validatorOnlyProjectCount: validatorOnlyProjects.length,
-        unassessedProjectCount: unassessedProjects.length,
+        unassessedProjectCount: 0,
         typeSpecOnlyProjectCount: typeSpecOnlyProjects.length,
         observedCoveragePercent,
-        validatorDiagnosticCount: validator.count,
+        validatorDiagnosticCount: validatorResults?.length ?? validator.count,
         typeSpecDiagnosticCount,
+        normalizedValidatorDiagnosticCount: normalization?.validatorKeys.size ?? null,
+        normalizedTypeSpecDiagnosticCount: normalization?.typeSpecKeys.size ?? null,
+        diagnosticConsistencyPercent: normalization
+          ? consistencyPercent(normalization.validatorKeys, normalization.typeSpecKeys)
+          : null,
+        normalizationMethod: normalization?.method ?? null,
         validatorProjects: [...validatorProjects].sort(),
         assessableValidatorProjects,
         typeSpecProjects: [...typeSpecProjects].sort(),
@@ -703,10 +947,10 @@ export function compareResults(
     durationMs: options.durationMs ?? 0,
     partial: scope.partial,
     sourceProjectCount: scope.sourceProjectCount,
-    projectCount: scope.projects.length,
+    projectCount: scope.projects.length - failedProjects.size,
     successfulProjectCount: scope.projects.length - failedProjects.size,
     failedProjectCount: failedProjects.size,
-    projects: scope.projects,
+    projects: scope.projects.filter((project) => !failedProjects.has(project)),
     unassessedProjects: [...failedProjects].sort(),
     filters: scope.filters,
     rules,
@@ -835,6 +1079,7 @@ function loadValidatorRuleData(
     rules[rule] = {
       count: selectedResults.length,
       projects: [...new Set(selectedResults.map((result) => result.project))].sort(),
+      results: selectedResults,
     };
   }
   return rules;
@@ -931,6 +1176,7 @@ async function compileProject(
   const rawRoot = path.join(projectDatasetRoot, "raw");
   const stdoutPath = path.join(rawRoot, "typespec.stdout.txt");
   const stderrPath = path.join(rawRoot, "typespec.stderr.txt");
+  const projectedEnumPath = path.join(rawRoot, "typespec.projected-enum.json");
   const rawFiles = [stdoutPath, stderrPath].map((filePath) =>
     normalizeRelative(path.relative(config.datasetDir, filePath)),
   );
@@ -1000,10 +1246,44 @@ async function compileProject(
     }
   }
 
-  const diagnostics = [
+  let diagnostics = [
     ...parseTypeSpecDiagnostics(stdout, project.sourcePath, projectDir),
     ...parseTypeSpecDiagnostics(stderr, project.sourcePath, projectDir),
   ];
+  if (
+    status === "success" &&
+    project.apiVersion &&
+    diagnostics.some((diagnostic) => diagnostic.rule === ENUM_INSTEAD_OF_BOOLEAN_RULE)
+  ) {
+    const workerPath = path.join(import.meta.dirname, "projected-enum-worker.ts");
+    const projected = await execFileAsync(
+      process.execPath,
+      [
+        "--import",
+        TSX_ESM_LOADER,
+        workerPath,
+        mainPath,
+        configPath,
+        project.apiVersion,
+      ],
+      {
+        cwd: projectDir,
+        maxBuffer: MAX_BUFFER,
+        timeout: 300_000,
+        env: { ...process.env, NODE_OPTIONS: "--max-old-space-size=4096" },
+      },
+    );
+    const projectedResult = JSON.parse(projected.stdout) as ProjectedEnumResult;
+    writeJson(projectedEnumPath, projectedResult);
+    rawFiles.push(normalizeRelative(path.relative(config.datasetDir, projectedEnumPath)));
+    diagnostics = filterProjectedEnumDiagnostics(
+      diagnostics,
+      projectedResult,
+      loadEmittedBooleanNames(config.datasetDir, project),
+    );
+  } else {
+    fs.rmSync(projectedEnumPath, { force: true });
+  }
   return {
     result: {
       project: project.sourcePath,
@@ -1120,8 +1400,8 @@ function formatObservedPercent(value: number | null): string {
 
 function coverageTableHeader(): string[] {
   return [
-    "| Validator Rule | CovKind | Fired | TSP Fired | Lint/Overlap | Gap | Unassessed | TSP Only | Observed % | Official Mapping | Fired TSP Rules | Mapped TSP Rules | Validator Diagnostics | TSP Diagnostics |",
-    "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | ---: | ---: |",
+    "| Validator Rule | CovKind | Fired | TSP Fired | Lint/Overlap | Gap | TSP Only | Observed % | Official Mapping | Fired TSP Rules | Mapped TSP Rules | Validator Diagnostics | TSP Diagnostics |",
+    "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | ---: | ---: |",
   ];
 }
 
@@ -1130,9 +1410,9 @@ function coverageTableRow(entry: ComparisonEntry): string {
     entry.coverageKind,
   )} | ${entry.validatorProjectCount} | ${entry.typeSpecProjectCount} | ${
     entry.overlapProjectCount
-  } | ${entry.validatorOnlyProjectCount} | ${entry.unassessedProjectCount} | ${
-    entry.typeSpecOnlyProjectCount
-  } | ${formatObservedPercent(entry.observedCoveragePercent)} | ${
+  } | ${entry.validatorOnlyProjectCount} | ${entry.typeSpecOnlyProjectCount} | ${formatObservedPercent(
+    entry.observedCoveragePercent,
+  )} | ${
     entry.officialMapping ? "yes" : "no"
   } | ${escapeMarkdown(entry.firedTypeSpecRules.join("<br>") || "—")} | ${escapeMarkdown(
     entry.mappedTypeSpecRules.join("<br>") || "—",
@@ -1153,10 +1433,10 @@ export function comparisonMarkdown(comparison: ComparisonResults): string {
     "",
     markdownDuration(comparison.durationMs),
     "",
-    `Successful projects: ${comparison.successfulProjectCount}; unassessed compile failures: ${comparison.failedProjectCount}`,
-    "",
     ...(comparison.filters.path ? [`Path filter: \`${comparison.filters.path}\``, ""] : []),
-    "Coverage is observed only when a mapped TypeSpec diagnostic fires in the same successfully compiled project as the validator rule.",
+    "Only successfully compiled TypeSpec projects are included in validator and TypeSpec counts.",
+    "",
+    "Coverage is observed only when a mapped TypeSpec diagnostic fires in the same included project as the validator rule.",
     "",
     ...coverageTableHeader(),
   ];
@@ -1169,13 +1449,12 @@ export function comparisonMarkdown(comparison: ComparisonResults): string {
     "",
     "## Column definitions",
     "",
-    "- **Fired**: projects where the validator rule fired, including unassessed compile failures.",
-    "- **TSP Fired**: successful projects where at least one mapped TypeSpec rule fired.",
-    "- **Lint/Overlap**: assessable validator projects with a mapped TypeSpec diagnostic in the same project.",
-    "- **Gap**: assessable validator projects without a mapped TypeSpec diagnostic.",
-    "- **Unassessed**: validator projects whose TypeSpec compilation failed.",
-    "- **TSP Only**: successful projects where a mapped TypeSpec rule fired without the validator rule.",
-    "- **Observed %**: Lint/Overlap divided by assessable validator projects; unavailable when none are assessable.",
+    "- **Fired**: included projects where the validator rule fired.",
+    "- **TSP Fired**: included projects where at least one mapped TypeSpec rule fired.",
+    "- **Lint/Overlap**: validator projects with a mapped TypeSpec diagnostic in the same project.",
+    "- **Gap**: validator projects without a mapped TypeSpec diagnostic.",
+    "- **TSP Only**: included projects where a mapped TypeSpec rule fired without the validator rule.",
+    "- **Observed %**: Lint/Overlap divided by validator projects; unavailable when none fired.",
     "- **Official Mapping**: whether any mapped rule starts with `@azure-tools/`; it is not coverage unless it overlaps.",
     "- **Fired TSP Rules**: mapped rules with diagnostics in at least one successful project.",
     "- **Mapped TSP Rules**: all `tspLints` declared in fixture YAML frontmatter.",
@@ -1191,14 +1470,6 @@ export function comparisonMarkdown(comparison: ComparisonResults): string {
   } else {
     for (const entry of comparison.unmappedTypeSpecRules) {
       lines.push(`| ${escapeMarkdown(entry.rule)} | ${entry.projectCount} | ${entry.count} |`);
-    }
-  }
-  lines.push("", "## Unassessed projects", "");
-  if (comparison.unassessedProjects.length === 0) {
-    lines.push("_None._");
-  } else {
-    for (const project of comparison.unassessedProjects) {
-      lines.push(`- \`${escapeMarkdown(project)}\``);
     }
   }
   lines.push("");
@@ -1281,7 +1552,7 @@ function appendCoverageSection(
 ): void {
   lines.push("", `## ${title} (${ruleIds.length})`, "", ...coverageTableHeader());
   if (ruleIds.length === 0) {
-    lines.push("| _None_ | — | 0 | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |");
+    lines.push("| _None_ | — | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |");
     return;
   }
   for (const ruleId of ruleIds) {
@@ -1299,7 +1570,7 @@ export function coverageBreakdownMarkdown(breakdown: CoverageBreakdown): string 
     "",
     markdownDuration(breakdown.durationMs),
     "",
-    `Successful projects: ${breakdown.successfulProjectCount}; unassessed compile failures: ${breakdown.failedProjectCount}`,
+    "Only successfully compiled TypeSpec projects are included in validator and TypeSpec counts.",
     "",
     "Official mappings and fixture coverage kinds are context only. Coverage is credited only for diagnostics that overlap in the same successful project.",
     "",
@@ -1316,19 +1587,17 @@ export function coverageBreakdownMarkdown(breakdown: CoverageBreakdown): string 
     `| Unmapped validator rules | ${breakdown.summary.unmappedValidatorRuleCount} |`,
     `| Validator rules never fired | ${breakdown.summary.validatorRulesNeverFiredCount} |`,
     `| TypeSpec-only / unmapped TypeSpec rules | ${breakdown.summary.typeSpecOnlyRuleCount} |`,
-    `| Unassessed projects | ${breakdown.summary.unassessedProjectCount} |`,
     "",
     "## Column definitions",
     "",
     "- **Validator Rule**: validator rule identifier from the catalog, fixtures, or validator results.",
     "- **CovKind**: fixture `coverageKind` value, or `unknown` when no fixture supplies it.",
-    "- **Fired**: projects where the validator rule fired, including unassessed compile failures.",
-    "- **TSP Fired**: successful projects where at least one mapped TypeSpec rule fired.",
-    "- **Lint/Overlap**: assessable validator projects with a mapped TypeSpec diagnostic in the same project.",
-    "- **Gap**: assessable validator projects without a mapped TypeSpec diagnostic.",
-    "- **Unassessed**: validator projects whose TypeSpec compilation failed.",
-    "- **TSP Only**: successful projects where a mapped TypeSpec rule fired without the validator rule.",
-    "- **Observed %**: Lint/Overlap divided by assessable validator projects; unavailable when the denominator is zero.",
+    "- **Fired**: included projects where the validator rule fired.",
+    "- **TSP Fired**: included projects where at least one mapped TypeSpec rule fired.",
+    "- **Lint/Overlap**: validator projects with a mapped TypeSpec diagnostic in the same project.",
+    "- **Gap**: validator projects without a mapped TypeSpec diagnostic.",
+    "- **TSP Only**: included projects where a mapped TypeSpec rule fired without the validator rule.",
+    "- **Observed %**: Lint/Overlap divided by validator projects; unavailable when the denominator is zero.",
     "- **Official Mapping**: whether any mapped rule starts with `@azure-tools/`; mapping alone receives no coverage credit.",
     "- **Fired TSP Rules**: mapped rules that actually emitted diagnostics in successful projects.",
     "- **Mapped TSP Rules**: all fixture `tspLints` mappings.",
@@ -1385,14 +1654,6 @@ export function coverageBreakdownMarkdown(breakdown: CoverageBreakdown): string 
     }
   }
 
-  lines.push("", `## Unassessed projects (${breakdown.unassessedProjects.length})`, "");
-  if (breakdown.unassessedProjects.length === 0) {
-    lines.push("_None._");
-  } else {
-    for (const project of breakdown.unassessedProjects) {
-      lines.push(`- \`${escapeMarkdown(project)}\``);
-    }
-  }
   lines.push("");
   return lines.join("\n");
 }
@@ -1498,6 +1759,21 @@ async function run(config: Config): Promise<void> {
         knownValidatorRules: loadKnownValidatorRules(
           path.join(packageDir, "catalog", "validator-rule-metadata.json"),
         ),
+        normalizationContext: {
+          selectedApiVersions: new Map(
+            meta.projects.map((project) => [project.sourcePath, project.apiVersion]),
+          ),
+          loadSwaggerDocument: (relativePath) =>
+            readJson(assertDatasetPath(config.datasetDir, relativePath)),
+          loadTypeSpecSource: (project, relativePath) => {
+            const specsRoot = path.resolve(config.specsRepo);
+            const sourcePath = path.resolve(specsRoot, project, relativePath);
+            if (sourcePath !== specsRoot && !sourcePath.startsWith(`${specsRoot}${path.sep}`)) {
+              throw new Error(`TypeSpec diagnostic path escapes the specs repo: ${relativePath}`);
+            }
+            return fs.readFileSync(sourcePath, "utf8");
+          },
+        },
       },
     );
     const coverageBreakdown = createCoverageBreakdown(comparison);

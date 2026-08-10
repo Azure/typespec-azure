@@ -1,0 +1,18 @@
+{
+  "apiVersion": "2019-01-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 227,
+      "column": 3,
+      "emittedName": "patchable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 334,
+      "column": 3,
+      "emittedName": "patchable"
+    }
+  ]
+}

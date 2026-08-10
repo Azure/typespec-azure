@@ -1,13 +1,13 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 5,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-07T07:07:31.719Z",
+  "generatedAt": "2026-08-10T06:49:00.682Z",
   "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-  "count": 4557,
+  "count": 4446,
   "levels": {
-    "warning": 4557
+    "warning": 4446
   },
-  "projectCount": 305,
+  "projectCount": 298,
   "results": [
     {
       "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
@@ -16,16 +16,6 @@
       "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
       "sourceFile": "models.tsp",
       "line": 464,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor",
-      "sourceFile": "models.tsp",
-      "line": 714,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -1825,16 +1815,6 @@
       "origin": "local",
       "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
       "sourceFile": "models.tsp",
-      "line": 7388,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "models.tsp",
       "line": 2237,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
@@ -1855,57 +1835,7 @@
       "origin": "local",
       "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
       "sourceFile": "models.tsp",
-      "line": 2766,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "models.tsp",
-      "line": 2854,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "models.tsp",
-      "line": 2885,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "models.tsp",
-      "line": 2910,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "models.tsp",
       "line": 2621,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "models.tsp",
-      "line": 2931,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -1975,26 +1905,6 @@
       "origin": "local",
       "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
       "sourceFile": "models.tsp",
-      "line": 6451,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "models.tsp",
-      "line": 6456,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "models.tsp",
       "line": 7731,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
@@ -2025,27 +1935,7 @@
       "origin": "local",
       "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
       "sourceFile": "models.tsp",
-      "line": 8082,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "models.tsp",
       "line": 8336,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "models.tsp",
-      "line": 8291,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -2067,66 +1957,6 @@
       "sourceFile": "models.tsp",
       "line": 8441,
       "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "SourceControl.tsp",
-      "line": 78,
-      "column": 7,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "SourceControl.tsp",
-      "line": 85,
-      "column": 7,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "SourceControl.tsp",
-      "line": 78,
-      "column": 7,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "SourceControl.tsp",
-      "line": 85,
-      "column": 7,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "SourceControl.tsp",
-      "line": 78,
-      "column": 7,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/app/resource-manager/Microsoft.App/ContainerApps",
-      "sourceFile": "SourceControl.tsp",
-      "line": 85,
-      "column": 7,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
     {
@@ -2956,16 +2786,6 @@
       "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/ProviderOperations",
       "sourceFile": "models.tsp",
       "line": 66,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/RoleAssignment",
-      "sourceFile": "models.tsp",
-      "line": 120,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -10465,16 +10285,6 @@
       "origin": "local",
       "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
       "sourceFile": "models.tsp",
-      "line": 6248,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
-      "sourceFile": "models.tsp",
       "line": 6474,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
@@ -11115,16 +10925,6 @@
       "origin": "local",
       "project": "specification/cognitiveservices/CognitiveServices.Management",
       "sourceFile": "models.tsp",
-      "line": 1713,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/cognitiveservices/CognitiveServices.Management",
-      "sourceFile": "models.tsp",
       "line": 1658,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
@@ -11186,16 +10986,6 @@
       "project": "specification/cognitiveservices/CognitiveServices.Management",
       "sourceFile": "models.tsp",
       "line": 3524,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/cognitiveservices/CognitiveServices.Management",
-      "sourceFile": "models.tsp",
-      "line": 3552,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -11276,16 +11066,6 @@
       "project": "specification/cognitiveservices/CognitiveServices.Management",
       "sourceFile": "models.tsp",
       "line": 4632,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/cognitiveservices/CognitiveServices.Management",
-      "sourceFile": "models.tsp",
-      "line": 6098,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -19404,16 +19184,6 @@
       "level": "warning",
       "origin": "local",
       "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
-      "sourceFile": "models.tsp",
-      "line": 11153,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
       "sourceFile": "DatabaseMigrationCosmosDbMongo.tsp",
       "line": 90,
       "column": 7,
@@ -19625,16 +19395,6 @@
       "origin": "local",
       "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
       "sourceFile": "models.tsp",
-      "line": 1237,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
-      "sourceFile": "models.tsp",
       "line": 1663,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
@@ -19686,26 +19446,6 @@
       "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
       "sourceFile": "models.tsp",
       "line": 2536,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
-      "sourceFile": "models.tsp",
-      "line": 2694,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
-      "sourceFile": "models.tsp",
-      "line": 2700,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -21124,16 +20864,6 @@
       "level": "warning",
       "origin": "local",
       "project": "specification/deviceregistry/DeviceRegistry.Management",
-      "sourceFile": "ns_policy.tsp",
-      "line": 103,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/deviceregistry/DeviceRegistry.Management",
       "sourceFile": "properties/ns_assetProperties.tsp",
       "line": 25,
       "column": 3,
@@ -21146,16 +20876,6 @@
       "project": "specification/deviceregistry/DeviceRegistry.Management",
       "sourceFile": "properties/ns_deviceProperties.tsp",
       "line": 23,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/deviceregistry/DeviceRegistry.Management",
-      "sourceFile": "ns_devices.tsp",
-      "line": 60,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -23593,126 +23313,6 @@
       "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
       "level": "warning",
       "origin": "local",
-      "project": "specification/iotoperations/resource-manager/Microsoft.IoTOperations/IoTOperations",
-      "sourceFile": "models/akri/connectorTemplate.tsp",
-      "line": 447,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/iotoperations/resource-manager/Microsoft.IoTOperations/IoTOperations",
-      "sourceFile": "models/akri/connectorTemplate.tsp",
-      "line": 450,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/iotoperations/resource-manager/Microsoft.IoTOperations/IoTOperations",
-      "sourceFile": "models/akri/connectorTemplate.tsp",
-      "line": 453,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/iotoperations/resource-manager/Microsoft.IoTOperations/IoTOperations",
-      "sourceFile": "models/akri/connectorTemplate.tsp",
-      "line": 456,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/iotoperations/resource-manager/Microsoft.IoTOperations/IoTOperations",
-      "sourceFile": "models/akri/connectorTemplate.tsp",
-      "line": 447,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/iotoperations/resource-manager/Microsoft.IoTOperations/IoTOperations",
-      "sourceFile": "models/akri/connectorTemplate.tsp",
-      "line": 450,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/iotoperations/resource-manager/Microsoft.IoTOperations/IoTOperations",
-      "sourceFile": "models/akri/connectorTemplate.tsp",
-      "line": 453,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/iotoperations/resource-manager/Microsoft.IoTOperations/IoTOperations",
-      "sourceFile": "models/akri/connectorTemplate.tsp",
-      "line": 456,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/iotoperations/resource-manager/Microsoft.IoTOperations/IoTOperations",
-      "sourceFile": "models/akri/connectorTemplate.tsp",
-      "line": 447,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/iotoperations/resource-manager/Microsoft.IoTOperations/IoTOperations",
-      "sourceFile": "models/akri/connectorTemplate.tsp",
-      "line": 450,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/iotoperations/resource-manager/Microsoft.IoTOperations/IoTOperations",
-      "sourceFile": "models/akri/connectorTemplate.tsp",
-      "line": 453,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/iotoperations/resource-manager/Microsoft.IoTOperations/IoTOperations",
-      "sourceFile": "models/akri/connectorTemplate.tsp",
-      "line": 456,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
       "project": "specification/iotoperationsdataprocessor/IoTOperationsDataProcessor.Management",
       "sourceFile": "pipeline.tsp",
       "line": 40,
@@ -24036,16 +23636,6 @@
       "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
       "sourceFile": "models.tsp",
       "line": 1085,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault",
-      "sourceFile": "models.tsp",
-      "line": 1100,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -25676,16 +25266,6 @@
       "project": "specification/maintenance/resource-manager/Microsoft.Maintenance/Maintenance",
       "sourceFile": "models.tsp",
       "line": 399,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
-      "sourceFile": "models/NetworkFabricController.tsp",
-      "line": 35,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -27595,27 +27175,7 @@
       "origin": "local",
       "project": "specification/mission/resource-manager/Microsoft.Mission/Mission",
       "sourceFile": "resourcetypes/virtualEnclave/virtualenclave.tsp",
-      "line": 108,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/mission/resource-manager/Microsoft.Mission/Mission",
-      "sourceFile": "resourcetypes/virtualEnclave/virtualenclave.tsp",
       "line": 202,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/mission/resource-manager/Microsoft.Mission/Mission",
-      "sourceFile": "resourcetypes/shared/governedserviceitem.tsp",
-      "line": 83,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -27646,66 +27206,6 @@
       "project": "specification/mission/resource-manager/Microsoft.Mission/Mission",
       "sourceFile": "resourcetypes/postActions/checkaddressspaceavailability.tsp",
       "line": 16,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/mission/resource-manager/Microsoft.Mission/Mission",
-      "sourceFile": "resourcetypes/enclaveEndpoint/enclaveEndpoint.tsp",
-      "line": 61,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/mission/resource-manager/Microsoft.Mission/Mission",
-      "sourceFile": "resourcetypes/enclaveEndpoint/enclaveEndpoint.tsp",
-      "line": 61,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/mission/resource-manager/Microsoft.Mission/Mission",
-      "sourceFile": "resourcetypes/communityEndpoint/communityEndpoint.tsp",
-      "line": 94,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/mission/resource-manager/Microsoft.Mission/Mission",
-      "sourceFile": "resourcetypes/communityEndpoint/communityEndpoint.tsp",
-      "line": 94,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/mongocluster/resource-manager/Microsoft.DocumentDB/MongoCluster",
-      "sourceFile": "MongoCluster.tsp",
-      "line": 527,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/mongocluster/resource-manager/Microsoft.DocumentDB/MongoCluster",
-      "sourceFile": "MongoCluster.tsp",
-      "line": 527,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -27833,16 +27333,6 @@
       "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
       "level": "warning",
       "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActionGroupsApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 132,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogAlertsApi",
       "sourceFile": "models.tsp",
       "line": 41,
@@ -27863,99 +27353,9 @@
       "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
       "level": "warning",
       "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogAlertsApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 132,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogAlertsApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 179,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogAlertsApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 256,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogsApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 132,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogsApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 179,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogsApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 256,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/AlertRulesIncidentsApi",
       "sourceFile": "models.tsp",
       "line": 34,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/AlertRulesIncidentsApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 132,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/AlertRulesIncidentsApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 179,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/AlertRulesIncidentsApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 256,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -28103,49 +27503,9 @@
       "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
       "level": "warning",
       "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/DiagnosticsSettings",
-      "sourceFile": "../Common/main.tsp",
-      "line": 179,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/DiagnosticsSettings",
-      "sourceFile": "../Common/main.tsp",
-      "line": 256,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/LogProfilesApi",
       "sourceFile": "../Common/main.tsp",
       "line": 132,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/LogProfilesApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 179,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/LogProfilesApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 256,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -28226,66 +27586,6 @@
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricAlertApi",
       "sourceFile": "models.tsp",
       "line": 603,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricAlertApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 132,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricAlertApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 179,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricAlertApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 256,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricBaselinesApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 132,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricBaselinesApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 179,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricBaselinesApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 256,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -28453,36 +27753,6 @@
       "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
       "level": "warning",
       "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 132,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 179,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 256,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ScheduledQueryRuleApi",
       "sourceFile": "models.tsp",
       "line": 202,
@@ -28553,36 +27823,6 @@
       "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
       "level": "warning",
       "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ScheduledQueryRuleApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 132,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ScheduledQueryRuleApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 179,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ScheduledQueryRuleApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 256,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi",
       "sourceFile": "models.tsp",
       "line": 63,
@@ -28606,26 +27846,6 @@
       "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi",
       "sourceFile": "models.tsp",
       "line": 83,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 179,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi",
-      "sourceFile": "../Common/main.tsp",
-      "line": 256,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -28697,46 +27917,6 @@
       "sourceFile": "typespec/models.tsp",
       "line": 89,
       "column": 5,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts",
-      "sourceFile": "typespec/issues/models.tsp",
-      "line": 257,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts",
-      "sourceFile": "typespec/issues/issues.tsp",
-      "line": 53,
-      "column": 7,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts",
-      "sourceFile": "typespec/issues/issues.tsp",
-      "line": 53,
-      "column": 7,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts",
-      "sourceFile": "typespec/issues/issues.tsp",
-      "line": 53,
-      "column": 7,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
     {
@@ -31993,176 +31173,6 @@
       "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
       "level": "warning",
       "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 3581,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 3586,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 3591,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 3596,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 4168,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 3653,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 3664,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 3670,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 4059,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 4064,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 3365,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 3370,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 3375,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 3380,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 3514,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 3519,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/network/resource-manager/Microsoft.Network/Network/Vmss",
-      "sourceFile": "../Common/main.tsp",
-      "line": 3564,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
       "project": "specification/networkfunction/resource-manager/Microsoft.NetworkFunction/TrafficCollector",
       "sourceFile": "models.tsp",
       "line": 147,
@@ -32196,26 +31206,6 @@
       "project": "specification/nginx/resource-manager/Nginx.NginxPlus/NginxPlus",
       "sourceFile": "models.tsp",
       "line": 956,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/nginx/resource-manager/Nginx.NginxPlus/NginxPlus",
-      "sourceFile": "models.tsp",
-      "line": 1282,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/notificationhubs/resource-manager/Microsoft.NotificationHubs/NotificationHubs",
-      "sourceFile": "client.tsp",
-      "line": 256,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -32616,16 +31606,6 @@
       "project": "specification/oracle/resource-manager/Oracle.Database/OracleDatabase",
       "sourceFile": "models/common.tsp",
       "line": 153,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/oracle/resource-manager/Oracle.Database/OracleDatabase",
-      "sourceFile": "models/common.tsp",
-      "line": 256,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -33286,36 +32266,6 @@
       "project": "specification/portalservices/CopilotSettings.Management",
       "sourceFile": "models.tsp",
       "line": 10,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/portalservices/Extension.Management",
-      "sourceFile": "models.tsp",
-      "line": 466,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/portalservices/Extension.Management",
-      "sourceFile": "models.tsp",
-      "line": 471,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/portalservices/Extension.Management",
-      "sourceFile": "models.tsp",
-      "line": 528,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -35365,16 +34315,6 @@
       "origin": "local",
       "project": "specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication",
       "sourceFile": "models.tsp",
-      "line": 3437,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication",
-      "sourceFile": "models.tsp",
       "line": 3628,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
@@ -36096,16 +35036,6 @@
       "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
       "sourceFile": "models.tsp",
       "line": 517,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
-      "sourceFile": "models.tsp",
-      "line": 566,
       "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
@@ -42323,16 +41253,6 @@
       "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
       "level": "warning",
       "origin": "local",
-      "project": "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
-      "sourceFile": "models.tsp",
-      "line": 2624,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
       "project": "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
       "sourceFile": "models.tsp",
       "line": 534,
@@ -44864,26 +43784,6 @@
       "level": "warning",
       "origin": "local",
       "project": "specification/web/resource-manager/Microsoft.Web/AppService",
-      "sourceFile": "models.tsp",
-      "line": 16132,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
-      "sourceFile": "models.tsp",
-      "line": 16178,
-      "column": 3,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
       "sourceFile": "routes.tsp",
       "line": 178,
       "column": 5,
@@ -45447,16 +44347,6 @@
       "sourceFile": "routes.tsp",
       "line": 465,
       "column": 7,
-      "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/enum-instead-of-boolean",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/web/resource-manager/Microsoft.Web/AppService",
-      "sourceFile": "client.tsp",
-      "line": 3086,
-      "column": 3,
       "message": "Consider using an enum instead of a boolean property so the API shape is more descriptive."
     },
     {

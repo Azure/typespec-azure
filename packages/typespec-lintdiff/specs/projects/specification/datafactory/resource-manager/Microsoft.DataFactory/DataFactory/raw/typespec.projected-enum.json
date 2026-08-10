@@ -1,0 +1,186 @@
+{
+  "apiVersion": "2018-06-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "Factory.tsp",
+      "line": 240,
+      "column": 7,
+      "emittedName": "isRecursive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3484,
+      "column": 3,
+      "emittedName": "toBeExportedForShoebox"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3661,
+      "column": 3,
+      "emittedName": "disablePublish"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4129,
+      "column": 3,
+      "emittedName": "isIdentityCertExprired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4438,
+      "column": 3,
+      "emittedName": "isActiveDispatcher"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4962,
+      "column": 3,
+      "emittedName": "isLatest"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5787,
+      "column": 3,
+      "emittedName": "isReserved"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6038,
+      "column": 3,
+      "emittedName": "allowVNetOverride"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6157,
+      "column": 3,
+      "emittedName": "isInlineDataset"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10363,
+      "column": 3,
+      "emittedName": "cleanup"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10794,
+      "column": 3,
+      "emittedName": "selfContainedInteractiveAuthoringEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 11118,
+      "column": 3,
+      "emittedName": "selfContainedInteractiveAuthoringEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 11249,
+      "column": 3,
+      "emittedName": "required"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 11254,
+      "column": 3,
+      "emittedName": "sensitive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 11279,
+      "column": 3,
+      "emittedName": "valueSet"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 11364,
+      "column": 3,
+      "emittedName": "sensitive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 19419,
+      "column": 3,
+      "emittedName": "secureInput"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 19424,
+      "column": 3,
+      "emittedName": "secureOutput"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 25903,
+      "column": 3,
+      "emittedName": "isSensitive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 26086,
+      "column": 3,
+      "emittedName": "secureInput"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 26107,
+      "column": 3,
+      "emittedName": "waitOnCompletion"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 26295,
+      "column": 3,
+      "emittedName": "disableCertValidation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 26305,
+      "column": 3,
+      "emittedName": "turnOffAsync"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 26528,
+      "column": 3,
+      "emittedName": "isSequential"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 27149,
+      "column": 3,
+      "emittedName": "setSystemVariable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 27159,
+      "column": 3,
+      "emittedName": "secureInput"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 27164,
+      "column": 3,
+      "emittedName": "secureOutput"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 28243,
+      "column": 3,
+      "emittedName": "ignoreEmptyBlobs"
+    },
+    {
+      "sourceFile": "PipelineResource.tsp",
+      "line": 104,
+      "column": 7,
+      "emittedName": "isRecovery"
+    },
+    {
+      "sourceFile": "PipelineResource.tsp",
+      "line": 116,
+      "column": 7,
+      "emittedName": "startFromFailure"
+    }
+  ]
+}

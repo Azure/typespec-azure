@@ -1,0 +1,456 @@
+{
+  "apiVersion": "2024-04-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "AssociatedTenant.tsp",
+      "line": 92,
+      "column": 3,
+      "emittedName": "includeRevoked"
+    },
+    {
+      "sourceFile": "AssociatedTenant.tsp",
+      "line": 122,
+      "column": 3,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "BillingAccount.tsp",
+      "line": 225,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "BillingAccount.tsp",
+      "line": 392,
+      "column": 3,
+      "emittedName": "includeAll"
+    },
+    {
+      "sourceFile": "BillingAccount.tsp",
+      "line": 398,
+      "column": 3,
+      "emittedName": "includeAllWithoutBillingProfiles"
+    },
+    {
+      "sourceFile": "BillingAccount.tsp",
+      "line": 404,
+      "column": 3,
+      "emittedName": "includeDeleted"
+    },
+    {
+      "sourceFile": "BillingAccount.tsp",
+      "line": 410,
+      "column": 3,
+      "emittedName": "includePendingAgreement"
+    },
+    {
+      "sourceFile": "BillingAccount.tsp",
+      "line": 416,
+      "column": 3,
+      "emittedName": "includeResellee"
+    },
+    {
+      "sourceFile": "BillingAccount.tsp",
+      "line": 468,
+      "column": 3,
+      "emittedName": "resolveScopeDisplayNames"
+    },
+    {
+      "sourceFile": "BillingProfile.tsp",
+      "line": 179,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "BillingProfile.tsp",
+      "line": 273,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "BillingProfile.tsp",
+      "line": 325,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "BillingProfile.tsp",
+      "line": 447,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "BillingProfile.tsp",
+      "line": 463,
+      "column": 3,
+      "emittedName": "includeDeleted"
+    },
+    {
+      "sourceFile": "BillingProfile.tsp",
+      "line": 493,
+      "column": 3,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "BillingProfile.tsp",
+      "line": 507,
+      "column": 3,
+      "emittedName": "resolveScopeDisplayNames"
+    },
+    {
+      "sourceFile": "BillingProperty.tsp",
+      "line": 68,
+      "column": 3,
+      "emittedName": "includeBillingCountry"
+    },
+    {
+      "sourceFile": "BillingProperty.tsp",
+      "line": 74,
+      "column": 3,
+      "emittedName": "includeTransitionStatus"
+    },
+    {
+      "sourceFile": "BillingRequest.tsp",
+      "line": 100,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "BillingSubscription.tsp",
+      "line": 246,
+      "column": 3,
+      "emittedName": "includeDeleted"
+    },
+    {
+      "sourceFile": "BillingSubscription.tsp",
+      "line": 282,
+      "column": 3,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "BillingSubscription.tsp",
+      "line": 296,
+      "column": 3,
+      "emittedName": "includeDeleted"
+    },
+    {
+      "sourceFile": "BillingSubscription.tsp",
+      "line": 302,
+      "column": 3,
+      "emittedName": "includeTenantSubscriptions"
+    },
+    {
+      "sourceFile": "BillingSubscription.tsp",
+      "line": 308,
+      "column": 3,
+      "emittedName": "includeFailed"
+    },
+    {
+      "sourceFile": "BillingSubscription.tsp",
+      "line": 344,
+      "column": 3,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "BillingSubscriptionAlias.tsp",
+      "line": 101,
+      "column": 3,
+      "emittedName": "includeDeleted"
+    },
+    {
+      "sourceFile": "BillingSubscriptionAlias.tsp",
+      "line": 131,
+      "column": 3,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "Customer.tsp",
+      "line": 156,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "Customer.tsp",
+      "line": 238,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "Customer.tsp",
+      "line": 375,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "Customer.tsp",
+      "line": 494,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "Customer.tsp",
+      "line": 579,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "Customer.tsp",
+      "line": 595,
+      "column": 3,
+      "emittedName": "resolveScopeDisplayNames"
+    },
+    {
+      "sourceFile": "Customer.tsp",
+      "line": 609,
+      "column": 3,
+      "emittedName": "includeDeleted"
+    },
+    {
+      "sourceFile": "Customer.tsp",
+      "line": 645,
+      "column": 3,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "Customer.tsp",
+      "line": 659,
+      "column": 3,
+      "emittedName": "includeDeleted"
+    },
+    {
+      "sourceFile": "Customer.tsp",
+      "line": 695,
+      "column": 3,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "EnrollmentAccount.tsp",
+      "line": 119,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "EnrollmentAccount.tsp",
+      "line": 234,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "EnrollmentAccount.tsp",
+      "line": 315,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "Invoice.tsp",
+      "line": 124,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "Invoice.tsp",
+      "line": 223,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "Invoice.tsp",
+      "line": 367,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 192,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 302,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 373,
+      "column": 7,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 389,
+      "column": 3,
+      "emittedName": "resolveScopeDisplayNames"
+    },
+    {
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 403,
+      "column": 3,
+      "emittedName": "includeDeleted"
+    },
+    {
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 439,
+      "column": 3,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 453,
+      "column": 3,
+      "emittedName": "includeDeleted"
+    },
+    {
+      "sourceFile": "InvoiceSection.tsp",
+      "line": 483,
+      "column": 3,
+      "emittedName": "count"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3347,
+      "column": 3,
+      "emittedName": "isDefault"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3403,
+      "column": 3,
+      "emittedName": "hasReadAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3408,
+      "column": 3,
+      "emittedName": "hasNoBillingProfiles"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3663,
+      "column": 3,
+      "emittedName": "isValidAddress"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3686,
+      "column": 3,
+      "emittedName": "required"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4023,
+      "column": 3,
+      "emittedName": "hasReadAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4039,
+      "column": 3,
+      "emittedName": "invoiceEmailOptIn"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4362,
+      "column": 3,
+      "emittedName": "isTransitionedBillingAccount"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4415,
+      "column": 3,
+      "emittedName": "isAccountAdmin"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5210,
+      "column": 3,
+      "emittedName": "renew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5355,
+      "column": 3,
+      "emittedName": "renew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5494,
+      "column": 3,
+      "emittedName": "renew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5534,
+      "column": 3,
+      "emittedName": "valid"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6034,
+      "column": 3,
+      "emittedName": "isMoveEligible"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6187,
+      "column": 3,
+      "emittedName": "isDevTestEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6334,
+      "column": 3,
+      "emittedName": "isMonthlyInvoice"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6822,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7351,
+      "column": 3,
+      "emittedName": "isMoveEligible"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7495,
+      "column": 3,
+      "emittedName": "archived"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7622,
+      "column": 3,
+      "emittedName": "renew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7880,
+      "column": 3,
+      "emittedName": "renew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8014,
+      "column": 3,
+      "emittedName": "renew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8314,
+      "column": 3,
+      "emittedName": "isThirdParty"
+    },
+    {
+      "sourceFile": "Product.tsp",
+      "line": 100,
+      "column": 7,
+      "emittedName": "count"
+    }
+  ]
+}

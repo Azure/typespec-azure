@@ -1,0 +1,42 @@
+{
+  "apiVersion": "2023-10-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 217,
+      "column": 3,
+      "emittedName": "isAvailiable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 265,
+      "column": 3,
+      "emittedName": "isAvailiable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1050,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1056,
+      "column": 3,
+      "emittedName": "critical"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1385,
+      "column": 3,
+      "emittedName": "fillGapWithZero"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1575,
+      "column": 3,
+      "emittedName": "isDataAction"
+    }
+  ]
+}

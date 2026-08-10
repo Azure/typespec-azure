@@ -1,0 +1,30 @@
+{
+  "apiVersion": "2023-04-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "ManagementGroup.tsp",
+      "line": 35,
+      "column": 3,
+      "emittedName": "$recurse"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 753,
+      "column": 3,
+      "emittedName": "requireAuthorizationForGroupCreation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 779,
+      "column": 3,
+      "emittedName": "requireAuthorizationForGroupCreation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 856,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    }
+  ]
+}

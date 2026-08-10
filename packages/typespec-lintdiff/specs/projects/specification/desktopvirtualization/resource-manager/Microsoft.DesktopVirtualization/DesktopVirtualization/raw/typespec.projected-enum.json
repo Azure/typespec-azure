@@ -1,0 +1,384 @@
+{
+  "apiVersion": "2026-04-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "AppAttachPackage.tsp",
+      "line": 63,
+      "column": 7,
+      "emittedName": "force"
+    },
+    {
+      "sourceFile": "Application.tsp",
+      "line": 70,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "ApplicationGroup.tsp",
+      "line": 59,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "ApplicationGroup.tsp",
+      "line": 117,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "Desktop.tsp",
+      "line": 57,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "HostPool.tsp",
+      "line": 90,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "HostPool.tsp",
+      "line": 121,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "HostPool.tsp",
+      "line": 159,
+      "column": 7,
+      "emittedName": "force"
+    },
+    {
+      "sourceFile": "HostPool.tsp",
+      "line": 179,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "HostPool.tsp",
+      "line": 206,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1353,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1561,
+      "column": 3,
+      "emittedName": "isRegularRegistration"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1566,
+      "column": 3,
+      "emittedName": "isActive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1985,
+      "column": 3,
+      "emittedName": "secureBootEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1991,
+      "column": 3,
+      "emittedName": "vTpmEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2006,
+      "column": 3,
+      "emittedName": "secureBootEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2012,
+      "column": 3,
+      "emittedName": "vTpmEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2022,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2037,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2155,
+      "column": 3,
+      "emittedName": "deleteOriginalVm"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2184,
+      "column": 3,
+      "emittedName": "deleteOriginalVm"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2245,
+      "column": 3,
+      "emittedName": "setDrainMode"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2268,
+      "column": 3,
+      "emittedName": "setDrainMode"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2358,
+      "column": 3,
+      "emittedName": "cloudPcResource"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2363,
+      "column": 3,
+      "emittedName": "showInFeed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2584,
+      "column": 3,
+      "emittedName": "validationEnvironment"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2637,
+      "column": 3,
+      "emittedName": "startVMOnConnect"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2643,
+      "column": 3,
+      "emittedName": "cloudPcResource"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2762,
+      "column": 3,
+      "emittedName": "useSessionHostLocalTime"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3004,
+      "column": 3,
+      "emittedName": "rampDownForceLogoffUsers"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3114,
+      "column": 3,
+      "emittedName": "scalingPlanEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3152,
+      "column": 3,
+      "emittedName": "cloudPcResource"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3274,
+      "column": 3,
+      "emittedName": "showInFeed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3345,
+      "column": 3,
+      "emittedName": "showInPortal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3412,
+      "column": 3,
+      "emittedName": "showInPortal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3602,
+      "column": 3,
+      "emittedName": "putShortcutOnDesktop"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3732,
+      "column": 3,
+      "emittedName": "validationEnvironment"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3773,
+      "column": 3,
+      "emittedName": "startVMOnConnect"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3859,
+      "column": 3,
+      "emittedName": "useSessionHostLocalTime"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3961,
+      "column": 3,
+      "emittedName": "isRegularRegistration"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3966,
+      "column": 3,
+      "emittedName": "isActive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4154,
+      "column": 3,
+      "emittedName": "allowNewSession"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4309,
+      "column": 3,
+      "emittedName": "allowNewSession"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4846,
+      "column": 3,
+      "emittedName": "rampDownForceLogoffUsers"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4967,
+      "column": 3,
+      "emittedName": "rampDownForceLogoffUsers"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5394,
+      "column": 3,
+      "emittedName": "isRegularRegistration"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5399,
+      "column": 3,
+      "emittedName": "isActive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5445,
+      "column": 3,
+      "emittedName": "isActive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5450,
+      "column": 3,
+      "emittedName": "isRegularRegistration"
+    },
+    {
+      "sourceFile": "MsixPackage.tsp",
+      "line": 95,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "PrivateEndpointConnection.tsp",
+      "line": 80,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "ScalingPlan.tsp",
+      "line": 75,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "ScalingPlan.tsp",
+      "line": 102,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "ScalingPlan.tsp",
+      "line": 134,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "ScalingPlanPersonalSchedule.tsp",
+      "line": 73,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "ScalingPlanPooledSchedule.tsp",
+      "line": 73,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "SessionHost.tsp",
+      "line": 51,
+      "column": 7,
+      "emittedName": "force"
+    },
+    {
+      "sourceFile": "SessionHost.tsp",
+      "line": 65,
+      "column": 7,
+      "emittedName": "force"
+    },
+    {
+      "sourceFile": "SessionHost.tsp",
+      "line": 85,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "UserSession.tsp",
+      "line": 44,
+      "column": 7,
+      "emittedName": "force"
+    },
+    {
+      "sourceFile": "UserSession.tsp",
+      "line": 64,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "UserSession.tsp",
+      "line": 99,
+      "column": 7,
+      "emittedName": "isDescending"
+    },
+    {
+      "sourceFile": "Workspace.tsp",
+      "line": 71,
+      "column": 7,
+      "emittedName": "isDescending"
+    }
+  ]
+}

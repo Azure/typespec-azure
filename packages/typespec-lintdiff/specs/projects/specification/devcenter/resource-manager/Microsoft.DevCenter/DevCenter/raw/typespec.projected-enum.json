@@ -1,0 +1,30 @@
+{
+  "apiVersion": "2026-01-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 1315,
+      "column": 3,
+      "emittedName": "readOnly"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1319,
+      "column": 3,
+      "emittedName": "required"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1473,
+      "column": 3,
+      "emittedName": "excludeFromLatest"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1800,
+      "column": 3,
+      "emittedName": "required"
+    }
+  ]
+}

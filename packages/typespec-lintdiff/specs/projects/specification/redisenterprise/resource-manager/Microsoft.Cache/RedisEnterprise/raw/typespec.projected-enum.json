@@ -1,0 +1,54 @@
+{
+  "apiVersion": "2026-06-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 1264,
+      "column": 3,
+      "emittedName": "aofEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1269,
+      "column": 3,
+      "emittedName": "rdbEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1717,
+      "column": 3,
+      "emittedName": "switchDns"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1722,
+      "column": 3,
+      "emittedName": "skipDataMigration"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1727,
+      "column": 3,
+      "emittedName": "forceMigrate"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1751,
+      "column": 3,
+      "emittedName": "skipDataMigration"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1756,
+      "column": 3,
+      "emittedName": "forceMigrate"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1766,
+      "column": 3,
+      "emittedName": "isValid"
+    }
+  ]
+}

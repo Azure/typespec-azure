@@ -1,0 +1,24 @@
+{
+  "apiVersion": "2024-03-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 360,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1091,
+      "column": 3,
+      "emittedName": "isLastStep"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1183,
+      "column": 3,
+      "emittedName": "isRequired"
+    }
+  ]
+}

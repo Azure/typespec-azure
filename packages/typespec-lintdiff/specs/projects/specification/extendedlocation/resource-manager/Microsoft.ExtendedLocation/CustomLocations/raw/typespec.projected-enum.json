@@ -1,0 +1,12 @@
+{
+  "apiVersion": "2021-08-31-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 82,
+      "column": 3,
+      "emittedName": "isDataAction"
+    }
+  ]
+}

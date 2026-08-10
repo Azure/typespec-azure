@@ -1,0 +1,36 @@
+{
+  "apiVersion": "2024-11-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "ExtensionTypeVersionForReleaseTrain.tsp",
+      "line": 98,
+      "column": 7,
+      "emittedName": "showLatest"
+    },
+    {
+      "sourceFile": "ExtensionTypeVersionForReleaseTrain.tsp",
+      "line": 182,
+      "column": 7,
+      "emittedName": "showLatest"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 24,
+      "column": 3,
+      "emittedName": "isSystemExtension"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 29,
+      "column": 3,
+      "emittedName": "isManagedIdentityRequired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 111,
+      "column": 3,
+      "emittedName": "allowMultipleInstances"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "apiVersion": "2025-04-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 590,
+      "column": 3,
+      "emittedName": "isServiceRole"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 647,
+      "column": 3,
+      "emittedName": "consentToAuthorization"
+    }
+  ]
+}

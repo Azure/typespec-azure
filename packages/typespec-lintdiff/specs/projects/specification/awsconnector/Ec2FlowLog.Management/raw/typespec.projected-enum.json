@@ -1,0 +1,18 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 147,
+      "column": 3,
+      "emittedName": "hiveCompatiblePartitions"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 150,
+      "column": 3,
+      "emittedName": "perHourPartition"
+    }
+  ]
+}

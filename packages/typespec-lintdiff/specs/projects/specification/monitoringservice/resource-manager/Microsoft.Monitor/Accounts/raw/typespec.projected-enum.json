@@ -1,0 +1,12 @@
+{
+  "apiVersion": "2025-10-03-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "typespec/models.tsp",
+      "line": 89,
+      "column": 5,
+      "emittedName": "enableAccessUsingResourcePermissions"
+    }
+  ]
+}

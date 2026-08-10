@@ -1,0 +1,18 @@
+{
+  "apiVersion": "2024-04-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 373,
+      "column": 3,
+      "emittedName": "boolean"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 408,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    }
+  ]
+}

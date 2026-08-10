@@ -1,0 +1,30 @@
+{
+  "apiVersion": "2026-07-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 476,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 776,
+      "column": 3,
+      "emittedName": "assignPermissions"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1805,
+      "column": 3,
+      "emittedName": "allowCustomProperties"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1878,
+      "column": 3,
+      "emittedName": "isBuiltInOnly"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "apiVersion": "2025-02-27-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "landingZoneConfigurationResourceProperties.tsp",
+      "line": 183,
+      "column": 3,
+      "emittedName": "create"
+    },
+    {
+      "sourceFile": "landingZoneConfigurationResourceProperties.tsp",
+      "line": 191,
+      "column": 3,
+      "emittedName": "create"
+    }
+  ]
+}

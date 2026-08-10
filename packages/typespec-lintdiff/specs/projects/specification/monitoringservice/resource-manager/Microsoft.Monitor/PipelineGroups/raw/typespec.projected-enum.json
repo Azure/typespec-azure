@@ -1,0 +1,12 @@
+{
+  "apiVersion": "2026-04-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "typespec/receivers/SyslogReceiver.tsp",
+      "line": 29,
+      "column": 3,
+      "emittedName": "allowSkipPriHeader"
+    }
+  ]
+}

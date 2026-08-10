@@ -1,0 +1,324 @@
+{
+  "apiVersion": "2026-05-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "ApplicationResource.tsp",
+      "line": 243,
+      "column": 3,
+      "emittedName": "forceRestart"
+    },
+    {
+      "sourceFile": "ApplicationResource.tsp",
+      "line": 268,
+      "column": 3,
+      "emittedName": "recreateApplication"
+    },
+    {
+      "sourceFile": "ApplicationResource.tsp",
+      "line": 324,
+      "column": 3,
+      "emittedName": "considerWarningAsError"
+    },
+    {
+      "sourceFile": "ApplicationResource.tsp",
+      "line": 483,
+      "column": 3,
+      "emittedName": "forceRestart"
+    },
+    {
+      "sourceFile": "ApplicationResource.tsp",
+      "line": 600,
+      "column": 3,
+      "emittedName": "considerWarningAsError"
+    },
+    {
+      "sourceFile": "ApplicationResource.tsp",
+      "line": 748,
+      "column": 3,
+      "emittedName": "excludeHealthStatistics"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 305,
+      "column": 3,
+      "emittedName": "allowRdpAccess"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 361,
+      "column": 3,
+      "emittedName": "enableAutoOSUpgrade"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 366,
+      "column": 3,
+      "emittedName": "zonalResiliency"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 376,
+      "column": 3,
+      "emittedName": "enableIpv6"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 399,
+      "column": 3,
+      "emittedName": "enableServicePublicIP"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 421,
+      "column": 3,
+      "emittedName": "useCustomVnet"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 465,
+      "column": 3,
+      "emittedName": "enableHttpGatewayExclusiveAuthMode"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 488,
+      "column": 3,
+      "emittedName": "enableOutboundOnlyNodeTypes"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 494,
+      "column": 3,
+      "emittedName": "skipManagedNsgAssignment"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 708,
+      "column": 3,
+      "emittedName": "enableIpv6"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 759,
+      "column": 3,
+      "emittedName": "forceRestart"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 1049,
+      "column": 3,
+      "emittedName": "isWindowEnabled"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 1055,
+      "column": 3,
+      "emittedName": "isRegionReady"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 1061,
+      "column": 3,
+      "emittedName": "isWindowActive"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 1067,
+      "column": 3,
+      "emittedName": "canApplyUpdates"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 1127,
+      "column": 3,
+      "emittedName": "isClusterZoneResilient"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 1150,
+      "column": 3,
+      "emittedName": "isZoneResilient"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 1281,
+      "column": 3,
+      "emittedName": "isAdmin"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 216,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 440,
+      "column": 3,
+      "emittedName": "force"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 248,
+      "column": 3,
+      "emittedName": "isPrimary"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 341,
+      "column": 3,
+      "emittedName": "isStateless"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 346,
+      "column": 3,
+      "emittedName": "multiplePlacementGroups"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 369,
+      "column": 3,
+      "emittedName": "enableEncryptionAtHost"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 380,
+      "column": 3,
+      "emittedName": "enableAcceleratedNetworking"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 385,
+      "column": 3,
+      "emittedName": "useDefaultPublicLoadBalancer"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 390,
+      "column": 3,
+      "emittedName": "useTempDataDisk"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 395,
+      "column": 3,
+      "emittedName": "enableOverProvisioning"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 406,
+      "column": 3,
+      "emittedName": "isSpotVM"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 417,
+      "column": 3,
+      "emittedName": "useEphemeralOSDisk"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 471,
+      "column": 3,
+      "emittedName": "secureBootEnabled"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 477,
+      "column": 3,
+      "emittedName": "enableNodePublicIP"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 483,
+      "column": 3,
+      "emittedName": "enableNodePublicIPv6"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 556,
+      "column": 3,
+      "emittedName": "zoneBalance"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 562,
+      "column": 3,
+      "emittedName": "isOutboundOnly"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 569,
+      "column": 3,
+      "emittedName": "enableResilientEphemeralOsDisk"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 596,
+      "column": 3,
+      "emittedName": "enableAcceleratedNetworking"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 687,
+      "column": 3,
+      "emittedName": "enableAutomaticUpgrade"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 711,
+      "column": 3,
+      "emittedName": "treatFailureAsDeploymentFailure"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 764,
+      "column": 3,
+      "emittedName": "force"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 945,
+      "column": 3,
+      "emittedName": "autoUpgradeMinorVersion"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 978,
+      "column": 3,
+      "emittedName": "enableAutomaticUpgrade"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 1361,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "NodeType.tsp",
+      "line": 1381,
+      "column": 3,
+      "emittedName": "addProxyAgentExtension"
+    },
+    {
+      "sourceFile": "ServiceResource.tsp",
+      "line": 201,
+      "column": 3,
+      "emittedName": "hasPersistedState"
+    },
+    {
+      "sourceFile": "ServiceResource.tsp",
+      "line": 681,
+      "column": 3,
+      "emittedName": "useOnlyPrimaryLoad"
+    },
+    {
+      "sourceFile": "ServiceResource.tsp",
+      "line": 850,
+      "column": 3,
+      "emittedName": "forceRestart"
+    }
+  ]
+}

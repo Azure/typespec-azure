@@ -1,0 +1,30 @@
+{
+  "apiVersion": "2026-01-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 77,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 92,
+      "column": 3,
+      "emittedName": "overrideSubscriptionLevelSettings"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 137,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 185,
+      "column": 3,
+      "emittedName": "isEnabled"
+    }
+  ]
+}

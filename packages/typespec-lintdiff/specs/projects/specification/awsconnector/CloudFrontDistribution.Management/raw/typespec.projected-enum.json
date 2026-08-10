@@ -1,0 +1,78 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 119,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 125,
+      "column": 3,
+      "emittedName": "ipV6Enabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 147,
+      "column": 3,
+      "emittedName": "staging"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 185,
+      "column": 3,
+      "emittedName": "compress"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 223,
+      "column": 3,
+      "emittedName": "smoothStreaming"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 295,
+      "column": 3,
+      "emittedName": "compress"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 330,
+      "column": 3,
+      "emittedName": "smoothStreaming"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 355,
+      "column": 3,
+      "emittedName": "includeCookies"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 446,
+      "column": 3,
+      "emittedName": "cloudFrontDefaultCertificate"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 471,
+      "column": 3,
+      "emittedName": "queryString"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 500,
+      "column": 3,
+      "emittedName": "includeBody"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 567,
+      "column": 3,
+      "emittedName": "enabled"
+    }
+  ]
+}

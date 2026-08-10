@@ -1,0 +1,36 @@
+{
+  "apiVersion": "2026-07-03-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 119,
+      "column": 3,
+      "emittedName": "updateDescription"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 145,
+      "column": 3,
+      "emittedName": "openAccess"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 347,
+      "column": 3,
+      "emittedName": "isEphemeral"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 363,
+      "column": 3,
+      "emittedName": "provisioningScriptShouldRestart"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 402,
+      "column": 3,
+      "emittedName": "keyExportable"
+    }
+  ]
+}

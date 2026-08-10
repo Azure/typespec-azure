@@ -1,0 +1,138 @@
+{
+  "apiVersion": "2025-11-15-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 2713,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2724,
+      "column": 3,
+      "emittedName": "autoCreateTopicWithFirstSubscription"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2735,
+      "column": 3,
+      "emittedName": "autoDeleteTopicWithLastSubscription"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2926,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2937,
+      "column": 3,
+      "emittedName": "autoCreateTopicWithFirstSubscription"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2948,
+      "column": 3,
+      "emittedName": "autoDeleteTopicWithLastSubscription"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3429,
+      "column": 3,
+      "emittedName": "isSubjectCaseSensitive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3434,
+      "column": 3,
+      "emittedName": "enableAdvancedFilteringOnArrays"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3562,
+      "column": 3,
+      "emittedName": "isZoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3595,
+      "column": 3,
+      "emittedName": "enableAutoScale"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3616,
+      "column": 3,
+      "emittedName": "enableAutoScale"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4209,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4432,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4481,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5080,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5163,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5225,
+      "column": 3,
+      "emittedName": "isInDefaultSet"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5332,
+      "column": 3,
+      "emittedName": "areRegionalAndGlobalSourcesSupported"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5346,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5628,
+      "column": 3,
+      "emittedName": "isSecret"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5802,
+      "column": 3,
+      "emittedName": "value"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6128,
+      "column": 3,
+      "emittedName": "value"
+    }
+  ]
+}

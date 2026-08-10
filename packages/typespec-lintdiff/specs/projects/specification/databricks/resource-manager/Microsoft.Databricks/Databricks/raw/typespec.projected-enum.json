@@ -1,0 +1,66 @@
+{
+  "apiVersion": "2026-01-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 532,
+      "column": 3,
+      "emittedName": "isUcEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 661,
+      "column": 3,
+      "emittedName": "value"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 676,
+      "column": 3,
+      "emittedName": "value"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 886,
+      "column": 3,
+      "emittedName": "rotationToLatestKeyVersionEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1319,
+      "column": 3,
+      "emittedName": "isAccessible"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1329,
+      "column": 3,
+      "emittedName": "allowVirtualNetworkAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1334,
+      "column": 3,
+      "emittedName": "allowForwardedTraffic"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1339,
+      "column": 3,
+      "emittedName": "allowGatewayTransit"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1344,
+      "column": 3,
+      "emittedName": "useRemoteGateways"
+    },
+    {
+      "sourceFile": "Workspace.tsp",
+      "line": 114,
+      "column": 3,
+      "emittedName": "forceDeletion"
+    }
+  ]
+}

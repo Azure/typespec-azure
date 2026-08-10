@@ -1,0 +1,72 @@
+{
+  "apiVersion": "2026-08-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "ContainerGroup.tsp",
+      "line": 169,
+      "column": 7,
+      "emittedName": "timestamps"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 744,
+      "column": 3,
+      "emittedName": "isCreatedFromStandbyPool"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1086,
+      "column": 3,
+      "emittedName": "readOnly"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1187,
+      "column": 3,
+      "emittedName": "privileged"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1192,
+      "column": 3,
+      "emittedName": "allowPrivilegeEscalation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1381,
+      "column": 3,
+      "emittedName": "readOnly"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1723,
+      "column": 3,
+      "emittedName": "failContainerGroupCreateOnReuseFailure"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1910,
+      "column": 3,
+      "emittedName": "isCreatedFromStandbyPool"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2293,
+      "column": 3,
+      "emittedName": "maintainDesiredCount"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2565,
+      "column": 3,
+      "emittedName": "inPlaceUpdate"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2741,
+      "column": 3,
+      "emittedName": "useKrypton"
+    }
+  ]
+}

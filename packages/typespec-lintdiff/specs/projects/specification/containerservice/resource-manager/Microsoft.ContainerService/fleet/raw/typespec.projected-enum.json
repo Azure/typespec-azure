@@ -1,0 +1,30 @@
+{
+  "apiVersion": "2026-06-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 111,
+      "column": 3,
+      "emittedName": "enablePrivateCluster"
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 118,
+      "column": 3,
+      "emittedName": "enableVnetIntegration"
+    },
+    {
+      "sourceFile": "update/autoupgradeprofile.tsp",
+      "line": 66,
+      "column": 3,
+      "emittedName": "disabled"
+    },
+    {
+      "sourceFile": "update/autoupgradeprofile.tsp",
+      "line": 89,
+      "column": 3,
+      "emittedName": "longTermSupport"
+    }
+  ]
+}

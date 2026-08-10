@@ -1,0 +1,72 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 69,
+      "column": 3,
+      "emittedName": "allowVersionUpgrade"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 81,
+      "column": 3,
+      "emittedName": "availabilityZoneRelocation"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 87,
+      "column": 3,
+      "emittedName": "classic"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 114,
+      "column": 3,
+      "emittedName": "deferMaintenance"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 135,
+      "column": 3,
+      "emittedName": "encrypted"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 141,
+      "column": 3,
+      "emittedName": "enhancedVpcRouting"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 162,
+      "column": 3,
+      "emittedName": "manageMasterPassword"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 181,
+      "column": 3,
+      "emittedName": "multiAZ"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 202,
+      "column": 3,
+      "emittedName": "publiclyAccessible"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 211,
+      "column": 3,
+      "emittedName": "rotateEncryptionKey"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 220,
+      "column": 3,
+      "emittedName": "snapshotCopyManual"
+    }
+  ]
+}

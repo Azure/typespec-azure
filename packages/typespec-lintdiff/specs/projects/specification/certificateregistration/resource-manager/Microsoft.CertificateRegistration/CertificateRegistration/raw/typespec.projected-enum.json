@@ -1,0 +1,84 @@
+{
+  "apiVersion": "2024-11-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 208,
+      "column": 3,
+      "emittedName": "autoRenew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 268,
+      "column": 3,
+      "emittedName": "isPrivateKeyExternal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 501,
+      "column": 3,
+      "emittedName": "autoRenew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 561,
+      "column": 3,
+      "emittedName": "isPrivateKeyExternal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 661,
+      "column": 3,
+      "emittedName": "isPrivateKeyExternal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 692,
+      "column": 3,
+      "emittedName": "isPrivateKeyExternal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 712,
+      "column": 3,
+      "emittedName": "lightTheme"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1054,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1122,
+      "column": 3,
+      "emittedName": "supportsInstanceLevelAggregation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1124,
+      "column": 3,
+      "emittedName": "enableRegionalMdmAccount"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1132,
+      "column": 3,
+      "emittedName": "fillGapWithZero"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1134,
+      "column": 3,
+      "emittedName": "isInternal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1165,
+      "column": 3,
+      "emittedName": "toBeExportedForShoebox"
+    }
+  ]
+}

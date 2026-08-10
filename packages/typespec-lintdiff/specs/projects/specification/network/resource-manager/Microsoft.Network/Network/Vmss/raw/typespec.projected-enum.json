@@ -1,0 +1,120 @@
+{
+  "apiVersion": "2018-10-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 937,
+      "column": 3,
+      "emittedName": "primary"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 943,
+      "column": 3,
+      "emittedName": "vnetEncryptionSupported"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 949,
+      "column": 3,
+      "emittedName": "defaultOutboundConnectivityEnabled"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 954,
+      "column": 3,
+      "emittedName": "enableAcceleratedNetworking"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 959,
+      "column": 3,
+      "emittedName": "disableTcpStateTracking"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 965,
+      "column": 3,
+      "emittedName": "enableIPForwarding"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 1208,
+      "column": 3,
+      "emittedName": "defaultOutboundAccess"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 1653,
+      "column": 3,
+      "emittedName": "allowDelete"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 1900,
+      "column": 3,
+      "emittedName": "primary"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 2319,
+      "column": 3,
+      "emittedName": "enableFloatingIP"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 2324,
+      "column": 3,
+      "emittedName": "enableTcpReset"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 2766,
+      "column": 3,
+      "emittedName": "flushConnection"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 2981,
+      "column": 3,
+      "emittedName": "enableProxyProtocol"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 3049,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 3087,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 3128,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 3171,
+      "column": 3,
+      "emittedName": "disableBgpRoutePropagation"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 3825,
+      "column": 3,
+      "emittedName": "primary"
+    },
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 3877,
+      "column": 3,
+      "emittedName": "hasBgpOverride"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "apiVersion": "2026-04-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 1751,
+      "column": 3,
+      "emittedName": "isDynamicConfig"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1757,
+      "column": 3,
+      "emittedName": "isReadOnly"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1763,
+      "column": 3,
+      "emittedName": "isConfigPendingRestart"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2629,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2776,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3572,
+      "column": 3,
+      "emittedName": "restartWithFailover"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4013,
+      "column": 3,
+      "emittedName": "deferrable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4102,
+      "column": 3,
+      "emittedName": "appliedNow"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4139,
+      "column": 3,
+      "emittedName": "passed"
+    }
+  ]
+}

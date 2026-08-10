@@ -1,0 +1,42 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 69,
+      "column": 3,
+      "emittedName": "assignIpv6AddressOnCreation"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 81,
+      "column": 3,
+      "emittedName": "enableDns64"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 102,
+      "column": 3,
+      "emittedName": "ipv6Native"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 108,
+      "column": 3,
+      "emittedName": "mapPublicIpOnLaunch"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 137,
+      "column": 3,
+      "emittedName": "enableResourceNameDnsAAAARecord"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 140,
+      "column": 3,
+      "emittedName": "enableResourceNameDnsARecord"
+    }
+  ]
+}

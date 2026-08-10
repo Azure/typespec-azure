@@ -1,0 +1,24 @@
+{
+  "apiVersion": "2024-02-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 1254,
+      "column": 3,
+      "emittedName": "isPartOfBaseConfiguration"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2203,
+      "column": 3,
+      "emittedName": "sendNotification"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2550,
+      "column": 3,
+      "emittedName": "shippingBoxRequired"
+    }
+  ]
+}

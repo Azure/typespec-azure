@@ -1,0 +1,24 @@
+{
+  "apiVersion": "2025-11-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 466,
+      "column": 3,
+      "emittedName": "hasBeenDeployed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 471,
+      "column": 3,
+      "emittedName": "ignoreDuplicateZipError"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 528,
+      "column": 3,
+      "emittedName": "hasBeenDeployed"
+    }
+  ]
+}

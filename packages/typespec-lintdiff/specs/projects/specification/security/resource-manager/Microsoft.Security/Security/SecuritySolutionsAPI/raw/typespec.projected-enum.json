@@ -1,0 +1,12 @@
+{
+  "apiVersion": "2020-01-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 691,
+      "column": 3,
+      "emittedName": "recommendationsExist"
+    }
+  ]
+}

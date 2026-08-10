@@ -1,0 +1,120 @@
+{
+  "apiVersion": "2025-07-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 1092,
+      "column": 3,
+      "emittedName": "isCancellable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1098,
+      "column": 3,
+      "emittedName": "isDeletable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1104,
+      "column": 3,
+      "emittedName": "isShippingAddressEditable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1122,
+      "column": 3,
+      "emittedName": "isPrepareToShipEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1174,
+      "column": 3,
+      "emittedName": "isCancellableWithoutFee"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1180,
+      "column": 3,
+      "emittedName": "allDevicesLost"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1486,
+      "column": 3,
+      "emittedName": "sendNotification"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1546,
+      "column": 3,
+      "emittedName": "skipAddressValidation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1763,
+      "column": 3,
+      "emittedName": "transferAllBlobs"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1768,
+      "column": 3,
+      "emittedName": "transferAllFiles"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1814,
+      "column": 3,
+      "emittedName": "isUpdated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1851,
+      "column": 3,
+      "emittedName": "isUpdated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1984,
+      "column": 3,
+      "emittedName": "isPerformedByCustomer"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2733,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3084,
+      "column": 3,
+      "emittedName": "isEnumerationInProgress"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3301,
+      "column": 3,
+      "emittedName": "enableManifestBackup"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3585,
+      "column": 3,
+      "emittedName": "isEnumerationInProgress"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3672,
+      "column": 3,
+      "emittedName": "isPasskeyUserDefined"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4269,
+      "column": 3,
+      "emittedName": "isDataAction"
+    }
+  ]
+}

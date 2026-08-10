@@ -1,0 +1,72 @@
+{
+  "apiVersion": "2024-08-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 549,
+      "column": 3,
+      "emittedName": "isEstimated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 619,
+      "column": 3,
+      "emittedName": "isRecurringCharge"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 772,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1028,
+      "column": 3,
+      "emittedName": "priceHidden"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2458,
+      "column": 3,
+      "emittedName": "isEstimatedBalance"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2645,
+      "column": 3,
+      "emittedName": "isEstimatedBalance"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2718,
+      "column": 3,
+      "emittedName": "isEstimatedBalance"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2993,
+      "column": 3,
+      "emittedName": "isAzureCreditEligible"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3348,
+      "column": 3,
+      "emittedName": "isAzureCreditEligible"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4096,
+      "column": 3,
+      "emittedName": "isInvoiced"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 673,
+      "column": 5,
+      "emittedName": "useMarkupIfPartner"
+    }
+  ]
+}

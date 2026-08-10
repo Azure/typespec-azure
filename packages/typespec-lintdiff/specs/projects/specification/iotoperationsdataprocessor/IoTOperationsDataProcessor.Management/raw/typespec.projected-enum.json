@@ -1,0 +1,18 @@
+{
+  "apiVersion": "2023-10-04-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 63,
+      "column": 3,
+      "emittedName": "primaryKey"
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 40,
+      "column": 3,
+      "emittedName": "enabled"
+    }
+  ]
+}

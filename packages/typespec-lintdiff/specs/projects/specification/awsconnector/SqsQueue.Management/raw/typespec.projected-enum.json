@@ -1,0 +1,24 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 72,
+      "column": 3,
+      "emittedName": "contentBasedDeduplication"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 81,
+      "column": 3,
+      "emittedName": "fifoQueue"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 114,
+      "column": 3,
+      "emittedName": "sqsManagedSseEnabled"
+    }
+  ]
+}

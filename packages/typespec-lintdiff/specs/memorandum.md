@@ -405,6 +405,71 @@ reconstructed; however, its native counts cannot be used as coverage evidence.
 
 <!-- rule-comparison:end -->
 
+## Equivalence judgment procedure
+
+Do not use raw diagnostic-count equality, project overlap alone, or
+`audit:noise` alone to declare a migration equivalent. Apply the following
+steps:
+
+1. Use `validate` to confirm that each violating fixture actually triggers the
+   Swagger validator rule and that the mapped TypeSpec diagnostic fires for the
+   intended target.
+2. Run compliant and boundary fixtures to ensure the TypeSpec rule does not
+   introduce false positives.
+3. Use `audit:noise` to identify incidental diagnostics, missing mappings, and
+   fixtures where only unrelated TypeSpec diagnostics fire. This is supporting
+   triage evidence, not proof of equivalence.
+4. Compare diagnostic targets or normalized semantic occurrences when both
+   sides expose a deterministic shared identity. Never use fuzzy matching to
+   manufacture equivalence.
+5. Analyze validator-only and TypeSpec-only real-service projects to cover
+   authoring patterns absent from the fixture corpus.
+6. Classify the rule as equivalent lint, partial coverage, emitter/template
+   enforced, not applicable to TypeSpec, or unresolved. Claim equivalence only
+   after all known trigger conditions are covered and compliant cases remain
+   clean.
+
+## Migrated rules below 100% observed project coverage
+
+This list includes validator rules mapped to
+`tsp-lintdiff-local-linter/*`, with at least one assessable validator project,
+whose mapped TypeSpec diagnostic did not fire in every assessable validator
+project. Rules that never fired in the validator corpus are not included because
+this corpus cannot measure their observed coverage.
+
+| Validator rule | Observed coverage | Overlap / assessable | Validator-only projects | TypeSpec-only projects |
+| --- | ---: | ---: | ---: | ---: |
+| `AvoidAnonymousParameter` | 0.0% | 0 / 5 | 5 | 7 |
+| `AvoidAnonymousTypes` | 0.0% | 0 / 7 | 7 | 1 |
+| `CollectionObjectPropertiesNaming` | 0.0% | 0 / 2 | 2 | 0 |
+| `OperationIdNounConflictingModelNames` | 0.0% | 0 / 55 | 55 | 0 |
+| `XmsResourceInPutResponse` | 0.0% | 0 / 13 | 13 | 3 |
+| `DescriptionMustNotBeNodeName` | 1.9% | 2 / 105 | 103 | 3 |
+| `AllResourcesMustHaveGetOperation` | 9.1% | 1 / 11 | 10 | 1 |
+| `UnSupportedPatchProperties` | 15.6% | 7 / 45 | 38 | 17 |
+| `XmsPageableForListCalls` | 32.0% | 24 / 75 | 51 | 0 |
+| `TopLevelResourcesListByResourceGroup` | 33.3% | 1 / 3 | 2 | 7 |
+| `PathResourceProviderNamePascalCase` | 35.3% | 6 / 17 | 11 | 6 |
+| `MissingXmsErrorResponse` | 42.9% | 3 / 7 | 4 | 0 |
+| `TrackedResourcePatchOperation` | 42.9% | 18 / 42 | 24 | 14 |
+| `ParametersSchemaAsTypeObject` | 44.4% | 4 / 9 | 5 | 6 |
+| `TrackedResourcesMustHavePut` | 50.0% | 10 / 20 | 10 | 31 |
+| `GuidUsage` | 56.3% | 27 / 48 | 21 | 5 |
+| `TenantLevelAPIsNotAllowed` | 62.5% | 15 / 24 | 9 | 0 |
+| `ImplementPrivateEndpointAPIs` | 66.7% | 2 / 3 | 1 | 25 |
+| `NestedResourcesMustHaveListOperation` | 70.8% | 17 / 24 | 7 | 16 |
+| `ParametersInPost` | 75.0% | 24 / 32 | 8 | 0 |
+| `OperationIdNounVerb` | 79.4% | 27 / 34 | 7 | 27 |
+| `XmsExamplesRequired` | 80.0% | 4 / 5 | 1 | 454 |
+| `ConsistentPatchProperties` | 85.2% | 23 / 27 | 4 | 4 |
+| `ListInOperationName` | 88.7% | 47 / 53 | 6 | 24 |
+| `PutRequestResponseSchemeArm` | 94.4% | 34 / 36 | 2 | 8 |
+| `GetCollectionOnlyHasValueAndNextLink` | 95.1% | 58 / 61 | 3 | 2 |
+| `PatchBodyParametersSchema` | 95.7% | 89 / 93 | 4 | 39 |
+| `GetInOperationName` | 96.2% | 25 / 26 | 1 | 38 |
+| `PostOperationIdContainsUrlVerb` | 97.9% | 94 / 96 | 2 | 5 |
+| `LatestVersionOfCommonTypesMustBeUsed` | 98.2% | 381 / 388 | 7 | 7 |
+
 ## Interpretation
 
 The gist remains useful as evidence about the behavior of its cross-repo

@@ -1,0 +1,72 @@
+{
+  "apiVersion": "2022-09-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 409,
+      "column": 3,
+      "emittedName": "fillGapWithZero"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 440,
+      "column": 3,
+      "emittedName": "toBeExportedForShoebox"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 587,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 631,
+      "column": 3,
+      "emittedName": "useIdentity"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 666,
+      "column": 3,
+      "emittedName": "useIdentity"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 721,
+      "column": 3,
+      "emittedName": "useIdentity"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1164,
+      "column": 3,
+      "emittedName": "isdir"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2332,
+      "column": 3,
+      "emittedName": "identity"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2416,
+      "column": 3,
+      "emittedName": "identity"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2438,
+      "column": 3,
+      "emittedName": "identity"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2624,
+      "column": 3,
+      "emittedName": "istransitioning"
+    }
+  ]
+}

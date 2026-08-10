@@ -1,0 +1,582 @@
+{
+  "apiVersion": "2025-09-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "ApiContract.tsp",
+      "line": 159,
+      "column": 7,
+      "emittedName": "deleteRevisions"
+    },
+    {
+      "sourceFile": "ApiContract.tsp",
+      "line": 212,
+      "column": 7,
+      "emittedName": "expandApiVersionSet"
+    },
+    {
+      "sourceFile": "ApiContract.tsp",
+      "line": 318,
+      "column": 7,
+      "emittedName": "includeNotTaggedOperations"
+    },
+    {
+      "sourceFile": "ApiContract.tsp",
+      "line": 461,
+      "column": 7,
+      "emittedName": "deleteRevisions"
+    },
+    {
+      "sourceFile": "ApiContract.tsp",
+      "line": 511,
+      "column": 7,
+      "emittedName": "expandApiVersionSet"
+    },
+    {
+      "sourceFile": "ApiManagementServiceResource.tsp",
+      "line": 252,
+      "column": 7,
+      "emittedName": "includeNotTaggedApis"
+    },
+    {
+      "sourceFile": "ApiManagementServiceResource.tsp",
+      "line": 455,
+      "column": 7,
+      "emittedName": "includeNotTaggedProducts"
+    },
+    {
+      "sourceFile": "CertificateContract.tsp",
+      "line": 170,
+      "column": 7,
+      "emittedName": "isKeyVaultRefreshFailed"
+    },
+    {
+      "sourceFile": "CertificateContract.tsp",
+      "line": 346,
+      "column": 7,
+      "emittedName": "isKeyVaultRefreshFailed"
+    },
+    {
+      "sourceFile": "IssueContract.tsp",
+      "line": 78,
+      "column": 7,
+      "emittedName": "expandCommentsAttachments"
+    },
+    {
+      "sourceFile": "IssueContract.tsp",
+      "line": 188,
+      "column": 7,
+      "emittedName": "expandCommentsAttachments"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2215,
+      "column": 3,
+      "emittedName": "isCurrent"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2221,
+      "column": 3,
+      "emittedName": "isOnline"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2243,
+      "column": 3,
+      "emittedName": "subscriptionRequired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2554,
+      "column": 3,
+      "emittedName": "isOnline"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2560,
+      "column": 3,
+      "emittedName": "isCurrent"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2732,
+      "column": 3,
+      "emittedName": "required"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3122,
+      "column": 3,
+      "emittedName": "subscriptionRequired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3127,
+      "column": 3,
+      "emittedName": "approvalRequired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3311,
+      "column": 3,
+      "emittedName": "logClientIp"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3331,
+      "column": 3,
+      "emittedName": "metrics"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4474,
+      "column": 3,
+      "emittedName": "useInTestConsole"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4479,
+      "column": 3,
+      "emittedName": "useInApiDocumentation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4547,
+      "column": 3,
+      "emittedName": "supportState"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4617,
+      "column": 3,
+      "emittedName": "useInTestConsole"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4622,
+      "column": 3,
+      "emittedName": "useInApiDocumentation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4934,
+      "column": 3,
+      "emittedName": "validateCertificateChain"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4939,
+      "column": 3,
+      "emittedName": "validateCertificateName"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4986,
+      "column": 3,
+      "emittedName": "acceptRetryAfter"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6067,
+      "column": 3,
+      "emittedName": "enableClientCertificate"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6084,
+      "column": 3,
+      "emittedName": "disableGateway"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6099,
+      "column": 3,
+      "emittedName": "restore"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6130,
+      "column": 3,
+      "emittedName": "zoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6170,
+      "column": 3,
+      "emittedName": "defaultSslBinding"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6175,
+      "column": 3,
+      "emittedName": "negotiateClientCertificate"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6312,
+      "column": 3,
+      "emittedName": "disableGateway"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6571,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6706,
+      "column": 3,
+      "emittedName": "isDefault"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7065,
+      "column": 3,
+      "emittedName": "negotiateClientCertificate"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7070,
+      "column": 3,
+      "emittedName": "tls10Enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7075,
+      "column": 3,
+      "emittedName": "tls11Enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7080,
+      "column": 3,
+      "emittedName": "http2Enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7132,
+      "column": 3,
+      "emittedName": "isTrusted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7227,
+      "column": 3,
+      "emittedName": "builtIn"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7656,
+      "column": 3,
+      "emittedName": "isBuffered"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7697,
+      "column": 3,
+      "emittedName": "isBuffered"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7767,
+      "column": 3,
+      "emittedName": "secret"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7929,
+      "column": 3,
+      "emittedName": "isOptional"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8133,
+      "column": 3,
+      "emittedName": "useInTestConsole"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8138,
+      "column": 3,
+      "emittedName": "useInApiDocumentation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8185,
+      "column": 3,
+      "emittedName": "useInTestConsole"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8190,
+      "column": 3,
+      "emittedName": "useInApiDocumentation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8567,
+      "column": 3,
+      "emittedName": "enableBasicAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8595,
+      "column": 3,
+      "emittedName": "require"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8618,
+      "column": 3,
+      "emittedName": "requireConsent"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8626,
+      "column": 3,
+      "emittedName": "delegateRegistration"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8631,
+      "column": 3,
+      "emittedName": "delegateSubscription"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8833,
+      "column": 3,
+      "emittedName": "isCurrent"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8912,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8927,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8937,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8952,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8957,
+      "column": 3,
+      "emittedName": "consentRequired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8968,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8979,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9182,
+      "column": 3,
+      "emittedName": "allowTracing"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9371,
+      "column": 3,
+      "emittedName": "isMasterRegion"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9376,
+      "column": 3,
+      "emittedName": "isDeleted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10064,
+      "column": 3,
+      "emittedName": "allowTracing"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10129,
+      "column": 3,
+      "emittedName": "allowTracing"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10305,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10342,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10362,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10394,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10419,
+      "column": 3,
+      "emittedName": "force"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10444,
+      "column": 3,
+      "emittedName": "force"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10476,
+      "column": 3,
+      "emittedName": "isExport"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10481,
+      "column": 3,
+      "emittedName": "isSynced"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10486,
+      "column": 3,
+      "emittedName": "isGitEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10715,
+      "column": 3,
+      "emittedName": "logClientIp"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10735,
+      "column": 3,
+      "emittedName": "metrics"
+    },
+    {
+      "sourceFile": "NamedValueContract.tsp",
+      "line": 196,
+      "column": 7,
+      "emittedName": "isKeyVaultRefreshFailed"
+    },
+    {
+      "sourceFile": "ProductContract.tsp",
+      "line": 250,
+      "column": 7,
+      "emittedName": "deleteSubscriptions"
+    },
+    {
+      "sourceFile": "ProductContract.tsp",
+      "line": 284,
+      "column": 7,
+      "emittedName": "expandGroups"
+    },
+    {
+      "sourceFile": "ProductContract.tsp",
+      "line": 627,
+      "column": 7,
+      "emittedName": "deleteSubscriptions"
+    },
+    {
+      "sourceFile": "ProductContract.tsp",
+      "line": 661,
+      "column": 7,
+      "emittedName": "expandGroups"
+    },
+    {
+      "sourceFile": "SchemaContract.tsp",
+      "line": 138,
+      "column": 7,
+      "emittedName": "force"
+    },
+    {
+      "sourceFile": "SchemaContract.tsp",
+      "line": 298,
+      "column": 7,
+      "emittedName": "force"
+    },
+    {
+      "sourceFile": "SubscriptionContract.tsp",
+      "line": 101,
+      "column": 7,
+      "emittedName": "notify"
+    },
+    {
+      "sourceFile": "SubscriptionContract.tsp",
+      "line": 147,
+      "column": 7,
+      "emittedName": "notify"
+    },
+    {
+      "sourceFile": "SubscriptionContract.tsp",
+      "line": 413,
+      "column": 7,
+      "emittedName": "notify"
+    },
+    {
+      "sourceFile": "SubscriptionContract.tsp",
+      "line": 459,
+      "column": 7,
+      "emittedName": "notify"
+    },
+    {
+      "sourceFile": "UserContract.tsp",
+      "line": 69,
+      "column": 7,
+      "emittedName": "notify"
+    },
+    {
+      "sourceFile": "UserContract.tsp",
+      "line": 129,
+      "column": 7,
+      "emittedName": "deleteSubscriptions"
+    },
+    {
+      "sourceFile": "UserContract.tsp",
+      "line": 135,
+      "column": 7,
+      "emittedName": "notify"
+    },
+    {
+      "sourceFile": "UserContract.tsp",
+      "line": 185,
+      "column": 7,
+      "emittedName": "expandGroups"
+    }
+  ]
+}

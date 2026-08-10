@@ -1,0 +1,30 @@
+{
+  "apiVersion": "2026-06-02-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 300,
+      "column": 3,
+      "emittedName": "accepted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 363,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2091,
+      "column": 3,
+      "emittedName": "cosmosMessageKeyEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2636,
+      "column": 3,
+      "emittedName": "isHiddenSaaS"
+    }
+  ]
+}

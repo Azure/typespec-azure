@@ -1,0 +1,300 @@
+{
+  "apiVersion": "2026-01-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 1000,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1085,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1107,
+      "column": 3,
+      "emittedName": "isAutoProvisioned"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1168,
+      "column": 3,
+      "emittedName": "disableWWWAuthenticate"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1243,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1293,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1328,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1363,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1397,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1432,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1457,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1567,
+      "column": 3,
+      "emittedName": "preserveUrlFragmentsForLogins"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1605,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1670,
+      "column": 3,
+      "emittedName": "validateNonce"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1685,
+      "column": 3,
+      "emittedName": "requireHttps"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2237,
+      "column": 3,
+      "emittedName": "valid"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2285,
+      "column": 3,
+      "emittedName": "ignoreErrors"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2621,
+      "column": 3,
+      "emittedName": "zoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2703,
+      "column": 3,
+      "emittedName": "internal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2854,
+      "column": 3,
+      "emittedName": "insecure"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2885,
+      "column": 3,
+      "emittedName": "includeDapr"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2910,
+      "column": 3,
+      "emittedName": "includeKeda"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2988,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3008,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3483,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3640,
+      "column": 3,
+      "emittedName": "caseSensitive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4662,
+      "column": 3,
+      "emittedName": "isVisible"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6451,
+      "column": 3,
+      "emittedName": "isMcpServerEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6456,
+      "column": 3,
+      "emittedName": "isMcpServerApiKeyDisabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7017,
+      "column": 3,
+      "emittedName": "external"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7049,
+      "column": 3,
+      "emittedName": "allowInsecure"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7102,
+      "column": 3,
+      "emittedName": "latestRevision"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7197,
+      "column": 3,
+      "emittedName": "allowCredentials"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7207,
+      "column": 3,
+      "emittedName": "external"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7227,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7262,
+      "column": 3,
+      "emittedName": "enableApiLogging"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7282,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7331,
+      "column": 3,
+      "emittedName": "enableMetrics"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7347,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7388,
+      "column": 3,
+      "emittedName": "autoConfigureDataProtection"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7731,
+      "column": 3,
+      "emittedName": "isHostnameAlreadyVerified"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7749,
+      "column": 3,
+      "emittedName": "hasConflictOnManagedEnvironment"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7755,
+      "column": 3,
+      "emittedName": "conflictWithEnvironmentCustomDomain"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8082,
+      "column": 3,
+      "emittedName": "isDisabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8291,
+      "column": 3,
+      "emittedName": "skip"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8336,
+      "column": 3,
+      "emittedName": "active"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8436,
+      "column": 3,
+      "emittedName": "ready"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8441,
+      "column": 3,
+      "emittedName": "started"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8566,
+      "column": 3,
+      "emittedName": "isDataAction"
+    }
+  ]
+}

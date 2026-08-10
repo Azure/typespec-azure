@@ -1,0 +1,54 @@
+{
+  "apiVersion": "2025-05-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 138,
+      "column": 5,
+      "emittedName": "includeStopSold"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 142,
+      "column": 5,
+      "emittedName": "includeFutureAvailabilities"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 167,
+      "column": 5,
+      "emittedName": "includeStopSold"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 171,
+      "column": 5,
+      "emittedName": "includeFutureAvailabilities"
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 227,
+      "column": 3,
+      "emittedName": "hasRi"
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 260,
+      "column": 3,
+      "emittedName": "isPiRequired"
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 376,
+      "column": 3,
+      "emittedName": "isAutorenewable"
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 410,
+      "column": 3,
+      "emittedName": "hasFreeTrials"
+    }
+  ]
+}

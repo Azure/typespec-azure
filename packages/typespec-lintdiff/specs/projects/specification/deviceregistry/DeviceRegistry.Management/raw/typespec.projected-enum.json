@@ -1,0 +1,30 @@
+{
+  "apiVersion": "2026-04-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "assets.tsp",
+      "line": 46,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "ns_devices.tsp",
+      "line": 51,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "properties/ns_assetProperties.tsp",
+      "line": 25,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "properties/ns_deviceProperties.tsp",
+      "line": 23,
+      "column": 3,
+      "emittedName": "enabled"
+    }
+  ]
+}

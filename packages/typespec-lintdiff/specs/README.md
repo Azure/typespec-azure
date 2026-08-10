@@ -81,9 +81,12 @@ pnpm specs:typespec `
 
 For the pinned 468-project corpus at
 `f6b53f105b95da05276530a0754a1c71b4f16397`, the full run with concurrency 6
-took 695,905 ms (11 minutes 35.9 seconds) inside the harness and 699,740 ms
-(11 minutes 39.7 seconds) wall-clock. Six projects had compile errors and were
-recorded as unassessed.
+took 1,488,689 ms (24 minutes 48.7 seconds) inside the harness with the
+projected `EnumInsteadOfBoolean` pass enabled. Six projects had compile errors
+and were excluded from both validator and TypeSpec comparison counts. The
+earlier unprojected run took approximately
+11 minutes 36 seconds, so the additional in-process compilation is a material
+cost.
 
 For a scoped run that writes to the same standard result locations:
 
@@ -110,6 +113,17 @@ Compilation uses `--no-emit`, so Swagger generation and validation are not
 repeated. Temporary configs are deleted and the specs clone's original ref is
 restored.
 
+`EnumInsteadOfBoolean` receives an additional real-project analysis pass. When
+the ordinary linter reports that rule, the harness projects the service to the
+dataset's selected API version using the same versioning mutator approach as the
+AutoRest emitter. It retains only projected source targets whose encoded
+property name is also emitted as a boolean schema in the selected Swagger. This
+removes older-version and non-emitted source models without dropping current
+emitted properties. Other rule diagnostics remain unchanged. The projected
+target set is stored as
+`projects/<spec-path>/raw/typespec.projected-enum.json`; the CLI stdout remains
+unmodified for debugging.
+
 The additive files are:
 
 - `typespec-results.json`: rule index and per-project compile status.
@@ -122,20 +136,22 @@ The additive files are:
   rules that did not fire are retained with zero counts.
 - `coverage-breakdown.json` and `coverage-breakdown.md`: an observed full-rule
   coverage summary grouped into 100%, partial, zero, unmapped, never-fired,
-  TypeSpec-only, and unassessed sections. Fixture `coverageKind` and official
+  and TypeSpec-only sections. Fixture `coverageKind` and official
   `@azure-tools/` mappings are shown as context, but mappings receive no
   coverage credit unless a mapped diagnostic overlaps the validator rule in the
   same successfully compiled project.
 - `projects/<spec-path>/raw/typespec.stdout.txt` and
   `typespec.stderr.txt`: complete TypeSpec CLI output for each project.
 
-Validator projects are **assessable** only when their TypeSpec compilation
-succeeds. A failed project is listed as **unassessed** for each validator rule
-that fired there and is excluded from overlap, gap, TypeSpec-only, and observed
-coverage calculations. Observed coverage is overlap divided by assessable
-validator projects; it is unavailable when no validator projects are
-assessable. Diagnostics from failed projects remain available in raw output and
-normalized TypeSpec shards for debugging.
+Projects are included in comparison reports only when their TypeSpec compilation
+succeeds. Failed projects are excluded from validator counts, TypeSpec counts,
+overlap, gaps, and TypeSpec-only results, and are not listed in the Markdown
+reports. Their compile status and raw output remain available in
+`typespec-results.json`, `_meta.json`, and project raw files for debugging.
+
+Machine-readable comparison results retain the occurrence-normalization pilot
+for `LatestVersionOfCommonTypesMustBeUsed`, but the Markdown tables omit those
+fields until enough rules have conservative shared-identity adapters.
 
 `_meta.json` keeps schema version 4 and receives a separate
 `typespecAnalysis` object. It records the analysis schema version, counts,

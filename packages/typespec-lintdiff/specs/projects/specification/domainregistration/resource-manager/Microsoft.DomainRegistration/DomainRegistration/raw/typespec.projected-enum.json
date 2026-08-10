@@ -1,0 +1,108 @@
+{
+  "apiVersion": "2024-11-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "Domain.tsp",
+      "line": 86,
+      "column": 7,
+      "emittedName": "forceHardDeleteDomain"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 132,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 234,
+      "column": 3,
+      "emittedName": "supportsInstanceLevelAggregation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 239,
+      "column": 3,
+      "emittedName": "enableRegionalMdmAccount"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 259,
+      "column": 3,
+      "emittedName": "fillGapWithZero"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 264,
+      "column": 3,
+      "emittedName": "isInternal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 317,
+      "column": 3,
+      "emittedName": "toBeExportedForShoebox"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 453,
+      "column": 3,
+      "emittedName": "available"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 515,
+      "column": 3,
+      "emittedName": "privacy"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 541,
+      "column": 3,
+      "emittedName": "autoRenew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 547,
+      "column": 3,
+      "emittedName": "readyForDnsRecordManagement"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 838,
+      "column": 3,
+      "emittedName": "privacy"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 864,
+      "column": 3,
+      "emittedName": "autoRenew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 870,
+      "column": 3,
+      "emittedName": "readyForDnsRecordManagement"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 971,
+      "column": 3,
+      "emittedName": "privacy"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 981,
+      "column": 3,
+      "emittedName": "includePrivacy"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 986,
+      "column": 3,
+      "emittedName": "forTransfer"
+    }
+  ]
+}

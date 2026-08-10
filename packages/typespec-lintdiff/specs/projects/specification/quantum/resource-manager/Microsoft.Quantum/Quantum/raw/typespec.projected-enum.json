@@ -1,0 +1,24 @@
+{
+  "apiVersion": "2026-06-15-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 312,
+      "column": 3,
+      "emittedName": "autoAdd"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 448,
+      "column": 3,
+      "emittedName": "apiKeyEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 576,
+      "column": 3,
+      "emittedName": "apiKeyEnabled"
+    }
+  ]
+}

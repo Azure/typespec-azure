@@ -1,0 +1,42 @@
+{
+  "apiVersion": "2026-05-15-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 198,
+      "column": 3,
+      "emittedName": "includeStreetAddress"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 206,
+      "column": 3,
+      "emittedName": "includeCity"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 214,
+      "column": 3,
+      "emittedName": "includeState"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 222,
+      "column": 3,
+      "emittedName": "includeCountry"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 230,
+      "column": 3,
+      "emittedName": "includePostalCode"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 348,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    }
+  ]
+}

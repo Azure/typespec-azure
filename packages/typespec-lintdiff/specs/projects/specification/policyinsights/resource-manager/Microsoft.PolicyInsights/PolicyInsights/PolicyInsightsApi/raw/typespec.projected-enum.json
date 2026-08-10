@@ -1,0 +1,30 @@
+{
+  "apiVersion": "2024-10-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 512,
+      "column": 3,
+      "emittedName": "isCompliant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 752,
+      "column": 3,
+      "emittedName": "isCompliant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1293,
+      "column": 3,
+      "emittedName": "includeAuditEffect"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1828,
+      "column": 3,
+      "emittedName": "isDataAction"
+    }
+  ]
+}

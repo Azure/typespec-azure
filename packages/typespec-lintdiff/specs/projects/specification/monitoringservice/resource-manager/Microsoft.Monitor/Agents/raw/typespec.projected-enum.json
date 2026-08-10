@@ -1,0 +1,18 @@
+{
+  "apiVersion": "2026-05-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "typespec/models.tsp",
+      "line": 27,
+      "column": 5,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "typespec/models.tsp",
+      "line": 87,
+      "column": 5,
+      "emittedName": "enabled"
+    }
+  ]
+}

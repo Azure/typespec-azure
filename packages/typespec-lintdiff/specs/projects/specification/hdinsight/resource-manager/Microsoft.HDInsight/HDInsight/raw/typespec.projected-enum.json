@@ -1,0 +1,144 @@
+{
+  "apiVersion": "2025-01-15-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 579,
+      "column": 3,
+      "emittedName": "encryptDataDisks"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 859,
+      "column": 3,
+      "emittedName": "disableGatewayAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 993,
+      "column": 3,
+      "emittedName": "primary"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1321,
+      "column": 3,
+      "emittedName": "isDefault"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1363,
+      "column": 3,
+      "emittedName": "enableSecureChannel"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1398,
+      "column": 3,
+      "emittedName": "encryptionAtHost"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1408,
+      "column": 3,
+      "emittedName": "isEncryptionInTransitEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1458,
+      "column": 3,
+      "emittedName": "enableComputeIsolation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1877,
+      "column": 3,
+      "emittedName": "restAuthCredential.isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1957,
+      "column": 3,
+      "emittedName": "clusterMonitoringEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2024,
+      "column": 3,
+      "emittedName": "clusterMonitoringEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2110,
+      "column": 3,
+      "emittedName": "isDefault"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2345,
+      "column": 3,
+      "emittedName": "supportedByVirtualMachines"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2350,
+      "column": 3,
+      "emittedName": "supportedByWebWorkerRoles"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2447,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2486,
+      "column": 3,
+      "emittedName": "fetchAaddsResource"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2554,
+      "column": 3,
+      "emittedName": "initialSyncComplete"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2559,
+      "column": 3,
+      "emittedName": "ldapsEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2709,
+      "column": 3,
+      "emittedName": "enableRegionalMdmAccount"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2729,
+      "column": 3,
+      "emittedName": "fillGapWithZero"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2744,
+      "column": 3,
+      "emittedName": "isInternal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2780,
+      "column": 3,
+      "emittedName": "toBeExportedForShoebox"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2807,
+      "column": 3,
+      "emittedName": "persistOnSuccess"
+    }
+  ]
+}

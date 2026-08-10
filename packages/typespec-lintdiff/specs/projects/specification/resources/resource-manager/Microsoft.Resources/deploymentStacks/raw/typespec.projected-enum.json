@@ -1,0 +1,24 @@
+{
+  "apiVersion": "2025-07-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 271,
+      "column": 3,
+      "emittedName": "bypassStackOutOfSyncError"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 385,
+      "column": 3,
+      "emittedName": "bypassStackOutOfSyncError"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 628,
+      "column": 3,
+      "emittedName": "applyToChildScopes"
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "apiVersion": "2026-07-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "AgentApplication.tsp",
+      "line": 57,
+      "column": 3,
+      "emittedName": "orderByAsc"
+    },
+    {
+      "sourceFile": "AgentDeploymentResource.tsp",
+      "line": 45,
+      "column": 3,
+      "emittedName": "orderByAsc"
+    },
+    {
+      "sourceFile": "ConnectionPropertiesV2BasicResource.tsp",
+      "line": 32,
+      "column": 3,
+      "emittedName": "includeAll"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1505,
+      "column": 3,
+      "emittedName": "isMigrated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1576,
+      "column": 3,
+      "emittedName": "dynamicThrottlingEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1581,
+      "column": 3,
+      "emittedName": "storedCompletionsDisabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1588,
+      "column": 3,
+      "emittedName": "restrictOutboundNetworkAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1592,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1603,
+      "column": 3,
+      "emittedName": "restore"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1658,
+      "column": 3,
+      "emittedName": "allowProjectManagement"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1814,
+      "column": 3,
+      "emittedName": "ignoreMissingVnetServiceEndpoint"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1935,
+      "column": 3,
+      "emittedName": "statisticsEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2007,
+      "column": 3,
+      "emittedName": "dynamicThrottlingEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2139,
+      "column": 3,
+      "emittedName": "useMicrosoftManagedNetwork"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2398,
+      "column": 3,
+      "emittedName": "isDefaultVersion"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2670,
+      "column": 3,
+      "emittedName": "skuAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2914,
+      "column": 3,
+      "emittedName": "isSubdomainAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3135,
+      "column": 3,
+      "emittedName": "dynamicThrottlingEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3340,
+      "column": 3,
+      "emittedName": "autoRenew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3478,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3488,
+      "column": 3,
+      "emittedName": "blocking"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3524,
+      "column": 3,
+      "emittedName": "blocking"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3578,
+      "column": 3,
+      "emittedName": "blocking"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3623,
+      "column": 3,
+      "emittedName": "isRegex"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3854,
+      "column": 3,
+      "emittedName": "isMultiLevelFilter"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4148,
+      "column": 3,
+      "emittedName": "isDefault"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4186,
+      "column": 3,
+      "emittedName": "isSharedToAll"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4213,
+      "column": 3,
+      "emittedName": "useWorkspaceManagedIdentity"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4301,
+      "column": 3,
+      "emittedName": "enablePublicHostingEnvironment"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4632,
+      "column": 3,
+      "emittedName": "isEnabled"
+    }
+  ]
+}

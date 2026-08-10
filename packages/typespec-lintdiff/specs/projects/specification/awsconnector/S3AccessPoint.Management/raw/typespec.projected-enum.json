@@ -1,0 +1,30 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 114,
+      "column": 3,
+      "emittedName": "blockPublicAcls"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 117,
+      "column": 3,
+      "emittedName": "blockPublicPolicy"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 120,
+      "column": 3,
+      "emittedName": "ignorePublicAcls"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 123,
+      "column": 3,
+      "emittedName": "restrictPublicBuckets"
+    }
+  ]
+}

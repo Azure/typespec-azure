@@ -1,0 +1,330 @@
+{
+  "apiVersion": "2026-05-15-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "Backup.tsp",
+      "line": 150,
+      "column": 3,
+      "emittedName": "useExistingSnapshot"
+    },
+    {
+      "sourceFile": "Backup.tsp",
+      "line": 172,
+      "column": 3,
+      "emittedName": "isLargeVolume"
+    },
+    {
+      "sourceFile": "BackupPolicy.tsp",
+      "line": 77,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "BackupPolicy.tsp",
+      "line": 113,
+      "column": 3,
+      "emittedName": "policyEnabled"
+    },
+    {
+      "sourceFile": "CapacityPool.tsp",
+      "line": 124,
+      "column": 3,
+      "emittedName": "coolAccess"
+    },
+    {
+      "sourceFile": "CapacityPool.tsp",
+      "line": 218,
+      "column": 3,
+      "emittedName": "coolAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 437,
+      "column": 3,
+      "emittedName": "enableRegionalMdmAccount"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 463,
+      "column": 3,
+      "emittedName": "fillGapWithZero"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 478,
+      "column": 3,
+      "emittedName": "isInternal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 538,
+      "column": 3,
+      "emittedName": "isAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 685,
+      "column": 3,
+      "emittedName": "isAvailable"
+    },
+    {
+      "sourceFile": "NetAppAccount.tsp",
+      "line": 401,
+      "column": 3,
+      "emittedName": "ldapOverTLS"
+    },
+    {
+      "sourceFile": "NetAppAccount.tsp",
+      "line": 636,
+      "column": 3,
+      "emittedName": "aesEncryption"
+    },
+    {
+      "sourceFile": "NetAppAccount.tsp",
+      "line": 641,
+      "column": 3,
+      "emittedName": "ldapSigning"
+    },
+    {
+      "sourceFile": "NetAppAccount.tsp",
+      "line": 652,
+      "column": 3,
+      "emittedName": "ldapOverTLS"
+    },
+    {
+      "sourceFile": "NetAppAccount.tsp",
+      "line": 657,
+      "column": 3,
+      "emittedName": "allowLocalNfsUsersWithLdap"
+    },
+    {
+      "sourceFile": "NetAppAccount.tsp",
+      "line": 663,
+      "column": 3,
+      "emittedName": "encryptDCConnections"
+    },
+    {
+      "sourceFile": "SnapshotPolicy.tsp",
+      "line": 63,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 142,
+      "column": 3,
+      "emittedName": "deleteBaseSnapshot"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 223,
+      "column": 3,
+      "emittedName": "isRestoring"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 228,
+      "column": 3,
+      "emittedName": "snapshotDirectoryVisible"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 234,
+      "column": 3,
+      "emittedName": "kerberosEnabled"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 245,
+      "column": 3,
+      "emittedName": "smbEncryption"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 261,
+      "column": 3,
+      "emittedName": "smbContinuouslyAvailable"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 289,
+      "column": 3,
+      "emittedName": "ldapEnabled"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 309,
+      "column": 3,
+      "emittedName": "coolAccess"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 365,
+      "column": 3,
+      "emittedName": "isDefaultQuotaEnabled"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 414,
+      "column": 3,
+      "emittedName": "encrypted"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 441,
+      "column": 3,
+      "emittedName": "isLargeVolume"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 916,
+      "column": 3,
+      "emittedName": "unixReadOnly"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 921,
+      "column": 3,
+      "emittedName": "unixReadWrite"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 926,
+      "column": 3,
+      "emittedName": "kerberos5ReadOnly"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 931,
+      "column": 3,
+      "emittedName": "kerberos5ReadWrite"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 936,
+      "column": 3,
+      "emittedName": "kerberos5iReadOnly"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 941,
+      "column": 3,
+      "emittedName": "kerberos5iReadWrite"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 946,
+      "column": 3,
+      "emittedName": "kerberos5pReadOnly"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 951,
+      "column": 3,
+      "emittedName": "kerberos5pReadWrite"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 956,
+      "column": 3,
+      "emittedName": "cifs"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 961,
+      "column": 3,
+      "emittedName": "nfsv3"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 966,
+      "column": 3,
+      "emittedName": "nfsv41"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 976,
+      "column": 3,
+      "emittedName": "hasRootAccess"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 1064,
+      "column": 3,
+      "emittedName": "policyEnforced"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 1254,
+      "column": 3,
+      "emittedName": "relocationRequested"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 1260,
+      "column": 3,
+      "emittedName": "readyToBeFinalized"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 1389,
+      "column": 3,
+      "emittedName": "isDefaultQuotaEnabled"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 1410,
+      "column": 3,
+      "emittedName": "coolAccess"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 1435,
+      "column": 3,
+      "emittedName": "snapshotDirectoryVisible"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 1508,
+      "column": 3,
+      "emittedName": "confirmRunningDisruptiveOperation"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 1540,
+      "column": 3,
+      "emittedName": "forceBreakReplication"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 1560,
+      "column": 3,
+      "emittedName": "healthy"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 1827,
+      "column": 3,
+      "emittedName": "healthy"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 1869,
+      "column": 3,
+      "emittedName": "healthy"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 2301,
+      "column": 3,
+      "emittedName": "isDerivedQuota"
+    },
+    {
+      "sourceFile": "Volume.tsp",
+      "line": 2424,
+      "column": 7,
+      "emittedName": "forceDelete"
+    }
+  ]
+}

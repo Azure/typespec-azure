@@ -1,0 +1,12 @@
+{
+  "apiVersion": "2026-04-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 19,
+      "column": 3,
+      "emittedName": "enabled"
+    }
+  ]
+}

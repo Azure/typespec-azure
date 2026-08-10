@@ -1,0 +1,54 @@
+{
+  "apiVersion": "2026-04-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 422,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 448,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 459,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 523,
+      "column": 3,
+      "emittedName": "enableAutoScaling"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 701,
+      "column": 3,
+      "emittedName": "ready"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 894,
+      "column": 3,
+      "emittedName": "isPreview"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1084,
+      "column": 3,
+      "emittedName": "isPreview"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1131,
+      "column": 3,
+      "emittedName": "ready"
+    }
+  ]
+}

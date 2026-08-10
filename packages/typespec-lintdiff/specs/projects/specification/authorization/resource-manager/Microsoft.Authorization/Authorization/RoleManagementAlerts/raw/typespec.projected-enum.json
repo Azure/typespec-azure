@@ -1,0 +1,30 @@
+{
+  "apiVersion": "2022-08-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 51,
+      "column": 3,
+      "emittedName": "isActive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 143,
+      "column": 3,
+      "emittedName": "isRemediatable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 149,
+      "column": 3,
+      "emittedName": "isConfigurable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 186,
+      "column": 3,
+      "emittedName": "isEnabled"
+    }
+  ]
+}

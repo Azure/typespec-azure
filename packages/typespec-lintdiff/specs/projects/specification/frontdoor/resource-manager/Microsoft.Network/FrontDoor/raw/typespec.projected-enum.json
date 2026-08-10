@@ -1,0 +1,24 @@
+{
+  "apiVersion": "2025-11-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 1770,
+      "column": 3,
+      "emittedName": "negateCondition"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2638,
+      "column": 3,
+      "emittedName": "negateCondition"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3224,
+      "column": 3,
+      "emittedName": "customDomainValidated"
+    }
+  ]
+}

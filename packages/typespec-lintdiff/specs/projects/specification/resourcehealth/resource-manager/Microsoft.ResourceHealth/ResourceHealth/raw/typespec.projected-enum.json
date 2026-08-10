@@ -1,0 +1,42 @@
+{
+  "apiVersion": "2025-05-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 815,
+      "column": 3,
+      "emittedName": "isEventSensitive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 871,
+      "column": 3,
+      "emittedName": "isHIR"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 876,
+      "column": 3,
+      "emittedName": "enableMicrosoftSupport"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 886,
+      "column": 3,
+      "emittedName": "platformInitiated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 891,
+      "column": 3,
+      "emittedName": "enableChatWithUs"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1263,
+      "column": 3,
+      "emittedName": "published"
+    }
+  ]
+}

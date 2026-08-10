@@ -1,0 +1,72 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 148,
+      "column": 3,
+      "emittedName": "disableNetworking"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 174,
+      "column": 3,
+      "emittedName": "essential"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 193,
+      "column": 3,
+      "emittedName": "interactive"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 222,
+      "column": 3,
+      "emittedName": "privileged"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 225,
+      "column": 3,
+      "emittedName": "pseudoTerminal"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 228,
+      "column": 3,
+      "emittedName": "readonlyRootFilesystem"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 352,
+      "column": 3,
+      "emittedName": "configuredAtLaunch"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 471,
+      "column": 3,
+      "emittedName": "initProcessEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 514,
+      "column": 3,
+      "emittedName": "readOnly"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 631,
+      "column": 3,
+      "emittedName": "readOnly"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 644,
+      "column": 3,
+      "emittedName": "autoprovision"
+    }
+  ]
+}

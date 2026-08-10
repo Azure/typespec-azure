@@ -1,0 +1,12 @@
+{
+  "apiVersion": "2025-11-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 414,
+      "column": 3,
+      "emittedName": "isDataAction"
+    }
+  ]
+}

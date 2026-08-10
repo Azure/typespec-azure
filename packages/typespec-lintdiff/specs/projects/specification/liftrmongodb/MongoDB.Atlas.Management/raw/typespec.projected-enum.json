@@ -1,0 +1,12 @@
+{
+  "apiVersion": "2026-03-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 246,
+      "column": 3,
+      "emittedName": "isReached"
+    }
+  ]
+}

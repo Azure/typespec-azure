@@ -1,0 +1,18 @@
+{
+  "apiVersion": "2026-03-18",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 545,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 582,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "apiVersion": "2018-09-15",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 626,
+      "column": 3,
+      "emittedName": "expired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 957,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1398,
+      "column": 3,
+      "emittedName": "isPlanAuthorized"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1468,
+      "column": 3,
+      "emittedName": "sysPrep"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1662,
+      "column": 3,
+      "emittedName": "isAuthenticationWithSshKey"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1677,
+      "column": 3,
+      "emittedName": "disallowPublicIpAddress"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1709,
+      "column": 3,
+      "emittedName": "allowClaim"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2082,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2092,
+      "column": 3,
+      "emittedName": "isPlanAuthorized"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2238,
+      "column": 3,
+      "emittedName": "hasError"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2837,
+      "column": 3,
+      "emittedName": "isAuthenticationWithSshKey"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2858,
+      "column": 3,
+      "emittedName": "disallowPublicIpAddress"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2908,
+      "column": 3,
+      "emittedName": "allowClaim"
+    }
+  ]
+}

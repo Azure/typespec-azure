@@ -1,0 +1,42 @@
+{
+  "apiVersion": "2025-01-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 239,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 379,
+      "column": 3,
+      "emittedName": "toBeExportedForShoebox"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 419,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 661,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 668,
+      "column": 3,
+      "emittedName": "disableAadAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 792,
+      "column": 3,
+      "emittedName": "clientCertEnabled"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 69,
+      "column": 3,
+      "emittedName": "allowUsersToChangePassword"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 72,
+      "column": 3,
+      "emittedName": "expirePasswords"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 75,
+      "column": 3,
+      "emittedName": "hardExpiry"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 87,
+      "column": 3,
+      "emittedName": "requireLowercaseCharacters"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 90,
+      "column": 3,
+      "emittedName": "requireNumbers"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 93,
+      "column": 3,
+      "emittedName": "requireSymbols"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 96,
+      "column": 3,
+      "emittedName": "requireUppercaseCharacters"
+    }
+  ]
+}

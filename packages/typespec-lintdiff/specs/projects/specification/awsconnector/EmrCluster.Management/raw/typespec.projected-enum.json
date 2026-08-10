@@ -1,0 +1,30 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 76,
+      "column": 3,
+      "emittedName": "autoTerminate"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 166,
+      "column": 3,
+      "emittedName": "terminationProtected"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 169,
+      "column": 3,
+      "emittedName": "unhealthyNodeReplacement"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 172,
+      "column": 3,
+      "emittedName": "visibleToAllUsers"
+    }
+  ]
+}

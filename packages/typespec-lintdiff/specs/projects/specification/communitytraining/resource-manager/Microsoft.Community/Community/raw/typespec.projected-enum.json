@@ -1,0 +1,24 @@
+{
+  "apiVersion": "2023-11-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 69,
+      "column": 3,
+      "emittedName": "teamsEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 125,
+      "column": 3,
+      "emittedName": "zoneRedundancyEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 129,
+      "column": 3,
+      "emittedName": "disasterRecoveryEnabled"
+    }
+  ]
+}

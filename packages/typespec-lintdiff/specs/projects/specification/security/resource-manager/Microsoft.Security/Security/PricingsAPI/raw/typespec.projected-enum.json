@@ -1,0 +1,12 @@
+{
+  "apiVersion": "2024-01-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 184,
+      "column": 3,
+      "emittedName": "deprecated"
+    }
+  ]
+}

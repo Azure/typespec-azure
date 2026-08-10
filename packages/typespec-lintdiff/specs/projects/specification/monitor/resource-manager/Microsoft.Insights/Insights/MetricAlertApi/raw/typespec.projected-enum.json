@@ -1,0 +1,54 @@
+{
+  "apiVersion": "2026-01-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 186,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 221,
+      "column": 3,
+      "emittedName": "autoMitigate"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 245,
+      "column": 3,
+      "emittedName": "isMigrated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 279,
+      "column": 3,
+      "emittedName": "autoResolved"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 391,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 426,
+      "column": 3,
+      "emittedName": "autoMitigate"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 450,
+      "column": 3,
+      "emittedName": "isMigrated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 603,
+      "column": 3,
+      "emittedName": "skipMetricValidation"
+    }
+  ]
+}

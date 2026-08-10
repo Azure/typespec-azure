@@ -1,0 +1,18 @@
+{
+  "apiVersion": "2024-03-03-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "Common/StandardizedContracts/CommonModels.tsp",
+      "line": 138,
+      "column": 3,
+      "emittedName": "isolationRequired"
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/CommonModels.tsp",
+      "line": 144,
+      "column": 3,
+      "emittedName": "isolationRequired"
+    }
+  ]
+}

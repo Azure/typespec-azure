@@ -1,0 +1,144 @@
+{
+  "apiVersion": "2025-06-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 1315,
+      "column": 3,
+      "emittedName": "dedicatedCoreQuotaPerVMFamilyEnforced"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1664,
+      "column": 3,
+      "emittedName": "allowUpdates"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1759,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1845,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2408,
+      "column": 3,
+      "emittedName": "enableAutomaticUpdates"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2546,
+      "column": 3,
+      "emittedName": "rotationToLatestKeyVersionEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2598,
+      "column": 3,
+      "emittedName": "autoUpgradeMinorVersion"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2603,
+      "column": 3,
+      "emittedName": "enableAutomaticUpgrade"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2661,
+      "column": 3,
+      "emittedName": "writeAcceleratorEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2753,
+      "column": 3,
+      "emittedName": "encryptionAtHost"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2776,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2813,
+      "column": 3,
+      "emittedName": "secureBootEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2818,
+      "column": 3,
+      "emittedName": "vTpmEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2994,
+      "column": 3,
+      "emittedName": "enableAcceleratedNetworking"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3287,
+      "column": 3,
+      "emittedName": "waitForSuccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3452,
+      "column": 3,
+      "emittedName": "isReadOnly"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3782,
+      "column": 3,
+      "emittedName": "disableAutomaticRollback"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3788,
+      "column": 3,
+      "emittedName": "enableAutomaticOSUpgrade"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3793,
+      "column": 3,
+      "emittedName": "useRollingUpgradePolicy"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3798,
+      "column": 3,
+      "emittedName": "osRollingUpgradeDeferral"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3808,
+      "column": 3,
+      "emittedName": "enableCrossZoneUpgrade"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3839,
+      "column": 3,
+      "emittedName": "prioritizeUnhealthyInstances"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3844,
+      "column": 3,
+      "emittedName": "rollbackFailedInstancesOnPolicyBreach"
+    }
+  ]
+}

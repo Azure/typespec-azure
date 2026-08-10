@@ -1,0 +1,24 @@
+{
+  "apiVersion": "2023-06-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "Workbook.tsp",
+      "line": 72,
+      "column": 7,
+      "emittedName": "canFetchContent"
+    },
+    {
+      "sourceFile": "Workbook.tsp",
+      "line": 137,
+      "column": 7,
+      "emittedName": "canFetchContent"
+    },
+    {
+      "sourceFile": "Workbook.tsp",
+      "line": 209,
+      "column": 7,
+      "emittedName": "canFetchContent"
+    }
+  ]
+}

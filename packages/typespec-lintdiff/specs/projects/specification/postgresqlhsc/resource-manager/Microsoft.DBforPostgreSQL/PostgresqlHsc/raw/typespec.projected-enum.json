@@ -1,0 +1,102 @@
+{
+  "apiVersion": "2023-03-02-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 233,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 310,
+      "column": 3,
+      "emittedName": "enableShardsOnCoordinator"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 315,
+      "column": 3,
+      "emittedName": "enableHa"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 336,
+      "column": 3,
+      "emittedName": "coordinatorEnablePublicIpAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 362,
+      "column": 3,
+      "emittedName": "nodeEnablePublicIpAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 423,
+      "column": 3,
+      "emittedName": "enableGeoBackup"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 601,
+      "column": 3,
+      "emittedName": "enableShardsOnCoordinator"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 606,
+      "column": 3,
+      "emittedName": "enableHa"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 632,
+      "column": 3,
+      "emittedName": "coordinatorEnablePublicIpAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 659,
+      "column": 3,
+      "emittedName": "nodeEnablePublicIpAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 692,
+      "column": 3,
+      "emittedName": "requiresRestart"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 778,
+      "column": 3,
+      "emittedName": "requiresRestart"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 817,
+      "column": 3,
+      "emittedName": "enableGeoBackup"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 927,
+      "column": 3,
+      "emittedName": "enableHa"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 933,
+      "column": 3,
+      "emittedName": "enablePublicIpAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 939,
+      "column": 3,
+      "emittedName": "isReadOnly"
+    }
+  ]
+}

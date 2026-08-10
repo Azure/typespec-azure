@@ -6,9 +6,12 @@ import {
   comparisonMarkdown,
   coverageBreakdownMarkdown,
   createCoverageBreakdown,
+  filterProjectedEnumDiagnostics,
   injectLocalRuleset,
   loadValidatorFixtureMetadata,
   loadValidatorMappings,
+  normalizeLatestCommonTypesTypeSpecDiagnostic,
+  normalizeLatestCommonTypesValidatorDiagnostic,
   parseTypeSpecDiagnostics,
   selectProjects,
   type TypeSpecDiagnostic,
@@ -105,6 +108,46 @@ describe("TypeSpec diagnostic parsing", () => {
 });
 
 describe("TypeSpec result aggregation", () => {
+  it("filters only EnumInsteadOfBoolean diagnostics outside the projected HTTP graph", () => {
+    const enumRule = "tsp-lintdiff-local-linter/enum-instead-of-boolean";
+    const diagnostics: TypeSpecDiagnostic[] = [
+      {
+        ...diagnostic(enumRule, project),
+        sourceFile: "models.tsp",
+        line: 10,
+        column: 3,
+      },
+      {
+        ...diagnostic(enumRule, project),
+        sourceFile: "models.tsp",
+        line: 20,
+        column: 3,
+      },
+      diagnostic("tsp-lintdiff-local-linter/another-rule", project),
+    ];
+
+    expect(
+      filterProjectedEnumDiagnostics(diagnostics, {
+        apiVersion: "2026-01-01",
+        serviceCount: 1,
+        locations: [
+          {
+            sourceFile: "models.tsp",
+            line: 10,
+            column: 3,
+            emittedName: "hidden",
+          },
+          {
+            sourceFile: "models.tsp",
+            line: 20,
+            column: 3,
+            emittedName: "enabled",
+          },
+        ],
+      }, new Set(["enabled"])),
+    ).toEqual([diagnostics[1], diagnostics[2]]);
+  });
+
   it("counts levels, projects, and duplicate diagnostics", () => {
     const diagnostics = [
       diagnostic("rule-b", "project-b"),
@@ -145,6 +188,117 @@ describe("TypeSpec project selection", () => {
 });
 
 describe("validator and TypeSpec comparison", () => {
+  it("normalizes repeated common-types references to a semantic project/version identity", () => {
+    const validatorDiagnostic = {
+      project: "project-a",
+      swaggerFile: "swagger.json",
+      message: "Use the latest version v6 of types.json.",
+      path: ["paths", "/items", "get", "parameters", 0, "$ref"],
+    };
+    const swagger = {
+      paths: {
+        "/items": {
+          get: {
+            parameters: [
+              {
+                $ref: "../../../../../common-types/resource-management/v4/types.json#/parameters/ApiVersionParameter",
+              },
+            ],
+          },
+        },
+      },
+    };
+    const typeSpecDiagnostic = {
+      ...diagnostic(
+        "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+        "project-a",
+      ),
+      message: "Use the latest ARM common-types version 'v6' instead of 'v4'.",
+    };
+
+    expect(
+      normalizeLatestCommonTypesValidatorDiagnostic(
+        validatorDiagnostic,
+        swagger,
+        "2026-01-01",
+      ),
+    ).toBe(`project-a\0${"2026-01-01"}\0v4`);
+    expect(
+      normalizeLatestCommonTypesTypeSpecDiagnostic(
+        { ...typeSpecDiagnostic, line: 2 },
+        "2026-01-01",
+        ['enum Versions {', '  v2026_01_01: "2026-01-01",', "}"].join("\n"),
+      ),
+    ).toBe(`project-a\0${"2026-01-01"}\0v4`);
+    expect(
+      normalizeLatestCommonTypesTypeSpecDiagnostic(
+        { ...typeSpecDiagnostic, line: 2 },
+        "2026-01-01",
+        ['enum Versions {', '  v2025_01_01: "2025-01-01",', "}"].join("\n"),
+      ),
+    ).toBeUndefined();
+  });
+
+  it("reports exact consistency after common-types reference deduplication", () => {
+    const rule = "LatestVersionOfCommonTypesMustBeUsed";
+    const typeSpecRule =
+      "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used";
+    const aggregate = aggregateTypeSpecResults("commit", "2026-08-07T00:00:00.000Z", [
+      {
+        ...diagnostic(typeSpecRule, "project-a"),
+        message: "Use the latest ARM common-types version 'v6' instead of 'v4'.",
+      },
+      {
+        ...diagnostic(typeSpecRule, "project-a"),
+        message: "Use the latest ARM common-types version 'v6' instead of 'v4'.",
+      },
+    ]);
+    const validatorDiagnostic = {
+      project: "project-a",
+      swaggerFile: "swagger.json",
+      message: "Use the latest version v6 of types.json.",
+      path: ["reference"],
+    };
+    const comparison = compareResults(
+      "commit",
+      "2026-08-07T00:00:00.000Z",
+      {
+        [rule]: {
+          count: 2,
+          projects: ["project-a"],
+          results: [validatorDiagnostic, validatorDiagnostic],
+        },
+      },
+      aggregate,
+      new Map([[rule, new Set([typeSpecRule])]]),
+      {
+        partial: false,
+        sourceProjectCount: 1,
+        projects: ["project-a"],
+        filters: {},
+      },
+      {
+        normalizationContext: {
+          selectedApiVersions: new Map([["project-a", "2026-01-01"]]),
+          loadSwaggerDocument: () => ({
+            reference:
+              "../../../../../common-types/resource-management/v4/types.json#/parameters/ApiVersionParameter",
+          }),
+          loadTypeSpecSource: () => 'v2026_01_01: "2026-01-01",',
+        },
+      },
+    );
+
+    expect(comparison.rules[0]).toMatchObject({
+      validatorDiagnosticCount: 2,
+      typeSpecDiagnosticCount: 2,
+      normalizedValidatorDiagnosticCount: 1,
+      normalizedTypeSpecDiagnosticCount: 1,
+      diagnosticConsistencyPercent: 100,
+      normalizationMethod: "project + selected API version + ARM common-types version",
+    });
+  });
+
   it("loads validator-to-TypeSpec mappings from fixture frontmatter", () => {
     const fixturesDir = path.resolve(import.meta.dirname, "..", "fixtures");
     const mappings = loadValidatorMappings(fixturesDir);
@@ -229,6 +383,18 @@ describe("validator and TypeSpec comparison", () => {
         ValidatorA: {
           count: 2,
           projects: ["project-success", "project-failed"],
+          results: [
+            {
+              project: "project-success",
+              message: "validator message",
+              path: [],
+            },
+            {
+              project: "project-failed",
+              message: "validator message",
+              path: [],
+            },
+          ],
         },
       },
       aggregate,
@@ -243,20 +409,23 @@ describe("validator and TypeSpec comparison", () => {
     );
 
     expect(comparison.rules[0]).toMatchObject({
-      validatorProjectCount: 2,
+      validatorProjectCount: 1,
       assessableValidatorProjectCount: 1,
       overlapProjectCount: 1,
       validatorOnlyProjectCount: 0,
-      unassessedProjectCount: 1,
+      unassessedProjectCount: 0,
       typeSpecOnlyProjectCount: 0,
       observedCoveragePercent: 100,
       typeSpecDiagnosticCount: 1,
-      unassessedProjects: ["project-failed"],
+      validatorDiagnosticCount: 1,
+      unassessedProjects: [],
     });
     expect(comparison.unmappedTypeSpecRules).toEqual([]);
     expect(comparison).toMatchObject({
       successfulProjectCount: 1,
       failedProjectCount: 1,
+      projectCount: 1,
+      projects: ["project-success"],
       unassessedProjects: ["project-failed"],
     });
   });
@@ -357,9 +526,10 @@ describe("validator and TypeSpec comparison", () => {
     expect(coverageMarkdown).toContain("Analysis duration: 1234 ms");
     expect(coverageMarkdown).toContain("Official mappings and fixture coverage kinds");
     expect(coverageMarkdown).toContain(
-      "| Validator Rule | CovKind | Fired | TSP Fired | Lint/Overlap | Gap | Unassessed | TSP Only | Observed % | Official Mapping | Fired TSP Rules | Mapped TSP Rules | Validator Diagnostics | TSP Diagnostics |",
+      "| Validator Rule | CovKind | Fired | TSP Fired | Lint/Overlap | Gap | TSP Only | Observed % | Official Mapping | Fired TSP Rules | Mapped TSP Rules | Validator Diagnostics | TSP Diagnostics |",
     );
-    expect(coverageMarkdown).toContain("## Unassessed projects (0)");
+    expect(coverageMarkdown).not.toContain("Normalized Validator Diagnostics");
+    expect(coverageMarkdown).not.toContain("Unassessed");
     expect(comparisonMarkdown(comparison)).toContain("## Column definitions");
   });
 });

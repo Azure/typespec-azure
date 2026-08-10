@@ -1,0 +1,36 @@
+{
+  "apiVersion": "2026-08-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "experiment.tsp",
+      "line": 47,
+      "column": 7,
+      "emittedName": "running"
+    },
+    {
+      "sourceFile": "experiment.tsp",
+      "line": 68,
+      "column": 7,
+      "emittedName": "running"
+    },
+    {
+      "sourceFile": "scenario.models.tsp",
+      "line": 96,
+      "column": 3,
+      "emittedName": "required"
+    },
+    {
+      "sourceFile": "scenarioConfiguration.models.tsp",
+      "line": 513,
+      "column": 3,
+      "emittedName": "whatIfMode"
+    },
+    {
+      "sourceFile": "scenarioConfiguration.models.tsp",
+      "line": 699,
+      "column": 3,
+      "emittedName": "whatIf"
+    }
+  ]
+}
