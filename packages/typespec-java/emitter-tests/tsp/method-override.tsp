@@ -122,6 +122,7 @@ namespace Customization {
     options?: TspTest.MethodOverride.GroupPartETagOptions,
     ...ApiVersionParameter,
   ): void;
+  #suppress "@typespec/http/duplicate-body" "The body is intentionally preserved while regrouping query parameters."
   op groupExcludeBodyCustomization(
     ...TspTest.MethodOverride.GroupExcludeBody,
     options?: TspTest.MethodOverride.GroupQueryOptions,
