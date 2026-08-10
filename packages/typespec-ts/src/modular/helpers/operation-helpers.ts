@@ -111,7 +111,7 @@ export function getSendPrivateFunction(
 ): OptionalKind<FunctionDeclarationStructure> {
   const operation = method[1];
   const parameters = getOperationSignatureParameters(dpgContext, method, clientType);
-  const { name } = getOperationName(operation);
+  const { name } = getOperationName(operation, dpgContext, method[0]);
   const dependencies = useDependencies();
 
   const functionStatement: OptionalKind<FunctionDeclarationStructure> = {
@@ -168,7 +168,7 @@ export function getDeserializePrivateFunction(
   method: [string[], ServiceOperation],
 ): OptionalKind<FunctionDeclarationStructure> {
   const operation = method[1];
-  const { name } = getOperationName(operation);
+  const { name } = getOperationName(operation, context, method[0]);
   const dependencies = useDependencies();
   const PathUncheckedResponseReference = resolveReference(dependencies.PathUncheckedResponse);
 
@@ -246,7 +246,7 @@ export function getDeserializePrivateFunction(
   statements.push(`const expectedStatuses = ${getExpectedStatuses(operation)};`);
   statements.push(
     `if(!expectedStatuses.includes(result.status)){`,
-    `${getExceptionThrowStatement(context, operation)}`,
+    `${getExceptionThrowStatement(context, method)}`,
     "}",
   );
   const deserializedType =
@@ -460,8 +460,9 @@ export function getDeserializePrivateFunction(
  */
 export function getDeserializeHeadersPrivateFunction(
   context: SdkContext,
-  operation: ServiceOperation,
+  method: [string[], ServiceOperation],
 ): OptionalKind<FunctionDeclarationStructure> | undefined {
+  const operation = method[1];
   const responseHeaders = getResponseHeaders(operation.operation.responses);
   const isResponseHeadersEnabled = context.emitterOptions?.includeHeadersInResponse === true;
   const isStorageCompatEnabled = context.emitterOptions?.enableStorageCompat === true;
@@ -471,7 +472,7 @@ export function getDeserializeHeadersPrivateFunction(
     return undefined;
   }
 
-  const { name } = getOperationName(operation);
+  const { name } = getOperationName(operation, context, method[0]);
   const dependencies = useDependencies();
   const PathUncheckedResponseReference = resolveReference(dependencies.PathUncheckedResponse);
 
@@ -614,8 +615,9 @@ function getExceptionResponseHeaders(
  */
 export function getDeserializeExceptionHeadersPrivateFunction(
   context: SdkContext,
-  operation: ServiceOperation,
+  method: [string[], ServiceOperation],
 ): OptionalKind<FunctionDeclarationStructure> | undefined {
+  const operation = method[1];
   const isResponseHeadersEnabled = context.emitterOptions?.includeHeadersInResponse === true;
   if (!isResponseHeadersEnabled) {
     return undefined;
@@ -626,7 +628,7 @@ export function getDeserializeExceptionHeadersPrivateFunction(
     return undefined;
   }
 
-  const { name } = getOperationName(operation);
+  const { name } = getOperationName(operation, context, method[0]);
   const dependencies = useDependencies();
   const PathUncheckedResponseReference = resolveReference(dependencies.PathUncheckedResponse);
 
@@ -666,7 +668,8 @@ function getExceptionDeserializeExpr(exception: ExceptionThrowDetail): string {
   return `isXml ? ${exception.xmlDeserializer}(result.body) : ${exception.deserializer}(result.body)`;
 }
 
-function getExceptionThrowStatement(context: SdkContext, operation: ServiceOperation) {
+function getExceptionThrowStatement(context: SdkContext, method: [string[], ServiceOperation]) {
+  const operation = method[1];
   const statements = [];
   const createRestErrorReference = resolveReference(useDependencies().createRestError);
   const { customized, defaultDeserializer, defaultXmlDeserializer, defaultIsXmlOnly } =
@@ -677,7 +680,7 @@ function getExceptionThrowStatement(context: SdkContext, operation: ServiceOpera
   // Check if exception headers function exists and build the call
   const exceptionHeaders = getExceptionResponseHeaders(operation.operation.exceptions);
   const hasExceptionHeaders = isResponseHeadersEnabled && exceptionHeaders.length > 0;
-  const { name: opName } = getOperationName(operation);
+  const { name: opName } = getOperationName(operation, context, method[0]);
   const exceptionHeadersCall = hasExceptionHeaders
     ? `error.details = {...(error.details as any), ..._${opName}DeserializeExceptionHeaders(result)};`
     : undefined;
@@ -995,14 +998,14 @@ export function getOperationFunction(
     }
   }
 
-  const { name, fixme = [] } = getOperationName(operation, context);
+  const { name, propertyName, fixme = [] } = getOperationName(operation, context, method[0]);
   const functionStatement = {
     kind: StructureKind.Function,
     docs: [...getDocsFromDescription(operation.doc), ...getFixmeForMultilineDocs(fixme)],
     isAsync: true,
     isExported: true,
     name,
-    propertyName: normalizeName(operation.name, NameType.Property),
+    propertyName,
     parameters,
     returnType: `Promise<${finalReturnType}>`,
   };
@@ -1119,7 +1122,7 @@ function getLroOnlyOperationFunction(
     clientType,
   );
   const returnType = buildLroReturnType(context, operation);
-  const { name, fixme = [] } = getOperationName(operation, context);
+  const { name, propertyName, fixme = [] } = getOperationName(operation, context, method[0]);
   const pollerLikeReference = resolveReference(AzurePollingDependencies.PollerLike);
   const operationStateReference = resolveReference(AzurePollingDependencies.OperationState);
 
@@ -1139,7 +1142,7 @@ function getLroOnlyOperationFunction(
     isAsync: false,
     isExported: true,
     name,
-    propertyName: normalizeName(operation.name, NameType.Property),
+    propertyName,
     isLro: true,
     lroFinalReturnType: effectiveReturnTypeName,
     parameters,
@@ -1193,7 +1196,7 @@ function getLroAndPagingOperationFunction(
 } {
   const operation = method[1];
   const parameters = getOperationSignatureParameters(context, method, clientType);
-  const { name, fixme = [] } = getOperationName(operation, context);
+  const { name, propertyName, fixme = [] } = getOperationName(operation, context, method[0]);
 
   const returnType = buildLroPagingReturnType(context, operation);
 
@@ -1246,7 +1249,7 @@ function getLroAndPagingOperationFunction(
     isLroPaging: true,
     lropagingFinalReturnType: returnType.type,
     name,
-    propertyName: normalizeName(operation.name, NameType.Property),
+    propertyName,
     parameters,
     returnType: `${refs.pagedIterator}<${returnType.type}>`,
     statements: [
@@ -1323,7 +1326,7 @@ function getPagingOnlyOperationFunction(
       type: getTypeExpression(context, type.valueType),
     };
   }
-  const { name, fixme = [] } = getOperationName(operation, context);
+  const { name, propertyName, fixme = [] } = getOperationName(operation, context, method[0]);
   const pagedAsyncIterableIteratorReference = resolveReference(
     PagingHelpers.PagedAsyncIterableIterator,
   );
@@ -1334,7 +1337,7 @@ function getPagingOnlyOperationFunction(
     isAsync: false,
     isExported: true,
     name,
-    propertyName: normalizeName(operation.name, NameType.Property),
+    propertyName,
     parameters,
     returnType: `${pagedAsyncIterableIteratorReference}<${returnType.type}>`,
   };

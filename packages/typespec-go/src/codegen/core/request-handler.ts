@@ -40,6 +40,7 @@ export function createRequestHandler(
   let text = `${helpers.comment(name, "// ")} creates the ${method.name} request.\n`;
   text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${name}(${helpers.getCreateRequestParametersSig(method)}) (${returns.join(", ")}) {\n`;
 
+  // BEGIN create request
   const hostParams = new Array<go.URIParameter>();
   for (const parameter of method.receiver.type.parameters) {
     if (parameter.kind === "uriParam") {
@@ -91,26 +92,6 @@ export function createRequestHandler(
     hostParam = `runtime.JoinPaths(${hostParam}, urlPath)`;
   }
 
-  // helper to build nil checks for param groups
-  const emitParamGroupCheck = function (param: go.MethodParameter): string {
-    if (!param.group) {
-      throw new CodegenError(
-        "InternalError",
-        `emitParamGroupCheck called for ungrouped parameter ${param.name}`,
-      );
-    }
-    let client = "";
-    if (param.location === "client") {
-      client = "client.";
-    }
-    const paramGroupName = naming.uncapitalize(param.group.name);
-    let optionalParamGroupCheck = `${client}${paramGroupName} != nil && `;
-    if (param.group.required) {
-      optionalParamGroupCheck = "";
-    }
-    return `${indent.get()}if ${optionalParamGroupCheck}${client}${paramGroupName}.${naming.capitalize(param.name)} != nil {\n`;
-  };
-
   if (hasPathParams) {
     // swagger defines path params, emit path and replace tokens
     imports.add("strings");
@@ -127,11 +108,12 @@ export function createRequestHandler(
 
         // emit check to ensure path param isn't an empty string
         if (pp.kind === "pathScalarParam") {
-          const choiceIsString = function (type: go.PathScalarParameterType): boolean {
-            return type.kind === "constant" && type.type === "string";
-          };
           // we only need to do this for params that have an underlying type of string
-          if ((pp.type.kind === "string" || choiceIsString(pp.type)) && !pp.omitEmptyStringCheck) {
+          if (
+            (pp.type.kind === "string" ||
+              (pp.type.kind === "constant" && pp.type.type === "string")) &&
+            !pp.omitEmptyStringCheck
+          ) {
             const paramName = helpers.getParamName(pp);
             imports.add("errors");
             text += `${indent.get()}if ${paramName} == "" {\n`;
@@ -158,7 +140,7 @@ export function createRequestHandler(
       } else if (go.isClientSideDefault(pp.style)) {
         const defaultValue = naming.uncapitalize(pp.name) + "Default";
         text += `${indent.get()}${defaultValue} := ${helpers.formatLiteralValue(pp.style.defaultValue, true)}\n`;
-        text += emitParamGroupCheck(pp);
+        text += emitParamGroupCheck(pp, indent);
         text += `${indent.push().get()}${defaultValue} = ${helpers.getParamName(pp)}\n`;
         text += `${indent.pop().get()}}\n`;
         paramValue = helpers.formatValue(defaultValue, pp.type, imports);
@@ -168,7 +150,7 @@ export function createRequestHandler(
         // the optional value when set.
         paramValue = `optional${naming.capitalize(pp.name)}`;
         text += `${indent.get()}${paramValue} := ""\n`;
-        text += emitParamGroupCheck(pp);
+        text += emitParamGroupCheck(pp, indent);
         text += `${indent.push().get()}${paramValue} = ${helpers.formatParamValue(pp, imports, indent)}\n`;
         text += `${indent.pop().get()}}\n`;
 
@@ -181,20 +163,12 @@ export function createRequestHandler(
         }
       }
 
-      const emitPathEscape = function (): string {
-        if (pp.isEncoded) {
-          imports.add("net/url");
-          return `url.PathEscape(${paramValue})`;
-        }
-        return paramValue;
-      };
-
       if (optionalPathSep) {
         text += `${indent.get()}if len(${paramValue}) > 0 {\n`;
-        text += `${indent.push().get()}${paramValue} = "/"+${emitPathEscape()}\n`;
+        text += `${indent.push().get()}${paramValue} = "/"+${emitPathEscape(pp, paramValue, imports)}\n`;
         text += `${indent.pop().get()}}\n`;
       } else {
-        paramValue = emitPathEscape();
+        paramValue = emitPathEscape(pp, paramValue, imports);
       }
 
       text += `${indent.get()}urlPath = strings.ReplaceAll(urlPath, "{${pp.pathSegment}}", ${paramValue})\n`;
@@ -205,41 +179,11 @@ export function createRequestHandler(
   text += `${indent.get()}if err != nil {\n`;
   text += `${indent.push().get()}return nil, err\n`;
   text += `${indent.pop().get()}}\n`;
+  // END create request
 
-  // add query parameters
+  // BEGIN add query parameters
   const encodedParams = methodParamGroups.encodedQueryParams;
   const unencodedParams = methodParamGroups.unencodedQueryParams;
-
-  const emitQueryParam = function (qp: go.QueryParameter, setter: string): string {
-    let qpText: string;
-    if (qp.location === "method" && go.isClientSideDefault(qp.style)) {
-      qpText = emitClientSideDefault(
-        qp,
-        qp.style,
-        (name, val) => {
-          return `${indent.get()}reqQP.Set(${name}, ${val})`;
-        },
-        imports,
-        indent,
-      );
-    } else if (
-      go.isRequiredParameter(qp.style) ||
-      go.isLiteralParameter(qp.style) ||
-      (qp.location === "client" && go.isClientSideDefault(qp.style))
-    ) {
-      qpText = `${indent.get()}${setter}\n`;
-    } else if (qp.location === "client" && !qp.group) {
-      // global optional param
-      qpText = `${indent.get()}if client.${qp.name} != nil {\n`;
-      qpText += `${indent.push().get()}${setter}\n`;
-      qpText += `${indent.pop().get()}}\n`;
-    } else {
-      qpText = emitParamGroupCheck(qp);
-      qpText += `${indent.push().get()}${setter}\n`;
-      qpText += `${indent.pop().get()}}\n`;
-    }
-    return qpText;
-  };
 
   // emit encoded params first
   if (encodedParams.length > 0) {
@@ -279,7 +223,7 @@ export function createRequestHandler(
         // cannot initialize setter to this value as helpers.formatParamValue() can change imports
         setter = `reqQP.Set("${qp.queryParameter}", ${helpers.formatParamValue(qp, imports, indent)})`;
       }
-      text += emitQueryParam(qp, setter);
+      text += emitQueryParam(qp, imports, indent, setter);
     }
 
     // reqQP.Encode() encodes space chars as '+' which is application/x-www-form-urlencoded
@@ -308,41 +252,19 @@ export function createRequestHandler(
       } else {
         setter = `unencodedParams = append(unencodedParams, "${qp.queryParameter}="+${helpers.formatParamValue(qp, imports, indent)})`;
       }
-      text += emitQueryParam(qp, setter);
+      text += emitQueryParam(qp, imports, indent, setter);
     }
     imports.add("strings");
     text += `${indent.get()}req.Raw().URL.RawQuery = strings.Join(unencodedParams, "&")\n`;
   }
+  // END add query parameters
 
   if (method.kind !== "nextPageMethod" && method.returns.result?.kind === "binaryResult") {
     // skip auto-body downloading for binary stream responses
     text += `${indent.get()}runtime.SkipBodyDownload(req)\n`;
   }
 
-  // add specific request headers
-  const emitHeaderSet = function (headerParam: go.HeaderParameter): string {
-    if (headerParam.kind === "headerMapParam") {
-      let headerText = `${indent.get()}for k, v := range ${helpers.getParamName(headerParam)} {\n`;
-      headerText += `${indent.push().get()}if v != nil {\n`;
-      headerText += `${indent.push().get()}req.Raw().Header["${headerParam.headerName}"+k] = []string{*v}\n`;
-      headerText += `${indent.pop().get()}}\n`;
-      headerText += `${indent.pop().get()}}\n`;
-      return headerText;
-    } else if (headerParam.location === "method" && go.isClientSideDefault(headerParam.style)) {
-      return emitClientSideDefault(
-        headerParam,
-        headerParam.style,
-        (name, val) => {
-          return `${indent.get()}req.Raw().Header[${name}] = []string{${val}}`;
-        },
-        imports,
-        indent,
-      );
-    } else {
-      return `${indent.get()}req.Raw().Header["${headerParam.headerName}"] = []string{${helpers.formatParamValue(headerParam, imports, indent)}}\n`;
-    }
-  };
-
+  // BEGIN specific request headers
   let contentType: string | undefined;
   for (const param of methodParamGroups.headerParams.sort(
     (a: go.HeaderParameter, b: go.HeaderParameter) => {
@@ -364,9 +286,9 @@ export function createRequestHandler(
           text += emitClientSideDefault(
             param as go.HeaderScalarParameter,
             param.style,
-            () => "",
             imports,
             indent,
+            () => "",
           );
           continue;
         } else if (param.style === "required") {
@@ -386,65 +308,32 @@ export function createRequestHandler(
       go.isLiteralParameter(param.style) ||
       go.isClientSideDefault(param.style)
     ) {
-      text += emitHeaderSet(param);
+      text += emitHeaderSet(param, imports, indent);
     } else if (param.location === "client" && !param.group) {
       // global optional param
       text += `${indent.get()}if client.${param.name} != nil {\n`;
       indent.push();
-      text += emitHeaderSet(param);
+      text += emitHeaderSet(param, imports, indent);
       indent.pop();
       text += `${indent.get()}}\n`;
     } else {
-      text += emitParamGroupCheck(param);
+      text += emitParamGroupCheck(param, indent);
       indent.push();
-      text += emitHeaderSet(param);
+      text += emitHeaderSet(param, imports, indent);
       indent.pop();
       text += `${indent.get()}}\n`;
     }
   }
+  // END specific request headers
 
+  // BEGIN set body
   // note that these are mutually exclusive
   const bodyParam = methodParamGroups.bodyParam;
   const formBodyParams = methodParamGroups.formBodyParams;
   const multipartBodyParams = methodParamGroups.multipartBodyParams;
   const partialBodyParams = methodParamGroups.partialBodyParams;
 
-  const emitSetBodyWithErrCheck = function (setBodyParam: string, contentType?: string): string {
-    let content = "";
-    if (contentType) {
-      content += `${indent.get()}req.Raw().Header["Content-Type"] = []string{${contentType}}\n`;
-    }
-    content += `${indent.get()}if err := ${setBodyParam}; err != nil {\n`;
-    content += `${indent.push().get()}return nil, err\n`;
-    content += `${indent.pop().get()}}\n`;
-    return content;
-  };
-
   if (bodyParam) {
-    /** returns the source value for the content type */
-    const getContentTypeValue = function (src: go.BodyParameterContentTypeKind): string {
-      switch (src.kind) {
-        case "literal":
-          return helpers.formatLiteralValue(src, false);
-        case "parameterRef": {
-          // find the param
-          for (const param of method.parameters) {
-            if (param.kind === "headerScalarParam" && param.name === src.name) {
-              if (go.isClientSideDefault(param.style)) {
-                return getClientSideDefaultVarName(param);
-              }
-              let paramName = helpers.getParamName(param);
-              if (param.type.kind === "constant") {
-                paramName = `string(${paramName})`;
-              }
-              return paramName;
-            }
-          }
-          throw new CodegenError("InternalError", `didn't find parameter reference ${src.name}`);
-        }
-      }
-    };
-
     if (bodyParam.bodyFormat === "JSON" || bodyParam.bodyFormat === "XML") {
       // default to the body param name
       let body = helpers.getParamName(bodyParam);
@@ -535,12 +424,12 @@ export function createRequestHandler(
         setBody = `req.SetBody(streaming.NopCloser(bytes.NewReader(${body})), "application/${bodyParam.bodyFormat.toLowerCase()}")`;
       }
       if (go.isRequiredParameter(bodyParam.style) || go.isLiteralParameter(bodyParam.style)) {
-        text += emitSetBodyWithErrCheck(setBody, contentType);
+        text += emitSetBodyWithErrCheck(setBody, indent, contentType);
         text += `${indent.get()}return req, nil\n`;
       } else {
-        text += emitParamGroupCheck(bodyParam);
+        text += emitParamGroupCheck(bodyParam, indent);
         indent.push();
-        text += emitSetBodyWithErrCheck(setBody, contentType);
+        text += emitSetBodyWithErrCheck(setBody, indent, contentType);
         text += `${indent.get()}return req, nil\n`;
         indent.pop();
         text += `${indent.get()}}\n`;
@@ -549,15 +438,17 @@ export function createRequestHandler(
     } else if (bodyParam.bodyFormat === "binary") {
       if (go.isRequiredParameter(bodyParam.style)) {
         text += emitSetBodyWithErrCheck(
-          `req.SetBody(${bodyParam.name}, ${getContentTypeValue(bodyParam.contentType)})`,
+          `req.SetBody(${bodyParam.name}, ${getContentTypeValue(method, bodyParam.contentType)})`,
+          indent,
           contentType,
         );
         text += `${indent.get()}return req, nil\n`;
       } else {
-        text += emitParamGroupCheck(bodyParam);
+        text += emitParamGroupCheck(bodyParam, indent);
         indent.push();
         text += emitSetBodyWithErrCheck(
-          `req.SetBody(${helpers.getParamName(bodyParam)}, ${getContentTypeValue(bodyParam.contentType)})`,
+          `req.SetBody(${helpers.getParamName(bodyParam)}, ${getContentTypeValue(method, bodyParam.contentType)})`,
+          indent,
           contentType,
         );
         text += `${indent.get()}return req, nil\n`;
@@ -571,16 +462,18 @@ export function createRequestHandler(
       if (go.isRequiredParameter(bodyParam.style)) {
         text += `${indent.get()}body := streaming.NopCloser(strings.NewReader(${bodyParam.name}))\n`;
         text += emitSetBodyWithErrCheck(
-          `req.SetBody(body, ${getContentTypeValue(bodyParam.contentType)})`,
+          `req.SetBody(body, ${getContentTypeValue(method, bodyParam.contentType)})`,
+          indent,
           contentType,
         );
         text += `${indent.get()}return req, nil\n`;
       } else {
-        text += emitParamGroupCheck(bodyParam);
+        text += emitParamGroupCheck(bodyParam, indent);
         indent.push();
         text += `${indent.get()}body := streaming.NopCloser(strings.NewReader(${helpers.getParamName(bodyParam)}))\n`;
         text += emitSetBodyWithErrCheck(
-          `req.SetBody(body, ${getContentTypeValue(bodyParam.contentType)})`,
+          `req.SetBody(body, ${getContentTypeValue(method, bodyParam.contentType)})`,
+          indent,
           contentType,
         );
         text += `${indent.get()}return req, nil\n`;
@@ -611,7 +504,7 @@ export function createRequestHandler(
     // now populate any optional params from the options type
     for (const partialBodyParam of partialBodyParams) {
       if (!go.isRequiredParameter(partialBodyParam.style)) {
-        text += emitParamGroupCheck(partialBodyParam);
+        text += emitParamGroupCheck(partialBodyParam, indent);
         text += `${indent.push().get()}body.${naming.capitalize(partialBodyParam.serializedName)} = options.${naming.capitalize(partialBodyParam.name)}\n`;
         text += `${indent.pop().get()}}\n`;
       }
@@ -659,7 +552,7 @@ export function createRequestHandler(
         if (go.isRequiredParameter(param.style)) {
           text += `${indent.get()}${setter}\n`;
         } else {
-          text += emitParamGroupCheck(param);
+          text += emitParamGroupCheck(param, indent);
           text += `${indent.push().get()}${setter}\n`;
           text += `${indent.pop().get()}}\n`;
         }
@@ -670,17 +563,6 @@ export function createRequestHandler(
     text += `${indent.pop().get()}}\n`;
     text += `${indent.get()}return req, nil\n`;
   } else if (formBodyParams.length > 0) {
-    const emitFormData = function (param: go.FormBodyParameter, setter: string): string {
-      let formDataText: string;
-      if (go.isRequiredParameter(param.style)) {
-        formDataText = `${indent.get()}${setter}\n`;
-      } else {
-        formDataText = emitParamGroupCheck(param);
-        formDataText += `${indent.push().get()}${setter}\n`;
-        formDataText += `${indent.pop().get()}}\n`;
-      }
-      return formDataText;
-    };
     imports.add("net/url");
     imports.add("strings");
     imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming");
@@ -688,24 +570,46 @@ export function createRequestHandler(
     // find all the form body params
     for (const param of formBodyParams) {
       const setter = `formData.Set("${param.formDataName}", ${helpers.formatParamValue(param, imports, indent)})`;
-      text += emitFormData(param, setter);
+      if (go.isRequiredParameter(param.style)) {
+        text += `${indent.get()}${setter}\n`;
+      } else {
+        text += emitParamGroupCheck(param, indent);
+        text += `${indent.push().get()}${setter}\n`;
+        text += `${indent.pop().get()}}\n`;
+      }
     }
     text += `${indent.get()}body := streaming.NopCloser(strings.NewReader(formData.Encode()))\n`;
-    text += emitSetBodyWithErrCheck('req.SetBody(body, "application/x-www-form-urlencoded")');
+    text += emitSetBodyWithErrCheck(
+      'req.SetBody(body, "application/x-www-form-urlencoded")',
+      indent,
+    );
     text += `${indent.get()}return req, nil\n`;
   } else {
+    // no body
     text += `${indent.get()}return req, nil\n`;
   }
+  // END set body
+
   text += "}\n\n";
   return text;
 }
 
+/**
+ * emits code for handling parameters with a client-side default
+ *
+ * @param param the param with a client-side default
+ * @param csd the client-side default value
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @param setterFormat any custom formatting for the value
+ * @returns the code for handling the client-side default
+ */
 function emitClientSideDefault(
   param: go.HeaderCollectionParameter | go.HeaderScalarParameter | go.QueryParameter,
   csd: go.ClientSideDefault,
-  setterFormat: (name: string, val: string) => string,
   imports: ImportManager,
   indent: helpers.Indentation,
+  setterFormat: (name: string, val: string) => string,
 ): string {
   const defaultVar = getClientSideDefaultVarName(param);
   let text = `${indent.get()}${defaultVar} := ${helpers.formatLiteralValue(csd.defaultValue, true)}\n`;
@@ -736,6 +640,55 @@ function emitClientSideDefault(
     text += "\n";
   }
   return text;
+}
+
+/**
+ * emits code for setting a header from a parameter.
+ * it includes handling for client-side defaults.
+ *
+ * @param headerParam the header param to be set
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @returns the code for setting a header
+ */
+function emitHeaderSet(
+  headerParam: go.HeaderParameter,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+): string {
+  if (headerParam.kind === "headerMapParam") {
+    let headerText = `${indent.get()}for k, v := range ${helpers.getParamName(headerParam)} {\n`;
+    headerText += `${indent.push().get()}if v != nil {\n`;
+    headerText += `${indent.push().get()}req.Raw().Header["${headerParam.headerName}"+k] = []string{*v}\n`;
+    headerText += `${indent.pop().get()}}\n`;
+    headerText += `${indent.pop().get()}}\n`;
+    return headerText;
+  } else if (headerParam.location === "method" && go.isClientSideDefault(headerParam.style)) {
+    return emitClientSideDefault(headerParam, headerParam.style, imports, indent, (name, val) => {
+      return `${indent.get()}req.Raw().Header[${name}] = []string{${val}}`;
+    });
+  } else {
+    return `${indent.get()}req.Raw().Header["${headerParam.headerName}"] = []string{${helpers.formatParamValue(headerParam, imports, indent)}}\n`;
+  }
+}
+
+/**
+ * emits code to URL escape a path parameter as required.
+ * the param name is a discrete param instead of param.name
+ * to handle cases where the param value was stored in a
+ * local variable.
+ *
+ * @param pp the path parameter
+ * @param paramName the path parameter var name
+ * @param imports the import manager currently in scope
+ * @returns the code that escaped the param or the param
+ */
+function emitPathEscape(pp: go.PathParameter, paramName: string, imports: ImportManager): string {
+  if (pp.isEncoded) {
+    imports.add("net/url");
+    return `url.PathEscape(${paramName})`;
+  }
+  return paramName;
 }
 
 /**
@@ -772,6 +725,99 @@ function emitMultipartContentTypeSetter(
 }
 
 /**
+ * helper to build nil checks for param groups.
+ * this requires that param.group contains a ParameterGroup.
+ * it assumes that the provided param is optional.
+ *
+ * @param param the parameter for which to build the nil check
+ * @param indent the indentation helper currently in scope
+ * @returns the code for checking the param group for nil
+ */
+function emitParamGroupCheck(param: go.MethodParameter, indent: helpers.Indentation): string {
+  if (!param.group) {
+    throw new CodegenError(
+      "InternalError",
+      `emitParamGroupCheck called for ungrouped parameter ${param.name}`,
+    );
+  }
+  let client = "";
+  if (param.location === "client") {
+    client = "client.";
+  }
+  const paramGroupName = naming.uncapitalize(param.group.name);
+  let optionalParamGroupCheck = `${client}${paramGroupName} != nil && `;
+  if (param.group.required) {
+    optionalParamGroupCheck = "";
+  }
+  return `${indent.get()}if ${optionalParamGroupCheck}${client}${paramGroupName}.${naming.capitalize(param.name)} != nil {\n`;
+}
+
+/**
+ * emits code for setting a query parameter.
+ * it handles nil checks and client-side defaults.
+ *
+ * @param qp the query param to be set
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @param setter the adjacent code for setting the query param
+ * @returns the code for setting the query param
+ */
+function emitQueryParam(
+  qp: go.QueryParameter,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+  setter: string,
+): string {
+  let qpText: string;
+  if (qp.location === "method" && go.isClientSideDefault(qp.style)) {
+    qpText = emitClientSideDefault(qp, qp.style, imports, indent, (name, val) => {
+      return `${indent.get()}reqQP.Set(${name}, ${val})`;
+    });
+  } else if (
+    go.isRequiredParameter(qp.style) ||
+    go.isLiteralParameter(qp.style) ||
+    (qp.location === "client" && go.isClientSideDefault(qp.style))
+  ) {
+    qpText = `${indent.get()}${setter}\n`;
+  } else if (qp.location === "client" && !qp.group) {
+    // global optional param
+    qpText = `${indent.get()}if client.${qp.name} != nil {\n`;
+    qpText += `${indent.push().get()}${setter}\n`;
+    qpText += `${indent.pop().get()}}\n`;
+  } else {
+    qpText = emitParamGroupCheck(qp, indent);
+    qpText += `${indent.push().get()}${setter}\n`;
+    qpText += `${indent.pop().get()}}\n`;
+  }
+  return qpText;
+}
+
+/**
+ * emits code for setting the request body and checking the resultant error.
+ * it's assumed that setBodyExpr is a function call that returns an error.
+ * also sets the Content-Type header as required.
+ *
+ * @param setBodyExpr the expression for setting the body
+ * @param indent the indentation helper currently in scope
+ * @param contentType optional value for setting the Content-Type header
+ * @returns the code for setting the body
+ */
+function emitSetBodyWithErrCheck(
+  setBodyExpr: string,
+  indent: helpers.Indentation,
+  contentType?: string,
+): string {
+  let content = "";
+  if (contentType) {
+    content += `${indent.get()}req.Raw().Header["Content-Type"] = []string{${contentType}}\n`;
+  }
+  content += `${indent.get()}if err := ${setBodyExpr}; err != nil {\n`;
+  content += `${indent.push().get()}return nil, err\n`;
+  content += `${indent.pop().get()}}\n`;
+  return content;
+}
+
+/**
  * returns the var name to use for a param's client-side default value
  *
  * @param param the param for which to name the var
@@ -783,6 +829,44 @@ function getClientSideDefaultVarName(
   return naming.uncapitalize(param.name) + "Default";
 }
 
+/**
+ * returns the source value for the Content-Type header
+ *
+ * @param method the method for which to find the value depending on src
+ * @param src the source containing the value
+ * @returns the code containing the Content-Type value
+ */
+function getContentTypeValue(method: go.MethodType | go.NextPageMethod, src: go.BodyParameterContentTypeKind): string {
+  switch (src.kind) {
+    case "literal":
+      return helpers.formatLiteralValue(src, false);
+    case "parameterRef": {
+      // find the param
+      for (const param of method.parameters) {
+        if (param.kind === "headerScalarParam" && param.name === src.name) {
+          if (go.isClientSideDefault(param.style)) {
+            return getClientSideDefaultVarName(param);
+          }
+          let paramName = helpers.getParamName(param);
+          if (param.type.kind === "constant") {
+            paramName = `string(${paramName})`;
+          }
+          return paramName;
+        }
+      }
+      throw new CodegenError("InternalError", `didn't find parameter reference ${src.name}`);
+    }
+  }
+}
+
+/**
+ * returns info for custom marshaling of slices of time.Time.
+ * returns undefined if the type isn't a slice of time.Time or
+ * if no custom marshaling is required.
+ *
+ * @param paramType the type to inspect
+ * @returns custom marshaling info or undefined
+ */
 function isArrayOfDateTimeForMarshalling(
   paramType: go.WireType,
 ): { format: go.TimeFormat; elemByVal: boolean; utc: boolean } | undefined {

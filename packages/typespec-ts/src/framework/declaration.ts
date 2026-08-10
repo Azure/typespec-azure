@@ -81,6 +81,7 @@ export function addDeclaration(
 
   // Update the declaration name to be unique
   const trackedDeclaration = { ...declaration, name: trackedDeclarationName };
+  trackedDeclaration.leadingTrivia ??= "\n";
 
   // Skip empty type aliases (they have no body to emit). Done before
   // dispatching so behaviour is identical whether batching or not.
