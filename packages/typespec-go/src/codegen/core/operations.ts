@@ -515,9 +515,12 @@ function generateConstructors(
  * @param method the method to determine the zero value
  * @returns the zero value
  */
-function getZeroReturnValue(method: go.MethodType): string {
+function getZeroReturnValue(method: go.MethodType, forFetcher: boolean): string {
+  // NOTE: we need more context when attempting to determine the zero value for pageable LROs:
+  //  - in the fetcher, return the response envelope type
+  //  - outside the fetcher return nil
   let returnType = `${method.returns.name}{}`;
-  if (go.isLROMethod(method)) {
+  if (go.isLROMethod(method) && !forFetcher) {
     // the api returns a *Poller[T]
     // the operation returns an *http.Response
     returnType = "nil";
@@ -573,7 +576,10 @@ function emitPagerDefinition(
   indent: helpers.Indentation,
 ): string {
   imports.add("context");
+  // BEGIN runtime.NewPager
   let text = `runtime.NewPager(runtime.PagingHandler[${method.returns.name}]{\n`;
+
+  // BEGIN More func
   text += `${indent.push().get()}More: func(page ${method.returns.name}) bool {\n`;
   indent.push();
   if (method.strategy) {
@@ -609,15 +615,18 @@ function emitPagerDefinition(
     // there is no advancer for single-page pagers
     text += `${indent.get()}return false\n`;
   }
-  text += `${indent.pop().get()}},\n`; // end More func
+  text += `${indent.pop().get()}},\n`;
+  // END More func
 
+  // BEGIN Fetcher func
   text += `${indent.get()}Fetcher: func(ctx context.Context, page *${method.returns.name}) (${method.returns.name}, error) {\n`;
   indent.push();
-  const reqParams = helpers.getCreateRequestParameters(method);
   if (options.generateFakes) {
     text += `${indent.get()}ctx = context.WithValue(ctx, runtime.CtxAPINameKey{}, "${method.receiver.type.name}.${helpers.fixUpMethodName(method)}")\n`;
   }
 
+  let nextLinkParam: string | undefined;
+  let optionsParam: string | undefined;
   if (method.strategy) {
     switch (method.strategy.kind) {
       case "continuationToken": {
@@ -651,117 +660,40 @@ function emitPagerDefinition(
             `${indent.get()}${optionsCopy}.${ms.requestToken.name} = page.${respToken}\n`,
         })}\n`;
 
-        text += callCreateRequestWithErrCheck(method, "req", indent, `&${optionsCopy}`);
-        text += callPipelineDoWithErrCheck(method, "req", "resp", indent);
-        text += `${indent.get()}return client.${method.naming.responseMethod}(resp, ${helpers.formatStatusCodes(method.httpStatusCodes)})\n`;
+        optionsParam = `&${optionsCopy}`;
         break;
       }
       case "nextLink": {
         const nextLinkPath = helpers.buildNextLinkPath(method.strategy);
-        let nextLinkVar: string;
         if (method.kind === "pageableMethod") {
           text += `${indent.get()}nextLink := ""\n`;
-          nextLinkVar = "nextLink";
+          nextLinkParam = "nextLink";
           text += `${indent.get()}if page != nil {\n`;
           text += `${indent.push().get()}nextLink = *page.${nextLinkPath}\n`;
           text += `${indent.pop().get()}}\n`;
         } else {
-          nextLinkVar = `*page.${nextLinkPath}`;
+          nextLinkParam = `*page.${nextLinkPath}`;
         }
-        text += `${indent.get()}resp, err := runtime.FetcherForNextLink(ctx, client.internal.Pipeline(), ${nextLinkVar}, func(ctx context.Context) (*policy.Request, error) {\n`;
-        text += `${indent.push().get()}return client.${method.naming.requestMethod}(${reqParams})\n`;
-        text += `${indent.pop().get()}}, `;
-        // nextPageMethod might be absent in some cases, see https://github.com/Azure/autorest/issues/4393
-        if (method.strategy.method) {
-          const nextOpParams = helpers
-            .getCreateRequestParametersSig(method.strategy.method)
-            .split(",");
-          // keep the parameter names from the name/type tuples and find nextLink param
-          for (let i = 0; i < nextOpParams.length; ++i) {
-            const paramName = nextOpParams[i].trim().split(" ")[0];
-            const paramType = nextOpParams[i].trim().split(" ")[1];
-            if (paramName.startsWith("next") && paramType === "string") {
-              nextOpParams[i] = "encodedNextLink";
-            } else {
-              nextOpParams[i] = paramName;
-            }
-          }
-          // add a definition for the nextReq func that uses the nextLinkOperation
-          indent.push();
-          text += `&runtime.FetcherForNextLinkOptions{\n`;
-          text += `${indent.get()}NextReq: func(ctx context.Context, encodedNextLink string) (*policy.Request, error) {\n`;
-          text += `${indent.push().get()}return client.${method.strategy.method.name}(${nextOpParams.join(", ")})\n`;
-          text += `${indent.pop().get()}},\n`;
-          text += `${indent.pop().get()}})\n`;
-        } else if (method.nextLinkVerb !== "get") {
-          text += `&runtime.FetcherForNextLinkOptions{\n`;
-          text += `${indent.push().get()}HTTPVerb: http.Method${naming.capitalize(method.nextLinkVerb)},\n`;
-          text += `${indent.pop().get()}})\n`;
-        } else {
-          text += "nil)\n";
-        }
-        text += `${indent.get()}if err != nil {\n`;
-        text += `${indent.push().get()}return ${method.returns.name}{}, err\n`;
-        text += `${indent.pop().get()}}\n`;
-        text += `${indent.get()}return client.${method.naming.responseMethod}(resp, ${helpers.formatStatusCodes(method.httpStatusCodes)})\n`;
       }
     }
-  } else {
-    // this is the singular page case, no fetcher helper required
-    text += callCreateRequestWithErrCheck(method, "req", indent);
-    text += callPipelineDoWithErrCheck(method, "req", "resp", indent);
-    text += `${indent.get()}return client.${method.naming.responseMethod}(resp, ${helpers.formatStatusCodes(method.httpStatusCodes)})\n`;
   }
-  text += `${indent.pop().get()}},\n`; // end Fetcher func
+
+  const reqParams = helpers.getCreateRequestParameters(method, nextLinkParam, optionsParam);
+  text += `${indent.get()}req, err := client.${method.naming.requestMethod}(${reqParams})\n`;
+  text += `${indent.get()}${helpers.buildErrCheck(indent, "err", getZeroReturnValue(method, true))}\n`;
+
+  text += `${indent.get()}resp, err := client.internal.Pipeline().Do(req)\n`;
+  text += `${indent.get()}${helpers.buildErrCheck(indent, "err", getZeroReturnValue(method, true))}\n`;
+  text += `${indent.get()}return client.${method.naming.responseMethod}(resp, ${helpers.formatStatusCodes(method.httpStatusCodes)})\n`;
+  text += `${indent.pop().get()}},\n`;
+  // END Fetcher func
+
   if (options.injectSpans) {
     text += `${indent.get()}Tracer: client.internal.Tracer(),\n`;
   }
-  text += `${indent.pop().get()}})\n`; // end runtime.NewPager
-  return text;
-}
+  text += `${indent.pop().get()}})\n`;
+  // END runtime.NewPager
 
-/**
- * emits the call to the *CreateRequest method for an SDK method.
- * if the call returns an error, the error is propagated to the caller.
- *
- * @param method the method to call its *CreateRequest method
- * @param reqVarName the var name of the resultant *policy.Request
- * @param indent the indentation helper currently in scope
- * @param optionsParam optional custom param name for the method options param
- * @returns the call to *CreateRequest with an error check
- */
-function callCreateRequestWithErrCheck(
-  method: go.MethodType,
-  reqVarName: string,
-  indent: helpers.Indentation,
-  optionsParam?: string,
-): string {
-  const reqParams = helpers.getCreateRequestParameters(method, optionsParam);
-  let text = `${indent.get()}${reqVarName}, err := client.${method.naming.requestMethod}(${reqParams})\n`;
-  const zeroResp = getZeroReturnValue(method);
-  text += `${indent.get()}${helpers.buildErrCheck(indent, "err", zeroResp)}\n`;
-  return text;
-}
-
-/**
- * emits the call to the pipeline's Do() method on the internal client.
- * if the call returns an error, the error is propagated to the caller.
- *
- * @param method the method that's making the call
- * @param reqVarName the var name of the *policy.Request
- * @param respVarName the var name of the *http.Response
- * @param indent the indentation helper currently in scope
- * @returns the call to Do() with an error check
- */
-function callPipelineDoWithErrCheck(
-  method: go.MethodType,
-  reqVarName: string,
-  respVarName: string,
-  indent: helpers.Indentation,
-): string {
-  let text = `${indent.get()}${respVarName}, err := client.internal.Pipeline().Do(${reqVarName})\n`;
-  const zeroResp = getZeroReturnValue(method);
-  text += `${indent.get()}${helpers.buildErrCheck(indent, "err", zeroResp)}\n`;
   return text;
 }
 
@@ -825,8 +757,15 @@ function generateOperation(
     text += `${indent.get()}defer func() { endSpan(err) }()\n`;
   }
 
-  text += callCreateRequestWithErrCheck(method, "req", indent);
-  text += callPipelineDoWithErrCheck(method, "req", "httpResp", indent);
+  const reqParams = helpers.getCreateRequestParameters(
+    method,
+    method.kind === "lroPageableMethod" ? `""` : undefined,
+  );
+  text += `${indent.get()}req, err := client.${method.naming.requestMethod}(${reqParams})\n`;
+  text += `${indent.get()}${helpers.buildErrCheck(indent, "err", getZeroReturnValue(method, false))}\n`;
+
+  text += `${indent.get()}httpResp, err := client.internal.Pipeline().Do(req)\n`;
+  text += `${indent.get()}${helpers.buildErrCheck(indent, "err", getZeroReturnValue(method, false))}\n`;
 
   // NOTE: for an LRO's op method we never invoke the response handler.
   // for vanilla LRO's we don't emit one, only for pageable LROs and in
@@ -836,7 +775,7 @@ function generateOperation(
     text += `${indent.get()}return client.${method.naming.responseMethod}(httpResp, ${helpers.formatStatusCodes(method.httpStatusCodes)})\n`;
   } else {
     // no response handler so we emit the status code check here
-    const zeroResp = getZeroReturnValue(method);
+    const zeroResp = getZeroReturnValue(method, false);
     text += `${indent.get()}${helpers.buildIfBlock(indent, {
       condition: `!runtime.HasStatusCode(httpResp, ${helpers.formatStatusCodes(method.httpStatusCodes)})`,
       body: (indent) => `${indent.get()}return ${zeroResp}, runtime.NewResponseError(httpResp)\n`,
@@ -855,7 +794,10 @@ function generateOperation(
         default:
           // we should never get here as the remaining kinds are all modeled results
           // thus should have been handled by the needsResponseHandler check earlier
-          throw new CodegenError("InternalError", `unexpected method result kind ${method.returns.result.kind}`);
+          throw new CodegenError(
+            "InternalError",
+            `unexpected method result kind ${method.returns.result.kind}`,
+          );
       }
     } else {
       // no result type, just response envelope
@@ -924,10 +866,7 @@ function getAPIParametersSig(
 // apiType describes where the return sig is used.
 //   api - for the API definition
 //    op - for the operation
-function generateReturnsInfo(
-  method: go.MethodType,
-  apiType: "api" | "op",
-): Array<string> {
+function generateReturnsInfo(method: go.MethodType, apiType: "api" | "op"): Array<string> {
   let returnType = method.returns.name;
   switch (method.kind) {
     case "lroMethod":
@@ -966,7 +905,7 @@ function generateLROBeginMethod(
     text += helpers.formatDocCommentWithPrefix(helpers.fixUpMethodName(method), method.docs);
     text += genRespErrorDoc(method);
   }
-  const zeroResp = getZeroReturnValue(method);
+  const zeroResp = getZeroReturnValue(method, false);
   const methodParams = helpers.getMethodParameters(method);
   for (const param of methodParams) {
     text += helpers.formatCommentAsBulletItem(param.name, param.docs);
