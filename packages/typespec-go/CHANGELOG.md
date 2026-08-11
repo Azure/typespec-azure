@@ -1,5 +1,22 @@
 # Release History
 
+## 0.16.0
+
+### Features
+
+- [#5032](https://github.com/Azure/typespec-azure/pull/5032) During SDK generation, if a go.mod file exists, its module identity is used as the source of truth, including any major version suffix. This alleviates the need to update tspconfig.yaml whenever a new major version is required.
+- [#5078](https://github.com/Azure/typespec-azure/pull/5078) Render bullet and numbered lists in doc comments following the native Go doc convention: list items are indented with aligned continuation lines, and a blank comment line is inserted around lists so `go doc`/`gofmt` recognize them. Emitted comments are byte-identical to what `gofmt` produces, including for docs that consist solely of a list. Nested (multi-level) lists are not supported, since the Go doc comment format has no concept of them.
+
+### Bug Fixes
+
+- [#5149](https://github.com/Azure/typespec-azure/pull/5149) Canonicalize generated header names passed to Go `Header.Get` and `Header.Set` methods.
+- [#4985](https://github.com/Azure/typespec-azure/pull/4985) Emit the `unpopulate` and `unpopulateTime` serde helpers using the `%s` verb with `err.Error()` instead of the non-wrapping `%v` verb, keeping the generated code `errorlint`-clean (follow-up to the earlier `unmarshalling type %T` fix).
+- [#5118](https://github.com/Azure/typespec-azure/pull/5118) Honor isExactName for types and model properties. Note that if the type/property is public, the exact name will be slightly transformed to follow Go export rules.
+- [#5104](https://github.com/Azure/typespec-azure/pull/5104) Fixed handling of @responseAsBool decorator.
+- [#5085](https://github.com/Azure/typespec-azure/pull/5085) Ensure UTC date-time values are converted to UTC before sending.  Update example generation for date-time values to use time.Date() instead of time.Parse() which leaks the wire format.
+- [#5073](https://github.com/Azure/typespec-azure/pull/5073) Always document raw JSON fields (emitted as `[]byte`) so callers know to marshal their data structure into the bytes.
+
+
 ## 0.15.0
 
 ### Features
