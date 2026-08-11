@@ -19,9 +19,16 @@ namespace Azure.Core;
  */
 model AadTokenAuthFlow<Scopes extends string[], AuthUrl extends string, TokenUrl extends string>
   extends TypeSpec.Http.AuthorizationCodeFlow {
+  /** The OAuth2 flow type, always the authorization code flow. */
   type: OAuth2FlowType.authorizationCode;
+
+  /** The authorization URL used to obtain an authorization code. */
   authorizationUrl: AuthUrl;
+
+  /** The token URL used to exchange the authorization code for a token. */
   tokenUrl: TokenUrl;
+
+  /** The list of scopes the token applies to. */
   scopes: Scopes;
 }
 

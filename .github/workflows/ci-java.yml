@@ -49,7 +49,7 @@ jobs:
         run: pnpm install
 
       # The emitter compiles against these peer packages; `pnpm run regenerate`
-      # (Generate.ps1) runs `pnpm build` for the emitter, which needs them already
+      # (eng/scripts/generate.ts) runs `pnpm build` for the emitter, which needs them already
       # built.
       - name: Build dependencies
         run: pnpm turbo run --filter "@azure-tools/typespec-java^..." build

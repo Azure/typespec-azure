@@ -18,6 +18,7 @@ import { noLegacyUsage } from "./rules/no-legacy-usage.js";
 import { noMultipleDiscriminatorRule } from "./rules/no-multiple-discriminator.js";
 import { noNullableRule } from "./rules/no-nullable.js";
 import { noOffsetDateTimeRule } from "./rules/no-offsetdatetime.js";
+import { noOpenapiClientExtensionsRule } from "./rules/no-openapi-client-extensions.js";
 import { noOpenAPIRule } from "./rules/no-openapi.js";
 import { noPrivateUsage } from "./rules/no-private-usage.js";
 import { noQueryExplodeRule } from "./rules/no-query-explode.js";
@@ -83,6 +84,7 @@ const rules = [
   noLegacyUsage,
   noQueryExplodeRule,
   noRouteParameterNameMismatchRule,
+  noOpenapiClientExtensionsRule,
 ];
 
 export const $linter = defineLinter({

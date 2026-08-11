@@ -48,14 +48,16 @@ model Azure.Core.AadTokenAuthFlow<Scopes, AuthUrl, TokenUrl>
 
 #### Properties
 
-| Name             | Type                                             | Description |
-| ---------------- | ------------------------------------------------ | ----------- |
-| type             | `TypeSpec.Http.OAuth2FlowType.authorizationCode` |             |
-| authorizationUrl | `AuthUrl`                                        |             |
-| tokenUrl         | `TokenUrl`                                       |             |
-| scopes           | `Scopes`                                         |             |
+| Name             | Type                                             | Description                                                        |
+| ---------------- | ------------------------------------------------ | ------------------------------------------------------------------ |
+| type             | `TypeSpec.Http.OAuth2FlowType.authorizationCode` | The OAuth2 flow type, always the authorization code flow.          |
+| authorizationUrl | `AuthUrl`                                        | The authorization URL used to obtain an authorization code.        |
+| tokenUrl         | `TokenUrl`                                       | The token URL used to exchange the authorization code for a token. |
+| scopes           | `Scopes`                                         | The list of scopes the token applies to.                           |
 
 ### `ArmResourceIdentifierAllowedResource` {#Azure.Core.ArmResourceIdentifierAllowedResource}
+
+Describes a resource type, and the scopes it applies to, that an `armResourceIdentifier` is allowed to refer to.
 
 ```typespec
 model Azure.Core.ArmResourceIdentifierAllowedResource
@@ -332,6 +334,8 @@ None
 
 ### `ResourceOperationStatus` {#Azure.Core.ResourceOperationStatus}
 
+Provides the status of a resource operation.
+
 ```typespec
 model Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError>
 ```
@@ -470,6 +474,8 @@ model Azure.Core.TopQueryParameter
 | top? | `int32` | The number of result items to return. |
 
 ### `ArmResourceDeploymentScope` {#Azure.Core.ArmResourceDeploymentScope}
+
+The deployment scopes in which an Azure Resource Manager resource identifier may be used.
 
 ```typespec
 union Azure.Core.ArmResourceDeploymentScope
@@ -845,9 +851,9 @@ model Azure.Core.Foundations.LocationOfCreatedResourceResponse<Resource>
 
 #### Template Parameters
 
-| Name     | Description |
-| -------- | ----------- |
-| Resource |             |
+| Name     | Description                       |
+| -------- | --------------------------------- |
+| Resource | The type of the created resource. |
 
 #### Properties
 
@@ -866,9 +872,9 @@ model Azure.Core.Foundations.LocationOfCreatedResourceWithServiceProvidedNameRes
 
 #### Template Parameters
 
-| Name     | Description |
-| -------- | ----------- |
-| Resource |             |
+| Name     | Description                       |
+| -------- | --------------------------------- |
+| Resource | The type of the created resource. |
 
 #### Properties
 
@@ -1072,10 +1078,10 @@ model Azure.Core.Traits.ListQueryParametersTrait<Parameters>
 
 #### Properties
 
-| Name                   | Type         | Description |
-| ---------------------- | ------------ | ----------- |
-| queryParams            | `{...}`      |             |
-| queryParams.parameters | `Parameters` |             |
+| Name                   | Type         | Description                                     |
+| ---------------------- | ------------ | ----------------------------------------------- |
+| queryParams            | `{...}`      | The query parameters contributed by this trait. |
+| queryParams.parameters | `Parameters` |                                                 |
 
 ### `NoClientRequestId` {#Azure.Core.Traits.NoClientRequestId}
 
@@ -1087,9 +1093,9 @@ model Azure.Core.Traits.NoClientRequestId
 
 #### Properties
 
-| Name            | Type | Description |
-| --------------- | ---- | ----------- |
-| clientRequestId | `{}` |             |
+| Name            | Type | Description                                                         |
+| --------------- | ---- | ------------------------------------------------------------------- |
+| clientRequestId | `{}` | Empty, indicating that client request id headers are not supported. |
 
 ### `NoConditionalRequests` {#Azure.Core.Traits.NoConditionalRequests}
 
@@ -1101,9 +1107,9 @@ model Azure.Core.Traits.NoConditionalRequests
 
 #### Properties
 
-| Name                | Type | Description |
-| ------------------- | ---- | ----------- |
-| conditionalRequests | `{}` |             |
+| Name                | Type | Description                                                    |
+| ------------------- | ---- | -------------------------------------------------------------- |
+| conditionalRequests | `{}` | Empty, indicating that conditional requests are not supported. |
 
 ### `NoRepeatableRequests` {#Azure.Core.Traits.NoRepeatableRequests}
 
@@ -1115,9 +1121,9 @@ model Azure.Core.Traits.NoRepeatableRequests
 
 #### Properties
 
-| Name               | Type | Description |
-| ------------------ | ---- | ----------- |
-| repeatableRequests | `{}` |             |
+| Name               | Type | Description                                                   |
+| ------------------ | ---- | ------------------------------------------------------------- |
+| repeatableRequests | `{}` | Empty, indicating that repeatable requests are not supported. |
 
 ### `QueryParametersTrait` {#Azure.Core.Traits.QueryParametersTrait}
 
@@ -1136,10 +1142,10 @@ model Azure.Core.Traits.QueryParametersTrait<Parameters, Contexts>
 
 #### Properties
 
-| Name                   | Type         | Description |
-| ---------------------- | ------------ | ----------- |
-| queryParams            | `{...}`      |             |
-| queryParams.parameters | `Parameters` |             |
+| Name                   | Type         | Description                                     |
+| ---------------------- | ------------ | ----------------------------------------------- |
+| queryParams            | `{...}`      | The query parameters contributed by this trait. |
+| queryParams.parameters | `Parameters` |                                                 |
 
 ### `RequestHeadersTrait` {#Azure.Core.Traits.RequestHeadersTrait}
 
@@ -1158,10 +1164,10 @@ model Azure.Core.Traits.RequestHeadersTrait<Headers, Contexts>
 
 #### Properties
 
-| Name                      | Type      | Description |
-| ------------------------- | --------- | ----------- |
-| requestHeaders            | `{...}`   |             |
-| requestHeaders.parameters | `Headers` |             |
+| Name                      | Type      | Description                                    |
+| ------------------------- | --------- | ---------------------------------------------- |
+| requestHeaders            | `{...}`   | The request headers contributed by this trait. |
+| requestHeaders.parameters | `Headers` |                                                |
 
 ### `ResponseHeadersTrait` {#Azure.Core.Traits.ResponseHeadersTrait}
 
@@ -1180,10 +1186,10 @@ model Azure.Core.Traits.ResponseHeadersTrait<Headers, Contexts>
 
 #### Properties
 
-| Name                       | Type      | Description |
-| -------------------------- | --------- | ----------- |
-| responseHeaders            | `{...}`   |             |
-| responseHeaders.parameters | `Headers` |             |
+| Name                       | Type      | Description                                     |
+| -------------------------- | --------- | ----------------------------------------------- |
+| responseHeaders            | `{...}`   | The response headers contributed by this trait. |
+| responseHeaders.parameters | `Headers` |                                                 |
 
 ### `SupportsClientRequestId` {#Azure.Core.Traits.SupportsClientRequestId}
 
@@ -1201,11 +1207,11 @@ model Azure.Core.Traits.SupportsClientRequestId<VersionAdded>
 
 #### Properties
 
-| Name                       | Type                                                                        | Description |
-| -------------------------- | --------------------------------------------------------------------------- | ----------- |
-| clientRequestId            | `{...}`                                                                     |             |
-| clientRequestId.parameters | [`ClientRequestIdHeader`](./data-types.md#Azure.Core.ClientRequestIdHeader) |             |
-| clientRequestId.response   | [`ClientRequestIdHeader`](./data-types.md#Azure.Core.ClientRequestIdHeader) |             |
+| Name                       | Type                                                                        | Description                                              |
+| -------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------- |
+| clientRequestId            | `{...}`                                                                     | The client request id headers contributed by this trait. |
+| clientRequestId.parameters | [`ClientRequestIdHeader`](./data-types.md#Azure.Core.ClientRequestIdHeader) |                                                          |
+| clientRequestId.response   | [`ClientRequestIdHeader`](./data-types.md#Azure.Core.ClientRequestIdHeader) |                                                          |
 
 ### `SupportsConditionalRequests` {#Azure.Core.Traits.SupportsConditionalRequests}
 
@@ -1223,11 +1229,11 @@ model Azure.Core.Traits.SupportsConditionalRequests<VersionAdded>
 
 #### Properties
 
-| Name                           | Type                                                                                | Description |
-| ------------------------------ | ----------------------------------------------------------------------------------- | ----------- |
-| conditionalRequests            | `{...}`                                                                             |             |
-| conditionalRequests.parameters | [`ConditionalRequestHeaders`](./data-types.md#Azure.Core.ConditionalRequestHeaders) |             |
-| conditionalRequests.response   | [`EtagResponseEnvelope`](./data-types.md#Azure.Core.EtagResponseEnvelope)           |             |
+| Name                           | Type                                                                                | Description                                                                 |
+| ------------------------------ | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| conditionalRequests            | `{...}`                                                                             | The conditional request headers and ETag headers contributed by this trait. |
+| conditionalRequests.parameters | [`ConditionalRequestHeaders`](./data-types.md#Azure.Core.ConditionalRequestHeaders) |                                                                             |
+| conditionalRequests.response   | [`EtagResponseEnvelope`](./data-types.md#Azure.Core.EtagResponseEnvelope)           |                                                                             |
 
 ### `SupportsRepeatableRequests` {#Azure.Core.Traits.SupportsRepeatableRequests}
 
@@ -1245,11 +1251,11 @@ model Azure.Core.Traits.SupportsRepeatableRequests<VersionAdded>
 
 #### Properties
 
-| Name                          | Type                                                                                      | Description |
-| ----------------------------- | ----------------------------------------------------------------------------------------- | ----------- |
-| repeatableRequests            | `{...}`                                                                                   |             |
-| repeatableRequests.parameters | [`RepeatabilityRequestHeaders`](./data-types.md#Azure.Core.RepeatabilityRequestHeaders)   |             |
-| repeatableRequests.response   | [`RepeatabilityResponseHeaders`](./data-types.md#Azure.Core.RepeatabilityResponseHeaders) |             |
+| Name                          | Type                                                                                      | Description                                               |
+| ----------------------------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| repeatableRequests            | `{...}`                                                                                   | The repeatable request headers contributed by this trait. |
+| repeatableRequests.parameters | [`RepeatabilityRequestHeaders`](./data-types.md#Azure.Core.RepeatabilityRequestHeaders)   |                                                           |
+| repeatableRequests.response   | [`RepeatabilityResponseHeaders`](./data-types.md#Azure.Core.RepeatabilityResponseHeaders) |                                                           |
 
 ### `TraitOverride` {#Azure.Core.Traits.TraitOverride}
 
@@ -1285,10 +1291,10 @@ model Azure.Core.Traits.VersionParameterTrait<VersionParameter>
 
 #### Properties
 
-| Name                             | Type               | Description |
-| -------------------------------- | ------------------ | ----------- |
-| versionParameter                 | `{...}`            |             |
-| versionParameter.apiVersionParam | `VersionParameter` |             |
+| Name                             | Type               | Description                                          |
+| -------------------------------- | ------------------ | ---------------------------------------------------- |
+| versionParameter                 | `{...}`            | The API version parameter contributed by this trait. |
+| versionParameter.apiVersionParam | `VersionParameter` |                                                      |
 
 ### `TraitContext` {#Azure.Core.Traits.TraitContext}
 

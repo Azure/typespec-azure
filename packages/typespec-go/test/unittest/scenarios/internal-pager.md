@@ -68,10 +68,7 @@ func (client *PagerWidgetsClient) newListPager(options *pagerWidgetsClientlistOp
 			if err != nil {
 				return pagerWidgetsClientlistResponse{}, err
 			}
-			if !runtime.HasStatusCode(resp, http.StatusOK) {
-				return pagerWidgetsClientlistResponse{}, runtime.NewResponseError(resp)
-			}
-			return client.listHandleResponse(resp)
+			return client.listHandleResponse(resp, http.StatusOK)
 		},
 	})
 }
@@ -88,8 +85,11 @@ func (client *PagerWidgetsClient) listCreateRequest(ctx context.Context, _ *page
 }
 
 // listHandleResponse handles the list response.
-func (client *PagerWidgetsClient) listHandleResponse(resp *http.Response) (pagerWidgetsClientlistResponse, error) {
+func (client *PagerWidgetsClient) listHandleResponse(resp *http.Response, successCodes ...int) (pagerWidgetsClientlistResponse, error) {
 	result := pagerWidgetsClientlistResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	if err := runtime.UnmarshalAsJSON(resp, &result.widgetList); err != nil {
 		return pagerWidgetsClientlistResponse{}, err
 	}

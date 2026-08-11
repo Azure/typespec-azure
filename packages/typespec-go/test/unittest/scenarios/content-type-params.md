@@ -95,8 +95,7 @@ func (client *RegressionsClient) BinaryBodyWithContentType(ctx context.Context, 
 		return RegressionsClientBinaryBodyWithContentTypeResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return RegressionsClientBinaryBodyWithContentTypeResponse{}, err
+		return RegressionsClientBinaryBodyWithContentTypeResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return RegressionsClientBinaryBodyWithContentTypeResponse{}, nil
 }
@@ -129,8 +128,7 @@ func (client *RegressionsClient) OptionalBinaryBodyWithContentType(ctx context.C
 		return RegressionsClientOptionalBinaryBodyWithContentTypeResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return RegressionsClientOptionalBinaryBodyWithContentTypeResponse{}, err
+		return RegressionsClientOptionalBinaryBodyWithContentTypeResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return RegressionsClientOptionalBinaryBodyWithContentTypeResponse{}, nil
 }
@@ -170,8 +168,7 @@ func (client *RegressionsClient) PayloadWithExplicitContentType(ctx context.Cont
 		return RegressionsClientPayloadWithExplicitContentTypeResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return RegressionsClientPayloadWithExplicitContentTypeResponse{}, err
+		return RegressionsClientPayloadWithExplicitContentTypeResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return RegressionsClientPayloadWithExplicitContentTypeResponse{}, nil
 }
