@@ -18,4 +18,4 @@ export { generateOptions } from "./options.js";
 export { generatePolymorphicHelpers } from "./polymorphics.js";
 export { generateResponses } from "./responses.js";
 export { generateVersionInfo } from "./version.js";
-export { generateXMLHelpers } from "./xml-helpers.js";
+export { generateXMLAdditionalPropsHelpers } from "./xml-additional-props.js";
