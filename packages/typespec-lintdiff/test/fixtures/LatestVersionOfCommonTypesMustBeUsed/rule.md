@@ -23,7 +23,10 @@ selection on the service namespace or on each service version enum member and
 warns when it is older than the latest version exposed by
 `Azure.ResourceManager.CommonTypes.Versions`. When that selection is current,
 it also checks common-type models and parameters reachable from HTTP operations
-and warns when an individual emitted common-types file reference is older.
+and warns when an individual symbol still resolves to an older emitted
+common-types file. That diagnostic explicitly distinguishes the API version's
+latest common-types selection from the specific legacy symbol that must be
+replaced.
 
 ## Authorability Notes
 

@@ -86,6 +86,12 @@ TypeSpec rule to reproduce the four validator-only projects would copy stale
 validator data and introduce false positives rather than preserve the intended
 latest-version behavior.
 
+For a real legacy reference, the diagnostic does not simply ask the user to
+select v6 again. It states that the API version already selects v6, identifies
+the specific common-type symbol still resolving to an older file, and asks the
+user to replace that legacy symbol with a type supported by v6. This distinction
+avoids implying that `@armCommonTypesVersion` itself is wrong.
+
 ## Complete TypeSpec-only project list
 
 | Project | TypeSpec diagnostics | Selected Swagger API version | Cause |

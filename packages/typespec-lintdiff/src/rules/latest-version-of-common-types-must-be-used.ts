@@ -31,7 +31,7 @@ export const latestVersionOfCommonTypesMustBeUsedRule = createRule({
     default:
       paramMessage`Use the latest ARM common-types version '${"latestVersion"}' instead of '${"currentVersion"}'.`,
     reference:
-      paramMessage`Use the latest ARM common-types version '${"latestVersion"}' for '${"fileName"}' instead of '${"currentVersion"}'.`,
+      paramMessage`This API version already selects the latest ARM common-types version '${"latestVersion"}', but the common-type ${"referenceKind"} '${"referenceName"}' resolves to '${"fileName"}' version '${"currentVersion"}'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${"latestVersion"}'.`,
   },
   create(context) {
     return {
@@ -135,6 +135,8 @@ function reportIfOutdated(
       currentVersion,
       latestVersion,
       fileName: "common-types",
+      referenceKind: "selection",
+      referenceName: "common-types",
     },
   });
   return true;
@@ -285,6 +287,8 @@ function reportOutdatedUsages(
         currentVersion: parsedReference.version,
         latestVersion,
         fileName: parsedReference.fileName,
+        referenceKind: parsedReference.referenceKind,
+        referenceName: parsedReference.referenceName,
       },
     });
   }
@@ -305,15 +309,22 @@ function isAvailableInVersion(
 
 function parseCommonTypesReference(
   reference: string | undefined,
-): { version: string; fileName: string } | undefined {
+): {
+  version: string;
+  fileName: string;
+  referenceKind: string;
+  referenceName: string;
+} | undefined {
   const match =
     reference?.match(
-      /(?:resource-management\/|\{arm-types-dir\}\/)(v\d+)\/([^/#]+\.json)#/i,
+      /(?:resource-management\/|\{arm-types-dir\}\/)(v\d+)\/([^/#]+\.json)#\/([^/]+)\/([^/]+)$/i,
     );
   return match
     ? {
         version: match[1].toLowerCase(),
         fileName: match[2].toLowerCase(),
+        referenceKind: match[3].replace(/s$/i, "").toLowerCase(),
+        referenceName: decodeURIComponent(match[4]),
       }
     : undefined;
 }

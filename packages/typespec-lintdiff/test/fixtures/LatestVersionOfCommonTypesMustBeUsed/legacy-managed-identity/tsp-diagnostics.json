@@ -2,7 +2,7 @@
   {
     "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
     "severity": "warning",
-    "message": "Use the latest ARM common-types version 'v6' for 'managedidentity.json' instead of 'v4'."
+    "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
   },
   {
     "code": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
