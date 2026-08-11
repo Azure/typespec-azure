@@ -7,7 +7,8 @@ description: Investigate coverage or diagnostic-count gaps between a Swagger val
 
 Investigate differences between a Swagger validator rule and its migrated
 TypeSpec lint rule without assuming that raw diagnostic counts must be equal.
-Produce reproducible evidence and a migration conclusion.
+Produce reproducible evidence, decide whether the migrated TypeSpec rule needs
+to change, and give a rule-focused implementation plan when it does.
 
 ## Inputs
 
@@ -221,11 +222,43 @@ Add a rule-specific canonical identity only when it is:
 - Collision-resistant.
 - Independently testable with fixtures and sampled real projects.
 
-When possible, prefer emitter source maps or instrumentation that maps an
-emitted Swagger node to its originating TypeSpec target. If no reliable mapping
-exists, preserve the two cardinalities and judge equivalence behaviorally.
+If no reliable semantic identity exists across the two outputs, preserve the
+two cardinalities and judge equivalence behaviorally.
 
-### 9. Reach the migration conclusion
+### 9. Decide whether the TypeSpec rule must change
+
+This is the primary decision produced by the investigation.
+
+Update the migrated TypeSpec rule when aligned evidence shows that it:
+
+- Misses an authorable API shape diagnosed by Swagger.
+- Reports an authorable compliant shape rejected by neither Swagger nor the
+  rule specification.
+- Checks a broader or narrower semantic target than Swagger.
+- Uses the wrong path, operation, version, visibility, or reachability
+  classification.
+- Cannot observe a Swagger-enforced concept that is represented in the
+  TypeSpec semantic program.
+
+Do not request a TypeSpec rule change when the gap is fully caused by report
+population, API-version projection, compile failures, duplicated emitted
+occurrences, stale validator data, or another non-rule comparison artifact.
+
+For every investigated gap, state exactly one of:
+
+- **TypeSpec rule update required:** identify the missing or extra semantic
+  behavior, the production rule file to change, and the violating and compliant
+  fixtures to add.
+- **No TypeSpec rule update required:** identify the evidence proving the
+  migrated rule already has matching behavior.
+
+The **Required changes** section must contain only production TypeSpec rule and
+directly related fixture/test changes. Do not include emitter, validator,
+report-generator, normalization, dataset, or harness work in that section.
+Those causes may be mentioned briefly as explanations for excluded report
+differences, but they are not migration-rule action items.
+
+### 10. Reach the migration conclusion
 
 Accept the migrated TypeSpec rule as functionally equivalent when:
 
@@ -259,14 +292,17 @@ Do not claim equivalence when one-sided projects or outliers remain unexplained.
 Create `migration.md` beside the rule fixtures and include:
 
 1. Final migration conclusion.
-2. Links or paths to both required reports and their observed source revisions.
-3. A row-level reconciliation of both reports.
-4. Specific causes for every reported number gap.
-5. Project-set comparison over an aligned population.
-6. Raw and deduplicated diagnostic totals.
-7. Major outliers and their causes.
-8. Fixture and real-service evidence.
-9. An explicit distinction between functional equivalence and raw count
+2. A direct answer to whether the migrated TypeSpec rule must change.
+3. Required TypeSpec rule and fixture/test changes, or an explicit statement
+   that none are required.
+4. Links or paths to both required reports and their observed source revisions.
+5. A row-level reconciliation of both reports.
+6. Specific causes for every reported number gap.
+7. Project-set comparison over an aligned population.
+8. Raw and deduplicated diagnostic totals.
+9. Major outliers and their causes.
+10. Fixture and real-service evidence.
+11. An explicit distinction between functional equivalence and raw count
    equality.
 
 The final statement should say whether the migrated TypeSpec rule is
