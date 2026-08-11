@@ -32,8 +32,8 @@ unassessed.
 
 ## Full-run evidence
 
-Generated at `2026-08-11T08:05:14.716Z` by the existing full corpus runner
-after the independent-review fixes. Duration: 1,999,634 ms.
+Generated at `2026-08-11T10:16:31.949Z` by the existing full corpus runner
+after all review fixes. Duration: 1,648,235 ms.
 
 | Measure | Swagger validator | TypeSpec |
 | --- | ---: | ---: |
@@ -128,8 +128,8 @@ important result is that all four projects now overlap.
 
 ## Independent review
 
-An independent code-review subagent identified three actionable issues, all of
-which were adopted:
+Independent code-review subagents identified six actionable issues across three
+review rounds, all of which were adopted:
 
 1. **Unprojected version analysis:** collecting usages once from the source
    service could report a property in API versions where it did not exist and
@@ -144,12 +144,36 @@ which were adopted:
    and common-types inputs required by the fixture harness. The development
    skill now requires `compare:setup` or verified
    `LINTDIFF_VALIDATOR_ROOT`/`LINTDIFF_COMMON_TYPES` values.
+4. **Payload visibility:** traversing every model property could report a
+   legacy common type that AutoRest excludes from the emitted request or
+   response schema. The rule now uses AutoRest's request visibility,
+   `Visibility.Read` for responses, and the same
+   `createMetadataInfo().isPayloadProperty` and schema-sharing behavior as the
+   emitter. Traversal deduplication also includes the payload context because
+   the same model can emit differently for requests and responses.
+5. **Undefined common-types selection:** the reference diagnostic says the API
+   already selects v6, so reference scanning is now explicitly limited to an
+   effective selection equal to the latest version. ARM provider namespaces
+   normally receive a default v3 selection, but this guard prevents a
+   misleading diagnostic if an incomplete or unsupported service state has no
+   effective selection.
+6. **Record payload context:** the first visibility fix applied
+   `Visibility.Item` to every model indexer. AutoRest uses that flag only for
+   array elements and preserves the original context for record
+   `additionalProperties`. The traversal now distinguishes arrays from records,
+   preventing metadata properties inside record values from being treated as
+   emitted payload properties.
 
 The new `versioned-legacy-property` fixture proves that a property added only
 in the second API version is checked only in that projected snapshot. The new
 `repeated-legacy-reference` fixture proves that two operations producing the
-same legacy reference each receive a diagnostic. No review finding was
-rejected.
+same legacy reference each receive a diagnostic. The new
+`payload-visibility-excludes-legacy` fixture proves that a read-only legacy
+property excluded from a PATCH request and a delete-only legacy property
+excluded from a response produce neither an emitted stale `$ref` nor a target
+lint diagnostic. It also covers a legacy metadata property inside a record
+value, proving that record traversal retains the emitter's non-item payload
+context. No review finding was rejected.
 
 ## Compile failures
 

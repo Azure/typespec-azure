@@ -47,3 +47,4 @@ TypeSpec emitter always introduces common-types references such as
 | `legacy-managed-identity`             | Yes       | A v6 service explicitly uses the legacy v4 managed-identity model. |
 | `versioned-legacy-property`           | Yes       | A legacy property added only in the second API version is reported only for that projected version. |
 | `repeated-legacy-reference`           | Yes       | Two operations using the same legacy definition each receive an actionable diagnostic. |
+| `payload-visibility-excludes-legacy`  | No        | Legacy properties excluded from their request or response payload visibility do not produce false-positive diagnostics. |

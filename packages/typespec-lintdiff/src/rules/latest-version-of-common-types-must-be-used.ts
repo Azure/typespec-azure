@@ -1,7 +1,17 @@
 import {
+  getArmCommonTypeOpenAPIRef,
+  getArmCommonTypesVersion,
+  getArmCommonTypesVersions,
+  getArmProviderNamespace,
+  isArmCommonType,
+} from "@azure-tools/typespec-azure-resource-manager";
+import {
   compilerAssert,
   createRule,
+  getLifecycleVisibilityEnum,
   getService,
+  getVisibilityForClass,
+  isArrayModelType,
   listServices,
   paramMessage,
   walkPropertiesInherited,
@@ -18,13 +28,12 @@ import {
 } from "@typespec/compiler";
 import { unsafe_mutateSubgraphWithNamespace } from "@typespec/compiler/experimental";
 import {
-  getArmCommonTypeOpenAPIRef,
-  getArmCommonTypesVersion,
-  getArmCommonTypesVersions,
-  getArmProviderNamespace,
-  isArmCommonType,
-} from "@azure-tools/typespec-azure-resource-manager";
-import { getHttpService, type HttpOperation } from "@typespec/http";
+  Visibility,
+  createMetadataInfo,
+  getHttpService,
+  resolveRequestVisibility,
+  type HttpOperation,
+} from "@typespec/http";
 import { getVersioningMutators } from "@typespec/versioning";
 
 export const latestVersionOfCommonTypesMustBeUsedRule = createRule({
@@ -32,10 +41,8 @@ export const latestVersionOfCommonTypesMustBeUsedRule = createRule({
   description: "ARM services must use the latest available ARM common-types version.",
   severity: "warning",
   messages: {
-    default:
-      paramMessage`Use the latest ARM common-types version '${"latestVersion"}' instead of '${"currentVersion"}'.`,
-    reference:
-      paramMessage`This API version already selects the latest ARM common-types version '${"latestVersion"}', but the common-type ${"referenceKind"} '${"referenceName"}' resolves to '${"fileName"}' version '${"currentVersion"}'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${"latestVersion"}'.`,
+    default: paramMessage`Use the latest ARM common-types version '${"latestVersion"}' instead of '${"currentVersion"}'.`,
+    reference: paramMessage`This API version already selects the latest ARM common-types version '${"latestVersion"}', but the common-type ${"referenceKind"} '${"referenceName"}' resolves to '${"fileName"}' version '${"currentVersion"}'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${"latestVersion"}'.`,
   },
   create(context) {
     return {
@@ -67,7 +74,8 @@ export const latestVersionOfCommonTypesMustBeUsedRule = createRule({
                   snapshot.version.enumMember,
                   currentVersion,
                   latestVersion,
-                )
+                ) ||
+                currentVersion !== latestVersion
               ) {
                 continue;
               }
@@ -80,12 +88,13 @@ export const latestVersionOfCommonTypesMustBeUsedRule = createRule({
                 projected.type.kind === "Namespace",
                 "A versioned service must project to a namespace.",
               );
-              const projectedService =
-                getService(program, projected.type) ?? { type: projected.type };
+              const projectedService = getService(program, projected.type) ?? {
+                type: projected.type,
+              };
               const [httpService] = getHttpService(program, projected.type);
               reportOutdatedUsages(
                 context,
-                collectCommonTypeUsages(httpService.operations),
+                collectCommonTypeUsages(program, httpService.operations),
                 projectedService,
                 snapshot.version.value,
                 latestVersion,
@@ -109,17 +118,13 @@ export const latestVersionOfCommonTypesMustBeUsedRule = createRule({
           }
           const currentVersion = getArmCommonTypesVersion(program, service.type);
           if (
-            !reportIfOutdated(
-              context,
-              service.type,
-              currentVersion,
-              latestVersion,
-            )
+            !reportIfOutdated(context, service.type, currentVersion, latestVersion) &&
+            currentVersion === latestVersion
           ) {
             const [httpService] = getHttpService(program, analyzedService);
             reportOutdatedUsages(
               context,
-              collectCommonTypeUsages(httpService.operations),
+              collectCommonTypeUsages(program, httpService.operations),
               getService(program, analyzedService) ?? compilerService,
               undefined,
               latestVersion,
@@ -175,12 +180,22 @@ interface CommonTypeUsage {
   type: Model | ModelProperty | Enum | Union;
 }
 
+interface PayloadContext {
+  visibility: Visibility;
+  inExplicitBody: boolean;
+}
+
 function collectCommonTypeUsages(
+  program: Program,
   operations: readonly HttpOperation[],
 ): CommonTypeUsage[] {
   const usages: CommonTypeUsage[] = [];
-  const seenTypes = new Map<ModelProperty | Operation, Set<Type>>();
+  const seenTypes = new Map<ModelProperty | Operation, Map<Type, Set<string>>>();
   const seenUsages = new Map<ModelProperty | Operation, Set<Type>>();
+  const metadataInfo = createMetadataInfo(program, {
+    canonicalVisibility: Visibility.Read,
+    canShareProperty: (property) => canSharePropertyUsingReadonlyOrXmsMutability(program, property),
+  });
 
   const addUsage = (
     type: Model | ModelProperty | Enum | Union,
@@ -200,44 +215,69 @@ function collectCommonTypeUsages(
     }
   };
 
-  const visitType = (type: Type, target: ModelProperty | Operation) => {
+  const visitType = (
+    type: Type,
+    target: ModelProperty | Operation,
+    payloadContext: PayloadContext,
+  ) => {
     let targetTypes = seenTypes.get(target);
     if (targetTypes === undefined) {
-      targetTypes = new Set();
+      targetTypes = new Map();
       seenTypes.set(target, targetTypes);
     }
-    if (targetTypes.has(type)) {
+    let typeContexts = targetTypes.get(type);
+    if (typeContexts === undefined) {
+      typeContexts = new Set();
+      targetTypes.set(type, typeContexts);
+    }
+    const contextIdentity = `${payloadContext.visibility}:${payloadContext.inExplicitBody}`;
+    if (typeContexts.has(contextIdentity)) {
       return;
     }
-    targetTypes.add(type);
+    typeContexts.add(contextIdentity);
 
     switch (type.kind) {
       case "Model":
         addUsage(type, target);
         if (type.indexer) {
-          visitType(type.indexer.value, target);
+          visitType(type.indexer.value, target, {
+            ...payloadContext,
+            visibility: isArrayModelType(type)
+              ? payloadContext.visibility | Visibility.Item
+              : payloadContext.visibility,
+          });
         }
         for (const property of walkPropertiesInherited(type)) {
-          addPropertyUsages(property, target);
-          visitType(property.type, target);
+          if (
+            !metadataInfo.isPayloadProperty(
+              property,
+              payloadContext.visibility,
+              payloadContext.inExplicitBody,
+            )
+          ) {
+            continue;
+          }
+          addPropertyUsages(property, target, payloadContext);
         }
         break;
       case "ModelProperty":
-        addPropertyUsages(type, target);
-        visitType(type.type, target);
+        addPropertyUsages(type, target, payloadContext);
         break;
       case "Enum":
       case "Union":
         addUsage(type, target);
         if (type.kind === "Union") {
           for (const variant of type.variants.values()) {
-            visitType(variant.type, target);
+            visitType(variant.type, target, payloadContext);
           }
         }
         break;
       case "Tuple":
         for (const value of type.values) {
-          visitType(value, target);
+          visitType(value, target, {
+            ...payloadContext,
+            visibility: payloadContext.visibility | Visibility.Item,
+          });
         }
         break;
     }
@@ -246,6 +286,7 @@ function collectCommonTypeUsages(
   function addPropertyUsages(
     property: ModelProperty,
     target: ModelProperty | Operation,
+    payloadContext: PayloadContext,
   ) {
     for (
       let current: ModelProperty | undefined = property;
@@ -253,27 +294,58 @@ function collectCommonTypeUsages(
       current = current.sourceProperty
     ) {
       addUsage(current, target);
-      visitType(current.type, target);
+      visitType(current.type, target, payloadContext);
     }
   }
 
   for (const httpOperation of operations) {
+    const requestContext = {
+      visibility: resolveRequestVisibility(program, httpOperation.operation, httpOperation.verb),
+      inExplicitBody: false,
+    };
     for (const parameter of httpOperation.parameters.properties) {
-      addPropertyUsages(parameter.property, httpOperation.operation);
+      addPropertyUsages(parameter.property, httpOperation.operation, requestContext);
     }
     if (httpOperation.parameters.body) {
-      visitType(httpOperation.parameters.body.type, httpOperation.operation);
+      const body = httpOperation.parameters.body;
+      visitType(body.type, httpOperation.operation, {
+        visibility: requestContext.visibility,
+        inExplicitBody:
+          body.bodyKind === "single" && body.isExplicit && body.containsMetadataAnnotations,
+      });
     }
     for (const response of httpOperation.responses) {
       for (const responseContent of response.responses) {
         if (responseContent.body) {
-          visitType(responseContent.body.type, httpOperation.operation);
+          const body = responseContent.body;
+          visitType(body.type, httpOperation.operation, {
+            visibility: Visibility.Read,
+            inExplicitBody:
+              body.bodyKind === "single" && body.isExplicit && body.containsMetadataAnnotations,
+          });
         }
       }
     }
   }
 
   return usages;
+}
+
+function canSharePropertyUsingReadonlyOrXmsMutability(
+  program: Program,
+  property: ModelProperty,
+): boolean {
+  const sharedVisibilities = new Set(["Read", "Create", "Update"]);
+  const lifecycle = getLifecycleVisibilityEnum(program);
+  const visibilities = getVisibilityForClass(program, property, lifecycle);
+  if (visibilities.size !== lifecycle.members.size) {
+    for (const visibility of visibilities) {
+      if (!sharedVisibilities.has(visibility.name)) {
+        return false;
+      }
+    }
+  }
+  return visibilities.size !== 0;
 }
 
 function reportOutdatedUsages(
@@ -291,10 +363,7 @@ function reportOutdatedUsages(
       version: apiVersion,
     });
     const parsedReference = parseCommonTypesReference(reference);
-    if (
-      parsedReference === undefined ||
-      parsedReference.version === latestVersion
-    ) {
+    if (parsedReference === undefined || parsedReference.version === latestVersion) {
       continue;
     }
 
@@ -323,18 +392,17 @@ function reportOutdatedUsages(
   }
 }
 
-function parseCommonTypesReference(
-  reference: string | undefined,
-): {
-  version: string;
-  fileName: string;
-  referenceKind: string;
-  referenceName: string;
-} | undefined {
-  const match =
-    reference?.match(
-      /(?:resource-management\/|\{arm-types-dir\}\/)(v\d+)\/([^/#]+\.json)#\/([^/]+)\/([^/]+)$/i,
-    );
+function parseCommonTypesReference(reference: string | undefined):
+  | {
+      version: string;
+      fileName: string;
+      referenceKind: string;
+      referenceName: string;
+    }
+  | undefined {
+  const match = reference?.match(
+    /(?:resource-management\/|\{arm-types-dir\}\/)(v\d+)\/([^/#]+\.json)#\/([^/]+)\/([^/]+)$/i,
+  );
   return match
     ? {
         version: match[1].toLowerCase(),
