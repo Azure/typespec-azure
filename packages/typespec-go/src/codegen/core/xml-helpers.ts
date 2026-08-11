@@ -8,43 +8,66 @@ import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
 
 /**
- * Creates the content for the required additional properties XML marshalling helpers.
+ * Returns the custom XML root name for a body parameter, if any.
+ *
+ * @param bodyParam the body parameter to inspect
+ * @returns the custom XML root name or undefined
+ */
+export function getXMLRootName(bodyParam: go.BodyParameter): string | undefined {
+  if (bodyParam.bodyFormat !== "XML") {
+    return undefined;
+  }
+  if (bodyParam.type.kind !== "model" && bodyParam.type.kind !== "polymorphicModel") {
+    return undefined;
+  }
+  return bodyParam.xml?.name ?? bodyParam.type.xml?.name;
+}
+
+/**
+ * Creates the content for the required XML marshalling helpers.
  *
  * @param pkg contains the package content
  * @returns the text for the file or the empty string
  */
-export function generateXMLAdditionalPropsHelpers(pkg: go.PackageContent): string {
-  // check if any models need this helper
-  let required = false;
+export function generateXMLHelpers(pkg: go.PackageContent): string {
+  let additionalPropertiesRequired = false;
   for (const model of pkg.models) {
     if (helpers.getSerDeFormat(model, pkg) !== "XML") {
       continue;
     }
     for (const field of model.fields) {
       if (field.type.kind === "map") {
-        required = true;
+        additionalPropertiesRequired = true;
         break;
       }
     }
-    if (required) {
+    if (additionalPropertiesRequired) {
       break;
     }
   }
 
-  if (!required) {
+  const xmlRootRequired = pkg.clients.some((client) =>
+    client.methods.some((method) => {
+      const bodyParam = helpers.getMethodParamGroups(method).bodyParam;
+      return bodyParam !== undefined && getXMLRootName(bodyParam) !== undefined;
+    }),
+  );
+  if (!additionalPropertiesRequired && !xmlRootRequired) {
     return "";
   }
 
   let text = helpers.contentPreamble(pkg);
-  // add standard imports
   const imports = new ImportManager(pkg);
   imports.add("encoding/xml");
-  imports.add("errors");
-  imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
-  imports.add("io");
-  imports.add("strings");
+  if (additionalPropertiesRequired) {
+    imports.add("errors");
+    imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
+    imports.add("io");
+    imports.add("strings");
+  }
   text += imports.text();
-  text += `
+  if (additionalPropertiesRequired) {
+    text += `
 type additionalProperties map[string]*string
 
 // MarshalXML implements the xml.Marshaler interface for additionalProperties.
@@ -115,5 +138,19 @@ func (ap *additionalProperties) UnmarshalXML(d *xml.Decoder, start xml.StartElem
 	return nil
 }
 `;
+  }
+  if (xmlRootRequired) {
+    text += `
+type xmlRoot struct {
+	value any
+	name  string
+}
+
+// MarshalXML implements the xml.Marshaler interface for xmlRoot.
+func (x xmlRoot) MarshalXML(enc *xml.Encoder, _ xml.StartElement) error {
+	return enc.EncodeElement(x.value, xml.StartElement{Name: xml.Name{Local: x.name}})
+}
+`;
+  }
   return text;
 }

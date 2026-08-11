@@ -133,9 +133,9 @@ export class Emitter {
           await write("responses_serde.go", responses.serDe);
         }
 
-        const xmlAddlProps = core.generateXMLAdditionalPropsHelpers(pkg);
-        if (xmlAddlProps.length > 0) {
-          await write("xml_helper.go", xmlAddlProps);
+        const xmlHelpers = core.generateXMLHelpers(pkg);
+        if (xmlHelpers.length > 0) {
+          await write("xml_helper.go", xmlHelpers);
         }
 
         if (this.codeModel.options.generateFakes) {

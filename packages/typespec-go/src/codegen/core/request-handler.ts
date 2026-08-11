@@ -8,22 +8,7 @@ import * as naming from "../../naming/naming.js";
 import { CodegenError } from "./errors.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
-
-/**
- * Returns the custom XML root name for a body parameter, if any.
- *
- * @param bodyParam the body parameter to inspect
- * @returns the custom XML root name or undefined
- */
-export function getXMLRootName(bodyParam: go.BodyParameter): string | undefined {
-  if (bodyParam.bodyFormat !== "XML") {
-    return undefined;
-  }
-  if (bodyParam.type.kind !== "model" && bodyParam.type.kind !== "polymorphicModel") {
-    return undefined;
-  }
-  return bodyParam.xml?.name ?? bodyParam.type.xml?.name;
-}
+import { getXMLRootName } from "./xml-helpers.js";
 
 /**
  * emits the request handler for the specified method.
