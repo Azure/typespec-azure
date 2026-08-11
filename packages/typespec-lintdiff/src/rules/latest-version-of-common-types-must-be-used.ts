@@ -1,17 +1,27 @@
 import {
   createRule,
+  getService,
   paramMessage,
+  walkPropertiesInherited,
+  type Enum,
   type EnumMember,
+  type Model,
+  type ModelProperty,
   type Namespace,
+  type Operation,
   type Program,
+  type Type,
+  type Union,
 } from "@typespec/compiler";
 import {
+  getArmCommonTypeOpenAPIRef,
   getArmCommonTypesVersion,
   getArmCommonTypesVersions,
   getArmProviderNamespace,
+  isArmCommonType,
 } from "@azure-tools/typespec-azure-resource-manager";
-import { getAllHttpServices } from "@typespec/http";
-import { getVersion } from "@typespec/versioning";
+import { getAllHttpServices, type HttpOperation } from "@typespec/http";
+import { Availability, getAvailabilityMap, getVersion, type Version } from "@typespec/versioning";
 
 export const latestVersionOfCommonTypesMustBeUsedRule = createRule({
   name: "latest-version-of-common-types-must-be-used",
@@ -20,6 +30,8 @@ export const latestVersionOfCommonTypesMustBeUsedRule = createRule({
   messages: {
     default:
       paramMessage`Use the latest ARM common-types version '${"latestVersion"}' instead of '${"currentVersion"}'.`,
+    reference:
+      paramMessage`Use the latest ARM common-types version '${"latestVersion"}' for '${"fileName"}' instead of '${"currentVersion"}'.`,
   },
   create(context) {
     return {
@@ -35,15 +47,56 @@ export const latestVersionOfCommonTypesMustBeUsedRule = createRule({
             continue;
           }
 
+          const compilerService = getService(program, service.namespace);
+          if (compilerService === undefined) {
+            continue;
+          }
+
+          const usages = collectCommonTypeUsages(service.operations);
           const versionMap = getVersion(program, service.namespace);
           if (versionMap) {
             for (const version of versionMap.getVersions()) {
-              reportIfOutdated(context, version.enumMember, latestVersion);
+              const currentVersion =
+                getArmCommonTypesVersion(program, version.enumMember) ??
+                getArmCommonTypesVersion(program, service.namespace);
+              if (
+                reportIfOutdated(
+                  context,
+                  version.enumMember,
+                  currentVersion,
+                  latestVersion,
+                )
+              ) {
+                continue;
+              }
+              reportOutdatedUsages(
+                context,
+                usages,
+                compilerService,
+                version,
+                latestVersion,
+              );
             }
             continue;
           }
 
-          reportIfOutdated(context, service.namespace, latestVersion);
+          const currentVersion = getArmCommonTypesVersion(program, service.namespace);
+          if (
+            !reportIfOutdated(
+              context,
+              service.namespace,
+              currentVersion,
+              latestVersion,
+            )
+          ) {
+            reportOutdatedUsages(
+              context,
+              usages,
+              compilerService,
+              undefined,
+              latestVersion,
+            );
+          }
         }
       },
     };
@@ -69,11 +122,11 @@ function getVersionNumber(version: string): number {
 function reportIfOutdated(
   context: Parameters<typeof latestVersionOfCommonTypesMustBeUsedRule.create>[0],
   target: Namespace | EnumMember,
+  currentVersion: string | undefined,
   latestVersion: string,
-): void {
-  const currentVersion = getArmCommonTypesVersion(context.program, target);
+): boolean {
   if (currentVersion === undefined || currentVersion === latestVersion) {
-    return;
+    return false;
   }
 
   context.reportDiagnostic({
@@ -81,6 +134,186 @@ function reportIfOutdated(
     format: {
       currentVersion,
       latestVersion,
+      fileName: "common-types",
     },
   });
+  return true;
+}
+
+interface CommonTypeUsage {
+  target: ModelProperty | Operation;
+  type: Model | ModelProperty | Enum | Union;
+}
+
+function collectCommonTypeUsages(
+  operations: readonly HttpOperation[],
+): CommonTypeUsage[] {
+  const usages: CommonTypeUsage[] = [];
+  const seenTypes = new Map<ModelProperty | Operation, Set<Type>>();
+  const seenUsages = new Map<ModelProperty | Operation, Set<Type>>();
+
+  const addUsage = (
+    type: Model | ModelProperty | Enum | Union,
+    target: ModelProperty | Operation,
+  ) => {
+    if (!isArmCommonType(type)) {
+      return;
+    }
+    let targetTypes = seenUsages.get(target);
+    if (targetTypes === undefined) {
+      targetTypes = new Set();
+      seenUsages.set(target, targetTypes);
+    }
+    if (!targetTypes.has(type)) {
+      targetTypes.add(type);
+      usages.push({ target, type });
+    }
+  };
+
+  const visitType = (type: Type, target: ModelProperty | Operation) => {
+    let targetTypes = seenTypes.get(target);
+    if (targetTypes === undefined) {
+      targetTypes = new Set();
+      seenTypes.set(target, targetTypes);
+    }
+    if (targetTypes.has(type)) {
+      return;
+    }
+    targetTypes.add(type);
+
+    switch (type.kind) {
+      case "Model":
+        addUsage(type, target);
+        if (type.indexer) {
+          visitType(type.indexer.value, target);
+        }
+        for (const property of walkPropertiesInherited(type)) {
+          addPropertyUsages(property, target);
+          visitType(property.type, target);
+        }
+        break;
+      case "ModelProperty":
+        addPropertyUsages(type, target);
+        visitType(type.type, target);
+        break;
+      case "Enum":
+      case "Union":
+        addUsage(type, target);
+        if (type.kind === "Union") {
+          for (const variant of type.variants.values()) {
+            visitType(variant.type, target);
+          }
+        }
+        break;
+      case "Tuple":
+        for (const value of type.values) {
+          visitType(value, target);
+        }
+        break;
+    }
+  };
+
+  function addPropertyUsages(
+    property: ModelProperty,
+    target: ModelProperty | Operation,
+  ) {
+    for (
+      let current: ModelProperty | undefined = property;
+      current !== undefined;
+      current = current.sourceProperty
+    ) {
+      addUsage(current, target);
+      visitType(current.type, target);
+    }
+  }
+
+  for (const httpOperation of operations) {
+    for (const parameter of httpOperation.parameters.properties) {
+      addPropertyUsages(parameter.property, httpOperation.operation);
+    }
+    if (httpOperation.parameters.body) {
+      visitType(httpOperation.parameters.body.type, httpOperation.operation);
+    }
+    for (const response of httpOperation.responses) {
+      for (const responseContent of response.responses) {
+        if (responseContent.body) {
+          visitType(responseContent.body.type, httpOperation.operation);
+        }
+      }
+    }
+  }
+
+  return usages;
+}
+
+function reportOutdatedUsages(
+  context: Parameters<typeof latestVersionOfCommonTypesMustBeUsedRule.create>[0],
+  usages: CommonTypeUsage[],
+  service: NonNullable<ReturnType<typeof getService>>,
+  version: Version | undefined,
+  latestVersion: string,
+): void {
+  const reported = new Set<string>();
+
+  for (const usage of usages) {
+    if (version && !isAvailableInVersion(context.program, usage.target, version)) {
+      continue;
+    }
+
+    const reference = getArmCommonTypeOpenAPIRef(context.program, usage.type, {
+      service,
+      version: version?.value,
+    });
+    const parsedReference = parseCommonTypesReference(reference);
+    if (
+      parsedReference === undefined ||
+      parsedReference.version === latestVersion
+    ) {
+      continue;
+    }
+
+    const identity = `${parsedReference.fileName}\0${parsedReference.version}`;
+    if (reported.has(identity)) {
+      continue;
+    }
+    reported.add(identity);
+
+    context.reportDiagnostic({
+      messageId: "reference",
+      target: usage.target,
+      format: {
+        currentVersion: parsedReference.version,
+        latestVersion,
+        fileName: parsedReference.fileName,
+      },
+    });
+  }
+}
+
+function isAvailableInVersion(
+  program: Program,
+  target: ModelProperty | Operation,
+  version: Version,
+): boolean {
+  const availability = getAvailabilityMap(program, target)?.get(version.name);
+  return (
+    availability === undefined ||
+    availability === Availability.Added ||
+    availability === Availability.Available
+  );
+}
+
+function parseCommonTypesReference(
+  reference: string | undefined,
+): { version: string; fileName: string } | undefined {
+  const match =
+    reference?.match(
+      /(?:resource-management\/|\{arm-types-dir\}\/)(v\d+)\/([^/#]+\.json)#/i,
+    );
+  return match
+    ? {
+        version: match[1].toLowerCase(),
+        fileName: match[2].toLowerCase(),
+      }
+    : undefined;
 }
