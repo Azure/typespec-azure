@@ -53,14 +53,10 @@ specs:
   "type/property/additional-properties": { options: { module: addlpropsgroup } }
   # missing plain time support: https://github.com/Azure/autorest.go/issues/1732
   "type/property/optionality": { options: { module: optionalitygroup, slice-elements-byval: true } }
-  "type/union": { options: { module: uniongroup } }
-  "type/union/discriminated": { options: { module: discriminatedgroup } }
   "type/property/value-types": { options: { module: valuetypesgroup, slice-elements-byval: true } }
   "type/scalar": { options: { module: scalargroup, slice-elements-byval: true } }
-  "versioning/added": { options: { module: addedgroup } }
   "versioning/madeOptional": { options: { module: madeoptionalgroup } }
   "versioning/removed": { options: { module: removedgroup } }
-  "versioning/renamedFrom": { options: { module: renamedfromgroup } }
   "versioning/returnTypeChangedFrom": { options: { module: rettypechangedfromgroup } }
   "versioning/typeChangedFrom": { options: { module: typechangedfromgroup } }
 
@@ -77,3 +73,11 @@ specs:
   "streaming/jsonl": false
   # not a real scenario
   "type/model/inheritance/nested-discriminator": false
+  # requires union support: https://github.com/Azure/typespec-azure/issues/4935
+  "type/union": false
+  # requires discriminated union support: https://github.com/Azure/typespec-azure/issues/4935
+  "type/union/discriminated": false
+  # requires union support: https://github.com/Azure/typespec-azure/issues/4935
+  "versioning/added": false
+  # requires union support: https://github.com/Azure/typespec-azure/issues/4935
+  "versioning/renamedFrom": false

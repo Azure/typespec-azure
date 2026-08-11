@@ -161,107 +161,12 @@ function patchAdditionalProperties(content) {
   return result;
 }
 
-function patchUnion(content) {
-  let result = content;
-  result = ensureScopeBefore(result, "  get(): {", "  // Go does not support union types.");
-  result = ensureScopeBefore(
-    result,
-    "  send(prop: Cases): void;",
-    "  // Go does not support union types.",
-  );
-  return result;
-}
-
-function patchUnionDiscriminated(content) {
-  let result = content;
-  const comment = "      // Go does not support discriminated union types.";
-  const comment2 = "    // Go does not support discriminated union types.";
-
-  result = ensureScopeBefore(
-    result,
-    "      @get\n      get(@query kind?: string): PetWithEnvelope;",
-    comment,
-  );
-  result = ensureScopeBefore(
-    result,
-    "      @put\n      put(@body input: PetWithEnvelope): PetWithEnvelope;",
-    comment,
-  );
-  result = ensureScopeBefore(
-    result,
-    "      @get\n      get(@query petType?: string): PetWithCustomNames;",
-    comment,
-  );
-  result = ensureScopeBefore(
-    result,
-    "      @put\n      put(@body input: PetWithCustomNames): PetWithCustomNames;",
-    comment,
-  );
-  result = ensureScopeBefore(
-    result,
-    "    @get\n    get(@query kind?: string): PetInline;",
-    comment2,
-  );
-  result = ensureScopeBefore(
-    result,
-    "    @put\n    put(@body input: PetInline): PetInline;",
-    comment2,
-  );
-  result = ensureScopeBefore(
-    result,
-    "    @get\n    get(@query type?: string): PetInlineWithCustomDiscriminator;",
-    comment2,
-  );
-  result = ensureScopeBefore(
-    result,
-    "    @put\n    put(@body input: PetInlineWithCustomDiscriminator): PetInlineWithCustomDiscriminator;",
-    comment2,
-  );
-
-  return result;
-}
-
-function patchVersioningAdded(content) {
-  let result = content;
-  result = ensureScopeBefore(
-    result,
-    "@post\nop v1(@body body: ModelV1, @added(Versions.v2) @header headerV2: string): ModelV1;",
-    "// Go does not support the union properties in ModelV1.",
-  );
-  result = ensureScopeBefore(
-    result,
-    "@post\nop v2(@body body: ModelV2): ModelV2;",
-    "// Go does not support the union properties in ModelV2.",
-  );
-  result = ensureScopeBefore(
-    result,
-    '  @post\n  @route("/v2")\n  v2InInterface(@body body: ModelV2): ModelV2;',
-    "  // Go does not support the union properties in ModelV2.",
-  );
-  return result;
-}
-
 function patchVersioningRemoved(content) {
   return ensureScopeBefore(
     content,
     "@post\nop v2(@body body: ModelV2, @removed(Versions.v2) @query param: string): ModelV2;",
     "// Go does not support the union properties in ModelV2.",
   );
-}
-
-function patchVersioningRenamedFrom(content) {
-  let result = content;
-  result = ensureScopeBefore(
-    result,
-    "op newOp(",
-    "// Go does not support the union properties in NewModel.",
-  );
-  result = ensureScopeBefore(
-    result,
-    '  @post\n  @route("/test")\n  newOpInNewInterface(@body body: NewModel): NewModel;',
-    "  // Go does not support the union properties in NewModel.",
-  );
-  return result;
 }
 
 function applyFile(relativePath, patchFn, includeTcgc = true) {
@@ -286,11 +191,7 @@ function applyFile(relativePath, patchFn, includeTcgc = true) {
 export function applyGoUnionCustomizations() {
   applyFile("special-headers/repeatability/main.tsp", patchRepeatability);
   applyFile("type/property/additional-properties/main.tsp", patchAdditionalProperties);
-  applyFile("type/union/main.tsp", patchUnion);
-  applyFile("type/union/discriminated/main.tsp", patchUnionDiscriminated);
-  applyFile("versioning/added/main.tsp", patchVersioningAdded);
   applyFile("versioning/removed/main.tsp", patchVersioningRemoved);
-  applyFile("versioning/renamedFrom/main.tsp", patchVersioningRenamedFrom);
 }
 
 export function getCustomizedSpecPath(input) {
