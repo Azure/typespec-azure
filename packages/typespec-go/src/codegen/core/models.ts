@@ -1057,7 +1057,9 @@ function generateXMLMarshaller(
   const desc = `MarshalXML implements the xml.Marshaller interface for type ${modelDef.Model.name}.`;
   let text = `func (${receiver} ${modelDef.Model.name}) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {\n`;
   if (modelDef.Model.xml?.name) {
-    text += `${indent.get()}start.Name.Local = "${modelDef.Model.xml.name}"\n`;
+    text += `${indent.get()}if start.Name.Local == "${modelDef.Model.name}" {\n`;
+    text += `${indent.push().get()}start.Name.Local = "${modelDef.Model.xml.name}"\n`;
+    text += `${indent.pop().get()}}\n`;
   }
   text += generateAliasType(modelDef.Model, receiver, true, imports, indent);
   for (const field of modelDef.Model.fields) {
