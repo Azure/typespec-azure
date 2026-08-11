@@ -29,7 +29,7 @@ export function getXMLRootName(bodyParam: go.BodyParameter): string | undefined 
  * @param pkg contains the package content
  * @returns the text for the file or the empty string
  */
-export function generateXMLAdditionalPropsHelpers(pkg: go.PackageContent): string {
+export function generateXMLHelpers(pkg: go.PackageContent): string {
   let additionalPropertiesRequired = false;
   for (const model of pkg.models) {
     if (helpers.getSerDeFormat(model, pkg) !== "XML") {
