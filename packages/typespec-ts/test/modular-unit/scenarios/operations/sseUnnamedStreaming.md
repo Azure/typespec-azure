@@ -26,10 +26,10 @@ op receive(): SSEStream<UnnamedEvents>;
 ```ts operations
 import { TestingContext as Client } from "./index.js";
 import { Info, infoDeserializer } from "../models/models.js";
+import { readSseStream } from "../static-helpers/sseStreamingHelpers.js";
 import {
   StreamResponse,
   getStreamResponse,
-  readSseStream,
 } from "../static-helpers/streamingHelpers.js";
 import { ReceiveOptionalParams } from "./options.js";
 import {
@@ -55,7 +55,11 @@ export async function _receiveDeserialize(result: StreamResponse): Promise<Async
   }
 
   return readSseStream(result.body, [
-    { isTerminal: false, deserialize: (data) => infoDeserializer(data) },
+    {
+      isTerminal: false,
+      deserialize: (data) => infoDeserializer(data),
+      contentType: "application/json",
+    },
   ]);
 }
 export async function receive(

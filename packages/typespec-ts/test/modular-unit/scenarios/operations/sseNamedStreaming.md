@@ -43,10 +43,10 @@ import {
   ResponseDelta,
   responseDeltaDeserializer,
 } from "../models/models.js";
+import { readSseStream } from "../static-helpers/sseStreamingHelpers.js";
 import {
   StreamResponse,
   getStreamResponse,
-  readSseStream,
 } from "../static-helpers/streamingHelpers.js";
 import { ReceiveOptionalParams } from "./options.js";
 import {
@@ -78,11 +78,13 @@ export async function _receiveDeserialize(
       eventName: "responseCreated",
       isTerminal: false,
       deserialize: (data) => responseCreatedDeserializer(data),
+      contentType: "application/json",
     },
     {
       eventName: "responseDelta",
       isTerminal: false,
       deserialize: (data) => responseDeltaDeserializer(data),
+      contentType: "application/json",
     },
     { isTerminal: true, terminalValue: "[DONE]" },
   ]);

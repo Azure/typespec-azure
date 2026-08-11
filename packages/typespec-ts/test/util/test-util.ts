@@ -26,6 +26,7 @@ import {
   PlatformTypeHelpers,
   PollingHelpers,
   SerializationHelpers,
+  SseStreamingHelpers,
   StorageCompatHelpers,
   StreamingHelpers,
   UrlTemplateHelpers,
@@ -462,6 +463,7 @@ export async function provideBinderWithAzureDependencies(project: Project) {
     ...CreateRecorderHelpers,
     ...StorageCompatHelpers,
     ...StreamingHelpers,
+    ...SseStreamingHelpers,
   };
 
   const staticHelperMap = await loadStaticHelpers(project, staticHelpers, {

@@ -72,6 +72,7 @@ import {
   PagingHelpers,
   PollingHelpers,
   SerializationHelpers,
+  SseStreamingHelpers,
   StorageCompatHelpers,
   StreamingHelpers,
   UrlTemplateHelpers,
@@ -1127,6 +1128,7 @@ interface StructuredStreamEvent {
   eventName?: string;
   isTerminal: boolean;
   terminalValue?: string;
+  contentType?: string;
   deserializerName?: string;
 }
 
@@ -1175,7 +1177,10 @@ export function getStructuredStreamInfo(
         eventName: sseEvent.eventType,
         isTerminal: sseEvent.isTerminalEvent,
       };
-      if (sseEvent.payloadType.kind === "constant") {
+      // Only a terminal event whose payload is a constant is matched by its sentinel data value.
+      // A non-terminal constant is a real payload variant and must be deserialized/yielded, not
+      // treated as a stream terminator.
+      if (sseEvent.isTerminalEvent && sseEvent.payloadType.kind === "constant") {
         event.terminalValue = String(sseEvent.payloadType.value);
       } else {
         const deserializerName = buildModelDeserializer(context, sseEvent.payloadType, {
@@ -1184,6 +1189,9 @@ export function getStructuredStreamInfo(
         });
         if (typeof deserializerName === "string") {
           event.deserializerName = deserializerName;
+        }
+        if (sseEvent.payloadContentType !== undefined) {
+          event.contentType = sseEvent.payloadContentType;
         }
         if (!sseEvent.isTerminalEvent) {
           payloadTypeExpressions.push(getTypeExpression(context, sseEvent.payloadType));
@@ -1284,7 +1292,7 @@ function getStructuredStreamDeserializeFunction(
       : `(e) => e`;
     statements.push(`return ${readJsonlStreamRef}(result.body, ${deserializeCallback});`);
   } else {
-    const readSseStreamRef = resolveReference(StreamingHelpers.readSseStream);
+    const readSseStreamRef = resolveReference(SseStreamingHelpers.readSseStream);
     const descriptors = (info.events ?? [])
       .map((event) => {
         const parts: string[] = [];
@@ -1297,6 +1305,9 @@ function getStructuredStreamDeserializeFunction(
         }
         if (event.deserializerName) {
           parts.push(`deserialize: (data) => ${event.deserializerName}(data)`);
+        }
+        if (event.contentType !== undefined) {
+          parts.push(`contentType: ${JSON.stringify(event.contentType)}`);
         }
         return `{ ${parts.join(", ")} }`;
       })
