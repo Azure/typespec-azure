@@ -1,5 +1,22 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.71.0
+
+### Features
+
+- [#4867](https://github.com/Azure/typespec-azure/pull/4867) Add `csharp-model-suffix` and `csharp-use-standard-acronyms` linter rules for C# SDK model naming.
+- [#4977](https://github.com/Azure/typespec-azure/pull/4977) Added `versionsEnum` field to `SdkClientType` providing a direct reference from each client to its Versions enum. This enables code generators to properly map clients to their version enums, especially for mixed api-version scenarios.
+- [#5101](https://github.com/Azure/typespec-azure/pull/5101) Add warning diagnostic when `@clientDefaultValue` value type does not match the property type
+- [#4880](https://github.com/Azure/typespec-azure/pull/4880) Replace the `no-unnamed-union` linter rule with `no-unnamed-types` in `@azure-tools/typespec-azure-core`. The new rule flags anonymous models in addition to unnamed unions, walking the type graph from operations to detect anonymous models on the client surface. The `no-unnamed-types` rule has been removed from `@azure-tools/typespec-client-generator-core`.
+- [#4882](https://github.com/Azure/typespec-azure/pull/4882) add `sseMetadata` with per-event information for server-sent event (SSE) streams
+
+### Bug Fixes
+
+- [#4979](https://github.com/Azure/typespec-azure/pull/4979) Surface `@encode(string)` on boolean types in `SdkBuiltInType` so downstream emitters can generate string-encoded boolean (de)serialization.
+- [#5027](https://github.com/Azure/typespec-azure/pull/5027) Detect operation name conflicts when multiple services are combined into one client via `@client({service: [ServiceA, ServiceB]})`. Previously only same-namespace duplicates were caught; now cross-service operation name collisions emit the existing `duplicate-client-name` diagnostic.
+- [#5146](https://github.com/Azure/typespec-azure/pull/5146) Add `wireType` to `SdkBuiltInType` interface and populate it from the `encodedAs` parameter of `@encode` for integer, boolean, and bytes types. Previously, `wireType` was only set for datetime and duration types.
+
+
 ## 0.70.0
 
 ### Features
