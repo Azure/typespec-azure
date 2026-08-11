@@ -250,11 +250,6 @@ export const StreamingHelpers = {
     name: "StreamResponse",
     location: "streamingHelpers.ts",
   },
-  SseEventDescriptor: {
-    kind: "interface",
-    name: "SseEventDescriptor",
-    location: "streamingHelpers.ts",
-  },
   getStreamResponse: {
     kind: "function",
     name: "getStreamResponse",
@@ -270,10 +265,18 @@ export const StreamingHelpers = {
     name: "readJsonlStream",
     location: "streamingHelpers.ts",
   },
+} as const;
+
+export const SseStreamingHelpers = {
+  SseEventDescriptor: {
+    kind: "interface",
+    name: "SseEventDescriptor",
+    location: "sseStreamingHelpers.ts",
+  },
   readSseStream: {
     kind: "function",
     name: "readSseStream",
-    location: "streamingHelpers.ts",
+    location: "sseStreamingHelpers.ts",
   },
 } as const;
 
