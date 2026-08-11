@@ -141,13 +141,29 @@ PR.
 4. Push both the target branch and rule branch to the `origin` repository.
 5. Create the pull request in the `origin` repository with the rule branch as
    head and the user-supplied target branch as base.
-6. Include in the PR description:
-   - the rule behavior changed
-   - focused fixture evidence
-   - latest full-corpus counts and one-sided project explanations
-   - compile failures and remaining uncertainty
-   - confirmation that generated coverage files are excluded
-7. Return the PR URL as the final workflow result.
+6. Write the PR description as an engineering explanation, not only a change
+   list. It must emphasize:
+   - **Why the TypeSpec rule changed:** describe the Swagger behavior, the
+     former TypeSpec behavior, concrete real-service misses or false positives,
+     and the evidence proving that these are semantic rule gaps rather than
+     report-population or validator-data artifacts.
+   - **How the rule was changed:** describe the semantic targets now inspected,
+     important compiler or library APIs used, version/projection handling,
+     diagnostic targeting and deduplication decisions, and why the design
+     matches intended Swagger behavior.
+   - **What was deliberately not copied:** identify validator defects, stale
+     maps, emitted-occurrence duplication, or other discrepancies excluded
+     from the TypeSpec implementation.
+   - **How the behavior is proven:** summarize focused violating and compliant
+     fixtures, former real-service misses now covered, latest full-corpus
+     counts, one-sided project explanations, compile failures, and remaining
+     uncertainty.
+   - **PR scope:** confirm generated coverage files are excluded and identify
+     the rule-related files included.
+7. Prefer concrete examples, project names, and before/after evidence. Avoid a
+   generic bullet such as “improve parity” without explaining the actual
+   missing semantic behavior.
+8. Return the PR URL as the final workflow result.
 
 ## Guardrails
 
