@@ -32,8 +32,8 @@ unassessed.
 
 ## Full-run evidence
 
-Generated at `2026-08-11T05:54:31.309Z` by the existing full corpus runner.
-Duration: 1,285,491 ms.
+Generated at `2026-08-11T08:05:14.716Z` by the existing full corpus runner
+after the independent-review fixes. Duration: 1,999,634 ms.
 
 | Measure | Swagger validator | TypeSpec |
 | --- | ---: | ---: |
@@ -41,10 +41,10 @@ Duration: 1,285,491 ms.
 | Projects with target-rule diagnostics | 388 | 391 |
 | Same-project overlap | 384 | 384 |
 | One-sided projects | 4 | 7 |
-| Raw diagnostics in successful projects | 40,692 | 698 |
+| Raw diagnostics in successful projects | 40,692 | 719 |
 
 The machine-readable occurrence-normalization pilot reports 383 validator
-identities and 384 TypeSpec identities (99.7396% consistency). It is not the
+identities and 380 TypeSpec identities (99.2167% consistency). It is not the
 equivalence basis for this rule because its identity omits the common-types
 filename and its source-line projection cannot reliably associate
 reference-level operation diagnostics with one selected API version.
@@ -117,14 +117,39 @@ diagnostic:
 
 | Project | Outdated reference | Validator diagnostics | Current TypeSpec evidence |
 | --- | --- | ---: | --- |
-| `specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement` | `v5/types.json` | 1 | Four version-projected reference diagnostics at `main.tsp:51`. |
-| `specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid` | `v5/types.json` | 4 | Reference diagnostic at `routes.tsp:112`. |
-| `specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute` | `v5/types.json` | 2 | Two reference diagnostics at `routes.tsp:54`, in addition to three existing older-version selection diagnostics. |
-| `specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise` | `v4/managedidentity.json` | 2 | Four version-projected reference diagnostics at `Cluster.tsp:52`. |
+| `specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement` | `v5/types.json` | 1 | Four projected reference diagnostics at `main.tsp:51`. |
+| `specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid` | `v5/types.json` | 4 | Four operation-specific diagnostics at `routes.tsp:112`, `139`, `166`, and `200`. |
+| `specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute` | `v5/types.json` | 2 | Four operation-specific reference diagnostics at `routes.tsp:54` and `79`, plus three older-version selection diagnostics. |
+| `specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise` | `v4/managedidentity.json` | 2 | Twenty projected operation diagnostics across five resource-operation locations in `Cluster.tsp`. |
 
 The raw counts differ because one Swagger reference may appear many times and
 one TypeSpec source usage may be evaluated in multiple service versions. The
 important result is that all four projects now overlap.
+
+## Independent review
+
+An independent code-review subagent identified three actionable issues, all of
+which were adopted:
+
+1. **Unprojected version analysis:** collecting usages once from the source
+   service could report a property in API versions where it did not exist and
+   could miss `@typeChangedFrom` or `@returnTypeChangedFrom` behavior. The rule
+   now applies the same versioning mutators used by the emitter and analyzes
+   each projected service snapshot.
+2. **Over-broad deduplication:** deduplicating only by filename and version
+   suppressed distinct user operations that produced the same legacy
+   reference. Deduplication is now scoped to a diagnostic target and reference
+   identity, so each actionable usage is reported once.
+3. **Incomplete skill setup:** a fresh worktree lacked the external validator
+   and common-types inputs required by the fixture harness. The development
+   skill now requires `compare:setup` or verified
+   `LINTDIFF_VALIDATOR_ROOT`/`LINTDIFF_COMMON_TYPES` values.
+
+The new `versioned-legacy-property` fixture proves that a property added only
+in the second API version is checked only in that projected snapshot. The new
+`repeated-legacy-reference` fixture proves that two operations producing the
+same legacy reference each receive a diagnostic. No review finding was
+rejected.
 
 ## Compile failures
 

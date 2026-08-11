@@ -45,3 +45,5 @@ TypeSpec emitter always introduces common-types references such as
 | `version-override-latest-common-types` | No       | A version enum member overrides an older namespace setting up to the latest version. |
 | `legacy-location-parameter`           | Yes       | A v6 service uses deprecated `LocationParameter`, which resolves to `v5/types.json`. |
 | `legacy-managed-identity`             | Yes       | A v6 service explicitly uses the legacy v4 managed-identity model. |
+| `versioned-legacy-property`           | Yes       | A legacy property added only in the second API version is reported only for that projected version. |
+| `repeated-legacy-reference`           | Yes       | Two operations using the same legacy definition each receive an actionable diagnostic. |

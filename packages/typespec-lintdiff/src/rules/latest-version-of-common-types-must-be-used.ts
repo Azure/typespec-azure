@@ -1,6 +1,8 @@
 import {
+  compilerAssert,
   createRule,
   getService,
+  listServices,
   paramMessage,
   walkPropertiesInherited,
   type Enum,
@@ -10,9 +12,11 @@ import {
   type Namespace,
   type Operation,
   type Program,
+  type Service,
   type Type,
   type Union,
 } from "@typespec/compiler";
+import { unsafe_mutateSubgraphWithNamespace } from "@typespec/compiler/experimental";
 import {
   getArmCommonTypeOpenAPIRef,
   getArmCommonTypesVersion,
@@ -20,8 +24,8 @@ import {
   getArmProviderNamespace,
   isArmCommonType,
 } from "@azure-tools/typespec-azure-resource-manager";
-import { getAllHttpServices, type HttpOperation } from "@typespec/http";
-import { Availability, getAvailabilityMap, getVersion, type Version } from "@typespec/versioning";
+import { getHttpService, type HttpOperation } from "@typespec/http";
+import { getVersioningMutators } from "@typespec/versioning";
 
 export const latestVersionOfCommonTypesMustBeUsedRule = createRule({
   name: "latest-version-of-common-types-must-be-used",
@@ -41,58 +45,82 @@ export const latestVersionOfCommonTypesMustBeUsedRule = createRule({
           return;
         }
 
-        const [services] = getAllHttpServices(program);
-        for (const service of services) {
-          if (!getArmProviderNamespace(program, service.namespace)) {
+        for (const service of listServices(program)) {
+          if (!getArmProviderNamespace(program, service.type)) {
             continue;
           }
 
-          const compilerService = getService(program, service.namespace);
+          const compilerService = getService(program, service.type);
           if (compilerService === undefined) {
             continue;
           }
 
-          const usages = collectCommonTypeUsages(service.operations);
-          const versionMap = getVersion(program, service.namespace);
-          if (versionMap) {
-            for (const version of versionMap.getVersions()) {
+          const versioning = getVersioningMutators(program, service.type);
+          if (versioning?.kind === "versioned") {
+            for (const snapshot of versioning.snapshots) {
               const currentVersion =
-                getArmCommonTypesVersion(program, version.enumMember) ??
-                getArmCommonTypesVersion(program, service.namespace);
+                getArmCommonTypesVersion(program, snapshot.version.enumMember) ??
+                getArmCommonTypesVersion(program, service.type);
               if (
                 reportIfOutdated(
                   context,
-                  version.enumMember,
+                  snapshot.version.enumMember,
                   currentVersion,
                   latestVersion,
                 )
               ) {
                 continue;
               }
+              const projected = unsafe_mutateSubgraphWithNamespace(
+                program,
+                [snapshot.mutator],
+                service.type,
+              );
+              compilerAssert(
+                projected.type.kind === "Namespace",
+                "A versioned service must project to a namespace.",
+              );
+              const projectedService =
+                getService(program, projected.type) ?? { type: projected.type };
+              const [httpService] = getHttpService(program, projected.type);
               reportOutdatedUsages(
                 context,
-                usages,
-                compilerService,
-                version,
+                collectCommonTypeUsages(httpService.operations),
+                projectedService,
+                snapshot.version.value,
                 latestVersion,
               );
             }
             continue;
           }
 
-          const currentVersion = getArmCommonTypesVersion(program, service.namespace);
+          let analyzedService = service.type;
+          if (versioning?.kind === "transient") {
+            const projected = unsafe_mutateSubgraphWithNamespace(
+              program,
+              [versioning.mutator],
+              service.type,
+            );
+            compilerAssert(
+              projected.type.kind === "Namespace",
+              "A transiently versioned service must project to a namespace.",
+            );
+            analyzedService = projected.type;
+          }
+          const currentVersion = getArmCommonTypesVersion(program, service.type);
           if (
             !reportIfOutdated(
               context,
-              service.namespace,
+              service.type,
               currentVersion,
               latestVersion,
             )
           ) {
+            const [httpService] = getHttpService(program, analyzedService);
             reportOutdatedUsages(
               context,
-              usages,
-              compilerService,
+              collectCommonTypeUsages(httpService.operations),
+              getService(program, analyzedService) ?? compilerService,
               undefined,
               latestVersion,
             );
@@ -251,20 +279,16 @@ function collectCommonTypeUsages(
 function reportOutdatedUsages(
   context: Parameters<typeof latestVersionOfCommonTypesMustBeUsedRule.create>[0],
   usages: CommonTypeUsage[],
-  service: NonNullable<ReturnType<typeof getService>>,
-  version: Version | undefined,
+  service: Service,
+  apiVersion: string | undefined,
   latestVersion: string,
 ): void {
-  const reported = new Set<string>();
+  const reported = new Map<ModelProperty | Operation, Set<string>>();
 
   for (const usage of usages) {
-    if (version && !isAvailableInVersion(context.program, usage.target, version)) {
-      continue;
-    }
-
     const reference = getArmCommonTypeOpenAPIRef(context.program, usage.type, {
       service,
-      version: version?.value,
+      version: apiVersion,
     });
     const parsedReference = parseCommonTypesReference(reference);
     if (
@@ -274,11 +298,16 @@ function reportOutdatedUsages(
       continue;
     }
 
-    const identity = `${parsedReference.fileName}\0${parsedReference.version}`;
-    if (reported.has(identity)) {
+    const identity = `${parsedReference.fileName}\0${parsedReference.version}\0${parsedReference.referenceKind}\0${parsedReference.referenceName}`;
+    let targetReferences = reported.get(usage.target);
+    if (targetReferences === undefined) {
+      targetReferences = new Set();
+      reported.set(usage.target, targetReferences);
+    }
+    if (targetReferences.has(identity)) {
       continue;
     }
-    reported.add(identity);
+    targetReferences.add(identity);
 
     context.reportDiagnostic({
       messageId: "reference",
@@ -292,19 +321,6 @@ function reportOutdatedUsages(
       },
     });
   }
-}
-
-function isAvailableInVersion(
-  program: Program,
-  target: ModelProperty | Operation,
-  version: Version,
-): boolean {
-  const availability = getAvailabilityMap(program, target)?.get(version.name);
-  return (
-    availability === undefined ||
-    availability === Availability.Added ||
-    availability === Availability.Available
-  );
 }
 
 function parseCommonTypesReference(

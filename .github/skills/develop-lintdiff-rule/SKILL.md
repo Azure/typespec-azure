@@ -35,7 +35,14 @@ The main agent must isolate each rule development before delegating it.
    the existing runner links packages and may change the checked-out revision.
 6. Ensure the specs worktree is clean and has its existing dependencies
    installed.
-7. Delegate the investigation, implementation, and validation to one subagent.
+7. Prepare the fixture comparison harness before delegating validation. Either:
+   - run `pnpm --dir packages/typespec-lintdiff compare:setup -- --specs-repo
+     <isolated-specs-worktree>`, or
+   - set and verify `LINTDIFF_VALIDATOR_ROOT` and `LINTDIFF_COMMON_TYPES`
+     against existing local checkouts.
+   Do not assume a fresh rule worktree already contains
+   `test/azure-openapi-validator` or `test/common-types`.
+8. Delegate the investigation, implementation, and validation to one subagent.
    Provide the rule ID and both absolute worktree paths.
 
 ## Development workflow
@@ -127,7 +134,37 @@ Before preparing the PR:
 Canonical coverage is rebuilt separately and serially on the target branch
 after rule PRs merge.
 
-### 7. Commit, push, and create the PR
+### 7. Run an independent code review
+
+Before committing or creating the PR, the main agent must assign the complete
+rule-related diff to a separate code-review subagent.
+
+The reviewer must:
+
+- compare the rule branch against the user-supplied target branch
+- inspect the production rule, fixtures, snapshots, `rule.md`, and
+  `migration.md`
+- check for semantic misses, false positives, incorrect TypeSpec compiler API
+  usage, version/projection mistakes, unstable diagnostic targets, ineffective
+  deduplication, and misleading diagnostics
+- verify that fixture evidence covers the implementation's important branches
+- confirm generated corpus and coverage files are absent from the PR diff
+- report only concrete, actionable findings with file and line references
+
+After the review:
+
+1. Evaluate each finding against the rule's source behavior and corpus
+   evidence. Do not adopt a suggestion merely because the reviewer proposed it.
+2. Apply every finding that is technically correct and within the rule PR's
+   scope.
+3. Record why any rejected finding does not apply.
+4. Rerun the affected focused tests, build, lint, and corpus validation when a
+   review fix changes rule behavior.
+5. Request a follow-up review from the same subagent when changes materially
+   alter the reviewed implementation.
+6. Proceed only when no unresolved high-confidence correctness findings remain.
+
+### 8. Commit, push, and create the PR
 
 Finishing validation is not the end of this skill. The main agent must complete
 the GitHub handoff unless the user explicitly asks to stop before creating a
@@ -163,7 +200,7 @@ PR.
 7. Prefer concrete examples, project names, and before/after evidence. Avoid a
    generic bullet such as “improve parity” without explaining the actual
    missing semantic behavior.
-8. Return the PR URL as the final workflow result.
+9. Return the PR URL as the final workflow result.
 
 ## Guardrails
 
@@ -176,6 +213,7 @@ PR.
 - Keep required changes focused on the TypeSpec rule and directly related
   tests.
 - Do not stop after validation when the requested workflow includes a PR.
+- Do not skip independent review because focused tests or corpus coverage pass.
 
 ## Deliverable
 
@@ -185,5 +223,6 @@ Return:
 - focused fixture evidence
 - full-run project overlap and one-sided project lists
 - compile failures or remaining uncertainty
+- review findings adopted and rejected, with reasons
 - the explicit rule-related files ready for the PR
 - the created PR URL
