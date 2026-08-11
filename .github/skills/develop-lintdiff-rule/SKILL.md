@@ -20,16 +20,22 @@ The normal invocation names the Swagger validator rule:
 
 The main agent must isolate each rule development before delegating it.
 
-1. Create a dedicated typespec-azure worktree and feature branch for the rule.
-   If the user already supplied a dedicated worktree, reuse it.
-2. Read the pinned `specsCommit` from
+1. Treat the user-supplied branch as the target branch, not as the
+   rule-development branch.
+2. Create a new rule-specific branch from the target branch. Its name must
+   identify the lint rule, for example
+   `feature/lintdiff-latest-version-common-types`.
+3. Create a dedicated typespec-azure worktree for that rule branch. If the
+   current worktree was created for the target branch, do not put the rule
+   commit directly on that branch.
+4. Read the pinned `specsCommit` from
    `packages/typespec-lintdiff/specs/_meta.json`.
-3. Create a separate azure-rest-api-specs worktree at that commit. Concurrent
+5. Create a separate azure-rest-api-specs worktree at that commit. Concurrent
    rule-development subagents must not share a writable specs checkout because
    the existing runner links packages and may change the checked-out revision.
-4. Ensure the specs worktree is clean and has its existing dependencies
+6. Ensure the specs worktree is clean and has its existing dependencies
    installed.
-5. Delegate the investigation, implementation, and validation to one subagent.
+7. Delegate the investigation, implementation, and validation to one subagent.
    Provide the rule ID and both absolute worktree paths.
 
 ## Development workflow
@@ -127,13 +133,14 @@ Finishing validation is not the end of this skill. The main agent must complete
 the GitHub handoff unless the user explicitly asks to stop before creating a
 PR.
 
-1. Confirm the branch is the dedicated feature branch created or supplied for
-   this rule.
-2. Determine the intended target branch from the worktree or stacked-branch
-   context. Ask the user when more than one plausible base exists.
+1. Confirm the current branch is the dedicated rule-specific branch and is
+   based directly on the user-supplied target branch.
+2. Confirm neither the rule commit nor generated coverage data was added to the
+   target branch.
 3. Commit only the explicit rule-related paths identified above.
-4. Push the feature branch to the user's fork.
-5. Create a pull request against the intended target branch.
+4. Push both the target branch and rule branch to the `origin` repository.
+5. Create the pull request in the `origin` repository with the rule branch as
+   head and the user-supplied target branch as base.
 6. Include in the PR description:
    - the rule behavior changed
    - focused fixture evidence
