@@ -58,9 +58,33 @@ reference-level operation diagnostics with one selected API version.
 | `specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB` | 1 | Emitted `v6/networksecurityperimeter.json`; validator map expects v5. |
 | `specification/search/resource-manager/Microsoft.Search/Search` | 2 | Emitted `v6/networksecurityperimeter.json`; validator map expects v5. |
 
-All four referenced files are valid v6 common-types assets at the pinned specs
-commit. Rejecting them in TypeSpec would copy a Swagger validator defect rather
-than preserve the intended latest-version rule.
+The four projects reference two distinct files:
+`networksecurityperimeter.json` and
+`managedidentitywithdelegation.json`. Valid v6 copies of both files exist under
+`specification/common-types/resource-management/v6` at the pinned specs
+commit, and their Swagger metadata identifies them as version 6.0.
+
+The published `@microsoft.azure/openapi-validator-rulesets` package does not
+discover the latest version from the common-types directory. Its generated
+`dist/spectral/functions/utils.js` contains this hard-coded map:
+
+```js
+["managedidentitywithdelegation.json", "v5"],
+["networksecurityperimeter.json", "v5"],
+```
+
+`isLatestCommonTypesVersionForFile` then uses exact string equality between the
+referenced version and that map. Consequently, a valid v6 reference does not
+equal the stale v5 entry, so the validator reports it and recommends
+downgrading to v5. There is no validator command-line option that overrides
+this map; correcting it requires a newer or locally patched rulesets package
+and regenerated validator results.
+
+The TypeSpec rule instead recognizes v6 as the latest ARM common-types version
+and therefore correctly does not report these references. Changing the
+TypeSpec rule to reproduce the four validator-only projects would copy stale
+validator data and introduce false positives rather than preserve the intended
+latest-version behavior.
 
 ## Complete TypeSpec-only project list
 
