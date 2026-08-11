@@ -8,7 +8,7 @@ import * as naming from "../../naming/naming.js";
 import { CodegenError } from "./errors.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
-import { createRequestHandler } from "./request-handler.js";
+import { createRequestHandler, getXMLRootName } from "./request-handler.js";
 import { createResponseHandler } from "./response-handler.js";
 
 // represents the generated content for an operation group
@@ -41,6 +41,7 @@ export function generateOperations(
     return operations;
   }
   const azureARM = target === "azure-arm";
+  let xmlRootEmitted = false;
   for (const client of pkg.clients) {
     // the list of packages to import
     const imports = new ImportManager(pkg);
@@ -50,6 +51,17 @@ export function generateOperations(
       imports.add("net/http");
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/policy");
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
+    }
+
+    const emitXMLRoot =
+      !xmlRootEmitted &&
+      client.methods.some((method) => {
+        const bodyParam = helpers.getMethodParamGroups(method).bodyParam;
+        return bodyParam !== undefined && getXMLRootName(bodyParam) !== undefined;
+      });
+    if (emitXMLRoot) {
+      imports.add("encoding/xml");
+      xmlRootEmitted = true;
     }
 
     imports.add(
@@ -208,11 +220,28 @@ export function generateOperations(
     // stitch it all together
     let text = helpers.contentPreamble(pkg);
     text += imports.text();
+    if (emitXMLRoot) {
+      text += generateXMLRootHelper();
+    }
     text += clientText;
     text += opText;
     operations.push(new OperationGroupContent(client.name, text));
   }
   return operations;
+}
+
+function generateXMLRootHelper(): string {
+  return `type xmlRoot struct {
+\tvalue any
+\tname  string
+}
+
+// MarshalXML implements the xml.Marshaler interface for xmlRoot.
+func (x xmlRoot) MarshalXML(enc *xml.Encoder, _ xml.StartElement) error {
+\treturn enc.EncodeElement(x.value, xml.StartElement{Name: xml.Name{Local: x.name}})
+}
+
+`;
 }
 
 /**

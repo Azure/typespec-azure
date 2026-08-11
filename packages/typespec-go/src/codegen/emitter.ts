@@ -138,11 +138,6 @@ export class Emitter {
           await write("xml_helper.go", xmlAddlProps);
         }
 
-        const xmlRoot = core.generateXMLRootHelper(pkg);
-        if (xmlRoot.length > 0) {
-          await write("xml_root.go", xmlRoot);
-        }
-
         if (this.codeModel.options.generateFakes) {
           const fakePkg = new go.FakePackage(pkg);
           const serverContent = fake.generateServers(fakePkg, this.codeModel.type);
