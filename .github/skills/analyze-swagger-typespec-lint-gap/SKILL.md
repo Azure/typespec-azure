@@ -16,7 +16,11 @@ Collect or identify:
 - Swagger validator rule ID.
 - Mapped TypeSpec lint rule ID.
 - Spec repo or lint-diff worktree.
-- Reports being compared and their source revisions.
+- The local snapshot of the external migration coverage report:
+  `packages/typespec-lintdiff/docs/coverage_old.md`.
+- The lint-diff observed coverage report:
+  `packages/typespec-lintdiff/specs/coverage-breakdown.md`.
+- Source revision, generation time, and generator revision for both reports.
 - Validator and TypeSpec per-project diagnostic files.
 - Rule fixtures, including violating and compliant cases.
 
@@ -25,7 +29,71 @@ unmatched projects cannot be reconstructed from it.
 
 ## Workflow
 
-### 1. Establish comparable populations
+### 1. Reconcile the two coverage reports
+
+Always examine both reports before investigating an individual rule. Do not
+compare their category totals or coverage percentages as if they used the same
+definition.
+
+The external gist and the lint-diff report answer different questions:
+
+| Dimension | External gist | Lint-diff `coverage-breakdown.md` |
+| --- | --- | --- |
+| Primary question | Is there some migration disposition or coverage, including official rules and structurally prevented cases? | Did mapped TypeSpec diagnostics occur in the same successfully compiled projects as validator diagnostics? |
+| Coverage credit | Local lint, official mapping, blocked/infallible classification, and some never-fired mappings | Observed same-project diagnostic overlap only; mapping alone receives no credit |
+| Main columns | `Fired`, `Lint`, `Official`, `Pct` | `Fired`, `TSP Fired`, `Lint/Overlap`, `Gap`, `TSP Only`, raw diagnostic totals |
+| Rule modes | May combine or omit execution-policy distinctions | Separates normal `production` validation from explicitly evaluated `stagingOnly` rules |
+| Diagnostic detail | Primarily aggregate project coverage | Project sets plus raw validator and TypeSpec diagnostic cardinality |
+
+Record the headline population shown by each concrete report. For example, the
+referenced gist currently says 450 compiled projects and 210 validator rules,
+while the checked-in lint-diff report says 462 of 468 projects and 215 known
+validator rules. Treat these values as report-version evidence, not permanent
+constants.
+
+For the rule under investigation, create a reconciliation table containing:
+
+- Row and category in each report.
+- Validator projects fired.
+- Locally migrated TypeSpec projects fired.
+- Official-rule projects credited.
+- Same-project overlap.
+- Validator-only and TypeSpec-only projects when available.
+- Production or staging execution mode.
+- Raw diagnostic totals, if reported.
+
+If a report contains only aggregate counts, do not infer which project is
+missing by subtracting totals. Reproduce or obtain per-project results.
+
+Classify every cross-report number gap using one or more of these causes, in
+this order:
+
+1. **Different snapshots or population:** spec commit, report date, generator
+   revision, compile-success set, or validator rule catalog changed.
+2. **Different coverage definition:** the gist may credit an official mapping,
+   blocked/infallible behavior, or a mapped rule that never fired; lint-diff
+   requires observed diagnostics in the same project.
+3. **Different validator execution mode:** a `stagingOnly` rule is zero in a
+   production run but can fire in a separately labeled staging run.
+4. **Different API-version scope:** all emitted Swagger versions or an
+   unprojected TypeSpec program can disagree with newest-version Swagger and a
+   TypeSpec program projected to that version.
+5. **Different failure/exclusion policy:** TypeSpec compile failures, parse
+   failures, external references, suppressions, or generated projects may be
+   included on only one side.
+6. **Different mapping set:** official rules, local temporary rules, renamed
+   rules, one-to-many mappings, and fixture metadata may differ.
+7. **Different aggregation identity:** project counts, raw emitted Swagger
+   occurrences, deduplicated JSON paths, and TypeSpec source locations are not
+   interchangeable.
+8. **Real semantic difference:** only after the preceding causes are ruled out
+   should the gap be attributed to missing or extra rule behavior.
+
+State the evidence for the selected cause. “The reports use different
+methodologies” is not sufficient without identifying the exact dimension and
+showing how it changes the reported row.
+
+### 2. Establish comparable populations
 
 Before comparing results, document for each report:
 
@@ -41,7 +109,7 @@ Do not attribute a difference to rule behavior until these dimensions are
 aligned. Exclude TypeSpec compile failures from both sides of a behavioral
 comparison, while retaining failure details in machine-readable metadata.
 
-### 2. Compare project sets first
+### 3. Compare project sets first
 
 Build these sets over the aligned population:
 
@@ -67,7 +135,7 @@ For version-sensitive rules, project TypeSpec to the same API version selected
 for Swagger. Follow the emitter's versioning approach rather than filtering
 diagnostics by filename or guessing from declaration names.
 
-### 3. Verify rule semantics with fixtures
+### 4. Verify rule semantics with fixtures
 
 Read the Swagger rule implementation and the TypeSpec rule implementation.
 List every authorable surface the Swagger rule can diagnose, such as:
@@ -85,7 +153,7 @@ compliant control. Run the repository's validation command and use
 `audit:noise` is supporting evidence only. It does not establish target
 identity, prove compliant behavior, or replace real-service analysis.
 
-### 4. Analyze raw diagnostic cardinality
+### 5. Analyze raw diagnostic cardinality
 
 Record raw validator and TypeSpec diagnostic totals, but do not use their
 equality as the migration criterion.
@@ -103,7 +171,7 @@ occurrences through:
 
 TypeSpec may also report multiple semantic targets that share an emitted name.
 
-### 5. Apply conservative deduplication
+### 6. Apply conservative deduplication
 
 Calculate at least these identities:
 
@@ -124,7 +192,7 @@ Deduplicated Swagger paths and TypeSpec source locations remain different
 identity domains. Similar or equal totals are evidence, not proof of one-to-one
 matching.
 
-### 6. Investigate outliers
+### 7. Investigate outliers
 
 Sort projects by absolute deduplicated difference and inspect the largest
 validator-higher and TypeSpec-higher cases.
@@ -143,7 +211,7 @@ For each outlier:
 Do not normalize solely by property name. Common names such as `enabled` can
 collide across unrelated models and operations.
 
-### 7. Decide whether stronger normalization is valid
+### 8. Decide whether stronger normalization is valid
 
 Add a rule-specific canonical identity only when it is:
 
@@ -157,7 +225,7 @@ When possible, prefer emitter source maps or instrumentation that maps an
 emitted Swagger node to its originating TypeSpec target. If no reliable mapping
 exists, preserve the two cardinalities and judge equivalence behaviorally.
 
-### 8. Reach the migration conclusion
+### 9. Reach the migration conclusion
 
 Accept the migrated TypeSpec rule as functionally equivalent when:
 
@@ -191,12 +259,14 @@ Do not claim equivalence when one-sided projects or outliers remain unexplained.
 Create `migration.md` beside the rule fixtures and include:
 
 1. Final migration conclusion.
-2. Methodological differences between the reports.
-3. Project-set comparison.
-4. Raw and deduplicated diagnostic totals.
-5. Major outliers and their causes.
-6. Fixture and real-service evidence.
-7. An explicit distinction between functional equivalence and raw count
+2. Links or paths to both required reports and their observed source revisions.
+3. A row-level reconciliation of both reports.
+4. Specific causes for every reported number gap.
+5. Project-set comparison over an aligned population.
+6. Raw and deduplicated diagnostic totals.
+7. Major outliers and their causes.
+8. Fixture and real-service evidence.
+9. An explicit distinction between functional equivalence and raw count
    equality.
 
 The final statement should say whether the migrated TypeSpec rule is
