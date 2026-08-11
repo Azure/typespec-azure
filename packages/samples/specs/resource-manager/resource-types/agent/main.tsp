@@ -19,9 +19,9 @@ namespace Microsoft.ContosoAgent;
 
 /** Contoso Agent API versions */
 enum Versions {
-  /** 2024-06-01 version */
+  /** 2026-04-01 version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  `2024-06-01`,
+  `2026-04-01`,
 }
 
 // ============================================================================
@@ -33,11 +33,11 @@ enum Versions {
 // AgentDefinitionPlatform: Use for the Platform deployment model where the client
 // owns and manages agent configuration. Definition fields are writable.
 // Template params control optional definition fields:
-//   HasModelDeploymentRef: include a modelDeploymentRef property
 //   HasInstructions: include an instructions property
+//   HasModelDeploymentRef (Platform only): include a modelDeploymentRef property
 
 // Appliance definition: read-only fields managed by the service
-model ContosoApplianceDefinition is AgentDefinitionAppliance<true, true>;
+model ContosoApplianceDefinition is AgentDefinitionAppliance<true>;
 
 // Platform definition: writable fields managed by the client
 model ContosoPlatformDefinition is AgentDefinitionPlatform<true, true>;

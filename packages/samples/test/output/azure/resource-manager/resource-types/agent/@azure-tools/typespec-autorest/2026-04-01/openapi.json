@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "ContosoAgentProviderClient",
-    "version": "2024-06-01",
+    "version": "2026-04-01",
     "description": "Contoso Agent Resource Provider management API.",
     "x-typespec-generated": [
       {
@@ -2285,7 +2285,7 @@
     },
     "ContosoApplianceAgentProperties": {
       "type": "object",
-      "description": "Appliance deployment model of AgentProperties.\nAll properties are read-only (the appliance owns and reports state), except the `definition`\ncontainer itself: it stays writable so the client can send the fields the agent definition\nmarks as writable, such as `modelDeploymentRef`. Every service-owned field inside the\ndefinition remains read-only.",
+      "description": "Appliance deployment model of AgentProperties.\nAll properties are read-only (the appliance owns and reports state).",
       "properties": {
         "baseTypes": {
           "type": "array",
@@ -2307,7 +2307,8 @@
         },
         "definition": {
           "$ref": "#/definitions/ContosoApplianceDefinition",
-          "description": "Inline agent definition. The container is writable so the client can set the definition fields that are not service-owned."
+          "description": "Inline agent definition.",
+          "readOnly": true
         },
         "tools": {
           "type": "array",
@@ -2345,7 +2346,7 @@
     },
     "ContosoApplianceDefinition": {
       "type": "object",
-      "description": "Appliance deployment model of AgentDefinition.\nProperties controlled by `@baseTypeOptional` are invisible when the corresponding\ntemplate parameter is false. When present, `instructions` is read-only while\n`modelDeploymentRef` stays writable so the client can point the agent at a model deployment.",
+      "description": "Appliance deployment model of AgentDefinition.\nProperties controlled by `@baseTypeOptional` are invisible when the corresponding\ntemplate parameter is false, or read-only when present. The appliance owns the whole\nagent definition, so there is no `modelDeploymentRef` property in this deployment model.",
       "properties": {
         "model": {
           "type": "string",
@@ -2356,10 +2357,6 @@
           "type": "string",
           "description": "System prompt / behavioral instructions for the agent.",
           "readOnly": true
-        },
-        "modelDeploymentRef": {
-          "type": "string",
-          "description": "Optional RP-specific reference to an underlying model deployment. Writable in both deployment models."
         }
       },
       "required": [
