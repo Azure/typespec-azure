@@ -474,7 +474,36 @@ function generateServerTransportMethods(
         if (!method.returns.result || method.returns.result.kind === "headAsBooleanResult") {
           content += `${indent.get()}resp, err := server.NewResponse(respContent, req, nil)\n`;
         } else if (method.returns.result.kind === "anyResult") {
-          content += `${indent.get()}resp, err := server.MarshalResponseAs${method.returns.result.format}(respContent, server.GetResponse(respr).${getResultFieldName(method.returns.result)}, req)\n`;
+          let responseField = `server.GetResponse(respr).${getResultFieldName(method.returns.result)}`;
+          if (method.returns.result.format === "XML") {
+            const rootNames = new Map<string, Array<string>>();
+            for (const [statusCode, resultType] of Object.entries(
+              method.returns.result.httpStatusCodeType,
+            )) {
+              if (
+                (resultType.kind === "model" || resultType.kind === "polymorphicModel") &&
+                resultType.xml?.name
+              ) {
+                const statusCodes = rootNames.get(resultType.xml.name) ?? [];
+                statusCodes.push(statusCode);
+                rootNames.set(resultType.xml.name, statusCodes);
+              }
+            }
+            if (rootNames.size > 0) {
+              requiredHelpers.xmlRoot = true;
+              content += `${indent.get()}responseBody := ${responseField}\n`;
+              content += `${indent.get()}switch respContent.HTTPStatus {\n`;
+              indent.push();
+              for (const [rootName, statusCodes] of rootNames) {
+                content += `${indent.get()}case ${statusCodes.join(", ")}:\n`;
+                content += `${indent.push().get()}responseBody = xmlRoot{value: responseBody, name: "${rootName}"}\n`;
+                indent.pop();
+              }
+              content += `${indent.pop().get()}}\n`;
+              responseField = "responseBody";
+            }
+          }
+          content += `${indent.get()}resp, err := server.MarshalResponseAs${method.returns.result.format}(respContent, ${responseField}, req)\n`;
         } else if (method.returns.result.kind === "binaryResult") {
           content += `${indent.get()}resp, err := server.NewResponse(respContent, req, &server.ResponseOptions{\n`;
           indent.push();
@@ -543,7 +572,15 @@ function generateServerTransportMethods(
           method.returns.result.kind === "polymorphicResult"
         ) {
           const respField = `.${getResultFieldName(method.returns.result)}`;
-          const responseField = `server.GetResponse(respr)${respField}`;
+          let responseField = `server.GetResponse(respr)${respField}`;
+          if (
+            method.returns.result.kind === "modelResult" &&
+            method.returns.result.format === "XML" &&
+            method.returns.result.modelType.xml?.name
+          ) {
+            requiredHelpers.xmlRoot = true;
+            responseField = `xmlRoot{value: ${responseField}, name: "${method.returns.result.modelType.xml.name}"}`;
+          }
           content += `${indent.get()}resp, err := server.MarshalResponseAs${method.returns.result.format}(respContent, ${responseField}, req)\n`;
         }
 

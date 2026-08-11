@@ -1052,15 +1052,11 @@ function generateXMLMarshaller(
   imports: ImportManager,
   indent: helpers.Indentation,
 ): void {
-  // only needed for types with time.Time, maps, or where the XML name doesn't match the type name
+  // only needed for fields that require custom XML serialization or to preserve
+  // the existing xml.Marshaler implementation for models with custom XML names
   const receiver = modelDef.receiverName();
   const desc = `MarshalXML implements the xml.Marshaller interface for type ${modelDef.Model.name}.`;
   let text = `func (${receiver} ${modelDef.Model.name}) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {\n`;
-  if (modelDef.Model.xml?.name) {
-    text += `${indent.get()}if start.Name.Local == "${modelDef.Model.name}" {\n`;
-    text += `${indent.push().get()}start.Name.Local = "${modelDef.Model.xml.name}"\n`;
-    text += `${indent.pop().get()}}\n`;
-  }
   text += generateAliasType(modelDef.Model, receiver, true, imports, indent);
   for (const field of modelDef.Model.fields) {
     if (field.type.kind === "slice") {

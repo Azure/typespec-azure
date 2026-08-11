@@ -19,3 +19,4 @@ export { generatePolymorphicHelpers } from "./polymorphics.js";
 export { generateResponses } from "./responses.js";
 export { generateVersionInfo } from "./version.js";
 export { generateXMLAdditionalPropsHelpers } from "./xml-additional-props.js";
+export { generateXMLRootHelper } from "./xml-root.js";
