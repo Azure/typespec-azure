@@ -513,11 +513,11 @@ function generateJSONMarshallerBody(
         // this will enable support for custom types that aren't (yet) described in the swagger.
         marshaller += `${indent.get()}objectMap["${field.serializedName}"] = ${receiver}.${field.name}\n`;
       }
-    } else if (field.type.kind === "slice" && field.annotations.arrayEncoding) {
+    } else if (field.type.kind === "sliceArray") {
       imports.add("strings");
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
       const source = `${receiver}.${field.name}`;
-      const delimiter = getArrayEncodingDelimiter(field.annotations.arrayEncoding);
+      const delimiter = getSliceArrayDelimiter(field.type.delimiter);
       marshaller += `${indent.get()}if azcore.IsNullValue(${source}) {\n`;
       marshaller += `${indent.push().get()}objectMap["${field.serializedName}"] = nil\n`;
       marshaller += `${indent.pop().get()}} else if ${source} != nil {\n`;
@@ -758,9 +758,9 @@ function generateJSONUnmarshallerBody(
       if (hasDiscriminatorInterface(field.type)) {
         unmarshalBody += generateDiscriminatorUnmarshaller(modelDef.Model, field, receiver, indent);
         needsErrCheck = true;
-      } else if (field.type.kind === "slice" && field.annotations.arrayEncoding) {
+      } else if (field.type.kind === "sliceArray") {
         imports.add("strings");
-        const delimiter = getArrayEncodingDelimiter(field.annotations.arrayEncoding);
+        const delimiter = getSliceArrayDelimiter(field.type.delimiter);
         const elementTypeName = go.getTypeDeclaration(field.type.elementType, modelDef.Model.pkg);
         const sliceTypeName = go.getTypeDeclaration(field.type, modelDef.Model.pkg);
         unmarshalBody += `${indent.get()}if val != nil && string(val) != "null" {\n`;
@@ -916,15 +916,15 @@ function generateJSONUnmarshallerBody(
   return unmarshalBody;
 }
 
-function getArrayEncodingDelimiter(encoding: go.ArrayEncoding): string {
-  switch (encoding) {
-    case "commaDelimited":
+function getSliceArrayDelimiter(delimiter: go.SliceArrayDelimiter): string {
+  switch (delimiter) {
+    case "comma":
       return ",";
-    case "spaceDelimited":
+    case "space":
       return " ";
-    case "pipeDelimited":
+    case "pipe":
       return "|";
-    case "newlineDelimited":
+    case "newline":
       return "\\n";
   }
 }

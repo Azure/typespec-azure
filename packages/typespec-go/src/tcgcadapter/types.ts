@@ -828,7 +828,12 @@ export class TypeAdapter {
         type.elementType.kind === "string" ||
         (type.elementType.kind === "constant" && type.elementType.type === "string")
       ) {
-        annotations.arrayEncoding = prop.encode;
+        type = new go.SliceArray(
+          type.elementType,
+          type.elementTypeByValue,
+          getSliceArrayDelimiter(prop.encode),
+        );
+        field.type = type;
       } else {
         this.ctx.program.reportDiagnostic({
           code: "UnsupportedArrayEncoding",
@@ -1096,6 +1101,21 @@ function getPrimitiveType(
         `unhandled tcgc.SdkBuiltInKinds: ${type.kind}`,
         type.__raw?.node,
       );
+  }
+}
+
+function getSliceArrayDelimiter(encoding: string): go.SliceArrayDelimiter {
+  switch (encoding) {
+    case "commaDelimited":
+      return "comma";
+    case "spaceDelimited":
+      return "space";
+    case "pipeDelimited":
+      return "pipe";
+    case "newlineDelimited":
+      return "newline";
+    default:
+      throw new AdapterError("UnsupportedTsp", `unsupported array encoding ${encoding}`);
   }
 }
 

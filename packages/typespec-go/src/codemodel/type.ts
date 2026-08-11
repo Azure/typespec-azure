@@ -43,6 +43,7 @@ export type WireType =
   | ReadSeekCloser
   | Scalar
   | Slice
+  | SliceArray
   | String
   | Time;
 
@@ -237,14 +238,7 @@ export interface ModelFieldAnnotations {
 
   /** unmarshal an empty string as nil. the default is false */
   unmarshalEmptyStringAsNil: boolean;
-
-  /** delimiter encoding used to serialize a string-like array as one string */
-  arrayEncoding?: ArrayEncoding;
 }
-
-/** supported delimiter encodings for model array properties */
-export type ArrayEncoding =
-  "commaDelimited" | "spaceDelimited" | "pipeDelimited" | "newlineDelimited";
 
 /** a struct that participates in serialization over the wire */
 export interface Model extends ModelBase {
@@ -326,6 +320,23 @@ export interface Slice {
   /** indicates if the slice's element type is pointer-to-type or not */
   elementTypeByValue: boolean;
 }
+
+/** specialized slice type for arrays represented as delimited strings */
+export interface SliceArray {
+  kind: "sliceArray";
+
+  /** the element type for this slice */
+  elementType: SliceElementType;
+
+  /** indicates if the slice's element type is pointer-to-type or not */
+  elementTypeByValue: boolean;
+
+  /** the delimiter used to separate elements */
+  delimiter: SliceArrayDelimiter;
+}
+
+/** the set of slice array delimiters */
+export type SliceArrayDelimiter = "comma" | "space" | "pipe" | "newline";
 
 /** the set of slice element types */
 export type SliceElementType = WireType;
@@ -500,6 +511,7 @@ export function getTypeDeclaration(type: Client | Type, scope: PackageType): str
     case "scalar":
       return type.type;
     case "slice":
+    case "sliceArray":
       return (
         `[]${type.elementTypeByValue ? "" : "*"}` + getTypeDeclaration(type.elementType, scope)
       );
@@ -798,6 +810,19 @@ export class Slice implements Slice {
     this.kind = "slice";
     this.elementType = elementType;
     this.elementTypeByValue = elementTypeByValue;
+  }
+}
+
+export class SliceArray implements SliceArray {
+  constructor(
+    elementType: SliceElementType,
+    elementTypeByValue: boolean,
+    delimiter: SliceArrayDelimiter,
+  ) {
+    this.kind = "sliceArray";
+    this.elementType = elementType;
+    this.elementTypeByValue = elementTypeByValue;
+    this.delimiter = delimiter;
   }
 }
 
