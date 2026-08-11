@@ -124,3 +124,18 @@ The library provides an experimental **Agent** base type in `lib/base-types/agen
 - How-to guide added: `website/src/content/docs/docs/howtos/ARM/agent-base-type.mdx`.
 - The ARM howtos sidebar is auto-generated from the directory (`current-sidebar.ts` → `autogenerate` on `howtos`), so new how-to files need no manual sidebar registration.
 - Reference docs (`reference/*.md`) for these lib additions were already regenerated in-commit; no `regen-docs` diff was needed for this batch.
+
+## Relationship Base Type (Experimental)
+
+The library provides an experimental **Relationship** base type in `lib/base-types/relationship.tsp` (namespace `Azure.ResourceManager.BaseTypes.Relationships`). Key facts:
+
+- `Relationship<Properties = RelationshipProperties>` is an `ExtensionResource` template that applies `@azureBaseType(#{ baseType: BaseType.Relationship, version: "2026-04-01" })` automatically. Like other base types, applying it in a user namespace emits `basetypes-experimental`, so specs must `#suppress`.
+- `RelationshipProperties<ProvisioningState extends string = ResourceProvisioningState>` supplies the required fields `sourceId`, `sourceTenant`, `targetId`, `targetTenant`, and read-only `provisioningState` (plus read-only `baseTypes`). Custom async flows override `ProvisioningState` with an `@Azure.Core.lroStatus` union.
+- Relationships are extension resources, so operations use the `Extension.*` templates over a scope: `Extension.Read`, `Extension.CreateOrReplaceAsync`, `Extension.CustomPatchAsync`, `Extension.DeleteWithoutOkAsync`, `Extension.ListByTarget`, routed via `Extension.ScopeParameter`.
+- New linting rule `use-relationship-required-properties` (registered in `src/linter.ts`): fires when a `@azureBaseType` "Relationship" resource is not an extension resource or is missing any of `sourceId, sourceTenant, targetId, targetTenant, provisioningState`. Its website rule doc was initially generated as a stub (description only); it should match peer rule-doc style (Id block, description, `## Impact`, ❌/✅ examples, `## Suppression`).
+- Canonical sample: `packages/samples/specs/resource-manager/resource-types/relationship/main.tsp` (uses `KeyName = "relationshipName"`, `SegmentName = "dependencyOf"`).
+- How-to guide added: `website/src/content/docs/docs/howtos/ARM/relationship-base-type.mdx` (mirrors the agent guide).
+
+## PR Feedback (PR #4971)
+
+Human corrections on the prior doc-update PR were in the `@azure-tools/azure-http-specs` package (adding an e2e scenario for the `@clientApiVersions` decorator) — unrelated to ARM doc content. No ARM-specific doc lesson to record from that feedback.
