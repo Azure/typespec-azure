@@ -19,6 +19,9 @@ This rule is now covered by
 fixture's `arm-resource-operation` suppression is ambient; the extra query
 parameter is still the operative authorable violation.
 
+See [migration.md](./migration.md) for the full-corpus equivalence evidence and
+the explanation of the broader TypeSpec rule's expected TypeSpec-only projects.
+
 | ID                  | Violation | Description                                |
 | ------------------- | --------- | ------------------------------------------ |
 | `extra-query-param` | true      | GET has extra query parameter              |
