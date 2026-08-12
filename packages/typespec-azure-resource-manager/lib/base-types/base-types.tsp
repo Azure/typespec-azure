@@ -44,7 +44,7 @@ model BaseTypeInfo {
  *
  * ```typespec
  * // Agent definition and properties using the Appliance deployment model
- * model ContosoApplianceDefinition is AgentDefinitionAppliance<true, true>;
+ * model ContosoApplianceDefinition is AgentDefinitionAppliance<true>;
  * model ContosoApplianceProperties is AgentPropertiesAppliance<ContosoApplianceDefinition> {
  *   ...DefaultProvisioningStateProperty;
  * }

@@ -182,6 +182,7 @@ export function sortClientParameters(
 // returns the parameters for the internal request creator method.
 // e.g. "i int, s string"
 export function getCreateRequestParametersSig(method: go.MethodType | go.NextPageMethod): string {
+  // NOTE: keep in sync with getCreateRequestParameters
   const methodParams = getMethodParameters(method);
   const params = new Array<string>();
   params.push("ctx context.Context");
@@ -198,6 +199,13 @@ export function getCreateRequestParametersSig(method: go.MethodType | go.NextPag
     }
     params.push(`${paramName} ${formatParameterTypeName(method.receiver.type.pkg, methodParam)}`);
   }
+  if (
+    (method.kind === "lroPageableMethod" || method.kind === "pageableMethod") &&
+    method.strategy?.kind === "nextLink"
+  ) {
+    // inject the nextLink param right before the options param
+    params.splice(-1, 0, "nextLink string");
+  }
   return params.join(", ");
 }
 
@@ -209,7 +217,11 @@ export function getCreateRequestParametersSig(method: go.MethodType | go.NextPag
  * @param optionsParam optional custom param name for the method options param
  * @returns the text for the parameters
  */
-export function getCreateRequestParameters(method: go.MethodType, optionsParam?: string): string {
+export function getCreateRequestParameters(
+  method: go.MethodType,
+  nextLinkParam?: string,
+  optionsParam?: string,
+): string {
   // NOTE: keep in sync with getCreateRequestParametersSig
   const methodParams = getMethodParameters(method);
   const params = new Array<string>();
@@ -222,6 +234,10 @@ export function getCreateRequestParameters(method: go.MethodType, optionsParam?:
     } else {
       params.push(methodParam.name);
     }
+  }
+  if (nextLinkParam) {
+    // inject the nextLink param right before the options param
+    params.splice(-1, 0, nextLinkParam);
   }
   return params.join(", ");
 }
@@ -426,7 +442,11 @@ export function getDelimiterForCollectionFormat(cf: go.CollectionFormat): string
   }
 }
 
-export function getMediaFormat(type: go.WireType, mediaType: "JSON" | "XML", param: string): string {
+export function getMediaFormat(
+  type: go.WireType,
+  mediaType: "JSON" | "XML",
+  param: string,
+): string {
   let marshaller: "JSON" | "XML" | "ByteArray" = mediaType;
   let format = "";
   if (type.kind === "encodedBytes") {
