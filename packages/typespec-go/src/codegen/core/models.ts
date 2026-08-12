@@ -929,7 +929,7 @@ function getSliceArrayDelimiter(delimiter: go.SliceArrayDelimiter): string {
   }
 }
 
-function getStringArrayElementExpression(type: go.SliceElementType, value: string): string {
+function getStringArrayElementExpression(type: go.SliceArrayElementType, value: string): string {
   if (type.kind === "string") {
     return value;
   }

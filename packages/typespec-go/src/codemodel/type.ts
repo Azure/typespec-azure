@@ -326,7 +326,7 @@ export interface SliceArray {
   kind: "sliceArray";
 
   /** the element type for this slice */
-  elementType: SliceElementType;
+  elementType: SliceArrayElementType;
 
   /** indicates if the slice's element type is pointer-to-type or not */
   elementTypeByValue: boolean;
@@ -337,6 +337,9 @@ export interface SliceArray {
 
 /** the set of slice array delimiters */
 export type SliceArrayDelimiter = "comma" | "space" | "pipe" | "newline";
+
+/** the supported element types for arrays represented as delimited strings */
+export type SliceArrayElementType = String | Constant;
 
 /** the set of slice element types */
 export type SliceElementType = WireType;
@@ -815,7 +818,7 @@ export class Slice implements Slice {
 
 export class SliceArray implements SliceArray {
   constructor(
-    elementType: SliceElementType,
+    elementType: SliceArrayElementType,
     elementTypeByValue: boolean,
     delimiter: SliceArrayDelimiter,
   ) {
