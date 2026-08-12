@@ -77,50 +77,10 @@ import (
 // MarshalJSON implements the json.Marshaller interface for type Widget.
 func (w Widget) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]any)
-	if azcore.IsNullValue(w.Colors) {
-		objectMap["colors"] = nil
-	} else if w.Colors != nil {
-		encodedValue := make([]string, len(w.Colors))
-		for i := range w.Colors {
-			if w.Colors[i] != nil {
-				encodedValue[i] = string(*w.Colors[i])
-			}
-		}
-		objectMap["colors"] = strings.Join(encodedValue, " ")
-	}
-	if azcore.IsNullValue(w.ExtensibleColors) {
-		objectMap["extensibleColors"] = nil
-	} else if w.ExtensibleColors != nil {
-		encodedValue := make([]string, len(w.ExtensibleColors))
-		for i := range w.ExtensibleColors {
-			if w.ExtensibleColors[i] != nil {
-				encodedValue[i] = string(*w.ExtensibleColors[i])
-			}
-		}
-		objectMap["extensibleColors"] = strings.Join(encodedValue, "\n")
-	}
-	if azcore.IsNullValue(w.Names) {
-		objectMap["names"] = nil
-	} else if w.Names != nil {
-		encodedValue := make([]string, len(w.Names))
-		for i := range w.Names {
-			if w.Names[i] != nil {
-				encodedValue[i] = *w.Names[i]
-			}
-		}
-		objectMap["names"] = strings.Join(encodedValue, ",")
-	}
-	if azcore.IsNullValue(w.OptionalNames) {
-		objectMap["optionalNames"] = nil
-	} else if w.OptionalNames != nil {
-		encodedValue := make([]string, len(w.OptionalNames))
-		for i := range w.OptionalNames {
-			if w.OptionalNames[i] != nil {
-				encodedValue[i] = *w.OptionalNames[i]
-			}
-		}
-		objectMap["optionalNames"] = strings.Join(encodedValue, "|")
-	}
+	populateStringArray(objectMap, "colors", w.Colors, " ")
+	populateStringArray(objectMap, "extensibleColors", w.ExtensibleColors, "\n")
+	populateStringArray(objectMap, "names", w.Names, ",")
+	populateStringArray(objectMap, "optionalNames", w.OptionalNames, "|")
 	return json.Marshal(objectMap)
 }
 
@@ -134,76 +94,16 @@ func (w *Widget) UnmarshalJSON(data []byte) error {
 		var err error
 		switch key {
 		case "colors":
-			if val != nil && string(val) != "null" {
-				var encodedValue string
-				err = unpopulate(val, "Colors", &encodedValue)
-				if err == nil {
-					if encodedValue == "" {
-						w.Colors = []*Color{}
-					} else {
-						values := strings.Split(encodedValue, " ")
-						w.Colors = make([]*Color, len(values))
-						for i := range values {
-							value := Color(values[i])
-							w.Colors[i] = &value
-						}
-					}
-				}
-			}
+			err = unpopulateStringArray(val, "Colors", &w.Colors, " ")
 			delete(rawMsg, key)
 		case "extensibleColors":
-			if val != nil && string(val) != "null" {
-				var encodedValue string
-				err = unpopulate(val, "ExtensibleColors", &encodedValue)
-				if err == nil {
-					if encodedValue == "" {
-						w.ExtensibleColors = []*ExtensibleColor{}
-					} else {
-						values := strings.Split(encodedValue, "\n")
-						w.ExtensibleColors = make([]*ExtensibleColor, len(values))
-						for i := range values {
-							value := ExtensibleColor(values[i])
-							w.ExtensibleColors[i] = &value
-						}
-					}
-				}
-			}
+			err = unpopulateStringArray(val, "ExtensibleColors", &w.ExtensibleColors, "\n")
 			delete(rawMsg, key)
 		case "names":
-			if val != nil && string(val) != "null" {
-				var encodedValue string
-				err = unpopulate(val, "Names", &encodedValue)
-				if err == nil {
-					if encodedValue == "" {
-						w.Names = []*string{}
-					} else {
-						values := strings.Split(encodedValue, ",")
-						w.Names = make([]*string, len(values))
-						for i := range values {
-							value := values[i]
-							w.Names[i] = &value
-						}
-					}
-				}
-			}
+			err = unpopulateStringArray(val, "Names", &w.Names, ",")
 			delete(rawMsg, key)
 		case "optionalNames":
-			if val != nil && string(val) != "null" {
-				var encodedValue string
-				err = unpopulate(val, "OptionalNames", &encodedValue)
-				if err == nil {
-					if encodedValue == "" {
-						w.OptionalNames = []*string{}
-					} else {
-						values := strings.Split(encodedValue, "|")
-						w.OptionalNames = make([]*string, len(values))
-						for i := range values {
-							value := values[i]
-							w.OptionalNames[i] = &value
-						}
-					}
-				}
-			}
+			err = unpopulateStringArray(val, "OptionalNames", &w.OptionalNames, "|")
 			delete(rawMsg, key)
 		}
 		if err != nil {
@@ -213,13 +113,36 @@ func (w *Widget) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func unpopulate(data json.RawMessage, fn string, v any) error {
+func unpopulateStringArray[T ~string](data json.RawMessage, fn string, v *[]T, d string) error {
 	if data == nil || string(data) == "null" {
 		return nil
 	}
-	if err := json.Unmarshal(data, v); err != nil {
+	var encodedValue string
+	if err := json.Unmarshal(data, &encodedValue); err != nil {
 		return fmt.Errorf("struct field %s: %s", fn, err.Error())
 	}
+	if encodedValue == "" {
+		*v = []T{}
+		return nil
+	}
+	values := strings.Split(encodedValue, d)
+	result := make([]T, len(values))
+	for i := range values {
+		result[i] = T(values[i])
+	}
+	*v = result
 	return nil
+}
+
+func populateStringArray[T ~string](m map[string]any, k string, v []T, d string) {
+	if azcore.IsNullValue(v) {
+		m[k] = nil
+	} else if v != nil {
+		encodedValue := make([]string, len(v))
+		for i := range v {
+			encodedValue[i] = string(v[i])
+		}
+		m[k] = strings.Join(encodedValue, d)
+	}
 }
 ```
