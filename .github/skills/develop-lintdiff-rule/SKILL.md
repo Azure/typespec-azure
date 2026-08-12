@@ -1,24 +1,75 @@
 ---
 name: develop-lintdiff-rule
-description: Develop or correct one migrated Swagger LintDiff rule in an isolated worktree, validate it with the existing full TypeSpec corpus runner, and prepare a PR containing only the TypeSpec rule and directly related tests.
-argument-hint: "[Swagger validator rule ID]"
+description: Prepare isolated worktrees and interactive worker commands for one or more migrated Swagger LintDiff rules, or develop one rule in worker mode.
+argument-hint: "[rule ID ...] | --worker [rule ID] --typespec-worktree [path] --specs-worktree [path] --target-branch [branch]"
 user-invocable: true
 ---
 
-# Develop one migrated LintDiff rule
+# Develop migrated LintDiff rules
 
-Use this skill to implement or correct one migrated Swagger validator rule in
+Use this skill to implement or correct migrated Swagger validator rules in
 `packages/typespec-lintdiff`.
 
-The normal invocation names the Swagger validator rule:
+The invocation names one or more Swagger validator rules:
 
 ```text
 /develop-lintdiff-rule LatestVersionOfCommonTypesMustBeUsed
+/develop-lintdiff-rule ParametersInPointGet PatchBodyParametersSchema
 ```
+
+To continue one dispatched rule interactively in another session, use worker
+mode with the paths reported by the dispatcher:
+
+```text
+/develop-lintdiff-rule --worker ParametersInPointGet --typespec-worktree C:\dev\worktrees\lintdiff-parameters-in-point-get --specs-worktree C:\dev\worktrees\azure-rest-api-specs-lintdiff-parameters-in-point-get --target-branch feature/lintdiff-migration-new
+```
+
+## Modes
+
+### Dispatcher mode
+
+An invocation without `--worker` is preparation-only, whether it contains one
+or multiple rule IDs. The current session creates and verifies isolated
+branches and worktrees, then reports the commands needed to open each rule in
+a new VS Code window and start its interactive worker. It must not launch a
+subagent, investigate the rule, install dependencies, prepare the comparison
+harness, edit, validate, commit, or create a PR.
+
+For every prepared rule, return both:
+
+```powershell
+code -n <typespec-azure-worktree>
+```
+
+```text
+/develop-lintdiff-rule --worker <rule-id> --typespec-worktree <typespec-azure-worktree> --specs-worktree <azure-rest-api-specs-worktree> --target-branch <target-branch>
+```
+
+After opening the new VS Code window, the user starts a new top-level chat and
+runs the reported worker command. Worker mode resumes from the existing branch
+and worktrees without recreating them.
+
+### Worker mode
+
+An invocation with `--worker` handles exactly one rule interactively. Verify
+that the supplied typespec-azure worktree is on the rule branch, the supplied
+specs worktree is at the pinned `specsCommit`, and both are clean except for
+known in-progress changes for that rule. Skip branch and worktree creation,
+prepare dependencies and the fixture comparison harness as described below,
+then execute the Development workflow. Never accept multiple rule IDs in
+worker mode and never delegate the complete workflow to a development
+subagent.
 
 ## Orchestration
 
-The main agent must isolate each rule development before delegating it.
+The dispatcher must isolate each requested rule before handing it back to the
+user for interactive development.
+
+When the user requests multiple rules, treat them as independent development
+units. For each rule, create a distinct rule branch, typespec-azure worktree,
+and azure-rest-api-specs worktree. Create and verify the worktrees serially to
+avoid competing large checkouts. The user may then open the worktrees in
+separate VS Code windows and run independent top-level worker sessions.
 
 1. Treat the user-supplied branch as the target branch, not as the
    rule-development branch.
@@ -31,23 +82,40 @@ The main agent must isolate each rule development before delegating it.
 4. Read the pinned `specsCommit` from
    `packages/typespec-lintdiff/specs/_meta.json`.
 5. Create a separate azure-rest-api-specs worktree at that commit. Concurrent
-   rule-development subagents must not share a writable specs checkout because
+   rule-development workers must not share a writable specs checkout because
    the existing runner links packages and may change the checked-out revision.
-6. Ensure the specs worktree is clean and has its existing dependencies
-   installed.
-7. Prepare the fixture comparison harness before delegating validation. Either:
+6. Verify both worktrees exist at the expected branch or commit and are clean.
+7. Report the rule ID, target branch, rule branch, both absolute worktree paths,
+   the `code -n` command, and the exact worker-mode invocation.
+
+Do not install dependencies, run `compare:setup`, or resolve package links in
+dispatcher mode. Those operations belong to the interactive worker and may
+modify its isolated worktrees.
+
+## Worker setup
+
+Before starting the Development workflow, the top-level worker must prepare
+its supplied worktrees:
+
+1. Ensure the specs worktree is clean and install its existing dependencies.
+2. Prepare the fixture comparison harness. Either:
    - run `pnpm --dir packages/typespec-lintdiff compare:setup -- --specs-repo
      <isolated-specs-worktree>`, or
    - set and verify `LINTDIFF_VALIDATOR_ROOT` and `LINTDIFF_COMMON_TYPES`
      against existing local checkouts.
    Do not assume a fresh rule worktree already contains
    `test/azure-openapi-validator` or `test/common-types`.
-8. Delegate the investigation, implementation, and validation to one subagent.
-   Provide the rule ID and both absolute worktree paths.
+3. Verify that the specs worktree's local
+   `node_modules/tsp-lintdiff-local-linter` resolves directly to the supplied
+   typespec-azure worktree. `compare:setup` uses a shared global npm link, so a
+   setup in another worker can redirect this specs worktree to the wrong rule
+   build. Repair any collision with a direct per-worktree link before running
+   validation, and do not run `compare:setup` concurrently with another
+   worker.
 
 ## Development workflow
 
-The delegated subagent works only in the supplied typespec-azure worktree.
+The top-level worker works only in the supplied typespec-azure worktree.
 
 ### 1. Establish evidence
 
@@ -166,9 +234,9 @@ After the review:
 
 ### 8. Commit, push, and create the PR
 
-Finishing validation is not the end of this skill. The main agent must complete
-the GitHub handoff unless the user explicitly asks to stop before creating a
-PR.
+Finishing validation is not the end of this skill. The top-level worker must
+complete the GitHub handoff unless the user explicitly asks to stop before
+creating a PR.
 
 1. Confirm the current branch is the dedicated rule-specific branch and is
    based directly on the user-supplied target branch.
@@ -200,12 +268,21 @@ PR.
 7. Prefer concrete examples, project names, and before/after evidence. Avoid a
    generic bullet such as “improve parity” without explaining the actual
    missing semantic behavior.
-9. Return the PR URL as the final workflow result.
+8. Return the PR URL as the rule's final workflow result.
 
 ## Guardrails
 
+- In dispatcher mode, the current session only creates and verifies branches
+   and worktrees and reports handoff commands. It must not perform setup or rule
+   development and must not launch development subagents.
 - Never develop multiple rule PRs in one worktree.
-- Never share a writable specs worktree between concurrent subagents.
+- Maintain a one-to-one mapping between each rule, rule branch, typespec-azure
+   worktree, azure-rest-api-specs worktree, and top-level worker session.
+- Never share a writable specs worktree between concurrent workers.
+- Never allow two specs worktrees to resolve
+   `node_modules/tsp-lintdiff-local-linter` to the same rule worktree.
+- Worker mode must reuse and verify the supplied worktrees; it must not create
+   replacements or dispatch another agent to own the complete workflow.
 - Stop if either worktree has unrelated changes before the workflow starts.
 - Surface compile, projection, linking, and corpus failures explicitly.
 - Do not silently omit failed projects from the conclusion.
@@ -217,12 +294,19 @@ PR.
 
 ## Deliverable
 
-Return:
+Dispatcher mode returns only:
 
-- whether and how the TypeSpec rule changed
-- focused fixture evidence
-- full-run project overlap and one-sided project lists
-- compile failures or remaining uncertainty
-- review findings adopted and rejected, with reasons
-- the explicit rule-related files ready for the PR
-- the created PR URL
+- per-rule preparation status, target branch, rule branch, and both absolute
+   worktree paths
+- the `code -n` command and exact worker-mode invocation for every rule
+- any branch or worktree preparation failure that prevents handoff
+
+Worker mode returns:
+
+- for each rule, whether and how the TypeSpec rule changed
+- per-rule focused fixture evidence
+- per-rule full-run project overlap and one-sided project lists
+- per-rule compile failures or remaining uncertainty
+- per-rule review findings adopted and rejected, with reasons
+- the explicit rule-related files ready for each PR
+- each created PR URL
