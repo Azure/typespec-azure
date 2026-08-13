@@ -4,12 +4,12 @@
 // path resolution algorithm as AutoRest so that the behavior
 // is fully consistent (and also supports AUTOREST_PYTHON_EXE).
 //
-// Invoke it like so: "node run-python3.ts script.py"
+// Invoke it like so: "node run-python3.js script.py"
 
 import cp from "child_process";
-import { patchPythonPath } from "./system-requirements.ts";
+import { patchPythonPath } from "./system-requirements.js";
 
-async function runPython3(...args: string[]) {
+async function runPython3(...args) {
   const command = await patchPythonPath(["python", ...args], {
     version: ">=3.9",
     environmentVariable: "AUTOREST_PYTHON_EXE",
