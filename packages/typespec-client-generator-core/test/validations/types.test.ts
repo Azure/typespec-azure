@@ -1053,7 +1053,7 @@ it("allows operations with the same name for C# overloads", async () => {
     ),
   );
   const context = await createSdkContextForTester(program, {
-    emitterName: "csharp",
+    emitterName: "@typespec/http-client-csharp",
   });
   const duplicateDiags = context.diagnostics.filter(
     (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
