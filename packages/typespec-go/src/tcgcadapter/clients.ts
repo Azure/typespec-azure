@@ -1539,19 +1539,15 @@ export class ClientAdapter {
           opParam.__raw?.node,
         );
       case "header":
-        if (opParam.serializedName === "x-ms-meta") {
-          const type = this.ta.getWireType(methodParam.type, true, false);
-          if (type.kind !== "map") {
-            throw new AdapterError(
-              "InternalError",
-              `unexpected kind ${type.kind} for HeaderMapParameter ${methodParam.name}`,
-              opParam.__raw?.node,
-            );
-          }
+        const headerMapType =
+          opParam.serializedName === "x-ms-meta"
+            ? this.ta.getWireType(methodParam.type, true, false)
+            : undefined;
+        if (headerMapType?.kind === "map") {
           adaptedParam = new go.HeaderMapParameter(
             paramName,
             `${opParam.serializedName}-`,
-            type,
+            headerMapType,
             paramStyle,
             byVal,
             location,
@@ -1777,20 +1773,14 @@ export class ClientAdapter {
           }
 
           let headerResp: go.HeaderScalarResponse | go.HeaderMapResponse;
-          if (
-            httpHeader.serializedName === "x-ms-meta" ||
-            httpHeader.serializedName === "x-ms-or"
-          ) {
-            const type = this.ta.getWireType(httpHeader.type, true, false);
-            if (type.kind !== "map") {
-              throw new AdapterError(
-                "InternalError",
-                `unexpected kind ${type.kind} for HeaderMapResponse ${httpHeader.name}`,
-              );
-            }
+          const headerMapType =
+            httpHeader.serializedName === "x-ms-meta" || httpHeader.serializedName === "x-ms-or"
+              ? this.ta.getWireType(httpHeader.type, true, false)
+              : undefined;
+          if (headerMapType?.kind === "map") {
             headerResp = new go.HeaderMapResponse(
               helpers.getEffectiveName(httpHeader),
-              type,
+              headerMapType,
               `${httpHeader.serializedName}-`,
             );
           } else {
