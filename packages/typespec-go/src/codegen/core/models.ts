@@ -916,12 +916,12 @@ function generateJSONUnmarshallerBody(
         imports.add("strings");
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
         unmarshalBody += `${indent.get()}err = unpopulateFromString(val, "${field.name}", func(encodedValue string) error {\n`;
-        unmarshalBody += `${indent.push().get()}v, err := strconv.ParseBool(strings.ToLower(encodedValue))\n`;
+        unmarshalBody += `${indent.push().get()}v, parseErr := strconv.ParseBool(strings.ToLower(encodedValue))\n`;
         unmarshalBody += `${indent.get()}${helpers.buildIfBlock(indent, {
-          condition: "err == nil",
+          condition: "parseErr == nil",
           body: (indent) => `${indent.get()}${receiver}.${field.name} = to.Ptr(v)\n`,
         })}\n`;
-        unmarshalBody += `${indent.get()}return err\n`;
+        unmarshalBody += `${indent.get()}return parseErr\n`;
         unmarshalBody += `${indent.pop().get()}})\n`;
         modelDef.SerDe.needsJSONUnpopulateFromString = true;
         needsErrCheck = true;
@@ -934,9 +934,9 @@ function generateJSONUnmarshallerBody(
         imports.add("strconv");
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
         unmarshalBody += `${indent.get()}err = unpopulateFromString(val, "${field.name}", func(encodedValue string) error {\n`;
-        unmarshalBody += `${indent.push().get()}v, err := strconv.${field.type.type.startsWith("int") ? "ParseInt" : "ParseUint"}(encodedValue, 10, 0)\n`;
+        unmarshalBody += `${indent.push().get()}v, parseErr := strconv.${field.type.type.startsWith("int") ? "ParseInt" : "ParseUint"}(encodedValue, 10, 0)\n`;
         unmarshalBody += `${indent.get()}${helpers.buildIfBlock(indent, {
-          condition: "err == nil",
+          condition: "parseErr == nil",
           body: (indent) => {
             let fieldExpr = "v";
             if (
@@ -948,7 +948,7 @@ function generateJSONUnmarshallerBody(
             return `${indent.get()}${receiver}.${field.name} = to.Ptr(${fieldExpr})\n`;
           },
         })}\n`;
-        unmarshalBody += `${indent.get()}return err\n`;
+        unmarshalBody += `${indent.get()}return parseErr\n`;
         unmarshalBody += `${indent.pop().get()}})\n`;
         modelDef.SerDe.needsJSONUnpopulateFromString = true;
         needsErrCheck = true;
