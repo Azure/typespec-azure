@@ -105,13 +105,9 @@ export function createRequestHandler(
         if (
           pp.kind === "pathScalarParam" &&
           pp.isApiVersion &&
-          helpers.supportsPathAPIVersionOverride(method.receiver.type)
+          helpers.getPathAPIVersionParameter(method.receiver.type)
         ) {
-          text += `${indent.get()}apiVersion := ${paramValue}\n`;
-          text += `${indent.get()}if client.apiVersion != "" {\n`;
-          text += `${indent.push().get()}apiVersion = client.apiVersion\n`;
-          text += `${indent.pop().get()}}\n`;
-          paramValue = "apiVersion";
+          paramValue = "client.apiVersion";
         }
       } else if (pp.style === "required" || pp.location === "client") {
         // NOTE: we include client params here since they behave

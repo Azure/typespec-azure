@@ -34,6 +34,7 @@ package testmodule
 
 import (
 	"context"
+	"errors"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
@@ -72,8 +73,15 @@ func NewVersionedClientWithNoCredential(endpoint string, options *VersionedClien
 	if err != nil {
 		return nil, err
 	}
+	apiVersion := version20221201Preview
+	if options.APIVersion != "" {
+		apiVersion = options.APIVersion
+	}
+	if apiVersion == "" {
+		return nil, errors.New("parameter apiVersion cannot be empty")
+	}
 	client := &VersionedClient{
-		apiVersion: options.APIVersion,
+		apiVersion: apiVersion,
 		endpoint:   endpoint,
 		internal:   cl,
 	}
@@ -103,11 +111,7 @@ func (client *VersionedClient) WithPathAPIVersion(ctx context.Context, options *
 // withPathAPIVersionCreateRequest creates the WithPathAPIVersion request.
 func (client *VersionedClient) withPathAPIVersionCreateRequest(ctx context.Context, _ *VersionedClientWithPathAPIVersionOptions) (*policy.Request, error) {
 	urlPath := "/with-path-api-version/{apiVersion}"
-	apiVersion := version20221201Preview
-	if client.apiVersion != "" {
-		apiVersion = client.apiVersion
-	}
-	urlPath = strings.ReplaceAll(urlPath, "{apiVersion}", url.PathEscape(apiVersion))
+	urlPath = strings.ReplaceAll(urlPath, "{apiVersion}", url.PathEscape(client.apiVersion))
 	req, err := runtime.NewRequest(ctx, http.MethodHead, runtime.JoinPaths(client.endpoint, urlPath))
 	if err != nil {
 		return nil, err

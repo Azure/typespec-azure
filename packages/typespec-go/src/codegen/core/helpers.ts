@@ -87,15 +87,17 @@ export function canonicalizeHeaderName(name: string): string {
   return canonicalName;
 }
 
-export function supportsPathAPIVersionOverride(client: go.Client): boolean {
-  return (
-    client.instance?.kind === "constructable" &&
-    client.parameters.some(
-      (param) =>
-        param.kind === "pathScalarParam" &&
-        param.isApiVersion &&
-        go.isLiteralParameter(param.style),
-    )
+export function getPathAPIVersionParameter(
+  client: go.Client,
+): go.PathScalarParameter | undefined {
+  if (client.instance?.kind !== "constructable") {
+    return undefined;
+  }
+  return client.parameters.find(
+    (param): param is go.PathScalarParameter =>
+      param.kind === "pathScalarParam" &&
+      param.isApiVersion &&
+      go.isLiteralParameter(param.style),
   );
 }
 

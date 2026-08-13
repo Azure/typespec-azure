@@ -27,6 +27,7 @@ package testmodule
 
 import (
 	"context"
+	"errors"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
@@ -56,8 +57,15 @@ func NewTestClient(credential azcore.TokenCredential, options *arm.ClientOptions
 	if err != nil {
 		return nil, err
 	}
+	apiVersion := version20220101
+	if options.APIVersion != "" {
+		apiVersion = options.APIVersion
+	}
+	if apiVersion == "" {
+		return nil, errors.New("parameter apiVersion cannot be empty")
+	}
 	client := &TestClient{
-		apiVersion: options.APIVersion,
+		apiVersion: apiVersion,
 		internal:   cl,
 	}
 	return client, nil
@@ -85,11 +93,7 @@ func (client *TestClient) Get(ctx context.Context, options *TestClientGetOptions
 // getCreateRequest creates the Get request.
 func (client *TestClient) getCreateRequest(ctx context.Context, _ *TestClientGetOptions) (*policy.Request, error) {
 	urlPath := "/api-version/{apiVersion}"
-	apiVersion := version20220101
-	if client.apiVersion != "" {
-		apiVersion = client.apiVersion
-	}
-	urlPath = strings.ReplaceAll(urlPath, "{apiVersion}", url.PathEscape(apiVersion))
+	urlPath = strings.ReplaceAll(urlPath, "{apiVersion}", url.PathEscape(client.apiVersion))
 	req, err := runtime.NewRequest(ctx, http.MethodGet, runtime.JoinPaths(client.internal.Endpoint(), urlPath))
 	if err != nil {
 		return nil, err

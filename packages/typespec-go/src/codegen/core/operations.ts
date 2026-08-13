@@ -96,11 +96,11 @@ export function generateOperations(
     }
 
     const indent = new helpers.Indentation();
-    const pathAPIVersionOverride = helpers.supportsPathAPIVersionOverride(client);
+    const pathAPIVersionParam = helpers.getPathAPIVersionParameter(client);
 
     clientText += `type ${client.name} struct {\n`;
     clientText += `${indent.get()}internal *${azureARM ? "arm" : "azcore"}.Client\n`;
-    if (pathAPIVersionOverride) {
+    if (pathAPIVersionParam) {
       clientText += `${indent.get()}apiVersion string\n`;
     }
 
@@ -146,7 +146,7 @@ export function generateOperations(
       target,
       imports,
       indent,
-      pathAPIVersionOverride,
+      pathAPIVersionParam,
     );
 
     // generate client accessors and operations
@@ -238,7 +238,7 @@ function generateConstructors(
   type: go.CodeModelType,
   imports: ImportManager,
   indent: helpers.Indentation,
-  pathAPIVersionOverride: boolean,
+  pathAPIVersionParam: go.PathScalarParameter | undefined,
 ): string {
   if (client.instance?.kind !== "constructable") {
     return "";
@@ -428,7 +428,7 @@ function generateConstructors(
               // this is the ARM case
               imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/arm");
               prolog = "";
-              if (pathAPIVersionOverride) {
+              if (pathAPIVersionParam) {
                 prolog += emitDefaultOptions(go.getTypeDeclaration(clientOptions, client.pkg));
               }
               prolog += `${indent.get()}cl, err := arm.NewClient(moduleName, moduleVersion, credential, options)\n`;
@@ -477,6 +477,17 @@ function generateConstructors(
       }
     }
 
+    if (pathAPIVersionParam) {
+      imports.add("errors");
+      ctorText += `${indent.get()}apiVersion := ${helpers.formatParamValue(pathAPIVersionParam, imports, indent)}\n`;
+      ctorText += `${indent.get()}if options.APIVersion != "" {\n`;
+      ctorText += `${indent.push().get()}apiVersion = options.APIVersion\n`;
+      ctorText += `${indent.pop().get()}}\n`;
+      ctorText += `${indent.get()}if apiVersion == "" {\n`;
+      ctorText += `${indent.push().get()}return nil, errors.New("parameter apiVersion cannot be empty")\n`;
+      ctorText += `${indent.pop().get()}}\n`;
+    }
+
     // construct the supplemental path and join it to the endpoint
     if (client.instance.endpoint?.supplemental) {
       // the endpoint param is always the first ctor param
@@ -509,8 +520,8 @@ function generateConstructors(
     // as any supplemental endpoint params are ephemeral and
     // consumed during client construction.
     indent.push();
-    if (pathAPIVersionOverride) {
-      ctorText += `${indent.get()}apiVersion: options.APIVersion,\n`;
+    if (pathAPIVersionParam) {
+      ctorText += `${indent.get()}apiVersion: apiVersion,\n`;
     }
     for (const parameter of client.parameters) {
       if (go.isLiteralParameter(parameter.style)) {
