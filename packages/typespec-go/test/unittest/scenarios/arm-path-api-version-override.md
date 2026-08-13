@@ -27,7 +27,6 @@ package testmodule
 
 import (
 	"context"
-	"errors"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
@@ -50,9 +49,6 @@ type TestClient struct {
 //   - credential - used to authorize requests. Usually a credential from azidentity.
 //   - options - Contains optional client configuration. Pass nil to accept the default values.
 func NewTestClient(credential azcore.TokenCredential, options *arm.ClientOptions) (*TestClient, error) {
-	if options == nil {
-		options = &arm.ClientOptions{}
-	}
 	cl, err := arm.NewClient(moduleName, moduleVersion, credential, options)
 	if err != nil {
 		return nil, err
@@ -60,9 +56,6 @@ func NewTestClient(credential azcore.TokenCredential, options *arm.ClientOptions
 	apiVersion := version20220101
 	if options.APIVersion != "" {
 		apiVersion = options.APIVersion
-	}
-	if apiVersion == "" {
-		return nil, errors.New("parameter apiVersion cannot be empty")
 	}
 	client := &TestClient{
 		apiVersion: apiVersion,

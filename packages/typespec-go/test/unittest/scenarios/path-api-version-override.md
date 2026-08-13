@@ -34,7 +34,6 @@ package testmodule
 
 import (
 	"context"
-	"errors"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
@@ -76,9 +75,6 @@ func NewVersionedClientWithNoCredential(endpoint string, options *VersionedClien
 	apiVersion := version20221201Preview
 	if options.APIVersion != "" {
 		apiVersion = options.APIVersion
-	}
-	if apiVersion == "" {
-		return nil, errors.New("parameter apiVersion cannot be empty")
 	}
 	client := &VersionedClient{
 		apiVersion: apiVersion,

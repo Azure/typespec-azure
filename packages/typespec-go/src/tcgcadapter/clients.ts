@@ -1257,10 +1257,12 @@ export class ClientAdapter {
             return v.name === adaptedParam.name;
           })
         ) {
+          // we allow path scalar API version param for ARM as it's part of client options already
           if (
             this.ta.codeModel.type === "azure-arm" &&
             adaptedParam.style !== "literal" &&
-            adaptedParam.style !== "required"
+            adaptedParam.style !== "required" &&
+            (adaptedParam.kind !== "pathScalarParam" || !adaptedParam.isApiVersion)
           ) {
             throw new AdapterError(
               "UnsupportedTsp",
@@ -1362,7 +1364,7 @@ export class ClientAdapter {
             opParam.serializedName,
             true,
             paramType,
-            paramStyle,
+            paramType.kind === "literal" ? new go.ClientSideDefault(paramType) : paramStyle,
             true,
             paramLoc,
           );
