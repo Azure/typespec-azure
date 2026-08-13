@@ -632,6 +632,22 @@ function generateJSONMarshallerBody(
         marshaller += `${indent.push().get()}${receiver}.${field.name} = to.Ptr(${helpers.formatLiteralValue(field.defaultValue, true)})\n`;
         marshaller += `${indent.pop().get()}}\n`;
       }
+      if (
+        field.type.kind === "scalar" &&
+        field.type.type === "bool" &&
+        field.type.encodeAsString
+      ) {
+        imports.add("strconv");
+        imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
+        marshaller += `${indent.get()}if ${receiver}.${field.name} != nil {\n`;
+        marshaller += `${indent.push().get()}if azcore.IsNullValue(${receiver}.${field.name}) {\n`;
+        marshaller += `${indent.push().get()}objectMap["${field.serializedName}"] = nil\n`;
+        marshaller += `${indent.pop().get()}} else {\n`;
+        marshaller += `${indent.push().get()}objectMap["${field.serializedName}"] = strconv.FormatBool(*${receiver}.${field.name})\n`;
+        marshaller += `${indent.pop().get()}}\n`;
+        marshaller += `${indent.pop().get()}}\n`;
+        continue;
+      }
       let populate: string;
       // some helpers require extra args after the common ones
       let populateArgs = "";
@@ -845,6 +861,27 @@ function generateJSONUnmarshallerBody(
         unmarshalBody += `${indent.get()}if string(val) != "null" {\n`;
         unmarshalBody += `${indent.push().get()}${receiver}.${field.name} = val\n`;
         unmarshalBody += `${indent.pop().get()}}\n`;
+      } else if (
+        field.type.kind === "scalar" &&
+        field.type.type === "bool" &&
+        field.type.encodeAsString
+      ) {
+        imports.add("strconv");
+        imports.add("strings");
+        imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
+        unmarshalBody += `${indent.get()}var aux string\n`;
+        unmarshalBody += `${indent.get()}err = unpopulate(val, "${field.name}", &aux)\n`;
+        unmarshalBody += `${indent.get()}if err == nil {\n`;
+        indent.push();
+        unmarshalBody += `${indent.get()}var v bool\n`;
+        unmarshalBody += `${indent.get()}v, err = strconv.ParseBool(strings.ToLower(aux))\n`;
+        unmarshalBody += `${indent.get()}if err == nil {\n`;
+        unmarshalBody += `${indent.push().get()}${receiver}.${field.name} = to.Ptr(v)\n`;
+        unmarshalBody += `${indent.pop().get()}}\n`;
+        indent.pop();
+        unmarshalBody += `${indent.get()}}\n`;
+        modelDef.SerDe.needsJSONUnpopulate = true;
+        needsErrCheck = true;
       } else if (
         field.type.kind === "scalar" &&
         (field.type.type.startsWith("uint") || field.type.type.startsWith("int")) &&

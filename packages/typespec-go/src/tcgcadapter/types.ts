@@ -406,7 +406,7 @@ export class TypeAdapter {
         return anyType;
       }
       case "boolean": {
-        const boolKey = "boolean";
+        const boolKey = type.encode === "string" ? "boolean-string" : "boolean";
         let primitiveBool = this.types.get(boolKey);
         if (primitiveBool) {
           return primitiveBool;
