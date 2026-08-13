@@ -17,7 +17,7 @@ model Resource {
   scope: string;
 }
 
-#suppress "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning" "Intentional overload for testing method overloading in C#"
+#suppress "@azure-tools/typespec-client-generator-core/duplicate-client-name" "Intentional overload for testing method overloading in C#"
 @scenario
 @scenarioDoc("""
   List all resources operation.
