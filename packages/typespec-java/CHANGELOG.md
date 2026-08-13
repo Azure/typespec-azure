@@ -1,5 +1,18 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.46.0
+
+### Features
+
+- [#5218](https://github.com/Azure/typespec-azure/pull/5218) Sync core to microsoft/typespec commit `27b39b71b`. Support removing models from management clients with the `remove-model` emitter option (core [#11658](https://github.com/microsoft/typespec/pull/11658)).
+
+### Bug Fixes
+
+- [#5218](https://github.com/Azure/typespec-azure/pull/5218) Fix Fluent Premium samples to use the correct service client for resource metadata suffixes (core [#11633](https://github.com/microsoft/typespec/pull/11633)).
+- [#5218](https://github.com/Azure/typespec-azure/pull/5218) Preserve existing properties files for applicable libraries during SDK integration (core [#11635](https://github.com/microsoft/typespec/pull/11635)).
+- [#5218](https://github.com/Azure/typespec-azure/pull/5218) Document response headers in protocol API Javadocs (core [#11610](https://github.com/microsoft/typespec/pull/11610)).
+
+
 ## 0.45.13
 
 ### Features
