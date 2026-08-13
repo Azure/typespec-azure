@@ -4,20 +4,20 @@
 
 ### Features
 
-- [#5218](https://github.com/Azure/typespec-azure/pull/5218) Sync core to microsoft/typespec commit `27b39b71b`. Support removing models from management clients with the `remove-model` emitter option (core [#11658](https://github.com/microsoft/typespec/pull/11658)).
+- Sync core to microsoft/typespec commit `27b39b71b`. Support removing models from management clients with the `remove-model` emitter option (core [#11658](https://github.com/microsoft/typespec/pull/11658)).
 
 ### Bug Fixes
 
-- [#5218](https://github.com/Azure/typespec-azure/pull/5218) Fix Fluent Premium samples to use the correct service client for resource metadata suffixes (core [#11633](https://github.com/microsoft/typespec/pull/11633)).
-- [#5218](https://github.com/Azure/typespec-azure/pull/5218) Preserve existing properties files for applicable libraries during SDK integration (core [#11635](https://github.com/microsoft/typespec/pull/11635)).
-- [#5218](https://github.com/Azure/typespec-azure/pull/5218) Document response headers in protocol API Javadocs (core [#11610](https://github.com/microsoft/typespec/pull/11610)).
+- Fix Fluent Premium samples to use the correct service client for resource metadata suffixes (core [#11633](https://github.com/microsoft/typespec/pull/11633)).
+- Preserve existing properties files for applicable libraries during SDK integration (core [#11635](https://github.com/microsoft/typespec/pull/11635)).
+- Document response headers in protocol API Javadocs (core [#11610](https://github.com/microsoft/typespec/pull/11610)).
 
 
 ## 0.45.13
 
 ### Features
 
-- [#5138](https://github.com/Azure/typespec-azure/pull/5138) Sync core to microsoft/typespec commit `2e1649b83`. Includes support for nested property paths and XML payloads in Azure pageable responses (core [#11504](https://github.com/microsoft/typespec/pull/11504)).
+- Sync core to microsoft/typespec commit `2e1649b83`. Includes support for nested property paths and XML payloads in Azure pageable responses (core [#11504](https://github.com/microsoft/typespec/pull/11504)).
 
 
 ## 0.45.12
