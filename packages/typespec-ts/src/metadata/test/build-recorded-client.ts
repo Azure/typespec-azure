@@ -1,4 +1,4 @@
-import { ClientModel } from "../../interfaces.js";
+import type { ClientModel } from "../../interfaces.js";
 import { recordedClientContent } from "./template.js";
 
 export function buildRecordedClientFile(_model: ClientModel) {

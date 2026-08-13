@@ -1,6 +1,6 @@
 import { strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { SdkClientType, SdkServiceOperation } from "../../src/interfaces.js";
+import type { SdkClientType, SdkServiceOperation } from "../../src/interfaces.js";
 import { createSdkContextForTester, SimpleTesterWithService } from "../tester.js";
 
 describe("normal namespace", () => {

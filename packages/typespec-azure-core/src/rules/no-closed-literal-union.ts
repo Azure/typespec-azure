@@ -1,4 +1,4 @@
-import { Union, createRule, fileRef, ignoreDiagnostics } from "@typespec/compiler";
+import { type Union, createRule, fileRef, ignoreDiagnostics } from "@typespec/compiler";
 import { getUnionAsEnum } from "../helpers/union-enums.js";
 
 export const noClosedLiteralUnionRule = createRule({

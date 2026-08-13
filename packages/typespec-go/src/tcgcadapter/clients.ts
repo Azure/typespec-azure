@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/no-deprecated -- uses TCGC APIs marked deprecated (correspondingMethodParams). */
 
 import * as tcgc from "@azure-tools/typespec-client-generator-core";
-import { ModelProperty, NoTarget } from "@typespec/compiler";
+import { type ModelProperty, NoTarget } from "@typespec/compiler";
 import * as http from "@typespec/http";
 import * as go from "../codemodel/index.js";
 import {
@@ -113,7 +113,7 @@ export class ClientAdapter {
     if (docs.summary) {
       docs.summary = `${clientName} - ${docs.summary}`;
     } else if (docs.description) {
-      docs.description = `${clientName} - ${docs.description}`;
+      docs.description = go.prefixDocWithName(clientName, docs.description);
     } else if (clientName.length > 6) {
       // strip clientName's "Client" suffix
       const groupName = clientName.substring(0, clientName.length - 6);
@@ -634,16 +634,6 @@ export class ClientAdapter {
         );
         break;
       case "paging":
-        if (
-          sdkMethod.pagingMetadata.nextLinkReInjectedParametersSegments !== undefined &&
-          sdkMethod.pagingMetadata.nextLinkReInjectedParametersSegments.length > 0
-        ) {
-          throw new AdapterError(
-            "UnsupportedTsp",
-            `paging with re-injected parameters is not supported`,
-            sdkMethod.__raw?.node,
-          );
-        }
         method = new go.PageableMethod(
           methodName,
           goClient,
@@ -736,9 +726,11 @@ export class ClientAdapter {
     if (sdkMethod.pagingMetadata.nextLinkOperation) {
       throw new AdapterError("UnsupportedTsp", "next page operation NYI", sdkMethod.__raw?.node);
     } else if (sdkMethod.pagingMetadata.nextLinkSegments) {
-      return new go.PageableStrategyNextLink(
+      const strategy = new go.PageableStrategyNextLink(
         buildNextLinkPath(sdkMethod.pagingMetadata.nextLinkSegments),
       );
+      strategy.reinjectedParams = this.adaptPageableMethodReinjectionParams(sdkMethod, paramsMap);
+      return strategy;
     } else if (
       sdkMethod.pagingMetadata.continuationTokenParameterSegments &&
       sdkMethod.pagingMetadata.continuationTokenResponseSegments
@@ -755,6 +747,13 @@ export class ClientAdapter {
             throw new AdapterError(
               "InternalError",
               `missing continuation token request parameter name ${tokenReq.name} for operation ${sdkMethod.name}`,
+              sdkMethod.__raw?.node,
+            );
+          }
+          if (tokenParam.kind === "queryCollectionParam") {
+            throw new AdapterError(
+              "InternalError",
+              `unexpected collection continuation token request parameter ${tokenReq.name} for operation ${sdkMethod.name}`,
               sdkMethod.__raw?.node,
             );
           }
@@ -802,6 +801,50 @@ export class ClientAdapter {
 
     // operation is pageable but doesn't yet support fetching subsequent pages
     return undefined;
+  }
+
+  /**
+   * converts the method parameters that must be added to next link requests.
+   *
+   * @param method the tcgc pageable method
+   * @param paramsMap maps tcgc method parameters to Go parameters
+   * @returns the query parameters to add to next link requests
+   */
+  private adaptPageableMethodReinjectionParams(
+    method:
+      | tcgc.SdkLroPagingServiceMethod<tcgc.SdkHttpOperation>
+      | tcgc.SdkPagingServiceMethod<tcgc.SdkHttpOperation>,
+    paramsMap: ParamsMapForPageable,
+  ): Array<go.QueryParameter> {
+    if (!method.pagingMetadata.nextLinkReInjectedParametersSegments) {
+      return [];
+    }
+
+    const paramsForReinjection = new Array<go.QueryParameter>();
+    for (const reinjectedParamSegment of method.pagingMetadata
+      .nextLinkReInjectedParametersSegments) {
+      for (const reinjectedParam of reinjectedParamSegment) {
+        if (reinjectedParam.kind !== "method") {
+          throw new AdapterError(
+            "InternalError",
+            `unexpected next link re-injection parameter kind ${reinjectedParam.kind}`,
+            reinjectedParam.__raw?.node,
+          );
+        }
+        const goParam = paramsMap.get(reinjectedParam);
+        if (!goParam) {
+          throw new AdapterError(
+            "InternalError",
+            `missing re-injection parameter name ${reinjectedParam.name} for operation ${method.name}`,
+            method.__raw?.node,
+          );
+        } else if (goParam.kind === "headerScalarParam") {
+          continue;
+        }
+        paramsForReinjection.push(goParam);
+      }
+    }
+    return paramsForReinjection;
   }
 
   private populateMethod(
@@ -1194,6 +1237,7 @@ export class ClientAdapter {
         if (method.kind !== "nextPageMethod" && go.isPageableMethod(method)) {
           switch (adaptedParam.kind) {
             case "headerScalarParam":
+            case "queryCollectionParam":
             case "queryScalarParam":
               pageableParamsMap.set(param, adaptedParam);
           }
@@ -1779,10 +1823,15 @@ export class ClientAdapter {
     // since HEAD requests don't return a type, we must check this before checking sdkResponseType
     if (
       method.httpMethod === "head" &&
-      this.ta.ctx.emitContext.options["head-as-boolean"] === true
+      (helpers.hasDecorator("@responseAsBool", sdkMethod.decorators) ||
+        this.ta.ctx.emitContext.options["head-as-boolean"] === true)
     ) {
       respEnv.result = new go.HeadAsBooleanResult("Success");
       respEnv.result.docs.summary = "Success indicates if the operation succeeded or failed.";
+      // NOTE: tcgc models a boolean response type for us. however, we use the presence of
+      // a response type as a predicate to mean "this operation returns a modeled response"
+      // which would send us down an incorrect code path. so we clear it here instead.
+      sdkResponseType = undefined;
     }
 
     if (!sdkResponseType) {
@@ -2459,7 +2508,7 @@ interface ParameterStyleInfo {
  */
 type ParamsMapForPageable = Map<
   tcgc.SdkMethodParameter,
-  go.HeaderScalarParameter | go.QueryScalarParameter
+  go.HeaderScalarParameter | go.QueryParameter
 >;
 
 /**

@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
+import type { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
 it("simple case", async () => {

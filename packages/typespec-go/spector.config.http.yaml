@@ -9,12 +9,15 @@ specs:
   "authentication/http/custom": { options: { module: customgroup } }
   "authentication/oauth2": { options: { module: oauth2group } }
   "authentication/union": { options: { module: unionauthgroup } }
+  "documentation": { options: { module: documentationgroup } }
+  "encode/array": { options: { module: encodearraygroup, slice-elements-byval: true } }
   "encode/bytes": { options: { module: bytesgroup } }
   "encode/datetime": { options: { module: datetimegroup, slice-elements-byval: true } }
   "encode/duration": { options: { module: durationgroup } }
   "encode/numeric": { options: { module: numericgroup } }
   "parameters/basic": { options: { module: basicparamsgroup } }
   "parameters/body-optionality": { options: { module: bodyoptionalgroup } }
+  "parameters/body-root": { options: { module: bodyrootgroup } }
   "parameters/collection-format": { options: { module: collectionfmtgroup } }
   "parameters/path": { options: { module: pathgroup } }
   "parameters/query": { options: { module: querygroup } }
@@ -56,6 +59,10 @@ specs:
   "versioning/typeChangedFrom": { options: { module: typechangedfromgroup } }
 
   # --- Not generated yet (tracked skips) ---
+  # emitter bug: @encode(string) on boolean is ignored; bool is serialized as a JSON boolean instead of a string, so the mock rejects the body
+  "encode/boolean": false
+  # emitter error: unexpected kind string for HeaderMapResponse metadata (HEAD op returning response headers)
+  "payload/head": false
   # TODO: https://github.com/Azure/autorest.go/issues/1606
   "response/status-code-range": false
   # TODO: https://github.com/Azure/autorest.go/issues/1730

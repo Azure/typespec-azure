@@ -235,7 +235,7 @@ of the operations will be grouped based on the interface name in generated
 clients.
 
 The optional `resourceOperationOptions` parameter provides additional options.
-`allowStaticRoutes` turns off autoRout for the interface, so individual operations can
+`allowStaticRoutes` turns off autoRoute for the interface, so individual operations can
 choose static (`@route`) or automatic (`@autoRoute`) routing.
 
 `resourceType: Model` specifies the resource type for the operations in the interface
@@ -602,7 +602,7 @@ multiple base types. Duplicate entries are ignored.
 
 ```typespec
 // Agent definition and properties using the Appliance deployment model
-model ContosoApplianceDefinition is AgentDefinitionAppliance<true, true>;
+model ContosoApplianceDefinition is AgentDefinitionAppliance<true>;
 model ContosoApplianceProperties is AgentPropertiesAppliance<ContosoApplianceDefinition> {
   ...DefaultProvisioningStateProperty;
 }

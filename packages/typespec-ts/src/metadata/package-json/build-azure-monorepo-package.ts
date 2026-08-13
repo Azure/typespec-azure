@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { AzurePackageInfoConfig, getAzureCommonPackageInfo } from "./azure-package-common.js";
+import { type AzurePackageInfoConfig, getAzureCommonPackageInfo } from "./azure-package-common.js";
 import { getCommonPackageScripts, getPackageCommonInfo } from "./package-common.js";
 
 export interface AzureMonorepoInfoConfig extends AzurePackageInfoConfig {
@@ -31,7 +31,7 @@ export function getAzureMonorepoDependencies(config: AzureMonorepoInfoConfig) {
   // revert this change after sdk repo update.
   const runtimeDeps = {
     ...dependencies,
-    "@azure-rest/core-client": "^2.3.1",
+    "@azure-rest/core-client": "^2.7.0",
     ...(hasLro && {
       "@azure/abort-controller": "^2.1.2",
     }),
@@ -39,7 +39,7 @@ export function getAzureMonorepoDependencies(config: AzureMonorepoInfoConfig) {
     ...(hasLro && {
       "@azure/core-lro": "^3.1.0",
     }),
-    "@azure/core-rest-pipeline": "^1.20.0",
+    "@azure/core-rest-pipeline": "^1.24.0",
     "@azure/core-util": "^1.12.0",
     "@azure/logger": "^1.2.0",
     tslib: "catalog:",

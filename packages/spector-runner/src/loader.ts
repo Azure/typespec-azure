@@ -1,12 +1,12 @@
 import { readFileSync } from "fs";
 import { parse } from "yaml";
 import {
-  ResolvedSpec,
-  SpecEntry,
-  SpecEntryOptions,
-  SpecOptions,
-  SpecOptionValue,
-  SpectorConfig,
+  type ResolvedSpec,
+  type SpecEntry,
+  type SpecEntryOptions,
+  type SpecOptions,
+  type SpecOptionValue,
+  type SpectorConfig,
   SpectorConfigError,
 } from "./types.js";
 

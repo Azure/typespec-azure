@@ -6,9 +6,6 @@ import { existsSync, opendirSync, readFileSync, unlinkSync, writeFileSync } from
 import { semaphore } from "./semaphore.js";
 import { syncAzureRestApiSpecs } from "./sync-azure-rest-api-specs.js";
 
-// limit to 8 concurrent builds
-const sem = semaphore(8);
-
 const pkgRoot =
   execSync("git rev-parse --show-toplevel").toString().trim() + "/packages/typespec-go/";
 
@@ -74,6 +71,9 @@ for (var i = 0; i < args.length; i += 1) {
       // the emitter has been installed so use that one instead
       emitter = "@azure-tools/typespec-go";
       break;
+    case "--debugger":
+      switches.push("--debugger");
+      break;
     default:
       break;
   }
@@ -82,6 +82,20 @@ for (var i = 0; i < args.length; i += 1) {
 if (filter !== undefined) {
   console.log("Using filter: " + filter);
 }
+
+// the emitter runs in a child process, so a debugger attached to this script won't stop
+// in it. with --debugger we launch each child with --inspect-brk (see below) so the
+// debugger reliably attaches and binds breakpoints before the short-lived emitter runs.
+// run serially so only one child waits for the debugger at a time.
+const debug = switches.includes("--debugger");
+if (debug && filter === undefined) {
+  console.warn(
+    "warning: --debugger without --filter pauses on every spec; pass --filter to debug a single test",
+  );
+}
+
+// limit concurrent builds; serialize when debugging
+const sem = semaphore(debug ? 1 : 8);
 
 function should_generate(name) {
   if (filter !== undefined) {
@@ -204,10 +218,11 @@ function generate(moduleName, input, outputDir, perTestOptions) {
     for (const option of allOptions) {
       options.push(`--option="@azure-tools/typespec-go.${option}"`);
     }
-    if (switches.includes("--debugger")) {
-      options.push(`--option="@azure-tools/typespec-go.debugger=true"`);
-    }
-    const command = `node ${compiler} compile ${input} --emit=${emitter} --config=${stubConfig} ${options.join(" ")}`;
+    // --inspect-brk makes the compiler child wait for the debugger on a fixed port so
+    // VS Code can attach (via the "Attach to Default Port" launch config) and bind
+    // breakpoints before the short-lived emitter runs.
+    const nodeArgs = debug ? "--inspect-brk=9229 " : "";
+    const command = `node ${nodeArgs}${compiler} compile ${input} --emit=${emitter} --config=${stubConfig} ${options.join(" ")}`;
     if (switches.includes("--verbose")) {
       console.log(command);
     }

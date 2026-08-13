@@ -5,6 +5,7 @@
 
 export * from "./client.js";
 export * from "./code-model.js";
+export * from "./docs.js";
 export * from "./examples.js";
 export * from "./method.js";
 export * from "./module.js";

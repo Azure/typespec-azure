@@ -314,7 +314,7 @@ export type ArmResourceCheckExistenceDecorator = (
  * clients.
  *
  * The optional `resourceOperationOptions` parameter provides additional options.
- * `allowStaticRoutes` turns off autoRout for the interface, so individual operations can
+ * `allowStaticRoutes` turns off autoRoute for the interface, so individual operations can
  * choose static (`@route`) or automatic (`@autoRoute`) routing.
  *
  * `resourceType: Model` specifies the resource type for the operations in the interface

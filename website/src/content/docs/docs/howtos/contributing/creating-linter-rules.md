@@ -408,13 +408,44 @@ the **extended** documentation (no frontmatter and no `Full name` code block —
 those are generated):
 
 - A plain-language explanation
+- An **`## Impact`** section (required) — see below
 - `#### ❌ Incorrect` examples
 - `#### ✅ Correct` examples
+- A **`## Suppression`** section (required) — see below
+- A **`## LintDiff Equivalent`** section (when applicable) — see below
+
+#### Required sections
+
+Every rule's `docs` file must include an **Impact** statement and a
+**Suppression** statement, and must include a **LintDiff Equivalent** section
+whenever an equivalent LintDiff (azure-openapi-validator) rule exists.
+
+- **`## Impact`** — Describe the practical consequence of a violation. Start with
+  a bulleted `**Area:**` line listing the affected areas (for example `API`,
+  `SDK`, `Emitters`), followed by a short paragraph explaining what breaks or
+  degrades when the rule is violated.
+- **`## Suppression`** — State whether suppression is acceptable and why. If the
+  rule should never be suppressed, say so and point to the correct fix. If
+  suppression is acceptable in narrow cases, describe exactly when. Suppressions
+  use the `#suppress "<rule-id>" "<justification>"` directive (see
+  [Step 10](#step-10-external-integration-check)).
+- **`## LintDiff Equivalent`** — If this rule corresponds to one or more LintDiff
+  rules from
+  [azure-openapi-validator](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md),
+  link them here (deep-link to the specific rule id, e.g. `#r2007`). This tells
+  spec authors which Swagger-era check the TypeSpec rule replaces. Omit the
+  section only when no LintDiff equivalent exists.
 
 Example `docs` markdown (`packages/<pkg>/src/rules/my-new-rule.md`):
 
 ````markdown
 Brief description of the rule.
+
+## Impact
+
+- **Area:** API, SDK
+
+Explain what breaks or degrades when this rule is violated.
 
 #### ❌ Incorrect
 
@@ -431,6 +462,15 @@ model GoodThing {
   goodName: string;
 }
 ```
+
+## LintDiff Equivalent
+
+This rule corresponds to the LintDiff rule
+[RuleName](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r2007).
+
+## Suppression
+
+Do not suppress. Use `goodName` instead of `badName`.
 ````
 
 After editing the rule docs, regenerate package docs:
@@ -508,8 +548,19 @@ existing specs in `Azure/azure-rest-api-specs`. To resolve this:
    follow conventions), submit a PR to `Azure/azure-rest-api-specs` on the
    **main** branch.
 2. **Suppress the rule** — If the spec cannot be fixed without changing API
-   behavior, add a `// suppress` comment. Suppressions can always go to the
+   behavior, add a `#suppress` directive. Suppressions can always go to the
    **main** branch.
+
+   Suppressions use the `#suppress` **directive**, not a `// suppress` comment.
+   Place it on the line directly above the target, passing the fully-qualified
+   rule id and a justification string:
+
+   ```tsp
+   #suppress "@azure-tools/typespec-azure-core/no-openapi-client-extensions" "Emitter-only annotation with no TypeSpec construct."
+   @OpenAPI.extension("x-ms-example-annotation", true)
+   op example(): void;
+   ```
+
 3. **Fix on typespec-next branch** — If the fix requires unreleased TypeSpec
    APIs, types, or behavior that aren't yet available in the published
    packages, submit the fix to the **typespec-next** branch, which uses nightly
@@ -634,6 +685,9 @@ website/
 - [ ] Rule registered in `linter.ts`
 - [ ] Rule listed in appropriate ruleset(s)
 - [ ] Documentation has realistic examples
+- [ ] Documentation has an `## Impact` section
+- [ ] Documentation has a `## Suppression` section
+- [ ] Documentation has a `## LintDiff Equivalent` section (if a LintDiff equivalent exists)
 - [ ] Reference docs regenerated
 - [ ] Changeset created
 - [ ] `pnpm validate:pr` passes

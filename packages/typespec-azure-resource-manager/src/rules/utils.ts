@@ -1,19 +1,19 @@
 import {
-  DecoratorApplication,
-  DecoratorArgument,
+  type DecoratorApplication,
+  type DecoratorArgument,
   getNamespaceFullName,
-  Interface,
+  type Interface,
   isTemplateDeclaration,
-  Model,
-  ModelProperty,
-  Namespace,
-  Operation,
-  Program,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Operation,
+  type Program,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 import { getResourceOperation } from "@typespec/rest";
-import { ArmResourceOperation } from "../operations.js";
-import { ArmResourceDetails, getArmResourceKind } from "../resource.js";
+import type { ArmResourceOperation } from "../operations.js";
+import { type ArmResourceDetails, getArmResourceKind } from "../resource.js";
 
 /**
  *

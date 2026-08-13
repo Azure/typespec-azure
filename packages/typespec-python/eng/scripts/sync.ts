@@ -15,8 +15,8 @@
  * nothing.
  *
  * Usage:
- *   tsx eng/scripts/sync.ts          # write mode: overwrite local files
- *   tsx eng/scripts/sync.ts --check  # check mode: exit non-zero on drift (CI)
+ *   node eng/scripts/sync.ts          # write mode: overwrite local files
+ *   node eng/scripts/sync.ts --check  # check mode: exit non-zero on drift (CI)
  */
 import fs from "fs";
 import { dirname, join, relative, sep } from "path";
@@ -34,6 +34,11 @@ const packageRoot = join(here, "..", "..");
 // levels up from packageRoot.
 const repoRoot = join(packageRoot, "..", "..");
 const sourceRoot = join(repoRoot, "core", "packages", "http-client-python");
+
+const GITIGNORE_LOCAL_BLOCK_BEGIN =
+  "# Generated SDK fixtures with hand-authored/customized code required by tests. (begin)";
+const GITIGNORE_LOCAL_BLOCK_END =
+  "# Generated SDK fixtures with hand-authored/customized code required by tests. (end)";
 
 /**
  * Paths (POSIX, relative to the package root on both sides) that should be
@@ -145,7 +150,7 @@ const argv = parseArgs({
 
 if (argv.values.help) {
   console.log(`
-${pc.bold("Usage:")} tsx eng/scripts/sync.ts [options]
+${pc.bold("Usage:")} node eng/scripts/sync.ts [options]
 
 ${pc.bold("Description:")}
   Copy the files (and recursive directories) listed in INCLUDES from
@@ -239,6 +244,59 @@ function syncDevRequirements(srcAbs: string, destAbs: string, stats: SyncStats):
     stats.drifted.push(relPath);
     return;
   }
+  fs.writeFileSync(destAbs, newText, "utf8");
+  stats.copied.push(relPath);
+}
+
+/** Copy only the ignore rules between the fixture block markers. */
+function syncGitignore(srcAbs: string, destAbs: string, stats: SyncStats): void {
+  const relPath = ".gitignore";
+
+  if (!fs.existsSync(srcAbs)) {
+    stats.missing.push(relPath);
+    return;
+  }
+
+  const srcText = fs.readFileSync(srcAbs, "utf8");
+  const destText = fs.readFileSync(destAbs, "utf8");
+  const srcBlockStart = srcText.indexOf(GITIGNORE_LOCAL_BLOCK_BEGIN);
+  const srcBlockEnd = srcText.indexOf(GITIGNORE_LOCAL_BLOCK_END, srcBlockStart);
+  const destBlockStart = destText.indexOf(GITIGNORE_LOCAL_BLOCK_BEGIN);
+  const destBlockEnd = destText.indexOf(GITIGNORE_LOCAL_BLOCK_END, destBlockStart);
+
+  if (srcBlockStart === -1 || srcBlockEnd === -1) {
+    console.warn(
+      pc.yellow(
+        `Warning: Source ${relPath} does not contain the generated fixture block; skipping ${relPath} sync.`,
+      ),
+    );
+    return;
+  }
+  if (destBlockStart === -1 || destBlockEnd === -1) {
+    console.warn(
+      pc.yellow(
+        `Warning: Destination ${relPath} does not contain the generated fixture block; skipping ${relPath} sync.`,
+      ),
+    );
+    return;
+  }
+
+  const srcContentStart = srcBlockStart + GITIGNORE_LOCAL_BLOCK_BEGIN.length;
+  const destContentStart = destBlockStart + GITIGNORE_LOCAL_BLOCK_BEGIN.length;
+  const newText =
+    destText.slice(0, destContentStart) +
+    srcText.slice(srcContentStart, srcBlockEnd) +
+    destText.slice(destBlockEnd);
+
+  if (newText === destText) {
+    stats.unchanged.push(relPath);
+    return;
+  }
+  if (check) {
+    stats.drifted.push(relPath);
+    return;
+  }
+
   fs.writeFileSync(destAbs, newText, "utf8");
   stats.copied.push(relPath);
 }
@@ -378,6 +436,9 @@ function main(): void {
     stats,
   );
 
+  // Special-case merge: update only the marked generated fixture ignore rules.
+  syncGitignore(join(sourceRoot, ".gitignore"), join(packageRoot, ".gitignore"), stats);
+
   if (stats.copied.length) {
     console.log(pc.green(pc.bold(`Copied (${stats.copied.length}):`)));
     for (const f of stats.copied) console.log("  " + f);
@@ -400,7 +461,7 @@ function main(): void {
     console.error(
       pc.red(
         `\nSynced files have drifted from core/packages/http-client-python.\n` +
-          `Run 'pnpm sync' (or 'tsx eng/scripts/sync.ts') and commit the result.`,
+          `Run 'pnpm sync' (or 'node eng/scripts/sync.ts') and commit the result.`,
       ),
     );
     process.exit(1);

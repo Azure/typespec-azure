@@ -1,6 +1,6 @@
-import { AzureResourceManagerBaseTypesDecorators } from "../generated-defs/Azure.ResourceManager.BaseTypes.js";
-import { AzureResourceManagerDecorators } from "../generated-defs/Azure.ResourceManager.js";
-import { AzureResourceManagerLegacyDecorators } from "../generated-defs/Azure.ResourceManager.Legacy.js";
+import type { AzureResourceManagerBaseTypesDecorators } from "../generated-defs/Azure.ResourceManager.BaseTypes.js";
+import type { AzureResourceManagerDecorators } from "../generated-defs/Azure.ResourceManager.js";
+import type { AzureResourceManagerLegacyDecorators } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { $azureBaseType } from "./base-types.js";
 import { $armCommonTypesVersion, $externalTypeRef } from "./common-types.js";
 import { $armLibraryNamespace, $armProviderNamespace, $useLibraryNamespace } from "./namespace.js";

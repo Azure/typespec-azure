@@ -1,7 +1,7 @@
 import {
   createLinterRuleTester,
-  LinterRuleTester,
-  TesterInstance,
+  type LinterRuleTester,
+  type TesterInstance,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { propertyNameConflictRule } from "../../src/rules/property-name-conflict.rule.js";

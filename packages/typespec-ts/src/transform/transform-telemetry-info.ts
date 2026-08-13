@@ -1,9 +1,9 @@
 import {
   getHttpOperationWithCache,
-  SdkClient,
-  SdkContext,
+  type SdkClient,
+  type SdkContext,
 } from "@azure-tools/typespec-client-generator-core";
-import { TelemetryInfo } from "../interfaces.js";
+import type { TelemetryInfo } from "../interfaces.js";
 import { listOperationsUnderClient } from "../utils/client-utils.js";
 import { getCustomRequestHeaderNameForOperation } from "../utils/operation-util.js";
 

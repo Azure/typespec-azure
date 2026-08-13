@@ -1,7 +1,7 @@
 import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { SdkArrayType, SdkBuiltInType, UsageFlags } from "../../src/interfaces.js";
+import { type SdkArrayType, type SdkBuiltInType, UsageFlags } from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
 import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
