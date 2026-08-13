@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.71.1
+
+### Bug Fixes
+
+- [#5215](https://github.com/Azure/typespec-azure/pull/5215) Allow C# emitters to generate operation overloads with the same client name.
+
+
 ## 0.71.0
 
 ### Features
