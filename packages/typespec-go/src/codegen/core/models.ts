@@ -682,29 +682,13 @@ function generateJSONMarshallerBody(
         marshaller += `${indent.push().get()}${receiver}.${field.name} = to.Ptr(${helpers.formatLiteralValue(field.defaultValue, true)})\n`;
         marshaller += `${indent.pop().get()}}\n`;
       }
-      let populate: string;
-      // some helpers require extra args after the common ones
-      let populateArgs = "";
-      if (field.type.kind === "time") {
-        imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-        populate = `populateTime[datetime.${field.type.format}]`;
-        populateArgs = `, ${field.type.utc}`;
-        modelDef.SerDe.needsJSONPopulateTime = true;
-      } else if (field.type.kind === "any") {
-        populate = "populateAny";
-        modelDef.SerDe.needsJSONPopulateAny = true;
-      } else if (field.type.kind === "sliceArray") {
-        populate = "populateStringArray";
-        populateArgs = `, "${getSliceArrayDelimiter(field.type.delimiter)}"`;
-        modelDef.SerDe.needsJSONPopulateStringArray = true;
-      } else if (
+      if (
         field.type.kind === "scalar" &&
         (field.type.type.startsWith("uint") || field.type.type.startsWith("int")) &&
         field.type.encodeAsString
       ) {
         imports.add("strconv");
-        populate = "populateAsString";
-        marshaller += `${indent.get()}${populate}(objectMap, "${field.serializedName}", ${receiver}.${field.name}, func() string {\n`;
+        marshaller += `${indent.get()}populateAsString(objectMap, "${field.serializedName}", ${receiver}.${field.name}, func() string {\n`;
         const isSigned = field.type.type.startsWith("int");
         let fieldExpr = `*${receiver}.${field.name}`;
         if (
@@ -722,15 +706,31 @@ function generateJSONMarshallerBody(
         field.type.encodeAsString
       ) {
         imports.add("strconv");
-        populate = "populateAsString";
-        marshaller += `${indent.get()}${populate}(objectMap, "${field.serializedName}", ${receiver}.${field.name}, func() string {\n`;
+        marshaller += `${indent.get()}populateAsString(objectMap, "${field.serializedName}", ${receiver}.${field.name}, func() string {\n`;
         marshaller += `${indent.push().get()}return strconv.FormatBool(*${receiver}.${field.name})\n`;
         marshaller += `${indent.pop().get()}})\n`;
         modelDef.SerDe.needsJSONPopulateAsString = true;
       } else {
-        populate = "populate";
+        let populate: string;
+        // some helpers require extra args after the common ones
+        let populateArgs = "";
+        if (field.type.kind === "time") {
+          imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
+          populate = `populateTime[datetime.${field.type.format}]`;
+          populateArgs = `, ${field.type.utc}`;
+          modelDef.SerDe.needsJSONPopulateTime = true;
+        } else if (field.type.kind === "any") {
+          populate = "populateAny";
+          modelDef.SerDe.needsJSONPopulateAny = true;
+        } else if (field.type.kind === "sliceArray") {
+          populate = "populateStringArray";
+          populateArgs = `, "${getSliceArrayDelimiter(field.type.delimiter)}"`;
+          modelDef.SerDe.needsJSONPopulateStringArray = true;
+        } else {
+          populate = "populate";
+          modelDef.SerDe.needsJSONPopulate = true;
+        }
         marshaller += `${indent.get()}${populate}(objectMap, "${field.serializedName}", ${receiver}.${field.name}${populateArgs})\n`;
-        modelDef.SerDe.needsJSONPopulate = true;
       }
     }
   }
