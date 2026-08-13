@@ -2,103 +2,145 @@
 
 ## 1. Problem statement
 
-Azure resources frequently declare server-side read-only properties (`@visibility(Lifecycle.Read)`), e.g. `provisioningState`, and ARM resource `name`/`id`. When such a property is **required**, the JS/TS SDK surfaces it as a mandatory field on the **write** (create/update) request type, forcing callers to supply a value they neither own nor can compute.
+Azure resources frequently contain required, service-owned properties such as `id`, `name`, and `provisioningState` that are visible only in responses:
 
-Root cause: the TS emitter renders a resource as a **single structural `interface`** shared by input and output. `@visibility(Lifecycle.Read)` maps to the TS `readonly` modifier, but `readonly` only blocks *reassignment* — the field stays **present and required** in the write type. TypeScript conflates "required" with "input"; there is no construction-time exclusion.
+```typespec
+model Widget {
+  @visibility(Lifecycle.Read)
+  id: string;
 
-Every other Azure SDK language avoids this by separating a **settable input surface** from a **readable output surface** (§2). The goal is to make the TS emitter distinguish write-time from read-time shapes, matching the other emitters and the wire contract already produced for Swagger.
+  name: string;
+}
+```
 
-**Current workaround (to be superseded):** 11 specs manually define write-specific models in `client.tsp` and bind operation parameters via `@@alternateType(..., <WriteModel>, "javascript")`. This works but is per-spec, JS-only, and easy to get wrong.
+The TypeScript emitter currently generates one interface for both requests and responses:
+
+```ts
+export interface Widget {
+  readonly id: string;
+  name: string;
+}
+```
+
+`readonly` prevents reassignment but does not remove `id` from the request type, so callers must provide a value owned by the service. The proposed split gives requests an accurate write shape while responses retain the full read model.
+
+Today, roughly a dozen specs use JavaScript-specific write models and `@@alternateType` customizations to fix sample-generation failures. A generated sample correctly omits read-only properties from the request. However, those properties are required by the shared request-and-response model, so the sample does not satisfy the TypeScript request type and fails to compile. This can occur in either the direct input model or a nested input model. The workaround replaces the operation input with a write model that does not contain the read-only properties.
 
 ## 2. Cross-language investigation
 
-Same spec (`computeschedule`), where `ScheduledActionResource` has **required** read-only `name`/`id` (`@visibility(Lifecycle.Read)`) plus optional `type?`. How each generated SDK handles the write body:
+The generated Azure SDKs show that this problem is specific to TypeScript:
 
-| Lang | Write-body shape (generated) | Required read-only a caller burden? | Mechanism |
-|------|------------------------------|-------------------------------------|-----------|
-| **JS/TS** | `interface ScheduledActionResource { readonly name: string; readonly id: string; ... }` | ❌ **Yes** | One structural interface; `readonly` required field stays a mandatory input |
-| **C#** | `ScheduledActionResourceDetails` — public ctor `(ResourceIdentifier resourceId)`; `Name`/`Id`/`Type` **get-only** | ✅ No | Get-only properties + ctor exposes only settable fields |
-| **Java** | immutable client-side interface (getters only); writes go through a separate fluent builder | ✅ No | Immutable getter interface + fluent builder |
-| **Go** | struct with `Name *string`, `ID *string`; read-only is a `READ-ONLY;` **doc comment** only | ✅ No | Every field is an optional pointer |
-| **Python** | typed `__init__` overload **omits** every read-only field (incl. required `entity_name`) | ✅ No | `visibility` metadata + typed `__init__` overload |
+| Language | How required read-only properties are handled in requests |
+| --- | --- |
+| **TypeScript** | Uses the shared model, so required read-only properties remain required inputs. |
+| **C# and Java** | Construction APIs expose only properties that callers can set. |
+| **Go** | Model fields are optional pointers. |
+| **Python** | Read-only properties are omitted from the typed constructor. |
 
-**Takeaway:** four of five languages express read-only via *accessors/construction* or *all-optional pointers*, so a required read-only field never becomes a mandatory input. TypeScript is the sole outlier; C#/Python confirm required read-only props can be cleanly excluded, so parity is achievable.
+**Takeaway:** other languages do not require callers to provide read-only values. TypeScript should provide the same behavior.
 
-Evidence: spec `specification/computeschedule/ComputeSchedule.Management/scheduledactionmodels.tsp:55-80`; JS `azure-sdk-for-js/.../arm-computeschedule/src/models/models.ts`; C# `.../ScheduledActionResourceDetails.cs`; Java `.../computeschedule/models/ScheduledActionResource.java`; Go `.../armcomputeschedule/models.go`; Python `.../azure-mgmt-cloudhealth/.../_models.py`.
+## 3. Design proposals
 
-## 3. Design Proposals
+### 3.1 Proposal 1 — Always split
 
-Both proposals split a model into read vs. write shapes. They differ in **when** a split happens and **how much** of the surface it touches.
+Create a visibility-suffixed model for every model reachable from a request body, even when its write and read shapes are identical.
 
-### 3.1 Proposal 1 — Full lifecycle split (prior art, #4710)
+**Pros**
 
-Split **every** model by lifecycle visibility **by default**, regardless of whether it carries read-only properties, with a feature flag to disable:
+- Uses one uniform rule: every request-reachable model has a visibility-specific name.
+- Keeps request-model identity stable when visibility metadata changes, avoiding base/projection transitions.
 
-| Position | Visibility | Emitted model |
-|----------|-----------|---------------|
-| response | Read | `Foo` |
-| POST request | Create | `FooCreate` |
-| PATCH request | Update | `FooUpdate` |
-| PUT request | Create + Update | `FooCreateOrUpdate` |
-| query/header request | Query | `FooQuery` |
+**Cons**
 
-- **Pros:** uniform, predictable names; matches the wire contract's canonical views by construction.
-- **Cons:** up to 5 models per type even when views are identical → surface/`.d.ts` bloat; and widespread model-name **breaking changes** during TypeSpec migration (the main concern raised in the thread).
+- Creates projected models even when their shapes are identical to the base models, producing the largest public surface.
+- Changes existing request type names even when no property is removed.
+- Has the highest measured generated-name collision count.
 
-### 3.2 Proposal 2 — Visibility-filtered split
+### 3.2 Proposal 2 — Split whenever the write graph differs
 
-Split **only when the write view actually differs** — materialize `FooCreate` only if the projection drops or transforms a property; otherwise keep the single `Foo`. This bounds surface growth and minimizes migration name-breaks (unchanged models keep their name). It is the approach validated by the prototype.
+Create a projected model when any property in the model or its nested models is not included in the operation's request payload.
 
-It has two independent axes: **engine** (how to compute the projection, §3.2.1) and **location** (how deeply it integrates, §3.2.2).
+Once a split is required, the projected graph contains the complete write view: both required and optional response-only properties are removed.
 
-#### 3.2.1 Engine — how to compute the projection
+**Pros**
 
-Two core TypeSpec libraries can source the projection logic:
+- Produces a complete write-specific model graph whenever the request shape differs.
+- Reuses the base model when the write and read graphs are identical.
+- Creates substantially fewer projected models and generated-name collisions than Proposal 1.
 
-- **[`@typespec/http`](https://github.com/microsoft/typespec/tree/main/packages/http)** — the standard HTTP library that resolves how operations map to the wire. It exposes stable, low-level helpers for the *decisions* we need: which visibility a request has ([`resolveRequestVisibility`](https://github.com/microsoft/typespec/blob/main/packages/http/src/metadata.ts)) and whether a property is on the payload for that visibility ([`MetadataInfo.isPayloadProperty`](https://github.com/microsoft/typespec/blob/main/packages/http/src/metadata.ts)). It tells us *what to keep/drop*, but does **not** materialize any split model — we build the clones ourselves.
-- **[`@typespec/http-canonicalization`](https://github.com/microsoft/typespec/tree/main/packages/http-canonicalization)** — an experimental library (built on the mutator/emitter frameworks) that goes one step further and *fully materializes* the per-visibility model views for an operation ([`HttpCanonicalizer.canonicalize`](https://github.com/microsoft/typespec/blob/main/packages/http-canonicalization/src/operation.ts)), naming them `FooCreate`/`FooCreateOrUpdate`/… itself. It produces the split types for us, but as raw compiler `Type`s in its own mutation realm.
+**Cons**
 
-The choice below is whether to borrow `@typespec/http`'s decision helpers as an **oracle** and materialize the split over TCGC's graph ourselves, or to let `@typespec/http-canonicalization` **produce the types** and convert them back.
+- Removes optional response-only properties from existing request types, which can cause source breaks.
+- A future API version can change an operation's input from `Widget` to `WidgetCreate`, or back, when its request and response shapes become different or identical.
 
-| | **`@typespec/http` helpers as oracle** (recommended) | **`@typespec/http-canonicalization` produces the types** |
-|---|---|---|
-| What it does | We borrow stable decision functions and materialize the split `SdkModelType` clones ourselves over TCGC's graph | The library fully materializes nested write models (`OuterCreate`→`InnerCreate`) for us |
-| Output type system | Real `SdkModelType` clones — usage/access/serialization inherited for free | Raw compiler `Type` in the **mutator-framework realm** — must be converted back to `SdkModelType` |
-| TCGC compatibility | Stays in TCGC's realm/caches | **Foreign realm** — TCGC's membership guards (`__mutatedRealm.hasType`) reject the nodes, so `@clientName`/`@access`/usage silently miss |
-| API stability | Depends only on stable `@typespec/http` exports | Depends on an **experimental ("WILL CHANGE")** API |
-| Verdict | ✅ recommended | ❌ realm conflict + instability, even if run *inside* TCGC (the conflict is structural: two mutation engines, two realms) |
+### 3.3 Proposal 3 — Split only for required read-only properties
 
-**Note:** `@typespec/http-canonicalization` (`new HttpCanonicalizer(tk).canonicalize(op)`) implements the whole projection and names views `FooCreate`/`FooCreateOrUpdate` — but because it works on compiler `Type`s, feeding its output back into TCGC breaks realm-keyed caches. So we prefer `@typespec/http`'s stable helpers as an oracle and materialize the split ourselves over TCGC's `SdkModelType` graph, so the clones inherit usage/access/serialization and render with zero core-emitter changes. Three helpers drive it:
+Create a projected model only when the reachable write graph contains a **required** property that is excluded from the request payload. Optional read-only properties alone do not trigger a split.
 
-- `resolveRequestVisibility(program, operation, verb)` → the request `Visibility` (POST→Create, PUT→Create | Update, PATCH→Update, …); responses are always `Visibility.Read`.
-- `MetadataInfo.isPayloadProperty(prop, visibility)` → the per-property keep/drop decision, matching the wire contract so write models align with Swagger.
-- `getVisibilitySuffix(visibility, Visibility.Read)` → the name suffix (`Create`/`Update`/`CreateOrUpdate`/`Query`) for a model that requires a clone. Collapse is determined separately by whether the reachable write graph drops any properties.
+Once a split is required, the projected graph still contains the complete write view; the proposal changes only the condition that creates the graph, not how that graph is projected.
 
-#### 3.2.2 Location — how deeply the split integrates
+**Pros**
 
-The projection is trivial and inherits usage/access everywhere it runs; **what actually differs is integration** — whether the rest of the pipeline knows the split model exists, and who moves the reference edges. Three sub-proposals sit on an integration-depth axis:
+- Removes required response-only properties from request types while preserving the base model for optional-only differences.
+- Creates the fewest projected models and changes the fewest current operation inputs in the repository-wide investigation.
 
-- **(A) Emitter-local** (preferred) — the emitter clones, repoints operation bodies, and registers the extra models in `sdkPackage.models`.
-- **(B) TCGC pull-only helper** — a helper (e.g. `getRequestBodyModelForVisibility`) lives in TCGC and **returns** the split model, but the emitter still repoints bodies and registers the produced models.
-- **(C) TCGC context-construction** — a `createSdkContext(..., { splitModelsByVisibility: true })` flag returns a context whose `sdkPackage`/operations are **already** split; the emitter consumes it verbatim.
+**Cons**
 
-**Same in all three:** the projection algorithm; and source-model decorators (`@clientName`, `@access`, …) are baked into the source `SdkModelType`, so clones inherit them. Decorators *targeting the split model itself* are **impossible everywhere** — `FooCreate` has no TypeSpec symbol.
+- Request models with only optional response-only properties still expose properties that are not accepted in the write payload.
+- Adding or removing an excluded required property, or changing an excluded property between optional and required, can switch an operation between a base and projected model name.
 
-**What actually differs:**
+### 3.4 Investigation comparison
 
-| | **(A) Emitter-local** | **(B) TCGC pull-only** | **(C) TCGC context-construction** |
-|---|---|---|---|
-| Known during TCGC context construction | ❌ registered later by emitter | ❌ returned later to emitter | ✅ constructed as a first-class member |
-| Name-collision vs. a user's real `FooCreate` | binder renames positionally (`FooCreate_1`); semantic dedup is extra | same as A | ✅ reuses TCGC's dedup (if split runs before/with naming) |
-| `body.type === response.type` invariant | preserved on canonical graph; only JS copy diverges → **localized** | same as A | **diverges globally** in the context → larger blast radius |
-| Emitter work required | all of it | repoint + register | **none** |
-| Who keeps the clone valid as `SdkModelType` evolves | shallow spread inherits new fields automatically (low burden) | TCGC | TCGC |
-| Who is affected | JS only | JS only | **JS only too** — `createSdkContext` is per-emitter |
-| Shipping velocity / size | fastest | small TCGC change | largest (touches construction + identity invariant) |
+The repository-wide investigation measures all three proposals across **185** multi-version TypeSpec projects and **513** adjacent version upgrades. A current breaking change is counted when an operation input changes from its current base model to a projected model.
 
-**(A) is preferred:** it is JS-only, ships without a TCGC release, and keeps the change fully in the emitter we own — so we can maintain and iterate on it directly. The clone is a shallow spread of an `SdkModelType`, so it inherits new fields automatically like every other emitter site; the only real cost is that name collisions fall back to the binder's positional rename rather than a semantic name.
+| Concern | Proposal 1: always split | Proposal 2: any write difference | Proposal 3: required read-only |
+| --- | --- | --- | --- |
+| Projected models in the latest versions of 185 projects | **10,959** | **3,735** | **1,286** |
+| Base/projection transitions across 513 version upgrades | **0** because projected models are always emitted  | **15** transitions across **12** upgrades | **1** transition across **1** upgrade |
+| Changed operation inputs in the latest versions (breaking change) | **2,831** across **179** projects | **1,516** across **151** projects | **1,227** across **142** projects |
+| Generated-name collision rows | **90** | **11** | **6** |
+
+
+Proposal 3 still changes **1,227** operation inputs. This is because a required read-only property can be inside an optional child model:
+
+```typespec
+model Parent {
+  child?: Child;
+}
+
+model Child {
+  @visibility(Lifecycle.Read)
+  id: string;
+}
+```
+
+A sample can omit `child`, so this case may not cause a sample failure. However, callers that provide `child` should not be required to set `id`. The emitter therefore creates `ChildCreate` without `id` and `ParentCreate` that references `ChildCreate`.
+
+This parent propagation explains why Proposal 3 still produces **1,286** projected models. The table measures changed public input types, not sample failures or downstream source-code changes. Existing JavaScript customizations reduce only the operations they explicitly replace.
 
 ## 4. Implementation
+
+The implementation is shared by all three proposals. The prototype uses Proposal 2; Proposals 1 and 3 require only a different seed condition in the mark phase.
+
+### 4.1 Projection engine
+
+The implementation uses stable `@typespec/http` helpers as an oracle and materializes `SdkModelType` clones over the existing TCGC graph:
+
+- `resolveRequestVisibility(program, operation, verb)` resolves the request visibility (POST→Create, PUT→Create | Update, PATCH→Update, and so on).
+- `MetadataInfo.isPayloadProperty(prop, visibility)` determines whether a property belongs in the request payload.
+- `getVisibilitySuffix(visibility, Visibility.Read)` supplies the projected model suffix (`Create`, `Update`, `CreateOrUpdate`, or `Query`).
+
+`@typespec/http-canonicalization` was also evaluated, but it produces compiler `Type`s in a separate mutation realm. Feeding those types back into TCGC breaks realm-keyed caches and relies on an experimental API, so it is not used.
+
+### 4.2 Integration location
+
+The split is implemented as an emitter-local pre-pass. The emitter clones models, repoints operation bodies, and registers the projected models in `sdkPackage.models`.
+
+This keeps the behavior JavaScript-specific, avoids a TCGC release, and preserves the canonical TCGC graph for other emitters. Source-model decorators such as `@clientName` and `@access` are already represented on `SdkModelType`, so shallow clones inherit them.
+
+The main tradeoff is name collision handling: if a generated `FooCreate` conflicts with an existing model, the emitter binder currently falls back to a positional name such as `FooCreate_1`.
+
+### 4.3 Graph rewrite
 
 The whole feature is a single emitter pre-pass in `src/modular/helpers/visibility-helpers.ts`:
 
@@ -137,7 +179,9 @@ Widget                      Detail                    Meta
 └─ meta   ──► Meta
 ```
 
-**Phase 1 — Collect** (`collectMethodRoots` → `collectNode`). Resolve the write visibility from the verb (`resolveRequestVisibility`), then DFS from each model-typed body root building one node per `(model, visibility)`. Each node records references through direct model properties and array element types, plus `ownPropertyDropped` (does it omit an own property under this visibility — `MetadataInfo.isPayloadProperty`). Nodes are seeded *before* recursing, so the `Detail → Detail` back-edge terminates; the source graph is never mutated.
+#### Phase 1 — Collect
+
+`collectMethodRoots` and `collectNode` resolve the write visibility from the verb, then DFS from each model-typed body root to build one node per `(model, visibility)`. Each node records references through direct model properties and array element types, plus whether it omits any own property under this visibility. Proposal 3 would additionally record whether any omitted own property is required. Nodes are seeded *before* recursing, so the `Detail → Detail` back-edge terminates; the source graph is never mutated.
 
 ```
         detail          next
@@ -152,7 +196,15 @@ Widget                      Detail                    Meta
  └────────┘
 ```
 
-**Phase 2 — Mark** (`markNodesNeedingClones`). Reverse-propagate `needsClone` outward from every `ownPropertyDropped` node: a node needs a clone iff it can *reach* a drop. As a transitive closure it needs no special-casing for cycles, mutual recursion, or discriminated trees.
+#### Phase 2 — Mark
+
+`markNodesNeedingClones` seeds and reverse-propagates `needsClone` through the graph:
+
+- **Proposal 1:** seed every request-reachable node.
+- **Proposal 2:** seed every node whose `ownPropertyDropped` is true.
+- **Proposal 3:** seed every node that drops at least one required own property.
+
+The graph preserves projected references through all parent models. For Proposals 2 and 3, a parent needs a clone when it can reach a seeded child; Proposal 1 has already seeded every request-reachable parent. The transitive closure needs no special-casing for cycles, mutual recursion, or discriminated trees.
 
 ```
  Widget  ✔ needsClone   (own drop: id)
@@ -160,7 +212,9 @@ Widget                      Detail                    Meta
  Meta    ·  collapses   (reaches no drop → no clone, reused as-is)
 ```
 
-**Phase 3 — Build clones** (`buildClones`). Pass 1 allocates an empty shell (`getVisibilitySuffix` name) for every node that needs a clone; pass 2 wires them once *all* shells exist — dropping non-payload props, repointing direct model references and array element models (and, for discriminated nodes, `baseModel`/`discriminatedSubtypes`) at their clones. Array types are shallow-cloned only when their element type changes. Shells-before-wiring is what lets the `Detail` self-cycle repoint to the clone rather than the read model.
+#### Phase 3 — Build clones
+
+`buildClones` first allocates an empty shell, named with `getVisibilitySuffix`, for every node that needs a clone. A second pass wires the shells once all of them exist: it drops all non-payload properties, repoints direct model references and array element models, and updates `baseModel` and `discriminatedSubtypes` for discriminated nodes. Array types are shallow-cloned only when their element type changes. Shells-before-wiring lets the `Detail` self-cycle repoint to the clone rather than the read model.
 
 ```
  WidgetCreate {                 DetailCreate {              Meta  (reused, no clone)
@@ -171,7 +225,9 @@ Widget                      Detail                    Meta
  // dropped (both @Read): Widget.id, Detail.secret
 ```
 
-**Phase 4 — Link** (`repointMethodBody`). Point each model-typed method parameter — and the payload side (`bodyParam.type` for a non-spread body, or the matching wrapper property for a *spread* body) — at its clone. Responses are left alone, so the read graph survives.
+#### Phase 4 — Link
+
+`repointMethodBody` points each model-typed method parameter—and the payload side (`bodyParam.type` for a non-spread body, or the matching wrapper property for a spread body)—at its clone. Responses are left alone, so the read graph survives.
 
 ```
  POST createWidget(body: WidgetCreate)     // request  → write view
@@ -225,15 +281,15 @@ Measured on two large ARM specs by compiling real `azure-rest-api-specs` with a 
 
 ## 7. Impact on the existing SDKs
 
-Enabling `experimental-split-models-by-visibility` changes the public TypeScript API of an existing SDK even though it does **not** change the service's HTTP contract. The request types become a more accurate representation of the existing wire payload. Consumer TypeScript applications that import, annotate, or construct the previous request models may require source changes after upgrading.
+Enabling `experimental-split-models-by-visibility` does **not** change the service's HTTP contract, but it can change the public TypeScript API of an existing SDK. Request types become a more accurate representation of the write payload; consumers that import, annotate, or construct the previous shared models may require source changes.
 
-The impact was evaluated by regenerating nine TypeSpec-based ARM packages that currently use JavaScript-specific visibility workarounds: Relationships, Cloud Health, Compute Schedule, Device Registry, Disconnected Operations, Discovery, Monitor Workspaces, Resilience Management, and Security. The generated diff is available in [Azure/azure-sdk-for-js#39505](https://github.com/Azure/azure-sdk-for-js/pull/39505).
+Section 3.4 compares the model growth, version stability, and current operation-input changes for all three proposals. The following categories explain how those changes affect SDK users.
 
 ### 7.1 Breaking-change categories
 
-#### 1. Request model names change
+#### 1. Request model names can change
 
-When a write view differs from the read view, an operation parameter changes from the canonical model to a suffixed model:
+When a write view differs from the read view, an operation parameter changes from the shared model to a suffixed request model:
 
 ```ts
 // Before
@@ -243,7 +299,9 @@ resource: Relationship
 resource: RelationshipCreateOrUpdate
 ```
 
-This breaks consumers that import or explicitly annotate the old parameter type. It also adds the generated request model to the package's public exports. Common suffixes are `Create`, `Update`, and `CreateOrUpdate`.
+This can break consumers that import or explicitly annotate the previous parameter type. Common suffixes are `Create`, `Update`, and `CreateOrUpdate`.
+
+With Proposals 2 and 3, model names can also change across API versions. For Proposal 2, adding any read-only property can change `Widget` to `WidgetCreate`; for Proposal 3, the transition occurs when an excluded property becomes required. Removing the last triggering difference can change the request type back to `Widget`.
 
 #### 2. Optional read-only properties disappear from request types
 
@@ -280,66 +338,10 @@ Visibility splitting removes these properties entirely from the new request mode
 
 Response models retain the read-only properties; only the request-side model graph is narrowed.
 
-#### 3. Existing `*Update` models can become `*UpdateUpdate`
-
-`ArmCustomPatchAsync` and `ArmCustomPatchSync` can create a top-level `*Update` model without removing read-only properties from models nested beneath it. If the visibility pass removes anything in that nested graph, the top-level model also needs a distinct projected clone. The mechanical naming rule therefore appends `Update` to the existing name:
-
-- `HealthModelUpdateUpdate`
-- `SchemaRegistryUpdateUpdate`
-- `DisconnectedOperationUpdateUpdate`
-- `AzureMonitorWorkspaceResourceUpdateUpdate`
-- `DrillUpdateUpdate`
-
-These models are not duplicate generic clones: they represent a second, nested visibility projection. The names are correct under the current rule but are awkward and create additional public API churn.
-
-#### 4. Public exports and API-review baselines grow
+#### 3. Public exports and API-review baselines grow
 
 Each non-collapsed projection introduces another public model and may introduce projected models for multiple levels of the object graph. Package entry points, API-review files, documentation, and generated serializers are updated accordingly. This is primarily additive, but removing or replacing hand-written workaround models can also rename or remove previously exported request types.
 
-### 7.2 Rollout implications
+### 7.2 Adoption implications
 
-The flag should not be enabled silently for an already released SDK. The following strategies could mitigate the breaking changes.
-
-#### Option 1 — Enable for greenfield services and during brownfield major releases
-
-Enable visibility splitting by default for new SDKs. Existing SDKs keep their current behavior until their next planned major version, where the generated API changes can be reviewed and released as intentional breaking changes.
-
-**Pros**
-
-- Produces consistent and accurate request models.
-- Handles the changes through the normal major-version process.
-
-**Cons**
-
-- Delays the improvement for brownfield SDKs.
-- Requires service teams to review a potentially large API change.
-- Requires tracking the flag and enabling it when a major release occurs.
-
-#### Option 2 — Add a brownfield compatibility mode
-
-Add an option such as `preserve-optional-readonly-properties`. Brownfield packages would enable visibility splitting together with this compatibility option, retaining optional read-only properties in write models while still removing properties that cannot safely remain.
-
-**Pros**
-
-- Mitigates most optional read-only property removals.
-- Reduces model renames and API-surface growth.
-
-**Cons**
-
-- Newly generated write models still expose optional read-only properties.
-- Adds another generation mode to understand and maintain.
-
-#### Option 3 — Add operation-level control (not recommended)
-
-Operation-level control could work in either direction:
-
-- **Opt-in:** keep the feature off and enable selected operations. New operations must be added manually, so visibility issues can be missed.
-- **Opt-out:** enable the feature and disable selected operations. Brownfield packages may need a large exclusion list, and a missed operation can introduce an accidental breaking change.
-
-Both approaches produce inconsistent behavior within a package and require ongoing list maintenance.
-
-Option 1 provides the cleanest long-term model and is the recommended default. Option 2 reduces the initial brownfield impact at the cost of less accurate request models.
-
-## 8. Open questions
-
-- **Deserializer for write-only models:** `addSerializationFunctions` (`emit-models.ts`) emits **both** a serializer and a deserializer for every model, with no `usage & Output` gate. A projected `FooCreate` is write-only (request body only), so its deserializer is dead code. This is pre-existing baseline-emitter behavior (any input-only model gets an unused deserializer too), not introduced by the split. Decide: should we gate deserializer emission on `UsageFlags.Output`? Note the fix would be a general emitter change affecting all input-only models, not just projected ones.
+The flag should not be enabled silently for an already released SDK. New SDKs can adopt the selected proposal from their first release; existing SDKs should adopt it as an intentional compatibility change, typically at a major-version boundary.
