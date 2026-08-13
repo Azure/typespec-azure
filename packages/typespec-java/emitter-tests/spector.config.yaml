@@ -54,6 +54,7 @@ specs:
   azure/resource-manager/operation-templates: { options: { generate-tests: false } }
   azure/resource-manager/resources: { options: { generate-tests: false } }
   azure/resource-manager/service-group: { options: { generate-tests: false } }
+  azure/resource-manager/service-group-extension: true
   azure/special-headers/client-request-id: true
   azure/special-headers/conditional-request: true
   azure/versioning/previewVersion: true
