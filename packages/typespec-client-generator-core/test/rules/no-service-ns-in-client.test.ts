@@ -8,8 +8,7 @@ import { noServiceNsInClientRule } from "../../src/rules/no-service-ns-in-client
 import { createClientCustomizationInput, SimpleBaseTester } from "../tester.js";
 
 const libraryName = "@azure-tools/typespec-client-generator-core";
-const diagnosticCode =
-  "@azure-tools/typespec-client-generator-core/no-service-ns-in-client";
+const diagnosticCode = "@azure-tools/typespec-client-generator-core/no-service-ns-in-client";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;

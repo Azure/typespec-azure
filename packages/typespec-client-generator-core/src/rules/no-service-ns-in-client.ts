@@ -2,10 +2,10 @@ import {
   createRule,
   getNamespaceFullName,
   isService,
+  type Namespace,
   paramMessage,
   type Program,
   resolvePath,
-  type Namespace,
   type Statement,
 } from "@typespec/compiler";
 import {
@@ -32,19 +32,14 @@ export const noServiceNsInClientRule = createRule({
         }
         processed = true;
 
-        const clientTspPath = resolvePath(
-          context.program.projectRoot,
-          "client.tsp",
-        );
+        const clientTspPath = resolvePath(context.program.projectRoot, "client.tsp");
         const clientScript = context.program.sourceFiles.get(clientTspPath);
         if (!clientScript) {
           return;
         }
 
         for (const namespaceDecl of getNamespaceDeclarations(clientScript)) {
-          const namespace = context.program.checker.getTypeForNode(
-            namespaceDecl.lookupNode,
-          );
+          const namespace = context.program.checker.getTypeForNode(namespaceDecl.lookupNode);
           if (namespace.kind !== "Namespace") {
             continue;
           }
@@ -77,9 +72,7 @@ interface NamespaceDeclaration {
   node: NamespaceStatementNode;
 }
 
-function getNamespaceDeclarations(
-  script: TypeSpecScriptNode,
-): NamespaceDeclaration[] {
+function getNamespaceDeclarations(script: TypeSpecScriptNode): NamespaceDeclaration[] {
   return collectNamespaceDeclarations(script.statements, []);
 }
 
@@ -94,9 +87,7 @@ function collectNamespaceDeclarations(
       continue;
     }
 
-    declarations.push(
-      ...collectNamespaceStatementDeclarations(statement, parentSegments),
-    );
+    declarations.push(...collectNamespaceStatementDeclarations(statement, parentSegments));
   }
 
   return declarations;
@@ -128,9 +119,7 @@ function collectNamespaceStatementDeclarations(
   ];
 
   if (Array.isArray(current.statements)) {
-    declarations.push(
-      ...collectNamespaceDeclarations(current.statements, segments),
-    );
+    declarations.push(...collectNamespaceDeclarations(current.statements, segments));
   }
 
   return declarations;
@@ -142,10 +131,7 @@ function isNamespaceStatementNode(
   return statement !== undefined && !Array.isArray(statement);
 }
 
-function findEnclosingServiceNamespace(
-  namespace: Namespace,
-  program: Program,
-): string | undefined {
+function findEnclosingServiceNamespace(namespace: Namespace, program: Program): string | undefined {
   let current: Namespace | undefined = namespace;
 
   while (current) {
