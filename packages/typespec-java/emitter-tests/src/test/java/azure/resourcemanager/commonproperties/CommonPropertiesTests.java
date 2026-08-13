@@ -105,6 +105,9 @@ public class CommonPropertiesTests {
             + "/providers/Microsoft.Network/virtualNetworks/myVnet";
         final String armIdWithAllScopes = "/subscriptions/" + subscriptionId + "/resourceGroups/" + resourceGroup
             + "/providers/Microsoft.Compute/virtualMachines/myVm";
+        final String armIdWithGroupScope
+            = "/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.Authorization/roleDefinitions/"
+                + "00000000-0000-0000-0000-000000000000";
 
         // Create
         ArmResourceIdentifierResource resource = manager.armResourceIdentifiers()
@@ -114,7 +117,8 @@ public class CommonPropertiesTests {
             .withProperties(new ArmResourceIdentifierResourceProperties().withSimpleArmId(simpleArmId)
                 .withArmIdWithType(simpleArmId)
                 .withArmIdWithTypeAndScope(simpleArmId)
-                .withArmIdWithAllScopes(armIdWithAllScopes))
+                .withArmIdWithAllScopes(armIdWithAllScopes)
+                .withArmIdWithGroupScope(armIdWithGroupScope))
             .create();
         Assertions.assertNotNull(resource);
         Assertions.assertEquals("armId", resource.name());
@@ -124,6 +128,7 @@ public class CommonPropertiesTests {
         Assertions.assertEquals(simpleArmId, resource.properties().armIdWithType());
         Assertions.assertEquals(simpleArmId, resource.properties().armIdWithTypeAndScope());
         Assertions.assertEquals(armIdWithAllScopes, resource.properties().armIdWithAllScopes());
+        Assertions.assertEquals(armIdWithGroupScope, resource.properties().armIdWithGroupScope());
 
         // Get
         resource = manager.armResourceIdentifiers().getByResourceGroup(resourceGroup, "armId");
@@ -132,6 +137,9 @@ public class CommonPropertiesTests {
         Assertions.assertNotNull(resource.properties());
         Assertions.assertEquals(ResourceProvisioningState.SUCCEEDED, resource.properties().provisioningState());
         Assertions.assertEquals(simpleArmId, resource.properties().simpleArmId());
+        Assertions.assertEquals(simpleArmId, resource.properties().armIdWithType());
+        Assertions.assertEquals(simpleArmId, resource.properties().armIdWithTypeAndScope());
         Assertions.assertEquals(armIdWithAllScopes, resource.properties().armIdWithAllScopes());
+        Assertions.assertEquals(armIdWithGroupScope, resource.properties().armIdWithGroupScope());
     }
 }

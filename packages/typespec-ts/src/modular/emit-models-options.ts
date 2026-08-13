@@ -1,11 +1,14 @@
 import { joinPaths } from "@typespec/compiler";
 
-import { ModularEmitterOptions } from "./interfaces.js";
+import type { ModularEmitterOptions } from "./interfaces.js";
 
-import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
+import type {
+  SdkClientType,
+  SdkServiceOperation,
+} from "@azure-tools/typespec-client-generator-core";
 import { useContext } from "../context-manager.js";
 import { getClientModuleInfo } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import { NameType, normalizeName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { buildOperationOptions } from "./build-operations.js";

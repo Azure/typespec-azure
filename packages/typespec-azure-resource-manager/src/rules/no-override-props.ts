@@ -3,10 +3,10 @@ import {
   createRule,
   fileRef,
   ignoreDiagnostics,
-  Model,
+  type Model,
   paramMessage,
-  Scalar,
-  Type,
+  type Scalar,
+  type Type,
 } from "@typespec/compiler";
 
 type ScalarFamily = "string" | "numeric" | "boolean";

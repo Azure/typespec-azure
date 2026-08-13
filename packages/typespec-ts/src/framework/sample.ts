@@ -1,6 +1,6 @@
 import {
-  FunctionDeclarationStructure,
-  InterfaceDeclarationStructure,
+  type FunctionDeclarationStructure,
+  type InterfaceDeclarationStructure,
   Project,
   StructureKind,
 } from "ts-morph";

@@ -885,7 +885,7 @@ op ArmResourceActionNoContentSync<
 /**
  * Adds check global name availability operation, normally used if
  * a resource name must be globally unique (for example, if the resource
- * exposes and endpoint that uses the resource name in the url)
+ * exposes an endpoint that uses the resource name in the url)
  * @template Request the availability request, defaults to the standard request, containing name and resource type
  * @template Response the availability response, default to the standard response
  * @template AdditionalParams A model specifying additional non-path parameters to the availability request
@@ -905,7 +905,7 @@ op checkGlobalNameAvailability<
 /**
  * Adds check location-specific name availability operation, normally used if
  * a resource name must be globally unique (for example, if the resource
- * exposes and endpoint that uses the resource name in the url)
+ * exposes an endpoint that uses the resource name in the url)
  * @template Request the availability request, defaults to the standard request, containing name and resource type
  * @template Response the availability response, default to the standard response
  * @template AdditionalParams A model specifying additional non-path parameters to the availability request

@@ -7,7 +7,7 @@ import {
   type Namespace,
   type Program,
 } from "@typespec/compiler";
-import { LanguagePackageMetadata, TypeSpecMetadata } from "./metadata.js";
+import type { LanguagePackageMetadata, TypeSpecMetadata } from "./metadata.js";
 
 const PACKAGE_NAME_KEYS = ["package-name", "packageName", "package"];
 const NAMESPACE_KEYS = ["namespace", "namespace-name", "namespaceName"];

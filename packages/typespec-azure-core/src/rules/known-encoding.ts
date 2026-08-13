@@ -1,6 +1,6 @@
 import {
-  ModelProperty,
-  Scalar,
+  type ModelProperty,
+  type Scalar,
   createRule,
   fileRef,
   getEncode,

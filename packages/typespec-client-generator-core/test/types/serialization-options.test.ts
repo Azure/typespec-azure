@@ -1,6 +1,6 @@
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
-import {
+import type {
   SdkArrayType,
   SdkHttpOperation,
   SdkModelType,

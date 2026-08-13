@@ -1,4 +1,4 @@
-import { Namespace, createRule, fileRef, paramMessage } from "@typespec/compiler";
+import { type Namespace, createRule, fileRef, paramMessage } from "@typespec/compiler";
 
 import { getVersion } from "@typespec/versioning";
 import { isInternalTypeSpec } from "./utils.js";

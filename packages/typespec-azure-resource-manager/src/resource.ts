@@ -1,34 +1,34 @@
 import { getAllProperties } from "@azure-tools/typespec-azure-core";
 import {
   $tag,
-  ArrayModelType,
+  type ArrayModelType,
   getProperty as compilerGetProperty,
-  DecoratorContext,
-  Enum,
-  EnumMember,
+  type DecoratorContext,
+  type Enum,
+  type EnumMember,
   getKeyName,
   getNamespaceFullName,
   getTags,
-  Interface,
+  type Interface,
   isArrayModelType,
   isGlobalNamespace,
   isNeverType,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   isTemplateInstance,
-  Model,
-  ModelProperty,
-  Namespace,
-  Operation,
-  Program,
-  Type,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Operation,
+  type Program,
+  type Type,
 } from "@typespec/compiler";
 import { useStateMap } from "@typespec/compiler/utils";
 import { getHttpOperation, isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
 
 import { camelCase, pascalCase } from "change-case";
-import {
+import type {
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
   ArmVirtualResourceDecorator,
@@ -45,7 +45,7 @@ import {
   SubscriptionResourceDecorator,
   TenantResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
-import {
+import type {
   ArmExternalTypeDecorator,
   ArmFeatureOptions,
   CustomAzureResourceDecorator,
@@ -61,10 +61,10 @@ import {
   resolveProviderNamespace,
 } from "./namespace.js";
 import {
-  ArmOperationKind,
-  ArmResolvedOperationsForResource,
-  ArmResourceOperation,
-  ArmResourceOperations,
+  type ArmOperationKind,
+  type ArmResolvedOperationsForResource,
+  type ArmResourceOperation,
+  type ArmResourceOperations,
   getArmResourceOperationData,
   getArmResourceOperationList,
   getResourceNameForOperation,

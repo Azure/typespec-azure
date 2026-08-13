@@ -1,4 +1,10 @@
-import { ModelProperty, Type, createRule, fileRef, paramMessage } from "@typespec/compiler";
+import {
+  type ModelProperty,
+  type Type,
+  createRule,
+  fileRef,
+  paramMessage,
+} from "@typespec/compiler";
 import {
   getAddedOnVersions,
   getMadeOptionalOn,

@@ -19,8 +19,8 @@ import {
   type Program,
   type Scalar,
   type Type,
-  UnknownType,
-  VoidType,
+  type UnknownType,
+  type VoidType,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import {
@@ -46,13 +46,13 @@ import { getLroResult } from "./decorators/lro-result.js";
 import {
   extractLroStates,
   findLroStatusProperty,
-  LongRunningStates,
+  type LongRunningStates,
 } from "./decorators/lro-status.js";
 import {
   getOperationLink,
   getOperationLinks,
   type OperationLink,
-  OperationLinkMetadata,
+  type OperationLinkMetadata,
 } from "./decorators/operation-link.js";
 import {
   getPollingLocationInfo,

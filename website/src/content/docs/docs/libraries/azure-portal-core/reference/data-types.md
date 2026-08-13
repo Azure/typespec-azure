@@ -46,10 +46,10 @@ model Azure.Portal.DisplayNamesOptions
 
 #### Properties
 
-| Name     | Type     | Description |
-| -------- | -------- | ----------- |
-| singular | `string` |             |
-| plural   | `string` |             |
+| Name     | Type     | Description                                |
+| -------- | -------- | ------------------------------------------ |
+| singular | `string` | The singular display name of the resource. |
+| plural   | `string` | The plural display name of the resource.   |
 
 ### `FilePath` {#Azure.Portal.FilePath}
 
@@ -75,10 +75,10 @@ model Azure.Portal.LearnMoreDocsOptions
 
 #### Properties
 
-| Name  | Type     | Description |
-| ----- | -------- | ----------- |
-| title | `string` |             |
-| uri   | `string` |             |
+| Name  | Type     | Description                          |
+| ----- | -------- | ------------------------------------ |
+| title | `string` | The title of the documentation link. |
+| uri   | `string` | The URI of the documentation link.   |
 
 ### `MarketplaceOfferOptions` {#Azure.Portal.MarketplaceOfferOptions}
 
@@ -104,7 +104,7 @@ model Azure.Portal.PromotionOptions
 
 #### Properties
 
-| Name        | Type                   | Description |
-| ----------- | ---------------------- | ----------- |
-| apiVersion  | `string \| EnumMember` |             |
-| autoUpdate? | `boolean`              |             |
+| Name        | Type                   | Description                                                                           |
+| ----------- | ---------------------- | ------------------------------------------------------------------------------------- |
+| apiVersion  | `string \| EnumMember` | The API version to promote, either a literal version string or a version enum member. |
+| autoUpdate? | `boolean`              | Whether the promoted API version should be updated automatically.                     |

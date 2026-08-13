@@ -498,13 +498,16 @@
           "readOnly": true
         },
         "identity": {
-          "$ref": "#/definitions/Identity"
+          "$ref": "#/definitions/Identity",
+          "description": "The identity of the resource."
         },
         "sku": {
-          "$ref": "#/definitions/Sku"
+          "$ref": "#/definitions/Sku",
+          "description": "The SKU of the resource."
         },
         "plan": {
-          "$ref": "#/definitions/Plan"
+          "$ref": "#/definitions/Plan",
+          "description": "The plan of the resource."
         }
       },
       "allOf": [

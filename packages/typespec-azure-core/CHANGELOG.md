@@ -1,5 +1,18 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.71.0
+
+### Features
+
+- [#5109](https://github.com/Azure/typespec-azure/pull/5109) Add `no-openapi-client-extensions` linter rule that flags use of the `@typespec/openapi` `@extension` decorator to emit client-altering `x-ms-*`/`x-nullable` OpenAPI extensions (e.g. `x-ms-long-running-operation`, `x-ms-pageable`, `x-ms-enum`, `x-ms-client-name`, `x-ms-secret`). These extensions only affect the OpenAPI output, so other emitters produce an incorrect representation of the API; use the equivalent TypeSpec construct instead.
+- [#4891](https://github.com/Azure/typespec-azure/pull/4891) Add built-in support for Azure service groups as extension resource targets and ARM resource identifier scopes.
+- [#4880](https://github.com/Azure/typespec-azure/pull/4880) Replace the `no-unnamed-union` linter rule with `no-unnamed-types` in `@azure-tools/typespec-azure-core`. The new rule flags anonymous models in addition to unnamed unions, walking the type graph from operations to detect anonymous models on the client surface. The `no-unnamed-types` rule has been removed from `@azure-tools/typespec-client-generator-core`.
+
+### Bug Fixes
+
+- [#5109](https://github.com/Azure/typespec-azure/pull/5109) The `no-openapi` rule no longer flags the `@extension` decorator. Client-altering `x-ms-*` extensions emitted through `@extension` are handled by the `no-openapi-client-extensions` rule instead.
+
+
 ## 0.70.0
 
 No changes, version bump only.

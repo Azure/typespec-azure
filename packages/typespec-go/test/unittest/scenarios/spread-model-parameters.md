@@ -83,8 +83,7 @@ func (client *RegressionsClient) SpreadWithModel(ctx context.Context, name strin
 		return RegressionsClientSpreadWithModelResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return RegressionsClientSpreadWithModelResponse{}, err
+		return RegressionsClientSpreadWithModelResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return RegressionsClientSpreadWithModelResponse{}, nil
 }

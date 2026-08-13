@@ -1,23 +1,23 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { SdkClient } from "@azure-tools/typespec-client-generator-core";
+import type { SdkClient } from "@azure-tools/typespec-client-generator-core";
 import { getDoc, joinPaths } from "@typespec/compiler";
 import { getServers } from "@typespec/http";
 import {
-  ClientModel,
-  ClientOptions,
-  Imports,
-  OperationParameter,
-  OperationResponse,
-  PathParameter,
-  Paths,
-  Schema,
+  type ClientModel,
+  type ClientOptions,
+  type Imports,
+  type OperationParameter,
+  type OperationResponse,
+  type PathParameter,
+  type Paths,
+  type Schema,
   SchemaContext,
-  UrlInfo,
+  type UrlInfo,
 } from "../interfaces.js";
 import { buildRuntimeImports, initInternalImports } from "../utils/imports-util.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import {
   getDefaultService,
   getFormattedPropertyDoc,

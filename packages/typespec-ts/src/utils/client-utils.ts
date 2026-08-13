@@ -2,20 +2,20 @@ import {
   InitializedByFlags,
   listAllServiceNamespaces,
   listClients,
-  SdkClient,
-  SdkClientType,
-  SdkServiceOperation,
+  type SdkClient,
+  type SdkClientType,
+  type SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
 import {
   getNamespaceFullName,
-  Interface,
+  type Interface,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
-  Namespace,
-  Operation,
+  type Namespace,
+  type Operation,
 } from "@typespec/compiler";
-import { ClientModuleInfo } from "../modular/interfaces.js";
-import { SdkContext } from "./interfaces.js";
+import type { ClientModuleInfo } from "../modular/interfaces.js";
+import type { SdkContext } from "./interfaces.js";
 import { NameType, normalizeName } from "./name-utils.js";
 
 export function getClients(dpgContext: SdkContext): SdkClient[] {

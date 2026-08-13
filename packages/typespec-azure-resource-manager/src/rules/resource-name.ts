@@ -1,7 +1,7 @@
 import {
-  Model,
-  ModelProperty,
-  SemanticNodeListener,
+  type Model,
+  type ModelProperty,
+  type SemanticNodeListener,
   createRule,
   fileRef,
   getProperty,

@@ -3,7 +3,7 @@ import {
   json,
   passOnCode,
   passOnSuccess,
-  ScenarioMockApi,
+  type ScenarioMockApi,
   ValidationError,
 } from "@typespec/spec-api";
 

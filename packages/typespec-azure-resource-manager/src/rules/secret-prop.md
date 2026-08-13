@@ -12,7 +12,7 @@ Returning a secret in a response violates the RPC contract unless the property i
 
 ## LintDiff Equivalent
 
-This rule corresponds to the LintDiff rule [XMSSecretInResponse](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md).
+This rule corresponds to the LintDiff rule [XMSSecretInResponse](https://github.com/Azure/azure-openapi-validator/blob/main/docs/xms-secret-in-response.md).
 
 ## ❌ Incorrect
 

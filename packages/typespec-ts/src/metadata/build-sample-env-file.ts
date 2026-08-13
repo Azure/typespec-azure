@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import { ClientModel } from "../interfaces.js";
+import type { ClientModel } from "../interfaces.js";
 
 const sampleEnvText = `
 # Feel free to add your own environment variables.

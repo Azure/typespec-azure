@@ -1,10 +1,10 @@
 import {
-  CodeFix,
+  type CodeFix,
   createAddDecoratorCodeFix,
   createRule,
   fileRef,
   listServices,
-  Namespace,
+  type Namespace,
   paramMessage,
 } from "@typespec/compiler";
 import { getVersion } from "@typespec/versioning";

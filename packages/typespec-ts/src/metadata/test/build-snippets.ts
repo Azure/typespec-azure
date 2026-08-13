@@ -1,4 +1,4 @@
-import { ClientModel } from "../../interfaces.js";
+import type { ClientModel } from "../../interfaces.js";
 import { getClientName } from "../../utils/name-constructors.js";
 import { renderTemplate } from "../render-template.js";
 import { snippetsContent } from "./template.js";
