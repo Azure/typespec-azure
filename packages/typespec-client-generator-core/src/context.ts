@@ -273,7 +273,7 @@ function validateOperationNamesInClients(context: SdkContext) {
   const diagnostics = createDiagnosticCollector();
 
   const validateClient = (client: SdkClientType<SdkHttpOperation>) => {
-    if (client.methods.length > 1) {
+    if (context.emitterName !== "csharp" && client.methods.length > 1) {
       const seen = new Map<string, SdkServiceMethod<SdkHttpOperation>>();
       const reported = new Set<string>();
       for (const method of client.methods) {
