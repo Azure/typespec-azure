@@ -44,6 +44,7 @@ model MonitoredResourceListResponse {
   @pageItems
   value: MonitoredResource[];
 
+  @nextLink
   @doc("The link to the next page of results.")
   nextLink?: url;
 }

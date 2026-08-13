@@ -6,9 +6,9 @@ name: "go / emitter diff commenter"
 #
 # SECURITY: the downloaded artifact is produced by the unprivileged fork run and
 # is fully attacker-controlled. Only the comment *body* is read from it; the
-# target PR is resolved from the trusted workflow_run.head_sha and the sticky
-# marker is hardcoded, so a crafted payload can't retarget another PR or
-# overwrite an unrelated comment.
+# target PR is resolved from the trusted workflow_run head repository, branch,
+# and SHA, and the sticky marker is hardcoded, so a crafted payload can't
+# retarget another PR or overwrite an unrelated comment.
 
 on:
   workflow_run:
@@ -49,23 +49,40 @@ jobs:
             // payload can't retarget/overwrite an unrelated sticky comment.
             const marker = "<!-- emitter-diff-go -->";
 
-            // Resolve the PR from the TRUSTED workflow_run head sha. Don't use
-            // workflow_run.pull_requests: it is empty for fork PRs. Don't trust
-            // any PR number carried in the artifact.
-            const headSha = context.payload.workflow_run.head_sha;
-            const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
-              owner, repo, commit_sha: headSha,
+            // Resolve the PR from TRUSTED workflow_run fields. Don't use
+            // workflow_run.pull_requests: it is empty for fork PRs. Looking up
+            // the head SHA in the base repo also returns no PR until the fork
+            // commit is merged.
+            const run = context.payload.workflow_run;
+            const headSha = run.head_sha;
+            const headBranch = run.head_branch;
+            const headRepo = run.head_repository?.full_name;
+            const headOwner = run.head_repository?.owner?.login;
+            if (!headSha || !headBranch || !headRepo || !headOwner) {
+              throw new Error('workflow_run payload is missing trusted head repository information.');
+            }
+
+            const { data: prs } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              head: `${headOwner}:${headBranch}`,
+              per_page: 100,
             });
-            const pr = prs.find(
+            const matches = prs.filter(
               (p) =>
-                p.state === 'open' &&
                 p.head.sha === headSha &&
+                p.head.ref === headBranch &&
+                p.head.repo?.full_name === headRepo &&
                 p.base.repo.full_name === `${owner}/${repo}`,
             );
-            if (!pr) {
-              core.info(`No open PR found for head sha ${headSha}; nothing to comment.`);
+            if (matches.length !== 1) {
+              core.info(
+                `Expected one open PR for ${headRepo}:${headBranch} at ${headSha}; found ${matches.length}.`,
+              );
               return;
             }
+            const [pr] = matches;
             const issue_number = pr.number;
 
             // Only the body is taken from the (untrusted) artifact; force our
