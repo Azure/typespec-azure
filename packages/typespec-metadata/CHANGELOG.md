@@ -1,5 +1,12 @@
 # @azure-tools/typespec-metadata
 
+## 0.3.0
+
+### Features
+
+- [#5065](https://github.com/Azure/typespec-azure/pull/5065) Add `apiVersion` field to `LanguagePackageMetadata` resolved via TCGC's `createSdkContext`. Values: `"all"` when configured for all versions, `"multiple-versions"` for multi-service configs, the actual resolved version string, or `undefined` when unavailable. Also adds `api-version` as a passthrough emitter option.
+
+
 ## 0.2.1
 
 ### Bug Fixes

@@ -634,16 +634,6 @@ export class ClientAdapter {
         );
         break;
       case "paging":
-        if (
-          sdkMethod.pagingMetadata.nextLinkReInjectedParametersSegments !== undefined &&
-          sdkMethod.pagingMetadata.nextLinkReInjectedParametersSegments.length > 0
-        ) {
-          throw new AdapterError(
-            "UnsupportedTsp",
-            `paging with re-injected parameters is not supported`,
-            sdkMethod.__raw?.node,
-          );
-        }
         method = new go.PageableMethod(
           methodName,
           goClient,
@@ -736,9 +726,11 @@ export class ClientAdapter {
     if (sdkMethod.pagingMetadata.nextLinkOperation) {
       throw new AdapterError("UnsupportedTsp", "next page operation NYI", sdkMethod.__raw?.node);
     } else if (sdkMethod.pagingMetadata.nextLinkSegments) {
-      return new go.PageableStrategyNextLink(
+      const strategy = new go.PageableStrategyNextLink(
         buildNextLinkPath(sdkMethod.pagingMetadata.nextLinkSegments),
       );
+      strategy.reinjectedParams = this.adaptPageableMethodReinjectionParams(sdkMethod, paramsMap);
+      return strategy;
     } else if (
       sdkMethod.pagingMetadata.continuationTokenParameterSegments &&
       sdkMethod.pagingMetadata.continuationTokenResponseSegments
@@ -755,6 +747,13 @@ export class ClientAdapter {
             throw new AdapterError(
               "InternalError",
               `missing continuation token request parameter name ${tokenReq.name} for operation ${sdkMethod.name}`,
+              sdkMethod.__raw?.node,
+            );
+          }
+          if (tokenParam.kind === "queryCollectionParam") {
+            throw new AdapterError(
+              "InternalError",
+              `unexpected collection continuation token request parameter ${tokenReq.name} for operation ${sdkMethod.name}`,
               sdkMethod.__raw?.node,
             );
           }
@@ -802,6 +801,50 @@ export class ClientAdapter {
 
     // operation is pageable but doesn't yet support fetching subsequent pages
     return undefined;
+  }
+
+  /**
+   * converts the method parameters that must be added to next link requests.
+   *
+   * @param method the tcgc pageable method
+   * @param paramsMap maps tcgc method parameters to Go parameters
+   * @returns the query parameters to add to next link requests
+   */
+  private adaptPageableMethodReinjectionParams(
+    method:
+      | tcgc.SdkLroPagingServiceMethod<tcgc.SdkHttpOperation>
+      | tcgc.SdkPagingServiceMethod<tcgc.SdkHttpOperation>,
+    paramsMap: ParamsMapForPageable,
+  ): Array<go.QueryParameter> {
+    if (!method.pagingMetadata.nextLinkReInjectedParametersSegments) {
+      return [];
+    }
+
+    const paramsForReinjection = new Array<go.QueryParameter>();
+    for (const reinjectedParamSegment of method.pagingMetadata
+      .nextLinkReInjectedParametersSegments) {
+      for (const reinjectedParam of reinjectedParamSegment) {
+        if (reinjectedParam.kind !== "method") {
+          throw new AdapterError(
+            "InternalError",
+            `unexpected next link re-injection parameter kind ${reinjectedParam.kind}`,
+            reinjectedParam.__raw?.node,
+          );
+        }
+        const goParam = paramsMap.get(reinjectedParam);
+        if (!goParam) {
+          throw new AdapterError(
+            "InternalError",
+            `missing re-injection parameter name ${reinjectedParam.name} for operation ${method.name}`,
+            method.__raw?.node,
+          );
+        } else if (goParam.kind === "headerScalarParam") {
+          continue;
+        }
+        paramsForReinjection.push(goParam);
+      }
+    }
+    return paramsForReinjection;
   }
 
   private populateMethod(
@@ -1194,6 +1237,7 @@ export class ClientAdapter {
         if (method.kind !== "nextPageMethod" && go.isPageableMethod(method)) {
           switch (adaptedParam.kind) {
             case "headerScalarParam":
+            case "queryCollectionParam":
             case "queryScalarParam":
               pageableParamsMap.set(param, adaptedParam);
           }
@@ -2464,7 +2508,7 @@ interface ParameterStyleInfo {
  */
 type ParamsMapForPageable = Map<
   tcgc.SdkMethodParameter,
-  go.HeaderScalarParameter | go.QueryScalarParameter
+  go.HeaderScalarParameter | go.QueryParameter
 >;
 
 /**

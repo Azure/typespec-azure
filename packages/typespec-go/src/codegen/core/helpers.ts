@@ -182,6 +182,7 @@ export function sortClientParameters(
 // returns the parameters for the internal request creator method.
 // e.g. "i int, s string"
 export function getCreateRequestParametersSig(method: go.MethodType | go.NextPageMethod): string {
+  // NOTE: keep in sync with getCreateRequestParameters
   const methodParams = getMethodParameters(method);
   const params = new Array<string>();
   params.push("ctx context.Context");
@@ -198,6 +199,13 @@ export function getCreateRequestParametersSig(method: go.MethodType | go.NextPag
     }
     params.push(`${paramName} ${formatParameterTypeName(method.receiver.type.pkg, methodParam)}`);
   }
+  if (
+    (method.kind === "lroPageableMethod" || method.kind === "pageableMethod") &&
+    method.strategy?.kind === "nextLink"
+  ) {
+    // inject the nextLink param right before the options param
+    params.splice(-1, 0, "nextLink string");
+  }
   return params.join(", ");
 }
 
@@ -209,7 +217,11 @@ export function getCreateRequestParametersSig(method: go.MethodType | go.NextPag
  * @param optionsParam optional custom param name for the method options param
  * @returns the text for the parameters
  */
-export function getCreateRequestParameters(method: go.MethodType, optionsParam?: string): string {
+export function getCreateRequestParameters(
+  method: go.MethodType,
+  nextLinkParam?: string,
+  optionsParam?: string,
+): string {
   // NOTE: keep in sync with getCreateRequestParametersSig
   const methodParams = getMethodParameters(method);
   const params = new Array<string>();
@@ -222,6 +234,10 @@ export function getCreateRequestParameters(method: go.MethodType, optionsParam?:
     } else {
       params.push(methodParam.name);
     }
+  }
+  if (nextLinkParam) {
+    // inject the nextLink param right before the options param
+    params.splice(-1, 0, nextLinkParam);
   }
   return params.join(", ");
 }
@@ -426,7 +442,11 @@ export function getDelimiterForCollectionFormat(cf: go.CollectionFormat): string
   }
 }
 
-export function getMediaFormat(type: go.WireType, mediaType: "JSON" | "XML", param: string): string {
+export function getMediaFormat(
+  type: go.WireType,
+  mediaType: "JSON" | "XML",
+  param: string,
+): string {
   let marshaller: "JSON" | "XML" | "ByteArray" = mediaType;
   let format = "";
   if (type.kind === "encodedBytes") {
@@ -1265,17 +1285,31 @@ export interface elseBlock {
 }
 
 /**
- * constructs an if block (can expand to include else if as necessary)
+ * constructs an if block
  *
  * @param indent the current indentation helper in scope
  * @param ifBlock the if block definition
+ * @param elseIfBlocks optional zero or more "else if" block definitions
  * @param elseBlock optional else block definition
  * @returns the text for the if block
  */
-export function buildIfBlock(indent: Indentation, ifBlock: ifBlock, elseBlock?: elseBlock): string {
+export function buildIfBlock(
+  indent: Indentation,
+  ifBlock: ifBlock,
+  elseIfBlocks?: Array<ifBlock>,
+  elseBlock?: elseBlock,
+): string {
   let body = `if ${ifBlock.condition} {\n`;
   body += ifBlock.body(indent.push());
   body += `${indent.pop().get()}}`;
+
+  if (elseIfBlocks) {
+    for (const elseIfBlock of elseIfBlocks) {
+      body += ` else if ${elseIfBlock.condition} {\n`;
+      body += elseIfBlock.body(indent.push());
+      body += `${indent.pop().get()}}`;
+    }
+  }
 
   if (elseBlock) {
     body += " else {\n";
@@ -1299,6 +1333,21 @@ export function buildErrCheck(indent: Indentation, errVar: string, returns?: str
   body += `${indent.push().get()}return ${returns ? `${returns}, ` : ""}${errVar}\n`;
   body += `${indent.pop().get()}}`;
   return body;
+}
+
+/**
+ * constructs a for block
+ *
+ * @param indent the current indentation helper in scope
+ * @param expression the for expression
+ * @param body the body of the for block
+ * @returns the text for the for block
+ */
+export function buildForBlock(indent: Indentation, expression: string, body: (indent: Indentation) => string): string {
+  let content = `for ${expression} {\n`;
+  content += body(indent.push());
+  content += `${indent.pop().get()}}\n`;
+  return content;
 }
 
 /**
