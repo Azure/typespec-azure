@@ -49,6 +49,7 @@ import {
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { createSdkPackage } from "./package.js";
+import { createDuplicateClientNameDiagnostic } from "./validations/diagnostics.js";
 
 interface CreateTCGCContextOptions {
   mutateNamespace?: boolean; // whether to mutate global namespace for versioning
@@ -272,8 +273,20 @@ function validateNamesUnderNamespaces(context: SdkContext) {
 function validateOperationNamesInClients(context: SdkContext) {
   const diagnostics = createDiagnosticCollector();
 
+  const reportDuplicateMethodName = (method: SdkServiceMethod<SdkHttpOperation>) => {
+    diagnostics.add(
+      createDuplicateClientNameDiagnostic(
+        method.name,
+        context.emitterName,
+        method.__raw ?? context.program.getGlobalNamespaceType(),
+        true,
+        "nonDecorator",
+      ),
+    );
+  };
+
   const validateClient = (client: SdkClientType<SdkHttpOperation>) => {
-    if (context.emitterName !== "csharp" && client.methods.length > 1) {
+    if (client.methods.length > 1) {
       const seen = new Map<string, SdkServiceMethod<SdkHttpOperation>>();
       const reported = new Set<string>();
       for (const method of client.methods) {
@@ -281,23 +294,9 @@ function validateOperationNamesInClients(context: SdkContext) {
         if (first) {
           if (!reported.has(method.name)) {
             reported.add(method.name);
-            diagnostics.add(
-              createDiagnostic({
-                code: "duplicate-client-name",
-                messageId: "nonDecorator",
-                format: { name: method.name, scope: context.emitterName },
-                target: first.__raw ?? context.program.getGlobalNamespaceType(),
-              }),
-            );
+            reportDuplicateMethodName(first);
           }
-          diagnostics.add(
-            createDiagnostic({
-              code: "duplicate-client-name",
-              messageId: "nonDecorator",
-              format: { name: method.name, scope: context.emitterName },
-              target: method.__raw ?? context.program.getGlobalNamespaceType(),
-            }),
-          );
+          reportDuplicateMethodName(method);
         } else {
           seen.set(method.name, method);
         }
