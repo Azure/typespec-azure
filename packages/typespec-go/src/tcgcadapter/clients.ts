@@ -1539,15 +1539,19 @@ export class ClientAdapter {
           opParam.__raw?.node,
         );
       case "header":
-        const headerMapType =
-          opParam.serializedName === "x-ms-meta"
-            ? this.ta.getWireType(methodParam.type, true, false)
-            : undefined;
-        if (headerMapType?.kind === "map") {
+        const type = this.ta.getWireType(methodParam.type, true, false);
+        if (type.kind === "map") {
+          if (opParam.serializedName !== "x-ms-meta") {
+            throw new AdapterError(
+              "InternalError",
+              `unexpected kind ${type.kind} for header ${opParam.serializedName}`,
+              opParam.__raw?.node,
+            );
+          }
           adaptedParam = new go.HeaderMapParameter(
             paramName,
             `${opParam.serializedName}-`,
-            headerMapType,
+            type,
             paramStyle,
             byVal,
             location,
@@ -1772,15 +1776,21 @@ export class ClientAdapter {
             continue;
           }
 
+          const type = this.ta.getWireType(httpHeader.type, true, false);
           let headerResp: go.HeaderScalarResponse | go.HeaderMapResponse;
-          const headerMapType =
-            httpHeader.serializedName === "x-ms-meta" || httpHeader.serializedName === "x-ms-or"
-              ? this.ta.getWireType(httpHeader.type, true, false)
-              : undefined;
-          if (headerMapType?.kind === "map") {
+          if (type.kind === "map") {
+            if (
+              httpHeader.serializedName !== "x-ms-meta" &&
+              httpHeader.serializedName !== "x-ms-or"
+            ) {
+              throw new AdapterError(
+                "InternalError",
+                `unexpected kind ${type.kind} for header ${httpHeader.serializedName}`,
+              );
+            }
             headerResp = new go.HeaderMapResponse(
               helpers.getEffectiveName(httpHeader),
-              headerMapType,
+              type,
               `${httpHeader.serializedName}-`,
             );
           } else {
