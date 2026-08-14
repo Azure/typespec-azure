@@ -115,7 +115,12 @@ export function createRequestHandler(
       if (pp.style === "literal") {
         // literals are always scalar types and require no empty checks
         paramValue = helpers.formatParamValue(pp, imports, indent);
-      } else if (pp.style === "required" || pp.location === "client") {
+      } else if (pp.location === "client") {
+        // required/optional client params have already been resolved
+        // in the constructor, so we can just use the client param value here.
+        // NOTE: we must check this before style === "required"
+        paramValue = helpers.getParamName(pp);
+      } else if (pp.style === "required") {
         // NOTE: we include client params here since they behave
         // like required params (i.e. not grouped).
 
@@ -127,11 +132,7 @@ export function createRequestHandler(
               (pp.type.kind === "constant" && pp.type.type === "string")) &&
             !pp.omitEmptyStringCheck
           ) {
-            const paramName = helpers.getParamName(pp);
-            imports.add("errors");
-            text += `${indent.get()}if ${paramName} == "" {\n`;
-            text += `${indent.push().get()}return nil, errors.New("parameter ${paramName} cannot be empty")\n`;
-            text += `${indent.pop().get()}}\n`;
+            text += helpers.emitEmptyPathParamCheck(pp, imports, indent)
           }
         }
 

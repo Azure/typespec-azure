@@ -88,6 +88,22 @@ export function canonicalizeHeaderName(name: string): string {
 }
 
 /**
+ * emits code to verify that a path parameter is not empty
+ *
+ * @param param the path parameter to check
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @returns the code to check the path parameter for emptiness
+ */
+export function emitEmptyPathParamCheck(param: go.PathParameter, imports: ImportManager, indent: Indentation): string {
+  imports.add("errors");
+  let text = `${indent.get()}if ${param.name} == "" {\n`;
+  text += `${indent.push().get()}return nil, errors.New("parameter ${param.name} cannot be empty")\n`;
+  text += `${indent.pop().get()}}\n`;
+  return text;
+}
+
+/**
  * returns the parameter's type definition with a possible '*' prefix
  *
  * @param scope the package into which the type definition is being emitted
@@ -945,16 +961,19 @@ export function star(byValue: boolean): string {
  * @param param the param for which to create a zero value
  * @returns the zero-value expression
  */
-export function zeroValue(param: go.MethodParameter): string {
+export function zeroValue(param: go.ClientParameter | go.MethodParameter): string {
   // even though API version params typically have a client-side default which makes
   // them optional, the azcore.ClientOptions.APIVersion field isn't pointer-to-type.
-  if (go.isRequiredParameter(param.style) || go.isAPIVersionParameter(param)) {
+  if (go.isRequiredParameter(param.style)) {
     switch (param.type.kind) {
       case "string":
         return `""`;
       default:
         throw new CodegenError("InternalError", `unhandled zero-value kind ${param.type.kind}`);
     }
+  } else if (go.isAPIVersionParameter(param)) {
+    // api version is always a string
+    return `""`;
   }
 
   // optional params are pointer-to-type

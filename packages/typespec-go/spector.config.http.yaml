@@ -36,7 +36,6 @@ specs:
   "server/path/multiple": { options: { module: multiplegroup } }
   "server/path/single": { options: { module: singlegroup } }
   "server/versions/not-versioned": { options: { module: unversionedgroup } }
-  "server/versions/versioned": { options: { module: versionedgroup } }
   "special-headers/conditional-request": { options: { module: condreqgroup } }
   special-words: { options: { module: specialwordsgroup } }
   "type/array": { options: { module: arraygroup, slice-elements-byval: true } }
@@ -65,6 +64,8 @@ specs:
   "response/status-code-range": false
   # TODO: https://github.com/Azure/autorest.go/issues/1730
   routes: false
+  # TODO: https://github.com/Azure/typespec-azure/issues/5226
+  "server/versions/versioned": false
   # requires union support
   "special-headers/repeatability": false
   # TODO: https://github.com/Azure/autorest.go/issues/1594
