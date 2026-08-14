@@ -1,5 +1,13 @@
 # Release
 
+## 0.63.5
+
+- Require node 22.18.0 or higher to run the emitter
+
+## 0.63.4
+
+- Bump @typespec/http-client-python to 0.36.0
+
 ## 0.63.3
 
 - Bump @typespec/http-client-python to 0.34.2

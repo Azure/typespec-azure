@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-python",
-  "version": "0.63.4",
+  "version": "0.63.5",
   "author": "Microsoft Corporation",
   "description": "TypeSpec emitter for Python SDKs",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -26,7 +26,7 @@
   },
   "tspMain": "dist/src/index.js",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.18.0"
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp ./venv ./node_modules",
