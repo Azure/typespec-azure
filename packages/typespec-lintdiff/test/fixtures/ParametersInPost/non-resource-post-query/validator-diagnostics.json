@@ -1,0 +1,13 @@
+[
+  {
+    "code": "ParametersInPost",
+    "message": "$filter is a query parameter. Post operation must not contain any query parameter other than api-version.",
+    "path": [
+      "paths",
+      "/providers/Microsoft.TestService/search",
+      "post",
+      "parameters"
+    ],
+    "severity": 0
+  }
+]
