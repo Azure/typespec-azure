@@ -1,15 +1,11 @@
-import { type ChildProcess, spawn, type SpawnOptions } from "child_process";
+import { spawn } from "child_process";
 import { coerce, satisfies } from "semver";
 
 /*
  * Copied from @autorest/system-requirements
  */
 
-const execute = (
-  command: string,
-  cmdlineargs: Array<string>,
-  options: MoreOptions = {},
-): Promise<ExecResult> => {
+const execute = (command, cmdlineargs, options = {}) => {
   return new Promise((resolve, reject) => {
     const cp = spawn(command, cmdlineargs, { ...options, stdio: "pipe", shell: true });
     if (options.onCreate) {
@@ -50,7 +46,7 @@ const execute = (
   });
 };
 
-const versionIsSatisfied = (version: string, requirement: string): boolean => {
+const versionIsSatisfied = (version, requirement) => {
   const cleanedVersion = coerce(version);
   if (!cleanedVersion) {
     throw new Error(`Invalid version ${version}.`);
@@ -65,11 +61,7 @@ const versionIsSatisfied = (version: string, requirement: string): boolean => {
  * @param requirement Requirement.
  * @returns the resolution if it is valid or an @see SystemRequirementError if not.
  */
-const validateVersionRequirement = (
-  resolution: SystemRequirementResolution,
-  actualVersion: string,
-  requirement: SystemRequirement,
-): SystemRequirementResolution | SystemRequirementError => {
+const validateVersionRequirement = (resolution, actualVersion, requirement) => {
   if (!requirement.version) {
     return resolution; // No version requirement.
   }
@@ -96,12 +88,8 @@ const validateVersionRequirement = (
   }
 };
 
-const tryPython = async (
-  requirement: SystemRequirement,
-  command: string,
-  additionalArgs: string[] = [],
-): Promise<SystemRequirementResolution | SystemRequirementError> => {
-  const resolution: SystemRequirementResolution = {
+const tryPython = async (requirement, command, additionalArgs = []) => {
+  const resolution = {
     name: PythonRequirement,
     command,
     additionalArgs: additionalArgs.length > 0 ? additionalArgs : undefined,
@@ -128,13 +116,10 @@ const tryPython = async (
  * @param requirement System requirement definition.
  * @returns If the requirement provide an environment variable for the path returns the value of that environment variable. undefined otherwise.
  */
-const getExecutablePath = (requirement: SystemRequirement): string | undefined =>
+const getExecutablePath = (requirement) =>
   requirement.environmentVariable && process.env[requirement.environmentVariable];
 
-const createPythonErrorMessage = (
-  requirement: SystemRequirement,
-  errors: SystemRequirementError[],
-): SystemRequirementError => {
+const createPythonErrorMessage = (requirement, errors) => {
   const versionReq = requirement.version ?? "*";
   const lines = [
     `Couldn't find a valid python interpreter satisfying the requirement (version: ${versionReq}). Tried:`,
@@ -149,16 +134,14 @@ const createPythonErrorMessage = (
   };
 };
 
-const resolvePythonRequirement = async (
-  requirement: SystemRequirement,
-): Promise<SystemRequirementResolution | SystemRequirementError> => {
+const resolvePythonRequirement = async (requirement) => {
   // Hardcoding AUTOREST_PYTHON_EXE is for backward compatibility
   const path = getExecutablePath(requirement) ?? process.env["AUTOREST_PYTHON_EXE"];
   if (path) {
     return await tryPython(requirement, path);
   }
 
-  const errors: SystemRequirementError[] = [];
+  const errors = [];
   // On windows try `py` executable with `-3` flag.
   if (process.platform === "win32") {
     const pyResult = await tryPython(requirement, "py", ["-3"]);
@@ -190,10 +173,7 @@ const resolvePythonRequirement = async (
  * @param command list of the command and arguments. First item in array must be a python exe @see KnownPythonExe. (e.g. ["python", "my_python_file.py"]
  * @param requirement
  */
-export const patchPythonPath = async (
-  command: PythonCommandLine,
-  requirement: SystemRequirement,
-): Promise<string[]> => {
+export const patchPythonPath = async (command, requirement) => {
   const [_, ...args] = command;
   const resolution = await resolvePythonRequirement(requirement);
   if ("error" in resolution) {
@@ -202,64 +182,5 @@ export const patchPythonPath = async (
   return [resolution.command, ...(resolution.additionalArgs ?? []), ...args];
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// TYPES
 const PythonRequirement = "python";
 const PRINT_PYTHON_VERSION_SCRIPT = "import sys; print('.'.join(map(str, sys.version_info[:3])))";
-
-type KnownPythonExe = "python.exe" | "python3.exe" | "python" | "python3";
-type PythonCommandLine = [KnownPythonExe, ...string[]];
-
-interface MoreOptions extends SpawnOptions {
-  onCreate?(cp: ChildProcess): void;
-  onStdOutData?(chunk: any): void;
-  onStdErrData?(chunk: any): void;
-}
-
-interface SystemRequirement {
-  version?: string;
-  /**
-   * Name of an environment variable where the user could provide the path to the exe.
-   * @example "AUTOREST_PYTHON_PATH"
-   */
-  environmentVariable?: string;
-}
-
-interface SystemRequirementResolution {
-  /**
-   * Name of the requirement.
-   * @example python, java, etc.
-   */
-  name: string;
-
-  /**
-   * Name of the command
-   * @example python3, /home/my_user/python39/python, java, etc.
-   */
-  command: string;
-
-  /**
-   * List of additional arguments to pass to this command.
-   * @example '-3' for 'py' to specify to use python 3
-   */
-  additionalArgs?: string[];
-}
-
-interface ExecResult {
-  stdout: string;
-  stderr: string;
-
-  /**
-   * Union of stdout and stderr.
-   */
-  log: string;
-  error: Error | null;
-  code: number | null;
-}
-
-interface SystemRequirementError extends SystemRequirementResolution {
-  error: true;
-  message: string;
-  neededVersion?: string;
-  actualVersion?: string;
-}
