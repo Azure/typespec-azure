@@ -5,9 +5,19 @@
     "message": "Security definition should have a description."
   },
   {
+    "code": "tsp-lintdiff-local-linter/path-parameter-names",
+    "severity": "warning",
+    "message": "Inconsistent path parameter names \"bookName\" and \"bookId\"."
+  },
+  {
     "code": "@azure-tools/typespec-azure-core/use-standard-operations",
     "severity": "warning",
     "message": "Operation 'getLibraryBook' should be defined using a signature from the Azure.Core namespace."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+    "severity": "warning",
+    "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Books' should not appear after the underscore."
   },
   {
     "code": "tsp-lintdiff-local-linter/path-parameter-schema",
@@ -30,9 +40,9 @@
     "message": "Operation 'getAuthorBook' should be defined using a signature from the Azure.Core namespace."
   },
   {
-    "code": "tsp-lintdiff-local-linter/path-parameter-names",
+    "code": "tsp-lintdiff-local-linter/operation-id-noun-verb",
     "severity": "warning",
-    "message": "Inconsistent path parameter names \"bookId\" and \"bookName\"."
+    "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Books' should not appear after the underscore."
   },
   {
     "code": "tsp-lintdiff-local-linter/path-parameter-schema",

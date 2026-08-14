@@ -1,1 +1,25 @@
-{ "violation": false }
+{
+  "violation": false,
+  "ambientDiagnostics": [
+    {
+      "code": "@azure-tools/typespec-azure-core/use-standard-operations",
+      "count": 3
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+      "count": 2
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "count": 3
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/security-definition-description",
+      "count": 1
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/xms-examples-required",
+      "count": 3
+    }
+  ]
+}

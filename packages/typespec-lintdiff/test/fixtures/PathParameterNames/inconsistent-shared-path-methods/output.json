@@ -1,0 +1,140 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "api-key",
+      "in": "header"
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/widgets/{name}": {
+      "get": {
+        "operationId": "Widgets_GetWidget",
+        "description": "Get a widget.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The widget name.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "The API version.",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/WidgetDetails"
+            }
+          }
+        }
+      }
+    },
+    "/widgets/{widgetId}/details": {
+      "get": {
+        "operationId": "Widgets_GetWidgetDetails",
+        "description": "Get widget details.",
+        "parameters": [
+          {
+            "name": "widgetId",
+            "in": "path",
+            "description": "The widget identifier.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "The API version.",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/WidgetDetails"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "Widgets_DeleteWidgetDetails",
+        "description": "Delete widget details.",
+        "parameters": [
+          {
+            "name": "widgetId",
+            "in": "path",
+            "description": "The widget identifier.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "The API version.",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "There is no content to send for this request, but the headers may be useful. "
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "WidgetDetails": {
+      "type": "object",
+      "description": "Detailed widget information.",
+      "properties": {
+        "info": {
+          "type": "string",
+          "description": "Additional widget details."
+        }
+      },
+      "required": [
+        "info"
+      ]
+    }
+  },
+  "parameters": {}
+}

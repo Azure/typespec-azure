@@ -5,9 +5,19 @@
     "message": "Security definition should have a description."
   },
   {
+    "code": "tsp-lintdiff-local-linter/path-parameter-names",
+    "severity": "warning",
+    "message": "Inconsistent path parameter names \"widgetId\" and \"name\"."
+  },
+  {
     "code": "@azure-tools/typespec-azure-core/use-standard-operations",
     "severity": "warning",
     "message": "Operation 'getWidget' should be defined using a signature from the Azure.Core namespace."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+    "severity": "warning",
+    "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Widgets' should not appear after the underscore."
   },
   {
     "code": "tsp-lintdiff-local-linter/path-parameter-schema",
@@ -25,9 +35,9 @@
     "message": "Operation 'getWidgetDetails' should be defined using a signature from the Azure.Core namespace."
   },
   {
-    "code": "tsp-lintdiff-local-linter/path-parameter-names",
+    "code": "tsp-lintdiff-local-linter/operation-id-noun-verb",
     "severity": "warning",
-    "message": "Inconsistent path parameter names \"widgetId\" and \"name\"."
+    "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Widgets' should not appear after the underscore."
   },
   {
     "code": "tsp-lintdiff-local-linter/path-parameter-schema",
