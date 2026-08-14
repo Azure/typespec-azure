@@ -313,7 +313,7 @@ Do the following to publish a new release:
    1. In your fork of the typespec-azure repo, run `pnpm exec chronus changelog --policy typespec-azure > out.md`.
    2. Create a new entry in `./website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/Azure/typespec-azure/pull/1306
-   3. Include the release-note updates in the corresponding TypeSpec and TypeSpec Azure publish PRs so the published packages and documentation are released together.
+   3. Merge the TypeSpec and TypeSpec Azure release notes PRs.
 
 6. Run `pnpm prepare-publish` in TypeSpec-Azure repo to stage the publishing changes.
    - This creates `publish/xxxxxx` branches for TypeSpec-Azure and TypeSpec repos.
