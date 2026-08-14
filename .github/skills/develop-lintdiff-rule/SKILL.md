@@ -160,6 +160,27 @@ coverage files in this development worktree. Use the refreshed rule row and
 rule shard to verify project overlap, validator-only projects, TypeSpec-only
 projects, and compile failures.
 
+The retained Swagger corpus represents the dataset-selected latest API version,
+while ordinary TypeSpec lint output may contain diagnostics from every declared
+API version. For every TypeSpec-only project, determine whether each diagnostic
+belongs to the selected latest API version or only to an older version:
+
+1. Read the project's selected `apiVersion` from the corpus metadata.
+2. Inspect the diagnostic target and the service's versioning decorators.
+3. Project the service to the selected API version when source inspection alone
+   cannot establish whether the target or violating type is present.
+4. Compare Swagger only with TypeSpec diagnostics attributable to that selected
+   version. Treat diagnostics that exist only in older API versions as a
+   population mismatch, not as a rule-semantic gap.
+5. Preserve and report the raw TypeSpec counts separately. Do not change the
+   production rule merely to suppress valid diagnostics from older API
+   versions.
+
+Use an existing rule-specific projected filter when one is available. Otherwise
+perform and document this attribution during the migration investigation rather
+than assuming every raw TypeSpec-only diagnostic applies to the retained
+Swagger version.
+
 If a quick iteration is needed first, use the existing `--filter`, `--limit`,
 and `--concurrency` options. The final behavioral check should use the full
 corpus when practical.
@@ -176,6 +197,9 @@ Record:
 - latest validator and TypeSpec project and diagnostic counts
 - same-project overlap
 - complete validator-only and TypeSpec-only project lists
+- the selected-latest-version TypeSpec population used for behavioral
+  comparison, including diagnostics excluded because they belong only to older
+  API versions
 - compile failures and their effect on the assessed population
 - explanations for remaining gaps
 - the final conclusion on functional equivalence and any uncertainty
@@ -232,11 +256,11 @@ After the review:
    alter the reviewed implementation.
 6. Proceed only when no unresolved high-confidence correctness findings remain.
 
-### 8. Commit, push, and create the PR
+### 8. Commit, push, and create the draft PR
 
 Finishing validation is not the end of this skill. The top-level worker must
 complete the GitHub handoff unless the user explicitly asks to stop before
-creating a PR.
+creating a draft PR.
 
 1. Confirm the current branch is the dedicated rule-specific branch and is
    based directly on the user-supplied target branch.
@@ -244,8 +268,10 @@ creating a PR.
    target branch.
 3. Commit only the explicit rule-related paths identified above.
 4. Push both the target branch and rule branch to the `origin` repository.
-5. Create the pull request in the `origin` repository with the rule branch as
-   head and the user-supplied target branch as base.
+5. Create the pull request in the `origin` repository as a **draft**, with the
+   rule branch as head and the user-supplied target branch as base. Do not mark
+   it ready for review; the user decides when the migration evidence and rule
+   behavior are ready for formal review.
 6. Write the PR description as an engineering explanation, not only a change
    list. It must emphasize:
    - **Why the TypeSpec rule changed:** describe the Swagger behavior, the
@@ -289,7 +315,7 @@ creating a PR.
 - Do not commit `packages/typespec-lintdiff/specs` changes in the rule PR.
 - Keep required changes focused on the TypeSpec rule and directly related
   tests.
-- Do not stop after validation when the requested workflow includes a PR.
+- Do not stop after validation when the requested workflow includes a draft PR.
 - Do not skip independent review because focused tests or corpus coverage pass.
 
 ## Deliverable
@@ -309,4 +335,4 @@ Worker mode returns:
 - per-rule compile failures or remaining uncertainty
 - per-rule review findings adopted and rejected, with reasons
 - the explicit rule-related files ready for each PR
-- each created PR URL
+- each created draft PR URL
