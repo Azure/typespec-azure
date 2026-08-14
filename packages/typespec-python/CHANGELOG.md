@@ -2,7 +2,9 @@
 
 ## 0.63.5
 
-- Require node 22.18.0 or higher to run the emitter
+### Bug Fixes
+
+- [#5225](https://github.com/Azure/typespec-azure/pull/5225) Ship the install/prepare setup scripts as native ESM `.js` instead of raw `.ts` so the emitter runs correctly when installed as a dependency. Node.js refuses to type-strip `.ts` files under `node_modules` (`ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING`), which broke consumers of 0.63.4+.
 
 ## 0.63.4
 
