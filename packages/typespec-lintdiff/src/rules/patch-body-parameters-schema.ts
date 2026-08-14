@@ -12,7 +12,7 @@ import { getHttpOperation } from "@typespec/http";
 
 export const patchBodyParametersSchemaRule = createRule({
   name: "patch-body-parameters-schema",
-  description: "ARM PATCH body properties must not be required and must not have defaults.",
+  description: "ARM PATCH body properties must not be required, have defaults, or be create-only.",
   severity: "warning",
   messages: {
     required: paramMessage`Properties of a PATCH request body must not be required, property:${"propertyName"}.`,
