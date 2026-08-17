@@ -1,5 +1,6 @@
 import {
   createLinterRuleTester,
+  expectDiagnosticEmpty,
   LinterRuleTester,
   TesterInstance,
 } from "@typespec/compiler/testing";
@@ -146,6 +147,36 @@ describe("no-service-ns-in-client", () => {
             'client.tsp must not define namespace "My.Service" because it is in the service namespace "My.Service". Put new types in another namespace such as "Customizations" and use augment decorators for service customizations.',
         },
       ]);
+  });
+
+  it("can be suppressed for service namespace customizations", async () => {
+    const [_, diagnostics] = await runner.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
+          @service
+          namespace My.Service;
+          `,
+        `
+          #suppress "${diagnosticCode}" "Existing customization requires the service namespace."
+          namespace My.Service {
+            model WidgetOptions {
+              mode: string;
+            }
+          }
+          `,
+      ),
+      {
+        compilerOptions: {
+          linterRuleSet: {
+            enable: {
+              [diagnosticCode]: true,
+            },
+          },
+        },
+      },
+    );
+
+    expectDiagnosticEmpty(diagnostics);
   });
 
   it("emits diagnostic when client.tsp defines a child namespace of the service namespace", async () => {

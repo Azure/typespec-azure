@@ -54,7 +54,7 @@ export const noServiceNsInClientRule = createRule({
           }
 
           context.reportDiagnostic({
-            target: namespaceDecl.node,
+            target: namespaceDecl.lookupNode,
             format: {
               namespace: namespaceDecl.fullName,
               serviceNamespace: matchingServiceNamespace,
