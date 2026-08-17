@@ -234,6 +234,17 @@ export class Emitter {
     }
   }
 
+  /** writes the APIView cross-language definition ID file */
+  async emitApiViewPropertiesFile(containingModuleRelativePackagePath?: string): Promise<void> {
+    const apiViewProperties = core.generateApiViewProperties(
+      this.codeModel,
+      containingModuleRelativePackagePath,
+    );
+    if (apiViewProperties.length > 0) {
+      await this.fs.write("testdata/apiview-properties.json", apiViewProperties);
+    }
+  }
+
   /**
    * recursively emits package contents.
    *

@@ -532,6 +532,7 @@ export class TypeAdapter {
     constType.values = this.getConstantValues(constType, enumType.values);
     constType.docs.summary = enumType.summary;
     constType.docs.description = enumType.doc;
+    constType.crossLanguageDefinitionId = enumType.crossLanguageDefinitionId;
     this.types.set(constTypeName, constType);
     return constType;
   }
@@ -740,6 +741,7 @@ export class TypeAdapter {
 
     modelType.docs.summary = model.summary;
     modelType.docs.description = model.doc;
+    modelType.crossLanguageDefinitionId = model.crossLanguageDefinitionId;
     if (modelType.docs.summary) {
       if (!modelType.docs.summary.startsWith(modelName)) {
         modelType.docs.summary = go.prefixDocWithName(modelName, modelType.docs.summary);
@@ -920,6 +922,7 @@ export class TypeAdapter {
       const value = new go.ConstantValue(valueTypeName, type, valueType.value);
       value.docs.summary = valueType.summary;
       value.docs.description = valueType.doc;
+      value.crossLanguageDefinitionId = valueType.crossLanguageDefinitionId;
       this.constValues.set(valueTypeName, value);
 
       values.push(value);

@@ -49,6 +49,9 @@ export interface Client {
 
   /** the parent client in a hierarchical client */
   parent?: Client;
+
+  /** the TCGC cross-language definition ID for this client */
+  crossLanguageDefinitionId?: string;
 }
 
 /** contains client endpoint configuration */
@@ -343,6 +346,9 @@ interface HttpMethodBase extends method.Method<Client, result.ResponseEnvelope> 
 
   /** any examples for this method */
   examples: Array<MethodExample>;
+
+  /** the TCGC cross-language definition ID for this method */
+  crossLanguageDefinitionId?: string;
 }
 
 interface PageableMethodBase extends HttpMethodBase {

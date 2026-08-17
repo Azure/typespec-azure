@@ -81,6 +81,9 @@ export interface Constant {
 
   /** the name of the func that returns the set of values */
   valuesFuncName: string;
+
+  /** the TCGC cross-language definition ID for this const type */
+  crossLanguageDefinitionId?: string;
 }
 
 /** the underlying type of a const */
@@ -101,6 +104,9 @@ export interface ConstantValue {
 
   /** the value for this const */
   value: ConstantValueType;
+
+  /** the TCGC cross-language definition ID for this const value */
+  crossLanguageDefinitionId?: string;
 }
 
 /** a non-enum constant (e.g. const foo string = "bar") */
@@ -604,6 +610,9 @@ interface ModelBase extends StructBase {
 
   /** any XML metadata */
   xml?: XMLInfo;
+
+  /** the TCGC cross-language definition ID for this model */
+  crossLanguageDefinitionId?: string;
 }
 
 class StructBase implements StructBase {
