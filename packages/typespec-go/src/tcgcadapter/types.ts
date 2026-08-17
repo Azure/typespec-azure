@@ -406,7 +406,7 @@ export class TypeAdapter {
         return anyType;
       }
       case "boolean": {
-        const boolKey = "boolean";
+        const boolKey = type.encode === "string" ? "boolean-string" : "boolean";
         let primitiveBool = this.types.get(boolKey);
         if (primitiveBool) {
           return primitiveBool;
@@ -823,6 +823,27 @@ export class TypeAdapter {
     field.docs.summary = prop.summary;
     field.docs.description = prop.doc;
 
+    if (prop.encode && type.kind === "slice") {
+      if (
+        type.elementType.kind === "string" ||
+        (type.elementType.kind === "constant" && type.elementType.type === "string")
+      ) {
+        type = new go.SliceArray(
+          type.elementType,
+          type.elementTypeByValue,
+          getSliceArrayDelimiter(prop.encode),
+        );
+        field.type = type;
+      } else {
+        this.ctx.program.reportDiagnostic({
+          code: "UnsupportedArrayEncoding",
+          severity: "warning",
+          message: `The array property ${prop.name} uses ${prop.encode} encoding with unsupported element type ${prop.type.kind === "array" ? prop.type.valueType.kind : prop.type.kind}. The encoding will be ignored.`,
+          target: prop.__raw?.node ?? tsp.NoTarget,
+        });
+      }
+    }
+
     if (prop.discriminator && modelType.discriminatorValue) {
       // the presence of modelType.discriminatorValue tells us that this
       // property is on a model that's not the root discriminator
@@ -1080,6 +1101,21 @@ function getPrimitiveType(
         `unhandled tcgc.SdkBuiltInKinds: ${type.kind}`,
         type.__raw?.node,
       );
+  }
+}
+
+function getSliceArrayDelimiter(encoding: string): go.SliceArrayDelimiter {
+  switch (encoding) {
+    case "commaDelimited":
+      return "comma";
+    case "spaceDelimited":
+      return "space";
+    case "pipeDelimited":
+      return "pipe";
+    case "newlineDelimited":
+      return "newline";
+    default:
+      throw new AdapterError("UnsupportedTsp", `unsupported array encoding ${encoding}`);
   }
 }
 

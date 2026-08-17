@@ -26,8 +26,7 @@ using Azure.ResourceManager.BaseTypes.Agents;
 Every agent shape comes in two variants that differ only in property visibility:
 
 - **Appliance** — the service owns and reports the agent configuration. Definition and agent
-  properties are **read-only**, except `modelDeploymentRef`: the `definition` container stays
-  writable so the client can select the underlying model deployment.
+  properties are **read-only**, including the `definition` container itself.
 - **Platform** — the client owns and manages the agent configuration. Definition and agent
   properties are **writable** (except `baseTypes`, which is always ARM-managed and read-only).
 
@@ -37,31 +36,32 @@ Pick the variant that matches how your resource provider manages agents, then us
 ## Defining the agent definition
 
 The agent definition describes the model and behavior of the agent. Derive it from
-`AgentDefinitionAppliance` or `AgentDefinitionPlatform`. Both templates take two boolean value
-parameters that control whether the optional `modelDeploymentRef` and `instructions` properties are
-present:
+`AgentDefinitionAppliance` or `AgentDefinitionPlatform`. Each template takes boolean value
+parameters that control whether the optional definition properties are present:
 
 ```typespec
-model AgentDefinitionAppliance<
+model AgentDefinitionAppliance<HasInstructions extends valueof boolean = false>
+
+model AgentDefinitionPlatform<
   HasModelDeploymentRef extends valueof boolean = false,
   HasInstructions extends valueof boolean = false
 >
 ```
 
-For example, to include both optional properties:
+For example, to include the optional properties in each deployment model:
 
 ```typespec
 // Appliance definition: read-only fields managed by the service
-model ContosoApplianceDefinition is AgentDefinitionAppliance<true, true>;
+model ContosoApplianceDefinition is AgentDefinitionAppliance<true>;
 
 // Platform definition: writable fields managed by the client
 model ContosoPlatformDefinition is AgentDefinitionPlatform<true, true>;
 ```
 
-`modelDeploymentRef` is writable in both deployment models: even when the service owns the rest of
-the appliance definition, the client selects the underlying model deployment. For this to work on
-the wire, `AgentPropertiesAppliance` also leaves the `definition` container itself writable — a
-read-only container would make every field inside it unsettable, including `modelDeploymentRef`.
+`modelDeploymentRef` exists only in the Platform deployment model, where the client selects the
+underlying model deployment. In the Appliance deployment model the service owns the entire agent
+definition, so there is no `modelDeploymentRef` property and `AgentPropertiesAppliance.definition`
+is read-only.
 
 ## Defining the agent properties
 

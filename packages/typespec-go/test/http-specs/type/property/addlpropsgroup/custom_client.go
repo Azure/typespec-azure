@@ -14,6 +14,7 @@ func NewAdditionalPropertiesClient(options *azcore.ClientOptions) (*AdditionalPr
 		return nil, err
 	}
 	return &AdditionalPropertiesClient{
+		endpoint: "http://localhost:3000",
 		internal: internal,
 	}, nil
 }

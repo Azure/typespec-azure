@@ -285,9 +285,11 @@ func (client *TenantItemsClient) NewListPager(apiVersion string, options *Tenant
 			if page != nil {
 				nextLink = *page.NextLink
 			}
-			resp, err := runtime.FetcherForNextLink(ctx, client.internal.Pipeline(), nextLink, func(ctx context.Context) (*policy.Request, error) {
-				return client.listCreateRequest(ctx, apiVersion, options)
-			}, nil)
+			req, err := client.listCreateRequest(ctx, apiVersion, nextLink, options)
+			if err != nil {
+				return TenantItemsClientListResponse{}, err
+			}
+			resp, err := client.internal.Pipeline().Do(req)
 			if err != nil {
 				return TenantItemsClientListResponse{}, err
 			}
@@ -297,16 +299,25 @@ func (client *TenantItemsClient) NewListPager(apiVersion string, options *Tenant
 }
 
 // listCreateRequest creates the List request.
-func (client *TenantItemsClient) listCreateRequest(ctx context.Context, apiVersion string, _ *TenantItemsClientListOptions) (*policy.Request, error) {
-	urlPath := "/providers/Microsoft.Test/tenantItems"
-	req, err := runtime.NewRequest(ctx, http.MethodGet, runtime.JoinPaths(client.internal.Endpoint(), urlPath))
+func (client *TenantItemsClient) listCreateRequest(ctx context.Context, apiVersion string, nextLink string, _ *TenantItemsClientListOptions) (*policy.Request, error) {
+	firstPage := nextLink == ""
+	var req *policy.Request
+	var err error
+	if firstPage {
+		urlPath := "/providers/Microsoft.Test/tenantItems"
+		req, err = runtime.NewRequest(ctx, http.MethodGet, runtime.JoinPaths(client.internal.Endpoint(), urlPath))
+	} else {
+		req, err = runtime.NewRequestForNextLink(ctx, http.MethodGet, client.internal.Endpoint(), nextLink)
+	}
 	if err != nil {
 		return nil, err
 	}
-	reqQP := req.Raw().URL.Query()
-	reqQP.Set("api-version", apiVersion)
-	req.Raw().URL.RawQuery = strings.ReplaceAll(reqQP.Encode(), "+", "%20")
-	req.Raw().Header["Accept"] = []string{"application/json"}
+	if firstPage {
+		reqQP := req.Raw().URL.Query()
+		reqQP.Set("api-version", apiVersion)
+		req.Raw().URL.RawQuery = strings.ReplaceAll(reqQP.Encode(), "+", "%20")
+		req.Raw().Header["Accept"] = []string{"application/json"}
+	}
 	return req, nil
 }
 
