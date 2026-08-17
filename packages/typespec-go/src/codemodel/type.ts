@@ -45,7 +45,8 @@ export type WireType =
   | Slice
   | SliceArray
   | String
-  | Time;
+  | Time
+  | UnionStruct;
 
 /** defines a type within the Go type system */
 export type Type = SdkType | WireType;
@@ -396,6 +397,25 @@ export interface TokenCredential extends QualifiedType {
   scopes: Array<string>;
 }
 
+/** a single variant within a union */
+export interface UnionField extends StructField {
+  /** the variant's underlying type */
+  type: UnionVariantType;
+}
+
+/** a Go struct modeling a non-discriminated union where exactly one field is set */
+export interface UnionStruct extends StructBase {
+  kind: "unionStruct";
+
+  /** the variant fields of the union. exactly one is populated at runtime */
+  fields: Array<UnionField>;
+}
+
+/**
+ * the subset of WireType kinds that can appear as a variant within a non-discriminated union.
+ */
+export type UnionVariantType = Constant | Literal | Map | Model | Scalar | Slice | String;
+
 /** bit flags indicating how a model/polymorphic type is used */
 export enum UsageFlags {
   /** the type is unreferenced */
@@ -480,7 +500,8 @@ export function getTypeDeclaration(type: Client | Type, scope: PackageType): str
     case "model":
     case "paramGroup":
     case "polymorphicModel":
-    case "responseEnvelope": {
+    case "responseEnvelope":
+    case "unionStruct": {
       let pkg: PackageType;
       const typeName = type.kind === "paramGroup" ? type.groupName : type.name;
       switch (type.kind) {
@@ -539,6 +560,22 @@ export function isLiteralValueType(type: WireType): type is LiteralType {
     case "scalar":
     case "string":
     case "time":
+      return true;
+    default:
+      return false;
+  }
+}
+
+/** narrows type to a UnionVariantType within the conditional block */
+export function isUnionVariantType(type: WireType): type is UnionVariantType {
+  switch (type.kind) {
+    case "constant":
+    case "literal":
+    case "map":
+    case "model":
+    case "scalar":
+    case "slice":
+    case "string":
       return true;
     default:
       return false;
@@ -839,6 +876,20 @@ export class Struct extends StructBase implements Struct {
   constructor(pkg: PackageContent, name: string) {
     super(pkg, name);
     this.kind = "struct";
+  }
+}
+
+export class UnionField extends StructField implements UnionField {
+  constructor(name: string, type: UnionVariantType, byValue: boolean) {
+    super(name, type, byValue);
+  }
+}
+
+export class UnionStruct extends StructBase implements UnionStruct {
+  constructor(pkg: PackageContent, name: string) {
+    super(pkg, name);
+    this.kind = "unionStruct";
+    this.fields = new Array<UnionField>();
   }
 }
 

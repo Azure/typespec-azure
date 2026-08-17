@@ -95,7 +95,11 @@ export function canonicalizeHeaderName(name: string): string {
  * @param indent the indentation helper currently in scope
  * @returns the code to check the path parameter for emptiness
  */
-export function emitEmptyPathParamCheck(param: go.PathParameter, imports: ImportManager, indent: Indentation): string {
+export function emitEmptyPathParamCheck(
+  param: go.PathParameter,
+  imports: ImportManager,
+  indent: Indentation,
+): string {
   imports.add("errors");
   let text = `${indent.get()}if ${param.name} == "" {\n`;
   text += `${indent.push().get()}return nil, errors.New("parameter ${param.name} cannot be empty")\n`;
@@ -1362,10 +1366,59 @@ export function buildErrCheck(indent: Indentation, errVar: string, returns?: str
  * @param body the body of the for block
  * @returns the text for the for block
  */
-export function buildForBlock(indent: Indentation, expression: string, body: (indent: Indentation) => string): string {
+export function buildForBlock(
+  indent: Indentation,
+  expression: string,
+  body: (indent: Indentation) => string,
+): string {
   let content = `for ${expression} {\n`;
   content += body(indent.push());
   content += `${indent.pop().get()}}\n`;
+  return content;
+}
+
+/** a case statement in a switch/case block */
+export interface caseStatement {
+  /** the case's expression */
+  expression: string;
+
+  /** the case's execution clause */
+  clause: (indent: Indentation) => string;
+}
+
+/** the default case in a switch/case block */
+export interface defaultCase {
+  /** the case's execution clause */
+  clause: (indent: Indentation) => string;
+}
+
+/**
+ * constructs a switch/case statement
+ *
+ * @param indent the current indentation helper in scope
+ * @param statement the statement to switch on
+ * @param cases one or more case statements
+ * @param def optional default case statement
+ * @returns the text for the switch/case statement
+ */
+export function buildSwitchCase(
+  indent: Indentation,
+  statement: string,
+  cases: Array<caseStatement>,
+  def?: defaultCase,
+): string {
+  let content = `switch ${statement} {\n`;
+  for (const cse of cases) {
+    content += `case ${cse.expression}:\n`;
+    content += cse.clause(indent.push());
+    indent.pop();
+  }
+  if (def) {
+    content += "default:\n";
+    content += def.clause(indent.push());
+    indent.pop();
+  }
+  content += "}\n";
   return content;
 }
 
