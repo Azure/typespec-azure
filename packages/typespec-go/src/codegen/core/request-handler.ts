@@ -8,7 +8,6 @@ import * as naming from "../../naming/naming.js";
 import { CodegenError } from "./errors.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
-import { getXMLRootName } from "./xml-helpers.js";
 
 /**
  * emits the request handler for the specified method.
@@ -540,10 +539,7 @@ function emitBody(
         text += `${indent.get()}}\n`;
         body = "aux";
       }
-      const xmlRootName = getXMLRootName(bodyParam);
-      if (xmlRootName !== undefined) {
-        body = `xmlRoot{value: ${body}, name: "${xmlRootName}"}`;
-      }
+
       let setBody = `runtime.MarshalAs${helpers.getMediaFormat(bodyParam.type, bodyParam.bodyFormat, `req, ${body}`)}`;
       if (bodyParam.type.kind === "rawJSON") {
         imports.add("bytes");

@@ -8,19 +8,33 @@ import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
 
 /**
- * Returns the custom XML root name for a body parameter, if any.
- *
- * @param bodyParam the body parameter to inspect
- * @returns the custom XML root name or undefined
+ * Returns true when the type is a model whose custom XML name must only be used at roots.
  */
-export function getXMLRootName(bodyParam: go.BodyParameter): string | undefined {
-  if (bodyParam.bodyFormat !== "XML") {
-    return undefined;
-  }
-  if (bodyParam.type.kind !== "model" && bodyParam.type.kind !== "polymorphicModel") {
-    return undefined;
-  }
-  return bodyParam.xml?.name ?? bodyParam.type.xml?.name;
+export function isXMLNamedModel(
+  type: go.WireType,
+  pkg: go.PackageContent,
+): type is go.Model {
+  return (
+    type.kind === "model" &&
+    type.pkg === pkg &&
+    type.xml?.name !== undefined &&
+    !type.annotations.omitSerDeMethods &&
+    helpers.getSerDeFormat(type, pkg) === "XML"
+  );
+}
+
+/**
+ * Returns true when the model contains a property or array item whose model has a custom XML name.
+ */
+export function needsXMLNestedModelMarshalling(
+  model: go.Model,
+  pkg: go.PackageContent,
+): boolean {
+  return model.fields.some(
+    (field) =>
+      isXMLNamedModel(field.type, pkg) ||
+      (field.type.kind === "slice" && isXMLNamedModel(field.type.elementType, pkg)),
+  );
 }
 
 /**
@@ -46,13 +60,14 @@ export function generateXMLHelpers(pkg: go.PackageContent): string {
     }
   }
 
-  const xmlRootRequired = pkg.clients.some((client) =>
-    client.methods.some((method) => {
-      const bodyParam = helpers.getMethodParamGroups(method).bodyParam;
-      return bodyParam !== undefined && getXMLRootName(bodyParam) !== undefined;
-    }),
+  const nestedModelRequired = pkg.models.some(
+    (model) =>
+      model.kind === "model" &&
+      !model.annotations.omitSerDeMethods &&
+      helpers.getSerDeFormat(model, pkg) === "XML" &&
+      needsXMLNestedModelMarshalling(model, pkg),
   );
-  if (!additionalPropertiesRequired && !xmlRootRequired) {
+  if (!additionalPropertiesRequired && !nestedModelRequired) {
     return "";
   }
 
@@ -139,16 +154,19 @@ func (ap *additionalProperties) UnmarshalXML(d *xml.Decoder, start xml.StartElem
 }
 `;
   }
-  if (xmlRootRequired) {
+  if (nestedModelRequired) {
     text += `
-type xmlRoot struct {
-	value any
-	name  string
+type xmlModelMarshaler interface {
+	marshalXML(*xml.Encoder, xml.StartElement, bool) error
 }
 
-// MarshalXML implements the xml.Marshaler interface for xmlRoot.
-func (x xmlRoot) MarshalXML(enc *xml.Encoder, _ xml.StartElement) error {
-	return enc.EncodeElement(x.value, xml.StartElement{Name: xml.Name{Local: x.name}})
+type xmlNestedModel struct {
+	value xmlModelMarshaler
+}
+
+// MarshalXML implements the xml.Marshaler interface for xmlNestedModel.
+func (x xmlNestedModel) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
+	return x.value.marshalXML(enc, start, false)
 }
 `;
   }

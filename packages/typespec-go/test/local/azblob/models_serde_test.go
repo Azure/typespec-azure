@@ -1220,11 +1220,19 @@ func TestQueryRequestRoundTrip(t *testing.T) {
 	assertEqual(t, "Expression", *qr2.Expression, "SELECT * FROM BlobStorage")
 }
 
-// TestJSONTextConfigurationMarshalElementName tests that JSONTextConfiguration.MarshalXML
-// preserves the element name "JsonTextConfiguration" supplied by its containing property.
+// TestJSONTextConfigurationMarshalElementName tests that JSONTextConfiguration.MarshalXML uses
+// its model name at the root and preserves the name supplied by its containing property.
 func TestJSONTextConfigurationMarshalElementName(t *testing.T) {
 	jtc := JSONTextConfiguration{
 		RecordSeparator: to.Ptr("\n"),
+	}
+
+	data, err := xml.Marshal(jtc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if xmlStr := string(data); !strings.Contains(xmlStr, "<JsonTextConfiguration>") {
+		t.Fatalf("expected root element name JsonTextConfiguration, got: %s", xmlStr)
 	}
 
 	formatType := QueryFormatType("json")
@@ -1233,7 +1241,7 @@ func TestJSONTextConfigurationMarshalElementName(t *testing.T) {
 		JSONTextConfiguration: &jtc,
 	}
 
-	data, err := xml.Marshal(qf) //nolint:staticcheck // we use custom helper for map[string]any
+	data, err = xml.Marshal(qf) //nolint:staticcheck // we use custom helper for map[string]any
 	if err != nil {
 		t.Fatal(err)
 	}

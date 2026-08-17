@@ -16,7 +16,6 @@ export class RequiredHelpers {
   readRequestBody: boolean;
   splitHelper: boolean;
   tracker: boolean;
-  xmlRoot: boolean;
 
   constructor() {
     this.getHeaderValue = false;
@@ -27,7 +26,6 @@ export class RequiredHelpers {
     this.readRequestBody = false;
     this.splitHelper = false;
     this.tracker = false;
-    this.xmlRoot = false;
   }
 }
 
@@ -74,9 +72,6 @@ export function generateServerInternal(
   }
   if (requiredHelpers.tracker) {
     body += emitTracker(imports);
-  }
-  if (requiredHelpers.xmlRoot) {
-    body += emitXMLRoot(imports);
   }
 
   return text + imports.text() + body;
@@ -132,21 +127,6 @@ func initServer[T any](mu *sync.Mutex, dst **T, src func() *T) {
 		*dst = src()
 	}
 	mu.Unlock()
-}
-`;
-}
-
-function emitXMLRoot(imports: ImportManager): string {
-  imports.add("encoding/xml");
-  return `
-type xmlRoot struct {
-	value any
-	name  string
-}
-
-// MarshalXML implements the xml.Marshaler interface for xmlRoot.
-func (x xmlRoot) MarshalXML(enc *xml.Encoder, _ xml.StartElement) error {
-	return enc.EncodeElement(x.value, xml.StartElement{Name: xml.Name{Local: x.name}})
 }
 `;
 }

@@ -20,6 +20,12 @@ model Author {
 model Library {
   @Xml.name("author")
   author: Author;
+
+  @Xml.name("Author")
+  sameNameAuthor: Author;
+
+  @Xml.name("contributor")
+  contributors: Author[];
 }
 
 @route("/library")
@@ -61,10 +67,16 @@ type Author struct {
 type Library struct {
 	// REQUIRED
 	Author *Author `xml:"author"`
+
+	// REQUIRED
+	Contributors []*Author `xml:"contributor>XmlAuthor"`
+
+	// REQUIRED
+	SameNameAuthor *Author `xml:"Author"`
 }
 ```
 
-## Model XML marshallers preserve the start element supplied by that context
+## Model XML marshallers distinguish root names from nested property and array names
 
 ```go models_serde
 // Copyright (c) Microsoft Corporation. All rights reserved.
@@ -77,6 +89,13 @@ import "encoding/xml"
 
 // MarshalXML implements the xml.Marshaller interface for type Author.
 func (a Author) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
+	return a.marshalXML(enc, start, true)
+}
+
+func (a Author) marshalXML(enc *xml.Encoder, start xml.StartElement, root bool) error {
+	if root {
+		start.Name.Local = "XmlAuthor"
+	}
 	type alias Author
 	aux := &struct {
 		*alias
@@ -88,17 +107,42 @@ func (a Author) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
 
 // MarshalXML implements the xml.Marshaller interface for type Library.
 func (l Library) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
+	return l.marshalXML(enc, start, true)
+}
+
+func (l Library) marshalXML(enc *xml.Encoder, start xml.StartElement, root bool) error {
+	if root {
+		start.Name.Local = "XmlLibrary"
+	}
 	type alias Library
 	aux := &struct {
 		*alias
+		Author         *xmlNestedModel    `xml:"author"`
+		Contributors   *[]*xmlNestedModel `xml:"contributor>XmlAuthor"`
+		SameNameAuthor *xmlNestedModel    `xml:"Author"`
 	}{
 		alias: (*alias)(&l),
+	}
+	if l.Author != nil {
+		aux.Author = &xmlNestedModel{value: l.Author}
+	}
+	if l.Contributors != nil {
+		nestedContributors := make([]*xmlNestedModel, len(l.Contributors))
+		for i := range l.Contributors {
+			if l.Contributors[i] != nil {
+				nestedContributors[i] = &xmlNestedModel{value: l.Contributors[i]}
+			}
+		}
+		aux.Contributors = &nestedContributors
+	}
+	if l.SameNameAuthor != nil {
+		aux.SameNameAuthor = &xmlNestedModel{value: l.SameNameAuthor}
 	}
 	return enc.EncodeElement(aux, start)
 }
 ```
 
-## Client root serialization explicitly applies the outer model XML name
+## Client root serialization delegates the outer model XML name to its marshaller
 
 ```go xmlnaminglibraryoperations_client
 // Copyright (c) Microsoft Corporation. All rights reserved.
@@ -190,7 +234,7 @@ func (client *XMLNamingLibraryOperationsClient) putCreateRequest(ctx context.Con
 	}
 	req.Raw().Header["Accept"] = []string{"application/xml"}
 	req.Raw().Header["Content-Type"] = []string{"application/xml"}
-	if err := runtime.MarshalAsXML(req, xmlRoot{value: body, name: "XmlLibrary"}); err != nil {
+	if err := runtime.MarshalAsXML(req, body); err != nil {
 		return nil, err
 	}
 	return req, nil
@@ -209,7 +253,7 @@ func (client *XMLNamingLibraryOperationsClient) putHandleResponse(resp *http.Res
 }
 ```
 
-## The client package generates the XML root wrapper
+## The client package generates the nested model context wrapper
 
 ```go xml_helper
 // Copyright (c) Microsoft Corporation. All rights reserved.
@@ -220,18 +264,21 @@ package testmodule
 
 import "encoding/xml"
 
-type xmlRoot struct {
-	value any
-	name  string
+type xmlModelMarshaler interface {
+	marshalXML(*xml.Encoder, xml.StartElement, bool) error
 }
 
-// MarshalXML implements the xml.Marshaler interface for xmlRoot.
-func (x xmlRoot) MarshalXML(enc *xml.Encoder, _ xml.StartElement) error {
-	return enc.EncodeElement(x.value, xml.StartElement{Name: xml.Name{Local: x.name}})
+type xmlNestedModel struct {
+	value xmlModelMarshaler
+}
+
+// MarshalXML implements the xml.Marshaler interface for xmlNestedModel.
+func (x xmlNestedModel) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
+	return x.value.marshalXML(enc, start, false)
 }
 ```
 
-## Fake response serialization explicitly applies the outer model XML name
+## Fake response serialization delegates the outer model XML name to its marshaller
 
 ```go fake/xmlnaminglibraryoperations_server
 // Copyright (c) Microsoft Corporation. All rights reserved.
@@ -329,7 +376,7 @@ func (x *XMLNamingLibraryOperationsServerTransport) dispatchGet(req *http.Reques
 	if !slices.Contains([]int{http.StatusOK}, respContent.HTTPStatus) {
 		return nil, &nonRetriableError{fmt.Errorf("unexpected status code %d. acceptable values are http.StatusOK", respContent.HTTPStatus)}
 	}
-	resp, err := server.MarshalResponseAsXML(respContent, xmlRoot{value: server.GetResponse(respr).Library, name: "XmlLibrary"}, req)
+	resp, err := server.MarshalResponseAsXML(respContent, server.GetResponse(respr).Library, req)
 	if err != nil {
 		return nil, err
 	}
@@ -352,7 +399,7 @@ func (x *XMLNamingLibraryOperationsServerTransport) dispatchPut(req *http.Reques
 	if !slices.Contains([]int{http.StatusOK}, respContent.HTTPStatus) {
 		return nil, &nonRetriableError{fmt.Errorf("unexpected status code %d. acceptable values are http.StatusOK", respContent.HTTPStatus)}
 	}
-	resp, err := server.MarshalResponseAsXML(respContent, xmlRoot{value: server.GetResponse(respr).Library, name: "XmlLibrary"}, req)
+	resp, err := server.MarshalResponseAsXML(respContent, server.GetResponse(respr).Library, req)
 	if err != nil {
 		return nil, err
 	}
@@ -366,7 +413,7 @@ var xmlNamingLibraryOperationsServerTransportInterceptor interface {
 }
 ```
 
-## The fake package generates its private XML root wrapper
+## The fake package needs no private XML root wrapper
 
 ```go fake/internal
 // Copyright (c) Microsoft Corporation. All rights reserved.
@@ -376,7 +423,6 @@ var xmlNamingLibraryOperationsServerTransportInterceptor interface {
 package fake
 
 import (
-	"encoding/xml"
 	"net/http"
 	"sync"
 )
@@ -400,15 +446,5 @@ func initServer[T any](mu *sync.Mutex, dst **T, src func() *T) {
 		*dst = src()
 	}
 	mu.Unlock()
-}
-
-type xmlRoot struct {
-	value any
-	name  string
-}
-
-// MarshalXML implements the xml.Marshaler interface for xmlRoot.
-func (x xmlRoot) MarshalXML(enc *xml.Encoder, _ xml.StartElement) error {
-	return enc.EncodeElement(x.value, xml.StartElement{Name: xml.Name{Local: x.name}})
 }
 ```

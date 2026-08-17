@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-go"
 ---
 
-Preserve a property's XML element name when its model type has a custom XML name.
+Use model XML names at serialization roots while preserving property and array element names for nested model values.

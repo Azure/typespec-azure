@@ -6,6 +6,7 @@
 import * as go from "../../codemodel/index.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
+import { isXMLNamedModel, needsXMLNestedModelMarshalling } from "./xml-helpers.js";
 
 export interface ModelsSerDe {
   models: string;
@@ -385,6 +386,7 @@ function generateModelDefs(
       if (
         needsDateTimeMarshalling ||
         model.xml?.name ||
+        needsXMLNestedModelMarshalling(model, pkg) ||
         needsXMLArrayMarshalling(model) ||
         byteArrayFormat
       ) {
@@ -1143,14 +1145,50 @@ function generateXMLMarshaller(
   const receiver = modelDef.receiverName();
   const desc = `MarshalXML implements the xml.Marshaller interface for type ${modelDef.Model.name}.`;
   let text = `func (${receiver} ${modelDef.Model.name}) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {\n`;
+  text += `${indent.get()}return ${receiver}.marshalXML(enc, start, true)\n`;
+  text += "}\n\n";
+  text += `func (${receiver} ${modelDef.Model.name}) marshalXML(enc *xml.Encoder, start xml.StartElement, root bool) error {\n`;
+  if (modelDef.Model.xml?.name) {
+    text += `${indent.get()}if root {\n`;
+    text += `${indent.push().get()}start.Name.Local = "${modelDef.Model.xml.name}"\n`;
+    text += `${indent.pop().get()}}\n`;
+  }
   text += generateAliasType(modelDef.Model, receiver, true, imports, indent);
   for (const field of modelDef.Model.fields) {
     if (field.type.kind === "slice") {
-      text += `${indent.get()}if ${receiver}.${field.name} != nil {\n`;
-      text += `${indent.push().get()}aux.${field.name} = &${receiver}.${field.name}\n`;
-      text += `${indent.pop().get()}}\n`;
+      if (isXMLNamedModel(field.type.elementType, modelDef.Model.pkg)) {
+        const nestedItems = `nested${field.name}`;
+        const nestedItemType = `${field.type.elementTypeByValue ? "" : "*"}xmlNestedModel`;
+        text += `${indent.get()}if ${receiver}.${field.name} != nil {\n`;
+        text += `${indent.push().get()}${nestedItems} := make([]${nestedItemType}, len(${receiver}.${field.name}))\n`;
+        text += `${indent.get()}for i := range ${receiver}.${field.name} {\n`;
+        indent.push();
+        if (field.type.elementTypeByValue) {
+          text += `${indent.get()}${nestedItems}[i] = xmlNestedModel{value: ${receiver}.${field.name}[i]}\n`;
+        } else {
+          text += `${indent.get()}if ${receiver}.${field.name}[i] != nil {\n`;
+          text += `${indent.push().get()}${nestedItems}[i] = &xmlNestedModel{value: ${receiver}.${field.name}[i]}\n`;
+          text += `${indent.pop().get()}}\n`;
+        }
+        indent.pop();
+        text += `${indent.get()}}\n`;
+        text += `${indent.get()}aux.${field.name} = &${nestedItems}\n`;
+        text += `${indent.pop().get()}}\n`;
+      } else {
+        text += `${indent.get()}if ${receiver}.${field.name} != nil {\n`;
+        text += `${indent.push().get()}aux.${field.name} = &${receiver}.${field.name}\n`;
+        text += `${indent.pop().get()}}\n`;
+      }
     } else if (field.annotations.isAdditionalProperties || field.type.kind === "map") {
       text += `${indent.get()}aux.${field.name} = (additionalProperties)(${receiver}.${field.name})\n`;
+    } else if (isXMLNamedModel(field.type, modelDef.Model.pkg)) {
+      if (field.byValue) {
+        text += `${indent.get()}aux.${field.name} = xmlNestedModel{value: ${receiver}.${field.name}}\n`;
+      } else {
+        text += `${indent.get()}if ${receiver}.${field.name} != nil {\n`;
+        text += `${indent.push().get()}aux.${field.name} = &xmlNestedModel{value: ${receiver}.${field.name}}\n`;
+        text += `${indent.pop().get()}}\n`;
+      }
     } else if (field.type.kind === "encodedBytes") {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
       text += `${indent.get()}if ${receiver}.${field.name} != nil {\n`;
@@ -1235,7 +1273,14 @@ function generateAliasType(
     } else if (field.annotations.isAdditionalProperties || field.type.kind === "map") {
       text += `${indent.get()}${field.name} additionalProperties \`xml:"${sn}"\`\n`;
     } else if (field.type.kind === "slice") {
-      text += `${indent.get()}${field.name} *${go.getTypeDeclaration(field.type, modelType.pkg)} \`xml:"${sn}"\`\n`;
+      if (forMarshal && isXMLNamedModel(field.type.elementType, modelType.pkg)) {
+        const nestedItemType = `${field.type.elementTypeByValue ? "" : "*"}xmlNestedModel`;
+        text += `${indent.get()}${field.name} *[]${nestedItemType} \`xml:"${sn}"\`\n`;
+      } else {
+        text += `${indent.get()}${field.name} *${go.getTypeDeclaration(field.type, modelType.pkg)} \`xml:"${sn}"\`\n`;
+      }
+    } else if (forMarshal && isXMLNamedModel(field.type, modelType.pkg)) {
+      text += `${indent.get()}${field.name} ${helpers.star(field.byValue)}xmlNestedModel \`xml:"${sn}"\`\n`;
     } else if (field.type.kind === "encodedBytes") {
       text += `${indent.get()}${field.name} *string \`xml:"${sn}"\`\n`;
     }
