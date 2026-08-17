@@ -28,8 +28,9 @@ export function _readSend(
   parameters: string,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "text/plain",
     headers: {
       "required-header": "requiredValue",
@@ -41,7 +42,7 @@ export function _readSend(
       ...(options?.optionalStringHeader !== undefined
         ? { "optional-string-header": options?.optionalStringHeader }
         : {}),
-      ...options.requestOptions?.headers,
+      ...requestParameters.headers,
     },
     body: parameters,
   });

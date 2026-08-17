@@ -453,10 +453,11 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: fooSerializer(body),
   });
 }
@@ -504,9 +505,10 @@ export function _readSend(
   prop: Date,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { prop: prop.toUTCString(), ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { prop: prop.toUTCString(), ...requestParameters.headers },
   });
 }
 
@@ -587,10 +589,11 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: fooSerializer(body),
   });
 }
@@ -672,10 +675,11 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: fooSerializer(body),
   });
 }
@@ -753,10 +757,11 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: fooSerializer(body),
   });
 }
@@ -825,10 +830,11 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: fooSerializer(body),
   });
 }
@@ -898,10 +904,11 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: fooSerializer(body),
   });
 }
@@ -975,10 +982,11 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: fooSerializer(body),
   });
 }
@@ -1062,10 +1070,11 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: fooSerializer(body),
   });
 }
@@ -1150,10 +1159,11 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: fooSerializer(body),
   });
 }
@@ -1238,10 +1248,11 @@ export function _readSend(
   body: Foo,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: fooSerializer(body),
   });
 }
@@ -1423,9 +1434,10 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 
@@ -1531,9 +1543,10 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 
@@ -1667,10 +1680,11 @@ export function _readSend(
   body: PSDog,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: psDogSerializer(body),
   });
 }
@@ -1805,9 +1819,10 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 
@@ -1984,9 +1999,10 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 
@@ -2078,9 +2094,10 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 
@@ -2303,10 +2320,11 @@ export function _getSend(
   body: string,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "text/plain",
-    headers: { "test-header": testHeader, ...options.requestOptions?.headers },
+    headers: { "test-header": testHeader, ...requestParameters.headers },
     body: body,
   });
 }
@@ -2880,10 +2898,11 @@ export function _readSend(
   body: Client_1,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: clientSerializer(body),
   });
 }

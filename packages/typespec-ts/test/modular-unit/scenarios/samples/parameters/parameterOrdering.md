@@ -96,8 +96,9 @@ export function _verifySend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
     headers: {
       ...(options?.clientRequestId !== undefined
@@ -105,7 +106,7 @@ export function _verifySend(
         : {}),
       "apc-gateway-id": apcGatewayId,
       accept: "application/json",
-      ...options.requestOptions?.headers,
+      ...requestParameters.headers,
     },
     body: testVerificationContentSerializer(body),
   });
