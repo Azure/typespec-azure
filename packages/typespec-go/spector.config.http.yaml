@@ -37,6 +37,7 @@ specs:
   "server/path/single": { options: { module: singlegroup } }
   "server/versions/not-versioned": { options: { module: unversionedgroup } }
   "special-headers/conditional-request": { options: { module: condreqgroup } }
+  "special-headers/repeatability": { options: { module: repeatabilitygroup } }
   special-words: { options: { module: specialwordsgroup } }
   "type/array": { options: { module: arraygroup, slice-elements-byval: true } }
   "type/dictionary": { options: { module: dictionarygroup } }
@@ -51,11 +52,13 @@ specs:
   "type/model/usage": { options: { module: usagegroup } }
   "type/model/visibility": { options: { module: visibilitygroup } }
   "type/property/nullable": { options: { module: nullablegroup } }
+  "type/property/additional-properties": { options: { module: addlpropsgroup } }
   # missing plain time support: https://github.com/Azure/autorest.go/issues/1732
   "type/property/optionality": { options: { module: optionalitygroup, slice-elements-byval: true } }
   "type/property/value-types": { options: { module: valuetypesgroup, slice-elements-byval: true } }
   "type/scalar": { options: { module: scalargroup, slice-elements-byval: true } }
   "versioning/madeOptional": { options: { module: madeoptionalgroup } }
+  "versioning/removed": { options: { module: removedgroup } }
   "versioning/returnTypeChangedFrom": { options: { module: rettypechangedfromgroup } }
   "versioning/typeChangedFrom": { options: { module: typechangedfromgroup } }
 
@@ -66,21 +69,15 @@ specs:
   routes: false
   # TODO: https://github.com/Azure/typespec-azure/issues/5226
   "server/versions/versioned": false
-  # requires union support
-  "special-headers/repeatability": false
   # TODO: https://github.com/Azure/autorest.go/issues/1594
   "streaming/jsonl": false
   # not a real scenario
   "type/model/inheritance/nested-discriminator": false
-  # requires union support
-  "type/property/additional-properties": false
-  # requires union support
+  # requires union support: https://github.com/Azure/typespec-azure/issues/4935
   "type/union": false
-  # requires union support
+  # requires discriminated union support: https://github.com/Azure/typespec-azure/issues/4935
   "type/union/discriminated": false
-  # requires union support
+  # requires union support: https://github.com/Azure/typespec-azure/issues/4935
   "versioning/added": false
-  # requires union support
-  "versioning/removed": false
-  # requires union support
+  # requires union support: https://github.com/Azure/typespec-azure/issues/4935
   "versioning/renamedFrom": false

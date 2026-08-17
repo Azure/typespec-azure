@@ -12,30 +12,26 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestExtendsModelClient_Get(t *testing.T) {
-	client, err := addlpropsgroup.NewAdditionalPropertiesClient(nil)
+func TestSpreadModelClient_Get(t *testing.T) {
+	client, err := addlpropsgroup.NewAdditionalPropertiesClientWithNoCredential("http://localhost:3000", nil)
 	require.NoError(t, err)
-	resp, err := client.NewAdditionalPropertiesExtendsModelClient().Get(context.Background(), nil)
+	resp, err := client.NewAdditionalPropertiesSpreadModelClient().Get(context.Background(), nil)
 	require.NoError(t, err)
-	require.EqualValues(t, addlpropsgroup.ExtendsModelAdditionalProperties{
+	require.EqualValues(t, addlpropsgroup.SpreadModelRecord{
 		KnownProp: &addlpropsgroup.ModelForRecord{State: to.Ptr("ok")},
 		AdditionalProperties: map[string]*addlpropsgroup.ModelForRecord{
-			"prop": {
-				State: to.Ptr("ok"),
-			},
+			"prop": {State: to.Ptr("ok")},
 		},
-	}, resp.ExtendsModelAdditionalProperties)
+	}, resp.SpreadModelRecord)
 }
 
-func TestExtendsModelClient_Put(t *testing.T) {
-	client, err := addlpropsgroup.NewAdditionalPropertiesClient(nil)
+func TestSpreadModelClient_Put(t *testing.T) {
+	client, err := addlpropsgroup.NewAdditionalPropertiesClientWithNoCredential("http://localhost:3000", nil)
 	require.NoError(t, err)
-	resp, err := client.NewAdditionalPropertiesExtendsModelClient().Put(context.Background(), addlpropsgroup.ExtendsModelAdditionalProperties{
+	resp, err := client.NewAdditionalPropertiesSpreadModelClient().Put(context.Background(), addlpropsgroup.SpreadModelRecord{
 		KnownProp: &addlpropsgroup.ModelForRecord{State: to.Ptr("ok")},
 		AdditionalProperties: map[string]*addlpropsgroup.ModelForRecord{
-			"prop": {
-				State: to.Ptr("ok"),
-			},
+			"prop": {State: to.Ptr("ok")},
 		},
 	}, nil)
 	require.NoError(t, err)

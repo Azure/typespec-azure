@@ -12,45 +12,37 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestExtendsModelArrayClient_Get(t *testing.T) {
-	client, err := addlpropsgroup.NewAdditionalPropertiesClient(nil)
+func TestSpreadModelArrayClient_Get(t *testing.T) {
+	client, err := addlpropsgroup.NewAdditionalPropertiesClientWithNoCredential("http://localhost:3000", nil)
 	require.NoError(t, err)
-	resp, err := client.NewAdditionalPropertiesExtendsModelArrayClient().Get(context.Background(), nil)
+	resp, err := client.NewAdditionalPropertiesSpreadModelArrayClient().Get(context.Background(), nil)
 	require.NoError(t, err)
-	require.EqualValues(t, addlpropsgroup.ExtendsModelArrayAdditionalProperties{
+	require.EqualValues(t, addlpropsgroup.SpreadModelArrayRecord{
 		KnownProp: []*addlpropsgroup.ModelForRecord{
 			{State: to.Ptr("ok")},
 			{State: to.Ptr("ok")},
 		},
 		AdditionalProperties: map[string][]*addlpropsgroup.ModelForRecord{
 			"prop": {
-				{
-					State: to.Ptr("ok"),
-				},
-				{
-					State: to.Ptr("ok"),
-				},
+				{State: to.Ptr("ok")},
+				{State: to.Ptr("ok")},
 			},
 		},
-	}, resp.ExtendsModelArrayAdditionalProperties)
+	}, resp.SpreadModelArrayRecord)
 }
 
-func TestExtendsModelArrayClient_Put(t *testing.T) {
-	client, err := addlpropsgroup.NewAdditionalPropertiesClient(nil)
+func TestSpreadModelArrayClient_Put(t *testing.T) {
+	client, err := addlpropsgroup.NewAdditionalPropertiesClientWithNoCredential("http://localhost:3000", nil)
 	require.NoError(t, err)
-	resp, err := client.NewAdditionalPropertiesExtendsModelArrayClient().Put(context.Background(), addlpropsgroup.ExtendsModelArrayAdditionalProperties{
+	resp, err := client.NewAdditionalPropertiesSpreadModelArrayClient().Put(context.Background(), addlpropsgroup.SpreadModelArrayRecord{
 		KnownProp: []*addlpropsgroup.ModelForRecord{
 			{State: to.Ptr("ok")},
 			{State: to.Ptr("ok")},
 		},
 		AdditionalProperties: map[string][]*addlpropsgroup.ModelForRecord{
 			"prop": {
-				{
-					State: to.Ptr("ok"),
-				},
-				{
-					State: to.Ptr("ok"),
-				},
+				{State: to.Ptr("ok")},
+				{State: to.Ptr("ok")},
 			},
 		},
 	}, nil)
