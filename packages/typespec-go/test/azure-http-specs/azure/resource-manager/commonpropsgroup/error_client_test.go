@@ -14,6 +14,7 @@ import (
 )
 
 func TestErrorClient_CreateForUserDefinedError(t *testing.T) {
+	t.Skip("https://github.com/Azure/typespec-azure/issues/4946")
 	resp, err := clientFactory.NewErrorClient().CreateForUserDefinedError(ctx, resourceGroupExpected, "confidential", commonpropsgroup.ConfidentialResource{
 		Location: to.Ptr("eastus"),
 		Properties: &commonpropsgroup.ConfidentialResourceProperties{
