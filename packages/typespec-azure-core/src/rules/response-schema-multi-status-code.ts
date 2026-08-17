@@ -1,6 +1,6 @@
 import {
-  Operation,
-  Type,
+  type Operation,
+  type Type,
   createRule,
   fileRef,
   ignoreDiagnostics,

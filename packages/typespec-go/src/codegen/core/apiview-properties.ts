@@ -5,7 +5,7 @@
 
 import * as path from "path";
 import * as go from "../../codemodel/index.js";
-import { fixUpMethodName } from "./operations.js";
+import { fixUpMethodName } from "./helpers.js";
 
 /** the shape of the apiview-properties.json file */
 interface ApiViewProperties {

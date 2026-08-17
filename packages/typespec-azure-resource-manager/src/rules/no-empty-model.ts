@@ -1,4 +1,4 @@
-import { createRule, fileRef, isRecordModelType, Model } from "@typespec/compiler";
+import { createRule, fileRef, isRecordModelType, type Model } from "@typespec/compiler";
 
 export const noEmptyModel = createRule({
   name: "no-empty-model",

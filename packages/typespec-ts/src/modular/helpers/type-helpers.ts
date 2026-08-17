@@ -1,4 +1,4 @@
-import {
+import type {
   SdkBodyParameter,
   SdkCredentialParameter,
   SdkEndpointParameter,
@@ -6,11 +6,11 @@ import {
   SdkModelType,
   SdkType,
 } from "@azure-tools/typespec-client-generator-core";
-import { SdkContext } from "../../utils/interfaces.js";
+import type { SdkContext } from "../../utils/interfaces.js";
 import { NameType, normalizeName } from "../../utils/name-utils.js";
 import {
   getPropertyWithOverrides,
-  ModelOverrideOptions,
+  type ModelOverrideOptions,
 } from "../serialization/serialize-utils.js";
 import { getAllAncestors, getAllProperties } from "./operation-helpers.js";
 

@@ -2,7 +2,8 @@
   "extends": "./core/tsconfig.base.json",
   "compilerOptions": {
     "allowJs": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true
   },
   "include": ["./eng", "./core/eng"],
   "exclude": ["./core/eng/vitest.config.ts", "./eng/vitest.config.ts", "./eng/scripts/doc-updater"]

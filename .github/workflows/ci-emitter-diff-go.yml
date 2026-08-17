@@ -25,7 +25,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -35,8 +34,6 @@ jobs:
   emitter-diff:
     name: "Generate & Diff"
     runs-on: ubuntu-latest
-    # Fork PRs are intentionally skipped
-    if: github.event.pull_request.head.repo.fork != true
     steps:
       - uses: actions/checkout@v7
         with:
@@ -112,7 +109,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Comment on PR
+      - name: Save comment artifact
         if: always() && github.event_name == 'pull_request'
         continue-on-error: true
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
@@ -120,21 +117,35 @@ jobs:
           BASELINE: ${{ steps.baseline.outputs.sha || steps.baseline.outputs.ref }}
           STATUS: ${{ steps.diff.outputs.status }}
           SUMMARY: ${{ steps.diff.outputs.summary }}
+          RUNNER_TEMP: ${{ runner.temp }}
         with:
           script: |
+            const fs = require('fs');
+            const path = require('path');
             const marker = "<!-- emitter-diff-go -->";
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            const { STATUS, SUMMARY, BASELINE } = process.env;
+            const { STATUS, SUMMARY, BASELINE, RUNNER_TEMP } = process.env;
             let body = `${marker}\n### Go emitter diff\nBaseline \`${BASELINE}\` vs this PR.\n\n`;
             body += STATUS !== "0"
               ? `⚠️ **emitter-diff failed** (exit \`${STATUS}\`) — tool/build error, not a diff. See the [run](${runUrl}).\n`
               : `${SUMMARY}\n\nRendered diff: inline on the [run summary](${runUrl}), or the **emitter-diff-go-html** artifact.\n`;
             body += `\n_Informational check (core/eng/emitter-diff); does not block the PR._`;
-            const { owner, repo } = context.repo, issue_number = context.issue.number;
-            const { data } = await github.rest.issues.listComments({ owner, repo, issue_number });
-            const hit = data.find((c) => c.body && c.body.includes(marker));
-            if (hit) await github.rest.issues.updateComment({ owner, repo, comment_id: hit.id, body });
-            else await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            const commentDir = path.join(RUNNER_TEMP, 'emitter-diff-comment');
+            fs.mkdirSync(commentDir, { recursive: true });
+            fs.writeFileSync(path.join(commentDir, 'comment.json'), JSON.stringify({
+              prNumber: context.issue.number,
+              marker,
+              body,
+            }));
+
+      - name: Upload comment artifact
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: emitter-diff-go-comment
+          path: ${{ runner.temp }}/emitter-diff-comment/
+          if-no-files-found: ignore
+          retention-days: 1
 
       - name: Fail on tool error
         if: always()

@@ -7,7 +7,7 @@
 
 import * as path from "path";
 import { Client, ClientOptions } from "./client.js";
-import { PackageContent, PackageType, getPackageName } from "./module.js";
+import { type PackageContent, type PackageType, getPackageName } from "./module.js";
 import { ParameterGroup } from "./param.js";
 import { ResponseEnvelope } from "./result.js";
 
@@ -43,6 +43,7 @@ export type WireType =
   | ReadSeekCloser
   | Scalar
   | Slice
+  | SliceArray
   | String
   | Time;
 
@@ -326,6 +327,26 @@ export interface Slice {
   elementTypeByValue: boolean;
 }
 
+/** specialized slice type for arrays represented as delimited strings */
+export interface SliceArray {
+  kind: "sliceArray";
+
+  /** the element type for this slice */
+  elementType: SliceArrayElementType;
+
+  /** indicates if the slice's element type is pointer-to-type or not */
+  elementTypeByValue: boolean;
+
+  /** the delimiter used to separate elements */
+  delimiter: SliceArrayDelimiter;
+}
+
+/** the set of slice array delimiters */
+export type SliceArrayDelimiter = "comma" | "space" | "pipe" | "newline";
+
+/** the supported element types for arrays represented as delimited strings */
+export type SliceArrayElementType = String | Constant;
+
 /** the set of slice element types */
 export type SliceElementType = WireType;
 
@@ -361,7 +382,12 @@ export interface Time extends QualifiedType {
   /** the serde format used */
   format: TimeFormat;
 
-  /** indicates if the time is always in UTC */
+  /**
+   * indicates the value must be coerced to UTC (via .UTC()) before marshalling.
+   * this is only true for RFC3339 utcDateTime values: RFC3339 is the sole
+   * offset-preserving format, so RFC7231 (always GMT) and Unix (absolute) leave
+   * this false even for a utcDateTime.
+   */
   utc: boolean;
 }
 
@@ -494,6 +520,7 @@ export function getTypeDeclaration(type: Client | Type, scope: PackageType): str
     case "scalar":
       return type.type;
     case "slice":
+    case "sliceArray":
       return (
         `[]${type.elementTypeByValue ? "" : "*"}` + getTypeDeclaration(type.elementType, scope)
       );
@@ -795,6 +822,19 @@ export class Slice implements Slice {
     this.kind = "slice";
     this.elementType = elementType;
     this.elementTypeByValue = elementTypeByValue;
+  }
+}
+
+export class SliceArray implements SliceArray {
+  constructor(
+    elementType: SliceArrayElementType,
+    elementTypeByValue: boolean,
+    delimiter: SliceArrayDelimiter,
+  ) {
+    this.kind = "sliceArray";
+    this.elementType = elementType;
+    this.elementTypeByValue = elementTypeByValue;
+    this.delimiter = delimiter;
   }
 }
 

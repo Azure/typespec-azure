@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { PackageCommonInfoConfig } from "./package-common.js";
+import type { PackageCommonInfoConfig } from "./package-common.js";
 
 export interface AzurePackageInfoConfig extends PackageCommonInfoConfig {
   hasLro: boolean;

@@ -1,7 +1,7 @@
 import { FinalStateValue } from "@azure-tools/typespec-azure-core";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { assert, describe, it } from "vitest";
-import { SdkClientType, SdkHttpOperation, UsageFlags } from "../../src/interfaces.js";
+import { type SdkClientType, type SdkHttpOperation, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import {

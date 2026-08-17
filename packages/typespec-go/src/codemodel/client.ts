@@ -279,6 +279,9 @@ export interface PageableStrategyNextLink {
    */
   nextLinkPath: Array<type.ModelField>;
 
+  /** query parameters to add to the next link request. can be empty */
+  reinjectedParams: Array<param.QueryParameter>;
+
   /** the custom method used to fetch the next link */
   method?: NextPageMethod;
 }
@@ -559,6 +562,7 @@ export class PageableStrategyNextLink implements PageableStrategyNextLink {
   constructor(nextLinkPath: Array<type.ModelField>) {
     this.kind = "nextLink";
     this.nextLinkPath = nextLinkPath;
+    this.reinjectedParams = new Array<param.QueryParameter>();
   }
 }
 

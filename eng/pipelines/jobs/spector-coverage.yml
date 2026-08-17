@@ -118,11 +118,11 @@ jobs:
       # then regenerates the SDK from the spector specs. `pnpm run test:java:e2e`
       # starts the mock server, runs the JUnit tests and produces
       # tsp-spector-coverage-java.json.
-      - pwsh: pnpm run regenerate
+      - script: pnpm run regenerate
         displayName: "Regenerate Java test code"
         workingDirectory: packages/typespec-java
 
-      - pwsh: pnpm run test:java:e2e
+      - script: pnpm run test:java:e2e
         displayName: "Run Java spector tests"
         workingDirectory: packages/typespec-java
 

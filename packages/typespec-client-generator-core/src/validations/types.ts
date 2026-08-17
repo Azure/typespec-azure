@@ -1,4 +1,4 @@
-import {
+import type {
   Enum,
   EnumMember,
   Interface,
@@ -12,11 +12,14 @@ import {
   Union,
   UnionVariant,
 } from "@typespec/compiler";
-import { AugmentDecoratorStatementNode, DecoratorExpressionNode } from "@typespec/compiler/ast";
+import type {
+  AugmentDecoratorStatementNode,
+  DecoratorExpressionNode,
+} from "@typespec/compiler/ast";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { getClientNameOverride } from "../decorators.js";
-import { TCGCContext } from "../interfaces.js";
+import type { TCGCContext } from "../interfaces.js";
 import {
   AllScopes,
   clientKey,
@@ -26,6 +29,7 @@ import {
   listScopedDecoratorData,
 } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
+import { createDuplicateClientNameDiagnostic } from "./diagnostics.js";
 
 export function validateTypes(context: TCGCContext) {
   validateClientNames(context);
@@ -346,41 +350,18 @@ function reportDuplicateClientNames(
 ) {
   for (const [name, duplicates] of duplicateTracker.entries()) {
     for (const item of duplicates) {
-      const scopeStr = scope === AllScopes ? "AllScopes" : scope;
-      if (Array.isArray(item)) {
-        // If the item is a decorator application
-        if (scope === "csharp" && item[0].kind === "Operation") {
-          // .NET support operations with same name with overloads
-          reportDiagnostic(program, {
-            code: "duplicate-client-name-warning",
-            format: { name, scope: scopeStr },
-            target: item[1],
-          });
-        } else {
-          reportDiagnostic(program, {
-            code: "duplicate-client-name",
-            format: { name, scope: scopeStr },
-            target: item[1],
-          });
-        }
-      } else {
-        if (scope === "csharp" && item.kind === "Operation") {
-          // .NET support operations with same name with overloads
-          reportDiagnostic(program, {
-            code: "duplicate-client-name-warning",
-            messageId: "nonDecorator",
-            format: { name, scope: scopeStr },
-            target: item,
-          });
-        } else {
-          reportDiagnostic(program, {
-            code: "duplicate-client-name",
-            messageId: "nonDecorator",
-            format: { name, scope: scopeStr },
-            target: item,
-          });
-        }
-      }
+      const [type, target, messageId] = Array.isArray(item)
+        ? [item[0], item[1], "default" as const]
+        : [item, item, "nonDecorator" as const];
+      program.reportDiagnostic(
+        createDuplicateClientNameDiagnostic(
+          name,
+          scope,
+          target,
+          type.kind === "Operation",
+          messageId,
+        ),
+      );
     }
   }
 }

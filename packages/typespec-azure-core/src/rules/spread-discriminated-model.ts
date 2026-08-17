@@ -1,4 +1,10 @@
-import { Model, createRule, fileRef, getDiscriminator, paramMessage } from "@typespec/compiler";
+import {
+  type Model,
+  createRule,
+  fileRef,
+  getDiscriminator,
+  paramMessage,
+} from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 
 export const spreadDiscriminatedModelRule = createRule({

@@ -173,6 +173,7 @@ model ExternalResource<
   Description extends valueof string = "The name of the resource",
   ParentType extends valueof "Tenant" | "Subscription" | "ResourceGroup" = "ResourceGroup"
 > {
+  /** The name of the resource. */
   @doc(Description)
   @visibility(Lifecycle.Read)
   @path
@@ -223,6 +224,7 @@ model ExternalChildResource<
   NameType extends string = string,
   Description extends valueof string = "The name of the resource"
 > {
+  /** The name of the resource. */
   @doc(Description)
   @visibility(Lifecycle.Read)
   @path

@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
+import type { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import {
   createClientCustomizationInput,
   createSdkContextForTester,

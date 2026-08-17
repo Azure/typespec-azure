@@ -1,4 +1,4 @@
-import { createRule, fileRef, isKey, Model } from "@typespec/compiler";
+import { createRule, fileRef, isKey, type Model } from "@typespec/compiler";
 import { isCustomAzureResource } from "../resource.js";
 import { getProperties } from "./utils.js";
 

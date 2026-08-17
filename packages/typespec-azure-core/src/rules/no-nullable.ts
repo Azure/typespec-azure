@@ -1,4 +1,4 @@
-import { ModelProperty, createRule, fileRef, isNullType } from "@typespec/compiler";
+import { type ModelProperty, createRule, fileRef, isNullType } from "@typespec/compiler";
 
 export const noNullableRule = createRule({
   name: "no-nullable",

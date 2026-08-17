@@ -1,10 +1,13 @@
 import {
   BrandedSdkEmitterOptions,
-  SdkContext,
-  SdkServiceOperation,
+  type SdkContext,
+  type SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
-import { createTypeSpecLibrary, JSONSchemaType } from "@typespec/compiler";
-import { PythonEmitterOptions, PythonEmitterOptionsSchema } from "@typespec/http-client-python";
+import { createTypeSpecLibrary, type JSONSchemaType } from "@typespec/compiler";
+import {
+  type PythonEmitterOptions,
+  PythonEmitterOptionsSchema,
+} from "@typespec/http-client-python";
 
 export interface PythonAzureEmitterOptions extends PythonEmitterOptions {
   "examples-dir"?: string;

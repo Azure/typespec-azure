@@ -1,4 +1,4 @@
-import { Model, createRule, fileRef, getProperty } from "@typespec/compiler";
+import { type Model, createRule, fileRef, getProperty } from "@typespec/compiler";
 
 import { getArmResources } from "../resource.js";
 import { getProperties } from "./utils.js";

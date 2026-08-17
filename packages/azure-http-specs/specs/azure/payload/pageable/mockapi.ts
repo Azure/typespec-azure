@@ -1,7 +1,7 @@
 import {
   json,
   MockRequest,
-  ScenarioMockApi,
+  type ScenarioMockApi,
   ValidationError,
   withServiceKeys,
 } from "@typespec/spec-api";

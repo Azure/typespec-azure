@@ -2,7 +2,7 @@ import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { Visibility } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { SdkModelType, UsageFlags } from "../../src/interfaces.js";
+import { type SdkModelType, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreTspModel } from "../../src/internal-utils.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";

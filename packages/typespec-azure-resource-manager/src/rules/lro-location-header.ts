@@ -1,4 +1,4 @@
-import { ModelProperty, Operation, createRule, fileRef } from "@typespec/compiler";
+import { type ModelProperty, type Operation, createRule, fileRef } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 
 function getCaseInsensitiveHeader(

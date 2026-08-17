@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { ErrorCode } from "../../codemodel/errors.js";
+import type { ErrorCode } from "../../codemodel/errors.js";
 
 /**
  * CodegenError is thrown when the emitter fails some condition
