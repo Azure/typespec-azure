@@ -524,6 +524,10 @@ The `@clientDefaultValue` decorator is legacy functionality that should **only**
 
 The `@Azure.ClientGenerator.Core.Legacy.clientDefaultValue` decorator allows you to set a client-level default value for a model property or operation parameter. This is primarily intended for maintaining backward compatibility with existing SDK users who may rely on default values that were previously generated from Swagger definitions.
 
+:::note
+The default value type must match the type of the property or parameter it is applied to. If it does not, TCGC emits the `client-default-value-type-mismatch` warning. When `@alternateType` is present, the default value is validated against the alternate type instead — so you can use `@alternateType` to make an otherwise-mismatched default valid. If the mismatch is intentional, suppress the diagnostic with `#suppress "@azure-tools/typespec-client-generator-core/client-default-value-type-mismatch"`; the mismatched value is still applied to the generated SDKs.
+:::
+
 ### Model Property Default Values
 
 Use `@clientDefaultValue` on model properties when you need to specify a default value that will be used in the generated SDK code.

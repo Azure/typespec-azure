@@ -1,5 +1,55 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.71.0
+
+### Features
+
+- [#4867](https://github.com/Azure/typespec-azure/pull/4867) Add `csharp-model-suffix` and `csharp-use-standard-acronyms` linter rules for C# SDK model naming.
+- [#5109](https://github.com/Azure/typespec-azure/pull/5109) Add `no-openapi-client-extensions` linter rule that flags use of the `@typespec/openapi` `@extension` decorator to emit client-altering `x-ms-*`/`x-nullable` OpenAPI extensions (e.g. `x-ms-long-running-operation`, `x-ms-pageable`, `x-ms-enum`, `x-ms-client-name`, `x-ms-secret`). These extensions only affect the OpenAPI output, so other emitters produce an incorrect representation of the API; use the equivalent TypeSpec construct instead.
+- [#4892](https://github.com/Azure/typespec-azure/pull/4892) Add the experimental Relationship base type for Azure Resource Manager extension resources. `RelationshipProperties` provides the `baseTypes` descriptor, source and target resource and tenant identifiers, and provisioning state. Resource providers can extend this property bag with relationship-specific information and expose the relationship against any ARM resource scope.
+  
+  Example of creating a dependency relationship with RP-specific metadata and operations:
+  
+  ```typespec
+  using Azure.ResourceManager;
+  using Azure.ResourceManager.BaseTypes.Relationships;
+  
+  model DependencyOfMetadata {
+    sourceType: string;
+    targetType: string;
+    description?: string;
+  }
+  
+  model DependencyOfProperties is RelationshipProperties {
+    metadata: DependencyOfMetadata;
+  }
+  
+  #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "Experimental BaseTypes"
+  model DependencyOf is Relationship<DependencyOfProperties> {
+    ...ResourceNameParameter<
+      Resource = DependencyOf,
+      KeyName = "relationshipName",
+      SegmentName = "dependencyOf",
+      NamePattern = "^[a-zA-Z0-9_.-]{1,64}$"
+    >;
+  }
+  
+  interface DependencyOfOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+    get is Extension.Read<Scope, DependencyOf>;
+    create is Extension.CreateOrReplaceAsync<Scope, DependencyOf>;
+    update is Extension.CustomPatchAsync<
+      Scope,
+      DependencyOf,
+      Azure.ResourceManager.Foundations.ResourceUpdateModel<DependencyOf, DependencyOfProperties>
+    >;
+    delete is Extension.DeleteWithoutOkAsync<Scope, DependencyOf>;
+    list is Extension.ListByTarget<Scope, DependencyOf>;
+  }
+  ```
+- [#4808](https://github.com/Azure/typespec-azure/pull/4808) Split `arm-resource-operation` lint rule: add `use-operation-decorator`, `use-api-version`, and `use-interface` as separate rules replacing the original combined rule.
+- [#4880](https://github.com/Azure/typespec-azure/pull/4880) Replace the `no-unnamed-union` linter rule with `no-unnamed-types` in `@azure-tools/typespec-azure-core`. The new rule flags anonymous models in addition to unnamed unions, walking the type graph from operations to detect anonymous models on the client surface. The `no-unnamed-types` rule has been removed from `@azure-tools/typespec-client-generator-core`.
+
+
 ## 0.70.0
 
 ### Features

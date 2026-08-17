@@ -174,6 +174,13 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
     //   items: { type: "string" },
     //   nullable: true,
     // },
+    // "remove-model": {
+    //   type: ["string", "array"],
+    //   description:
+    //     "Do not generate the model classes. Format should be in array form. This option is for management-plane SDK.",
+    //   items: { type: "string" },
+    //   nullable: true,
+    // },
     // "preserve-model": {
     //   type: ["string", "array"],
     //   description:
