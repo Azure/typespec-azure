@@ -37,7 +37,6 @@ specs:
   "server/path/single": { options: { module: singlegroup } }
   "server/versions/not-versioned": { options: { module: unversionedgroup } }
   "special-headers/conditional-request": { options: { module: condreqgroup } }
-  "special-headers/repeatability": { options: { module: repeatabilitygroup } }
   special-words: { options: { module: specialwordsgroup } }
   "type/array": { options: { module: arraygroup, slice-elements-byval: true } }
   "type/dictionary": { options: { module: dictionarygroup } }
@@ -53,7 +52,6 @@ specs:
   "type/model/visibility": { options: { module: visibilitygroup } }
   "type/property/nullable": { options: { module: nullablegroup } }
   "type/property/additional-properties": { options: { module: addlpropsgroup } }
-  # missing plain time support: https://github.com/Azure/autorest.go/issues/1732
   "type/property/optionality": { options: { module: optionalitygroup, slice-elements-byval: true } }
   "type/property/value-types": { options: { module: valuetypesgroup, slice-elements-byval: true } }
   "type/scalar": { options: { module: scalargroup, slice-elements-byval: true } }
@@ -63,13 +61,15 @@ specs:
   "versioning/typeChangedFrom": { options: { module: typechangedfromgroup } }
 
   # --- Not generated yet (tracked skips) ---
-  # TODO: https://github.com/Azure/autorest.go/issues/1606
+  # TODO: https://github.com/Azure/typespec-azure/issues/4946
   "response/status-code-range": false
-  # TODO: https://github.com/Azure/autorest.go/issues/1730
+  # TODO: https://github.com/Azure/typespec-azure/issues/4928
   routes: false
   # TODO: https://github.com/Azure/typespec-azure/issues/5226
   "server/versions/versioned": false
-  # TODO: https://github.com/Azure/autorest.go/issues/1594
+  # TODO: https://github.com/Azure/typespec-azure/issues/4957
+  "special-headers/repeatability": false
+  # TODO: https://github.com/Azure/typespec-azure/issues/4934
   "streaming/jsonl": false
   # not a real scenario
   "type/model/inheritance/nested-discriminator": false
