@@ -44,10 +44,7 @@ import {
   responseDeltaDeserializer,
 } from "../models/models.js";
 import { readSseStream } from "../static-helpers/sseStreamingHelpers.js";
-import {
-  StreamResponse,
-  getStreamResponse,
-} from "../static-helpers/streamingHelpers.js";
+import { StreamResponse, getStreamResponse } from "../static-helpers/streamingHelpers.js";
 import { ReceiveOptionalParams } from "./options.js";
 import {
   StreamableMethod,
