@@ -579,8 +579,13 @@ function emitBody(
     } else if (bodyParam.bodyFormat === "Text") {
       imports.add("strings");
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming");
+      const body = helpers.formatValue(
+        helpers.getParamName(bodyParam),
+        bodyParam.type,
+        imports,
+      );
       if (go.isRequiredParameter(bodyParam.style)) {
-        text += `${indent.get()}body := streaming.NopCloser(strings.NewReader(${bodyParam.name}))\n`;
+        text += `${indent.get()}body := streaming.NopCloser(strings.NewReader(${body}))\n`;
         text += emitSetBodyWithErrCheck(
           `req.SetBody(body, ${getContentTypeValue(method, bodyParam.contentType)})`,
           indent,
@@ -589,7 +594,7 @@ function emitBody(
       } else {
         text += emitParamGroupCheck(bodyParam, indent);
         indent.push();
-        text += `${indent.get()}body := streaming.NopCloser(strings.NewReader(${helpers.getParamName(bodyParam)}))\n`;
+        text += `${indent.get()}body := streaming.NopCloser(strings.NewReader(${body}))\n`;
         text += emitSetBodyWithErrCheck(
           `req.SetBody(body, ${getContentTypeValue(method, bodyParam.contentType)})`,
           indent,
