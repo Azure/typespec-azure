@@ -12,8 +12,12 @@ union Payload {
 }
 
 @post
-@route("/enum")
-op send(@header contentType: "text/plain", @body payload?: Payload): void;
+@route("/enum-optional")
+op sendOptional(@header contentType: "text/plain", @body payload?: Payload): void;
+
+@post
+@route("/enum-required")
+op sendRequired(@header contentType: "text/plain", @body payload: Payload): void;
 ```
 
 ## The generated client converts the extensible enum to a string
@@ -65,29 +69,29 @@ func NewExtensibleEnumRequestBodyClientWithNoCredential(endpoint string, options
 	return client, nil
 }
 
-// Send -
+// SendOptional -
 // If the operation fails it returns an *azcore.ResponseError type.
-//   - options - ExtensibleEnumRequestBodyClientSendOptions contains the optional parameters for the ExtensibleEnumRequestBodyClient.Send
+//   - options - ExtensibleEnumRequestBodyClientSendOptionalOptions contains the optional parameters for the ExtensibleEnumRequestBodyClient.SendOptional
 //     method.
-func (client *ExtensibleEnumRequestBodyClient) Send(ctx context.Context, options *ExtensibleEnumRequestBodyClientSendOptions) (ExtensibleEnumRequestBodyClientSendResponse, error) {
+func (client *ExtensibleEnumRequestBodyClient) SendOptional(ctx context.Context, options *ExtensibleEnumRequestBodyClientSendOptionalOptions) (ExtensibleEnumRequestBodyClientSendOptionalResponse, error) {
 	var err error
-	req, err := client.sendCreateRequest(ctx, options)
+	req, err := client.sendOptionalCreateRequest(ctx, options)
 	if err != nil {
-		return ExtensibleEnumRequestBodyClientSendResponse{}, err
+		return ExtensibleEnumRequestBodyClientSendOptionalResponse{}, err
 	}
 	httpResp, err := client.internal.Pipeline().Do(req)
 	if err != nil {
-		return ExtensibleEnumRequestBodyClientSendResponse{}, err
+		return ExtensibleEnumRequestBodyClientSendOptionalResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		return ExtensibleEnumRequestBodyClientSendResponse{}, runtime.NewResponseError(httpResp)
+		return ExtensibleEnumRequestBodyClientSendOptionalResponse{}, runtime.NewResponseError(httpResp)
 	}
-	return ExtensibleEnumRequestBodyClientSendResponse{}, nil
+	return ExtensibleEnumRequestBodyClientSendOptionalResponse{}, nil
 }
 
-// sendCreateRequest creates the Send request.
-func (client *ExtensibleEnumRequestBodyClient) sendCreateRequest(ctx context.Context, options *ExtensibleEnumRequestBodyClientSendOptions) (*policy.Request, error) {
-	urlPath := "/enum"
+// sendOptionalCreateRequest creates the SendOptional request.
+func (client *ExtensibleEnumRequestBodyClient) sendOptionalCreateRequest(ctx context.Context, options *ExtensibleEnumRequestBodyClientSendOptionalOptions) (*policy.Request, error) {
+	urlPath := "/enum-optional"
 	req, err := runtime.NewRequest(ctx, http.MethodPost, runtime.JoinPaths(client.endpoint, urlPath))
 	if err != nil {
 		return nil, err
@@ -99,6 +103,41 @@ func (client *ExtensibleEnumRequestBodyClient) sendCreateRequest(ctx context.Con
 			return nil, err
 		}
 		return req, nil
+	}
+	return req, nil
+}
+
+// SendRequired -
+// If the operation fails it returns an *azcore.ResponseError type.
+//   - options - ExtensibleEnumRequestBodyClientSendRequiredOptions contains the optional parameters for the ExtensibleEnumRequestBodyClient.SendRequired
+//     method.
+func (client *ExtensibleEnumRequestBodyClient) SendRequired(ctx context.Context, payload Payload, options *ExtensibleEnumRequestBodyClientSendRequiredOptions) (ExtensibleEnumRequestBodyClientSendRequiredResponse, error) {
+	var err error
+	req, err := client.sendRequiredCreateRequest(ctx, payload, options)
+	if err != nil {
+		return ExtensibleEnumRequestBodyClientSendRequiredResponse{}, err
+	}
+	httpResp, err := client.internal.Pipeline().Do(req)
+	if err != nil {
+		return ExtensibleEnumRequestBodyClientSendRequiredResponse{}, err
+	}
+	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
+		return ExtensibleEnumRequestBodyClientSendRequiredResponse{}, runtime.NewResponseError(httpResp)
+	}
+	return ExtensibleEnumRequestBodyClientSendRequiredResponse{}, nil
+}
+
+// sendRequiredCreateRequest creates the SendRequired request.
+func (client *ExtensibleEnumRequestBodyClient) sendRequiredCreateRequest(ctx context.Context, payload Payload, _ *ExtensibleEnumRequestBodyClientSendRequiredOptions) (*policy.Request, error) {
+	urlPath := "/enum-required"
+	req, err := runtime.NewRequest(ctx, http.MethodPost, runtime.JoinPaths(client.endpoint, urlPath))
+	if err != nil {
+		return nil, err
+	}
+	body := streaming.NopCloser(strings.NewReader(string(payload)))
+	req.Raw().Header["Content-Type"] = []string{"text/plain"}
+	if err := req.SetBody(body, "text/plain"); err != nil {
+		return nil, err
 	}
 	return req, nil
 }
