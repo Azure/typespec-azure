@@ -1221,33 +1221,26 @@ func TestQueryRequestRoundTrip(t *testing.T) {
 }
 
 // TestJSONTextConfigurationMarshalElementName tests that JSONTextConfiguration.MarshalXML
-// produces the correct element name "JsonTextConfiguration".
+// preserves the element name "JsonTextConfiguration" supplied by its containing property.
 func TestJSONTextConfigurationMarshalElementName(t *testing.T) {
 	jtc := JSONTextConfiguration{
 		RecordSeparator: to.Ptr("\n"),
 	}
 
-	data, err := xml.Marshal(jtc)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Verify the element name is "JsonTextConfiguration", not "JSONTextConfiguration"
-	xmlStr := string(data)
-	if !strings.Contains(xmlStr, "<JsonTextConfiguration>") {
-		t.Fatalf("expected element name JsonTextConfiguration, got: %s", xmlStr)
-	}
-
-	// Round-trip via QueryFormat which embeds JSONTextConfiguration
 	formatType := QueryFormatType("json")
 	qf := QueryFormat{
 		Type:                  &formatType,
 		JSONTextConfiguration: &jtc,
 	}
 
-	data, err = xml.Marshal(qf) //nolint:staticcheck // we use custom helper for map[string]any
+	data, err := xml.Marshal(qf) //nolint:staticcheck // we use custom helper for map[string]any
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	xmlStr := string(data)
+	if !strings.Contains(xmlStr, "<JsonTextConfiguration>") {
+		t.Fatalf("expected nested element name JsonTextConfiguration, got: %s", xmlStr)
 	}
 
 	var qf2 QueryFormat
