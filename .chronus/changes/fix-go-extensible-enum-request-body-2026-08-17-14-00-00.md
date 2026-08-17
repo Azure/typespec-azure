@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-go"
 ---
 
-Convert extensible enum request bodies to strings before creating text readers.
+Format text request body values as strings before creating readers.
