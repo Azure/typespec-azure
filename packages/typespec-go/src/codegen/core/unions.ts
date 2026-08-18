@@ -284,7 +284,7 @@ function generateUnmarshalObjects(goUnion: go.UnionStruct, indent: helpers.Inden
     }
   }
 
-  let elseBlock: helpers.elseBlock = { body: () => "" };
+  const elseBlock: helpers.elseBlock = { body: () => "" };
   // if the last field is a map then it's the fallback
   if (jsonObjects[jsonObjects.length - 1].type.kind === "map") {
     elseBlock.body = (indent) => `${indent.get()}err = json.Unmarshal(data, &${receiver}.${jsonObjects[jsonObjects.length - 1].name})\n`;
@@ -372,7 +372,7 @@ function getForMixedTypes(goUnion: go.UnionStruct): mixedTypesInfo | undefined {
     mixedTypes.push({
       expression: "jsonNumber",
       clause: (indent) => {
-        let caseStatement = `${indent.get()}${helpers.buildIfBlock(indent, {
+        const caseStatement = `${indent.get()}${helpers.buildIfBlock(indent, {
           condition: "jsonNumberIsFloat(data)",
           body: (indent) =>
             `${indent.get()}err = json.Unmarshal(data, &${receiver}.${mixedNumbers[0].name})\n`,
