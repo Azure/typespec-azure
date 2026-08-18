@@ -26,9 +26,9 @@ model DefaultApproval {
 }
 
 enum Threshold {
-	Small: 3,
-	Medium: 7,
-	Large: 15,
+  Small: 3,
+  Medium: 7,
+  Large: 15,
 }
 
 /** A tool server definition. */
