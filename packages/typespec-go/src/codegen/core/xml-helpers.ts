@@ -8,43 +8,81 @@ import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
 
 /**
- * Creates the content for the required additional properties XML marshalling helpers.
+ * Returns true when the type is a model whose custom XML name must only be used at roots.
+ */
+export function isXMLNamedModel(
+  type: go.WireType,
+  pkg: go.PackageContent,
+): type is go.Model {
+  return (
+    type.kind === "model" &&
+    type.pkg === pkg &&
+    type.xml?.name !== undefined &&
+    !type.annotations.omitSerDeMethods &&
+    helpers.getSerDeFormat(type, pkg) === "XML"
+  );
+}
+
+/**
+ * Returns true when the model contains a property or array item whose model has a custom XML name.
+ */
+export function needsXMLNestedModelMarshalling(
+  model: go.Model,
+  pkg: go.PackageContent,
+): boolean {
+  return model.fields.some(
+    (field) =>
+      isXMLNamedModel(field.type, pkg) ||
+      (field.type.kind === "slice" && isXMLNamedModel(field.type.elementType, pkg)),
+  );
+}
+
+/**
+ * Creates the content for the required XML marshalling helpers.
  *
  * @param pkg contains the package content
  * @returns the text for the file or the empty string
  */
-export function generateXMLAdditionalPropsHelpers(pkg: go.PackageContent): string {
-  // check if any models need this helper
-  let required = false;
+export function generateXMLHelpers(pkg: go.PackageContent): string {
+  let additionalPropertiesRequired = false;
   for (const model of pkg.models) {
     if (helpers.getSerDeFormat(model, pkg) !== "XML") {
       continue;
     }
     for (const field of model.fields) {
       if (field.type.kind === "map") {
-        required = true;
+        additionalPropertiesRequired = true;
         break;
       }
     }
-    if (required) {
+    if (additionalPropertiesRequired) {
       break;
     }
   }
 
-  if (!required) {
+  const nestedModelRequired = pkg.models.some(
+    (model) =>
+      model.kind === "model" &&
+      !model.annotations.omitSerDeMethods &&
+      helpers.getSerDeFormat(model, pkg) === "XML" &&
+      needsXMLNestedModelMarshalling(model, pkg),
+  );
+  if (!additionalPropertiesRequired && !nestedModelRequired) {
     return "";
   }
 
   let text = helpers.contentPreamble(pkg);
-  // add standard imports
   const imports = new ImportManager(pkg);
   imports.add("encoding/xml");
-  imports.add("errors");
-  imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
-  imports.add("io");
-  imports.add("strings");
+  if (additionalPropertiesRequired) {
+    imports.add("errors");
+    imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
+    imports.add("io");
+    imports.add("strings");
+  }
   text += imports.text();
-  text += `
+  if (additionalPropertiesRequired) {
+    text += `
 type additionalProperties map[string]*string
 
 // MarshalXML implements the xml.Marshaler interface for additionalProperties.
@@ -115,5 +153,22 @@ func (ap *additionalProperties) UnmarshalXML(d *xml.Decoder, start xml.StartElem
 	return nil
 }
 `;
+  }
+  if (nestedModelRequired) {
+    text += `
+type xmlModelMarshaler interface {
+	marshalXML(*xml.Encoder, xml.StartElement, bool) error
+}
+
+type xmlNestedModel struct {
+	value xmlModelMarshaler
+}
+
+// MarshalXML implements the xml.Marshaler interface for xmlNestedModel.
+func (x xmlNestedModel) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
+	return x.value.marshalXML(enc, start, false)
+}
+`;
+  }
   return text;
 }
