@@ -66,6 +66,7 @@ package testmodule
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -94,24 +95,31 @@ func (t ToolServerRequireApproval) MarshalJSON() ([]byte, error) {
 	}
 }
 
-func (t *ToolServerRequireApproval) UnmarshalJSON(data []byte) error {
+func (t *ToolServerRequireApproval) UnmarshalJSON(data []byte) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("unmarshalling type %T: %s", t, err.Error())
+		}
+	}()
 	switch probeJSONKind(data) {
 	case jsonObject:
 		var rawMsg map[string]json.RawMessage
-		if err := json.Unmarshal(data, &rawMsg); err != nil {
-			return fmt.Errorf("unmarshalling type %T: %s", t, err.Error())
+		if err = json.Unmarshal(data, &rawMsg); err != nil {
+			return
 		}
 		if hasRequiredFields(rawMsg, "approved", "reason") {
-			return json.Unmarshal(data, &t.DefaultApproval)
+			err = json.Unmarshal(data, &t.DefaultApproval)
+		} else {
+			err = json.Unmarshal(data, &t.MapOfSliceOfString)
 		}
-		return json.Unmarshal(data, &t.MapOfSliceOfString)
 	case jsonString:
-		return json.Unmarshal(data, &t.ApprovalMode)
+		err = json.Unmarshal(data, &t.ApprovalMode)
 	case jsonEmpty, jsonNull:
-		return nil
+		err = nil
 	default:
-		return fmt.Errorf("unmarshalling %T: unexpected JSON token", t)
+		err = errors.New("unexpected JSON token")
 	}
+	return
 }
 
 type jsonKind int

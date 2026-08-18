@@ -83,6 +83,7 @@ function generateUnionsSerde(pkg: go.PackageContent): string {
   const imports = new ImportManager(pkg);
 
   imports.add("encoding/json");
+  imports.add("errors");
   imports.add("fmt");
 
   let emitProbe = false;
@@ -202,7 +203,13 @@ function generateUnmarshalJson(
   indent: helpers.Indentation,
 ): unmarshalInfo {
   const receiver = getReceiverName(goUnion);
-  let text = `func (${receiver} *${goUnion.name}) UnmarshalJSON(data []byte) error {\n`;
+  let text = `func (${receiver} *${goUnion.name}) UnmarshalJSON(data []byte) (err error) {\n`;
+  text += `${indent.get()}defer func() {\n`;
+  text += `${indent.push().get()}${helpers.buildIfBlock(indent, {
+    condition: "err != nil",
+    body: (indent) => `${indent.get()}err = fmt.Errorf("unmarshalling type %T: %s", ${receiver}, err.Error())\n`,
+  })}\n`;
+  text += `${indent.pop().get()}}()\n`;
   const mixedTypes = getForMixedTypes(goUnion);
   if (mixedTypes) {
     text += `${indent.get()}${helpers.buildSwitchCase(
@@ -211,12 +218,14 @@ function generateUnmarshalJson(
       mixedTypes.cases,
       {
         clause: (indent) =>
-          `${indent.get()}return fmt.Errorf("unmarshalling %T: unexpected JSON token", ${receiver})\n`,
+          `${indent.get()}err = errors.New("unexpected JSON token")\n`,
       },
     )}`;
   } else {
     text += generateUnmarshalObjects(goUnion, indent);
   }
+
+  text += `${indent.get()}return\n`;
   text += "}\n\n";
 
   return {
@@ -240,9 +249,9 @@ function generateUnmarshalObjects(goUnion: go.UnionStruct, indent: helpers.Inden
   const receiver = getReceiverName(goUnion);
   let text = `${indent.get()}var rawMsg map[string]json.RawMessage\n`;
   text += `${indent.get()}${helpers.buildIfBlock(indent, {
-    condition: "err := json.Unmarshal(data, &rawMsg); err != nil",
+    condition: "err = json.Unmarshal(data, &rawMsg); err != nil",
     body: (indent) =>
-      `${indent.get()}return fmt.Errorf("unmarshalling type %T: %s", ${receiver}, err.Error())\n`,
+      `${indent.get()}return\n`,
   })}\n`;
 
   const jsonObjects = groupJsonObjects(goUnion);
@@ -261,7 +270,7 @@ function generateUnmarshalObjects(goUnion: go.UnionStruct, indent: helpers.Inden
 
     const condition = `hasRequiredFields(rawMsg, ${getJsonFieldsForProbe(field.type)})`;
     const body = (indent: helpers.Indentation) =>
-      `${indent.get()}return json.Unmarshal(data, &${receiver}.${field.name})\n`;
+      `${indent.get()}err = json.Unmarshal(data, &${receiver}.${field.name})\n`;
     if (i === 0) {
       ifBlock = {
         condition: condition,
@@ -275,14 +284,15 @@ function generateUnmarshalObjects(goUnion: go.UnionStruct, indent: helpers.Inden
     }
   }
 
-  text += `${indent.get()}${helpers.buildIfBlock(indent, ifBlock, elseIfBlocks)}\n`;
-
+  let elseBlock: helpers.elseBlock = { body: () => "" };
   // if the last field is a map then it's the fallback
   if (jsonObjects[jsonObjects.length - 1].type.kind === "map") {
-    text += `${indent.get()}return json.Unmarshal(data, &${receiver}.${jsonObjects[jsonObjects.length - 1].name})\n`;
+    elseBlock.body = (indent) => `${indent.get()}err = json.Unmarshal(data, &${receiver}.${jsonObjects[jsonObjects.length - 1].name})\n`;
   } else {
-    text += `${indent.get()}return fmt.Errorf("unmarshalling type %T: could not determine variant", ${receiver})\n`;
+    elseBlock.body = (indent) => `${indent.get()}err = errors.New("could not determine variant")\n`;
   }
+
+  text += `${indent.get()}${helpers.buildIfBlock(indent, ifBlock, elseIfBlocks, elseBlock)}\n`;
 
   return text;
 }
@@ -353,7 +363,7 @@ function getForMixedTypes(goUnion: go.UnionStruct): mixedTypesInfo | undefined {
     mixedTypes.push({
       expression: getJsonProbeKindForType(field.type),
       clause: (indent) =>
-        `${indent.get()}return json.Unmarshal(data, &${receiver}.${field.name})\n`,
+        `${indent.get()}err = json.Unmarshal(data, &${receiver}.${field.name})\n`,
     });
   }
 
@@ -365,9 +375,10 @@ function getForMixedTypes(goUnion: go.UnionStruct): mixedTypesInfo | undefined {
         let caseStatement = `${indent.get()}${helpers.buildIfBlock(indent, {
           condition: "jsonNumberIsFloat(data)",
           body: (indent) =>
-            `${indent.get()}return json.Unmarshal(data, &${receiver}.${mixedNumbers[0].name})\n`,
+            `${indent.get()}err = json.Unmarshal(data, &${receiver}.${mixedNumbers[0].name})\n`,
+        }, undefined, {
+          body: (indent) => `${indent.get()}err = json.Unmarshal(data, &${receiver}.${mixedNumbers[1].name})\n`,
         })}\n`;
-        caseStatement += `${indent.get()}return json.Unmarshal(data, &${receiver}.${mixedNumbers[1].name})\n`;
         return caseStatement;
       },
     });
@@ -386,7 +397,7 @@ function getForMixedTypes(goUnion: go.UnionStruct): mixedTypesInfo | undefined {
 
   mixedTypes.push({
     expression: "jsonEmpty, jsonNull",
-    clause: (indent) => `${indent.get()}return nil\n`,
+    clause: (indent) => `${indent.get()}err = nil\n`,
   });
 
   return {
