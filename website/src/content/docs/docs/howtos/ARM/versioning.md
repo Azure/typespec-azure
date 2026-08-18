@@ -121,7 +121,9 @@ model Employee {
 }
 ```
 
-In the next version (v2), the visibility changes so that the property can be read or created. To achieve this, you can use a combination of `@removed`, `@added`, and `@renamedFrom` decorators:
+First determine whether the earlier TypeSpec accurately describes the deployed service behavior. If `@visibility(Lifecycle.Read)` was a specification mistake and every supported API version already accepts the property in create requests, correct the existing property directly for all versions, for example to `@visibility(Lifecycle.Create, Lifecycle.Read)`, and obtain breaking-change review and approval. Do not preserve the inaccurate old contract with versioned replacements.
+
+Use the versioned replacement pattern only when the service behavior truly differs by API version. For example, if version `v1` rejects the property on create and version `v2` accepts it, use a combination of `@removed`, `@added`, and `@renamedFrom` decorators:
 
 ```tsp
 model Employee {
