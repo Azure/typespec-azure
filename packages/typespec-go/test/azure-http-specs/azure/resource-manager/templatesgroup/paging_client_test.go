@@ -42,12 +42,22 @@ func TestPagingClient_NewPostActionPagingPager(t *testing.T) {
 	require.NotNil(t, pager)
 
 	require.True(t, pager.More())
-	page, err := pager.NextPage(context.Background())
+	page1, err := pager.NextPage(context.Background())
 	require.NoError(t, err)
-	require.Len(t, page.Value, 1)
-	require.NotNil(t, page.Value[0].ID)
-	require.NotNil(t, page.Value[0].SendingMetrics)
-	require.True(t, *page.Value[0].SendingMetrics)
+	require.Len(t, page1.Value, 1)
+	require.NotNil(t, page1.Value[0].ID)
+	require.Equal(t, "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1", *page1.Value[0].ID)
+	require.NotNil(t, page1.Value[0].SendingMetrics)
+	require.True(t, *page1.Value[0].SendingMetrics)
+
+	require.True(t, pager.More())
+	page2, err := pager.NextPage(context.Background())
+	require.NoError(t, err)
+	require.Len(t, page2.Value, 1)
+	require.NotNil(t, page2.Value[0].ID)
+	require.Equal(t, "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm2", *page2.Value[0].ID)
+	require.NotNil(t, page2.Value[0].SendingMetrics)
+	require.False(t, *page2.Value[0].SendingMetrics)
 
 	require.False(t, pager.More())
 }
