@@ -1130,6 +1130,12 @@ interface StructuredStreamEvent {
   terminalValue?: string;
   contentType?: string;
   deserializerName?: string;
+  /**
+   * True for a non-terminal payload variant whose payload type needs no model deserializer
+   * (e.g. a primitive/scalar/enum). The raw JSON-parsed value (or raw `data` string for
+   * non-JSON content) is yielded as-is via an identity deserializer.
+   */
+  identityDeserialize?: boolean;
 }
 
 /**
@@ -1188,6 +1194,10 @@ export function getStructuredStreamInfo(
         });
         if (typeof deserializerName === "string") {
           event.deserializerName = deserializerName;
+        } else if (!sseEvent.isTerminalEvent) {
+          // A non-terminal payload whose type needs no model deserializer (primitive/scalar/
+          // enum). Yield the raw payload via an identity deserializer instead of dropping it.
+          event.identityDeserialize = true;
         }
         if (sseEvent.payloadContentType !== undefined) {
           event.contentType = sseEvent.payloadContentType;
@@ -1304,6 +1314,8 @@ function getStructuredStreamDeserializeFunction(
         }
         if (event.deserializerName) {
           parts.push(`deserialize: (data) => ${event.deserializerName}(data)`);
+        } else if (event.identityDeserialize) {
+          parts.push(`deserialize: (data) => data`);
         }
         if (event.contentType !== undefined) {
           parts.push(`contentType: ${JSON.stringify(event.contentType)}`);
@@ -1327,12 +1339,25 @@ function getStructuredStreamDeserializeFunction(
 /**
  * Returns true when the package contains at least one SSE (`text/event-stream`) streaming
  * operation. Used to add the `@azure/core-sse` runtime dependency to the generated package
- * only when it is actually needed.
+ * only when it is actually needed. Mirrors the SSE gating of {@link getStructuredStreamInfo}
+ * (paging/LRO exclusions and the `streamMetadata` + `sseMetadata` requirement) so the
+ * dependency is not injected for operations that never generate SSE streaming.
  */
 export function packageHasSseStreaming(context: SdkContext): boolean {
   for (const client of context.sdkPackage.clients) {
-    for (const method of getAllOperationsFromClient(client)) {
-      if ((method as ServiceOperation).response?.sseMetadata) {
+    for (const rawMethod of getAllOperationsFromClient(client)) {
+      const method = rawMethod as ServiceOperation;
+      if (
+        isPagingOnlyOperation(method) ||
+        isLroOnlyOperation(method) ||
+        isLroAndPagingOperation(method)
+      ) {
+        continue;
+      }
+      // Mirror getStructuredStreamInfo's SSE gating: an SSE stream requires both
+      // streamMetadata and sseMetadata on the response. This keeps the @azure/core-sse
+      // dependency from being injected for operations that never generate SSE streaming.
+      if (method.response?.streamMetadata && method.response?.sseMetadata) {
         return true;
       }
     }
