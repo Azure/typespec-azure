@@ -207,7 +207,8 @@ function generateUnmarshalJson(
   text += `${indent.get()}defer func() {\n`;
   text += `${indent.push().get()}${helpers.buildIfBlock(indent, {
     condition: "err != nil",
-    body: (indent) => `${indent.get()}err = fmt.Errorf("unmarshalling type %T: %s", ${receiver}, err.Error())\n`,
+    body: (indent) =>
+      `${indent.get()}err = fmt.Errorf("unmarshalling type %T: %s", ${receiver}, err.Error())\n`,
   })}\n`;
   text += `${indent.pop().get()}}()\n`;
   const mixedTypes = getForMixedTypes(goUnion);
@@ -217,8 +218,7 @@ function generateUnmarshalJson(
       "probeJSONKind(data)",
       mixedTypes.cases,
       {
-        clause: (indent) =>
-          `${indent.get()}err = errors.New("unexpected JSON token")\n`,
+        clause: (indent) => `${indent.get()}err = errors.New("unexpected JSON token")\n`,
       },
     )}`;
   } else {
@@ -250,11 +250,20 @@ function generateUnmarshalObjects(goUnion: go.UnionStruct, indent: helpers.Inden
   let text = `${indent.get()}var rawMsg map[string]json.RawMessage\n`;
   text += `${indent.get()}${helpers.buildIfBlock(indent, {
     condition: "err = json.Unmarshal(data, &rawMsg); err != nil",
-    body: (indent) =>
-      `${indent.get()}return\n`,
+    body: (indent) => `${indent.get()}return\n`,
   })}\n`;
 
   const jsonObjects = groupJsonObjects(goUnion);
+
+  // the codegen below assumes at most one map variant, which it treats
+  // as the fallback. a union with multiple maps (e.g. Foo | Record<int32>
+  // | Record<string>) would generate incorrect code, so fail instead.
+  if (jsonObjects.filter((field) => field.type.kind === "map").length > 1) {
+    throw new CodegenError(
+      "UnsupportedTsp",
+      `union ${goUnion.name} has multiple map variants which is not supported`,
+    );
+  }
 
   let ifBlock: helpers.ifBlock = { condition: "", body: () => "" };
   const elseIfBlocks = new Array<helpers.ifBlock>();
@@ -287,7 +296,8 @@ function generateUnmarshalObjects(goUnion: go.UnionStruct, indent: helpers.Inden
   const elseBlock: helpers.elseBlock = { body: () => "" };
   // if the last field is a map then it's the fallback
   if (jsonObjects[jsonObjects.length - 1].type.kind === "map") {
-    elseBlock.body = (indent) => `${indent.get()}err = json.Unmarshal(data, &${receiver}.${jsonObjects[jsonObjects.length - 1].name})\n`;
+    elseBlock.body = (indent) =>
+      `${indent.get()}err = json.Unmarshal(data, &${receiver}.${jsonObjects[jsonObjects.length - 1].name})\n`;
   } else {
     elseBlock.body = (indent) => `${indent.get()}err = errors.New("could not determine variant")\n`;
   }
@@ -362,8 +372,7 @@ function getForMixedTypes(goUnion: go.UnionStruct): mixedTypesInfo | undefined {
 
     mixedTypes.push({
       expression: getJsonProbeKindForType(field.type),
-      clause: (indent) =>
-        `${indent.get()}err = json.Unmarshal(data, &${receiver}.${field.name})\n`,
+      clause: (indent) => `${indent.get()}err = json.Unmarshal(data, &${receiver}.${field.name})\n`,
     });
   }
 
@@ -372,13 +381,19 @@ function getForMixedTypes(goUnion: go.UnionStruct): mixedTypesInfo | undefined {
     mixedTypes.push({
       expression: "jsonNumber",
       clause: (indent) => {
-        const caseStatement = `${indent.get()}${helpers.buildIfBlock(indent, {
-          condition: "jsonNumberIsFloat(data)",
-          body: (indent) =>
-            `${indent.get()}err = json.Unmarshal(data, &${receiver}.${mixedNumbers[0].name})\n`,
-        }, undefined, {
-          body: (indent) => `${indent.get()}err = json.Unmarshal(data, &${receiver}.${mixedNumbers[1].name})\n`,
-        })}\n`;
+        const caseStatement = `${indent.get()}${helpers.buildIfBlock(
+          indent,
+          {
+            condition: "jsonNumberIsFloat(data)",
+            body: (indent) =>
+              `${indent.get()}err = json.Unmarshal(data, &${receiver}.${mixedNumbers[0].name})\n`,
+          },
+          undefined,
+          {
+            body: (indent) =>
+              `${indent.get()}err = json.Unmarshal(data, &${receiver}.${mixedNumbers[1].name})\n`,
+          },
+        )}\n`;
         return caseStatement;
       },
     });
