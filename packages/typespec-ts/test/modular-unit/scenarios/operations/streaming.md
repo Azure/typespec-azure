@@ -224,3 +224,86 @@ export async function receive(
   return _receiveDeserialize(result);
 }
 ```
+
+# Structured streaming yields raw payloads for non-terminal primitive SSE events
+
+An operation returning `SSEStream<T>` for a `@events` union that mixes a model variant with a
+primitive (scalar) variant generates a `Promise<AsyncIterable<...>>` whose primitive events are
+yielded as-is via an identity deserializer (no model deserializer exists for them).
+
+## TypeSpec
+
+```tsp
+model ResponseCreated {
+  id: string;
+}
+
+@events
+union MixedEvents {
+  @Events.contentType("application/json")
+  created: ResponseCreated,
+
+  @Events.contentType("text/plain")
+  progress: string,
+}
+
+@route("receive")
+op receive(): SSEStream<MixedEvents>;
+```
+
+## Operations
+
+```ts operations
+import { TestingContext as Client } from "./index.js";
+import { ResponseCreated, responseCreatedDeserializer } from "../models/models.js";
+import { readSseStream } from "../static-helpers/sseStreamingHelpers.js";
+import { StreamResponse, getStreamResponse } from "../static-helpers/streamingHelpers.js";
+import { ReceiveOptionalParams } from "./options.js";
+import {
+  StreamableMethod,
+  createRestError,
+  operationOptionsToRequestParameters,
+} from "@azure-rest/core-client";
+
+export function _receiveSend(
+  context: Client,
+  options: ReceiveOptionalParams = { requestOptions: {} },
+): StreamableMethod {
+  return context.path("/receive").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "text/event-stream", ...options.requestOptions?.headers },
+  });
+}
+
+export async function _receiveDeserialize(
+  result: StreamResponse,
+): Promise<AsyncIterable<ResponseCreated | string>> {
+  const expectedStatuses = ["200"];
+  if (!expectedStatuses.includes(result.status)) {
+    throw createRestError(result);
+  }
+
+  return readSseStream(result.body, [
+    {
+      eventName: "created",
+      isTerminal: false,
+      deserialize: (data) => responseCreatedDeserializer(data),
+      contentType: "application/json",
+    },
+    {
+      eventName: "progress",
+      isTerminal: false,
+      deserialize: (data) => data,
+      contentType: "text/plain",
+    },
+  ]);
+}
+
+export async function receive(
+  context: Client,
+  options: ReceiveOptionalParams = { requestOptions: {} },
+): Promise<AsyncIterable<ResponseCreated | string>> {
+  const result = await getStreamResponse(_receiveSend(context, options));
+  return _receiveDeserialize(result);
+}
+```
