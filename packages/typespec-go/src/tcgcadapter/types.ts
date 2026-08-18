@@ -67,6 +67,11 @@ export class TypeAdapter {
       this.getPkg().constants.push(constType);
     }
 
+    for (const sdkUnion of this.ctx.sdkPackage.unions.filter((u) => u.kind === "union")) {
+      const goUnion = this.getUnionStruct(sdkUnion, this.codeModel.options.sliceElementsByval);
+      this.getPkg().unions.push(goUnion);
+    }
+
     // we must adapt all interface/model types first. this is because models can contain cyclic references
     const modelTypes = new Array<ModelTypeSdkModelType>();
     const ifaceTypes = new Array<InterfaceTypeSdkModelType>();
@@ -314,6 +319,15 @@ export class TypeAdapter {
         return this.getModel(type);
       case "nullable":
         return this.getWireType(type.type, elementTypeByValue, substituteDiscriminator);
+      case "union":
+        if (type.discriminatedOptions) {
+          throw new AdapterError(
+            "UnsupportedTsp",
+            `unsupported type kind ${type.kind}`,
+            type.__raw?.node,
+          );
+        }
+        return this.getUnionStruct(type, elementTypeByValue);
       default:
         throw new AdapterError(
           "UnsupportedTsp",
@@ -610,7 +624,7 @@ export class TypeAdapter {
 
   private getInterfaceType(model: tcgc.SdkModelType): go.Interface {
     if (model.name.length === 0) {
-      throw new AdapterError("InternalError", "unnamed model");
+      throw new AdapterError("InternalError", "unnamed model", model.__raw?.node);
     }
     if (!helpers.isPolymorphicRoot(model)) {
       throw new AdapterError(
@@ -1081,6 +1095,52 @@ export class TypeAdapter {
 
     // TODO: tcgc doesn't support duration as a literal value
   }
+
+  private getUnionStruct(sdkUnion: tcgc.SdkUnionType, elementTypeByValue: boolean): go.UnionStruct {
+    if (sdkUnion.name.length === 0) {
+      throw new AdapterError("InternalError", "unnamed union", sdkUnion.__raw?.node);
+    }
+
+    const unionName = helpers.getEffectiveName(sdkUnion);
+    let goUnion = this.types.get(unionName);
+    if (goUnion) {
+      return <go.UnionStruct>goUnion;
+    }
+
+    goUnion = new go.UnionStruct(this.getPkg(), unionName);
+    for (const variant of sdkUnion.variantTypes) {
+      const type = this.getWireType(variant, elementTypeByValue, false);
+      if (!go.isUnionVariantType(type)) {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `unsupported kind ${variant.kind} for union variant`,
+          variant.__raw?.node,
+        );
+      }
+      goUnion.fields.push(
+        new go.UnionField(
+          recursiveVariantFieldName(type),
+          type,
+          helpers.isTypePassedByValue(variant),
+        ),
+      );
+    }
+
+    goUnion.docs.summary = sdkUnion.summary;
+    goUnion.docs.description = sdkUnion.doc;
+    if (goUnion.docs.summary) {
+      if (!goUnion.docs.summary.startsWith(unionName)) {
+        goUnion.docs.summary = go.prefixDocWithName(unionName, goUnion.docs.summary);
+      }
+    } else if (goUnion.docs.description) {
+      if (!goUnion.docs.description.startsWith(unionName)) {
+        goUnion.docs.description = go.prefixDocWithName(unionName, goUnion.docs.description);
+      }
+    }
+
+    this.types.set(unionName, goUnion);
+    return goUnion;
+  }
 }
 
 function getPrimitiveType(
@@ -1170,6 +1230,26 @@ function recursiveKeyName(
       return `${root}-timeRFC3339`;
     default:
       return `${root}-${obj.kind}`;
+  }
+}
+
+function recursiveVariantFieldName(type: go.WireType): string {
+  switch (type.kind) {
+    case "constant":
+    case "model":
+      return type.name;
+    case "encodedBytes":
+      return "Bytes";
+    case "literal":
+      return `Literal${recursiveVariantFieldName(type.type)}`;
+    case "map":
+      return `MapOf${recursiveVariantFieldName(type.valueType)}`;
+    case "slice":
+      return `SliceOf${recursiveVariantFieldName(type.elementType)}`;
+    case "scalar":
+      return naming.capitalize(type.type);
+    default:
+      return naming.capitalize(type.kind);
   }
 }
 
