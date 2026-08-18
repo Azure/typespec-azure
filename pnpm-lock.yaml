@@ -63,6 +63,9 @@ catalogs:
     '@azure/core-rest-pipeline':
       specifier: ^1.24.0
       version: 1.25.0
+    '@azure/core-sse':
+      specifier: ^2.1.3
+      version: 2.4.0
     '@azure/core-util':
       specifier: ^1.4.0
       version: 1.14.0
@@ -4079,7 +4082,7 @@ importers:
         specifier: 'catalog:'
         version: 1.25.0
       '@azure/core-sse':
-        specifier: ^2.1.3
+        specifier: 'catalog:'
         version: 2.4.0
       '@azure/core-util':
         specifier: 'catalog:'
