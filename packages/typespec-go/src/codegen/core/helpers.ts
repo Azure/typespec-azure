@@ -72,6 +72,37 @@ export function sortAscending(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
+/** returns the header name using Go's canonical MIME header key casing */
+export function canonicalizeHeaderName(name: string): string {
+  if (!/^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/.test(name)) {
+    return name;
+  }
+
+  let canonicalName = "";
+  let upper = true;
+  for (const char of name) {
+    canonicalName += upper ? char.toUpperCase() : char.toLowerCase();
+    upper = char === "-";
+  }
+  return canonicalName;
+}
+
+/**
+ * emits code to verify that a path parameter is not empty
+ *
+ * @param param the path parameter to check
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @returns the code to check the path parameter for emptiness
+ */
+export function emitEmptyPathParamCheck(param: go.PathParameter, imports: ImportManager, indent: Indentation): string {
+  imports.add("errors");
+  let text = `${indent.get()}if ${param.name} == "" {\n`;
+  text += `${indent.push().get()}return nil, errors.New("parameter ${param.name} cannot be empty")\n`;
+  text += `${indent.pop().get()}}\n`;
+  return text;
+}
+
 /**
  * returns the parameter's type definition with a possible '*' prefix
  *
@@ -106,7 +137,7 @@ export function formatParameterTypeName(
 }
 
 // sorts parameters by their required state, ordering required before optional
-export function sortParametersByRequired(
+function sortParametersByRequired(
   a: go.ClientParameter | go.ParameterGroup,
   b: go.ClientParameter | go.ParameterGroup,
 ): number {
@@ -167,6 +198,7 @@ export function sortClientParameters(
 // returns the parameters for the internal request creator method.
 // e.g. "i int, s string"
 export function getCreateRequestParametersSig(method: go.MethodType | go.NextPageMethod): string {
+  // NOTE: keep in sync with getCreateRequestParameters
   const methodParams = getMethodParameters(method);
   const params = new Array<string>();
   params.push("ctx context.Context");
@@ -183,6 +215,13 @@ export function getCreateRequestParametersSig(method: go.MethodType | go.NextPag
     }
     params.push(`${paramName} ${formatParameterTypeName(method.receiver.type.pkg, methodParam)}`);
   }
+  if (
+    (method.kind === "lroPageableMethod" || method.kind === "pageableMethod") &&
+    method.strategy?.kind === "nextLink"
+  ) {
+    // inject the nextLink param right before the options param
+    params.splice(-1, 0, "nextLink string");
+  }
   return params.join(", ");
 }
 
@@ -194,7 +233,11 @@ export function getCreateRequestParametersSig(method: go.MethodType | go.NextPag
  * @param optionsParam optional custom param name for the method options param
  * @returns the text for the parameters
  */
-export function getCreateRequestParameters(method: go.MethodType, optionsParam?: string): string {
+export function getCreateRequestParameters(
+  method: go.MethodType,
+  nextLinkParam?: string,
+  optionsParam?: string,
+): string {
   // NOTE: keep in sync with getCreateRequestParametersSig
   const methodParams = getMethodParameters(method);
   const params = new Array<string>();
@@ -207,6 +250,10 @@ export function getCreateRequestParameters(method: go.MethodType, optionsParam?:
     } else {
       params.push(methodParam.name);
     }
+  }
+  if (nextLinkParam) {
+    // inject the nextLink param right before the options param
+    params.splice(-1, 0, nextLinkParam);
   }
   return params.join(", ");
 }
@@ -291,6 +338,28 @@ export function getParamName(param: go.MethodParameter): string {
   return paramName;
 }
 
+export function fixUpMethodName(method: go.MethodType): string {
+  switch (method.kind) {
+    case "lroMethod":
+    case "lroPageableMethod":
+      return `Begin${method.name}`;
+    case "pageableMethod": {
+      let N = "N";
+      let name = method.name;
+      if (method.name[0] !== method.name[0].toUpperCase()) {
+        // the method isn't exported; don't export the pager ctor
+        N = "n";
+        // ensure correct casing of the emitted function name e.g.,
+        // "listThings" -> "newListThingsPager"
+        name = name[0].toUpperCase() + name.substring(1);
+      }
+      return `${N}ew${name}Pager`;
+    }
+    case "method":
+      return method.name;
+  }
+}
+
 // converts the Go code model encoding type to the type name in the standard library
 export function formatBytesEncoding(enc: go.BytesEncoding): string {
   if (enc === "URL") {
@@ -364,6 +433,16 @@ export function formatParamValue(
   return formatValue(paramName, param.type, imports);
 }
 
+/**
+ * returns the receiver definition for a client
+ *
+ * @param receiver the receiver for which to emit the definition
+ * @returns the receiver definition
+ */
+export function getClientReceiverDefinition(receiver: go.Receiver<go.Client>): string {
+  return `(${receiver.name} ${receiver.byValue ? "" : "*"}${receiver.type.name})`;
+}
+
 export function getDelimiterForCollectionFormat(cf: go.CollectionFormat): string {
   switch (cf) {
     case "csv":
@@ -377,6 +456,32 @@ export function getDelimiterForCollectionFormat(cf: go.CollectionFormat): string
     default:
       throw new CodegenError("InternalError", `unhandled CollectionFormat ${cf}`);
   }
+}
+
+export function getMediaFormat(
+  type: go.WireType,
+  mediaType: "JSON" | "XML",
+  param: string,
+): string {
+  let marshaller: "JSON" | "XML" | "ByteArray" = mediaType;
+  let format = "";
+  if (type.kind === "encodedBytes") {
+    marshaller = "ByteArray";
+    format = `, runtime.Base64${type.encoding}Format`;
+  }
+  return `${marshaller}(${param}${format})`;
+}
+
+export function isMapOfDateTime(
+  paramType: go.WireType,
+): { format: go.TimeFormat; utc: boolean } | undefined {
+  if (paramType.kind !== "map") {
+    return undefined;
+  }
+  if (paramType.valueType.kind !== "time") {
+    return undefined;
+  }
+  return { format: paramType.valueType.format, utc: paramType.valueType.utc };
 }
 
 export function formatValue(
@@ -487,19 +592,6 @@ export function formatLiteralValue(value: go.Literal, withCast: boolean): string
       return `"${value.literal}"`;
     case "time":
       return `"${value.literal}"`;
-  }
-}
-
-// returns true if at least one of the responses has a schema
-export function hasSchemaResponse(method: go.MethodType): boolean {
-  switch (method.returns.result?.kind) {
-    case "anyResult":
-    case "modelResult":
-    case "monomorphicResult":
-    case "polymorphicResult":
-      return true;
-    default:
-      return false;
   }
 }
 
@@ -869,16 +961,19 @@ export function star(byValue: boolean): string {
  * @param param the param for which to create a zero value
  * @returns the zero-value expression
  */
-export function zeroValue(param: go.MethodParameter): string {
+export function zeroValue(param: go.ClientParameter | go.MethodParameter): string {
   // even though API version params typically have a client-side default which makes
   // them optional, the azcore.ClientOptions.APIVersion field isn't pointer-to-type.
-  if (go.isRequiredParameter(param.style) || go.isAPIVersionParameter(param)) {
+  if (go.isRequiredParameter(param.style)) {
     switch (param.type.kind) {
       case "string":
         return `""`;
       default:
         throw new CodegenError("InternalError", `unhandled zero-value kind ${param.type.kind}`);
     }
+  } else if (go.isAPIVersionParameter(param)) {
+    // api version is always a string
+    return `""`;
   }
 
   // optional params are pointer-to-type
@@ -1209,17 +1304,31 @@ export interface elseBlock {
 }
 
 /**
- * constructs an if block (can expand to include else if as necessary)
+ * constructs an if block
  *
  * @param indent the current indentation helper in scope
  * @param ifBlock the if block definition
+ * @param elseIfBlocks optional zero or more "else if" block definitions
  * @param elseBlock optional else block definition
  * @returns the text for the if block
  */
-export function buildIfBlock(indent: Indentation, ifBlock: ifBlock, elseBlock?: elseBlock): string {
+export function buildIfBlock(
+  indent: Indentation,
+  ifBlock: ifBlock,
+  elseIfBlocks?: Array<ifBlock>,
+  elseBlock?: elseBlock,
+): string {
   let body = `if ${ifBlock.condition} {\n`;
   body += ifBlock.body(indent.push());
   body += `${indent.pop().get()}}`;
+
+  if (elseIfBlocks) {
+    for (const elseIfBlock of elseIfBlocks) {
+      body += ` else if ${elseIfBlock.condition} {\n`;
+      body += elseIfBlock.body(indent.push());
+      body += `${indent.pop().get()}}`;
+    }
+  }
 
   if (elseBlock) {
     body += " else {\n";
@@ -1243,6 +1352,21 @@ export function buildErrCheck(indent: Indentation, errVar: string, returns?: str
   body += `${indent.push().get()}return ${returns ? `${returns}, ` : ""}${errVar}\n`;
   body += `${indent.pop().get()}}`;
   return body;
+}
+
+/**
+ * constructs a for block
+ *
+ * @param indent the current indentation helper in scope
+ * @param expression the for expression
+ * @param body the body of the for block
+ * @returns the text for the for block
+ */
+export function buildForBlock(indent: Indentation, expression: string, body: (indent: Indentation) => string): string {
+  let content = `for ${expression} {\n`;
+  content += body(indent.push());
+  content += `${indent.pop().get()}}\n`;
+  return content;
 }
 
 /**
@@ -1403,7 +1527,7 @@ export function camelCase(identifier: string | Array<string>): string {
   return `${naming.uncapitalize(identifier[0])}${pascalCase(identifier.slice(1))}`;
 }
 
-export function pascalCase(identifier: string | Array<string>): string {
+function pascalCase(identifier: string | Array<string>): string {
   return identifier === undefined
     ? ""
     : typeof identifier === "string"

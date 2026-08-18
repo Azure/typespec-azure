@@ -61,12 +61,7 @@ func (client *WidgetClient) Get(ctx context.Context, options *WidgetClientGetOpt
 	if err != nil {
 		return WidgetClientGetResponse{}, err
 	}
-	if !runtime.HasStatusCode(httpResp, http.StatusOK) {
-		err = runtime.NewResponseError(httpResp)
-		return WidgetClientGetResponse{}, err
-	}
-	resp, err := client.getHandleResponse(httpResp)
-	return resp, err
+	return client.getHandleResponse(httpResp, http.StatusOK)
 }
 
 // getCreateRequest creates the Get request.
@@ -81,8 +76,11 @@ func (client *WidgetClient) getCreateRequest(ctx context.Context, _ *WidgetClien
 }
 
 // getHandleResponse handles the Get response.
-func (client *WidgetClient) getHandleResponse(resp *http.Response) (WidgetClientGetResponse, error) {
+func (client *WidgetClient) getHandleResponse(resp *http.Response, successCodes ...int) (WidgetClientGetResponse, error) {
 	result := WidgetClientGetResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	if err := runtime.UnmarshalAsJSON(resp, &result.Widget); err != nil {
 		return WidgetClientGetResponse{}, err
 	}

@@ -1,17 +1,17 @@
 import {
   ClassDeclaration,
-  ClassDeclarationStructure,
+  type ClassDeclarationStructure,
   EnumDeclaration,
-  EnumDeclarationStructure,
+  type EnumDeclarationStructure,
   FunctionDeclaration,
-  FunctionDeclarationStructure,
+  type FunctionDeclarationStructure,
   InterfaceDeclaration,
-  InterfaceDeclarationStructure,
+  type InterfaceDeclarationStructure,
   SourceFile,
-  StatementStructures,
+  type StatementStructures,
   StructureKind,
   TypeAliasDeclaration,
-  TypeAliasDeclarationStructure,
+  type TypeAliasDeclarationStructure,
 } from "ts-morph";
 import { useBinder } from "./hooks/binder.js";
 import { refkey as getRefKey } from "./refkey.js";
@@ -81,6 +81,7 @@ export function addDeclaration(
 
   // Update the declaration name to be unique
   const trackedDeclaration = { ...declaration, name: trackedDeclarationName };
+  trackedDeclaration.leadingTrivia ??= "\n";
 
   // Skip empty type aliases (they have no body to emit). Done before
   // dispatching so behaviour is identical whether batching or not.

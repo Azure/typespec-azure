@@ -1,4 +1,4 @@
-import {
+import type {
   SdkClientType,
   SdkCredentialParameter,
   SdkEndpointParameter,
@@ -6,11 +6,16 @@ import {
   SdkMethodParameter,
   SdkServiceOperation,
 } from "@azure-tools/typespec-client-generator-core";
-import { Node, OptionalKind, ParameterDeclarationStructure, StatementedNode } from "ts-morph";
-import { ModularEmitterOptions } from "../interfaces.js";
+import {
+  Node,
+  type OptionalKind,
+  type ParameterDeclarationStructure,
+  StatementedNode,
+} from "ts-morph";
+import type { ModularEmitterOptions } from "../interfaces.js";
 
 import { resolveReference } from "../../framework/reference.js";
-import { SdkContext } from "../../utils/interfaces.js";
+import type { SdkContext } from "../../utils/interfaces.js";
 import { NameType, normalizeName } from "../../utils/name-utils.js";
 import { CloudSettingHelpers } from "../static-helpers-metadata.js";
 import { getTypeExpression } from "../type-expressions/get-type-expression.js";

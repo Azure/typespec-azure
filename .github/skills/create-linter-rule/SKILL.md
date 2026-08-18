@@ -154,6 +154,10 @@ Edit `packages/<pkg>/src/rules/<rule-name>.md`:
 - This file holds only the extended documentation body — the page title, rule id, and
   short description are generated from the rule definition. `tspd` renders the page at
   `website/src/content/docs/docs/libraries/<pkg>/rules/<rule-name>.md`
+- For ARM rules, also update the alphabetized rule table in
+  `website/src/content/docs/docs/howtos/ARM/arm-rules.md` with the documentation URL,
+  LintDiff equivalent, and impact. This table is authored manually and is not updated
+  by `regen-docs`.
 
 Then regenerate the library's reference docs (updates the rule listing):
 

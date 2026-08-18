@@ -1,12 +1,17 @@
 import {
   getHttpOperationWithCache,
   isApiVersion,
-  SdkClient,
+  type SdkClient,
 } from "@azure-tools/typespec-client-generator-core";
-import { ApiVersionInfo, ApiVersionPosition, SchemaContext, UrlInfo } from "../interfaces.js";
+import {
+  type ApiVersionInfo,
+  type ApiVersionPosition,
+  SchemaContext,
+  type UrlInfo,
+} from "../interfaces.js";
 import { extractDefinedPosition, extractPathApiVersion } from "../utils/api-version-util.js";
 import { listOperationsUnderClient } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import { getDefaultApiVersionString, getSchemaForType, trimUsage } from "../utils/model-utils.js";
 
 export function transformApiVersionInfo(

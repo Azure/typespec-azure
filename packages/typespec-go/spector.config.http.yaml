@@ -10,6 +10,8 @@ specs:
   "authentication/oauth2": { options: { module: oauth2group } }
   "authentication/union": { options: { module: unionauthgroup } }
   "documentation": { options: { module: documentationgroup } }
+  "encode/array": { options: { module: encodearraygroup, slice-elements-byval: true } }
+  "encode/boolean": { options: { module: booleangroup } }
   "encode/bytes": { options: { module: bytesgroup } }
   "encode/datetime": { options: { module: datetimegroup, slice-elements-byval: true } }
   "encode/duration": { options: { module: durationgroup } }
@@ -22,6 +24,7 @@ specs:
   "parameters/query": { options: { module: querygroup } }
   "parameters/spread": { options: { module: spreadgroup } }
   "payload/content-negotiation": { options: { module: contentneggroup } }
+  "payload/head": { options: { module: headgroup } }
   "payload/json-merge-patch": { options: { module: jmergepatchgroup } }
   "payload/media-type": { options: { module: mediatypegroup } }
   "payload/multipart": { options: { module: multipartgroup } }
@@ -33,7 +36,6 @@ specs:
   "server/path/multiple": { options: { module: multiplegroup } }
   "server/path/single": { options: { module: singlegroup } }
   "server/versions/not-versioned": { options: { module: unversionedgroup } }
-  "server/versions/versioned": { options: { module: versionedgroup } }
   "special-headers/conditional-request": { options: { module: condreqgroup } }
   special-words: { options: { module: specialwordsgroup } }
   "type/array": { options: { module: arraygroup, slice-elements-byval: true } }
@@ -49,38 +51,33 @@ specs:
   "type/model/usage": { options: { module: usagegroup } }
   "type/model/visibility": { options: { module: visibilitygroup } }
   "type/property/nullable": { options: { module: nullablegroup } }
-  # missing plain time support: https://github.com/Azure/autorest.go/issues/1732
+  "type/property/additional-properties": { options: { module: addlpropsgroup } }
   "type/property/optionality": { options: { module: optionalitygroup, slice-elements-byval: true } }
   "type/property/value-types": { options: { module: valuetypesgroup, slice-elements-byval: true } }
   "type/scalar": { options: { module: scalargroup, slice-elements-byval: true } }
   "versioning/madeOptional": { options: { module: madeoptionalgroup } }
+  "versioning/removed": { options: { module: removedgroup } }
   "versioning/returnTypeChangedFrom": { options: { module: rettypechangedfromgroup } }
   "versioning/typeChangedFrom": { options: { module: typechangedfromgroup } }
 
   # --- Not generated yet (tracked skips) ---
-  # emitter bug: @encode(string) on boolean is ignored; bool is serialized as a JSON boolean instead of a string, so the mock rejects the body
-  "encode/boolean": false
-  # emitter error: unexpected kind string for HeaderMapResponse metadata (HEAD op returning response headers)
-  "payload/head": false
-  # TODO: https://github.com/Azure/autorest.go/issues/1606
+  # TODO: https://github.com/Azure/typespec-azure/issues/4946
   "response/status-code-range": false
-  # TODO: https://github.com/Azure/autorest.go/issues/1730
+  # TODO: https://github.com/Azure/typespec-azure/issues/4928
   routes: false
-  # requires union support
+  # TODO: https://github.com/Azure/typespec-azure/issues/5226
+  "server/versions/versioned": false
+  # TODO: https://github.com/Azure/typespec-azure/issues/4957
   "special-headers/repeatability": false
-  # TODO: https://github.com/Azure/autorest.go/issues/1594
+  # TODO: https://github.com/Azure/typespec-azure/issues/4934
   "streaming/jsonl": false
   # not a real scenario
   "type/model/inheritance/nested-discriminator": false
-  # requires union support
-  "type/property/additional-properties": false
-  # requires union support
+  # requires union support: https://github.com/Azure/typespec-azure/issues/4935
   "type/union": false
-  # requires union support
+  # requires discriminated union support: https://github.com/Azure/typespec-azure/issues/4935
   "type/union/discriminated": false
-  # requires union support
+  # requires union support: https://github.com/Azure/typespec-azure/issues/4935
   "versioning/added": false
-  # requires union support
-  "versioning/removed": false
-  # requires union support
+  # requires union support: https://github.com/Azure/typespec-azure/issues/4935
   "versioning/renamedFrom": false

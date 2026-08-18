@@ -1,9 +1,12 @@
-import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
+import type {
+  SdkClientType,
+  SdkServiceOperation,
+} from "@azure-tools/typespec-client-generator-core";
 import {
-  FunctionDeclarationStructure,
-  InterfaceDeclarationStructure,
-  OptionalKind,
-  PropertySignatureStructure,
+  type FunctionDeclarationStructure,
+  type InterfaceDeclarationStructure,
+  type OptionalKind,
+  type PropertySignatureStructure,
   SourceFile,
   StructureKind,
 } from "ts-morph";
@@ -11,9 +14,9 @@ import { addDeclaration } from "../../framework/declaration.js";
 import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
 import { getClientModuleInfo } from "../../utils/client-utils.js";
-import { SdkContext } from "../../utils/interfaces.js";
+import type { SdkContext } from "../../utils/interfaces.js";
 import { NameType, normalizeName } from "../../utils/name-utils.js";
-import { ServiceOperation } from "../../utils/operation-util.js";
+import type { ServiceOperation } from "../../utils/operation-util.js";
 import { AzurePollingDependencies } from "../external-dependencies.js";
 import { PagingHelpers, SimplePollerHelpers } from "../static-helpers-metadata.js";
 import { getClassicalLayerPrefix } from "./naming-helpers.js";

@@ -56,14 +56,11 @@ internal model AgentDefinition {
 /**
  * Appliance deployment model of AgentDefinition.
  * Properties controlled by `@baseTypeOptional` are invisible when the corresponding
- * template parameter is false, or read-only when present.
- * @template HasModelDeploymentRef Whether the modelDeploymentRef property is present.
+ * template parameter is false, or read-only when present. The appliance owns the whole
+ * agent definition, so there is no `modelDeploymentRef` property in this deployment model.
  * @template HasInstructions Whether the instructions property is present.
  */
-model AgentDefinitionAppliance<
-  HasModelDeploymentRef extends valueof boolean = false,
-  HasInstructions extends valueof boolean = false
-> {
+model AgentDefinitionAppliance<HasInstructions extends valueof boolean = false> {
   /** Model identifier (RP-defined). */
   @visibility(Lifecycle.Read)
   `model`: string;
@@ -71,10 +68,6 @@ model AgentDefinitionAppliance<
   /** System prompt / behavioral instructions for the agent. */
   @baseTypeOptional(HasInstructions, true)
   instructions: string;
-
-  /** Optional RP-specific reference to an underlying model deployment. */
-  @baseTypeOptional(HasModelDeploymentRef, true)
-  modelDeploymentRef?: string;
 }
 
 /**

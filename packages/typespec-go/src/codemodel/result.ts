@@ -62,7 +62,9 @@ export interface HeadAsBooleanResult {
 
 /**
  * a collection of header responses.
- * NOTE: this is a specialized type to support storage.
+ * NOTE: this is a specialized type to support storage
+ * x-ms-meta and x-ms-or headers and should _not_ be used
+ * for any other cases.
  */
 export interface HeaderMapResponse {
   kind: "headerMapResponse";

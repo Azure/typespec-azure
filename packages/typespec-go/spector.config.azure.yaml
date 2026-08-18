@@ -50,11 +50,8 @@ specs:
   "azure/core/lro/rpc": { options: { module: lrorpcgroup } }
   "azure/core/lro/standard": { options: { module: lrostdgroup } }
   "azure/core/model": { options: { module: coremodelgroup } }
-  # requires paging with re-injection support
   "azure/core/page/client.tsp": { options: { module: azurepagegroup } }
   "azure/core/scalar": { options: { module: corescalargroup } }
-  # requires union support
-  "azure/core/traits": { options: { module: traitsgroup } }
   "azure/encode/duration": { options: { module: encodedurationgroup } }
   "azure/example/basic": { options: { module: examplebasicgroup } }
   "azure/payload/pageable": { options: { module: pageablegroup } }
@@ -84,3 +81,5 @@ specs:
 
   # --- Not generated yet (tracked skips) ---
   "azure/client-generator-core/alternate-type": false
+  # TODO: https://github.com/Azure/typespec-azure/issues/4957
+  "azure/core/traits": false

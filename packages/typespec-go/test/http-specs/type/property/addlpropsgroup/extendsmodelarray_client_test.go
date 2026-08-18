@@ -18,15 +18,11 @@ func TestExtendsModelArrayClient_Get(t *testing.T) {
 	resp, err := client.NewAdditionalPropertiesExtendsModelArrayClient().Get(context.Background(), nil)
 	require.NoError(t, err)
 	require.EqualValues(t, addlpropsgroup.ExtendsModelArrayAdditionalProperties{
+		KnownProp: []*addlpropsgroup.ModelForRecord{
+			{State: to.Ptr("ok")},
+			{State: to.Ptr("ok")},
+		},
 		AdditionalProperties: map[string][]*addlpropsgroup.ModelForRecord{
-			"knownProp": {
-				{
-					State: to.Ptr("ok"),
-				},
-				{
-					State: to.Ptr("ok"),
-				},
-			},
 			"prop": {
 				{
 					State: to.Ptr("ok"),
@@ -43,15 +39,11 @@ func TestExtendsModelArrayClient_Put(t *testing.T) {
 	client, err := addlpropsgroup.NewAdditionalPropertiesClient(nil)
 	require.NoError(t, err)
 	resp, err := client.NewAdditionalPropertiesExtendsModelArrayClient().Put(context.Background(), addlpropsgroup.ExtendsModelArrayAdditionalProperties{
+		KnownProp: []*addlpropsgroup.ModelForRecord{
+			{State: to.Ptr("ok")},
+			{State: to.Ptr("ok")},
+		},
 		AdditionalProperties: map[string][]*addlpropsgroup.ModelForRecord{
-			"knownProp": {
-				{
-					State: to.Ptr("ok"),
-				},
-				{
-					State: to.Ptr("ok"),
-				},
-			},
 			"prop": {
 				{
 					State: to.Ptr("ok"),

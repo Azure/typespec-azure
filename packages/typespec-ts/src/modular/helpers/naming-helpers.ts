@@ -1,7 +1,12 @@
-import { SdkClientType, SdkServiceOperation } from "@azure-tools/typespec-client-generator-core";
-import { SdkContext } from "../../utils/interfaces.js";
+import {
+  getClientNameOverride,
+  type SdkClientType,
+  type SdkServiceOperation,
+} from "@azure-tools/typespec-client-generator-core";
+import pluralize from "pluralize";
+import type { SdkContext } from "../../utils/interfaces.js";
 import { NameType, normalizeName, ReservedModelNames } from "../../utils/name-utils.js";
-import { ServiceOperation } from "../../utils/operation-util.js";
+import type { ServiceOperation } from "../../utils/operation-util.js";
 
 export function getClientName(client: SdkClientType<SdkServiceOperation>): string {
   return client.name.replace(/Client$/, "");
@@ -12,19 +17,47 @@ export function getClassicalClientName(client: SdkClientType<SdkServiceOperation
 }
 
 export interface GuardedName {
+  /** The name used for the generated API-layer function (e.g. `deleteConversation`). */
   name: string;
+  /** The name used for the public method exposed on clients and operation groups. */
+  propertyName: string;
   fixme?: string[];
 }
 
 export function getOperationName(
   operation: ServiceOperation,
   dpgContext?: SdkContext,
+  prefixes: string[] = [],
 ): GuardedName {
-  const norm = normalizeName(operation.name, NameType.Method, true);
+  const name = normalizeName(operation.name, NameType.Method, true);
+  const propertyName = normalizeName(operation.name, NameType.Property);
   const isDataplane = dpgContext !== undefined && !dpgContext.emitterOptions?.azureArm;
-  if (isReservedName(operation.name, NameType.Method) && isDataplane) {
+  // An explicit `@clientName` override is an intentional naming choice by the user, so we
+  // honor it verbatim and skip the reserved-word disambiguation (and its `@fixme`). The
+  // public method keeps the reserved word (e.g. `delete`), while the generated API-layer
+  // function stays guarded (e.g. `$delete`) because a reserved word is not a valid function
+  // binding in JavaScript.
+  const hasClientNameOverride =
+    dpgContext !== undefined &&
+    operation.__raw !== undefined &&
+    getClientNameOverride(dpgContext, operation.__raw) !== undefined;
+  if (isReservedName(operation.name, NameType.Method) && isDataplane && !hasClientNameOverride) {
+    const suffix = getReservedNameGroupSuffix(prefixes);
+    if (suffix) {
+      // Disambiguate the reserved word by suffixing the singularized operation group
+      // name, e.g. `delete` in the `Conversations` group becomes `deleteConversation`.
+      const disambiguated = normalizeName(`${operation.name}_${suffix}`, NameType.Method);
+      return {
+        name: disambiguated,
+        propertyName: disambiguated,
+      };
+    }
+    // There is no operation group to disambiguate the reserved word with (e.g. a top-level
+    // operation), so keep the guarded name (e.g. `$delete`) and surface a fixme asking the
+    // user to override the generated name.
     return {
-      name: norm,
+      name,
+      propertyName,
       fixme: [
         `${operation.name} is a reserved word that cannot be used as an operation name. 
         Please add @clientName("clientName") or @clientName("<JS-Specific-Name>", "javascript") 
@@ -33,8 +66,23 @@ export function getOperationName(
     };
   }
   return {
-    name: norm,
+    name,
+    propertyName,
   };
+}
+
+/**
+ * Builds the suffix used to disambiguate a reserved-word operation name from the
+ * operation group it belongs to. The innermost operation group name is singularized
+ * so that, for example, the `Conversations` group yields `Conversation`.
+ */
+function getReservedNameGroupSuffix(prefixes: string[]): string | undefined {
+  const groups = prefixes.filter((prefix) => prefix && prefix.length > 0);
+  const innermostGroup = groups[groups.length - 1];
+  if (!innermostGroup) {
+    return undefined;
+  }
+  return pluralize.singular(normalizeName(innermostGroup, NameType.Interface));
 }
 
 export function isReservedName(name: string, nameType: NameType): boolean {

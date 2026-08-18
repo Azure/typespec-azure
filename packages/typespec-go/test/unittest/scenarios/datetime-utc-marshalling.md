@@ -87,8 +87,7 @@ func (client *DateTimeUTCClient) Put(ctx context.Context, body Schedule, options
 		return DateTimeUTCClientPutResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return DateTimeUTCClientPutResponse{}, err
+		return DateTimeUTCClientPutResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return DateTimeUTCClientPutResponse{}, nil
 }

@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-java",
-  "version": "0.45.13",
+  "version": "0.46.0",
   "description": "TypeSpec library for emitting Java client from the TypeSpec REST protocol binding",
   "keywords": [
     "TypeSpec"
@@ -30,13 +30,13 @@
   "scripts": {
     "clean": "rimraf ./dist ./temp ./generator",
     "build": "pnpm build:emitter && pnpm build:generator",
-    "build:emitter": "pwsh -NoProfile -NonInteractive -File Copy-Sources.ps1 && tsc -p .",
-    "build:generator": "pwsh -NoProfile -NonInteractive -File Build-Generator.ps1",
+    "build:emitter": "node ./eng/scripts/copy-sources.ts && tsc -p .",
+    "build:generator": "node ./eng/scripts/build-generator.ts",
     "watch": "tsc -p . --watch",
     "test": "vitest run",
-    "regenerate": "pwsh ./Generate.ps1",
-    "test:java:e2e": "pwsh ./Spector-Tests.ps1",
-    "sync-tests": "pwsh ./SyncTests.ps1",
+    "regenerate": "node ./eng/scripts/generate.ts",
+    "test:java:e2e": "node ./eng/scripts/spector-tests.ts",
+    "sync-tests": "node ./eng/scripts/sync-tests.ts",
     "spector-serve": "tsp-spector serve ./node_modules/@typespec/http-specs/specs ./node_modules/@azure-tools/azure-http-specs/specs --coverageFile ./emitter-tests/tsp-spector-coverage-java.json",
     "spector-start": "tsp-spector server start ./node_modules/@typespec/http-specs/specs ./node_modules/@azure-tools/azure-http-specs/specs --coverageFile ./emitter-tests/tsp-spector-coverage-java.json",
     "spector-stop": "tsp-spector server stop",
@@ -92,7 +92,9 @@
     "@typespec/tspd": "workspace:^",
     "@typespec/versioning": "workspace:^",
     "@typespec/xml": "workspace:^",
+    "execa": "catalog:",
     "rimraf": "catalog:",
+    "tar": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }
