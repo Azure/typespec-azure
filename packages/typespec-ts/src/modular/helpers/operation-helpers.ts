@@ -1148,8 +1148,7 @@ interface StructuredStreamInfo {
  *
  * Triggers purely on the operation's TCGC stream metadata: an operation is treated as a
  * structured stream when its response carries `streamMetadata` with a model/union `streamType`
- * (JSONL) and/or `sseMetadata` (SSE). Structured streaming is the default behavior for this
- * (always Azure-flavored) emitter, so no opt-in is required.
+ * (JSONL) and/or `sseMetadata` (SSE).
  */
 export function getStructuredStreamInfo(
   context: SdkContext,
