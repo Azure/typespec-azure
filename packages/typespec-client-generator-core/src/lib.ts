@@ -536,12 +536,17 @@ export const $lib = createTypeSpecLibrary({
           "@clientOption is experimental and should only be used for temporary workarounds. This usage must be suppressed.",
       },
     },
-    "client-option-requires-scope": {
-      ...doc("client-option-requires-scope"),
+    "decorator-requires-scope": {
+      ...doc("decorator-requires-scope"),
       severity: "warning",
       messages: {
-        default:
-          "@clientOption should be applied with a specific language scope since it is highly likely this is language-specific.",
+        default: paramMessage`@${"decoratorName"} should be applied with a language scope of ${"allowedScopes"}.`,
+      },
+    },
+    "unnecessary-emitter-option": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`The option "${"optionName"}" is only applicable to Java and C# emitters and has no effect for "${"emitterName"}".`,
       },
     },
     "replace-parameter-not-found": {

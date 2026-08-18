@@ -6,12 +6,13 @@ import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from
 
 async function protocolAPITestHelper(protocolValue: boolean, globalValue: boolean): Promise<void> {
   const { program, test } = await SimpleTesterWithService.compile(t.code`
-    @protocolAPI(${protocolValue.toString()})
+    @protocolAPI(${protocolValue.toString()}, "java")
     @test
     op ${t.op("test")}(): void;
   `);
 
   const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
     "generate-protocol-methods": globalValue,
     "generate-convenience-methods": false,
   });
@@ -44,7 +45,7 @@ describe("@protocolAPI on interface", () => {
     const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
       namespace MyService {
-        @protocolAPI(false)
+        @protocolAPI(false, "java")
         interface MyOperations {
           @route("/test1")
           op ${t.op("test1")}(): void;
@@ -53,7 +54,9 @@ describe("@protocolAPI on interface", () => {
         }
       }
     `);
-    const context = await createSdkContextForTester(program);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
 
     // Test the core functionality - shouldGenerateProtocol should return false
     strictEqual(shouldGenerateProtocol(context, test1), false);
@@ -65,7 +68,7 @@ describe("@protocolAPI on namespace", () => {
   it("applies protocolAPI false to all operations in namespace", async () => {
     const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
-      @protocolAPI(false)
+      @protocolAPI(false, "java")
       namespace TestService2 {
         @test("test1")
         @route("/test1")
@@ -76,7 +79,9 @@ describe("@protocolAPI on namespace", () => {
       }
     `);
 
-    const context = await createSdkContextForTester(program);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
 
     strictEqual(shouldGenerateProtocol(context, test1), false);
     strictEqual(shouldGenerateProtocol(context, test2), false);
