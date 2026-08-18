@@ -4317,6 +4317,197 @@ interface SupportTicketsNoSubscription {
     expect(tenantResource.operations.lists).toHaveLength(1);
   });
 
+  it("separates Compute run command resources that reuse the same model across different parent paths", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+@armProviderNamespace
+@service(#{ title: "ComputeManagementClient" })
+@versioned(Versions)
+namespace Microsoft.Compute;
+
+enum Versions {
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2024_11_01: "2024-11-01",
+}
+
+model VirtualMachineProperties {}
+
+model VirtualMachine is TrackedResource<VirtualMachineProperties> {
+  ...ResourceNameParameter<
+    Resource = VirtualMachine,
+    KeyName = "vmName",
+    SegmentName = "virtualMachines",
+    NamePattern = ""
+  >;
+}
+
+model VirtualMachineScaleSetProperties {}
+
+model VirtualMachineScaleSet is TrackedResource<VirtualMachineScaleSetProperties> {
+  ...ResourceNameParameter<
+    Resource = VirtualMachineScaleSet,
+    KeyName = "vmScaleSetName",
+    SegmentName = "virtualMachineScaleSets",
+    NamePattern = ""
+  >;
+}
+
+model VirtualMachineScaleSetVMProperties {}
+
+@parentResource(VirtualMachineScaleSet)
+model VirtualMachineScaleSetVM is ProxyResource<VirtualMachineScaleSetVMProperties> {
+  ...ResourceNameParameter<
+    Resource = VirtualMachineScaleSetVM,
+    KeyName = "instanceId",
+    SegmentName = "virtualMachines",
+    NamePattern = ""
+  >;
+}
+
+model VirtualMachineRunCommandProperties {}
+
+model CloudError {}
+
+@parentResource(VirtualMachine)
+model VirtualMachineRunCommand is TrackedResource<VirtualMachineRunCommandProperties> {
+  ...ResourceNameParameter<
+    Resource = VirtualMachineRunCommand,
+    KeyName = "runCommandName",
+    SegmentName = "runCommands",
+    NamePattern = ""
+  >;
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+alias VirtualMachinePath = {
+  ...ApiVersionParameter;
+  ...SubscriptionIdParameter;
+  ...ResourceGroupParameter;
+  ...Azure.ResourceManager.Legacy.Provider;
+  ...KeysOf<ResourceNameParameter<
+    VirtualMachine,
+    SegmentName = "virtualMachines",
+    KeyName = "vmName",
+    NamePattern = ""
+  >>;
+};
+
+@armResourceOperations
+interface VirtualMachineRunCommandOps
+  extends Azure.ResourceManager.Legacy.LegacyOperations<
+    VirtualMachinePath,
+    KeysOf<{
+      ...ResourceNameParameter<
+        VirtualMachineRunCommand,
+        SegmentName = "runCommands",
+        KeyName = "runCommandName",
+        NamePattern = ""
+      >,
+    }>,
+    CloudError
+  > {}
+
+alias VirtualMachineScaleSetVMPath = {
+  ...ApiVersionParameter;
+  ...SubscriptionIdParameter;
+  ...ResourceGroupParameter;
+  ...Azure.ResourceManager.Legacy.Provider;
+  ...KeysOf<ResourceNameParameter<
+    VirtualMachineScaleSet,
+    SegmentName = "virtualMachineScaleSets",
+    KeyName = "vmScaleSetName",
+    NamePattern = ""
+  >>;
+  ...KeysOf<ResourceNameParameter<
+    VirtualMachineScaleSetVM,
+    SegmentName = "virtualMachines",
+    KeyName = "instanceId",
+    NamePattern = ""
+  >>;
+};
+
+@armResourceOperations
+interface VirtualMachineScaleSetVMRunCommandOps
+  extends Azure.ResourceManager.Legacy.LegacyOperations<
+    VirtualMachineScaleSetVMPath,
+    KeysOf<{
+      ...ResourceNameParameter<
+        VirtualMachineRunCommand,
+        SegmentName = "runCommands",
+        KeyName = "runCommandName",
+        NamePattern = ""
+      >,
+    }>,
+    CloudError
+  > {}
+
+@armResourceOperations
+interface VirtualMachineRunCommands {
+  getByVirtualMachine is VirtualMachineRunCommandOps.Read<VirtualMachineRunCommand>;
+}
+
+@armResourceOperations
+interface VirtualMachineScaleSetVMRunCommands {
+  get is VirtualMachineScaleSetVMRunCommandOps.Read<VirtualMachineRunCommand>;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+
+    const virtualMachineRunCommand = provider.resources.find(
+      (r) =>
+        r.resourceInstancePath ===
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/runCommands/{runCommandName}",
+    );
+    ok(virtualMachineRunCommand);
+    checkResolvedOperations(virtualMachineRunCommand, {
+      operations: {
+        lifecycle: {
+          read: [
+            {
+              operationGroup: "VirtualMachineRunCommands",
+              name: "getByVirtualMachine",
+              kind: "read",
+            },
+          ],
+        },
+      },
+      resourceType: {
+        provider: "Microsoft.Compute",
+        types: ["virtualMachines", "runCommands"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/runCommands/{runCommandName}",
+    });
+
+    const virtualMachineScaleSetVMRunCommand = provider.resources.find(
+      (r) =>
+        r.resourceInstancePath ===
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}/runCommands/{runCommandName}",
+    );
+    ok(virtualMachineScaleSetVMRunCommand);
+    checkResolvedOperations(virtualMachineScaleSetVMRunCommand, {
+      operations: {
+        lifecycle: {
+          read: [
+            { operationGroup: "VirtualMachineScaleSetVMRunCommands", name: "get", kind: "read" },
+          ],
+        },
+      },
+      resourceType: {
+        provider: "Microsoft.Compute",
+        types: ["virtualMachineScaleSets", "virtualMachines", "runCommands"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}/runCommands/{runCommandName}",
+    });
+  }, 30_000);
+
   it.each([
     { propertyType: "{}" },
     { propertyType: "unknown" },
