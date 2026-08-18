@@ -4465,6 +4465,7 @@ interface VirtualMachineScaleSetVMRunCommands {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/runCommands/{runCommandName}",
     );
     ok(virtualMachineRunCommand);
+    expect(virtualMachineRunCommand.resourceName).toEqual("VirtualMachinesRunCommands");
     checkResolvedOperations(virtualMachineRunCommand, {
       operations: {
         lifecycle: {
@@ -4491,6 +4492,9 @@ interface VirtualMachineScaleSetVMRunCommands {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}/runCommands/{runCommandName}",
     );
     ok(virtualMachineScaleSetVMRunCommand);
+    expect(virtualMachineScaleSetVMRunCommand.resourceName).toEqual(
+      "VirtualMachineScaleSetsVirtualMachinesRunCommands",
+    );
     checkResolvedOperations(virtualMachineScaleSetVMRunCommand, {
       operations: {
         lifecycle: {
