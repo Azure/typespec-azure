@@ -25,6 +25,12 @@ model DefaultApproval {
   reason: string;
 }
 
+enum Threshold {
+	Small: 3,
+	Medium: 7,
+	Large: 15,
+}
+
 /** A tool server definition. */
 model ToolServer {
   /** identifies the server */
@@ -32,6 +38,9 @@ model ToolServer {
 
   /** either a named approval mode or a per-tool approval map */
   requireApproval?: ApprovalMode | DefaultApproval | Record<string[]>;
+
+  /** defined threshold values or a custom string value */
+  thresholdInfo: Threshold | string;
 }
 
 @route("/server")
@@ -52,6 +61,11 @@ type ToolServerRequireApproval struct {
 	ApprovalMode       *ApprovalMode
 	DefaultApproval    *DefaultApproval
 	MapOfSliceOfString map[string][]*string
+}
+
+type ToolServerThresholdInfo struct {
+	String    *string
+	Threshold *Threshold
 }
 ```
 
@@ -114,6 +128,48 @@ func (t *ToolServerRequireApproval) UnmarshalJSON(data []byte) (err error) {
 		}
 	case jsonString:
 		err = json.Unmarshal(data, &t.ApprovalMode)
+	case jsonEmpty:
+		err = errors.New("unexpected end of JSON input")
+	case jsonNull:
+		err = nil
+	default:
+		err = errors.New("unexpected JSON token")
+	}
+	return
+}
+
+func (t ToolServerThresholdInfo) MarshalJSON() ([]byte, error) {
+	var val any
+	set := 0
+	if t.String != nil {
+		val = t.String
+		set++
+	}
+	if t.Threshold != nil {
+		val = t.Threshold
+		set++
+	}
+	switch set {
+	case 0:
+		return nil, fmt.Errorf("%T has no value", t)
+	case 1:
+		return json.Marshal(val)
+	default:
+		return nil, fmt.Errorf("set only one field in %T", t)
+	}
+}
+
+func (t *ToolServerThresholdInfo) UnmarshalJSON(data []byte) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("unmarshalling type %T: %s", t, err.Error())
+		}
+	}()
+	switch probeJSONKind(data) {
+	case jsonString:
+		err = json.Unmarshal(data, &t.String)
+	case jsonNumber:
+		err = json.Unmarshal(data, &t.Threshold)
 	case jsonEmpty:
 		err = errors.New("unexpected end of JSON input")
 	case jsonNull:
@@ -198,6 +254,23 @@ func PossibleApprovalModeValues() []ApprovalMode {
 		ApprovalModeNever,
 	}
 }
+
+type Threshold int32
+
+const (
+	ThresholdLarge  Threshold = 15
+	ThresholdMedium Threshold = 7
+	ThresholdSmall  Threshold = 3
+)
+
+// PossibleThresholdValues returns the possible values for the Threshold const type.
+func PossibleThresholdValues() []Threshold {
+	return []Threshold{
+		ThresholdLarge,
+		ThresholdMedium,
+		ThresholdSmall,
+	}
+}
 ```
 
 ## The generated models
@@ -221,6 +294,9 @@ type DefaultApproval struct {
 type ToolServer struct {
 	// REQUIRED; identifies the server
 	ServerLabel *string
+
+	// REQUIRED; defined threshold values or a custom string value
+	ThresholdInfo *ToolServerThresholdInfo
 
 	// either a named approval mode or a per-tool approval map
 	RequireApproval *ToolServerRequireApproval

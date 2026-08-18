@@ -530,7 +530,14 @@ function getJsonProbeKindForType(variantType: go.UnionVariantType): string {
 
   switch (variantType.kind) {
     case "constant":
-      return "jsonString";
+      switch (variantType.type) {
+        case "bool":
+          return "jsonBool";
+        case "string":
+          return "jsonString";
+        default:
+          return "jsonNumber";
+      }
     case "literal":
       switch (variantType.type.kind) {
         case "scalar":
