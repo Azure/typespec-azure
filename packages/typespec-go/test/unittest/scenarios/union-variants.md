@@ -114,7 +114,9 @@ func (t *ToolServerRequireApproval) UnmarshalJSON(data []byte) (err error) {
 		}
 	case jsonString:
 		err = json.Unmarshal(data, &t.ApprovalMode)
-	case jsonEmpty, jsonNull:
+	case jsonEmpty:
+		err = errors.New("unexpected end of JSON input")
+	case jsonNull:
 		err = nil
 	default:
 		err = errors.New("unexpected JSON token")

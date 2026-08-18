@@ -396,7 +396,12 @@ function getForMixedTypes(goUnion: go.UnionStruct): mixedTypesInfo | undefined {
   }
 
   mixedTypes.push({
-    expression: "jsonEmpty, jsonNull",
+    expression: "jsonEmpty",
+    clause: (indent) => `${indent.get()}err = errors.New("unexpected end of JSON input")\n`,
+  });
+
+  mixedTypes.push({
+    expression: "jsonNull",
     clause: (indent) => `${indent.get()}err = nil\n`,
   });
 
