@@ -57,7 +57,7 @@
     "@azure/core-lro": "catalog:",
     "@azure/core-paging": "catalog:",
     "@azure/core-rest-pipeline": "catalog:",
-    "@azure/core-sse": "^2.1.3",
+    "@azure/core-sse": "catalog:",
     "@azure/core-util": "catalog:",
     "@azure/logger": "catalog:",
     "@typespec/compiler": "workspace:^",
