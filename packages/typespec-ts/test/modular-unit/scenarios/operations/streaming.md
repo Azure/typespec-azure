@@ -219,7 +219,12 @@ export async function _receiveDeserialize(
 export async function receive(
   context: Client,
   options: ReceiveOptionalParams = { requestOptions: {} },
-): Promise<AsyncIterable<ResponseCreated | ResponseDelta>> {
+): Promise<
+  AsyncIterable<
+    | { event: "responseCreated"; data: ResponseCreated }
+    | { event: "responseDelta"; data: ResponseDelta }
+  >
+> {
   const result = await getStreamResponse(_receiveSend(context, options));
   return _receiveDeserialize(result);
 }
@@ -302,7 +307,9 @@ export async function _receiveDeserialize(
 export async function receive(
   context: Client,
   options: ReceiveOptionalParams = { requestOptions: {} },
-): Promise<AsyncIterable<ResponseCreated | string>> {
+): Promise<
+  AsyncIterable<{ event: "created"; data: ResponseCreated } | { event: "progress"; data: string }>
+> {
   const result = await getStreamResponse(_receiveSend(context, options));
   return _receiveDeserialize(result);
 }
