@@ -84,16 +84,21 @@ export class Adapter {
 
     const info = new go.Info(this.ctx.sdkPackage.crossLanguagePackageId);
     const codeModelType: go.CodeModelType = this.ctx.arm === true ? "azure-arm" : "data-plane";
-    this.codeModel = new go.CodeModel(info, codeModelType, {
-      headerText: this.ctx.sdkPackage.licenseInfo?.header,
-      licenseText: this.ctx.sdkPackage.licenseInfo?.description,
-      ...this.options,
-      // the JSON schema default isn't applied by the compiler at present, so
-      // coerce it here to match the documented default of true.
-      "factory-gather-all-params": this.options["factory-gather-all-params"] ?? true,
-      // generate-examples has been deprecated, for compat we still support it.
-      "generate-samples": this.options["generate-samples"] ?? this.options["generate-examples"],
-    }, root);
+    this.codeModel = new go.CodeModel(
+      info,
+      codeModelType,
+      {
+        headerText: this.ctx.sdkPackage.licenseInfo?.header,
+        licenseText: this.ctx.sdkPackage.licenseInfo?.description,
+        ...this.options,
+        // the JSON schema default isn't applied by the compiler at present, so
+        // coerce it here to match the documented default of true.
+        "factory-gather-all-params": this.options["factory-gather-all-params"] ?? true,
+        // generate-examples has been deprecated, for compat we still support it.
+        "generate-samples": this.options["generate-samples"] ?? this.options["generate-examples"],
+      },
+      root,
+    );
     this.codeModel.metadata = buildMetadata(this.ctx.sdkPackage.metadata);
   }
 

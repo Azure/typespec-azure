@@ -68,7 +68,10 @@ export class TypeAdapter {
     }
 
     for (const sdkUnion of this.ctx.sdkPackage.unions.filter((u) => u.kind === "union")) {
-      const goUnion = this.getUnionStruct(sdkUnion, this.codeModel.options["slice-elements-byval"] ?? false);
+      const goUnion = this.getUnionStruct(
+        sdkUnion,
+        this.codeModel.options["slice-elements-byval"] ?? false,
+      );
       this.getPkg().unions.push(goUnion);
     }
 
@@ -240,7 +243,8 @@ export class TypeAdapter {
           ? true
           : nullable
             ? false
-            : this.codeModel.options["slice-elements-byval"] || helpers.isTypePassedByValue(elementType);
+            : this.codeModel.options["slice-elements-byval"] ||
+              helpers.isTypePassedByValue(elementType);
         const keyName = recursiveKeyName(
           `array-${myElementTypeByValue}`,
           elementType,

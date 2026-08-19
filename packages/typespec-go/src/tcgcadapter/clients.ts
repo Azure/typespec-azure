@@ -1810,7 +1810,14 @@ export class ClientAdapter {
           headerResp.docs.summary = httpHeader.summary;
           headerResp.docs.description = httpHeader.doc;
 
-          if (helpers.isOmittedResponseHeader(httpHeader, sdkMethod, this.ta.ctx.program, this.ta.codeModel.options)) {
+          if (
+            helpers.isOmittedResponseHeader(
+              httpHeader,
+              sdkMethod,
+              this.ta.ctx.program,
+              this.ta.codeModel.options,
+            )
+          ) {
             literalContentTypeHeader = headerResp as go.HeaderScalarResponse;
           } else {
             respEnv.headers.push(headerResp);
@@ -2281,7 +2288,12 @@ export class ClientAdapter {
                   // a matching go header. skip them here so example mapping stays in sync
                   // with envelope construction.
                   if (
-                    helpers.isOmittedResponseHeader(header.header, sdkMethod, this.ta.ctx.program, this.ta.codeModel.options)
+                    helpers.isOmittedResponseHeader(
+                      header.header,
+                      sdkMethod,
+                      this.ta.ctx.program,
+                      this.ta.codeModel.options,
+                    )
                   ) {
                     continue;
                   }

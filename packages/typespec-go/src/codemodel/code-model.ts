@@ -5,8 +5,8 @@
 
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging -- codemodel intentionally merges interface and class declarations of the same name to define its public API shape. */
 
-import * as module from "./module.js";
 import { type GoEmitterOptions } from "../lib.js";
+import * as module from "./module.js";
 
 /** a Go-specific abstraction over REST endpoints */
 export interface CodeModel {
@@ -50,7 +50,6 @@ export interface Options extends GoEmitterOptions {
    * the default is the MIT license with a Microsoft copyright.
    */
   licenseText?: string;
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

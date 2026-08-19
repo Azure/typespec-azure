@@ -136,17 +136,25 @@ export function generateModels(
   if (needsJSONPopulateAsString) {
     serdeImports.add("reflect");
     serdeImports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
-    serdeTextBody += "func populateAsString(m map[string]any, k string, v any, fn func() string) {\n";
-    serdeTextBody += `${indent.get()}${helpers.buildIfBlock(indent, {
-      condition: "v == nil",
-      body: (indent) => `${indent.get()}return\n`,
-    }, [{
-      condition: "azcore.IsNullValue(v)",
-      body: (indent) => `${indent.get()}m[k] = nil\n`,
-    }, {
-      condition: "!reflect.ValueOf(v).IsNil()",
-      body: (indent) => `${indent.get()}m[k] = fn()\n`,
-    }])}\n`;
+    serdeTextBody +=
+      "func populateAsString(m map[string]any, k string, v any, fn func() string) {\n";
+    serdeTextBody += `${indent.get()}${helpers.buildIfBlock(
+      indent,
+      {
+        condition: "v == nil",
+        body: (indent) => `${indent.get()}return\n`,
+      },
+      [
+        {
+          condition: "azcore.IsNullValue(v)",
+          body: (indent) => `${indent.get()}m[k] = nil\n`,
+        },
+        {
+          condition: "!reflect.ValueOf(v).IsNil()",
+          body: (indent) => `${indent.get()}m[k] = fn()\n`,
+        },
+      ],
+    )}\n`;
     serdeTextBody += "}\n\n";
   }
   if (needsJSONPopulateTime) {
@@ -211,7 +219,8 @@ export function generateModels(
   }
   if (needsJSONUnpopulateFromString) {
     serdeImports.add("fmt");
-    serdeTextBody += "func unpopulateFromString(data json.RawMessage, fn string, f func(s string) error) error {\n";
+    serdeTextBody +=
+      "func unpopulateFromString(data json.RawMessage, fn string, f func(s string) error) error {\n";
     serdeTextBody += `${indent.get()}${helpers.buildIfBlock(indent, {
       condition: `data == nil || string(data) == "null"`,
       body: (indent) => `${indent.get()}return nil\n`,
@@ -224,14 +233,16 @@ export function generateModels(
     })}\n`;
     serdeTextBody += `${indent.get()}${helpers.buildIfBlock(indent, {
       condition: "err != nil",
-      body: (indent) => `${indent.get()}return fmt.Errorf("struct field %s: %s", fn, err.Error())\n`,
+      body: (indent) =>
+        `${indent.get()}return fmt.Errorf("struct field %s: %s", fn, err.Error())\n`,
     })}\n`;
     serdeTextBody += `${indent.get()}return nil\n`;
     serdeTextBody += "}\n\n";
   }
   if (needsJSONUnpopulateStringArray) {
     serdeImports.add("strings");
-    serdeTextBody += "func unpopulateStringArray[T ~string](data json.RawMessage, fn string, v *[]T, d string) error {\n";
+    serdeTextBody +=
+      "func unpopulateStringArray[T ~string](data json.RawMessage, fn string, v *[]T, d string) error {\n";
     serdeTextBody += `${indent.get()}${helpers.buildIfBlock(indent, {
       condition: `data == nil || string(data) == "null"`,
       body: (indent) => `${indent.get()}return nil\n`,
@@ -239,7 +250,8 @@ export function generateModels(
     serdeTextBody += `${indent.get()}var encodedValue string\n`;
     serdeTextBody += `${indent.get()}${helpers.buildIfBlock(indent, {
       condition: "err := json.Unmarshal(data, &encodedValue); err != nil",
-      body: (indent) => `${indent.get()}return fmt.Errorf("struct field %s: %s", fn, err.Error())\n`,
+      body: (indent) =>
+        `${indent.get()}return fmt.Errorf("struct field %s: %s", fn, err.Error())\n`,
     })}\n`;
     serdeTextBody += `${indent.get()}${helpers.buildIfBlock(indent, {
       condition: `encodedValue == ""`,
@@ -251,9 +263,13 @@ export function generateModels(
     })}\n`;
     serdeTextBody += `${indent.get()}values := strings.Split(encodedValue, d)\n`;
     serdeTextBody += `${indent.get()}result := make([]T, len(values))\n`;
-    serdeTextBody += `${indent.get()}${helpers.buildForBlock(indent, "i := range values", (indent) => {
-      return `${indent.get()}result[i] = T(values[i])\n`;
-    })}`;
+    serdeTextBody += `${indent.get()}${helpers.buildForBlock(
+      indent,
+      "i := range values",
+      (indent) => {
+        return `${indent.get()}result[i] = T(values[i])\n`;
+      },
+    )}`;
     serdeTextBody += `${indent.get()}*v = result\n`;
     serdeTextBody += `${indent.get()}return nil\n`;
     serdeTextBody += "}\n\n";
@@ -289,23 +305,32 @@ export function generateModels(
   if (needsJSONPopulateStringArray) {
     serdeImports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
     serdeImports.add("strings");
-    serdeTextBody += "func populateStringArray[T ~string](m map[string]any, k string, v []T, d string) {";
-    serdeTextBody += `${indent.get()}${helpers.buildIfBlock(indent, {
-      condition: "azcore.IsNullValue(v)",
-      body: (indent) => `${indent.get()}m[k] = nil\n`,
-    }, [
+    serdeTextBody +=
+      "func populateStringArray[T ~string](m map[string]any, k string, v []T, d string) {";
+    serdeTextBody += `${indent.get()}${helpers.buildIfBlock(
+      indent,
       {
-        condition: "v != nil",
-        body: (indent) => {
-          let controlBlock = `${indent.get()}encodedValue := make([]string, len(v))\n`;
-          controlBlock += `${indent.get()}${helpers.buildForBlock(indent, "i := range v", (indent) => {
-            return `${indent.get()}encodedValue[i] = string(v[i])\n`;
-          })}`;
-          controlBlock += `${indent.get()}m[k] = strings.Join(encodedValue, d)\n`;
-          return controlBlock;
+        condition: "azcore.IsNullValue(v)",
+        body: (indent) => `${indent.get()}m[k] = nil\n`,
+      },
+      [
+        {
+          condition: "v != nil",
+          body: (indent) => {
+            let controlBlock = `${indent.get()}encodedValue := make([]string, len(v))\n`;
+            controlBlock += `${indent.get()}${helpers.buildForBlock(
+              indent,
+              "i := range v",
+              (indent) => {
+                return `${indent.get()}encodedValue[i] = string(v[i])\n`;
+              },
+            )}`;
+            controlBlock += `${indent.get()}m[k] = strings.Join(encodedValue, d)\n`;
+            return controlBlock;
+          },
         },
-      }
-    ])}\n`;
+      ],
+    )}\n`;
     serdeTextBody += "}\n\n";
   }
   if (needsJSONUnpopulateTime || needsJSONPopulateTime) {
