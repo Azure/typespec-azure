@@ -12,23 +12,23 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestExtendsFloatClient_Get(t *testing.T) {
-	client, err := addlpropsgroup.NewAdditionalPropertiesClient(nil)
+func TestSpreadFloatClient_Get(t *testing.T) {
+	client, err := addlpropsgroup.NewAdditionalPropertiesClientWithNoCredential("http://localhost:3000", nil)
 	require.NoError(t, err)
-	resp, err := client.NewAdditionalPropertiesExtendsFloatClient().Get(context.Background(), nil)
+	resp, err := client.NewAdditionalPropertiesSpreadFloatClient().Get(context.Background(), nil)
 	require.NoError(t, err)
-	require.EqualValues(t, addlpropsgroup.ExtendsFloatAdditionalProperties{
+	require.EqualValues(t, addlpropsgroup.SpreadFloatRecord{
 		ID: to.Ptr[float32](43.125),
 		AdditionalProperties: map[string]*float32{
 			"prop": to.Ptr[float32](43.125),
 		},
-	}, resp.ExtendsFloatAdditionalProperties)
+	}, resp.SpreadFloatRecord)
 }
 
-func TestExtendsFloatClient_Put(t *testing.T) {
-	client, err := addlpropsgroup.NewAdditionalPropertiesClient(nil)
+func TestSpreadFloatClient_Put(t *testing.T) {
+	client, err := addlpropsgroup.NewAdditionalPropertiesClientWithNoCredential("http://localhost:3000", nil)
 	require.NoError(t, err)
-	resp, err := client.NewAdditionalPropertiesExtendsFloatClient().Put(context.Background(), addlpropsgroup.ExtendsFloatAdditionalProperties{
+	resp, err := client.NewAdditionalPropertiesSpreadFloatClient().Put(context.Background(), addlpropsgroup.SpreadFloatRecord{
 		ID: to.Ptr[float32](43.125),
 		AdditionalProperties: map[string]*float32{
 			"prop": to.Ptr[float32](43.125),

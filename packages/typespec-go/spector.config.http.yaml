@@ -28,7 +28,6 @@ specs:
   "payload/json-merge-patch": { options: { module: jmergepatchgroup } }
   "payload/media-type": { options: { module: mediatypegroup } }
   "payload/multipart": { options: { module: multipartgroup } }
-  # missing continuation-token support: https://github.com/Azure/autorest.go/issues/1494
   "payload/pageable": { options: { module: pageablegroup } }
   "payload/xml": { options: { module: xmlgroup, slice-elements-byval: true } }
   "serialization/encoded-name/json": { options: { module: jsongroup } }
@@ -50,37 +49,32 @@ specs:
   "type/model/inheritance/single-discriminator": { options: { module: singlediscgroup } }
   "type/model/usage": { options: { module: usagegroup } }
   "type/model/visibility": { options: { module: visibilitygroup } }
+  "type/property/additional-properties": { options: { module: addlpropsgroup } }
   "type/property/nullable": { options: { module: nullablegroup } }
-  # missing plain time support: https://github.com/Azure/autorest.go/issues/1732
   "type/property/optionality": { options: { module: optionalitygroup, slice-elements-byval: true } }
   "type/property/value-types": { options: { module: valuetypesgroup, slice-elements-byval: true } }
   "type/scalar": { options: { module: scalargroup, slice-elements-byval: true } }
+  "type/union": { options: { module: uniongroup, slice-elements-byval: true } }
+  "versioning/added": { options: { module: versioningaddedgroup, slice-elements-byval: true } }
   "versioning/madeOptional": { options: { module: madeoptionalgroup } }
+  "versioning/removed": { options: { module: removedgroup } }
+  "versioning/renamedFrom":
+    { options: { module: versioningrenamedfromgroup, slice-elements-byval: true } }
   "versioning/returnTypeChangedFrom": { options: { module: rettypechangedfromgroup } }
   "versioning/typeChangedFrom": { options: { module: typechangedfromgroup } }
 
   # --- Not generated yet (tracked skips) ---
-  # TODO: https://github.com/Azure/autorest.go/issues/1606
+  # TODO: https://github.com/Azure/typespec-azure/issues/4946
   "response/status-code-range": false
-  # TODO: https://github.com/Azure/autorest.go/issues/1730
+  # TODO: https://github.com/Azure/typespec-azure/issues/4928
   routes: false
   # TODO: https://github.com/Azure/typespec-azure/issues/5226
   "server/versions/versioned": false
-  # requires union support
+  # TODO: https://github.com/Azure/typespec-azure/issues/4957
   "special-headers/repeatability": false
-  # TODO: https://github.com/Azure/autorest.go/issues/1594
+  # TODO: https://github.com/Azure/typespec-azure/issues/4934
   "streaming/jsonl": false
   # not a real scenario
   "type/model/inheritance/nested-discriminator": false
-  # requires union support
-  "type/property/additional-properties": false
-  # requires union support
-  "type/union": false
-  # requires union support
+  # requires union support (new discriminator style)
   "type/union/discriminated": false
-  # requires union support
-  "versioning/added": false
-  # requires union support
-  "versioning/removed": false
-  # requires union support
-  "versioning/renamedFrom": false

@@ -601,7 +601,8 @@ function dispatchForOperationBody(
 ): string {
   const methodParamGroups = helpers.getMethodParamGroups(method);
   const numPathParams = methodParamGroups.pathParams.filter(
-    (each: go.PathParameter) => !go.isLiteralParameter(each.style),
+    (each: go.PathParameter) =>
+      !go.isLiteralParameter(each.style) && !go.isAPIVersionParameter(each),
   ).length;
   let content = "";
   if (numPathParams > 0) {

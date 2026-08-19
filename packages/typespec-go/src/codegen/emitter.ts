@@ -133,6 +133,12 @@ export class Emitter {
           await write("responses_serde.go", responses.serDe);
         }
 
+        const unions = core.generateUnions(pkg);
+        if (unions) {
+          await write("unions.go", unions.types);
+          await write("unions_serde.go", unions.serde);
+        }
+
         const xmlAddlProps = core.generateXMLAdditionalPropsHelpers(pkg);
         if (xmlAddlProps.length > 0) {
           await write("xml_helper.go", xmlAddlProps);
@@ -361,6 +367,11 @@ function sortContent(pkg: go.PackageContent): void {
         return sortAscending(a.fieldName, b.fieldName);
       },
     );
+  }
+
+  pkg.unions.sort((a, b) => sortAscending(a.name, b.name));
+  for (const goUnion of pkg.unions) {
+    goUnion.fields.sort((a, b) => sortAscending(a.name, b.name));
   }
 
   pkg.clients.sort((a: go.Client, b: go.Client) => {

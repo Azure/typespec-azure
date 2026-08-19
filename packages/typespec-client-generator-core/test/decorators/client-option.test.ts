@@ -21,7 +21,7 @@ describe("@clientOption diagnostics", () => {
     });
   });
 
-  it("should emit both client-option and client-option-requires-scope warnings when scope is missing", async () => {
+  it("should emit both client-option and decorator-requires-scope warnings when scope is missing", async () => {
     const diagnostics = await SimpleTester.diagnose(`
       @service
       namespace MyService;
@@ -37,7 +37,7 @@ describe("@clientOption diagnostics", () => {
         code: "@azure-tools/typespec-client-generator-core/client-option",
       },
       {
-        code: "@azure-tools/typespec-client-generator-core/client-option-requires-scope",
+        code: "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
       },
     ]);
   });
@@ -53,7 +53,7 @@ describe("@clientOption diagnostics", () => {
       }
     `);
 
-    // Should only have the client-option warning, not client-option-requires-scope
+    // Should only have the client-option warning, not decorator-requires-scope
     strictEqual(diagnostics.length, 1);
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/client-option",
@@ -81,7 +81,7 @@ describe("@clientOption diagnostics", () => {
       namespace MyService;
 
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
-      #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope"
+      #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope"
       @clientOption("enableFeatureFoo", true)
       model Test {
         id: string;
@@ -312,7 +312,7 @@ describe("@clientOption with getClientOptions getter", () => {
   it("should handle option without scope argument", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
-      #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope"
+      #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope"
       @clientOption("noScopeOption", 123)
       @test
       model Test {
