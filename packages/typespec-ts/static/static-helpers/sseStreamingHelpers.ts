@@ -40,6 +40,10 @@ function isJsonContentType(contentType: string | undefined): boolean {
  * event to the matching {@link SseEventDescriptor} by its `event:` name and yielding the
  * deserialized payload. Iteration stops when a terminal event is received; terminal events
  * are not yielded unless they declare a payload deserializer.
+ *
+ * Terminal events are identified by their event descriptor's `isTerminal` flag. Additionally,
+ * if a terminal descriptor specifies a `terminalValue` (constant sentinel), the stream only
+ * terminates when an event with that specific event name carries that sentinel data.
  */
 export async function* readSseStream<T>(
   body: AsyncIterable<Uint8Array | string> | undefined,
@@ -50,28 +54,27 @@ export async function* readSseStream<T>(
   }
   const named = new Map<string, SseEventDescriptor<T>>();
   let unnamed: SseEventDescriptor<T> | undefined;
-  const terminalValues: SseEventDescriptor<T>[] = [];
   for (const descriptor of descriptors) {
-    if (descriptor.terminalValue !== undefined) {
-      terminalValues.push(descriptor);
-    }
     if (descriptor.eventName !== undefined) {
       named.set(descriptor.eventName, descriptor);
     } else if (descriptor.terminalValue === undefined) {
+      // Only treat unnamed descriptors without terminalValue as the default unnamed handler.
       unnamed = descriptor;
     }
   }
 
   const stream = createSseStream(body as any);
   for await (const event of stream) {
-    // Terminal sentinel carried in the event data (e.g. a constant literal variant).
-    if (terminalValues.some((descriptor) => descriptor.terminalValue === event.data)) {
-      return;
-    }
     const descriptor = named.get(event.event) ?? unnamed;
     if (!descriptor) {
       continue;
     }
+
+    // Check if this is a terminal event with a sentinel value that should terminate the stream.
+    if (descriptor.terminalValue !== undefined && descriptor.terminalValue === event.data) {
+      return;
+    }
+
     if (descriptor.deserialize) {
       const payload = event.data
         ? isJsonContentType(descriptor.contentType)
@@ -80,6 +83,8 @@ export async function* readSseStream<T>(
         : undefined;
       yield descriptor.deserialize(payload);
     }
+
+    // Terminal event: stop iteration after yielding (if any payload).
     if (descriptor.isTerminal) {
       return;
     }

@@ -1152,9 +1152,13 @@ interface StructuredStreamInfo {
  * Resolves structured JSONL/SSE streaming metadata for an operation, or `undefined` when the
  * operation is not a structured stream.
  *
- * Triggers purely on the operation's TCGC stream metadata: an operation is treated as a
- * structured stream when its response carries `streamMetadata` with a model/union `streamType`
- * (JSONL) and/or `sseMetadata` (SSE).
+ * An operation is treated as a structured stream when:
+ * - Its response carries `streamMetadata` with a recognized content type:
+ *   - SSE (text/event-stream) with `sseMetadata`, returning an AsyncIterable of event payloads
+ *   - JSONL (application/jsonl) with a model/union `streamType`, returning an AsyncIterable of items
+ * - The operation is not paging-only, LRO-only, or combined paging+LRO
+ *
+ * Custom stream templates with non-standard content types are not treated as structured streams.
  */
 export function getStructuredStreamInfo(
   context: SdkContext,
@@ -1173,8 +1177,14 @@ export function getStructuredStreamInfo(
     return undefined;
   }
 
+  // Validate content type to distinguish between JSONL and SSE streams.
+  // Only process recognized structured streaming content types.
+  const contentTypes = streamMetadata.contentTypes ?? [];
+  const hasJsonlContentType = contentTypes.some((ct) => ct.includes("jsonl"));
+  const hasSseContentType = contentTypes.some((ct) => ct.includes("event-stream"));
+
   const sseMetadata = response.sseMetadata;
-  if (sseMetadata) {
+  if (sseMetadata && hasSseContentType) {
     const events: StructuredStreamEvent[] = [];
     const payloadTypeExpressions: string[] = [];
     for (const sseEvent of sseMetadata.events) {
@@ -1213,6 +1223,11 @@ export function getStructuredStreamInfo(
         ? Array.from(new Set(payloadTypeExpressions)).join(" | ")
         : getTypeExpression(context, streamMetadata.streamType);
     return { kind: "sse", itemType, events };
+  }
+
+  // Not SSE; check for JSONL if content type matches.
+  if (!hasJsonlContentType) {
+    return undefined;
   }
 
   const streamType = streamMetadata.streamType;
