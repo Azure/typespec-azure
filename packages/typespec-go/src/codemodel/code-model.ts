@@ -6,6 +6,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging -- codemodel intentionally merges interface and class declarations of the same name to define its public API shape. */
 
 import * as module from "./module.js";
+import { type GoEmitterOptions } from "../lib.js";
 
 /** a Go-specific abstraction over REST endpoints */
 export interface CodeModel {
@@ -37,7 +38,7 @@ export interface Info {
  * contains global options set on the CodeModel.
  * most of the values come from command-line args.
  */
-export interface Options {
+export interface Options extends GoEmitterOptions {
   /**
    * the header text to emit per file. usually contains license and copyright info.
    * the default is the MIT license with a Microsoft copyright.
@@ -50,35 +51,6 @@ export interface Options {
    */
   licenseText?: string;
 
-  /** indicates if fakes should be emitted. the default is false */
-  generateFakes: boolean;
-
-  /** indicates if tracing spans should be emitted. the default is false */
-  injectSpans: boolean;
-
-  /** indicates if client constructors should be omitted. the default is false */
-  omitConstructors: boolean;
-
-  /**
-   * indicates whether or not to disallow unknown fields in the JSON unmarshaller.
-   * reproduce the behavior of https://pkg.go.dev/encoding/json#Decoder.DisallowUnknownFields
-   */
-  disallowUnknownFields: boolean;
-
-  /** custom version of azcore to use instead of the emitter's default value */
-  azcoreVersion?: string;
-
-  /** emits Go any types as []byte containing raw JSON. the default value is false */
-  rawJSONAsBytes: boolean;
-
-  /** emit slice element types by value (e.g. []string not []*string). the default value is false */
-  sliceElementsByval: boolean;
-
-  /** generates example _test.go files. the default value is false */
-  generateExamples: boolean;
-
-  /** whether or not to gather all client parameters for the client factory. the default value is true */
-  factoryGatherAllParams: boolean;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,20 +73,5 @@ export class CodeModel implements CodeModel {
 export class Info implements Info {
   constructor(title: string) {
     this.title = title;
-  }
-}
-
-export class Options implements Options {
-  constructor(
-    generateFakes: boolean,
-    injectSpans: boolean,
-    disallowUnknownFields: boolean,
-    generateExamples: boolean,
-  ) {
-    this.generateFakes = generateFakes;
-    this.injectSpans = injectSpans;
-    this.omitConstructors = false;
-    this.disallowUnknownFields = disallowUnknownFields;
-    this.generateExamples = generateExamples;
   }
 }

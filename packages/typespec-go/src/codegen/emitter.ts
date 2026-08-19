@@ -144,7 +144,7 @@ export class Emitter {
           await write("xml_helper.go", xmlAddlProps);
         }
 
-        if (this.codeModel.options.generateFakes) {
+        if (this.codeModel.options["generate-fakes"]) {
           const fakePkg = new go.FakePackage(pkg);
           const serverContent = fake.generateServers(fakePkg, this.codeModel.type);
           if (serverContent.servers.length > 0) {
@@ -193,7 +193,7 @@ export class Emitter {
 
   /** writes the *_example_test.go files */
   async emitExamples(): Promise<void> {
-    if (!this.codeModel.options.generateExamples) {
+    if (!this.codeModel.options["generate-samples"]) {
       return;
     }
 

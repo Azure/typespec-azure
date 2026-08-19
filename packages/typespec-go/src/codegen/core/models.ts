@@ -973,7 +973,7 @@ function generateJSONUnmarshallerBody(
       indent.push(); // case body level
       unmarshalBody += emitAddlProps(addlProps);
       indent.pop();
-    } else if (options.disallowUnknownFields) {
+    } else if (options["disallow-unknown-fields"]) {
       unmarshalBody += `${indent.get()}default:\n`;
       unmarshalBody += `${indent.push().get()}err = fmt.Errorf("unmarshalling type %T, unknown field %q", ${receiver}, key)\n`;
       indent.pop();

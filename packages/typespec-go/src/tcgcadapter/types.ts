@@ -68,7 +68,7 @@ export class TypeAdapter {
     }
 
     for (const sdkUnion of this.ctx.sdkPackage.unions.filter((u) => u.kind === "union")) {
-      const goUnion = this.getUnionStruct(sdkUnion, this.codeModel.options.sliceElementsByval);
+      const goUnion = this.getUnionStruct(sdkUnion, this.codeModel.options["slice-elements-byval"] ?? false);
       this.getPkg().unions.push(goUnion);
     }
 
@@ -240,7 +240,7 @@ export class TypeAdapter {
           ? true
           : nullable
             ? false
-            : this.codeModel.options.sliceElementsByval || helpers.isTypePassedByValue(elementType);
+            : this.codeModel.options["slice-elements-byval"] || helpers.isTypePassedByValue(elementType);
         const keyName = recursiveKeyName(
           `array-${myElementTypeByValue}`,
           elementType,
@@ -401,7 +401,7 @@ export class TypeAdapter {
   private getBuiltInType(type: tcgc.SdkBuiltInType): go.WireType {
     switch (type.kind) {
       case "unknown": {
-        if (this.codeModel.options.rawJSONAsBytes) {
+        if (this.codeModel.options["rawjson-as-bytes"]) {
           const anyRawJSONKey = "any-raw-json";
           let anyRawJSON = this.types.get(anyRawJSONKey);
           if (anyRawJSON) {
