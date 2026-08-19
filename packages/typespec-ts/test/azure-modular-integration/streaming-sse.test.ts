@@ -1,13 +1,6 @@
 import { assert, beforeEach, describe, it } from "vitest";
 
-import {
-  FinalResult,
-  Info,
-  PartialResult,
-  ResponseCreated,
-  ResponseDelta,
-  SseClient,
-} from "./generated/streaming/sse/src/index.js";
+import { Info, SseClient } from "./generated/streaming/sse/src/index.js";
 
 async function collect<T>(iter: AsyncIterable<T>): Promise<T[]> {
   const out: T[] = [];
@@ -39,25 +32,33 @@ describe("SSE Streaming Client", () => {
   });
 
   it("should stream heterogeneous named events and stop at terminal [DONE]", async () => {
-    const stream = await client.named.receive();
-    // The return type is a discriminated union: { event: "responseCreated" | "responseDelta"; data: T }
-    // allowing type-safe narrowing by event name.
-    const events = await collect(stream);
-    // Terminal `data: [DONE]` must not be yielded.
-    assert.strictEqual(events.length, 3);
-    // Type narrowing: can check event.event to narrow to specific payload type
-    assert.strictEqual((events[0] as ResponseCreated).id, "resp_1");
-    assert.strictEqual((events[1] as ResponseDelta).delta, "Hello");
-    assert.strictEqual((events[2] as ResponseDelta).delta, " world");
+    const events = await collect(await client.named.receive());
+
+    // Named events keep their `event:` name alongside the payload, so callers can narrow
+    // without a cast. Terminal `data: [DONE]` is consumed by the reader and never yielded.
+    assert.deepEqual(events, [
+      { event: "responseCreated", data: { id: "resp_1" } },
+      { event: "responseDelta", data: { delta: "Hello" } },
+      { event: "responseDelta", data: { delta: " world" } },
+    ]);
+
+    // The discriminant narrows `data` to the matching payload type with no cast.
+    const deltas: string[] = [];
+    for (const event of events) {
+      if (event.event === "responseDelta") {
+        deltas.push(event.data.delta);
+      }
+    }
+    assert.deepEqual(deltas, ["Hello", " world"]);
   });
 
   it("should stream retrieve events dispatched by event name and stop at terminal", async () => {
-    const events = await collect<PartialResult | FinalResult>(
-      await client.retrieve.stream({ query: "what is typespec?" }),
-    );
-    assert.strictEqual(events.length, 3);
-    assert.strictEqual((events[0] as PartialResult).text, "partial one");
-    assert.strictEqual((events[1] as PartialResult).text, "partial two");
-    assert.deepEqual((events[2] as FinalResult).references, ["doc1", "doc2"]);
+    const events = await collect(await client.retrieve.stream({ query: "what is typespec?" }));
+
+    assert.deepEqual(events, [
+      { event: "partialResult", data: { text: "partial one" } },
+      { event: "partialResult", data: { text: "partial two" } },
+      { event: "finalResult", data: { references: ["doc1", "doc2"] } },
+    ]);
   });
 });

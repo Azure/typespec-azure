@@ -1147,9 +1147,9 @@ interface StructuredStreamInfo {
   itemDeserializerName?: string;
   events?: StructuredStreamEvent[];
   /**
-   * For named SSE streams, maps event names to their payload types for discriminated union.
-   * Used to generate return type like `{ event: "name1"; data: Type1 } | { event: "name2"; data: Type2 }`.
-   * Present only when the stream has at least one named event.
+   * Maps SSE event names to their payload types, producing the discriminated union
+   * `{ event: "name1"; data: Type1 } | { event: "name2"; data: Type2 }`. Present only when every
+   * yielded event of the stream is named, so the envelope is never partially applied.
    */
   namedEventTypes?: Record<string, string>;
 }
@@ -1194,16 +1194,19 @@ export function getStructuredStreamInfo(
     const events: StructuredStreamEvent[] = [];
     const payloadTypeExpressions: string[] = [];
     const namedEventTypes: Record<string, string> = {};
+    let everyPayloadEventIsNamed = true;
     for (const sseEvent of sseMetadata.events) {
       const event: StructuredStreamEvent = {
         eventName: sseEvent.eventType,
         isTerminal: sseEvent.isTerminalEvent,
       };
-      // Only a terminal event whose payload is a constant is matched by its sentinel data value.
-      // A non-terminal constant is a real payload variant and must be deserialized/yielded, not
-      // treated as a stream terminator.
-      if (sseEvent.isTerminalEvent && sseEvent.payloadType.kind === "constant") {
-        event.terminalValue = String(sseEvent.payloadType.value);
+      if (sseEvent.isTerminalEvent) {
+        // Terminal events are consumed by the reader and never yielded, so they need no
+        // deserializer and contribute no type to the item union. A constant payload doubles as
+        // the sentinel `data` value that marks termination for this event name.
+        if (sseEvent.payloadType.kind === "constant") {
+          event.terminalValue = String(sseEvent.payloadType.value);
+        }
       } else {
         const deserializerName = buildModelDeserializer(context, sseEvent.payloadType, {
           nameOnly: true,
@@ -1211,21 +1214,20 @@ export function getStructuredStreamInfo(
         });
         if (typeof deserializerName === "string") {
           event.deserializerName = deserializerName;
-        } else if (!sseEvent.isTerminalEvent) {
-          // A non-terminal payload whose type needs no model deserializer (primitive/scalar/
-          // enum). Yield the raw payload via an identity deserializer instead of dropping it.
+        } else {
+          // A payload whose type needs no model deserializer (primitive/scalar/enum). Yield the
+          // raw payload via an identity deserializer instead of dropping it.
           event.identityDeserialize = true;
         }
         if (sseEvent.payloadContentType !== undefined) {
           event.contentType = sseEvent.payloadContentType;
         }
-        if (!sseEvent.isTerminalEvent) {
-          const payloadType = getTypeExpression(context, sseEvent.payloadType);
-          payloadTypeExpressions.push(payloadType);
-          // Track named events for discriminated union typing
-          if (sseEvent.eventType !== undefined) {
-            namedEventTypes[sseEvent.eventType] = payloadType;
-          }
+        const payloadType = getTypeExpression(context, sseEvent.payloadType);
+        payloadTypeExpressions.push(payloadType);
+        if (sseEvent.eventType === undefined) {
+          everyPayloadEventIsNamed = false;
+        } else {
+          namedEventTypes[sseEvent.eventType] = payloadType;
         }
       }
       events.push(event);
@@ -1235,8 +1237,9 @@ export function getStructuredStreamInfo(
         ? Array.from(new Set(payloadTypeExpressions)).join(" | ")
         : getTypeExpression(context, streamMetadata.streamType);
     const result: StructuredStreamInfo = { kind: "sse", itemType, events };
-    // Include namedEventTypes only if there are named events (for discriminated union typing)
-    if (Object.keys(namedEventTypes).length > 0) {
+    // Only emit the `{ event, data }` envelope when every yielded event carries a name, so the
+    // declared union always matches what the reader yields at runtime.
+    if (everyPayloadEventIsNamed && Object.keys(namedEventTypes).length > 0) {
       result.namedEventTypes = namedEventTypes;
     }
     return result;
@@ -1305,19 +1308,17 @@ function getStructuredStreamOperationFunction(
 }
 
 /**
- * Builds the return type for a streaming operation.
- * For named SSE streams, builds a discriminated union: `{ event: "name1"; data: Type1 } | ...`
- * For all other cases, uses the itemType directly.
+ * Builds the item type yielded by a streaming operation. Named SSE streams keep the event name in
+ * a discriminated union (`{ event: "name"; data: Type }`) so callers can narrow by event; JSONL and
+ * unnamed SSE streams yield the payload directly.
  */
 function buildStreamReturnType(info: StructuredStreamInfo): string {
-  if (info.kind === "sse" && info.namedEventTypes && Object.keys(info.namedEventTypes).length > 0) {
-    // Build discriminated union type for named events
-    const eventTypes = Object.entries(info.namedEventTypes)
-      .map(([eventName, dataType]) => `{ event: ${JSON.stringify(eventName)}; data: ${dataType} }`)
-      .join(" | ");
-    return eventTypes;
+  if (!info.namedEventTypes) {
+    return info.itemType;
   }
-  return info.itemType;
+  return Object.entries(info.namedEventTypes)
+    .map(([eventName, dataType]) => `{ event: ${JSON.stringify(eventName)}; data: ${dataType} }`)
+    .join(" | ");
 }
 
 /**
@@ -1350,6 +1351,7 @@ function getStructuredStreamDeserializeFunction(
     statements.push(`return ${readJsonlStreamRef}(result.body, ${deserializeCallback});`);
   } else {
     const readSseStreamRef = resolveReference(SseStreamingHelpers.readSseStream);
+    const useEventEnvelope = info.namedEventTypes !== undefined;
     const descriptors = (info.events ?? [])
       .map((event) => {
         const parts: string[] = [];
@@ -1360,10 +1362,18 @@ function getStructuredStreamDeserializeFunction(
         if (event.terminalValue !== undefined) {
           parts.push(`terminalValue: ${JSON.stringify(event.terminalValue)}`);
         }
-        if (event.deserializerName) {
-          parts.push(`deserialize: (data) => ${event.deserializerName}(data)`);
-        } else if (event.identityDeserialize) {
-          parts.push(`deserialize: (data) => data`);
+        const payloadExpression = event.deserializerName
+          ? `${event.deserializerName}(data)`
+          : event.identityDeserialize
+            ? "data"
+            : undefined;
+        if (payloadExpression !== undefined) {
+          // When the operation declares the `{ event, data }` envelope, the reader must yield
+          // that same shape so the runtime value matches the declared return type.
+          const yielded = useEventEnvelope
+            ? `({ event: ${JSON.stringify(event.eventName)}, data: ${payloadExpression} })`
+            : payloadExpression;
+          parts.push(`deserialize: (data) => ${yielded}`);
         }
         if (event.contentType !== undefined) {
           parts.push(`contentType: ${JSON.stringify(event.contentType)}`);
@@ -1379,7 +1389,7 @@ function getStructuredStreamDeserializeFunction(
     isExported: true,
     name: `_${name}Deserialize`,
     parameters: [{ name: "result", type: streamResponseRef }],
-    returnType: `Promise<AsyncIterable<${info.itemType}>>`,
+    returnType: `Promise<AsyncIterable<${buildStreamReturnType(info)}>>`,
     statements,
   };
 }
