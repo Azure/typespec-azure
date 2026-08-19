@@ -39,9 +39,13 @@ describe("SSE Streaming Client", () => {
   });
 
   it("should stream heterogeneous named events and stop at terminal [DONE]", async () => {
-    const events = await collect<ResponseCreated | ResponseDelta>(await client.named.receive());
+    const stream = await client.named.receive();
+    // The return type is a discriminated union: { event: "responseCreated" | "responseDelta"; data: T }
+    // allowing type-safe narrowing by event name.
+    const events = await collect(stream);
     // Terminal `data: [DONE]` must not be yielded.
     assert.strictEqual(events.length, 3);
+    // Type narrowing: can check event.event to narrow to specific payload type
     assert.strictEqual((events[0] as ResponseCreated).id, "resp_1");
     assert.strictEqual((events[1] as ResponseDelta).delta, "Hello");
     assert.strictEqual((events[2] as ResponseDelta).delta, " world");
