@@ -194,7 +194,12 @@ export function _receiveSend(
 
 export async function _receiveDeserialize(
   result: StreamResponse,
-): Promise<AsyncIterable<ResponseCreated | ResponseDelta>> {
+): Promise<
+  AsyncIterable<
+    | { event: "responseCreated"; data: ResponseCreated }
+    | { event: "responseDelta"; data: ResponseDelta }
+  >
+> {
   const expectedStatuses = ["200"];
   if (!expectedStatuses.includes(result.status)) {
     throw createRestError(result);
@@ -204,13 +209,16 @@ export async function _receiveDeserialize(
     {
       eventName: "responseCreated",
       isTerminal: false,
-      deserialize: (data) => responseCreatedDeserializer(data),
+      deserialize: (data) => ({
+        event: "responseCreated",
+        data: responseCreatedDeserializer(data),
+      }),
       contentType: "application/json",
     },
     {
       eventName: "responseDelta",
       isTerminal: false,
-      deserialize: (data) => responseDeltaDeserializer(data),
+      deserialize: (data) => ({ event: "responseDelta", data: responseDeltaDeserializer(data) }),
       contentType: "application/json",
     },
     { isTerminal: true, terminalValue: "[DONE]" },
@@ -282,7 +290,9 @@ export function _receiveSend(
 
 export async function _receiveDeserialize(
   result: StreamResponse,
-): Promise<AsyncIterable<ResponseCreated | string>> {
+): Promise<
+  AsyncIterable<{ event: "created"; data: ResponseCreated } | { event: "progress"; data: string }>
+> {
   const expectedStatuses = ["200"];
   if (!expectedStatuses.includes(result.status)) {
     throw createRestError(result);
@@ -292,13 +302,13 @@ export async function _receiveDeserialize(
     {
       eventName: "created",
       isTerminal: false,
-      deserialize: (data) => responseCreatedDeserializer(data),
+      deserialize: (data) => ({ event: "created", data: responseCreatedDeserializer(data) }),
       contentType: "application/json",
     },
     {
       eventName: "progress",
       isTerminal: false,
-      deserialize: (data) => data,
+      deserialize: (data) => ({ event: "progress", data: data }),
       contentType: "text/plain",
     },
   ]);
