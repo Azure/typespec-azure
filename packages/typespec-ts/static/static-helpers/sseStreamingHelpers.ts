@@ -46,8 +46,11 @@ function isJsonContentType(contentType: string | undefined): boolean {
  *
  * Terminal events end the stream and are never yielded: `@terminalEvent` marks the signal to
  * disconnect, so its payload is not part of the streamed data. A descriptor's `terminalValue`
- * (constant sentinel) is only compared against events matching that same descriptor, so an
+ * (constant sentinel) is only compared against events with the same `event:` name, so an
  * unrelated event carrying the same `data` cannot end the stream.
+ *
+ * Events whose `event:` name matches no descriptor are ignored rather than being decoded by the
+ * unnamed descriptor, so an unrecognized event can never be deserialized as the wrong type.
  */
 export async function* readSseStream<T>(
   body: AsyncIterable<Uint8Array | string> | undefined,
@@ -57,19 +60,26 @@ export async function* readSseStream<T>(
     return;
   }
   const named = new Map<string, SseEventDescriptor<T>>();
+  const unnamedTerminals: SseEventDescriptor<T>[] = [];
   let unnamed: SseEventDescriptor<T> | undefined;
   for (const descriptor of descriptors) {
     if (descriptor.eventName !== undefined) {
       named.set(descriptor.eventName, descriptor);
-    } else if (descriptor.terminalValue === undefined) {
-      // Only treat unnamed descriptors without terminalValue as the default unnamed handler.
+    } else if (descriptor.terminalValue !== undefined) {
+      // A sentinel terminal shares the unnamed `message` event with the payload descriptor, so it
+      // is matched on its `data` value before falling back to the unnamed payload handler.
+      unnamedTerminals.push(descriptor);
+    } else {
       unnamed = descriptor;
     }
   }
 
   const stream = createSseStream(body as any);
   for await (const event of stream) {
-    const descriptor = named.get(event.event) ?? unnamed;
+    // `@azure/core-sse` reports unnamed (`message`) events with an empty `event` field.
+    const descriptor = event.event
+      ? named.get(event.event)
+      : (unnamedTerminals.find((candidate) => candidate.terminalValue === event.data) ?? unnamed);
     if (!descriptor) {
       continue;
     }
@@ -85,9 +95,7 @@ export async function* readSseStream<T>(
 
     if (descriptor.deserialize) {
       let payload: unknown;
-      if (!event.data) {
-        payload = undefined;
-      } else if (isJsonContentType(descriptor.contentType)) {
+      if (isJsonContentType(descriptor.contentType)) {
         try {
           payload = JSON.parse(event.data);
         } catch (error) {
