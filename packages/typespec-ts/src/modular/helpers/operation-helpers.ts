@@ -1146,6 +1146,12 @@ interface StructuredStreamInfo {
   itemType: string;
   itemDeserializerName?: string;
   events?: StructuredStreamEvent[];
+  /**
+   * For named SSE streams, maps event names to their payload types for discriminated union.
+   * Used to generate return type like `{ event: "name1"; data: Type1 } | { event: "name2"; data: Type2 }`.
+   * Present only when the stream has at least one named event.
+   */
+  namedEventTypes?: Record<string, string>;
 }
 
 /**
@@ -1187,6 +1193,7 @@ export function getStructuredStreamInfo(
   if (sseMetadata && hasSseContentType) {
     const events: StructuredStreamEvent[] = [];
     const payloadTypeExpressions: string[] = [];
+    const namedEventTypes: Record<string, string> = {};
     for (const sseEvent of sseMetadata.events) {
       const event: StructuredStreamEvent = {
         eventName: sseEvent.eventType,
@@ -1213,7 +1220,12 @@ export function getStructuredStreamInfo(
           event.contentType = sseEvent.payloadContentType;
         }
         if (!sseEvent.isTerminalEvent) {
-          payloadTypeExpressions.push(getTypeExpression(context, sseEvent.payloadType));
+          const payloadType = getTypeExpression(context, sseEvent.payloadType);
+          payloadTypeExpressions.push(payloadType);
+          // Track named events for discriminated union typing
+          if (sseEvent.eventType !== undefined) {
+            namedEventTypes[sseEvent.eventType] = payloadType;
+          }
         }
       }
       events.push(event);
@@ -1222,7 +1234,12 @@ export function getStructuredStreamInfo(
       payloadTypeExpressions.length > 0
         ? Array.from(new Set(payloadTypeExpressions)).join(" | ")
         : getTypeExpression(context, streamMetadata.streamType);
-    return { kind: "sse", itemType, events };
+    const result: StructuredStreamInfo = { kind: "sse", itemType, events };
+    // Include namedEventTypes only if there are named events (for discriminated union typing)
+    if (Object.keys(namedEventTypes).length > 0) {
+      result.namedEventTypes = namedEventTypes;
+    }
+    return result;
   }
 
   // Not SSE; check for JSONL if content type matches.
@@ -1282,9 +1299,25 @@ function getStructuredStreamOperationFunction(
     name,
     propertyName: normalizeName(operation.name, NameType.Property),
     parameters,
-    returnType: `Promise<AsyncIterable<${info.itemType}>>`,
+    returnType: `Promise<AsyncIterable<${buildStreamReturnType(info)}>>`,
     statements,
   } as FunctionDeclarationStructure & { propertyName?: string };
+}
+
+/**
+ * Builds the return type for a streaming operation.
+ * For named SSE streams, builds a discriminated union: `{ event: "name1"; data: Type1 } | ...`
+ * For all other cases, uses the itemType directly.
+ */
+function buildStreamReturnType(info: StructuredStreamInfo): string {
+  if (info.kind === "sse" && info.namedEventTypes && Object.keys(info.namedEventTypes).length > 0) {
+    // Build discriminated union type for named events
+    const eventTypes = Object.entries(info.namedEventTypes)
+      .map(([eventName, dataType]) => `{ event: ${JSON.stringify(eventName)}; data: ${dataType} }`)
+      .join(" | ");
+    return eventTypes;
+  }
+  return info.itemType;
 }
 
 /**
