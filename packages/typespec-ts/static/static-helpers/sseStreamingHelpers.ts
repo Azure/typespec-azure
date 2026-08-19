@@ -76,11 +76,21 @@ export async function* readSseStream<T>(
     }
 
     if (descriptor.deserialize) {
-      const payload = event.data
-        ? isJsonContentType(descriptor.contentType)
-          ? JSON.parse(event.data)
-          : event.data
-        : undefined;
+      let payload: unknown;
+      if (!event.data) {
+        payload = undefined;
+      } else if (isJsonContentType(descriptor.contentType)) {
+        try {
+          payload = JSON.parse(event.data);
+        } catch (error) {
+          const eventName = event.event || "message";
+          throw new Error(`Unable to deserialize event "${eventName}".`, {
+            cause: error,
+          });
+        }
+      } else {
+        payload = event.data;
+      }
       yield descriptor.deserialize(payload);
     }
 
