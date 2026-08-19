@@ -26,16 +26,16 @@ export function generateGoModFile(
   // here we specify the minimum version of azcore as required by the code generator.
   // the version can be overwritten by passing the --azcore-version switch during generation.
   let version = "1.23.0";
-  if (options.azcoreVersion) {
+  if (options["azcore-version"]) {
     // when matching versions, we need to handle beta, non-beta, and pseudo versions
     // 1.2.3-beta.1, 1.2.3, 0.22.1-0.20220315231014-ed309e73db6b
-    if (!options.azcoreVersion.match(/^\d+\.\d+\.\d+(?:-[a-zA-Z0-9_.-]+)?$/)) {
+    if (!options["azcore-version"].match(/^\d+\.\d+\.\d+(?:-[a-zA-Z0-9_.-]+)?$/)) {
       throw new CodegenError(
         "InvalidArgument",
         `azcore version ${version} must be in the format major.minor.patch[-beta.N]`,
       );
     }
-    version = options.azcoreVersion;
+    version = options["azcore-version"];
   }
 
   const minGoVersion = "go 1.25.0";

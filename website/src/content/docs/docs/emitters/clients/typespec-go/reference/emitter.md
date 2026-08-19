@@ -54,6 +54,12 @@ The module into which the package is being emitted. Mutually exclusive with modu
 
 When true, unmarshalers will return an error when an unknown field is encountered in the payload. The default is false.
 
+### `emit-content-type-header`
+
+**Type:** `boolean`
+
+Includes the Content-Type header in response envelopes for modeled responses. The default is false.
+
 ### `file-prefix`
 
 **Type:** `string`

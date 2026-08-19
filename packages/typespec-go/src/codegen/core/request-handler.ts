@@ -132,7 +132,7 @@ export function createRequestHandler(
               (pp.type.kind === "constant" && pp.type.type === "string")) &&
             !pp.omitEmptyStringCheck
           ) {
-            text += helpers.emitEmptyPathParamCheck(pp, imports, indent)
+            text += helpers.emitEmptyPathParamCheck(pp, imports, indent);
           }
         }
 
@@ -579,11 +579,7 @@ function emitBody(
     } else if (bodyParam.bodyFormat === "Text") {
       imports.add("strings");
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming");
-      const body = helpers.formatValue(
-        helpers.getParamName(bodyParam),
-        bodyParam.type,
-        imports,
-      );
+      const body = helpers.formatValue(helpers.getParamName(bodyParam), bodyParam.type, imports);
       if (go.isRequiredParameter(bodyParam.style)) {
         text += `${indent.get()}body := streaming.NopCloser(strings.NewReader(${body}))\n`;
         text += emitSetBodyWithErrCheck(
