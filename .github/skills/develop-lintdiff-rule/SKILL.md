@@ -65,6 +65,14 @@ subagent.
 The dispatcher must isolate each requested rule before handing it back to the
 user for interactive development.
 
+Derive the canonical rule slug for every branch and worktree from the exact
+Swagger validator rule ID, not from the local TypeSpec rule file name, catalog
+shorthand, or an abbreviated description. Convert the validator rule ID to
+kebab-case and keep all words, for example
+`LatestVersionOfCommonTypesMustBeUsed` becomes
+`latest-version-of-common-types-must-be-used` and `ParametersInPointGet` becomes
+`parameters-in-point-get`.
+
 When the user requests multiple rules, treat them as independent development
 units. For each rule, create a distinct rule branch, typespec-azure worktree,
 and azure-rest-api-specs worktree. Create and verify the worktrees serially to
@@ -73,20 +81,32 @@ separate VS Code windows and run independent top-level worker sessions.
 
 1. Treat the user-supplied branch as the target branch, not as the
    rule-development branch.
-2. Create a new rule-specific branch from the target branch. Its name must
-   identify the lint rule, for example
-   `feature/lintdiff-latest-version-common-types`.
-3. Create a dedicated typespec-azure worktree for that rule branch. If the
-   current worktree was created for the target branch, do not put the rule
-   commit directly on that branch.
+2. Create a new rule-specific branch from the target branch. Its name must use
+   the canonical validator rule slug, for example
+   `feature/lintdiff-latest-version-of-common-types-must-be-used`. If the repo
+   or user supplies a different branch prefix, keep that prefix but keep the
+   suffix as `lintdiff-<validator-rule-slug>`.
+3. Create a dedicated typespec-azure worktree for that rule branch. Its
+   directory name must use the same canonical validator rule slug, for example
+   `C:\dev\worktrees\lintdiff-latest-version-of-common-types-must-be-used`. If a
+   matching clean worktree already exists for the same rule branch, reuse it
+   instead of creating another worktree with a different name. If the current
+   worktree was created for the target branch, do not put the rule commit
+   directly on that branch.
 4. Read the pinned `specsCommit` from
    `packages/typespec-lintdiff/specs/_meta.json`.
-5. Create a separate azure-rest-api-specs worktree at that commit. Concurrent
-   rule-development workers must not share a writable specs checkout because
-   the existing runner links packages and may change the checked-out revision.
+5. Create a separate azure-rest-api-specs worktree at that commit. Its directory
+   name must use the same canonical validator rule slug, for example
+   `C:\dev\worktrees\azure-rest-api-specs-lintdiff-latest-version-of-common-types-must-be-used`.
+   If a local branch is needed for the specs worktree instead of detached HEAD,
+   name it `lintdiff-specs-<validator-rule-slug>` at the pinned `specsCommit`.
+   Concurrent rule-development workers must not share a writable specs checkout
+   because the existing runner links packages and may change the checked-out
+   revision.
 6. Verify both worktrees exist at the expected branch or commit and are clean.
-7. Report the rule ID, target branch, rule branch, both absolute worktree paths,
-   the `code -n` command, and the exact worker-mode invocation.
+7. Report the rule ID, canonical validator rule slug, target branch, rule
+   branch, specs branch when one was created, both absolute worktree paths, the
+   `code -n` command, and the exact worker-mode invocation.
 
 Do not install dependencies, run `compare:setup`, or resolve package links in
 dispatcher mode. Those operations belong to the interactive worker and may
@@ -306,6 +326,9 @@ creating a draft PR.
 - Never develop multiple rule PRs in one worktree.
 - Maintain a one-to-one mapping between each rule, rule branch, typespec-azure
   worktree, azure-rest-api-specs worktree, and top-level worker session.
+- Keep each rule's source branch names and worktree directory names tied to the
+  canonical Swagger validator rule slug so source branches can be linked and
+  prepared worktrees can be found and reused later.
 - Never share a writable specs worktree between concurrent workers.
 - Never allow two specs worktrees to resolve
   `node_modules/tsp-lintdiff-local-linter` to the same rule worktree.

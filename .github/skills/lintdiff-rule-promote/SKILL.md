@@ -31,6 +31,11 @@ official-library PR is prepared in a clean worktree.
   change `packages/typespec-lintdiff` source, fixtures, snapshots, package
   manifests, or docs unless the user explicitly redirects from promotion back to
   rule repair.
+- Use the exact Swagger validator rule ID as the stable naming source for any
+  lintdiff source branch, specs worktree, typespec-azure worktree, and promotion
+  worktree that this workflow creates or reuses. Convert that ID to kebab-case
+  and keep all words, for example `LatestVersionOfCommonTypesMustBeUsed` becomes
+  `latest-version-of-common-types-must-be-used`.
 
 ## Fast path for repeat promotions
 
@@ -40,8 +45,9 @@ needs special investigation:
 1. Run the destination analysis and user confirmation before creating or
    preparing a worktree.
 2. Read checked-in source evidence from the existing source worktree or fetched
-   git refs; do not create a source worktree just to inspect files that can be
-   read with `git show <ref>:<path>`.
+   git refs; prefer source branches and worktrees whose names use the canonical
+   Swagger validator rule slug. Do not create a source worktree just to inspect
+   files that can be read with `git show <ref>:<path>`.
 3. Reuse a clean, already-prepared promotion worktree pattern when available:
    submodules initialized, `mise trust` completed, and dependencies already
    installed. If the worktree is new, perform those setup steps immediately after
@@ -85,6 +91,9 @@ effort.
 1. Resolve the user input to both:
    - the validator rule id, usually `test/fixtures/<ValidatorRuleId>/rule.md`
    - the local TypeSpec rule name, usually `src/rules/<rule-name>.ts`
+   Then derive the canonical validator rule slug from the exact validator rule
+   id. Use this slug, not the local TypeSpec rule file name or destination
+   package, when naming or matching source branches and worktrees.
 2. Inspect the source rule and evidence:
    - `packages/typespec-lintdiff/src/rules/<rule-name>.ts`
    - `packages/typespec-lintdiff/src/linter.ts`
@@ -98,11 +107,17 @@ effort.
 4. Record the lintdiff source branch, commit, and source location in your notes.
    Prefer one of these source-location forms:
    - existing worktree path, when a matching local worktree is already present
+     and its directory name uses the canonical validator rule slug, for example
+     `C:\dev\worktrees\lintdiff-<validator-rule-slug>`
    - fetched ref name plus commit, when reading checked-in source with
-     `git show <ref>:<path>`
+     `git show <ref>:<path>`; prefer refs whose suffix is
+     `lintdiff-<validator-rule-slug>`
    - newly created source worktree path, only when uncommitted local source
      changes are intentionally part of the source of truth or the user
-     explicitly asks for a local source branch
+     explicitly asks for a local source branch. Name the source branch
+     `feature/lintdiff-<validator-rule-slug>` unless the repo or user supplies a
+     different prefix, and name the source worktree
+     `C:\dev\worktrees\lintdiff-<validator-rule-slug>`.
 5. If there are uncommitted source-rule changes, treat the current working tree
    as the source only after making that explicit in the PR description.
 
@@ -150,11 +165,15 @@ Stop until the user selects the destination.
 1. Keep the current lintdiff worktree untouched.
 2. Fetch the Azure main branch (`upstream/main` or `origin/main`, depending on
    local remotes).
-3. Create a new worktree and dedicated branch from the Azure main branch, for
-   example:
-   - `promote-lintdiff-<rule-name>`
-   - `promote-<rule-name>-to-core`
-   - `promote-<rule-name>-to-arm`
+3. Create a new worktree and dedicated branch from the Azure main branch. Use the
+   canonical validator rule slug in both the branch and worktree directory name
+   so the promotion source can be linked and the worktree can be reused later,
+   for example:
+   - `promote-lintdiff-<validator-rule-slug>`
+   - `promote-<validator-rule-slug>-to-core`
+   - `promote-<validator-rule-slug>-to-arm`
+   A matching worktree directory should use the same slug, for example
+   `C:\dev\worktrees\promote-lintdiff-<validator-rule-slug>`.
 4. Initialize repository prerequisites in the new worktree before installing or
    validating:
    - run `git submodule update --init` so the `core/` workspace packages such
@@ -391,10 +410,11 @@ It must include:
   and any known validator defects, stale maps, emitted-occurrence duplication, or
   other discrepancies that should not be copied.
 - **Source TypeSpec lintdiff rule:** identify the source lintdiff rule id, local
-  rule name, source branch, and whether the source worktree had uncommitted rule
-  changes. Link only to the original lintdiff source rule file. Use a
-  branch-based GitHub URL, not a commit-SHA URL. State that the user-marked done
-  source rule was not modified during promotion.
+  rule name, canonical validator rule slug, source branch, source worktree path,
+  and whether the source worktree had uncommitted rule changes. Link only to the
+  original lintdiff source rule file. Use a branch-based GitHub URL, not a
+  commit-SHA URL. State that the user-marked done source rule was not modified
+  during promotion.
 - **Destination analysis:** explain the selected official package, plausible
   alternatives, and the evidence from imports, rule semantics, fixture metadata,
   catalog/report data, and target-library dependency direction.
@@ -433,7 +453,8 @@ new rule could affect existing Azure service specs.
 Produce:
 
 - the destination analysis and user-selected target package
-- a clean worktree branch containing only native-library promotion changes
+- a clean worktree branch, named from the canonical validator rule slug,
+  containing only native-library promotion changes
 - source, tests, docs, rulesets, and change entries in the target packages
 - validation evidence
 - a draft PR link
