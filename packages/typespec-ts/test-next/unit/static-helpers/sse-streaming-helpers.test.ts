@@ -65,7 +65,7 @@ describe("readSseStream", () => {
     expect(items).toEqual([{ event: "delta", data: { id: "a" } }]);
   });
 
-  it("terminates on a named terminal event without yielding its payload", async () => {
+  it("yields a typed named terminal event before terminating", async () => {
     const descriptors: SseEventDescriptor<any>[] = [
       {
         eventName: "delta",
@@ -73,14 +73,22 @@ describe("readSseStream", () => {
         deserialize: (data) => ({ event: "delta", data }),
         contentType: "application/json",
       },
-      { eventName: "done", isTerminal: true },
+      {
+        eventName: "done",
+        isTerminal: true,
+        deserialize: (data) => ({ event: "done", data }),
+        contentType: "application/json",
+      },
     ];
     const items = await collect(descriptors, [
       'event: delta\ndata: {"id":"a"}\n\n',
       'event: done\ndata: {"final":true}\n\n',
       'event: delta\ndata: {"id":"after-done"}\n\n',
     ]);
-    expect(items).toEqual([{ event: "delta", data: { id: "a" } }]);
+    expect(items).toEqual([
+      { event: "delta", data: { id: "a" } },
+      { event: "done", data: { final: true } },
+    ]);
   });
 
   it("ignores an unknown named event rather than decoding it as the unnamed event", async () => {
