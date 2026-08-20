@@ -312,15 +312,49 @@ Commit only the promotion-worktree changes needed for the native-library PR.
 Push the promotion branch to the user's fork and create a draft PR against
 `Azure/typespec-azure` `main`.
 
-The PR description should include:
+Write the PR description as an engineering explanation, not only a change list.
+It must include:
 
-- source lintdiff rule id and source branch/commit
-- selected destination package and why it was chosen
-- what changed during adaptation
-- how fixture coverage was converted to native tests
-- validation commands and results
-- synchronization note: review-driven semantic fixes should land in the
-  lintdiff PR first, then be synced into this native PR
+- **Original Swagger linter:** paste the Swagger rule name and docs/source link
+  from the fixture `rule.md` or validator docs, then list a checklist of every
+  specific check the original rule performs.
+- **How the Swagger linter works:** explain the Swagger objects it inspects,
+  traversal or lookup strategy, conditions and exemptions, diagnostic locations,
+  and any known validator defects, stale maps, emitted-occurrence duplication, or
+  other discrepancies that should not be copied.
+- **Source TypeSpec lintdiff rule:** identify the source lintdiff rule id, local
+  rule name, source branch/commit, and whether the source worktree had
+  uncommitted rule changes. Link to the original lintdiff source rule file,
+  fixture `rule.md`, relevant fixture `main.tsp` files, and any source tests or
+  docs being referenced. State that the user-marked done source rule was not
+  modified during promotion.
+- **Destination analysis:** explain the selected official package, plausible
+  alternatives, and the evidence from imports, rule semantics, fixture metadata,
+  catalog/report data, and target-library dependency direction.
+- **How the promoted TypeSpec linter works:** describe the target package rule
+  implementation, semantic targets inspected, important compiler or library APIs
+  used, version/projection handling, diagnostic targeting and deduplication
+  decisions, and any intentional adaptation from the lintdiff source.
+- **Fixture-to-native test mapping:** explain how each relevant lintdiff fixture
+  or semantic branch was converted into native `vitest` coverage, including
+  compliant cases and any review-regression tests. Link to the original fixture
+  files and the promoted native test file when referring to them. Do not claim
+  copied snapshot parity when snapshots were not copied.
+- **Migration evidence:** link directly to the rule's `migration.md` for the
+  declared focused tests, real-service project comparison, latest full-corpus
+  counts, one-sided project explanations, compile failures, and remaining
+  uncertainty. Do not duplicate the detailed migration table or corpus
+  declaration in the PR description when `migration.md` already contains it.
+- **Validation:** list validation commands and results. If lintdiff harness
+  validation could not run because external validator inputs were missing, state
+  that blocker explicitly.
+- **Promotion sync policy:** semantic gaps found after promotion should block the
+  promotion PR until the user explicitly reopens lintdiff repair; do not describe
+  unapproved source-rule edits as part of the promotion flow.
+
+Prefer concrete examples, project names, and before/after evidence. Avoid a
+generic bullet such as "promote lint rule" without explaining the actual rule
+behavior and why the destination package is correct.
 
 After the draft PR exists, apply or ask for the `int:azure-specs` label when the
 new rule could affect existing Azure service specs.

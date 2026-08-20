@@ -100,11 +100,11 @@ its supplied worktrees:
 1. Ensure the specs worktree is clean and install its existing dependencies.
 2. Prepare the fixture comparison harness. Either:
    - run `pnpm --dir packages/typespec-lintdiff compare:setup -- --specs-repo
-     <isolated-specs-worktree>`, or
+<isolated-specs-worktree>`, or
    - set and verify `LINTDIFF_VALIDATOR_ROOT` and `LINTDIFF_COMMON_TYPES`
      against existing local checkouts.
-   Do not assume a fresh rule worktree already contains
-   `test/azure-openapi-validator` or `test/common-types`.
+     Do not assume a fresh rule worktree already contains
+     `test/azure-openapi-validator` or `test/common-types`.
 3. Verify that the specs worktree's local
    `node_modules/tsp-lintdiff-local-linter` resolves directly to the supplied
    typespec-azure worktree. `compare:setup` uses a shared global npm link, so a
@@ -285,17 +285,11 @@ creating a draft PR.
      targets inspected, important compiler or library APIs used,
      version/projection handling, diagnostic targeting and deduplication
      decisions, and how these choices match the intended Swagger behavior.
-   - **Why the TypeSpec rule changed:** describe the former TypeSpec behavior,
-     concrete real-service misses or false positives, and the evidence proving
-     these are semantic rule gaps rather than report-population or
-     validator-data artifacts.
    - **Migration evidence:** link directly to the rule's `migration.md` for the
      declared focused tests, real-service project comparison, latest full-corpus
      counts, one-sided project explanations, compile failures, and remaining
      uncertainty. Do not duplicate the detailed migration table or corpus
      declaration in the PR description when `migration.md` already contains it.
-   - **PR scope:** confirm generated coverage files are excluded and identify
-     the rule-related files included.
 7. Prefer concrete examples, project names, and before/after evidence. Avoid a
    generic bullet such as “improve parity” without explaining the actual
    missing semantic behavior.
@@ -304,16 +298,16 @@ creating a draft PR.
 ## Guardrails
 
 - In dispatcher mode, the current session only creates and verifies branches
-   and worktrees and reports handoff commands. It must not perform setup or rule
-   development and must not launch development subagents.
+  and worktrees and reports handoff commands. It must not perform setup or rule
+  development and must not launch development subagents.
 - Never develop multiple rule PRs in one worktree.
 - Maintain a one-to-one mapping between each rule, rule branch, typespec-azure
-   worktree, azure-rest-api-specs worktree, and top-level worker session.
+  worktree, azure-rest-api-specs worktree, and top-level worker session.
 - Never share a writable specs worktree between concurrent workers.
 - Never allow two specs worktrees to resolve
-   `node_modules/tsp-lintdiff-local-linter` to the same rule worktree.
+  `node_modules/tsp-lintdiff-local-linter` to the same rule worktree.
 - Worker mode must reuse and verify the supplied worktrees; it must not create
-   replacements or dispatch another agent to own the complete workflow.
+  replacements or dispatch another agent to own the complete workflow.
 - Stop if either worktree has unrelated changes before the workflow starts.
 - Surface compile, projection, linking, and corpus failures explicitly.
 - Do not silently omit failed projects from the conclusion.
@@ -328,7 +322,7 @@ creating a draft PR.
 Dispatcher mode returns only:
 
 - per-rule preparation status, target branch, rule branch, and both absolute
-   worktree paths
+  worktree paths
 - the `code -n` command and exact worker-mode invocation for every rule
 - any branch or worktree preparation failure that prevents handoff
 
