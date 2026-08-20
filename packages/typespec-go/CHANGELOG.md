@@ -11,7 +11,6 @@
 
 ### Bug Fixes
 
-- [#5189](https://github.com/Azure/typespec-azure/pull/5189) add spector test cases except union cases
 - [#5219](https://github.com/Azure/typespec-azure/pull/5219) Honor `@encode(string)` when serializing and deserializing boolean model properties.
 - [#5238](https://github.com/Azure/typespec-azure/pull/5238) Format text request body values as strings before creating readers.
 - [#5235](https://github.com/Azure/typespec-azure/pull/5235) Generate fake servers for operations with path-based API versions and additional path parameters.
