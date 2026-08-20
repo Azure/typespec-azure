@@ -1,5 +1,24 @@
 # Release History
 
+## 0.17.0
+
+### Features
+
+- [#5261](https://github.com/Azure/typespec-azure/pull/5261) Add emit-content-type-header emitter option.
+- [#5198](https://github.com/Azure/typespec-azure/pull/5198) Add support for paged operations with next links that are parameterized or relative URLs.
+- [#5245](https://github.com/Azure/typespec-azure/pull/5245) Added support for tsp non-discriminated unions.
+- [#5152](https://github.com/Azure/typespec-azure/pull/5152) Support array encoding decorators.
+
+### Bug Fixes
+
+- [#5189](https://github.com/Azure/typespec-azure/pull/5189) add spector test cases except union cases
+- [#5219](https://github.com/Azure/typespec-azure/pull/5219) Honor `@encode(string)` when serializing and deserializing boolean model properties.
+- [#5238](https://github.com/Azure/typespec-azure/pull/5238) Format text request body values as strings before creating readers.
+- [#5235](https://github.com/Azure/typespec-azure/pull/5235) Generate fake servers for operations with path-based API versions and additional path parameters.
+- [#5151](https://github.com/Azure/typespec-azure/pull/5151) Honor `ClientOptions.APIVersion` for API versions emitted in operation paths.
+- [#5220](https://github.com/Azure/typespec-azure/pull/5220) Generate scalar `x-ms-meta` request and response headers without treating them as metadata maps.
+
+
 ## 0.16.0
 
 ### Features
