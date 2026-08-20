@@ -167,7 +167,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   const diagnostics = createDiagnosticCollector();
 
   const baseServiceMethod = diagnostics.pipe(
-    getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
+    getSdkBasicServiceMethod<TServiceOperation>(context, operation, client, false),
   );
 
   // If the response body type itself is nullable (e.g., {@body body: Type | null}), unwrap it for paging/LRO processing
@@ -327,7 +327,10 @@ export function getPropertySegmentsFromModelOrParameters(
   source: SdkModelType | SdkMethodParameter[],
   predicate: (property: SdkMethodParameter | SdkModelPropertyType) => boolean,
 ): (SdkMethodParameter | SdkModelPropertyType)[] | undefined {
-  const queue: { model: SdkModelType; path: (SdkMethodParameter | SdkModelPropertyType)[] }[] = [];
+  const queue: {
+    model: SdkModelType;
+    path: (SdkMethodParameter | SdkModelPropertyType)[];
+  }[] = [];
 
   if (!Array.isArray(source)) {
     if (source.baseModel) {
@@ -607,8 +610,12 @@ function getSdkMethodResponse(
   operation: Operation,
   sdkOperation: SdkServiceOperation,
   client: SdkClientType<SdkServiceOperation>,
+  useResponseOverride = true,
 ): SdkMethodResponse {
   const responses = sdkOperation.responses;
+  const responseOverride = useResponseOverride
+    ? getOverriddenClientMethod(context, operation)?.returnType
+    : undefined;
 
   const allResponseBodies: SdkType[] = [];
   let containsResponseWithoutBody = false;
@@ -622,7 +629,11 @@ function getSdkMethodResponse(
 
   const responseTypes = new Set<string>(allResponseBodies.map((x) => getHashForType(x)));
   let type: SdkType | undefined = undefined;
-  if (getResponseAsBool(context, operation)) {
+  if (responseOverride && isNeverOrVoidType(responseOverride)) {
+    type = undefined;
+  } else if (responseOverride) {
+    type = ignoreDiagnostics(getClientTypeWithDiagnostics(context, responseOverride, operation));
+  } else if (getResponseAsBool(context, operation)) {
     type = getSdkBuiltInType(context, $(context.program).builtin.boolean);
   } else {
     if (responseTypes.size > 1) {
@@ -678,6 +689,7 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
   context: TCGCContext,
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
+  useResponseOverride = true,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const methodParameters: SdkMethodParameter[] = [];
@@ -722,7 +734,13 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
   const serviceOperation = diagnostics.pipe(
     getSdkServiceOperation<TServiceOperation>(context, operation, methodParameters, client),
   );
-  const response = getSdkMethodResponse(context, operation, serviceOperation, client);
+  const response = getSdkMethodResponse(
+    context,
+    operation,
+    serviceOperation,
+    client,
+    useResponseOverride,
+  );
   const name = getLibraryName(context, operation);
   return diagnostics.wrap({
     __raw: operation,
@@ -749,12 +767,13 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
-  const lro = getTcgcLroMetadata(context, operation, client);
+  const clientOperation = getOverriddenClientMethod(context, operation) ?? operation;
+  const lro = getTcgcLroMetadata(context, clientOperation, client);
   // `@disablePageable` disables paging even for operations with @list
-  const pagingDisabled = getDisablePageable(context, operation);
+  const pagingDisabled = getDisablePageable(context, clientOperation);
   const paging =
     !pagingDisabled &&
-    (isList(context.program, operation) || getMarkAsPageable(context, operation));
+    (isList(context.program, clientOperation) || getMarkAsPageable(context, clientOperation));
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);
   } else if (paging) {
