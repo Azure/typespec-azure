@@ -64,24 +64,24 @@ extern dec clientName(target: unknown, rename: valueof string, scope?: valueof s
  * When applied to a namespace or interface, it affects all operations within that scope unless explicitly overridden.
  * @param target The target operation, namespace, or interface.
  * @param flag Whether to generate the operation as a convenience method or not.
- * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * @param scope Specifies the Java and/or C# emitters to which the decorator applies. The scope must include `java`, `csharp`, or both. Omitting the scope or excluding both languages produces a warning.
  *
- * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ * **Supported language identifiers:** `csharp` and `java`.
  *
  * **Valid patterns:**
- * - Single language: `"python"`
- * - Multiple languages (comma-separated): `"python, java"`
- * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
+ * - Single language: `"java"`
+ * - Both languages (comma-separated): `"java, csharp"`
+ * - Negation that leaves at least one supported language: `"!java"`
  *
  * @example Apply to a single operation
  * ```typespec
- * @convenientAPI(false)
- * op test: void;
+ * @convenientAPI(false, "java")
+ * op test(): void;
  * ```
  *
  * @example Apply to all operations in an interface
  * ```typespec
- * @convenientAPI(false)
+ * @convenientAPI(false, "java, csharp")
  * interface MyOperations {
  *   op test1(): void;
  *   op test2(): void;
@@ -90,7 +90,7 @@ extern dec clientName(target: unknown, rename: valueof string, scope?: valueof s
  *
  * @example Apply to all operations in a namespace
  * ```typespec
- * @convenientAPI(false)
+ * @convenientAPI(false, "csharp")
  * namespace MyService {
  *   op test1(): void;
  *   op test2(): void;
@@ -108,24 +108,24 @@ extern dec convenientAPI(
  * When applied to a namespace or interface, it affects all operations within that scope unless explicitly overridden.
  * @param target The target operation, namespace, or interface.
  * @param flag Whether to generate the operation as a protocol method or not.
- * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * @param scope Specifies the Java and/or C# emitters to which the decorator applies. The scope must include `java`, `csharp`, or both. Omitting the scope or excluding both languages produces a warning.
  *
- * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ * **Supported language identifiers:** `csharp` and `java`.
  *
  * **Valid patterns:**
- * - Single language: `"python"`
- * - Multiple languages (comma-separated): `"python, java"`
- * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
+ * - Single language: `"csharp"`
+ * - Both languages (comma-separated): `"java, csharp"`
+ * - Negation that leaves at least one supported language: `"!csharp"`
  *
  * @example Apply to a single operation
  * ```typespec
- * @protocolAPI(false)
- * op test: void;
+ * @protocolAPI(false, "csharp")
+ * op test(): void;
  * ```
  *
  * @example Apply to all operations in an interface
  * ```typespec
- * @protocolAPI(false)
+ * @protocolAPI(false, "java, csharp")
  * interface MyOperations {
  *   op test1(): void;
  *   op test2(): void;
@@ -134,7 +134,7 @@ extern dec convenientAPI(
  *
  * @example Apply to all operations in a namespace
  * ```typespec
- * @protocolAPI(false)
+ * @protocolAPI(false, "java")
  * namespace MyService {
  *   op test1(): void;
  *   op test2(): void;
@@ -1179,7 +1179,7 @@ extern dec clientDoc(
  * @param target The type you want to apply the option to.
  * @param name The name of the option (e.g., "enableFeatureFoo").
  * @param value The value of the option. Can be any type; emitters will cast as needed.
- * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * @param scope Specifies the target language emitters to which the decorator applies. Every use must provide an explicit scope; omitting it produces an additional warning.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
  *
