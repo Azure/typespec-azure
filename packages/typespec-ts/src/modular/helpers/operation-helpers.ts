@@ -1131,9 +1131,9 @@ interface StructuredStreamEvent {
   contentType?: string;
   deserializerName?: string;
   /**
-   * True for a non-terminal payload variant whose payload type needs no model deserializer
-   * (e.g. a primitive/scalar/enum). The raw JSON-parsed value (or raw `data` string for
-   * non-JSON content) is yielded as-is via an identity deserializer.
+   * True for a payload variant whose payload type needs no model deserializer (e.g. a
+   * primitive/scalar/enum). The raw JSON-parsed value (or raw `data` string for non-JSON content)
+   * is yielded as-is via an identity deserializer.
    */
   identityDeserialize?: boolean;
 }
@@ -1200,14 +1200,13 @@ export function getStructuredStreamInfo(
         eventName: sseEvent.eventType,
         isTerminal: sseEvent.isTerminalEvent,
       };
-      if (sseEvent.isTerminalEvent) {
-        // Terminal events are consumed by the reader and never yielded, so they need no
-        // deserializer and contribute no type to the item union. A constant payload doubles as
-        // the sentinel `data` value that marks termination for this event name.
-        if (sseEvent.payloadType.kind === "constant") {
-          event.terminalValue = String(sseEvent.payloadType.value);
-        }
+      if (sseEvent.isTerminalEvent && sseEvent.payloadType.kind === "constant") {
+        // A constant terminal payload is a control sentinel (for example `[DONE]`). It is consumed
+        // by the reader, so it needs no deserializer and contributes no type to the item union.
+        event.terminalValue = String(sseEvent.payloadType.value);
       } else {
+        // Typed terminal payloads are application data: deserialize and yield them before the
+        // reader terminates so final response and error models are not lost.
         const deserializerName = buildModelDeserializer(context, sseEvent.payloadType, {
           nameOnly: true,
           skipDiscriminatedUnionSuffix: false,

@@ -11,8 +11,8 @@ export interface SseEventDescriptor<T> {
    */
   eventName?: string;
   /**
-   * Whether receiving this event terminates the stream. Terminal events are consumed by the
-   * reader and never yielded.
+   * Whether receiving this event terminates the stream. Typed terminal payloads are yielded before
+   * termination; constant terminal sentinels are consumed internally.
    */
   isTerminal: boolean;
   /**
@@ -29,8 +29,8 @@ export interface SseEventDescriptor<T> {
   contentType?: string;
   /**
    * Deserializes the event's `data` payload into the target type. The input is the JSON-parsed
-   * value for JSON payloads, or the raw `data` string otherwise. Omitted for terminal events,
-   * whose payloads are never yielded.
+   * value for JSON payloads, or the raw `data` string otherwise. Omitted for constant terminal
+   * sentinels, whose payloads are never yielded.
    */
   deserialize?: (data: any) => T;
 }
@@ -44,10 +44,10 @@ function isJsonContentType(contentType: string | undefined): boolean {
  * event to the matching {@link SseEventDescriptor} by its `event:` name and yielding the
  * deserialized payload.
  *
- * Terminal events end the stream and are never yielded: `@terminalEvent` marks the signal to
- * disconnect, so its payload is not part of the streamed data. A descriptor's `terminalValue`
- * (constant sentinel) is only compared against events with the same `event:` name, so an
- * unrelated event carrying the same `data` cannot end the stream.
+ * Terminal events end the stream. Typed terminal payloads are yielded before disconnecting;
+ * constant `terminalValue` sentinels are consumed internally. A sentinel is only compared against
+ * events with the same `event:` name, so an unrelated event carrying the same `data` cannot end
+ * the stream.
  *
  * Events whose `event:` name matches no descriptor are ignored rather than being decoded by the
  * unnamed descriptor, so an unrecognized event can never be deserialized as the wrong type.
@@ -84,13 +84,12 @@ export async function* readSseStream<T>(
       continue;
     }
 
-    // Terminal events are a disconnect signal, not stream data, so stop before deserializing.
-    // A sentinel value narrows termination to events whose `data` matches it exactly.
-    if (
-      descriptor.isTerminal &&
-      (descriptor.terminalValue === undefined || descriptor.terminalValue === event.data)
-    ) {
-      return;
+    if (descriptor.terminalValue !== undefined) {
+      // Constant sentinels are transport control messages rather than application payloads.
+      if (descriptor.terminalValue === event.data) {
+        return;
+      }
+      continue;
     }
 
     if (descriptor.deserialize) {
@@ -108,6 +107,11 @@ export async function* readSseStream<T>(
         payload = event.data;
       }
       yield descriptor.deserialize(payload);
+    }
+
+    // Typed terminal payloads are application data, so yield them before disconnecting.
+    if (descriptor.isTerminal) {
+      return;
     }
   }
 }

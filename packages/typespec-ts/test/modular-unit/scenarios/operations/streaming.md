@@ -238,11 +238,12 @@ export async function receive(
 }
 ```
 
-# Structured streaming yields raw payloads for non-terminal primitive SSE events
+# Structured streaming yields typed terminal events and primitive SSE payloads
 
 An operation returning `SSEStream<T>` for a `@events` union that mixes a model variant with a
-primitive (scalar) variant generates a `Promise<AsyncIterable<...>>` whose primitive events are
-yielded as-is via an identity deserializer (no model deserializer exists for them).
+primitive (scalar) variant generates a `Promise<AsyncIterable<...>>`. A typed terminal model is
+included in the item union and yielded before iteration stops; primitive events are yielded as-is
+via an identity deserializer (no model deserializer exists for them).
 
 ## TypeSpec
 
@@ -254,6 +255,7 @@ model ResponseCreated {
 @events
 union MixedEvents {
   @Events.contentType("application/json")
+  @terminalEvent
   created: ResponseCreated,
 
   @Events.contentType("text/plain")
@@ -301,7 +303,7 @@ export async function _receiveDeserialize(
   return readSseStream(result.body, [
     {
       eventName: "created",
-      isTerminal: false,
+      isTerminal: true,
       deserialize: (data) => ({ event: "created", data: responseCreatedDeserializer(data) }),
       contentType: "application/json",
     },
