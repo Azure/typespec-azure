@@ -611,7 +611,7 @@ describe("@convenientAPI requires scope diagnostic", () => {
     strictEqual(diagnostics.length, 1);
   });
 
-  it("should warn for negation scope", async () => {
+  it("should not warn for negation scope that still includes java/csharp", async () => {
     const diagnostics = (
       await SimpleTester.diagnose(`
       @service
@@ -624,7 +624,7 @@ describe("@convenientAPI requires scope diagnostic", () => {
       (d) => d.code === "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
     );
 
-    strictEqual(diagnostics.length, 1);
+    strictEqual(diagnostics.length, 0);
   });
 
   it("should warn for negation scope that excludes all valid scopes", async () => {

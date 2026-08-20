@@ -83,6 +83,7 @@ export type ClientNameDecorator = (
  * **Valid patterns:**
  * - Single language: `"java"`
  * - Both languages (comma-separated): `"java, csharp"`
+ * - Negation that leaves at least one supported language: `"!java"`
  * @example Apply to a single operation
  * ```typespec
  * @convenientAPI(false, "java")
@@ -125,6 +126,7 @@ export type ConvenientAPIDecorator = (
  * **Valid patterns:**
  * - Single language: `"csharp"`
  * - Both languages (comma-separated): `"java, csharp"`
+ * - Negation that leaves at least one supported language: `"!csharp"`
  * @example Apply to a single operation
  * ```typespec
  * @protocolAPI(false, "csharp")
