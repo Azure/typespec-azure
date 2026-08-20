@@ -273,22 +273,27 @@ creating a draft PR.
    it ready for review; the user decides when the migration evidence and rule
    behavior are ready for formal review.
 6. Write the PR description as an engineering explanation, not only a change
-   list. It must emphasize:
-   - **Why the TypeSpec rule changed:** describe the Swagger behavior, the
-     former TypeSpec behavior, concrete real-service misses or false positives,
-     and the evidence proving that these are semantic rule gaps rather than
-     report-population or validator-data artifacts.
-   - **How the rule was changed:** describe the semantic targets now inspected,
-     important compiler or library APIs used, version/projection handling,
-     diagnostic targeting and deduplication decisions, and why the design
-     matches intended Swagger behavior.
-   - **What was deliberately not copied:** identify validator defects, stale
-     maps, emitted-occurrence duplication, or other discrepancies excluded
-     from the TypeSpec implementation.
-   - **How the behavior is proven:** summarize focused violating and compliant
-     fixtures, former real-service misses now covered, latest full-corpus
+   list. It must include:
+   - **Original Swagger linter:** paste the Swagger rule name and docs/source
+     link from the fixture `rule.md` or validator docs, then list a checklist of
+     every specific check the original rule performs.
+   - **How the Swagger linter works:** explain the Swagger objects it inspects,
+     traversal or lookup strategy, conditions and exemptions, diagnostic
+     locations, and any known validator defects, stale maps, emitted-occurrence
+     duplication, or other discrepancies that should not be copied.
+   - **How the migrated TypeSpec linter works:** describe the TypeSpec semantic
+     targets inspected, important compiler or library APIs used,
+     version/projection handling, diagnostic targeting and deduplication
+     decisions, and how these choices match the intended Swagger behavior.
+   - **Why the TypeSpec rule changed:** describe the former TypeSpec behavior,
+     concrete real-service misses or false positives, and the evidence proving
+     these are semantic rule gaps rather than report-population or
+     validator-data artifacts.
+   - **Migration evidence:** link directly to the rule's `migration.md` for the
+     declared focused tests, real-service project comparison, latest full-corpus
      counts, one-sided project explanations, compile failures, and remaining
-     uncertainty.
+     uncertainty. Do not duplicate the detailed migration table or corpus
+     declaration in the PR description when `migration.md` already contains it.
    - **PR scope:** confirm generated coverage files are excluded and identify
      the rule-related files included.
 7. Prefer concrete examples, project names, and before/after evidence. Avoid a
