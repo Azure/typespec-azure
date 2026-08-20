@@ -272,7 +272,10 @@ creating a draft PR.
    rule branch as head and the user-supplied target branch as base. Do not mark
    it ready for review; the user decides when the migration evidence and rule
    behavior are ready for formal review.
-6. Write the PR description as an engineering explanation, not only a change
+6. Set the PR title to the exact stable pattern
+   `[Swagger Linter Migration] <ValidatorRuleId> (origin)`, replacing
+   `<ValidatorRuleId>` with the original Swagger validator rule ID.
+7. Write the PR description as an engineering explanation, not only a change
    list. It must include:
    - **Original Swagger linter:** paste the Swagger rule name and docs/source
      link from the fixture `rule.md` or validator docs, then list a checklist of
@@ -290,10 +293,10 @@ creating a draft PR.
      counts, one-sided project explanations, compile failures, and remaining
      uncertainty. Do not duplicate the detailed migration table or corpus
      declaration in the PR description when `migration.md` already contains it.
-7. Prefer concrete examples, project names, and before/after evidence. Avoid a
+8. Prefer concrete examples, project names, and before/after evidence. Avoid a
    generic bullet such as “improve parity” without explaining the actual
    missing semantic behavior.
-8. Return the PR URL as the rule's final workflow result.
+9. Return the PR URL as the rule's final workflow result.
 
 ## Guardrails
 

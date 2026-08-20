@@ -43,9 +43,9 @@ needs special investigation:
    submodules initialized, `mise trust` completed, and dependencies already
    installed. If the worktree is new, perform those setup steps immediately after
    creation and before code edits.
-3. Check lintdiff harness prerequisites up front. If the external validator
-   checkout is absent, do not spend time trying to update snapshots; record the
-   blocker and use source package build plus native target tests for validation.
+3. Do not run the lintdiff harness during promotion. The done rule's
+   `migration.md` is the source of migration evidence; use source package build
+   plus native target tests for promotion validation.
 4. Convert fixture coverage with the standard mapping in step 5 instead of
    copying snapshots or recreating the full harness layout.
 5. Run a focused review after the native rule and tests compile, before broad
@@ -71,9 +71,8 @@ needs special investigation:
    - `packages/typespec-lintdiff/docs/validate-report.md`
    - `packages/typespec-lintdiff/catalog/catalog.json` and
      `catalog/validator-rule-metadata.json` when present
-3. Before running the lintdiff harness, check whether
-   `LINTDIFF_VALIDATOR_ROOT` or `test/azure-openapi-validator` is available.
-   Missing harness inputs are an environment blocker, not a rule failure.
+3. Do not run lintdiff harness validation as part of promotion; rely on the
+   done rule's checked-in migration evidence.
 4. Record the lintdiff source branch, commit, and worktree path in your notes.
    If there are uncommitted source-rule changes, treat the current working tree
    as the source only after making that explicit in the PR description.
@@ -285,16 +284,9 @@ promotion. For every review or validation finding, classify it before editing:
 - **pre-existing or environmental issue**: record the evidence and do not change
   unrelated code
 
-When validating `packages/typespec-lintdiff`, confirm the migration harness
-inputs are present before assuming a rule failure:
-
-- `LINTDIFF_VALIDATOR_ROOT` or `test/azure-openapi-validator` must point to an
-  `azure-openapi-validator` source checkout; npm packages do not include the
-  source files the harness reads for metadata
-- `LINTDIFF_COMMON_TYPES` may also be required for corpus-style validation
-- if those inputs are absent, run the package build and any native tests you can,
-  then report the missing external input explicitly instead of fabricating
-  snapshots
+Do not run the lintdiff migration harness during promotion. Harness validation
+belongs to the lintdiff development or repair workflow before the user marks the
+rule done.
 
 ### 10. Review, commit, push, and create a draft PR
 
@@ -312,6 +304,10 @@ Commit only the promotion-worktree changes needed for the native-library PR.
 Push the promotion branch to the user's fork and create a draft PR against
 `Azure/typespec-azure` `main`.
 
+Use this stable PR title pattern:
+
+- `[Swagger Linter Migration] <ValidatorRuleId>`
+
 Write the PR description as an engineering explanation, not only a change list.
 It must include:
 
@@ -323,11 +319,10 @@ It must include:
   and any known validator defects, stale maps, emitted-occurrence duplication, or
   other discrepancies that should not be copied.
 - **Source TypeSpec lintdiff rule:** identify the source lintdiff rule id, local
-  rule name, source branch/commit, and whether the source worktree had
-  uncommitted rule changes. Link to the original lintdiff source rule file,
-  fixture `rule.md`, relevant fixture `main.tsp` files, and any source tests or
-  docs being referenced. State that the user-marked done source rule was not
-  modified during promotion.
+  rule name, source branch, and whether the source worktree had uncommitted rule
+  changes. Link only to the original lintdiff source rule file. Use a
+  branch-based GitHub URL, not a commit-SHA URL. State that the user-marked done
+  source rule was not modified during promotion.
 - **Destination analysis:** explain the selected official package, plausible
   alternatives, and the evidence from imports, rule semantics, fixture metadata,
   catalog/report data, and target-library dependency direction.
@@ -337,17 +332,19 @@ It must include:
   decisions, and any intentional adaptation from the lintdiff source.
 - **Fixture-to-native test mapping:** explain how each relevant lintdiff fixture
   or semantic branch was converted into native `vitest` coverage, including
-  compliant cases and any review-regression tests. Link to the original fixture
-  files and the promoted native test file when referring to them. Do not claim
-  copied snapshot parity when snapshots were not copied.
+  compliant cases and any review-regression tests. Link each fixture name to its
+  original fixture file with a branch-based GitHub URL, for example
+  `[boolean-property](<http-link>) -> emits warning for boolean model properties`.
+  Do not paste a promoted native test file link, because that file is already in
+  the PR. Do not claim copied snapshot parity when snapshots were not copied.
 - **Migration evidence:** link directly to the rule's `migration.md` for the
   declared focused tests, real-service project comparison, latest full-corpus
   counts, one-sided project explanations, compile failures, and remaining
   uncertainty. Do not duplicate the detailed migration table or corpus
   declaration in the PR description when `migration.md` already contains it.
-- **Validation:** list validation commands and results. If lintdiff harness
-  validation could not run because external validator inputs were missing, state
-  that blocker explicitly.
+- **Validation blocker:** include this section only when required native
+  promotion validation is blocked or incomplete. Do not mention skipped lintdiff
+  harness validation as a blocker; the harness is not part of promotion.
 - **Promotion sync policy:** semantic gaps found after promotion should block the
   promotion PR until the user explicitly reopens lintdiff repair; do not describe
   unapproved source-rule edits as part of the promotion flow.
