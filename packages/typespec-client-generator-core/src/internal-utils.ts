@@ -1047,7 +1047,10 @@ export function resolveApiVersionForService(
   }
   // Map case: map each service namespace's full name or nested segments to a version.
   if (serviceNamespace === undefined) return undefined;
-  const version = resolveApiVersionFromServiceMap(config, getNamespaceFullName(serviceNamespace));
+  const version = resolveApiVersionFromServiceMap(
+    config as ApiVersionServiceMap,
+    getNamespaceFullName(serviceNamespace),
+  );
   // Multi-service packages do not support `all`; fall back to the latest version.
   if (version === "all" && isMultiService) return undefined;
   return version;
