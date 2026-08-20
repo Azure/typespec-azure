@@ -71,7 +71,6 @@ extern dec clientName(target: unknown, rename: valueof string, scope?: valueof s
  * **Valid patterns:**
  * - Single language: `"java"`
  * - Both languages (comma-separated): `"java, csharp"`
- * - Negation that leaves at least one supported language: `"!java"`
  *
  * @example Apply to a single operation
  * ```typespec
@@ -115,7 +114,6 @@ extern dec convenientAPI(
  * **Valid patterns:**
  * - Single language: `"csharp"`
  * - Both languages (comma-separated): `"java, csharp"`
- * - Negation that leaves at least one supported language: `"!csharp"`
  *
  * @example Apply to a single operation
  * ```typespec

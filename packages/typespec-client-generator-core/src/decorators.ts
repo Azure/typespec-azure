@@ -429,26 +429,19 @@ function validateJavaCsharpScope(
 
       const [negationScopes, positiveScopes] = parseScopes(scope);
 
-      // Negation scopes like "!(python)" implicitly include java/csharp, so they're valid.
-      // But if ALL valid scopes are negated, it's invalid.
       if (negationScopes && negationScopes.length > 0) {
-        const allValidNegated = VALID_SCOPES.every((s) => negationScopes.includes(s));
-        if (allValidNegated) {
-          return [
-            createDiagnostic({
-              code: "decorator-requires-scope",
-              format: {
-                decoratorName,
-                allowedScopes: `"${VALID_SCOPES.join('" or "')}"`,
-              },
-              target: entity,
-            }),
-          ];
-        }
-        return [];
+        return [
+          createDiagnostic({
+            code: "decorator-requires-scope",
+            format: {
+              decoratorName,
+              allowedScopes: `"${VALID_SCOPES.join('" or "')}"`,
+            },
+            target: entity,
+          }),
+        ];
       }
 
-      // Positive scopes: at least one must be java or csharp
       if (positiveScopes && positiveScopes.length > 0) {
         const hasValidScope = positiveScopes.some((s) => VALID_SCOPES.includes(s));
         if (!hasValidScope) {

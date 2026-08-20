@@ -127,13 +127,17 @@ import { getClientOptions } from "@azure-tools/typespec-client-generator-core";
 // Get one client option from a model
 const sdkModel = context.sdkPackage.models.find((m) => m.name === "MyModel");
 const enableFeatureFoo = getClientOptions(sdkModel, "enableFeatureFoo");
+
+if (enableFeatureFoo === true) {
+  // Generate the feature supported by this emitter.
+}
 ```
 
-The function returns the option value as `unknown`, or `undefined` when the named option isn't present. Call it once for each option key your emitter supports.
+The function returns the option value as `unknown`, or `undefined` when the named option isn't present. Narrow or validate the value before using it, then call it once for each option key your emitter supports.
 
 ### Works with Any Decorated SDK Type
 
-The helper works with any SDK type that has a decorators array:
+The helper works with any decorated SDK type:
 
 ```typescript
 // Models
