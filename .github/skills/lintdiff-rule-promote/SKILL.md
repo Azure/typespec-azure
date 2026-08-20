@@ -39,22 +39,44 @@ needs special investigation:
 
 1. Run the destination analysis and user confirmation before creating or
    preparing a worktree.
-2. Reuse a clean, already-prepared promotion worktree pattern when available:
+2. Read checked-in source evidence from the existing source worktree or fetched
+   git refs; do not create a source worktree just to inspect files that can be
+   read with `git show <ref>:<path>`.
+3. Reuse a clean, already-prepared promotion worktree pattern when available:
    submodules initialized, `mise trust` completed, and dependencies already
    installed. If the worktree is new, perform those setup steps immediately after
    creation and before code edits.
-3. Do not run the lintdiff harness during promotion. The done rule's
+4. For a new promotion worktree, install JS dependencies without unrelated
+   package lifecycle scripts first: `pnpm install --ignore-scripts`. Run a full
+   `pnpm install` only when the target validation actually needs lifecycle
+   outputs.
+5. Do not run the lintdiff harness during promotion. The done rule's
    `migration.md` is the source of migration evidence; use source package build
    plus native target tests for promotion validation.
-4. Convert fixture coverage with the standard mapping in step 5 instead of
+6. Convert fixture coverage with the standard mapping in step 5 instead of
    copying snapshots or recreating the full harness layout.
-5. Run a focused review after the native rule and tests compile, before broad
+7. In a fresh worktree, build the target package dependency closure once before
+   running `vitest` directly; otherwise tests may fail only because workspace
+   packages such as `@typespec/compiler` have no `dist` output yet.
+8. Run a focused review after the native rule and tests compile, before broad
    package validation. If the review finds a source-semantic issue, stop and
    report that promotion is blocked by a source-rule gap; do not repair the
    lintdiff source as part of promotion.
-6. Validate in this order: focused rule test, affected package build/lint,
-   docs regeneration, rulesets build/test, affected package test. Escalate to
-   broader validation only when the touched surface or a failure requires it.
+9. Validate in this order: one-time dependency-closure build if needed, focused
+   rule test, affected package build/lint, docs regeneration, rulesets
+   build/test, affected package test. Escalate to broader validation only when
+   the touched surface or a failure requires it.
+10. Run `pnpm validate:pr` with a bounded wait. If it makes no progress for
+    several minutes after an already-passed narrow validation set, stop it,
+    classify it as an environmental/pre-existing validation blocker, and include
+    the evidence in the PR instead of waiting indefinitely.
+
+`pnpm validate:pr` is intentionally broad: it fetches/checks the branch, then
+runs full-repo build, test, lint, format check, spelling check, docs regen,
+changeset validation, and diff hygiene. It is not affected-file-aware except for
+the changeset and final diff checks. For promotion PRs, prefer the targeted
+validation commands below and only use bounded `validate:pr` as a final best
+effort.
 
 ## Process
 
@@ -73,8 +95,15 @@ needs special investigation:
      `catalog/validator-rule-metadata.json` when present
 3. Do not run lintdiff harness validation as part of promotion; rely on the
    done rule's checked-in migration evidence.
-4. Record the lintdiff source branch, commit, and worktree path in your notes.
-   If there are uncommitted source-rule changes, treat the current working tree
+4. Record the lintdiff source branch, commit, and source location in your notes.
+   Prefer one of these source-location forms:
+   - existing worktree path, when a matching local worktree is already present
+   - fetched ref name plus commit, when reading checked-in source with
+     `git show <ref>:<path>`
+   - newly created source worktree path, only when uncommitted local source
+     changes are intentionally part of the source of truth or the user
+     explicitly asks for a local source branch
+5. If there are uncommitted source-rule changes, treat the current working tree
    as the source only after making that explicit in the PR description.
 
 ### 2. Recommend the destination library, then wait for the user's choice
@@ -132,6 +161,11 @@ Stop until the user selects the destination.
      as `@typespec/compiler` are present
    - run `mise trust` and use `mise exec --` for `pnpm` commands when mise is
      available
+   - if dependencies are not installed, first run
+     `mise exec -- pnpm install --ignore-scripts` to avoid unrelated workspace
+     lifecycle setup such as Python package preparation; run full
+     `mise exec -- pnpm install` only if a later target validation proves those
+     scripts are required
    - prefer reusing an already-prepared clean promotion worktree only if it has
      no uncommitted or unrelated changes and is based on the requested main
      branch
@@ -257,6 +291,9 @@ Use the repo's mise-managed toolchain when available.
 
 Optimized validation order:
 
+0. In a fresh worktree, run
+   `pnpm -r --filter "<affected-package>..." build` once before direct `vitest`
+   invocations if workspace package `dist` outputs are missing.
 1. affected rule test file
 2. affected package build
 3. affected package lint, if available
@@ -264,15 +301,50 @@ Optimized validation order:
 5. `@azure-tools/typespec-azure-rulesets` build and test when rulesets changed
 6. affected package test
 
+For ARM rule promotion, use this command set as the default targeted validation
+loop, replacing `<rule-name>` with the promoted rule file stem:
+
+```bash
+pnpm -r --filter "@azure-tools/typespec-azure-resource-manager..." build
+pnpm --filter @azure-tools/typespec-azure-resource-manager exec vitest run test/rules/<rule-name>.test.ts
+pnpm --filter @azure-tools/typespec-azure-resource-manager build
+pnpm --filter @azure-tools/typespec-azure-resource-manager lint
+pnpm --filter @azure-tools/typespec-azure-resource-manager regen-docs
+pnpm --filter @azure-tools/typespec-azure-rulesets build
+pnpm --filter @azure-tools/typespec-azure-rulesets test
+pnpm --filter @azure-tools/typespec-azure-resource-manager test
+git diff --check
+```
+
+For core rule promotion, use the same shape with the core package:
+
+```bash
+pnpm -r --filter "@azure-tools/typespec-azure-core..." build
+pnpm --filter @azure-tools/typespec-azure-core exec vitest run test/rules/<rule-name>.test.ts
+pnpm --filter @azure-tools/typespec-azure-core build
+pnpm --filter @azure-tools/typespec-azure-core lint
+pnpm --filter @azure-tools/typespec-azure-core regen-docs
+pnpm --filter @azure-tools/typespec-azure-rulesets build
+pnpm --filter @azure-tools/typespec-azure-rulesets test
+pnpm --filter @azure-tools/typespec-azure-core test
+git diff --check
+```
+
 Run a focused code review after steps 1-2 pass and before steps 3-6 when the
 rule logic is non-trivial. This catches semantic gaps before expensive full
 package validation.
 
-Before PR creation, run the repo's pre-PR validation if available:
+Before PR creation, run the repo's pre-PR validation if available, but bound the
+wait and do not let it consume the rest of the session after the required narrow
+validation has already passed:
 
 ```bash
 pnpm validate:pr
 ```
+
+If `validate:pr` stalls with no new output for several minutes, stop it and
+include a **Validation blocker** section in the PR body with the last observed
+step, elapsed time, and the successful narrower validations.
 
 If validation reveals a semantic issue, do not edit the lintdiff source during
 promotion. For every review or validation finding, classify it before editing:
@@ -366,3 +438,24 @@ Produce:
 - validation evidence
 - a draft PR link
 - any sync notes for the corresponding lintdiff source PR
+
+## Post-run process review
+
+After the promotion PR is created and the deliverable is complete, briefly
+review the run before the final user response. Capture concrete suggestions for
+the next promotion, especially:
+
+- steps that cost unexpected time and how to avoid or parallelize them next time
+- commands that were too broad, stalled, or failed for environmental reasons
+- narrower build, lint, test, docs, or PR-validation commands that proved
+  sufficient
+- setup shortcuts that are safe to reuse, such as prepared worktrees, initialized
+  submodules, installed dependencies, or already-built package dependency
+  closures
+- test-conversion patterns that made fixture coverage easier or more reliable
+- skill instructions that should be updated based on the observed run
+
+Print the suggestions in the final handoff and ask the user whether any should
+be adopted into this skill. Do not update the skill automatically from the
+post-run review; only make skill changes after the user explicitly approves the
+specific suggestion(s).
