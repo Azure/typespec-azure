@@ -130,7 +130,10 @@ export function createBillingBenefits(
   const endpointUrl = options.endpoint ?? String(endpointParam);
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
 
@@ -183,12 +186,13 @@ export function _getSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     headers: {
       ...(context.expand !== undefined ? { $expand: context.expand } : {}),
       accept: "application/json",
-      ...options.requestOptions?.headers,
+      ...requestParameters.headers,
     },
   });
 }
@@ -359,7 +363,10 @@ export function createBillingBenefits(
   const endpointUrl = options.endpoint ?? String(endpointParam);
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
 
@@ -412,12 +419,13 @@ export function _getSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     headers: {
       ...(context.expand !== undefined ? { $expand: context.expand } : {}),
       accept: "application/json",
-      ...options.requestOptions?.headers,
+      ...requestParameters.headers,
     },
   });
 }

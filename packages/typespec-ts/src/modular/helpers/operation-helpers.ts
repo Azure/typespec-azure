@@ -126,6 +126,7 @@ export function getSendPrivateFunction(
   const operationMethod = operation.operation.verb.toLowerCase();
   const optionalParamName = getOptionalParamsName(parameters);
   const statements: string[] = [];
+  const parameterNames = new Set(parameters.map((p) => p.name));
   let pathStr = `"${operationPath}"`;
   const urlTemplateParams = [
     ...getPathParameters(operation),
@@ -133,8 +134,7 @@ export function getSendPrivateFunction(
   ];
   if (urlTemplateParams.length > 0) {
     // Generate a unique local variable name that doesn't conflict with parameter names
-    const paramNames = new Set(parameters.map((p) => p.name));
-    const pathVarName = generateLocallyUniqueName("path", paramNames);
+    const pathVarName = generateLocallyUniqueName("path", parameterNames);
     const includeRootSlash = client ? getClientOptions(client, "includeRootSlash") !== false : true;
 
     const uriTemplate = includeRootSlash
@@ -149,12 +149,26 @@ export function getSendPrivateFunction(
     pathStr = pathVarName;
   }
 
+  const requestParametersName = generateLocallyUniqueName("requestParameters", parameterNames);
+  const headerAndBodyParameters = getHeaderAndBodyParameters(
+    dpgContext,
+    operation,
+    optionalParamName,
+    requestParametersName,
+  );
+  const operationOptionsExpression = `${resolveReference(
+    dependencies.operationOptionsToRequestParameters,
+  )}(${optionalParamName})`;
+  const requestParametersExpression = headerAndBodyParameters.hasHeaders
+    ? requestParametersName
+    : operationOptionsExpression;
+
+  if (headerAndBodyParameters.hasHeaders) {
+    statements.push(`const ${requestParametersName} = ${operationOptionsExpression};`);
+  }
+
   statements.push(
-    `return context.path(${pathStr}).${operationMethod}({...${resolveReference(dependencies.operationOptionsToRequestParameters)}(${optionalParamName}), ${getHeaderAndBodyParameters(
-      dpgContext,
-      operation,
-      optionalParamName,
-    )}});`,
+    `return context.path(${pathStr}).${operationMethod}({...${requestParametersExpression}, ${headerAndBodyParameters.value}});`,
   );
 
   return {
@@ -1413,9 +1427,10 @@ function getHeaderAndBodyParameters(
   dpgContext: SdkContext,
   operation: ServiceOperation,
   optionalParamName: string = "options",
-): string {
+  requestParametersName: string = "requestParameters",
+): { value: string; hasHeaders: boolean } {
   if (!operation.operation.parameters) {
-    return "";
+    return { value: "", hasHeaders: false };
   }
   const operationParameters = operation.operation.parameters.filter((p) => !isContentType(p));
 
@@ -1464,7 +1479,7 @@ function getHeaderAndBodyParameters(
   if (parametersImplementation.header.length) {
     paramStr = `${paramStr}\nheaders: {${parametersImplementation.header
       .map((i) => buildHeaderParameter(dpgContext.program, i.paramMap, i.param, i.paramAccessor))
-      .join(",\n")}, ...${optionalParamName}.requestOptions?.headers },`;
+      .join(",\n")}, ...${requestParametersName}.headers },`;
   }
   if (operation.operation.bodyParam === undefined && parametersImplementation.body.length) {
     paramStr = `${paramStr}\nbody: {${parametersImplementation.body
@@ -1473,7 +1488,7 @@ function getHeaderAndBodyParameters(
   } else if (operation.operation.bodyParam !== undefined) {
     paramStr = `${paramStr}${buildBodyParameter(dpgContext, operation.operation.bodyParam)}`;
   }
-  return paramStr;
+  return { value: paramStr, hasHeaders: parametersImplementation.header.length > 0 };
 }
 
 // Specially handle the type for headers because we only allow string/number/boolean values
