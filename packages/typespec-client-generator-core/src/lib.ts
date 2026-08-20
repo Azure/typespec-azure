@@ -11,7 +11,7 @@ import type {
 } from "./internal-utils.js";
 
 // `api-version` accepts either a string (single service / `latest` / `all`) or a
-// map from service namespace full name to version (multi-service).
+// map from service namespace names or nested namespace segments to versions.
 const apiVersionSchema = {
   oneOf: [
     {
@@ -20,13 +20,22 @@ const apiVersionSchema = {
     },
     {
       type: "object",
-      additionalProperties: { type: "string" },
+      additionalProperties: {
+        oneOf: [
+          { type: "string" },
+          {
+            type: "object",
+            additionalProperties: true,
+            required: [],
+          },
+        ],
+      },
       required: [],
       nullable: true,
     },
   ],
   description:
-    "Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace's full name to its desired version; services not listed default to their latest version.",
+    "Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace to its desired version. Nested namespaces must be represented as nested objects in `tspconfig.yaml`; services not listed default to their latest version.",
 } as any;
 
 export const UnbrandedSdkEmitterOptions = {
