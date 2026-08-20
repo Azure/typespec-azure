@@ -83,7 +83,7 @@ export function buildClientContext(
     .map((p) => {
       return {
         name: getClientParameterName(p),
-        type: getTypeExpression(dpgContext, p.type),
+        type: shouldUseStringApiVersionType(p) ? "string" : getTypeExpression(dpgContext, p.type),
         hasQuestionToken: false,
         docs: getDocsWithKnownVersion(dpgContext, p),
       };
@@ -108,7 +108,7 @@ export function buildClientContext(
     .map((p) => {
       return {
         name: getClientParameterName(p),
-        type: getTypeExpression(dpgContext, p.type),
+        type: shouldUseStringApiVersionType(p) ? "string" : getTypeExpression(dpgContext, p.type),
         hasQuestionToken: true,
         docs: getDocsWithKnownVersion(dpgContext, p),
       };
@@ -129,8 +129,7 @@ export function buildClientContext(
     .map((p) => {
       return {
         name: getClientParameterName(p),
-        type:
-          p.name.toLowerCase() === "apiversion" ? "string" : getTypeExpression(dpgContext, p.type),
+        type: shouldUseStringApiVersionType(p) ? "string" : getTypeExpression(dpgContext, p.type),
         hasQuestionToken: true,
         docs: getDocsWithKnownVersion(dpgContext, p),
       };
@@ -235,7 +234,10 @@ export function buildClientContext(
           : [];
     const apiVersionInEndpoint =
       templateArguments && templateArguments.find((p) => p.isApiVersionParam);
-    if (!apiVersionInEndpoint && apiVersionParam.clientDefaultValue) {
+    if (
+      !apiVersionInEndpoint &&
+      (apiVersionParam.optional || apiVersionParam.clientDefaultValue !== undefined)
+    ) {
       apiVersionStatement += `const ${apiVersionParamName} = options.${apiVersionParamName};`;
     }
   } else {
@@ -296,6 +298,16 @@ export function buildClientContext(
 
   clientContextFile.fixUnusedIdentifiers();
   return clientContextFile;
+}
+
+function shouldUseStringApiVersionType(
+  parameter: SdkMethodParameter | SdkHttpParameter | SdkEndpointParameter | SdkCredentialParameter,
+): boolean {
+  if (!parameter.isApiVersionParam) {
+    return false;
+  }
+  const name = parameter.name.toLowerCase();
+  return name === "apiversion" || name === "serviceversion";
 }
 
 function getDocsWithKnownVersion(
