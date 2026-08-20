@@ -62,6 +62,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/no-override-props": true,
     "@azure-tools/typespec-azure-resource-manager/no-empty-model": true,
     "@azure-tools/typespec-azure-resource-manager/arm-common-types-version": true,
+    "@azure-tools/typespec-azure-resource-manager/latest-version-of-common-types-must-be-used": true,
     "@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-child-resources": true,
     "@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-lifecycle-operations": true,
     "@azure-tools/typespec-azure-resource-manager/use-relationship-required-properties": true,

@@ -25,6 +25,7 @@ import { armResourceProvisioningStateRule } from "./rules/arm-resource-provision
 import { beyondNestingRule } from "./rules/beyond-nesting-levels.js";
 import { envelopePropertiesRules } from "./rules/envelope-properties.js";
 import { improperSubscriptionListOperationRule } from "./rules/improper-subscription-list-operation.js";
+import { latestVersionOfCommonTypesMustBeUsedRule } from "./rules/latest-version-of-common-types-must-be-used.js";
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
@@ -78,6 +79,7 @@ const rules = [
   armResourceInvalidActionVerbRule,
   improperSubscriptionListOperationRule,
   lroLocationHeaderRule,
+  latestVersionOfCommonTypesMustBeUsedRule,
   missingXmsIdentifiersRule,
   noResponseBodyRule,
   operationsInterfaceMissingRule,
