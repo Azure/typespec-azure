@@ -21,7 +21,12 @@ Common-types references must use the latest version available.
 The local ARM TypeSpec lint checks the effective `@armCommonTypesVersion`
 selection on the service namespace or on each service version enum member and
 warns when it is older than the latest version exposed by
-`Azure.ResourceManager.CommonTypes.Versions`.
+`Azure.ResourceManager.CommonTypes.Versions`. When that selection is current,
+it also checks common-type models and parameters reachable from HTTP operations
+and warns when an individual symbol still resolves to an older emitted
+common-types file. That diagnostic explicitly distinguishes the API version's
+latest common-types selection from the specific legacy symbol that must be
+replaced.
 
 ## Authorability Notes
 
@@ -38,3 +43,8 @@ TypeSpec emitter always introduces common-types references such as
 | `latest-common-types`                 | No        | Versioned ARM service uses the latest namespace-level common-types version. |
 | `version-override-older-common-types` | Yes       | A version enum member overrides a latest namespace setting back to `v3`. |
 | `version-override-latest-common-types` | No       | A version enum member overrides an older namespace setting up to the latest version. |
+| `legacy-location-parameter`           | Yes       | A v6 service uses deprecated `LocationParameter`, which resolves to `v5/types.json`. |
+| `legacy-managed-identity`             | Yes       | A v6 service explicitly uses the legacy v4 managed-identity model. |
+| `versioned-legacy-property`           | Yes       | A legacy property added only in the second API version is reported only for that projected version. |
+| `repeated-legacy-reference`           | Yes       | Two operations using the same legacy definition each receive an actionable diagnostic. |
+| `payload-visibility-excludes-legacy`  | No        | Legacy properties excluded from their request or response payload visibility do not produce false-positive diagnostics. |
