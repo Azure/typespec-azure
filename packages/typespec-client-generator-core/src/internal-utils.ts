@@ -70,6 +70,8 @@ import {
   getParamAlias,
 } from "./decorators.js";
 import type {
+  ApiVersionConfig,
+  ApiVersionServiceMap,
   DecoratorInfo,
   ExternalTypeInfo,
   SdkBuiltInType,
@@ -98,7 +100,7 @@ export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
 export interface UnbrandedSdkEmitterOptionsInterface {
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
-  "api-version"?: string | Record<string, string>;
+  "api-version"?: ApiVersionConfig;
   license?: {
     name: string;
     company?: string;
@@ -1016,9 +1018,10 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
  * - When the option is a string: `latest` is a global keyword; any other string
  *   (a specific version or `all`) applies only to the single service case and is
  *   ignored for multi-service packages.
- * - When the option is a record, the version is looked up by the service
- *   namespace's full name. Services that are not listed return `undefined`
- *   (meaning "use the latest version").
+ * - When the option is a map, the version is looked up first by the service
+ *   namespace's full name and then by traversing nested namespace segments.
+ *   Services that are not listed return `undefined` (meaning "use the latest
+ *   version").
  *
  * Multi-service packages do not support the special `all` value (in either the
  * string or the record form); it is ignored and treated as `undefined` (use the
@@ -1042,12 +1045,29 @@ export function resolveApiVersionForService(
     // multi-service packages do not support `all`.
     return isMultiService ? undefined : config;
   }
-  // Record case: map each service namespace's full name to a version.
+  // Map case: map each service namespace's full name or nested segments to a version.
   if (serviceNamespace === undefined) return undefined;
-  const version = config[getNamespaceFullName(serviceNamespace)];
+  const version = resolveApiVersionFromServiceMap(config, getNamespaceFullName(serviceNamespace));
   // Multi-service packages do not support `all`; fall back to the latest version.
   if (version === "all" && isMultiService) return undefined;
   return version;
+}
+
+function resolveApiVersionFromServiceMap(
+  config: ApiVersionServiceMap,
+  namespaceName: string,
+): string | undefined {
+  const flatVersion = config[namespaceName];
+  if (typeof flatVersion === "string") return flatVersion;
+
+  let current: string | ApiVersionServiceMap | undefined = config;
+  for (const segment of namespaceName.split(".")) {
+    if (typeof current !== "object" || current === null || Array.isArray(current)) {
+      return undefined;
+    }
+    current = current[segment];
+  }
+  return typeof current === "string" ? current : undefined;
 }
 
 /**

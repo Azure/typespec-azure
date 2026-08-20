@@ -1,5 +1,8 @@
+import { getDirectoryPath, resolveCompilerOptions } from "@typespec/compiler";
+import { resolveVirtualPath } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
+import { parse } from "yaml";
 import {
   createClientCustomizationInput,
   createSdkContextForTester,
@@ -34,6 +37,84 @@ it("single service with versioning should populate apiVersions map", async () =>
   ok(sdkPackage.metadata.apiVersions);
   strictEqual(sdkPackage.metadata.apiVersions.size, 1);
   strictEqual(sdkPackage.metadata.apiVersions.get("WidgetService"), "v3");
+});
+
+it("supports nested service namespaces in tspconfig.yaml", async () => {
+  const tester = await SimpleBaseTester.createInstance();
+  const spec = createClientCustomizationInput(
+    `
+      @service
+      @versioned(Microsoft.Network.Versions)
+      namespace Microsoft.Network {
+        enum Versions {
+          v1,
+          v2,
+        }
+        op networkTest(): void;
+      }
+
+      @service
+      @versioned(Microsoft.Compute.Versions)
+      namespace Microsoft.Compute {
+        enum Versions {
+          v1,
+          v2,
+        }
+        op computeTest(): void;
+      }
+    `,
+    `
+      @client({
+        name: "CombinedClient",
+        service: [Microsoft.Network, Microsoft.Compute],
+        autoMergeService: true,
+      })
+      namespace Combined;
+    `,
+  );
+  tester.fs.addTypeSpecFile("main.tsp", "");
+  tester.fs.addTypeSpecFile(
+    "tspconfig.yaml",
+    `
+emit:
+  - "@azure-tools/typespec-client-generator-core"
+options:
+  "@azure-tools/typespec-client-generator-core":
+    api-version:
+      Microsoft:
+        Network: v1
+        Compute: v1
+`,
+  );
+
+  const entrypoint = resolveVirtualPath("main.tsp");
+  const [compilerOptions, configDiagnostics] = await resolveCompilerOptions(
+    tester.fs.compilerHost,
+    {
+      cwd: getDirectoryPath(entrypoint),
+      entrypoint,
+    },
+  );
+  strictEqual(configDiagnostics.length, 0);
+
+  const [, diagnostics] = await tester.compileAndDiagnose(spec, {
+    compilerOptions,
+  });
+  strictEqual(
+    diagnostics.length,
+    0,
+    diagnostics.map((diagnostic) => diagnostic.message).join("\n"),
+  );
+
+  const output = [...tester.fs.fs.entries()].find(([path]) =>
+    path.endsWith("tcgc-output.yaml"),
+  )?.[1];
+  ok(output);
+  const sdkPackage = parse(output);
+  deepStrictEqual(sdkPackage.metadata.apiVersions, {
+    "Microsoft.Network": "v1",
+    "Microsoft.Compute": "v1",
+  });
 });
 
 it("multiple services should populate apiVersions map with all services", async () => {
