@@ -488,6 +488,53 @@ export function isMapOfDateTime(
   return { format: paramType.valueType.format, utc: paramType.valueType.utc };
 }
 
+export interface ScalarParseExpression {
+  expression: string;
+  cast?: go.ScalarType;
+}
+
+/**
+ * Returns the expression for parsing a scalar from its string representation.
+ *
+ * @param type the scalar type to parse
+ * @param source the source expression containing the string value
+ * @param imports the import manager currently in scope
+ */
+export function getScalarParseExpression(
+  type: go.ScalarType,
+  source: string,
+  imports: ImportManager,
+): ScalarParseExpression {
+  imports.add("strconv");
+  switch (type) {
+    case "bool":
+      return { expression: `strconv.ParseBool(${source})` };
+    case "float32":
+      return { expression: `strconv.ParseFloat(${source}, 32)`, cast: type };
+    case "float64":
+      return { expression: `strconv.ParseFloat(${source}, 64)` };
+    case "int8":
+      return { expression: `strconv.ParseInt(${source}, 10, 8)`, cast: type };
+    case "int16":
+      return { expression: `strconv.ParseInt(${source}, 10, 16)`, cast: type };
+    case "int32":
+      return { expression: `strconv.ParseInt(${source}, 10, 32)`, cast: type };
+    case "int64":
+      return { expression: `strconv.ParseInt(${source}, 10, 64)` };
+    case "rune":
+      return { expression: `strconv.ParseInt(${source}, 10, 32)`, cast: type };
+    case "byte":
+    case "uint8":
+      return { expression: `strconv.ParseUint(${source}, 10, 8)`, cast: type };
+    case "uint16":
+      return { expression: `strconv.ParseUint(${source}, 10, 16)`, cast: type };
+    case "uint32":
+      return { expression: `strconv.ParseUint(${source}, 10, 32)`, cast: type };
+    case "uint64":
+      return { expression: `strconv.ParseUint(${source}, 10, 64)` };
+  }
+}
+
 export function formatValue(
   paramName: string,
   type: go.WireType,

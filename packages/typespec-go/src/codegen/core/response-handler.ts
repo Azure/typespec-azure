@@ -326,27 +326,16 @@ function emitScalarParsing(
   imports: ImportManager,
   indent: helpers.Indentation,
 ): string {
-  imports.add("strconv");
-  switch (scalar.type) {
-    case "bool":
-      return `${indent.get()}${dst}, err := strconv.ParseBool(${src})\n`;
-    case "float32":
-      return (
-        `${indent.get()}${dst}32, err := strconv.ParseFloat(${src}, 32)\n` +
-        `${indent.get()}${dst} := float32(${dst}32)\n`
-      );
-    case "float64":
-      return `${indent.get()}${dst}, err := strconv.ParseFloat(${src}, 64)\n`;
-    case "int32":
-      return (
-        `${indent.get()}${dst}32, err := strconv.ParseInt(${src}, 10, 32)\n` +
-        `${indent.get()}${dst} := int32(${dst}32)\n`
-      );
-    case "int64":
-      return `${indent.get()}${dst}, err := strconv.ParseInt(${src}, 10, 64)\n`;
-    default:
-      throw new CodegenError("InternalError", `unhandled scalar type ${scalar.type}`);
+  const parse = helpers.getScalarParseExpression(scalar.type, src, imports);
+  if (parse.cast) {
+    const parsed =
+      parse.cast === "float32" || parse.cast === "int32" ? `${dst}32` : `${dst}Parsed`;
+    return (
+      `${indent.get()}${parsed}, err := ${parse.expression}\n` +
+      `${indent.get()}${dst} := ${parse.cast}(${parsed})\n`
+    );
   }
+  return `${indent.get()}${dst}, err := ${parse.expression}\n`;
 }
 
 function isArrayOfDateTime(
