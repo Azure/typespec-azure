@@ -1,13 +1,10 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
-## 0.72.0
-
-### Features
-
-- [#5119](https://github.com/Azure/typespec-azure/pull/5119) Add `decorator-requires-scope` validation that warns when `@convenientAPI` is used without a "java" or "csharp" scope, and when `@clientOption` is used without any scope. This subsumes the previous `client-option-requires-scope` diagnostic.
+## 0.71.2
 
 ### Bug Fixes
 
+- [#5119](https://github.com/Azure/typespec-azure/pull/5119) Add `decorator-requires-scope` validation that warns when `@convenientAPI` is used without a "java" or "csharp" scope, and when `@clientOption` is used without any scope. This subsumes the previous `client-option-requires-scope` diagnostic.
 - [#5268](https://github.com/Azure/typespec-azure/pull/5268) Resolve cross-language definition IDs through `@alternateType`.
 - [#5270](https://github.com/Azure/typespec-azure/pull/5270) Support nested service namespaces in per-service `api-version` configuration.
 
