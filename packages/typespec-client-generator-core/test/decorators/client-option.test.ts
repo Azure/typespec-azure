@@ -193,6 +193,63 @@ describe("@clientOption with getClientOptions getter", () => {
     strictEqual(typeof numberValue, "number");
   });
 
+  it("should support a model reference as the value", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      model ComposedOptions {
+        a: string;
+      }
+
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("composes", ComposedOptions, "csharp")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModel, "SDK model should exist");
+
+    const value = getClientOptions(sdkModel, "composes") as { kind?: string; name?: string };
+    strictEqual(value?.kind, "model");
+    strictEqual(value?.name, "ComposedOptions");
+  });
+
+  it("should preserve customizations, such as @alternateType, on a model reference value", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      @alternateType(string, "csharp")
+      model AlternateOptions {
+        a: string;
+      }
+
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("composes", AlternateOptions, "csharp")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModel, "SDK model should exist");
+
+    const value = getClientOptions(sdkModel, "composes") as { kind?: string };
+    strictEqual(value?.kind, "string");
+    // @alternateType(string) replaces the referenced model with the builtin `string` type
+  });
+
   it("should return client option value for operation", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"

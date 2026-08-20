@@ -1178,7 +1178,9 @@ extern dec clientDoc(
  *
  * @param target The type you want to apply the option to.
  * @param name The name of the option (e.g., "enableFeatureFoo").
- * @param value The value of the option. Can be any type; emitters will cast as needed.
+ * @param value The value of the option. Can be a literal value (string, boolean, number, etc.) or a
+ * reference to a TypeSpec model, in which case the referenced model (including its own decorators,
+ * such as `@alternateType`) is preserved so the scoped emitter can resolve it. Emitters will cast as needed.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
@@ -1196,10 +1198,17 @@ extern dec clientDoc(
  *   prop: string;
  * }
  * ```
+ *
+ * @example Apply an experimental option that references a model
+ * ```typespec
+ * #suppress "@azure-tools/typespec-client-generator-core/client-option" "preview feature for csharp"
+ * @clientOption("composes", OpenAICreateResponseOptions, "csharp")
+ * model FoundryCreateResponseOptions {}
+ * ```
  */
 extern dec clientOption(
   target: unknown,
   name: valueof string,
-  value: valueof unknown,
+  value: unknown | (valueof unknown),
   scope?: valueof string
 );
