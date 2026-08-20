@@ -77,8 +77,8 @@ func TestPageClient_NewListWithParametersPager(t *testing.T) {
 	require.EqualValues(t, 1, pages)
 }
 
-/*func TestPageClient_NewWithParameterizedNextLinkPager(t *testing.T) {
-	client, err := azurepagegroup.NewPageClient("http://localhost:3000", nil)
+func TestPageClient_NewWithParameterizedNextLinkPager(t *testing.T) {
+	client, err := azurepagegroup.NewPageClientWithNoCredential("http://localhost:3000", nil)
 	require.NoError(t, err)
 	pager := client.NewWithParameterizedNextLinkPager("name", &azurepagegroup.PageClientWithParameterizedNextLinkOptions{
 		IncludePending: to.Ptr(true),
@@ -108,10 +108,9 @@ func TestPageClient_NewListWithParametersPager(t *testing.T) {
 		}
 	}
 	require.EqualValues(t, 2, pages)
-}*/
+}
 
-// TODO: runtime.FetcherForNextLink doesn't support relative next link URLs
-/*func TestPageClient_NewWithRelativeNextLinkPager(t *testing.T) {
+func TestPageClient_NewWithRelativeNextLinkPager(t *testing.T) {
 	client, err := azurepagegroup.NewPageClientWithNoCredential("http://localhost:3000", nil)
 	require.NoError(t, err)
 	pager := client.NewWithRelativeNextLinkPager(nil)
@@ -142,4 +141,4 @@ func TestPageClient_NewListWithParametersPager(t *testing.T) {
 		}
 	}
 	require.EqualValues(t, 2, pages)
-}*/
+}

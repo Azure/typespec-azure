@@ -14,7 +14,7 @@ on:
 
 engine:
   id: copilot
-  model: claude-opus-4.8
+model: gpt-5.6-sol
 timeout-minutes: 120
 
 permissions:

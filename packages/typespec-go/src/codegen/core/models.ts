@@ -44,14 +44,20 @@ export function generateModels(
 
   modelText += modelImports.text();
 
-  // structs
+  // populate helpers
   let needsJSONPopulate = false;
-  let needsJSONPopulateTime = false;
-  let needsJSONUnpopulate = false;
-  let needsJSONUnpopulateTime = false;
-  let needsJSONPopulateByteArray = false;
   let needsJSONPopulateAny = false;
+  let needsJSONPopulateAsString = false;
+  let needsJSONPopulateByteArray = false;
   let needsJSONPopulateMultipart = false;
+  let needsJSONPopulateStringArray = false;
+  let needsJSONPopulateTime = false;
+
+  // unpopulate helpers
+  let needsJSONUnpopulate = false;
+  let needsJSONUnpopulateFromString = false;
+  let needsJSONUnpopulateStringArray = false;
+  let needsJSONUnpopulateTime = false;
   let serdeTextBody = "";
   for (const modelDef of modelDefs) {
     modelText += modelDef.text(indent);
@@ -75,26 +81,42 @@ export function generateModels(
       }
       serdeTextBody += method.text;
     }
+
+    // select populate helpers to emit
     if (modelDef.SerDe.needsJSONPopulate) {
       needsJSONPopulate = true;
     }
-    if (modelDef.SerDe.needsJSONPopulateTime) {
-      needsJSONPopulateTime = true;
-    }
-    if (modelDef.SerDe.needsJSONUnpopulate) {
-      needsJSONUnpopulate = true;
-    }
-    if (modelDef.SerDe.needsJSONUnpopulateTime) {
-      needsJSONUnpopulateTime = true;
-    }
-    if (modelDef.SerDe.needsJSONPopulateByteArray) {
-      needsJSONPopulateByteArray = true;
+    if (modelDef.SerDe.needsJSONPopulateAsString) {
+      needsJSONPopulateAsString = true;
     }
     if (modelDef.SerDe.needsJSONPopulateAny) {
       needsJSONPopulateAny = true;
     }
+    if (modelDef.SerDe.needsJSONPopulateByteArray) {
+      needsJSONPopulateByteArray = true;
+    }
     if (modelDef.SerDe.needsJSONPopulateMultipart) {
       needsJSONPopulateMultipart = true;
+    }
+    if (modelDef.SerDe.needsJSONPopulateStringArray) {
+      needsJSONPopulateStringArray = true;
+    }
+    if (modelDef.SerDe.needsJSONPopulateTime) {
+      needsJSONPopulateTime = true;
+    }
+
+    // select unpopulate helpers to emit
+    if (modelDef.SerDe.needsJSONUnpopulate) {
+      needsJSONUnpopulate = true;
+    }
+    if (modelDef.SerDe.needsJSONUnpopulateFromString) {
+      needsJSONUnpopulateFromString = true;
+    }
+    if (modelDef.SerDe.needsJSONUnpopulateStringArray) {
+      needsJSONUnpopulateStringArray = true;
+    }
+    if (modelDef.SerDe.needsJSONUnpopulateTime) {
+      needsJSONUnpopulateTime = true;
     }
   }
 
@@ -109,6 +131,30 @@ export function generateModels(
     serdeTextBody += `${indent.pop().get()}} else if !reflect.ValueOf(v).IsNil() {\n`;
     serdeTextBody += `${indent.push().get()}m[k] = v\n`;
     serdeTextBody += `${indent.pop().get()}}\n`;
+    serdeTextBody += "}\n\n";
+  }
+  if (needsJSONPopulateAsString) {
+    serdeImports.add("reflect");
+    serdeImports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
+    serdeTextBody +=
+      "func populateAsString(m map[string]any, k string, v any, fn func() string) {\n";
+    serdeTextBody += `${indent.get()}${helpers.buildIfBlock(
+      indent,
+      {
+        condition: "v == nil",
+        body: (indent) => `${indent.get()}return\n`,
+      },
+      [
+        {
+          condition: "azcore.IsNullValue(v)",
+          body: (indent) => `${indent.get()}m[k] = nil\n`,
+        },
+        {
+          condition: "!reflect.ValueOf(v).IsNil()",
+          body: (indent) => `${indent.get()}m[k] = fn()\n`,
+        },
+      ],
+    )}\n`;
     serdeTextBody += "}\n\n";
   }
   if (needsJSONPopulateTime) {
@@ -171,6 +217,63 @@ export function generateModels(
     serdeTextBody += `${indent.get()}return nil\n`;
     serdeTextBody += "}\n\n";
   }
+  if (needsJSONUnpopulateFromString) {
+    serdeImports.add("fmt");
+    serdeTextBody +=
+      "func unpopulateFromString(data json.RawMessage, fn string, f func(s string) error) error {\n";
+    serdeTextBody += `${indent.get()}${helpers.buildIfBlock(indent, {
+      condition: `data == nil || string(data) == "null"`,
+      body: (indent) => `${indent.get()}return nil\n`,
+    })}\n`;
+    serdeTextBody += `${indent.get()}var encodedValue string\n`;
+    serdeTextBody += `${indent.get()}err := json.Unmarshal(data, &encodedValue)\n`;
+    serdeTextBody += `${indent.get()}${helpers.buildIfBlock(indent, {
+      condition: "err == nil",
+      body: (indent) => `${indent.get()}err = f(encodedValue)\n`,
+    })}\n`;
+    serdeTextBody += `${indent.get()}${helpers.buildIfBlock(indent, {
+      condition: "err != nil",
+      body: (indent) =>
+        `${indent.get()}return fmt.Errorf("struct field %s: %s", fn, err.Error())\n`,
+    })}\n`;
+    serdeTextBody += `${indent.get()}return nil\n`;
+    serdeTextBody += "}\n\n";
+  }
+  if (needsJSONUnpopulateStringArray) {
+    serdeImports.add("strings");
+    serdeTextBody +=
+      "func unpopulateStringArray[T ~string](data json.RawMessage, fn string, v *[]T, d string) error {\n";
+    serdeTextBody += `${indent.get()}${helpers.buildIfBlock(indent, {
+      condition: `data == nil || string(data) == "null"`,
+      body: (indent) => `${indent.get()}return nil\n`,
+    })}\n`;
+    serdeTextBody += `${indent.get()}var encodedValue string\n`;
+    serdeTextBody += `${indent.get()}${helpers.buildIfBlock(indent, {
+      condition: "err := json.Unmarshal(data, &encodedValue); err != nil",
+      body: (indent) =>
+        `${indent.get()}return fmt.Errorf("struct field %s: %s", fn, err.Error())\n`,
+    })}\n`;
+    serdeTextBody += `${indent.get()}${helpers.buildIfBlock(indent, {
+      condition: `encodedValue == ""`,
+      body: (indent) => {
+        let bodyContent = `${indent.get()}*v = []T{}\n`;
+        bodyContent += `${indent.get()}return nil\n`;
+        return bodyContent;
+      },
+    })}\n`;
+    serdeTextBody += `${indent.get()}values := strings.Split(encodedValue, d)\n`;
+    serdeTextBody += `${indent.get()}result := make([]T, len(values))\n`;
+    serdeTextBody += `${indent.get()}${helpers.buildForBlock(
+      indent,
+      "i := range values",
+      (indent) => {
+        return `${indent.get()}result[i] = T(values[i])\n`;
+      },
+    )}`;
+    serdeTextBody += `${indent.get()}*v = result\n`;
+    serdeTextBody += `${indent.get()}return nil\n`;
+    serdeTextBody += "}\n\n";
+  }
   if (needsJSONUnpopulateTime) {
     serdeImports.add("fmt");
     serdeImports.add("time");
@@ -197,6 +300,37 @@ export function generateModels(
     serdeTextBody += `${indent.pop().get()}}\n`;
     serdeTextBody += `${indent.get()}m[k] = data\n`;
     serdeTextBody += `${indent.get()}return nil\n`;
+    serdeTextBody += "}\n\n";
+  }
+  if (needsJSONPopulateStringArray) {
+    serdeImports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore");
+    serdeImports.add("strings");
+    serdeTextBody +=
+      "func populateStringArray[T ~string](m map[string]any, k string, v []T, d string) {";
+    serdeTextBody += `${indent.get()}${helpers.buildIfBlock(
+      indent,
+      {
+        condition: "azcore.IsNullValue(v)",
+        body: (indent) => `${indent.get()}m[k] = nil\n`,
+      },
+      [
+        {
+          condition: "v != nil",
+          body: (indent) => {
+            let controlBlock = `${indent.get()}encodedValue := make([]string, len(v))\n`;
+            controlBlock += `${indent.get()}${helpers.buildForBlock(
+              indent,
+              "i := range v",
+              (indent) => {
+                return `${indent.get()}encodedValue[i] = string(v[i])\n`;
+              },
+            )}`;
+            controlBlock += `${indent.get()}m[k] = strings.Join(encodedValue, d)\n`;
+            return controlBlock;
+          },
+        },
+      ],
+    )}\n`;
     serdeTextBody += "}\n\n";
   }
   if (needsJSONUnpopulateTime || needsJSONPopulateTime) {
@@ -573,38 +707,54 @@ function generateJSONMarshallerBody(
         marshaller += `${indent.push().get()}${receiver}.${field.name} = to.Ptr(${helpers.formatLiteralValue(field.defaultValue, true)})\n`;
         marshaller += `${indent.pop().get()}}\n`;
       }
-      let populate: string;
-      // populateTime takes an extra utc argument; the other populate funcs don't.
-      let populateArgs = "";
-      if (field.type.kind === "time") {
-        imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-        populate = `populateTime[datetime.${field.type.format}]`;
-        populateArgs = `, ${field.type.utc}`;
-        modelDef.SerDe.needsJSONPopulateTime = true;
-      } else if (field.type.kind === "any") {
-        populate = "populateAny";
-        modelDef.SerDe.needsJSONPopulateAny = true;
-      } else {
-        populate = "populate";
-        modelDef.SerDe.needsJSONPopulate = true;
-      }
       if (
         field.type.kind === "scalar" &&
         (field.type.type.startsWith("uint") || field.type.type.startsWith("int")) &&
         field.type.encodeAsString
       ) {
-        // TODO: need to handle map and slice type with underlying int as string type
         imports.add("strconv");
-        imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
+        marshaller += `${indent.get()}populateAsString(objectMap, "${field.serializedName}", ${receiver}.${field.name}, func() string {\n`;
+        const isSigned = field.type.type.startsWith("int");
+        let fieldExpr = `*${receiver}.${field.name}`;
         if (
           (field.type.type.startsWith("uint") && field.type.type !== "uint64") ||
           (field.type.type.startsWith("int") && field.type.type !== "int64")
         ) {
-          marshaller += `${indent.get()}${populate}(objectMap, "${field.serializedName}", to.Ptr(strconv.${field.type.type.startsWith("int") ? "FormatInt" : "FormatUint"}(${field.type.type.startsWith("int") ? "int64" : "uint64"}(*${receiver}.${field.name}), 10)))\n`;
-        } else {
-          marshaller += `${indent.get()}${populate}(objectMap, "${field.serializedName}", to.Ptr(strconv.${field.type.type.startsWith("int") ? "FormatInt" : "FormatUint"}(*${receiver}.${field.name}, 10)))\n`;
+          fieldExpr = `${isSigned ? "int64" : "uint64"}(${fieldExpr})`;
         }
+        marshaller += `${indent.push().get()}return strconv.${isSigned ? "FormatInt" : "FormatUint"}(${fieldExpr}, 10)\n`;
+        marshaller += `${indent.pop().get()}})\n`;
+        modelDef.SerDe.needsJSONPopulateAsString = true;
+      } else if (
+        field.type.kind === "scalar" &&
+        field.type.type === "bool" &&
+        field.type.encodeAsString
+      ) {
+        imports.add("strconv");
+        marshaller += `${indent.get()}populateAsString(objectMap, "${field.serializedName}", ${receiver}.${field.name}, func() string {\n`;
+        marshaller += `${indent.push().get()}return strconv.FormatBool(*${receiver}.${field.name})\n`;
+        marshaller += `${indent.pop().get()}})\n`;
+        modelDef.SerDe.needsJSONPopulateAsString = true;
       } else {
+        let populate: string;
+        // some helpers require extra args after the common ones
+        let populateArgs = "";
+        if (field.type.kind === "time") {
+          imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
+          populate = `populateTime[datetime.${field.type.format}]`;
+          populateArgs = `, ${field.type.utc}`;
+          modelDef.SerDe.needsJSONPopulateTime = true;
+        } else if (field.type.kind === "any") {
+          populate = "populateAny";
+          modelDef.SerDe.needsJSONPopulateAny = true;
+        } else if (field.type.kind === "sliceArray") {
+          populate = "populateStringArray";
+          populateArgs = `, "${getSliceArrayDelimiter(field.type.delimiter)}"`;
+          modelDef.SerDe.needsJSONPopulateStringArray = true;
+        } else {
+          populate = "populate";
+          modelDef.SerDe.needsJSONPopulate = true;
+        }
         marshaller += `${indent.get()}${populate}(objectMap, "${field.serializedName}", ${receiver}.${field.name}${populateArgs})\n`;
       }
     }
@@ -736,6 +886,10 @@ function generateJSONUnmarshallerBody(
       if (hasDiscriminatorInterface(field.type)) {
         unmarshalBody += generateDiscriminatorUnmarshaller(modelDef.Model, field, receiver, indent);
         needsErrCheck = true;
+      } else if (field.type.kind === "sliceArray") {
+        unmarshalBody += `${indent.get()}err = unpopulateStringArray(val, "${field.name}", &${receiver}.${field.name}, "${getSliceArrayDelimiter(field.type.delimiter)}")\n`;
+        modelDef.SerDe.needsJSONUnpopulateStringArray = true;
+        needsErrCheck = true;
       } else if (field.type.kind === "time") {
         unmarshalBody += `${indent.get()}err = unpopulateTime[datetime.${field.type.format}](val, "${field.name}", &${receiver}.${field.name})\n`;
         modelDef.SerDe.needsJSONUnpopulateTime = true;
@@ -780,30 +934,48 @@ function generateJSONUnmarshallerBody(
         unmarshalBody += `${indent.pop().get()}}\n`;
       } else if (
         field.type.kind === "scalar" &&
+        field.type.type === "bool" &&
+        field.type.encodeAsString
+      ) {
+        imports.add("strconv");
+        imports.add("strings");
+        imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
+        unmarshalBody += `${indent.get()}err = unpopulateFromString(val, "${field.name}", func(encodedValue string) error {\n`;
+        unmarshalBody += `${indent.push().get()}v, parseErr := strconv.ParseBool(strings.ToLower(encodedValue))\n`;
+        unmarshalBody += `${indent.get()}${helpers.buildIfBlock(indent, {
+          condition: "parseErr == nil",
+          body: (indent) => `${indent.get()}${receiver}.${field.name} = to.Ptr(v)\n`,
+        })}\n`;
+        unmarshalBody += `${indent.get()}return parseErr\n`;
+        unmarshalBody += `${indent.pop().get()}})\n`;
+        modelDef.SerDe.needsJSONUnpopulateFromString = true;
+        needsErrCheck = true;
+      } else if (
+        field.type.kind === "scalar" &&
         (field.type.type.startsWith("uint") || field.type.type.startsWith("int")) &&
         field.type.encodeAsString
       ) {
-        // TODO: need to handle map and slice type with underlying int as string type
+        const scalarType = field.type.type;
         imports.add("strconv");
-        unmarshalBody += `${indent.get()}var aux string\n`;
-        unmarshalBody += `${indent.get()}err = unpopulate(val, "${field.name}", &aux)\n`;
-        unmarshalBody += `${indent.get()}if err == nil {\n`;
-        indent.push();
-        unmarshalBody += `${indent.get()}var v ${field.type.type.startsWith("int") ? "int64" : "uint64"}\n`;
-        unmarshalBody += `${indent.get()}v, err = strconv.${field.type.type.startsWith("int") ? "ParseInt" : "ParseUint"}(aux, 10, 0)\n`;
-        unmarshalBody += `${indent.get()}if err == nil {\n`;
-        if (
-          (field.type.type.startsWith("uint") && field.type.type !== "uint64") ||
-          (field.type.type.startsWith("int") && field.type.type !== "int64")
-        ) {
-          unmarshalBody += `${indent.push().get()}${receiver}.${field.name} = to.Ptr(${field.type.type}(v))\n`;
-        } else {
-          unmarshalBody += `${indent.push().get()}${receiver}.${field.name} = to.Ptr(v)\n`;
-        }
-        unmarshalBody += `${indent.pop().get()}}\n`;
-        indent.pop();
-        unmarshalBody += `${indent.get()}}\n`;
-        modelDef.SerDe.needsJSONUnpopulate = true;
+        imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
+        unmarshalBody += `${indent.get()}err = unpopulateFromString(val, "${field.name}", func(encodedValue string) error {\n`;
+        unmarshalBody += `${indent.push().get()}v, parseErr := strconv.${field.type.type.startsWith("int") ? "ParseInt" : "ParseUint"}(encodedValue, 10, 0)\n`;
+        unmarshalBody += `${indent.get()}${helpers.buildIfBlock(indent, {
+          condition: "parseErr == nil",
+          body: (indent) => {
+            let fieldExpr = "v";
+            if (
+              (scalarType.startsWith("uint") && scalarType !== "uint64") ||
+              (scalarType.startsWith("int") && scalarType !== "int64")
+            ) {
+              fieldExpr = `${scalarType}(${fieldExpr})`;
+            }
+            return `${indent.get()}${receiver}.${field.name} = to.Ptr(${fieldExpr})\n`;
+          },
+        })}\n`;
+        unmarshalBody += `${indent.get()}return parseErr\n`;
+        unmarshalBody += `${indent.pop().get()}})\n`;
+        modelDef.SerDe.needsJSONUnpopulateFromString = true;
         needsErrCheck = true;
       } else {
         const unpopulateField = `err = unpopulate(val, "${field.name}", &${receiver}.${field.name})\n`;
@@ -826,7 +998,7 @@ function generateJSONUnmarshallerBody(
       indent.push(); // case body level
       unmarshalBody += emitAddlProps(addlProps);
       indent.pop();
-    } else if (options.disallowUnknownFields) {
+    } else if (options["disallow-unknown-fields"]) {
       unmarshalBody += `${indent.get()}default:\n`;
       unmarshalBody += `${indent.push().get()}err = fmt.Errorf("unmarshalling type %T, unknown field %q", ${receiver}, key)\n`;
       indent.pop();
@@ -855,6 +1027,25 @@ function generateJSONUnmarshallerBody(
   unmarshalBody += `${indent.get()}}\n`; // end for key, val := range rawMsg
   unmarshalBody += `${indent.get()}return nil\n`;
   return unmarshalBody;
+}
+
+/**
+ * returns the delimiter to emit for the specified value
+ *
+ * @param delimiter the name of the delimiter
+ * @returns the delimiter text
+ */
+function getSliceArrayDelimiter(delimiter: go.SliceArrayDelimiter): string {
+  switch (delimiter) {
+    case "comma":
+      return ",";
+    case "space":
+      return " ";
+    case "pipe":
+      return "|";
+    case "newline":
+      return "\\n";
+  }
 }
 
 // returns true if item has a discriminator interface.
@@ -1187,22 +1378,30 @@ interface ModelMethod {
 class SerDeInfo {
   methods: Array<ModelMethod>;
   needsJSONPopulate: boolean;
-  needsJSONPopulateTime: boolean;
-  needsJSONUnpopulate: boolean;
-  needsJSONUnpopulateTime: boolean;
-  needsJSONPopulateByteArray: boolean;
   needsJSONPopulateAny: boolean;
+  needsJSONPopulateAsString: boolean;
+  needsJSONPopulateByteArray: boolean;
   needsJSONPopulateMultipart: boolean;
+  needsJSONPopulateTime: boolean;
+  needsJSONPopulateStringArray: boolean;
+  needsJSONUnpopulate: boolean;
+  needsJSONUnpopulateFromString: boolean;
+  needsJSONUnpopulateStringArray: boolean;
+  needsJSONUnpopulateTime: boolean;
 
   constructor() {
     this.methods = new Array<ModelMethod>();
     this.needsJSONPopulate = false;
+    this.needsJSONPopulateAny = false;
+    this.needsJSONPopulateAsString = false;
+    this.needsJSONPopulateByteArray = false;
+    this.needsJSONPopulateMultipart = false;
+    this.needsJSONPopulateStringArray = false;
     this.needsJSONPopulateTime = false;
     this.needsJSONUnpopulate = false;
+    this.needsJSONUnpopulateFromString = false;
+    this.needsJSONUnpopulateStringArray = false;
     this.needsJSONUnpopulateTime = false;
-    this.needsJSONPopulateByteArray = false;
-    this.needsJSONPopulateAny = false;
-    this.needsJSONPopulateMultipart = false;
   }
 }
 
