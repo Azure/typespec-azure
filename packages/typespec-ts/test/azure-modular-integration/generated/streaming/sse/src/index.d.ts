@@ -16,7 +16,13 @@ export declare interface Info {
 export { isRestError }
 
 export declare interface NamedOperations {
-    receive: (options?: NamedReceiveOptionalParams) => Promise<AsyncIterable<ResponseCreated | ResponseDelta>>;
+    receive: (options?: NamedReceiveOptionalParams) => Promise<AsyncIterable<{
+        event: "responseCreated";
+        data: ResponseCreated;
+    } | {
+        event: "responseDelta";
+        data: ResponseDelta;
+    }>>;
 }
 
 export declare interface NamedReceiveOptionalParams extends OperationOptions {
@@ -50,7 +56,13 @@ export declare interface RetrievalRequest {
 }
 
 export declare interface RetrieveOperations {
-    stream: (request: RetrievalRequest, options?: RetrieveStreamOptionalParams) => Promise<AsyncIterable<PartialResult | FinalResult>>;
+    stream: (request: RetrievalRequest, options?: RetrieveStreamOptionalParams) => Promise<AsyncIterable<{
+        event: "partialResult";
+        data: PartialResult;
+    } | {
+        event: "finalResult";
+        data: FinalResult;
+    }>>;
 }
 
 export declare interface RetrieveStreamOptionalParams extends OperationOptions {
