@@ -17,6 +17,23 @@ The invocation names one or more Swagger validator rules:
 /develop-lintdiff-rule ParametersInPointGet PatchBodyParametersSchema
 ```
 
+## ARM rule eligibility gate
+
+This skill only develops ARM-only Swagger linter rules.
+
+Before dispatcher mode creates branches or worktrees, and before worker mode
+prepares dependencies or starts the Development workflow, check every requested
+Swagger validator rule ID against
+`packages/typespec-lintdiff/catalog/validator-rule-metadata.json`.
+
+Continue only when the rule exists and its catalog `applicability` is exactly
+`ARM`. If any requested rule is missing, `DataPlane`, or `Both`/common, stop
+immediately and warn the user that `/develop-lintdiff-rule` supports only
+ARM-only Swagger linter rules. Include the rejected rule ID and the catalog
+applicability found, or `not found`. Do not create worktrees, install
+dependencies, run `compare:setup`, inspect migration evidence, edit files,
+validate, commit, push, or create a PR for a rejected rule.
+
 To continue one dispatched rule interactively in another session, use worker
 mode with the paths reported by the dispatcher:
 

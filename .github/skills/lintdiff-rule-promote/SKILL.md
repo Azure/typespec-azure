@@ -308,8 +308,9 @@ library documentation:
   Azure emitter/tooling behavior
 - include realistic TypeSpec incorrect and correct examples
 - keep Swagger or LintDiff provenance only in a dedicated provenance section such
-  as `## LintDiff Equivalent`; do not frame the rule primarily as keeping Swagger
-  up to date
+  as `## LintDiff Equivalent`; link the original validator rule name to its
+  source documentation or source file, and do not frame the rule primarily as
+  keeping Swagger up to date
 - check the generated docs page path and title match the official TypeSpec rule
   name, not the source validator slug, when the names differ
 
