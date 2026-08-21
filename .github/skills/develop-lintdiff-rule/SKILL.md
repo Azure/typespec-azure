@@ -65,6 +65,14 @@ subagent.
 The dispatcher must isolate each requested rule before handing it back to the
 user for interactive development.
 
+Derive the canonical rule slug for every branch and worktree from the exact
+Swagger validator rule ID, not from the local TypeSpec rule file name, catalog
+shorthand, or an abbreviated description. Convert the validator rule ID to
+kebab-case and keep all words, for example
+`LatestVersionOfCommonTypesMustBeUsed` becomes
+`latest-version-of-common-types-must-be-used` and `ParametersInPointGet` becomes
+`parameters-in-point-get`.
+
 When the user requests multiple rules, treat them as independent development
 units. For each rule, create a distinct rule branch, typespec-azure worktree,
 and azure-rest-api-specs worktree. Create and verify the worktrees serially to
@@ -73,20 +81,32 @@ separate VS Code windows and run independent top-level worker sessions.
 
 1. Treat the user-supplied branch as the target branch, not as the
    rule-development branch.
-2. Create a new rule-specific branch from the target branch. Its name must
-   identify the lint rule, for example
-   `feature/lintdiff-latest-version-common-types`.
-3. Create a dedicated typespec-azure worktree for that rule branch. If the
-   current worktree was created for the target branch, do not put the rule
-   commit directly on that branch.
+2. Create a new rule-specific branch from the target branch. Its name must use
+   the canonical validator rule slug, for example
+   `feature/lintdiff-latest-version-of-common-types-must-be-used`. If the repo
+   or user supplies a different branch prefix, keep that prefix but keep the
+   suffix as `lintdiff-<validator-rule-slug>`.
+3. Create a dedicated typespec-azure worktree for that rule branch. Its
+   directory name must use the same canonical validator rule slug, for example
+   `C:\dev\worktrees\lintdiff-latest-version-of-common-types-must-be-used`. If a
+   matching clean worktree already exists for the same rule branch, reuse it
+   instead of creating another worktree with a different name. If the current
+   worktree was created for the target branch, do not put the rule commit
+   directly on that branch.
 4. Read the pinned `specsCommit` from
    `packages/typespec-lintdiff/specs/_meta.json`.
-5. Create a separate azure-rest-api-specs worktree at that commit. Concurrent
-   rule-development workers must not share a writable specs checkout because
-   the existing runner links packages and may change the checked-out revision.
+5. Create a separate azure-rest-api-specs worktree at that commit. Its directory
+   name must use the same canonical validator rule slug, for example
+   `C:\dev\worktrees\azure-rest-api-specs-lintdiff-latest-version-of-common-types-must-be-used`.
+   If a local branch is needed for the specs worktree instead of detached HEAD,
+   name it `lintdiff-specs-<validator-rule-slug>` at the pinned `specsCommit`.
+   Concurrent rule-development workers must not share a writable specs checkout
+   because the existing runner links packages and may change the checked-out
+   revision.
 6. Verify both worktrees exist at the expected branch or commit and are clean.
-7. Report the rule ID, target branch, rule branch, both absolute worktree paths,
-   the `code -n` command, and the exact worker-mode invocation.
+7. Report the rule ID, canonical validator rule slug, target branch, rule
+   branch, specs branch when one was created, both absolute worktree paths, the
+   `code -n` command, and the exact worker-mode invocation.
 
 Do not install dependencies, run `compare:setup`, or resolve package links in
 dispatcher mode. Those operations belong to the interactive worker and may
@@ -100,11 +120,11 @@ its supplied worktrees:
 1. Ensure the specs worktree is clean and install its existing dependencies.
 2. Prepare the fixture comparison harness. Either:
    - run `pnpm --dir packages/typespec-lintdiff compare:setup -- --specs-repo
-     <isolated-specs-worktree>`, or
+<isolated-specs-worktree>`, or
    - set and verify `LINTDIFF_VALIDATOR_ROOT` and `LINTDIFF_COMMON_TYPES`
      against existing local checkouts.
-   Do not assume a fresh rule worktree already contains
-   `test/azure-openapi-validator` or `test/common-types`.
+     Do not assume a fresh rule worktree already contains
+     `test/azure-openapi-validator` or `test/common-types`.
 3. Verify that the specs worktree's local
    `node_modules/tsp-lintdiff-local-linter` resolves directly to the supplied
    typespec-azure worktree. `compare:setup` uses a shared global npm link, so a
@@ -160,6 +180,27 @@ coverage files in this development worktree. Use the refreshed rule row and
 rule shard to verify project overlap, validator-only projects, TypeSpec-only
 projects, and compile failures.
 
+The retained Swagger corpus represents the dataset-selected latest API version,
+while ordinary TypeSpec lint output may contain diagnostics from every declared
+API version. For every TypeSpec-only project, determine whether each diagnostic
+belongs to the selected latest API version or only to an older version:
+
+1. Read the project's selected `apiVersion` from the corpus metadata.
+2. Inspect the diagnostic target and the service's versioning decorators.
+3. Project the service to the selected API version when source inspection alone
+   cannot establish whether the target or violating type is present.
+4. Compare Swagger only with TypeSpec diagnostics attributable to that selected
+   version. Treat diagnostics that exist only in older API versions as a
+   population mismatch, not as a rule-semantic gap.
+5. Preserve and report the raw TypeSpec counts separately. Do not change the
+   production rule merely to suppress valid diagnostics from older API
+   versions.
+
+Use an existing rule-specific projected filter when one is available. Otherwise
+perform and document this attribution during the migration investigation rather
+than assuming every raw TypeSpec-only diagnostic applies to the retained
+Swagger version.
+
 If a quick iteration is needed first, use the existing `--filter`, `--limit`,
 and `--concurrency` options. The final behavioral check should use the full
 corpus when practical.
@@ -176,6 +217,9 @@ Record:
 - latest validator and TypeSpec project and diagnostic counts
 - same-project overlap
 - complete validator-only and TypeSpec-only project lists
+- the selected-latest-version TypeSpec population used for behavioral
+  comparison, including diagnostics excluded because they belong only to older
+  API versions
 - compile failures and their effect on the assessed population
 - explanations for remaining gaps
 - the final conclusion on functional equivalence and any uncertainty
@@ -232,11 +276,11 @@ After the review:
    alter the reviewed implementation.
 6. Proceed only when no unresolved high-confidence correctness findings remain.
 
-### 8. Commit, push, and create the PR
+### 8. Commit, push, and create the draft PR
 
 Finishing validation is not the end of this skill. The top-level worker must
 complete the GitHub handoff unless the user explicitly asks to stop before
-creating a PR.
+creating a draft PR.
 
 1. Confirm the current branch is the dedicated rule-specific branch and is
    based directly on the user-supplied target branch.
@@ -244,52 +288,59 @@ creating a PR.
    target branch.
 3. Commit only the explicit rule-related paths identified above.
 4. Push both the target branch and rule branch to the `origin` repository.
-5. Create the pull request in the `origin` repository with the rule branch as
-   head and the user-supplied target branch as base.
-6. Write the PR description as an engineering explanation, not only a change
-   list. It must emphasize:
-   - **Why the TypeSpec rule changed:** describe the Swagger behavior, the
-     former TypeSpec behavior, concrete real-service misses or false positives,
-     and the evidence proving that these are semantic rule gaps rather than
-     report-population or validator-data artifacts.
-   - **How the rule was changed:** describe the semantic targets now inspected,
-     important compiler or library APIs used, version/projection handling,
-     diagnostic targeting and deduplication decisions, and why the design
-     matches intended Swagger behavior.
-   - **What was deliberately not copied:** identify validator defects, stale
-     maps, emitted-occurrence duplication, or other discrepancies excluded
-     from the TypeSpec implementation.
-   - **How the behavior is proven:** summarize focused violating and compliant
-     fixtures, former real-service misses now covered, latest full-corpus
+5. Create the pull request in the `origin` repository as a **draft**, with the
+   rule branch as head and the user-supplied target branch as base. Do not mark
+   it ready for review; the user decides when the migration evidence and rule
+   behavior are ready for formal review.
+6. Set the PR title to the exact stable pattern
+   `[Swagger Linter Migration] <ValidatorRuleId> (origin)`, replacing
+   `<ValidatorRuleId>` with the original Swagger validator rule ID.
+7. Write the PR description as an engineering explanation, not only a change
+   list. It must include:
+   - **Original Swagger linter:** paste the Swagger rule name and docs/source
+     link from the fixture `rule.md` or validator docs, then list a checklist of
+     every specific check the original rule performs.
+   - **How the Swagger linter works:** explain the Swagger objects it inspects,
+     traversal or lookup strategy, conditions and exemptions, diagnostic
+     locations, and any known validator defects, stale maps, emitted-occurrence
+     duplication, or other discrepancies that should not be copied.
+   - **How the migrated TypeSpec linter works:** describe the TypeSpec semantic
+     targets inspected, important compiler or library APIs used,
+     version/projection handling, diagnostic targeting and deduplication
+     decisions, and how these choices match the intended Swagger behavior.
+   - **Migration evidence:** link directly to the rule's `migration.md` for the
+     declared focused tests, real-service project comparison, latest full-corpus
      counts, one-sided project explanations, compile failures, and remaining
-     uncertainty.
-   - **PR scope:** confirm generated coverage files are excluded and identify
-     the rule-related files included.
-7. Prefer concrete examples, project names, and before/after evidence. Avoid a
+     uncertainty. Do not duplicate the detailed migration table or corpus
+     declaration in the PR description when `migration.md` already contains it.
+8. Prefer concrete examples, project names, and before/after evidence. Avoid a
    generic bullet such as “improve parity” without explaining the actual
    missing semantic behavior.
-8. Return the PR URL as the rule's final workflow result.
+9. Return the PR URL as the rule's final workflow result.
 
 ## Guardrails
 
 - In dispatcher mode, the current session only creates and verifies branches
-   and worktrees and reports handoff commands. It must not perform setup or rule
-   development and must not launch development subagents.
+  and worktrees and reports handoff commands. It must not perform setup or rule
+  development and must not launch development subagents.
 - Never develop multiple rule PRs in one worktree.
 - Maintain a one-to-one mapping between each rule, rule branch, typespec-azure
-   worktree, azure-rest-api-specs worktree, and top-level worker session.
+  worktree, azure-rest-api-specs worktree, and top-level worker session.
+- Keep each rule's source branch names and worktree directory names tied to the
+  canonical Swagger validator rule slug so source branches can be linked and
+  prepared worktrees can be found and reused later.
 - Never share a writable specs worktree between concurrent workers.
 - Never allow two specs worktrees to resolve
-   `node_modules/tsp-lintdiff-local-linter` to the same rule worktree.
+  `node_modules/tsp-lintdiff-local-linter` to the same rule worktree.
 - Worker mode must reuse and verify the supplied worktrees; it must not create
-   replacements or dispatch another agent to own the complete workflow.
+  replacements or dispatch another agent to own the complete workflow.
 - Stop if either worktree has unrelated changes before the workflow starts.
 - Surface compile, projection, linking, and corpus failures explicitly.
 - Do not silently omit failed projects from the conclusion.
 - Do not commit `packages/typespec-lintdiff/specs` changes in the rule PR.
 - Keep required changes focused on the TypeSpec rule and directly related
   tests.
-- Do not stop after validation when the requested workflow includes a PR.
+- Do not stop after validation when the requested workflow includes a draft PR.
 - Do not skip independent review because focused tests or corpus coverage pass.
 
 ## Deliverable
@@ -297,7 +348,7 @@ creating a PR.
 Dispatcher mode returns only:
 
 - per-rule preparation status, target branch, rule branch, and both absolute
-   worktree paths
+  worktree paths
 - the `code -n` command and exact worker-mode invocation for every rule
 - any branch or worktree preparation failure that prevents handoff
 
@@ -309,4 +360,4 @@ Worker mode returns:
 - per-rule compile failures or remaining uncertainty
 - per-rule review findings adopted and rejected, with reasons
 - the explicit rule-related files ready for each PR
-- each created PR URL
+- each created draft PR URL
