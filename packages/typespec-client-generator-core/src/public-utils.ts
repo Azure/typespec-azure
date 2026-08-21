@@ -31,7 +31,12 @@ import {
 import { getOperationId } from "@typespec/openapi";
 import { type Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
-import { getClientLocation, getClientNameOverride, getIsApiVersion } from "./decorators.js";
+import {
+  getAlternateType,
+  getClientLocation,
+  getClientNameOverride,
+  getIsApiVersion,
+} from "./decorators.js";
 import { normalizeExactName } from "./functions.js";
 import type {
   DecoratedType,
@@ -305,6 +310,25 @@ export function getCrossLanguageDefinitionId(
   operation?: Operation,
   appendNamespace: boolean = true,
 ): string {
+  if (
+    type.kind === "Union" ||
+    type.kind === "Model" ||
+    type.kind === "Enum" ||
+    type.kind === "Scalar" ||
+    type.kind === "ModelProperty"
+  ) {
+    const alternateType = getAlternateType(context, type);
+    if (
+      alternateType?.kind === "Union" ||
+      alternateType?.kind === "Model" ||
+      alternateType?.kind === "Enum" ||
+      alternateType?.kind === "Scalar" ||
+      alternateType?.kind === "ModelProperty"
+    ) {
+      return getCrossLanguageDefinitionId(context, alternateType, operation, appendNamespace);
+    }
+  }
+
   let retval: string = typeof type.name === "symbol" ? "anonymous" : type.name || "anonymous";
   let namespace =
     type.kind === "ModelProperty"

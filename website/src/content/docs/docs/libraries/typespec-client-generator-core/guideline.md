@@ -60,7 +60,7 @@ Use the [TCGC Playground](https://azure.github.io/typespec-azure/playground/?e=%
 
 ### TCGC Flags
 
-TCGC provides flags to control the client type graph style, such as enabling or disabling convenience APIs. See the [documentation](../reference/emitter/#emitter-options) for details.
+TCGC provides flags to control the client type graph style, such as enabling or disabling convenience and protocol APIs for Java and C# emitters. Other emitters should not set `generate-convenience-methods` or `generate-protocol-methods`; TCGC reports an `unnecessary-emitter-option` warning when either option is explicitly set for another language. See the [documentation](../reference/emitter/#emitter-options) for details.
 
 ## TCGC Raw Types and Helpers
 

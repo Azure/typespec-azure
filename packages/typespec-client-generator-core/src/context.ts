@@ -231,7 +231,7 @@ export async function createSdkContext<
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
     namespaceFlag: context.options["namespace"],
-    apiVersion: context.options["api-version"],
+    apiVersion: context.options["api-version"] as TCGCContext["apiVersion"],
     license: context.options["license"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
