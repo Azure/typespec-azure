@@ -9,6 +9,7 @@ export default {
     "@azure-tools/typespec-azure-core/byos": true,
     "@azure-tools/typespec-azure-core/casing-style": true,
     "@azure-tools/typespec-azure-core/composition-over-inheritance": true,
+    "@azure-tools/typespec-azure-core/use-enum-instead-of-boolean": true,
     "@azure-tools/typespec-azure-core/use-extensible-enum": true,
     "@azure-tools/typespec-azure-core/known-encoding": true,
     "@azure-tools/typespec-azure-core/long-running-polling-operation-required": true,

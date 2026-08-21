@@ -39,6 +39,7 @@ import { requireVersionedRule } from "./rules/require-versioned.js";
 import { responseSchemaMultiStatusCodeRule } from "./rules/response-schema-multi-status-code.js";
 import { rpcOperationRequestBodyRule } from "./rules/rpc-operation-request-body.js";
 import { spreadDiscriminatedModelRule } from "./rules/spread-discriminated-model.js";
+import { useEnumInsteadOfBooleanRule } from "./rules/use-enum-instead-of-boolean.js";
 import { useStandardNames } from "./rules/use-standard-names.js";
 import { useStandardOperations } from "./rules/use-standard-operations.js";
 
@@ -49,6 +50,7 @@ const rules = [
   byosRule,
   casingRule,
   compositionOverInheritanceRule,
+  useEnumInsteadOfBooleanRule,
   knownEncodingRule,
   longRunningOperationsRequirePollingOperation,
   noCaseMismatchRule,
