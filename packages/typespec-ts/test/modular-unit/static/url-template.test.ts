@@ -510,5 +510,33 @@ describe("url-template", () => {
       });
       assert("/foo/{+bar}", "/foo/bar/hello%20world");
     });
+
+    // https://github.com/Azure/typespec-azure/issues/5278
+    // Query parameter names are pre-encoded by the emitter (e.g. "$Select" -> "%24Select")
+    // before being passed as the template variable name. The variable name should not be
+    // encoded again when expanding the template, regardless of whether the value is a
+    // scalar, a list, or an associative array.
+    it("should not double encode a pre-encoded query parameter name with a scalar value", () => {
+      const assert = createAssertion({
+        "%24Select": "name",
+      });
+      assert("{?%24Select}", "?%24Select=name");
+    });
+
+    it("should not double encode a pre-encoded query parameter name with a list value", () => {
+      const assert = createAssertion({
+        "%24Select": ["name", "value"],
+      });
+      assert("{?%24Select*}", "?%24Select=name&%24Select=value");
+      assert("{?%24Select}", "?%24Select=name,value");
+    });
+
+    it("should not double encode a pre-encoded query parameter name with an associative array value", () => {
+      const assert = createAssertion({
+        "%24Select": { name: "value" },
+      });
+      assert("{?%24Select*}", "?name=value");
+      assert("{?%24Select}", "?%24Select=name,value");
+    });
   });
 });
