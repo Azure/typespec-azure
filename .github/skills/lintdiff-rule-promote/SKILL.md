@@ -36,6 +36,16 @@ official-library PR is prepared in a clean worktree.
   worktree that this workflow creates or reuses. Convert that ID to kebab-case
   and keep all words, for example `LatestVersionOfCommonTypesMustBeUsed` becomes
   `latest-version-of-common-types-must-be-used`.
+- The canonical validator rule slug is for source traceability, branch names, and
+  worktree names. It is not automatically the official TypeSpec rule name. Choose
+  the promoted rule's user-facing `createRule({ name })` using the TypeSpec
+  linter naming convention: short kebab-case, `no-<thing>` for banned constructs,
+  `use-<preferred-thing>` for preferred patterns, and concise subject-oriented
+  names such as `<subject>-missing-<thing>` or
+  `<subject>-invalid-<condition>` when `no-`/`use-` does not fit. Do not include
+  the package or library name in `name`. Example:
+  `LatestVersionOfCommonTypesMustBeUsed` should be promoted as a concise rule
+  name such as `use-latest-version-of-common-types`, not the full validator slug.
 
 ## Fast path for repeat promotions
 
@@ -217,6 +227,10 @@ Then adapt it to the destination package:
 - update exported rule variable names to match neighboring rules
 - preserve severity and diagnostic intent unless the target package convention
   or existing equivalent rule requires a better fit
+- choose the official `createRule({ name })` by TypeSpec linter naming
+  conventions, even when that differs from the source validator slug; if the
+  name changes, keep the validator slug only in provenance, branch/worktree names,
+  and PR notes
 - keep diagnostic messages actionable and consistent with neighboring rules
 - register the rule in the target package's `src/linter.ts`
 - if the rule name changes, update tests, docs, rulesets, and PR notes with the
@@ -273,11 +287,39 @@ Use the lintdiff `rule.md` as source material, but rewrite it as official
 library documentation:
 
 - remove lintdiff front matter and harness-only notes
-- explain what the rule checks and why
-- include realistic TypeSpec incorrect and correct examples
-- keep validator provenance only when it helps explain behavior
+- add Docusaurus front matter with the official TypeSpec rule name:
 
-Regenerate docs for the affected library after the rule docs are in place.
+  ```md
+  ---
+  title: "<rule-name>"
+  ---
+  ```
+
+- include a full-name block immediately after the front matter:
+
+  ````md
+  ```text title="Full name"
+  @azure-tools/<target-package>/<rule-name>
+  ```
+  ````
+
+- explain what the rule checks and why for TypeSpec authors
+- focus the rationale on TypeSpec authoring, generated SDKs, API consistency, and
+  Azure emitter/tooling behavior
+- include realistic TypeSpec incorrect and correct examples
+- keep Swagger or LintDiff provenance only in a dedicated provenance section such
+  as `## LintDiff Equivalent`; do not frame the rule primarily as keeping Swagger
+  up to date
+- check the generated docs page path and title match the official TypeSpec rule
+  name, not the source validator slug, when the names differ
+
+Regenerate docs for the affected library after the rule docs are in place. Let
+the command complete; `tspd doc` can be quiet for several minutes after printing
+the experimental banner, and stopping it early can leave generated rule indexes
+and table formatting stale. Do not hand-edit generated README or website
+reference entries as a substitute for regeneration. After docs regeneration,
+format the changed markdown files or run the repo format check so generated
+tables use the expected Prettier layout.
 
 ### 7. Update rulesets
 
@@ -317,8 +359,11 @@ Optimized validation order:
 2. affected package build
 3. affected package lint, if available
 4. affected package `regen-docs`
-5. `@azure-tools/typespec-azure-rulesets` build and test when rulesets changed
-6. affected package test
+5. format check for generated markdown, especially package README and website
+   linter reference files
+6. website build when the generated website reference changed
+7. `@azure-tools/typespec-azure-rulesets` build and test when rulesets changed
+8. affected package test
 
 For ARM rule promotion, use this command set as the default targeted validation
 loop, replacing `<rule-name>` with the promoted rule file stem:
@@ -329,6 +374,8 @@ pnpm --filter @azure-tools/typespec-azure-resource-manager exec vitest run test/
 pnpm --filter @azure-tools/typespec-azure-resource-manager build
 pnpm --filter @azure-tools/typespec-azure-resource-manager lint
 pnpm --filter @azure-tools/typespec-azure-resource-manager regen-docs
+pnpm run format:check
+pnpm --filter "@azure-tools/typespec-azure-website..." run build
 pnpm --filter @azure-tools/typespec-azure-rulesets build
 pnpm --filter @azure-tools/typespec-azure-rulesets test
 pnpm --filter @azure-tools/typespec-azure-resource-manager test
@@ -343,6 +390,8 @@ pnpm --filter @azure-tools/typespec-azure-core exec vitest run test/rules/<rule-
 pnpm --filter @azure-tools/typespec-azure-core build
 pnpm --filter @azure-tools/typespec-azure-core lint
 pnpm --filter @azure-tools/typespec-azure-core regen-docs
+pnpm run format:check
+pnpm --filter "@azure-tools/typespec-azure-website..." run build
 pnpm --filter @azure-tools/typespec-azure-rulesets build
 pnpm --filter @azure-tools/typespec-azure-rulesets test
 pnpm --filter @azure-tools/typespec-azure-core test
@@ -385,9 +434,17 @@ Before committing or creating the PR, request a focused code review of the
 promotion diff. The review should inspect:
 
 - rule semantics and diagnostic targets
+- TypeSpec linter naming convention compliance for the official rule name
 - target-library dependency direction
 - test conversion fidelity from lintdiff fixtures
-- docs accuracy
+- docs accuracy, including front matter, full-name block, TypeSpec/SDK-focused
+  rationale, and any Swagger/LintDiff provenance being confined to a provenance
+  section
+- generated docs and formatting drift, especially after rule renames:
+  `packages/<target>/README.md`,
+  `website/src/content/docs/docs/libraries/<library>/reference/linter.md`, and
+  any generated rule page links must reflect the official rule name and pass
+  Prettier
 - ruleset registration
 - absence of generated lintdiff corpus artifacts
 
