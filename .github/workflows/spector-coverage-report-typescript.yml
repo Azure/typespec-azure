@@ -1,0 +1,273 @@
+name: "typespec-ts / Spector Coverage Report"
+
+on:
+  schedule:
+    # Every Monday at 09:00 UTC+8.
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: typespec-ts-spector-coverage-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    name: Generate Spector coverage report
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      PUPPETEER_SKIP_DOWNLOAD: "true"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - name: Install dependencies
+        run: pnpm install
+        timeout-minutes: 15
+
+      - name: Build typespec-ts package
+        run: pnpm turbo run --filter "@azure-tools/typespec-ts..." build
+        timeout-minutes: 20
+
+      - name: Copy TypeSpec files
+        working-directory: packages/typespec-ts
+        run: pnpm copy:typespec
+
+      - name: Run Spector tests
+        working-directory: packages/typespec-ts
+        run: pnpm spector-test
+        timeout-minutes: 60
+
+      - name: Create or update coverage report issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require("fs");
+            const path = require("path");
+
+            const reportTitle = "[typespec-ts] Spector Coverage Report";
+            const coveragePath = path.join(
+              process.env.GITHUB_WORKSPACE,
+              "packages/typespec-ts/coverage/spector-coverage-typescript-azure.json",
+            );
+
+            if (!fs.existsSync(coveragePath)) {
+              core.setFailed(`Spector coverage file was not generated: ${coveragePath}`);
+              return;
+            }
+
+            const coverage = JSON.parse(fs.readFileSync(coveragePath, "utf8"));
+            if (!Array.isArray(coverage)) {
+              core.setFailed("Spector coverage file must contain an array of coverage reports.");
+              return;
+            }
+
+            const { owner, repo } = context.repo;
+            const openIssues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: "open",
+              per_page: 100,
+            });
+            const reportIssue = openIssues.find(
+              (issue) => issue.title === reportTitle && issue.pull_request === undefined,
+            );
+
+            const previousGroups = new Map();
+            if (reportIssue?.body) {
+              let currentPackage;
+              for (const line of reportIssue.body.split(/\r?\n/)) {
+                const packageMatch = line.match(/^### `(.+?)` \(\d+ not implemented\)$/);
+                if (packageMatch) {
+                  currentPackage = packageMatch[1];
+                  continue;
+                }
+
+                if (!currentPackage) {
+                  continue;
+                }
+
+                const rowMatch = line.match(
+                  /^\|\s*(?:🆕\s*)?`(.+?)`\s*\|\s*(\d+)\s*\|\s*(\[[ xX]\])\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|$/,
+                );
+                if (!rowMatch) {
+                  continue;
+                }
+
+                const [, group, , checkbox, scenarioList, comment] = rowMatch;
+                previousGroups.set(`${currentPackage}\0${group}`, {
+                  skipped: checkbox.toLowerCase() === "[x]",
+                  scenarios: new Set(
+                    scenarioList
+                      .split(",")
+                      .map((scenario) => scenario.replace(/^🆕\s*/, "").trim())
+                      .filter(Boolean),
+                  ),
+                  comment: comment.trim(),
+                });
+              }
+            }
+
+            const validStatuses = new Set([
+              "pass",
+              "fail",
+              "not-implemented",
+              "not-supported",
+              "not-applicable",
+            ]);
+            const notImplementedByPackage = new Map();
+            const summaries = [];
+
+            for (const entry of coverage) {
+              const packageName = entry?.scenariosMetadata?.packageName;
+              const version = entry?.scenariosMetadata?.version;
+              const results = entry?.results;
+              if (
+                typeof packageName !== "string" ||
+                typeof version !== "string" ||
+                !results ||
+                typeof results !== "object" ||
+                Array.isArray(results)
+              ) {
+                core.setFailed("Spector coverage file contains an invalid report entry.");
+                return;
+              }
+
+              const counts = {
+                pass: 0,
+                fail: 0,
+                "not-implemented": 0,
+                "not-supported": 0,
+                "not-applicable": 0,
+              };
+              const groups = new Map();
+
+              for (const [scenarioName, status] of Object.entries(results)) {
+                if (!validStatuses.has(status)) {
+                  core.setFailed(
+                    `Scenario "${scenarioName}" has an unknown coverage status: ${status}`,
+                  );
+                  return;
+                }
+                counts[status]++;
+
+                if (status === "not-implemented") {
+                  const separator = scenarioName.lastIndexOf("_");
+                  const group = separator === -1 ? scenarioName : scenarioName.slice(0, separator);
+                  const scenario =
+                    separator === -1 ? scenarioName : scenarioName.slice(separator + 1);
+                  const scenarios = groups.get(group) ?? [];
+                  scenarios.push(scenario);
+                  groups.set(group, scenarios);
+                }
+              }
+
+              const applicable = counts.pass + counts.fail + counts["not-implemented"];
+              const percentage =
+                applicable === 0 ? "100.0" : ((counts.pass / applicable) * 100).toFixed(1);
+              summaries.push({
+                packageName,
+                version,
+                total: Object.keys(results).length,
+                counts,
+                percentage,
+              });
+              notImplementedByPackage.set(packageName, groups);
+            }
+
+            const totalNotImplemented = summaries.reduce(
+              (total, summary) => total + summary.counts["not-implemented"],
+              0,
+            );
+            const today = new Date().toISOString().slice(0, 10);
+            const body = [
+              `# ${reportTitle} — ${today}`,
+              "",
+              "> Auto-generated by the **typespec-ts / Spector Coverage Report** workflow.",
+              "",
+              "## Summary",
+              "",
+              "| Package | Version | Total | ✅ Pass | ❌ Fail | 🔲 Not Implemented | Not Supported | Not Applicable | Coverage |",
+              "|---------|---------|------:|--------:|--------:|--------------------:|--------------:|---------------:|---------:|",
+            ];
+
+            for (const summary of summaries) {
+              body.push(
+                `| \`${summary.packageName}\` | ${summary.version} | ${summary.total} | ${summary.counts.pass} | ${summary.counts.fail} | ${summary.counts["not-implemented"]} | ${summary.counts["not-supported"]} | ${summary.counts["not-applicable"]} | ${summary.percentage}% |`,
+              );
+            }
+
+            body.push("", `## Not-Implemented Scenarios (${totalNotImplemented})`, "");
+
+            if (totalNotImplemented === 0) {
+              body.push("🎉 All applicable scenarios are implemented!", "");
+            } else {
+              for (const summary of summaries) {
+                const groups = notImplementedByPackage.get(summary.packageName);
+                if (!groups || groups.size === 0) {
+                  continue;
+                }
+
+                body.push(
+                  `### \`${summary.packageName}\` (${summary.counts["not-implemented"]} not implemented)`,
+                  "",
+                  "| Group | Count | Skip Implement | Scenarios | Comments |",
+                  "|-------|------:|:--------------:|-----------|----------|",
+                );
+
+                for (const [group, scenarios] of [...groups.entries()].sort(([a], [b]) =>
+                  a.localeCompare(b),
+                )) {
+                  scenarios.sort((a, b) => a.localeCompare(b));
+                  const previous = previousGroups.get(`${summary.packageName}\0${group}`);
+                  const isNewGroup = previousGroups.size > 0 && previous === undefined;
+                  const groupLabel = isNewGroup ? `🆕 \`${group}\`` : `\`${group}\``;
+                  const scenarioLabels = scenarios.map((scenario) => {
+                    const isNewScenario =
+                      previousGroups.size > 0 &&
+                      previous !== undefined &&
+                      !previous.scenarios.has(scenario);
+                    return isNewScenario ? `🆕 ${scenario}` : scenario;
+                  });
+                  body.push(
+                    `| ${groupLabel} | ${scenarios.length} | ${previous?.skipped ? "[x]" : "[ ]"} | ${scenarioLabels.join(", ")} | ${previous?.comment ?? ""} |`,
+                  );
+                }
+
+                body.push("");
+              }
+
+              body.push(
+                "---",
+                "> **Skip Implement:** Check `[x]` for a scenario group that should not be selected for automatic implementation. The workflow preserves checkbox state and comments on future updates.",
+                "",
+              );
+            }
+
+            const issueBody = body.join("\n");
+            if (reportIssue) {
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: reportIssue.number,
+                body: issueBody,
+              });
+              core.info(`Updated issue #${reportIssue.number} in ${owner}/${repo}.`);
+            } else {
+              const created = await github.rest.issues.create({
+                owner,
+                repo,
+                title: reportTitle,
+                body: issueBody,
+              });
+              core.info(`Created issue #${created.data.number} in ${owner}/${repo}.`);
+            }
