@@ -54,6 +54,8 @@ Prefer these `.github/skills/` skills when the task matches:
   lint discovery, implementation, and validation.
 - `/lintdiff-rule-intake`, `/lintdiff-rule-migration-overseer`, `/lintdiff-rule-reimport-repair` —
   LintDiff / `azure-openapi-validator` rule intake and migration orchestration.
+- `/lintdiff-rule-promote` — promote a user-marked done rule from `packages/typespec-lintdiff` into
+  the selected official library from a clean worktree and create a draft PR.
 
 Keep the generic `typespec-lint-*` skills portable-first; use the `lintdiff-*` skills when actively
 comparing validator rules to native TypeSpec outcomes.
