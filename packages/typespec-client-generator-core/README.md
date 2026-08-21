@@ -125,6 +125,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-client-generator-core/csharp-no-url-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-no-url-suffix)                 | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions. |
 | [`@azure-tools/typespec-client-generator-core/csharp-model-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-model-suffix)                   | Model names should use recommended suffixes for C# SDKs.                                        |
 | [`@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-use-standard-acronyms) | C# SDK names should use standard acronym casing.                                                |
+| [`@azure-tools/typespec-client-generator-core/no-service-ns-in-client`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-service-ns-in-client)           | Prevent client.tsp from redefining the service namespace.                                       |
 
 ## Decorators
 
