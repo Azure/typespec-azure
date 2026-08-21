@@ -199,7 +199,7 @@ export async function emitModularOperationsFromTypeSpec(
     withRawContent: options.withRawContent ? true : false,
     withVersionedApiVersion: options.withVersionedApiVersion ? true : false,
   });
-  const dpgContext = await createDpgContextTestHelper(context.program);
+  const dpgContext = await createDpgContextTestHelper(context.program, false, options);
   const binder = useBinder();
   const includeResponseHeaders = options["include-headers-in-response"] === true;
   dpgContext.emitterOptions!.includeHeadersInResponse = includeResponseHeaders;

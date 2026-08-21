@@ -61,6 +61,7 @@ export interface EmitterOptions {
   "compatibility-mode"?: boolean;
   "compatibility-lro"?: boolean;
   "experimental-extensible-enums"?: boolean;
+  "experimental-split-models-by-visibility"?: boolean;
   "clear-output-folder"?: boolean;
   "ignore-property-name-normalize"?: boolean;
   "typespec-title-map"?: Record<string, string>;
@@ -245,6 +246,12 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
       type: "boolean",
       nullable: true,
       description: "Whether to transform union type enums to extensible enums",
+    },
+    "experimental-split-models-by-visibility": {
+      type: "boolean",
+      nullable: true,
+      description:
+        "Whether to project request-body models to their write visibility (e.g. WidgetCreate/WidgetCreateOrUpdate) so read-only properties do not leak into input types",
     },
     "clear-output-folder": {
       type: "boolean",
