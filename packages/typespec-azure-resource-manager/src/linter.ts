@@ -34,6 +34,7 @@ import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
+import { pointOperationInvalidQueryParameterRule } from "./rules/point-operation-invalid-query-parameter.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { secretProprule } from "./rules/secret-prop.js";
@@ -89,6 +90,7 @@ const rules = [
   secretProprule,
   noEmptyModel,
   noReservedResourcePropertyRule,
+  pointOperationInvalidQueryParameterRule,
 ];
 
 export const $linter = defineLinter({
