@@ -4,7 +4,6 @@ import { badRecordTypeRule } from "./rules/bad-record-type.js";
 import { byosRule } from "./rules/byos.js";
 import { casingRule } from "./rules/casing-style.js";
 import { compositionOverInheritanceRule } from "./rules/composition-over-inheritance.js";
-import { enumInsteadOfBooleanRule } from "./rules/enum-instead-of-boolean.js";
 import { friendlyNameRule } from "./rules/friendly-name.js";
 import { knownEncodingRule } from "./rules/known-encoding.js";
 import { longRunningOperationsRequirePollingOperation } from "./rules/lro-polling-operation.js";
@@ -40,6 +39,7 @@ import { requireVersionedRule } from "./rules/require-versioned.js";
 import { responseSchemaMultiStatusCodeRule } from "./rules/response-schema-multi-status-code.js";
 import { rpcOperationRequestBodyRule } from "./rules/rpc-operation-request-body.js";
 import { spreadDiscriminatedModelRule } from "./rules/spread-discriminated-model.js";
+import { useEnumInsteadOfBooleanRule } from "./rules/use-enum-instead-of-boolean.js";
 import { useStandardNames } from "./rules/use-standard-names.js";
 import { useStandardOperations } from "./rules/use-standard-operations.js";
 
@@ -50,7 +50,7 @@ const rules = [
   byosRule,
   casingRule,
   compositionOverInheritanceRule,
-  enumInsteadOfBooleanRule,
+  useEnumInsteadOfBooleanRule,
   knownEncodingRule,
   longRunningOperationsRequirePollingOperation,
   noCaseMismatchRule,

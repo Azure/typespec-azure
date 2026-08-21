@@ -1,7 +1,7 @@
 import { Tester } from "#test/test-host.js";
 import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { enumInsteadOfBooleanRule } from "../../src/rules/enum-instead-of-boolean.js";
+import { useEnumInsteadOfBooleanRule } from "../../src/rules/use-enum-instead-of-boolean.js";
 
 let tester: LinterRuleTester;
 
@@ -9,7 +9,7 @@ beforeEach(async () => {
   const runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    enumInsteadOfBooleanRule,
+    useEnumInsteadOfBooleanRule,
     "@azure-tools/typespec-azure-core",
   );
 });
@@ -25,7 +25,7 @@ describe("boolean shapes should use descriptive extensible enums", () => {
         `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-core/enum-instead-of-boolean",
+        code: "@azure-tools/typespec-azure-core/use-enum-instead-of-boolean",
         message:
           "Consider using an extensible enum instead of a boolean property so the API shape is more descriptive.",
       });
@@ -41,7 +41,7 @@ describe("boolean shapes should use descriptive extensible enums", () => {
         `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-core/enum-instead-of-boolean",
+        code: "@azure-tools/typespec-azure-core/use-enum-instead-of-boolean",
       });
   });
 
@@ -54,7 +54,7 @@ describe("boolean shapes should use descriptive extensible enums", () => {
         `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-core/enum-instead-of-boolean",
+        code: "@azure-tools/typespec-azure-core/use-enum-instead-of-boolean",
       });
   });
 
@@ -67,7 +67,7 @@ describe("boolean shapes should use descriptive extensible enums", () => {
         `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-core/enum-instead-of-boolean",
+        code: "@azure-tools/typespec-azure-core/use-enum-instead-of-boolean",
       });
   });
 
