@@ -19,20 +19,25 @@ The invocation names one or more Swagger validator rules:
 
 ## ARM rule eligibility gate
 
-This skill only develops ARM-only Swagger linter rules.
+This skill develops Swagger linter rules whose catalog applicability is `ARM`
+or `Both`.
 
 Before dispatcher mode creates branches or worktrees, and before worker mode
 prepares dependencies or starts the Development workflow, check every requested
 Swagger validator rule ID against
 `packages/typespec-lintdiff/catalog/validator-rule-metadata.json`.
 
-Continue only when the rule exists and its catalog `applicability` is exactly
-`ARM`. If any requested rule is missing, `DataPlane`, or `Both`/common, stop
-immediately and warn the user that `/develop-lintdiff-rule` supports only
-ARM-only Swagger linter rules. Include the rejected rule ID and the catalog
-applicability found, or `not found`. Do not create worktrees, install
+Continue only when the rule exists and its catalog `applicability` is `ARM` or
+`Both`. If any requested rule is missing or `DataPlane`, stop immediately and
+warn the user that `/develop-lintdiff-rule` does not support DataPlane-only
+Swagger linter rules. For a single requested rule, include the rejected rule ID
+and the catalog applicability found, or `not found`. For multiple requested
+rules, report every requested rule and whether it is eligible; include the
+catalog applicability (`ARM`, `DataPlane`, `Both`, or `not found`) for each rule
+so the user can distinguish eligible and rejected rules. Do not dispatch the
+eligible subset when any rule is rejected. Do not create worktrees, install
 dependencies, run `compare:setup`, inspect migration evidence, edit files,
-validate, commit, push, or create a PR for a rejected rule.
+validate, commit, push, or create a PR for a rejected invocation.
 
 To continue one dispatched rule interactively in another session, use worker
 mode with the paths reported by the dispatcher:
