@@ -19,7 +19,8 @@ API later needs more than two values.
 
 ## LintDiff Equivalent
 
-This rule corresponds to the LintDiff rule `EnumInsteadOfBoolean`.
+This rule corresponds to the LintDiff rule
+[EnumInsteadOfBoolean](https://github.com/Azure/azure-openapi-validator/blob/main/docs/enum-instead-of-boolean.md).
 
 #### Incorrect
 
