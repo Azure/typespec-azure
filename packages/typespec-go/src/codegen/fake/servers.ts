@@ -672,8 +672,7 @@ function dispatchForOperationBody(
       case "Text":
         if (bodyParam && !go.isLiteralParameter(bodyParam.style)) {
           imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/fake", "azfake");
-          content += `${indent.get()}body, err := server.UnmarshalRequestAsText(req)\n`;
-          content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+          content += emitTextBodyUnmarshal(pkg, bodyParam, imports, indent);
         }
         break;
     }
@@ -927,6 +926,98 @@ function dispatchForOperationBody(
   content += `${indent.get()}respr, errRespr ${apiCall}\n`;
   content += `${indent.get()}if respErr := server.GetError(errRespr, req); respErr != nil {\n`;
   content += `${indent.push().get()}return nil, respErr\n${indent.pop().get()}}\n`;
+  return content;
+}
+
+function emitTextBodyUnmarshal(
+  pkg: go.FakePackage,
+  bodyParam: go.BodyParameter,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+): string {
+  const typeName = go.getTypeDeclaration(bodyParam.type, pkg);
+  const optional = !go.isRequiredParameter(bodyParam.style);
+  let content = "";
+  if (optional) {
+    imports.addForType(bodyParam.type);
+    content += `${indent.get()}var body ${typeName}\n`;
+    content += `${indent.get()}if req.Body != nil {\n`;
+    indent.push();
+  }
+
+  content += `${indent.get()}bodyRaw, err := server.UnmarshalRequestAsText(req)\n`;
+  content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+
+  const emitParse = (expression: string, cast?: string): void => {
+    content += `${indent.get()}bodyParsed, err := ${expression}\n`;
+    content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+    content += `${indent.get()}body ${optional ? "=" : ":="} ${cast ? `${cast}(bodyParsed)` : "bodyParsed"}\n`;
+  };
+
+  switch (bodyParam.type.kind) {
+    case "string":
+      content += `${indent.get()}body ${optional ? "=" : ":="} bodyRaw\n`;
+      break;
+    case "constant":
+      imports.addForType(bodyParam.type);
+      if (bodyParam.type.type === "string") {
+        content += `${indent.get()}body ${optional ? "=" : ":="} ${typeName}(bodyRaw)\n`;
+      } else {
+        content += helpers.emitScalarParsing(
+          bodyParam.type,
+          "bodyRaw",
+          "bodyParsed",
+          imports,
+          indent,
+        );
+        content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+        content += `${indent.get()}body ${optional ? "=" : ":="} ${typeName}(bodyParsed)\n`;
+      }
+      break;
+    case "encodedBytes":
+      imports.add("encoding/base64");
+      emitParse(`base64.${bodyParam.type.encoding}Encoding.DecodeString(bodyRaw)`);
+      break;
+    case "etag":
+      imports.addForType(bodyParam.type);
+      content += `${indent.get()}body ${optional ? "=" : ":="} ${typeName}(bodyRaw)\n`;
+      break;
+    case "scalar": {
+      const parsedName = optional ? "bodyParsed" : "body";
+      content += helpers.emitScalarParsing(bodyParam.type, "bodyRaw", parsedName, imports, indent);
+      content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+      if (optional) {
+        content += `${indent.get()}body = bodyParsed\n`;
+      }
+      break;
+    }
+    case "time": {
+      imports.add("time");
+      const formatMap: Partial<Record<go.TimeFormat, string>> = {
+        PlainDate: helpers.plainDateFormat,
+        PlainTime: helpers.plainTimeFormat,
+        RFC1123: helpers.RFC1123Format,
+        RFC3339: helpers.RFC3339Format,
+        RFC7231: helpers.RFC1123Format,
+      };
+      const format = formatMap[bodyParam.type.format];
+      if (format) {
+        emitParse(`time.Parse(${format}, bodyRaw)`);
+      } else {
+        imports.add("strconv");
+        content += `${indent.get()}bodySeconds, err := strconv.ParseInt(bodyRaw, 10, 64)\n`;
+        content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+        content += `${indent.get()}body ${optional ? "=" : ":="} time.Unix(bodySeconds, 0)\n`;
+      }
+      break;
+    }
+    default:
+      throw new CodegenError("InternalError", `unhandled text body type ${bodyParam.type.kind}`);
+  }
+
+  if (optional) {
+    content += `${indent.pop().get()}}\n`;
+  }
   return content;
 }
 
@@ -1455,6 +1546,8 @@ function parseHeaderPathQueryParams(
             if (param.bodyFormat === "binary") {
               imports.add("io");
               paramNilCheck.push("req.Body != nil");
+            } else if (param.bodyFormat === "Text") {
+              paramNilCheck.push("req.Body != nil");
             } else {
               imports.add("reflect");
               paramNilCheck.push("!reflect.ValueOf(body).IsZero()");
@@ -1617,7 +1710,8 @@ function getFinalParamValue(
     (param.kind === "bodyParam" ||
       go.isFormBodyParameter(param) ||
       param.kind === "multipartFormBodyParam") &&
-    param.type.kind === "time"
+    param.type.kind === "time" &&
+    (param.kind !== "bodyParam" || param.bodyFormat !== "Text")
   ) {
     // time types in the body have been unmarshalled into our time helpers thus require a cast to time.Time
     return `time.Time(${paramValue})`;
