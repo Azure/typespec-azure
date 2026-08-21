@@ -236,6 +236,8 @@ export interface SdkClientType<
   apiVersions: string[];
   /** The SDK versions enum for this client's service. Undefined for unversioned services or multi-service clients. */
   versionsEnum?: SdkEnumType;
+  /** Opaque API-version wire default configured for this client, if any. */
+  apiVersionDefaultValue?: string;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
   /** The parent client of this client. The structure follows the definition hierarchy. */
