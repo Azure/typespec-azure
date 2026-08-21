@@ -15,6 +15,15 @@ matching the broader staging-only Swagger
 `ValidQueryParametersForPointOperations` rule. That aligned staging comparison
 has 62 Swagger projects, 62 TypeSpec projects, and no one-sided projects.
 
+## TypeSpec rule-change answer
+
+No TypeSpec rule update is required for `ParametersInPointGet`.
+
+Required production rule and fixture/test changes: none. The only rule-specific
+change is this migration note and the fixture `rule.md` link that explain why
+the existing broader TypeSpec rule is the correct mapping for this GET-only
+Swagger rule.
+
 ## Report reconciliation
 
 The older external report records 38 Swagger projects and 37 TypeSpec projects
@@ -38,6 +47,16 @@ All 40 Swagger projects are assessable and overlap the TypeSpec result. The
 newer 40/40 observation supersedes the older aggregate 38/37 result for this
 pinned population; it is not evidence that raw diagnostic counts should be
 equal.
+
+The comparable TypeSpec population is the selected-latest-version population
+produced by the existing `valid-query-parameters-for-point-operations`
+projection filter, shared with the staging
+`ValidQueryParametersForPointOperations` analysis. No remaining
+`ParametersInPointGet` validator project is hidden by an older-version-only
+TypeSpec diagnostic. The raw 62-project TypeSpec set is retained separately
+because it contains latest-version PUT, PATCH, and DELETE point-operation
+diagnostics that belong to the broader staging Swagger rule, not to the
+GET-only production rule.
 
 ## TypeSpec-only projects
 
@@ -69,7 +88,9 @@ The 22 TypeSpec-only projects are:
 These projects are one-sided only in the comparison with the GET-only
 production rule. The broader staging-rule comparison proves that the same
 62-project TypeSpec set matches Swagger behavior across point GET, PUT, PATCH,
-and DELETE operations.
+and DELETE operations at the selected latest Swagger API versions. They are not
+older-version-only diagnostics and they are not TypeSpec false positives for the
+broader migrated rule.
 
 ## Compile failures
 
@@ -86,13 +107,20 @@ Failed projects cannot establish behavioral equivalence and are excluded when
 necessary. None affects this rule's observed Swagger population: the comparison
 records zero unassessed `ParametersInPointGet` projects.
 
-## Diagnostic cardinality
+## Raw and deduplicated diagnostic cardinality
 
 Swagger reports emitted OpenAPI operation-parameter occurrences, while TypeSpec
 reports semantic source targets that may be instantiated or reused across
 operations and API versions. The TypeSpec total also includes three additional
 HTTP verbs. Consequently, the 189 and 724 raw diagnostics are supporting
 evidence only and are not expected to match.
+
+No rule-specific canonical deduplication is applied to `ParametersInPointGet`
+because the intentionally shared TypeSpec rule spans a broader verb set than
+this production Swagger rule. The linked staging-rule investigation records the
+deduplicated operation-parameter/source-target analysis used to validate the
+shared implementation; for this GET-only rule, project-level overlap of all 40
+Swagger projects is the behavioral equivalence criterion.
 
 ## Fixture evidence
 
