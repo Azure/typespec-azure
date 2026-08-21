@@ -1,10 +1,10 @@
 import { createRule, paramMessage } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
-import { getArmResourceOperationData } from "@azure-tools/typespec-azure-resource-manager";
+import { isArmProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 
 export const parametersInPostRule = createRule({
   name: "parameters-in-post",
-  description: "POST ARM resource actions must not declare extra query parameters.",
+  description: "ARM POST operations must not declare extra query parameters.",
   severity: "warning",
   messages: {
     default: paramMessage`Query parameter '${"name"}' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.`,
@@ -12,8 +12,8 @@ export const parametersInPostRule = createRule({
   create(context) {
     return {
       operation: (operation) => {
-        const armOperation = getArmResourceOperationData(context.program, operation);
-        if (armOperation?.kind !== "action") {
+        const namespace = operation.interface?.namespace ?? operation.namespace;
+        if (!isArmProviderNamespace(context.program, namespace)) {
           return;
         }
 
