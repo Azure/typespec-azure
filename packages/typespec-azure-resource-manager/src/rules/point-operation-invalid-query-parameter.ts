@@ -10,12 +10,12 @@ const pointOperationPathRegExp = new RegExp(
   "i",
 );
 
-export const validQueryParametersForPointOperationsRule = createRule({
-  name: "valid-query-parameters-for-point-operations",
-  docs: fileRef.fromPackageRoot("src/rules/valid-query-parameters-for-point-operations.md"),
+export const pointOperationInvalidQueryParameterRule = createRule({
+  name: "point-operation-invalid-query-parameter",
+  docs: fileRef.fromPackageRoot("src/rules/point-operation-invalid-query-parameter.md"),
   description: "Point operations must not declare query parameters beyond api-version.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/valid-query-parameters-for-point-operations",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/point-operation-invalid-query-parameter",
   messages: {
     default: paramMessage`Query parameter '${"name"}' should be removed. Point operation '${"verb"}' MUST not have query parameters other than api-version.`,
   },

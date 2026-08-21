@@ -34,6 +34,7 @@ import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
+import { pointOperationInvalidQueryParameterRule } from "./rules/point-operation-invalid-query-parameter.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { secretProprule } from "./rules/secret-prop.js";
@@ -42,7 +43,6 @@ import { useApiVersionRule } from "./rules/use-api-version.js";
 import { useInterfaceRule } from "./rules/use-interface.js";
 import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
-import { validQueryParametersForPointOperationsRule } from "./rules/valid-query-parameters-for-point-operations.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
@@ -90,7 +90,7 @@ const rules = [
   secretProprule,
   noEmptyModel,
   noReservedResourcePropertyRule,
-  validQueryParametersForPointOperationsRule,
+  pointOperationInvalidQueryParameterRule,
 ];
 
 export const $linter = defineLinter({
