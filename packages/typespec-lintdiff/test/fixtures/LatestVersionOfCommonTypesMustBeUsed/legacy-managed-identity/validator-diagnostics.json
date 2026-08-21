@@ -1,0 +1,14 @@
+[
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of managedidentity.json.",
+    "path": [
+      "definitions",
+      "Widget",
+      "properties",
+      "identity",
+      "$ref"
+    ],
+    "severity": 0
+  }
+]

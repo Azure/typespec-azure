@@ -1,0 +1,30 @@
+[
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of managedidentity.json.",
+    "path": [
+      "paths",
+      "/first",
+      "get",
+      "responses",
+      "200",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of managedidentity.json.",
+    "path": [
+      "paths",
+      "/second",
+      "get",
+      "responses",
+      "200",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  }
+]

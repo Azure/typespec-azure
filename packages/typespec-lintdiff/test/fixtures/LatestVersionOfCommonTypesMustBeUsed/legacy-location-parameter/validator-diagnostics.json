@@ -1,0 +1,15 @@
+[
+  {
+    "code": "LatestVersionOfCommonTypesMustBeUsed",
+    "message": "Use the latest version v6 of types.json.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/providers/Microsoft.TestService/locations/{location}/widgets",
+      "get",
+      "parameters",
+      "1",
+      "$ref"
+    ],
+    "severity": 0
+  }
+]
