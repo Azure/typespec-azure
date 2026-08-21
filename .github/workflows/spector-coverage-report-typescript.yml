@@ -97,13 +97,14 @@ jobs:
                 }
 
                 const rowMatch = line.match(
-                  /^\|\s*(?:🆕\s*)?`(.+?)`\s*\|\s*(\d+)\s*\|\s*(\[[ xX]\])\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|$/,
+                  /^\|\s*(?:🆕\s*)?(?:\[`(.+?)`\]\([^)]+\)|`(.+?)`)\s*\|\s*(\d+)\s*\|\s*(\[[ xX]\])\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|$/,
                 );
                 if (!rowMatch) {
                   continue;
                 }
 
-                const [, group, , checkbox, scenarioList, comment] = rowMatch;
+                const [, linkedGroup, plainGroup, , checkbox, scenarioList, comment] = rowMatch;
+                const group = linkedGroup ?? plainGroup;
                 previousGroups.set(`${currentPackage}\0${group}`, {
                   skipped: checkbox.toLowerCase() === "[x]",
                   scenarios: new Set(
@@ -126,6 +127,56 @@ jobs:
             ]);
             const notImplementedByPackage = new Map();
             const summaries = [];
+            const scenarioSources = new Map([
+              [
+                "@azure-tools/azure-http-specs",
+                {
+                  root: path.join(
+                    process.env.GITHUB_WORKSPACE,
+                    "packages/azure-http-specs/specs",
+                  ),
+                  url: "https://github.com/Azure/typespec-azure/tree/main/packages/azure-http-specs/specs",
+                },
+              ],
+              [
+                "@typespec/http-specs",
+                {
+                  root: path.join(process.env.GITHUB_WORKSPACE, "core/packages/http-specs/specs"),
+                  url: "https://github.com/microsoft/typespec/tree/main/packages/http-specs/specs",
+                },
+              ],
+            ]);
+
+            function findMockApiFiles(root) {
+              const files = [];
+              for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+                const entryPath = path.join(root, entry.name);
+                if (entry.isDirectory()) {
+                  files.push(...findMockApiFiles(entryPath));
+                } else if (entry.name === "mockapi.ts") {
+                  files.push(entryPath);
+                }
+              }
+              return files;
+            }
+
+            for (const source of scenarioSources.values()) {
+              source.mockApis = findMockApiFiles(source.root).map((file) => ({
+                content: fs.readFileSync(file, "utf8"),
+                directory: path.relative(source.root, path.dirname(file)).split(path.sep).join("/"),
+              }));
+            }
+
+            function getGroupUrl(packageName, group) {
+              const source = scenarioSources.get(packageName);
+              if (!source) {
+                return undefined;
+              }
+
+              const registration = `Scenarios.${group}_`;
+              const match = source.mockApis.find(({ content }) => content.includes(registration));
+              return match ? `${source.url}/${match.directory}` : undefined;
+            }
 
             for (const entry of coverage) {
               const packageName = entry?.scenariosMetadata?.packageName;
@@ -230,7 +281,9 @@ jobs:
                   scenarios.sort((a, b) => a.localeCompare(b));
                   const previous = previousGroups.get(`${summary.packageName}\0${group}`);
                   const isNewGroup = previousGroups.size > 0 && previous === undefined;
-                  const groupLabel = isNewGroup ? `🆕 \`${group}\`` : `\`${group}\``;
+                  const groupUrl = getGroupUrl(summary.packageName, group);
+                  const linkedGroup = groupUrl ? `[\`${group}\`](${groupUrl})` : `\`${group}\``;
+                  const groupLabel = isNewGroup ? `🆕 ${linkedGroup}` : linkedGroup;
                   const scenarioLabels = scenarios.map((scenario) => {
                     const isNewScenario =
                       previousGroups.size > 0 &&
