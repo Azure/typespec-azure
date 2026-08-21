@@ -704,13 +704,32 @@ function dispatchForOperationBody(
       let parseErr = "parseErr";
       const parseResults = `parsed, ${parseErr}`;
       let parsingCode: string;
-      const parse = helpers.getScalarParseExpression(typeName, "string(content)", imports);
-      if (boolTarget) {
-        // we reuse the err var declared earlier when calling reader.NextPart()
-        parsingCode = `${indent.get()}${boolTarget}, err = ${parse.expression}\n`;
-        parseErr = "err";
-      } else {
-        parsingCode = `${indent.get()}${parseResults} := ${parse.expression}\n`;
+      imports.add("strconv");
+      switch (typeName) {
+        case "bool":
+          if (boolTarget) {
+            // we reuse the err var declared earlier when calling reader.NextPart()
+            parsingCode = `${indent.get()}${boolTarget}, err = strconv.ParseBool(string(content))\n`;
+            parseErr = "err";
+          } else {
+            parsingCode = `${indent.get()}${parseResults} := strconv.ParseBool(string(content))\n`;
+          }
+          break;
+        case "float32":
+        case "float64":
+          parsingCode = `${indent.get()}${parseResults} := strconv.ParseFloat(string(content), ${helpers.getBitSizeForNumber(typeName)})\n`;
+          break;
+        case "int8":
+        case "int16":
+        case "int32":
+        case "int64":
+          parsingCode = `${indent.get()}${parseResults} := strconv.ParseInt(string(content), 10, ${helpers.getBitSizeForNumber(typeName)})\n`;
+          break;
+        default:
+          throw new CodegenError(
+            "InternalError",
+            `unhandled multipart parameter primitive type ${typeName}`,
+          );
       }
       parsingCode += `${indent.get()}if ${parseErr} != nil {\n${indent.push().get()}return nil, ${parseErr}\n${indent.pop().get()}}\n`;
       return parsingCode;
@@ -944,8 +963,15 @@ function emitTextBodyUnmarshal(
       if (bodyParam.type.type === "string") {
         content += `${indent.get()}body ${optional ? "=" : ":="} ${typeName}(bodyRaw)\n`;
       } else {
-        const parse = helpers.getScalarParseExpression(bodyParam.type.type, "bodyRaw", imports);
-        emitParse(parse.expression, typeName);
+        content += helpers.emitScalarParsing(
+          bodyParam.type,
+          "bodyRaw",
+          "bodyParsed",
+          imports,
+          indent,
+        );
+        content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+        content += `${indent.get()}body ${optional ? "=" : ":="} ${typeName}(bodyParsed)\n`;
       }
       break;
     case "encodedBytes":
@@ -956,10 +982,15 @@ function emitTextBodyUnmarshal(
       imports.addForType(bodyParam.type);
       content += `${indent.get()}body ${optional ? "=" : ":="} ${typeName}(bodyRaw)\n`;
       break;
-    case "scalar":
-      const parse = helpers.getScalarParseExpression(bodyParam.type.type, "bodyRaw", imports);
-      emitParse(parse.expression, parse.cast);
+    case "scalar": {
+      const parsedName = optional ? "bodyParsed" : "body";
+      content += helpers.emitScalarParsing(bodyParam.type, "bodyRaw", parsedName, imports, indent);
+      content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+      if (optional) {
+        content += `${indent.get()}body = bodyParsed\n`;
+      }
       break;
+    }
     case "time": {
       imports.add("time");
       const formatMap: Partial<Record<go.TimeFormat, string>> = {
@@ -1167,6 +1198,24 @@ function parseHeaderPathQueryParams(
     return paramName;
   };
 
+  const emitNumericConversion = function (
+    src: string,
+    type: "float32" | "float64" | "int32" | "int64",
+  ): string {
+    imports.add("strconv");
+    let precision: "32" | "64" = "32";
+    if (type === "float64" || type === "int64") {
+      precision = "64";
+    }
+    let parseType: "Int" | "Float" = "Int";
+    let base = "10, ";
+    if (type === "float32" || type === "float64") {
+      parseType = "Float";
+      base = "";
+    }
+    return `strconv.Parse${parseType}(${src}, ${base}${precision})`;
+  };
+
   // track the param groups that need to be instantiated/populated.
   // we track the params separately as it might be a subset of ParameterGroup.params
   const paramGroups = new Map<go.ParameterGroup, Array<go.MethodParameter>>();
@@ -1296,12 +1345,7 @@ function parseHeaderPathQueryParams(
           elementFormat === "int64"
         ) {
           fromVar = `parsed${naming.capitalize(elementFormat)}`;
-          const parse = helpers.getScalarParseExpression(
-            elementFormat,
-            `${paramValue}[i]`,
-            imports,
-          );
-          content += `${indent.get()}${fromVar}, parseErr := ${parse.expression}\n`;
+          content += `${indent.get()}${fromVar}, parseErr := ${emitNumericConversion(`${paramValue}[i]`, elementFormat)}\n`;
           content += `${indent.get()}if parseErr != nil {\n${indent.push().get()}return nil, parseErr\n${indent.pop().get()}}\n`;
         } else if (elementFormat === "string") {
           // we're casting an enum string value to its const type
@@ -1409,14 +1453,13 @@ function parseHeaderPathQueryParams(
         requiredHelpers.parseWithCast = true;
         parser = "parseWithCast";
       }
-      const parse = helpers.getScalarParseExpression(param.type.type, "v", imports);
       if (
         param.type.type === "float32" ||
         param.type.type === "int32" ||
         !go.isRequiredParameter(param.style)
       ) {
         content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := ${parser}(${paramValue}, func(v string) (${param.type.type}, error) {\n`;
-        content += `${indent.push().get()}p, parseErr := ${parse.expression}\n`;
+        content += `${indent.push().get()}p, parseErr := ${emitNumericConversion("v", param.type.type)}\n`;
         content += `${indent.get()}if parseErr != nil {\n${indent.push().get()}return 0, parseErr\n${indent.pop().get()}}\n`;
         let result = "p";
         if (param.type.type === "float32" || param.type.type === "int32") {
@@ -1424,8 +1467,7 @@ function parseHeaderPathQueryParams(
         }
         content += `${indent.get()}return ${result}, nil\n${indent.pop().get()}})\n`;
       } else {
-        const directParse = helpers.getScalarParseExpression(param.type.type, paramValue, imports);
-        content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := ${directParse.expression}\n`;
+        content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := ${emitNumericConversion(paramValue, param.type.type)}\n`;
       }
       content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
     } else if (param.kind === "headerMapParam") {
@@ -1452,10 +1494,12 @@ function parseHeaderPathQueryParams(
       let parse: string;
       let zeroValue: string;
       if (param.type.type === "bool") {
-        parse = helpers.getScalarParseExpression(param.type.type, "v", imports).expression;
+        imports.add("strconv");
+        parse = "strconv.ParseBool(v)";
         zeroValue = "false";
       } else {
-        parse = helpers.getScalarParseExpression(param.type.type, "v", imports).expression;
+        // emitNumericConversion adds the necessary import of strconv
+        parse = emitNumericConversion("v", param.type.type);
         zeroValue = "0";
       }
       const toConstType = go.getTypeDeclaration(param.type, pkg);

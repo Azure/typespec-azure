@@ -194,7 +194,13 @@ function generateResponseUnmarshaller(
     switch (type.kind) {
       case "scalar":
         resultVar = "parsedBody";
-        unmarshallerText += emitScalarParsing(type, "string(body)", resultVar, imports, indent);
+        unmarshallerText += helpers.emitScalarParsing(
+          type,
+          "string(body)",
+          resultVar,
+          imports,
+          indent,
+        );
         unmarshallerText += `${indent.get()}${helpers.buildErrCheck(indent, "err", zeroValue)}\n`;
         break;
       case "string":
@@ -266,7 +272,7 @@ function formatHeaderResponseValue(
       text += `${indent.get()}}\n`;
       return text;
     case "scalar":
-      text += emitScalarParsing(headerResp.type, "val", name, imports, indent);
+      text += helpers.emitScalarParsing(headerResp.type, "val", name, imports, indent);
       break;
     case "string":
       text += `${indent.get()}${respObj}.${headerResp.fieldName} = &val\n`;
@@ -305,37 +311,6 @@ function formatHeaderResponseValue(
   text += `${indent.get()}${respObj}.${headerResp.fieldName} = ${byRef}${name}\n`;
   text += `${indent.pop().get()}}\n`;
   return text;
-}
-
-/**
- * emits the code for parsing scalar types from a string.
- * note that the parsing error result is placed into a
- * local var named "err".
- *
- * @param scalar the type of scalar to parse
- * @param src the source var that contains the scalar in string format
- * @param dst the destination var that contains the result
- * @param imports the import manager currently in scope
- * @param indent the indentation helper currently in scope
- * @returns the scalar parsing code
- */
-function emitScalarParsing(
-  scalar: go.Scalar,
-  src: string,
-  dst: string,
-  imports: ImportManager,
-  indent: helpers.Indentation,
-): string {
-  const parse = helpers.getScalarParseExpression(scalar.type, src, imports);
-  if (parse.cast) {
-    const parsed =
-      parse.cast === "float32" || parse.cast === "int32" ? `${dst}32` : `${dst}Parsed`;
-    return (
-      `${indent.get()}${parsed}, err := ${parse.expression}\n` +
-      `${indent.get()}${dst} := ${parse.cast}(${parsed})\n`
-    );
-  }
-  return `${indent.get()}${dst}, err := ${parse.expression}\n`;
 }
 
 function isArrayOfDateTime(

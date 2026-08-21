@@ -937,15 +937,11 @@ function generateJSONUnmarshallerBody(
         field.type.type === "bool" &&
         field.type.encodeAsString
       ) {
+        imports.add("strconv");
         imports.add("strings");
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
-        const parse = helpers.getScalarParseExpression(
-          field.type.type,
-          "strings.ToLower(encodedValue)",
-          imports,
-        );
         unmarshalBody += `${indent.get()}err = unpopulateFromString(val, "${field.name}", func(encodedValue string) error {\n`;
-        unmarshalBody += `${indent.push().get()}v, parseErr := ${parse.expression}\n`;
+        unmarshalBody += `${indent.push().get()}v, parseErr := strconv.ParseBool(strings.ToLower(encodedValue))\n`;
         unmarshalBody += `${indent.get()}${helpers.buildIfBlock(indent, {
           condition: "parseErr == nil",
           body: (indent) => `${indent.get()}${receiver}.${field.name} = to.Ptr(v)\n`,

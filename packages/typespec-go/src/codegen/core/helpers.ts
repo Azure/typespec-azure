@@ -488,50 +488,44 @@ export function isMapOfDateTime(
   return { format: paramType.valueType.format, utc: paramType.valueType.utc };
 }
 
-export interface ScalarParseExpression {
-  expression: string;
-  cast?: go.ScalarType;
-}
-
 /**
- * Returns the expression for parsing a scalar from its string representation.
+ * Emits the code for parsing scalar types from a string.
+ * The parsing error result is placed into a local var named "err".
  *
- * @param type the scalar type to parse
- * @param source the source expression containing the string value
+ * @param scalar the type of scalar to parse
+ * @param src the source var that contains the scalar in string format
+ * @param dst the destination var that contains the result
  * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @returns the scalar parsing code
  */
-export function getScalarParseExpression(
-  type: go.ScalarType,
-  source: string,
+export function emitScalarParsing(
+  scalar: go.Scalar | go.Constant,
+  src: string,
+  dst: string,
   imports: ImportManager,
-): ScalarParseExpression {
+  indent: Indentation,
+): string {
   imports.add("strconv");
-  switch (type) {
+  switch (scalar.type) {
     case "bool":
-      return { expression: `strconv.ParseBool(${source})` };
+      return `${indent.get()}${dst}, err := strconv.ParseBool(${src})\n`;
     case "float32":
-      return { expression: `strconv.ParseFloat(${source}, 32)`, cast: type };
+      return (
+        `${indent.get()}${dst}32, err := strconv.ParseFloat(${src}, 32)\n` +
+        `${indent.get()}${dst} := float32(${dst}32)\n`
+      );
     case "float64":
-      return { expression: `strconv.ParseFloat(${source}, 64)` };
-    case "int8":
-      return { expression: `strconv.ParseInt(${source}, 10, 8)`, cast: type };
-    case "int16":
-      return { expression: `strconv.ParseInt(${source}, 10, 16)`, cast: type };
+      return `${indent.get()}${dst}, err := strconv.ParseFloat(${src}, 64)\n`;
     case "int32":
-      return { expression: `strconv.ParseInt(${source}, 10, 32)`, cast: type };
+      return (
+        `${indent.get()}${dst}32, err := strconv.ParseInt(${src}, 10, 32)\n` +
+        `${indent.get()}${dst} := int32(${dst}32)\n`
+      );
     case "int64":
-      return { expression: `strconv.ParseInt(${source}, 10, 64)` };
-    case "rune":
-      return { expression: `strconv.ParseInt(${source}, 10, 32)`, cast: type };
-    case "byte":
-    case "uint8":
-      return { expression: `strconv.ParseUint(${source}, 10, 8)`, cast: type };
-    case "uint16":
-      return { expression: `strconv.ParseUint(${source}, 10, 16)`, cast: type };
-    case "uint32":
-      return { expression: `strconv.ParseUint(${source}, 10, 32)`, cast: type };
-    case "uint64":
-      return { expression: `strconv.ParseUint(${source}, 10, 64)` };
+      return `${indent.get()}${dst}, err := strconv.ParseInt(${src}, 10, 64)\n`;
+    default:
+      throw new CodegenError("InternalError", `unhandled scalar type ${scalar.type}`);
   }
 }
 

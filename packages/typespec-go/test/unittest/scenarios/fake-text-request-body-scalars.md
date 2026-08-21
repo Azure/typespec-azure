@@ -192,11 +192,11 @@ func (s *ScalarTextRequestBodiesServerTransport) dispatchSendInteger(req *http.R
 	if err != nil {
 		return nil, err
 	}
-	bodyParsed, err := strconv.ParseInt(bodyRaw, 10, 32)
+	body32, err := strconv.ParseInt(bodyRaw, 10, 32)
+	body := int32(body32)
 	if err != nil {
 		return nil, err
 	}
-	body := int32(bodyParsed)
 	respr, errRespr := s.srv.SendInteger(req.Context(), body, nil)
 	if respErr := server.GetError(errRespr, req); respErr != nil {
 		return nil, respErr
