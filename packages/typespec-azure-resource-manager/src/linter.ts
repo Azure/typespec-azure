@@ -25,7 +25,6 @@ import { armResourceProvisioningStateRule } from "./rules/arm-resource-provision
 import { beyondNestingRule } from "./rules/beyond-nesting-levels.js";
 import { envelopePropertiesRules } from "./rules/envelope-properties.js";
 import { improperSubscriptionListOperationRule } from "./rules/improper-subscription-list-operation.js";
-import { latestVersionOfCommonTypesMustBeUsedRule } from "./rules/latest-version-of-common-types-must-be-used.js";
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
@@ -41,6 +40,7 @@ import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 import { useApiVersionRule } from "./rules/use-api-version.js";
 import { useInterfaceRule } from "./rules/use-interface.js";
+import { useLatestVersionOfCommonTypesRule } from "./rules/use-latest-version-of-common-types.js";
 import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
@@ -79,7 +79,7 @@ const rules = [
   armResourceInvalidActionVerbRule,
   improperSubscriptionListOperationRule,
   lroLocationHeaderRule,
-  latestVersionOfCommonTypesMustBeUsedRule,
+  useLatestVersionOfCommonTypesRule,
   missingXmsIdentifiersRule,
   noResponseBodyRule,
   operationsInterfaceMissingRule,

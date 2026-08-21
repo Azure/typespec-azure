@@ -37,12 +37,12 @@ import {
 } from "../common-types.js";
 import { getArmProviderNamespace } from "../namespace.js";
 
-export const latestVersionOfCommonTypesMustBeUsedRule = createRule({
-  name: "latest-version-of-common-types-must-be-used",
-  docs: fileRef.fromPackageRoot("src/rules/latest-version-of-common-types-must-be-used.md"),
+export const useLatestVersionOfCommonTypesRule = createRule({
+  name: "use-latest-version-of-common-types",
+  docs: fileRef.fromPackageRoot("src/rules/use-latest-version-of-common-types.md"),
   description: "ARM services must use the latest available ARM common-types version.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/latest-version-of-common-types-must-be-used",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-latest-version-of-common-types",
   messages: {
     default: paramMessage`Use the latest ARM common-types version '${"latestVersion"}' instead of '${"currentVersion"}'.`,
     reference: paramMessage`This API version already selects the latest ARM common-types version '${"latestVersion"}', but the common-type ${"referenceKind"} '${"referenceName"}' resolves to '${"fileName"}' version '${"currentVersion"}'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${"latestVersion"}'.`,
@@ -158,7 +158,7 @@ function getVersionNumber(version: string): number {
 }
 
 function reportIfOutdated(
-  context: Parameters<typeof latestVersionOfCommonTypesMustBeUsedRule.create>[0],
+  context: Parameters<typeof useLatestVersionOfCommonTypesRule.create>[0],
   target: Namespace | EnumMember,
   currentVersion: string | undefined,
   latestVersion: string,
@@ -360,7 +360,7 @@ function canSharePropertyUsingReadonlyOrXmsMutability(
 }
 
 function reportOutdatedUsages(
-  context: Parameters<typeof latestVersionOfCommonTypesMustBeUsedRule.create>[0],
+  context: Parameters<typeof useLatestVersionOfCommonTypesRule.create>[0],
   usages: CommonTypeUsage[],
   service: Service,
   apiVersion: string | undefined,

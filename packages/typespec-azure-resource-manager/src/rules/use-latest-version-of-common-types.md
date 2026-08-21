@@ -1,6 +1,14 @@
+---
+title: "use-latest-version-of-common-types"
+---
+
+```text title="Full name"
+@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types
+```
+
 ARM services should use the latest ARM common-types version available in
-`Azure.ResourceManager.CommonTypes.Versions`. This keeps generated Swagger and
-SDKs aligned with the current ARM common schemas.
+`Azure.ResourceManager.CommonTypes.Versions`. This keeps TypeSpec services,
+generated SDKs, and Azure tooling aligned with the current ARM common schemas.
 
 The rule checks the effective `@armCommonTypesVersion` on each ARM service or
 service version. When the selected version is current, it also checks common
@@ -11,8 +19,8 @@ symbols are not emitted through an otherwise current API version.
 
 - **Area:** API, SDK
 
-Older ARM common-types versions can emit stale shared schemas or parameters into
-Swagger even when newer definitions are available.
+Older ARM common-types versions can expose stale shared schemas or parameters in
+generated API surfaces and SDKs even when newer definitions are available.
 
 ## Incorrect
 
@@ -101,8 +109,13 @@ model WidgetProperties {
 op getIdentity(): Widget;
 ```
 
+## LintDiff Equivalent
+
+This rule corresponds to the LintDiff rule
+[LatestVersionOfCommonTypesMustBeUsed](https://github.com/Azure/azure-openapi-validator/blob/main/docs/latest-version-of-common-types-must-be-used.md).
+
 ## Suppression
 
 Suppress only when an API must intentionally emit an older ARM common-types
-schema for compatibility and the service team has accepted the SDK and Swagger
+schema for compatibility and the service team has accepted the API and SDK
 impact.

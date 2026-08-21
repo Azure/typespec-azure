@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
-import { latestVersionOfCommonTypesMustBeUsedRule } from "../../src/rules/latest-version-of-common-types-must-be-used.js";
+import { useLatestVersionOfCommonTypesRule } from "../../src/rules/use-latest-version-of-common-types.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -15,7 +15,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    latestVersionOfCommonTypesMustBeUsedRule,
+    useLatestVersionOfCommonTypesRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
@@ -74,7 +74,7 @@ const widgetResource = `
 
 it("emits diagnostic when a versioned ARM service selects an older namespace common-types version", async () => {
   await tester.expect(`${serviceHeader("v3")} ${widgetResource}`).toEmitDiagnostics({
-    code: "@azure-tools/typespec-azure-resource-manager/latest-version-of-common-types-must-be-used",
+    code: "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types",
     message: `Use the latest ARM common-types version '${latestVersion}' instead of 'v3'.`,
   });
 });
@@ -95,7 +95,7 @@ it("emits diagnostic when a version enum member overrides the namespace back to 
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/latest-version-of-common-types-must-be-used",
+      code: "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types",
       message: `Use the latest ARM common-types version '${latestVersion}' instead of 'v3'.`,
     });
 });
@@ -145,7 +145,7 @@ it("emits diagnostic when a latest-version service uses a legacy common paramete
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/latest-version-of-common-types-must-be-used",
+      code: "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types",
       message: `This API version already selects the latest ARM common-types version '${latestVersion}', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${latestVersion}'.`,
     });
 });
@@ -184,11 +184,11 @@ it("emits diagnostic when a latest-version service uses a legacy common model", 
     )
     .toEmitDiagnostics([
       {
-        code: "@azure-tools/typespec-azure-resource-manager/latest-version-of-common-types-must-be-used",
+        code: "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types",
         message: `This API version already selects the latest ARM common-types version '${latestVersion}', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${latestVersion}'.`,
       },
       {
-        code: "@azure-tools/typespec-azure-resource-manager/latest-version-of-common-types-must-be-used",
+        code: "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types",
         message: `This API version already selects the latest ARM common-types version '${latestVersion}', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${latestVersion}'.`,
       },
     ]);
@@ -218,7 +218,7 @@ it("reports a versioned legacy property only for the projected API version that 
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/latest-version-of-common-types-must-be-used",
+      code: "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types",
       message: `This API version already selects the latest ARM common-types version '${latestVersion}', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${latestVersion}'.`,
     });
 });
@@ -240,11 +240,11 @@ it("reports each operation that emits the same legacy common type reference", as
     )
     .toEmitDiagnostics([
       {
-        code: "@azure-tools/typespec-azure-resource-manager/latest-version-of-common-types-must-be-used",
+        code: "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types",
         message: `This API version already selects the latest ARM common-types version '${latestVersion}', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${latestVersion}'.`,
       },
       {
-        code: "@azure-tools/typespec-azure-resource-manager/latest-version-of-common-types-must-be-used",
+        code: "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types",
         message: `This API version already selects the latest ARM common-types version '${latestVersion}', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${latestVersion}'.`,
       },
     ]);
