@@ -877,7 +877,7 @@ See supported client options for each language emitter here https://azure.github
 warning if no scope is provided (since options are typically language-specific).
 
 ```typespec
-@Azure.ClientGenerator.Core.clientOption(name: valueof string, value: valueof unknown, scope?: valueof string)
+@Azure.ClientGenerator.Core.clientOption(name: valueof string, value: unknown | valueof unknown, scope?: valueof string)
 ```
 
 ##### Target
@@ -887,11 +887,11 @@ The type you want to apply the option to.
 
 ##### Parameters
 
-| Name  | Type              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ----- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| name  | `valueof string`  | The name of the option (e.g., "enableFeatureFoo").                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| value | `valueof unknown` | The value of the option. Can be any type; emitters will cast as needed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| scope | `valueof string`  | Specifies the target language emitters to which the decorator applies. Every use must provide an explicit scope; omitting it produces an additional warning.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
+| Name  | Type                           | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ----- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| name  | `valueof string`               | The name of the option (e.g., "enableFeatureFoo").                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| value | `unknown` \| `valueof unknown` | The value of the option. Can be a literal value (string, boolean, number, etc.) or a<br />reference to a TypeSpec model, in which case the referenced model (including its own decorators,<br />such as `@alternateType`) is preserved so the scoped emitter can resolve it. Emitters will cast as needed.                                                                                                                                                                                                                                                                                      |
+| scope | `valueof string`               | Specifies the target language emitters to which the decorator applies. Every use must provide an explicit scope; omitting it produces an additional warning.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 ##### Examples
 
@@ -903,6 +903,14 @@ The type you want to apply the option to.
 model MyModel {
   prop: string;
 }
+```
+
+###### Apply an experimental option that references a model
+
+```typespec
+#suppress "@azure-tools/typespec-client-generator-core/client-option" "preview feature for csharp"
+@clientOption("composes", OpenAICreateResponseOptions, "csharp")
+model FoundryCreateResponseOptions {}
 ```
 
 #### `@convenientAPI`

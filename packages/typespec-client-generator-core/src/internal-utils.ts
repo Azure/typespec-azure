@@ -552,7 +552,7 @@ function getDecoratorArgValue(
 ): [any, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof arg === "object" && arg !== null && "kind" in arg) {
-    if (arg.kind === "EnumMember") {
+    if (arg.kind === "EnumMember" || arg.kind === "Model") {
       return diagnostics.wrap(diagnostics.pipe(getClientTypeWithDiagnostics(context, arg as any)));
     }
     if (
