@@ -26,6 +26,7 @@ import { beyondNestingRule } from "./rules/beyond-nesting-levels.js";
 import { envelopePropertiesRules } from "./rules/envelope-properties.js";
 import { improperSubscriptionListOperationRule } from "./rules/improper-subscription-list-operation.js";
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
+import { lroResponseMismatchRule } from "./rules/lro-response-mismatch.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
 import { noOverridePropsRule } from "./rules/no-override-props.js";
@@ -55,6 +56,7 @@ const rules = [
   armDeleteResponseCodesRule,
   armPutResponseCodesRule,
   armPostResponseCodesRule,
+  lroResponseMismatchRule,
   armResourceActionNoSegmentRule,
   armResourceDuplicatePropertiesRule,
   armResourceEnvelopeProperties,
