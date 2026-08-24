@@ -6,8 +6,8 @@ import {
   comparisonMarkdown,
   coverageBreakdownMarkdown,
   createCoverageBreakdown,
+  filterProjectedDiagnostics,
   filterProjectedEnumDiagnostics,
-  filterProjectedPointQueryDiagnostics,
   injectLocalRuleset,
   loadValidatorFixtureMetadata,
   loadValidatorMappings,
@@ -109,7 +109,7 @@ describe("TypeSpec diagnostic parsing", () => {
 });
 
 describe("TypeSpec result aggregation", () => {
-  it("filters only EnumInsteadOfBoolean diagnostics outside the projected HTTP graph", () => {
+  it("normalizes projected enum diagnostics against emitted boolean names", () => {
     const enumRule = "tsp-lintdiff-local-linter/enum-instead-of-boolean";
     const diagnostics: TypeSpecDiagnostic[] = [
       {
@@ -128,31 +128,35 @@ describe("TypeSpec result aggregation", () => {
     ];
 
     expect(
-      filterProjectedEnumDiagnostics(diagnostics, {
-        apiVersion: "2026-01-01",
-        serviceCount: 1,
-        locations: [
-          {
-            sourceFile: "models.tsp",
-            line: 10,
-            column: 3,
-            emittedName: "hidden",
-          },
-          {
-            sourceFile: "models.tsp",
-            line: 20,
-            column: 3,
-            emittedName: "enabled",
-          },
-        ],
-        queryParameterLocations: [],
-      }, new Set(["enabled"])),
+      filterProjectedEnumDiagnostics(
+        diagnostics,
+        {
+          apiVersion: "2026-01-01",
+          serviceCount: 1,
+          reachableLocations: [],
+          locations: [
+            {
+              sourceFile: "models.tsp",
+              line: 10,
+              column: 3,
+              emittedName: "hidden",
+            },
+            {
+              sourceFile: "models.tsp",
+              line: 20,
+              column: 3,
+              emittedName: "enabled",
+            },
+          ],
+          queryParameterLocations: [],
+        },
+        new Set(["enabled"]),
+      ),
     ).toEqual([diagnostics[1], diagnostics[2]]);
   });
 
-  it("filters point-query diagnostics outside the selected API version", () => {
-    const pointRule =
-      "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations";
+  it("filters opted-in diagnostics outside the selected API version", () => {
+    const pointRule = "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations";
     const diagnostics: TypeSpecDiagnostic[] = [
       {
         ...diagnostic(pointRule, project),
@@ -167,24 +171,63 @@ describe("TypeSpec result aggregation", () => {
         column: 3,
       },
       diagnostic("tsp-lintdiff-local-linter/another-rule", project),
+      diagnostic(pointRule, project),
     ];
 
     expect(
-      filterProjectedPointQueryDiagnostics(diagnostics, {
-        apiVersion: "2026-01-01",
-        serviceCount: 1,
-        locations: [],
-        queryParameterLocations: [
-          {
-            sourceFile: "operations.tsp",
-            line: 20,
-            column: 3,
-            name: "mode",
-            verb: "delete",
-          },
-        ],
-      }),
-    ).toEqual([diagnostics[1], diagnostics[2]]);
+      filterProjectedDiagnostics(
+        diagnostics,
+        {
+          apiVersion: "2026-01-01",
+          serviceCount: 1,
+          reachableLocations: [
+            {
+              sourceFile: "operations.tsp",
+              line: 20,
+              column: 3,
+            },
+          ],
+          locations: [],
+          queryParameterLocations: [
+            {
+              sourceFile: "operations.tsp",
+              line: 20,
+              column: 3,
+              name: "mode",
+              verb: "delete",
+            },
+          ],
+        },
+        new Set([pointRule]),
+      ),
+    ).toEqual([diagnostics[1], diagnostics[2], diagnostics[3]]);
+  });
+
+  it("preserves non-opted-in and locationless diagnostics", () => {
+    const projectedRule = "tsp-lintdiff-local-linter/projected";
+    const diagnostics: TypeSpecDiagnostic[] = [
+      diagnostic(projectedRule, project),
+      {
+        ...diagnostic("tsp-lintdiff-local-linter/unprojected", project),
+        sourceFile: "old.tsp",
+        line: 10,
+        column: 3,
+      },
+    ];
+
+    expect(
+      filterProjectedDiagnostics(
+        diagnostics,
+        {
+          apiVersion: "2026-01-01",
+          serviceCount: 1,
+          reachableLocations: [],
+          locations: [],
+          queryParameterLocations: [],
+        },
+        new Set([projectedRule]),
+      ),
+    ).toEqual(diagnostics);
   });
 
   it("counts levels, projects, and duplicate diagnostics", () => {
@@ -256,32 +299,27 @@ describe("validator and TypeSpec comparison", () => {
     };
 
     expect(
-      normalizeLatestCommonTypesValidatorDiagnostic(
-        validatorDiagnostic,
-        swagger,
+      normalizeLatestCommonTypesValidatorDiagnostic(validatorDiagnostic, swagger, "2026-01-01"),
+    ).toBe(`project-a\0${"2026-01-01"}\0v4`);
+    expect(
+      normalizeLatestCommonTypesTypeSpecDiagnostic(
+        { ...typeSpecDiagnostic, line: 2 },
         "2026-01-01",
+        ["enum Versions {", '  v2026_01_01: "2026-01-01",', "}"].join("\n"),
       ),
     ).toBe(`project-a\0${"2026-01-01"}\0v4`);
     expect(
       normalizeLatestCommonTypesTypeSpecDiagnostic(
         { ...typeSpecDiagnostic, line: 2 },
         "2026-01-01",
-        ['enum Versions {', '  v2026_01_01: "2026-01-01",', "}"].join("\n"),
-      ),
-    ).toBe(`project-a\0${"2026-01-01"}\0v4`);
-    expect(
-      normalizeLatestCommonTypesTypeSpecDiagnostic(
-        { ...typeSpecDiagnostic, line: 2 },
-        "2026-01-01",
-        ['enum Versions {', '  v2025_01_01: "2025-01-01",', "}"].join("\n"),
+        ["enum Versions {", '  v2025_01_01: "2025-01-01",', "}"].join("\n"),
       ),
     ).toBeUndefined();
   });
 
   it("reports exact consistency after common-types reference deduplication", () => {
     const rule = "LatestVersionOfCommonTypesMustBeUsed";
-    const typeSpecRule =
-      "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used";
+    const typeSpecRule = "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used";
     const aggregate = aggregateTypeSpecResults("commit", "2026-08-07T00:00:00.000Z", [
       {
         ...diagnostic(typeSpecRule, "project-a"),
@@ -352,6 +390,8 @@ describe("validator and TypeSpec comparison", () => {
     );
     expect(metadata.get("DeleteInOperationName")?.coverageKind).toBe("lint");
     expect(metadata.get("PostResponseCodes")?.tspLints).toEqual(mappings.get("PostResponseCodes"));
+    expect(metadata.get("PatchBodyParametersSchema")?.projectionScope).toBe("http-reachable");
+    expect(metadata.get("DeleteInOperationName")?.projectionScope).toBe("none");
   });
 
   it("computes overlap from projects where mapped TypeSpec rules actually fire", () => {

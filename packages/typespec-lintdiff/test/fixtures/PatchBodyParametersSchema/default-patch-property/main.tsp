@@ -45,6 +45,15 @@ model WidgetPatchBody {
 model WidgetPatchProperties {
   @doc("Mode default in patch body -- violates rule")
   mode?: string = "enabled";
+
+  @doc("Falsy boolean default in patch body -- violates rule")
+  enabled?: boolean = false;
+
+  @doc("Falsy numeric default in patch body -- violates rule")
+  count?: int32 = 0;
+
+  @doc("Falsy string default in patch body -- violates rule")
+  label?: string = "";
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}

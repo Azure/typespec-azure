@@ -2,13 +2,23 @@ import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-m
 import {
   createRule,
   getLifecycleVisibilityEnum,
+  getLocationContext,
   getVisibilityForClass,
   paramMessage,
+  type DiagnosticTarget,
   type Model,
   type ModelProperty,
+  type Operation,
   type Program,
+  type Type,
 } from "@typespec/compiler";
-import { getHttpOperation } from "@typespec/http";
+import {
+  createMetadataInfo,
+  getHttpOperation,
+  resolveRequestVisibility,
+  Visibility,
+  type MetadataInfo,
+} from "@typespec/http";
 
 export const patchBodyParametersSchemaRule = createRule({
   name: "patch-body-parameters-schema",
@@ -37,7 +47,7 @@ export const patchBodyParametersSchemaRule = createRule({
           return;
         }
 
-        for (const violation of findViolations(context.program, patchBody)) {
+        for (const violation of findViolations(context.program, patchBody, operation)) {
           context.reportDiagnostic({
             target: violation.target,
             messageId: violation.messageId,
@@ -52,14 +62,30 @@ export const patchBodyParametersSchemaRule = createRule({
 });
 
 type Violation = {
-  target: ModelProperty;
+  target: DiagnosticTarget;
   propertyName: string;
   messageId: "required" | "default" | "createOnly";
 };
 
-function findViolations(program: Program, patchModel: Model): Violation[] {
+function findViolations(program: Program, patchModel: Model, operation: Operation): Violation[] {
   const violations: Violation[] = [];
-  collectViolations(program, patchModel, violations, [], new Set());
+  const patchModelTarget =
+    getLocationContext(program, patchModel).type === "project" ? patchModel : operation;
+  const metadataInfo = createMetadataInfo(program, {
+    canonicalVisibility: Visibility.Read,
+    canShareProperty: (property) => canSharePropertyUsingReadonlyOrXmsMutability(program, property),
+  });
+  const visibility = resolveRequestVisibility(program, operation, "patch");
+  collectViolations(
+    program,
+    patchModel,
+    violations,
+    [],
+    new Map(),
+    patchModelTarget,
+    metadataInfo,
+    visibility,
+  );
   return violations;
 }
 
@@ -68,22 +94,38 @@ function collectViolations(
   model: Model,
   violations: Violation[],
   path: string[] = [],
-  visited: Set<Model> = new Set(),
+  visited: Map<Model, Set<Visibility>> = new Map(),
+  diagnosticTarget: DiagnosticTarget,
+  metadataInfo: MetadataInfo,
+  visibility: Visibility,
 ) {
-  if (visited.has(model)) {
+  const schemaVisibility = metadataInfo.isTransformed(model, visibility)
+    ? visibility
+    : Visibility.Read;
+  const visitedVisibilities = visited.get(model);
+  if (visitedVisibilities?.has(schemaVisibility)) {
     return;
   }
-  visited.add(model);
+  if (visitedVisibilities === undefined) {
+    visited.set(model, new Set([schemaVisibility]));
+  } else {
+    visitedVisibilities.add(schemaVisibility);
+  }
 
   for (const property of getModelProperties(model)) {
     const propertyPath = [...path, property.name];
     if (isTopLevelIdentityProperty(propertyPath)) {
       continue;
     }
+    if (!metadataInfo.isPayloadProperty(property, schemaVisibility)) {
+      continue;
+    }
+    const propertyTarget =
+      getLocationContext(program, property).type === "project" ? property : diagnosticTarget;
 
-    if (!property.optional) {
+    if (!metadataInfo.isOptional(property, schemaVisibility)) {
       violations.push({
-        target: property,
+        target: propertyTarget,
         propertyName: propertyPath.join("."),
         messageId: "required",
       });
@@ -91,7 +133,7 @@ function collectViolations(
 
     if (property.defaultValue !== undefined) {
       violations.push({
-        target: property,
+        target: propertyTarget,
         propertyName: propertyPath.join("."),
         messageId: "default",
       });
@@ -99,14 +141,61 @@ function collectViolations(
 
     if (isCreateOnlyMutability(program, property)) {
       violations.push({
-        target: property,
+        target: propertyTarget,
         propertyName: propertyPath.join("."),
         messageId: "createOnly",
       });
     }
 
-    if (property.type.kind === "Model") {
-      collectViolations(program, property.type, violations, propertyPath, visited);
+    collectNestedViolations(
+      program,
+      property.type,
+      violations,
+      propertyPath,
+      visited,
+      propertyTarget,
+      metadataInfo,
+      schemaVisibility,
+    );
+  }
+}
+
+function collectNestedViolations(
+  program: Program,
+  type: Type,
+  violations: Violation[],
+  path: string[],
+  visited: Map<Model, Set<Visibility>>,
+  diagnosticTarget: DiagnosticTarget,
+  metadataInfo: MetadataInfo,
+  visibility: Visibility,
+) {
+  if (type.kind === "Model") {
+    collectViolations(
+      program,
+      type,
+      violations,
+      path,
+      visited,
+      diagnosticTarget,
+      metadataInfo,
+      visibility,
+    );
+    return;
+  }
+
+  if (type.kind === "Union") {
+    for (const variant of type.variants.values()) {
+      collectNestedViolations(
+        program,
+        variant.type,
+        violations,
+        path,
+        visited,
+        diagnosticTarget,
+        metadataInfo,
+        visibility,
+      );
     }
   }
 }
@@ -124,6 +213,22 @@ function isCreateOnlyMutability(program: Program, property: ModelProperty): bool
 
   const visibility = getVisibilityForClass(program, property, lifecycle);
   return visibility.size === 1 && visibility.has(create);
+}
+
+function canSharePropertyUsingReadonlyOrXmsMutability(
+  program: Program,
+  property: ModelProperty,
+): boolean {
+  const lifecycle = getLifecycleVisibilityEnum(program);
+  const visibility = getVisibilityForClass(program, property, lifecycle);
+  if (visibility.size === lifecycle.members.size) {
+    return true;
+  }
+
+  return (
+    visibility.size > 0 &&
+    [...visibility].every((member) => ["Read", "Create", "Update"].includes(member.name))
+  );
 }
 
 function getModelProperties(model: Model): ModelProperty[] {

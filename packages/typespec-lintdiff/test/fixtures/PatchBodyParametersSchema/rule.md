@@ -4,6 +4,7 @@ engine: spectral
 tspLints:
   - tsp-lintdiff-local-linter/patch-body-parameters-schema
 coverageKind: partial
+projectionScope: http-reachable
 ---
 
 # PatchBodyParametersSchema
@@ -25,11 +26,16 @@ The Swagger rule skips a top-level PATCH body property named `identity` before c
 property or its children. The local lint mirrors that exception to avoid false positives on
 identity envelopes.
 
+The local lint uses TypeSpec HTTP metadata to mirror Autorest's effective PATCH schema. Properties
+omitted by request visibility are not checked, and requiredness follows emitted PATCH optionality.
+
 ## Test Cases
 
-| ID                             | Violation | Description                                                      |
-| ------------------------------ | --------- | ---------------------------------------------------------------- |
-| `required-patch-property`      | true      | PATCH body contains required property                            |
-| `default-patch-property`       | true      | PATCH body contains default-valued property                      |
-| `create-only-patch-property`   | true      | PATCH body contains a property emitted as create-only mutable    |
-| `top-level-identity-compliant` | false     | PATCH body top-level `identity` is skipped like the Swagger rule |
+| ID                                  | Violation | Description                                                      |
+| ----------------------------------- | --------- | ---------------------------------------------------------------- |
+| `required-patch-property`           | true      | PATCH body contains required property                            |
+| `nullable-model-required-property`  | true      | Nullable PATCH model contains a required nested property         |
+| `default-patch-property`            | true      | PATCH body contains truthy and falsy default-valued properties   |
+| `create-only-patch-property`        | true      | PATCH body contains a property emitted as create-only mutable    |
+| `implicit-optional-patch-compliant` | false     | PATCH transforms optionalize or omit source properties           |
+| `top-level-identity-compliant`      | false     | PATCH body top-level `identity` is skipped like the Swagger rule |

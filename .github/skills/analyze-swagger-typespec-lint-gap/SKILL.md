@@ -38,13 +38,13 @@ definition.
 
 The external gist and the lint-diff report answer different questions:
 
-| Dimension | External gist | Lint-diff `coverage-breakdown.md` |
-| --- | --- | --- |
-| Primary question | Is there some migration disposition or coverage, including official rules and structurally prevented cases? | Did mapped TypeSpec diagnostics occur in the same successfully compiled projects as validator diagnostics? |
-| Coverage credit | Local lint, official mapping, blocked/infallible classification, and some never-fired mappings | Observed same-project diagnostic overlap only; mapping alone receives no credit |
-| Main columns | `Fired`, `Lint`, `Official`, `Pct` | `Fired`, `TSP Fired`, `Lint/Overlap`, `Gap`, `TSP Only`, raw diagnostic totals |
-| Rule modes | May combine or omit execution-policy distinctions | Separates normal `production` validation from explicitly evaluated `stagingOnly` rules |
-| Diagnostic detail | Primarily aggregate project coverage | Project sets plus raw validator and TypeSpec diagnostic cardinality |
+| Dimension         | External gist                                                                                               | Lint-diff `coverage-breakdown.md`                                                                          |
+| ----------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Primary question  | Is there some migration disposition or coverage, including official rules and structurally prevented cases? | Did mapped TypeSpec diagnostics occur in the same successfully compiled projects as validator diagnostics? |
+| Coverage credit   | Local lint, official mapping, blocked/infallible classification, and some never-fired mappings              | Observed same-project diagnostic overlap only; mapping alone receives no credit                            |
+| Main columns      | `Fired`, `Lint`, `Official`, `Pct`                                                                          | `Fired`, `TSP Fired`, `Lint/Overlap`, `Gap`, `TSP Only`, raw diagnostic totals                             |
+| Rule modes        | May combine or omit execution-policy distinctions                                                           | Separates normal `production` validation from explicitly evaluated `stagingOnly` rules                     |
+| Diagnostic detail | Primarily aggregate project coverage                                                                        | Project sets plus raw validator and TypeSpec diagnostic cardinality                                        |
 
 Record the headline population shown by each concrete report. For example, the
 referenced gist currently says 450 compiled projects and 210 validator rules,
@@ -303,7 +303,59 @@ Create `migration.md` beside the rule fixtures and include:
 9. Major outliers and their causes.
 10. Fixture and real-service evidence.
 11. An explicit distinction between functional equivalence and raw count
-   equality.
+    equality.
+
+### Code-backed gap examples
+
+For every distinct material cause of a validator-only, TypeSpec-only, or
+diagnostic-count gap, include at least one representative example. Do not rely
+on aggregate counts or a project list alone. Use this structure so a reviewer
+can understand the difference without reconstructing the investigation:
+
+```md
+### Gap example: <short cause>
+
+- **Classification:** <validator-only | TypeSpec-only | count-only>
+- **Status:** <fixed | intentional | population mismatch | unresolved>
+- **Project/API version:** `<project>` / `<version>`
+- **Source:** `<path or symbol>`
+
+**TypeSpec source**
+
+\`\`\`typespec
+<smallest relevant authored TypeSpec excerpt>
+\`\`\`
+
+**Emitted OpenAPI or validator behavior**
+
+\`\`\`json
+<smallest relevant emitted schema excerpt>
+\`\`\`
+
+| Engine            | Observed result                            |
+| ----------------- | ------------------------------------------ |
+| Swagger validator | <diagnostic or no diagnostic, with reason> |
+| TypeSpec lint     | <diagnostic or no diagnostic, with reason> |
+
+**Explanation:** <the exact semantic, emission, projection, or validator
+implementation difference that causes the gap>.
+
+**Disposition:** <rule fix, comparison projection, intentional extra coverage,
+or remaining investigation>.
+```
+
+Use excerpts verified against the pinned source and generated output; do not
+invent illustrative code. Keep each excerpt to the smallest shape that proves
+the cause, and name the relevant property, operation, JSON path, or diagnostic
+target. When the gap is caused only by population or API-version selection and
+there is no meaningful emitted schema excerpt, replace that block with the
+smallest versioning, projection, or report-metadata excerpt that proves the
+exclusion and explain why no Swagger comparison exists.
+
+One example may cover multiple projects only when evidence shows they share the
+same cause. Separate examples are required for different causes. Resolved gaps
+must retain an example when it explains why production or comparison behavior
+changed; mark the status and disposition accordingly.
 
 The final statement should say whether the migrated TypeSpec rule is
 functionally equal to the related Swagger rule and clearly identify any

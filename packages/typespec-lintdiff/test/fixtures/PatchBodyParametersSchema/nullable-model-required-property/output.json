@@ -97,10 +97,8 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget",
             "required": true,
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9_-]+$"
+            "type": "string"
           }
         ],
         "responses": {
@@ -137,10 +135,8 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget",
             "required": true,
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9_-]+$"
+            "type": "string"
           },
           {
             "name": "resource",
@@ -193,7 +189,6 @@
         "tags": [
           "Widgets"
         ],
-        "description": "Update widget",
         "parameters": [
           {
             "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
@@ -207,15 +202,12 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget",
             "required": true,
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9_-]+$"
+            "type": "string"
           },
           {
             "name": "body",
             "in": "body",
-            "description": "The request body",
             "required": true,
             "schema": {
               "$ref": "#/definitions/WidgetPatchBody"
@@ -256,10 +248,8 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget",
             "required": true,
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9_-]+$"
+            "type": "string"
           }
         ],
         "responses": {
@@ -295,36 +285,6 @@
     }
   },
   "definitions": {
-    "Azure.ResourceManager.ResourceProvisioningState": {
-      "type": "string",
-      "description": "The provisioning state of a resource type.",
-      "enum": [
-        "Succeeded",
-        "Failed",
-        "Canceled"
-      ],
-      "x-ms-enum": {
-        "name": "ResourceProvisioningState",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "Succeeded",
-            "value": "Succeeded",
-            "description": "Resource has been created."
-          },
-          {
-            "name": "Failed",
-            "value": "Failed",
-            "description": "Resource creation failed."
-          },
-          {
-            "name": "Canceled",
-            "value": "Canceled",
-            "description": "Resource creation was canceled."
-          }
-        ]
-      }
-    },
     "Widget": {
       "type": "object",
       "description": "Concrete tracked resource types can be created by aliasing this type using a specific property type.",
@@ -342,55 +302,26 @@
     },
     "WidgetPatchBody": {
       "type": "object",
-      "description": "Patch envelope for widget.",
       "properties": {
-        "properties": {
-          "$ref": "#/definitions/WidgetPatchProperties",
-          "description": "Resource properties with a defaulted field"
+        "details": {
+          "$ref": "#/definitions/WidgetPatchDetails",
+          "x-nullable": true
         }
       }
     },
-    "WidgetPatchProperties": {
+    "WidgetPatchDetails": {
       "type": "object",
-      "description": "Patch properties with a defaulted property.",
       "properties": {
-        "mode": {
-          "type": "string",
-          "description": "Mode default in patch body -- violates rule",
-          "default": "enabled"
-        },
-        "enabled": {
-          "type": "boolean",
-          "description": "Falsy boolean default in patch body -- violates rule",
-          "default": false
-        },
-        "count": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Falsy numeric default in patch body -- violates rule",
-          "default": 0
-        },
-        "label": {
-          "type": "string",
-          "description": "Falsy string default in patch body -- violates rule",
-          "default": ""
+        "requiredProp": {
+          "type": "string"
         }
-      }
+      },
+      "required": [
+        "requiredProp"
+      ]
     },
     "WidgetProperties": {
-      "type": "object",
-      "description": "Widget resource properties.",
-      "properties": {
-        "description": {
-          "type": "string",
-          "description": "Description of the widget"
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "Resource provisioning state",
-          "readOnly": true
-        }
-      }
+      "type": "object"
     }
   },
   "parameters": {}
