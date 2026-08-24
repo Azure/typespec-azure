@@ -7,6 +7,7 @@ import {
   getVisibilityForClass,
   isNeverType,
   paramMessage,
+  resolveEncodedName,
   type DiagnosticTarget,
   type Model,
   type ModelProperty,
@@ -45,7 +46,7 @@ export const patchBodyParametersSchemaRule = createRule({
         }
 
         const patchBody = httpOperation.parameters.body?.type;
-        if (patchBody?.kind !== "Model") {
+        if (patchBody === undefined) {
           return;
         }
 
@@ -69,22 +70,20 @@ type Violation = {
   messageId: "required" | "default" | "createOnly";
 };
 
-function findViolations(program: Program, patchModel: Model, operation: Operation): Violation[] {
+function findViolations(program: Program, patchBody: Type, operation: Operation): Violation[] {
   const violations: Violation[] = [];
-  const patchModelTarget =
-    getLocationContext(program, patchModel).type === "project" ? patchModel : operation;
   const metadataInfo = createMetadataInfo(program, {
     canonicalVisibility: Visibility.Read,
     canShareProperty: (property) => canSharePropertyUsingReadonlyOrXmsMutability(program, property),
   });
   const visibility = resolveRequestVisibility(program, operation, "patch");
-  collectViolations(
+  collectNestedViolations(
     program,
-    patchModel,
+    patchBody,
     violations,
     [],
     new Map(),
-    patchModelTarget,
+    operation,
     metadataInfo,
     visibility,
   );
@@ -124,8 +123,9 @@ function collectViolations(
   }
 
   for (const property of getModelProperties(model)) {
-    const propertyPath = [...path, property.name];
-    if (isTopLevelIdentityProperty(propertyPath)) {
+    const jsonName = resolveEncodedName(program, property, "application/json");
+    const propertyPath = [...path, jsonName];
+    if (isTopLevelIdentityProperty(propertyPath, jsonName)) {
       continue;
     }
     if (!metadataInfo.isPayloadProperty(property, schemaVisibility)) {
@@ -217,8 +217,8 @@ function collectNestedViolations(
   }
 }
 
-function isTopLevelIdentityProperty(propertyPath: string[]): boolean {
-  return propertyPath.length === 1 && propertyPath[0].toLowerCase() === "identity";
+function isTopLevelIdentityProperty(propertyPath: string[], jsonName: string): boolean {
+  return propertyPath.length === 1 && jsonName.toLowerCase() === "identity";
 }
 
 function isCreateOnlyMutability(program: Program, property: ModelProperty): boolean {

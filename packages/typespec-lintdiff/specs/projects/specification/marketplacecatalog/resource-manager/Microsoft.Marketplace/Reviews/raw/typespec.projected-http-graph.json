@@ -1,0 +1,45 @@
+{
+  "apiVersion": "2023-01-01-preview",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "reviews.models.tsp",
+      "line": 15,
+      "column": 7
+    },
+    {
+      "sourceFile": "reviews.models.tsp",
+      "line": 25,
+      "column": 7
+    },
+    {
+      "sourceFile": "reviews.models.tsp",
+      "line": 27,
+      "column": 3
+    },
+    {
+      "sourceFile": "reviews.models.tsp",
+      "line": 30,
+      "column": 3
+    },
+    {
+      "sourceFile": "reviews.models.tsp",
+      "line": 40,
+      "column": 3
+    },
+    {
+      "sourceFile": "reviews.models.tsp",
+      "line": 46,
+      "column": 7
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "reviews.models.tsp",
+      "line": 27,
+      "column": 3,
+      "emittedName": "hasReview"
+    }
+  ],
+  "queryParameterLocations": []
+}

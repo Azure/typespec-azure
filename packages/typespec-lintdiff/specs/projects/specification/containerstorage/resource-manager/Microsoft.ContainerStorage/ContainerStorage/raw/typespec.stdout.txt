@@ -8,8 +8,6 @@ pool.tsp:14:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please 
 pool.tsp:22:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 pool.tsp:26:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 pool.tsp:103:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.resources.requests.storage.
-pool.tsp:194:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.poolType.azureDisk.encryption.keyName.
-pool.tsp:197:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.poolType.azureDisk.encryption.keyVaultUri.
 pool.tsp:225:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.poolType.ephemeralDisk.replicas.
 pool.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 pool.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -26,5 +24,5 @@ snapshot.tsp:39:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inco
 snapshot.tsp:26:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 snapshot.tsp:27:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 23 warnings.
+Found 21 warnings.
 

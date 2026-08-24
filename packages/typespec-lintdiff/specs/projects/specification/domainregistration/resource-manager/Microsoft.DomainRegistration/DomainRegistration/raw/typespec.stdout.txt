@@ -27,6 +27,7 @@ Domain.tsp:45:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error res
 Domain.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Domain.tsp:63:3 - warning tsp-lintdiff-local-linter/lro-extension: ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`.
 models.tsp:797:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.contactAdmin.
+models.tsp:797:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.contactAdmin.
 models.tsp:648:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.contactAdmin.addressMailing.address1.
 models.tsp:658:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.contactAdmin.addressMailing.city.
 models.tsp:663:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.contactAdmin.addressMailing.country.
@@ -37,10 +38,14 @@ models.tsp:618:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schem
 models.tsp:623:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.contactAdmin.nameLast.
 models.tsp:638:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.contactAdmin.phone.
 models.tsp:803:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.contactBilling.
+models.tsp:803:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.contactBilling.
 models.tsp:809:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.contactRegistrant.
+models.tsp:809:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.contactRegistrant.
 models.tsp:815:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.contactTech.
+models.tsp:815:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.contactTech.
 models.tsp:864:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.autoRenew.
 models.tsp:883:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.consent.
+models.tsp:883:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.consent.
 Domain.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Domain.tsp:86:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'forceHardDeleteDomain' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
 Domain.tsp:79:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -72,5 +77,5 @@ routes.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Pleas
 routes.tsp:52:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'listRecommendations' should contain the action verb 'listdomainrecommendations' from the route path. Consider updating the operation name.
 routes.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 69 warnings.
+Found 74 warnings.
 

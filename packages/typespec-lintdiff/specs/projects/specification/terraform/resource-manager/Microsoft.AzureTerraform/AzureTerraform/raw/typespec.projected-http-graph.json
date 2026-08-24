@@ -1,0 +1,187 @@
+{
+  "apiVersion": "2025-09-01-preview",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 18,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 26,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 55,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 57,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 60,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 63,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 66,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 70,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 74,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 78,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 82,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 150,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 153,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 157,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 163,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 167,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 171,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 175,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 179,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 183,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 187,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 189,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 192,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 195,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 199,
+      "column": 3
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 27,
+      "column": 3
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 63,
+      "column": 3,
+      "emittedName": "fullProperties"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 66,
+      "column": 3,
+      "emittedName": "maskSensitive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 70,
+      "column": 3,
+      "emittedName": "includeRoleAssignment"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 74,
+      "column": 3,
+      "emittedName": "includeManagedResource"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 94,
+      "column": 3,
+      "emittedName": "recursive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 101,
+      "column": 3,
+      "emittedName": "includeResourceGroup"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 129,
+      "column": 3,
+      "emittedName": "recursive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 133,
+      "column": 3,
+      "emittedName": "includeResourceGroup"
+    }
+  ],
+  "queryParameterLocations": []
+}

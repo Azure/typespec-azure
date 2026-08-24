@@ -55,20 +55,20 @@
         "description": "List the operations for the provider",
         "parameters": [
           {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/OperationListResult"
+              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/definitions/OperationListResult"
             }
           },
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -86,13 +86,13 @@
         "description": "Get a Widget",
         "parameters": [
           {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "widgetName",
@@ -113,7 +113,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -126,13 +126,13 @@
         "description": "Create a Widget",
         "parameters": [
           {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "widgetName",
@@ -179,7 +179,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -196,13 +196,13 @@
         "description": "Update widget",
         "parameters": [
           {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "widgetName",
@@ -232,7 +232,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -245,13 +245,13 @@
         "description": "Delete a Widget",
         "parameters": [
           {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "widgetName",
@@ -283,7 +283,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -353,7 +353,7 @@
       },
       "allOf": [
         {
-          "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/TrackedResource"
+          "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/definitions/TrackedResource"
         }
       ]
     },

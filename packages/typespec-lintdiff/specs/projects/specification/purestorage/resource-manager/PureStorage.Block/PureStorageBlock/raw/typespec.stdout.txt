@@ -25,21 +25,6 @@ LiftrBase.Storage/main.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples
   main.tsp:61:11 - occurred while instantiating template
 LiftrBase.Storage/main.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
   main.tsp:61:11 - occurred while instantiating template
-LiftrBase/main.tsp:142:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.user.firstName.
-  LiftrBase/main.tsp:167:10 - occurred while instantiating template
-  main.tsp:55:32 - occurred while instantiating template
-LiftrBase/main.tsp:145:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.user.lastName.
-  LiftrBase/main.tsp:167:10 - occurred while instantiating template
-  main.tsp:55:32 - occurred while instantiating template
-LiftrBase/main.tsp:148:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.user.emailAddress.
-  LiftrBase/main.tsp:167:10 - occurred while instantiating template
-  main.tsp:55:32 - occurred while instantiating template
-LiftrBase/main.tsp:102:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.user.companyDetails.companyName.
-LiftrBase/main.tsp:111:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.user.companyDetails.address.addressLine1.
-LiftrBase/main.tsp:117:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.user.companyDetails.address.city.
-LiftrBase/main.tsp:120:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.user.companyDetails.address.state.
-LiftrBase/main.tsp:123:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.user.companyDetails.address.country.
-LiftrBase/main.tsp:126:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.user.companyDetails.address.postalCode.
 LiftrBase.Storage/main.tsp:55:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
   main.tsp:61:11 - occurred while instantiating template
 LiftrBase.Storage/main.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -57,7 +42,6 @@ main.tsp:343:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please
 main.tsp:224:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "storagePoolName" and "reservationName".
 main.tsp:345:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:224:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "storagePoolName" and "reservationName".
-main.tsp:298:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.platformConsoleSettings.gui.enabled.
 main.tsp:349:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:224:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "storagePoolName" and "reservationName".
 main.tsp:357:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -81,7 +65,6 @@ main.tsp:781:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path p
 main.tsp:781:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 main.tsp:827:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:224:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "storagePoolName" and "reservationName".
-main.tsp:897:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.softDeletion.destroyed.
 main.tsp:941:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:781:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 main.tsp:224:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "storagePoolName" and "reservationName".
@@ -97,7 +80,6 @@ main.tsp:953:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please
 main.tsp:781:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 main.tsp:224:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "storagePoolName" and "reservationName".
 main.tsp:781:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
-main.tsp:897:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.softDeletion.destroyed.
 main.tsp:1059:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:224:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "storagePoolName" and "reservationName".
 main.tsp:1067:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -105,7 +87,6 @@ main.tsp:224:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsi
 main.tsp:1069:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:1071:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:224:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "storagePoolName" and "reservationName".
-main.tsp:897:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.softDeletion.destroyed.
 main.tsp:1092:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:224:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "storagePoolName" and "reservationName".
 main.tsp:1100:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -199,5 +180,5 @@ main.tsp:1748:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: 
 main.tsp:1758:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 LiftrBase.Storage/main.tsp:17:21 - warning tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case: The ARM provider namespace "PureStorage.Block" must use PascalCase (e.g., Microsoft.Compute).
 
-Found 184 warnings.
+Found 171 warnings.
 

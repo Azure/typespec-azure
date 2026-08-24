@@ -196,7 +196,6 @@ models.tsp:6120:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-sche
 models.tsp:6130:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.zoneRedundant.
 models.tsp:6328:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.name.
 models.tsp:6333:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.capacity.
-models.tsp:6439:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 ApiManagementServiceResource.tsp:165:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ApiManagementServiceResource.tsp:175:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ApiManagementServiceResource.tsp:136:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
@@ -2105,5 +2104,5 @@ routes.tsp:122:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Plea
 routes.tsp:175:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:198:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 2102 warnings.
+Found 2101 warnings.
 

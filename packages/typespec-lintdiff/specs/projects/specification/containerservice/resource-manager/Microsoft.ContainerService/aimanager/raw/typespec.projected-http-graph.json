@@ -1,0 +1,656 @@
+{
+  "apiVersion": "2026-05-02-preview",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "aimanager.tsp",
+      "line": 17,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimanager.tsp",
+      "line": 30,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimanager.tsp",
+      "line": 33,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanager.tsp",
+      "line": 36,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanager.tsp",
+      "line": 40,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanager.tsp",
+      "line": 44,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimanager.tsp",
+      "line": 55,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimanager.tsp",
+      "line": 71,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimanager.tsp",
+      "line": 78,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanager.tsp",
+      "line": 80,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanager.tsp",
+      "line": 87,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanager.tsp",
+      "line": 94,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanager.tsp",
+      "line": 100,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanager.tsp",
+      "line": 101,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanager.tsp",
+      "line": 106,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 17,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 29,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 32,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 36,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 40,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 44,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 61,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 63,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 70,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 79,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 84,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 94,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 104,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 113,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 116,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 121,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 126,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimanagernamespace.tsp",
+      "line": 130,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 19,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 32,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 35,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 39,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 48,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 51,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 55,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 59,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 66,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 73,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 76,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 81,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 86,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 89,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 93,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 98,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 103,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 107,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 112,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 117,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 121,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 129,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 133,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 138,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 143,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 149,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 154,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 157,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 161,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 166,
+      "column": 7
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 183,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 185,
+      "column": 3
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 190,
+      "column": 3
+    },
+    {
+      "sourceFile": "helpers.tsp",
+      "line": 13,
+      "column": 3
+    },
+    {
+      "sourceFile": "helpers.tsp",
+      "line": 19,
+      "column": 3
+    },
+    {
+      "sourceFile": "helpers.tsp",
+      "line": 28,
+      "column": 7
+    },
+    {
+      "sourceFile": "helpers.tsp",
+      "line": 32,
+      "column": 3
+    },
+    {
+      "sourceFile": "helpers.tsp",
+      "line": 36,
+      "column": 7
+    },
+    {
+      "sourceFile": "helpers.tsp",
+      "line": 39,
+      "column": 3
+    },
+    {
+      "sourceFile": "helpers.tsp",
+      "line": 44,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 21,
+      "column": 8
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 30,
+      "column": 8
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 48,
+      "column": 7
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 60,
+      "column": 7
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 63,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 67,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 71,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 74,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 78,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 81,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 84,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 88,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 93,
+      "column": 7
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 109,
+      "column": 7
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 124,
+      "column": 7
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 127,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 131,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 135,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 139,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 143,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 147,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 151,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 155,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 159,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 164,
+      "column": 7
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 167,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 196,
+      "column": 7
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 198,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 201,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 206,
+      "column": 7
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 209,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 214,
+      "column": 7
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 217,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 221,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 227,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 230,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 237,
+      "column": 3
+    },
+    {
+      "sourceFile": "modeldeployment.tsp",
+      "line": 246,
+      "column": 3
+    },
+    {
+      "sourceFile": "modelsource.tsp",
+      "line": 18,
+      "column": 7
+    },
+    {
+      "sourceFile": "modelsource.tsp",
+      "line": 30,
+      "column": 7
+    },
+    {
+      "sourceFile": "modelsource.tsp",
+      "line": 33,
+      "column": 3
+    },
+    {
+      "sourceFile": "modelsource.tsp",
+      "line": 37,
+      "column": 3
+    },
+    {
+      "sourceFile": "modelsource.tsp",
+      "line": 40,
+      "column": 3
+    },
+    {
+      "sourceFile": "modelsource.tsp",
+      "line": 44,
+      "column": 3
+    },
+    {
+      "sourceFile": "modelsource.tsp",
+      "line": 49,
+      "column": 7
+    },
+    {
+      "sourceFile": "modelsource.tsp",
+      "line": 65,
+      "column": 7
+    },
+    {
+      "sourceFile": "modelsource.tsp",
+      "line": 67,
+      "column": 3
+    },
+    {
+      "sourceFile": "modelsource.tsp",
+      "line": 72,
+      "column": 7
+    },
+    {
+      "sourceFile": "modelsource.tsp",
+      "line": 76,
+      "column": 3
+    },
+    {
+      "sourceFile": "modelsource.tsp",
+      "line": 82,
+      "column": 3
+    },
+    {
+      "sourceFile": "modelsource.tsp",
+      "line": 85,
+      "column": 3
+    },
+    {
+      "sourceFile": "modelsource.tsp",
+      "line": 92,
+      "column": 3
+    },
+    {
+      "sourceFile": "modelsource.tsp",
+      "line": 98,
+      "column": 3
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 55,
+      "column": 3,
+      "emittedName": "isRestricted"
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 129,
+      "column": 3,
+      "emittedName": "feasible"
+    }
+  ],
+  "queryParameterLocations": []
+}

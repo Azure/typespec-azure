@@ -2,7 +2,7 @@
 
 ## Conclusion
 
-The migrated TypeSpec rule required production and comparison-harness updates. The production rule now covers the Swagger rule's authorable required, default, and create-only branches; traverses model variants inside unions; preserves project-owned diagnostic targets while traversing imported library models; and mirrors Swagger's top-level `identity` exception. It uses the same HTTP metadata visibility and optionality APIs as the Autorest emitter, so it checks only properties present in the effective PATCH schema and reports required properties according to their emitted PATCH optionality.
+The migrated TypeSpec rule required production and comparison-harness updates. The production rule now covers the Swagger rule's authorable required, default, and create-only branches; traverses model variants inside unions, including nullable top-level PATCH bodies; preserves project-owned diagnostic targets while traversing imported library models; and mirrors Swagger's top-level emitted-JSON `identity` exception. It uses the same HTTP metadata visibility and optionality APIs as the Autorest emitter, so it checks only properties present in the effective PATCH schema and reports required properties according to their emitted PATCH optionality.
 
 The corpus comparison now projects opted-in rules to the dataset-selected API version and keeps only diagnostics reachable from that version's HTTP operations. Raw TypeSpec diagnostics remain recorded for audit. This is comparison-only behavior: ordinary linting still reports diagnostics for every authored version.
 
@@ -11,9 +11,9 @@ The final full corpus run reports all 93 validator projects in the TypeSpec set,
 ## Evidence provenance
 
 - Validator report: `packages/typespec-lintdiff/specs/validator-results.json`, generated from azure-rest-api-specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` by the dataset recorded in `packages/typespec-lintdiff/specs/_meta.json`.
-- TypeSpec report: `packages/typespec-lintdiff/specs/typespec-results.json` and `comparison-results.json`, full run generated at `2026-08-24T04:36:41.110Z` from the same specs commit and local branch HEAD `10e0adf6001831a232a39d641e9424b59b0deb1e` plus the review fixes documented below.
-- Population: 468 source projects, 462 successful projects, and 6 compile failures. The full run took 1,429,932 ms.
-- Raw/projected totals: 51,137 raw TypeSpec diagnostics and 51,014 selected-version projected diagnostics across all rules.
+- TypeSpec report: `packages/typespec-lintdiff/specs/typespec-results.json` and `comparison-results.json`, full run generated at `2026-08-24T08:08:01.918Z` from the same specs commit and this branch's review fixes documented below.
+- Population: 468 source projects, 462 successful projects, and 6 compile failures. The full run took 2,506,210 ms.
+- Raw/projected totals: 51,137 raw TypeSpec diagnostics and 51,000 selected-version projected diagnostics across all rules.
 - Rule totals: 703 raw emitted Swagger diagnostics and 872 projected TypeSpec diagnostics.
 - Deduplicated totals: not defined for this rule. `normalizedValidatorDiagnosticCount` and `normalizedTypeSpecDiagnosticCount` are `null` because emitted occurrences and semantic source targets do not have a proven one-to-one identity. No inferred deduplicated count is presented as evidence.
 
@@ -21,9 +21,9 @@ The final full corpus run reports all 93 validator projects in the TypeSpec set,
 
 - Production rule: `src/rules/patch-body-parameters-schema.ts`
   - report `@visibility(Lifecycle.Create)` properties that emit exactly `x-ms-mutability: ["create"]`;
-  - recurse into models nested in unions, including nullable models;
+  - recurse into models nested in unions, including nullable nested models and nullable top-level PATCH bodies;
   - report imported-library violations at the nearest project-owned target;
-  - skip a top-level PATCH body property named `identity`;
+  - skip a top-level PATCH body property whose emitted JSON name is `identity`;
   - resolve each operation's request visibility with `resolveRequestVisibility`;
   - use `MetadataInfo.isTransformed`, `isPayloadProperty`, and `isOptional` with the same canonical Read schema sharing policy as Autorest;
   - force authored discriminator properties required and report discriminator properties synthesized by Autorest;
@@ -32,18 +32,19 @@ The final full corpus run reports all 93 validator projects in the TypeSpec set,
 - Corpus harness:
   - declare selected-version comparison through `projectionScope: http-reachable`;
   - project the service to the dataset-selected API version and index source locations reachable from its HTTP operations;
+  - retain the point-query rule's selected-version filter against projected query-parameter locations;
   - retain locationless and unrelated-rule diagnostics conservatively;
   - record raw and projected diagnostic totals separately;
   - retain the broader, rule-specific emitted-name normalization for `EnumInsteadOfBoolean` rather than forcing it through strict HTTP reachability.
 - Fixtures:
-  - required, create-only, discriminator, nullable-union, imported-model, and top-level `identity` behavior remain covered;
+  - required, create-only, discriminator, nullable-union, nullable-body, imported-model, and emitted top-level `identity` behavior remain covered;
   - `implicit-optional-patch-compliant` covers required and create-only source properties that are optional or omitted in a transformed PATCH schema;
   - `never-property-compliant` covers a required source property omitted because its type is `never`;
   - `default-patch-property` includes `false`, `0`, and `""` defaults to prove those valid TypeSpec findings are retained.
 
 ## Final corpus
 
-The final full run used specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` and was generated on `2026-08-24T04:36:41.110Z`.
+The final full run used specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` and was generated on `2026-08-24T08:08:01.918Z`.
 
 | Population                                |  Count |
 | ----------------------------------------- | -----: |
@@ -51,9 +52,9 @@ The final full run used specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` 
 | Successfully compiled projects            |    462 |
 | Compile failures                          |      6 |
 | Raw TypeSpec diagnostics, all rules       | 51,137 |
-| Projected TypeSpec diagnostics, all rules | 51,014 |
+| Projected TypeSpec diagnostics, all rules | 51,000 |
 
-The 123-diagnostic overall reduction includes selected-version HTTP reachability and the existing enum emitted-name normalization. It is not a `PatchBodyParametersSchema`-only count.
+The 137-diagnostic overall reduction includes selected-version HTTP reachability, point-query selected-version filtering, and the existing enum emitted-name normalization. It is not a `PatchBodyParametersSchema`-only count.
 
 | PatchBodyParametersSchema result      | Count |
 | ------------------------------------- | ----: |
@@ -178,18 +179,19 @@ model WidgetPatchBody {
 
 - **Classification:** validator-only
 - **Status:** fixed
-- **Project/API version:** fixture `nullable-model-required-property` / `2024-01-01`
-- **Source:** `WidgetPatchBody.details` and nested `requiredProp`
+- **Project/API version:** fixtures `nullable-body-required-property` and `nullable-model-required-property` / `2024-01-01`
+- **Source:** nullable top-level `WidgetPatchBody | null`, `WidgetPatchBody.details`, and nested `requiredProp`
 
 ```typespec
+@body body: WidgetPatchBody | null;
 details?: WidgetPatchDetails | null;
 model WidgetPatchDetails { requiredProp: string; }
 ```
 
-| Engine            | Observed result                                                           |
-| ----------------- | ------------------------------------------------------------------------- |
-| Swagger validator | Reports nested `requiredProp`.                                            |
-| TypeSpec lint     | Reports `details.requiredProp` after traversing model variants in unions. |
+| Engine            | Observed result                                                                                             |
+| ----------------- | ----------------------------------------------------------------------------------------------------------- |
+| Swagger validator | Reports required properties inside nullable model references.                                               |
+| TypeSpec lint     | Reports `requiredProp` and `details.requiredProp` after traversing model variants in root and nested unions. |
 
 **Disposition:** Production recursive traversal fix.
 
@@ -226,7 +228,7 @@ projectionScope: http-reachable
 
 ```text
 Raw TypeSpec diagnostics:       51,137
-Projected TypeSpec diagnostics: 51,014
+Projected TypeSpec diagnostics: 51,000
 ```
 
 | Engine            | Observed result                                                                                                                       |
@@ -287,14 +289,17 @@ No `PatchBodyParametersSchema` validator-only project is hidden by these failure
 
 ## Fixture evidence
 
-The repository's fixture harness validates eight cases:
+The repository's fixture harness validates eleven cases:
 
 - `required-patch-property`: Swagger and TypeSpec report the required property.
+- `nullable-body-required-property`: Swagger and TypeSpec report a required property in a nullable top-level PATCH body.
 - `default-patch-property`: Swagger reports the truthy default; TypeSpec additionally reports `false`, `0`, and `""` defaults by design.
 - `create-only-patch-property`: Swagger and TypeSpec report the create-only property.
 - `nullable-model-required-property`: Swagger and TypeSpec report a required property inside a nullable model.
 - `discriminator-required-patch-property`: Swagger and TypeSpec report both an authored optional discriminator and a discriminator synthesized by Autorest as required.
 - `top-level-identity-compliant`: both sides are clean for the skipped top-level `identity` shape.
+- `encoded-identity-compliant`: both sides are clean when an authored property emits as top-level JSON `identity`.
+- `encoded-non-identity-violating`: Swagger and TypeSpec both check an authored `identity` property that emits as a non-identity JSON property.
 - `implicit-optional-patch-compliant`: both sides are clean when the transformed PATCH schema makes required source properties optional and omits a create-only source property.
 - `never-property-compliant`: both sides are clean when Autorest omits a required `never`-typed property.
 

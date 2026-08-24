@@ -1,0 +1,241 @@
+{
+  "apiVersion": "2015-05-01",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 13,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 61,
+      "column": 6
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 76,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 81,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 87,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 93,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 100,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 106,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 112,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 119,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 125,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 131,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 137,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 144,
+      "column": 3
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 24,
+      "column": 3
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 25,
+      "column": 16
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 26,
+      "column": 35
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 35,
+      "column": 7
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 41,
+      "column": 7
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 47,
+      "column": 7
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 53,
+      "column": 7
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 59,
+      "column": 7
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 68,
+      "column": 3
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 68,
+      "column": 6
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 77,
+      "column": 5
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 83,
+      "column": 5
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 84,
+      "column": 6
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 91,
+      "column": 3
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 91,
+      "column": 6
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 100,
+      "column": 5
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 106,
+      "column": 5
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 112,
+      "column": 5
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 113,
+      "column": 6
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 121,
+      "column": 3
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 121,
+      "column": 9
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 130,
+      "column": 5
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 136,
+      "column": 5
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 142,
+      "column": 5
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 143,
+      "column": 6
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 150,
+      "column": 3
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 150,
+      "column": 9
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 159,
+      "column": 5
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 165,
+      "column": 5
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 166,
+      "column": 6
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 137,
+      "column": 3,
+      "emittedName": "IsGeneratedFromTemplate"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 53,
+      "column": 7,
+      "emittedName": "canFetchContent"
+    }
+  ],
+  "queryParameterLocations": []
+}

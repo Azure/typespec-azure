@@ -112,6 +112,7 @@ models.tsp:7227:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-sche
 models.tsp:7237:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.configuration.dapr.appProtocol.
 models.tsp:7398:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.configuration.service.type.
 models.tsp:7588:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.template.scale.maxReplicas.
+ContainerApp.tsp:87:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:location.
 ContainerApp.tsp:87:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ContainerApp.tsp:94:3 - warning tsp-lintdiff-local-linter/summary-and-description-must-not-be-same: The summary and description values should not be same.
 ContainerApp.tsp:94:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -377,6 +378,7 @@ Certificate.tsp:141:3 - warning tsp-lintdiff-local-linter/xms-examples-required:
 Certificate.tsp:158:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
 ManagedEnvironment.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ManagedEnvironment.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+ManagedEnvironment.tsp:74:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:location.
 ManagedEnvironment.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ManagedEnvironment.tsp:84:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ManagedEnvironment.tsp:96:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -608,5 +610,5 @@ routes.tsp:109:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Plea
 routes.tsp:119:7 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "environmentName" and "sessionPoolName".
 routes.tsp:119:7 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 
-Found 605 warnings.
+Found 607 warnings.
 

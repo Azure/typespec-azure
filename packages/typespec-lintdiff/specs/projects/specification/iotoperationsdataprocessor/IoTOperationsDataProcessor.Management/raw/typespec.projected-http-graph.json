@@ -1,0 +1,301 @@
+{
+  "apiVersion": "2023-10-04-preview",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "common.tsp",
+      "line": 16,
+      "column": 7
+    },
+    {
+      "sourceFile": "common.tsp",
+      "line": 18,
+      "column": 3
+    },
+    {
+      "sourceFile": "common.tsp",
+      "line": 21,
+      "column": 3
+    },
+    {
+      "sourceFile": "common.tsp",
+      "line": 26,
+      "column": 7
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 19,
+      "column": 7
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 25,
+      "column": 3
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 31,
+      "column": 3
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 35,
+      "column": 7
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 37,
+      "column": 3
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 40,
+      "column": 3
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 46,
+      "column": 3
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 50,
+      "column": 3
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 54,
+      "column": 3
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 58,
+      "column": 7
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 60,
+      "column": 3
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 63,
+      "column": 3
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 68,
+      "column": 3
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 71,
+      "column": 3
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 75,
+      "column": 3
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 76,
+      "column": 3
+    },
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 77,
+      "column": 3
+    },
+    {
+      "sourceFile": "instance.tsp",
+      "line": 17,
+      "column": 7
+    },
+    {
+      "sourceFile": "instance.tsp",
+      "line": 23,
+      "column": 3
+    },
+    {
+      "sourceFile": "instance.tsp",
+      "line": 29,
+      "column": 3
+    },
+    {
+      "sourceFile": "instance.tsp",
+      "line": 33,
+      "column": 7
+    },
+    {
+      "sourceFile": "instance.tsp",
+      "line": 35,
+      "column": 3
+    },
+    {
+      "sourceFile": "instance.tsp",
+      "line": 39,
+      "column": 3
+    },
+    {
+      "sourceFile": "instance.tsp",
+      "line": 44,
+      "column": 3
+    },
+    {
+      "sourceFile": "instance.tsp",
+      "line": 47,
+      "column": 3
+    },
+    {
+      "sourceFile": "instance.tsp",
+      "line": 51,
+      "column": 3
+    },
+    {
+      "sourceFile": "instance.tsp",
+      "line": 52,
+      "column": 3
+    },
+    {
+      "sourceFile": "instance.tsp",
+      "line": 53,
+      "column": 3
+    },
+    {
+      "sourceFile": "instance.tsp",
+      "line": 54,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 19,
+      "column": 7
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 25,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 31,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 35,
+      "column": 7
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 37,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 40,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 47,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 51,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 56,
+      "column": 7
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 58,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 61,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 64,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 69,
+      "column": 7
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 71,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 74,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 77,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 82,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 85,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 89,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 90,
+      "column": 3
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 91,
+      "column": 3
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "dataset.tsp",
+      "line": 63,
+      "column": 3,
+      "emittedName": "primaryKey"
+    },
+    {
+      "sourceFile": "pipeline.tsp",
+      "line": 40,
+      "column": 3,
+      "emittedName": "enabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

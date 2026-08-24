@@ -148,7 +148,6 @@ StorageAccount.tsp:111:3 - warning tsp-lintdiff-local-linter/lro-error-content: 
 StorageAccount.tsp:111:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme-arm: PUT request body schema should match the 200 response schema.
 StorageAccount.tsp:111:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 models.tsp:1446:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.name.
-models.tsp:3018:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 models.tsp:3224:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.customDomain.name.
 models.tsp:3244:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.encryption.keySource.
 models.tsp:3199:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.sasPolicy.sasExpirationPeriod.
@@ -353,5 +352,5 @@ routes.tsp:25:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Pleas
 routes.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:59:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 350 warnings.
+Found 349 warnings.
 

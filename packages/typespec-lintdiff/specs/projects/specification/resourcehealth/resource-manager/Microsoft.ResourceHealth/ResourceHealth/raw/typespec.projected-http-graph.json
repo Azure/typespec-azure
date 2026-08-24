@@ -1,0 +1,1574 @@
+{
+  "apiVersion": "2025-05-01",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 19,
+      "column": 7
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 23,
+      "column": 3
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 35,
+      "column": 3
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 35,
+      "column": 16
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 40,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 46,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 52,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 53,
+      "column": 6
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 63,
+      "column": 3
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 63,
+      "column": 23
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 71,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 77,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 78,
+      "column": 6
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 88,
+      "column": 3
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 88,
+      "column": 7
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 93,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 99,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 105,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 106,
+      "column": 6
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 116,
+      "column": 3
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 116,
+      "column": 22
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 125,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 131,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 132,
+      "column": 6
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 144,
+      "column": 3
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 144,
+      "column": 16
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 149,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 155,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 161,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 162,
+      "column": 6
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 172,
+      "column": 3
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 172,
+      "column": 7
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 177,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 183,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 189,
+      "column": 5
+    },
+    {
+      "sourceFile": "AvailabilityStatus.tsp",
+      "line": 190,
+      "column": 6
+    },
+    {
+      "sourceFile": "EmergingIssuesGetResult.tsp",
+      "line": 17,
+      "column": 7
+    },
+    {
+      "sourceFile": "EmergingIssuesGetResult.tsp",
+      "line": 34,
+      "column": 3
+    },
+    {
+      "sourceFile": "EmergingIssuesGetResult.tsp",
+      "line": 45,
+      "column": 3
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 17,
+      "column": 7
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 35,
+      "column": 5
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 43,
+      "column": 5
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 54,
+      "column": 3
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 61,
+      "column": 7
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 67,
+      "column": 7
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 76,
+      "column": 3
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 83,
+      "column": 7
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 89,
+      "column": 7
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 101,
+      "column": 3
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 109,
+      "column": 7
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 122,
+      "column": 3
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 136,
+      "column": 3
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 151,
+      "column": 5
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 159,
+      "column": 5
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 170,
+      "column": 3
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 177,
+      "column": 7
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 183,
+      "column": 7
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 192,
+      "column": 3
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 199,
+      "column": 7
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 205,
+      "column": 7
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 217,
+      "column": 3
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 225,
+      "column": 7
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 238,
+      "column": 3
+    },
+    {
+      "sourceFile": "EventImpactedResource.tsp",
+      "line": 19,
+      "column": 7
+    },
+    {
+      "sourceFile": "EventImpactedResource.tsp",
+      "line": 38,
+      "column": 5
+    },
+    {
+      "sourceFile": "EventImpactedResource.tsp",
+      "line": 44,
+      "column": 5
+    },
+    {
+      "sourceFile": "EventImpactedResource.tsp",
+      "line": 53,
+      "column": 5
+    },
+    {
+      "sourceFile": "EventImpactedResource.tsp",
+      "line": 63,
+      "column": 3
+    },
+    {
+      "sourceFile": "EventImpactedResource.tsp",
+      "line": 71,
+      "column": 3
+    },
+    {
+      "sourceFile": "EventImpactedResource.tsp",
+      "line": 78,
+      "column": 7
+    },
+    {
+      "sourceFile": "EventImpactedResource.tsp",
+      "line": 92,
+      "column": 5
+    },
+    {
+      "sourceFile": "EventImpactedResource.tsp",
+      "line": 98,
+      "column": 5
+    },
+    {
+      "sourceFile": "EventImpactedResource.tsp",
+      "line": 107,
+      "column": 5
+    },
+    {
+      "sourceFile": "EventImpactedResource.tsp",
+      "line": 118,
+      "column": 3
+    },
+    {
+      "sourceFile": "EventImpactedResource.tsp",
+      "line": 127,
+      "column": 3
+    },
+    {
+      "sourceFile": "EventImpactedResource.tsp",
+      "line": 134,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 58,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 58,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 66,
+      "column": 5
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 67,
+      "column": 6
+    },
+    {
+      "sourceFile": "MetadataEntity.tsp",
+      "line": 17,
+      "column": 7
+    },
+    {
+      "sourceFile": "MetadataEntity.tsp",
+      "line": 33,
+      "column": 3
+    },
+    {
+      "sourceFile": "MetadataEntity.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 17,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 44,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 59,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 98,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 140,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 187,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 204,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 221,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 238,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 265,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 282,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 304,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 324,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 359,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 363,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 368,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 373,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 378,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 383,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 388,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 393,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 398,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 404,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 409,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 414,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 419,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 424,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 431,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 437,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 442,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 448,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 453,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 459,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 465,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 471,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 476,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 482,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 487,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 493,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 497,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 503,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 509,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 514,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 520,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 525,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 531,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 536,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 541,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 546,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 552,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 556,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 562,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 566,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 571,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 576,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 581,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 589,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 594,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 600,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 606,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 612,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 616,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 621,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 627,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 631,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 636,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 641,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 646,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 653,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 657,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 662,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 667,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 672,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 678,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 682,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 687,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 692,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 697,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 702,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 707,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 714,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 719,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 725,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 731,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 737,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 743,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 748,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 754,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 760,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 766,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 770,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 775,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 780,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 785,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 790,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 795,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 800,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 805,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 810,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 815,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 820,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 825,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 830,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 836,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 842,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 848,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 854,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 859,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 865,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 871,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 876,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 881,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 886,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 891,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 896,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 902,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 907,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 912,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 917,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 922,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 931,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 936,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 941,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 946,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 951,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 957,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 961,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 966,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 972,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 978,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 982,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 987,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 992,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 997,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1003,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1009,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1013,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1018,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1024,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1028,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1033,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1039,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1045,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1049,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1054,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1059,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1064,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1070,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1076,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1082,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1086,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1092,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1101,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1107,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1111,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1117,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1122,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1128,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1132,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1137,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1143,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1147,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1152,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1157,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1163,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1167,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1174,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1179,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1185,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1191,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1197,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1201,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1206,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1211,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1217,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1223,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1227,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1232,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1237,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1243,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1248,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1253,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1258,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1263,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1269,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1274,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1280,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1284,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1289,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1294,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1300,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1304,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1309,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1359,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1364,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1370,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1377,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1382,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1388,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1395,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1400,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1406,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1413,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1418,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1424,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1429,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1435,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1445,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1449,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1456,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1461,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1466,
+      "column": 3
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 26,
+      "column": 3
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 34,
+      "column": 7
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 50,
+      "column": 3
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 57,
+      "column": 7
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 63,
+      "column": 7
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 815,
+      "column": 3,
+      "emittedName": "isEventSensitive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 871,
+      "column": 3,
+      "emittedName": "isHIR"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 876,
+      "column": 3,
+      "emittedName": "enableMicrosoftSupport"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 886,
+      "column": 3,
+      "emittedName": "platformInitiated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 891,
+      "column": 3,
+      "emittedName": "enableChatWithUs"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1263,
+      "column": 3,
+      "emittedName": "published"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Event.tsp",
+      "line": 61,
+      "column": 7,
+      "name": "$filter",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 67,
+      "column": 7,
+      "name": "queryStartTime",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 177,
+      "column": 7,
+      "name": "$filter",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Event.tsp",
+      "line": 183,
+      "column": 7,
+      "name": "queryStartTime",
+      "verb": "get"
+    }
+  ]
+}

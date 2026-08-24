@@ -237,6 +237,15 @@ Database.tsp:83:7 - warning tsp-lintdiff-local-linter/parameter-names-convention
 Database.tsp:89:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
 Database.tsp:101:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 models.tsp:5576:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.name.
+models.tsp:6079:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.createMode.
+models.tsp:6096:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.sampleName.
+models.tsp:6111:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.sourceDatabaseId.
+models.tsp:6162:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.restorePointInTime.
+models.tsp:6169:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.sourceDatabaseDeletionDate.
+models.tsp:6175:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.recoveryServicesRecoveryPointId.
+models.tsp:6181:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.longTermRetentionBackupResourceId.
+models.tsp:6191:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.recoverableDatabaseId.
+models.tsp:6197:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.restorableDroppedDatabaseId.
 Database.tsp:119:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Database.tsp:128:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Database.tsp:150:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
@@ -784,6 +793,20 @@ DistributedAvailabilityGroup.tsp:87:3 - warning tsp-lintdiff-local-linter/xms-ex
 DistributedAvailabilityGroup.tsp:96:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ManagedDatabase.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ManagedDatabase.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:11439:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.restorePointInTime.
+models.tsp:11457:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.createMode.
+models.tsp:11463:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.storageContainerUri.
+models.tsp:11469:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.sourceDatabaseId.
+models.tsp:11475:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.crossSubscriptionSourceDatabaseId.
+models.tsp:11481:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.restorableDroppedDatabaseId.
+models.tsp:11487:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.crossSubscriptionRestorableDroppedDatabaseId.
+models.tsp:11493:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.storageContainerIdentity.
+models.tsp:11500:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.storageContainerSasToken.
+models.tsp:11512:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.recoverableDatabaseId.
+models.tsp:11518:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.longTermRetentionBackupResourceId.
+models.tsp:11524:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.autoCompleteRestore.
+models.tsp:11530:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.lastBackupName.
+models.tsp:11536:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.crossSubscriptionTargetManagedInstanceId.
 models.tsp:11561:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.extendedAccessibilityInfo.inaccessibilityReasonErrorCode.
 models.tsp:11567:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.extendedAccessibilityInfo.inaccessibilityReasonDescription.
 models.tsp:11573:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.extendedAccessibilityInfo.inaccessibilityReasonKind.
@@ -841,6 +864,10 @@ ManagedInstance.tsp:56:7 - warning tsp-lintdiff-local-linter/valid-query-paramet
 ManagedInstance.tsp:56:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
 ManagedInstance.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 models.tsp:5576:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.name.
+models.tsp:12563:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.managedInstanceCreateMode.
+models.tsp:12665:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.dnsZonePartner.
+models.tsp:12676:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.sourceManagedInstanceId.
+models.tsp:12683:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.restorePointInTime.
 ManagedInstance.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ManagedInstance.tsp:98:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ManagedInstance.tsp:119:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
@@ -993,7 +1020,6 @@ JobExecution.tsp:144:7 - warning tsp-lintdiff-local-linter/parameter-names-conve
 JobExecution.tsp:132:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 JobAgent.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 JobAgent.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
-models.tsp:8645:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 models.tsp:5576:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.name.
 JobAgent.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 JobAgent.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -1547,7 +1573,6 @@ SyncAgent.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Pl
 SyncGroup.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 SyncGroup.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 models.tsp:5576:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.name.
-models.tsp:16072:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 SyncGroup.tsp:72:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 SyncGroup.tsp:78:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 SyncGroup.tsp:89:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -1560,7 +1585,6 @@ SyncMember.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: P
 models.tsp:15352:3 - warning tsp-lintdiff-local-linter/repeated-path-info: Request body property 'serverName' repeats information already carried in the path or query.
 models.tsp:15357:3 - warning tsp-lintdiff-local-linter/repeated-path-info: Request body property 'databaseName' repeats information already carried in the path or query.
 SyncMember.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
-models.tsp:16072:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 SyncMember.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 SyncMember.tsp:72:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 SyncMember.tsp:83:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -1659,5 +1683,5 @@ routes.tsp:433:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Plea
 routes.tsp:442:7 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "locationName" and "serverName".
 routes.tsp:442:7 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
 
-Found 1656 warnings.
+Found 1680 warnings.
 

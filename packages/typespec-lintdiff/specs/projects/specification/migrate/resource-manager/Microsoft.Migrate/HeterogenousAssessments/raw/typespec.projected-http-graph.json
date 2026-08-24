@@ -1,0 +1,281 @@
+{
+  "apiVersion": "2024-03-03-preview",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "Common/ArmModels/AssessmentProjectV2.tsp",
+      "line": 19,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/ArmModels/AzureResourceProperties.tsp",
+      "line": 9,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/Enums/Enums.tsp",
+      "line": 7,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/Enums/Enums.tsp",
+      "line": 39,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/Enums/Enums.tsp",
+      "line": 70,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2407,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2494,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2572,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2663,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/CommonModels.tsp",
+      "line": 160,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/CommonModels.tsp",
+      "line": 163,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/CommonModels.tsp",
+      "line": 167,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/CostComponent.tsp",
+      "line": 2,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/CostComponent.tsp",
+      "line": 5,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/CostComponent.tsp",
+      "line": 8,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/CostComponent.tsp",
+      "line": 11,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/CostComponent.tsp",
+      "line": 15,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/SavingComponent.tsp",
+      "line": 2,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/SavingComponent.tsp",
+      "line": 5,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/SavingComponent.tsp",
+      "line": 8,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/SavingComponent.tsp",
+      "line": 11,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/SavingComponent.tsp",
+      "line": 15,
+      "column": 7
+    },
+    {
+      "sourceFile": "haasmroutes.tsp",
+      "line": 18,
+      "column": 3
+    },
+    {
+      "sourceFile": "haasmroutes.tsp",
+      "line": 21,
+      "column": 3
+    },
+    {
+      "sourceFile": "haasmroutes.tsp",
+      "line": 24,
+      "column": 3
+    },
+    {
+      "sourceFile": "haasmroutes.tsp",
+      "line": 27,
+      "column": 3
+    },
+    {
+      "sourceFile": "haasmroutes.tsp",
+      "line": 33,
+      "column": 3
+    },
+    {
+      "sourceFile": "haasmroutes.tsp",
+      "line": 36,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessments.tsp",
+      "line": 17,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessments.tsp",
+      "line": 25,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessments.tsp",
+      "line": 29,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessments.tsp",
+      "line": 31,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessments.tsp",
+      "line": 35,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessments.tsp",
+      "line": 39,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessments.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessments.tsp",
+      "line": 47,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessments.tsp",
+      "line": 51,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessments.tsp",
+      "line": 55,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessmentsSummary.tsp",
+      "line": 18,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessmentsSummary.tsp",
+      "line": 26,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessmentsSummary.tsp",
+      "line": 31,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessmentsSummary.tsp",
+      "line": 34,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessmentsSummary.tsp",
+      "line": 38,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessmentsSummary.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessmentsSummary.tsp",
+      "line": 48,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessmentsSummary.tsp",
+      "line": 52,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessmentsSummary.tsp",
+      "line": 57,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessmentsSummary.tsp",
+      "line": 62,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessmentsSummary.tsp",
+      "line": 66,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessmentsSummary.tsp",
+      "line": 69,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessmentsSummary.tsp",
+      "line": 73,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/HeterogeneousAssessmentsSummary.tsp",
+      "line": 78,
+      "column": 3
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "Common/StandardizedContracts/CommonModels.tsp",
+      "line": 138,
+      "column": 3,
+      "emittedName": "isolationRequired"
+    },
+    {
+      "sourceFile": "Common/StandardizedContracts/CommonModels.tsp",
+      "line": 144,
+      "column": 3,
+      "emittedName": "isolationRequired"
+    }
+  ],
+  "queryParameterLocations": []
+}

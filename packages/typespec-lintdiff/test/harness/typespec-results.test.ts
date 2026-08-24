@@ -183,7 +183,7 @@ describe("TypeSpec result aggregation", () => {
           reachableLocations: [
             {
               sourceFile: "operations.tsp",
-              line: 20,
+              line: 10,
               column: 3,
             },
           ],
@@ -391,6 +391,9 @@ describe("validator and TypeSpec comparison", () => {
     expect(metadata.get("DeleteInOperationName")?.coverageKind).toBe("lint");
     expect(metadata.get("PostResponseCodes")?.tspLints).toEqual(mappings.get("PostResponseCodes"));
     expect(metadata.get("PatchBodyParametersSchema")?.projectionScope).toBe("http-reachable");
+    expect(metadata.get("ValidQueryParametersForPointOperations")?.projectionScope).toBe(
+      "http-reachable",
+    );
     expect(metadata.get("DeleteInOperationName")?.projectionScope).toBe("none");
   });
 

@@ -14,7 +14,10 @@ main.tsp:50:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path pa
 main.tsp:548:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:50:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 main.tsp:50:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+main.tsp:88:7 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.organizationProfile.kind.
+main.tsp:435:7 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.agentProfile.kind.
 main.tsp:466:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.agentProfile.resourcePredictionsProfile.kind.
+main.tsp:180:7 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.fabricProfile.kind.
 main.tsp:553:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:50:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 main.tsp:50:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
@@ -41,5 +44,5 @@ main.tsp:880:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path p
 main.tsp:880:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "imageName" and "poolName".
 main.tsp:880:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 
-Found 38 warnings.
+Found 41 warnings.
 

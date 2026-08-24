@@ -1,0 +1,915 @@
+{
+  "apiVersion": "2025-05-01",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 38,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 43,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 47,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 51,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 55,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 59,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 63,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 67,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 71,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 78,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 83,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 87,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 91,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 95,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 99,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 103,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 107,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 111,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 127,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 127,
+      "column": 22
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 134,
+      "column": 5
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 138,
+      "column": 5
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 142,
+      "column": 5
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 143,
+      "column": 6
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 155,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 155,
+      "column": 22
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 163,
+      "column": 5
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 167,
+      "column": 5
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 171,
+      "column": 5
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 172,
+      "column": 6
+    },
+    {
+      "sourceFile": "parameters.tsp",
+      "line": 30,
+      "column": 3
+    },
+    {
+      "sourceFile": "parameters.tsp",
+      "line": 41,
+      "column": 3
+    },
+    {
+      "sourceFile": "parameters.tsp",
+      "line": 52,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 15,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 17,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 20,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 24,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 26,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 29,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 32,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 35,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 38,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 41,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 44,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 47,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 51,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 53,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 56,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 59,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 62,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 65,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 68,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 72,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 74,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 77,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 80,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 83,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 86,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 89,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 93,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 95,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 98,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 101,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 104,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 107,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 110,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 113,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 116,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 119,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 128,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 132,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 135,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 138,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 141,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 144,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 147,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 150,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 153,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 156,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 159,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 163,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 168,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 173,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 176,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 179,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 182,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 185,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 188,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 191,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 194,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 197,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 200,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 203,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 206,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 209,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 212,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 215,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 218,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 221,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 224,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 227,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 231,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 234,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 238,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 241,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 244,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 247,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 255,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 257,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 260,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 263,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 266,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 270,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 272,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 275,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 279,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 281,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 284,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 287,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 290,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 293,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 297,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 301,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 303,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 306,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 310,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 312,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 316,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 318,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 321,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 324,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 327,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 331,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 333,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 336,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 339,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 343,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 346,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 349,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 352,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 355,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 358,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 361,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 364,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 367,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 370,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 373,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 376,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 379,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 382,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 385,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 388,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 392,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 394,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 397,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 400,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 403,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 407,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 410,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 413,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 416,
+      "column": 3
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 425,
+      "column": 7
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 428,
+      "column": 3
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 138,
+      "column": 5,
+      "emittedName": "includeStopSold"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 142,
+      "column": 5,
+      "emittedName": "includeFutureAvailabilities"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 167,
+      "column": 5,
+      "emittedName": "includeStopSold"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 171,
+      "column": 5,
+      "emittedName": "includeFutureAvailabilities"
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 227,
+      "column": 3,
+      "emittedName": "hasRi"
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 260,
+      "column": 3,
+      "emittedName": "isPiRequired"
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 376,
+      "column": 3,
+      "emittedName": "isAutorenewable"
+    },
+    {
+      "sourceFile": "sku.tsp",
+      "line": 410,
+      "column": 3,
+      "emittedName": "hasFreeTrials"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 134,
+      "column": 5,
+      "name": "language",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 138,
+      "column": 5,
+      "name": "includeStopSold",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 142,
+      "column": 5,
+      "name": "includeFutureAvailabilities",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 163,
+      "column": 5,
+      "name": "language",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 167,
+      "column": 5,
+      "name": "includeStopSold",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 171,
+      "column": 5,
+      "name": "includeFutureAvailabilities",
+      "verb": "get"
+    }
+  ]
+}

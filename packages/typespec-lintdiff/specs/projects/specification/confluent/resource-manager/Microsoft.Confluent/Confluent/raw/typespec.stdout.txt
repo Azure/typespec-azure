@@ -8,6 +8,7 @@ main.tsp:59:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types
 main.tsp:65:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
 main.tsp:71:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
 main.tsp:54:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-07-17-preview' has been in preview for over one year. Move it to GA or retire it.
+main.tsp:59:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-08-18-preview' has been in preview for over one year. Move it to GA or retire it.
 models.tsp:363:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 models.tsp:300:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 OrganizationResource.tsp:157:11 - warning tsp-lintdiff-local-linter/tracked-resources-must-have-put: Tracked resource 'OrganizationResource' must have a put/createOrUpdate operation.
@@ -112,5 +113,5 @@ routes.tsp:85:3 - warning tsp-lintdiff-local-linter/summary-and-description-must
 routes.tsp:85:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'validateOrganizationV2' should contain the action verb 'orgvalidatev2' from the route path. Consider updating the operation name.
 routes.tsp:85:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 109 warnings.
+Found 110 warnings.
 

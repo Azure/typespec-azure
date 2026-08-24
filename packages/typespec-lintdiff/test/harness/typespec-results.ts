@@ -17,6 +17,8 @@ const DATASET_SCHEMA_VERSION = 4;
 const LOCAL_RULESET = "tsp-lintdiff-local-linter/all";
 const LOCAL_RULE_PREFIX = "tsp-lintdiff-local-linter/";
 const ENUM_INSTEAD_OF_BOOLEAN_RULE = "tsp-lintdiff-local-linter/enum-instead-of-boolean";
+const VALID_QUERY_PARAMETERS_FOR_POINT_OPERATIONS_RULE =
+  "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations";
 const TSX_ESM_LOADER = import.meta.resolve("tsx/esm");
 const MAX_BUFFER = 256 * 1024 * 1024;
 
@@ -609,11 +611,17 @@ export function filterProjectedDiagnostics(
   const projectedLocations = new Set(
     projected.reachableLocations.map((location) => diagnosticLocationKey(location)!),
   );
+  const projectedQueryParameterLocations = new Set(
+    projected.queryParameterLocations.map((location) => diagnosticLocationKey(location)!),
+  );
   return diagnostics.filter((diagnostic) => {
     if (!projectedRules.has(diagnostic.rule)) {
       return true;
     }
     const key = diagnosticLocationKey(diagnostic);
+    if (diagnostic.rule === VALID_QUERY_PARAMETERS_FOR_POINT_OPERATIONS_RULE) {
+      return key === undefined || projectedQueryParameterLocations.has(key);
+    }
     return key === undefined || projectedLocations.has(key);
   });
 }

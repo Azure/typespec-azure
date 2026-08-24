@@ -41,7 +41,6 @@ models.tsp:1030:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-sche
 models.tsp:1039:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.autoStorage.authenticationMode.
 models.tsp:1562:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.publicNetworkAccess.
 models.tsp:1100:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.networkProfile.accountAccess.defaultAction.
-models.tsp:1183:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 BatchAccount.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 BatchAccount.tsp:68:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
 BatchAccount.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -115,7 +114,6 @@ models.tsp:3151:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-sche
 models.tsp:3281:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.startTask.maxTaskRetryCount.
 models.tsp:3415:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.startTask.containerSettings.imageName.
 models.tsp:3758:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.upgradePolicy.mode.
-models.tsp:3854:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 Pool.tsp:100:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Pool.tsp:125:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
 Pool.tsp:125:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -143,5 +141,5 @@ routes.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Pleas
 routes.tsp:93:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "locationName" and "accountName".
 routes.tsp:93:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
 
-Found 140 warnings.
+Found 138 warnings.
 

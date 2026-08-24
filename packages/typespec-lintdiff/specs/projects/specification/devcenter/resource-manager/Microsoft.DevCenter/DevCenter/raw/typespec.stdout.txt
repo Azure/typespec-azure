@@ -141,6 +141,7 @@ ProjectEnvironmentType.tsp:55:7 - warning tsp-lintdiff-local-linter/parameter-na
 ProjectEnvironmentType.tsp:55:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
 DevBoxDefinition.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 DevBoxDefinition.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:1681:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.sku.name.
 DevBoxDefinition.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 DevBoxDefinition.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 DevBoxDefinition.tsp:91:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
@@ -177,6 +178,7 @@ ImageDefinitionBuild.tsp:162:3 - warning tsp-lintdiff-local-linter/xms-examples-
 ImageDefinitionBuild.tsp:171:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Pool.tsp:29:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Pool.tsp:32:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:2112:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.devBoxDefinition.sku.name.
 Pool.tsp:36:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Pool.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Pool.tsp:60:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
@@ -240,5 +242,5 @@ routes.tsp:79:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Pleas
 routes.tsp:92:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'execute' should contain the action verb 'checkscopednameavailability' from the route path. Consider updating the operation name.
 routes.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 237 warnings.
+Found 239 warnings.
 

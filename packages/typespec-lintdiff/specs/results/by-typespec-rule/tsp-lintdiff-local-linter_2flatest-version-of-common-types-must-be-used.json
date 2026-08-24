@@ -1,13 +1,13 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-10T09:38:18.108Z",
+  "generatedAt": "2026-08-24T08:08:01.918Z",
   "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
-  "count": 696,
+  "count": 728,
   "levels": {
-    "warning": 696
+    "warning": 728
   },
-  "projectCount": 394,
+  "projectCount": 397,
   "results": [
     {
       "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
@@ -1663,6 +1663,46 @@
       "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
       "level": "warning",
       "origin": "local",
+      "project": "specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement",
+      "sourceFile": "main.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement",
+      "sourceFile": "main.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement",
+      "sourceFile": "main.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement",
+      "sourceFile": "main.tsp",
+      "line": 51,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
       "project": "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCIVM",
       "sourceFile": "main.tsp",
       "line": 53,
@@ -3173,6 +3213,46 @@
       "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
       "level": "warning",
       "origin": "local",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "sourceFile": "routes.tsp",
+      "line": 112,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "sourceFile": "routes.tsp",
+      "line": 139,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "sourceFile": "routes.tsp",
+      "line": 166,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+      "sourceFile": "routes.tsp",
+      "line": 200,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
       "project": "specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub",
       "sourceFile": "main.tsp",
       "line": 55,
@@ -3438,6 +3518,46 @@
       "line": 69,
       "column": 3,
       "message": "Use the latest ARM common-types version 'v6' instead of 'v3'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "sourceFile": "routes.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "sourceFile": "routes.tsp",
+      "line": 79,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "sourceFile": "routes.tsp",
+      "line": 54,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute",
+      "sourceFile": "routes.tsp",
+      "line": 79,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
     },
     {
       "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
@@ -5618,6 +5738,206 @@
       "line": 55,
       "column": 3,
       "message": "Use the latest ARM common-types version 'v6' instead of 'v4'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 90,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 98,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 90,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 98,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 90,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 98,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 52,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 58,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 65,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 90,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise",
+      "sourceFile": "Cluster.tsp",
+      "line": 98,
+      "column": 3,
+      "message": "This API version already selects the latest ARM common-types version 'v6', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'."
     },
     {
       "rule": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",

@@ -377,6 +377,7 @@ Package.tsp:42:3 - warning tsp-lintdiff-local-linter/put-request-response-scheme
 Package.tsp:42:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 models.tsp:3415:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.contentLink.contentHash.algorithm.
 models.tsp:3420:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.contentLink.contentHash.value.
+models.tsp:4747:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:allOf.location.
 Package.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Package.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Package.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -494,5 +495,5 @@ models.tsp:1802:7 - warning tsp-lintdiff-local-linter/get-collection-only-has-va
 routes.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-pageable-for-list-calls: ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata.
 
-Found 489 warnings.
+Found 490 warnings.
 

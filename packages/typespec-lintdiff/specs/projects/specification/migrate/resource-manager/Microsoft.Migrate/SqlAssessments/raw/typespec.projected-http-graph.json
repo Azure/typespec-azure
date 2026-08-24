@@ -1,0 +1,2230 @@
+{
+  "apiVersion": "2024-03-03-preview",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 120,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 122,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 125,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 128,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 133,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 137,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 140,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 143,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 264,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 266,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 269,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 274,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 323,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 325,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 328,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 333,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 335,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 338,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 341,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 344,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 348,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 353,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 357,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 359,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 363,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 366,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 369,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 372,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 375,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 379,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 381,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 385,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 389,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 392,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 396,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 398,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 402,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 405,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 408,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 411,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 414,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 419,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 421,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 424,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 427,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 431,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 433,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 436,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 439,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 442,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 445,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 449,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 451,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 454,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 458,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 461,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 464,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 468,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 475,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 479,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 484,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 489,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 493,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 496,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 500,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 504,
+      "column": 3
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 19,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 50,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 64,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 95,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 112,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 132,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 152,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 169,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 183,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 197,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 211,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 225,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 242,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 265,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 288,
+      "column": 7
+    },
+    {
+      "sourceFile": "Common/SqlEnums.tsp",
+      "line": 361,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/ArmModels/AssessmentProjectV2.tsp",
+      "line": 19,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/ArmModels/AzureResourceProperties.tsp",
+      "line": 9,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/DataModels/DownloadUrl.tsp",
+      "line": 4,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/DataModels/DownloadUrl.tsp",
+      "line": 8,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/DataModels/DownloadUrl.tsp",
+      "line": 12,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/Enums/Enums.tsp",
+      "line": 7,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/Enums/Enums.tsp",
+      "line": 39,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/Enums/Enums.tsp",
+      "line": 70,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/Enums/Enums.tsp",
+      "line": 96,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/Enums/Enums.tsp",
+      "line": 302,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/Enums/Enums.tsp",
+      "line": 385,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/Enums/Enums.tsp",
+      "line": 408,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/Enums/Enums.tsp",
+      "line": 476,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/Enums/Enums.tsp",
+      "line": 496,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/Enums/Enums.tsp",
+      "line": 513,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 18,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 23,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 28,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 32,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 35,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 39,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 47,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 54,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 58,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 62,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 66,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 70,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 74,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 79,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 84,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 89,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 94,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 98,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 101,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 105,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 108,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 112,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 115,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 119,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 123,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 126,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 130,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 133,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 137,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 141,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 145,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 149,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 154,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 158,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 161,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 165,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 169,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 173,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 177,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 182,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 186,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 190,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 193,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 197,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 201,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 204,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 208,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 213,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 218,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessedWorkloadProperties.tsp",
+      "line": 223,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 18,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 21,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 24,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 30,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 33,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 39,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 42,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 45,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 48,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 51,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 54,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 57,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 61,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 66,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 72,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 75,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 78,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 82,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 84,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 87,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 91,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 93,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 96,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 100,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 103,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 107,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 111,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 115,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/AssessmentProperties.tsp",
+      "line": 119,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 13,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 135,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 367,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2354,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2371,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2385,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2396,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2407,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2421,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2462,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2494,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2511,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2572,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2595,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2663,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2683,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2697,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2708,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2734,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 2745,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 3038,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonAssessmentPropertiesEnums.tsp",
+      "line": 3058,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonEnums.tsp",
+      "line": 2,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonEnums.tsp",
+      "line": 19,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonEnums.tsp",
+      "line": 87,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 80,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 83,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 87,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 118,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 121,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 124,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 128,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 130,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 133,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 161,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 164,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 168,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 175,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 179,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 182,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 185,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 188,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 191,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 194,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 201,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 204,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 207,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 212,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 215,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 218,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 222,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 225,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 230,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 234,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 237,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 242,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 246,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 249,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 253,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 259,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 262,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 265,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 268,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/ProductSupportStatus.tsp",
+      "line": 2,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/ProductSupportStatus.tsp",
+      "line": 5,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/ProductSupportStatus.tsp",
+      "line": 9,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/ProductSupportStatus.tsp",
+      "line": 13,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/ProductSupportStatus.tsp",
+      "line": 17,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/ProductSupportStatus.tsp",
+      "line": 21,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/ProductSupportStatus.tsp",
+      "line": 25,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/ProductSupportStatus.tsp",
+      "line": 29,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/ProductSupportStatus.tsp",
+      "line": 33,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/ProductSupportStatus.tsp",
+      "line": 37,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/ProductSupportStatus.tsp",
+      "line": 41,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/ProductSupportStatus.tsp",
+      "line": 45,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/Scope.tsp",
+      "line": 4,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/Scope.tsp",
+      "line": 6,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/Scope.tsp",
+      "line": 9,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/Scope.tsp",
+      "line": 12,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 16,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 19,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 23,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 28,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 33,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 38,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 48,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 52,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 55,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 59,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 63,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 67,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 71,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 74,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 78,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 82,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 86,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 90,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 93,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 97,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 101,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 105,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 109,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 114,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 119,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 124,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 128,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 132,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 136,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 140,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 144,
+      "column": 7
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 147,
+      "column": 3
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/SummaryProperties.tsp",
+      "line": 152,
+      "column": 3
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 19,
+      "column": 3
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 22,
+      "column": 3
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 25,
+      "column": 3
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 28,
+      "column": 3
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 34,
+      "column": 3
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 34,
+      "column": 58
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 40,
+      "column": 3
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 53,
+      "column": 7
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 57,
+      "column": 7
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 61,
+      "column": 7
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 65,
+      "column": 7
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 73,
+      "column": 3
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 76,
+      "column": 3
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 86,
+      "column": 7
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 90,
+      "column": 7
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 94,
+      "column": 7
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 98,
+      "column": 7
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 106,
+      "column": 3
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 109,
+      "column": 3
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 119,
+      "column": 7
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 123,
+      "column": 7
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 127,
+      "column": 7
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 131,
+      "column": 7
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 139,
+      "column": 3
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 142,
+      "column": 3
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 148,
+      "column": 3
+    },
+    {
+      "sourceFile": "sqlasmroutes.tsp",
+      "line": 151,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 16,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 23,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 28,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 34,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 38,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 42,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 48,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 51,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 55,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 59,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 63,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 67,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 71,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 75,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 79,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 83,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 87,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 91,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 94,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 97,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 100,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 103,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 12,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 19,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 24,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 30,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 34,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 38,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 42,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 46,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 50,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 55,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 59,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 63,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 70,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 74,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 78,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 83,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 87,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 91,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 95,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 99,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 104,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 108,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 14,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 21,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 26,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 32,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 36,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 40,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 44,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 48,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 51,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 55,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 59,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 63,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 68,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 73,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 77,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 81,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 85,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 89,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 93,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 97,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 101,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 105,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 113,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 121,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 125,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 133,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 137,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 140,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlMachineV3.tsp",
+      "line": 143,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 13,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 20,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 24,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 30,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 34,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 37,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 46,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 49,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 52,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 55,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 58,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 61,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 64,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 70,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 73,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 76,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 79,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3Summary.tsp",
+      "line": 15,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3Summary.tsp",
+      "line": 22,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlGraphAssessmentOptions.tsp",
+      "line": 20,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/SqlGraphAssessmentOptions.tsp",
+      "line": 27,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlGraphAssessmentOptions.tsp",
+      "line": 32,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/SqlGraphAssessmentOptions.tsp",
+      "line": 35,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlGraphAssessmentOptions.tsp",
+      "line": 39,
+      "column": 7
+    },
+    {
+      "sourceFile": "WebModels/SqlGraphAssessmentOptions.tsp",
+      "line": 42,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlGraphAssessmentOptions.tsp",
+      "line": 45,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlGraphAssessmentOptions.tsp",
+      "line": 48,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlGraphAssessmentOptions.tsp",
+      "line": 51,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlGraphAssessmentOptions.tsp",
+      "line": 54,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlGraphAssessmentOptions.tsp",
+      "line": 57,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlGraphAssessmentOptions.tsp",
+      "line": 60,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlGraphAssessmentOptions.tsp",
+      "line": 63,
+      "column": 3
+    },
+    {
+      "sourceFile": "WebModels/SqlGraphAssessmentOptions.tsp",
+      "line": 66,
+      "column": 3
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 44,
+      "column": 3,
+      "emittedName": "shouldProvisionReplicas"
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 179,
+      "column": 3,
+      "emittedName": "shouldProvisionReplicas"
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 253,
+      "column": 3,
+      "emittedName": "isClustered"
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 256,
+      "column": 3,
+      "emittedName": "isHighAvailabilityEnabled"
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 424,
+      "column": 3,
+      "emittedName": "isMultiSubnet"
+    },
+    {
+      "sourceFile": "Common/CommonModels.tsp",
+      "line": 475,
+      "column": 3,
+      "emittedName": "shouldProvisionReplicas"
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 139,
+      "column": 3,
+      "emittedName": "isolationRequired"
+    },
+    {
+      "sourceFile": "Normalized Contract/StandardizedContracts/CommonModels.tsp",
+      "line": 145,
+      "column": 3,
+      "emittedName": "isolationRequired"
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 63,
+      "column": 3,
+      "emittedName": "isDatabaseHighlyAvailable"
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 100,
+      "column": 3,
+      "emittedName": "isClustered"
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlDatabaseV3.tsp",
+      "line": 103,
+      "column": 3,
+      "emittedName": "isHighAvailabilityEnabled"
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 50,
+      "column": 3,
+      "emittedName": "hasScanOccurred"
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 74,
+      "column": 3,
+      "emittedName": "isClustered"
+    },
+    {
+      "sourceFile": "WebModels/AssessedSqlInstanceV3.tsp",
+      "line": 78,
+      "column": 3,
+      "emittedName": "isHighAvailabilityEnabled"
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 64,
+      "column": 3,
+      "emittedName": "isInternetAccessAvailable"
+    },
+    {
+      "sourceFile": "WebModels/SqlAssessmentV3.tsp",
+      "line": 73,
+      "column": 3,
+      "emittedName": "enableHadrAssessment"
+    }
+  ],
+  "queryParameterLocations": []
+}

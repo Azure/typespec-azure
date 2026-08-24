@@ -1,0 +1,255 @@
+{
+  "apiVersion": "2020-02-07-preview",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 59,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 59,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 60,
+      "column": 5
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 16,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 58,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 64,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 68,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 74,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 79,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 84,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 90,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 95,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 101,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 107,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 113,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 119,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 127,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 131,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 137,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 142,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 148,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 154,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 159,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 165,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 170,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 175,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 180,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 186,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 192,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 197,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 203,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 209,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 215,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 220,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 226,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 231,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 237,
+      "column": 3
+    },
+    {
+      "sourceFile": "ProviderInstance.tsp",
+      "line": 18,
+      "column": 7
+    },
+    {
+      "sourceFile": "ProviderInstance.tsp",
+      "line": 36,
+      "column": 3
+    },
+    {
+      "sourceFile": "ProviderInstance.tsp",
+      "line": 44,
+      "column": 3
+    },
+    {
+      "sourceFile": "ProviderInstance.tsp",
+      "line": 58,
+      "column": 3
+    },
+    {
+      "sourceFile": "ProviderInstance.tsp",
+      "line": 73,
+      "column": 3
+    },
+    {
+      "sourceFile": "SapMonitor.tsp",
+      "line": 16,
+      "column": 7
+    },
+    {
+      "sourceFile": "SapMonitor.tsp",
+      "line": 34,
+      "column": 3
+    },
+    {
+      "sourceFile": "SapMonitor.tsp",
+      "line": 42,
+      "column": 3
+    },
+    {
+      "sourceFile": "SapMonitor.tsp",
+      "line": 56,
+      "column": 3
+    },
+    {
+      "sourceFile": "SapMonitor.tsp",
+      "line": 69,
+      "column": 3
+    },
+    {
+      "sourceFile": "SapMonitor.tsp",
+      "line": 84,
+      "column": 3
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 175,
+      "column": 3,
+      "emittedName": "enableCustomerAnalytics"
+    }
+  ],
+  "queryParameterLocations": []
+}

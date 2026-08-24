@@ -1,0 +1,246 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "../shared/main.tsp",
+      "line": 9,
+      "column": 3
+    },
+    {
+      "sourceFile": "../shared/main.tsp",
+      "line": 12,
+      "column": 3
+    },
+    {
+      "sourceFile": "../shared/main.tsp",
+      "line": 15,
+      "column": 3
+    },
+    {
+      "sourceFile": "../shared/main.tsp",
+      "line": 18,
+      "column": 3
+    },
+    {
+      "sourceFile": "../shared/main.tsp",
+      "line": 21,
+      "column": 3
+    },
+    {
+      "sourceFile": "../shared/main.tsp",
+      "line": 24,
+      "column": 3
+    },
+    {
+      "sourceFile": "../shared/main.tsp",
+      "line": 27,
+      "column": 3
+    },
+    {
+      "sourceFile": "../shared/main.tsp",
+      "line": 31,
+      "column": 3
+    },
+    {
+      "sourceFile": "../shared/main.tsp",
+      "line": 36,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 41,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 47,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 55,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 57,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 67,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 69,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 72,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 75,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 79,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 82,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 85,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 88,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 91,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 95,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 99,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 102,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 105,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 108,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 116,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 118,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 121,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 124,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 127,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 131,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 155,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 157,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 160,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 168,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 170,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 173,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 179,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 181,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 182,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 186,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 187,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 188,
+      "column": 3
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 72,
+      "column": 3,
+      "emittedName": "contentBasedDeduplication"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 85,
+      "column": 3,
+      "emittedName": "fifoTopic"
+    }
+  ],
+  "queryParameterLocations": []
+}

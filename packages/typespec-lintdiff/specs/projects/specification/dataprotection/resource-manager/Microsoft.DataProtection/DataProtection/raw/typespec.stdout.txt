@@ -161,13 +161,16 @@ routes.tsp:119:3 - warning tsp-lintdiff-local-linter/summary-and-description-mus
 routes.tsp:119:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:135:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:156:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:191:5 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:197:5 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$skipToken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 routes.tsp:181:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'list' should contain the action verb 'fetchsecondaryrecoverypoints' from the route path. Consider updating the operation name.
 routes.tsp:181:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:214:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'get' should contain the action verb 'fetchcrossregionrestorejob' from the route path. Consider updating the operation name.
 routes.tsp:214:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:246:5 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 routes.tsp:236:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'list' should contain the action verb 'fetchcrossregionrestorejobs' from the route path. Consider updating the operation name.
 routes.tsp:236:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:264:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 166 warnings.
+Found 169 warnings.
 

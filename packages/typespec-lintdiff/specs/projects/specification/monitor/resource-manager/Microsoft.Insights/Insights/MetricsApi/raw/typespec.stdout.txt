@@ -20,6 +20,19 @@ routes.tsp:183:7 - warning tsp-lintdiff-local-linter/parameter-names-convention:
 routes.tsp:190:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'ValidateDimensions' should be camel case.
 routes.tsp:183:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 routes.tsp:190:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
+routes.tsp:215:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'region' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:221:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'timespan' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:23:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'interval' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:229:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'metricnames' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:236:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'aggregation' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:244:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:252:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:258:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:264:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'resultType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:270:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'metricnamespace' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:277:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'AutoAdjustTimegrain' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:284:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'ValidateDimensions' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:290:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'rollupby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 routes.tsp:206:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'listAtSubscriptionScopePost' should contain the action verb 'metrics' from the route path. Consider updating the operation name.
 routes.tsp:206:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:277:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
@@ -41,5 +54,5 @@ routes.tsp:373:7 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Co
 ../Common/main.tsp:179:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 ../Common/main.tsp:256:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 
-Found 38 warnings.
+Found 51 warnings.
 

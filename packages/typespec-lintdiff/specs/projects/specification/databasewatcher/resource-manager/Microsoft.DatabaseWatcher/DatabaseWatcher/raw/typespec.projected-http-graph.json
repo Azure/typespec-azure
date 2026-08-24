@@ -1,0 +1,497 @@
+{
+  "apiVersion": "2025-01-02",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "alertRuleResources.tsp",
+      "line": 15,
+      "column": 3
+    },
+    {
+      "sourceFile": "alertRuleResources.tsp",
+      "line": 16,
+      "column": 3
+    },
+    {
+      "sourceFile": "alertRuleResources.tsp",
+      "line": 17,
+      "column": 3
+    },
+    {
+      "sourceFile": "alertRuleResources.tsp",
+      "line": 18,
+      "column": 3
+    },
+    {
+      "sourceFile": "alertRuleResources.tsp",
+      "line": 23,
+      "column": 7
+    },
+    {
+      "sourceFile": "alertRuleResources.tsp",
+      "line": 29,
+      "column": 3
+    },
+    {
+      "sourceFile": "alertRuleResources.tsp",
+      "line": 34,
+      "column": 7
+    },
+    {
+      "sourceFile": "alertRuleResources.tsp",
+      "line": 36,
+      "column": 3
+    },
+    {
+      "sourceFile": "alertRuleResources.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "alertRuleResources.tsp",
+      "line": 46,
+      "column": 3
+    },
+    {
+      "sourceFile": "alertRuleResources.tsp",
+      "line": 50,
+      "column": 3
+    },
+    {
+      "sourceFile": "alertRuleResources.tsp",
+      "line": 53,
+      "column": 3
+    },
+    {
+      "sourceFile": "alertRuleResources.tsp",
+      "line": 56,
+      "column": 3
+    },
+    {
+      "sourceFile": "alertRuleResources.tsp",
+      "line": 61,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 13,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 14,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 15,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 16,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 20,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 26,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 32,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 34,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 37,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 41,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 45,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 49,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 51,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 59,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 64,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseTarget.tsp",
+      "line": 68,
+      "column": 7
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 15,
+      "column": 3
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 16,
+      "column": 3
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 18,
+      "column": 3
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 27,
+      "column": 7
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 33,
+      "column": 3
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 38,
+      "column": 7
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 41,
+      "column": 3
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 45,
+      "column": 3
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 49,
+      "column": 3
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 54,
+      "column": 3
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 58,
+      "column": 3
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 63,
+      "column": 7
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 87,
+      "column": 7
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 90,
+      "column": 3
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 94,
+      "column": 3
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 98,
+      "column": 3
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 102,
+      "column": 3
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 107,
+      "column": 3
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 111,
+      "column": 3
+    },
+    {
+      "sourceFile": "healthValidation.tsp",
+      "line": 115,
+      "column": 3
+    },
+    {
+      "sourceFile": "sharedPrivateLinkResource.tsp",
+      "line": 14,
+      "column": 3
+    },
+    {
+      "sourceFile": "sharedPrivateLinkResource.tsp",
+      "line": 17,
+      "column": 3
+    },
+    {
+      "sourceFile": "sharedPrivateLinkResource.tsp",
+      "line": 21,
+      "column": 3
+    },
+    {
+      "sourceFile": "sharedPrivateLinkResource.tsp",
+      "line": 22,
+      "column": 3
+    },
+    {
+      "sourceFile": "sharedPrivateLinkResource.tsp",
+      "line": 26,
+      "column": 7
+    },
+    {
+      "sourceFile": "sharedPrivateLinkResource.tsp",
+      "line": 33,
+      "column": 3
+    },
+    {
+      "sourceFile": "sharedPrivateLinkResource.tsp",
+      "line": 37,
+      "column": 7
+    },
+    {
+      "sourceFile": "sharedPrivateLinkResource.tsp",
+      "line": 39,
+      "column": 3
+    },
+    {
+      "sourceFile": "sharedPrivateLinkResource.tsp",
+      "line": 42,
+      "column": 3
+    },
+    {
+      "sourceFile": "sharedPrivateLinkResource.tsp",
+      "line": 45,
+      "column": 3
+    },
+    {
+      "sourceFile": "sharedPrivateLinkResource.tsp",
+      "line": 48,
+      "column": 3
+    },
+    {
+      "sourceFile": "sharedPrivateLinkResource.tsp",
+      "line": 52,
+      "column": 3
+    },
+    {
+      "sourceFile": "sharedPrivateLinkResource.tsp",
+      "line": 56,
+      "column": 3
+    },
+    {
+      "sourceFile": "sharedPrivateLinkResource.tsp",
+      "line": 60,
+      "column": 7
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 46,
+      "column": 7
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 52,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 59,
+      "column": 7
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 61,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 65,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 69,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 73,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 81,
+      "column": 7
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 83,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 90,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 93,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 96,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 99,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 103,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 106,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 110,
+      "column": 7
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 129,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 132,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 138,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 145,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 146,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 147,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 158,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 158,
+      "column": 8
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 159,
+      "column": 5
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 173,
+      "column": 3
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 173,
+      "column": 7
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 174,
+      "column": 5
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 180,
+      "column": 7
+    },
+    {
+      "sourceFile": "watcher.tsp",
+      "line": 200,
+      "column": 7
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "sqlDbDatabaseTarget.tsp",
+      "line": 27,
+      "column": 3,
+      "emittedName": "readIntent"
+    },
+    {
+      "sourceFile": "sqlDbElasticPoolTarget.tsp",
+      "line": 28,
+      "column": 3,
+      "emittedName": "readIntent"
+    },
+    {
+      "sourceFile": "sqlMiTarget.tsp",
+      "line": 29,
+      "column": 3,
+      "emittedName": "readIntent"
+    }
+  ],
+  "queryParameterLocations": []
+}

@@ -52,7 +52,6 @@ EmailConfigurationModel.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-example
 EmailConfigurationModel.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 VaultModel.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 VaultModel.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
-models.tsp:2346:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 VaultModel.tsp:56:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 VaultModel.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 VaultModel.tsp:75:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
@@ -66,6 +65,7 @@ EventModel.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: P
 FabricModel.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 FabricModel.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 models.tsp:1145:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.customProperties.
+models.tsp:1154:7 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.customProperties.instanceType.
 FabricModel.tsp:54:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 FabricModel.tsp:59:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 FabricModel.tsp:73:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter 'continuationToken' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
@@ -93,6 +93,7 @@ PrivateLinkResource.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-re
 PrivateLinkResource.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ProtectedItemModel.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ProtectedItemModel.tsp:51:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:2100:7 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.customProperties.instanceType.
 ProtectedItemModel.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ProtectedItemModel.tsp:71:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'forceDelete' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
 ProtectedItemModel.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -119,5 +120,5 @@ routes.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Pleas
 routes.tsp:73:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:90:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 116 warnings.
+Found 117 warnings.
 

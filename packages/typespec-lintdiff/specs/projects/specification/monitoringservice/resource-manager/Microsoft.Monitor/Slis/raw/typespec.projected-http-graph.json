@@ -1,0 +1,675 @@
+{
+  "apiVersion": "2025-03-01-preview",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "baselineProperties.tsp",
+      "line": 10,
+      "column": 7
+    },
+    {
+      "sourceFile": "baselineProperties.tsp",
+      "line": 12,
+      "column": 3
+    },
+    {
+      "sourceFile": "baselineProperties.tsp",
+      "line": 16,
+      "column": 7
+    },
+    {
+      "sourceFile": "baselineProperties.tsp",
+      "line": 20,
+      "column": 3
+    },
+    {
+      "sourceFile": "baselineProperties.tsp",
+      "line": 25,
+      "column": 3
+    },
+    {
+      "sourceFile": "baselineProperties.tsp",
+      "line": 28,
+      "column": 3
+    },
+    {
+      "sourceFile": "baselineProperties.tsp",
+      "line": 32,
+      "column": 7
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 11,
+      "column": 8
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 14,
+      "column": 7
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 16,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 19,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 23,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 27,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 31,
+      "column": 7
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 42,
+      "column": 7
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 44,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 48,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 52,
+      "column": 7
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 54,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 57,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 60,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 63,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 66,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 69,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 73,
+      "column": 7
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 103,
+      "column": 7
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 105,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 108,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 111,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 114,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 117,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 120,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 124,
+      "column": 7
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 127,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 130,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 134,
+      "column": 7
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 136,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 139,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 142,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 145,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 149,
+      "column": 7
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 163,
+      "column": 7
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 165,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 168,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 171,
+      "column": 3
+    },
+    {
+      "sourceFile": "kqlmQueryResult.tsp",
+      "line": 174,
+      "column": 3
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 18,
+      "column": 7
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 35,
+      "column": 7
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 37,
+      "column": 3
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 40,
+      "column": 3
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 47,
+      "column": 3
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 50,
+      "column": 3
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 54,
+      "column": 3
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 57,
+      "column": 3
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 73,
+      "column": 3
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 73,
+      "column": 19
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 79,
+      "column": 5
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 81,
+      "column": 5
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 81,
+      "column": 7
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 82,
+      "column": 21
+    },
+    {
+      "sourceFile": "signalPreview.tsp",
+      "line": 83,
+      "column": 15
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 16,
+      "column": 7
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 22,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 32,
+      "column": 7
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 35,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 39,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 42,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 45,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 49,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 53,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 58,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 61,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 65,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 69,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 72,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 75,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 79,
+      "column": 7
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 81,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 84,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 88,
+      "column": 7
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 90,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 93,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 97,
+      "column": 7
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 99,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 102,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 106,
+      "column": 7
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 117,
+      "column": 7
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 129,
+      "column": 7
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 139,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 152,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 156,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 160,
+      "column": 3
+    },
+    {
+      "sourceFile": "sli.tsp",
+      "line": 164,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 10,
+      "column": 7
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 12,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 15,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 18,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 21,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 25,
+      "column": 7
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 28,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 31,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 35,
+      "column": 7
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 37,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 40,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 46,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 49,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 59,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 62,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 65,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 69,
+      "column": 7
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 71,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 74,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 77,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 80,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 85,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 89,
+      "column": 7
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 106,
+      "column": 7
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 126,
+      "column": 7
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 167,
+      "column": 7
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 169,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 172,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 176,
+      "column": 7
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 208,
+      "column": 7
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 228,
+      "column": 7
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 230,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 233,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 237,
+      "column": 7
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 254,
+      "column": 7
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 256,
+      "column": 3
+    },
+    {
+      "sourceFile": "sliProperties.tsp",
+      "line": 259,
+      "column": 3
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "sli.tsp",
+      "line": 72,
+      "column": 3,
+      "emittedName": "enableAlert"
+    }
+  ],
+  "queryParameterLocations": []
+}

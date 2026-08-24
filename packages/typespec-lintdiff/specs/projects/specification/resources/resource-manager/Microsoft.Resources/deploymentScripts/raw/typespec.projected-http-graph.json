@@ -1,0 +1,196 @@
+{
+  "apiVersion": "2023-08-01",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 30,
+      "column": 3
+    },
+    {
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 43,
+      "column": 7
+    },
+    {
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 55,
+      "column": 3
+    },
+    {
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 61,
+      "column": 3
+    },
+    {
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 75,
+      "column": 3
+    },
+    {
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 86,
+      "column": 3
+    },
+    {
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 96,
+      "column": 3
+    },
+    {
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 104,
+      "column": 3
+    },
+    {
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 112,
+      "column": 3
+    },
+    {
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 121,
+      "column": 3
+    },
+    {
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 131,
+      "column": 3
+    },
+    {
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 141,
+      "column": 3
+    },
+    {
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 149,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 26,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 129,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 133,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 139,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 145,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 151,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 156,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 162,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 168,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 173,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 179,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 185,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 193,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 198,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 204,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 209,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 216,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 222,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 226,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 233,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 238,
+      "column": 3
+    },
+    {
+      "sourceFile": "ScriptLog.tsp",
+      "line": 19,
+      "column": 7
+    }
+  ],
+  "locations": [],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "DeploymentScript.tsp",
+      "line": 149,
+      "column": 7,
+      "name": "tail",
+      "verb": "get"
+    }
+  ]
+}

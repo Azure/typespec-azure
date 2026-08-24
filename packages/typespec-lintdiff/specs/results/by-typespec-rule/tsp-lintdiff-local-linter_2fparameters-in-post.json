@@ -1,13 +1,13 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-10T09:38:18.108Z",
+  "generatedAt": "2026-08-24T08:08:01.918Z",
   "rule": "tsp-lintdiff-local-linter/parameters-in-post",
-  "count": 217,
+  "count": 476,
   "levels": {
-    "warning": 217
+    "warning": 476
   },
-  "projectCount": 26,
+  "projectCount": 34,
   "results": [
     {
       "rule": "tsp-lintdiff-local-linter/parameters-in-post",
@@ -373,6 +373,66 @@
       "rule": "tsp-lintdiff-local-linter/parameters-in-post",
       "level": "warning",
       "origin": "local",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "sourceFile": "routes.tsp",
+      "line": 654,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "sourceFile": "routes.tsp",
+      "line": 687,
+      "column": 7,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "sourceFile": "routes.tsp",
+      "line": 901,
+      "column": 5,
+      "message": "Query parameter 'startDate' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "sourceFile": "routes.tsp",
+      "line": 907,
+      "column": 5,
+      "message": "Query parameter 'endDate' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "sourceFile": "routes.tsp",
+      "line": 951,
+      "column": 5,
+      "message": "Query parameter 'startDate' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "sourceFile": "routes.tsp",
+      "line": 957,
+      "column": 5,
+      "message": "Query parameter 'endDate' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
       "project": "specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge",
       "sourceFile": "DataBoxEdgeDevice.tsp",
       "line": 230,
@@ -428,6 +488,36 @@
       "line": 116,
       "column": 7,
       "message": "Query parameter 'startFromFailure' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "routes.tsp",
+      "line": 191,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "routes.tsp",
+      "line": 197,
+      "column": 5,
+      "message": "Query parameter '$skipToken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection",
+      "sourceFile": "routes.tsp",
+      "line": 246,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
     },
     {
       "rule": "tsp-lintdiff-local-linter/parameters-in-post",
@@ -613,6 +703,46 @@
       "rule": "tsp-lintdiff-local-linter/parameters-in-post",
       "level": "warning",
       "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "routes.tsp",
+      "line": 32,
+      "column": 7,
+      "message": "Query parameter '$skipToken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "routes.tsp",
+      "line": 49,
+      "column": 7,
+      "message": "Query parameter '$expand' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "routes.tsp",
+      "line": 55,
+      "column": 7,
+      "message": "Query parameter '$skipToken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+      "sourceFile": "routes.tsp",
+      "line": 72,
+      "column": 7,
+      "message": "Query parameter '$skipToken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
       "project": "specification/education/resource-manager/Microsoft.Education/Education",
       "sourceFile": "LabDetails.tsp",
       "line": 184,
@@ -725,9 +855,239 @@
       "origin": "local",
       "project": "specification/hybridconnectivity/HybridConnectivity.Management",
       "sourceFile": "EndpointResource.tsp",
+      "line": 135,
+      "column": 7,
+      "message": "Query parameter 'expiresin' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hybridconnectivity/HybridConnectivity.Management",
+      "sourceFile": "EndpointResource.tsp",
       "line": 163,
       "column": 7,
       "message": "Query parameter 'expiresin' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/hybridconnectivity/HybridConnectivity.Management",
+      "sourceFile": "EndpointResource.tsp",
+      "line": 163,
+      "column": 7,
+      "message": "Query parameter 'expiresin' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "routes.tsp",
+      "line": 37,
+      "column": 3,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "routes.tsp",
+      "line": 43,
+      "column": 3,
+      "message": "Query parameter '$skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "routes.tsp",
+      "line": 49,
+      "column": 3,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "routes.tsp",
+      "line": 55,
+      "column": 3,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "routes.tsp",
+      "line": 66,
+      "column": 3,
+      "message": "Query parameter '$search' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "routes.tsp",
+      "line": 72,
+      "column": 3,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "routes.tsp",
+      "line": 78,
+      "column": 3,
+      "message": "Query parameter '$view' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+      "sourceFile": "routes.tsp",
+      "line": 84,
+      "column": 3,
+      "message": "Query parameter 'groupName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
+      "sourceFile": "routes.tsp",
+      "line": 215,
+      "column": 7,
+      "message": "Query parameter 'region' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
+      "sourceFile": "routes.tsp",
+      "line": 221,
+      "column": 7,
+      "message": "Query parameter 'timespan' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
+      "sourceFile": "routes.tsp",
+      "line": 23,
+      "column": 3,
+      "message": "Query parameter 'interval' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
+      "sourceFile": "routes.tsp",
+      "line": 229,
+      "column": 7,
+      "message": "Query parameter 'metricnames' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
+      "sourceFile": "routes.tsp",
+      "line": 236,
+      "column": 7,
+      "message": "Query parameter 'aggregation' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
+      "sourceFile": "routes.tsp",
+      "line": 244,
+      "column": 7,
+      "message": "Query parameter 'top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
+      "sourceFile": "routes.tsp",
+      "line": 252,
+      "column": 7,
+      "message": "Query parameter 'orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
+      "sourceFile": "routes.tsp",
+      "line": 258,
+      "column": 7,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
+      "sourceFile": "routes.tsp",
+      "line": 264,
+      "column": 7,
+      "message": "Query parameter 'resultType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
+      "sourceFile": "routes.tsp",
+      "line": 270,
+      "column": 7,
+      "message": "Query parameter 'metricnamespace' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
+      "sourceFile": "routes.tsp",
+      "line": 277,
+      "column": 7,
+      "message": "Query parameter 'AutoAdjustTimegrain' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
+      "sourceFile": "routes.tsp",
+      "line": 284,
+      "column": 7,
+      "message": "Query parameter 'ValidateDimensions' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricsApi",
+      "sourceFile": "routes.tsp",
+      "line": 290,
+      "column": 7,
+      "message": "Query parameter 'rollupby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
     },
     {
       "rule": "tsp-lintdiff-local-linter/parameters-in-post",
@@ -1493,6 +1853,46 @@
       "rule": "tsp-lintdiff-local-linter/parameters-in-post",
       "level": "warning",
       "origin": "local",
+      "project": "specification/peering/resource-manager/Microsoft.Peering/Peering",
+      "sourceFile": "routes.tsp",
+      "line": 115,
+      "column": 7,
+      "message": "Query parameter 'command' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/peering/resource-manager/Microsoft.Peering/Peering",
+      "sourceFile": "routes.tsp",
+      "line": 121,
+      "column": 7,
+      "message": "Query parameter 'sourceType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/peering/resource-manager/Microsoft.Peering/Peering",
+      "sourceFile": "routes.tsp",
+      "line": 127,
+      "column": 7,
+      "message": "Query parameter 'sourceLocation' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/peering/resource-manager/Microsoft.Peering/Peering",
+      "sourceFile": "routes.tsp",
+      "line": 134,
+      "column": 7,
+      "message": "Query parameter 'destinationIP' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
       "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
       "sourceFile": "Remediation.tsp",
       "line": 238,
@@ -1523,10 +1923,2200 @@
       "rule": "tsp-lintdiff-local-linter/parameters-in-post",
       "level": "warning",
       "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 48,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 125,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 132,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 139,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 146,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 153,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 160,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 167,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 174,
+      "column": 5,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 200,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 207,
+      "column": 7,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 214,
+      "column": 7,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 221,
+      "column": 7,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 228,
+      "column": 7,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 235,
+      "column": 7,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 242,
+      "column": 7,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 249,
+      "column": 7,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 276,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 283,
+      "column": 7,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 290,
+      "column": 7,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 297,
+      "column": 7,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 304,
+      "column": 7,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 311,
+      "column": 7,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 318,
+      "column": 7,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 325,
+      "column": 7,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 355,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 362,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 369,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 376,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 383,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 390,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 397,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 404,
+      "column": 5,
+      "message": "Query parameter '$expand' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 411,
+      "column": 5,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 447,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 454,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 461,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 468,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 475,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 482,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 489,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 496,
+      "column": 5,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 532,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 539,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 546,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 553,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 560,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 567,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 574,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 581,
+      "column": 5,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 617,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 624,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 631,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 638,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 645,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 652,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 659,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 666,
+      "column": 5,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 708,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 715,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 722,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 729,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 736,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 743,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 750,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 757,
+      "column": 5,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 820,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 827,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 834,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 841,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 848,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 855,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 862,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 869,
+      "column": 5,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 903,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 910,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 917,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 924,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 950,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 957,
+      "column": 7,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 964,
+      "column": 7,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 971,
+      "column": 7,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 978,
+      "column": 7,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 985,
+      "column": 7,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 992,
+      "column": 7,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 999,
+      "column": 7,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1025,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1032,
+      "column": 7,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1039,
+      "column": 7,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1046,
+      "column": 7,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1073,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1080,
+      "column": 7,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1087,
+      "column": 7,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1094,
+      "column": 7,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1101,
+      "column": 7,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1108,
+      "column": 7,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1115,
+      "column": 7,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1122,
+      "column": 7,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1148,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1155,
+      "column": 7,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1162,
+      "column": 7,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1169,
+      "column": 7,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1199,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1206,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1213,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1220,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1227,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1234,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1241,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1248,
+      "column": 5,
+      "message": "Query parameter '$expand' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1255,
+      "column": 5,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1283,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1290,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1297,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1304,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1396,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1403,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1410,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1417,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1424,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1431,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1438,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1445,
+      "column": 5,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1481,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1488,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1495,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1502,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1539,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1546,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1553,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1560,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1567,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1574,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1581,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1588,
+      "column": 5,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1624,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1631,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1638,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1645,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1682,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1689,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1696,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1703,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1710,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1717,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1724,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1731,
+      "column": 5,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1767,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1774,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1781,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1788,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1831,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1838,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1845,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1852,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1859,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1866,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1873,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1880,
+      "column": 5,
+      "message": "Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1922,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1929,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1936,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 1943,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2046,
+      "column": 3,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2053,
+      "column": 3,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2060,
+      "column": 3,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2067,
+      "column": 3,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2074,
+      "column": 3,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2081,
+      "column": 3,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2088,
+      "column": 3,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2046,
+      "column": 3,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2053,
+      "column": 3,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2060,
+      "column": 3,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2067,
+      "column": 3,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2074,
+      "column": 3,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2081,
+      "column": 3,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2088,
+      "column": 3,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2140,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2147,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2154,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2161,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2168,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2175,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2182,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2189,
+      "column": 5,
+      "message": "Query parameter '$expand' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2227,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2234,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2241,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2248,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2255,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2262,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2269,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2307,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2314,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2321,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2328,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2335,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2342,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2349,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2393,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2400,
+      "column": 5,
+      "message": "Query parameter '$orderby' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2407,
+      "column": 5,
+      "message": "Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2414,
+      "column": 5,
+      "message": "Query parameter '$from' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2421,
+      "column": 5,
+      "message": "Query parameter '$to' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2428,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi",
+      "sourceFile": "routes.tsp",
+      "line": 2435,
+      "column": 5,
+      "message": "Query parameter '$apply' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyTrackedResourcesApi",
+      "sourceFile": "routes.tsp",
+      "line": 48,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyTrackedResourcesApi",
+      "sourceFile": "routes.tsp",
+      "line": 55,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyTrackedResourcesApi",
+      "sourceFile": "routes.tsp",
+      "line": 81,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyTrackedResourcesApi",
+      "sourceFile": "routes.tsp",
+      "line": 88,
+      "column": 7,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyTrackedResourcesApi",
+      "sourceFile": "routes.tsp",
+      "line": 115,
+      "column": 7,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyTrackedResourcesApi",
+      "sourceFile": "routes.tsp",
+      "line": 122,
+      "column": 7,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyTrackedResourcesApi",
+      "sourceFile": "routes.tsp",
+      "line": 152,
+      "column": 5,
+      "message": "Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyTrackedResourcesApi",
+      "sourceFile": "routes.tsp",
+      "line": 159,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/purview/resource-manager/Microsoft.Purview/Purview",
+      "sourceFile": "routes.tsp",
+      "line": 38,
+      "column": 3,
+      "message": "Query parameter 'scopeTenantId' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/purview/resource-manager/Microsoft.Purview/Purview",
+      "sourceFile": "routes.tsp",
+      "line": 88,
+      "column": 7,
+      "message": "Query parameter 'scopeType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/purview/resource-manager/Microsoft.Purview/Purview",
+      "sourceFile": "routes.tsp",
+      "line": 94,
+      "column": 7,
+      "message": "Query parameter 'scope' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
       "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
       "sourceFile": "ProtectionContainerResource.tsp",
       "line": 86,
       "column": 7,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "routes.tsp",
+      "line": 201,
+      "column": 5,
+      "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
+    },
+    {
+      "rule": "tsp-lintdiff-local-linter/parameters-in-post",
+      "level": "warning",
+      "origin": "local",
+      "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+      "sourceFile": "routes.tsp",
+      "line": 466,
+      "column": 5,
       "message": "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version."
     },
     {

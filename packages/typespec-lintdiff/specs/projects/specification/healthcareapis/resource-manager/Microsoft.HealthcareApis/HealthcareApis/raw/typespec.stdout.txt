@@ -86,7 +86,6 @@ DicomService.tsp:59:3 - warning tsp-lintdiff-local-linter/lro-error-content: Err
 DicomService.tsp:59:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 DicomService.tsp:78:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 DicomService.tsp:94:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
-models.tsp:1044:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 DicomService.tsp:94:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 DicomService.tsp:133:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
 DicomService.tsp:133:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -95,7 +94,6 @@ IotConnector.tsp:59:3 - warning tsp-lintdiff-local-linter/lro-error-content: Err
 IotConnector.tsp:59:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 IotConnector.tsp:78:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 IotConnector.tsp:103:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
-models.tsp:1044:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 IotConnector.tsp:103:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 IotConnector.tsp:142:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
 IotConnector.tsp:142:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -110,12 +108,11 @@ FhirService.tsp:65:3 - warning tsp-lintdiff-local-linter/lro-error-content: Erro
 FhirService.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 FhirService.tsp:84:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 FhirService.tsp:100:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
-models.tsp:1044:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 FhirService.tsp:100:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 FhirService.tsp:139:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
 FhirService.tsp:139:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 114 warnings.
+Found 111 warnings.
 

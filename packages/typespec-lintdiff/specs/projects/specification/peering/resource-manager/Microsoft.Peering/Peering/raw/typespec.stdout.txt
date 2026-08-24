@@ -57,6 +57,10 @@ PeeringServicePrefix.tsp:62:7 - warning tsp-lintdiff-local-linter/parameter-name
 PeeringServicePrefix.tsp:62:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
 routes.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+routes.tsp:115:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'command' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:121:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'sourceType' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:127:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'sourceLocation' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
+routes.tsp:134:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'destinationIP' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 routes.tsp:107:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'invoke' should contain the action verb 'lookingglass' from the route path. Consider updating the operation name.
 routes.tsp:107:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:134:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name 'destinationIP' should be camel case.
@@ -66,5 +70,5 @@ routes.tsp:191:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Plea
 routes.tsp:213:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:225:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 63 warnings.
+Found 67 warnings.
 

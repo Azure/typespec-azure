@@ -13,7 +13,6 @@ models.tsp:283:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Co
 models.tsp:438:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 ScheduledQueryRuleResource.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ScheduledQueryRuleResource.tsp:71:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
-../Common/main.tsp:87:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 ScheduledQueryRuleResource.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ScheduledQueryRuleResource.tsp:91:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ScheduledQueryRuleResource.tsp:100:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -22,5 +21,5 @@ ScheduledQueryRuleResource.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-exa
 ../Common/main.tsp:179:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 ../Common/main.tsp:256:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 
-Found 19 warnings.
+Found 18 warnings.
 

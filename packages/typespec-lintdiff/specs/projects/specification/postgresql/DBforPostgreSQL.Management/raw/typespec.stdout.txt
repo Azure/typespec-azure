@@ -26,7 +26,6 @@ Migration.tsp:66:7 - warning tsp-lintdiff-local-linter/query-parameters-in-colle
 Migration.tsp:59:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Server.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Server.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
-models.tsp:2919:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 models.tsp:3517:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.highAvailability.standbyAvailabilityZone.
 models.tsp:3434:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.availabilityZone.
 models.tsp:3328:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.cluster.clusterSize.
@@ -115,5 +114,5 @@ routes.tsp:141:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Plea
 routes.tsp:156:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:159:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 112 warnings.
+Found 111 warnings.
 

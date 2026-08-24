@@ -1,0 +1,216 @@
+{
+  "apiVersion": "2023-01-01-preview",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "ActivityLogAlertResource.tsp",
+      "line": 16,
+      "column": 7
+    },
+    {
+      "sourceFile": "ActivityLogAlertResource.tsp",
+      "line": 28,
+      "column": 3
+    },
+    {
+      "sourceFile": "ActivityLogAlertResource.tsp",
+      "line": 33,
+      "column": 3
+    },
+    {
+      "sourceFile": "ActivityLogAlertResource.tsp",
+      "line": 41,
+      "column": 3
+    },
+    {
+      "sourceFile": "ActivityLogAlertResource.tsp",
+      "line": 49,
+      "column": 3
+    },
+    {
+      "sourceFile": "ActivityLogAlertResource.tsp",
+      "line": 58,
+      "column": 3
+    },
+    {
+      "sourceFile": "ActivityLogAlertResource.tsp",
+      "line": 67,
+      "column": 3
+    },
+    {
+      "sourceFile": "ActivityLogAlertResource.tsp",
+      "line": 75,
+      "column": 3
+    },
+    {
+      "sourceFile": "ActivityLogAlertResource.tsp",
+      "line": 84,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 17,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 21,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 26,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 31,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 36,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 41,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 46,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 52,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 57,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 71,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 76,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 83,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 88,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 93,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 98,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 104,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 109,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 115,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 119,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 125,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 131,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 174,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 179,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 185,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 191,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 196,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 201,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 207,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 211,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 217,
+      "column": 7
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 41,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 211,
+      "column": 3,
+      "emittedName": "enabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

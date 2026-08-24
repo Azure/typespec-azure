@@ -4,7 +4,7 @@ Specs commit: `f6b53f105b95da05276530a0754a1c71b4f16397`
 
 Scope: full (462/468 projects)
 
-Analysis duration: 1393248 ms
+Analysis duration: 2506210 ms
 
 Only successfully compiled TypeSpec projects are included in validator and TypeSpec counts.
 
@@ -78,7 +78,7 @@ Coverage is observed only when a mapped TypeSpec diagnostic fires in the same in
 | IntegerTypeMustHaveFormat | production | unknown | 2 | 0 | 0 | 2 | 0 | 0.0% | no | — | — | 5 | 0 |
 | InvalidSkuModel | production | unknown | 7 | 0 | 0 | 7 | 0 | 0.0% | no | — | — | 7 | 0 |
 | InvalidVerbUsed | production | unknown | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |
-| LatestVersionOfCommonTypesMustBeUsed | production | lint | 388 | 388 | 381 | 7 | 7 | 98.2% | no | tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used | tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used | 40692 | 687 |
+| LatestVersionOfCommonTypesMustBeUsed | production | lint | 388 | 391 | 384 | 4 | 7 | 99.0% | no | tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used | tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used | 40692 | 719 |
 | LicenseHeaderMustNotBeSpecified | production | unknown | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |
 | ListInOperationName | production | lint | 53 | 71 | 47 | 6 | 24 | 88.7% | no | tsp-lintdiff-local-linter/list-in-operation-name | tsp-lintdiff-local-linter/list-in-operation-name | 172 | 391 |
 | LocationMustHaveXmsMutability | production | template | 89 | 0 | 0 | 89 | 0 | 0.0% | no | — | — | 503 | 0 |
@@ -129,10 +129,10 @@ Coverage is observed only when a mapped TypeSpec diagnostic fires in the same in
 | ParameterNotUsingCommonTypes | production | template | 70 | 0 | 0 | 70 | 0 | 0.0% | no | — | — | 463 | 0 |
 | ParameterOrder | production | unknown | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |
 | ParametersInPointGet | production | lint | 40 | 62 | 40 | 0 | 22 | 100.0% | no | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | 189 | 724 |
-| ParametersInPost | production | unknown | 32 | 24 | 24 | 8 | 0 | 75.0% | no | tsp-lintdiff-local-linter/parameters-in-post | tsp-lintdiff-local-linter/parameters-in-post | 424 | 167 |
+| ParametersInPost | production | unknown | 32 | 32 | 32 | 0 | 0 | 100.0% | no | tsp-lintdiff-local-linter/parameters-in-post | tsp-lintdiff-local-linter/parameters-in-post | 424 | 426 |
 | ParametersOrder | production | unknown | 9 | 0 | 0 | 9 | 0 | 0.0% | no | — | — | 54 | 0 |
 | ParametersSchemaAsTypeObject | production | unknown | 9 | 10 | 4 | 5 | 6 | 44.4% | no | tsp-lintdiff-local-linter/parameters-schema-as-type-object | tsp-lintdiff-local-linter/parameters-schema-as-type-object | 18 | 63 |
-| PatchBodyParametersSchema | production | partial | 93 | 128 | 89 | 4 | 39 | 95.7% | no | tsp-lintdiff-local-linter/patch-body-parameters-schema | tsp-lintdiff-local-linter/patch-body-parameters-schema | 703 | 1230 |
+| PatchBodyParametersSchema | production | partial | 93 | 105 | 93 | 0 | 12 | 100.0% | no | tsp-lintdiff-local-linter/patch-body-parameters-schema | tsp-lintdiff-local-linter/patch-body-parameters-schema | 703 | 872 |
 | PatchContentType | production | unknown | 0 | 0 | 0 | 0 | 0 | — | no | — | — | 0 | 0 |
 | PatchIdentityProperty | production | template | 21 | 0 | 0 | 21 | 0 | 0.0% | no | — | — | 32 | 0 |
 | PatchInOperationName | production | lint | 14 | 24 | 14 | 0 | 10 | 100.0% | no | tsp-lintdiff-local-linter/patch-in-operation-name | tsp-lintdiff-local-linter/patch-in-operation-name | 14 | 63 |
@@ -154,7 +154,7 @@ Coverage is observed only when a mapped TypeSpec diagnostic fires in the same in
 | Post201Response | production | unknown | 0 | 2 | 0 | 0 | 2 | — | no | tsp-lintdiff-local-linter/post-201-response | tsp-lintdiff-local-linter/post-201-response | 0 | 6 |
 | PostOperationIdContainsUrlVerb | production | lint | 96 | 99 | 94 | 2 | 5 | 97.9% | no | tsp-lintdiff-local-linter/post-operation-id-contains-url-verb | tsp-lintdiff-local-linter/post-operation-id-contains-url-verb | 415 | 510 |
 | PostResponseCodes | production | unknown | 112 | 0 | 0 | 112 | 0 | 0.0% | yes | — | @azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes | 724 | 0 |
-| PreviewVersionOverOneYear | production | lint | 108 | 173 | 108 | 0 | 65 | 100.0% | no | tsp-lintdiff-local-linter/preview-version-over-one-year | tsp-lintdiff-local-linter/preview-version-over-one-year | 358 | 248 |
+| PreviewVersionOverOneYear | production | lint | 108 | 174 | 108 | 0 | 66 | 100.0% | no | tsp-lintdiff-local-linter/preview-version-over-one-year | tsp-lintdiff-local-linter/preview-version-over-one-year | 358 | 252 |
 | PrivateEndpointResourceSchemaValidation | production | unknown | 3 | 0 | 0 | 3 | 0 | 0.0% | no | — | — | 3 | 0 |
 | PropertiesTypeObjectNoDefinition | production | lint | 0 | 0 | 0 | 0 | 0 | — | yes | — | @azure-tools/typespec-azure-resource-manager/no-empty-model | 0 | 0 |
 | PropertyDescription | production | unknown | 0 | 0 | 0 | 0 | 0 | — | yes | — | @azure-tools/typespec-azure-core/documentation-required | 0 | 0 |

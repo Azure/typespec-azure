@@ -41,7 +41,6 @@ Workspace.tsp:172:3 - warning tsp-lintdiff-local-linter/xms-examples-required: P
 models.tsp:2747:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.sku.name.
 models.tsp:2700:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.publicNetworkAccessForIngestion.
 models.tsp:2705:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.publicNetworkAccessForQuery.
-models.tsp:2923:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 Workspace.tsp:190:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Workspace.tsp:205:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'force' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
 Workspace.tsp:198:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -184,5 +183,5 @@ routes.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Pleas
 routes.tsp:94:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:106:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 181 warnings.
+Found 180 warnings.
 

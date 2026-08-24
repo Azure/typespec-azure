@@ -1,0 +1,15 @@
+[
+  {
+    "code": "PatchBodyParametersSchema",
+    "message": "Properties of a PATCH request body must not be required, property:requiredProp.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "parameters",
+      "4",
+      "schema"
+    ],
+    "severity": 0
+  }
+]

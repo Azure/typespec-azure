@@ -25,6 +25,7 @@ versions.tsp:33:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-y
 versions.tsp:36:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-06-01-preview' has been in preview for over one year. Move it to GA or retire it.
 versions.tsp:39:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-07-01-preview' has been in preview for over one year. Move it to GA or retire it.
 versions.tsp:42:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-08-01-preview' has been in preview for over one year. Move it to GA or retire it.
+versions.tsp:45:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2025-08-15-preview' has been in preview for over one year. Move it to GA or retire it.
 models/exadata/exadatainfra.tsp:80:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 models/exadata/exadatainfra.tsp:83:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 models/exadata/exadatainfra.tsp:125:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
@@ -327,5 +328,5 @@ models/basedb/dbVersion.tsp:81:3 - warning tsp-lintdiff-local-linter/enum-instea
 models/basedb/dbVersion.tsp:77:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 models/basedb/dbVersion.tsp:81:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 
-Found 279 warnings.
+Found 280 warnings.
 

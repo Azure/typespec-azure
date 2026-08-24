@@ -1,0 +1,347 @@
+{
+  "apiVersion": "2024-07-01",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 52,
+      "column": 3
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 52,
+      "column": 7
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 53,
+      "column": 5
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 45,
+      "column": 6
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 61,
+      "column": 6
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 77,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 83,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 87,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 89,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 91,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 93,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 97,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 99,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 101,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 103,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 105,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 114,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 118,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 126,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 130,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 135,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 140,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 146,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 153,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 155,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 159,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 163,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 170,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 173,
+      "column": 13
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 181,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 185,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 190,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 197,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 199,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 203,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 207,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 214,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 216,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 220,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 224,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 231,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 236,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 243,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 247,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 252,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 259,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 263,
+      "column": 3
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 25,
+      "column": 4
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 25,
+      "column": 20
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 32,
+      "column": 9
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 34,
+      "column": 3
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 44,
+      "column": 3
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 56,
+      "column": 3
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 72,
+      "column": 3
+    },
+    {
+      "sourceFile": "SerialPort.tsp",
+      "line": 17,
+      "column": 7
+    },
+    {
+      "sourceFile": "SerialPort.tsp",
+      "line": 36,
+      "column": 3
+    },
+    {
+      "sourceFile": "SerialPort.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "SerialPort.tsp",
+      "line": 49,
+      "column": 3
+    },
+    {
+      "sourceFile": "SerialPort.tsp",
+      "line": 55,
+      "column": 3
+    },
+    {
+      "sourceFile": "SerialPort.tsp",
+      "line": 64,
+      "column": 3
+    },
+    {
+      "sourceFile": "SerialPort.tsp",
+      "line": 74,
+      "column": 3
+    },
+    {
+      "sourceFile": "SerialPort.tsp",
+      "line": 84,
+      "column": 3
+    },
+    {
+      "sourceFile": "SerialPort.tsp",
+      "line": 94,
+      "column": 3
+    },
+    {
+      "sourceFile": "SerialPort.tsp",
+      "line": 103,
+      "column": 3
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 163,
+      "column": 3,
+      "emittedName": "disabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 207,
+      "column": 3,
+      "emittedName": "disabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 224,
+      "column": 3,
+      "emittedName": "disabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

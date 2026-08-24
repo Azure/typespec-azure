@@ -1,0 +1,325 @@
+{
+  "apiVersion": "2026-07-31",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "Feature.tsp",
+      "line": 17,
+      "column": 7
+    },
+    {
+      "sourceFile": "Feature.tsp",
+      "line": 27,
+      "column": 7
+    },
+    {
+      "sourceFile": "Feature.tsp",
+      "line": 29,
+      "column": 3
+    },
+    {
+      "sourceFile": "Feature.tsp",
+      "line": 36,
+      "column": 7
+    },
+    {
+      "sourceFile": "Feature.tsp",
+      "line": 49,
+      "column": 7
+    },
+    {
+      "sourceFile": "Feature.tsp",
+      "line": 51,
+      "column": 3
+    },
+    {
+      "sourceFile": "Feature.tsp",
+      "line": 59,
+      "column": 3
+    },
+    {
+      "sourceFile": "Feature.tsp",
+      "line": 62,
+      "column": 3
+    },
+    {
+      "sourceFile": "Feature.tsp",
+      "line": 79,
+      "column": 3
+    },
+    {
+      "sourceFile": "Feature.tsp",
+      "line": 98,
+      "column": 3
+    },
+    {
+      "sourceFile": "GuestSubscription.tsp",
+      "line": 13,
+      "column": 7
+    },
+    {
+      "sourceFile": "GuestSubscription.tsp",
+      "line": 23,
+      "column": 7
+    },
+    {
+      "sourceFile": "GuestSubscription.tsp",
+      "line": 33,
+      "column": 3
+    },
+    {
+      "sourceFile": "GuestSubscription.tsp",
+      "line": 38,
+      "column": 3
+    },
+    {
+      "sourceFile": "GuestSubscription.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "GuestSubscription.tsp",
+      "line": 48,
+      "column": 3
+    },
+    {
+      "sourceFile": "MemberCapOverride.tsp",
+      "line": 20,
+      "column": 7
+    },
+    {
+      "sourceFile": "MemberCapOverride.tsp",
+      "line": 31,
+      "column": 7
+    },
+    {
+      "sourceFile": "MemberCapOverride.tsp",
+      "line": 34,
+      "column": 3
+    },
+    {
+      "sourceFile": "MemberCapOverride.tsp",
+      "line": 44,
+      "column": 3
+    },
+    {
+      "sourceFile": "MemberCapOverride.tsp",
+      "line": 47,
+      "column": 3
+    },
+    {
+      "sourceFile": "MemberCapOverride.tsp",
+      "line": 50,
+      "column": 3
+    },
+    {
+      "sourceFile": "MemberCapOverride.tsp",
+      "line": 53,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimit.tsp",
+      "line": 13,
+      "column": 7
+    },
+    {
+      "sourceFile": "SharedLimit.tsp",
+      "line": 22,
+      "column": 7
+    },
+    {
+      "sourceFile": "SharedLimit.tsp",
+      "line": 25,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimit.tsp",
+      "line": 29,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimit.tsp",
+      "line": 33,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimit.tsp",
+      "line": 39,
+      "column": 7
+    },
+    {
+      "sourceFile": "SharedLimit.tsp",
+      "line": 41,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimit.tsp",
+      "line": 45,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimit.tsp",
+      "line": 54,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimit.tsp",
+      "line": 59,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimit.tsp",
+      "line": 64,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimit.tsp",
+      "line": 69,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 20,
+      "column": 7
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 30,
+      "column": 7
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 38,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 54,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 63,
+      "column": 7
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 66,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 70,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 75,
+      "column": 7
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 82,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 87,
+      "column": 7
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 90,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 98,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 103,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 106,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 109,
+      "column": 3
+    },
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 116,
+      "column": 3
+    },
+    {
+      "sourceFile": "TrustedHostSubscription.tsp",
+      "line": 20,
+      "column": 7
+    },
+    {
+      "sourceFile": "TrustedHostSubscription.tsp",
+      "line": 39,
+      "column": 3
+    },
+    {
+      "sourceFile": "TrustedHostSubscription.tsp",
+      "line": 44,
+      "column": 3
+    },
+    {
+      "sourceFile": "TrustedHostSubscription.tsp",
+      "line": 49,
+      "column": 3
+    },
+    {
+      "sourceFile": "TrustedHostSubscription.tsp",
+      "line": 54,
+      "column": 3
+    },
+    {
+      "sourceFile": "VmFamily.tsp",
+      "line": 16,
+      "column": 7
+    },
+    {
+      "sourceFile": "VmFamily.tsp",
+      "line": 26,
+      "column": 7
+    },
+    {
+      "sourceFile": "VmFamily.tsp",
+      "line": 28,
+      "column": 3
+    },
+    {
+      "sourceFile": "VmFamily.tsp",
+      "line": 38,
+      "column": 3
+    },
+    {
+      "sourceFile": "VmFamily.tsp",
+      "line": 41,
+      "column": 3
+    },
+    {
+      "sourceFile": "VmFamily.tsp",
+      "line": 46,
+      "column": 7
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "SharedLimitCap.tsp",
+      "line": 54,
+      "column": 3,
+      "emittedName": "isBoundedCap"
+    }
+  ],
+  "queryParameterLocations": []
+}

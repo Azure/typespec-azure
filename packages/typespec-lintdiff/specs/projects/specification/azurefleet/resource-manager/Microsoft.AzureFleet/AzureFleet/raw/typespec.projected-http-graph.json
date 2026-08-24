@@ -1,0 +1,2324 @@
+{
+  "apiVersion": "2026-06-01-preview",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 13,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 18,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 23,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 29,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 35,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 40,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 46,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 60,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 65,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 72,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 78,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 83,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 89,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 96,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 102,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 111,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 118,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 123,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 135,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 155,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 166,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 171,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 178,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 190,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 197,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 202,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 208,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 216,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 223,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 232,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 239,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 244,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 251,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 258,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 266,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 270,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 276,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 282,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 291,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 297,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 311,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 318,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 327,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 333,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 341,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 346,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 351,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 358,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 363,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 370,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 375,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 393,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 401,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 405,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 410,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 419,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 424,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 431,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 437,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 442,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 449,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 455,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 463,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 469,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 478,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 487,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 493,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 501,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 506,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 511,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 517,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 522,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 528,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 534,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 538,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 545,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 562,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 573,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 579,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 586,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 594,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 603,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 608,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 618,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 622,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 628,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 633,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 647,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 655,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 661,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 667,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 674,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 678,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 685,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 690,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 699,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 705,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 713,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 720,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 725,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 731,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 736,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 748,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 756,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 760,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 771,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 777,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 781,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 787,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 792,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 798,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 803,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 812,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 819,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 827,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 834,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 840,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 844,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 851,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 858,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 863,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 868,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 877,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 882,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 890,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 898,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 908,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 914,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 920,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 926,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 933,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 939,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 944,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 950,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 954,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 959,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 965,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 970,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 975,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 980,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 985,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 990,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 995,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1001,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1007,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1012,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1018,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1024,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1030,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1034,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1041,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1045,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1051,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1059,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1063,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1069,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1074,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1081,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1089,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1094,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1101,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1108,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1116,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1120,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1126,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1132,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1140,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1144,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1149,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1155,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1160,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1167,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1172,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1179,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1185,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1193,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1199,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1203,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1208,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1216,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1220,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1225,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1232,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1237,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1246,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1253,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1259,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1265,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1272,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1277,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1283,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1290,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1294,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1301,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1306,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1314,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1320,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1326,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1334,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1343,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1347,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1354,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1360,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1364,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1372,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1378,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1382,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1388,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1393,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1399,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1405,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1410,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1415,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1420,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1427,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1433,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1439,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1450,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1456,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1462,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1469,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1475,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1481,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1486,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1491,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1502,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1508,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1512,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1517,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1523,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1530,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1535,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1542,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1549,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1554,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1560,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1567,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1574,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1579,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1587,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1591,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1596,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1602,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1608,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1614,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1620,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1626,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1632,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1639,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1647,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1657,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1665,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1670,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1677,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1682,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1688,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1693,
+      "column": 3
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1700,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1719,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1746,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1763,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1791,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1810,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1831,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1849,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1876,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1900,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1917,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1956,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1973,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1993,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 2025,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 2068,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 2095,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 2107,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 2125,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 2148,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 2182,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 2202,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 2229,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 2246,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 2265,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 2285,
+      "column": 7
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 2332,
+      "column": 7
+    },
+    {
+      "sourceFile": "common.tsp",
+      "line": 12,
+      "column": 7
+    },
+    {
+      "sourceFile": "common.tsp",
+      "line": 15,
+      "column": 3
+    },
+    {
+      "sourceFile": "common.tsp",
+      "line": 18,
+      "column": 3
+    },
+    {
+      "sourceFile": "common.tsp",
+      "line": 22,
+      "column": 7
+    },
+    {
+      "sourceFile": "common.tsp",
+      "line": 24,
+      "column": 3
+    },
+    {
+      "sourceFile": "common.tsp",
+      "line": 27,
+      "column": 3
+    },
+    {
+      "sourceFile": "common.tsp",
+      "line": 30,
+      "column": 3
+    },
+    {
+      "sourceFile": "common.tsp",
+      "line": 34,
+      "column": 7
+    },
+    {
+      "sourceFile": "common.tsp",
+      "line": 36,
+      "column": 3
+    },
+    {
+      "sourceFile": "common.tsp",
+      "line": 39,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 16,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 22,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 26,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 33,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 37,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 40,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 43,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 46,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 49,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 54,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 72,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 75,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 78,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 81,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 85,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 89,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 93,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 96,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 100,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 104,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 108,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 113,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 121,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 125,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 129,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 133,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 139,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 149,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 158,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 162,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 164,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 173,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 180,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 184,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 188,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 191,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 194,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 197,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 206,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 210,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 224,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 226,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 230,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 242,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 254,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 260,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 263,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 269,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 272,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 276,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 282,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 285,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 289,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 294,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 312,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 358,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 376,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 388,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 400,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 415,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 428,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 430,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 433,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 436,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 442,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 448,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 454,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 457,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 460,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 463,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 466,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 473,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 480,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 487,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 493,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 500,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 503,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 506,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 509,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 512,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 515,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 520,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 524,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 530,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 535,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 538,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 543,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 555,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 570,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 572,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 576,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 581,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 599,
+      "column": 7
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 601,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 610,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 632,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 636,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 642,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 644,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 646,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 648,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 654,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 665,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 676,
+      "column": 3
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 680,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachine.tsp",
+      "line": 15,
+      "column": 7
+    },
+    {
+      "sourceFile": "virtualMachine.tsp",
+      "line": 20,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachine.tsp",
+      "line": 26,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachine.tsp",
+      "line": 31,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachine.tsp",
+      "line": 35,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachine.tsp",
+      "line": 39,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachine.tsp",
+      "line": 44,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachine.tsp",
+      "line": 49,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachine.tsp",
+      "line": 54,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachine.tsp",
+      "line": 59,
+      "column": 7
+    },
+    {
+      "sourceFile": "virtualMachine.tsp",
+      "line": 77,
+      "column": 7
+    },
+    {
+      "sourceFile": "virtualMachine.tsp",
+      "line": 80,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachine.tsp",
+      "line": 84,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachineScaleSet.tsp",
+      "line": 14,
+      "column": 7
+    },
+    {
+      "sourceFile": "virtualMachineScaleSet.tsp",
+      "line": 19,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachineScaleSet.tsp",
+      "line": 26,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachineScaleSet.tsp",
+      "line": 30,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachineScaleSet.tsp",
+      "line": 40,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachineScaleSet.tsp",
+      "line": 45,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachineScaleSet.tsp",
+      "line": 49,
+      "column": 7
+    },
+    {
+      "sourceFile": "virtualMachineScaleSet.tsp",
+      "line": 52,
+      "column": 3
+    },
+    {
+      "sourceFile": "virtualMachineScaleSet.tsp",
+      "line": 56,
+      "column": 3
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 197,
+      "column": 3,
+      "emittedName": "allowExtensionOperations"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 202,
+      "column": 3,
+      "emittedName": "requireGuestProvisionSignal"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 216,
+      "column": 3,
+      "emittedName": "provisionVMAgent"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 223,
+      "column": 3,
+      "emittedName": "enableAutomaticUpdates"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 258,
+      "column": 3,
+      "emittedName": "enableVMAgentPlatformUpdates"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 318,
+      "column": 3,
+      "emittedName": "enableHotpatching"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 351,
+      "column": 3,
+      "emittedName": "bypassPlatformSafetyChecksOnUserSchedule"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 405,
+      "column": 3,
+      "emittedName": "disablePasswordAuthentication"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 419,
+      "column": 3,
+      "emittedName": "provisionVMAgent"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 431,
+      "column": 3,
+      "emittedName": "enableVMAgentPlatformUpdates"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 511,
+      "column": 3,
+      "emittedName": "bypassPlatformSafetyChecksOnUserSchedule"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 690,
+      "column": 3,
+      "emittedName": "writeAcceleratorEnabled"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 863,
+      "column": 3,
+      "emittedName": "writeAcceleratorEnabled"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 970,
+      "column": 3,
+      "emittedName": "primary"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 975,
+      "column": 3,
+      "emittedName": "enableAcceleratedNetworking"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 980,
+      "column": 3,
+      "emittedName": "disableTcpStateTracking"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 985,
+      "column": 3,
+      "emittedName": "enableFpga"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1007,
+      "column": 3,
+      "emittedName": "enableIPForwarding"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1069,
+      "column": 3,
+      "emittedName": "primary"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1246,
+      "column": 3,
+      "emittedName": "encryptionAtHost"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1277,
+      "column": 3,
+      "emittedName": "secureBootEnabled"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1283,
+      "column": 3,
+      "emittedName": "vTpmEnabled"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1306,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1347,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1427,
+      "column": 3,
+      "emittedName": "autoUpgradeMinorVersion"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1433,
+      "column": 3,
+      "emittedName": "enableAutomaticUpgrade"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1469,
+      "column": 3,
+      "emittedName": "suppressFailures"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1535,
+      "column": 3,
+      "emittedName": "enable"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1554,
+      "column": 3,
+      "emittedName": "enable"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1614,
+      "column": 3,
+      "emittedName": "treatFailureAsDeploymentFailure"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1620,
+      "column": 3,
+      "emittedName": "enableAutomaticUpgrade"
+    },
+    {
+      "sourceFile": "baseVirtualMachineProfile.tsp",
+      "line": 1693,
+      "column": 3,
+      "emittedName": "isOverridable"
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 206,
+      "column": 3,
+      "emittedName": "maintain"
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 260,
+      "column": 3,
+      "emittedName": "ultraSSDEnabled"
+    },
+    {
+      "sourceFile": "fleet.tsp",
+      "line": 263,
+      "column": 3,
+      "emittedName": "hibernationEnabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

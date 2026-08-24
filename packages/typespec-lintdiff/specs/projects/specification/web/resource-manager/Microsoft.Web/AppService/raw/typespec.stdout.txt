@@ -578,6 +578,7 @@ models.tsp:2807:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-sche
 models.tsp:2854:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.siteConfig.http20Enabled.
 models.tsp:2859:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.siteConfig.http20ProxyFlag.
 models.tsp:9715:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.scmSiteAlsoStopped.
+models.tsp:9807:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.cloningInfo.
 models.tsp:3887:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.cloningInfo.sourceWebAppId.
 Site.tsp:1593:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Site.tsp:1495:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "name" and "siteName".
@@ -1613,6 +1614,7 @@ models.tsp:2807:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-sche
 models.tsp:2854:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.siteConfig.http20Enabled.
 models.tsp:2859:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.siteConfig.http20ProxyFlag.
 models.tsp:9715:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.scmSiteAlsoStopped.
+models.tsp:9807:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.cloningInfo.
 models.tsp:3887:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.cloningInfo.sourceWebAppId.
 Site.tsp:140:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Site.tsp:56:9 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "name" and "siteName".
@@ -4838,5 +4840,5 @@ client.tsp:3068:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Ple
 client.tsp:3086:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 client.tsp:3102:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 4795 warnings.
+Found 4797 warnings.
 

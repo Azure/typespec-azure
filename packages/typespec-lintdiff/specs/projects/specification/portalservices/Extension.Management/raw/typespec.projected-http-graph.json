@@ -1,0 +1,72 @@
+{
+  "apiVersion": "2025-11-01",
+  "serviceCount": 1,
+  "reachableLocations": [
+    {
+      "sourceFile": "ExtensionTenantCompileFile.tsp",
+      "line": 14,
+      "column": 3
+    },
+    {
+      "sourceFile": "ExtensionTenantCompileFile.tsp",
+      "line": 14,
+      "column": 14
+    },
+    {
+      "sourceFile": "ExtensionTenantCompileFile.tsp",
+      "line": 19,
+      "column": 5
+    },
+    {
+      "sourceFile": "ExtensionTenantCompileFile.tsp",
+      "line": 20,
+      "column": 6
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 646,
+      "column": 7
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 650,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 655,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 660,
+      "column": 3
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 675,
+      "column": 7
+    }
+  ],
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 466,
+      "column": 3,
+      "emittedName": "hasBeenDeployed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 471,
+      "column": 3,
+      "emittedName": "ignoreDuplicateZipError"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 528,
+      "column": 3,
+      "emittedName": "hasBeenDeployed"
+    }
+  ],
+  "queryParameterLocations": []
+}
