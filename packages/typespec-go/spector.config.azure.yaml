@@ -14,6 +14,8 @@ specs:
   "/service/multi-service": { options: { module: multiservicegroup } }
   "/service/multiple-services": { options: { module: multipleservicesgroup } }
   "azure/client-generator-core/access": { options: { module: accessgroup } }
+  "azure/client-generator-core/api-version/client-api-versions":
+    { options: { module: clientapivergroup } }
   "azure/client-generator-core/api-version/header/client.tsp":
     { options: { module: apiversionheadergroup } }
   "azure/client-generator-core/api-version/path/client.tsp":
