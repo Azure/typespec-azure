@@ -55,7 +55,7 @@ The 137-diagnostic overall reduction includes selected-version HTTP reachability
 
 Raw diagnostic equality is not expected: Swagger reports emitted OpenAPI occurrences, while TypeSpec reports semantic source properties that can be reused by multiple operations or versions.
 
-As a cross-rule regression check, `EnumInsteadOfBoolean` returned to 293 validator projects, 293 TypeSpec projects, and 293 overlapping projects after preserving its rule-specific projection semantics. `ValidQueryParametersForPointOperations`, which uses the common HTTP-reachability filter, remained at 62/62/62.
+As a cross-rule regression check, `EnumInsteadOfBoolean` returned to 293 validator projects, 293 TypeSpec projects, and 293 overlapping projects after preserving its rule-specific projection semantics.
 
 ## Aligned project sets
 
