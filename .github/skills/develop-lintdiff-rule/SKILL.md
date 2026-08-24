@@ -52,24 +52,29 @@ mode with the paths reported by the dispatcher:
 
 An invocation without `--worker` is preparation-only, whether it contains one
 or multiple rule IDs. The current session creates and verifies isolated
-branches and worktrees, then reports the commands needed to open each rule in
-a new VS Code window and start its interactive worker. It must not launch a
+branches and worktrees, then reports the copyable worktree path and worker
+command needed to open each rule in a new VS Code window and start its
+interactive worker. It must not launch a
 subagent, investigate the rule, install dependencies, prepare the comparison
 harness, edit, validate, commit, or create a PR.
 
-For every prepared rule, return both:
+For every prepared rule, return a 1-based handoff ID starting at `1`, the
+copyable typespec-azure worktree path by itself, and the exact worker-mode
+invocation:
 
-```powershell
-code -n <typespec-azure-worktree>
+```text
+1. <typespec-azure-worktree>
 ```
 
 ```text
 /develop-lintdiff-rule --worker <rule-id> --typespec-worktree <typespec-azure-worktree> --specs-worktree <azure-rest-api-specs-worktree> --target-branch <target-branch>
 ```
 
-After opening the new VS Code window, the user starts a new top-level chat and
-runs the reported worker command. Worker mode resumes from the existing branch
-and worktrees without recreating them.
+Do not prefix the worktree path with `code -n` or any other command in the
+reported path field; the user should be able to copy the path directly. After
+opening the path in a new VS Code window, the user starts a new top-level chat
+and runs the reported worker command. Worker mode resumes from the existing
+branch and worktrees without recreating them.
 
 ### Worker mode
 
@@ -126,9 +131,10 @@ separate VS Code windows and run independent top-level worker sessions.
    because the existing runner links packages and may change the checked-out
    revision.
 6. Verify both worktrees exist at the expected branch or commit and are clean.
-7. Report the rule ID, canonical validator rule slug, target branch, rule
-   branch, specs branch when one was created, both absolute worktree paths, the
-   `code -n` command, and the exact worker-mode invocation.
+7. Report the 1-based handoff ID, rule ID, canonical validator rule slug, target
+   branch, rule branch, specs branch when one was created, both absolute
+   worktree paths, and the exact worker-mode invocation. Do not include a
+   `code -n` wrapper around any worktree path.
 
 Do not install dependencies, run `compare:setup`, or resolve package links in
 dispatcher mode. Those operations belong to the interactive worker and may
@@ -371,9 +377,9 @@ creating a draft PR.
 
 Dispatcher mode returns only:
 
-- per-rule preparation status, target branch, rule branch, and both absolute
-  worktree paths
-- the `code -n` command and exact worker-mode invocation for every rule
+- per-rule 1-based handoff ID, preparation status, target branch, rule branch,
+  and both absolute worktree paths
+- the exact worker-mode invocation for every rule
 - any branch or worktree preparation failure that prevents handoff
 
 Worker mode returns:
