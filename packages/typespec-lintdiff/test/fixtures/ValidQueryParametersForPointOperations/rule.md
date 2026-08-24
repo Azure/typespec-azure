@@ -5,7 +5,6 @@ tspLints:
   - tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations
 tspRuleset: resource-manager
 coverageKind: lint
-projectionScope: http-reachable
 ---
 
 # ValidQueryParametersForPointOperations
@@ -40,13 +39,13 @@ resource reads. The upstream validator classifies point operations purely by pat
 shape, so the local rule falls back to the point-operation path regex whenever an
 operation's ARM kind is not itself a point kind (covered by `legacy-action-point-get`).
 
-| ID                         | Violation | Description                                                           |
-| -------------------------- | --------- | --------------------------------------------------------------------- |
-| `extra-query-param`        | true      | Top-level point GET, PUT, PATCH, and DELETE have extra query params   |
-| `nested-extra-query-param` | true      | Nested point GET and PUT have extra query params                      |
-| `multiple-query-params`    | true      | Point GET has more than one extra query parameter                     |
+| ID                         | Violation | Description                                                          |
+| -------------------------- | --------- | -------------------------------------------------------------------- |
+| `extra-query-param`        | true      | Top-level point GET, PUT, PATCH, and DELETE have extra query params  |
+| `nested-extra-query-param` | true      | Nested point GET and PUT have extra query params                     |
+| `multiple-query-params`    | true      | Point GET has more than one extra query parameter                    |
 | `legacy-action-point-get`  | true      | Point-path GET authored as a legacy routed ARM action has query param |
-| `api-version-only`         | false     | Point operations only use default query parameters                    |
-| `list-operation`           | false     | Collection/list GET is outside this rule's scope                      |
-| `list-shaped-read`         | false     | Read-kind list path with an unmatched trailing segment is excluded    |
-| `providerless-delete`      | false     | Providerless DELETE is outside the Swagger point-path classifier      |
+| `api-version-only`         | false     | Point operations only use default query parameters                   |
+| `list-operation`           | false     | Collection/list GET is outside this rule's scope                     |
+| `list-shaped-read`         | false     | Read-kind list path with an unmatched trailing segment is excluded   |
+| `providerless-delete`      | false     | Providerless DELETE is outside the Swagger point-path classifier     |
