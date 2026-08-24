@@ -1,0 +1,13 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 94,
+      "column": 3,
+      "emittedName": "isLatestVersion"
+    }
+  ],
+  "queryParameterLocations": []
+}

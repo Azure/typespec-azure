@@ -1,0 +1,117 @@
+{
+  "apiVersion": "2025-12-26-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 251,
+      "column": 3,
+      "emittedName": "accepted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 282,
+      "column": 3,
+      "emittedName": "creationSupported"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 443,
+      "column": 3,
+      "emittedName": "sendingMetrics"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 453,
+      "column": 3,
+      "emittedName": "sendingLogs"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 478,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 659,
+      "column": 3,
+      "emittedName": "cspm"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 664,
+      "column": 3,
+      "emittedName": "resourceCollection"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 760,
+      "column": 3,
+      "emittedName": "cspm"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 765,
+      "column": 3,
+      "emittedName": "resourceCollection"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 852,
+      "column": 3,
+      "emittedName": "subscribed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 913,
+      "column": 3,
+      "emittedName": "automuting"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 918,
+      "column": 3,
+      "emittedName": "customMetrics"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 928,
+      "column": 3,
+      "emittedName": "sendAadLogs"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 933,
+      "column": 3,
+      "emittedName": "sendSubscriptionLogs"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 938,
+      "column": 3,
+      "emittedName": "sendResourceLogs"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 983,
+      "column": 3,
+      "emittedName": "enableAgentMonitoring"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1120,
+      "column": 3,
+      "emittedName": "isHiddenSaaS"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "routes.tsp",
+      "line": 83,
+      "column": 7,
+      "name": "datadogOrganizationId",
+      "verb": "get"
+    }
+  ]
+}

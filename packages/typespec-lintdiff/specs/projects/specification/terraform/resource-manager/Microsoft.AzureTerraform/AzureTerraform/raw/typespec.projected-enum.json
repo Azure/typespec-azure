@@ -1,0 +1,55 @@
+{
+  "apiVersion": "2025-09-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 63,
+      "column": 3,
+      "emittedName": "fullProperties"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 66,
+      "column": 3,
+      "emittedName": "maskSensitive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 70,
+      "column": 3,
+      "emittedName": "includeRoleAssignment"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 74,
+      "column": 3,
+      "emittedName": "includeManagedResource"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 94,
+      "column": 3,
+      "emittedName": "recursive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 101,
+      "column": 3,
+      "emittedName": "includeResourceGroup"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 129,
+      "column": 3,
+      "emittedName": "recursive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 133,
+      "column": 3,
+      "emittedName": "includeResourceGroup"
+    }
+  ],
+  "queryParameterLocations": []
+}

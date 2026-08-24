@@ -1,0 +1,25 @@
+{
+  "apiVersion": "2016-09-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "../Common/main.tsp",
+      "line": 132,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 63,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 83,
+      "column": 3,
+      "emittedName": "enabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

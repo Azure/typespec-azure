@@ -1,0 +1,67 @@
+{
+  "apiVersion": "2024-02-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 255,
+      "column": 3,
+      "emittedName": "isDimensionRequired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 359,
+      "column": 3,
+      "emittedName": "isDimensionRequired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 695,
+      "column": 3,
+      "emittedName": "autoAdjustTimegrain"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 700,
+      "column": 3,
+      "emittedName": "validateDimensions"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 183,
+      "column": 7,
+      "emittedName": "AutoAdjustTimegrain"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 190,
+      "column": 7,
+      "emittedName": "ValidateDimensions"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 277,
+      "column": 7,
+      "emittedName": "AutoAdjustTimegrain"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 284,
+      "column": 7,
+      "emittedName": "ValidateDimensions"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 366,
+      "column": 7,
+      "emittedName": "AutoAdjustTimegrain"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 373,
+      "column": 7,
+      "emittedName": "ValidateDimensions"
+    }
+  ],
+  "queryParameterLocations": []
+}

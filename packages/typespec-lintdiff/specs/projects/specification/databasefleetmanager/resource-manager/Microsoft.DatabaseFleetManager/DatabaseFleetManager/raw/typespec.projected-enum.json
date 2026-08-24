@@ -1,0 +1,37 @@
+{
+  "apiVersion": "2025-02-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 148,
+      "column": 3,
+      "emittedName": "recoverable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 286,
+      "column": 3,
+      "emittedName": "enableAutoRotation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 485,
+      "column": 3,
+      "emittedName": "disabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 491,
+      "column": 3,
+      "emittedName": "serverless"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 497,
+      "column": 3,
+      "emittedName": "pooled"
+    }
+  ],
+  "queryParameterLocations": []
+}

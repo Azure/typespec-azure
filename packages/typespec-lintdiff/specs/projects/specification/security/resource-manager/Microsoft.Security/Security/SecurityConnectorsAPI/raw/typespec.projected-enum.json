@@ -1,0 +1,163 @@
+{
+  "apiVersion": "2024-08-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 700,
+      "column": 3,
+      "emittedName": "enableAuditLogsAutoProvisioning"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 705,
+      "column": 3,
+      "emittedName": "enableDefenderAgentAutoProvisioning"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 710,
+      "column": 3,
+      "emittedName": "enablePolicyAgentAutoProvisioning"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 790,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 805,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 841,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 944,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 974,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 999,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1067,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1082,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1200,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1225,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1322,
+      "column": 3,
+      "emittedName": "enableAuditLogsAutoProvisioning"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1327,
+      "column": 3,
+      "emittedName": "enableDefenderAgentAutoProvisioning"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1332,
+      "column": 3,
+      "emittedName": "enablePolicyAgentAutoProvisioning"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1392,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1412,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1511,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1526,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1581,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1596,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1675,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1695,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1715,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1818,
+      "column": 3,
+      "emittedName": "enabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

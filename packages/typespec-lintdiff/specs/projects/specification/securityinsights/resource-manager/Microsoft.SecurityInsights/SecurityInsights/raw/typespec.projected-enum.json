@@ -1,0 +1,373 @@
+{
+  "apiVersion": "2025-10-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 3975,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5591,
+      "column": 3,
+      "emittedName": "addDefaultExtendedTimeRange"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7016,
+      "column": 3,
+      "emittedName": "customerManagedKey"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7052,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7542,
+      "column": 3,
+      "emittedName": "rotateWebhookSecret"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7761,
+      "column": 3,
+      "emittedName": "defanged"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7788,
+      "column": 3,
+      "emittedName": "revoked"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7973,
+      "column": 3,
+      "emittedName": "includeDisabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8487,
+      "column": 3,
+      "emittedName": "isDeleted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8565,
+      "column": 3,
+      "emittedName": "isDeleted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9083,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9188,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9245,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9267,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9295,
+      "column": 3,
+      "emittedName": "isSupported"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9317,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9474,
+      "column": 3,
+      "emittedName": "isSupported"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9523,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9625,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9731,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9748,
+      "column": 3,
+      "emittedName": "suppressionEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9779,
+      "column": 3,
+      "emittedName": "createIncident"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9794,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9799,
+      "column": 3,
+      "emittedName": "reopenClosedIncident"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9939,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9956,
+      "column": 3,
+      "emittedName": "suppressionEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10449,
+      "column": 3,
+      "emittedName": "isPreview"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10593,
+      "column": 3,
+      "emittedName": "isConnectivityCriteriasMatchSome"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10684,
+      "column": 3,
+      "emittedName": "read"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10689,
+      "column": 3,
+      "emittedName": "write"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10694,
+      "column": 3,
+      "emittedName": "delete"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10699,
+      "column": 3,
+      "emittedName": "action"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 11375,
+      "column": 3,
+      "emittedName": "requiredSKUsPresent"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 11686,
+      "column": 3,
+      "emittedName": "isActive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 11858,
+      "column": 3,
+      "emittedName": "isGzipCompressed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12031,
+      "column": 3,
+      "emittedName": "zeroBasedIndexing"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12160,
+      "column": 3,
+      "emittedName": "isApiKeyInPostPayload"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12422,
+      "column": 3,
+      "emittedName": "isJwtBearerFlow"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 13351,
+      "column": 3,
+      "emittedName": "isPreview"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 13417,
+      "column": 3,
+      "emittedName": "action"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 13422,
+      "column": 3,
+      "emittedName": "write"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 13427,
+      "column": 3,
+      "emittedName": "read"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 13432,
+      "column": 3,
+      "emittedName": "delete"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 13557,
+      "column": 3,
+      "emittedName": "isActive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 13646,
+      "column": 3,
+      "emittedName": "isClientSecretInHeader"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 13796,
+      "column": 3,
+      "emittedName": "isGzipCompressed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14112,
+      "column": 3,
+      "emittedName": "supportDeepLink"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14386,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14582,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14631,
+      "column": 3,
+      "emittedName": "isDefaultSettings"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14685,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14713,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14901,
+      "column": 3,
+      "emittedName": "isDomainJoined"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15178,
+      "column": 3,
+      "emittedName": "isDomainJoined"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15396,
+      "column": 3,
+      "emittedName": "isAuthorized"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15403,
+      "column": 3,
+      "emittedName": "isProgramming"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15410,
+      "column": 3,
+      "emittedName": "isScanner"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15663,
+      "column": 3,
+      "emittedName": "isVolumeAnomaly"
+    },
+    {
+      "sourceFile": "PackageModel.tsp",
+      "line": 90,
+      "column": 7,
+      "emittedName": "$count"
+    },
+    {
+      "sourceFile": "ProductTemplateModel.tsp",
+      "line": 115,
+      "column": 7,
+      "emittedName": "$count"
+    },
+    {
+      "sourceFile": "TemplateModel.tsp",
+      "line": 102,
+      "column": 7,
+      "emittedName": "$count"
+    }
+  ],
+  "queryParameterLocations": []
+}

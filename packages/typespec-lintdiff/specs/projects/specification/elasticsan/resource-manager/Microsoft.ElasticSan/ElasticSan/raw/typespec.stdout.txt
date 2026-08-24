@@ -32,6 +32,7 @@ Volume.tsp:91:3 - warning tsp-lintdiff-local-linter/operation-id-noun-verb: Per 
 Volume.tsp:91:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 VolumeGroup.tsp:53:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 VolumeGroup.tsp:58:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:580:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 VolumeGroup.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 VolumeGroup.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 VolumeGroup.tsp:85:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -47,5 +48,5 @@ routes.tsp:26:3 - warning tsp-lintdiff-local-linter/summary-and-description-must
 routes.tsp:26:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:34:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
 
-Found 44 warnings.
+Found 45 warnings.
 

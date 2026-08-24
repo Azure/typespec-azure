@@ -1,0 +1,49 @@
+{
+  "apiVersion": "2025-01-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 202,
+      "column": 3,
+      "emittedName": "isLegacyLogAnalyticsRule"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 222,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 268,
+      "column": 3,
+      "emittedName": "isWorkspaceAlertsStorageConfigured"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 273,
+      "column": 3,
+      "emittedName": "checkWorkspaceAlertsStorageConfigured"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 278,
+      "column": 3,
+      "emittedName": "skipQueryValidation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 283,
+      "column": 3,
+      "emittedName": "autoMitigate"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 438,
+      "column": 3,
+      "emittedName": "autoResolved"
+    }
+  ],
+  "queryParameterLocations": []
+}

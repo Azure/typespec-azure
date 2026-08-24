@@ -237,12 +237,10 @@ AccessReviewDefaultSettings.tsp:107:3 - warning tsp-lintdiff-local-linter/xms-ex
 AccessReviewDefaultSettings.tsp:77:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
 AccessReviewDecision.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 AccessReviewDecision.tsp:46:3 - warning tsp-lintdiff-local-linter/patch-in-operation-name: 'PATCH' operation 'patch' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
-models.tsp:1192:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:principal.type.
-models.tsp:1214:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:resource.type.
 AccessReviewDecision.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 AccessReviewDecision.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 AccessReviewDecision.tsp:65:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
 AccessReviewDecision.tsp:65:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
 
-Found 241 warnings.
+Found 239 warnings.
 

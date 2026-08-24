@@ -1,13 +1,13 @@
 {
-  "schemaVersion": 7,
+  "schemaVersion": 6,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-24T08:08:01.918Z",
+  "generatedAt": "2026-08-10T09:38:18.108Z",
   "rule": "tsp-lintdiff-local-linter/preview-version-over-one-year",
-  "count": 255,
+  "count": 251,
   "levels": {
-    "warning": 255
+    "warning": 251
   },
-  "projectCount": 177,
+  "projectCount": 176,
   "results": [
     {
       "rule": "tsp-lintdiff-local-linter/preview-version-over-one-year",
@@ -463,16 +463,6 @@
       "rule": "tsp-lintdiff-local-linter/preview-version-over-one-year",
       "level": "warning",
       "origin": "local",
-      "project": "specification/confluent/resource-manager/Microsoft.Confluent/Confluent",
-      "sourceFile": "main.tsp",
-      "line": 59,
-      "column": 3,
-      "message": "Preview API version '2025-08-18-preview' has been in preview for over one year. Move it to GA or retire it."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/preview-version-over-one-year",
-      "level": "warning",
-      "origin": "local",
       "project": "specification/connectedcache/resource-manager/Microsoft.ConnectedCache/ConnectedCache",
       "sourceFile": "main.tsp",
       "line": 29,
@@ -778,16 +768,6 @@
       "line": 30,
       "column": 3,
       "message": "Preview API version '2025-04-01-preview' has been in preview for over one year. Move it to GA or retire it."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/preview-version-over-one-year",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/edge/resource-manager/Microsoft.Edge/configurationmanager",
-      "sourceFile": "main.tsp",
-      "line": 68,
-      "column": 3,
-      "message": "Preview API version '2025-08-15-preview' has been in preview for over one year. Move it to GA or retire it."
     },
     {
       "rule": "tsp-lintdiff-local-linter/preview-version-over-one-year",
@@ -1803,16 +1783,6 @@
       "rule": "tsp-lintdiff-local-linter/preview-version-over-one-year",
       "level": "warning",
       "origin": "local",
-      "project": "specification/oracle/resource-manager/Oracle.Database/OracleDatabase",
-      "sourceFile": "versions.tsp",
-      "line": 45,
-      "column": 3,
-      "message": "Preview API version '2025-08-15-preview' has been in preview for over one year. Move it to GA or retire it."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/preview-version-over-one-year",
-      "level": "warning",
-      "origin": "local",
       "project": "specification/orbitalplanetarycomputer/Orbital.Management",
       "sourceFile": "main.tsp",
       "line": 22,
@@ -2018,16 +1988,6 @@
       "line": 49,
       "column": 3,
       "message": "Preview API version '2025-01-01-preview' has been in preview for over one year. Move it to GA or retire it."
-    },
-    {
-      "rule": "tsp-lintdiff-local-linter/preview-version-over-one-year",
-      "level": "warning",
-      "origin": "local",
-      "project": "specification/quantum/resource-manager/Microsoft.Quantum/Quantum",
-      "sourceFile": "main.tsp",
-      "line": 55,
-      "column": 3,
-      "message": "Preview API version '2025-08-11-preview' has been in preview for over one year. Move it to GA or retire it."
     },
     {
       "rule": "tsp-lintdiff-local-linter/preview-version-over-one-year",

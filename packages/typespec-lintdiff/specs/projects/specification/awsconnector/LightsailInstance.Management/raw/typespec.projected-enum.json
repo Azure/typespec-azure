@@ -1,0 +1,19 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 91,
+      "column": 3,
+      "emittedName": "isStaticIp"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 272,
+      "column": 3,
+      "emittedName": "isSystemDisk"
+    }
+  ],
+  "queryParameterLocations": []
+}

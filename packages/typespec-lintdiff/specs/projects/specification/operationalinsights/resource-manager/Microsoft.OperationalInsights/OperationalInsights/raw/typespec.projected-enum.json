@@ -1,0 +1,147 @@
+{
+  "apiVersion": "2025-07-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "LogAnalyticsQueryPack.tsp",
+      "line": 88,
+      "column": 7,
+      "emittedName": "includeBody"
+    },
+    {
+      "sourceFile": "LogAnalyticsQueryPackQuery.tsp",
+      "line": 74,
+      "column": 7,
+      "emittedName": "includeBody"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1078,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1147,
+      "column": 3,
+      "emittedName": "isDoubleEncryptionEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1152,
+      "column": 3,
+      "emittedName": "isAvailabilityZonesEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1287,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1292,
+      "column": 3,
+      "emittedName": "isAvailabilityZonesEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1397,
+      "column": 3,
+      "emittedName": "enable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1453,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1573,
+      "column": 3,
+      "emittedName": "isGateway"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2094,
+      "column": 3,
+      "emittedName": "indexed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2099,
+      "column": 3,
+      "emittedName": "stored"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2104,
+      "column": 3,
+      "emittedName": "facet"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2288,
+      "column": 3,
+      "emittedName": "retentionInDaysAsDefault"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2294,
+      "column": 3,
+      "emittedName": "totalRetentionInDaysAsDefault"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2494,
+      "column": 3,
+      "emittedName": "isDefaultDisplay"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2500,
+      "column": 3,
+      "emittedName": "isHidden"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2710,
+      "column": 3,
+      "emittedName": "forceCmkForQuery"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2863,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3015,
+      "column": 3,
+      "emittedName": "isActive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3115,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "Workspace.tsp",
+      "line": 205,
+      "column": 7,
+      "emittedName": "force"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Workspace.tsp",
+      "line": 205,
+      "column": 7,
+      "name": "force",
+      "verb": "delete"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "apiVersion": "2024-03-03-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "NormalizedContract/StandardizedContracts/CommonModels.tsp",
+      "line": 138,
+      "column": 3,
+      "emittedName": "isolationRequired"
+    },
+    {
+      "sourceFile": "NormalizedContract/StandardizedContracts/CommonModels.tsp",
+      "line": 144,
+      "column": 3,
+      "emittedName": "isolationRequired"
+    },
+    {
+      "sourceFile": "WebModels/AvsAssessmentV2.tsp",
+      "line": 59,
+      "column": 3,
+      "emittedName": "isVcfByolEnabled"
+    },
+    {
+      "sourceFile": "WebModels/AvsAssessmentV2.tsp",
+      "line": 68,
+      "column": 3,
+      "emittedName": "isStretchClusterEnabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

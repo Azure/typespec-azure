@@ -6,6 +6,9 @@ Diagnostics were reported during compilation:
 ../Discovery.Management.Shared/namespace.tsp:22:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v5'.
 ../Discovery.Bookshelf.Management/bookshelf.tsp:98:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Bookshelf.Management/bookshelf.tsp:99:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../Discovery.Management.Shared/control-plane.tsp:199:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.keyVaultProperties.keyVaultUri.
+../Discovery.Management.Shared/control-plane.tsp:203:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.keyVaultProperties.keyName.
+../Discovery.Bookshelf.Management/bookshelf.tsp:31:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.keyVaultProperties.identityClientId.
 ../Discovery.Bookshelf.Management/bookshelf.tsp:100:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Bookshelf.Management/bookshelf.tsp:101:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Bookshelf.Management/bookshelf.tsp:102:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -20,6 +23,9 @@ Diagnostics were reported during compilation:
   agent.tsp:83:26 - occurred while instantiating template
 ../Discovery.Management.Shared/control-plane.tsp:175:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
   agent.tsp:83:26 - occurred while instantiating template
+agent.tsp:62:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.modelName.
+../Discovery.Management.Shared/control-plane.tsp:62:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.version.
+../Discovery.Management.Shared/control-plane.tsp:77:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.definitionContent.
 ../Discovery.Management.Shared/control-plane.tsp:176:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
   agent.tsp:83:26 - occurred while instantiating template
 ../Discovery.Management.Shared/control-plane.tsp:177:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -30,12 +36,16 @@ Diagnostics were reported during compilation:
   agent.tsp:83:26 - occurred while instantiating template
 dataAsset.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 dataAsset.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../Discovery.Management.Shared/shared.tsp:40:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.description.
 dataAsset.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 dataAsset.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 dataAsset.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 dataAsset.tsp:49:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 dataContainer.tsp:105:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 dataContainer.tsp:106:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+dataContainer.tsp:94:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.dataStore.
+dataContainer.tsp:46:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.dataStore.kind.
+dataContainer.tsp:99:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.credentials.
 dataContainer.tsp:107:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 dataContainer.tsp:108:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 dataContainer.tsp:109:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -44,6 +54,9 @@ dataContainer.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-require
   model.tsp:47:26 - occurred while instantiating template
 ../Discovery.Management.Shared/control-plane.tsp:175:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
   model.tsp:47:26 - occurred while instantiating template
+../Discovery.Management.Shared/control-plane.tsp:62:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.version.
+model.tsp:32:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.workspaceId.
+../Discovery.Management.Shared/control-plane.tsp:77:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.definitionContent.
 ../Discovery.Management.Shared/control-plane.tsp:176:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
   model.tsp:47:26 - occurred while instantiating template
 ../Discovery.Management.Shared/control-plane.tsp:177:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -56,6 +69,8 @@ dataContainer.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-require
   tool.tsp:37:25 - occurred while instantiating template
 ../Discovery.Management.Shared/control-plane.tsp:175:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
   tool.tsp:37:25 - occurred while instantiating template
+../Discovery.Management.Shared/control-plane.tsp:62:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.version.
+../Discovery.Management.Shared/control-plane.tsp:77:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.definitionContent.
 ../Discovery.Management.Shared/control-plane.tsp:176:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
   tool.tsp:37:25 - occurred while instantiating template
 ../Discovery.Management.Shared/control-plane.tsp:177:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -68,6 +83,8 @@ dataContainer.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-require
   workflow.tsp:31:29 - occurred while instantiating template
 ../Discovery.Management.Shared/control-plane.tsp:175:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
   workflow.tsp:31:29 - occurred while instantiating template
+../Discovery.Management.Shared/control-plane.tsp:62:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.version.
+../Discovery.Management.Shared/control-plane.tsp:77:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.definitionContent.
 ../Discovery.Management.Shared/control-plane.tsp:176:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
   workflow.tsp:31:29 - occurred while instantiating template
 ../Discovery.Management.Shared/control-plane.tsp:177:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -78,12 +95,18 @@ dataContainer.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-require
   workflow.tsp:31:29 - occurred while instantiating template
 ../Discovery.Workspace.Management/project.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Workspace.Management/project.tsp:87:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../Discovery.Workspace.Management/project.tsp:59:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.entryReferenceId.
+../Discovery.Workspace.Management/project.tsp:76:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.dataContainerIds.
 ../Discovery.Workspace.Management/project.tsp:88:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Workspace.Management/project.tsp:89:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Workspace.Management/project.tsp:90:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Workspace.Management/project.tsp:93:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Workspace.Management/workspace.tsp:108:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Workspace.Management/workspace.tsp:109:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../Discovery.Workspace.Management/workspace.tsp:53:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.workspaceIdentity.
+../Discovery.Management.Shared/control-plane.tsp:90:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.workspaceIdentity.id.
+../Discovery.Management.Shared/control-plane.tsp:199:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.keyVaultProperties.keyVaultUri.
+../Discovery.Management.Shared/control-plane.tsp:203:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.keyVaultProperties.keyName.
 ../Discovery.Workspace.Management/workspace.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Workspace.Management/workspace.tsp:111:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Workspace.Management/workspace.tsp:112:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -94,6 +117,8 @@ dataContainer.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-require
 ../Discovery.Workspace.Management/workspacePrivateEndpointConnection.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Workspace.Management/ChatModelDeployments.tsp:61:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Workspace.Management/ChatModelDeployments.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../Discovery.Workspace.Management/ChatModelDeployments.tsp:35:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.modelFormat.
+../Discovery.Workspace.Management/ChatModelDeployments.tsp:39:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.modelName.
 ../Discovery.Workspace.Management/ChatModelDeployments.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Workspace.Management/ChatModelDeployments.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Workspace.Management/ChatModelDeployments.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -101,34 +126,53 @@ dataContainer.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-require
 ../Discovery.Workspace.Management/workspacePrivateLinkResource.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Supercomputer.Management/nodePool.tsp:138:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Supercomputer.Management/nodePool.tsp:139:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../Discovery.Supercomputer.Management/nodePool.tsp:92:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.subnetId.
+../Discovery.Supercomputer.Management/nodePool.tsp:96:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.vmSize.
+../Discovery.Supercomputer.Management/nodePool.tsp:101:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.maxNodeCount.
 ../Discovery.Supercomputer.Management/nodePool.tsp:106:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.minNodeCount.
+../Discovery.Supercomputer.Management/nodePool.tsp:111:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.scaleSetPriority.
+../Discovery.Supercomputer.Management/nodePool.tsp:119:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.osDiskSizeGb.
+../Discovery.Supercomputer.Management/nodePool.tsp:126:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.imageCacheLowerThreshold.
+../Discovery.Supercomputer.Management/nodePool.tsp:133:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.imageCacheUpperThreshold.
 ../Discovery.Supercomputer.Management/nodePool.tsp:140:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Supercomputer.Management/nodePool.tsp:141:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Supercomputer.Management/nodePool.tsp:142:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Supercomputer.Management/nodePool.tsp:145:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Supercomputer.Management/supercomputer.tsp:153:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Supercomputer.Management/supercomputer.tsp:154:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../Discovery.Supercomputer.Management/supercomputer.tsp:72:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.subnetId.
+../Discovery.Supercomputer.Management/supercomputer.tsp:89:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.outboundType.
+../Discovery.Supercomputer.Management/supercomputer.tsp:100:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.identities.
+../Discovery.Supercomputer.Management/supercomputer.tsp:133:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.identities.clusterIdentity.
+../Discovery.Management.Shared/control-plane.tsp:90:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.identities.clusterIdentity.id.
+../Discovery.Supercomputer.Management/supercomputer.tsp:141:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.identities.kubeletIdentity.
 ../Discovery.Supercomputer.Management/supercomputer.tsp:155:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Supercomputer.Management/supercomputer.tsp:156:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Supercomputer.Management/supercomputer.tsp:157:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Supercomputer.Management/supercomputer.tsp:158:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Supercomputer.Management/storage.tsp:72:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Supercomputer.Management/storage.tsp:73:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../Discovery.Supercomputer.Management/storage.tsp:59:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.store.
+../Discovery.Supercomputer.Management/storage.tsp:38:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.store.kind.
+../Discovery.Supercomputer.Management/storage.tsp:64:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.subnetId.
 ../Discovery.Supercomputer.Management/storage.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Supercomputer.Management/storage.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Supercomputer.Management/storage.tsp:76:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ../Discovery.Supercomputer.Management/storage.tsp:77:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 storageAsset.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 storageAsset.tsp:45:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+../Discovery.Management.Shared/shared.tsp:40:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.description.
 storageAsset.tsp:46:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 storageAsset.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 storageAsset.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 storageContainer.tsp:112:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 storageContainer.tsp:113:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+storageContainer.tsp:106:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.storageStore.
+storageContainer.tsp:64:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.storageStore.kind.
 storageContainer.tsp:114:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 storageContainer.tsp:115:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 storageContainer.tsp:116:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 storageContainer.tsp:117:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 103 warnings.
+Found 147 warnings.
 

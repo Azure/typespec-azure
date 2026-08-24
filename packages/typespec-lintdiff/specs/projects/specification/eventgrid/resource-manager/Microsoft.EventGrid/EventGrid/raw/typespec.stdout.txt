@@ -3,10 +3,6 @@ TypeSpec compiler v1.14.0
 Diagnostics were reported during compilation:
 
 PrivateEndpointConnection.tsp:50:11 - warning tsp-lintdiff-local-linter/implement-private-endpoint-apis: The private endpoint API: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/{parentType}/{parentName}/privateLinkResources is missing.
-routes.tsp:112:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'.
-routes.tsp:139:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'.
-routes.tsp:166:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'.
-routes.tsp:200:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'.
 models.tsp:3059:3 - warning tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources: Proxy resource 'Subscription' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required.
 models.tsp:4324:3 - warning tsp-lintdiff-local-linter/consistent-patch-properties: The property 'properties.defaultMaximumExpirationTimeInDays' in the request body either does not appear in the resource model or is nested at the wrong level.
 models.tsp:4209:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
@@ -634,5 +630,5 @@ routes.tsp:26:5 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path 
 routes.tsp:243:7 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
 routes.tsp:249:7 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
 
-Found 631 warnings.
+Found 627 warnings.
 

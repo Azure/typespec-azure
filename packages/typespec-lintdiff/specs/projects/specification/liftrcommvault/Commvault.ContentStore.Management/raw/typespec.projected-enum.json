@@ -1,0 +1,49 @@
+{
+  "apiVersion": "2026-07-03-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 110,
+      "column": 3,
+      "emittedName": "isHiddenSaaS"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 858,
+      "column": 3,
+      "emittedName": "backupCopyImmediately"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 862,
+      "column": 3,
+      "emittedName": "runSnapShotBackup"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 866,
+      "column": 3,
+      "emittedName": "notifyUserOnJobCompletion"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 996,
+      "column": 3,
+      "emittedName": "powerOnVmAfterRestore"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 1021,
+      "column": 3,
+      "emittedName": "attachAndSwapOsDisk"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 1054,
+      "column": 3,
+      "emittedName": "inPlaceRestore"
+    }
+  ],
+  "queryParameterLocations": []
+}

@@ -79,14 +79,6 @@ HierarchySettings.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-requ
 models.tsp:198:3 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
 routes.tsp:105:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:27:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skiptoken' should not begin with '$' or '@'.
-routes.tsp:37:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$skiptoken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
-routes.tsp:43:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$skip' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
-routes.tsp:49:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
-routes.tsp:55:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$select' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
-routes.tsp:66:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$search' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
-routes.tsp:72:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
-routes.tsp:78:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$view' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
-routes.tsp:84:3 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'groupName' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 routes.tsp:141:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'list' should contain the action verb 'getentities' from the route path. Consider updating the operation name.
 routes.tsp:141:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:37:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skiptoken' should not begin with '$' or '@'.
@@ -97,5 +89,5 @@ routes.tsp:66:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: 
 routes.tsp:72:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
 routes.tsp:78:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$view' should not begin with '$' or '@'.
 
-Found 92 warnings.
+Found 84 warnings.
 

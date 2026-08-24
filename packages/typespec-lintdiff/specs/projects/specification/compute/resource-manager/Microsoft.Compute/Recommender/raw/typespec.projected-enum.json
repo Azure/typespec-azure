@@ -1,0 +1,25 @@
+{
+  "apiVersion": "2026-05-05-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 46,
+      "column": 3,
+      "emittedName": "availabilityZones"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 82,
+      "column": 3,
+      "emittedName": "availabilityZones"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 118,
+      "column": 3,
+      "emittedName": "isQuotaAvailable"
+    }
+  ],
+  "queryParameterLocations": []
+}

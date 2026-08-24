@@ -1,0 +1,25 @@
+{
+  "apiVersion": "2025-01-02",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "sqlDbDatabaseTarget.tsp",
+      "line": 27,
+      "column": 3,
+      "emittedName": "readIntent"
+    },
+    {
+      "sourceFile": "sqlDbElasticPoolTarget.tsp",
+      "line": 28,
+      "column": 3,
+      "emittedName": "readIntent"
+    },
+    {
+      "sourceFile": "sqlMiTarget.tsp",
+      "line": 29,
+      "column": 3,
+      "emittedName": "readIntent"
+    }
+  ],
+  "queryParameterLocations": []
+}

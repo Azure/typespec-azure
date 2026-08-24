@@ -1,0 +1,19 @@
+{
+  "apiVersion": "2024-07-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 93,
+      "column": 3,
+      "emittedName": "doNotApplyToChildScopes"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 108,
+      "column": 3,
+      "emittedName": "isSystemProtected"
+    }
+  ],
+  "queryParameterLocations": []
+}

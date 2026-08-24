@@ -10,6 +10,11 @@ disconnectedOperations.tsp:20:3 - warning tsp-lintdiff-local-linter/path-paramet
 disconnectedOperations.tsp:30:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 disconnectedOperations.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 disconnectedOperations.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+models.tsp:483:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.billingConfiguration.autoRenew.
+models.tsp:487:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.billingConfiguration.billingStatus.
+models.tsp:490:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.billingConfiguration.current.
+models.tsp:465:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.billingConfiguration.current.cores.
+models.tsp:468:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.billingConfiguration.current.pricingModel.
 disconnectedOperations.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 disconnectedOperations.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 disconnectedOperations.tsp:31:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -54,5 +59,5 @@ hardwareSettings.tsp:35:3 - warning tsp-lintdiff-local-linter/xms-examples-requi
 disconnectedOperations.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 disconnectedOperations.tsp:20:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 
-Found 51 warnings.
+Found 56 warnings.
 

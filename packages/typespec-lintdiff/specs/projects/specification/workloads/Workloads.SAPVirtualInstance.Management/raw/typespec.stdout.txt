@@ -11,6 +11,7 @@ models.tsp:1669:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: C
 models.tsp:1857:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 SAPVirtualInstance.tsp:28:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 SAPVirtualInstance.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+models.tsp:2516:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 SAPVirtualInstance.tsp:39:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 SAPVirtualInstance.tsp:47:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 SAPVirtualInstance.tsp:52:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -75,5 +76,5 @@ custom.tsp:21:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-u
 custom.tsp:21:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
   SAPApplicationServerInstance.tsp:70:11 - occurred while instantiating template
 
-Found 56 warnings.
+Found 57 warnings.
 

@@ -1,0 +1,19 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 95,
+      "column": 3,
+      "emittedName": "allSupported"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 101,
+      "column": 3,
+      "emittedName": "includeGlobalResourceTypes"
+    }
+  ],
+  "queryParameterLocations": []
+}

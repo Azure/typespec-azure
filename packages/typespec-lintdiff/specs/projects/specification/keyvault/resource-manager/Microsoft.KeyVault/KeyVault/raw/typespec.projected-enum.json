@@ -1,0 +1,175 @@
+{
+  "apiVersion": "2026-03-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 703,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 736,
+      "column": 3,
+      "emittedName": "exportable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 897,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 930,
+      "column": 3,
+      "emittedName": "exportable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1070,
+      "column": 3,
+      "emittedName": "enabledForDeployment"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1075,
+      "column": 3,
+      "emittedName": "enabledForDiskEncryption"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1080,
+      "column": 3,
+      "emittedName": "enabledForTemplateDeployment"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1085,
+      "column": 3,
+      "emittedName": "enableSoftDelete"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1106,
+      "column": 3,
+      "emittedName": "enableRbacAuthorization"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1117,
+      "column": 3,
+      "emittedName": "enablePurgeProtection"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1279,
+      "column": 3,
+      "emittedName": "ignoreMissingVnetServiceEndpoint"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1423,
+      "column": 3,
+      "emittedName": "enabledForDeployment"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1428,
+      "column": 3,
+      "emittedName": "enabledForDiskEncryption"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1433,
+      "column": 3,
+      "emittedName": "enabledForTemplateDeployment"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1438,
+      "column": 3,
+      "emittedName": "enableSoftDelete"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1443,
+      "column": 3,
+      "emittedName": "enableRbacAuthorization"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1458,
+      "column": 3,
+      "emittedName": "enablePurgeProtection"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1564,
+      "column": 3,
+      "emittedName": "purgeProtectionEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1590,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1685,
+      "column": 3,
+      "emittedName": "enableSoftDelete"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1695,
+      "column": 3,
+      "emittedName": "enablePurgeProtection"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1831,
+      "column": 3,
+      "emittedName": "isPrimary"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2014,
+      "column": 3,
+      "emittedName": "purgeProtectionEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2101,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2216,
+      "column": 3,
+      "emittedName": "fillGapWithZero"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2241,
+      "column": 3,
+      "emittedName": "toBeExportedForShoebox"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2307,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2458,
+      "column": 3,
+      "emittedName": "isDataAction"
+    }
+  ],
+  "queryParameterLocations": []
+}

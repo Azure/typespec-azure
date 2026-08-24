@@ -17,6 +17,8 @@ main.tsp:48:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please 
 main.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 main.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 main.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+landingZoneAccountResourceProperties.tsp:15:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.storageAccount.
+main.tsp:37:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
 main.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 main.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
@@ -38,6 +40,21 @@ main.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path pa
 main.tsp:73:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 main.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 main.tsp:73:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+landingZoneConfigurationResourceProperties.tsp:20:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.ddosProtectionCreationOption.
+landingZoneConfigurationResourceProperties.tsp:30:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.logAnalyticsWorkspaceCreationOption.
+landingZoneConfigurationResourceProperties.tsp:44:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.firewallCreationOption.
+landingZoneConfigurationResourceProperties.tsp:50:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.gatewaySubnetCidrBlock.
+landingZoneConfigurationResourceProperties.tsp:55:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.logRetentionInDays.
+landingZoneConfigurationResourceProperties.tsp:58:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.hubNetworkCidrBlock.
+landingZoneConfigurationResourceProperties.tsp:61:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.azureBastionCreationOption.
+landingZoneConfigurationResourceProperties.tsp:164:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.topLevelMgMetadata.policyInitiativesAssignmentProperties.
+landingZoneConfigurationResourceProperties.tsp:164:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.decommissionedMgMetadata.policyInitiativesAssignmentProperties.
+landingZoneConfigurationResourceProperties.tsp:183:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.decommissionedMgMetadata.create.
+landingZoneConfigurationResourceProperties.tsp:164:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.sandboxMgMetadata.policyInitiativesAssignmentProperties.
+landingZoneConfigurationResourceProperties.tsp:191:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.sandboxMgMetadata.create.
+landingZoneConfigurationResourceProperties.tsp:102:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.managedIdentity.
+landingZoneConfigurationResourceProperties.tsp:120:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.managedIdentity.type.
+main.tsp:73:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
 main.tsp:84:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 main.tsp:73:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
@@ -82,6 +99,10 @@ main.tsp:136:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path p
 main.tsp:136:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "landingZoneRegistrationName" and "landingZoneConfigurationName".
 main.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 main.tsp:136:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+landingZoneRegistrationResourceProperties.tsp:15:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.existingTopLevelMgId.
+landingZoneRegistrationResourceProperties.tsp:23:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.existingLandingZoneConfigurationId.
+landingZoneConfigurationResourceProperties.tsp:120:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.managedIdentity.type.
+main.tsp:136:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
 main.tsp:147:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 main.tsp:136:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
@@ -97,5 +118,5 @@ main.tsp:154:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please
 main.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 main.tsp:37:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 
-Found 94 warnings.
+Found 115 warnings.
 

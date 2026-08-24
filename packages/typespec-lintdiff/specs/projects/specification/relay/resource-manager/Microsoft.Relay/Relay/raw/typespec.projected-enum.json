@@ -1,0 +1,61 @@
+{
+  "apiVersion": "2026-07-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "Cluster.tsp",
+      "line": 112,
+      "column": 3,
+      "emittedName": "supportsScaling"
+    },
+    {
+      "sourceFile": "Cluster.tsp",
+      "line": 118,
+      "column": 3,
+      "emittedName": "zoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 278,
+      "column": 3,
+      "emittedName": "requiresClientAuthorization"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 309,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 517,
+      "column": 3,
+      "emittedName": "trustedServiceAccessEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 566,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 627,
+      "column": 3,
+      "emittedName": "isDynamic"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 658,
+      "column": 3,
+      "emittedName": "requiresClientAuthorization"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 663,
+      "column": 3,
+      "emittedName": "requiresTransportSecurity"
+    }
+  ],
+  "queryParameterLocations": []
+}

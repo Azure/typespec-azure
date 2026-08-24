@@ -1,0 +1,61 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 121,
+      "column": 3,
+      "emittedName": "objectLockEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 286,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 476,
+      "column": 3,
+      "emittedName": "blockPublicAcls"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 479,
+      "column": 3,
+      "emittedName": "blockPublicPolicy"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 482,
+      "column": 3,
+      "emittedName": "ignorePublicAcls"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 485,
+      "column": 3,
+      "emittedName": "restrictPublicBuckets"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 586,
+      "column": 3,
+      "emittedName": "bucketKeyEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 710,
+      "column": 3,
+      "emittedName": "expiredObjectDeleteMarker"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 783,
+      "column": 3,
+      "emittedName": "eventBridgeEnabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

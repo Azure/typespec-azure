@@ -1,0 +1,49 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 72,
+      "column": 3,
+      "emittedName": "cacheClusterEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 107,
+      "column": 3,
+      "emittedName": "tracingEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 142,
+      "column": 3,
+      "emittedName": "useStageCache"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 152,
+      "column": 3,
+      "emittedName": "cacheDataEncrypted"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 158,
+      "column": 3,
+      "emittedName": "cachingEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 161,
+      "column": 3,
+      "emittedName": "dataTraceEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 170,
+      "column": 3,
+      "emittedName": "metricsEnabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

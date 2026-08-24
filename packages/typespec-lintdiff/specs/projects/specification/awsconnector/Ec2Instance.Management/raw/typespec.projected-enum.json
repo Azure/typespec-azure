@@ -1,0 +1,103 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 90,
+      "column": 3,
+      "emittedName": "ebsOptimized"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 101,
+      "column": 3,
+      "emittedName": "enaSupport"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 201,
+      "column": 3,
+      "emittedName": "sourceDestCheck"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 2953,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 2963,
+      "column": 3,
+      "emittedName": "configured"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 3223,
+      "column": 3,
+      "emittedName": "sourceDestCheck"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 3327,
+      "column": 3,
+      "emittedName": "enableResourceNameDnsAAAARecord"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 3330,
+      "column": 3,
+      "emittedName": "enableResourceNameDnsARecord"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 3513,
+      "column": 3,
+      "emittedName": "deleteOnTermination"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 3600,
+      "column": 3,
+      "emittedName": "deleteOnTermination"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 3651,
+      "column": 3,
+      "emittedName": "isPrimaryIpv6"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 3674,
+      "column": 3,
+      "emittedName": "primary"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 3690,
+      "column": 3,
+      "emittedName": "enaSrdEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 3703,
+      "column": 3,
+      "emittedName": "enaSrdUdpEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 3709,
+      "column": 3,
+      "emittedName": "force"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 3712,
+      "column": 3,
+      "emittedName": "hibernate"
+    }
+  ],
+  "queryParameterLocations": []
+}

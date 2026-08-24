@@ -15,6 +15,12 @@ main.tsp:35:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path pa
 main.tsp:381:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:35:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 main.tsp:35:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+main.tsp:347:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.fabricProfile.keyUri.
+main.tsp:351:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.fabricProfile.oneLakeUri.
+main.tsp:355:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.fabricProfile.oneLakePath.
+main.tsp:363:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.userManagedOpenAIProfile.id.
+main.tsp:367:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.userManagedOpenAIProfile.gptModelDeploymentName.
+main.tsp:371:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.userManagedOpenAIProfile.embeddingModelDeploymentName.
 main.tsp:386:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:102:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 main.tsp:106:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
@@ -29,5 +35,5 @@ main.tsp:398:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please
 main.tsp:409:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
   main.tsp:398:28 - occurred while instantiating template
 
-Found 25 warnings.
+Found 31 warnings.
 

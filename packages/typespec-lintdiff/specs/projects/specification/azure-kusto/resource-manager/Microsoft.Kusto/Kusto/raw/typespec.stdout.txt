@@ -43,8 +43,6 @@ Database.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Pat
 Database.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 Database.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "databaseName" and "principalAssignmentName".
 Database.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
-models.tsp:2714:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.scriptUrlSasToken.
-models.tsp:2721:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.scriptContent.
 models.tsp:2731:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.continueOnErrors.
 Script.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Database.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
@@ -73,6 +71,7 @@ Database.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inco
 DataConnection.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "dataConnectionName" and "principalAssignmentName".
 Database.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 DataConnection.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+DataConnection.tsp:32:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
 DataConnection.tsp:44:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:kind.
 DataConnection.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Database.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
@@ -102,6 +101,7 @@ Database.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Pat
 Database.tsp:68:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'callerRole' should be removed. Point operation 'put' MUST not have query parameters other than api-version.
 Database.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "databaseName" and "principalAssignmentName".
 Database.tsp:32:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+Database.tsp:32:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:name.
 Database.tsp:44:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:kind.
 Database.tsp:98:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'callerRole' should be removed. Point operation 'patch' MUST not have query parameters other than api-version.
 Database.tsp:90:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -163,6 +163,7 @@ Cluster.tsp:54:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Plea
 Cluster.tsp:81:3 - warning tsp-lintdiff-local-linter/list-in-operation-name: Operation 'update' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.
 models.tsp:1478:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.name.
 models.tsp:1488:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.tier.
+models.tsp:1510:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:identity.type.
 models.tsp:1705:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.optimizedAutoscale.version.
 models.tsp:1710:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.optimizedAutoscale.isEnabled.
 models.tsp:1715:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.optimizedAutoscale.minimum.
@@ -180,7 +181,6 @@ models.tsp:1627:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-sche
 models.tsp:1638:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.enableAutoStop.
 models.tsp:1643:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.restrictOutboundNetworkAccess.
 models.tsp:1660:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.publicIPType.
-models.tsp:1667:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:properties.virtualClusterGraduationProperties.
 Cluster.tsp:81:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Cluster.tsp:116:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Cluster.tsp:130:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.

@@ -1,0 +1,341 @@
+{
+  "apiVersion": "2026-05-31-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 1602,
+      "column": 3,
+      "emittedName": "crossRegionRestoreFlag"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2040,
+      "column": 3,
+      "emittedName": "isSoftDeleteFeatureStateEditable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2056,
+      "column": 3,
+      "emittedName": "useSystemAssignedIdentity"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2282,
+      "column": 3,
+      "emittedName": "ignoreMoved"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2331,
+      "column": 3,
+      "emittedName": "pauseGC"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2397,
+      "column": 3,
+      "emittedName": "isScheduledForDeferredDelete"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2407,
+      "column": 3,
+      "emittedName": "isDeferredDeleteScheduleUpcoming"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2412,
+      "column": 3,
+      "emittedName": "isRehydrate"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2422,
+      "column": 3,
+      "emittedName": "isArchiveEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2813,
+      "column": 3,
+      "emittedName": "canReRegister"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2833,
+      "column": 3,
+      "emittedName": "isAzureBackupAgentUpgradeAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2838,
+      "column": 3,
+      "emittedName": "isDpmUpgradeAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3556,
+      "column": 3,
+      "emittedName": "isSoftDeleted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3573,
+      "column": 3,
+      "emittedName": "isImmutable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3718,
+      "column": 3,
+      "emittedName": "makePolicyConsistent"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3738,
+      "column": 3,
+      "emittedName": "issqlcompression"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3744,
+      "column": 3,
+      "emittedName": "isCompression"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4071,
+      "column": 3,
+      "emittedName": "policyInconsistent"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4099,
+      "column": 3,
+      "emittedName": "isInclusionList"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4183,
+      "column": 3,
+      "emittedName": "isUserTriggered"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4493,
+      "column": 3,
+      "emittedName": "isUserTriggered"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4992,
+      "column": 3,
+      "emittedName": "isReadyForMove"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5107,
+      "column": 3,
+      "emittedName": "skipAttachAndMount"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5350,
+      "column": 3,
+      "emittedName": "shouldUseAlternateTargetLocation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5355,
+      "column": 3,
+      "emittedName": "isNonRecoverable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5448,
+      "column": 3,
+      "emittedName": "extendedInfo"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5454,
+      "column": 3,
+      "emittedName": "moveReadyRPOnly"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5460,
+      "column": 3,
+      "emittedName": "includeSoftDeletedRP"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5493,
+      "column": 3,
+      "emittedName": "getLatestRPOnly"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5529,
+      "column": 3,
+      "emittedName": "isLast"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5726,
+      "column": 3,
+      "emittedName": "protected"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5731,
+      "column": 3,
+      "emittedName": "isPresentOnCloud"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5771,
+      "column": 3,
+      "emittedName": "isCollocated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5796,
+      "column": 3,
+      "emittedName": "encryptionEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5962,
+      "column": 3,
+      "emittedName": "isSystemAssignedIdentity"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6085,
+      "column": 3,
+      "emittedName": "isSourceVMEncrypted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6095,
+      "column": 3,
+      "emittedName": "isInstantIlrSessionActive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6106,
+      "column": 3,
+      "emittedName": "isManagedVirtualMachine"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6116,
+      "column": 3,
+      "emittedName": "originalStorageAccountOption"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6152,
+      "column": 3,
+      "emittedName": "isPrivateAccessEnabledOnAnyDisk"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6348,
+      "column": 3,
+      "emittedName": "createNewCloudService"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6353,
+      "column": 3,
+      "emittedName": "originalStorageAccountOption"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6368,
+      "column": 3,
+      "emittedName": "restoreWithManagedDisks"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7115,
+      "column": 3,
+      "emittedName": "canReRegister"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7140,
+      "column": 3,
+      "emittedName": "upgradeAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7646,
+      "column": 3,
+      "emittedName": "isAutoProtectable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7691,
+      "column": 3,
+      "emittedName": "isAutoProtectable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7696,
+      "column": 3,
+      "emittedName": "isAutoProtected"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7716,
+      "column": 3,
+      "emittedName": "isProtectable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7996,
+      "column": 3,
+      "emittedName": "enableCompression"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8440,
+      "column": 3,
+      "emittedName": "renewExistingRegistration"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8466,
+      "column": 3,
+      "emittedName": "canReRegister"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "BackupEngineBaseResource.tsp",
+      "line": 49,
+      "column": 7,
+      "name": "$filter",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "BackupEngineBaseResource.tsp",
+      "line": 55,
+      "column": 7,
+      "name": "$skipToken",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "ProtectedItemResource.tsp",
+      "line": 52,
+      "column": 7,
+      "name": "$filter",
+      "verb": "get"
+    }
+  ]
+}

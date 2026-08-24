@@ -11,7 +11,6 @@ routes.tsp:17:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Pleas
 ConfidentialLedger.tsp:33:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 models.tsp:225:3 - warning tsp-lintdiff-local-linter/repeated-path-info: Request body property 'ledgerName' repeats information already carried in the path or query.
 ConfidentialLedger.tsp:38:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
-ConfidentialLedger.tsp:44:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:location.
 ConfidentialLedger.tsp:44:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ConfidentialLedger.tsp:57:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ConfidentialLedger.tsp:68:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -25,7 +24,6 @@ ConfidentialLedger.tsp:112:3 - warning tsp-lintdiff-local-linter/xms-examples-re
 ManagedCCF.tsp:37:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 models.tsp:449:3 - warning tsp-lintdiff-local-linter/repeated-path-info: Request body property 'appName' repeats information already carried in the path or query.
 ManagedCCF.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
-ManagedCCF.tsp:54:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:location.
 ManagedCCF.tsp:54:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ManagedCCF.tsp:60:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ManagedCCF.tsp:71:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -37,5 +35,5 @@ ManagedCCF.tsp:93:7 - warning tsp-lintdiff-local-linter/parameter-names-conventi
 ManagedCCF.tsp:101:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 ManagedCCF.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 34 warnings.
+Found 32 warnings.
 

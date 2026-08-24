@@ -1,0 +1,27 @@
+{
+  "apiVersion": "2025-05-04",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 981,
+      "column": 3,
+      "emittedName": "preview"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1155,
+      "column": 3,
+      "emittedName": "isContextualRisk"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "SecurityAssessmentResponse.tsp",
+      "line": 47,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
+  ]
+}

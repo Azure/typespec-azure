@@ -1,0 +1,97 @@
+{
+  "apiVersion": "2023-10-04-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models/base.tsp",
+      "line": 178,
+      "column": 3,
+      "emittedName": "tlsEnabled"
+    },
+    {
+      "sourceFile": "models/datalakeconnector.tsp",
+      "line": 265,
+      "column": 3,
+      "emittedName": "optional"
+    },
+    {
+      "sourceFile": "models/kafkaconnector.tsp",
+      "line": 82,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models/kafkaconnector.tsp",
+      "line": 160,
+      "column": 3,
+      "emittedName": "tlsEnabled"
+    },
+    {
+      "sourceFile": "models/kafkaconnector.tsp",
+      "line": 220,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models/mqttbridgeconnector.tsp",
+      "line": 116,
+      "column": 3,
+      "emittedName": "tlsEnabled"
+    },
+    {
+      "sourceFile": "models/mqttbroker.tsp",
+      "line": 55,
+      "column": 3,
+      "emittedName": "encryptInternalTraffic"
+    },
+    {
+      "sourceFile": "models/mqttbroker.tsp",
+      "line": 99,
+      "column": 3,
+      "emittedName": "temporaryDiskTransferEnabled"
+    },
+    {
+      "sourceFile": "models/mqttbroker.tsp",
+      "line": 185,
+      "column": 3,
+      "emittedName": "enableMetrics"
+    },
+    {
+      "sourceFile": "models/mqttbroker.tsp",
+      "line": 188,
+      "column": 3,
+      "emittedName": "enableSelfCheck"
+    },
+    {
+      "sourceFile": "models/mqttbroker.tsp",
+      "line": 191,
+      "column": 3,
+      "emittedName": "enableSelfTracing"
+    },
+    {
+      "sourceFile": "models/mqttbroker.tsp",
+      "line": 194,
+      "column": 3,
+      "emittedName": "enableTracing"
+    },
+    {
+      "sourceFile": "models/mqttbroker.tsp",
+      "line": 392,
+      "column": 3,
+      "emittedName": "authenticationEnabled"
+    },
+    {
+      "sourceFile": "models/mqttbroker.tsp",
+      "line": 395,
+      "column": 3,
+      "emittedName": "authorizationEnabled"
+    },
+    {
+      "sourceFile": "models/mqttbroker.tsp",
+      "line": 659,
+      "column": 3,
+      "emittedName": "enableCache"
+    }
+  ],
+  "queryParameterLocations": []
+}

@@ -1,0 +1,13 @@
+{
+  "apiVersion": "2025-10-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 222,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    }
+  ],
+  "queryParameterLocations": []
+}

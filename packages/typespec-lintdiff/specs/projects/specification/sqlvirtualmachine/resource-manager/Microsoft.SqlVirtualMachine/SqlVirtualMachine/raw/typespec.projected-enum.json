@@ -1,0 +1,148 @@
+{
+  "apiVersion": "2023-10-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 394,
+      "column": 3,
+      "emittedName": "createDefaultAvailabilityGroupIfNotExist"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 617,
+      "column": 3,
+      "emittedName": "isSqlServiceAccountGmsa"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 781,
+      "column": 3,
+      "emittedName": "enableAutomaticUpgrade"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 832,
+      "column": 3,
+      "emittedName": "enable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 862,
+      "column": 3,
+      "emittedName": "enable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 867,
+      "column": 3,
+      "emittedName": "enableEncryption"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 902,
+      "column": 3,
+      "emittedName": "backupSystemDbs"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 942,
+      "column": 3,
+      "emittedName": "enable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1070,
+      "column": 3,
+      "emittedName": "isRServicesEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1091,
+      "column": 3,
+      "emittedName": "isOptimizeForAdHocWorkloadsEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1108,
+      "column": 3,
+      "emittedName": "isLpimEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1113,
+      "column": 3,
+      "emittedName": "isIfiEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1149,
+      "column": 3,
+      "emittedName": "sqlSystemDbOnDataDisk"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1166,
+      "column": 3,
+      "emittedName": "enableStorageConfigBlade"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1187,
+      "column": 3,
+      "emittedName": "useStoragePool"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1223,
+      "column": 3,
+      "emittedName": "persistFolder"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1243,
+      "column": 3,
+      "emittedName": "useStoragePool"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1317,
+      "column": 3,
+      "emittedName": "enable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1322,
+      "column": 3,
+      "emittedName": "runImmediately"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1337,
+      "column": 3,
+      "emittedName": "enable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1382,
+      "column": 3,
+      "emittedName": "runDiskConfigRules"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "AvailabilityGroupListener.tsp",
+      "line": 40,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "SqlVirtualMachine.tsp",
+      "line": 46,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "apiVersion": "2023-03-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 69,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 110,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 174,
+      "column": 3,
+      "emittedName": "autoResolved"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 201,
+      "column": 3,
+      "emittedName": "enabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

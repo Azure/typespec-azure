@@ -12,14 +12,12 @@ EndpointResource.tsp:101:3 - warning tsp-lintdiff-local-linter/xms-examples-requ
 EndpointResource.tsp:111:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 EndpointResource.tsp:135:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'expiresin' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 EndpointResource.tsp:123:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
-EndpointResource.tsp:135:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'expiresin' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 EndpointResource.tsp:41:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ArmResourceActionSync' should contain the action verb 'endpoints' from the route path. Consider updating the operation name.
   EndpointResource.tsp:123:22 - occurred while instantiating template
 EndpointResource.tsp:41:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
   EndpointResource.tsp:123:22 - occurred while instantiating template
 EndpointResource.tsp:163:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'expiresin' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 EndpointResource.tsp:151:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
-EndpointResource.tsp:163:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter 'expiresin' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 EndpointResource.tsp:41:4 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'ArmResourceActionSync' should contain the action verb 'endpoints' from the route path. Consider updating the operation name.
   EndpointResource.tsp:151:36 - occurred while instantiating template
 EndpointResource.tsp:41:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -86,5 +84,5 @@ PublicCloud.tsp:251:3 - warning tsp-lintdiff-local-linter/path-parameter-schema:
 PublicCloud.tsp:423:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 PublicCloud.tsp:424:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 79 warnings.
+Found 77 warnings.
 

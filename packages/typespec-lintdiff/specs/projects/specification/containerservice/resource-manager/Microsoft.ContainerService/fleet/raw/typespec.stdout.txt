@@ -78,6 +78,8 @@ fleetnamespace.tsp:223:3 - warning tsp-lintdiff-local-linter/xms-examples-requir
 fleetnamespace.tsp:31:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "managedNamespaceName" and "clusterMeshProfileName".
 gate.tsp:183:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 gate.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "gateName" and "clusterMeshProfileName".
+gate.tsp:170:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.
+gate.tsp:177:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.state.
 gate.tsp:191:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 gate.tsp:25:3 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "gateName" and "clusterMeshProfileName".
 helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$top' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
@@ -130,5 +132,5 @@ helpers.tsp:40:3 - warning tsp-lintdiff-local-linter/parameter-names-convention:
 helpers.tsp:33:3 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
 update/autoupgradeprofile.tsp:198:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 127 warnings.
+Found 129 warnings.
 

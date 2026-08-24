@@ -1,0 +1,19 @@
+{
+  "apiVersion": "2015-05-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 137,
+      "column": 3,
+      "emittedName": "IsGeneratedFromTemplate"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 53,
+      "column": 7,
+      "emittedName": "canFetchContent"
+    }
+  ],
+  "queryParameterLocations": []
+}

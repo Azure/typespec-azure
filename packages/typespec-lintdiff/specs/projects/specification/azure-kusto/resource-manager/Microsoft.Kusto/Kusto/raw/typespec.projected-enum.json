@@ -1,0 +1,88 @@
+{
+  "apiVersion": "2025-02-14",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 1582,
+      "column": 3,
+      "emittedName": "enableDiskEncryption"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1587,
+      "column": 3,
+      "emittedName": "enableStreamingIngest"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1602,
+      "column": 3,
+      "emittedName": "enablePurge"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1612,
+      "column": 3,
+      "emittedName": "enableDoubleEncryption"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1638,
+      "column": 3,
+      "emittedName": "enableAutoStop"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1710,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2015,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2731,
+      "column": 3,
+      "emittedName": "continueOnErrors"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3349,
+      "column": 3,
+      "emittedName": "isFollowed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3611,
+      "column": 3,
+      "emittedName": "ignoreFirstRecord"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3854,
+      "column": 3,
+      "emittedName": "ignoreFirstRecord"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Database.tsp",
+      "line": 68,
+      "column": 7,
+      "name": "callerRole",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "Database.tsp",
+      "line": 98,
+      "column": 7,
+      "name": "callerRole",
+      "verb": "patch"
+    }
+  ]
+}

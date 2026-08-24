@@ -1,0 +1,25 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 79,
+      "column": 3,
+      "emittedName": "exported"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 85,
+      "column": 3,
+      "emittedName": "hasAdditionalSubjectAlternativeNames"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 91,
+      "column": 3,
+      "emittedName": "inUse"
+    }
+  ],
+  "queryParameterLocations": []
+}

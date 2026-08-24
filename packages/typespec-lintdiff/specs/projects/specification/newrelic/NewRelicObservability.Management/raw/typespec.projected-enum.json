@@ -1,0 +1,21 @@
+{
+  "apiVersion": "2025-05-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 1319,
+      "column": 3,
+      "emittedName": "isHiddenSaaS"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "NewRelicMonitorResource.tsp",
+      "line": 65,
+      "column": 7,
+      "name": "userEmail",
+      "verb": "delete"
+    }
+  ]
+}

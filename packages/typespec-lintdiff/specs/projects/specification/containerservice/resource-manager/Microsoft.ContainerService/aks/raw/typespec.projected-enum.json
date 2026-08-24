@@ -1,0 +1,610 @@
+{
+  "apiVersion": "2026-05-02-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "AgentPool.tsp",
+      "line": 68,
+      "column": 7,
+      "emittedName": "ignore-pod-disruption-budget"
+    },
+    {
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 142,
+      "column": 3,
+      "emittedName": "enableAutoScaling"
+    },
+    {
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 197,
+      "column": 3,
+      "emittedName": "enableOSDiskFullCaching"
+    },
+    {
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 232,
+      "column": 3,
+      "emittedName": "enableNodePublicIP"
+    },
+    {
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 306,
+      "column": 3,
+      "emittedName": "enableEncryptionAtHost"
+    },
+    {
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 312,
+      "column": 3,
+      "emittedName": "enableUltraSSD"
+    },
+    {
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 318,
+      "column": 3,
+      "emittedName": "enableFIPS"
+    },
+    {
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 494,
+      "column": 3,
+      "emittedName": "cpuCfsQuota"
+    },
+    {
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 524,
+      "column": 3,
+      "emittedName": "failSwapOn"
+    },
+    {
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 700,
+      "column": 3,
+      "emittedName": "netIpv4TcpTwReuse"
+    },
+    {
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 859,
+      "column": 3,
+      "emittedName": "enableAcceleratedNetworking"
+    },
+    {
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 908,
+      "column": 3,
+      "emittedName": "disableOutboundNat"
+    },
+    {
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 919,
+      "column": 3,
+      "emittedName": "enableVTPM"
+    },
+    {
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 924,
+      "column": 3,
+      "emittedName": "enableSecureBoot"
+    },
+    {
+      "sourceFile": "AgentPoolModels.tsp",
+      "line": 989,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "AgentPoolUpgradeProfile.tsp",
+      "line": 106,
+      "column": 3,
+      "emittedName": "isPreview"
+    },
+    {
+      "sourceFile": "AgentPoolUpgradeProfile.tsp",
+      "line": 112,
+      "column": 3,
+      "emittedName": "isOutOfSupport"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 1664,
+      "column": 3,
+      "emittedName": "isDefault"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 1669,
+      "column": 3,
+      "emittedName": "isPreview"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 1930,
+      "column": 3,
+      "emittedName": "enableRBAC"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 1942,
+      "column": 3,
+      "emittedName": "enableFIPS"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 1948,
+      "column": 3,
+      "emittedName": "enableNamespaceResources"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2004,
+      "column": 3,
+      "emittedName": "disableLocalAccounts"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2168,
+      "column": 3,
+      "emittedName": "enableCSIProxy"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2183,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2219,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2272,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2277,
+      "column": 3,
+      "emittedName": "allowNetworkPluginKubenet"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2407,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2551,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2577,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2587,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2610,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2704,
+      "column": 3,
+      "emittedName": "enableMultipleStandardLoadBalancers"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2860,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2871,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2940,
+      "column": 3,
+      "emittedName": "managed"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 2946,
+      "column": 3,
+      "emittedName": "enableAzureRBAC"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3012,
+      "column": 3,
+      "emittedName": "forceUpgrade"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3037,
+      "column": 3,
+      "emittedName": "daemonset-eviction-for-empty-nodes"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3044,
+      "column": 3,
+      "emittedName": "daemonset-eviction-for-occupied-nodes"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3051,
+      "column": 3,
+      "emittedName": "ignore-daemonsets-utilization"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3178,
+      "column": 3,
+      "emittedName": "enablePrivateCluster"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3190,
+      "column": 3,
+      "emittedName": "enablePrivateClusterPublicFQDN"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3195,
+      "column": 3,
+      "emittedName": "disableRunCommand"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3200,
+      "column": 3,
+      "emittedName": "enableVnetIntegration"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3285,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3377,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3388,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3399,
+      "column": 3,
+      "emittedName": "allowSecretAccess"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3423,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3463,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3473,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3489,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3500,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3510,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3554,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3565,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3575,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3586,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3628,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3701,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3718,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3749,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3759,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3797,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3834,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3845,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3864,
+      "column": 3,
+      "emittedName": "disableCustomMetrics"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3869,
+      "column": 3,
+      "emittedName": "disablePrometheusMetricsScraping"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3927,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3938,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 3959,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 4044,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 4054,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 4134,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 4177,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 4210,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 4277,
+      "column": 3,
+      "emittedName": "hasBreakingChanges"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 4441,
+      "column": 3,
+      "emittedName": "enableContinuousControlPlaneAndAddonMonitor"
+    },
+    {
+      "sourceFile": "CommonModels.tsp",
+      "line": 4446,
+      "column": 3,
+      "emittedName": "enableOnDemandMonitor"
+    },
+    {
+      "sourceFile": "GuardrailsAvailableVersion.tsp",
+      "line": 95,
+      "column": 3,
+      "emittedName": "isDefaultVersion"
+    },
+    {
+      "sourceFile": "LoadBalancer.tsp",
+      "line": 113,
+      "column": 3,
+      "emittedName": "allowServicePlacement"
+    },
+    {
+      "sourceFile": "LocationRoutes.tsp",
+      "line": 92,
+      "column": 7,
+      "emittedName": "includeExtendedLocations"
+    },
+    {
+      "sourceFile": "Machine.tsp",
+      "line": 137,
+      "column": 3,
+      "emittedName": "enableVTPM"
+    },
+    {
+      "sourceFile": "Machine.tsp",
+      "line": 142,
+      "column": 3,
+      "emittedName": "enableSecureBoot"
+    },
+    {
+      "sourceFile": "Machine.tsp",
+      "line": 152,
+      "column": 3,
+      "emittedName": "enableEncryptionAtHost"
+    },
+    {
+      "sourceFile": "Machine.tsp",
+      "line": 178,
+      "column": 3,
+      "emittedName": "ultraSsdEnabled"
+    },
+    {
+      "sourceFile": "Machine.tsp",
+      "line": 214,
+      "column": 3,
+      "emittedName": "enableFIPS"
+    },
+    {
+      "sourceFile": "Machine.tsp",
+      "line": 518,
+      "column": 3,
+      "emittedName": "enableNodePublicIP"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 57,
+      "column": 3,
+      "emittedName": "default"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 67,
+      "column": 3,
+      "emittedName": "isPreview"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 328,
+      "column": 7,
+      "emittedName": "ignore-pod-disruption-budget"
+    },
+    {
+      "sourceFile": "ManagedClusterSnapshot.tsp",
+      "line": 133,
+      "column": 3,
+      "emittedName": "enableRbac"
+    },
+    {
+      "sourceFile": "ManagedClusterUpgradeProfile.tsp",
+      "line": 114,
+      "column": 3,
+      "emittedName": "isPreview"
+    },
+    {
+      "sourceFile": "ManagedClusterUpgradeProfile.tsp",
+      "line": 120,
+      "column": 3,
+      "emittedName": "isOutOfSupport"
+    },
+    {
+      "sourceFile": "SafeguardsAvailableVersion.tsp",
+      "line": 95,
+      "column": 3,
+      "emittedName": "isDefaultVersion"
+    },
+    {
+      "sourceFile": "Snapshot.tsp",
+      "line": 129,
+      "column": 3,
+      "emittedName": "enableFIPS"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "AgentPool.tsp",
+      "line": 68,
+      "column": 7,
+      "name": "ignore-pod-disruption-budget",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "ManagedCluster.tsp",
+      "line": 328,
+      "column": 7,
+      "name": "ignore-pod-disruption-budget",
+      "verb": "delete"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "PublicCloud.tsp",
+      "line": 165,
+      "column": 3,
+      "emittedName": "isOrganizationalAccount"
+    }
+  ],
+  "queryParameterLocations": []
+}

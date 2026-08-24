@@ -1,0 +1,481 @@
+{
+  "apiVersion": "2026-04-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 90,
+      "column": 3,
+      "emittedName": "availabilityZone"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 98,
+      "column": 3,
+      "emittedName": "persistence"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 240,
+      "column": 3,
+      "emittedName": "persistence"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 272,
+      "column": 3,
+      "emittedName": "isPolicyEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 490,
+      "column": 3,
+      "emittedName": "softDeletionEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1559,
+      "column": 3,
+      "emittedName": "isVirtualNetworkFilterEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1564,
+      "column": 3,
+      "emittedName": "enableAutomaticFailover"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1614,
+      "column": 3,
+      "emittedName": "enableMultipleWriteLocations"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1619,
+      "column": 3,
+      "emittedName": "enableCassandraConnector"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1629,
+      "column": 3,
+      "emittedName": "disableKeyBasedMetadataWriteAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1649,
+      "column": 3,
+      "emittedName": "enableFreeTier"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1659,
+      "column": 3,
+      "emittedName": "enableAnalyticalStorage"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1712,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1735,
+      "column": 3,
+      "emittedName": "enableMaterializedViews"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1746,
+      "column": 3,
+      "emittedName": "enablePartitionMerge"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1751,
+      "column": 3,
+      "emittedName": "enableBurstCapacity"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1772,
+      "column": 3,
+      "emittedName": "enablePriorityBasedExecution"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1782,
+      "column": 3,
+      "emittedName": "enablePerRegionPerPartitionAutoscale"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1788,
+      "column": 3,
+      "emittedName": "enableAllVersionsAndDeletesChangeFeed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1813,
+      "column": 3,
+      "emittedName": "enforceHierarchicalPartitionKeyIdLastLevel"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1897,
+      "column": 3,
+      "emittedName": "isZoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1939,
+      "column": 3,
+      "emittedName": "ignoreMissingVNetServiceEndpoint"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2108,
+      "column": 3,
+      "emittedName": "restoreWithTtlDisabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2426,
+      "column": 3,
+      "emittedName": "isVirtualNetworkFilterEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2431,
+      "column": 3,
+      "emittedName": "enableAutomaticFailover"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2446,
+      "column": 3,
+      "emittedName": "enableMultipleWriteLocations"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2451,
+      "column": 3,
+      "emittedName": "enableCassandraConnector"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2461,
+      "column": 3,
+      "emittedName": "disableKeyBasedMetadataWriteAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2481,
+      "column": 3,
+      "emittedName": "enableFreeTier"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2491,
+      "column": 3,
+      "emittedName": "enableAnalyticalStorage"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2528,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2545,
+      "column": 3,
+      "emittedName": "enableMaterializedViews"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2556,
+      "column": 3,
+      "emittedName": "enablePartitionMerge"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2561,
+      "column": 3,
+      "emittedName": "enableBurstCapacity"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2576,
+      "column": 3,
+      "emittedName": "enablePriorityBasedExecution"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2586,
+      "column": 3,
+      "emittedName": "enablePerRegionPerPartitionAutoscale"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2592,
+      "column": 3,
+      "emittedName": "enableAllVersionsAndDeletesChangeFeed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2603,
+      "column": 3,
+      "emittedName": "enforceHierarchicalPartitionKeyIdLastLevel"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2653,
+      "column": 3,
+      "emittedName": "isVirtualNetworkFilterEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2658,
+      "column": 3,
+      "emittedName": "enableAutomaticFailover"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2673,
+      "column": 3,
+      "emittedName": "enableMultipleWriteLocations"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2678,
+      "column": 3,
+      "emittedName": "enableCassandraConnector"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2688,
+      "column": 3,
+      "emittedName": "disableKeyBasedMetadataWriteAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2708,
+      "column": 3,
+      "emittedName": "enableFreeTier"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2718,
+      "column": 3,
+      "emittedName": "enableAnalyticalStorage"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2760,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2782,
+      "column": 3,
+      "emittedName": "enableMaterializedViews"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2793,
+      "column": 3,
+      "emittedName": "enablePartitionMerge"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2798,
+      "column": 3,
+      "emittedName": "enableBurstCapacity"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2813,
+      "column": 3,
+      "emittedName": "enablePriorityBasedExecution"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2823,
+      "column": 3,
+      "emittedName": "enablePerRegionPerPartitionAutoscale"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2829,
+      "column": 3,
+      "emittedName": "enableAllVersionsAndDeletesChangeFeed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2840,
+      "column": 3,
+      "emittedName": "enforceHierarchicalPartitionKeyIdLastLevel"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2974,
+      "column": 3,
+      "emittedName": "skipAccountKeysLastUsageCheck"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3782,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3807,
+      "column": 3,
+      "emittedName": "isDefaultBucket"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4067,
+      "column": 3,
+      "emittedName": "automatic"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4237,
+      "column": 3,
+      "emittedName": "systemKey"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4485,
+      "column": 3,
+      "emittedName": "isDryRun"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5105,
+      "column": 3,
+      "emittedName": "unique"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5674,
+      "column": 3,
+      "emittedName": "supportsAvailabilityZone"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5680,
+      "column": 3,
+      "emittedName": "isResidencyRestricted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5692,
+      "column": 3,
+      "emittedName": "isSubscriptionRegionAccessAllowedForRegular"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5698,
+      "column": 3,
+      "emittedName": "isSubscriptionRegionAccessAllowedForAz"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5980,
+      "column": 3,
+      "emittedName": "repairEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6032,
+      "column": 3,
+      "emittedName": "deallocated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6037,
+      "column": 3,
+      "emittedName": "cassandraAuditLoggingEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6225,
+      "column": 3,
+      "emittedName": "cassandra-stop-start"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6230,
+      "column": 3,
+      "emittedName": "readwrite"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6268,
+      "column": 3,
+      "emittedName": "cassandra-stop-start"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6273,
+      "column": 3,
+      "emittedName": "readWrite"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6304,
+      "column": 3,
+      "emittedName": "isAdmin"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6309,
+      "column": 3,
+      "emittedName": "cassandraStopStart"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6314,
+      "column": 3,
+      "emittedName": "readWrite"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6482,
+      "column": 3,
+      "emittedName": "availabilityZone"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6492,
+      "column": 3,
+      "emittedName": "deallocated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6580,
+      "column": 3,
+      "emittedName": "healthy"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6738,
+      "column": 3,
+      "emittedName": "isLatestModel"
+    },
+    {
+      "sourceFile": "SoftDeletedResources.tsp",
+      "line": 42,
+      "column": 3,
+      "emittedName": "isSoftDeleted"
+    }
+  ],
+  "queryParameterLocations": []
+}

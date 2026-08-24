@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 7,
+  "schemaVersion": 6,
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-08-24T08:08:01.918Z",
+  "generatedAt": "2026-08-10T09:38:18.108Z",
   "rule": "tsp-lintdiff-local-linter/all-resources-must-have-get-operation",
   "count": 3,
   "levels": {

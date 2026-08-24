@@ -1,0 +1,21 @@
+{
+  "apiVersion": "2024-06-27",
+  "serviceCount": 1,
+  "locations": [],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "models/models.tsp",
+      "line": 1866,
+      "column": 3,
+      "name": "offerGuid",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "models/models.tsp",
+      "line": 1873,
+      "column": 3,
+      "name": "reportCreatorTenantId",
+      "verb": "put"
+    }
+  ]
+}

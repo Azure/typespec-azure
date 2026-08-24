@@ -1,0 +1,256 @@
+{
+  "apiVersion": "2026-05-31-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 3431,
+      "column": 3,
+      "emittedName": "enableAcceleratedNetworkingOnRecovery"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3441,
+      "column": 3,
+      "emittedName": "enableAcceleratedNetworkingOnTfo"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3456,
+      "column": 3,
+      "emittedName": "reuseExistingNic"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3471,
+      "column": 3,
+      "emittedName": "tfoReuseExistingNic"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3485,
+      "column": 3,
+      "emittedName": "isPrimary"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3487,
+      "column": 3,
+      "emittedName": "isSeletedForFailover"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4290,
+      "column": 3,
+      "emittedName": "areAllClusterNodesRegistered"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4340,
+      "column": 3,
+      "emittedName": "isSharedDiskVirtualNode"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5796,
+      "column": 3,
+      "emittedName": "isActive"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7534,
+      "column": 3,
+      "emittedName": "resyncRequired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7570,
+      "column": 3,
+      "emittedName": "isDiskEncrypted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7585,
+      "column": 3,
+      "emittedName": "isDiskKeyEncrypted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7738,
+      "column": 3,
+      "emittedName": "resyncRequired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7774,
+      "column": 3,
+      "emittedName": "isDiskEncrypted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7789,
+      "column": 3,
+      "emittedName": "isDiskKeyEncrypted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7981,
+      "column": 3,
+      "emittedName": "isClusterInfraReady"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8099,
+      "column": 3,
+      "emittedName": "isReplicationAgentUpdateRequired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8111,
+      "column": 3,
+      "emittedName": "isReplicationAgentCertificateUpdateRequired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8236,
+      "column": 3,
+      "emittedName": "isAgentUpgradeable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8241,
+      "column": 3,
+      "emittedName": "isAgentReinstallRequired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8257,
+      "column": 3,
+      "emittedName": "isAgentUpgradeInProgress"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8267,
+      "column": 3,
+      "emittedName": "isAgentUpgradeRetryThresholdExhausted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8344,
+      "column": 3,
+      "emittedName": "enableAcceleratedNetworkingOnRecovery"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8359,
+      "column": 3,
+      "emittedName": "enableAcceleratedNetworkingOnTfo"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8374,
+      "column": 3,
+      "emittedName": "reuseExistingNic"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8389,
+      "column": 3,
+      "emittedName": "tfoReuseExistingNic"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8403,
+      "column": 3,
+      "emittedName": "isPrimary"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8411,
+      "column": 3,
+      "emittedName": "isSeletedForFailover"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9378,
+      "column": 3,
+      "emittedName": "isPrimarySideScript"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12637,
+      "column": 3,
+      "emittedName": "isAdditionalStatsAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14256,
+      "column": 3,
+      "emittedName": "isDeleted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14741,
+      "column": 3,
+      "emittedName": "isDeleted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15240,
+      "column": 3,
+      "emittedName": "isAgentRegistrationSuccessfulAfterFailover"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15465,
+      "column": 3,
+      "emittedName": "isAgentUpgradeable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15470,
+      "column": 3,
+      "emittedName": "isAgentReinstallRequired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15475,
+      "column": 3,
+      "emittedName": "isLastReinstallSuccessful"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 16215,
+      "column": 3,
+      "emittedName": "isAgentRegistrationSuccessfulAfterFailover"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 16735,
+      "column": 3,
+      "emittedName": "isAdditionalStatsAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 17839,
+      "column": 3,
+      "emittedName": "isPrimarySideScript"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Fabric.tsp",
+      "line": 78,
+      "column": 7,
+      "name": "$filter",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "MigrationItem.tsp",
+      "line": 84,
+      "column": 7,
+      "name": "deleteOption",
+      "verb": "delete"
+    }
+  ]
+}

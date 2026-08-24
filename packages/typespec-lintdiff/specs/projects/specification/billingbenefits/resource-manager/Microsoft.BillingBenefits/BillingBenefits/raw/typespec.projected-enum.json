@@ -1,0 +1,94 @@
+{
+  "apiVersion": "2026-06-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 779,
+      "column": 3,
+      "emittedName": "renew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1175,
+      "column": 3,
+      "emittedName": "renew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1307,
+      "column": 3,
+      "emittedName": "renew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1428,
+      "column": 3,
+      "emittedName": "renew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1461,
+      "column": 3,
+      "emittedName": "valid"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1545,
+      "column": 3,
+      "emittedName": "renew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1638,
+      "column": 3,
+      "emittedName": "renew"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2458,
+      "column": 3,
+      "emittedName": "allowContributors"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2512,
+      "column": 3,
+      "emittedName": "allowContributors"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2622,
+      "column": 3,
+      "emittedName": "contributors"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2627,
+      "column": 3,
+      "emittedName": "milestones"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3454,
+      "column": 3,
+      "emittedName": "valid"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "SavingsPlanModel.tsp",
+      "line": 48,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "SavingsPlanOrderModel.tsp",
+      "line": 46,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
+  ]
+}

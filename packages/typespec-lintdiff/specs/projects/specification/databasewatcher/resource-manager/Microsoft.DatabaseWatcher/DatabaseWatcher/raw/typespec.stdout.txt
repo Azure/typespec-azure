@@ -19,6 +19,11 @@ watcher.tsp:132:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Ple
 watcher.tsp:52:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 watcher.tsp:52:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 watcher.tsp:52:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
+watcher.tsp:93:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.datastore.kustoClusterUri.
+watcher.tsp:96:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.datastore.kustoDataIngestionUri.
+watcher.tsp:99:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.datastore.kustoDatabaseName.
+watcher.tsp:103:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.datastore.kustoManagementUrl.
+watcher.tsp:106:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.datastore.kustoOfferingType.
 watcher.tsp:138:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 watcher.tsp:52:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 watcher.tsp:52:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
@@ -98,5 +103,5 @@ sharedPrivateLinkResource.tsp:22:3 - warning tsp-lintdiff-local-linter/xms-examp
 watcher.tsp:52:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 watcher.tsp:52:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength).
 
-Found 95 warnings.
+Found 100 warnings.
 

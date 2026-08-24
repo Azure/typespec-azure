@@ -1,0 +1,55 @@
+{
+  "apiVersion": "2025-10-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 527,
+      "column": 3,
+      "emittedName": "continueDistributeOnFailure"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 532,
+      "column": 3,
+      "emittedName": "sourceValidationOnly"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 893,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1065,
+      "column": 3,
+      "emittedName": "runElevated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1070,
+      "column": 3,
+      "emittedName": "runAsSystem"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1206,
+      "column": 3,
+      "emittedName": "runElevated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1211,
+      "column": 3,
+      "emittedName": "runAsSystem"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1286,
+      "column": 3,
+      "emittedName": "excludeFromLatest"
+    }
+  ],
+  "queryParameterLocations": []
+}

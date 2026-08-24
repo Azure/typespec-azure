@@ -1,0 +1,277 @@
+{
+  "apiVersion": "2023-09-15-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 388,
+      "column": 3,
+      "emittedName": "isCmekEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 416,
+      "column": 3,
+      "emittedName": "isStreamingSupported"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 422,
+      "column": 3,
+      "emittedName": "isDeveloperAppInsightsApiKeySet"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 434,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 993,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 998,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1003,
+      "column": 3,
+      "emittedName": "requireTermsAgreement"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1043,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1049,
+      "column": 3,
+      "emittedName": "isTokenEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1054,
+      "column": 3,
+      "emittedName": "isEndpointParametersEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1059,
+      "column": 3,
+      "emittedName": "isDetailedLoggingEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1070,
+      "column": 3,
+      "emittedName": "isNoStorageEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1086,
+      "column": 3,
+      "emittedName": "isV1Enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1091,
+      "column": 3,
+      "emittedName": "isV3Enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1096,
+      "column": 3,
+      "emittedName": "isSecureSiteEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1106,
+      "column": 3,
+      "emittedName": "isWebChatSpeechEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1111,
+      "column": 3,
+      "emittedName": "isWebchatPreviewEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1189,
+      "column": 3,
+      "emittedName": "valid"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1386,
+      "column": 3,
+      "emittedName": "required"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1564,
+      "column": 3,
+      "emittedName": "ValidateAuthority"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1709,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1764,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1826,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1861,
+      "column": 3,
+      "emittedName": "enableCalling"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1871,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1912,
+      "column": 3,
+      "emittedName": "enableMessaging"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1917,
+      "column": 3,
+      "emittedName": "enableMediaCards"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1922,
+      "column": 3,
+      "emittedName": "enableVideo"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1927,
+      "column": 3,
+      "emittedName": "enableCalling"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1932,
+      "column": 3,
+      "emittedName": "enableScreenSharing"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1937,
+      "column": 3,
+      "emittedName": "enableGroups"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1957,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1993,
+      "column": 3,
+      "emittedName": "isValidated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1998,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2117,
+      "column": 3,
+      "emittedName": "isValidated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2122,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2164,
+      "column": 3,
+      "emittedName": "isValidated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2169,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2235,
+      "column": 3,
+      "emittedName": "registerBeforeOAuthFlow"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2242,
+      "column": 3,
+      "emittedName": "IsValidated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2253,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2292,
+      "column": 3,
+      "emittedName": "isValidated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2358,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2373,
+      "column": 3,
+      "emittedName": "isDefaultBotForCogSvcAccount"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2443,
+      "column": 3,
+      "emittedName": "isEnabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

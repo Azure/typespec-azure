@@ -1,0 +1,19 @@
+{
+  "apiVersion": "2026-05-02-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 55,
+      "column": 3,
+      "emittedName": "isRestricted"
+    },
+    {
+      "sourceFile": "aimodel.tsp",
+      "line": 129,
+      "column": 3,
+      "emittedName": "feasible"
+    }
+  ],
+  "queryParameterLocations": []
+}

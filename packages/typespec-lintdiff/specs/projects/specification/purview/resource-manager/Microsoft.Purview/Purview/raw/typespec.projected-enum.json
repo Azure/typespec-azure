@@ -1,0 +1,31 @@
+{
+  "apiVersion": "2024-04-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 847,
+      "column": 3,
+      "emittedName": "deprovisioned"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1339,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1514,
+      "column": 3,
+      "emittedName": "toBeExportedForCustomer"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1573,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    }
+  ],
+  "queryParameterLocations": []
+}

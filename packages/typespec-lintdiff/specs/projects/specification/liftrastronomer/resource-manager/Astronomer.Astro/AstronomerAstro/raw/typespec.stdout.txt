@@ -10,10 +10,18 @@ main.tsp:27:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year:
 main.tsp:38:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2024-08-27-preview' has been in preview for over one year. Move it to GA or retire it.
 main.tsp:66:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:69:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
+LiftrBase/main.tsp:65:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.marketplace.offerDetails.
+LiftrBase/main.tsp:71:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.marketplace.offerDetails.publisherId.
+LiftrBase/main.tsp:74:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.marketplace.offerDetails.offerId.
+LiftrBase/main.tsp:77:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.marketplace.offerDetails.planId.
+LiftrBase/main.tsp:107:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.user.firstName.
+LiftrBase/main.tsp:110:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.user.lastName.
+LiftrBase/main.tsp:113:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.user.emailAddress.
+LiftrBase.Data/main.tsp:47:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.partnerOrganizationProperties.organizationName.
 main.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:82:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:83:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 main.tsp:84:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 12 warnings.
+Found 20 warnings.
 

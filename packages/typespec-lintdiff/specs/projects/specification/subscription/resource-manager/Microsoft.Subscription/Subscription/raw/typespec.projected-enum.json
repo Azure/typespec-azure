@@ -1,0 +1,37 @@
+{
+  "apiVersion": "2025-11-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 534,
+      "column": 3,
+      "emittedName": "blockSubscriptionsLeavingTenant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 539,
+      "column": 3,
+      "emittedName": "blockSubscriptionsIntoTenant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 561,
+      "column": 3,
+      "emittedName": "blockSubscriptionsLeavingTenant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 566,
+      "column": 3,
+      "emittedName": "blockSubscriptionsIntoTenant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 593,
+      "column": 3,
+      "emittedName": "allowTransfers"
+    }
+  ],
+  "queryParameterLocations": []
+}

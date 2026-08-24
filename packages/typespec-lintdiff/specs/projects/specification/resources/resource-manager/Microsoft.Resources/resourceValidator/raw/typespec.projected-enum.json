@@ -1,0 +1,19 @@
+{
+  "apiVersion": "2022-06-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 37,
+      "column": 3,
+      "emittedName": "performPreflightWithoutRbacWriteCheck"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 57,
+      "column": 3,
+      "emittedName": "onlyIfNotExists"
+    }
+  ],
+  "queryParameterLocations": []
+}

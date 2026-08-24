@@ -5,24 +5,16 @@ Diagnostics were reported during compilation:
 main.tsp:44:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
 main.tsp:44:3 - warning tsp-lintdiff-local-linter/preview-version-over-one-year: Preview API version '2018-07-01-preview' has been in preview for over one year. Move it to GA or retire it.
 routes.tsp:21:3 - warning tsp-lintdiff-local-linter/extension-resource-path-pattern: Extension resource path '/providers/{managementGroupsNamespace}/managementGroups/{managementGroupName}/providers/Microsoft.PolicyInsights/policyTrackedResources/{policyTrackedResourcesResource}/queryResults' should use {scope}/providers/... instead of hardcoding the parent scope.
-routes.tsp:48:5 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
-routes.tsp:55:5 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 routes.tsp:21:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
-routes.tsp:81:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
-routes.tsp:88:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 routes.tsp:63:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:73:7 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
 routes.tsp:81:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
 routes.tsp:88:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
-routes.tsp:115:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
-routes.tsp:122:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 routes.tsp:97:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:107:7 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path parameter should specify a maximum length (maxLength) and characters allowed (pattern).
 routes.tsp:115:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
 routes.tsp:122:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$filter' should not begin with '$' or '@'.
-routes.tsp:152:5 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$top' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
-routes.tsp:159:5 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 routes.tsp:131:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 21 warnings.
+Found 13 warnings.
 

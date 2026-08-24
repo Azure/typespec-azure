@@ -1,0 +1,19 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 88,
+      "column": 3,
+      "emittedName": "multiValueAnswer"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 201,
+      "column": 3,
+      "emittedName": "evaluateTargetHealth"
+    }
+  ],
+  "queryParameterLocations": []
+}

@@ -1,0 +1,79 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 77,
+      "column": 3,
+      "emittedName": "autoMinorVersionUpgrade"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 89,
+      "column": 3,
+      "emittedName": "copyTagsToSnapshot"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 119,
+      "column": 3,
+      "emittedName": "deletionProtection"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 131,
+      "column": 3,
+      "emittedName": "enableGlobalWriteForwarding"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 134,
+      "column": 3,
+      "emittedName": "enableHttpEndpoint"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 137,
+      "column": 3,
+      "emittedName": "enableIAMDatabaseAuthentication"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 161,
+      "column": 3,
+      "emittedName": "manageMasterUserPassword"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 183,
+      "column": 3,
+      "emittedName": "performanceInsightsEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 201,
+      "column": 3,
+      "emittedName": "publiclyAccessible"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 231,
+      "column": 3,
+      "emittedName": "storageEncrypted"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 244,
+      "column": 3,
+      "emittedName": "useLatestRestorableTime"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 306,
+      "column": 3,
+      "emittedName": "autoPause"
+    }
+  ],
+  "queryParameterLocations": []
+}

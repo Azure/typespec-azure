@@ -1,0 +1,618 @@
+{
+  "apiVersion": "2026-04-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "AdvancedPlatformMetrics.tsp",
+      "line": 90,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 56,
+      "column": 3,
+      "emittedName": "isBlobEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1248,
+      "column": 3,
+      "emittedName": "isVersioningEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1253,
+      "column": 3,
+      "emittedName": "automaticSnapshotPolicyEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1325,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1337,
+      "column": 3,
+      "emittedName": "allowPermanentDelete"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1348,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1373,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1390,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1421,
+      "column": 3,
+      "emittedName": "enable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1496,
+      "column": 3,
+      "emittedName": "deleted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1519,
+      "column": 3,
+      "emittedName": "denyEncryptionScopeOverride"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1573,
+      "column": 3,
+      "emittedName": "hasLegalHold"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1579,
+      "column": 3,
+      "emittedName": "hasImmutabilityPolicy"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1589,
+      "column": 3,
+      "emittedName": "enableNfsV3RootSquash"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1594,
+      "column": 3,
+      "emittedName": "enableNfsV3AllSquash"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1640,
+      "column": 3,
+      "emittedName": "allowProtectedAppendWrites"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1645,
+      "column": 3,
+      "emittedName": "allowProtectedAppendWritesAll"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1692,
+      "column": 3,
+      "emittedName": "allowProtectedAppendWrites"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1697,
+      "column": 3,
+      "emittedName": "allowProtectedAppendWritesAll"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1708,
+      "column": 3,
+      "emittedName": "hasLegalHold"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1765,
+      "column": 3,
+      "emittedName": "allowProtectedAppendWritesAll"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1782,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1810,
+      "column": 3,
+      "emittedName": "hasLegalHold"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1820,
+      "column": 3,
+      "emittedName": "allowProtectedAppendWritesAll"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1998,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2008,
+      "column": 3,
+      "emittedName": "required"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2362,
+      "column": 3,
+      "emittedName": "deleted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2477,
+      "column": 3,
+      "emittedName": "paidBurstingEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2735,
+      "column": 3,
+      "emittedName": "fillGapWithZero"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2907,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3096,
+      "column": 3,
+      "emittedName": "supportsHttpsTrafficOnly"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3101,
+      "column": 3,
+      "emittedName": "isSftpEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3106,
+      "column": 3,
+      "emittedName": "isLocalUserEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3111,
+      "column": 3,
+      "emittedName": "enableExtendedGroups"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3116,
+      "column": 3,
+      "emittedName": "isHnsEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3136,
+      "column": 3,
+      "emittedName": "allowBlobPublicAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3146,
+      "column": 3,
+      "emittedName": "allowSharedKeyAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3151,
+      "column": 3,
+      "emittedName": "isNfsV3Enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3156,
+      "column": 3,
+      "emittedName": "allowCrossTenantReplication"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3162,
+      "column": 3,
+      "emittedName": "defaultToOAuthAuthentication"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3229,
+      "column": 3,
+      "emittedName": "useSubDomainName"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3249,
+      "column": 3,
+      "emittedName": "requireInfrastructureEncryption"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3294,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3532,
+      "column": 3,
+      "emittedName": "isSmbOAuthEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3547,
+      "column": 3,
+      "emittedName": "publishMicrosoftEndpoints"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3552,
+      "column": 3,
+      "emittedName": "publishInternetEndpoints"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3562,
+      "column": 3,
+      "emittedName": "publishIpv6Endpoint"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3572,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3599,
+      "column": 3,
+      "emittedName": "allowProtectedAppendWrites"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3610,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3647,
+      "column": 3,
+      "emittedName": "allowStorageConnectors"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3652,
+      "column": 3,
+      "emittedName": "allowStorageDataShares"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3657,
+      "column": 3,
+      "emittedName": "allowCrossTenantDataSharing"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3764,
+      "column": 3,
+      "emittedName": "supportsHttpsTrafficOnly"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3775,
+      "column": 3,
+      "emittedName": "isSftpEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3780,
+      "column": 3,
+      "emittedName": "isLocalUserEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3785,
+      "column": 3,
+      "emittedName": "enableExtendedGroups"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3790,
+      "column": 3,
+      "emittedName": "isHnsEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3802,
+      "column": 3,
+      "emittedName": "failoverInProgress"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3834,
+      "column": 3,
+      "emittedName": "allowBlobPublicAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3844,
+      "column": 3,
+      "emittedName": "allowSharedKeyAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3849,
+      "column": 3,
+      "emittedName": "isNfsV3Enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3854,
+      "column": 3,
+      "emittedName": "allowCrossTenantReplication"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3860,
+      "column": 3,
+      "emittedName": "defaultToOAuthAuthentication"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3891,
+      "column": 3,
+      "emittedName": "isSkuConversionBlocked"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3897,
+      "column": 3,
+      "emittedName": "accountMigrationInProgress"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4128,
+      "column": 3,
+      "emittedName": "canFailover"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4134,
+      "column": 3,
+      "emittedName": "canPlannedFailover"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4369,
+      "column": 3,
+      "emittedName": "supportsHttpsTrafficOnly"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4374,
+      "column": 3,
+      "emittedName": "isSftpEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4379,
+      "column": 3,
+      "emittedName": "isLocalUserEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4384,
+      "column": 3,
+      "emittedName": "enableExtendedGroups"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4409,
+      "column": 3,
+      "emittedName": "allowBlobPublicAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4419,
+      "column": 3,
+      "emittedName": "allowSharedKeyAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4424,
+      "column": 3,
+      "emittedName": "allowCrossTenantReplication"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4430,
+      "column": 3,
+      "emittedName": "defaultToOAuthAuthentication"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4879,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4964,
+      "column": 3,
+      "emittedName": "enableAutoTierToHotFromCool"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5142,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5168,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5238,
+      "column": 3,
+      "emittedName": "includeBlobVersions"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5243,
+      "column": 3,
+      "emittedName": "includeSnapshots"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5248,
+      "column": 3,
+      "emittedName": "includeDeleted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5457,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5467,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5478,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5517,
+      "column": 3,
+      "emittedName": "hasSharedKey"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5522,
+      "column": 3,
+      "emittedName": "hasSshKey"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5527,
+      "column": 3,
+      "emittedName": "hasSshPassword"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5543,
+      "column": 3,
+      "emittedName": "allowAclAuthorization"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5554,
+      "column": 3,
+      "emittedName": "isNFSv3Enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5656,
+      "column": 3,
+      "emittedName": "requireInfrastructureEncryption"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5975,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6217,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6384,
+      "column": 3,
+      "emittedName": "testConnection"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6445,
+      "column": 3,
+      "emittedName": "testConnection"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "FileShare.tsp",
+      "line": 46,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "FileShare.tsp",
+      "line": 68,
+      "column": 7,
+      "name": "$expand",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "FileShare.tsp",
+      "line": 100,
+      "column": 7,
+      "name": "$include",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "StorageAccount.tsp",
+      "line": 99,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    }
+  ]
+}

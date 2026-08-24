@@ -1,0 +1,25 @@
+{
+  "apiVersion": "2024-06-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 240,
+      "column": 3,
+      "emittedName": "restore"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 275,
+      "column": 3,
+      "emittedName": "required"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 278,
+      "column": 3,
+      "emittedName": "deprecated"
+    }
+  ],
+  "queryParameterLocations": []
+}

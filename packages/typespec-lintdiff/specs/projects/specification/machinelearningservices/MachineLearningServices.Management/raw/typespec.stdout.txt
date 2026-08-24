@@ -167,7 +167,6 @@ Workspace.tsp:76:3 - warning tsp-lintdiff-local-linter/summary-and-description-m
 models.tsp:8970:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.encryption.keyVaultProperties.
 models.tsp:8978:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.encryption.keyVaultProperties.keyIdentifier.
 models.tsp:8542:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.managedNetwork.enableNetworkMonitor.
-models.tsp:8828:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.name.
 Workspace.tsp:76:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Workspace.tsp:86:3 - warning tsp-lintdiff-local-linter/summary-and-description-must-not-be-same: The summary and description values should not be same.
 Workspace.tsp:47:3 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter 'forceToPurge' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.
@@ -1471,5 +1470,5 @@ routes.tsp:129:3 - warning tsp-lintdiff-local-linter/summary-and-description-mus
 routes.tsp:129:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:139:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skip' should not begin with '$' or '@'.
 
-Found 1468 warnings.
+Found 1467 warnings.
 

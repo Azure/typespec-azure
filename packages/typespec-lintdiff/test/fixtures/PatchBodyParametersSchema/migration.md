@@ -11,7 +11,7 @@ The final full corpus run reports all 93 validator projects in the TypeSpec set,
 ## Evidence provenance
 
 - Validator report: `packages/typespec-lintdiff/specs/validator-results.json`, generated from azure-rest-api-specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` by the dataset recorded in `packages/typespec-lintdiff/specs/_meta.json`.
-- TypeSpec report: `packages/typespec-lintdiff/specs/typespec-results.json` and `comparison-results.json`, full run generated at `2026-08-24T08:08:01.918Z` from the same specs commit and this branch's review fixes documented below.
+- TypeSpec report: local full run generated at `2026-08-24T08:08:01.918Z` from the same specs commit and this branch's review fixes documented below. Generated `packages/typespec-lintdiff/specs` artifacts were used as validation evidence only and intentionally excluded from this rule PR.
 - Population: 468 source projects, 462 successful projects, and 6 compile failures. The full run took 2,506,210 ms.
 - Raw/projected totals: 51,137 raw TypeSpec diagnostics and 51,000 selected-version projected diagnostics across all rules.
 - Rule totals: 703 raw emitted Swagger diagnostics and 872 projected TypeSpec diagnostics.

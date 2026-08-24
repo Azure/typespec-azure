@@ -1,0 +1,25 @@
+{
+  "apiVersion": "2025-11-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 626,
+      "column": 3,
+      "emittedName": "enableDiagnosticsSupport"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 956,
+      "column": 3,
+      "emittedName": "enableDiagnosticsSupport"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1282,
+      "column": 3,
+      "emittedName": "isDataAction"
+    }
+  ],
+  "queryParameterLocations": []
+}

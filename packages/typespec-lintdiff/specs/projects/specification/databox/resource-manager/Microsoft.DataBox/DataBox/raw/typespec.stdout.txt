@@ -51,6 +51,7 @@ models.tsp:1808:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-sche
 models.tsp:1824:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.details.preferences.encryptionPreferences.doubleEncryption.
 models.tsp:1925:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.details.keyEncryptionKey.kekType.
 models.tsp:1925:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.details.keyEncryptionKey.kekType.
+models.tsp:2500:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:identity.type.
 JobResource.tsp:75:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 JobResource.tsp:93:3 - warning tsp-lintdiff-local-linter/lro-error-content: Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.
 JobResource.tsp:93:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -73,5 +74,5 @@ routes.tsp:62:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Pleas
 routes.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:98:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 70 warnings.
+Found 71 warnings.
 

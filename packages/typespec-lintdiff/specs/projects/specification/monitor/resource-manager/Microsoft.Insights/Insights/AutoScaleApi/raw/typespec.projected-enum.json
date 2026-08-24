@@ -1,0 +1,31 @@
+{
+  "apiVersion": "2022-10-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 309,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 462,
+      "column": 3,
+      "emittedName": "dividePerInstance"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 603,
+      "column": 3,
+      "emittedName": "sendToSubscriptionAdministrator"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 608,
+      "column": 3,
+      "emittedName": "sendToSubscriptionCoAdministrators"
+    }
+  ],
+  "queryParameterLocations": []
+}

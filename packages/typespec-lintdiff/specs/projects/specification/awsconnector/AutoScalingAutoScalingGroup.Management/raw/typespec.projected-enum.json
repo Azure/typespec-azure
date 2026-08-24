@@ -1,0 +1,31 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 83,
+      "column": 3,
+      "emittedName": "capacityRebalance"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 142,
+      "column": 3,
+      "emittedName": "newInstancesProtectedFromScaleIn"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 278,
+      "column": 3,
+      "emittedName": "propagateAtLaunch"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 409,
+      "column": 3,
+      "emittedName": "requireHibernateSupport"
+    }
+  ],
+  "queryParameterLocations": []
+}

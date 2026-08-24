@@ -4,7 +4,7 @@ Specs commit: `f6b53f105b95da05276530a0754a1c71b4f16397`
 
 Scope: full (462/468 projects)
 
-Analysis duration: 2506210 ms
+Analysis duration: 1393248 ms
 
 Only successfully compiled TypeSpec projects are included in validator and TypeSpec counts.
 
@@ -17,8 +17,8 @@ Categories are investigative views and may overlap (for example, an unmapped rul
 | Category | Count |
 | --- | ---: |
 | Known validator rules | 215 |
-| 100% observed coverage | 19 |
-| Partial observed coverage | 23 |
+| 100% observed coverage | 17 |
+| Partial observed coverage | 25 |
 | Zero observed coverage | 31 |
 | Unmapped validator rules | 115 |
 | Validator rules never fired | 93 |
@@ -40,7 +40,7 @@ Categories are investigative views and may overlap (for example, an unmapped rul
 - **Mapped TSP Rules**: all fixture `tspLints` mappings.
 - **Validator Diagnostics** and **TSP Diagnostics**: raw validator count and successful-project mapped TypeSpec diagnostic count.
 
-## 100% observed coverage (19)
+## 100% observed coverage (17)
 
 | Validator Rule | Mode | CovKind | Fired | TSP Fired | Lint/Overlap | Gap | TSP Only | Observed % | Official Mapping | Fired TSP Rules | Mapped TSP Rules | Validator Diagnostics | TSP Diagnostics |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | ---: | ---: |
@@ -53,10 +53,8 @@ Categories are investigative views and may overlap (for example, an unmapped rul
 | NoErrorCodeResponses | production | lint | 20 | 20 | 20 | 0 | 0 | 100.0% | yes | tsp-lintdiff-local-linter/no-error-code-responses | @azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes<br>tsp-lintdiff-local-linter/no-error-code-responses | 144 | 146 |
 | NonApplicationJsonType | production | unknown | 3 | 3 | 3 | 0 | 0 | 100.0% | no | tsp-lintdiff-local-linter/non-application-json-type | tsp-lintdiff-local-linter/non-application-json-type | 20 | 19 |
 | ParametersInPointGet | production | lint | 40 | 62 | 40 | 0 | 22 | 100.0% | no | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | 189 | 724 |
-| ParametersInPost | production | unknown | 32 | 32 | 32 | 0 | 0 | 100.0% | no | tsp-lintdiff-local-linter/parameters-in-post | tsp-lintdiff-local-linter/parameters-in-post | 424 | 426 |
-| PatchBodyParametersSchema | production | partial | 93 | 105 | 93 | 0 | 12 | 100.0% | no | tsp-lintdiff-local-linter/patch-body-parameters-schema | tsp-lintdiff-local-linter/patch-body-parameters-schema | 703 | 872 |
 | PatchInOperationName | production | lint | 14 | 24 | 14 | 0 | 10 | 100.0% | no | tsp-lintdiff-local-linter/patch-in-operation-name | tsp-lintdiff-local-linter/patch-in-operation-name | 14 | 63 |
-| PreviewVersionOverOneYear | production | lint | 108 | 174 | 108 | 0 | 66 | 100.0% | no | tsp-lintdiff-local-linter/preview-version-over-one-year | tsp-lintdiff-local-linter/preview-version-over-one-year | 358 | 252 |
+| PreviewVersionOverOneYear | production | lint | 108 | 173 | 108 | 0 | 65 | 100.0% | no | tsp-lintdiff-local-linter/preview-version-over-one-year | tsp-lintdiff-local-linter/preview-version-over-one-year | 358 | 248 |
 | PutInOperationName | production | lint | 52 | 55 | 52 | 0 | 3 | 100.0% | no | tsp-lintdiff-local-linter/put-in-operation-name | tsp-lintdiff-local-linter/put-in-operation-name | 133 | 186 |
 | RepeatedPathInfo | production | unknown | 25 | 25 | 25 | 0 | 0 | 100.0% | no | tsp-lintdiff-local-linter/repeated-path-info | tsp-lintdiff-local-linter/repeated-path-info | 61 | 62 |
 | SubscriptionsAndResourceGroupCasing | production | lint | 6 | 6 | 6 | 0 | 0 | 100.0% | no | tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing | tsp-lintdiff-local-linter/subscriptions-and-resource-group-casing | 26 | 38 |
@@ -64,7 +62,7 @@ Categories are investigative views and may overlap (for example, an unmapped rul
 | ValidQueryParametersForPointOperations | staging | lint | 62 | 62 | 62 | 0 | 0 | 100.0% | no | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations | 321 | 724 |
 | XMSLongRunningOperationProperty | production | lint | 3 | 3 | 3 | 0 | 0 | 100.0% | no | tsp-lintdiff-local-linter/xms-long-running-operation-property | tsp-lintdiff-local-linter/xms-long-running-operation-property | 6 | 6 |
 
-## Partial observed coverage (23)
+## Partial observed coverage (25)
 
 | Validator Rule | Mode | CovKind | Fired | TSP Fired | Lint/Overlap | Gap | TSP Only | Observed % | Official Mapping | Fired TSP Rules | Mapped TSP Rules | Validator Diagnostics | TSP Diagnostics |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | ---: | ---: |
@@ -75,12 +73,14 @@ Categories are investigative views and may overlap (for example, an unmapped rul
 | GetInOperationName | production | lint | 26 | 63 | 25 | 1 | 38 | 96.2% | no | tsp-lintdiff-local-linter/get-in-operation-name | tsp-lintdiff-local-linter/get-in-operation-name | 39 | 450 |
 | GuidUsage | production | lint | 48 | 32 | 27 | 21 | 5 | 56.3% | no | tsp-lintdiff-local-linter/guid-usage | tsp-lintdiff-local-linter/guid-usage | 281 | 184 |
 | ImplementPrivateEndpointAPIs | production | lint | 3 | 27 | 2 | 1 | 25 | 66.7% | no | tsp-lintdiff-local-linter/implement-private-endpoint-apis | tsp-lintdiff-local-linter/implement-private-endpoint-apis | 10 | 33 |
-| LatestVersionOfCommonTypesMustBeUsed | production | lint | 388 | 391 | 384 | 4 | 7 | 99.0% | no | tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used | tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used | 40692 | 719 |
+| LatestVersionOfCommonTypesMustBeUsed | production | lint | 388 | 388 | 381 | 7 | 7 | 98.2% | no | tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used | tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used | 40692 | 687 |
 | ListInOperationName | production | lint | 53 | 71 | 47 | 6 | 24 | 88.7% | no | tsp-lintdiff-local-linter/list-in-operation-name | tsp-lintdiff-local-linter/list-in-operation-name | 172 | 391 |
 | MissingXmsErrorResponse | production | unknown | 7 | 3 | 3 | 4 | 0 | 42.9% | no | tsp-lintdiff-local-linter/missing-xms-error-response | tsp-lintdiff-local-linter/missing-xms-error-response | 14 | 6 |
 | NestedResourcesMustHaveListOperation | production | lint | 24 | 33 | 17 | 7 | 16 | 70.8% | no | tsp-lintdiff-local-linter/nested-resources-must-have-list-operation | tsp-lintdiff-local-linter/nested-resources-must-have-list-operation | 53 | 62 |
 | OperationIdNounVerb | production | unknown | 34 | 54 | 27 | 7 | 27 | 79.4% | no | tsp-lintdiff-local-linter/operation-id-noun-verb | tsp-lintdiff-local-linter/operation-id-noun-verb | 111 | 263 |
+| ParametersInPost | production | unknown | 32 | 24 | 24 | 8 | 0 | 75.0% | no | tsp-lintdiff-local-linter/parameters-in-post | tsp-lintdiff-local-linter/parameters-in-post | 424 | 167 |
 | ParametersSchemaAsTypeObject | production | unknown | 9 | 10 | 4 | 5 | 6 | 44.4% | no | tsp-lintdiff-local-linter/parameters-schema-as-type-object | tsp-lintdiff-local-linter/parameters-schema-as-type-object | 18 | 63 |
+| PatchBodyParametersSchema | production | partial | 93 | 128 | 89 | 4 | 39 | 95.7% | no | tsp-lintdiff-local-linter/patch-body-parameters-schema | tsp-lintdiff-local-linter/patch-body-parameters-schema | 703 | 1230 |
 | PathResourceProviderNamePascalCase | production | unknown | 17 | 12 | 6 | 11 | 6 | 35.3% | no | tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case | tsp-lintdiff-local-linter/path-resource-provider-name-pascal-case | 401 | 13 |
 | PostOperationIdContainsUrlVerb | production | lint | 96 | 99 | 94 | 2 | 5 | 97.9% | no | tsp-lintdiff-local-linter/post-operation-id-contains-url-verb | tsp-lintdiff-local-linter/post-operation-id-contains-url-verb | 415 | 510 |
 | PutRequestResponseSchemeArm | production | lint | 36 | 42 | 34 | 2 | 8 | 94.4% | yes | tsp-lintdiff-local-linter/put-request-response-scheme-arm | @azure-tools/typespec-azure-resource-manager/arm-resource-operation-response<br>tsp-lintdiff-local-linter/put-request-response-scheme-arm | 160 | 184 |

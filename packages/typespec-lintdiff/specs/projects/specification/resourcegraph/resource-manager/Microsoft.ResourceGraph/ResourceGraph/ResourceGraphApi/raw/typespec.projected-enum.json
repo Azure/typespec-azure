@@ -1,0 +1,13 @@
+{
+  "apiVersion": "2024-04-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 170,
+      "column": 3,
+      "emittedName": "allowPartialScopes"
+    }
+  ],
+  "queryParameterLocations": []
+}

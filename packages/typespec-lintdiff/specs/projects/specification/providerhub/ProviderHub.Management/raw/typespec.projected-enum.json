@@ -1,0 +1,199 @@
+{
+  "apiVersion": "2024-09-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 1259,
+      "column": 3,
+      "emittedName": "refreshSubscriptionRegistration"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1264,
+      "column": 3,
+      "emittedName": "skipReleaseScopeValidation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1282,
+      "column": 3,
+      "emittedName": "storage"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1284,
+      "column": 3,
+      "emittedName": "resourceGraph"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1431,
+      "column": 3,
+      "emittedName": "allowManagedByInheritance"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1568,
+      "column": 3,
+      "emittedName": "disableCertificateAuthenticationFallback"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1937,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1978,
+      "column": 3,
+      "emittedName": "preflightSupported"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1991,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2317,
+      "column": 3,
+      "emittedName": "enableAsyncOperation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2328,
+      "column": 3,
+      "emittedName": "enableThirdPartyS2S"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2338,
+      "column": 3,
+      "emittedName": "isPureProxy"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2480,
+      "column": 3,
+      "emittedName": "allowEmptyRoleAssignments"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2574,
+      "column": 3,
+      "emittedName": "supportsTags"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2589,
+      "column": 3,
+      "emittedName": "addResourceListTargetLocations"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2627,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2984,
+      "column": 3,
+      "emittedName": "enableDefaultValidation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3048,
+      "column": 3,
+      "emittedName": "validationRequired"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3053,
+      "column": 3,
+      "emittedName": "crossResourceGroupMoveEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3058,
+      "column": 3,
+      "emittedName": "crossSubscriptionMoveEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3082,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3111,
+      "column": 3,
+      "emittedName": "allowNoncompliantCollectionResponse"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3324,
+      "column": 3,
+      "emittedName": "addOnPlanConversionAllowed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3347,
+      "column": 3,
+      "emittedName": "enableResourceCache"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3532,
+      "column": 3,
+      "emittedName": "isCheckedIn"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3647,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3735,
+      "column": 3,
+      "emittedName": "storage"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3740,
+      "column": 3,
+      "emittedName": "resourceGraph"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4169,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4249,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4329,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4988,
+      "column": 3,
+      "emittedName": "enabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

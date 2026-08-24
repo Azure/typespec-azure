@@ -1,0 +1,82 @@
+{
+  "apiVersion": "2021-12-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "GrantDetails.tsp",
+      "line": 88,
+      "column": 7,
+      "emittedName": "includeAllocatedBudget"
+    },
+    {
+      "sourceFile": "GrantDetails.tsp",
+      "line": 103,
+      "column": 7,
+      "emittedName": "includeAllocatedBudget"
+    },
+    {
+      "sourceFile": "GrantDetails.tsp",
+      "line": 119,
+      "column": 7,
+      "emittedName": "includeAllocatedBudget"
+    },
+    {
+      "sourceFile": "JoinRequestDetails.tsp",
+      "line": 95,
+      "column": 7,
+      "emittedName": "includeDenied"
+    },
+    {
+      "sourceFile": "LabDetails.tsp",
+      "line": 112,
+      "column": 7,
+      "emittedName": "includeBudget"
+    },
+    {
+      "sourceFile": "LabDetails.tsp",
+      "line": 143,
+      "column": 7,
+      "emittedName": "includeBudget"
+    },
+    {
+      "sourceFile": "LabDetails.tsp",
+      "line": 159,
+      "column": 7,
+      "emittedName": "includeBudget"
+    },
+    {
+      "sourceFile": "LabDetails.tsp",
+      "line": 165,
+      "column": 7,
+      "emittedName": "includeDeleted"
+    },
+    {
+      "sourceFile": "LabDetails.tsp",
+      "line": 184,
+      "column": 7,
+      "emittedName": "onlyUpdateStudentCountParameter"
+    },
+    {
+      "sourceFile": "StudentDetails.tsp",
+      "line": 110,
+      "column": 7,
+      "emittedName": "includeDeleted"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "GrantDetails.tsp",
+      "line": 88,
+      "column": 7,
+      "name": "includeAllocatedBudget",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "LabDetails.tsp",
+      "line": 112,
+      "column": 7,
+      "name": "includeBudget",
+      "verb": "get"
+    }
+  ]
+}

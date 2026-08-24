@@ -1,0 +1,97 @@
+{
+  "apiVersion": "2026-06-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 247,
+      "column": 3,
+      "emittedName": "isEntitled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 272,
+      "column": 3,
+      "emittedName": "isEnterpriseManaged"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 275,
+      "column": 3,
+      "emittedName": "shouldMigrate"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 278,
+      "column": 3,
+      "emittedName": "resendSignupCode"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 281,
+      "column": 3,
+      "emittedName": "verifySignupCode"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 335,
+      "column": 3,
+      "emittedName": "signupStatus"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 466,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 480,
+      "column": 3,
+      "emittedName": "isEnterpriseManaged"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 566,
+      "column": 3,
+      "emittedName": "shouldMigrate"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 577,
+      "column": 3,
+      "emittedName": "isFrozen"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 641,
+      "column": 3,
+      "emittedName": "openFirewallPort80"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 645,
+      "column": 3,
+      "emittedName": "openFirewallPort443"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 649,
+      "column": 3,
+      "emittedName": "openFirewallPort5000"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 653,
+      "column": 3,
+      "emittedName": "openFirewallPort5001"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 703,
+      "column": 3,
+      "emittedName": "isProvisioned"
+    }
+  ],
+  "queryParameterLocations": []
+}

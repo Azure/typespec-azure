@@ -1,0 +1,19 @@
+{
+  "apiVersion": "2023-12-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 602,
+      "column": 3,
+      "emittedName": "jitAccessEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 980,
+      "column": 3,
+      "emittedName": "isEnabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

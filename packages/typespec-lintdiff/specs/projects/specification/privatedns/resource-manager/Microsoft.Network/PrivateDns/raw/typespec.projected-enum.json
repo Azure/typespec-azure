@@ -1,0 +1,19 @@
+{
+  "apiVersion": "2024-06-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 191,
+      "column": 3,
+      "emittedName": "registrationEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 247,
+      "column": 3,
+      "emittedName": "isAutoRegistered"
+    }
+  ],
+  "queryParameterLocations": []
+}

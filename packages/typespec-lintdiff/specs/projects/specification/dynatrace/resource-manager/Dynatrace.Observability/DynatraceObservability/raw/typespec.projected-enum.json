@@ -1,0 +1,13 @@
+{
+  "apiVersion": "2024-04-24",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 565,
+      "column": 3,
+      "emittedName": "creationSupported"
+    }
+  ],
+  "queryParameterLocations": []
+}

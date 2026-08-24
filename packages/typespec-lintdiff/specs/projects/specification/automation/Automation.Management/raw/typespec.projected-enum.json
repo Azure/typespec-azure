@@ -1,0 +1,313 @@
+{
+  "apiVersion": "2024-10-23",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 1589,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2294,
+      "column": 3,
+      "emittedName": "rebootNodeIfNeeded"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2319,
+      "column": 3,
+      "emittedName": "allowModuleOverwrite"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2370,
+      "column": 3,
+      "emittedName": "publicNetworkAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2375,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2545,
+      "column": 3,
+      "emittedName": "publicNetworkAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2550,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2659,
+      "column": 3,
+      "emittedName": "publicNetworkAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2664,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2910,
+      "column": 3,
+      "emittedName": "isExportable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2969,
+      "column": 3,
+      "emittedName": "isExportable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3119,
+      "column": 3,
+      "emittedName": "isGlobal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3154,
+      "column": 3,
+      "emittedName": "isEncrypted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3159,
+      "column": 3,
+      "emittedName": "isOptional"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3189,
+      "column": 3,
+      "emittedName": "isGlobal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3333,
+      "column": 3,
+      "emittedName": "logVerbose"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3370,
+      "column": 3,
+      "emittedName": "isMandatory"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3456,
+      "column": 3,
+      "emittedName": "logVerbose"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3461,
+      "column": 3,
+      "emittedName": "logProgress"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3536,
+      "column": 3,
+      "emittedName": "incrementNodeConfigurationBuild"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3587,
+      "column": 3,
+      "emittedName": "incrementNodeConfigurationBuild"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4196,
+      "column": 3,
+      "emittedName": "isMandatory"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4201,
+      "column": 3,
+      "emittedName": "isDynamic"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4211,
+      "column": 3,
+      "emittedName": "valueFromPipeline"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4216,
+      "column": 3,
+      "emittedName": "valueFromPipelineByPropertyName"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4221,
+      "column": 3,
+      "emittedName": "valueFromRemainingArguments"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4272,
+      "column": 3,
+      "emittedName": "isGlobal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4325,
+      "column": 3,
+      "emittedName": "isComposite"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4660,
+      "column": 3,
+      "emittedName": "default"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4817,
+      "column": 3,
+      "emittedName": "inEdit"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4860,
+      "column": 3,
+      "emittedName": "isMandatory"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4910,
+      "column": 3,
+      "emittedName": "logVerbose"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4915,
+      "column": 3,
+      "emittedName": "logProgress"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5005,
+      "column": 3,
+      "emittedName": "logVerbose"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5010,
+      "column": 3,
+      "emittedName": "logProgress"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5081,
+      "column": 3,
+      "emittedName": "logVerbose"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5086,
+      "column": 3,
+      "emittedName": "logProgress"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5343,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5423,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5778,
+      "column": 3,
+      "emittedName": "autoSync"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5783,
+      "column": 3,
+      "emittedName": "publishRunbook"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5846,
+      "column": 3,
+      "emittedName": "autoSync"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5851,
+      "column": 3,
+      "emittedName": "publishRunbook"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5903,
+      "column": 3,
+      "emittedName": "autoSync"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5908,
+      "column": 3,
+      "emittedName": "publishRunbook"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6213,
+      "column": 3,
+      "emittedName": "isEncrypted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6370,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6451,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6503,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6529,
+      "column": 3,
+      "emittedName": "logVerbose"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6534,
+      "column": 3,
+      "emittedName": "logProgress"
+    }
+  ],
+  "queryParameterLocations": []
+}

@@ -1,0 +1,13 @@
+{
+  "apiVersion": "2022-01-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 390,
+      "column": 3,
+      "emittedName": "isIncident"
+    }
+  ],
+  "queryParameterLocations": []
+}

@@ -1,0 +1,277 @@
+{
+  "apiVersion": "2026-03-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 2145,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2519,
+      "column": 3,
+      "emittedName": "dev"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2697,
+      "column": 3,
+      "emittedName": "dbMasterKeyExists"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2703,
+      "column": 3,
+      "emittedName": "isHadrEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2848,
+      "column": 3,
+      "emittedName": "isMicrosoftPkiCertTrustConfigured"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2854,
+      "column": 3,
+      "emittedName": "isDigiCertPkiCertTrustConfigured"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2883,
+      "column": 3,
+      "emittedName": "isEncryptionEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2907,
+      "column": 3,
+      "emittedName": "isDynamicPort"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3026,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3058,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3384,
+      "column": 3,
+      "emittedName": "zoneRedundancyAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3481,
+      "column": 3,
+      "emittedName": "zoneRedundancyAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3692,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3707,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3742,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3865,
+      "column": 3,
+      "emittedName": "dbMasterKeyExists"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 3871,
+      "column": 3,
+      "emittedName": "isHadrEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4012,
+      "column": 3,
+      "emittedName": "isMicrosoftPkiCertTrustConfigured"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4017,
+      "column": 3,
+      "emittedName": "isDigiCertPkiCertTrustConfigured"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4285,
+      "column": 3,
+      "emittedName": "includeFileLevelRequirements"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4435,
+      "column": 3,
+      "emittedName": "isCompressed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4453,
+      "column": 3,
+      "emittedName": "isCompressed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5201,
+      "column": 3,
+      "emittedName": "preferK8sDnsForPtrLookups"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5288,
+      "column": 3,
+      "emittedName": "dev"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5411,
+      "column": 3,
+      "emittedName": "basicFeatures"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5416,
+      "column": 3,
+      "emittedName": "dtcSupport"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5422,
+      "column": 3,
+      "emittedName": "dbFailover"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5427,
+      "column": 3,
+      "emittedName": "isDistributed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5443,
+      "column": 3,
+      "emittedName": "isContained"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5781,
+      "column": 3,
+      "emittedName": "isLocal"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5787,
+      "column": 3,
+      "emittedName": "isPrimaryReplica"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5799,
+      "column": 3,
+      "emittedName": "isCommitParticipant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5817,
+      "column": 3,
+      "emittedName": "isSuspended"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6116,
+      "column": 3,
+      "emittedName": "force"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6175,
+      "column": 3,
+      "emittedName": "isReadOnly"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6250,
+      "column": 3,
+      "emittedName": "isAutoCloseOn"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6252,
+      "column": 3,
+      "emittedName": "isAutoShrinkOn"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6254,
+      "column": 3,
+      "emittedName": "isAutoCreateStatsOn"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6256,
+      "column": 3,
+      "emittedName": "isAutoUpdateStatsOn"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6258,
+      "column": 3,
+      "emittedName": "isRemoteDataArchiveEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6260,
+      "column": 3,
+      "emittedName": "isMemoryOptimizationEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6262,
+      "column": 3,
+      "emittedName": "isEncrypted"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6264,
+      "column": 3,
+      "emittedName": "isTrustworthyOn"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6269,
+      "column": 3,
+      "emittedName": "isHekatonFilesOn"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6473,
+      "column": 3,
+      "emittedName": "zoneRedundancyAvailable"
+    }
+  ],
+  "queryParameterLocations": []
+}

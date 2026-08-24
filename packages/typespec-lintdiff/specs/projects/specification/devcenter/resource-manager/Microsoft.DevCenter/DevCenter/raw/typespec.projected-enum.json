@@ -1,0 +1,60 @@
+{
+  "apiVersion": "2026-01-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 1315,
+      "column": 3,
+      "emittedName": "readOnly"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1319,
+      "column": 3,
+      "emittedName": "required"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1473,
+      "column": 3,
+      "emittedName": "excludeFromLatest"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1800,
+      "column": 3,
+      "emittedName": "required"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Schedule.tsp",
+      "line": 34,
+      "column": 7,
+      "name": "$top",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Schedule.tsp",
+      "line": 44,
+      "column": 7,
+      "name": "$top",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "Schedule.tsp",
+      "line": 56,
+      "column": 7,
+      "name": "$top",
+      "verb": "patch"
+    },
+    {
+      "sourceFile": "Schedule.tsp",
+      "line": 73,
+      "column": 7,
+      "name": "$top",
+      "verb": "delete"
+    }
+  ]
+}

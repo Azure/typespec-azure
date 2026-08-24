@@ -1,0 +1,43 @@
+{
+  "apiVersion": "2025-05-25-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "Alert.tsp",
+      "line": 199,
+      "column": 7,
+      "emittedName": "includeContext"
+    },
+    {
+      "sourceFile": "Alert.tsp",
+      "line": 205,
+      "column": 7,
+      "emittedName": "includeEgressConfig"
+    },
+    {
+      "sourceFile": "Alert.tsp",
+      "line": 323,
+      "column": 7,
+      "emittedName": "includeContext"
+    },
+    {
+      "sourceFile": "Alert.tsp",
+      "line": 329,
+      "column": 7,
+      "emittedName": "includeEgressConfig"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 656,
+      "column": 3,
+      "emittedName": "isSuppressed"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 55,
+      "column": 7,
+      "emittedName": "includeSmartGroupsCount"
+    }
+  ],
+  "queryParameterLocations": []
+}

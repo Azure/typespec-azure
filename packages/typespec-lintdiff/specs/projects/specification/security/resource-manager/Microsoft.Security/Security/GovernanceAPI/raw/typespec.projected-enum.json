@@ -1,0 +1,61 @@
+{
+  "apiVersion": "2022-01-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 140,
+      "column": 3,
+      "emittedName": "isGracePeriod"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 176,
+      "column": 3,
+      "emittedName": "disableManagerEmailNotification"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 181,
+      "column": 3,
+      "emittedName": "disableOwnerEmailNotification"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 253,
+      "column": 3,
+      "emittedName": "isGracePeriod"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 265,
+      "column": 3,
+      "emittedName": "isDisabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 291,
+      "column": 3,
+      "emittedName": "includeMemberScopes"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 329,
+      "column": 3,
+      "emittedName": "disableManagerEmailNotification"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 334,
+      "column": 3,
+      "emittedName": "disableOwnerEmailNotification"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 375,
+      "column": 3,
+      "emittedName": "override"
+    }
+  ],
+  "queryParameterLocations": []
+}

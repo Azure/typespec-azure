@@ -1,0 +1,49 @@
+{
+  "apiVersion": "2025-09-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 419,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 460,
+      "column": 3,
+      "emittedName": "skipVerify"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 470,
+      "column": 3,
+      "emittedName": "externalEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 480,
+      "column": 3,
+      "emittedName": "viewersCanEdit"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 485,
+      "column": 3,
+      "emittedName": "editorsCanAdmin"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 495,
+      "column": 3,
+      "emittedName": "csrfAlwaysCheck"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 505,
+      "column": 3,
+      "emittedName": "captureEnabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

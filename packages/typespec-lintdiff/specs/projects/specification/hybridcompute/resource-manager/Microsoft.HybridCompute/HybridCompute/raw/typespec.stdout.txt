@@ -5,10 +5,6 @@ Diagnostics were reported during compilation:
 main.tsp:55:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
 main.tsp:62:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
 main.tsp:69:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: Use the latest ARM common-types version 'v6' instead of 'v3'.
-routes.tsp:54:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'.
-routes.tsp:79:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'.
-routes.tsp:54:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'.
-routes.tsp:79:3 - warning tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used: This API version already selects the latest ARM common-types version 'v6', but the common-type parameter 'LocationParameter' resolves to 'types.json' version 'v5'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in 'v6'.
 models.tsp:2948:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 models.tsp:1680:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
 models.tsp:1757:3 - warning tsp-lintdiff-local-linter/enum-instead-of-boolean: Consider using an enum instead of a boolean property so the API shape is more descriptive.
@@ -43,7 +39,6 @@ Machine.tsp:117:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Ple
 Machine.tsp:124:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
 Machine.tsp:124:7 - warning tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations: Query parameter '$expand' should be removed. Point operation 'put' MUST not have query parameters other than api-version.
 Machine.tsp:124:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
-models.tsp:2230:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.locationData.name.
 Machine.tsp:134:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Machine.tsp:140:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Machine.tsp:156:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
@@ -161,5 +156,5 @@ routes.tsp:79:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Pleas
 routes.tsp:101:5 - warning tsp-lintdiff-local-linter/path-parameter-names: Inconsistent path parameter names "privateLinkScopeId" and "scopeName".
 routes.tsp:92:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 158 warnings.
+Found 153 warnings.
 

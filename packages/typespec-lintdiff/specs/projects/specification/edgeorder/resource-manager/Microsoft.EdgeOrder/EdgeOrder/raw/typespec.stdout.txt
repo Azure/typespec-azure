@@ -66,6 +66,7 @@ models.tsp:2213:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-sche
 models.tsp:2243:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.preferences.termCommitmentPreferences.preferredTermCommitmentType.
 models.tsp:1969:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.orderItemDetails.productDetails.parentProvisioningDetails.quantity.
 models.tsp:2127:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:properties.orderItemDetails.siteDetails.siteId.
+models.tsp:2340:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:identity.type.
 OrderItemResource.tsp:67:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 OrderItemResource.tsp:83:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 OrderItemResource.tsp:101:7 - warning tsp-lintdiff-local-linter/query-parameters-in-collection-get: Query parameter '$expand' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.
@@ -95,15 +96,11 @@ OrderItemResource.tsp:146:7 - warning tsp-lintdiff-local-linter/parameter-names-
 OrderItemResource.tsp:155:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 OrderItemResource.tsp:165:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 OrderResource.tsp:34:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
-routes.tsp:32:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$skipToken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 routes.tsp:23:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:32:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
-routes.tsp:49:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$expand' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
-routes.tsp:55:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$skipToken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 routes.tsp:40:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:49:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$expand' should not begin with '$' or '@'.
 routes.tsp:55:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
-routes.tsp:72:7 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$skipToken' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 routes.tsp:64:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:72:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$skipToken' should not begin with '$' or '@'.
 routes.tsp:86:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -111,5 +108,5 @@ routes.tsp:94:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: 
 routes.tsp:100:7 - warning tsp-lintdiff-local-linter/parameter-names-convention: Parameter name '$top' should not begin with '$' or '@'.
 routes.tsp:110:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 108 warnings.
+Found 105 warnings.
 

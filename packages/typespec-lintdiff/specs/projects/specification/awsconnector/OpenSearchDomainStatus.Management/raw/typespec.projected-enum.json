@@ -1,0 +1,163 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 94,
+      "column": 3,
+      "emittedName": "created"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 97,
+      "column": 3,
+      "emittedName": "deleted"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 146,
+      "column": 3,
+      "emittedName": "processing"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 158,
+      "column": 3,
+      "emittedName": "upgradeProcessing"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 210,
+      "column": 3,
+      "emittedName": "anonymousAuthEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 213,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 216,
+      "column": 3,
+      "emittedName": "internalUserDatabaseEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 256,
+      "column": 3,
+      "emittedName": "useOffPeakWindow"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 378,
+      "column": 3,
+      "emittedName": "dedicatedMasterEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 390,
+      "column": 3,
+      "emittedName": "multiAZWithStandbyEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 396,
+      "column": 3,
+      "emittedName": "warmEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 405,
+      "column": 3,
+      "emittedName": "zoneAwarenessEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 460,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 809,
+      "column": 3,
+      "emittedName": "customEndpointEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 812,
+      "column": 3,
+      "emittedName": "enforceHTTPS"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 849,
+      "column": 3,
+      "emittedName": "ebsEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 898,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 914,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 964,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 974,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 990,
+      "column": 3,
+      "emittedName": "cancellable"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 1002,
+      "column": 3,
+      "emittedName": "optionalDeployment"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 1005,
+      "column": 3,
+      "emittedName": "updateAvailable"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 1058,
+      "column": 3,
+      "emittedName": "autoSoftwareUpdateEnabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 1087,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 1111,
+      "column": 3,
+      "emittedName": "enabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

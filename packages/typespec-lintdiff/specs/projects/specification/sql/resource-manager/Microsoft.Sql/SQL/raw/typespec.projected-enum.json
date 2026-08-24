@@ -1,0 +1,899 @@
+{
+  "apiVersion": "2025-02-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "Database.tsp",
+      "line": 443,
+      "column": 7,
+      "emittedName": "$count"
+    },
+    {
+      "sourceFile": "Database.tsp",
+      "line": 491,
+      "column": 7,
+      "emittedName": "includeDisabledRecommendations"
+    },
+    {
+      "sourceFile": "InstancePool.tsp",
+      "line": 143,
+      "column": 7,
+      "emittedName": "expandChildren"
+    },
+    {
+      "sourceFile": "JobAgent.tsp",
+      "line": 144,
+      "column": 7,
+      "emittedName": "isActive"
+    },
+    {
+      "sourceFile": "JobExecution.tsp",
+      "line": 132,
+      "column": 7,
+      "emittedName": "isActive"
+    },
+    {
+      "sourceFile": "JobExecution.tsp",
+      "line": 234,
+      "column": 7,
+      "emittedName": "isActive"
+    },
+    {
+      "sourceFile": "JobExecution.tsp",
+      "line": 342,
+      "column": 7,
+      "emittedName": "isActive"
+    },
+    {
+      "sourceFile": "JobExecution.tsp",
+      "line": 397,
+      "column": 7,
+      "emittedName": "isActive"
+    },
+    {
+      "sourceFile": "LongTermRetentionBackup.tsp",
+      "line": 96,
+      "column": 7,
+      "emittedName": "onlyLatestPerDatabase"
+    },
+    {
+      "sourceFile": "LongTermRetentionBackup.tsp",
+      "line": 257,
+      "column": 7,
+      "emittedName": "onlyLatestPerDatabase"
+    },
+    {
+      "sourceFile": "ManagedDatabase.tsp",
+      "line": 262,
+      "column": 7,
+      "emittedName": "$count"
+    },
+    {
+      "sourceFile": "ManagedDatabase.tsp",
+      "line": 314,
+      "column": 7,
+      "emittedName": "includeDisabledRecommendations"
+    },
+    {
+      "sourceFile": "ManagedDatabaseMoveOperationResult.tsp",
+      "line": 72,
+      "column": 7,
+      "emittedName": "onlyLatestPerDatabase"
+    },
+    {
+      "sourceFile": "ManagedInstanceLongTermRetentionBackup.tsp",
+      "line": 103,
+      "column": 7,
+      "emittedName": "onlyLatestPerDatabase"
+    },
+    {
+      "sourceFile": "ManagedInstanceLongTermRetentionBackup.tsp",
+      "line": 178,
+      "column": 7,
+      "emittedName": "onlyLatestPerDatabase"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4245,
+      "column": 3,
+      "emittedName": "isDevopsAuditEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4320,
+      "column": 3,
+      "emittedName": "isStorageSecondaryKeyInUse"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4336,
+      "column": 3,
+      "emittedName": "isAzureMonitorTargetEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4347,
+      "column": 3,
+      "emittedName": "isManagedIdentityInUse"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4458,
+      "column": 3,
+      "emittedName": "isStorageSecondaryKeyInUse"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4474,
+      "column": 3,
+      "emittedName": "isAzureMonitorTargetEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4485,
+      "column": 3,
+      "emittedName": "isManagedIdentityInUse"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4601,
+      "column": 3,
+      "emittedName": "isStorageSecondaryKeyInUse"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4617,
+      "column": 3,
+      "emittedName": "isAzureMonitorTargetEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4628,
+      "column": 3,
+      "emittedName": "isManagedIdentityInUse"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4679,
+      "column": 3,
+      "emittedName": "isDevopsAuditEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4759,
+      "column": 3,
+      "emittedName": "isStorageSecondaryKeyInUse"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4775,
+      "column": 3,
+      "emittedName": "isAzureMonitorTargetEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4786,
+      "column": 3,
+      "emittedName": "isManagedIdentityInUse"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4911,
+      "column": 3,
+      "emittedName": "isExecutableAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4917,
+      "column": 3,
+      "emittedName": "isRevertableAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 4923,
+      "column": 3,
+      "emittedName": "isArchivedAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5232,
+      "column": 3,
+      "emittedName": "memoryOptimized"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5237,
+      "column": 3,
+      "emittedName": "isComputed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5521,
+      "column": 3,
+      "emittedName": "isUserError"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5540,
+      "column": 3,
+      "emittedName": "isCancellable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5801,
+      "column": 3,
+      "emittedName": "zoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5886,
+      "column": 3,
+      "emittedName": "isLedgerOn"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5892,
+      "column": 3,
+      "emittedName": "isInfraEncryptionEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5919,
+      "column": 3,
+      "emittedName": "useFreeLimit"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5957,
+      "column": 3,
+      "emittedName": "manualCutover"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5968,
+      "column": 3,
+      "emittedName": "performCutover"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 5978,
+      "column": 3,
+      "emittedName": "encryptionProtectorAutoRotation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6208,
+      "column": 3,
+      "emittedName": "zoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6293,
+      "column": 3,
+      "emittedName": "isLedgerOn"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6299,
+      "column": 3,
+      "emittedName": "isInfraEncryptionEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6326,
+      "column": 3,
+      "emittedName": "useFreeLimit"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6346,
+      "column": 3,
+      "emittedName": "manualCutover"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6357,
+      "column": 3,
+      "emittedName": "performCutover"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6362,
+      "column": 3,
+      "emittedName": "encryptionProtectorAutoRotation"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6585,
+      "column": 3,
+      "emittedName": "emailAccountAdmins"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6642,
+      "column": 3,
+      "emittedName": "latestScan"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6682,
+      "column": 3,
+      "emittedName": "latestScan"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6718,
+      "column": 3,
+      "emittedName": "isTrimmed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 6766,
+      "column": 3,
+      "emittedName": "automated"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7028,
+      "column": 3,
+      "emittedName": "isBaselineApplied"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7077,
+      "column": 3,
+      "emittedName": "memoryOptimized"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7184,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7189,
+      "column": 3,
+      "emittedName": "emailSubscriptionAdmins"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7823,
+      "column": 3,
+      "emittedName": "isUserError"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7842,
+      "column": 3,
+      "emittedName": "isCancellable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7883,
+      "column": 3,
+      "emittedName": "zoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 7992,
+      "column": 3,
+      "emittedName": "zoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8070,
+      "column": 3,
+      "emittedName": "autoRotationEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8544,
+      "column": 3,
+      "emittedName": "isCancellable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 8939,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9201,
+      "column": 3,
+      "emittedName": "isZoneResilientProvisioningAllowed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9273,
+      "column": 3,
+      "emittedName": "zoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9292,
+      "column": 3,
+      "emittedName": "zonePinning"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9360,
+      "column": 3,
+      "emittedName": "zoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9391,
+      "column": 3,
+      "emittedName": "zonePinning"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9625,
+      "column": 3,
+      "emittedName": "zoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9753,
+      "column": 3,
+      "emittedName": "zoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9759,
+      "column": 3,
+      "emittedName": "zonePinning"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 9834,
+      "column": 3,
+      "emittedName": "zoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10042,
+      "column": 3,
+      "emittedName": "isGeneralPurposeV2"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10091,
+      "column": 3,
+      "emittedName": "zoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10222,
+      "column": 3,
+      "emittedName": "instancePoolSupported"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10228,
+      "column": 3,
+      "emittedName": "standaloneSupported"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10564,
+      "column": 3,
+      "emittedName": "isBackupImmutable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10858,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 10889,
+      "column": 3,
+      "emittedName": "allowMultipleMaintenanceWindowsPerCycle"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 11013,
+      "column": 3,
+      "emittedName": "isCancellable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 11037,
+      "column": 3,
+      "emittedName": "isUserError"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 11524,
+      "column": 3,
+      "emittedName": "autoCompleteRestore"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 11542,
+      "column": 3,
+      "emittedName": "isLedgerOn"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 11668,
+      "column": 3,
+      "emittedName": "emailAccountAdmins"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 11872,
+      "column": 3,
+      "emittedName": "isDisabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12028,
+      "column": 3,
+      "emittedName": "azureADOnlyAuthentication"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12040,
+      "column": 3,
+      "emittedName": "dtcEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12062,
+      "column": 3,
+      "emittedName": "fqdnEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12085,
+      "column": 3,
+      "emittedName": "xaTransactionsEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12090,
+      "column": 3,
+      "emittedName": "snaLu6point2TransactionsEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12112,
+      "column": 3,
+      "emittedName": "allowInboundEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12117,
+      "column": 3,
+      "emittedName": "allowOutboundEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12159,
+      "column": 3,
+      "emittedName": "autoRotationEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12198,
+      "column": 3,
+      "emittedName": "autoRotationEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12302,
+      "column": 3,
+      "emittedName": "isUserError"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12321,
+      "column": 3,
+      "emittedName": "isCancellable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12574,
+      "column": 3,
+      "emittedName": "isGeneralPurposeV2"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12670,
+      "column": 3,
+      "emittedName": "publicDataEndpointEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12736,
+      "column": 3,
+      "emittedName": "zoneRedundant"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 12860,
+      "column": 3,
+      "emittedName": "azureADOnlyAuthentication"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 13220,
+      "column": 3,
+      "emittedName": "createDnsRecord"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 13668,
+      "column": 3,
+      "emittedName": "isTerminationAllowed"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 13927,
+      "column": 3,
+      "emittedName": "azureADOnlyAuthentication"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 13942,
+      "column": 3,
+      "emittedName": "azureADOnlyAuthentication"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 13997,
+      "column": 3,
+      "emittedName": "isAzureMonitorTargetEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14002,
+      "column": 3,
+      "emittedName": "isManagedIdentityInUse"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14101,
+      "column": 3,
+      "emittedName": "autoRotationEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14188,
+      "column": 3,
+      "emittedName": "isUserError"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14207,
+      "column": 3,
+      "emittedName": "isCancellable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14239,
+      "column": 3,
+      "emittedName": "available"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14420,
+      "column": 3,
+      "emittedName": "azureADOnlyAuthentication"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 14914,
+      "column": 3,
+      "emittedName": "isUpToDate"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15075,
+      "column": 3,
+      "emittedName": "enableConflictLogging"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15085,
+      "column": 3,
+      "emittedName": "usePrivateLinkConnection"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15196,
+      "column": 3,
+      "emittedName": "hasError"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15237,
+      "column": 3,
+      "emittedName": "hasError"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15243,
+      "column": 3,
+      "emittedName": "isPrimaryKey"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15341,
+      "column": 3,
+      "emittedName": "usePrivateLinkConnection"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15579,
+      "column": 3,
+      "emittedName": "ignoreMissingVnetServiceEndpoint"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 15679,
+      "column": 3,
+      "emittedName": "showServerRecords"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 95,
+      "column": 7,
+      "emittedName": "onlyLatestPerDatabase"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 134,
+      "column": 7,
+      "emittedName": "onlyLatestPerDatabase"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 166,
+      "column": 7,
+      "emittedName": "onlyLatestPerDatabase"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 205,
+      "column": 7,
+      "emittedName": "onlyLatestPerDatabase"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 246,
+      "column": 7,
+      "emittedName": "onlyLatestPerDatabase"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 303,
+      "column": 7,
+      "emittedName": "onlyLatestPerDatabase"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 335,
+      "column": 7,
+      "emittedName": "onlyLatestPerDatabase"
+    },
+    {
+      "sourceFile": "routes.tsp",
+      "line": 392,
+      "column": 7,
+      "emittedName": "onlyLatestPerDatabase"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "Database.tsp",
+      "line": 83,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Database.tsp",
+      "line": 89,
+      "column": 7,
+      "name": "$filter",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DatabaseSqlVulnerabilityAssessmentBaselineSet.tsp",
+      "line": 138,
+      "column": 7,
+      "name": "systemDatabaseName",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DatabaseSqlVulnerabilityAssessmentBaselineSet.tsp",
+      "line": 154,
+      "column": 7,
+      "name": "systemDatabaseName",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "DatabaseSqlVulnerabilityAssessmentRuleBaseline.tsp",
+      "line": 151,
+      "column": 7,
+      "name": "systemDatabaseName",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "DatabaseSqlVulnerabilityAssessmentRuleBaseline.tsp",
+      "line": 167,
+      "column": 7,
+      "name": "systemDatabaseName",
+      "verb": "put"
+    },
+    {
+      "sourceFile": "DatabaseSqlVulnerabilityAssessmentRuleBaseline.tsp",
+      "line": 182,
+      "column": 7,
+      "name": "systemDatabaseName",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "ManagedInstance.tsp",
+      "line": 56,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "RecoverableDatabase.tsp",
+      "line": 44,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "RecoverableDatabase.tsp",
+      "line": 50,
+      "column": 7,
+      "name": "$filter",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "RestorableDroppedDatabase.tsp",
+      "line": 60,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "RestorableDroppedDatabase.tsp",
+      "line": 66,
+      "column": 7,
+      "name": "$filter",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "Server.tsp",
+      "line": 55,
+      "column": 7,
+      "name": "$expand",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "SqlVulnerabilityAssessmentScanRecord.tsp",
+      "line": 130,
+      "column": 7,
+      "name": "systemDatabaseName",
+      "verb": "get"
+    },
+    {
+      "sourceFile": "SqlVulnerabilityAssessmentScanResults.tsp",
+      "line": 137,
+      "column": 7,
+      "name": "systemDatabaseName",
+      "verb": "get"
+    }
+  ]
+}

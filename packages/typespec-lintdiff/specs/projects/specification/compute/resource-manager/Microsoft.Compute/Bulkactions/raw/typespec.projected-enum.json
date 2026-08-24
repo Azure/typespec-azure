@@ -1,0 +1,310 @@
+{
+  "apiVersion": "2026-07-06-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "bulkCreateCustom.tsp",
+      "line": 49,
+      "column": 3,
+      "emittedName": "deleteInstances"
+    },
+    {
+      "sourceFile": "common.tsp",
+      "line": 138,
+      "column": 3,
+      "emittedName": "tempDisk"
+    },
+    {
+      "sourceFile": "launchBulkInstancesOperation.tsp",
+      "line": 48,
+      "column": 3,
+      "emittedName": "deleteInstances"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 359,
+      "column": 3,
+      "emittedName": "verifyVmAgentHealth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 732,
+      "column": 3,
+      "emittedName": "forceDeletion"
+    },
+    {
+      "sourceFile": "recurringScheduledActions.tsp",
+      "line": 236,
+      "column": 3,
+      "emittedName": "disabled"
+    },
+    {
+      "sourceFile": "recurringScheduledActions.tsp",
+      "line": 483,
+      "column": 3,
+      "emittedName": "disabled"
+    },
+    {
+      "sourceFile": "recurringScheduledActions.tsp",
+      "line": 515,
+      "column": 3,
+      "emittedName": "disabled"
+    },
+    {
+      "sourceFile": "virtualMachineExtension.tsp",
+      "line": 32,
+      "column": 3,
+      "emittedName": "autoUpgradeMinorVersion"
+    },
+    {
+      "sourceFile": "virtualMachineExtension.tsp",
+      "line": 35,
+      "column": 3,
+      "emittedName": "enableAutomaticUpgrade"
+    },
+    {
+      "sourceFile": "virtualMachineExtension.tsp",
+      "line": 47,
+      "column": 3,
+      "emittedName": "suppressFailures"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 76,
+      "column": 3,
+      "emittedName": "automaticallyApprove"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 82,
+      "column": 3,
+      "emittedName": "automaticallyApprove"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 94,
+      "column": 3,
+      "emittedName": "enable"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 103,
+      "column": 3,
+      "emittedName": "automaticallyApprove"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 189,
+      "column": 3,
+      "emittedName": "writeAcceleratorEnabled"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 342,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 425,
+      "column": 3,
+      "emittedName": "writeAcceleratorEnabled"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 441,
+      "column": 3,
+      "emittedName": "toBeDetached"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 485,
+      "column": 3,
+      "emittedName": "ultraSSDEnabled"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 488,
+      "column": 3,
+      "emittedName": "hibernationEnabled"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 531,
+      "column": 3,
+      "emittedName": "allowExtensionOperations"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 536,
+      "column": 3,
+      "emittedName": "requireGuestProvisionSignal"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 547,
+      "column": 3,
+      "emittedName": "provisionVMAgent"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 552,
+      "column": 3,
+      "emittedName": "enableAutomaticUpdates"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 614,
+      "column": 3,
+      "emittedName": "enableHotpatching"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 640,
+      "column": 3,
+      "emittedName": "bypassPlatformSafetyChecksOnUserSchedule"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 747,
+      "column": 3,
+      "emittedName": "disablePasswordAuthentication"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 758,
+      "column": 3,
+      "emittedName": "provisionVMAgent"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 769,
+      "column": 3,
+      "emittedName": "enableVMAgentPlatformUpdates"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 823,
+      "column": 3,
+      "emittedName": "bypassPlatformSafetyChecksOnUserSchedule"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 914,
+      "column": 3,
+      "emittedName": "primary"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 936,
+      "column": 3,
+      "emittedName": "primary"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 942,
+      "column": 3,
+      "emittedName": "enableAcceleratedNetworking"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 945,
+      "column": 3,
+      "emittedName": "disableTcpStateTracking"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 948,
+      "column": 3,
+      "emittedName": "enableFpga"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 952,
+      "column": 3,
+      "emittedName": "enableIPForwarding"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 998,
+      "column": 3,
+      "emittedName": "primary"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 1244,
+      "column": 3,
+      "emittedName": "treatFailureAsDeploymentFailure"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 1247,
+      "column": 3,
+      "emittedName": "enableAutomaticUpgrade"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 1274,
+      "column": 3,
+      "emittedName": "enable"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 1284,
+      "column": 3,
+      "emittedName": "enable"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 1300,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 1314,
+      "column": 3,
+      "emittedName": "encryptionAtHost"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 1331,
+      "column": 3,
+      "emittedName": "secureBootEnabled"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 1334,
+      "column": 3,
+      "emittedName": "vTpmEnabled"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 1350,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "virtualMachineProfile.tsp",
+      "line": 1365,
+      "column": 3,
+      "emittedName": "addProxyAgentExtension"
+    }
+  ],
+  "queryParameterLocations": [
+    {
+      "sourceFile": "bulkCreateCustom.tsp",
+      "line": 49,
+      "column": 3,
+      "name": "deleteInstances",
+      "verb": "delete"
+    },
+    {
+      "sourceFile": "launchBulkInstancesOperation.tsp",
+      "line": 48,
+      "column": 3,
+      "name": "deleteInstances",
+      "verb": "delete"
+    }
+  ]
+}

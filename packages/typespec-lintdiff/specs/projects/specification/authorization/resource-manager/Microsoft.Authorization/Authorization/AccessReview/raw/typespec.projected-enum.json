@@ -1,0 +1,67 @@
+{
+  "apiVersion": "2021-12-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 527,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 737,
+      "column": 3,
+      "emittedName": "expandNestedMemberships"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 742,
+      "column": 3,
+      "emittedName": "includeInheritedAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 747,
+      "column": 3,
+      "emittedName": "includeAccessBelowResource"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 977,
+      "column": 3,
+      "emittedName": "mailNotificationsEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 982,
+      "column": 3,
+      "emittedName": "reminderNotificationsEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 987,
+      "column": 3,
+      "emittedName": "defaultDecisionEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 992,
+      "column": 3,
+      "emittedName": "justificationRequiredOnApproval"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1002,
+      "column": 3,
+      "emittedName": "autoApplyDecisionsEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1007,
+      "column": 3,
+      "emittedName": "recommendationsEnabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

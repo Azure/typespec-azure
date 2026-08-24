@@ -1,0 +1,91 @@
+{
+  "apiVersion": "2026-03-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "ConnectedRegistry.models.tsp",
+      "line": 417,
+      "column": 3,
+      "emittedName": "enabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 157,
+      "column": 3,
+      "emittedName": "isDataAction"
+    },
+    {
+      "sourceFile": "Registry.models.tsp",
+      "line": 319,
+      "column": 3,
+      "emittedName": "adminUserEnabled"
+    },
+    {
+      "sourceFile": "Registry.models.tsp",
+      "line": 339,
+      "column": 3,
+      "emittedName": "dataEndpointEnabled"
+    },
+    {
+      "sourceFile": "Registry.models.tsp",
+      "line": 385,
+      "column": 3,
+      "emittedName": "networkRuleBypassAllowedForTasks"
+    },
+    {
+      "sourceFile": "Registry.models.tsp",
+      "line": 395,
+      "column": 3,
+      "emittedName": "anonymousPullEnabled"
+    },
+    {
+      "sourceFile": "Registry.models.tsp",
+      "line": 682,
+      "column": 3,
+      "emittedName": "keyRotationEnabled"
+    },
+    {
+      "sourceFile": "Registry.models.tsp",
+      "line": 737,
+      "column": 3,
+      "emittedName": "adminUserEnabled"
+    },
+    {
+      "sourceFile": "Registry.models.tsp",
+      "line": 757,
+      "column": 3,
+      "emittedName": "dataEndpointEnabled"
+    },
+    {
+      "sourceFile": "Registry.models.tsp",
+      "line": 784,
+      "column": 3,
+      "emittedName": "networkRuleBypassAllowedForTasks"
+    },
+    {
+      "sourceFile": "Registry.models.tsp",
+      "line": 789,
+      "column": 3,
+      "emittedName": "anonymousPullEnabled"
+    },
+    {
+      "sourceFile": "Registry.models.tsp",
+      "line": 839,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    },
+    {
+      "sourceFile": "Replication.models.tsp",
+      "line": 22,
+      "column": 3,
+      "emittedName": "regionEndpointEnabled"
+    },
+    {
+      "sourceFile": "Replication.models.tsp",
+      "line": 53,
+      "column": 3,
+      "emittedName": "regionEndpointEnabled"
+    }
+  ],
+  "queryParameterLocations": []
+}

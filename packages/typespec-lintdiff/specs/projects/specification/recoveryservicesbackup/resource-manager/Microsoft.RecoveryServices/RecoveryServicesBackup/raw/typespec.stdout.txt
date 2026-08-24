@@ -711,7 +711,6 @@ routes.tsp:115:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Plea
 models.tsp:1847:7 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
 routes.tsp:150:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:185:3 - warning tsp-lintdiff-local-linter/lro-extension: ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`.
-routes.tsp:201:5 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 routes.tsp:185:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'export' should contain the action verb 'backupjobsexport' from the route path. Consider updating the operation name.
 routes.tsp:185:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 models.tsp:2682:7 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
@@ -727,7 +726,6 @@ routes.tsp:372:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Plea
 models.tsp:2895:7 - warning tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link: Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.
 routes.tsp:410:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:444:3 - warning tsp-lintdiff-local-linter/lro-extension: ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`.
-routes.tsp:466:5 - warning tsp-lintdiff-local-linter/parameters-in-post: Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.
 routes.tsp:444:3 - warning tsp-lintdiff-local-linter/post-operation-id-contains-url-verb: POST operation 'refresh' should contain the action verb 'refreshcontainers' from the route path. Consider updating the operation name.
 routes.tsp:444:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:483:3 - warning tsp-lintdiff-local-linter/get-response-codes: GET operations must include a 200 response and may only use 202 and default as additional response codes.
@@ -746,5 +744,5 @@ routes.tsp:673:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Plea
 routes.tsp:714:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 routes.tsp:742:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 
-Found 743 warnings.
+Found 741 warnings.
 

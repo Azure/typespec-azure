@@ -1,0 +1,109 @@
+{
+  "apiVersion": "2026-05-01-preview",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "models.tsp",
+      "line": 757,
+      "column": 3,
+      "emittedName": "disableLocalAuth"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 763,
+      "column": 3,
+      "emittedName": "disableDeviceSAS"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 769,
+      "column": 3,
+      "emittedName": "disableModuleSAS"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 774,
+      "column": 3,
+      "emittedName": "restrictOutboundNetworkAccess"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 864,
+      "column": 3,
+      "emittedName": "enableFileUploadNotifications"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 901,
+      "column": 3,
+      "emittedName": "enableDataResidency"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1007,
+      "column": 3,
+      "emittedName": "applyToBuiltInEventHubEndpoint"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1579,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1611,
+      "column": 3,
+      "emittedName": "isEnabled"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 1795,
+      "column": 3,
+      "emittedName": "enableRootCertificateV2"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2218,
+      "column": 3,
+      "emittedName": "nameAvailable"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2506,
+      "column": 3,
+      "emittedName": "excludeKeys"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2526,
+      "column": 3,
+      "emittedName": "includeConfigurations"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2571,
+      "column": 3,
+      "emittedName": "includeConfigurations"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2617,
+      "column": 3,
+      "emittedName": "isVerified"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2709,
+      "column": 3,
+      "emittedName": "isVerified"
+    },
+    {
+      "sourceFile": "models.tsp",
+      "line": 2807,
+      "column": 3,
+      "emittedName": "isVerified"
+    }
+  ],
+  "queryParameterLocations": []
+}

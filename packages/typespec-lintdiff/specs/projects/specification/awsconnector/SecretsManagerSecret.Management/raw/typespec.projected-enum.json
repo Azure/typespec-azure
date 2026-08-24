@@ -1,0 +1,43 @@
+{
+  "apiVersion": "2024-12-01",
+  "serviceCount": 1,
+  "locations": [
+    {
+      "sourceFile": "main.tsp",
+      "line": 105,
+      "column": 3,
+      "emittedName": "excludeLowercase"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 108,
+      "column": 3,
+      "emittedName": "excludeNumbers"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 111,
+      "column": 3,
+      "emittedName": "excludePunctuation"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 114,
+      "column": 3,
+      "emittedName": "excludeUppercase"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 121,
+      "column": 3,
+      "emittedName": "includeSpace"
+    },
+    {
+      "sourceFile": "main.tsp",
+      "line": 127,
+      "column": 3,
+      "emittedName": "requireEachIncludedType"
+    }
+  ],
+  "queryParameterLocations": []
+}

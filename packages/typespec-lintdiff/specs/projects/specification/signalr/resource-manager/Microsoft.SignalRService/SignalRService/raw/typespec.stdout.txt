@@ -30,7 +30,6 @@ models.tsp:668:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schem
 models.tsp:675:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.regionEndpointEnabled.
 models.tsp:682:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.resourceStopped.
 models.tsp:500:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.name.
-SignalRResource.tsp:74:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:location.
 SignalRResource.tsp:74:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 SignalRResource.tsp:80:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 SignalRResource.tsp:91:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -59,7 +58,6 @@ Replica.tsp:43:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Plea
 models.tsp:1430:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.regionEndpointEnabled.
 models.tsp:1437:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not have default value, property:properties.resourceStopped.
 models.tsp:500:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:sku.name.
-Replica.tsp:50:3 - warning tsp-lintdiff-local-linter/patch-body-parameters-schema: Properties of a PATCH request body must not be required, property:location.
 Replica.tsp:50:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Replica.tsp:65:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 Replica.tsp:70:3 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
@@ -135,5 +133,5 @@ client.tsp:212:3 - warning tsp-lintdiff-local-linter/path-parameter-schema: Path
 client.tsp:191:4 - warning tsp-lintdiff-local-linter/xms-examples-required: Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations.
 client.tsp:200:3 - warning tsp-lintdiff-local-linter/guid-usage: Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.
 
-Found 128 warnings.
+Found 126 warnings.
 
