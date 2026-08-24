@@ -537,7 +537,7 @@ export function emitScalarParsing(
  * @param time the modeled time associated with srcVar
  * @param dstVar the name of the variable to contain the parsed value
  * @param imports the import manager currently in scope
- * @param indent the indentatio helper currently in scope
+ * @param indent the indentation helper currently in scope
  * @returns the time parsing code
  */
 export function emitTimeParsing(srcVar: string, time: go.Time, dstVar: string, imports: ImportManager, indent: Indentation): string {

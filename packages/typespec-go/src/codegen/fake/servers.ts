@@ -972,7 +972,13 @@ function emitTextBodyUnmarshal(
       }
       break;
     case "scalar":
-      content += helpers.emitScalarParsing(bodyParam.type, "bodyRaw", optional ? "bodyParsed" : "body", imports, indent);
+      content += helpers.emitScalarParsing(
+        bodyParam.type,
+        "bodyRaw",
+        optional ? "bodyParsed" : "body",
+        imports,
+        indent,
+      );
       content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
       if (optional) {
         content += `${indent.get()}body = bodyParsed\n`;
