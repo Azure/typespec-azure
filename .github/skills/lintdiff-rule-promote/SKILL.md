@@ -272,6 +272,9 @@ Use this standard fixture-to-native-test mapping:
   them
 - add regression tests for semantic fixes discovered during review, even when
   they were not part of the original fixture set
+- keep a written mapping from each original fixture `main.tsp` to the exact
+  native `it("...")` test title or titles that replace it; do not paraphrase test
+  titles in mapping tables or PR notes
 
 Prefer direct TypeSpec snippets and expected diagnostics over OpenAPI output
 snapshots. If a lintdiff fixture depends on unrelated diagnostics or
@@ -480,13 +483,20 @@ It must include:
   implementation, semantic targets inspected, important compiler or library APIs
   used, version/projection handling, diagnostic targeting and deduplication
   decisions, and any intentional adaptation from the lintdiff source.
-- **Fixture-to-native test mapping:** explain how each relevant lintdiff fixture
-  or semantic branch was converted into native `vitest` coverage, including
-  compliant cases and any review-regression tests. Link each fixture name to its
-  original fixture file with a branch-based GitHub URL, for example
-  `[boolean-property](<http-link>) -> emits warning for boolean model properties`.
-  Do not paste a promoted native test file link, because that file is already in
-  the PR. Do not claim copied snapshot parity when snapshots were not copied.
+- **Fixture-to-native test mapping:** provide an explicit table that maps each
+  relevant original lintdiff fixture to the exact native `vitest` test title or
+  titles that cover it, including compliant cases and any review-regression
+  tests. Link each fixture name to its original `main.tsp` with a branch-based
+  GitHub URL, and write the native title exactly as it appears in the promoted
+  test file, including the full `it("...")` string. If one fixture maps to
+  multiple native tests, include one row per test title; if one native test
+  combines multiple fixtures or semantic branches, include each fixture/branch in
+  separate rows with the same exact test title. For new regression tests without
+  an original fixture, use `N/A (review regression)` or a similarly explicit
+  source value. Use this shape:
+  `| Original lintdiff fixture | Native vitest case | Coverage note |`. Do not
+  paraphrase native test titles, and do not claim copied snapshot parity when
+  snapshots were not copied.
 - **Migration evidence:** link directly to the rule's `migration.md` for the
   declared focused tests, real-service project comparison, latest full-corpus
   counts, one-sided project explanations, compile failures, and remaining
