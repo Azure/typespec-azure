@@ -5,6 +5,7 @@ import {
   getLifecycleVisibilityEnum,
   getLocationContext,
   getVisibilityForClass,
+  isNullType,
   isNeverType,
   paramMessage,
   resolveEncodedName,
@@ -113,8 +114,11 @@ function collectViolations(
     visitedVisibilities.add(schemaVisibility);
   }
 
-  const discriminator = getDiscriminator(program, model);
-  if (discriminator !== undefined && !model.properties.has(discriminator.propertyName)) {
+  const discriminator = getInheritedDiscriminator(program, model);
+  if (
+    discriminator !== undefined &&
+    getModelProperty(model, discriminator.propertyName) === undefined
+  ) {
     violations.push({
       target: getLocationContext(program, model).type === "project" ? model : diagnosticTarget,
       propertyName: [...path, discriminator.propertyName].join("."),
@@ -202,10 +206,13 @@ function collectNestedViolations(
   }
 
   if (type.kind === "Union") {
-    for (const variant of type.variants.values()) {
+    const nonNullVariants = [...type.variants.values()]
+      .map((variant) => variant.type)
+      .filter((variant) => !isNullType(variant));
+    if (nonNullVariants.length === 1) {
       collectNestedViolations(
         program,
-        variant.type,
+        nonNullVariants[0],
         violations,
         path,
         visited,
@@ -232,6 +239,17 @@ function isCreateOnlyMutability(program: Program, property: ModelProperty): bool
   return visibility.size === 1 && visibility.has(create);
 }
 
+function getInheritedDiscriminator(program: Program, model: Model) {
+  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
+    const discriminator = getDiscriminator(program, current);
+    if (discriminator !== undefined) {
+      return discriminator;
+    }
+  }
+
+  return undefined;
+}
+
 function canSharePropertyUsingReadonlyOrXmsMutability(
   program: Program,
   property: ModelProperty,
@@ -246,6 +264,17 @@ function canSharePropertyUsingReadonlyOrXmsMutability(
     visibility.size > 0 &&
     [...visibility].every((member) => ["Read", "Create", "Update"].includes(member.name))
   );
+}
+
+function getModelProperty(model: Model, name: string): ModelProperty | undefined {
+  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
+    const property = current.properties.get(name);
+    if (property !== undefined) {
+      return property;
+    }
+  }
+
+  return undefined;
 }
 
 function getModelProperties(model: Model): ModelProperty[] {

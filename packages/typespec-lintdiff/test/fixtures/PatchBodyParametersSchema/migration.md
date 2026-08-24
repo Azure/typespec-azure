@@ -11,8 +11,8 @@ The final full corpus run reports all 93 validator projects in the TypeSpec set,
 ## Evidence provenance
 
 - Validator report: `packages/typespec-lintdiff/specs/validator-results.json`, generated from azure-rest-api-specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` by the dataset recorded in `packages/typespec-lintdiff/specs/_meta.json`.
-- TypeSpec report: local full run generated at `2026-08-24T08:08:01.918Z` from the same specs commit and this branch's review fixes documented below. Generated `packages/typespec-lintdiff/specs` artifacts were used as validation evidence only and intentionally excluded from this rule PR.
-- Population: 468 source projects, 462 successful projects, and 6 compile failures. The full run took 2,506,210 ms.
+- TypeSpec report: local full run generated at `2026-08-24T11:35:06.664Z` from the same specs commit and this branch's review fixes documented below. Generated `packages/typespec-lintdiff/specs` artifacts were used as validation evidence only and intentionally excluded from this rule PR.
+- Population: 468 source projects, 462 successful projects, and 6 compile failures. The full run took 3,560,089 ms.
 - Raw/projected totals: 51,137 raw TypeSpec diagnostics and 51,000 selected-version projected diagnostics across all rules.
 - Rule totals: 703 raw emitted Swagger diagnostics and 872 projected TypeSpec diagnostics.
 - Deduplicated totals: not defined for this rule. `normalizedValidatorDiagnosticCount` and `normalizedTypeSpecDiagnosticCount` are `null` because emitted occurrences and semantic source targets do not have a proven one-to-one identity. No inferred deduplicated count is presented as evidence.
@@ -38,13 +38,14 @@ The final full corpus run reports all 93 validator projects in the TypeSpec set,
   - retain the broader, rule-specific emitted-name normalization for `EnumInsteadOfBoolean` rather than forcing it through strict HTTP reachability.
 - Fixtures:
   - required, create-only, discriminator, nullable-union, nullable-body, imported-model, and emitted top-level `identity` behavior remain covered;
+  - `multi-model-union-compliant` covers unsupported multi-model unions that Autorest emits without traversable PATCH schema properties;
   - `implicit-optional-patch-compliant` covers required and create-only source properties that are optional or omitted in a transformed PATCH schema;
   - `never-property-compliant` covers a required source property omitted because its type is `never`;
   - `default-patch-property` includes `false`, `0`, and `""` defaults to prove those valid TypeSpec findings are retained.
 
 ## Final corpus
 
-The final full run used specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` and was generated on `2026-08-24T08:08:01.918Z`.
+The final full run used specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` and was generated on `2026-08-24T11:35:06.664Z`.
 
 | Population                                |  Count |
 | ----------------------------------------- | -----: |
@@ -128,7 +129,7 @@ model WidgetProperties {
 - **Classification:** validator-only
 - **Status:** fixed
 - **Project/API version:** fixture `discriminator-required-patch-property` / `2024-01-01`
-- **Source:** `OptionalDiscriminator.kind` and `SynthesizedDiscriminator.kind`
+- **Source:** `OptionalDiscriminator.kind`, `SynthesizedDiscriminator.kind`, and inherited `DerivedDiscriminator.kind`
 
 ```typespec
 @discriminator("kind")
@@ -137,17 +138,24 @@ model OptionalDiscriminator {
 }
 @discriminator("kind")
 model SynthesizedDiscriminator {}
+@discriminator("kind")
+model BaseSynthesizedDiscriminator {}
+model DerivedDiscriminator extends BaseSynthesizedDiscriminator {
+  kind: "derived";
+}
 ```
 
 ```json
 "OptionalDiscriminator": { "discriminator": "kind", "required": ["kind"] },
-"SynthesizedDiscriminator": { "discriminator": "kind", "required": ["kind"] }
+"SynthesizedDiscriminator": { "discriminator": "kind", "required": ["kind"] },
+"BaseSynthesizedDiscriminator": { "discriminator": "kind", "required": ["kind"] },
+"DerivedDiscriminator": { "allOf": [{ "$ref": "#/definitions/BaseSynthesizedDiscriminator" }] }
 ```
 
-| Engine            | Observed result                                                                                    |
-| ----------------- | -------------------------------------------------------------------------------------------------- |
-| Swagger validator | Two required-property diagnostics.                                                                 |
-| TypeSpec lint     | Two matching diagnostics after mirroring Autorest's forced and synthesized discriminator behavior. |
+| Engine            | Observed result                                                                                                 |
+| ----------------- | --------------------------------------------------------------------------------------------------------------- |
+| Swagger validator | Three required-property diagnostics.                                                                            |
+| TypeSpec lint     | Three matching diagnostics after mirroring Autorest's direct, synthesized, and inherited discriminator behavior. |
 
 **Disposition:** Production rule fix and focused violating fixture.
 
@@ -289,7 +297,7 @@ No `PatchBodyParametersSchema` validator-only project is hidden by these failure
 
 ## Fixture evidence
 
-The repository's fixture harness validates eleven cases:
+The repository's fixture harness validates twelve cases:
 
 - `required-patch-property`: Swagger and TypeSpec report the required property.
 - `nullable-body-required-property`: Swagger and TypeSpec report a required property in a nullable top-level PATCH body.
@@ -301,6 +309,7 @@ The repository's fixture harness validates eleven cases:
 - `encoded-identity-compliant`: both sides are clean when an authored property emits as top-level JSON `identity`.
 - `encoded-non-identity-violating`: Swagger and TypeSpec both check an authored `identity` property that emits as a non-identity JSON property.
 - `implicit-optional-patch-compliant`: both sides are clean when the transformed PATCH schema makes required source properties optional and omits a create-only source property.
+- `multi-model-union-compliant`: both sides are clean for unsupported multi-model unions because Autorest emits no traversable PATCH schema properties.
 - `never-property-compliant`: both sides are clean when Autorest omits a required `never`-typed property.
 
 An earlier review suggested treating `Lifecycle.Create` combined with non-emitted lifecycle members such as `Lifecycle.Delete` as create-only. A focused fixture showed that such a property is omitted from the PATCH schema and Swagger does not report it, so that suggestion was rejected to avoid a TypeSpec-only false positive.

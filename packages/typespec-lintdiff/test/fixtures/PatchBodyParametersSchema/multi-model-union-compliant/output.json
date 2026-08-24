@@ -215,11 +215,9 @@
           {
             "name": "body",
             "in": "body",
-            "description": "The request body",
+            "description": "Unsupported union request body",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/WidgetPatchBody"
-            }
+            "schema": {}
           }
         ],
         "responses": {
@@ -295,82 +293,30 @@
     }
   },
   "definitions": {
-    "Azure.ResourceManager.ResourceProvisioningState": {
-      "type": "string",
-      "description": "The provisioning state of a resource type.",
-      "enum": [
-        "Succeeded",
-        "Failed",
-        "Canceled"
-      ],
-      "x-ms-enum": {
-        "name": "ResourceProvisioningState",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "Succeeded",
-            "value": "Succeeded",
-            "description": "Resource has been created."
-          },
-          {
-            "name": "Failed",
-            "value": "Failed",
-            "description": "Resource creation failed."
-          },
-          {
-            "name": "Canceled",
-            "value": "Canceled",
-            "description": "Resource creation was canceled."
-          }
-        ]
-      }
-    },
-    "BaseSynthesizedDiscriminator": {
+    "FirstPatchBody": {
       "type": "object",
+      "description": "First unsupported union branch.",
       "properties": {
-        "kind": {
+        "firstRequired": {
           "type": "string",
-          "description": "Discriminator property for BaseSynthesizedDiscriminator."
+          "description": "Required property that is not emitted as a PATCH schema property"
         }
       },
-      "discriminator": "kind",
       "required": [
-        "kind"
+        "firstRequired"
       ]
     },
-    "DerivedDiscriminator": {
+    "SecondPatchBody": {
       "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/BaseSynthesizedDiscriminator"
-        }
-      ],
-      "x-ms-discriminator-value": "derived"
-    },
-    "OptionalDiscriminator": {
-      "type": "object",
+      "description": "Second unsupported union branch.",
       "properties": {
-        "kind": {
+        "secondRequired": {
           "type": "string",
-          "description": "An authored optional discriminator emitted as required"
+          "description": "Required property that is not emitted as a PATCH schema property"
         }
       },
-      "discriminator": "kind",
       "required": [
-        "kind"
-      ]
-    },
-    "SynthesizedDiscriminator": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "type": "string",
-          "description": "Discriminator property for SynthesizedDiscriminator."
-        }
-      },
-      "discriminator": "kind",
-      "required": [
-        "kind"
+        "secondRequired"
       ]
     },
     "Widget": {
@@ -388,24 +334,6 @@
         }
       ]
     },
-    "WidgetPatchBody": {
-      "type": "object",
-      "description": "Patch envelope for widget.",
-      "properties": {
-        "optional": {
-          "$ref": "#/definitions/OptionalDiscriminator",
-          "description": "A model with an authored optional discriminator"
-        },
-        "synthesized": {
-          "$ref": "#/definitions/SynthesizedDiscriminator",
-          "description": "A model whose discriminator is synthesized by Autorest"
-        },
-        "inheritedDiscriminator": {
-          "$ref": "#/definitions/DerivedDiscriminator",
-          "description": "A derived model with an inherited discriminator declaration"
-        }
-      }
-    },
     "WidgetProperties": {
       "type": "object",
       "description": "Widget resource properties.",
@@ -413,11 +341,6 @@
         "description": {
           "type": "string",
           "description": "Description of the widget"
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "Resource provisioning state",
-          "readOnly": true
         }
       }
     }

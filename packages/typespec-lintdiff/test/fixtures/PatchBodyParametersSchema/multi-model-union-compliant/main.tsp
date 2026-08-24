@@ -16,23 +16,6 @@ enum Versions {
   v2024_01_01: "2024-01-01",
 }
 
-@discriminator("kind")
-model OptionalDiscriminator {
-  @doc("An authored optional discriminator emitted as required")
-  kind?: string;
-}
-
-@discriminator("kind")
-model SynthesizedDiscriminator {}
-
-@discriminator("kind")
-model BaseSynthesizedDiscriminator {}
-
-model DerivedDiscriminator extends BaseSynthesizedDiscriminator {
-  @doc("An inherited discriminator value emitted as required")
-  kind: "derived";
-}
-
 model Widget is TrackedResource<WidgetProperties> {
   @key("widgetName")
   @segment("widgets")
@@ -46,22 +29,18 @@ model Widget is TrackedResource<WidgetProperties> {
 model WidgetProperties {
   @doc("Description of the widget")
   description?: string;
-
-  @doc("Resource provisioning state")
-  @visibility(Lifecycle.Read)
-  provisioningState?: ResourceProvisioningState;
 }
 
-@doc("Patch envelope for widget.")
-model WidgetPatchBody {
-  @doc("A model with an authored optional discriminator")
-  optional?: OptionalDiscriminator;
+@doc("First unsupported union branch.")
+model FirstPatchBody {
+  @doc("Required property that is not emitted as a PATCH schema property")
+  firstRequired: string;
+}
 
-  @doc("A model whose discriminator is synthesized by Autorest")
-  synthesized?: SynthesizedDiscriminator;
-
-  @doc("A derived model with an inherited discriminator declaration")
-  inheritedDiscriminator?: DerivedDiscriminator;
+@doc("Second unsupported union branch.")
+model SecondPatchBody {
+  @doc("Required property that is not emitted as a PATCH schema property")
+  secondRequired: string;
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}
@@ -77,6 +56,6 @@ interface Widgets {
   @armResourceUpdate(Widget)
   update(
     ...ResourceInstanceParameters<Widget>,
-    @doc("The request body") @body body: WidgetPatchBody,
+    @doc("Unsupported union request body") @body body: FirstPatchBody | SecondPatchBody,
   ): ArmResponse<Widget> | ErrorResponse;
 }

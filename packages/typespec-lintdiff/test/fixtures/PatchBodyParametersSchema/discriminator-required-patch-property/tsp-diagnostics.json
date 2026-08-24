@@ -15,6 +15,11 @@
     "message": "The property 'synthesized' in the request body either does not appear in the resource model or is nested at the wrong level."
   },
   {
+    "code": "tsp-lintdiff-local-linter/consistent-patch-properties",
+    "severity": "warning",
+    "message": "The property 'inheritedDiscriminator.kind' in the request body either does not appear in the resource model or is nested at the wrong level."
+  },
+  {
     "code": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
     "severity": "warning",
     "message": "Top-level resource 'Widget' should define a list by resource group operation."
@@ -43,6 +48,26 @@
     "code": "@azure-tools/typespec-azure-resource-manager/no-empty-model",
     "severity": "warning",
     "message": "Properties with type:object must have definition of a reference model."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Model named 'BaseSynthesizedDiscriminator' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-string-discriminator",
+    "severity": "warning",
+    "message": "Use an extensible union instead of a plain string (ex: `union PetKind { cat: \"cat\", dog: \"dog\", string };`)"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/no-empty-model",
+    "severity": "warning",
+    "message": "Properties with type:object must have definition of a reference model."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Model named 'DerivedDiscriminator' should have a documentation or description, use doc comment /** */ to provide it."
   },
   {
     "code": "@azure-tools/typespec-azure-resource-manager/patch-envelope",
@@ -102,7 +127,7 @@
   {
     "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
     "severity": "warning",
-    "message": "Resource PATCH models must be a subset of the resource type. The following properties: [optional, synthesized] do not exist in resource Model 'Widget'."
+    "message": "Resource PATCH models must be a subset of the resource type. The following properties: [optional, synthesized, inheritedDiscriminator] do not exist in resource Model 'Widget'."
   },
   {
     "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
@@ -113,6 +138,11 @@
     "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
     "severity": "warning",
     "message": "Properties of a PATCH request body must not be required, property:synthesized.kind."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
+    "severity": "warning",
+    "message": "Properties of a PATCH request body must not be required, property:inheritedDiscriminator.kind."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",

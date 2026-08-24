@@ -38,10 +38,11 @@ required.
 | `required-patch-property`               | true      | PATCH body contains required property                            |
 | `nullable-body-required-property`       | true      | Nullable top-level PATCH body contains a required property       |
 | `nullable-model-required-property`      | true      | Nullable PATCH model contains a required nested property         |
-| `discriminator-required-patch-property` | true      | Autorest forces authored and synthesized discriminators required |
+| `discriminator-required-patch-property` | true      | Autorest forces direct and inherited discriminators required     |
 | `default-patch-property`                | true      | PATCH body contains truthy and falsy default-valued properties   |
 | `create-only-patch-property`            | true      | PATCH body contains a property emitted as create-only mutable    |
 | `implicit-optional-patch-compliant`     | false     | PATCH transforms optionalize or omit source properties           |
+| `multi-model-union-compliant`           | false     | Unsupported multi-model unions emit no PATCH schema properties   |
 | `never-property-compliant`              | false     | Autorest omits a required property whose type is `never`         |
 | `top-level-identity-compliant`          | false     | PATCH body top-level `identity` is skipped like the Swagger rule |
 | `encoded-identity-compliant`            | false     | PATCH body property encoded as top-level `identity` is skipped   |
