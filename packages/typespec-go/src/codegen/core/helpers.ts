@@ -488,6 +488,81 @@ export function isMapOfDateTime(
   return { format: paramType.valueType.format, utc: paramType.valueType.utc };
 }
 
+/**
+ * Emits the code for parsing scalar types from a string.
+ * The parsing error result is placed into a local var named "err".
+ *
+ * @param scalar the type of scalar to parse
+ * @param src the source var that contains the scalar in string format
+ * @param dst the destination var that contains the result
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @returns the scalar parsing code
+ */
+export function emitScalarParsing(
+  scalar: go.Scalar | go.Constant,
+  src: string,
+  dst: string,
+  imports: ImportManager,
+  indent: Indentation,
+): string {
+  imports.add("strconv");
+  switch (scalar.type) {
+    case "bool":
+      return `${indent.get()}${dst}, err := strconv.ParseBool(${src})\n`;
+    case "float32":
+      return (
+        `${indent.get()}${dst}32, err := strconv.ParseFloat(${src}, 32)\n` +
+        `${indent.get()}${dst} := float32(${dst}32)\n`
+      );
+    case "float64":
+      return `${indent.get()}${dst}, err := strconv.ParseFloat(${src}, 64)\n`;
+    case "int32":
+      return (
+        `${indent.get()}${dst}32, err := strconv.ParseInt(${src}, 10, 32)\n` +
+        `${indent.get()}${dst} := int32(${dst}32)\n`
+      );
+    case "int64":
+      return `${indent.get()}${dst}, err := strconv.ParseInt(${src}, 10, 64)\n`;
+    default:
+      throw new CodegenError("InternalError", `unhandled scalar type ${scalar.type}`);
+  }
+}
+
+/**
+ * emits the code for parsing a time.Time from the specified variable.
+ * note that the emitted code does not include the error check after parsing.
+ *
+ * @param srcVar the name of the variable that contains the value to parse
+ * @param time the modeled time associated with srcVar
+ * @param dstVar the name of the variable to contain the parsed value
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @returns the time parsing code
+ */
+export function emitTimeParsing(srcVar: string, time: go.Time, dstVar: string, imports: ImportManager, indent: Indentation): string {
+  imports.add("time");
+  let text: string;
+  switch (time.format) {
+    case "RFC1123":
+    case "RFC3339":
+    case "RFC7231":
+      text = `${indent.get()}${dstVar}, err := time.Parse(${time.format === "RFC3339" ? RFC3339Format : RFC1123Format}, ${srcVar})\n`;
+      break;
+    case "PlainDate":
+      text = `${indent.get()}${dstVar}, err := time.Parse(${plainDateFormat}, ${srcVar})\n`;
+      break;
+    case "PlainTime":
+      text = `${indent.get()}${dstVar}, err := time.Parse(${plainTimeFormat}, ${srcVar})\n`;
+      break;
+    case "Unix":
+      imports.add("strconv");
+      text = `${indent.get()}${dstVar}, err := strconv.ParseInt(${srcVar}, 10, 64)\n`;
+      break;
+  }
+  return text;
+}
+
 export function formatValue(
   paramName: string,
   type: go.WireType,
