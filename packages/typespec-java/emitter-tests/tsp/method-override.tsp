@@ -124,7 +124,7 @@ namespace Customization {
   ): void;
   op groupExcludeBodyCustomization(
     ...TspTest.MethodOverride.GroupExcludeBody,
-    @query options?: TspTest.MethodOverride.GroupQueryOptions,
+    options?: TspTest.MethodOverride.GroupQueryOptions,
     ...ApiVersionParameter,
   ): void;
   op groupNoneCustomization(
