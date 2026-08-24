@@ -5,6 +5,12 @@ on:
     # Every Monday at 09:00 UTC+8.
     - cron: "0 1 * * 1"
   workflow_dispatch:
+    inputs:
+      report_only:
+        description: "Only update the coverage report; do not create an implementation task"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -19,6 +25,9 @@ jobs:
     name: Generate Spector coverage report
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    outputs:
+      issue_number: ${{ steps.update-issue.outputs.issue_number }}
+      not_implemented: ${{ steps.update-issue.outputs.not_implemented }}
     env:
       PUPPETEER_SKIP_DOWNLOAD: "true"
     steps:
@@ -47,6 +56,7 @@ jobs:
         timeout-minutes: 60
 
       - name: Create or update coverage report issue
+        id: update-issue
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -307,6 +317,7 @@ jobs:
             }
 
             const issueBody = body.join("\n");
+            let issueNumber;
             if (reportIssue) {
               await github.rest.issues.update({
                 owner,
@@ -314,6 +325,7 @@ jobs:
                 issue_number: reportIssue.number,
                 body: issueBody,
               });
+              issueNumber = reportIssue.number;
               core.info(`Updated issue #${reportIssue.number} in ${owner}/${repo}.`);
             } else {
               const created = await github.rest.issues.create({
@@ -322,5 +334,33 @@ jobs:
                 title: reportTitle,
                 body: issueBody,
               });
+              issueNumber = created.data.number;
               core.info(`Created issue #${created.data.number} in ${owner}/${repo}.`);
             }
+
+            const actionableGroups = {};
+            for (const [packageName, groups] of notImplementedByPackage) {
+              for (const [group, scenarios] of groups) {
+                if (previousGroups.get(`${packageName}\0${group}`)?.skipped) {
+                  continue;
+                }
+                actionableGroups[packageName] ??= {};
+                actionableGroups[packageName][group] = scenarios;
+              }
+            }
+
+            core.setOutput("issue_number", issueNumber);
+            core.setOutput("not_implemented", JSON.stringify(actionableGroups));
+
+  create-implementation-task:
+    name: Create Spector implementation task
+    needs: report
+    if: >-
+      needs.report.outputs.not_implemented != '{}' &&
+      !(github.event_name == 'workflow_dispatch' && inputs.report_only)
+    permissions:
+      issues: write
+    uses: ./.github/workflows/spector-auto-tests-typescript.yml
+    with:
+      coverage_issue_number: ${{ fromJSON(needs.report.outputs.issue_number) }}
+      not_implemented: ${{ needs.report.outputs.not_implemented }}
