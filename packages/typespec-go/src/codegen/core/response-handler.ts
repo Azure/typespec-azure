@@ -279,28 +279,13 @@ function formatHeaderResponseValue(
       text += `${indent.pop().get()}}\n`;
       return text;
     case "time":
-      imports.add("time");
-      switch (headerResp.type.format) {
-        case "RFC1123":
-        case "RFC3339":
-        case "RFC7231":
-          text += `${indent.get()}${name}, err := time.Parse(${headerResp.type.format === "RFC3339" ? helpers.RFC3339Format : helpers.RFC1123Format}, val)\n`;
-          break;
-        case "PlainDate":
-          text += `${indent.get()}${name}, err := time.Parse(${helpers.plainDateFormat}, val)\n`;
-          break;
-        case "PlainTime":
-          text += `${indent.get()}${name}, err := time.Parse(${helpers.plainTimeFormat}, val)\n`;
-          break;
-        case "Unix":
-          imports.add("strconv");
-          imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
-          text += `${indent.get()}sec, err := strconv.ParseInt(val, 10, 64)\n`;
-          name = "to.Ptr(time.Unix(sec, 0))";
-          byRef = "";
-          break;
-        default:
-          headerResp.type.format satisfies never;
+      if (headerResp.type.format === "Unix") {
+        imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
+        text += helpers.emitTimeParsing("val", headerResp.type, "sec", imports, indent);
+        name = "to.Ptr(time.Unix(sec, 0))";
+        byRef = "";
+      } else {
+        text += helpers.emitTimeParsing("val", headerResp.type, name, imports, indent);
       }
   }
 

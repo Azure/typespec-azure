@@ -937,6 +937,7 @@ function emitTextBodyUnmarshal(
 ): string {
   const typeName = go.getTypeDeclaration(bodyParam.type, pkg);
   const optional = !go.isRequiredParameter(bodyParam.style);
+
   let content = "";
   if (optional) {
     imports.addForType(bodyParam.type);
@@ -946,22 +947,18 @@ function emitTextBodyUnmarshal(
   }
 
   content += `${indent.get()}bodyRaw, err := server.UnmarshalRequestAsText(req)\n`;
-  content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+  content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
 
-  const emitParse = (expression: string, cast?: string): void => {
-    content += `${indent.get()}bodyParsed, err := ${expression}\n`;
-    content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
-    content += `${indent.get()}body ${optional ? "=" : ":="} ${cast ? `${cast}(bodyParsed)` : "bodyParsed"}\n`;
-  };
+  const assignOrDecl = optional ? "=" : ":=";
 
   switch (bodyParam.type.kind) {
     case "string":
-      content += `${indent.get()}body ${optional ? "=" : ":="} bodyRaw\n`;
+      content += `${indent.get()}body ${assignOrDecl} bodyRaw\n`;
       break;
     case "constant":
       imports.addForType(bodyParam.type);
       if (bodyParam.type.type === "string") {
-        content += `${indent.get()}body ${optional ? "=" : ":="} ${typeName}(bodyRaw)\n`;
+        content += `${indent.get()}body ${assignOrDecl} ${typeName}(bodyRaw)\n`;
       } else {
         content += helpers.emitScalarParsing(
           bodyParam.type,
@@ -970,47 +967,22 @@ function emitTextBodyUnmarshal(
           imports,
           indent,
         );
-        content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
-        content += `${indent.get()}body ${optional ? "=" : ":="} ${typeName}(bodyParsed)\n`;
+        content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
+        content += `${indent.get()}body ${assignOrDecl} ${typeName}(bodyParsed)\n`;
       }
       break;
-    case "encodedBytes":
-      imports.add("encoding/base64");
-      emitParse(`base64.${bodyParam.type.encoding}Encoding.DecodeString(bodyRaw)`);
-      break;
-    case "etag":
-      imports.addForType(bodyParam.type);
-      content += `${indent.get()}body ${optional ? "=" : ":="} ${typeName}(bodyRaw)\n`;
-      break;
-    case "scalar": {
-      const parsedName = optional ? "bodyParsed" : "body";
-      content += helpers.emitScalarParsing(bodyParam.type, "bodyRaw", parsedName, imports, indent);
-      content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+    case "scalar":
+      content += helpers.emitScalarParsing(bodyParam.type, "bodyRaw", optional ? "bodyParsed" : "body", imports, indent);
+      content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
       if (optional) {
         content += `${indent.get()}body = bodyParsed\n`;
       }
       break;
-    }
-    case "time": {
-      imports.add("time");
-      const formatMap: Partial<Record<go.TimeFormat, string>> = {
-        PlainDate: helpers.plainDateFormat,
-        PlainTime: helpers.plainTimeFormat,
-        RFC1123: helpers.RFC1123Format,
-        RFC3339: helpers.RFC3339Format,
-        RFC7231: helpers.RFC1123Format,
-      };
-      const format = formatMap[bodyParam.type.format];
-      if (format) {
-        emitParse(`time.Parse(${format}, bodyRaw)`);
-      } else {
-        imports.add("strconv");
-        content += `${indent.get()}bodySeconds, err := strconv.ParseInt(bodyRaw, 10, 64)\n`;
-        content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
-        content += `${indent.get()}body ${optional ? "=" : ":="} time.Unix(bodySeconds, 0)\n`;
-      }
+    case "time":
+      content += helpers.emitTimeParsing("bodyRaw", bodyParam.type, "bodyParsed", imports, indent);
+      content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
+      content += `${indent.get()}body ${assignOrDecl} bodyParsed\n`;
       break;
-    }
     default:
       throw new CodegenError("InternalError", `unhandled text body type ${bodyParam.type.kind}`);
   }

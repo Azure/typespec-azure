@@ -529,6 +529,40 @@ export function emitScalarParsing(
   }
 }
 
+/**
+ * emits the code for parsing a time.Time from the specified variable.
+ * note that the emitted code does not include the error check after parsing.
+ *
+ * @param srcVar the name of the variable that contains the value to parse
+ * @param time the modeled time associated with srcVar
+ * @param dstVar the name of the variable to contain the parsed value
+ * @param imports the import manager currently in scope
+ * @param indent the indentatio helper currently in scope
+ * @returns the time parsing code
+ */
+export function emitTimeParsing(srcVar: string, time: go.Time, dstVar: string, imports: ImportManager, indent: Indentation): string {
+  imports.add("time");
+  let text: string;
+  switch (time.format) {
+    case "RFC1123":
+    case "RFC3339":
+    case "RFC7231":
+      text = `${indent.get()}${dstVar}, err := time.Parse(${time.format === "RFC3339" ? RFC3339Format : RFC1123Format}, ${srcVar})\n`;
+      break;
+    case "PlainDate":
+      text = `${indent.get()}${dstVar}, err := time.Parse(${plainDateFormat}, ${srcVar})\n`;
+      break;
+    case "PlainTime":
+      text = `${indent.get()}${dstVar}, err := time.Parse(${plainTimeFormat}, ${srcVar})\n`;
+      break;
+    case "Unix":
+      imports.add("strconv");
+      text = `${indent.get()}${dstVar}, err := strconv.ParseInt(${srcVar}, 10, 64)\n`;
+      break;
+  }
+  return text;
+}
+
 export function formatValue(
   paramName: string,
   type: go.WireType,
