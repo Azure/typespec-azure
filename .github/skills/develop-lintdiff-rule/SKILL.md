@@ -244,6 +244,8 @@ Record:
   API versions
 - compile failures and their effect on the assessed population
 - explanations for remaining gaps
+- the standard code-backed example from
+  `/analyze-swagger-typespec-lint-gap` for every distinct material gap cause
 - the final conclusion on functional equivalence and any uncertainty
 
 Do not leave earlier corpus numbers in `migration.md` as though they describe
