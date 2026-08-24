@@ -27,15 +27,19 @@ property or its children. The local lint mirrors that exception to avoid false p
 identity envelopes.
 
 The local lint uses TypeSpec HTTP metadata to mirror Autorest's effective PATCH schema. Properties
-omitted by request visibility are not checked, and requiredness follows emitted PATCH optionality.
+omitted by request visibility or typed as `never` are not checked. Requiredness follows emitted
+PATCH optionality, including discriminator properties that Autorest forces or synthesizes as
+required.
 
 ## Test Cases
 
-| ID                                  | Violation | Description                                                      |
-| ----------------------------------- | --------- | ---------------------------------------------------------------- |
-| `required-patch-property`           | true      | PATCH body contains required property                            |
-| `nullable-model-required-property`  | true      | Nullable PATCH model contains a required nested property         |
-| `default-patch-property`            | true      | PATCH body contains truthy and falsy default-valued properties   |
-| `create-only-patch-property`        | true      | PATCH body contains a property emitted as create-only mutable    |
-| `implicit-optional-patch-compliant` | false     | PATCH transforms optionalize or omit source properties           |
-| `top-level-identity-compliant`      | false     | PATCH body top-level `identity` is skipped like the Swagger rule |
+| ID                                      | Violation | Description                                                      |
+| --------------------------------------- | --------- | ---------------------------------------------------------------- |
+| `required-patch-property`               | true      | PATCH body contains required property                            |
+| `nullable-model-required-property`      | true      | Nullable PATCH model contains a required nested property         |
+| `discriminator-required-patch-property` | true      | Autorest forces authored and synthesized discriminators required |
+| `default-patch-property`                | true      | PATCH body contains truthy and falsy default-valued properties   |
+| `create-only-patch-property`            | true      | PATCH body contains a property emitted as create-only mutable    |
+| `implicit-optional-patch-compliant`     | false     | PATCH transforms optionalize or omit source properties           |
+| `never-property-compliant`              | false     | Autorest omits a required property whose type is `never`         |
+| `top-level-identity-compliant`          | false     | PATCH body top-level `identity` is skipped like the Swagger rule |

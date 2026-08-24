@@ -1,9 +1,11 @@
 import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 import {
   createRule,
+  getDiscriminator,
   getLifecycleVisibilityEnum,
   getLocationContext,
   getVisibilityForClass,
+  isNeverType,
   paramMessage,
   type DiagnosticTarget,
   type Model,
@@ -112,6 +114,15 @@ function collectViolations(
     visitedVisibilities.add(schemaVisibility);
   }
 
+  const discriminator = getDiscriminator(program, model);
+  if (discriminator !== undefined && !model.properties.has(discriminator.propertyName)) {
+    violations.push({
+      target: getLocationContext(program, model).type === "project" ? model : diagnosticTarget,
+      propertyName: [...path, discriminator.propertyName].join("."),
+      messageId: "required",
+    });
+  }
+
   for (const property of getModelProperties(model)) {
     const propertyPath = [...path, property.name];
     if (isTopLevelIdentityProperty(propertyPath)) {
@@ -120,10 +131,16 @@ function collectViolations(
     if (!metadataInfo.isPayloadProperty(property, schemaVisibility)) {
       continue;
     }
+    if (isNeverType(property.type)) {
+      continue;
+    }
     const propertyTarget =
       getLocationContext(program, property).type === "project" ? property : diagnosticTarget;
 
-    if (!metadataInfo.isOptional(property, schemaVisibility)) {
+    if (
+      !metadataInfo.isOptional(property, schemaVisibility) ||
+      property.name === discriminator?.propertyName
+    ) {
       violations.push({
         target: propertyTarget,
         propertyName: propertyPath.join("."),

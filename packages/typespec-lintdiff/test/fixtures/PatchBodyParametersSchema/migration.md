@@ -8,6 +8,15 @@ The corpus comparison now projects opted-in rules to the dataset-selected API ve
 
 The final full corpus run reports all 93 validator projects in the TypeSpec set, with no validator-only projects. TypeSpec-only projects fell from 51 to 12 after selected-version reachability and emitted PATCH schema filtering were applied. The rule remains **partial** because the remaining TypeSpec-only findings include intentional detection of falsy defaults that Swagger misses and other source-to-emission differences that have not all been classified path by path.
 
+## Evidence provenance
+
+- Validator report: `packages/typespec-lintdiff/specs/validator-results.json`, generated from azure-rest-api-specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` by the dataset recorded in `packages/typespec-lintdiff/specs/_meta.json`.
+- TypeSpec report: `packages/typespec-lintdiff/specs/typespec-results.json` and `comparison-results.json`, full run generated at `2026-08-24T04:36:41.110Z` from the same specs commit and local branch HEAD `10e0adf6001831a232a39d641e9424b59b0deb1e` plus the review fixes documented below.
+- Population: 468 source projects, 462 successful projects, and 6 compile failures. The full run took 1,429,932 ms.
+- Raw/projected totals: 51,137 raw TypeSpec diagnostics and 51,014 selected-version projected diagnostics across all rules.
+- Rule totals: 703 raw emitted Swagger diagnostics and 872 projected TypeSpec diagnostics.
+- Deduplicated totals: not defined for this rule. `normalizedValidatorDiagnosticCount` and `normalizedTypeSpecDiagnosticCount` are `null` because emitted occurrences and semantic source targets do not have a proven one-to-one identity. No inferred deduplicated count is presented as evidence.
+
 ## Implemented changes
 
 - Production rule: `src/rules/patch-body-parameters-schema.ts`
@@ -17,6 +26,8 @@ The final full corpus run reports all 93 validator projects in the TypeSpec set,
   - skip a top-level PATCH body property named `identity`;
   - resolve each operation's request visibility with `resolveRequestVisibility`;
   - use `MetadataInfo.isTransformed`, `isPayloadProperty`, and `isOptional` with the same canonical Read schema sharing policy as Autorest;
+  - force authored discriminator properties required and report discriminator properties synthesized by Autorest;
+  - omit `never`-typed properties that Autorest does not emit;
   - omit properties absent from the emitted PATCH schema while retaining defaults and exact create-only mutability when they remain in the emitted schema.
 - Corpus harness:
   - declare selected-version comparison through `projectionScope: http-reachable`;
@@ -25,23 +36,24 @@ The final full corpus run reports all 93 validator projects in the TypeSpec set,
   - record raw and projected diagnostic totals separately;
   - retain the broader, rule-specific emitted-name normalization for `EnumInsteadOfBoolean` rather than forcing it through strict HTTP reachability.
 - Fixtures:
-  - required, create-only, nullable-union, imported-model, and top-level `identity` behavior remain covered;
+  - required, create-only, discriminator, nullable-union, imported-model, and top-level `identity` behavior remain covered;
   - `implicit-optional-patch-compliant` covers required and create-only source properties that are optional or omitted in a transformed PATCH schema;
+  - `never-property-compliant` covers a required source property omitted because its type is `never`;
   - `default-patch-property` includes `false`, `0`, and `""` defaults to prove those valid TypeSpec findings are retained.
 
 ## Final corpus
 
-The final full run used specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` and was generated on `2026-08-24T03:14:25.621Z`.
+The final full run used specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` and was generated on `2026-08-24T04:36:41.110Z`.
 
 | Population                                |  Count |
 | ----------------------------------------- | -----: |
 | Source projects                           |    468 |
 | Successfully compiled projects            |    462 |
 | Compile failures                          |      6 |
-| Raw TypeSpec diagnostics, all rules       | 50,841 |
-| Projected TypeSpec diagnostics, all rules | 50,704 |
+| Raw TypeSpec diagnostics, all rules       | 51,137 |
+| Projected TypeSpec diagnostics, all rules | 51,014 |
 
-The 137-diagnostic overall reduction includes selected-version HTTP reachability and the existing enum emitted-name normalization. It is not a `PatchBodyParametersSchema`-only count.
+The 123-diagnostic overall reduction includes selected-version HTTP reachability and the existing enum emitted-name normalization. It is not a `PatchBodyParametersSchema`-only count.
 
 | PatchBodyParametersSchema result      | Count |
 | ------------------------------------- | ----: |
@@ -51,11 +63,178 @@ The 137-diagnostic overall reduction includes selected-version HTTP reachability
 | Validator-only projects               |     0 |
 | TypeSpec-only projects                |    12 |
 | Validator diagnostics                 |   703 |
-| Selected-version TypeSpec diagnostics |   867 |
+| Selected-version TypeSpec diagnostics |   872 |
 
 Raw diagnostic equality is not expected: Swagger reports emitted OpenAPI occurrences, while TypeSpec reports semantic source properties that can be reused by multiple operations or versions.
 
 As a cross-rule regression check, `EnumInsteadOfBoolean` returned to 293 validator projects, 293 TypeSpec projects, and 293 overlapping projects after preserving its rule-specific projection semantics.
+
+## Code-backed gap examples
+
+### Gap example: falsy defaults missed by Swagger
+
+- **Classification:** TypeSpec-only
+- **Status:** intentional
+- **Project/API version:** fixture `default-patch-property` / `2024-01-01`
+- **Source:** `WidgetPatchProperties.enabled`, `count`, and `label`
+
+```typespec
+enabled?: boolean = false;
+count?: int32 = 0;
+label?: string = "";
+```
+
+```json
+{ "enabled": { "default": false }, "count": { "default": 0 }, "label": { "default": "" } }
+```
+
+| Engine            | Observed result                                                                                |
+| ----------------- | ---------------------------------------------------------------------------------------------- |
+| Swagger validator | No diagnostics for the three falsy values because the validator tests `default` by truthiness. |
+| TypeSpec lint     | Three default diagnostics because each authored default is defined.                            |
+
+**Disposition:** Retain the TypeSpec findings; copying the validator's truthiness bug would weaken the guideline.
+
+### Gap example: transformed PATCH optionality and omission
+
+- **Classification:** TypeSpec-only
+- **Status:** fixed
+- **Project/API version:** fixture `implicit-optional-patch-compliant` / `2025-01-01`
+- **Source:** `WidgetProperties.description` and `createOnly`
+
+```typespec
+model WidgetProperties {
+  description: string;
+  @visibility(Lifecycle.Create) createOnly: string;
+}
+```
+
+```json
+"WidgetPropertiesUpdate": {
+  "properties": { "description": { "type": "string" } }
+}
+```
+
+| Engine            | Observed result                                                                             |
+| ----------------- | ------------------------------------------------------------------------------------------- |
+| Swagger validator | Clean: `description` is emitted optional and `createOnly` is absent from the update schema. |
+| TypeSpec lint     | Clean after using `isOptional` and `isPayloadProperty` with PATCH visibility.               |
+
+**Disposition:** Production rule fix; HTTP reachability alone cannot represent schema transformation.
+
+### Gap example: discriminator requiredness
+
+- **Classification:** validator-only
+- **Status:** fixed
+- **Project/API version:** fixture `discriminator-required-patch-property` / `2024-01-01`
+- **Source:** `OptionalDiscriminator.kind` and `SynthesizedDiscriminator.kind`
+
+```typespec
+@discriminator("kind")
+model OptionalDiscriminator {
+  kind?: string;
+}
+@discriminator("kind")
+model SynthesizedDiscriminator {}
+```
+
+```json
+"OptionalDiscriminator": { "discriminator": "kind", "required": ["kind"] },
+"SynthesizedDiscriminator": { "discriminator": "kind", "required": ["kind"] }
+```
+
+| Engine            | Observed result                                                                                    |
+| ----------------- | -------------------------------------------------------------------------------------------------- |
+| Swagger validator | Two required-property diagnostics.                                                                 |
+| TypeSpec lint     | Two matching diagnostics after mirroring Autorest's forced and synthesized discriminator behavior. |
+
+**Disposition:** Production rule fix and focused violating fixture.
+
+### Gap example: `never` property omitted by Autorest
+
+- **Classification:** TypeSpec-only
+- **Status:** fixed
+- **Project/API version:** fixture `never-property-compliant` / unversioned service
+- **Source:** `WidgetPatchBody.omitted`
+
+```typespec
+model WidgetPatchBody {
+  omitted: never;
+}
+```
+
+```json
+"WidgetPatchBody": { "type": "object", "description": "Patch envelope for widget." }
+```
+
+| Engine            | Observed result                                    |
+| ----------------- | -------------------------------------------------- |
+| Swagger validator | Clean because no `omitted` property is emitted.    |
+| TypeSpec lint     | Clean after skipping `isNeverType(property.type)`. |
+
+**Disposition:** Production rule fix and focused compliant fixture.
+
+### Gap example: nullable union traversal
+
+- **Classification:** validator-only
+- **Status:** fixed
+- **Project/API version:** fixture `nullable-model-required-property` / `2024-01-01`
+- **Source:** `WidgetPatchBody.details` and nested `requiredProp`
+
+```typespec
+details?: WidgetPatchDetails | null;
+model WidgetPatchDetails { requiredProp: string; }
+```
+
+| Engine            | Observed result                                                           |
+| ----------------- | ------------------------------------------------------------------------- |
+| Swagger validator | Reports nested `requiredProp`.                                            |
+| TypeSpec lint     | Reports `details.requiredProp` after traversing model variants in unions. |
+
+**Disposition:** Production recursive traversal fix.
+
+### Gap example: imported-library diagnostic target
+
+- **Classification:** validator-only
+- **Status:** fixed
+- **Project/API version:** `ConfidentialLedger`, `DevCenter`, and `HybridCompute` / dataset-selected versions
+- **Source:** required PATCH properties declared in the imported ARM library
+
+```text
+Swagger target: emitted project PATCH schema
+Original TypeSpec target: imported library ModelProperty (diagnostic discarded)
+Fixed TypeSpec target: nearest project-owned PATCH model or operation
+```
+
+| Engine            | Observed result                                                                    |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Swagger validator | Reports the emitted required property in each project.                             |
+| TypeSpec lint     | Reports after retargeting imported violations to the nearest project-owned target. |
+
+**Disposition:** Production diagnostic-target fix. The final project overlap includes all three services.
+
+### Gap example: selected-version population
+
+- **Classification:** TypeSpec-only
+- **Status:** population mismatch
+- **Project/API version:** full corpus / dataset-selected API versions
+- **Source:** diagnostics attached only to selected-out versions or declarations outside the selected HTTP graph
+
+```yaml
+projectionScope: http-reachable
+```
+
+```text
+Raw TypeSpec diagnostics:       51,137
+Projected TypeSpec diagnostics: 51,014
+```
+
+| Engine            | Observed result                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Swagger validator | Evaluates the dataset-selected emitted API version.                                                                                   |
+| TypeSpec lint     | Ordinary linting sees every authored version; comparison retains only selected-version HTTP-reachable diagnostics for opted-in rules. |
+
+**Disposition:** Comparison projection only. Raw diagnostics remain recorded and normal lint behavior is unchanged.
 
 ## Aligned project sets
 
@@ -108,14 +287,16 @@ No `PatchBodyParametersSchema` validator-only project is hidden by these failure
 
 ## Fixture evidence
 
-The repository's fixture harness validates six cases:
+The repository's fixture harness validates eight cases:
 
 - `required-patch-property`: Swagger and TypeSpec report the required property.
 - `default-patch-property`: Swagger reports the truthy default; TypeSpec additionally reports `false`, `0`, and `""` defaults by design.
 - `create-only-patch-property`: Swagger and TypeSpec report the create-only property.
 - `nullable-model-required-property`: Swagger and TypeSpec report a required property inside a nullable model.
+- `discriminator-required-patch-property`: Swagger and TypeSpec report both an authored optional discriminator and a discriminator synthesized by Autorest as required.
 - `top-level-identity-compliant`: both sides are clean for the skipped top-level `identity` shape.
 - `implicit-optional-patch-compliant`: both sides are clean when the transformed PATCH schema makes required source properties optional and omits a create-only source property.
+- `never-property-compliant`: both sides are clean when Autorest omits a required `never`-typed property.
 
 An earlier review suggested treating `Lifecycle.Create` combined with non-emitted lifecycle members such as `Lifecycle.Delete` as create-only. A focused fixture showed that such a property is omitted from the PATCH schema and Swagger does not report it, so that suggestion was rejected to avoid a TypeSpec-only false positive.
 
