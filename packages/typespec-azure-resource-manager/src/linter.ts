@@ -29,6 +29,7 @@ import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
 import { noOverridePropsRule } from "./rules/no-override-props.js";
+import { noQueryParametersInPostRule } from "./rules/no-query-parameters-in-post.js";
 import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
@@ -80,6 +81,7 @@ const rules = [
   lroLocationHeaderRule,
   missingXmsIdentifiersRule,
   noResponseBodyRule,
+  noQueryParametersInPostRule,
   operationsInterfaceMissingRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
