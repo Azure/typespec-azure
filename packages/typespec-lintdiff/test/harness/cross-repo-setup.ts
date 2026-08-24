@@ -5,9 +5,8 @@
  *
  * Automates the prerequisite steps needed before running `npm run compare`:
  *   1. Builds the local linter package
- *   2. Links the local linter globally via npm link
- *   3. Links the local linter into the target specs repo
- *   4. Verifies the link is functional
+ *   2. Links the local linter directly into the target specs repo
+ *   3. Verifies the link is functional
  *
  * Usage:
  *   npm run compare:setup -- --specs-repo <path>
@@ -15,11 +14,10 @@
  * This only needs to be run once per environment (or after a clean install).
  */
 
-import * as path from "path";
-import * as fs from "fs";
 import { execSync } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
 
-const REPO_ROOT = path.resolve(import.meta.dirname, "..");
 const LINTER_DIR = path.resolve(import.meta.dirname, "..", "..");
 
 function parseArgs(): { specsRepo: string } {
@@ -67,7 +65,12 @@ function main() {
     console.error(`   ✗ node_modules not found. Run 'npm install' in ${specsRepo} first.`);
     process.exit(1);
   }
-  const tspBin = path.join(specsRepo, "node_modules", ".bin", process.platform === "win32" ? "tsp.cmd" : "tsp");
+  const tspBin = path.join(
+    specsRepo,
+    "node_modules",
+    ".bin",
+    process.platform === "win32" ? "tsp.cmd" : "tsp",
+  );
   if (!fs.existsSync(tspBin)) {
     console.error(`   ✗ tsp CLI not found at ${tspBin}. Run 'npm install' in ${specsRepo}.`);
     process.exit(1);
@@ -82,19 +85,24 @@ function main() {
   }
   run("npm run build", LINTER_DIR, "tsc -p tsconfig.build.json");
 
-  // Step 3: npm link the linter globally
-  console.log("\n3. Linking linter globally...");
-  run("npm link", LINTER_DIR, "npm link (global)");
-
-  // Step 4: Link into specs repo
-  console.log("\n4. Linking linter into specs repo...");
-  run("npm link tsp-lintdiff-local-linter", specsRepo, "npm link tsp-lintdiff-local-linter");
-
-  // Step 5: Verify the link works
-  console.log("\n5. Verifying setup...");
+  // Link directly instead of using npm's global link registry. Concurrent rule
+  // worktrees otherwise overwrite the same global package-name entry.
+  console.log("\n3. Linking linter into specs repo...");
   const linkedPath = path.join(specsRepo, "node_modules", "tsp-lintdiff-local-linter");
+  fs.rmSync(linkedPath, { recursive: true, force: true });
+  fs.symlinkSync(LINTER_DIR, linkedPath, process.platform === "win32" ? "junction" : "dir");
+  console.log(`   ✓ Linked directly to ${LINTER_DIR}`);
+
+  // Step 4: Verify the link works
+  console.log("\n4. Verifying setup...");
   if (!fs.existsSync(linkedPath)) {
     console.error(`   ✗ Link verification failed: ${linkedPath} does not exist`);
+    process.exit(1);
+  }
+  if (fs.realpathSync(linkedPath) !== fs.realpathSync(LINTER_DIR)) {
+    console.error(
+      `   ✗ Link resolves to the wrong linter worktree: ${fs.realpathSync(linkedPath)}`,
+    );
     process.exit(1);
   }
 

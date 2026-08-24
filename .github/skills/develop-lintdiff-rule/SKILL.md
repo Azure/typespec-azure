@@ -52,11 +52,11 @@ mode with the paths reported by the dispatcher:
 
 An invocation without `--worker` is preparation-only, whether it contains one
 or multiple rule IDs. The current session creates and verifies isolated
-branches and worktrees, then reports the copyable worktree path and worker
-command needed to open each rule in a new VS Code window and start its
-interactive worker. It must not launch a
-subagent, investigate the rule, install dependencies, prepare the comparison
-harness, edit, validate, commit, or create a PR.
+branches and worktrees, completes their dependency installation, then reports
+the copyable worktree path and worker command needed to open each rule in a new
+VS Code window and start its interactive worker. It must not launch a subagent,
+investigate the rule, prepare the comparison harness, edit, validate, commit, or
+create a PR.
 
 For every prepared rule, return a 1-based handoff ID starting at `1`, the
 copyable typespec-azure worktree path by itself, and the exact worker-mode
@@ -82,10 +82,10 @@ An invocation with `--worker` handles exactly one rule interactively. Verify
 that the supplied typespec-azure worktree is on the rule branch, the supplied
 specs worktree is at the pinned `specsCommit`, and both are clean except for
 known in-progress changes for that rule. Skip branch and worktree creation,
-prepare dependencies and the fixture comparison harness as described below,
-then execute the Development workflow. Never accept multiple rule IDs in
-worker mode and never delegate the complete workflow to a development
-subagent.
+verify the dispatcher-prepared dependencies and prepare the fixture comparison
+harness as described below, then execute the Development workflow. Never accept
+multiple rule IDs in worker mode and never delegate the complete workflow to a
+development subagent.
 
 ## Orchestration
 
@@ -131,21 +131,60 @@ separate VS Code windows and run independent top-level worker sessions.
    because the existing runner links packages and may change the checked-out
    revision.
 6. Verify both worktrees exist at the expected branch or commit and are clean.
-7. Report the 1-based handoff ID, rule ID, canonical validator rule slug, target
+7. Complete dependency installation before handoff:
+   - initialize the `core` submodule in every typespec-azure worktree
+   - trust the typespec-azure mise configuration and run `mise install` before
+     starting concurrent installs so tool installation cannot race
+   - run
+     `mise exec -- pnpm --filter "tsp-lintdiff-local-linter..." install --frozen-lockfile`
+     in every typespec-azure worktree so installation includes the lintdiff
+     package's workspace dependency closure but does not run unrelated
+     monorepo lifecycle setup; do not use `--ignore-scripts`
+   - if and only if pnpm reports `ERR_PNPM_OUTDATED_LOCKFILE` because the target
+     branch's lintdiff importer is missing from `pnpm-lock.yaml`, rerun the same
+     filtered install with `--no-frozen-lockfile --lockfile=false`; this
+     resolves the package manifests without modifying the target branch's
+     tracked lockfile
+   - use the same mise-managed Node.js to run `npm ci` in every specs worktree;
+     do not use `--ignore-scripts`, and confirm the pinned specs repository's
+     Node.js engine requirement is satisfied
+   - run
+     `mise exec -- pnpm -r --filter "tsp-lintdiff-local-linter..." build`
+     after the typespec-azure install; workspace packages link to source
+     checkouts whose `dist` output is not produced by installation alone
+   - verify the pnpm workspace install and the specs worktree's
+     `node_modules/.bin/tsp`, and confirm the lintdiff package build succeeds;
+     the existence of `node_modules` alone is not sufficient
+   - treat any install or verification failure as a dispatch failure and do not
+     hand off that worker for interactive development
+8. Report the 1-based handoff ID, rule ID, canonical validator rule slug, target
    branch, rule branch, specs branch when one was created, both absolute
-   worktree paths, and the exact worker-mode invocation. Do not include a
-   `code -n` wrapper around any worktree path.
+   worktree paths, completed dependency status, and the exact worker-mode
+   invocation. Do not include a `code -n` wrapper around any worktree path.
 
-Do not install dependencies, run `compare:setup`, or resolve package links in
-dispatcher mode. Those operations belong to the interactive worker and may
-modify its isolated worktrees.
+Create and verify worktree pairs serially. After `mise install` has completed,
+pipeline the repository-local dependency installs: start the typespec-azure and
+specs installs for a verified pair in parallel, then create the next pair while
+those installs run. Keep at most two pairs in the install phase at once to
+avoid excessive shared package-cache, network, and disk contention. Wait for
+all installs and verifications before reporting the handoffs.
+
+Do not run `compare:setup` in dispatcher mode. The worker performs that
+rule-specific direct link step after development begins and rebuilds the local
+linter when source changes.
 
 ## Worker setup
 
 Before starting the Development workflow, the top-level worker must prepare
 its supplied worktrees:
 
-1. Ensure the specs worktree is clean and install its existing dependencies.
+1. Ensure both worktrees are clean and verify the dispatcher-prepared
+   dependencies against their lockfiles. Confirm the typespec-azure worktree
+   has its initialized `core` submodule and usable pnpm workspace dependencies,
+   confirm the lintdiff dependency closure has built output, and confirm the
+   specs worktree has `node_modules/.bin/tsp`. Do not reinstall or rebuild
+   unchanged dependencies in worker mode. Stop and report an incomplete
+   dispatcher handoff if any verification fails.
 2. Prepare the fixture comparison harness. Either:
    - run `pnpm --dir packages/typespec-lintdiff compare:setup -- --specs-repo
 <isolated-specs-worktree>`, or
@@ -155,11 +194,9 @@ its supplied worktrees:
      `test/azure-openapi-validator` or `test/common-types`.
 3. Verify that the specs worktree's local
    `node_modules/tsp-lintdiff-local-linter` resolves directly to the supplied
-   typespec-azure worktree. `compare:setup` uses a shared global npm link, so a
-   setup in another worker can redirect this specs worktree to the wrong rule
-   build. Repair any collision with a direct per-worktree link before running
-   validation, and do not run `compare:setup` concurrently with another
-   worker.
+   typespec-azure worktree. `compare:setup` creates a direct per-worktree link
+   and does not use npm's shared global link registry, so separate specs
+   worktrees can prepare concurrently without redirecting each other.
 
 ## Development workflow
 
@@ -351,8 +388,9 @@ creating a draft PR.
 ## Guardrails
 
 - In dispatcher mode, the current session only creates and verifies branches
-  and worktrees and reports handoff commands. It must not perform setup or rule
-  development and must not launch development subagents.
+  and worktrees, completes locked dependency installs, and reports handoff
+  commands. It must not run comparison setup or perform rule development and
+  must not launch development subagents.
 - Never develop multiple rule PRs in one worktree.
 - Maintain a one-to-one mapping between each rule, rule branch, typespec-azure
   worktree, azure-rest-api-specs worktree, and top-level worker session.
@@ -377,10 +415,10 @@ creating a draft PR.
 
 Dispatcher mode returns only:
 
-- per-rule 1-based handoff ID, preparation status, target branch, rule branch,
-  and both absolute worktree paths
+- per-rule 1-based handoff ID, worktree and dependency preparation status,
+  target branch, rule branch, and both absolute worktree paths
 - the exact worker-mode invocation for every rule
-- any branch or worktree preparation failure that prevents handoff
+- any branch, worktree, or dependency preparation failure that prevents handoff
 
 Worker mode returns:
 
