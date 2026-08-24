@@ -169,6 +169,91 @@ Test that the client sends the api-version from @clientApiVersions decorator.
 The client api version enum is extended with an older version "2022-10-01" not present in the service versions.
 The client should be able to send "2022-10-01" as the api-version query parameter.
 
+### Azure_ClientGenerator_Core_ClientControl_ClientOption_get
+
+- Endpoint: `get /azure/client-generator-core/client-control/client-option`
+
+Verify that `@clientOption` accepts a model reference for an emitter-specific option.
+Input: None.
+Expected response body:
+
+```json
+{
+  "id": "client-option"
+}
+```
+
+### Azure_ClientGenerator_Core_ClientControl_DisablePageable_list
+
+- Endpoint: `get /azure/client-generator-core/client-control/disable-pageable`
+
+Verify that `@disablePageable` generates a regular method instead of a paging method.
+Input: None.
+Expected response body:
+
+```json
+{
+  "value": ["first", "second"]
+}
+```
+
+### Azure_ClientGenerator_Core_ClientControl_OperationScope_get
+
+- Endpoint: `get /azure/client-generator-core/client-control/operation-scope`
+
+Verify that `@scope` restricts an operation to the C# emitter.
+Input: None.
+Expected response body:
+
+```json
+{
+  "value": "csharp"
+}
+```
+
+### Azure_ClientGenerator_Core_ClientControl_ProtocolApi_get
+
+- Endpoint: `get /azure/client-generator-core/client-control/protocol-api`
+
+Verify that `@protocolAPI(false)` disables the C# protocol method while preserving the convenience method.
+Input: None.
+Expected response body:
+
+```json
+{
+  "value": "protocol"
+}
+```
+
+### Azure_ClientGenerator_Core_ClientControl_Scope_get
+
+- Endpoint: `get /azure/client-generator-core/client-control/scope`
+
+Verify that `@scope` restricts a model property to the C# emitter.
+Input: None.
+Expected response body:
+
+```json
+{
+  "common": "all-languages",
+  "languageSpecific": "csharp"
+}
+```
+
+### Azure_ClientGenerator_Core_ClientControl_SystemTextJson_get
+
+- Endpoint: `get /azure/client-generator-core/client-control/system-text-json`
+
+Verify that `@useSystemTextJsonConverter` marks a response model for the C# emitter.
+Input: None.
+Expected response body:
+
+```json
+{
+  "value": "system-text-json"
+}
+```
+
 ### Azure_ClientGenerator_Core_ClientDefaultValue_getHeaderParameter
 
 - Endpoint: `get /azure/client-generator-core/client-default-value/header-parameter`
@@ -1301,6 +1386,15 @@ Expected response body:
   ]
 }
 ```
+
+### Azure_ClientGenerator_Core_Override_AddParameter_add
+
+- Endpoint: `get /azure/client-generator-core/override/add`
+
+Verify that `addParameter` adds a required header to the generated client method.
+Expected header:
+trace-id: trace-id
+Expected response: 204 No Content
 
 ### Azure_ClientGenerator_Core_Override_GroupParameters_group
 

@@ -71,3 +71,19 @@ Scenarios.Azure_ClientGenerator_Core_Override_RemoveOptionalParameter_removeOpti
       kind: "MockApiDefinition",
     },
   ]);
+
+Scenarios.Azure_ClientGenerator_Core_Override_AddParameter_add = passOnSuccess([
+  {
+    uri: "/azure/client-generator-core/override/add",
+    method: "get",
+    request: {
+      headers: {
+        "trace-id": "trace-id",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+]);
