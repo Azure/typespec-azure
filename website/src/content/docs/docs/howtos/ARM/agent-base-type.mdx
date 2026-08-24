@@ -23,7 +23,7 @@ using Azure.ResourceManager.BaseTypes.Agents;
 
 ## Deployment models: Appliance vs. Platform
 
-Every agent shape comes in two variants that differ only in property visibility:
+Every agent shape comes in two variants with different property visibility and ownership:
 
 - **Appliance** — the service owns and reports the agent configuration. Definition and agent
   properties are **read-only**, including the `definition` container itself.
@@ -152,14 +152,20 @@ interface ApplianceConversations {
 ## Applying `@azureBaseType` directly
 
 The `Agent` template applies `@azureBaseType` for you. If you need to declare base-type conformance
-on a properties model directly, apply the decorator with a `BaseTypeInfo` value. It may be applied
+on a resource model directly, apply the decorator with a `BaseTypeInfo` value. It may be applied
 multiple times to declare conformance to multiple base types; duplicate entries are ignored:
 
 ```typespec
-@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
-model MyAgentProperties {
-  ...AgentPropertiesPlatform<MyDefinition>;
+model MyDefinition is AgentDefinitionPlatform;
+
+model MyAgentProperties is AgentPropertiesPlatform<MyDefinition> {
   ...DefaultProvisioningStateProperty;
+}
+
+#suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "Experimental BaseTypes"
+@azureBaseType(#{ baseType: BaseType.Agent, version: "2026-04-01" })
+model MyAgent is TrackedResource<MyAgentProperties> {
+  ...ResourceNameParameter<MyAgent>;
 }
 ```
 

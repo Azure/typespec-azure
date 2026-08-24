@@ -1,0 +1,62 @@
+---
+title: Relationship base type
+---
+
+# Relationship base type
+
+Use the experimental `Relationship` base type to represent a resource that describes a relationship between a source resource and a target resource. A relationship is an extension resource under the source. Its properties identify both resources and their tenants. The template applies the Relationship base type contract version `2026-04-01`.
+
+Import the Relationship models along with the standard ARM models:
+
+```typespec
+using Azure.ResourceManager;
+using Azure.ResourceManager.BaseTypes.Relationships;
+```
+
+## Define the relationship resource
+
+Extend `RelationshipProperties` with service-specific properties, then pass that model to `Relationship`. The base properties include `baseTypes`, source and target resource and tenant IDs, and the provisioning state.
+
+```typespec
+model DependencyOfProperties is RelationshipProperties {
+  /** Service-specific description of this dependency. */
+  description?: string;
+}
+
+#suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "Experimental BaseTypes"
+model DependencyOf is Relationship<DependencyOfProperties> {
+  ...ResourceNameParameter<
+    Resource = DependencyOf,
+    KeyName = "relationshipName",
+    SegmentName = "dependencyOf",
+    NamePattern = "^[a-zA-Z0-9_.-]{1,64}$"
+  >;
+}
+```
+
+`RelationshipProperties` uses the standard `ResourceProvisioningState` by default. If the service needs additional long-running-operation states, define an `@Azure.Core.lroStatus` union and pass it as the `ProvisioningState` template argument.
+
+## Define the operations
+
+Relationship operations are scoped to the source extension resource. Use the standard extension operation templates so routing, status codes, and long-running-operation metadata conform to the base type.
+
+```typespec
+interface DependencyOfOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+  get is Extension.Read<Scope, DependencyOf>;
+  create is Extension.CreateOrReplaceAsync<Scope, DependencyOf>;
+  update is Extension.CustomPatchAsync<
+    Scope,
+    DependencyOf,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<DependencyOf, DependencyOfProperties>
+  >;
+  delete is Extension.DeleteWithoutOkAsync<Scope, DependencyOf>;
+  list is Extension.ListByTarget<Scope, DependencyOf>;
+}
+
+@armResourceOperations
+interface DependencyOfRelationships extends DependencyOfOps<Extension.ScopeParameter> {}
+```
+
+This operation set provides read, create-or-replace, patch, delete, and list-by-target behavior. `Extension.ScopeParameter` allows the relationship to be placed under any supported source resource scope.
+
+For a complete service definition with a custom provisioning state, metadata, and origin information, see the [canonical Relationship sample](https://github.com/Azure/typespec-azure/tree/main/packages/samples/specs/resource-manager/resource-types/relationship).
