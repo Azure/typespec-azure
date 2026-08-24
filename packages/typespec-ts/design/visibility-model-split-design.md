@@ -56,7 +56,7 @@ Create a visibility-suffixed model for every model reachable from a request body
 - Changes existing request type names even when no property is removed.
 - Has the highest measured generated-name collision count.
 
-### 3.2 Proposal 2 — Split whenever the write graph differs
+### 3.2 Proposal 2 — Split whenever the write graph differs (Preferred)
 
 Create a projected model when any property in the model or its nested models is not included in the operation's request payload.
 
@@ -70,7 +70,7 @@ Once a split is required, the projected graph contains the complete write view: 
 
 **Cons**
 
-- Removes optional response-only properties from existing request types, which can cause source breaks.
+- Removes optional response-only properties from request types. This can break objects written directly in an operation call when they include those properties. It can also break code that derives the operation's declared input type, for example with `Parameters<typeof client.createWidget>[0]`.
 - A future API version can change an operation's input from `Widget` to `WidgetCreate`, or back, when its request and response shapes become different or identical.
 
 ### 3.3 Proposal 3 — Split only for required read-only properties
@@ -82,26 +82,51 @@ Once a split is required, the projected graph still contains the complete write 
 **Pros**
 
 - Removes required response-only properties from request types while preserving the base model for optional-only differences.
-- Creates the fewest projected models and changes the fewest current operation inputs in the repository-wide investigation.
+- Creates the fewest projected models and changes the fewest current operation signatures in the repository-wide investigation.
 
 **Cons**
 
 - Request models with only optional response-only properties still expose properties that are not accepted in the write payload.
 - Adding or removing an excluded required property, or changing an excluded property between optional and required, can switch an operation between a base and projected model name.
 
-### 3.4 Investigation comparison
+### 3.4 Proposal 4 — Add a temporary deprecated overload
 
-The repository-wide investigation measures all three proposals across **185** multi-version TypeSpec projects and **513** adjacent version upgrades. A current breaking change is counted when an operation input changes from its current base model to a projected model.
+Use Proposal 2 to generate the complete write model. Keep the old base-model signature as a deprecated overload, add the write-model signature as the canonical overload, and use a union only in the implementation:
 
-| Concern | Proposal 1: always split | Proposal 2: any write difference | Proposal 3: required read-only |
-| --- | --- | --- | --- |
-| Projected models in the latest versions of 185 projects | **10,959** | **3,735** | **1,286** |
-| Base/projection transitions across 513 version upgrades | **0** because projected models are always emitted  | **15** transitions across **12** upgrades | **1** transition across **1** upgrade |
-| Changed operation inputs in the latest versions (breaking change) | **2,831** across **179** projects | **1,516** across **151** projects | **1,227** across **142** projects |
-| Generated-name collision rows | **90** | **11** | **6** |
+```ts
+/** @deprecated Use WidgetCreate for request bodies. */
+createWidget(resource: Widget): Promise<Widget>;
+createWidget(resource: WidgetCreate): Promise<Widget>;
+createWidget(resource: Widget | WidgetCreate): Promise<Widget> {
+  // The serializer uses the WidgetCreate write shape.
+}
+```
+
+The generated declaration exposes the two overloads; the union is an implementation detail. The deprecated overload is transitional and can be removed at a future major-version boundary.
+
+**Pros**
+
+- Existing calls continue to compile and receive a deprecation warning that directs users to `WidgetCreate`.
+- New code uses an accurate request model, and the old input pattern has a clear removal path.
+
+**Cons**
+
+- Adds a deprecated overload to every affected operation and temporarily increases the public API surface.
+- Increases emitter maintenance because it requires temporary overload-generation logic that must be removed with the deprecated signatures in the future.
+
+### 3.5 Investigation comparison
+
+The repository-wide investigation measures the three projection triggers across **185** multi-version TypeSpec projects and **513** adjacent version upgrades. Proposal 4 uses Proposal 2's projection trigger, so its model and transition counts are the same. The operation count measures changed public signatures, not confirmed downstream source breaks.
+
+| Concern | Proposal 1: always split | Proposal 2: any write difference | Proposal 3: required read-only | Proposal 4: deprecated overload |
+| --- | --- | --- | --- | --- |
+| Projected models in the latest versions of 185 projects | **10,959** | **3,735** | **1,286** | **3,735** |
+| Base/projection signature transitions across 513 version upgrades | **0** because projected models are always emitted | **15** transitions across **12** upgrades | **1** transition across **1** upgrade | **15** base/overload transitions across **12** upgrades |
+| Changed operation signatures in the latest versions | **2,831** across **179** projects | **1,516** across **151** projects | **1,227** across **142** projects | **1,516** overload sets across **151** projects |
+| Generated-name collision rows | **90** | **11** | **6** | **11** |
 
 
-Proposal 3 still changes **1,227** operation inputs. This is because a required read-only property can be inside an optional child model:
+Proposal 3 still changes **1,227** operation signatures. This is because a required read-only property can be inside an optional child model:
 
 ```typespec
 model Parent {
@@ -116,11 +141,11 @@ model Child {
 
 A sample can omit `child`, so this case may not cause a sample failure. However, callers that provide `child` should not be required to set `id`. The emitter therefore creates `ChildCreate` without `id` and `ParentCreate` that references `ChildCreate`.
 
-This parent propagation explains why Proposal 3 still produces **1,286** projected models. The table measures changed public input types, not sample failures or downstream source-code changes. Existing JavaScript customizations reduce only the operations they explicitly replace.
+This parent propagation explains why Proposal 3 still produces **1,286** projected models. Existing JavaScript customizations reduce only the operations they explicitly replace.
 
 ## 4. Implementation
 
-The implementation is shared by all three proposals. The prototype uses Proposal 2; Proposals 1 and 3 require only a different seed condition in the mark phase.
+The projection engine is shared by all four proposals. The prototype uses Proposal 2; Proposals 1 and 3 require only a different seed condition in the mark phase. Proposal 4 uses Proposal 2's projected graph and adds a public-signature layer that emits the deprecated base-model overload and the canonical write-model overload.
 
 ### 4.1 Projection engine
 
@@ -203,6 +228,7 @@ Widget                      Detail                    Meta
 - **Proposal 1:** seed every request-reachable node.
 - **Proposal 2:** seed every node whose `ownPropertyDropped` is true.
 - **Proposal 3:** seed every node that drops at least one required own property.
+- **Proposal 4:** use the same seeds as Proposal 2.
 
 The graph preserves projected references through all parent models. For Proposals 2 and 3, a parent needs a clone when it can reach a seeded child; Proposal 1 has already seeded every request-reachable parent. The transitive closure needs no special-casing for cycles, mutual recursion, or discriminated trees.
 
@@ -281,67 +307,62 @@ Measured on two large ARM specs by compiling real `azure-rest-api-specs` with a 
 
 ## 7. Impact on the existing SDKs
 
-Enabling `experimental-split-models-by-visibility` does **not** change the service's HTTP contract, but it can change the public TypeScript API of an existing SDK. Request types become a more accurate representation of the write payload; consumers that import, annotate, or construct the previous shared models may require source changes.
+Enabling `experimental-split-models-by-visibility` does **not** change the service's HTTP contract, but it changes the public TypeScript signature of affected operations. Request types become a more accurate representation of the write payload.
 
-Section 3.4 compares the model growth, version stability, and current operation-input changes for all three proposals. The following categories explain how those changes affect SDK users.
-
-### 7.1 Breaking-change categories
-
-#### 1. Request model names can change
-
-When a write view differs from the read view, an operation parameter changes from the shared model to a suffixed request model:
+Changing `Widget` to `WidgetCreate` does not normally break a call that passes a variable typed as `Widget`:
 
 ```ts
-// Before
-resource: Relationship
-
-// After
-resource: RelationshipCreateOrUpdate
+const widget: Widget = response;
+await client.createWidget(widget); // Still compiles with a WidgetCreate parameter.
 ```
 
-This can break consumers that import or explicitly annotate the previous parameter type. Common suffixes are `Create`, `Update`, and `CreateOrUpdate`.
+TypeScript uses structural typing. Because `WidgetCreate` is produced by removing response-only properties from `Widget`, a `Widget` value still contains everything required by `WidgetCreate`. The same rule applies recursively to projected child models. This means that importing a response model, annotating a variable with it, or reusing a response object as a request does not by itself cause a source break. Proposal 4 keeps the old signature temporarily and marks it deprecated, while Proposals 1–3 receive call compatibility from structural typing without a deprecation warning.
 
-With Proposals 2 and 3, model names can also change across API versions. For Proposal 2, adding any read-only property can change `Widget` to `WidgetCreate`; for Proposal 3, the transition occurs when an excluded property becomes required. Removing the last triggering difference can change the request type back to `Widget`.
+Section 3.5 therefore counts changed operation signatures rather than confirmed downstream breaks. The following cases describe where user code can actually break.
 
-#### 2. Optional read-only properties disappear from request types
+### 7.1 Source-breaking cases
 
-Most existing JavaScript SDKs generate a single model for both reads and writes. Properties returned only by the service are therefore commonly included in the write model as optional and `readonly`: consumers do not need to set them, but the properties remain visible on the TypeScript type. Examples include provisioning state, generated IDs and URLs, status, timestamps, identity `principalId`/`tenantId`, and private-endpoint state.
+#### 1. Code derives the exact operation parameter type
 
-Visibility splitting removes these properties entirely from the new request model. Although consumers normally do not set them, this can still require source changes:
+Utilities and wrappers that derive the input type observe the new public signature:
 
-1. **Reading a response-only property through a request-model variable no longer compiles.**
+```ts
+type CreateInput = Parameters<typeof client.createWidget>[0];
 
-   ```ts
-   // Before: Relationship was used for both requests and responses.
-   function logState(model: Relationship) {
-     console.log(model.properties?.provisioningState);
-   }
+// Before: CreateInput is Widget.
+// Proposals 1–3: CreateInput is WidgetCreate.
+// Proposal 4: CreateInput is WidgetCreate because it is the last overload.
+```
 
-   // After: the operation accepts RelationshipCreateOrUpdate, which does not
-   // contain provisioningState.
-   function logState(model: RelationshipCreateOrUpdate) {
-     console.log(model.properties?.provisioningState); // TypeScript error
-   }
-   ```
+Code that reads a response-only property through the derived type then fails:
 
-2. **Object literals that explicitly include a removed property no longer compile.**
+```ts
+function logInput(input: CreateInput) {
+  console.log(input.provisioningState);
+  // Error after the change: provisioningState is not available on WidgetCreate.
+}
+```
 
-   ```ts
-   const request: RelationshipCreateOrUpdate = {
-     properties: {
-       provisioningState: "Succeeded", // TypeScript error: unknown property
-     },
-   };
-   ```
+#### 2. An object written directly in the operation call includes response-only properties
 
-   Consumers should remove the property because the service owns its value.
+TypeScript checks objects written directly in an operation call more strictly for properties that are not part of the parameter type:
 
-Response models retain the read-only properties; only the request-side model graph is narrowed.
+```ts
+await client.createWidget({
+  displayName: "example",
+  provisioningState: "Succeeded",
+  // Error with a WidgetCreate parameter: provisioningState is not a request property.
+});
+```
 
-#### 3. Public exports and API-review baselines grow
+### 7.2 Other public API changes
 
-Each non-collapsed projection introduces another public model and may introduce projected models for multiple levels of the object graph. Package entry points, API-review files, documentation, and generated serializers are updated accordingly. This is primarily additive, but removing or replacing hand-written workaround models can also rename or remove previously exported request types.
+Each non-collapsed projection introduces another public model and may introduce projected models for multiple levels of the object graph. Package entry points, API-review files, documentation, and generated serializers grow accordingly. Removing or replacing hand-written workaround models can also rename or remove previously exported request types.
 
-### 7.2 Adoption implications
+With Proposals 2 and 3, signatures can change again across API versions. For Proposal 2, adding any response-only property can change `Widget` to `WidgetCreate`; for Proposal 3, the transition occurs when an excluded property becomes required. Removing the last triggering difference can change the request type back to `Widget`. Proposal 4 has the same transition points as Proposal 2, but adds or removes the temporary overload set.
 
-The flag should not be enabled silently for an already released SDK. New SDKs can adopt the selected proposal from their first release; existing SDKs should adopt it as an intentional compatibility change, typically at a major-version boundary.
+### 7.3 Adoption implications
+
+The flag should not be enabled silently for an already released SDK. Most ordinary calls should continue to compile, but API baselines and some exact-signature usage will change. New SDKs can adopt the selected proposal from their first release; existing SDKs should adopt it as an intentional compatibility change under the repository's versioning policy.
+
+Proposal 4 provides a migration period: existing calls resolve to a deprecated overload, while new code uses the write-model overload. It does not preserve derived parameter types and requires a later breaking change when the deprecated overload is removed. Its value therefore depends on whether downstream validation finds enough source impact to justify the temporary API growth.
