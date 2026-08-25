@@ -79,7 +79,8 @@ needs special investigation:
    report that promotion is blocked by a source-rule gap; do not repair the
    lintdiff source as part of promotion.
 9. Validate in this order: one-time dependency-closure build if needed, focused
-   rule test, affected package build/lint, docs regeneration, rulesets
+   rule test, affected package build/lint, docs regeneration, format newly
+   added or edited rule source/docs/tests before broad validation, rulesets
    build/test, affected package test. Escalate to broader validation only when
    the touched surface or a failure requires it.
 10. Run `pnpm validate:pr` with a bounded wait. If it makes no progress for
