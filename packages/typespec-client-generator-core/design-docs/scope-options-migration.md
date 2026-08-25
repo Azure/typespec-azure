@@ -30,11 +30,11 @@ settings without introducing more positional parameters or a breaking signature 
   (since new fields on the extended model should remain optional).
 - `@client` additionally accepts `scope` directly on its existing `ClientOptions` bag. The legacy
   third positional `scope` argument is still accepted. If both are specified with **conflicting**
-  values, TCGC reports the `conflicting-scope` diagnostic and does not apply the decorator.
-- Scope normalization (turning either shape into the internal string representation) and basic
-  validation (rejecting empty/malformed scope strings via the `invalid-scope` diagnostic) are
-  centralized in `internal-utils.ts` (`normalizeScope`, `isValidScopeString`), so decorator
-  implementations do not need to special-case both forms themselves.
+  values, TCGC reports the `conflicting-scope` warning diagnostic, uses the options bag value, and
+  ignores the legacy positional argument.
+- Scope normalization (turning either shape into the internal string representation) is
+  centralized in `internal-utils.ts` (`normalizeScope`), so decorator implementations do not need
+  to special-case both forms themselves.
 
 ## Compatibility guarantees
 

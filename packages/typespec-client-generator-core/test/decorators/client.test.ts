@@ -215,8 +215,8 @@ describe("@client scope in ClientOptions", () => {
     strictEqual(listClients(csharpContext).length, 1);
   });
 
-  it("reports a diagnostic when ClientOptions.scope conflicts with the legacy positional argument", async () => {
-    const diagnostics = await SimpleTester.diagnose(t.code`
+  it("reports a warning and prefers the options bag scope when ClientOptions.scope conflicts with the legacy positional argument", async () => {
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
         @client({service: MyClient, scope: "csharp"}, "python")
         @service
         namespace ${t.namespace("MyClient")};
@@ -224,7 +224,18 @@ describe("@client scope in ClientOptions", () => {
 
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/conflicting-scope",
+      severity: "warning",
     });
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(listClients(pythonContext).length, 0);
   });
 });
 

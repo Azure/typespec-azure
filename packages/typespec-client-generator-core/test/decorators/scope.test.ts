@@ -93,39 +93,6 @@ describe("Azure.ClientGenerator.Core.Scope alias", () => {
     strictEqual(getAccess(contextPython, func), "internal");
   });
 
-  it("reports a diagnostic for an empty grouped negation scope", async () => {
-    const diagnostics = await SimpleTester.diagnose(t.code`
-      @access(Access.internal, "!()")
-      op func(): void;
-    `);
-
-    expectDiagnostics(diagnostics, {
-      code: "@azure-tools/typespec-client-generator-core/invalid-scope",
-    });
-  });
-
-  it("reports a diagnostic for an empty entry in a comma-separated scope list", async () => {
-    const diagnostics = await SimpleTester.diagnose(t.code`
-      @access(Access.internal, "csharp,")
-      op func(): void;
-    `);
-
-    expectDiagnostics(diagnostics, {
-      code: "@azure-tools/typespec-client-generator-core/invalid-scope",
-    });
-  });
-
-  it("reports a diagnostic for an empty scope string provided through the ScopeOptions bag", async () => {
-    const diagnostics = await SimpleTester.diagnose(t.code`
-      @access(Access.internal, #{ scope: "!()" })
-      op func(): void;
-    `);
-
-    expectDiagnostics(diagnostics, {
-      code: "@azure-tools/typespec-client-generator-core/invalid-scope",
-    });
-  });
-
   it("treats the legacy string scope and the equivalent ScopeOptions bag as equivalent for @usage", async () => {
     const { program, LegacyModel, OptionsModel } = await SimpleTester.compile(t.code`
       @usage(Usage.input, "csharp,python")

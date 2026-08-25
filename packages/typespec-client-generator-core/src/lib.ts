@@ -554,16 +554,9 @@ export const $lib = createTypeSpecLibrary({
     },
     "conflicting-scope": {
       ...doc("conflicting-scope"),
-      severity: "error",
+      severity: "warning",
       messages: {
-        default: paramMessage`@${"decoratorName"} received conflicting scope values: the options bag specifies "${"optionsScope"}" while the legacy positional argument specifies "${"legacyScope"}". Use a single, consistent scope value.`,
-      },
-    },
-    "invalid-scope": {
-      ...doc("invalid-scope"),
-      severity: "error",
-      messages: {
-        default: paramMessage`@${"decoratorName"} received an invalid scope value: "${"scope"}". Scope must be a non-empty language identifier, a comma-separated list (e.g. "python, java"), or a negation (e.g. "!csharp" or "!(java, python)").`,
+        default: paramMessage`@${"decoratorName"} received conflicting scope values: the options bag specifies "${"optionsScope"}" while the legacy positional argument specifies "${"legacyScope"}". The options bag value will be used; the legacy positional argument is ignored.`,
       },
     },
     "unnecessary-emitter-option": {

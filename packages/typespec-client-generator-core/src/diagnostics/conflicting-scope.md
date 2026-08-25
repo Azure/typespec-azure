@@ -4,8 +4,8 @@ disagree.
 
 ## Impact
 
-- **Area:** Scoped decorator resolution. TCGC cannot determine which scope value should take
-  effect, so the decorator is not applied at all until the conflict is resolved.
+- **Area:** Scoped decorator resolution. TCGC uses the value specified in the options bag and
+  ignores the legacy positional argument.
 - **Not affected:** Decorators that only specify a scope through one of the two mechanisms are
   unaffected.
 
@@ -27,7 +27,7 @@ interface MyInterface {}
 TCGC reports:
 
 ```text
-@client received conflicting scope values: the options bag specifies "csharp" while the legacy positional argument specifies "python". Use a single, consistent scope value.
+@client received conflicting scope values: the options bag specifies "csharp" while the legacy positional argument specifies "python". The options bag value will be used; the legacy positional argument is ignored.
 ```
 
 ## ✅ How to Fix

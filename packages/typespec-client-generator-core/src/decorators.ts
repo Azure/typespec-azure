@@ -87,7 +87,6 @@ import {
   getScopedDecoratorData,
   isSameAuth,
   isSameServers,
-  isValidScopeString,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
@@ -123,18 +122,6 @@ function setScopedDecoratorData(
         .stateMap(key)
         .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
     }
-    return;
-  }
-
-  if (!isValidScopeString(scope)) {
-    reportDiagnostic(context.program, {
-      code: "invalid-scope",
-      format: {
-        decoratorName: decorator.name.replace(/^\$/, ""),
-        scope,
-      },
-      target,
-    });
     return;
   }
 
@@ -204,11 +191,10 @@ export const $client: ClientDecorator = (
       },
       target: context.decoratorTarget,
     });
-    return;
   }
-  // Prefer the legacy positional argument when both agree or only one is set, since
-  // setScopedDecoratorData below already knows how to normalize either shape.
-  const effectiveScope = scope ?? optionsScope;
+  // Prefer the options bag scope when both are set (ignoring the legacy positional argument in
+  // that case), otherwise use whichever one was set.
+  const effectiveScope = optionsScope ?? scope;
 
   if (serviceConfig?.kind === "Namespace") {
     // Explicit single service
@@ -1441,17 +1427,6 @@ export const $scope: ScopeDecorator = (
   scopeArg?: LanguageScopes | ScopeOptions,
 ) => {
   const normalizedScope = normalizeScope(scopeArg);
-  if (normalizedScope !== undefined && !isValidScopeString(normalizedScope)) {
-    reportDiagnostic(context.program, {
-      code: "invalid-scope",
-      format: {
-        decoratorName: "scope",
-        scope: normalizedScope,
-      },
-      target: entity,
-    });
-    return;
-  }
   const [negationScopes, scopes] = parseScopes(normalizedScope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // for negation scope, override the previous value
