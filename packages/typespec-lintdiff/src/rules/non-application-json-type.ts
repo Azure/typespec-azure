@@ -1,8 +1,8 @@
-import { createRule } from "@typespec/compiler";
-import type { ModelProperty, Operation } from "@typespec/compiler";
-import { getHttpOperation } from "@typespec/http";
-import type { HttpPayloadBody } from "@typespec/http";
 import { isArmProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
+import type { Interface, ModelProperty, Operation, Program } from "@typespec/compiler";
+import { createRule, getLocationContext } from "@typespec/compiler";
+import type { HttpPayloadBody } from "@typespec/http";
+import { getHttpOperation } from "@typespec/http";
 
 export const nonApplicationJsonTypeRule = createRule({
   name: "non-application-json-type",
@@ -49,22 +49,34 @@ function reportInvalidBody(
     }
 
     context.reportDiagnostic({
-      target: getDiagnosticTarget(operation, body),
+      target: getDiagnosticTarget(context.program, operation, body),
     });
   }
 }
 
 function getDiagnosticTarget(
+  program: Program,
   operation: Operation,
   body: HttpPayloadBody,
-): ModelProperty | Operation {
-  if (body.contentTypeProperty !== undefined) {
+): Interface | ModelProperty | Operation {
+  if (
+    body.contentTypeProperty !== undefined &&
+    getLocationContext(program, body.contentTypeProperty).type === "project"
+  ) {
     return body.contentTypeProperty;
   }
 
-  if ("property" in body && body.property !== undefined) {
+  if (
+    "property" in body &&
+    body.property !== undefined &&
+    getLocationContext(program, body.property).type === "project"
+  ) {
     return body.property;
   }
 
-  return operation;
+  if (getLocationContext(program, operation).type === "project") {
+    return operation;
+  }
+
+  return operation.interface ?? operation;
 }
