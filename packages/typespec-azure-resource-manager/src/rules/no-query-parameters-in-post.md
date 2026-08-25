@@ -15,7 +15,7 @@ The `api-version` query parameter is allowed.
 
 ## Impact
 
-- **Area:** API
+- **Area:** API, SDK
 
 Extra query parameters on ARM POST operations violate the ARM POST request
 contract and can lead to inconsistent generated SDK method signatures.
