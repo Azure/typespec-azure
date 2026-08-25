@@ -135,16 +135,14 @@ separate VS Code windows and run independent top-level worker sessions.
    - initialize the `core` submodule in every typespec-azure worktree
    - trust the typespec-azure mise configuration and run `mise install` before
      starting concurrent installs so tool installation cannot race
-   - run
-     `mise exec -- pnpm --filter "tsp-lintdiff-local-linter..." install --frozen-lockfile`
-     in every typespec-azure worktree so installation includes the lintdiff
-     package's workspace dependency closure but does not run unrelated
-     monorepo lifecycle setup; do not use `--ignore-scripts`
+   - run `mise exec -- pnpm install --frozen-lockfile` in every typespec-azure
+     worktree
    - if and only if pnpm reports `ERR_PNPM_OUTDATED_LOCKFILE` because the target
-     branch's lintdiff importer is missing from `pnpm-lock.yaml`, rerun the same
-     filtered install with `--no-frozen-lockfile --lockfile=false`; this
-     resolves the package manifests without modifying the target branch's
-     tracked lockfile
+     branch's lintdiff importer is missing from `pnpm-lock.yaml`, run
+     `mise exec -- pnpm install --no-frozen-lockfile --lockfile=false --ignore-scripts`;
+     this creates all workspace links needed by the dependency build without
+     modifying the tracked lockfile or running unrelated monorepo lifecycle
+     setup such as the Python package environment
    - use the same mise-managed Node.js to run `npm ci` in every specs worktree;
      do not use `--ignore-scripts`, and confirm the pinned specs repository's
      Node.js engine requirement is satisfied
