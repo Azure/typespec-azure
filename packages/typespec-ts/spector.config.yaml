@@ -33,6 +33,9 @@ specs:
   type/model/inheritance/enum-discriminator: true
   type/model/inheritance/single-discriminator: true
   encode/bytes: true
+  # Disabled: @encode(string) booleans are serialized as JSON booleans instead of wire strings.
+  # Tracking: https://github.com/Azure/typespec-azure/issues/5296
+  encode/boolean: false
   encode/duration: true
   encode/datetime: true
   parameters/spread: true
@@ -42,6 +45,7 @@ specs:
   server/path/multiple: true
   authentication/oauth2: true
   authentication/union: true
+  authentication/noauth/union: true
   special-headers/repeatability: true
   azure/core/traits: true
   type/model/empty: true
@@ -50,8 +54,10 @@ specs:
   type/model/inheritance/recursive: true
   type/union: true
   payload/media-type: true
+  payload/json-merge-patch: true
   payload/xml: true
   payload/head: true
+  response/status-code-range: true
   server/versions/versioned: true
   server/versions/not-versioned: true
   type/scalar: true
@@ -84,6 +90,7 @@ specs:
     - { options: { outputPath: client/namespace } }
     - { options: { outputPath: client/enableModelNamespace } }
   parameters/path: true
+  parameters/body-root: true
   azure/encode/duration: true
   azure/client-generator-core/client-initialization/default: true
   azure/client-generator-core/client-initialization/individually: true
@@ -92,6 +99,7 @@ specs:
   azure/client-generator-core/api-version/header: true
   azure/client-generator-core/api-version/path: true
   azure/client-generator-core/api-version/query: true
+  azure/client-generator-core/api-version/client-api-versions: true
   azure/resource-manager/large-header: true
   azure/client-generator-core/deserialize-empty-string-as-null: true
   azure/resource-manager/operation-templates: true
@@ -103,6 +111,8 @@ specs:
   azure/client-generator-core/next-link-verb: true
   special-headers/conditional-request: true
   azure/resource-manager/method-subscription-id: true
+  azure/resource-manager/management-group: true
+  azure/resource-manager/service-group: true
   azure/client-generator-core/client-location/move-to-existing-sub-client: true
   azure/client-generator-core/client-location/move-to-new-sub-client: true
   azure/client-generator-core/client-location/move-to-root-client: true
@@ -115,6 +125,13 @@ specs:
   azure/client-generator-core/client-doc: true
   azure/client-generator-core/response-as-bool: true
   documentation: true
+
+  # Disabled: operation-specific visibility is not applied to generated serializers.
+  type/model/visibility: false
+  # Disabled: Http.File generates unresolved __PLACEHOLDER types and identifiers.
+  type/file: false
+  # Disabled: exact model and property names are normalized by the emitter.
+  azure/client-generator-core/exact-name: false
 
   # Disabled: needs tcgc upgrade https://github.com/Azure/typespec-azure/pull/3997
   client/structure/renamed-operation: false
