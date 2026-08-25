@@ -117,7 +117,11 @@ function collectViolations(
   const discriminator = getInheritedDiscriminator(program, model);
   if (
     discriminator !== undefined &&
-    getModelProperty(model, discriminator.propertyName) === undefined
+    getModelProperty(model, discriminator.propertyName) === undefined &&
+    !isTopLevelIdentityProperty(
+      [...path, discriminator.propertyName],
+      discriminator.propertyName,
+    )
   ) {
     violations.push({
       target: getLocationContext(program, model).type === "project" ? model : diagnosticTarget,

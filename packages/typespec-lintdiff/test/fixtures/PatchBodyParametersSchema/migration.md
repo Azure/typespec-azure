@@ -11,8 +11,8 @@ The final full corpus run reports all 93 validator projects in the TypeSpec set,
 ## Evidence provenance
 
 - Validator report: `packages/typespec-lintdiff/specs/validator-results.json`, generated from azure-rest-api-specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` by the dataset recorded in `packages/typespec-lintdiff/specs/_meta.json`.
-- TypeSpec report: local full run generated at `2026-08-24T11:35:06.664Z` from the same specs commit and this branch's review fixes documented below. Generated `packages/typespec-lintdiff/specs` artifacts were used as validation evidence only and intentionally excluded from this rule PR.
-- Population: 468 source projects, 462 successful projects, and 6 compile failures. The full run took 3,560,089 ms.
+- TypeSpec report: local full run generated at `2026-08-25T04:55:45.589Z` from the same specs commit and this branch's review fixes documented below. Generated `packages/typespec-lintdiff/specs` artifacts were used as validation evidence only and intentionally excluded from this rule PR.
+- Population: 468 source projects, 462 successful projects, and 6 compile failures. The full run took 1,267,110 ms.
 - Raw/projected totals: 51,137 raw TypeSpec diagnostics and 51,000 selected-version projected diagnostics across all rules.
 - Rule totals: 703 raw emitted Swagger diagnostics and 872 projected TypeSpec diagnostics.
 - Deduplicated totals: not defined for this rule. `normalizedValidatorDiagnosticCount` and `normalizedTypeSpecDiagnosticCount` are `null` because emitted occurrences and semantic source targets do not have a proven one-to-one identity. No inferred deduplicated count is presented as evidence.
@@ -39,13 +39,14 @@ The final full corpus run reports all 93 validator projects in the TypeSpec set,
 - Fixtures:
   - required, create-only, discriminator, nullable-union, nullable-body, imported-model, and emitted top-level `identity` behavior remain covered;
   - `multi-model-union-compliant` covers unsupported multi-model unions that Autorest emits without traversable PATCH schema properties;
+  - `synthesized-identity-discriminator-compliant` covers a top-level `identity` discriminator synthesized by Autorest and skipped by the Swagger rule;
   - `implicit-optional-patch-compliant` covers required and create-only source properties that are optional or omitted in a transformed PATCH schema;
   - `never-property-compliant` covers a required source property omitted because its type is `never`;
   - `default-patch-property` includes `false`, `0`, and `""` defaults to prove those valid TypeSpec findings are retained.
 
 ## Final corpus
 
-The final full run used specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` and was generated on `2026-08-24T11:35:06.664Z`.
+The final full run used specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` and was generated on `2026-08-25T04:55:45.589Z`.
 
 | Population                                |  Count |
 | ----------------------------------------- | -----: |
@@ -297,7 +298,7 @@ No `PatchBodyParametersSchema` validator-only project is hidden by these failure
 
 ## Fixture evidence
 
-The repository's fixture harness validates twelve cases:
+The repository's fixture harness validates thirteen cases:
 
 - `required-patch-property`: Swagger and TypeSpec report the required property.
 - `nullable-body-required-property`: Swagger and TypeSpec report a required property in a nullable top-level PATCH body.
@@ -306,6 +307,7 @@ The repository's fixture harness validates twelve cases:
 - `nullable-model-required-property`: Swagger and TypeSpec report a required property inside a nullable model.
 - `discriminator-required-patch-property`: Swagger and TypeSpec report both an authored optional discriminator and a discriminator synthesized by Autorest as required.
 - `top-level-identity-compliant`: both sides are clean for the skipped top-level `identity` shape.
+- `synthesized-identity-discriminator-compliant`: both sides are clean when Autorest synthesizes a top-level `identity` discriminator that the Swagger rule skips.
 - `encoded-identity-compliant`: both sides are clean when an authored property emits as top-level JSON `identity`.
 - `encoded-non-identity-violating`: Swagger and TypeSpec both check an authored `identity` property that emits as a non-identity JSON property.
 - `implicit-optional-patch-compliant`: both sides are clean when the transformed PATCH schema makes required source properties optional and omits a create-only source property.
