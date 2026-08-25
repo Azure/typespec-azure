@@ -74,6 +74,8 @@ import type {
   ApiVersionServiceMap,
   DecoratorInfo,
   ExternalTypeInfo,
+  LanguageScopes,
+  ScopeOptions,
   SdkBuiltInType,
   SdkClient,
   SdkClientType,
@@ -183,6 +185,22 @@ export function getScopedDecoratorData(
     }
   }
   return retval[AllScopes]; // in this case it applies to all languages
+}
+
+/**
+ * Centralizes normalization of the `scope` argument accepted by scoped TCGC decorators. Decorator
+ * implementations should call this instead of independently handling both the legacy plain-string
+ * form and the typed `ScopeOptions` bag form, so any future evolution of the accepted shapes only
+ * needs to be implemented in one place.
+ *
+ * @param scope Either the legacy plain-string scope value, or a typed options bag (whose own
+ * decorator-specific model may extend `ScopeOptions`) containing a `scope` property.
+ * @returns The plain-string scope value, or `undefined` if none was specified.
+ */
+export function normalizeScope(scope?: LanguageScopes | ScopeOptions): string | undefined {
+  if (scope === undefined) return undefined;
+  if (typeof scope === "string") return scope;
+  return scope.scope;
 }
 
 /**

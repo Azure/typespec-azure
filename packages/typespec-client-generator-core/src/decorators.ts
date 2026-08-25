@@ -70,6 +70,7 @@ import {
   type ClientInitializationOptions,
   type ExternalTypeInfo,
   type LanguageScopes,
+  type ScopeOptions,
   type SdkClient,
   type TCGCContext,
   UsageFlags,
@@ -89,6 +90,7 @@ import {
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
+  normalizeScope,
   omitOperation,
   overrideKey,
   parseScopes,
@@ -106,8 +108,9 @@ function setScopedDecoratorData(
   key: symbol,
   target: Type,
   value: unknown,
-  scope?: LanguageScopes,
+  scopeArg?: LanguageScopes | ScopeOptions,
 ) {
+  const scope = normalizeScope(scopeArg);
   const targetEntry = context.program.stateMap(key).get(target);
   // if no scope specified, then set with the new value
   if (!scope) {
@@ -155,7 +158,7 @@ export const $client: ClientDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   options?: Type,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
     reportDiagnostic(context.program, {
@@ -341,7 +344,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
 export const $operationGroup: OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   // Delegate to $client - @operationGroup is now just an alias for @client
   context.call($client, target, undefined, scope);
@@ -410,8 +413,9 @@ const VALID_SCOPES = ["java", "csharp"];
 function validateJavaCsharpScope(
   decoratorName: string,
   entity: DiagnosticTarget,
-  scope?: LanguageScopes,
+  scopeArg?: LanguageScopes | ScopeOptions,
 ): DecoratorValidatorCallbacks | void {
+  const scope = normalizeScope(scopeArg);
   return {
     onTargetFinish: () => {
       if (scope === undefined) {
@@ -474,7 +478,7 @@ export const $protocolAPI: ProtocolAPIDecorator = (
   context: DecoratorContext,
   entity: Operation | Namespace | Interface,
   value?: boolean,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   setScopedDecoratorData(context, $protocolAPI, protocolAPIKey, entity, value, scope);
   return validateJavaCsharpScope("protocolAPI", entity, scope);
@@ -486,7 +490,7 @@ export const $convenientAPI: ConvenientAPIDecorator = (
   context: DecoratorContext,
   entity: Operation | Namespace | Interface,
   value?: boolean,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   setScopedDecoratorData(context, $convenientAPI, convenientAPIKey, entity, value, scope);
   return validateJavaCsharpScope("convenientAPI", entity, scope);
@@ -538,7 +542,7 @@ export const $usage: UsageDecorator = (
   context: DecoratorContext,
   entity: Model | Enum | Union | Namespace,
   value: EnumMember | Union,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   const isValidValue = (value: number): boolean => {
     // Allow the new usage values: input(2), output(4), json(256), xml(512)
@@ -626,7 +630,7 @@ export const $access: AccessDecorator = (
   context: DecoratorContext,
   entity: Model | Enum | Operation | Union | Namespace | ModelProperty,
   value: EnumMember,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   if (typeof value.value !== "string" || (value.value !== "public" && value.value !== "internal")) {
     reportDiagnostic(context.program, {
@@ -687,7 +691,7 @@ const flattenPropertyKey = createStateSymbol("flattenProperty");
 export const $flattenProperty: FlattenPropertyDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   if (getDiscriminator(context.program, target.type)) {
     reportDiagnostic(context.program, {
@@ -715,7 +719,7 @@ export const $clientName: ClientNameDecorator = (
   context: DecoratorContext,
   entity: Type,
   value: string,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   // workaround for current lack of functionality in compiler
   // https://github.com/microsoft/typespec/issues/2717
@@ -800,7 +804,7 @@ export const $override = (
   context: DecoratorContext,
   original: Operation,
   override: Operation,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   // omit all override operation
   context.program.stateMap(omitOperation).set(override, true);
@@ -983,7 +987,7 @@ export const $alternateType: AlternateTypeDecorator = (
   context: DecoratorContext,
   source: ModelProperty | Scalar | Model | Enum | Union,
   alternate: Type,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   let alternateInput: Type | ExternalTypeInfo = alternate;
   if (alternate.kind === "Model" && isExternalType(alternate)) {
@@ -1091,7 +1095,7 @@ export function getAlternateType(
 export const $useSystemTextJsonConverter: DecoratorFunction = (
   context: DecoratorContext,
   entity: Model,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {};
 
 const clientInitializationKey = createStateSymbol("clientInitialization");
@@ -1100,7 +1104,7 @@ export const $clientInitialization: ClientInitializationDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   options: Type,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   if (options.kind === "Model") {
     if (options.properties.get("initializedBy")) {
@@ -1239,10 +1243,11 @@ export const $paramAlias: ParamAliasDecorator = (
   context: DecoratorContext,
   original: ModelProperty,
   paramAlias: string,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
+  const normalizedScope = normalizeScope(scope);
   const paramAliasDec = context.program.stateMap(paramAliasKey).get(original);
-  const paramAliasVal = paramAliasDec?.[scope || AllScopes] ?? paramAliasDec?.[AllScopes];
+  const paramAliasVal = paramAliasDec?.[normalizedScope || AllScopes] ?? paramAliasDec?.[AllScopes];
   if (paramAliasVal) {
     reportDiagnostic(context.program, {
       code: "multiple-param-alias",
@@ -1267,7 +1272,7 @@ export const $apiVersion: ApiVersionDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   value?: boolean,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   setScopedDecoratorData(context, $apiVersion, apiVersionKey, target, value ?? true, scope);
 };
@@ -1280,7 +1285,7 @@ export const $clientNamespace: ClientNamespaceDecorator = (
   context: DecoratorContext,
   entity: Namespace | Interface | Model | Enum | Union,
   value: string,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   if (value.trim() === "") {
     reportDiagnostic(context.program, {
@@ -1399,9 +1404,9 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
 export const $scope: ScopeDecorator = (
   context: DecoratorContext,
   entity: Operation | ModelProperty,
-  scope?: LanguageScopes,
+  scopeArg?: LanguageScopes | ScopeOptions,
 ) => {
-  const [negationScopes, scopes] = parseScopes(scope);
+  const [negationScopes, scopes] = parseScopes(normalizeScope(scopeArg));
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // for negation scope, override the previous value
     setScopedDecoratorData(context, $scope, negationScopesKey, entity, negationScopes);
@@ -1433,7 +1438,7 @@ export const $clientApiVersions: ClientApiVersionsDecorator = (
   context: DecoratorContext,
   target: Namespace,
   value: Enum,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   setScopedDecoratorData(context, $clientApiVersions, clientApiVersionsKey, target, value, scope);
 };
@@ -1454,7 +1459,7 @@ export function getExplicitClientApiVersions(
 export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   if (target.type.kind !== "Scalar") {
     reportDiagnostic(context.program, {
@@ -1487,7 +1492,7 @@ const responseAsBoolKey = createStateSymbol("responseAsBool");
 export const $responseAsBool: ResponseAsBoolDecorator = (
   context: DecoratorContext,
   target: Operation,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   if (!target.decorators.some((d) => d.definition?.name === "@head")) {
     reportDiagnostic(context.program, {
@@ -1521,7 +1526,7 @@ export const $clientDoc: ClientDocDecorator = (
   target: Type,
   documentation: string,
   mode: EnumMember,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   const docMode = mode.value as string;
   // Validate the mode value
@@ -1560,7 +1565,7 @@ export const $clientLocation = (
   context: DecoratorContext,
   source: Operation | ModelProperty,
   target: Interface | Namespace | Operation | string,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   if (source.kind === "Operation") {
     // can only move parameters to an operation, not another operation
@@ -1642,7 +1647,7 @@ export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
   context: DecoratorContext,
   target: Model,
   value: Model,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   setScopedDecoratorData(
     context,
@@ -1666,7 +1671,7 @@ const markAsLroKey = createStateSymbol("markAsLro");
 export const $markAsLro: MarkAsLroDecorator = (
   context: DecoratorContext,
   target: Operation,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
   const hasModelResponse = httpOperation.responses.filter(
@@ -1705,7 +1710,7 @@ const markAsPageableKey = createStateSymbol("markAsPageable");
 export const $markAsPageable: MarkAsPageableDecorator = (
   context: DecoratorContext,
   target: Operation,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
   const modelResponse = httpOperation.responses.filter(
@@ -1802,7 +1807,7 @@ const disablePageableKey = createStateSymbol("disablePageable");
 export const $disablePageable: DisablePageableDecorator = (
   context: DecoratorContext,
   target: Operation,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   setScopedDecoratorData(context, $disablePageable, disablePageableKey, target, true, scope);
 };
@@ -1831,7 +1836,7 @@ export const $nextLinkVerb: NextLinkVerbDecorator = (
   context: DecoratorContext,
   target: Operation,
   verb: Type,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   compilerAssert(
     verb.kind === "String" && (verb.value === "POST" || verb.value === "GET"),
@@ -1856,7 +1861,7 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   value: string | boolean | Numeric,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   const actualValue = isNumeric(value) ? value.asNumber() : value;
   setScopedDecoratorData(
@@ -1877,7 +1882,7 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
         { program: context.program } as TCGCContext,
         alternateTypeKey,
         target,
-        scope ?? AllScopes,
+        normalizeScope(scope) ?? AllScopes,
       );
       const effectiveType =
         alternateType !== undefined && alternateType.kind !== "externalTypeInfo"
@@ -1955,7 +1960,7 @@ export const $clientOption: ClientOptionDecorator = (
   target: Type,
   name: string,
   value: unknown,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | ScopeOptions,
 ) => {
   // Always emit warning that this is experimental
   reportDiagnostic(context.program, {

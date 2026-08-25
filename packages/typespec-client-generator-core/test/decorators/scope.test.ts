@@ -40,6 +40,57 @@ describe("Azure.ClientGenerator.Core.Scope alias", () => {
     });
     strictEqual(getAccess(contextPython, func), "internal");
   });
+
+  it("accepts a typed ScopeOptions bag in place of the legacy plain-string scope", async () => {
+    const { program, func } = await SimpleTester.compile(t.code`
+      @clientName("RenamedFunc", #{ scope: "csharp" })
+      op ${t.op("func")}(): void;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(getClientNameOverride(context, func), "RenamedFunc");
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(getClientNameOverride(pythonContext, func), undefined);
+  });
+
+  it("treats the legacy string scope and the equivalent ScopeOptions bag as equivalent", async () => {
+    const { program, legacyFunc, optionsFunc } = await SimpleTester.compile(t.code`
+      @route("/legacy")
+      @access(Access.internal, "!(csharp, java)")
+      op ${t.op("legacyFunc")}(): void;
+
+      @route("/options")
+      @access(Access.internal, #{ scope: "!(csharp, java)" })
+      op ${t.op("optionsFunc")}(): void;
+    `);
+
+    for (const emitterName of ["@azure-tools/typespec-csharp", "@azure-tools/typespec-python"]) {
+      const context = await createSdkContextForTester(program, { emitterName });
+      strictEqual(getAccess(context, legacyFunc), getAccess(context, optionsFunc));
+    }
+  });
+
+  it("supports grouped and negated scopes through the ScopeOptions bag", async () => {
+    const { program, func } = await SimpleTester.compile(t.code`
+      @access(Access.internal, #{ scope: "!(csharp, java)" })
+      op ${t.op("func")}(): void;
+    `);
+
+    const contextCsharp = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(getAccess(contextCsharp, func), "public");
+
+    const contextPython = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(getAccess(contextPython, func), "internal");
+  });
 });
 
 it("emitter with same scope as decorator", async () => {

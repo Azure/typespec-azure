@@ -3,22 +3,37 @@ using Reflection;
 namespace Azure.ClientGenerator.Core;
 
 /**
- * The type used for the `scope` argument accepted by scoped TCGC decorators. Centralizing this as
- * an alias lets every scoped decorator share the exact same shape, so it can evolve (for example to
- * a typed options bag) in one place without having to touch each decorator signature individually.
+ * Common typed options bag for the `scope` argument accepted by scoped TCGC decorators.
  *
- * Specifies the target language emitters that a decorator should apply to. If not set, the decorator
- * applies to all language emitters by default.
+ * Every scoped decorator's own options model can extend this base so new, decorator-specific
+ * settings can be added over time without breaking the legacy plain-string scope argument.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language
  * emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
  *
- * **Valid patterns:**
+ * **Valid patterns for `scope`:**
  * - Single language: `"python"`
  * - Multiple languages (comma-separated): `"python, java"`
  * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  */
-alias Scope = string;
+model ScopeOptions {
+  /**
+   * Specifies the target language emitters that a decorator should apply to. If not set, the
+   * decorator applies to all language emitters by default.
+   */
+  scope?: string;
+}
+
+/**
+ * The type used for the `scope` argument accepted by scoped TCGC decorators. Centralizing this as
+ * an alias lets every scoped decorator share the exact same shape, so it can evolve in one place
+ * without having to touch each decorator signature individually.
+ *
+ * Accepts either the legacy plain-string scope value (e.g. `"csharp"`, `"!(java, python)"`) or a
+ * typed options bag (e.g. `#{ scope: "csharp" }`), which can be extended in the future to carry
+ * additional decorator-specific settings.
+ */
+alias Scope = ScopeOptions | string;
 
 /**
  * Overrides the generated name for client SDK elements including clients, methods, parameters,

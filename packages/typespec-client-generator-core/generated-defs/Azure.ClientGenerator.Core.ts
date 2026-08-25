@@ -14,6 +14,10 @@ import type {
   Union,
 } from "@typespec/compiler";
 
+export interface ScopeOptions {
+  readonly scope?: string;
+}
+
 /**
  * Overrides the generated name for client SDK elements including clients, methods, parameters,
  * unions, models, enums, and model properties.
@@ -67,7 +71,7 @@ export type ClientNameDecorator = (
   context: DecoratorContext,
   target: Type,
   rename: string,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -110,7 +114,7 @@ export type ConvenientAPIDecorator = (
   context: DecoratorContext,
   target: Operation | Namespace | Interface,
   flag?: boolean,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -153,7 +157,7 @@ export type ProtocolAPIDecorator = (
   context: DecoratorContext,
   target: Operation | Namespace | Interface,
   flag?: boolean,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -193,7 +197,7 @@ export type ClientDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   options?: Type,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -221,7 +225,7 @@ export type ClientDecorator = (
 export type OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -300,7 +304,7 @@ export type UsageDecorator = (
   context: DecoratorContext,
   target: Model | Enum | Union | Namespace,
   value: EnumMember | Union,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -457,7 +461,7 @@ export type AccessDecorator = (
   context: DecoratorContext,
   target: ModelProperty | Model | Operation | Enum | Union | Namespace,
   value: EnumMember,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -517,7 +521,7 @@ export type OverrideDecorator = (
   context: DecoratorContext,
   target: Operation,
   override: Operation,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -543,7 +547,7 @@ export type OverrideDecorator = (
 export type UseSystemTextJsonConverterDecorator = (
   context: DecoratorContext,
   target: Model,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -586,7 +590,7 @@ export type ClientInitializationDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   options: Type,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -626,7 +630,7 @@ export type ParamAliasDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   paramAlias: string,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -660,7 +664,7 @@ export type ClientNamespaceDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface | Model | Enum | Union,
   rename: string,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -749,7 +753,7 @@ export type AlternateTypeDecorator = (
   context: DecoratorContext,
   target: ModelProperty | Scalar | Model | Enum | Union,
   alternate: Type,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -797,7 +801,7 @@ export type AlternateTypeDecorator = (
 export type ScopeDecorator = (
   context: DecoratorContext,
   target: Operation | ModelProperty,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -840,7 +844,7 @@ export type ApiVersionDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   value?: boolean,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -877,7 +881,7 @@ export type ClientApiVersionsDecorator = (
   context: DecoratorContext,
   target: Namespace,
   value: Enum,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -909,7 +913,7 @@ export type ClientApiVersionsDecorator = (
 export type DeserializeEmptyStringAsNullDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -936,7 +940,7 @@ export type DeserializeEmptyStringAsNullDecorator = (
 export type ResponseAsBoolDecorator = (
   context: DecoratorContext,
   target: Operation,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -1029,7 +1033,7 @@ export type ClientLocationDecorator = (
   context: DecoratorContext,
   source: Operation | ModelProperty,
   target: Interface | Namespace | Operation | string,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -1074,7 +1078,7 @@ export type ClientDocDecorator = (
   target: Type,
   documentation: string,
   mode: EnumMember,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -1120,7 +1124,7 @@ export type ClientOptionDecorator = (
   target: Type,
   name: string,
   value: Type | unknown,
-  scope?: string,
+  scope?: ScopeOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 export type AzureClientGeneratorCoreDecorators = {
