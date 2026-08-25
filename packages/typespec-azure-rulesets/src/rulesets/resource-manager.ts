@@ -96,6 +96,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers": true,
     "@azure-tools/typespec-azure-resource-manager/no-response-body": true,
     "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint": true,
+    "@azure-tools/typespec-azure-resource-manager/patch-body-invalid-property": true,
     "@azure-tools/typespec-azure-resource-manager/patch-envelope": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-patch": true,
     "@azure-tools/typespec-azure-resource-manager/resource-name": true,

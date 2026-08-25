@@ -33,6 +33,7 @@ import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-pro
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
+import { patchBodyInvalidPropertyRule } from "./rules/patch-body-invalid-property.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
@@ -81,6 +82,7 @@ const rules = [
   missingXmsIdentifiersRule,
   noResponseBodyRule,
   operationsInterfaceMissingRule,
+  patchBodyInvalidPropertyRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
   resourceNameRule,
