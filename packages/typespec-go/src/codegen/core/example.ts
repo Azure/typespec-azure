@@ -58,7 +58,7 @@ export function generateExamples(
     }
 
     let clientFactoryParams: Array<go.ClientParameter>;
-    if (options.factoryGatherAllParams) {
+    if (options["factory-gather-all-params"]) {
       clientFactoryParams = helpers.getAllClientParameters(pkg.src, target);
     } else {
       clientFactoryParams = helpers.getCommonClientParameters(pkg.src, target);

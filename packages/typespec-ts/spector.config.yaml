@@ -133,9 +133,8 @@ specs:
   # Disabled: exact model and property names are normalized by the emitter.
   azure/client-generator-core/exact-name: false
 
-  # Disabled: needs tcgc upgrade https://github.com/Azure/typespec-azure/pull/3997
-  client/structure/renamed-operation: false
+  client/structure/renamed-operation: true
   client/structure/two-operation-group: false
-  client/structure/client-operation-group: false
+  client/structure/client-operation-group: true
   # Disabled: multipart not yet supported
   payload/multipart: false

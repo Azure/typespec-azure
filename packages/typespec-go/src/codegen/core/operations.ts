@@ -646,7 +646,7 @@ function emitPagerDefinition(
   // BEGIN Fetcher func
   text += `${indent.get()}Fetcher: func(ctx context.Context, page *${method.returns.name}) (${method.returns.name}, error) {\n`;
   indent.push();
-  if (options.generateFakes) {
+  if (options["generate-fakes"]) {
     text += `${indent.get()}ctx = context.WithValue(ctx, runtime.CtxAPINameKey{}, "${method.receiver.type.name}.${helpers.fixUpMethodName(method)}")\n`;
   }
 
@@ -713,7 +713,7 @@ function emitPagerDefinition(
   text += `${indent.pop().get()}},\n`;
   // END Fetcher func
 
-  if (options.injectSpans) {
+  if (options["inject-spans"]) {
     text += `${indent.get()}Tracer: client.internal.Tracer(),\n`;
   }
   text += `${indent.pop().get()}})\n`;
@@ -770,14 +770,14 @@ function generateOperation(
   }
   text += `${indent.get()}var err error\n`;
   let operationName = `"${method.receiver.type.name}.${helpers.fixUpMethodName(method)}"`;
-  if (options.generateFakes && options.injectSpans) {
+  if (options["generate-fakes"] && options["inject-spans"]) {
     text += `${indent.get()}const operationName = ${operationName}\n`;
     operationName = "operationName";
   }
-  if (options.generateFakes) {
+  if (options["generate-fakes"]) {
     text += `${indent.get()}ctx = context.WithValue(ctx, runtime.CtxAPINameKey{}, ${operationName})\n`;
   }
-  if (options.injectSpans) {
+  if (options["inject-spans"]) {
     text += `${indent.get()}ctx, endSpan := runtime.StartSpan(ctx, ${operationName}, client.internal.Tracer(), nil)\n`;
     text += `${indent.get()}defer func() { endSpan(err) }()\n`;
   }
@@ -980,7 +980,7 @@ function generateLROBeginMethod(
   }
 
   text += `${indent.get()}poller, err := runtime.NewPoller`;
-  if (finalStateVia === "" && pollerType === "nil" && !options.injectSpans) {
+  if (finalStateVia === "" && pollerType === "nil" && !options["inject-spans"]) {
     // the generic type param is redundant when it's also specified in the
     // options struct so we only include it when there's no options.
     text += pollerTypeParam;
@@ -989,7 +989,7 @@ function generateLROBeginMethod(
   if (
     finalStateVia === "" &&
     pollerType === "nil" &&
-    !options.injectSpans &&
+    !options["inject-spans"] &&
     !method.operationLocationResultPath
   ) {
     // no options
@@ -1007,7 +1007,7 @@ function generateLROBeginMethod(
     if (pollerType !== "nil") {
       text += `${indent.get()}Response: ${pollerType},\n`;
     }
-    if (options.injectSpans) {
+    if (options["inject-spans"]) {
       text += `${indent.get()}Tracer: client.internal.Tracer(),\n`;
     }
     indent.pop();
@@ -1021,11 +1021,11 @@ function generateLROBeginMethod(
   // creating the poller from resume token branch
 
   text += `${indent.get()}return runtime.NewPollerFromResumeToken`;
-  if (pollerType === "nil" && !options.injectSpans) {
+  if (pollerType === "nil" && !options["inject-spans"]) {
     text += pollerTypeParam;
   }
   text += "(options.ResumeToken, client.internal.Pipeline(), ";
-  if (pollerType === "nil" && !options.injectSpans) {
+  if (pollerType === "nil" && !options["inject-spans"]) {
     text += "nil)\n";
   } else {
     indent.push();
@@ -1033,7 +1033,7 @@ function generateLROBeginMethod(
     if (pollerType !== "nil") {
       text += `${indent.get()}Response: ${pollerType},\n`;
     }
-    if (options.injectSpans) {
+    if (options["inject-spans"]) {
       text += `${indent.get()}Tracer: client.internal.Tracer(),\n`;
     }
     indent.pop();

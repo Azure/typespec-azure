@@ -3,6 +3,7 @@ import {
   compilerAssert,
   type DecoratorContext,
   type DecoratorFunction,
+  type DecoratorValidatorCallbacks,
   type DiagnosticTarget,
   type Enum,
   type EnumMember,
@@ -404,6 +405,71 @@ export function listOperationsInClient(
 
 const protocolAPIKey = createStateSymbol("protocolAPI");
 
+const VALID_SCOPES = ["java", "csharp"];
+
+function validateJavaCsharpScope(
+  decoratorName: string,
+  entity: DiagnosticTarget,
+  scope?: LanguageScopes,
+): DecoratorValidatorCallbacks | void {
+  return {
+    onTargetFinish: () => {
+      if (scope === undefined) {
+        return [
+          createDiagnostic({
+            code: "decorator-requires-scope",
+            format: {
+              decoratorName,
+              allowedScopes: `"${VALID_SCOPES.join('" or "')}"`,
+            },
+            target: entity,
+          }),
+        ];
+      }
+
+      const [negationScopes, positiveScopes] = parseScopes(scope);
+
+      // Negation scopes like "!(python)" implicitly include java/csharp, so they're valid.
+      // But if ALL valid scopes are negated, it's invalid.
+      if (negationScopes && negationScopes.length > 0) {
+        const allValidNegated = VALID_SCOPES.every((s) => negationScopes.includes(s));
+        if (allValidNegated) {
+          return [
+            createDiagnostic({
+              code: "decorator-requires-scope",
+              format: {
+                decoratorName,
+                allowedScopes: `"${VALID_SCOPES.join('" or "')}"`,
+              },
+              target: entity,
+            }),
+          ];
+        }
+        return [];
+      }
+
+      // Positive scopes: at least one must be java or csharp
+      if (positiveScopes && positiveScopes.length > 0) {
+        const hasValidScope = positiveScopes.some((s) => VALID_SCOPES.includes(s));
+        if (!hasValidScope) {
+          return [
+            createDiagnostic({
+              code: "decorator-requires-scope",
+              format: {
+                decoratorName,
+                allowedScopes: `"${VALID_SCOPES.join('" or "')}"`,
+              },
+              target: entity,
+            }),
+          ];
+        }
+      }
+
+      return [];
+    },
+  };
+}
+
 export const $protocolAPI: ProtocolAPIDecorator = (
   context: DecoratorContext,
   entity: Operation | Namespace | Interface,
@@ -411,6 +477,7 @@ export const $protocolAPI: ProtocolAPIDecorator = (
   scope?: LanguageScopes,
 ) => {
   setScopedDecoratorData(context, $protocolAPI, protocolAPIKey, entity, value, scope);
+  return validateJavaCsharpScope("protocolAPI", entity, scope);
 };
 
 const convenientAPIKey = createStateSymbol("convenientAPI");
@@ -422,6 +489,7 @@ export const $convenientAPI: ConvenientAPIDecorator = (
   scope?: LanguageScopes,
 ) => {
   setScopedDecoratorData(context, $convenientAPI, convenientAPIKey, entity, value, scope);
+  return validateJavaCsharpScope("convenientAPI", entity, scope);
 };
 
 function getConvenientOrProtocolValue(
@@ -1895,17 +1963,26 @@ export const $clientOption: ClientOptionDecorator = (
     target: context.decoratorTarget,
   });
 
-  // Emit additional warning if scope is not provided
-  if (scope === undefined) {
-    reportDiagnostic(context.program, {
-      code: "client-option-requires-scope",
-      target: context.decoratorTarget,
-    });
-  }
-
   // Store the option data - each decorator application is stored separately
   // The decorator info will be exposed via the decorators array on SDK types
   setScopedDecoratorData(context, $clientOption, clientOptionKey, target, { name, value }, scope);
+
+  // clientOption must be scoped to any language
+  if (scope === undefined) {
+    return {
+      onTargetFinish: () => [
+        createDiagnostic({
+          code: "decorator-requires-scope",
+          format: {
+            decoratorName: "clientOption",
+            allowedScopes: "a language scope",
+          },
+          target: context.decoratorTarget,
+        }),
+      ],
+    };
+  }
+  return undefined;
 };
 
 /**

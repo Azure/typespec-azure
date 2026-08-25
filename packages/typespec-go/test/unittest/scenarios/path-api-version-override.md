@@ -212,7 +212,7 @@ func (v *VersionedServerTransport) dispatchWithPathAPIVersion(req *http.Request)
 	if v.srv.WithPathAPIVersion == nil {
 		return nil, &nonRetriableError{errors.New("fake for method WithPathAPIVersion not implemented")}
 	}
-	const regexStr = `/with-path-api-version/(?P<apiVersion>[!#&$-;=?-\[\]_a-zA-Z0-9~%@]+)/resources/(?P<resourceId>[!#&$-;=?-\[\]_a-zA-Z0-9~%@]+)`
+	const regexStr = `/with-path-api-version/(?P<apiVersion>[a-zA-Z0-9._~%!$&'()*+,;=:@-]+)/resources/(?P<resourceId>[a-zA-Z0-9._~%!$&'()*+,;=:@-]+)`
 	regex := regexp.MustCompile(regexStr)
 	matches := regex.FindStringSubmatch(req.URL.EscapedPath())
 	if len(matches) < 2 {
