@@ -50,7 +50,7 @@ export const useLatestVersionOfCommonTypesRule = createRule({
   create(context) {
     return {
       root: (program) => {
-        const latestVersion = getLatestArmCommonTypesVersion(program);
+        const latestVersion = tryGetLatestArmCommonTypesVersion(program);
         if (latestVersion === undefined) {
           return;
         }
@@ -71,15 +71,16 @@ export const useLatestVersionOfCommonTypesRule = createRule({
               const currentVersion =
                 getArmCommonTypesVersion(program, snapshot.version.enumMember) ??
                 getArmCommonTypesVersion(program, service.type);
-              if (
-                reportIfOutdated(
+              if (isOutdated(currentVersion, latestVersion)) {
+                reportOutdatedSelection(
                   context,
                   snapshot.version.enumMember,
                   currentVersion,
                   latestVersion,
-                ) ||
-                currentVersion !== latestVersion
-              ) {
+                );
+                continue;
+              }
+              if (currentVersion === undefined) {
                 continue;
               }
 
@@ -122,26 +123,29 @@ export const useLatestVersionOfCommonTypesRule = createRule({
           }
 
           const currentVersion = getArmCommonTypesVersion(program, service.type);
-          if (
-            !reportIfOutdated(context, service.type, currentVersion, latestVersion) &&
-            currentVersion === latestVersion
-          ) {
-            const [httpService] = getHttpService(program, analyzedService);
-            reportOutdatedUsages(
-              context,
-              collectCommonTypeUsages(program, httpService.operations),
-              getService(program, analyzedService) ?? compilerService,
-              undefined,
-              latestVersion,
-            );
+          if (isOutdated(currentVersion, latestVersion)) {
+            reportOutdatedSelection(context, service.type, currentVersion, latestVersion);
+            continue;
           }
+          if (currentVersion === undefined) {
+            continue;
+          }
+
+          const [httpService] = getHttpService(program, analyzedService);
+          reportOutdatedUsages(
+            context,
+            collectCommonTypeUsages(program, httpService.operations),
+            getService(program, analyzedService) ?? compilerService,
+            undefined,
+            latestVersion,
+          );
         }
       },
     };
   },
 });
 
-function getLatestArmCommonTypesVersion(program: Program): string | undefined {
+function tryGetLatestArmCommonTypesVersion(program: Program): string | undefined {
   const allVersions = getArmCommonTypesVersions(program)?.allVersions;
   if (allVersions === undefined || allVersions.length === 0) {
     return undefined;
@@ -157,16 +161,19 @@ function getVersionNumber(version: string): number {
   return match ? Number(match[1]) : Number.NEGATIVE_INFINITY;
 }
 
-function reportIfOutdated(
-  context: Parameters<typeof useLatestVersionOfCommonTypesRule.create>[0],
-  target: Namespace | EnumMember,
+function isOutdated(
   currentVersion: string | undefined,
   latestVersion: string,
-): boolean {
-  if (currentVersion === undefined || currentVersion === latestVersion) {
-    return false;
-  }
+): currentVersion is string {
+  return currentVersion !== undefined && currentVersion !== latestVersion;
+}
 
+function reportOutdatedSelection(
+  context: Parameters<typeof useLatestVersionOfCommonTypesRule.create>[0],
+  target: Namespace | EnumMember,
+  currentVersion: string,
+  latestVersion: string,
+): void {
   context.reportDiagnostic({
     target,
     format: {
@@ -177,7 +184,6 @@ function reportIfOutdated(
       referenceName: "common-types",
     },
   });
-  return true;
 }
 
 interface CommonTypeUsage {

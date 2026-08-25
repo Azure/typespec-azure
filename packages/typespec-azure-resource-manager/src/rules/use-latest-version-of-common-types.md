@@ -52,6 +52,10 @@ enum Versions {
 }
 ```
 
+As of August 2026, `v6` was the latest ARM common-types version.
+Newer versions may exist; check `Azure.ResourceManager.CommonTypes.Versions`
+for the latest version before updating a service.
+
 ## Incorrect
 
 This service selects the latest common-types version but still uses a legacy
@@ -76,8 +80,8 @@ op getIdentity(): Azure.ResourceManager.Legacy.ManagedServiceIdentityV4;
 
 ## Correct
 
-Use a common type supported by the selected latest common-types version, or
-remove the legacy reference when the API shape no longer needs it.
+Use the equivalent common type supported by the selected latest common-types
+version, or remove the legacy reference when the API shape no longer needs it.
 
 ```tsp
 @armProviderNamespace
@@ -91,22 +95,9 @@ enum Versions {
   v2024_01_01: "2024-01-01",
 }
 
-model Widget is TrackedResource<WidgetProperties> {
-  ...ManagedServiceIdentityProperty;
-
-  @key("widgetName")
-  @segment("widgets")
-  @path
-  name: string;
-}
-
-model WidgetProperties {
-  description?: string;
-}
-
 @route("/identity")
 @get
-op getIdentity(): Widget;
+op getIdentity(): Azure.ResourceManager.CommonTypes.ManagedServiceIdentity;
 ```
 
 ## LintDiff Equivalent
