@@ -95,7 +95,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/lro-location-header": true,
     "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers": true,
     "@azure-tools/typespec-azure-resource-manager/no-response-body": true,
-    "@azure-tools/typespec-azure-resource-manager/no-query-parameters-in-post": true,
+    "@azure-tools/typespec-azure-resource-manager/no-query-parameters-in-post": false,
     "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint": true,
     "@azure-tools/typespec-azure-resource-manager/patch-envelope": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-patch": true,
