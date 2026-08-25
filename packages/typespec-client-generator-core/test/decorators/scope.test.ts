@@ -1,8 +1,46 @@
 import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { getAccess } from "../../src/decorators.js";
+import { getAccess, getClientNameOverride } from "../../src/decorators.js";
 import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
+
+describe("Azure.ClientGenerator.Core.Scope alias", () => {
+  it("is a reusable alias for the type accepted by scoped decorators' scope argument", async () => {
+    const { program, func } = await SimpleTester.compile(t.code`
+      alias MyDecoratorScope = Azure.ClientGenerator.Core.Scope;
+
+      @clientName("RenamedFunc", "csharp")
+      op ${t.op("func")}(): void;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(getClientNameOverride(context, func), "RenamedFunc");
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(getClientNameOverride(pythonContext, func), undefined);
+  });
+
+  it("scoped decorators using the shared alias still apply to all emitters by default", async () => {
+    const { program, func } = await SimpleTester.compile(t.code`
+      @access(Access.internal, "!csharp")
+      op ${t.op("func")}(): void;
+    `);
+
+    const contextCsharp = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(getAccess(contextCsharp, func), "public");
+
+    const contextPython = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(getAccess(contextPython, func), "internal");
+  });
+});
 
 it("emitter with same scope as decorator", async () => {
   const { program, func } = await SimpleTester.compile(t.code`
