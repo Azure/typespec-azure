@@ -1,5 +1,6 @@
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
+import { UsageFlags } from "../../src/interfaces.js";
 import {
   createClientCustomizationInput,
   createSdkContextForTester,
@@ -39,18 +40,20 @@ it("replaces the generated method response without changing HTTP responses", asy
 
 it("uses a different response type supplied by @override", async () => {
   const { program } = await SimpleTesterWithService.compile(`
+    @usage(Usage.output)
     model Widget {
       name: string;
     }
 
+    @usage(Usage.output)
     model DeleteResult {
       deleted: boolean;
     }
 
     @post op create(): Widget;
 
-    op customizedCreate(): DeleteResult;
-    @@override(TestService.create, TestService.customizedCreate);
+    alias CustomizedCreate = replaceResponse(TestService.create, DeleteResult);
+    @@override(TestService.create, CustomizedCreate);
   `);
 
   const context = await createSdkContextForTester(program);
@@ -59,8 +62,12 @@ it("uses a different response type supplied by @override", async () => {
   ok(method.response.type);
   strictEqual(method.response.type.kind, "model");
   strictEqual(method.response.type.name, "DeleteResult");
+  strictEqual(method.response.type.usage & UsageFlags.Output, UsageFlags.Output);
+  ok(method.response.type.serializationOptions);
   ok(method.operation.responses[0].type);
   strictEqual(method.operation.responses[0].type.name, "Widget");
+  strictEqual(method.operation.responses[0].type.usage & UsageFlags.Output, UsageFlags.Output);
+  ok(method.operation.responses[0].type.serializationOptions);
 });
 
 it("replaces a response with bytes", async () => {
@@ -120,9 +127,11 @@ it("removes pageable behavior when overriding a list operation with bytes", asyn
     @list
     op listBlobs(): BlobPage;
 
-    @route("/bytes")
-    op listBlobsAsBytes(): bytes;
-    @@override(TestService.listBlobs, TestService.listBlobsAsBytes, "rust");
+    @@override(
+      TestService.listBlobs,
+      replaceResponse(TestService.listBlobs, bytes),
+      "rust"
+    );
   `);
 
   const context = await createSdkContextForTester(program, {

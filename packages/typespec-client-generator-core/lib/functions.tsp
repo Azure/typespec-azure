@@ -134,6 +134,9 @@ extern fn reorderParameters(
  * Replace the method response type of an operation.
  * This preserves the HTTP response metadata and only changes the return type
  * of the generated client method when used with `@@override`.
+ * The replacement type is not mapped to or validated against the HTTP body;
+ * it is the customization author's responsibility to ensure it matches the
+ * runtime response.
  *
  * @param operation The operation to transform.
  * @param response The replacement method response type.

@@ -75,6 +75,7 @@ import {
   getTypeDecorators,
   isNeverOrVoidType,
   isSubscriptionId,
+  responseOverrideKey,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import {
@@ -167,7 +168,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   const diagnostics = createDiagnosticCollector();
 
   const baseServiceMethod = diagnostics.pipe(
-    getSdkBasicServiceMethod<TServiceOperation>(context, operation, client, false),
+    getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
   );
 
   // If the response body type itself is nullable (e.g., {@body body: Type | null}), unwrap it for paging/LRO processing
@@ -610,12 +611,13 @@ function getSdkMethodResponse(
   operation: Operation,
   sdkOperation: SdkServiceOperation,
   client: SdkClientType<SdkServiceOperation>,
-  useResponseOverride = true,
 ): SdkMethodResponse {
   const responses = sdkOperation.responses;
-  const responseOverride = useResponseOverride
-    ? getOverriddenClientMethod(context, operation)?.returnType
-    : undefined;
+  const responseOverride = getOverriddenClientMethod(context, operation);
+  const responseOverrideType =
+    responseOverride && context.program.stateMap(responseOverrideKey).get(responseOverride)
+      ? responseOverride.returnType
+      : undefined;
 
   const allResponseBodies: SdkType[] = [];
   let containsResponseWithoutBody = false;
@@ -629,10 +631,12 @@ function getSdkMethodResponse(
 
   const responseTypes = new Set<string>(allResponseBodies.map((x) => getHashForType(x)));
   let type: SdkType | undefined = undefined;
-  if (responseOverride && isNeverOrVoidType(responseOverride)) {
+  if (responseOverrideType && isNeverOrVoidType(responseOverrideType)) {
     type = undefined;
-  } else if (responseOverride) {
-    type = ignoreDiagnostics(getClientTypeWithDiagnostics(context, responseOverride, operation));
+  } else if (responseOverrideType) {
+    type = ignoreDiagnostics(
+      getClientTypeWithDiagnostics(context, responseOverrideType, operation),
+    );
   } else if (getResponseAsBool(context, operation)) {
     type = getSdkBuiltInType(context, $(context.program).builtin.boolean);
   } else {
@@ -689,7 +693,6 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
   context: TCGCContext,
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
-  useResponseOverride = true,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const methodParameters: SdkMethodParameter[] = [];
@@ -734,13 +737,7 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
   const serviceOperation = diagnostics.pipe(
     getSdkServiceOperation<TServiceOperation>(context, operation, methodParameters, client),
   );
-  const response = getSdkMethodResponse(
-    context,
-    operation,
-    serviceOperation,
-    client,
-    useResponseOverride,
-  );
+  const response = getSdkMethodResponse(context, operation, serviceOperation, client);
   const name = getLibraryName(context, operation);
   return diagnostics.wrap({
     __raw: operation,
@@ -767,13 +764,16 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
-  const clientOperation = getOverriddenClientMethod(context, operation) ?? operation;
-  const lro = getTcgcLroMetadata(context, clientOperation, client);
+  const override = getOverriddenClientMethod(context, operation);
+  const responseReplacement =
+    override !== undefined && context.program.stateMap(responseOverrideKey).get(override) === true;
+  const lro = getTcgcLroMetadata(context, operation, client);
   // `@disablePageable` disables paging even for operations with @list
-  const pagingDisabled = getDisablePageable(context, clientOperation);
+  const pagingDisabled = getDisablePageable(context, operation);
   const paging =
+    !responseReplacement &&
     !pagingDisabled &&
-    (isList(context.program, clientOperation) || getMarkAsPageable(context, clientOperation));
+    (isList(context.program, operation) || getMarkAsPageable(context, operation));
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);
   } else if (paging) {

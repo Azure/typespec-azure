@@ -1,6 +1,6 @@
 import type { FunctionContext, ModelProperty, Operation, Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { EXACT_NAME_PREFIX } from "./internal-utils.js";
+import { EXACT_NAME_PREFIX, responseOverrideKey } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
 
 // Helper function to clone an operation with new parameters and/or return type
@@ -256,9 +256,11 @@ export function replaceResponse(
   operation: Operation,
   response: Type,
 ): Operation {
-  return cloneOperation($(context.program), operation, {
+  const replacement = cloneOperation($(context.program), operation, {
     returnType: response,
   });
+  context.program.stateMap(responseOverrideKey).set(replacement, true);
+  return replacement;
 }
 
 /**
