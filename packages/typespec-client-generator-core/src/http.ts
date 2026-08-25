@@ -461,6 +461,9 @@ function createContentTypeOrAcceptHeader(
   bodyObject: SdkBodyParameter | SdkHttpResponse | SdkHttpErrorResponse,
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
+  // @typespec/http uses */* as the unconstrained File content-type marker. For
+  // generated request clients, expose that as an optional Content-Type parameter
+  // with the binary payload default instead of sending */* as a concrete value.
   const isDefaultFileContentType =
     bodyObject.kind === "body" &&
     httpOperation.parameters.body?.bodyKind === "file" &&
