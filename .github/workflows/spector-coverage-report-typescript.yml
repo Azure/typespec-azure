@@ -81,6 +81,28 @@ jobs:
               return;
             }
 
+            const scenarioTiersPath = path.join(
+              process.env.GITHUB_WORKSPACE,
+              "website/src/pages/can-i-use/scenario-tiers.ts",
+            );
+            const scenarioTiers = fs.readFileSync(scenarioTiersPath, "utf8");
+            const backlogBlock = scenarioTiers.match(/Backlog:\s*\[([\s\S]*?)\n\s*\],/);
+            if (!backlogBlock) {
+              core.setFailed(`Could not read the Backlog tier from ${scenarioTiersPath}.`);
+              return;
+            }
+
+            const backlogMatchers = [...backlogBlock[1].matchAll(/^\s*"([^"]+)",\s*$/gm)].map(
+              ([, pattern]) => {
+                const regexPattern = pattern
+                  .replace(/[.+?^${}()|[\]\\]/g, "\\$&")
+                  .replace(/\*/g, ".*");
+                return new RegExp(`^${regexPattern}$`);
+              },
+            );
+            const isBacklogScenario = (scenarioName) =>
+              backlogMatchers.some((matcher) => matcher.test(scenarioName));
+
             const { owner, repo } = context.repo;
             const openIssues = await github.paginate(github.rest.issues.listForRepo, {
               owner,
@@ -180,6 +202,41 @@ jobs:
               const registration = `Scenarios.${group}_`;
               const match = source.mockApis.find(({ content }) => content.includes(registration));
               return match ? `${source.url}/${match.directory}` : undefined;
+            }
+
+            function getGroupState(packageName, group, scenarios) {
+              const previous = previousGroups.get(`${packageName}\0${group}`);
+              const backlogScenarios = scenarios.filter((scenario) =>
+                isBacklogScenario(`${group}_${scenario}`),
+              );
+              const allBacklog =
+                scenarios.length > 0 && backlogScenarios.length === scenarios.length;
+              const previousComment = previous?.comment ?? "";
+              const backlogManagedComment = /^Backlog(?:$| scenarios:)/i.test(previousComment);
+              let skipped = previous?.skipped ?? false;
+              let comment = previousComment;
+
+              if (allBacklog) {
+                skipped = true;
+                if (backlogManagedComment || comment.length === 0) {
+                  comment = "Backlog";
+                } else if (!/\bBacklog\b/i.test(comment)) {
+                  comment = `${comment}; Backlog`;
+                }
+              } else if (backlogScenarios.length > 0) {
+                const backlogComment = `Backlog scenarios: ${backlogScenarios.join(", ")}`;
+                if (backlogManagedComment || comment.length === 0) {
+                  skipped = false;
+                  comment = backlogComment;
+                } else if (!/\bBacklog\b/i.test(comment)) {
+                  comment = `${comment}; ${backlogComment}`;
+                }
+              } else if (backlogManagedComment) {
+                skipped = false;
+                comment = "";
+              }
+
+              return { skipped, comment };
             }
 
             for (const entry of coverage) {
@@ -282,6 +339,7 @@ jobs:
                 )) {
                   scenarios.sort((a, b) => a.localeCompare(b));
                   const previous = previousGroups.get(`${summary.packageName}\0${group}`);
+                  const groupState = getGroupState(summary.packageName, group, scenarios);
                   const isNewGroup = previousGroups.size > 0 && previous === undefined;
                   const groupUrl = getGroupUrl(summary.packageName, group);
                   const linkedGroup = groupUrl ? `[\`${group}\`](${groupUrl})` : `\`${group}\``;
@@ -294,7 +352,7 @@ jobs:
                     return isNewScenario ? `🆕 ${scenario}` : scenario;
                   });
                   body.push(
-                    `| ${groupLabel} | ${scenarios.length} | ${previous?.skipped ? "[x]" : "[ ]"} | ${scenarioLabels.join(", ")} | ${previous?.comment ?? ""} |`,
+                    `| ${groupLabel} | ${scenarios.length} | ${groupState.skipped ? "[x]" : "[ ]"} | ${scenarioLabels.join(", ")} | ${groupState.comment} |`,
                   );
                 }
 
@@ -333,11 +391,18 @@ jobs:
             const actionableGroups = {};
             for (const [packageName, groups] of notImplementedByPackage) {
               for (const [group, scenarios] of groups) {
-                if (previousGroups.get(`${packageName}\0${group}`)?.skipped) {
+                const groupState = getGroupState(packageName, group, scenarios);
+                if (groupState.skipped) {
+                  continue;
+                }
+                const actionableScenarios = scenarios.filter(
+                  (scenario) => !isBacklogScenario(`${group}_${scenario}`),
+                );
+                if (actionableScenarios.length === 0) {
                   continue;
                 }
                 actionableGroups[packageName] ??= {};
-                actionableGroups[packageName][group] = scenarios;
+                actionableGroups[packageName][group] = actionableScenarios;
               }
             }
 
