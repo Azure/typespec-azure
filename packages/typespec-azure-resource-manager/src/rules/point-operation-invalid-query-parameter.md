@@ -21,46 +21,49 @@ This rule corresponds to the Swagger linter rule [ValidQueryParametersForPointOp
 #### ❌ Incorrect
 
 ```tsp
-@route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}")
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
+}
+
+model WidgetProperties {}
+
+model ExtraReadParameters {
+  @query expand?: string;
+}
+
+@armResourceOperations
 interface Widgets {
-  @get
-  get(
-    @path subscriptionId: string,
-    @path resourceGroupName: string,
-    @path widgetName: string,
-    @query("api-version") apiVersion: string,
-    @query expand?: string,
-  ): Widget;
+  get is ArmResourceRead<Widget, Parameters = ExtraReadParameters>;
 }
 ```
 
 #### ✅ Correct
 
 ```tsp
-@route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}")
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
+}
+
+model WidgetProperties {}
+
+@armResourceOperations
 interface Widgets {
-  @get
-  get(
-    @path subscriptionId: string,
-    @path resourceGroupName: string,
-    @path widgetName: string,
-    @query("api-version") apiVersion: string,
-  ): Widget;
+  get is ArmResourceRead<Widget>;
 }
 ```
 
 Query parameters remain valid on collection operations because they are outside this rule's scope:
 
 ```tsp
-@route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets")
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
+}
+
+model WidgetProperties {}
+
+@armResourceOperations
 interface Widgets {
-  @get
-  list(
-    @path subscriptionId: string,
-    @path resourceGroupName: string,
-    @query("api-version") apiVersion: string,
-    @query top?: int32,
-  ): WidgetListResult;
+  list is ArmResourceListByParent<Widget, Parameters = ArmTopParameter>;
 }
 ```
 
