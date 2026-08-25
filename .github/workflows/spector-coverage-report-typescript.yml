@@ -129,14 +129,24 @@ jobs:
                 }
 
                 const rowMatch = line.match(
-                  /^\|\s*(?:🆕\s*)?(?:\[`(.+?)`\]\([^)]+\)|`(.+?)`)\s*\|\s*(\d+)\s*\|\s*(\[[ xX]\])\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|$/,
+                  /^\|\s*(?:🆕\s*)?(?:\[`([^`]+)`\]\([^)]+\)|\[([^\]]+)\]\([^)]+\)|`([^`]+)`|([^|]+?))\s*\|\s*(\d+)\s*\|\s*(\[[ xX]\])\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|$/,
                 );
                 if (!rowMatch) {
                   continue;
                 }
 
-                const [, linkedGroup, plainGroup, , checkbox, scenarioList, comment] = rowMatch;
-                const group = linkedGroup ?? plainGroup;
+                const [
+                  ,
+                  linkedCodeGroup,
+                  linkedTextGroup,
+                  codeGroup,
+                  textGroup,
+                  ,
+                  checkbox,
+                  scenarioList,
+                  comment,
+                ] = rowMatch;
+                const group = linkedCodeGroup ?? linkedTextGroup ?? codeGroup ?? textGroup.trim();
                 previousGroups.set(`${currentPackage}\0${group}`, {
                   skipped: checkbox.toLowerCase() === "[x]",
                   scenarios: new Set(
@@ -342,7 +352,7 @@ jobs:
                   const groupState = getGroupState(summary.packageName, group, scenarios);
                   const isNewGroup = previousGroups.size > 0 && previous === undefined;
                   const groupUrl = getGroupUrl(summary.packageName, group);
-                  const linkedGroup = groupUrl ? `[\`${group}\`](${groupUrl})` : `\`${group}\``;
+                  const linkedGroup = groupUrl ? `[${group}](${groupUrl})` : group;
                   const groupLabel = isNewGroup ? `🆕 ${linkedGroup}` : linkedGroup;
                   const scenarioLabels = scenarios.map((scenario) => {
                     const isNewScenario =
