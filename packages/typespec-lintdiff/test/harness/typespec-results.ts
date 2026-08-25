@@ -16,10 +16,11 @@ const ANALYSIS_SCHEMA_VERSION = 6;
 const DATASET_SCHEMA_VERSION = 4;
 const LOCAL_RULESET = "tsp-lintdiff-local-linter/all";
 const LOCAL_RULE_PREFIX = "tsp-lintdiff-local-linter/";
-const ENUM_INSTEAD_OF_BOOLEAN_RULE =
-  "tsp-lintdiff-local-linter/enum-instead-of-boolean";
+const ENUM_INSTEAD_OF_BOOLEAN_RULE = "tsp-lintdiff-local-linter/enum-instead-of-boolean";
 const VALID_QUERY_PARAMETERS_FOR_POINT_OPERATIONS_RULE =
   "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations";
+const QUERY_PARAMETERS_IN_COLLECTION_GET_RULE =
+  "tsp-lintdiff-local-linter/query-parameters-in-collection-get";
 const TSX_ESM_LOADER = import.meta.resolve("tsx/esm");
 const MAX_BUFFER = 256 * 1024 * 1024;
 
@@ -615,6 +616,28 @@ export function filterProjectedPointQueryDiagnostics(
   });
 }
 
+export function filterProjectedCollectionQueryDiagnostics(
+  diagnostics: TypeSpecDiagnostic[],
+  projected: ProjectedEnumResult,
+): TypeSpecDiagnostic[] {
+  const projectedLocations = new Set(
+    projected.collectionQueryParameterLocations.map(
+      (location) =>
+        `${location.sourceFile}\0${location.line}\0${location.column}\0${location.name}`,
+    ),
+  );
+  return diagnostics.filter((diagnostic) => {
+    if (diagnostic.rule !== QUERY_PARAMETERS_IN_COLLECTION_GET_RULE) {
+      return true;
+    }
+    const location = diagnosticLocationKey(diagnostic);
+    const name = /Query parameter '(.+?)' should/.exec(diagnostic.message)?.[1];
+    return (
+      location !== undefined && name !== undefined && projectedLocations.has(`${location}\0${name}`)
+    );
+  });
+}
+
 function collectBooleanSchemaNames(document: unknown): Set<string> {
   const names = new Set<string>();
 
@@ -733,8 +756,7 @@ function jsonPathValue(document: unknown, jsonPath: Array<string | number>): unk
 }
 
 function commonTypesVersion(value: string): string | undefined {
-  return /(?:^|\/)resource-management\/(v\d+)\/types\.json(?:#|$)/i.exec(value)?.[1]
-    .toLowerCase();
+  return /(?:^|\/)resource-management\/(v\d+)\/types\.json(?:#|$)/i.exec(value)?.[1].toLowerCase();
 }
 
 export function normalizeLatestCommonTypesValidatorDiagnostic(
@@ -759,9 +781,7 @@ export function normalizeLatestCommonTypesTypeSpecDiagnostic(
 ): string | undefined {
   if (selectedApiVersion && sourceText && diagnostic.line) {
     const targetLine = sourceText.split(/\r?\n/)[diagnostic.line - 1];
-    const targetApiVersion = /:\s*"(\d{4}-\d{2}-\d{2}(?:-preview)?)"/i.exec(
-      targetLine,
-    )?.[1];
+    const targetApiVersion = /:\s*"(\d{4}-\d{2}-\d{2}(?:-preview)?)"/i.exec(targetLine)?.[1];
     if (targetApiVersion && targetApiVersion !== selectedApiVersion) {
       return undefined;
     }
@@ -913,9 +933,7 @@ export function compareResults(
       );
       return {
         validatorRule,
-        validatorMode: options.stagingValidatorRules?.has(validatorRule)
-          ? "staging"
-          : "production",
+        validatorMode: options.stagingValidatorRules?.has(validatorRule) ? "staging" : "production",
         coverageKind: options.fixtureMetadata?.get(validatorRule)?.coverageKind ?? "unknown",
         mappedTypeSpecRules,
         firedTypeSpecRules,
@@ -1280,20 +1298,14 @@ async function compileProject(
     diagnostics.some(
       (diagnostic) =>
         diagnostic.rule === ENUM_INSTEAD_OF_BOOLEAN_RULE ||
-        diagnostic.rule === VALID_QUERY_PARAMETERS_FOR_POINT_OPERATIONS_RULE,
+        diagnostic.rule === VALID_QUERY_PARAMETERS_FOR_POINT_OPERATIONS_RULE ||
+        diagnostic.rule === QUERY_PARAMETERS_IN_COLLECTION_GET_RULE,
     )
   ) {
     const workerPath = path.join(import.meta.dirname, "projected-enum-worker.ts");
     const projected = await execFileAsync(
       process.execPath,
-      [
-        "--import",
-        TSX_ESM_LOADER,
-        workerPath,
-        mainPath,
-        configPath,
-        project.apiVersion,
-      ],
+      ["--import", TSX_ESM_LOADER, workerPath, mainPath, configPath, project.apiVersion],
       {
         cwd: projectDir,
         maxBuffer: MAX_BUFFER,
@@ -1310,6 +1322,7 @@ async function compileProject(
       loadEmittedBooleanNames(config.datasetDir, project),
     );
     diagnostics = filterProjectedPointQueryDiagnostics(diagnostics, projectedResult);
+    diagnostics = filterProjectedCollectionQueryDiagnostics(diagnostics, projectedResult);
   } else {
     fs.rmSync(projectedEnumPath, { force: true });
   }
@@ -1782,27 +1795,15 @@ async function run(config: Config): Promise<void> {
       validatorIndex,
       new Set(scope.projects),
     );
-    const stagingValidatorPath = path.join(
-      config.datasetDir,
-      "staging-validator-results.json",
-    );
+    const stagingValidatorPath = path.join(config.datasetDir, "staging-validator-results.json");
     const stagingValidatorIndex = fs.existsSync(stagingValidatorPath)
       ? readJson<ValidatorIndex>(stagingValidatorPath)
       : undefined;
-    if (
-      stagingValidatorIndex &&
-      stagingValidatorIndex.specsCommit !== meta.specsCommit
-    ) {
-      throw new Error(
-        `Staging validator results do not match dataset commit ${meta.specsCommit}.`,
-      );
+    if (stagingValidatorIndex && stagingValidatorIndex.specsCommit !== meta.specsCommit) {
+      throw new Error(`Staging validator results do not match dataset commit ${meta.specsCommit}.`);
     }
     const stagingValidatorRules = stagingValidatorIndex
-      ? loadValidatorRuleData(
-          config.datasetDir,
-          stagingValidatorIndex,
-          new Set(scope.projects),
-        )
+      ? loadValidatorRuleData(config.datasetDir, stagingValidatorIndex, new Set(scope.projects))
       : {};
     const comparison = compareResults(
       meta.specsCommit,

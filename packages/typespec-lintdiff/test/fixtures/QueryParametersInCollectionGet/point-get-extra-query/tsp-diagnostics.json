@@ -77,7 +77,7 @@
   {
     "code": "tsp-lintdiff-local-linter/get-in-operation-name",
     "severity": "warning",
-    "message": "'GET' operation 'readWithQuery' should use method name 'Get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    "message": "'GET' operation 'readWithQuery' should use method name 'get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
   },
   {
     "code": "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations",

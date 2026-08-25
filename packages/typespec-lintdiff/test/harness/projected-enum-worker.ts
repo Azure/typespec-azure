@@ -34,6 +34,12 @@ export interface ProjectedEnumResult {
     name: string;
     verb: string;
   }>;
+  collectionQueryParameterLocations: Array<{
+    sourceFile: string;
+    line: number;
+    column: number;
+    name: string;
+  }>;
 }
 
 const pointOperationVerbs = new Set(["get", "put", "patch", "delete"]);
@@ -58,10 +64,7 @@ function locationKey(
   projectDir: string,
 ): { key: string; sourceFile: string; line: number; column: number } | undefined {
   const location = getSourceLocation(target, { locateId: true });
-  if (
-    !location ||
-    program.getSourceFileLocationContext(location.file).type !== "project"
-  ) {
+  if (!location || program.getSourceFileLocationContext(location.file).type !== "project") {
     return undefined;
   }
   const position = location.file.getLineAndCharacterOfPosition(location.pos);
@@ -161,9 +164,7 @@ function visitBody(
       addTarget(
         program,
         body.property ?? operation,
-        body.property
-          ? resolveEncodedName(program, body.property, "application/json")
-          : "$direct",
+        body.property ? resolveEncodedName(program, body.property, "application/json") : "$direct",
         projectDir,
         locations,
       );
@@ -209,14 +210,7 @@ function visitHttpOperation(
       for (const property of content.properties) {
         visitType(program, property.property, projectDir, locations, visited);
       }
-      visitBody(
-        program,
-        content.body,
-        operation.operation,
-        projectDir,
-        locations,
-        visited,
-      );
+      visitBody(program, content.body, operation.operation, projectDir, locations, visited);
     }
   }
 }
@@ -227,18 +221,12 @@ function collectQueryParameterLocations(
   projectDir: string,
   locations: Map<string, ProjectedEnumResult["queryParameterLocations"][number]>,
 ): void {
-  if (
-    !pointOperationVerbs.has(operation.verb) ||
-    !isPointOperationPath(operation.path)
-  ) {
+  if (!pointOperationVerbs.has(operation.verb) || !isPointOperationPath(operation.path)) {
     return;
   }
 
   for (const parameter of operation.parameters.parameters) {
-    if (
-      parameter.type !== "query" ||
-      parameter.name.toLowerCase() === "api-version"
-    ) {
+    if (parameter.type !== "query" || parameter.name.toLowerCase() === "api-version") {
       continue;
     }
     const location = locationKey(program, parameter.param, projectDir);
@@ -254,10 +242,49 @@ function collectQueryParameterLocations(
   }
 }
 
-async function compileProgram(
-  mainPath: string,
-  configPath: string,
-): Promise<Program> {
+function isCollectionPath(path: string): boolean {
+  const providerPath = path.split(".").at(-1);
+  return (
+    path.includes(".") &&
+    providerPath !== undefined &&
+    providerPath.includes("/") &&
+    providerPath.split("/").length % 2 === 0
+  );
+}
+
+function collectCollectionQueryParameterLocations(
+  program: Program,
+  operation: HttpOperation,
+  projectDir: string,
+  locations: Map<string, ProjectedEnumResult["collectionQueryParameterLocations"][number]>,
+): void {
+  if (operation.verb !== "get" || !isCollectionPath(operation.path)) {
+    return;
+  }
+
+  for (const parameter of operation.parameters.parameters) {
+    if (
+      parameter.type !== "query" ||
+      parameter.name === "api-version" ||
+      parameter.name === "$filter"
+    ) {
+      continue;
+    }
+    const location =
+      locationKey(program, parameter.param, projectDir) ??
+      locationKey(program, operation.operation, projectDir);
+    if (location) {
+      locations.set(`${location.key}\0${parameter.name}`, {
+        sourceFile: location.sourceFile,
+        line: location.line,
+        column: location.column,
+        name: parameter.name,
+      });
+    }
+  }
+}
+
+async function compileProgram(mainPath: string, configPath: string): Promise<Program> {
   const projectDir = path.dirname(mainPath);
   const [options, configDiagnostics] = await resolveCompilerOptions(NodeHost, {
     cwd: projectDir,
@@ -297,6 +324,10 @@ export async function collectProjectedEnumLocations(
     string,
     ProjectedEnumResult["queryParameterLocations"][number]
   >();
+  const collectionQueryParameterLocations = new Map<
+    string,
+    ProjectedEnumResult["collectionQueryParameterLocations"][number]
+  >();
   let serviceCount = 0;
   for (const service of listServices(program)) {
     const versioning = getVersioningMutators(program, service.type);
@@ -329,11 +360,12 @@ export async function collectProjectedEnumLocations(
       });
       for (const operation of httpService.operations) {
         visitHttpOperation(program, operation, projectDir, locations);
-        collectQueryParameterLocations(
+        collectQueryParameterLocations(program, operation, projectDir, queryParameterLocations);
+        collectCollectionQueryParameterLocations(
           program,
           operation,
           projectDir,
-          queryParameterLocations,
+          collectionQueryParameterLocations,
         );
       }
       continue;
@@ -360,11 +392,12 @@ export async function collectProjectedEnumLocations(
     });
     for (const operation of httpService.operations) {
       visitHttpOperation(program, operation, projectDir, locations);
-      collectQueryParameterLocations(
+      collectQueryParameterLocations(program, operation, projectDir, queryParameterLocations);
+      collectCollectionQueryParameterLocations(
         program,
         operation,
         projectDir,
-        queryParameterLocations,
+        collectionQueryParameterLocations,
       );
     }
   }
@@ -388,15 +421,20 @@ export async function collectProjectedEnumLocations(
         left.line - right.line ||
         left.column - right.column,
     ),
+    collectionQueryParameterLocations: [...collectionQueryParameterLocations.values()].sort(
+      (left, right) =>
+        left.sourceFile.localeCompare(right.sourceFile) ||
+        left.line - right.line ||
+        left.column - right.column ||
+        left.name.localeCompare(right.name),
+    ),
   };
 }
 
 async function main(): Promise<void> {
   const [mainPath, configPath, apiVersion] = process.argv.slice(2);
   if (!mainPath || !configPath || !apiVersion) {
-    throw new Error(
-      "Usage: projected-enum-worker.ts <main.tsp> <tspconfig.yaml> <api-version>",
-    );
+    throw new Error("Usage: projected-enum-worker.ts <main.tsp> <tspconfig.yaml> <api-version>");
   }
   process.stdout.write(
     JSON.stringify(

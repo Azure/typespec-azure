@@ -6,6 +6,7 @@ import {
   comparisonMarkdown,
   coverageBreakdownMarkdown,
   createCoverageBreakdown,
+  filterProjectedCollectionQueryDiagnostics,
   filterProjectedEnumDiagnostics,
   filterProjectedPointQueryDiagnostics,
   injectLocalRuleset,
@@ -128,31 +129,35 @@ describe("TypeSpec result aggregation", () => {
     ];
 
     expect(
-      filterProjectedEnumDiagnostics(diagnostics, {
-        apiVersion: "2026-01-01",
-        serviceCount: 1,
-        locations: [
-          {
-            sourceFile: "models.tsp",
-            line: 10,
-            column: 3,
-            emittedName: "hidden",
-          },
-          {
-            sourceFile: "models.tsp",
-            line: 20,
-            column: 3,
-            emittedName: "enabled",
-          },
-        ],
-        queryParameterLocations: [],
-      }, new Set(["enabled"])),
+      filterProjectedEnumDiagnostics(
+        diagnostics,
+        {
+          apiVersion: "2026-01-01",
+          serviceCount: 1,
+          locations: [
+            {
+              sourceFile: "models.tsp",
+              line: 10,
+              column: 3,
+              emittedName: "hidden",
+            },
+            {
+              sourceFile: "models.tsp",
+              line: 20,
+              column: 3,
+              emittedName: "enabled",
+            },
+          ],
+          collectionQueryParameterLocations: [],
+          queryParameterLocations: [],
+        },
+        new Set(["enabled"]),
+      ),
     ).toEqual([diagnostics[1], diagnostics[2]]);
   });
 
   it("filters point-query diagnostics outside the selected API version", () => {
-    const pointRule =
-      "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations";
+    const pointRule = "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations";
     const diagnostics: TypeSpecDiagnostic[] = [
       {
         ...diagnostic(pointRule, project),
@@ -174,6 +179,7 @@ describe("TypeSpec result aggregation", () => {
         apiVersion: "2026-01-01",
         serviceCount: 1,
         locations: [],
+        collectionQueryParameterLocations: [],
         queryParameterLocations: [
           {
             sourceFile: "operations.tsp",
@@ -181,6 +187,44 @@ describe("TypeSpec result aggregation", () => {
             column: 3,
             name: "mode",
             verb: "delete",
+          },
+        ],
+      }),
+    ).toEqual([diagnostics[1], diagnostics[2]]);
+  });
+
+  it("filters collection-query diagnostics outside the selected API version", () => {
+    const collectionRule = "tsp-lintdiff-local-linter/query-parameters-in-collection-get";
+    const diagnostics: TypeSpecDiagnostic[] = [
+      {
+        ...diagnostic(collectionRule, project),
+        sourceFile: "operations.tsp",
+        line: 10,
+        column: 3,
+        message: "Query parameter 'timestamp' should be removed.",
+      },
+      {
+        ...diagnostic(collectionRule, project),
+        sourceFile: "operations.tsp",
+        line: 20,
+        column: 3,
+        message: "Query parameter 'continuationToken' should be removed.",
+      },
+      diagnostic("tsp-lintdiff-local-linter/another-rule", project),
+    ];
+
+    expect(
+      filterProjectedCollectionQueryDiagnostics(diagnostics, {
+        apiVersion: "2026-01-01",
+        serviceCount: 1,
+        locations: [],
+        queryParameterLocations: [],
+        collectionQueryParameterLocations: [
+          {
+            sourceFile: "operations.tsp",
+            line: 20,
+            column: 3,
+            name: "continuationToken",
           },
         ],
       }),
@@ -256,32 +300,27 @@ describe("validator and TypeSpec comparison", () => {
     };
 
     expect(
-      normalizeLatestCommonTypesValidatorDiagnostic(
-        validatorDiagnostic,
-        swagger,
+      normalizeLatestCommonTypesValidatorDiagnostic(validatorDiagnostic, swagger, "2026-01-01"),
+    ).toBe(`project-a\0${"2026-01-01"}\0v4`);
+    expect(
+      normalizeLatestCommonTypesTypeSpecDiagnostic(
+        { ...typeSpecDiagnostic, line: 2 },
         "2026-01-01",
+        ["enum Versions {", '  v2026_01_01: "2026-01-01",', "}"].join("\n"),
       ),
     ).toBe(`project-a\0${"2026-01-01"}\0v4`);
     expect(
       normalizeLatestCommonTypesTypeSpecDiagnostic(
         { ...typeSpecDiagnostic, line: 2 },
         "2026-01-01",
-        ['enum Versions {', '  v2026_01_01: "2026-01-01",', "}"].join("\n"),
-      ),
-    ).toBe(`project-a\0${"2026-01-01"}\0v4`);
-    expect(
-      normalizeLatestCommonTypesTypeSpecDiagnostic(
-        { ...typeSpecDiagnostic, line: 2 },
-        "2026-01-01",
-        ['enum Versions {', '  v2025_01_01: "2025-01-01",', "}"].join("\n"),
+        ["enum Versions {", '  v2025_01_01: "2025-01-01",', "}"].join("\n"),
       ),
     ).toBeUndefined();
   });
 
   it("reports exact consistency after common-types reference deduplication", () => {
     const rule = "LatestVersionOfCommonTypesMustBeUsed";
-    const typeSpecRule =
-      "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used";
+    const typeSpecRule = "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used";
     const aggregate = aggregateTypeSpecResults("commit", "2026-08-07T00:00:00.000Z", [
       {
         ...diagnostic(typeSpecRule, "project-a"),
