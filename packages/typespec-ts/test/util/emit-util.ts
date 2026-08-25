@@ -211,6 +211,12 @@ export async function emitModularOperationsFromTypeSpec(
   if (options["treat-unknown-as-record"] !== undefined) {
     dpgContext.emitterOptions!.treatUnknownAsRecord = options["treat-unknown-as-record"] === true;
   }
+  if (options["enable-operation-group"] !== undefined) {
+    dpgContext.emitterOptions!.enableOperationGroup = options["enable-operation-group"] === true;
+  }
+  if (options["hierarchy-client"] !== undefined) {
+    dpgContext.emitterOptions!.hierarchyClient = options["hierarchy-client"] === true;
+  }
   const modularEmitterOptions = transformModularEmitterOptions(dpgContext, "", {
     casing: "camel",
   });

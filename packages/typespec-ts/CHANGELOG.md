@@ -1,5 +1,48 @@
 # Change Log - @azure-tools/typespec-ts
 
+## 0.56.0
+
+### Features
+
+- [#4891](https://github.com/Azure/typespec-azure/pull/4891) Add built-in support for Azure service groups as extension resource targets and ARM resource identifier scopes.
+- [#5154](https://github.com/Azure/typespec-azure/pull/5154) Rename reserved-word operations (e.g. `delete`) that belong to an operation group by suffixing the singularized group name instead of emitting a `@fixme`. For example, `Conversations.delete` is now generated as `deleteConversation` rather than `$delete` with a fixme doc comment. Operations without an operation group continue to fall back to the previous guarded name and `@fixme` guidance.
+  
+  An explicit `@clientName` override opts out of this renaming: when a reserved-word operation carries a `@clientName`, the emitter keeps the requested public method name (e.g. `delete`) and does not disambiguate it with the operation group or emit a `@fixme`. This provides a backwards-compatibility escape hatch for already-shipped libraries. The generated API-layer function stays guarded (`$delete`) because a reserved word is not a valid JavaScript function binding, while the public surface preserves the original name.
+  
+  ```tsp
+  @route("/conversations")
+  interface Conversations {
+    // Keep `delete` as the generated method name instead of `deleteConversation`.
+    @delete
+    @clientName("delete", "javascript")
+    delete(@path conversationName: string): void;
+  }
+  ```
+
+### Bug Fixes
+
+- [#5038](https://github.com/Azure/typespec-azure/pull/5038) Add the license header to emitted `.mts`/`.mjs` files (e.g. the browser and react-native static helper variants such as `get-binary-stream-response-browser.mts`), which were previously skipped because the source-code detection only matched `.ts`/`.js` extensions.
+- [#4872](https://github.com/Azure/typespec-azure/pull/4872) Fix multi-client package build failures by syncing the generated `config/tsconfig.src.*.json` `include` lists with the `warp.config.yml` exports, so every client entry point is compiled and emitted to `dist` (previously warp failed with `DIST_MISSING`).
+- [#4585](https://github.com/Azure/typespec-azure/pull/4585) [typespec-ts] fix platform import issue for customization
+- [#5162](https://github.com/Azure/typespec-azure/pull/5162) Restore blank lines between generated TypeScript declarations after batching ts-morph source-file mutations.
+
+
+## 0.55.2
+
+### Bug Fixes
+
+- [#5096](https://github.com/Azure/typespec-azure/pull/5096) Fix multi-client package build failures by syncing the generated `config/tsconfig.src.*.json` `include` lists with the `warp.config.yml` exports, so every client entry point is compiled and emitted to `dist` (previously warp failed with `DIST_MISSING`).
+
+
+## 0.55.1
+
+### Bug Fixes
+
+- [#4804](https://github.com/Azure/typespec-azure/pull/4804) Fix return type for operations with optional body response: use `void` instead of `undefined` in union return types (e.g. `Promise<KeyValue | void>` instead of `Promise<KeyValue | undefined>`)
+- [#4817](https://github.com/Azure/typespec-azure/pull/4817) Simplify the generated SDK `User-Agent` telemetry prefix to follow the [Azure Core telemetry policy](https://azure.github.io/azure-sdk/general_azurecore.html#telemetry-policy). The legacy internal layering tokens `azsdk-js-client` and `azsdk-js-api` are no longer emitted, so the user agent is now `[<application_id> ]azsdk-js-<package>/<version> <platform_info>`. Any caller-supplied application id is still forwarded and prepended.
+- [#4570](https://github.com/Azure/typespec-azure/pull/4570) Use the `catalog:` pnpm workspace specifier for the `tslib` dependency when generating `package.json` for the azure-sdk-for-js monorepo.
+
+
 ## 0.55.0
 
 ### Breaking Changes

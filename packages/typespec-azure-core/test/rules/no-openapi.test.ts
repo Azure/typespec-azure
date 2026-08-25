@@ -1,5 +1,5 @@
 import { Tester } from "#test/test-host.js";
-import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
+import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { noOpenAPIRule } from "../../src/rules/no-openapi.js";
 
@@ -27,7 +27,7 @@ describe("@operationId", () => {
 });
 
 describe("@extension", () => {
-  it("emit warning if @extension is used", async () => {
+  it("does not emit a warning if @extension is used", async () => {
     await tester
       .expect(
         `
@@ -35,14 +35,11 @@ describe("@extension", () => {
         op test(): string;
       `,
       )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-core/no-openapi",
-        message: `Azure specs should not be using decorator "$extension" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter.`,
-      });
+      .toBeValid();
   });
 
   // https://github.com/Azure/typespec-azure/issues/687
-  it("include x-ms-identifiers key", async () => {
+  it("does not emit a warning for the x-ms-identifiers key", async () => {
     await tester
       .expect(
         `model foo {
@@ -51,9 +48,7 @@ describe("@extension", () => {
         }
         model Bar { prop: string;}`,
       )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-core/no-openapi",
-      });
+      .toBeValid();
   });
 });
 

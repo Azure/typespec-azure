@@ -1,6 +1,6 @@
-import { createDiagnosticCollector, Diagnostic, getDoc, getSummary } from "@typespec/compiler";
+import { createDiagnosticCollector, type Diagnostic, getDoc, getSummary } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { getServers, HttpServer } from "@typespec/http";
+import { getServers, type HttpServer } from "@typespec/http";
 import {
   getClientInitializationOptions,
   getClientNameOverride,
@@ -8,18 +8,19 @@ import {
 } from "./decorators.js";
 import { getSdkHttpParameter } from "./http.js";
 import {
-  ClientInitializationOptions,
+  type ClientInitializationOptions,
   InitializedByFlags,
-  SdkClient,
-  SdkClientInitializationType,
-  SdkClientType,
-  SdkEndpointParameter,
-  SdkEndpointType,
-  SdkHttpOperation,
-  SdkPathParameter,
-  SdkServiceOperation,
-  SdkUnionType,
-  TCGCContext,
+  type SdkClient,
+  type SdkClientInitializationType,
+  type SdkClientType,
+  type SdkEndpointParameter,
+  type SdkEndpointType,
+  type SdkEnumType,
+  type SdkHttpOperation,
+  type SdkPathParameter,
+  type SdkServiceOperation,
+  type SdkUnionType,
+  type TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
 import {
@@ -35,6 +36,13 @@ import { createDiagnostic } from "./lib.js";
 import { createSdkMethods, getSdkMethodParameter } from "./methods.js";
 import { getCrossLanguageDefinitionId, getLibraryName, isExactClientName } from "./public-utils.js";
 import { getSdkBuiltInType, getSdkCredentialParameter, getTypeSpecBuiltInType } from "./types.js";
+
+function getVersionsEnum(context: TCGCContext, client: SdkClient): SdkEnumType | undefined {
+  if (client.services.length !== 1) {
+    return undefined;
+  }
+  return context.getPackageVersionSdkEnum().get(client.services[0]);
+}
 
 function getEndpointTypeFromSingleServer<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
@@ -61,6 +69,7 @@ function getEndpointTypeFromSingleServer<
         allowReserved: true,
         optional: false,
         serializedName: "endpoint",
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
         correspondingMethodParams: [],
         methodParameterSegments: [],
         type: getSdkBuiltInType(context, $(context.program).builtin.url),
@@ -203,6 +212,7 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
     apiVersions: context.getApiVersionsForType(clientType),
+    versionsEnum: getVersionsEnum(context, client),
     namespace: getClientNamespace(context, clientType),
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),

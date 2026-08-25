@@ -1,9 +1,15 @@
-import { CompilerHost, getDirectoryPath, joinPaths, NoTarget, Program } from "@typespec/compiler";
+import {
+  type CompilerHost,
+  getDirectoryPath,
+  joinPaths,
+  NoTarget,
+  type Program,
+} from "@typespec/compiler";
 import { format } from "prettier";
 import prettierPluginBabel from "prettier/plugins/babel";
 import prettierPluginEstree from "prettier/plugins/estree";
 import prettierPluginTypescript from "prettier/plugins/typescript";
-import { ClientModel, ContentBuilder, File } from "../interfaces.js";
+import type { ClientModel, ContentBuilder, File } from "../interfaces.js";
 import { prettierJSONOptions, prettierTypeScriptOptions, reportDiagnostic } from "../lib.js";
 
 export async function emitContentByBuilder(
@@ -36,7 +42,7 @@ async function emitFile(file: File, program: Program, emitterOutputDir?: string)
   const host: CompilerHost = program.host;
   const filePath = joinPaths(emitterOutputDir ?? "", file.path);
   const isJson = /\.json$/gi.test(filePath);
-  const isSourceCode = /\.(ts|js)$/gi.test(filePath);
+  const isSourceCode = /\.(m|c)?(ts|js)$/gi.test(filePath);
   const licenseHeader = `// Copyright (c) Microsoft Corporation.\n// Licensed under the MIT License.\n`;
   let prettierFileContent = file.content;
 

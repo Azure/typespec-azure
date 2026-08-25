@@ -1,12 +1,12 @@
 import {
   createDiagnosticCollector,
-  Diagnostic,
   getEffectiveModelType,
   ignoreDiagnostics,
   isNeverType,
   isUnknownType,
   isVoidType,
   type DecoratorContext,
+  type Diagnostic,
   type IntrinsicType,
   type Model,
   type ModelProperty,
@@ -18,14 +18,14 @@ import { useStateMap, useStateSet } from "@typespec/compiler/utils";
 import { isMetadata } from "@typespec/http";
 import type { PollingLocationDecorator } from "../../generated-defs/Azure.Core.js";
 import { AzureCoreStateKeys } from "../lib.js";
-import { ModelPropertyTerminationStatus } from "../lro-helpers.js";
+import type { ModelPropertyTerminationStatus } from "../lro-helpers.js";
 import { getLroErrorResult } from "./lro-error-result.js";
 import { getLroResult } from "./lro-result.js";
 import {
   extractLroStates,
   findLroStatusProperty,
   getLongRunningStates,
-  LongRunningStates,
+  type LongRunningStates,
 } from "./lro-status.js";
 
 export const [

@@ -2,31 +2,31 @@ import {
   isPagedResultModel,
   isReadOnly,
   listAllServiceNamespaces,
-  SdkArrayType,
-  SdkClientType,
-  SdkDictionaryType,
-  SdkEnumType,
-  SdkEnumValueType,
-  SdkHttpOperation,
-  SdkMethod,
-  SdkModelPropertyType,
-  SdkModelType,
-  SdkNullableType,
-  SdkServiceMethod,
-  SdkServiceOperation,
-  SdkType,
-  SdkUnionType,
+  type SdkArrayType,
+  type SdkClientType,
+  type SdkDictionaryType,
+  type SdkEnumType,
+  type SdkEnumValueType,
+  type SdkHttpOperation,
+  type SdkMethod,
+  type SdkModelPropertyType,
+  type SdkModelType,
+  type SdkNullableType,
+  type SdkServiceMethod,
+  type SdkServiceOperation,
+  type SdkType,
+  type SdkUnionType,
   UsageFlags,
 } from "@azure-tools/typespec-client-generator-core";
 import {
-  EnumDeclarationStructure,
-  EnumMemberStructure,
-  InterfaceDeclarationStructure,
-  OptionalKind,
-  PropertySignatureStructure,
+  type EnumDeclarationStructure,
+  type EnumMemberStructure,
+  type InterfaceDeclarationStructure,
+  type OptionalKind,
+  type PropertySignatureStructure,
   SourceFile,
   StructureKind,
-  TypeAliasDeclarationStructure,
+  type TypeAliasDeclarationStructure,
 } from "ts-morph";
 // import { isKey } from "@typespec/compiler";
 import {
@@ -49,7 +49,7 @@ import { refkey } from "../framework/refkey.js";
 import { beginSourceFileBatch, flushSourceFileBatch } from "../framework/source-file-batch.js";
 import { reportDiagnostic } from "../lib.js";
 import { getClientHierarchyMap } from "../utils/client-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import { isAzureCoreErrorType } from "../utils/model-utils.js";
 import { fixLeadingNumber, NameType, normalizeName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
@@ -95,12 +95,7 @@ type InterfaceStructure = OptionalKind<InterfaceDeclarationStructure> & {
 function isGenerableType(
   type: SdkType,
 ): type is
-  | SdkModelType
-  | SdkEnumType
-  | SdkUnionType
-  | SdkDictionaryType
-  | SdkArrayType
-  | SdkNullableType {
+  SdkModelType | SdkEnumType | SdkUnionType | SdkDictionaryType | SdkArrayType | SdkNullableType {
   return (
     type.kind === "model" ||
     type.kind === "enum" ||
@@ -808,12 +803,7 @@ export function getAdditionalPropertiesName(context: SdkContext, model: SdkModel
 export function normalizeModelName(
   context: SdkContext,
   type:
-    | SdkModelType
-    | SdkEnumType
-    | SdkUnionType
-    | SdkArrayType
-    | SdkDictionaryType
-    | SdkNullableType,
+    SdkModelType | SdkEnumType | SdkUnionType | SdkArrayType | SdkDictionaryType | SdkNullableType,
   nameType: NameType = NameType.Interface,
   skipPolymorphicUnionSuffix = false,
   rawModelName?: boolean,

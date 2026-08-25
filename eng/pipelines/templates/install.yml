@@ -30,6 +30,10 @@ steps:
 
   - template: /eng/common/pipelines/templates/steps/create-authenticated-npmrc.yml
 
+  - template: /eng/common/pipelines/templates/steps/maven-authenticate.yml
+
+  - template: /eng/common/pipelines/templates/steps/python-auth-dev-feed.yml
+
   - task: Cache@2
     inputs:
       key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'

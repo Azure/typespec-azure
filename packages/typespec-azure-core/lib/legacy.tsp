@@ -18,6 +18,8 @@ namespace Azure.Core.Legacy;
  *   @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[ListCertificateOptions.includePending]>;
  * }
  * ```
+ *
+ * @template ParameterizedParams The model properties whose values must be reapplied to the next link.
  */
 @Azure.Core.Foundations.Private.parameterizedNextLinkConfig(ParameterizedParams)
 scalar parameterizedNextLink<ParameterizedParams extends TypeSpec.Reflection.ModelProperty[]>

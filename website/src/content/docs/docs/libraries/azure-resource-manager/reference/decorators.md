@@ -235,7 +235,7 @@ of the operations will be grouped based on the interface name in generated
 clients.
 
 The optional `resourceOperationOptions` parameter provides additional options.
-`allowStaticRoutes` turns off autoRout for the interface, so individual operations can
+`allowStaticRoutes` turns off autoRoute for the interface, so individual operations can
 choose static (`@route`) or automatic (`@autoRoute`) routing.
 
 `resourceType: Model` specifies the resource type for the operations in the interface
@@ -602,14 +602,14 @@ multiple base types. Duplicate entries are ignored.
 
 ```typespec
 // Agent definition and properties using the Appliance deployment model
-model ContosoApplianceDefinition is AgentDefinitionAppliance<true, true>;
+model ContosoApplianceDefinition is AgentDefinitionAppliance<true>;
 model ContosoApplianceProperties is AgentPropertiesAppliance<ContosoApplianceDefinition> {
   ...DefaultProvisioningStateProperty;
 }
 
 // The @azureBaseType decorator marks the resource as conforming to the Agent base type.
 // (The Agent template applies this automatically, but it can also be applied directly.)
-@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+@azureBaseType(#{ baseType: BaseType.Agent, version: "2026-04-01" })
 model ContosoApplianceAgent is TrackedResource<ContosoApplianceProperties> {
   ...ResourceNameParameter<ContosoApplianceAgent>;
 }

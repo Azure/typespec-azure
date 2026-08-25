@@ -1,0 +1,5 @@
+emit:
+  - "@azure-tools/typespec-client-generator-core"
+linter:
+  extends:
+    - "@azure-tools/typespec-azure-rulesets/resource-manager"

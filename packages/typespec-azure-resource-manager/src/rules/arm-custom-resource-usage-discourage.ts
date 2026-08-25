@@ -1,4 +1,10 @@
-import { createRule, isTemplateInstance, Model, Program } from "@typespec/compiler";
+import {
+  createRule,
+  fileRef,
+  isTemplateInstance,
+  type Model,
+  type Program,
+} from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { isCustomAzureResource } from "../resource.js";
 
@@ -7,6 +13,7 @@ const armCustomResourceUsageDiscourageCode =
 
 export const armCustomResourceUsageDiscourage = createRule({
   name: "arm-custom-resource-usage-discourage",
+  docs: fileRef.fromPackageRoot("src/rules/arm-custom-resource-usage-discourage.md"),
   severity: "warning",
   description: "Verify the usage of @customAzureResource decorator.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-custom-resource-usage-discourage",

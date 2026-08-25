@@ -1,11 +1,12 @@
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   createRule,
+  fileRef,
   ignoreDiagnostics,
-  Model,
+  type Model,
   paramMessage,
-  Scalar,
-  Type,
+  type Scalar,
+  type Type,
 } from "@typespec/compiler";
 
 type ScalarFamily = "string" | "numeric" | "boolean";
@@ -75,6 +76,7 @@ function getScalarFamily(type: Type): ScalarFamily | undefined {
 
 export const noOverridePropsRule = createRule({
   name: "no-override-props",
+  docs: fileRef.fromPackageRoot("src/rules/no-override-props.md"),
   severity: "warning",
   description: "Disallow redefining properties already defined in a base type.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-override-props",

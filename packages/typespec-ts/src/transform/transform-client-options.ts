@@ -1,12 +1,12 @@
 import { getHttpOperationWithCache } from "@azure-tools/typespec-client-generator-core";
-import { getDoc, NoTarget, Program } from "@typespec/compiler";
+import { getDoc, NoTarget, type Program } from "@typespec/compiler";
 import { getAuthentication } from "@typespec/http";
-import { ClientOptions, PackageDetails, ServiceInfo } from "../interfaces.js";
-import { EmitterOptions, reportDiagnostic } from "../lib.js";
+import type { ClientOptions, PackageDetails, ServiceInfo } from "../interfaces.js";
+import { type EmitterOptions, reportDiagnostic } from "../lib.js";
 import { getClientParameters } from "../modular/helpers/client-helpers.js";
 import { getClients, listOperationsUnderClient } from "../utils/client-utils.js";
 import { getSupportedHttpAuth } from "../utils/credential-utils.js";
-import { SdkContext } from "../utils/interfaces.js";
+import type { SdkContext } from "../utils/interfaces.js";
 import { getDefaultService } from "../utils/model-utils.js";
 import { NameType, normalizeName, pascalCase } from "../utils/name-utils.js";
 import { detectModelConflicts } from "../utils/namespace-utils.js";
@@ -235,14 +235,12 @@ function buildPackageDetails(program: Program, emitterOptions: EmitterOptions): 
     nameWithoutScope: "unamedpackage",
     version: "1.0.0-beta.1",
   };
-  const isVersionUserProvided = Boolean(emitterOptions["package-details"]?.version);
   const packageDetails: PackageDetails = {
     ...emitterOptions["package-details"],
     name:
       emitterOptions["package-details"]?.name ??
       normalizeName(getDefaultService(program)?.title ?? "", NameType.Class),
-    version: emitterOptions["package-details"]?.version ?? "1.0.0-beta.1",
-    isVersionUserProvided,
+    version: emitterOptions["package-details"]?.version,
   };
   if (emitterOptions["package-details"]?.name) {
     const nameParts = emitterOptions["package-details"]?.name.split("/");

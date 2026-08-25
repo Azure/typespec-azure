@@ -63,27 +63,6 @@ describe("Package file generation", () => {
       });
     });
 
-    it("should have monorepo metadata", () => {
-      const model = createMockModel({ ...baseConfig });
-      const packageFileContent = buildPackageFile(model, {
-        clientContextPaths: ["src/api/testContext.ts"],
-      });
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      const expectedMetadata = {
-        constantPaths: [
-          {
-            path: "src/api/testContext.ts",
-            prefix: "userAgentInfo",
-          },
-        ],
-      };
-
-      // Verify monorepo specific metadata
-      expect(packageFile).to.have.property("//metadata");
-      expect(packageFile["//metadata"]).toEqual(expectedMetadata);
-    });
-
     it("should have sample metadata", () => {
       const model = createMockModel({
         ...baseConfig,
@@ -141,13 +120,6 @@ describe("Package file generation", () => {
       // Default: no react-native entrypoint
       expect(packageFile).not.toHaveProperty("react-native");
       expect(packageFile).to.have.property("exports");
-      expect(packageFile).to.have.property("imports");
-      expect(packageFile.imports).toEqual({
-        "#platform/*": {
-          browser: "./src/*-browser.mts",
-          default: "./src/*.ts",
-        },
-      });
       expect(packageFile.exports["./package.json"]).to.equal("./package.json");
       expect(packageFile.exports["."]).to.have.property("browser");
       // Default: no react-native in exports
@@ -170,14 +142,6 @@ describe("Package file generation", () => {
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
 
       expect(packageFile).to.have.property("react-native", "./dist/react-native/index.js");
-      expect(packageFile).to.have.property("imports");
-      expect(packageFile.imports).toEqual({
-        "#platform/*": {
-          browser: "./src/*-browser.mts",
-          "react-native": "./src/*-react-native.mts",
-          default: "./src/*.ts",
-        },
-      });
       expect(packageFile.exports["."]).to.have.property("react-native");
       expect(packageFile.exports["."]["react-native"]).toEqual({
         types: "./dist/react-native/index.d.ts",
@@ -246,24 +210,6 @@ describe("Package file generation", () => {
       expect(packageFile.scripts).to.have.property(
         "format",
         'prettier --write --config ../../../.prettierrc.json --ignore-path ../../../.prettierignore "src/**/*.{ts,cts,mts}" "test/**/*.{ts,cts,mts}" "*.{js,cjs,mjs,json}" ',
-      );
-    });
-
-    it("[esm] should read clientContextPaths from config for modular", () => {
-      const model = createMockModel({
-        ...baseConfig,
-        isModularLibrary: true,
-      });
-
-      const packageFileContent = buildPackageFile(model, {
-        clientContextPaths: ["src/api/chatCompletionsContext.ts"],
-      });
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-      expect(packageFile).to.have.property("//metadata");
-      expect(packageFile["//metadata"]["constantPaths"][0]).to.have.property(
-        "path",
-        "src/api/chatCompletionsContext.ts",
-        "modular",
       );
     });
 
@@ -455,81 +401,6 @@ describe("Package file generation", () => {
       expect(packageFile).not.toHaveProperty("tshy");
     });
 
-    it("should update constantPaths when clientContextPaths option is provided for Azure packages", () => {
-      const model = createMockModel({
-        hasLro: false,
-      });
-
-      const initialPackageInfo = {
-        name: "@azure/test-package",
-        version: "1.0.0",
-        dependencies: {
-          "@azure/core-client": "^1.0.0",
-        },
-        "//metadata": {
-          constantPaths: [
-            { path: "src/old-path.ts", prefix: "userAgentInfo" },
-            { path: "src/other-file.ts", prefix: "packageDetails" },
-          ],
-        },
-      };
-
-      const packageFileContent = updatePackageFile(model, initialPackageInfo, {
-        clientContextPaths: ["src/api/newContext.ts", "src/api/anotherContext.ts"],
-      });
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      expect(packageFile["//metadata"]).to.have.property("constantPaths");
-      const constantPaths = packageFile["//metadata"]["constantPaths"];
-
-      // Should keep non-userAgentInfo entries
-      expect(constantPaths).toContainEqual({
-        path: "src/other-file.ts",
-        prefix: "packageDetails",
-      });
-
-      // Should replace old userAgentInfo entries with new ones
-      expect(constantPaths).toContainEqual({
-        path: "src/api/newContext.ts",
-        prefix: "userAgentInfo",
-      });
-      expect(constantPaths).toContainEqual({
-        path: "src/api/anotherContext.ts",
-        prefix: "userAgentInfo",
-      });
-
-      // Should not include old userAgentInfo entry
-      expect(constantPaths).not.toContainEqual({
-        path: "src/old-path.ts",
-        prefix: "userAgentInfo",
-      });
-    });
-
-    it("should not update constantPaths when clientContextPaths is empty", () => {
-      const model = createMockModel({
-        hasLro: false,
-      });
-
-      const initialPackageInfo = {
-        name: "@azure/test-package",
-        version: "1.0.0",
-        "//metadata": {
-          constantPaths: [{ path: "src/old-path.ts", prefix: "userAgentInfo" }],
-        },
-      };
-
-      const packageFileContent = updatePackageFile(model, initialPackageInfo, {
-        clientContextPaths: [],
-      });
-
-      // Should still return a result (imports are added for warp packages),
-      // but constantPaths should remain unchanged
-      const packageInfo = JSON.parse(packageFileContent!.content);
-      expect(packageInfo["//metadata"].constantPaths).toEqual([
-        { path: "src/old-path.ts", prefix: "userAgentInfo" },
-      ]);
-    });
-
     it("should migrate @azure/core-client to @azure-rest/core-client", () => {
       const model = createMockModel({
         hasLro: false,
@@ -550,8 +421,8 @@ describe("Package file generation", () => {
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
 
       expect(packageFile.dependencies).not.toHaveProperty("@azure/core-client");
-      expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.3.1");
-      expect(packageFile.dependencies).to.have.property("@azure/core-rest-pipeline", "^1.19.1");
+      expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.7.0");
+      expect(packageFile.dependencies).to.have.property("@azure/core-rest-pipeline", "^1.24.0");
     });
 
     it("should not add duplicate @azure-rest/core-client if already present", () => {
@@ -564,7 +435,7 @@ describe("Package file generation", () => {
         version: "1.0.0",
         dependencies: {
           "@azure/core-client": "^1.9.3",
-          "@azure-rest/core-client": "^2.0.0",
+          "@azure-rest/core-client": "^2.7.0",
           tslib: "^2.6.2",
         },
       };
@@ -575,10 +446,10 @@ describe("Package file generation", () => {
 
       expect(packageFile.dependencies).not.toHaveProperty("@azure/core-client");
       // Existing version should be preserved, not overwritten
-      expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.0.0");
+      expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.7.0");
     });
 
-    it("should only add platform imports when no @azure/core-client and no other update triggers", () => {
+    it("should still normalize runtime dependencies when no other update triggers", () => {
       const model = createMockModel({
         hasLro: false,
       });
@@ -587,7 +458,7 @@ describe("Package file generation", () => {
         name: "@azure/test-package",
         version: "1.0.0",
         dependencies: {
-          "@azure-rest/core-client": "^2.3.1",
+          "@azure-rest/core-client": "^2.7.0",
           "@azure/core-rest-pipeline": "^1.20.0",
           tslib: "^2.8.1",
         },
@@ -597,58 +468,10 @@ describe("Package file generation", () => {
       expect(packageFileContent).toBeDefined();
       const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
 
-      // Dependencies should remain unchanged
       expect(packageFile.dependencies).not.toHaveProperty("@azure/core-client");
-      expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.3.1");
-
-      // Platform imports should be added for Azure monorepo ESM packages.
-      // By default (generateReactNativeTarget=false) the `react-native`
-      // condition must NOT be emitted, matching the fresh-generation path.
-      expect(packageFile).to.have.property("imports");
-      expect(packageFile.imports).toEqual({
-        "#platform/*": {
-          browser: "./src/*-browser.mts",
-          default: "./src/*.ts",
-        },
-      });
-    });
-
-    it("should include react-native in platform imports when generateReactNativeTarget is true", () => {
-      const model = createMockModel({
-        hasLro: false,
-        generateReactNativeTarget: true,
-      });
-
-      const initialPackageInfo = {
-        name: "@azure/test-package",
-        version: "1.0.0",
-        dependencies: {
-          "@azure-rest/core-client": "^2.3.1",
-          "@azure/core-rest-pipeline": "^1.20.0",
-          tslib: "^2.8.1",
-        },
-      };
-
-      const packageFileContent = updatePackageFile(model, initialPackageInfo);
-      expect(packageFileContent).toBeDefined();
-      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
-
-      // When opted-in, the `react-native` condition is added and must be
-      // positioned before `default` so Node's conditional resolution order
-      // matches the fresh-generation output in packageCommon.ts.
-      expect(packageFile).to.have.property("imports");
-      expect(packageFile.imports).toEqual({
-        "#platform/*": {
-          browser: "./src/*-browser.mts",
-          "react-native": "./src/*-react-native.mts",
-          default: "./src/*.ts",
-        },
-      });
-      expect(Object.keys(packageFile.imports["#platform/*"])).toEqual([
-        "browser",
-        "react-native",
-        "default",
-      ]);
+      expect(packageFile.dependencies).to.have.property("@azure-rest/core-client", "^2.7.0");
+      expect(packageFile.dependencies).to.have.property("@azure/core-rest-pipeline", "^1.24.0");
+      expect(packageFile.dependencies).to.have.property("tslib", "^2.8.1");
     });
   });
 });

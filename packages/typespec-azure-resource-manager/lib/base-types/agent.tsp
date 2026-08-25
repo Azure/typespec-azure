@@ -56,14 +56,11 @@ internal model AgentDefinition {
 /**
  * Appliance deployment model of AgentDefinition.
  * Properties controlled by `@baseTypeOptional` are invisible when the corresponding
- * template parameter is false, or read-only when present.
- * @template HasModelDeploymentRef Whether the modelDeploymentRef property is present.
+ * template parameter is false, or read-only when present. The appliance owns the whole
+ * agent definition, so there is no `modelDeploymentRef` property in this deployment model.
  * @template HasInstructions Whether the instructions property is present.
  */
-model AgentDefinitionAppliance<
-  HasModelDeploymentRef extends valueof boolean = false,
-  HasInstructions extends valueof boolean = false
-> {
+model AgentDefinitionAppliance<HasInstructions extends valueof boolean = false> {
   /** Model identifier (RP-defined). */
   @visibility(Lifecycle.Read)
   `model`: string;
@@ -71,10 +68,6 @@ model AgentDefinitionAppliance<
   /** System prompt / behavioral instructions for the agent. */
   @baseTypeOptional(HasInstructions, true)
   instructions: string;
-
-  /** Optional RP-specific reference to an underlying model deployment. */
-  @baseTypeOptional(HasModelDeploymentRef, true)
-  modelDeploymentRef?: string;
 }
 
 /**
@@ -186,6 +179,9 @@ model ConversationProperties {
   /** Timestamp of when the conversation was created. Read-only. */
   @visibility(Lifecycle.Read)
   createdAt?: utcDateTime;
+
+  /** Content input to the conversation. Required on create. */
+  input: InputItem;
 }
 
 /**
@@ -232,7 +228,7 @@ enum ItemType {
  *   - `FunctionCallOutput`: `callId`, `output`
  *   - `Compaction`: `summary`
  */
-model ConversationItem {
+model InputItem {
   /** Unique identifier of the item. Read-only (assigned by the service). */
   @visibility(Lifecycle.Read)
   id?: string;
@@ -240,11 +236,12 @@ model ConversationItem {
   /** The item type discriminator. Determines which variant this item represents. */
   type: ItemType;
 
-  /** The role of the message author. Applies to `Message` items. */
+  /** The role of the message author. Applies to `Message` items. Read-only. */
+  @visibility(Lifecycle.Read)
   role?: MessageRole;
 
-  /** The text content of the message. Applies to `Message` items. */
-  content?: string;
+  /** The content of the message. Applies to `Message` items. */
+  content?: Record<unknown>;
 
   /** Identifier correlating a function call with its output. Applies to `FunctionCall` and `FunctionCallOutput` items. */
   callId?: string;
@@ -316,7 +313,7 @@ model ResponseProperties {
   status?: ResponseStatus;
 
   /** Content input to the model. Required on create. */
-  input: ConversationItem;
+  input: InputItem;
 }
 
 /**
@@ -342,9 +339,9 @@ model ResponseItem {
   @visibility(Lifecycle.Read)
   role?: MessageRole;
 
-  /** The text content of the message. Applies to `Message` items. Read-only. */
+  /** The content of the message. Applies to `Message` items. Read-only. */
   @visibility(Lifecycle.Read)
-  content?: string;
+  content?: Record<unknown>;
 
   /** Identifier correlating a function call with its output. Applies to `FunctionCall` and `FunctionCallOutput` items. Read-only. */
   @visibility(Lifecycle.Read)
@@ -399,7 +396,7 @@ model ResponseInstructionsProperty {
  * Applies the Agent base type decorator automatically.
  * @template Properties RP-specific properties for the agent (must extend AgentProperties)
  */
-@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+@azureBaseType(#{ baseType: BaseType.Agent, version: "2026-04-01" })
 model Agent<Properties extends AgentProperties> is TrackedResource<Properties>;
 
 /**

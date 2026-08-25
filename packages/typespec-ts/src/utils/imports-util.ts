@@ -1,5 +1,5 @@
 import { SourceFile } from "ts-morph";
-import { ImportType, Imports } from "../interfaces.js";
+import type { ImportType, Imports } from "../interfaces.js";
 
 /**
  * Build the common imports for generated SDK. Azure Core packages are always used.
@@ -10,7 +10,7 @@ export function buildRuntimeImports(): Imports {
     restClient: {
       type: "restClient",
       specifier: "@azure-rest/core-client",
-      version: "^2.0.0",
+      version: "^2.7.0",
     },
     coreAuth: {
       type: "coreAuth",

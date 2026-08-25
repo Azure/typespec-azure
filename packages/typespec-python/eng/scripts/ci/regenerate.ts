@@ -13,20 +13,22 @@
  */
 
 import { platform } from "os";
-import { dirname, resolve } from "path";
+import { dirname, relative, resolve } from "path";
 import pc from "picocolors";
 import { fileURLToPath } from "url";
 import { parseArgs } from "util";
 
+import { isSpecEnabled, loadSpectorConfig, type SpectorConfig } from "@azure-tools/spector-runner";
+
 import {
   buildTaskGroups,
+  cleanGeneratedCode,
   getSubdirectories,
-  prepareBaselineOfGeneratedCode,
   preprocess,
-  RegenerateContext,
-  RegenerateFlags,
+  type RegenerateContext,
+  type RegenerateFlags,
   runParallel,
-} from "./regenerate-common.js";
+} from "./regenerate-common.ts";
 
 const argv = parseArgs({
   args: process.argv.slice(2),
@@ -44,7 +46,7 @@ const argv = parseArgs({
 
 if (argv.values.help) {
   console.log(`
-${pc.bold("Usage:")} tsx regenerate.ts [options]
+${pc.bold("Usage:")} node regenerate.ts [options]
 
 ${pc.bold("Description:")}
   Regenerates Python SDK code from TypeSpec definitions using in-process
@@ -73,16 +75,16 @@ ${pc.bold("Options:")}
 
 ${pc.bold("Examples:")}
   ${pc.dim("# Regenerate all packages for both flavors")}
-  tsx regenerate.ts
+  node regenerate.ts
 
   ${pc.dim("# Regenerate only Azure packages")}
-  tsx regenerate.ts --flavor azure
+  node regenerate.ts --flavor azure
 
   ${pc.dim("# Regenerate a specific package by name")}
-  tsx regenerate.ts --flavor azure --name authentication-api-key
+  node regenerate.ts --flavor azure --name authentication-api-key
 
   ${pc.dim("# Regenerate with more parallelism")}
-  tsx regenerate.ts --jobs 50
+  node regenerate.ts --jobs 50
 `);
   process.exit(0);
 }
@@ -108,6 +110,35 @@ const ctx: RegenerateContext = {
   emitterName: EMITTER_NAME,
 };
 
+// Opt-in spec selection (see Azure/typespec-azure#4997). Only specs listed
+// with a truthy value in spector.config.yaml are generated; anything discovered on
+// disk but not opted in is skipped. Per-spec emitter options still come from the
+// upstream-synced option tables in regenerate-common.ts.
+const spectorConfig: SpectorConfig = loadSpectorConfig(resolve(PLUGIN_DIR, "spector.config.yaml"));
+
+function toPosix(p: string): string {
+  return p.split("\\").join("/");
+}
+
+/** Spec-path key matching `getEmitterOptions`'s key computation. */
+function specKey(spec: string): string {
+  const specDir = spec.includes("azure-http-specs") ? AZURE_HTTP_SPECS : HTTP_SPECS;
+  const relativeSpec = toPosix(relative(specDir, spec));
+  return relativeSpec.includes("resiliency/srv-driven/old.tsp")
+    ? relativeSpec
+    : dirname(relativeSpec);
+}
+
+/** Keep only specs opted into via spector.config.yaml. */
+function filterOptedIn(specs: string[]): { kept: string[]; skipped: string[] } {
+  const kept: string[] = [];
+  const skipped: string[] = [];
+  for (const spec of specs) {
+    (isSpecEnabled(spectorConfig, specKey(spec)) ? kept : skipped).push(spec);
+  }
+  return { kept, skipped };
+}
+
 async function regenerateFlavor(
   flavor: string,
   name: string | undefined,
@@ -124,7 +155,12 @@ async function regenerateFlavor(
 
   const azureSpecs = flavor === "azure" ? await getSubdirectories(AZURE_HTTP_SPECS, flags) : [];
   const standardSpecs = await getSubdirectories(HTTP_SPECS, flags);
-  const allSpecs = [...azureSpecs, ...standardSpecs];
+  const discovered = [...azureSpecs, ...standardSpecs];
+
+  const { kept: allSpecs, skipped } = filterOptedIn(discovered);
+  if (skipped.length > 0) {
+    console.log(pc.yellow(`Skipping ${skipped.length} spec(s) not opted into spector.config.yaml`));
+  }
 
   const groups = buildTaskGroups(allSpecs, flags, ctx);
   const totalTasks = groups.reduce((sum, g) => sum + g.tasks.length, 0);
@@ -169,7 +205,7 @@ async function main(): Promise<void> {
   const startTime = performance.now();
   let success: boolean;
 
-  await prepareBaselineOfGeneratedCode(GENERATED_FOLDER);
+  await cleanGeneratedCode(GENERATED_FOLDER);
 
   if (flavor) {
     success = await regenerateFlavor(flavor, name, debug, jobs);

@@ -14,7 +14,7 @@ on:
 
 engine:
   id: copilot
-  model: claude-opus-4.8
+model: gpt-5.6-sol
 timeout-minutes: 120
 
 permissions:
@@ -67,7 +67,7 @@ steps:
         REBUILD_FLAG="--full-rebuild"
       fi
 
-      npx tsx eng/scripts/doc-updater/src/precompute.ts \
+      node eng/scripts/doc-updater/src/precompute.ts \
         --config "$CONFIG_INPUT" \
         --output /tmp/gh-aw/agent/context.json \
         ${REBUILD_FLAG:+"$REBUILD_FLAG"}
@@ -89,7 +89,7 @@ safe-outputs:
   noop:
     report-as-issue: false
   create-pull-request:
-    title-prefix: "[Automated][${{ github.event.inputs.config }}] "
+    title-prefix: "[Automated][${{ github.event.inputs.config }}][skip chg] "
     labels: [docs, "lib:${{ github.event.inputs.config }}"]
     max: 1
 
@@ -102,7 +102,7 @@ post-steps:
       ALLOWED_FILE="eng/scripts/doc-updater/configs/${CONFIG}.yaml"
 
       # Read allowedPaths using the doc-updater config loader
-      ALLOWED_PATHS=$(npx tsx eng/scripts/doc-updater/src/print-allowed-paths.ts --config "$CONFIG")
+      ALLOWED_PATHS=$(node eng/scripts/doc-updater/src/print-allowed-paths.ts --config "$CONFIG")
 
       if [ -z "$ALLOWED_PATHS" ]; then
         echo "WARNING: No allowedPaths in config, skipping validation"
@@ -166,11 +166,12 @@ been pre-computed and is available in `/tmp/gh-aw/agent/context.json`.
 - **Use sub-agents as much as possible.** Your main context window is limited — offload all reading, investigation, and editing work to sub-agents to prevent context loss. Only keep high-level coordination state in your own context. When in doubt, use a sub-agent.
 - **Sub-agents must NEVER call `create_pull_request`.** When delegating work to sub-agents, explicitly instruct them: "Do NOT call create_pull_request. Only read files, edit files, and report results back. The main agent will create the PR." Sub-agents should only use file reading and editing tools.
 - **Only modify files** whose paths start with one of the `allowedPaths` entries.
+- **Only add a changelog entry when necessary.** Run `pnpm change add` only if the changes modify content in a versioned package (e.g., adding or updating spec examples in `packages/azure-http-specs/specs/`). Do NOT add a changelog for documentation-only changes or changes that don't affect package consumers. Use `patch` bump type for spec additions.
 - **Complete every step in the domain-specific prompt.** Do not stop after finishing one step. After each step, explicitly state which step you just completed and which step you are starting next. Continue until all steps are done.
 - **Do not defer work.** Fix every issue you find in this run. Do not leave "remaining gaps" or "future work" in the knowledge base or PR description — the knowledge base is for lessons learned, not a to-do list.
 - **Update the knowledge base** at `knowledgePath` as you work (see Knowledge Base Rules below).
 - **Create exactly one pull request at the very end.** Only the main agent (you) may call `create_pull_request`, and only once, after ALL steps and ALL file edits are complete. Never delegate PR creation to a sub-agent.
-- **Update metadata as your final step before creating the PR.** Run `npx tsx eng/scripts/doc-updater/src/update-meta.ts --config <config-name> --commit <checkoutCommit>` (using the config name and `checkoutCommit` from the context) via the bash tool. This records the checkout commit hash so the next incremental run knows where to start. This must be done inside the agent so the metadata file is captured by safe-outputs.
+- **Update metadata as your final step before creating the PR.** Run `node eng/scripts/doc-updater/src/update-meta.ts --config <config-name> --commit <checkoutCommit>` (using the config name and `checkoutCommit` from the context) via the bash tool. This records the checkout commit hash so the next incremental run knows where to start. This must be done inside the agent so the metadata file is captured by safe-outputs.
 
 ## Knowledge Base Rules
 

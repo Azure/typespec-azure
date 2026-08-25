@@ -1,22 +1,22 @@
 import {
-  FinalOperationStep,
+  type FinalOperationStep,
   getParameterizedNextLinkArguments,
-  NextOperationLink,
-  NextOperationReference,
-  OperationLink,
-  OperationReference,
-  PollingOperationStep,
-  TerminationStatus,
+  type NextOperationLink,
+  type NextOperationReference,
+  type OperationLink,
+  type OperationReference,
+  type PollingOperationStep,
+  type TerminationStatus,
 } from "@azure-tools/typespec-azure-core";
 import {
   compilerAssert,
   createDiagnosticCollector,
-  Diagnostic,
+  type Diagnostic,
   getSummary,
   ignoreDiagnostics,
   isList,
-  ModelProperty,
-  Operation,
+  type ModelProperty,
+  type Operation,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import {
@@ -33,33 +33,34 @@ import {
 } from "./decorators.js";
 import { getSdkHttpOperation } from "./http.js";
 import {
-  SdkArrayType,
-  SdkBuiltInType,
-  SdkClient,
-  SdkClientType,
-  SdkLroPagingServiceMethod,
-  SdkLroServiceFinalResponse,
-  SdkLroServiceFinalStep,
-  SdkLroServiceMetadata,
-  SdkLroServiceMethod,
-  SdkMethod,
-  SdkMethodParameter,
-  SdkMethodResponse,
-  SdkModelPropertyType,
-  SdkModelType,
-  SdkNextOperationLink,
-  SdkNextOperationReference,
-  SdkOperationLink,
-  SdkOperationReference,
-  SdkPagingServiceMethod,
-  SdkPollingOperationStep,
-  SdkPropertyMap,
-  SdkServiceMethod,
-  SdkServiceOperation,
-  SdkStreamMetadata,
-  SdkTerminationStatus,
-  SdkType,
-  TCGCContext,
+  type SdkArrayType,
+  type SdkBuiltInType,
+  type SdkClient,
+  type SdkClientType,
+  type SdkLroPagingServiceMethod,
+  type SdkLroServiceFinalResponse,
+  type SdkLroServiceFinalStep,
+  type SdkLroServiceMetadata,
+  type SdkLroServiceMethod,
+  type SdkMethod,
+  type SdkMethodParameter,
+  type SdkMethodResponse,
+  type SdkModelPropertyType,
+  type SdkModelType,
+  type SdkNextOperationLink,
+  type SdkNextOperationReference,
+  type SdkOperationLink,
+  type SdkOperationReference,
+  type SdkPagingServiceMethod,
+  type SdkPollingOperationStep,
+  type SdkPropertyMap,
+  type SdkServiceMethod,
+  type SdkServiceOperation,
+  type SdkSseMetadata,
+  type SdkStreamMetadata,
+  type SdkTerminationStatus,
+  type SdkType,
+  type TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
 import {
@@ -181,23 +182,11 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       getOverriddenClientMethod(context, operation) ?? operation,
     );
 
-    if (responseType?.__raw?.kind !== "Model" || responseType.kind !== "model" || !pagingMetadata) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "unexpected-pageable-operation-return-type",
-          target: operation,
-          format: {
-            operationName: operation.name,
-          },
-        }),
-      );
-      // return as page method with no paging info
-      return diagnostics.wrap({
-        ...baseServiceMethod,
-        kind: "paging",
-        pagingMetadata: {},
-      });
-    }
+    compilerAssert(
+      responseType?.__raw?.kind === "Model" && responseType.kind === "model" && !!pagingMetadata,
+      "The response object for the pageable operation is either not a paging model, or is not correctly decorated with @nextLink and @pageItems.",
+      operation,
+    );
 
     const resultSegments = mapFirstSegmentForResultSegments(
       pagingMetadata.output.pageItems.path,
@@ -212,8 +201,8 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       baseServiceMethod.response,
     );
 
-    baseServiceMethod.response.resultSegments = resultSegments?.map(
-      (resultSegment) => context.__modelPropertyCache.get(resultSegment)!,
+    baseServiceMethod.response.resultSegments = resultSegments?.map((resultSegment) =>
+      context.__modelPropertyCache.get(resultSegment)!,
     );
 
     context.__pagedResultSet.add(responseType);
@@ -254,14 +243,13 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
                   context.program,
                   pagingMetadata.output.nextLink.property.type,
                 ) ?? []
-              ).map(
-                (t: ModelProperty) =>
-                  getPropertySegmentsFromModelOrParameters(
-                    baseServiceMethod.parameters,
-                    (p) =>
-                      p.__raw?.kind === "ModelProperty" &&
-                      findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
-                  )!,
+              ).map((t: ModelProperty) =>
+                getPropertySegmentsFromModelOrParameters(
+                  baseServiceMethod.parameters,
+                  (p) =>
+                    p.__raw?.kind === "ModelProperty" &&
+                    findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
+                )!,
               )
             : undefined,
       },
@@ -668,9 +656,11 @@ function getSdkMethodResponse(
 
   // Propagate stream metadata from HTTP responses to method response
   let streamMetadata: SdkStreamMetadata | undefined;
+  let sseMetadata: SdkSseMetadata | undefined;
   for (const response of responses) {
     if (response.streamMetadata) {
       streamMetadata = response.streamMetadata;
+      sseMetadata = response.sseMetadata;
       break;
     }
   }
@@ -680,6 +670,7 @@ function getSdkMethodResponse(
     type,
     ...(optional !== undefined && { optional }),
     ...(streamMetadata && { streamMetadata }),
+    ...(sseMetadata && { sseMetadata }),
   };
 }
 

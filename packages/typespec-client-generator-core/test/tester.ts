@@ -1,8 +1,23 @@
-import { Program, resolvePath } from "@typespec/compiler";
+import { type Program, resolvePath } from "@typespec/compiler";
 import { createTester, resolveVirtualPath, t } from "@typespec/compiler/testing";
 import { TemplateWithMarkers } from "../../../core/packages/compiler/src/testing/marked-template.js";
-import { createSdkContext, CreateSdkContextOptions } from "../src/context.js";
-import { BrandedSdkEmitterOptionsInterface } from "../src/internal-utils.js";
+import { createSdkContext, type CreateSdkContextOptions } from "../src/context.js";
+import type { BrandedSdkEmitterOptionsInterface } from "../src/internal-utils.js";
+
+/** Create a multiline test string without its shared source indentation. */
+export function d(strings: TemplateStringsArray, ...values: unknown[]): string {
+  const result = strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
+  return dedent(result);
+}
+
+function dedent(str: string): string {
+  str = str.replace(/^\n|\n[ ]*$/g, "");
+  const indent = str.match(/^[ \t]+/)?.[0] ?? "";
+  return str
+    .split("\n")
+    .map((line) => (line.startsWith(indent) ? line.slice(indent.length) : line))
+    .join("\n");
+}
 
 export interface SdkTesterOptions extends BrandedSdkEmitterOptionsInterface {
   emitterName?: string;
@@ -271,3 +286,49 @@ export function createSdkContextForTester(
     createSdkContextOption,
   );
 }
+/**
+ * Tester for streaming and SSE tests (loads @typespec/streams, @typespec/sse, @typespec/events).
+ */
+export const StreamsTester = createTester(resolvePath(import.meta.dirname, ".."), {
+  libraries: [
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/versioning",
+    "@typespec/streams",
+    "@typespec/sse",
+    "@typespec/events",
+    "@azure-tools/typespec-client-generator-core",
+  ],
+})
+  .import(
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/versioning",
+    "@typespec/http/streams",
+    "@typespec/streams",
+    "@typespec/sse",
+    "@typespec/events",
+    "@azure-tools/typespec-client-generator-core",
+  )
+  .using(
+    "Http",
+    "Rest",
+    "Versioning",
+    "TypeSpec.Http.Streams",
+    "TypeSpec.Streams",
+    "TypeSpec.SSE",
+    "TypeSpec.Events",
+    "Azure.ClientGenerator.Core",
+  );
+
+/**
+ * Streams/SSE tester with a built-in simple service namespace.
+ */
+export const StreamsTesterWithBuiltInService = StreamsTester.wrap(
+  (x) => `
+@service
+namespace TestService;
+
+${x}
+`,
+);

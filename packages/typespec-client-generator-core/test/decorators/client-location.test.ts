@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
+import type { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import {
   ArmTester,
   createClientCustomizationInput,
@@ -1203,16 +1203,14 @@ describe("Parameter", () => {
 
     // The foo method should NOT have subscriptionId as a method parameter (it's on client)
     const fooMethod = client.methods.find((m) => m.name === "foo") as
-      | SdkServiceMethod<SdkHttpOperation>
-      | undefined;
+      SdkServiceMethod<SdkHttpOperation> | undefined;
     ok(fooMethod);
     const fooSubIdMethodParam = fooMethod.parameters.find((p) => p.name === "subscriptionId");
     ok(!fooSubIdMethodParam);
 
     // The bar method SHOULD have subscriptionId as a method parameter (moved to method level)
     const barMethod = client.methods.find((m) => m.name === "bar") as
-      | SdkServiceMethod<SdkHttpOperation>
-      | undefined;
+      SdkServiceMethod<SdkHttpOperation> | undefined;
     ok(barMethod);
     const barSubIdMethodParam = barMethod.parameters.find((p) => p.name === "subscriptionId");
     ok(barSubIdMethodParam);

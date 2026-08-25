@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { ClientModel } from "../interfaces.js";
+import type { ClientModel } from "../interfaces.js";
 
 export interface WarpConfigOptions {
   /** Source-level exports, e.g. { ".": "./src/index.ts", "./models": "./src/models/index.ts" } */
@@ -61,8 +61,6 @@ targets:
  * Builds a self-contained warp.config.yml file.
  *
  * Emits a full inline config with all exports and targets.
- * Polyfill resolution (browser/react-native file substitution) is handled
- * via package.json `imports` subpath imports (#platform/*).
  *
  * By default, react-native target is NOT included. Set `generateReactNativeTarget: true`
  * in options to include it.

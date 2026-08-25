@@ -13,8 +13,8 @@
 ### Core Decorators (lib/decorators.tsp) — 21 decorators
 
 1. `@clientName(rename, scope?)` — rename any type/operation
-2. `@convenientAPI(target, flag?, scope?)` — control convenience method generation
-3. `@protocolAPI(target, flag?, scope?)` — control protocol method generation
+2. `@convenientAPI(target, flag?, scope?)` — control convenience method generation; scope must include Java and/or C#
+3. `@protocolAPI(target, flag?, scope?)` — control protocol method generation; scope must include Java and/or C#
 4. `@client(target, options?, scope?)` — define explicit client; ClientOptions has service, name, autoMergeService
 5. `@operationGroup(target, scope?)` — DEPRECATED, use @client
 6. `@usage(target, value, scope?)` — mark model/enum/union/namespace usage (input/output/json/xml); on namespace, propagates recursively to all contained types
@@ -32,7 +32,7 @@
 18. `@responseAsBool(target, scope?)` — HEAD operations return boolean (2xx=true, 404=false)
 19. `@clientLocation(source, target, scope?)` — move operations/params between clients
 20. `@clientDoc(target, documentation, mode, scope?)` — override docs with append/replace mode
-21. `@clientOption(target, name, value, scope?)` — pass experimental flags to emitters
+21. `@clientOption(target, name, value, scope?)` — pass experimental flags to emitters; an explicit language scope is required
 
 ### Legacy Decorators (lib/legacy.tsp) — 7 decorators
 
@@ -99,14 +99,14 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - `@scope` — language-specific scoping
 - `@markAsLro` — force LRO behavior
 - `@markAsPageable` / `@disablePageable` — force/disable pagination
-- `@clientOption` — experimental flags
 - `@clientApiVersions` — extend API versions
 - `@useSystemTextJsonConverter` — C# specific
 - Functions (replaceParameter, removeParameter, addParameter, reorderParameters)
 
-### Specs Removed (feedback from PR #4268)
+### Specs Excluded or Removed
 
 - `convenient-api` — removed because @convenientAPI/@protocolAPI are code-generation controls that aren't testable at the wire level via Spector
+- `@clientOption` — emitter-defined experimental metadata has no stable cross-language wire or generated-client behavior to assert in Spector
 
 ## Guideline.md (Emitter Developer Docs) Notes
 
@@ -120,6 +120,7 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 
 - `operation-not-in-client`: REMOVED in May 2026. This diagnostic no longer exists.
 - `inconsistent-multiple-service-dependency` (warning): Emitted when services merged into the same client depend on different versions of a shared library dependency. Documented in 03client.mdx under the "One Client from Multiple Services" section and in guideline.md under "Client Detection".
+- `duplicate-client-name-warning` (warning): C# operation-name collisions are warnings because distinct signatures may be valid overloads, including when operations from multiple services are combined into one client. Other language scopes continue to report `duplicate-client-name` errors. Suppress only after confirming the generated C# signatures form valid overloads.
 - `legacy-hierarchy-building-conflict` (warning): Now only has `property-type-mismatch` message ID (the old `property-missing` and `type-mismatch` message IDs were removed). Emitted during property reconciliation when a dropped property's type is incompatible with the same-named property on the new base chain.
 - `override-parameters-mismatch` (error): In addition to the general "different parameters definition" case, `@override` now reports this when the override operation drops a parameter that is realized as a `@path` parameter in the original operation's HTTP route, or redeclares it without `@path` (the underlying route still needs it). The check is skipped when any override parameter carries `@clientLocation` (intentional relocation). Matching between original/override parameters is by **name**, not position (so overrides may add/remove/regroup parameters). "Realized path parameter" is resolved from `getHttpOperation(...).parameters` (route ground truth), not from the `@path` decorator alone, because templated params (e.g. ARM scope models) can carry `@path` without appearing in the route. Documented in 04method.mdx `@override` section as a `:::caution`.
 - `client-location-conflict` / `parameterTypeConflict` (warning): `@clientLocation` cannot move multiple parameters that share a name but have different types to the same client. Common when `@clientLocation` is on a templated parameter instantiated with different types across operations; the client parameter collapses to a single (last) type, breaking the SDK. Fix: move the parameter on each operation instead. Validated in `src/validations/types.ts` (`validateClientLocationParameterTypes`). Documented in 04method.mdx `@clientLocation` section as a `:::caution`.
@@ -144,6 +145,8 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - Use `// NOT_SUPPORTED` for language examples where an emitter doesn't support a feature. Do NOT use `// TODO: fill in X example manually`.
 - Separate changesets: TCGC documentation updates use "internal" changeKind. Spector spec additions use "feature" changeKind with a separate changeset file.
 - Don't add Spector specs for code-generation controls like @convenientAPI/@protocolAPI — they aren't testable at the HTTP wire level.
+- `@convenientAPI` and `@protocolAPI` only apply to Java and C#; an omitted scope or a scope excluding both languages warns. Likewise, their global emitter options warn when explicitly set for another language.
+- `@clientOption` requires an explicit language scope and accepts arbitrary values, including arrays, objects, and nested combinations. `getClientOptions(type, key)` returns one value as `unknown`.
 - The `@deserializeEmptyStringAsNull` section was removed from 08types.mdx in feedback PR #4268. Don't re-add it unless specifically requested.
 - Spector response-as-bool spec needs BOTH a success (200) case AND a 404 case to be complete.
 - TypeSpec examples in docs with operations MUST include `@route` decorators to be valid TypeSpec (feedback PR #4398).
@@ -258,3 +261,64 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 ## Feedback Lessons (PR #4683)
 
 - In versioning (and any API-version) examples, use realistic **date-based** api-version identifiers (e.g. `2024-01-01`, enum members like `v2024_01_01: "2024-01-01"`) — NOT placeholder names like `av1`/`bv1`. Human reviewers rewrote placeholder versions to date-based ones. Keep the enum member name and its string value consistent (e.g. `v2024_05_01: "2024-05-01"`).
+
+## Collection Type Serialization Options (July 2026)
+
+- `SdkArrayType` and `SdkDictionaryType` gained an optional `serializationOptions?: SerializationOptions` property (`src/interfaces.ts`).
+- It is populated ONLY when the collection is a _named_ model carrying explicit serialization decorators, e.g. `@Xml.name("Foo") model Foo is Bar[];` or `@encodedName("application/xml", ...) model Foo is Bar[];`. Anonymous/inline arrays and records leave it `undefined`.
+- Rationale (`updateSerializationOptions`/`setSerializationOptions` in `src/types.ts`): for un-decorated collections the wrapping element name comes from the referencing property/model, so emitting a name on the collection itself would be spurious. `setSerializationOptions(context, type, [])` is called with an empty content-type list so only explicitly-defined info is captured.
+- Documented in guideline.md "Collection Types" bullet. No Spector spec needed — this is emitter-consumed type-graph metadata, covered by unit tests in `test/types/serialization-options.test.ts` (array model with `@Xml.name`, with `@encodedName`, and without decorators).
+
+## @clientLocation + scoped @client validation (July 2026)
+
+- Bug fix in `src/validations/types.ts`: `@clientLocation` name-collision validation now skips operations that belong to an explicit `@client` scoped to a _different_ language than the scope being validated (`isClientForOtherScopeOnly`). Prevents false-positive collisions for `is`-derived operations inside a `@client(..., "java")` interface. Internal validation only — no user-facing doc change.
+
+## SdkClientType.versionsEnum (July 2026)
+
+- `SdkClientType` gained `versionsEnum?: SdkEnumType` (`src/interfaces.ts`, populated by `getVersionsEnum` in `src/clients.ts`). It is the API-versions enum for the client's service, `usage` includes `UsageFlags.ApiVersionEnum` (8), and it is the SAME object instance that appears in `SdkPackage.enums`.
+- `undefined` for unversioned services and for multi-service root clients (spanning >1 service). Sub-clients that map to a single service still get their own service's enum. Verified by `test/package/versioning.test.ts` ("client has versionsEnum reference", "multi-service client has no versionsEnum").
+- Context caches these per-service via `__serviceToVersionsSdkEnum` and exposes `getPackageVersionSdkEnum(): Map<Namespace, SdkEnumType>` (emitter helper on `TCGCContext`/`SdkContext`).
+- Documented in guideline.md "Client" section. Emitter-consumed type-graph metadata — no Spector spec needed.
+
+## SSE Metadata (July 2026)
+
+- `SdkBodyParameter` and `SdkMethodResponse` gained `sseMetadata?: SdkSseMetadata`, set ALONGSIDE `streamMetadata` when the body/response is a server-sent event stream (`text/event-stream`, `SSEStream`). `undefined` for non-event streams like JSONL. Built by `buildSdkSseMetadata` in `src/http.ts`.
+- `SdkSseMetadata.events` is `SdkSseEventMetadata[]`, one entry per variant of the streamed `@events` union. Derived from `@typespec/events` event definitions plus the `@typespec/sse` `@terminalEvent` marker. Fields: `eventType?` (SSE `event:` name from named variant; undefined→`message` event), `isTerminalEvent`, `isEventEnvelope`, `type`/`contentType`, `payloadType`/`payloadContentType`. When `isEventEnvelope` is false, `type`==`payloadType` and content types match.
+- Kept separate from `SdkStreamMetadata` because SSE, streaming, and events are modeled by three distinct TypeSpec libraries (`@typespec/sse`, `@typespec/http`, `@typespec/events`).
+- Documented in guideline.md "Operation" section under a new "Streaming and Server-Sent Events" subsection (also introduced `streamMetadata` documentation there, which was previously undocumented). Tests: `test/methods/sse.test.ts`, `test/methods/streams.test.ts`. Emitter type-graph metadata — no Spector spec needed.
+
+## no-unnamed-types Linter Rule REMOVED (July 2026)
+
+- The `no-unnamed-types` rule was removed from `src/linter.ts` (both the rules array and `no-unnamed-types.rule.ts` / `.md` deleted). `reference/linter.md` no longer lists it — already consistent. Do NOT re-add it.
+- Rule source files were renamed to the `<name>.rule.ts` convention (e.g. `property-name-conflict.ts` → `property-name-conflict.rule.ts`); `csharp-no-url-suffix` still uses `.ts`.
+
+## Diagnostic Messages Externalized (July 2026)
+
+- Diagnostic message definitions were moved out of `src/lib.ts` into individual `src/diagnostics/<name>.md` files (loaded at build). Purely an authoring refactor; reference docs regenerate the same content. No user-facing doc action.
+
+## Streaming howto — emitters output "unsupported" (Feedback PR #5072)
+
+- A `13streaming.mdx` howto was added covering `JsonlStream<T>`, `SSEStream<TEvents>`, `HttpStream`, terminal events, event envelopes, unnamed (message) events, SSE request bodies, and custom `@streamOf` bodies. Also linked from `04method.mdx` ("Streaming Operations").
+- **Do NOT hand-write language tabs for streaming.** Human reviewers replaced every hand-written Python/C#/TypeScript/Java/Go signature in the streaming `<ClientTabs>` blocks with `# unsupported` / `// unsupported`. As of this writing NO language emitter generates real streaming client surface — the @doc-example-generator skill emits `unsupported` for all six languages. Always run the skill; never invent hopeful signatures.
+- **Every code example needs a full `<ClientTabs>` wrapper.** Reviewers wrapped bare single-`typespec` examples (terminal events, event envelopes, unnamed events, SSE request, custom body) in `<ClientTabs>` with all six languages (typespec + five `unsupported` blocks). A lone ```typespec block is not acceptable in howto docs.
+- **TypeSpec inside examples must be `pnpm format`-clean.** Reviewers expanded inline object literals to multiline, e.g. `op f(@body request: { prompt: string }): X;` became a multiline `@body request: {\n  prompt: string;\n}` form, and `model AudioChunk { id: string; }` became multiline. Always run `pnpm format` on `.mdx` before finishing.
+
+## New wireType property on SdkBuiltInType (Aug 2026)
+
+- `SdkBuiltInType` gained `wireType?: SdkBuiltInType` (`src/interfaces.ts`). Set when `@encode` specifies an `encodedAs` target type — e.g. `@encode(string) prop: int64` gives `wireType.kind === "string"`, and `@encode("abc", int32) value: string` gives `encode === "abc"`, `wireType.kind === "int32"`.
+- `addEncodeInfo` in `src/types.ts` now allows `string` and `url` kinds (previously only int kinds + boolean) to be encoded as another type. When an explicit encoding name is given (e.g. `"abc"`) it stays in `encode`; otherwise `encode` is set to the wire type's kind. `wireType` always carries the target built-in type. Array element types keep `encode: undefined` (array-level encode like `commaDelimited` lives on the property).
+- Documented in guideline.md "Built-in Types" bullet. Emitter-consumed type-graph metadata — no Spector spec needed.
+
+## client-default-value-type-mismatch diagnostic (Aug 2026)
+
+- New `warning` diagnostic emitted by `@clientDefaultValue` when the value type does not match the target property/parameter type. Respects `@alternateType` (validates against the alternate). Definition in `src/lib.ts` + `src/diagnostics/client-default-value-type-mismatch.md`.
+- Documented as a `:::note` admonition in the `@clientDefaultValue` section of `08types.mdx` (matches the "validations/diagnostics get admonitions, not ClientTabs" rule). No Spector spec — error condition.
+
+## Two new C# linter rules (Aug 2026)
+
+- `csharp-model-suffix` and `csharp-use-standard-acronyms` added (`src/rules/`), both `warning`, registered in `all` and `best-practices:csharp` rulesets.
+- The tracked `reference/linter.md` rule index was regenerated in the same source commit, so it is already current — verify, don't re-add. Individual `rules/<name>.md` pages are git-ignored and auto-generated by `tspd` at docs build; nothing to commit for them.
+
+## @operationGroup doc comment (Aug 2026)
+
+- The `@deprecated` JSDoc tag on `@operationGroup` in `lib/decorators.tsp` was changed to plain prose ("Deprecated: use `@client` instead.") because the leading `@deprecated` tag was breaking the generated reference doc layout. Reference docs regenerate to the same info; no manual reference edit.

@@ -1,5 +1,25 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.44
+
+### Features
+
+- [#4959](https://github.com/Azure/typespec-azure/pull/4959) Add e2e scenario for `@clientApiVersions` decorator to verify clients can send api-version from an extended client enum.
+- [#4891](https://github.com/Azure/typespec-azure/pull/4891) Add built-in support for Azure service groups as extension resource targets and ARM resource identifier scopes.
+- [#4632](https://github.com/Azure/typespec-azure/pull/4632) Add tests for ARM `getLro`, `postActionPaging`, `markAsPageable`, `postPagingLroWithBody`, `routedGet`, and `createOrReplaceOptionalBody`
+
+### Bug Fixes
+
+- [#4981](https://github.com/Azure/typespec-azure/pull/4981) Fix `ResponseAsBool_HeadAsBoolean` scenario coverage always failing. Split it into two scenarios (`exists` and `notExists`) so the intentional `404` response of `notExists` is validated with `passOnCode(404)` instead of `passOnSuccess` (which requires all endpoints to return 2xx). Endpoint paths are unchanged.
+- [#4991](https://github.com/Azure/typespec-azure/pull/4991) Fix the `postPagingLroWithBody` ARM scenario to declare the LRO final result (`ArmLroLocationHeader<FinalResult = ProductListResult>`) so the accepted response's `location` header points at the paged result type.
+
+
+## 0.1.0-alpha.43
+
+### Bump dependencies
+
+- Republish aligned with the TypeSpec `1.14.0` / TypeSpec Azure `0.70.0` release. Peer dependencies now resolve to `@azure-tools/typespec-azure-core@^0.70.0`, `@typespec/compiler@^1.14.0`, `@typespec/http@^1.14.0`, `@typespec/rest@^0.84.0`, `@typespec/versioning@^0.84.0`, and `@typespec/xml@^0.84.0`, so downstream emitters (e.g. `@typespec/http-client-python`) can install against the `0.70.0` line.
+
 ## 0.1.0-alpha.42
 
 ### Features

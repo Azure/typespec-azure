@@ -58,7 +58,7 @@ jobs:
           - name: Java
             lang: java
             package-filter: "@azure-tools/typespec-java"
-            working-directory: packages/typespec-java/emitter-tests
+            working-directory: packages/typespec-java
             mise-install-args: "java maven"
             run-prepare: false
             run-regenerate: true
@@ -92,7 +92,7 @@ jobs:
 
       - name: Setup language runtime
         if: matrix.mise-install-args
-        uses: jdx/mise-action@e6a8b3978addb5a52f2b4cd9d91eafa7f0ab959d # v4.2.0
+        uses: jdx/mise-action@7e36c90d9ab29c415a2384db3006f3ec8a8cc654 # v4.2.4
         with:
           install_args: ${{ matrix.mise-install-args }}
 

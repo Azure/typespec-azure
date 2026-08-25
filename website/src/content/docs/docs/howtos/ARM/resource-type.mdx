@@ -144,6 +144,10 @@ interface ResourceGroups extends EmplOps<Extension.ResourceGroup> {}
 /** Management group-level operations */
 @armResourceOperations
 interface ManagementGroups extends EmplOps<Extension.ManagementGroup> {}
+
+/** Service group-level operations */
+@armResourceOperations
+interface ServiceGroups extends EmplOps<Extension.ServiceGroup> {}
 ```
 
 | Scope                       | Description                               |
@@ -153,6 +157,50 @@ interface ManagementGroups extends EmplOps<Extension.ManagementGroup> {}
 | `Extension.Subscription`    | Subscription-level scope                  |
 | `Extension.ResourceGroup`   | Resource group-level scope                |
 | `Extension.ManagementGroup` | Management group-level scope              |
+| `Extension.ServiceGroup`    | Service group-level scope                 |
+
+##### Note: Service Group Scope
+
+Service groups are a grouping mechanism allowing you to create flexible, custom groupings of Azure resources. For more information on service groups, including when to use service groups instead of management groups, please see the official Azure documentation: [https://aka.ms/servicegroups](https://aka.ms/servicegroups).
+
+If you previously modeled service group scope manually with `Extension.ExternalResource`, replace the custom alias with `Extension.ServiceGroup`:
+
+```typespec
+// Before
+interface EmplOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+  get is Extension.Read<Scope, Employee>;
+}
+
+alias ServiceGroup = Extension.ExternalResource<
+  "Microsoft.Management",
+  "serviceGroups",
+  "serviceGroupName",
+  ParentType = "Tenant"
+>;
+
+// GET /providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}
+@armResourceOperations
+interface ServiceGroups extends EmplOps<ServiceGroup> {}
+```
+
+```typespec
+// After
+interface EmplOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+  get is Extension.Read<Scope, Employee>;
+}
+
+// GET /providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}
+@armResourceOperations
+interface ServiceGroups extends EmplOps<Extension.ServiceGroup> {}
+```
+
+Use `Extension.ServiceGroup<"serviceGroupId">` if your API already uses a different path parameter name.
+
+```typespec
+// GET /providers/Microsoft.Management/serviceGroups/{serviceGroupId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}
+@armResourceOperations
+interface ServiceGroups extends EmplOps<Extension.ServiceGroup<"serviceGroupId">> {}
+```
 
 #### Targeting External Resources
 
@@ -487,6 +535,18 @@ In addition to the resource-specific property bag, a resource may configure on o
 - **ResourceKind**: A standard mechanism for specifying a type of user experience in the portal.
 - **ManagedBy**: Indicating that this resource is managed by another Azure resource.
 - **ExtendedLocation**: Enabling deployment to custom locations such as Azure Arc-connected environments.
+- **Billing Data**: A standard mechanism for specifying billing properties for prepaid resources.
+
+### Billing Data
+
+Billing Data provides a standard description of resource's billing state, including a reference to a product in the Marketplace Catalog. It is strongly recommended for Resource Providers with prepaid billing (where a customer is charged _before_ the product is provisioned/fulfilled) to utilize this pattern, allowing customers to interact with such resources through central experiences.
+
+```typespec
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+  ...BillingDataProperty;
+}
+```
 
 ### Managed Identity
 

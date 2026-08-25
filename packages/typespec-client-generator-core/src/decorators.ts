@@ -1,30 +1,31 @@
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   compilerAssert,
-  DecoratorContext,
-  DecoratorFunction,
-  DiagnosticTarget,
-  Enum,
-  EnumMember,
+  type DecoratorContext,
+  type DecoratorFunction,
+  type DecoratorValidatorCallbacks,
+  type DiagnosticTarget,
+  type Enum,
+  type EnumMember,
   getDiscriminator,
   getNamespaceFullName,
   ignoreDiagnostics,
-  Interface,
+  type Interface,
   isErrorModel,
   isList,
   isNumeric,
-  Model,
-  ModelProperty,
-  Namespace,
+  type Model,
+  type ModelProperty,
+  type Namespace,
   Numeric,
-  Operation,
-  Program,
-  RekeyableMap,
-  Scalar,
-  Type,
-  Union,
+  type Operation,
+  type Program,
+  type RekeyableMap,
+  type Scalar,
+  type Type,
+  type Union,
 } from "@typespec/compiler";
-import { SyntaxKind, type Node } from "@typespec/compiler/ast";
+import { type Node, SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
 import {
   getAuthentication,
@@ -35,7 +36,7 @@ import {
   isPathParam,
 } from "@typespec/http";
 import { getVersion, resolveVersions, type Version } from "@typespec/versioning";
-import {
+import type {
   AccessDecorator,
   AlternateTypeDecorator,
   ApiVersionDecorator,
@@ -55,7 +56,7 @@ import {
   ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
-import {
+import type {
   ClientDefaultValueDecorator,
   DisablePageableDecorator,
   FlattenPropertyDecorator,
@@ -65,12 +66,12 @@ import {
   NextLinkVerbDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
-  AccessFlags,
-  ClientInitializationOptions,
-  ExternalTypeInfo,
-  LanguageScopes,
-  SdkClient,
-  TCGCContext,
+  type AccessFlags,
+  type ClientInitializationOptions,
+  type ExternalTypeInfo,
+  type LanguageScopes,
+  type SdkClient,
+  type TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
 import {
@@ -94,7 +95,7 @@ import {
   scopeKey,
   usageKey,
 } from "./internal-utils.js";
-import { createStateSymbol, reportDiagnostic } from "./lib.js";
+import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
@@ -404,6 +405,71 @@ export function listOperationsInClient(
 
 const protocolAPIKey = createStateSymbol("protocolAPI");
 
+const VALID_SCOPES = ["java", "csharp"];
+
+function validateJavaCsharpScope(
+  decoratorName: string,
+  entity: DiagnosticTarget,
+  scope?: LanguageScopes,
+): DecoratorValidatorCallbacks | void {
+  return {
+    onTargetFinish: () => {
+      if (scope === undefined) {
+        return [
+          createDiagnostic({
+            code: "decorator-requires-scope",
+            format: {
+              decoratorName,
+              allowedScopes: `"${VALID_SCOPES.join('" or "')}"`,
+            },
+            target: entity,
+          }),
+        ];
+      }
+
+      const [negationScopes, positiveScopes] = parseScopes(scope);
+
+      // Negation scopes like "!(python)" implicitly include java/csharp, so they're valid.
+      // But if ALL valid scopes are negated, it's invalid.
+      if (negationScopes && negationScopes.length > 0) {
+        const allValidNegated = VALID_SCOPES.every((s) => negationScopes.includes(s));
+        if (allValidNegated) {
+          return [
+            createDiagnostic({
+              code: "decorator-requires-scope",
+              format: {
+                decoratorName,
+                allowedScopes: `"${VALID_SCOPES.join('" or "')}"`,
+              },
+              target: entity,
+            }),
+          ];
+        }
+        return [];
+      }
+
+      // Positive scopes: at least one must be java or csharp
+      if (positiveScopes && positiveScopes.length > 0) {
+        const hasValidScope = positiveScopes.some((s) => VALID_SCOPES.includes(s));
+        if (!hasValidScope) {
+          return [
+            createDiagnostic({
+              code: "decorator-requires-scope",
+              format: {
+                decoratorName,
+                allowedScopes: `"${VALID_SCOPES.join('" or "')}"`,
+              },
+              target: entity,
+            }),
+          ];
+        }
+      }
+
+      return [];
+    },
+  };
+}
+
 export const $protocolAPI: ProtocolAPIDecorator = (
   context: DecoratorContext,
   entity: Operation | Namespace | Interface,
@@ -411,6 +477,7 @@ export const $protocolAPI: ProtocolAPIDecorator = (
   scope?: LanguageScopes,
 ) => {
   setScopedDecoratorData(context, $protocolAPI, protocolAPIKey, entity, value, scope);
+  return validateJavaCsharpScope("protocolAPI", entity, scope);
 };
 
 const convenientAPIKey = createStateSymbol("convenientAPI");
@@ -422,6 +489,7 @@ export const $convenientAPI: ConvenientAPIDecorator = (
   scope?: LanguageScopes,
 ) => {
   setScopedDecoratorData(context, $convenientAPI, convenientAPIKey, entity, value, scope);
+  return validateJavaCsharpScope("convenientAPI", entity, scope);
 };
 
 function getConvenientOrProtocolValue(
@@ -1799,6 +1867,41 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
     actualValue,
     scope,
   );
+
+  return {
+    onTargetFinish: () => {
+      const tk = $(context.program);
+
+      // Check if there's an alternate type set on this property (respecting scope)
+      const alternateType = getScopedDecoratorData(
+        { program: context.program } as TCGCContext,
+        alternateTypeKey,
+        target,
+        scope ?? AllScopes,
+      );
+      const effectiveType =
+        alternateType !== undefined && alternateType.kind !== "externalTypeInfo"
+          ? alternateType
+          : target.type;
+
+      // Create a literal type from the value and check assignability to the property type
+      const literal = tk.literal.create(actualValue as string | number | boolean);
+      if (tk.type.isAssignableTo(literal, effectiveType)) return [];
+
+      const valueType = typeof actualValue;
+      const valueTypeLabel = valueType === "number" ? "numeric" : valueType;
+      return [
+        createDiagnostic({
+          code: "client-default-value-type-mismatch",
+          format: {
+            valueType: valueTypeLabel,
+            propertyType: tk.scalar.is(effectiveType) ? effectiveType.name : effectiveType.kind,
+          },
+          target: target,
+        }),
+      ];
+    },
+  };
 };
 
 /**
@@ -1860,17 +1963,26 @@ export const $clientOption: ClientOptionDecorator = (
     target: context.decoratorTarget,
   });
 
-  // Emit additional warning if scope is not provided
-  if (scope === undefined) {
-    reportDiagnostic(context.program, {
-      code: "client-option-requires-scope",
-      target: context.decoratorTarget,
-    });
-  }
-
   // Store the option data - each decorator application is stored separately
   // The decorator info will be exposed via the decorators array on SDK types
   setScopedDecoratorData(context, $clientOption, clientOptionKey, target, { name, value }, scope);
+
+  // clientOption must be scoped to any language
+  if (scope === undefined) {
+    return {
+      onTargetFinish: () => [
+        createDiagnostic({
+          code: "decorator-requires-scope",
+          format: {
+            decoratorName: "clientOption",
+            allowedScopes: "a language scope",
+          },
+          target: context.decoratorTarget,
+        }),
+      ],
+    };
+  }
+  return undefined;
 };
 
 /**
@@ -1884,8 +1996,7 @@ export function getClientOptionValue(
 ): unknown | undefined {
   // Check operation directly
   const opOption = getScopedDecoratorData(context, clientOptionKey, target) as
-    | { name: string; value: unknown }
-    | undefined;
+    { name: string; value: unknown } | undefined;
   if (opOption?.name === optionName) {
     return opOption.value;
   }
@@ -1893,8 +2004,7 @@ export function getClientOptionValue(
   // Check interface if operation is in one
   if (target.interface) {
     const ifaceOption = getScopedDecoratorData(context, clientOptionKey, target.interface) as
-      | { name: string; value: unknown }
-      | undefined;
+      { name: string; value: unknown } | undefined;
     if (ifaceOption?.name === optionName) {
       return ifaceOption.value;
     }
@@ -1904,8 +2014,7 @@ export function getClientOptionValue(
   let ns = target.namespace;
   while (ns) {
     const nsOption = getScopedDecoratorData(context, clientOptionKey, ns) as
-      | { name: string; value: unknown }
-      | undefined;
+      { name: string; value: unknown } | undefined;
     if (nsOption?.name === optionName) {
       return nsOption.value;
     }

@@ -1,5 +1,9 @@
-import { FinalStateValue, LroMetadata, ParameterSource } from "@azure-tools/typespec-azure-core";
 import {
+  FinalStateValue,
+  type LroMetadata,
+  type ParameterSource,
+} from "@azure-tools/typespec-azure-core";
+import type {
   DateTimeKnownEncoding,
   Diagnostic,
   DurationKnownEncoding,
@@ -18,11 +22,11 @@ import {
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
-  HttpAuth,
-  HttpOperation,
-  HttpOperationResponse,
-  HttpStatusCodeRange,
-  HttpVerb,
+  type HttpAuth,
+  type HttpOperation,
+  type HttpOperationResponse,
+  type HttpStatusCodeRange,
+  type HttpVerb,
   Visibility,
 } from "@typespec/http";
 import type { ContextNode } from "./internal-utils.js";
@@ -30,6 +34,12 @@ import type { ContextNode } from "./internal-utils.js";
 // Types for TCGC lib
 
 type SourceKind = "RequestParameter" | "RequestBody" | "ResponseBody";
+
+export type ApiVersionConfig = string | ApiVersionServiceMap;
+
+export interface ApiVersionServiceMap {
+  [namespaceSegment: string]: string | ApiVersionServiceMap;
+}
 
 export interface TCGCContext {
   program: Program;
@@ -74,6 +84,7 @@ export interface TCGCContext {
   __pagedResultSet: Set<SdkType>;
   __namingContextPath: ContextNode[]; // Stack tracking the current traversal position for naming anonymous types.
   __orphanTypesCache?: (Model | Enum | Union)[]; // cached result of listOrphanTypes to avoid repeated namespace traversals
+  __serviceToVersionsSdkEnum?: Map<Namespace, SdkEnumType>; // the SDK enum type for the versions enum (for each service).
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
   __mutatedRealm?: unsafe_Realm; // the realm that contains all mutated types for this instance
   __packageVersions?: Map<Namespace, string[]>; // the package versions (for each service) from the service versioning config and api version setting in tspconfig.
@@ -85,6 +96,7 @@ export interface TCGCContext {
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
   getPackageVersions(): Map<Namespace, string[]>;
   getPackageVersionEnum(): Map<Namespace, Enum | undefined>;
+  getPackageVersionSdkEnum(): Map<Namespace, SdkEnumType>;
   getClients(): SdkClient[];
   getRootClients(): SdkClient[];
   getClient(type: Namespace | Interface): SdkClient | undefined;
@@ -222,6 +234,8 @@ export interface SdkClientType<
   methods: SdkMethod<TServiceOperation>[];
   /** API versions supported for current type. */
   apiVersions: string[];
+  /** The SDK versions enum for this client's service. Undefined for unversioned services or multi-service clients. */
+  versionsEnum?: SdkEnumType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
   /** The parent client of this client. The structure follows the definition hierarchy. */
@@ -275,6 +289,8 @@ export interface SdkBuiltInType<
   kind: TKind;
   /** How to encode the type on wire. */
   encode?: string;
+  /** The type this is encoded as on the wire when `@encode` specifies an encodedAs type. */
+  wireType?: SdkBuiltInType;
   /** Client name for the type. */
   name: string;
   /** Which type this type is derived from. */
@@ -422,6 +438,12 @@ export interface SdkArrayType extends SdkTypeBase {
   valueType: SdkType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
+  /**
+   * Serialization options for the array model itself.
+   * Only set when the array is a named model with explicit serialization decorators,
+   * e.g. `@Xml.name("Foo") model Foo is Bar[];`.
+   */
+  serializationOptions?: SerializationOptions;
 }
 
 export interface SdkTupleType extends SdkTypeBase {
@@ -433,6 +455,12 @@ export interface SdkDictionaryType extends SdkTypeBase {
   kind: "dict";
   keyType: SdkType;
   valueType: SdkType;
+  /**
+   * Serialization options for the dictionary model itself.
+   * Only set when the dictionary is a named model with explicit serialization decorators,
+   * e.g. `@Xml.name("Foo") model Foo is Record<Bar>;`.
+   */
+  serializationOptions?: SerializationOptions;
 }
 
 export interface SdkNullableType extends SdkTypeBase {
@@ -635,10 +663,7 @@ export interface SdkModelPropertyTypeBase<
 }
 
 export type ArrayKnownEncoding =
-  | "pipeDelimited"
-  | "spaceDelimited"
-  | "commaDelimited"
-  | "newlineDelimited";
+  "pipeDelimited" | "spaceDelimited" | "commaDelimited" | "newlineDelimited";
 
 /**
  * Options to show how to serialize a model/property.
@@ -882,6 +907,56 @@ export interface SdkStreamMetadata {
 }
 
 /**
+ * Metadata about a server-sent event (SSE, `text/event-stream`) body or response.
+ *
+ * Kept separate from {@link SdkStreamMetadata} because SSE, streaming, and events are
+ * modeled by distinct TypeSpec libraries (`@typespec/sse`, `@typespec/http`, and
+ * `@typespec/events`). Present alongside `streamMetadata` when the body/response is an
+ * SSE stream; absent for non-event streams such as JSONL.
+ */
+export interface SdkSseMetadata {
+  /**
+   * Per-event metadata, one entry per variant of the streamed `@events` union.
+   */
+  events: SdkSseEventMetadata[];
+}
+
+/**
+ * Metadata about a single server-sent event within an SSE (`text/event-stream`) stream.
+ *
+ * Derived from the `@typespec/events` event definitions of the streamed union,
+ * plus the `@typespec/sse` `@terminalEvent` marker. Gives emitters the information
+ * they need to (de)serialize each event without re-deriving it from raw TypeSpec:
+ * the wire `event:` name, whether the event terminates the stream, and the
+ * payload type/content type.
+ */
+export interface SdkSseEventMetadata {
+  /**
+   * The SSE `event:` field name, taken from the named union variant. Undefined for
+   * unnamed variants, which are `message` events with no `event:` field.
+   */
+  eventType?: string;
+  /**
+   * Whether the presence of this event terminates the stream and the client should
+   * disconnect (from `@terminalEvent`).
+   */
+  isTerminalEvent: boolean;
+  /**
+   * Whether `type` describes an event envelope wrapping a separate `@data` payload.
+   * When `false`, `type` and `payloadType` (and their content types) are the same.
+   */
+  isEventEnvelope: boolean;
+  /** The event type. Represents the event envelope when `isEventEnvelope` is `true`. */
+  type: SdkType;
+  /** The content type of the event (the envelope when `isEventEnvelope` is `true`). */
+  contentType?: string;
+  /** The type of the event payload. Matches `type` when `isEventEnvelope` is `false`. */
+  payloadType: SdkType;
+  /** The content type of the event payload. Matches `contentType` when `isEventEnvelope` is `false`. */
+  payloadContentType?: string;
+}
+
+/**
  * Http body parameter.
  */
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
@@ -903,16 +978,14 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
   /** Stream metadata, present when the body is a streaming type (e.g. JsonlStream, SSEStream). */
   streamMetadata?: SdkStreamMetadata;
+  /** SSE metadata, present when the body is a server-sent event stream (SSEStream). */
+  sseMetadata?: SdkSseMetadata;
   /** Options to show how to serialize the body. */
   serializationOptions: SerializationOptions;
 }
 
 export type SdkHttpParameter =
-  | SdkQueryParameter
-  | SdkPathParameter
-  | SdkBodyParameter
-  | SdkHeaderParameter
-  | SdkCookieParameter;
+  SdkQueryParameter | SdkPathParameter | SdkBodyParameter | SdkHeaderParameter | SdkCookieParameter;
 
 export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
   kind: "method";
@@ -938,6 +1011,8 @@ export interface SdkMethodResponse {
   optional?: boolean;
   /** Stream metadata, present when the response is a streaming type (e.g. JsonlStream, SSEStream). */
   streamMetadata?: SdkStreamMetadata;
+  /** SSE metadata, present when the response is a server-sent event stream (SSEStream). */
+  sseMetadata?: SdkSseMetadata;
 }
 
 export interface SdkServiceResponse {
@@ -955,6 +1030,8 @@ interface SdkHttpResponseBase extends SdkServiceResponse {
   description?: string;
   /** Stream metadata, present when the response is a streaming type (e.g. JsonlStream, SSEStream). */
   streamMetadata?: SdkStreamMetadata;
+  /** SSE metadata, present when the response is a server-sent event stream (SSEStream). */
+  sseMetadata?: SdkSseMetadata;
   /** Options to show how to deserialize the response body. */
   serializationOptions: SerializationOptions;
 }
