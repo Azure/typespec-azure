@@ -552,6 +552,20 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`@${"decoratorName"} should be applied with a language scope of ${"allowedScopes"}.`,
       },
     },
+    "conflicting-scope": {
+      ...doc("conflicting-scope"),
+      severity: "error",
+      messages: {
+        default: paramMessage`@${"decoratorName"} received conflicting scope values: the options bag specifies "${"optionsScope"}" while the legacy positional argument specifies "${"legacyScope"}". Use a single, consistent scope value.`,
+      },
+    },
+    "invalid-scope": {
+      ...doc("invalid-scope"),
+      severity: "error",
+      messages: {
+        default: paramMessage`@${"decoratorName"} received an invalid scope value: "${"scope"}". Scope must be a non-empty language identifier, a comma-separated list (e.g. "python, java"), or a negation (e.g. "!csharp" or "!(java, python)").`,
+      },
+    },
     "unnecessary-emitter-option": {
       severity: "warning",
       messages: {

@@ -87,6 +87,7 @@ import {
   getScopedDecoratorData,
   isSameAuth,
   isSameServers,
+  isValidScopeString,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
@@ -122,6 +123,18 @@ function setScopedDecoratorData(
         .stateMap(key)
         .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
     }
+    return;
+  }
+
+  if (!isValidScopeString(scope)) {
+    reportDiagnostic(context.program, {
+      code: "invalid-scope",
+      format: {
+        decoratorName: decorator.name.replace(/^\$/, ""),
+        scope,
+      },
+      target,
+    });
     return;
   }
 
@@ -175,6 +188,27 @@ export const $client: ClientDecorator = (
     options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
   const autoMergeServiceConfig =
     options?.kind === "Model" ? options?.properties.get("autoMergeService")?.type : undefined;
+  const optionsScopeConfig =
+    options?.kind === "Model" ? options?.properties.get("scope")?.type : undefined;
+  const optionsScope: string | undefined =
+    optionsScopeConfig?.kind === "String" ? optionsScopeConfig.value : undefined;
+  const legacyScope = normalizeScope(scope);
+
+  if (optionsScope !== undefined && legacyScope !== undefined && optionsScope !== legacyScope) {
+    reportDiagnostic(context.program, {
+      code: "conflicting-scope",
+      format: {
+        decoratorName: "client",
+        optionsScope,
+        legacyScope,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  // Prefer the legacy positional argument when both agree or only one is set, since
+  // setScopedDecoratorData below already knows how to normalize either shape.
+  const effectiveScope = scope ?? optionsScope;
 
   if (serviceConfig?.kind === "Namespace") {
     // Explicit single service
@@ -253,7 +287,7 @@ export const $client: ClientDecorator = (
     autoMergeService:
       autoMergeServiceConfig?.kind === "Boolean" ? autoMergeServiceConfig.value : false,
   };
-  setScopedDecoratorData(context, $client, clientKey, target, client, scope);
+  setScopedDecoratorData(context, $client, clientKey, target, client, effectiveScope);
 };
 
 /**
@@ -1406,7 +1440,19 @@ export const $scope: ScopeDecorator = (
   entity: Operation | ModelProperty,
   scopeArg?: LanguageScopes | ScopeOptions,
 ) => {
-  const [negationScopes, scopes] = parseScopes(normalizeScope(scopeArg));
+  const normalizedScope = normalizeScope(scopeArg);
+  if (normalizedScope !== undefined && !isValidScopeString(normalizedScope)) {
+    reportDiagnostic(context.program, {
+      code: "invalid-scope",
+      format: {
+        decoratorName: "scope",
+        scope: normalizedScope,
+      },
+      target: entity,
+    });
+    return;
+  }
+  const [negationScopes, scopes] = parseScopes(normalizedScope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // for negation scope, override the previous value
     setScopedDecoratorData(context, $scope, negationScopesKey, entity, negationScopes);

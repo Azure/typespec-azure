@@ -166,7 +166,9 @@ export type ProtocolAPIDecorator = (
  * This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
  *
  * @param target The target namespace or interface that you want to define as a client.
- * @param options Optional configuration for the service.
+ * @param options Optional configuration for the service. `options.scope` can also be used to set the
+ * language scope instead of (or in addition to) the legacy third positional `scope` argument; specifying
+ * conflicting values for both produces a diagnostic.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).

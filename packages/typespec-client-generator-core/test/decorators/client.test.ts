@@ -183,6 +183,51 @@ describe("@client", () => {
   });
 });
 
+describe("@client scope in ClientOptions", () => {
+  it("accepts scope through ClientOptions.scope instead of the legacy positional argument", async () => {
+    const { program } = await SimpleTester.compile(t.code`
+        @client({service: MyClient, scope: "csharp"})
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(listClients(pythonContext).length, 0);
+  });
+
+  it("accepts matching scope from both ClientOptions.scope and the legacy positional argument", async () => {
+    const { program } = await SimpleTester.compile(t.code`
+        @client({service: MyClient, scope: "csharp"}, "csharp")
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+  });
+
+  it("reports a diagnostic when ClientOptions.scope conflicts with the legacy positional argument", async () => {
+    const diagnostics = await SimpleTester.diagnose(t.code`
+        @client({service: MyClient, scope: "csharp"}, "python")
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflicting-scope",
+    });
+  });
+});
+
 describe("listClients without @client", () => {
   it("use service namespace if there is not clients and append Client to service name", async () => {
     const { program, MyService } = await SimpleTester.compile(t.code`

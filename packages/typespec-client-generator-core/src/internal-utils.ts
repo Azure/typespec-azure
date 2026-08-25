@@ -204,6 +204,28 @@ export function normalizeScope(scope?: LanguageScopes | ScopeOptions): string | 
 }
 
 /**
+ * Validate that a normalized scope string is well-formed.
+ * Rejects empty/whitespace-only scopes, empty grouped negation (`"!()"`), and entries that are
+ * empty after trimming (e.g. `"csharp,"` or `"!,"`).
+ *
+ * @param scope The normalized scope string to validate
+ * @returns true if the scope string is valid, false otherwise
+ */
+export function isValidScopeString(scope: string): boolean {
+  if (scope.trim().length === 0) return false;
+
+  const negationScopeRegex = /!\((.*?)\)/;
+  const negationScopeMatch = scope.match(negationScopeRegex);
+  if (negationScopeMatch) {
+    const entries = negationScopeMatch[1].split(",").map((s) => s.trim());
+    return entries.length > 0 && entries.every((s) => s.length > 0);
+  }
+
+  const entries = scope.split(",").map((s) => s.trim());
+  return entries.every((s) => s.length > 0 && s !== "!");
+}
+
+/**
  * Parse a scope string to extract negation scopes and positive scopes.
  * Supports two syntax patterns:
  * 1. !(scope1, scope2,...) - Grouped negation

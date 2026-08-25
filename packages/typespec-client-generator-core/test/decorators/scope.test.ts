@@ -2,6 +2,7 @@ import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { getAccess, getClientNameOverride } from "../../src/decorators.js";
+import { getSdkModel } from "../../src/types.js";
 import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 describe("Azure.ClientGenerator.Core.Scope alias", () => {
@@ -90,6 +91,80 @@ describe("Azure.ClientGenerator.Core.Scope alias", () => {
       emitterName: "@azure-tools/typespec-python",
     });
     strictEqual(getAccess(contextPython, func), "internal");
+  });
+
+  it("reports a diagnostic for an empty grouped negation scope", async () => {
+    const diagnostics = await SimpleTester.diagnose(t.code`
+      @access(Access.internal, "!()")
+      op func(): void;
+    `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/invalid-scope",
+    });
+  });
+
+  it("reports a diagnostic for an empty entry in a comma-separated scope list", async () => {
+    const diagnostics = await SimpleTester.diagnose(t.code`
+      @access(Access.internal, "csharp,")
+      op func(): void;
+    `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/invalid-scope",
+    });
+  });
+
+  it("reports a diagnostic for an empty scope string provided through the ScopeOptions bag", async () => {
+    const diagnostics = await SimpleTester.diagnose(t.code`
+      @access(Access.internal, #{ scope: "!()" })
+      op func(): void;
+    `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/invalid-scope",
+    });
+  });
+
+  it("treats the legacy string scope and the equivalent ScopeOptions bag as equivalent for @usage", async () => {
+    const { program, LegacyModel, OptionsModel } = await SimpleTester.compile(t.code`
+      @usage(Usage.input, "csharp,python")
+      model ${t.model("LegacyModel")} {}
+
+      @usage(Usage.input, #{ scope: "csharp,python" })
+      model ${t.model("OptionsModel")} {}
+    `);
+
+    for (const emitterName of [
+      "@azure-tools/typespec-csharp",
+      "@azure-tools/typespec-python",
+      "@azure-tools/typespec-java",
+    ]) {
+      const context = await createSdkContextForTester(program, { emitterName });
+      const sdkModelLegacy = getSdkModel(context, LegacyModel);
+      const sdkModelOptions = getSdkModel(context, OptionsModel);
+      strictEqual(sdkModelLegacy.usage, sdkModelOptions.usage);
+    }
+  });
+
+  it("supports comma-separated positive scopes through the ScopeOptions bag for multiple decorators on the same target", async () => {
+    const { program, func } = await SimpleTester.compile(t.code`
+      @clientName("RenamedFunc", #{ scope: "csharp,python" })
+      @access(Access.internal, #{ scope: "csharp,python" })
+      op ${t.op("func")}(): void;
+    `);
+
+    for (const emitterName of ["@azure-tools/typespec-csharp", "@azure-tools/typespec-python"]) {
+      const context = await createSdkContextForTester(program, { emitterName });
+      strictEqual(getClientNameOverride(context, func), "RenamedFunc");
+      strictEqual(getAccess(context, func), "internal");
+    }
+
+    const javaContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+    strictEqual(getClientNameOverride(javaContext, func), undefined);
+    strictEqual(getAccess(javaContext, func), "public");
   });
 });
 
