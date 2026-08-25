@@ -387,9 +387,17 @@ function getSdkHttpParameters(
   }
   if (retval.bodyParam && !headerParams.some((h) => isContentTypeHeader(h))) {
     // if we have a body param and no content type header, we add one
+    // `*/*` is `@typespec/http`'s marker for an unconstrained (e.g. default File) content type,
+    // not a real value, so we exclude it from the doc. Besides being misleading, embedding a
+    // literal `*/*` in the doc string can prematurely close a generated `/** ... */` doc comment
+    // (e.g. in Java), so it must never end up there.
+    const knownContentTypes = retval.bodyParam.contentTypes.filter((ct) => ct !== "*/*");
     const contentTypeBase = {
       ...createContentTypeOrAcceptHeader(context, httpOperation, retval.bodyParam),
-      doc: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
+      doc:
+        knownContentTypes.length > 0
+          ? `Body parameter's content type. Known values are ${knownContentTypes}`
+          : `Body parameter's content type.`,
     };
     let methodParameter: SdkMethodParameter | undefined = methodParameters.find(
       (m) => m.name === "contentType",
