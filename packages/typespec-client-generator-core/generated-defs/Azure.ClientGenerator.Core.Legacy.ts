@@ -8,7 +8,7 @@ import type {
   Type,
 } from "@typespec/compiler";
 
-export interface ScopeOptions {
+export interface DecoratorOptions {
   readonly scope?: string;
 }
 
@@ -158,7 +158,7 @@ export type HierarchyBuildingDecorator = (
   context: DecoratorContext,
   target: Model,
   value: Model,
-  scope?: ScopeOptions | string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -181,7 +181,7 @@ export type HierarchyBuildingDecorator = (
 export type FlattenPropertyDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  scope?: ScopeOptions | string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -217,7 +217,7 @@ export type FlattenPropertyDecorator = (
 export type MarkAsLroDecorator = (
   context: DecoratorContext,
   target: Operation,
-  scope?: ScopeOptions | string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -251,7 +251,7 @@ export type MarkAsLroDecorator = (
 export type MarkAsPageableDecorator = (
   context: DecoratorContext,
   target: Operation,
-  scope?: ScopeOptions | string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -282,7 +282,7 @@ export type MarkAsPageableDecorator = (
 export type DisablePageableDecorator = (
   context: DecoratorContext,
   target: Operation,
-  scope?: ScopeOptions | string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -310,7 +310,7 @@ export type NextLinkVerbDecorator = (
   context: DecoratorContext,
   target: Operation,
   verb: Type,
-  scope?: ScopeOptions | string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -358,7 +358,7 @@ export type ClientDefaultValueDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   value: string | boolean | Numeric,
-  scope?: ScopeOptions | string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 export type AzureClientGeneratorCoreLegacyDecorators = {

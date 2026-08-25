@@ -1,4 +1,4 @@
-# Scope options bag: migration and deprecation policy
+# Decorator options bag: migration and deprecation policy
 
 Tracks [Azure/typespec-azure#5254](https://github.com/Azure/typespec-azure/issues/5254): making the
 `scope` argument accepted by scoped TCGC decorators evolvable via a shared, typed options model.
@@ -12,22 +12,22 @@ settings without introducing more positional parameters or a breaking signature 
 
 ## Current state (this change)
 
-- `Azure.ClientGenerator.Core.ScopeOptions` is a new common model:
+- `Azure.ClientGenerator.Core.DecoratorOptions` is a new common model:
 
   ```typespec
-  model ScopeOptions {
+  model DecoratorOptions {
     scope?: string;
   }
   ```
 
-- `Azure.ClientGenerator.Core.Scope` is now `ScopeOptions | string`, and every scoped decorator's
-  final `scope` parameter accepts this shared alias. This means decorators accept **either**:
+- Every scoped decorator's final `scope` parameter now accepts `DecoratorOptions | string`. This
+  means decorators accept **either**:
   - the legacy positional string (`"csharp"`, `"!(java, python)"`), or
   - a typed options bag (`#{ scope: "csharp" }`).
-- Individual decorators can later grow their own options model that `extends ScopeOptions` (e.g.
-  `model FooOptions extends ScopeOptions { extra?: string }`) without breaking other decorators
-  still using the shared `Scope` alias, and without breaking existing callers of that decorator
-  (since new fields on the extended model should remain optional).
+- Individual decorators can later grow their own options model that `extends DecoratorOptions` (e.g.
+  `model FooOptions extends DecoratorOptions { extra?: string }`) without breaking other decorators
+  still using the shared base options model, and without breaking existing callers of that
+  decorator (since new fields on the extended model should remain optional).
 - `@client` additionally accepts `scope` directly on its existing `ClientOptions` bag. The legacy
   third positional `scope` argument is still accepted. If both are specified with **conflicting**
   values, TCGC reports the `conflicting-scope` warning diagnostic, uses the options bag value, and
@@ -40,8 +40,9 @@ settings without introducing more positional parameters or a breaking signature 
 
 - The legacy positional string scope syntax is fully supported and is **not** deprecated by this
   change. There is no forced migration.
-- Decorators using only the shared `Scope` alias remain source- and behavior-compatible for all
-  existing specs.
+- Decorators using only `DecoratorOptions | string` remain source- and behavior-compatible for all
+  existing specs, without exposing a short public `Scope` alias that can conflict with service
+  models named `Scope`.
 
 ## Deprecation timeline
 
@@ -73,8 +74,8 @@ op myOperation(): void;
 op myOperation(): void;
 ```
 
-For `@client`, `scope` can be set directly on `ClientOptions` instead of (or in addition to,
-as long as it agrees with) the legacy third argument:
+For `@client`, `scope` can be set directly on `ClientOptions` instead of using the legacy third
+argument:
 
 ```typespec
 // Before
@@ -97,24 +98,24 @@ interface MyInterface {}
 ## Passing extended options models
 
 A decorator only accepts an options bag shaped like its declared `scope` parameter type. Passing a
-value typed as a model that `extends ScopeOptions` with additional properties to a decorator whose
-`scope` parameter is still typed as the shared `Scope` alias will fail, because the extra
-properties aren't assignable to `ScopeOptions | string`:
+value typed as a model that `extends DecoratorOptions` with additional properties to a decorator
+whose `scope` parameter is still typed as `DecoratorOptions | string` will fail, because the extra
+properties aren't assignable to `DecoratorOptions | string`:
 
 ```typespec
-model MyScopeOptions extends ScopeOptions {
+model MyScopeOptions extends DecoratorOptions {
   extra?: string;
 }
 
-// Error: not assignable to ScopeOptions | string
+// Error: not assignable to DecoratorOptions | string
 @clientName("RenamedName", #{ scope: "csharp", extra: "foo" })
 op myOperation(): void;
 ```
 
 To let a specific decorator accept extra options, that decorator's own `scope` parameter type must
-be updated to the extended options model (or a `Scope`-like alias built on it). This is the
-intended mechanism for evolving individual decorators independently without affecting others still
-using the shared alias.
+be updated to the extended options model (or a decorator-specific union alias built on it). This is
+the intended mechanism for evolving individual decorators independently without affecting others
+still using the shared base options model.
 
 ## Usage instrumentation
 

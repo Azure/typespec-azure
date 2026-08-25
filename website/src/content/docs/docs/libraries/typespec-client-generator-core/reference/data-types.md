@@ -37,23 +37,7 @@ model Azure.ClientGenerator.Core.ClientOptions
 | name?             | `string`                   | The name of the client. If not specified, the default name will be `<Name of the target>Client`.                                                             |
 | autoMergeService? | `boolean`                  | Auto-merge service's things into current client.                                                                                                             |
 
-### `ExternalType` {#Azure.ClientGenerator.Core.ExternalType}
-
-Represents an external type that can be used in alternate type definitions.
-
-```typespec
-model Azure.ClientGenerator.Core.ExternalType
-```
-
-#### Properties
-
-| Name        | Type     | Description                                                                             |
-| ----------- | -------- | --------------------------------------------------------------------------------------- |
-| identity    | `string` | The identity of the external type. For example, `pystac.Collection`                     |
-| package?    | `string` | The package that exports the external type. For example, `pystac`                       |
-| minVersion? | `string` | The minimum version of the package to use for your external type. For example, `1.13.0` |
-
-### `ScopeOptions` {#Azure.ClientGenerator.Core.ScopeOptions}
+### `DecoratorOptions` {#Azure.ClientGenerator.Core.DecoratorOptions}
 
 Common typed options bag for the `scope` argument accepted by scoped TCGC decorators.
 
@@ -70,7 +54,7 @@ emitter names (derived from the emitter package name, e.g., `@azure-tools/typesp
 - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
 
 ```typespec
-model Azure.ClientGenerator.Core.ScopeOptions
+model Azure.ClientGenerator.Core.DecoratorOptions
 ```
 
 #### Properties
@@ -78,6 +62,22 @@ model Azure.ClientGenerator.Core.ScopeOptions
 | Name   | Type     | Description                                                                                                                                          |
 | ------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | scope? | `string` | Specifies the target language emitters that a decorator should apply to. If not set, the<br />decorator applies to all language emitters by default. |
+
+### `ExternalType` {#Azure.ClientGenerator.Core.ExternalType}
+
+Represents an external type that can be used in alternate type definitions.
+
+```typespec
+model Azure.ClientGenerator.Core.ExternalType
+```
+
+#### Properties
+
+| Name        | Type     | Description                                                                             |
+| ----------- | -------- | --------------------------------------------------------------------------------------- |
+| identity    | `string` | The identity of the external type. For example, `pystac.Collection`                     |
+| package?    | `string` | The package that exports the external type. For example, `pystac`                       |
+| minVersion? | `string` | The minimum version of the package to use for your external type. For example, `1.13.0` |
 
 ### `Access` {#Azure.ClientGenerator.Core.Access}
 

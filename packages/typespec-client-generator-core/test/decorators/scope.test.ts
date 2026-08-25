@@ -5,11 +5,9 @@ import { getAccess, getClientNameOverride } from "../../src/decorators.js";
 import { getSdkModel } from "../../src/types.js";
 import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
-describe("Azure.ClientGenerator.Core.Scope alias", () => {
-  it("is a reusable alias for the type accepted by scoped decorators' scope argument", async () => {
+describe("Azure.ClientGenerator.Core.DecoratorOptions", () => {
+  it("accepts the legacy plain-string scope argument", async () => {
     const { program, func } = await SimpleTester.compile(t.code`
-      alias MyDecoratorScope = Azure.ClientGenerator.Core.Scope;
-
       @clientName("RenamedFunc", "csharp")
       op ${t.op("func")}(): void;
     `);
@@ -25,7 +23,7 @@ describe("Azure.ClientGenerator.Core.Scope alias", () => {
     strictEqual(getClientNameOverride(pythonContext, func), undefined);
   });
 
-  it("scoped decorators using the shared alias still apply to all emitters by default", async () => {
+  it("scoped decorators still apply to all emitters by default", async () => {
     const { program, func } = await SimpleTester.compile(t.code`
       @access(Access.internal, "!csharp")
       op ${t.op("func")}(): void;
@@ -42,7 +40,7 @@ describe("Azure.ClientGenerator.Core.Scope alias", () => {
     strictEqual(getAccess(contextPython, func), "internal");
   });
 
-  it("accepts a typed ScopeOptions bag in place of the legacy plain-string scope", async () => {
+  it("accepts a typed DecoratorOptions bag in place of the legacy plain-string scope", async () => {
     const { program, func } = await SimpleTester.compile(t.code`
       @clientName("RenamedFunc", #{ scope: "csharp" })
       op ${t.op("func")}(): void;
@@ -59,7 +57,7 @@ describe("Azure.ClientGenerator.Core.Scope alias", () => {
     strictEqual(getClientNameOverride(pythonContext, func), undefined);
   });
 
-  it("treats the legacy string scope and the equivalent ScopeOptions bag as equivalent", async () => {
+  it("treats the legacy string scope and the equivalent DecoratorOptions bag as equivalent", async () => {
     const { program, legacyFunc, optionsFunc } = await SimpleTester.compile(t.code`
       @route("/legacy")
       @access(Access.internal, "!(csharp, java)")
@@ -76,7 +74,7 @@ describe("Azure.ClientGenerator.Core.Scope alias", () => {
     }
   });
 
-  it("supports grouped and negated scopes through the ScopeOptions bag", async () => {
+  it("supports grouped and negated scopes through the DecoratorOptions bag", async () => {
     const { program, func } = await SimpleTester.compile(t.code`
       @access(Access.internal, #{ scope: "!(csharp, java)" })
       op ${t.op("func")}(): void;
@@ -93,7 +91,7 @@ describe("Azure.ClientGenerator.Core.Scope alias", () => {
     strictEqual(getAccess(contextPython, func), "internal");
   });
 
-  it("treats the legacy string scope and the equivalent ScopeOptions bag as equivalent for @usage", async () => {
+  it("treats the legacy string scope and the equivalent DecoratorOptions bag as equivalent for @usage", async () => {
     const { program, LegacyModel, OptionsModel } = await SimpleTester.compile(t.code`
       @usage(Usage.input, "csharp,python")
       model ${t.model("LegacyModel")} {}
@@ -114,7 +112,7 @@ describe("Azure.ClientGenerator.Core.Scope alias", () => {
     }
   });
 
-  it("supports comma-separated positive scopes through the ScopeOptions bag for multiple decorators on the same target", async () => {
+  it("supports comma-separated positive scopes through the DecoratorOptions bag for multiple decorators on the same target", async () => {
     const { program, func } = await SimpleTester.compile(t.code`
       @clientName("RenamedFunc", #{ scope: "csharp,python" })
       @access(Access.internal, #{ scope: "csharp,python" })

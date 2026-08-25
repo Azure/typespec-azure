@@ -152,7 +152,7 @@ namespace Azure.ClientGenerator.Core.Legacy;
 extern dec hierarchyBuilding(
   target: Model,
   value: Model,
-  scope?: valueof Azure.ClientGenerator.Core.Scope
+  scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string
 );
 
 /**
@@ -172,7 +172,10 @@ extern dec hierarchyBuilding(
  * }
  * ```
  */
-extern dec flattenProperty(target: ModelProperty, scope?: valueof Azure.ClientGenerator.Core.Scope);
+extern dec flattenProperty(
+  target: ModelProperty,
+  scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string
+);
 
 /**
  * Forces an operation to be treated as a Long Running Operation (LRO) by the SDK generators,
@@ -206,7 +209,10 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof Azure.ClientGe
  * ```
  *
  */
-extern dec markAsLro(target: Operation, scope?: valueof Azure.ClientGenerator.Core.Scope);
+extern dec markAsLro(
+  target: Operation,
+  scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string
+);
 
 /**
  * Forces an operation to be treated as a pageable operation by the SDK generators,
@@ -238,7 +244,10 @@ extern dec markAsLro(target: Operation, scope?: valueof Azure.ClientGenerator.Co
  * ```
  *
  */
-extern dec markAsPageable(target: Operation, scope?: valueof Azure.ClientGenerator.Core.Scope);
+extern dec markAsPageable(
+  target: Operation,
+  scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string
+);
 
 /**
  * Prevents an operation from being treated as a pageable operation by the SDK generators,
@@ -267,7 +276,10 @@ extern dec markAsPageable(target: Operation, scope?: valueof Azure.ClientGenerat
  * ```
  *
  */
-extern dec disablePageable(target: Operation, scope?: valueof Azure.ClientGenerator.Core.Scope);
+extern dec disablePageable(
+  target: Operation,
+  scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string
+);
 
 /**
  * Specifies the HTTP verb for the next link operation in a paging scenario.
@@ -294,7 +306,7 @@ extern dec disablePageable(target: Operation, scope?: valueof Azure.ClientGenera
 extern dec nextLinkVerb(
   target: Operation,
   verb: "GET" | "POST",
-  scope?: valueof Azure.ClientGenerator.Core.Scope
+  scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string
 );
 
 /**
@@ -344,5 +356,5 @@ extern dec nextLinkVerb(
 extern dec clientDefaultValue(
   target: ModelProperty,
   value: valueof string | boolean | numeric,
-  scope?: valueof Azure.ClientGenerator.Core.Scope
+  scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string
 );
