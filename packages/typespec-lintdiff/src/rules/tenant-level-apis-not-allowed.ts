@@ -1,11 +1,5 @@
 import { createRule, paramMessage } from "@typespec/compiler";
-import {
-  getArmResources,
-  getResourceBaseType,
-  ResourceBaseType,
-  type ArmResourceDetails,
-  type ArmResourceOperation,
-} from "@azure-tools/typespec-azure-resource-manager";
+import { getAllHttpServices } from "@typespec/http";
 
 export const tenantLevelAPIsNotAllowedRule = createRule({
   name: "tenant-level-apis-not-allowed",
@@ -21,24 +15,13 @@ process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-contr
   create(context) {
     return {
       root: (program) => {
-        for (const armResource of getArmResources(program)) {
-          if (
-            getResourceBaseType(program, armResource.typespecType) !==
-            ResourceBaseType.Tenant
-          ) {
-            continue;
-          }
-
-          for (const armResourceOperation of getAllResourceOperations(
-            armResource,
-          )) {
-            if (
-              armResourceOperation.httpOperation.verb === "put" &&
-              isTenantPutPath(armResourceOperation.path)
-            ) {
+        const [services] = getAllHttpServices(program);
+        for (const service of services) {
+          for (const httpOperation of service.operations) {
+            if (httpOperation.verb === "put" && isTenantPutPath(httpOperation.path)) {
               context.reportDiagnostic({
-                target: armResourceOperation.operation,
-                format: { name: armResourceOperation.name },
+                target: httpOperation.operation,
+                format: { name: httpOperation.operation.name },
               });
             }
           }
@@ -48,16 +31,6 @@ process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-contr
   },
 });
 
-function getAllResourceOperations(
-  resource: ArmResourceDetails,
-): Array<ArmResourceOperation> {
-  return [
-    ...Object.values(resource.operations.lifecycle),
-    ...Object.values(resource.operations.lists),
-    ...Object.values(resource.operations.actions),
-  ];
-}
-
 function isTenantPutPath(path: string): boolean {
-  return path.startsWith("/providers/") && !path.endsWith("/operations");
+  return path.startsWith("/providers") && !path.endsWith("/operations");
 }
