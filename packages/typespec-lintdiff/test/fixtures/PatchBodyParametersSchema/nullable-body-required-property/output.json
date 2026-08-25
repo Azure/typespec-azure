@@ -215,10 +215,11 @@
           {
             "name": "body",
             "in": "body",
-            "description": "The request body",
+            "description": "Nullable request body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetPatchBody"
+              "$ref": "#/definitions/WidgetPatchBody",
+              "x-nullable": true
             }
           }
         ],
@@ -295,36 +296,6 @@
     }
   },
   "definitions": {
-    "Azure.ResourceManager.ResourceProvisioningState": {
-      "type": "string",
-      "description": "The provisioning state of a resource type.",
-      "enum": [
-        "Succeeded",
-        "Failed",
-        "Canceled"
-      ],
-      "x-ms-enum": {
-        "name": "ResourceProvisioningState",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "Succeeded",
-            "value": "Succeeded",
-            "description": "Resource has been created."
-          },
-          {
-            "name": "Failed",
-            "value": "Failed",
-            "description": "Resource creation failed."
-          },
-          {
-            "name": "Canceled",
-            "value": "Canceled",
-            "description": "Resource creation was canceled."
-          }
-        ]
-      }
-    },
     "Widget": {
       "type": "object",
       "description": "Concrete tracked resource types can be created by aliasing this type using a specific property type.",
@@ -344,20 +315,6 @@
       "type": "object",
       "description": "Patch envelope for widget.",
       "properties": {
-        "properties": {
-          "$ref": "#/definitions/WidgetPatchProperties",
-          "description": "Resource properties with a required field — violates rule"
-        }
-      }
-    },
-    "WidgetPatchProperties": {
-      "type": "object",
-      "description": "Patch properties with a required property — violates ARM guidelines.",
-      "properties": {
-        "description": {
-          "type": "string",
-          "description": "Description of the widget"
-        },
         "requiredProp": {
           "type": "string",
           "description": "Required property in patch body — violates rule"
@@ -374,15 +331,6 @@
         "description": {
           "type": "string",
           "description": "Description of the widget"
-        },
-        "requiredProp": {
-          "type": "string",
-          "description": "Required property in the resource"
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "Resource provisioning state",
-          "readOnly": true
         }
       }
     }

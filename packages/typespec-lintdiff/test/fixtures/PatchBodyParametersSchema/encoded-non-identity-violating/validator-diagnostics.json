@@ -1,0 +1,30 @@
+[
+  {
+    "code": "PatchBodyParametersSchema",
+    "message": "Properties of a PATCH request body must not be required, property:principalId.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "parameters",
+      "4",
+      "schema",
+      "properties",
+      "customIdentity"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "PatchBodyParametersSchema",
+    "message": "Properties of a PATCH request body must not be required, property:customIdentity.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "parameters",
+      "4",
+      "schema"
+    ],
+    "severity": 0
+  }
+]

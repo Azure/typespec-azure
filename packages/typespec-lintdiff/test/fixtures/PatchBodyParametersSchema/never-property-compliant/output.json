@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Test Service",
-    "version": "2024-01-01",
+    "version": "0000-00-00",
     "x-typespec-generated": [
       {
         "emitter": "@azure-tools/typespec-autorest"
@@ -342,30 +342,7 @@
     },
     "WidgetPatchBody": {
       "type": "object",
-      "description": "Patch envelope for widget.",
-      "properties": {
-        "properties": {
-          "$ref": "#/definitions/WidgetPatchProperties",
-          "description": "Resource properties with a required field — violates rule"
-        }
-      }
-    },
-    "WidgetPatchProperties": {
-      "type": "object",
-      "description": "Patch properties with a required property — violates ARM guidelines.",
-      "properties": {
-        "description": {
-          "type": "string",
-          "description": "Description of the widget"
-        },
-        "requiredProp": {
-          "type": "string",
-          "description": "Required property in patch body — violates rule"
-        }
-      },
-      "required": [
-        "requiredProp"
-      ]
+      "description": "Patch envelope for widget."
     },
     "WidgetProperties": {
       "type": "object",
@@ -374,10 +351,6 @@
         "description": {
           "type": "string",
           "description": "Description of the widget"
-        },
-        "requiredProp": {
-          "type": "string",
-          "description": "Required property in the resource"
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",

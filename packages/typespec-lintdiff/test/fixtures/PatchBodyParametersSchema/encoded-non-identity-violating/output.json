@@ -295,35 +295,18 @@
     }
   },
   "definitions": {
-    "Azure.ResourceManager.ResourceProvisioningState": {
-      "type": "string",
-      "description": "The provisioning state of a resource type.",
-      "enum": [
-        "Succeeded",
-        "Failed",
-        "Canceled"
-      ],
-      "x-ms-enum": {
-        "name": "ResourceProvisioningState",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "Succeeded",
-            "value": "Succeeded",
-            "description": "Resource has been created."
-          },
-          {
-            "name": "Failed",
-            "value": "Failed",
-            "description": "Resource creation failed."
-          },
-          {
-            "name": "Canceled",
-            "value": "Canceled",
-            "description": "Resource creation was canceled."
-          }
-        ]
-      }
+    "CustomIdentity": {
+      "type": "object",
+      "description": "Custom identity model.",
+      "properties": {
+        "principalId": {
+          "type": "string",
+          "description": "Required property in emitted non-identity envelope — violates rule"
+        }
+      },
+      "required": [
+        "principalId"
+      ]
     },
     "Widget": {
       "type": "object",
@@ -344,27 +327,14 @@
       "type": "object",
       "description": "Patch envelope for widget.",
       "properties": {
-        "properties": {
-          "$ref": "#/definitions/WidgetPatchProperties",
-          "description": "Resource properties with a required field — violates rule"
-        }
-      }
-    },
-    "WidgetPatchProperties": {
-      "type": "object",
-      "description": "Patch properties with a required property — violates ARM guidelines.",
-      "properties": {
-        "description": {
-          "type": "string",
-          "description": "Description of the widget"
-        },
-        "requiredProp": {
-          "type": "string",
-          "description": "Required property in patch body — violates rule"
+        "customIdentity": {
+          "$ref": "#/definitions/CustomIdentity",
+          "description": "Authored identity encoded away from identity is checked by the Swagger rule",
+          "x-ms-client-name": "identity"
         }
       },
       "required": [
-        "requiredProp"
+        "customIdentity"
       ]
     },
     "WidgetProperties": {
@@ -374,15 +344,6 @@
         "description": {
           "type": "string",
           "description": "Description of the widget"
-        },
-        "requiredProp": {
-          "type": "string",
-          "description": "Required property in the resource"
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "Resource provisioning state",
-          "readOnly": true
         }
       }
     }

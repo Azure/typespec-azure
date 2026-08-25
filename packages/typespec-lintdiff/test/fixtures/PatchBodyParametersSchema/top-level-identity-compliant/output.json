@@ -325,6 +325,19 @@
         ]
       }
     },
+    "CustomIdentity": {
+      "type": "object",
+      "description": "Custom identity model.",
+      "properties": {
+        "principalId": {
+          "type": "string",
+          "description": "Required identity field that Swagger skips under top-level identity"
+        }
+      },
+      "required": [
+        "principalId"
+      ]
+    },
     "Widget": {
       "type": "object",
       "description": "Concrete tracked resource types can be created by aliasing this type using a specific property type.",
@@ -332,6 +345,10 @@
         "properties": {
           "$ref": "#/definitions/WidgetProperties",
           "description": "The resource-specific properties for this resource."
+        },
+        "identity": {
+          "$ref": "#/definitions/CustomIdentity",
+          "description": "Identity on the resource model"
         }
       },
       "allOf": [
@@ -344,27 +361,13 @@
       "type": "object",
       "description": "Patch envelope for widget.",
       "properties": {
-        "properties": {
-          "$ref": "#/definitions/WidgetPatchProperties",
-          "description": "Resource properties with a required field — violates rule"
-        }
-      }
-    },
-    "WidgetPatchProperties": {
-      "type": "object",
-      "description": "Patch properties with a required property — violates ARM guidelines.",
-      "properties": {
-        "description": {
-          "type": "string",
-          "description": "Description of the widget"
-        },
-        "requiredProp": {
-          "type": "string",
-          "description": "Required property in patch body — violates rule"
+        "identity": {
+          "$ref": "#/definitions/CustomIdentity",
+          "description": "Top-level identity is skipped by the Swagger rule"
         }
       },
       "required": [
-        "requiredProp"
+        "identity"
       ]
     },
     "WidgetProperties": {
@@ -374,10 +377,6 @@
         "description": {
           "type": "string",
           "description": "Description of the widget"
-        },
-        "requiredProp": {
-          "type": "string",
-          "description": "Required property in the resource"
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",

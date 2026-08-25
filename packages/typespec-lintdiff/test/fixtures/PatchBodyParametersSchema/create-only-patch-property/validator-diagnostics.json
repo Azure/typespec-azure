@@ -1,0 +1,17 @@
+[
+  {
+    "code": "PatchBodyParametersSchema",
+    "message": "Properties of a PATCH request body must not be x-ms-mutability: [\"create\"], property:createOnly.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "parameters",
+      "4",
+      "schema",
+      "properties",
+      "properties"
+    ],
+    "severity": 0
+  }
+]
