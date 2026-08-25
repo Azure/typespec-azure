@@ -49,7 +49,7 @@ There is currently **no deprecation timeline** for the legacy positional string 
 Both forms (string and options bag) are supported side by side indefinitely. A future deprecation
 of the positional string form would only be considered once:
 
-1. Migration code fixes exist and have been available for at least one full TCGC release cycle.
+1. Migration guidance has been available for at least one full TCGC release cycle.
 2. The majority of first-party TCGC-based emitters (C#, Java, Python, JavaScript/TypeScript, Go)
    have migrated their own decorator usage to the options-bag form internally.
 3. Usage telemetry (see below) shows options-bag adoption is broadly viable for spec authors.
@@ -93,6 +93,28 @@ interface MyInterface {}
 })
 interface MyInterface {}
 ```
+
+## Passing extended options models
+
+A decorator only accepts an options bag shaped like its declared `scope` parameter type. Passing a
+value typed as a model that `extends ScopeOptions` with additional properties to a decorator whose
+`scope` parameter is still typed as the shared `Scope` alias will fail, because the extra
+properties aren't assignable to `ScopeOptions | string`:
+
+```typespec
+model MyScopeOptions extends ScopeOptions {
+  extra?: string;
+}
+
+// Error: not assignable to ScopeOptions | string
+@clientName("RenamedName", #{ scope: "csharp", extra: "foo" })
+op myOperation(): void;
+```
+
+To let a specific decorator accept extra options, that decorator's own `scope` parameter type must
+be updated to the extended options model (or a `Scope`-like alias built on it). This is the
+intended mechanism for evolving individual decorators independently without affecting others still
+using the shared alias.
 
 ## Usage instrumentation
 

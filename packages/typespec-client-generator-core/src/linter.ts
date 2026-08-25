@@ -4,7 +4,6 @@ import { csharpNoUrlSuffixRule } from "./rules/csharp-no-url-suffix.js";
 import { csharpUseStandardAcronymsRule } from "./rules/csharp-use-standard-acronyms.js";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
-import { scopeOptionsMigrationRule } from "./rules/scope-options-migration.js";
 
 const rules = [
   requireClientSuffixRule,
@@ -12,7 +11,6 @@ const rules = [
   csharpNoUrlSuffixRule,
   csharpModelSuffixRule,
   csharpUseStandardAcronymsRule,
-  scopeOptionsMigrationRule,
 ];
 
 const csharpRules = [
