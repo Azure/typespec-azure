@@ -334,8 +334,9 @@ explicitly listed.
 - Core rules that apply to data-plane and ARM go in both
   `src/rulesets/data-plane.ts` and `src/rulesets/resource-manager.ts`.
 - Core rules that are not applicable to ARM, or conflict with an ARM-specific
-  rule, must still be explicitly listed in `resource-manager.ts` with `false`
-  and a short comment.
+  rule, must still be explicitly listed in `resource-manager.ts` with a plain
+  `false` value and no annotation or explanatory comment, matching the existing
+  resource-manager ruleset style for disabled entries.
 
 Run or plan to run the rulesets build and test after updating the lists.
 
