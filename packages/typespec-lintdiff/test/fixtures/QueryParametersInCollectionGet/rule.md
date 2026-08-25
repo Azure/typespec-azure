@@ -3,6 +3,7 @@ validatorRuleId: QueryParametersInCollectionGet
 engine: spectral
 tspLints:
   - tsp-lintdiff-local-linter/query-parameters-in-collection-get
+projectionScope: http-reachable
 ---
 
 # QueryParametersInCollectionGet

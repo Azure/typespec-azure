@@ -325,6 +325,54 @@
         ]
       }
     },
+    "BaseSynthesizedDiscriminator": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "Discriminator property for BaseSynthesizedDiscriminator."
+        }
+      },
+      "discriminator": "kind",
+      "required": [
+        "kind"
+      ]
+    },
+    "DerivedDiscriminator": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseSynthesizedDiscriminator"
+        }
+      ],
+      "x-ms-discriminator-value": "derived"
+    },
+    "OptionalDiscriminator": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "An authored optional discriminator emitted as required"
+        }
+      },
+      "discriminator": "kind",
+      "required": [
+        "kind"
+      ]
+    },
+    "SynthesizedDiscriminator": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "Discriminator property for SynthesizedDiscriminator."
+        }
+      },
+      "discriminator": "kind",
+      "required": [
+        "kind"
+      ]
+    },
     "Widget": {
       "type": "object",
       "description": "Concrete tracked resource types can be created by aliasing this type using a specific property type.",
@@ -344,28 +392,19 @@
       "type": "object",
       "description": "Patch envelope for widget.",
       "properties": {
-        "properties": {
-          "$ref": "#/definitions/WidgetPatchProperties",
-          "description": "Resource properties with a required field — violates rule"
+        "optional": {
+          "$ref": "#/definitions/OptionalDiscriminator",
+          "description": "A model with an authored optional discriminator"
+        },
+        "synthesized": {
+          "$ref": "#/definitions/SynthesizedDiscriminator",
+          "description": "A model whose discriminator is synthesized by Autorest"
+        },
+        "inheritedDiscriminator": {
+          "$ref": "#/definitions/DerivedDiscriminator",
+          "description": "A derived model with an inherited discriminator declaration"
         }
       }
-    },
-    "WidgetPatchProperties": {
-      "type": "object",
-      "description": "Patch properties with a required property — violates ARM guidelines.",
-      "properties": {
-        "description": {
-          "type": "string",
-          "description": "Description of the widget"
-        },
-        "requiredProp": {
-          "type": "string",
-          "description": "Required property in patch body — violates rule"
-        }
-      },
-      "required": [
-        "requiredProp"
-      ]
     },
     "WidgetProperties": {
       "type": "object",
@@ -374,10 +413,6 @@
         "description": {
           "type": "string",
           "description": "Description of the widget"
-        },
-        "requiredProp": {
-          "type": "string",
-          "description": "Required property in the resource"
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",

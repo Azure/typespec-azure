@@ -346,26 +346,36 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/WidgetPatchProperties",
-          "description": "Resource properties with a required field — violates rule"
+          "description": "Resource properties with a defaulted field"
         }
       }
     },
     "WidgetPatchProperties": {
       "type": "object",
-      "description": "Patch properties with a required property — violates ARM guidelines.",
+      "description": "Patch properties with a defaulted property.",
       "properties": {
-        "description": {
+        "mode": {
           "type": "string",
-          "description": "Description of the widget"
+          "description": "Mode default in patch body -- violates rule",
+          "default": "enabled"
         },
-        "requiredProp": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Falsy boolean default in patch body -- violates rule",
+          "default": false
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Falsy numeric default in patch body -- violates rule",
+          "default": 0
+        },
+        "label": {
           "type": "string",
-          "description": "Required property in patch body — violates rule"
+          "description": "Falsy string default in patch body -- violates rule",
+          "default": ""
         }
-      },
-      "required": [
-        "requiredProp"
-      ]
+      }
     },
     "WidgetProperties": {
       "type": "object",
@@ -374,10 +384,6 @@
         "description": {
           "type": "string",
           "description": "Description of the widget"
-        },
-        "requiredProp": {
-          "type": "string",
-          "description": "Required property in the resource"
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",

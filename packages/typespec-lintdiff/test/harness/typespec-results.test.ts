@@ -6,9 +6,8 @@ import {
   comparisonMarkdown,
   coverageBreakdownMarkdown,
   createCoverageBreakdown,
-  filterProjectedCollectionQueryDiagnostics,
+  filterProjectedDiagnostics,
   filterProjectedEnumDiagnostics,
-  filterProjectedPointQueryDiagnostics,
   injectLocalRuleset,
   loadValidatorFixtureMetadata,
   loadValidatorMappings,
@@ -110,7 +109,7 @@ describe("TypeSpec diagnostic parsing", () => {
 });
 
 describe("TypeSpec result aggregation", () => {
-  it("filters only EnumInsteadOfBoolean diagnostics outside the projected HTTP graph", () => {
+  it("normalizes projected enum diagnostics against emitted boolean names", () => {
     const enumRule = "tsp-lintdiff-local-linter/enum-instead-of-boolean";
     const diagnostics: TypeSpecDiagnostic[] = [
       {
@@ -134,6 +133,7 @@ describe("TypeSpec result aggregation", () => {
         {
           apiVersion: "2026-01-01",
           serviceCount: 1,
+          reachableLocations: [],
           locations: [
             {
               sourceFile: "models.tsp",
@@ -148,7 +148,6 @@ describe("TypeSpec result aggregation", () => {
               emittedName: "enabled",
             },
           ],
-          collectionQueryParameterLocations: [],
           queryParameterLocations: [],
         },
         new Set(["enabled"]),
@@ -156,7 +155,7 @@ describe("TypeSpec result aggregation", () => {
     ).toEqual([diagnostics[1], diagnostics[2]]);
   });
 
-  it("filters point-query diagnostics outside the selected API version", () => {
+  it("filters opted-in diagnostics outside the selected API version", () => {
     const pointRule = "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations";
     const diagnostics: TypeSpecDiagnostic[] = [
       {
@@ -172,63 +171,63 @@ describe("TypeSpec result aggregation", () => {
         column: 3,
       },
       diagnostic("tsp-lintdiff-local-linter/another-rule", project),
+      diagnostic(pointRule, project),
     ];
 
     expect(
-      filterProjectedPointQueryDiagnostics(diagnostics, {
-        apiVersion: "2026-01-01",
-        serviceCount: 1,
-        locations: [],
-        collectionQueryParameterLocations: [],
-        queryParameterLocations: [
-          {
-            sourceFile: "operations.tsp",
-            line: 20,
-            column: 3,
-            name: "mode",
-            verb: "delete",
-          },
-        ],
-      }),
-    ).toEqual([diagnostics[1], diagnostics[2]]);
+      filterProjectedDiagnostics(
+        diagnostics,
+        {
+          apiVersion: "2026-01-01",
+          serviceCount: 1,
+          reachableLocations: [
+            {
+              sourceFile: "operations.tsp",
+              line: 10,
+              column: 3,
+            },
+          ],
+          locations: [],
+          queryParameterLocations: [
+            {
+              sourceFile: "operations.tsp",
+              line: 20,
+              column: 3,
+              name: "mode",
+              verb: "delete",
+            },
+          ],
+        },
+        new Set([pointRule]),
+      ),
+    ).toEqual([diagnostics[1], diagnostics[2], diagnostics[3]]);
   });
 
-  it("filters collection-query diagnostics outside the selected API version", () => {
-    const collectionRule = "tsp-lintdiff-local-linter/query-parameters-in-collection-get";
+  it("preserves non-opted-in and locationless diagnostics", () => {
+    const projectedRule = "tsp-lintdiff-local-linter/projected";
     const diagnostics: TypeSpecDiagnostic[] = [
+      diagnostic(projectedRule, project),
       {
-        ...diagnostic(collectionRule, project),
-        sourceFile: "operations.tsp",
+        ...diagnostic("tsp-lintdiff-local-linter/unprojected", project),
+        sourceFile: "old.tsp",
         line: 10,
         column: 3,
-        message: "Query parameter 'timestamp' should be removed.",
       },
-      {
-        ...diagnostic(collectionRule, project),
-        sourceFile: "operations.tsp",
-        line: 20,
-        column: 3,
-        message: "Query parameter 'continuationToken' should be removed.",
-      },
-      diagnostic("tsp-lintdiff-local-linter/another-rule", project),
     ];
 
     expect(
-      filterProjectedCollectionQueryDiagnostics(diagnostics, {
-        apiVersion: "2026-01-01",
-        serviceCount: 1,
-        locations: [],
-        queryParameterLocations: [],
-        collectionQueryParameterLocations: [
-          {
-            sourceFile: "operations.tsp",
-            line: 20,
-            column: 3,
-            name: "continuationToken",
-          },
-        ],
-      }),
-    ).toEqual([diagnostics[1], diagnostics[2]]);
+      filterProjectedDiagnostics(
+        diagnostics,
+        {
+          apiVersion: "2026-01-01",
+          serviceCount: 1,
+          reachableLocations: [],
+          locations: [],
+          queryParameterLocations: [],
+        },
+        new Set([projectedRule]),
+      ),
+    ).toEqual(diagnostics);
   });
 
   it("counts levels, projects, and duplicate diagnostics", () => {
@@ -391,6 +390,11 @@ describe("validator and TypeSpec comparison", () => {
     );
     expect(metadata.get("DeleteInOperationName")?.coverageKind).toBe("lint");
     expect(metadata.get("PostResponseCodes")?.tspLints).toEqual(mappings.get("PostResponseCodes"));
+    expect(metadata.get("PatchBodyParametersSchema")?.projectionScope).toBe("http-reachable");
+    expect(metadata.get("ValidQueryParametersForPointOperations")?.projectionScope).toBe(
+      "http-reachable",
+    );
+    expect(metadata.get("DeleteInOperationName")?.projectionScope).toBe("none");
   });
 
   it("computes overlap from projects where mapped TypeSpec rules actually fire", () => {

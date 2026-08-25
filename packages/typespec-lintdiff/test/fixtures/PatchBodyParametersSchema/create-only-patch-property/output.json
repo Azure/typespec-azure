@@ -346,26 +346,22 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/WidgetPatchProperties",
-          "description": "Resource properties with a required field — violates rule"
+          "description": "Resource properties with a create-only field"
         }
       }
     },
     "WidgetPatchProperties": {
       "type": "object",
-      "description": "Patch properties with a required property — violates ARM guidelines.",
+      "description": "Patch properties with a create-only property.",
       "properties": {
-        "description": {
+        "createOnly": {
           "type": "string",
-          "description": "Description of the widget"
-        },
-        "requiredProp": {
-          "type": "string",
-          "description": "Required property in patch body — violates rule"
+          "description": "Create-only property in patch body -- violates rule",
+          "x-ms-mutability": [
+            "create"
+          ]
         }
-      },
-      "required": [
-        "requiredProp"
-      ]
+      }
     },
     "WidgetProperties": {
       "type": "object",
@@ -374,10 +370,6 @@
         "description": {
           "type": "string",
           "description": "Description of the widget"
-        },
-        "requiredProp": {
-          "type": "string",
-          "description": "Required property in the resource"
         },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",

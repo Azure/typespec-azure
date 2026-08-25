@@ -1,0 +1,41 @@
+{
+  "violation": false,
+  "ambientDiagnostics": [
+    {
+      "code": "@azure-tools/typespec-azure-core/no-string-discriminator",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/empty-updateable-properties",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/no-empty-model",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/patch-envelope",
+      "count": 1
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "count": 1
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
+      "count": 1
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/xms-examples-required",
+      "count": 4
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "count": 7
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Test Service",
-    "version": "2024-01-01",
+    "title": "Widget Service",
+    "version": "2025-01-01",
     "x-typespec-generated": [
       {
         "emitter": "@azure-tools/typespec-autorest"
@@ -46,7 +46,7 @@
     }
   ],
   "paths": {
-    "/providers/Microsoft.TestService/operations": {
+    "/providers/Microsoft.Widgets/operations": {
       "get": {
         "operationId": "Operations_List",
         "tags": [
@@ -55,20 +55,20 @@
         "description": "List the operations for the provider",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/definitions/OperationListResult"
+              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/definitions/OperationListResult"
             }
           },
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -77,7 +77,7 @@
         }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Widgets/widgets/{widgetName}": {
       "get": {
         "operationId": "Widgets_Get",
         "tags": [
@@ -86,21 +86,21 @@
         "description": "Get a Widget",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
-            "pattern": "^[a-zA-Z0-9_-]+$"
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
           }
         ],
         "responses": {
@@ -113,7 +113,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -126,21 +126,21 @@
         "description": "Create a Widget",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
-            "pattern": "^[a-zA-Z0-9_-]+$"
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
             "name": "resource",
@@ -179,7 +179,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -193,32 +193,32 @@
         "tags": [
           "Widgets"
         ],
-        "description": "Update widget",
+        "description": "Update a Widget",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
-            "pattern": "^[a-zA-Z0-9_-]+$"
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
-            "name": "body",
+            "name": "properties",
             "in": "body",
-            "description": "The request body",
+            "description": "The resource properties to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetPatchBody"
+              "$ref": "#/definitions/WidgetUpdate"
             }
           }
         ],
@@ -229,13 +229,31 @@
               "$ref": "#/definitions/Widget"
             }
           },
+          "202": {
+            "description": "Resource update request accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
-        }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
       },
       "delete": {
         "operationId": "Widgets_Delete",
@@ -245,21 +263,21 @@
         "description": "Delete a Widget",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
-            "pattern": "^[a-zA-Z0-9_-]+$"
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
           }
         ],
         "responses": {
@@ -283,7 +301,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -295,35 +313,24 @@
     }
   },
   "definitions": {
-    "Azure.ResourceManager.ResourceProvisioningState": {
-      "type": "string",
-      "description": "The provisioning state of a resource type.",
-      "enum": [
-        "Succeeded",
-        "Failed",
-        "Canceled"
-      ],
-      "x-ms-enum": {
-        "name": "ResourceProvisioningState",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "Succeeded",
-            "value": "Succeeded",
-            "description": "Resource has been created."
-          },
-          {
-            "name": "Failed",
-            "value": "Failed",
-            "description": "Resource creation failed."
-          },
-          {
-            "name": "Canceled",
-            "value": "Canceled",
-            "description": "Resource creation was canceled."
+    "Azure.ResourceManager.CommonTypes.TrackedResourceUpdate": {
+      "type": "object",
+      "title": "Tracked Resource",
+      "description": "The resource model definition for an Azure Resource Manager tracked top level resource which has 'tags' and a 'location'",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
           }
-        ]
-      }
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/definitions/Resource"
+        }
+      ]
     },
     "Widget": {
       "type": "object",
@@ -336,55 +343,51 @@
       },
       "allOf": [
         {
-          "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v5/types.json#/definitions/TrackedResource"
+          "$ref": "../../../../../../../../../../azure-rest-api-specs/specification/common-types/resource-management/resource-management/v3/types.json#/definitions/TrackedResource"
         }
-      ]
-    },
-    "WidgetPatchBody": {
-      "type": "object",
-      "description": "Patch envelope for widget.",
-      "properties": {
-        "properties": {
-          "$ref": "#/definitions/WidgetPatchProperties",
-          "description": "Resource properties with a required field — violates rule"
-        }
-      }
-    },
-    "WidgetPatchProperties": {
-      "type": "object",
-      "description": "Patch properties with a required property — violates ARM guidelines.",
-      "properties": {
-        "description": {
-          "type": "string",
-          "description": "Description of the widget"
-        },
-        "requiredProp": {
-          "type": "string",
-          "description": "Required property in patch body — violates rule"
-        }
-      },
-      "required": [
-        "requiredProp"
       ]
     },
     "WidgetProperties": {
       "type": "object",
-      "description": "Widget resource properties.",
       "properties": {
         "description": {
-          "type": "string",
-          "description": "Description of the widget"
+          "type": "string"
         },
-        "requiredProp": {
+        "createOnly": {
           "type": "string",
-          "description": "Required property in the resource"
-        },
-        "provisioningState": {
-          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "Resource provisioning state",
-          "readOnly": true
+          "description": "A create-only value omitted from the transformed PATCH schema",
+          "x-ms-mutability": [
+            "create"
+          ]
+        }
+      },
+      "required": [
+        "description",
+        "createOnly"
+      ]
+    },
+    "WidgetPropertiesUpdate": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
         }
       }
+    },
+    "WidgetUpdate": {
+      "type": "object",
+      "description": "Concrete tracked resource types can be created by aliasing this type using a specific property type.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/WidgetPropertiesUpdate",
+          "description": "The resource-specific properties for this resource."
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.TrackedResourceUpdate"
+        }
+      ]
     }
   },
   "parameters": {}

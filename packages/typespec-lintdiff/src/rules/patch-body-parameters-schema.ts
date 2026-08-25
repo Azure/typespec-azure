@@ -1,29 +1,43 @@
+import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 import {
   createRule,
+  getDiscriminator,
+  getLifecycleVisibilityEnum,
+  getLocationContext,
+  getVisibilityForClass,
+  isNullType,
+  isNeverType,
   paramMessage,
+  resolveEncodedName,
+  type DiagnosticTarget,
   type Model,
   type ModelProperty,
   type Operation,
+  type Program,
+  type Type,
 } from "@typespec/compiler";
-import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
-import { getHttpOperation } from "@typespec/http";
+import {
+  createMetadataInfo,
+  getHttpOperation,
+  resolveRequestVisibility,
+  Visibility,
+  type MetadataInfo,
+} from "@typespec/http";
 
 export const patchBodyParametersSchemaRule = createRule({
   name: "patch-body-parameters-schema",
-  description:
-    "ARM PATCH body properties must not be required and must not have defaults.",
+  description: "ARM PATCH body properties must not be required, have defaults, or be create-only.",
   severity: "warning",
   messages: {
     required: paramMessage`Properties of a PATCH request body must not be required, property:${"propertyName"}.`,
     default: paramMessage`Properties of a PATCH request body must not have default value, property:${"propertyName"}.`,
+    createOnly: paramMessage`Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:${"propertyName"}.`,
   },
   create(context) {
     return {
       operation: (operation) => {
         const namespace = operation.interface?.namespace ?? operation.namespace;
-        if (
-          resolveProviderNamespace(context.program, namespace) === undefined
-        ) {
+        if (resolveProviderNamespace(context.program, namespace) === undefined) {
           return;
         }
 
@@ -33,11 +47,11 @@ export const patchBodyParametersSchemaRule = createRule({
         }
 
         const patchBody = httpOperation.parameters.body?.type;
-        if (patchBody?.kind !== "Model") {
+        if (patchBody === undefined) {
           return;
         }
 
-        for (const violation of findViolations(operation, patchBody)) {
+        for (const violation of findViolations(context.program, patchBody, operation)) {
           context.reportDiagnostic({
             target: violation.target,
             messageId: violation.messageId,
@@ -52,90 +66,225 @@ export const patchBodyParametersSchemaRule = createRule({
 });
 
 type Violation = {
-  target: ModelProperty;
+  target: DiagnosticTarget;
   propertyName: string;
-  messageId: "required" | "default";
+  messageId: "required" | "default" | "createOnly";
 };
 
-function findViolations(operation: Operation, patchModel: Model): Violation[] {
+function findViolations(program: Program, patchBody: Type, operation: Operation): Violation[] {
   const violations: Violation[] = [];
-  collectViolations(patchModel, operation.name, violations, [], new Set());
+  const metadataInfo = createMetadataInfo(program, {
+    canonicalVisibility: Visibility.Read,
+    canShareProperty: (property) => canSharePropertyUsingReadonlyOrXmsMutability(program, property),
+  });
+  const visibility = resolveRequestVisibility(program, operation, "patch");
+  collectNestedViolations(
+    program,
+    patchBody,
+    violations,
+    [],
+    new Map(),
+    operation,
+    metadataInfo,
+    visibility,
+  );
   return violations;
 }
 
 function collectViolations(
+  program: Program,
   model: Model,
-  resourceName: string,
   violations: Violation[],
   path: string[] = [],
-  visited: Set<Model> = new Set(),
+  visited: Map<Model, Set<Visibility>> = new Map(),
+  diagnosticTarget: DiagnosticTarget,
+  metadataInfo: MetadataInfo,
+  visibility: Visibility,
 ) {
-  if (visited.has(model)) {
+  const schemaVisibility = metadataInfo.isTransformed(model, visibility)
+    ? visibility
+    : Visibility.Read;
+  const visitedVisibilities = visited.get(model);
+  if (visitedVisibilities?.has(schemaVisibility)) {
     return;
   }
-  visited.add(model);
+  if (visitedVisibilities === undefined) {
+    visited.set(model, new Set([schemaVisibility]));
+  } else {
+    visitedVisibilities.add(schemaVisibility);
+  }
+
+  const discriminator = getInheritedDiscriminator(program, model);
+  if (
+    discriminator !== undefined &&
+    getModelProperty(model, discriminator.propertyName) === undefined &&
+    !isTopLevelIdentityProperty(
+      [...path, discriminator.propertyName],
+      discriminator.propertyName,
+    )
+  ) {
+    violations.push({
+      target: getLocationContext(program, model).type === "project" ? model : diagnosticTarget,
+      propertyName: [...path, discriminator.propertyName].join("."),
+      messageId: "required",
+    });
+  }
 
   for (const property of getModelProperties(model)) {
-    const propertyPath = [...path, property.name];
-    if (
-      !isTopLevelManagedIdentityException(resourceName, propertyPath, property)
-    ) {
-      if (!property.optional) {
-        violations.push({
-          target: property,
-          propertyName: propertyPath.join("."),
-          messageId: "required",
-        });
-      }
+    const jsonName = resolveEncodedName(program, property, "application/json");
+    const propertyPath = [...path, jsonName];
+    if (isTopLevelIdentityProperty(propertyPath, jsonName)) {
+      continue;
+    }
+    if (!metadataInfo.isPayloadProperty(property, schemaVisibility)) {
+      continue;
+    }
+    if (isNeverType(property.type)) {
+      continue;
+    }
+    const propertyTarget =
+      getLocationContext(program, property).type === "project" ? property : diagnosticTarget;
 
-      if (property.defaultValue !== undefined) {
-        violations.push({
-          target: property,
-          propertyName: propertyPath.join("."),
-          messageId: "default",
-        });
-      }
+    if (
+      !metadataInfo.isOptional(property, schemaVisibility) ||
+      property.name === discriminator?.propertyName
+    ) {
+      violations.push({
+        target: propertyTarget,
+        propertyName: propertyPath.join("."),
+        messageId: "required",
+      });
     }
 
-    if (property.type.kind === "Model") {
-      collectViolations(
-        property.type,
-        resourceName,
+    if (property.defaultValue !== undefined) {
+      violations.push({
+        target: propertyTarget,
+        propertyName: propertyPath.join("."),
+        messageId: "default",
+      });
+    }
+
+    if (isCreateOnlyMutability(program, property)) {
+      violations.push({
+        target: propertyTarget,
+        propertyName: propertyPath.join("."),
+        messageId: "createOnly",
+      });
+    }
+
+    collectNestedViolations(
+      program,
+      property.type,
+      violations,
+      propertyPath,
+      visited,
+      propertyTarget,
+      metadataInfo,
+      schemaVisibility,
+    );
+  }
+}
+
+function collectNestedViolations(
+  program: Program,
+  type: Type,
+  violations: Violation[],
+  path: string[],
+  visited: Map<Model, Set<Visibility>>,
+  diagnosticTarget: DiagnosticTarget,
+  metadataInfo: MetadataInfo,
+  visibility: Visibility,
+) {
+  if (type.kind === "Model") {
+    collectViolations(
+      program,
+      type,
+      violations,
+      path,
+      visited,
+      diagnosticTarget,
+      metadataInfo,
+      visibility,
+    );
+    return;
+  }
+
+  if (type.kind === "Union") {
+    const nonNullVariants = [...type.variants.values()]
+      .map((variant) => variant.type)
+      .filter((variant) => !isNullType(variant));
+    if (nonNullVariants.length === 1) {
+      collectNestedViolations(
+        program,
+        nonNullVariants[0],
         violations,
-        propertyPath,
+        path,
         visited,
+        diagnosticTarget,
+        metadataInfo,
+        visibility,
       );
     }
   }
 }
 
-function isTopLevelManagedIdentityException(
-  resourceName: string,
-  propertyPath: string[],
-  property: ModelProperty,
-): boolean {
-  if (propertyPath.length !== 1 || property.name !== "identity") {
+function isTopLevelIdentityProperty(propertyPath: string[], jsonName: string): boolean {
+  return propertyPath.length === 1 && jsonName.toLowerCase() === "identity";
+}
+
+function isCreateOnlyMutability(program: Program, property: ModelProperty): boolean {
+  const lifecycle = getLifecycleVisibilityEnum(program);
+  const create = lifecycle.members.get("Create");
+  if (create === undefined) {
     return false;
   }
 
-  if (property.type.kind !== "Model") {
-    return false;
+  const visibility = getVisibilityForClass(program, property, lifecycle);
+  return visibility.size === 1 && visibility.has(create);
+}
+
+function getInheritedDiscriminator(program: Program, model: Model) {
+  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
+    const discriminator = getDiscriminator(program, current);
+    if (discriminator !== undefined) {
+      return discriminator;
+    }
+  }
+
+  return undefined;
+}
+
+function canSharePropertyUsingReadonlyOrXmsMutability(
+  program: Program,
+  property: ModelProperty,
+): boolean {
+  const lifecycle = getLifecycleVisibilityEnum(program);
+  const visibility = getVisibilityForClass(program, property, lifecycle);
+  if (visibility.size === lifecycle.members.size) {
+    return true;
   }
 
   return (
-    property.type.name.includes("ManagedServiceIdentity") ||
-    property.type.name.includes("SystemAssignedServiceIdentity")
+    visibility.size > 0 &&
+    [...visibility].every((member) => ["Read", "Create", "Update"].includes(member.name))
   );
+}
+
+function getModelProperty(model: Model, name: string): ModelProperty | undefined {
+  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
+    const property = current.properties.get(name);
+    if (property !== undefined) {
+      return property;
+    }
+  }
+
+  return undefined;
 }
 
 function getModelProperties(model: Model): ModelProperty[] {
   const properties = new Map<string, ModelProperty>();
 
-  for (
-    let current: Model | undefined = model;
-    current !== undefined;
-    current = current.baseModel
-  ) {
+  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
     for (const property of current.properties.values()) {
       if (!properties.has(property.name)) {
         properties.set(property.name, property);

@@ -1,6 +1,7 @@
 import {
   NodeHost,
   compile,
+  getLocationContext,
   getSourceLocation,
   listServices,
   navigateTypesInNamespace,
@@ -18,9 +19,14 @@ import * as path from "path";
 import { pathToFileURL } from "url";
 import { isPointOperationPath } from "../../src/rules/point-operation-path.js";
 
-export interface ProjectedEnumResult {
+export interface ProjectedHttpGraphResult {
   apiVersion: string;
   serviceCount: number;
+  reachableLocations: Array<{
+    sourceFile: string;
+    line: number;
+    column: number;
+  }>;
   locations: Array<{
     sourceFile: string;
     line: number;
@@ -34,13 +40,9 @@ export interface ProjectedEnumResult {
     name: string;
     verb: string;
   }>;
-  collectionQueryParameterLocations: Array<{
-    sourceFile: string;
-    line: number;
-    column: number;
-    name: string;
-  }>;
 }
+
+export type ProjectedEnumResult = ProjectedHttpGraphResult;
 
 const pointOperationVerbs = new Set(["get", "put", "patch", "delete"]);
 
@@ -64,7 +66,7 @@ function locationKey(
   projectDir: string,
 ): { key: string; sourceFile: string; line: number; column: number } | undefined {
   const location = getSourceLocation(target, { locateId: true });
-  if (!location || program.getSourceFileLocationContext(location.file).type !== "project") {
+  if (!location || getLocationContext(program, target).type !== "project") {
     return undefined;
   }
   const position = location.file.getLineAndCharacterOfPosition(location.pos);
@@ -97,17 +99,35 @@ function addTarget(
   }
 }
 
+function addReachableTarget(
+  program: Program,
+  target: DiagnosticTarget,
+  projectDir: string,
+  locations: Map<string, ProjectedHttpGraphResult["reachableLocations"][number]>,
+): void {
+  const location = locationKey(program, target, projectDir);
+  if (location) {
+    locations.set(location.key, {
+      sourceFile: location.sourceFile,
+      line: location.line,
+      column: location.column,
+    });
+  }
+}
+
 function visitType(
   program: Program,
   type: Type,
   projectDir: string,
   locations: Map<string, ProjectedEnumResult["locations"][number]>,
+  reachableLocations: Map<string, ProjectedHttpGraphResult["reachableLocations"][number]>,
   visited: Set<Type>,
 ): void {
   if (visited.has(type)) {
     return;
   }
   visited.add(type);
+  addReachableTarget(program, type, projectDir, reachableLocations);
 
   switch (type.kind) {
     case "ModelProperty":
@@ -120,27 +140,27 @@ function visitType(
           locations,
         );
       }
-      visitType(program, type.type, projectDir, locations, visited);
+      visitType(program, type.type, projectDir, locations, reachableLocations, visited);
       return;
     case "Model":
       for (const property of type.properties.values()) {
-        visitType(program, property, projectDir, locations, visited);
+        visitType(program, property, projectDir, locations, reachableLocations, visited);
       }
       if (type.baseModel) {
-        visitType(program, type.baseModel, projectDir, locations, visited);
+        visitType(program, type.baseModel, projectDir, locations, reachableLocations, visited);
       }
       if (type.indexer) {
-        visitType(program, type.indexer.value, projectDir, locations, visited);
+        visitType(program, type.indexer.value, projectDir, locations, reachableLocations, visited);
       }
       return;
     case "Union":
       for (const variant of type.variants.values()) {
-        visitType(program, variant.type, projectDir, locations, visited);
+        visitType(program, variant.type, projectDir, locations, reachableLocations, visited);
       }
       return;
     case "Tuple":
       for (const value of type.values) {
-        visitType(program, value, projectDir, locations, visited);
+        visitType(program, value, projectDir, locations, reachableLocations, visited);
       }
       return;
     default:
@@ -154,6 +174,7 @@ function visitBody(
   operation: Operation,
   projectDir: string,
   locations: Map<string, ProjectedEnumResult["locations"][number]>,
+  reachableLocations: Map<string, ProjectedHttpGraphResult["reachableLocations"][number]>,
   visited: Set<Type>,
 ): void {
   if (!body) {
@@ -169,12 +190,12 @@ function visitBody(
         locations,
       );
     } else {
-      visitType(program, body.type, projectDir, locations, visited);
+      visitType(program, body.type, projectDir, locations, reachableLocations, visited);
     }
   }
   if ("parts" in body) {
     for (const part of body.parts) {
-      visitBody(program, part.body, operation, projectDir, locations, visited);
+      visitBody(program, part.body, operation, projectDir, locations, reachableLocations, visited);
     }
   }
 }
@@ -184,13 +205,29 @@ function visitHttpOperation(
   operation: HttpOperation,
   projectDir: string,
   locations: Map<string, ProjectedEnumResult["locations"][number]>,
+  reachableLocations: Map<string, ProjectedHttpGraphResult["reachableLocations"][number]>,
 ): void {
   const visited = new Set<Type>();
-  visitType(program, operation.operation.parameters, projectDir, locations, visited);
-  visitType(program, operation.operation.returnType, projectDir, locations, visited);
+  addReachableTarget(program, operation.operation, projectDir, reachableLocations);
+  visitType(
+    program,
+    operation.operation.parameters,
+    projectDir,
+    locations,
+    reachableLocations,
+    visited,
+  );
+  visitType(
+    program,
+    operation.operation.returnType,
+    projectDir,
+    locations,
+    reachableLocations,
+    visited,
+  );
 
   for (const property of operation.parameters.properties) {
-    visitType(program, property.property, projectDir, locations, visited);
+    visitType(program, property.property, projectDir, locations, reachableLocations, visited);
   }
 
   visitBody(
@@ -199,6 +236,7 @@ function visitHttpOperation(
     operation.operation,
     projectDir,
     locations,
+    reachableLocations,
     visited,
   );
 
@@ -208,9 +246,17 @@ function visitHttpOperation(
     }
     for (const content of response.responses) {
       for (const property of content.properties) {
-        visitType(program, property.property, projectDir, locations, visited);
+        visitType(program, property.property, projectDir, locations, reachableLocations, visited);
       }
-      visitBody(program, content.body, operation.operation, projectDir, locations, visited);
+      visitBody(
+        program,
+        content.body,
+        operation.operation,
+        projectDir,
+        locations,
+        reachableLocations,
+        visited,
+      );
     }
   }
 }
@@ -237,48 +283,6 @@ function collectQueryParameterLocations(
         column: location.column,
         name: parameter.name,
         verb: operation.verb,
-      });
-    }
-  }
-}
-
-function isCollectionPath(path: string): boolean {
-  const providerPath = path.split(".").at(-1);
-  return (
-    path.includes(".") &&
-    providerPath !== undefined &&
-    providerPath.includes("/") &&
-    providerPath.split("/").length % 2 === 0
-  );
-}
-
-function collectCollectionQueryParameterLocations(
-  program: Program,
-  operation: HttpOperation,
-  projectDir: string,
-  locations: Map<string, ProjectedEnumResult["collectionQueryParameterLocations"][number]>,
-): void {
-  if (operation.verb !== "get" || !isCollectionPath(operation.path)) {
-    return;
-  }
-
-  for (const parameter of operation.parameters.parameters) {
-    if (
-      parameter.type !== "query" ||
-      parameter.name === "api-version" ||
-      parameter.name === "$filter"
-    ) {
-      continue;
-    }
-    const location =
-      locationKey(program, parameter.param, projectDir) ??
-      locationKey(program, operation.operation, projectDir);
-    if (location) {
-      locations.set(`${location.key}\0${parameter.name}`, {
-        sourceFile: location.sourceFile,
-        line: location.line,
-        column: location.column,
-        name: parameter.name,
       });
     }
   }
@@ -320,13 +324,13 @@ export async function collectProjectedEnumLocations(
   }
 
   const locations = new Map<string, ProjectedEnumResult["locations"][number]>();
+  const reachableLocations = new Map<
+    string,
+    ProjectedHttpGraphResult["reachableLocations"][number]
+  >();
   const queryParameterLocations = new Map<
     string,
     ProjectedEnumResult["queryParameterLocations"][number]
-  >();
-  const collectionQueryParameterLocations = new Map<
-    string,
-    ProjectedEnumResult["collectionQueryParameterLocations"][number]
   >();
   let serviceCount = 0;
   for (const service of listServices(program)) {
@@ -359,14 +363,8 @@ export async function collectProjectedEnumLocations(
         },
       });
       for (const operation of httpService.operations) {
-        visitHttpOperation(program, operation, projectDir, locations);
+        visitHttpOperation(program, operation, projectDir, locations, reachableLocations);
         collectQueryParameterLocations(program, operation, projectDir, queryParameterLocations);
-        collectCollectionQueryParameterLocations(
-          program,
-          operation,
-          projectDir,
-          collectionQueryParameterLocations,
-        );
       }
       continue;
     }
@@ -391,14 +389,8 @@ export async function collectProjectedEnumLocations(
       },
     });
     for (const operation of httpService.operations) {
-      visitHttpOperation(program, operation, projectDir, locations);
+      visitHttpOperation(program, operation, projectDir, locations, reachableLocations);
       collectQueryParameterLocations(program, operation, projectDir, queryParameterLocations);
-      collectCollectionQueryParameterLocations(
-        program,
-        operation,
-        projectDir,
-        collectionQueryParameterLocations,
-      );
     }
   }
 
@@ -409,6 +401,12 @@ export async function collectProjectedEnumLocations(
   return {
     apiVersion,
     serviceCount,
+    reachableLocations: [...reachableLocations.values()].sort(
+      (left, right) =>
+        left.sourceFile.localeCompare(right.sourceFile) ||
+        left.line - right.line ||
+        left.column - right.column,
+    ),
     locations: [...locations.values()].sort(
       (left, right) =>
         left.sourceFile.localeCompare(right.sourceFile) ||
@@ -420,13 +418,6 @@ export async function collectProjectedEnumLocations(
         left.sourceFile.localeCompare(right.sourceFile) ||
         left.line - right.line ||
         left.column - right.column,
-    ),
-    collectionQueryParameterLocations: [...collectionQueryParameterLocations.values()].sort(
-      (left, right) =>
-        left.sourceFile.localeCompare(right.sourceFile) ||
-        left.line - right.line ||
-        left.column - right.column ||
-        left.name.localeCompare(right.name),
     ),
   };
 }

@@ -9,18 +9,16 @@ import * as path from "path";
 import { pathToFileURL } from "url";
 import { promisify } from "util";
 import YAML from "yaml";
-import type { ProjectedEnumResult } from "./projected-enum-worker.js";
+import type { ProjectedEnumResult, ProjectedHttpGraphResult } from "./projected-enum-worker.js";
 
 const execFileAsync = promisify(execFile);
-const ANALYSIS_SCHEMA_VERSION = 6;
+const ANALYSIS_SCHEMA_VERSION = 7;
 const DATASET_SCHEMA_VERSION = 4;
 const LOCAL_RULESET = "tsp-lintdiff-local-linter/all";
 const LOCAL_RULE_PREFIX = "tsp-lintdiff-local-linter/";
 const ENUM_INSTEAD_OF_BOOLEAN_RULE = "tsp-lintdiff-local-linter/enum-instead-of-boolean";
 const VALID_QUERY_PARAMETERS_FOR_POINT_OPERATIONS_RULE =
   "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations";
-const QUERY_PARAMETERS_IN_COLLECTION_GET_RULE =
-  "tsp-lintdiff-local-linter/query-parameters-in-collection-get";
 const TSX_ESM_LOADER = import.meta.resolve("tsx/esm");
 const MAX_BUFFER = 256 * 1024 * 1024;
 
@@ -91,6 +89,8 @@ export interface TypeSpecProjectResult {
   status: "success" | "failed";
   durationMs: number;
   diagnosticCount: number;
+  rawDiagnosticCount: number;
+  projectedDiagnosticCount: number;
   error?: string;
   rawFiles: string[];
 }
@@ -147,6 +147,7 @@ export interface ValidatorRuleData {
 export interface ValidatorFixtureMetadata {
   coverageKind: string;
   tspLints: Set<string>;
+  projectionScope: "none" | "http-reachable";
 }
 
 export interface AnalysisScope {
@@ -267,6 +268,8 @@ interface TypeSpecAnalysisMetadata {
     limit?: number;
   };
   diagnosticCount: number;
+  rawDiagnosticCount: number;
+  projectedDiagnosticCount: number;
   ruleCount: number;
   failedProjectCount: number;
   resultFiles: string[];
@@ -600,41 +603,26 @@ export function filterProjectedEnumDiagnostics(
   });
 }
 
-export function filterProjectedPointQueryDiagnostics(
+export function filterProjectedDiagnostics(
   diagnostics: TypeSpecDiagnostic[],
-  projected: ProjectedEnumResult,
+  projected: ProjectedHttpGraphResult,
+  projectedRules: Set<string>,
 ): TypeSpecDiagnostic[] {
   const projectedLocations = new Set(
+    projected.reachableLocations.map((location) => diagnosticLocationKey(location)!),
+  );
+  const projectedQueryParameterLocations = new Set(
     projected.queryParameterLocations.map((location) => diagnosticLocationKey(location)!),
   );
   return diagnostics.filter((diagnostic) => {
-    if (diagnostic.rule !== VALID_QUERY_PARAMETERS_FOR_POINT_OPERATIONS_RULE) {
+    if (!projectedRules.has(diagnostic.rule)) {
       return true;
     }
     const key = diagnosticLocationKey(diagnostic);
-    return key !== undefined && projectedLocations.has(key);
-  });
-}
-
-export function filterProjectedCollectionQueryDiagnostics(
-  diagnostics: TypeSpecDiagnostic[],
-  projected: ProjectedEnumResult,
-): TypeSpecDiagnostic[] {
-  const projectedLocations = new Set(
-    projected.collectionQueryParameterLocations.map(
-      (location) =>
-        `${location.sourceFile}\0${location.line}\0${location.column}\0${location.name}`,
-    ),
-  );
-  return diagnostics.filter((diagnostic) => {
-    if (diagnostic.rule !== QUERY_PARAMETERS_IN_COLLECTION_GET_RULE) {
-      return true;
+    if (diagnostic.rule === VALID_QUERY_PARAMETERS_FOR_POINT_OPERATIONS_RULE) {
+      return key === undefined || projectedQueryParameterLocations.has(key);
     }
-    const location = diagnosticLocationKey(diagnostic);
-    const name = /Query parameter '(.+?)' should/.exec(diagnostic.message)?.[1];
-    return (
-      location !== undefined && name !== undefined && projectedLocations.has(`${location}\0${name}`)
-    );
+    return key === undefined || projectedLocations.has(key);
   });
 }
 
@@ -1027,6 +1015,7 @@ export function loadValidatorFixtureMetadata(
       validatorRuleId?: unknown;
       coverageKind?: unknown;
       tspLints?: unknown;
+      projectionScope?: unknown;
     };
     if (typeof metadata.validatorRuleId !== "string") {
       throw new Error(`Missing validatorRuleId in ${rulePath}`);
@@ -1042,12 +1031,20 @@ export function loadValidatorFixtureMetadata(
     ) {
       throw new Error(`tspLints must be a string array in ${rulePath}`);
     }
+    if (
+      metadata.projectionScope !== undefined &&
+      metadata.projectionScope !== "none" &&
+      metadata.projectionScope !== "http-reachable"
+    ) {
+      throw new Error(`projectionScope must be none or http-reachable in ${rulePath}`);
+    }
 
     const validatorRule = metadata.validatorRuleId;
     const typeSpecRules = (metadata.tspLints ?? []) as string[];
     const existing = fixtureMetadata.get(validatorRule) ?? {
       coverageKind: "unknown",
       tspLints: new Set<string>(),
+      projectionScope: "none" as const,
     };
     if (
       metadata.coverageKind !== undefined &&
@@ -1061,6 +1058,9 @@ export function loadValidatorFixtureMetadata(
     }
     for (const typeSpecRule of typeSpecRules) {
       existing.tspLints.add(typeSpecRule);
+    }
+    if (metadata.projectionScope === "http-reachable") {
+      existing.projectionScope = "http-reachable";
     }
     fixtureMetadata.set(validatorRule, existing);
   }
@@ -1200,6 +1200,7 @@ function commandOutput(value: unknown): string {
 async function compileProject(
   config: Config,
   project: DatasetProject,
+  projectedRules: Set<string>,
 ): Promise<{ result: TypeSpecProjectResult; diagnostics: TypeSpecDiagnostic[] }> {
   const projectDir = path.resolve(config.specsRepo, project.sourcePath);
   const mainPath = path.join(projectDir, "main.tsp");
@@ -1218,7 +1219,7 @@ async function compileProject(
   const rawRoot = path.join(projectDatasetRoot, "raw");
   const stdoutPath = path.join(rawRoot, "typespec.stdout.txt");
   const stderrPath = path.join(rawRoot, "typespec.stderr.txt");
-  const projectedEnumPath = path.join(rawRoot, "typespec.projected-enum.json");
+  const projectedHttpGraphPath = path.join(rawRoot, "typespec.projected-http-graph.json");
   const rawFiles = [stdoutPath, stderrPath].map((filePath) =>
     normalizeRelative(path.relative(config.datasetDir, filePath)),
   );
@@ -1292,14 +1293,13 @@ async function compileProject(
     ...parseTypeSpecDiagnostics(stdout, project.sourcePath, projectDir),
     ...parseTypeSpecDiagnostics(stderr, project.sourcePath, projectDir),
   ];
+  const rawDiagnosticCount = diagnostics.length;
   if (
     status === "success" &&
     project.apiVersion &&
     diagnostics.some(
       (diagnostic) =>
-        diagnostic.rule === ENUM_INSTEAD_OF_BOOLEAN_RULE ||
-        diagnostic.rule === VALID_QUERY_PARAMETERS_FOR_POINT_OPERATIONS_RULE ||
-        diagnostic.rule === QUERY_PARAMETERS_IN_COLLECTION_GET_RULE,
+        projectedRules.has(diagnostic.rule) || diagnostic.rule === ENUM_INSTEAD_OF_BOOLEAN_RULE,
     )
   ) {
     const workerPath = path.join(import.meta.dirname, "projected-enum-worker.ts");
@@ -1314,17 +1314,16 @@ async function compileProject(
       },
     );
     const projectedResult = JSON.parse(projected.stdout) as ProjectedEnumResult;
-    writeJson(projectedEnumPath, projectedResult);
-    rawFiles.push(normalizeRelative(path.relative(config.datasetDir, projectedEnumPath)));
+    writeJson(projectedHttpGraphPath, projectedResult);
+    rawFiles.push(normalizeRelative(path.relative(config.datasetDir, projectedHttpGraphPath)));
+    diagnostics = filterProjectedDiagnostics(diagnostics, projectedResult, projectedRules);
     diagnostics = filterProjectedEnumDiagnostics(
       diagnostics,
       projectedResult,
       loadEmittedBooleanNames(config.datasetDir, project),
     );
-    diagnostics = filterProjectedPointQueryDiagnostics(diagnostics, projectedResult);
-    diagnostics = filterProjectedCollectionQueryDiagnostics(diagnostics, projectedResult);
   } else {
-    fs.rmSync(projectedEnumPath, { force: true });
+    fs.rmSync(projectedHttpGraphPath, { force: true });
   }
   return {
     result: {
@@ -1332,6 +1331,8 @@ async function compileProject(
       status,
       durationMs: Date.now() - started,
       diagnosticCount: diagnostics.length,
+      rawDiagnosticCount,
+      projectedDiagnosticCount: diagnostics.length,
       error: errorMessage,
       rawFiles,
     },
@@ -1750,6 +1751,14 @@ async function run(config: Config): Promise<void> {
     setupLocalLinter(packageDir, config.specsRepo);
     const fingerprint = fingerprintLocalLinter(packageDir);
     invalidateExistingAnalysis(config.datasetDir, meta);
+    const fixtureMetadata = loadValidatorFixtureMetadata(
+      path.resolve(import.meta.dirname, "..", "fixtures"),
+    );
+    const projectedRules = new Set(
+      [...fixtureMetadata.values()]
+        .filter((metadata) => metadata.projectionScope === "http-reachable")
+        .flatMap((metadata) => [...metadata.tspLints]),
+    );
     const projectRuns = await mapWithConcurrency(
       selectedProjects,
       config.concurrency,
@@ -1757,7 +1766,7 @@ async function run(config: Config): Promise<void> {
         process.stdout.write(
           `[${index + 1}/${selectedProjects.length}] ${project.sourcePath} ... `,
         );
-        const result = await compileProject(config, project);
+        const result = await compileProject(config, project, projectedRules);
         console.log(`${result.result.status}, ${result.diagnostics.length} diagnostic(s)`);
         return result;
       },
@@ -1779,9 +1788,6 @@ async function run(config: Config): Promise<void> {
     );
     const resultFiles = typeSpecOutput.resultFiles;
 
-    const fixtureMetadata = loadValidatorFixtureMetadata(
-      path.resolve(import.meta.dirname, "..", "fixtures"),
-    );
     const mappings = new Map(
       [...fixtureMetadata].map(([rule, metadata]) => [rule, metadata.tspLints]),
     );
@@ -1878,6 +1884,11 @@ async function run(config: Config): Promise<void> {
       projectCount: projectResults.length,
       filters: scope.filters,
       diagnosticCount: aggregate.totalDiagnostics,
+      rawDiagnosticCount: projectResults.reduce(
+        (total, project) => total + project.rawDiagnosticCount,
+        0,
+      ),
+      projectedDiagnosticCount: aggregate.totalDiagnostics,
       ruleCount: Object.keys(aggregate.rules).length,
       failedProjectCount: projectResults.filter((project) => project.status === "failed").length,
       resultFiles: resultFiles.sort(),
