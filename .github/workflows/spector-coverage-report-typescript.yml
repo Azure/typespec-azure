@@ -128,13 +128,7 @@ jobs:
               }
             }
 
-            const validStatuses = new Set([
-              "pass",
-              "fail",
-              "not-implemented",
-              "not-supported",
-              "not-applicable",
-            ]);
+            const validStatuses = new Set(["pass", "fail", "not-implemented"]);
             const notImplementedByPackage = new Map();
             const summaries = [];
             const scenarioSources = new Map([
@@ -207,8 +201,6 @@ jobs:
                 pass: 0,
                 fail: 0,
                 "not-implemented": 0,
-                "not-supported": 0,
-                "not-applicable": 0,
               };
               const groups = new Map();
 
@@ -257,13 +249,13 @@ jobs:
               "",
               "## Summary",
               "",
-              "| Package | Version | Total | ✅ Pass | ❌ Fail | 🔲 Not Implemented | Not Supported | Not Applicable | Coverage |",
-              "|---------|---------|------:|--------:|--------:|--------------------:|--------------:|---------------:|---------:|",
+              "| Package | Version | Total | ✅ Pass | ❌ Fail | 🔲 Not Implemented | Coverage |",
+              "|---------|---------|------:|--------:|--------:|--------------------:|---------:|",
             ];
 
             for (const summary of summaries) {
               body.push(
-                `| \`${summary.packageName}\` | ${summary.version} | ${summary.total} | ${summary.counts.pass} | ${summary.counts.fail} | ${summary.counts["not-implemented"]} | ${summary.counts["not-supported"]} | ${summary.counts["not-applicable"]} | ${summary.percentage}% |`,
+                `| \`${summary.packageName}\` | ${summary.version} | ${summary.total} | ${summary.counts.pass} | ${summary.counts.fail} | ${summary.counts["not-implemented"]} | ${summary.percentage}% |`,
               );
             }
 
