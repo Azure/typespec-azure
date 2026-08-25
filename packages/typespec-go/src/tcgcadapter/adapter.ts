@@ -72,18 +72,6 @@ export class Adapter {
       );
     }
 
-    const goOptions = new go.Options(
-      this.options["generate-fakes"] === true,
-      this.options["inject-spans"] === true,
-      this.options["disallow-unknown-fields"] === true,
-      // generate-examples has been deprecated, for compat we still support it.
-      this.options["generate-examples"] === true || this.options["generate-samples"] === true,
-    );
-    goOptions.headerText = this.ctx.sdkPackage.licenseInfo?.header;
-    goOptions.licenseText = this.ctx.sdkPackage.licenseInfo?.description;
-    goOptions.azcoreVersion = this.options["azcore-version"];
-    goOptions.omitConstructors = this.options["omit-constructors"] ?? false;
-
     let root: go.ContainingModule | go.Module;
     if (this.options.module) {
       root = new go.Module(this.options.module);
@@ -96,12 +84,22 @@ export class Adapter {
 
     const info = new go.Info(this.ctx.sdkPackage.crossLanguagePackageId);
     const codeModelType: go.CodeModelType = this.ctx.arm === true ? "azure-arm" : "data-plane";
-    this.codeModel = new go.CodeModel(info, codeModelType, goOptions, root);
+    this.codeModel = new go.CodeModel(
+      info,
+      codeModelType,
+      {
+        headerText: this.ctx.sdkPackage.licenseInfo?.header,
+        licenseText: this.ctx.sdkPackage.licenseInfo?.description,
+        ...this.options,
+        // the JSON schema default isn't applied by the compiler at present, so
+        // coerce it here to match the documented default of true.
+        "factory-gather-all-params": this.options["factory-gather-all-params"] ?? true,
+        // generate-examples has been deprecated, for compat we still support it.
+        "generate-samples": this.options["generate-samples"] ?? this.options["generate-examples"],
+      },
+      root,
+    );
     this.codeModel.metadata = buildMetadata(this.ctx.sdkPackage.metadata);
-    this.codeModel.options.rawJSONAsBytes = this.options["rawjson-as-bytes"] ?? false;
-    this.codeModel.options.sliceElementsByval = this.options["slice-elements-byval"] ?? false;
-    this.codeModel.options.factoryGatherAllParams =
-      this.options["factory-gather-all-params"] ?? true;
   }
 
   /** performs all the steps to convert tcgc to the Go code model */
@@ -111,6 +109,7 @@ export class Adapter {
       this.codeModel.root.kind === "containingModule"
         ? this.codeModel.root.package.name
         : naming.packageNameFromOutputFolder(this.ctx.emitContext.emitterOutputDir);
+
     fixStutteringTypeNames(this.ctx.sdkPackage, packageName, this.options);
 
     const ta = new TypeAdapter(this.ctx, this.codeModel);

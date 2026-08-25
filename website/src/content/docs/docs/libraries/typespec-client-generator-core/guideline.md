@@ -60,7 +60,7 @@ Use the [TCGC Playground](https://azure.github.io/typespec-azure/playground/?e=%
 
 ### TCGC Flags
 
-TCGC provides flags to control the client type graph style, such as enabling or disabling convenience APIs. See the [documentation](../reference/emitter/#emitter-options) for details.
+TCGC provides flags to control the client type graph style, such as enabling or disabling convenience and protocol APIs for Java and C# emitters. Other emitters should not set `generate-convenience-methods` or `generate-protocol-methods`; TCGC reports an `unnecessary-emitter-option` warning when either option is explicitly set for another language. See the [documentation](../reference/emitter/#emitter-options) for details.
 
 ## TCGC Raw Types and Helpers
 
@@ -207,7 +207,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 **Built-in Types:**
 
-- [`SdkBuiltInType`](../reference/js-api/interfaces/sdkbuiltintype/) represents a [built-in TypeSpec type](https://typespec.io/docs/language-basics/built-in-types/) or a [`scalar`](https://typespec.io/docs/language-basics/scalars/) type that derives from a built-in TypeSpec type, excluding `utcDateTime`, `offsetDateTime` and `duration`. The `encode` property indicates how to encode when sending to the service. It is set when the `@encode` decorator exists, or when the context determines a specific encoding — for example, `bytes` in a `multipart/form-data` part get `encode: "bytes"` (raw binary) rather than the default `"base64"`.
+- [`SdkBuiltInType`](../reference/js-api/interfaces/sdkbuiltintype/) represents a [built-in TypeSpec type](https://typespec.io/docs/language-basics/built-in-types/) or a [`scalar`](https://typespec.io/docs/language-basics/scalars/) type that derives from a built-in TypeSpec type, excluding `utcDateTime`, `offsetDateTime` and `duration`. The `encode` property indicates how to encode when sending to the service. It is set when the `@encode` decorator exists, or when the context determines a specific encoding — for example, `bytes` in a `multipart/form-data` part get `encode: "bytes"` (raw binary) rather than the default `"base64"`. When `@encode` specifies an `encodedAs` target type (for example encoding an `int32` as a `string`, or a `string` as an `int32`), the target wire type is exposed on the `wireType` property as its own `SdkBuiltInType`. Emitters should serialize the value using `wireType` while keeping the client-facing type unchanged.
 
 **Date and Time Types:**
 

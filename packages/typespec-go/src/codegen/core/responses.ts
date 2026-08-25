@@ -38,7 +38,7 @@ export function generateResponses(pkg: go.PackageContent, options: go.Options): 
 
   for (const respEnv of pkg.responseEnvelopes) {
     respContent += emit(respEnv, imports, indent);
-    if (options.generateFakes) {
+    if (options["generate-fakes"]) {
       serdeContent += generateMarshaller(respEnv, serdeImports, indent);
     }
     serdeContent += generateUnmarshaller(respEnv, serdeImports, indent);
