@@ -331,9 +331,15 @@ tables use the expected Prettier layout.
 Update `packages/typespec-azure-rulesets` so all official rules remain
 explicitly listed.
 
-- ARM-specific rules go in `src/rulesets/resource-manager.ts`.
+- Newly promoted rules must be registered with a plain `false` value by default.
+  Promotion adds official rule availability without enabling new diagnostics for
+  existing Azure service specs. Set a promoted rule to `true` only when the user
+  explicitly approves immediate enablement after reviewing integration impact.
+- ARM-specific rules go in `src/rulesets/resource-manager.ts` with a plain
+  `false` value.
 - Core rules that apply to data-plane and ARM go in both
-  `src/rulesets/data-plane.ts` and `src/rulesets/resource-manager.ts`.
+  `src/rulesets/data-plane.ts` and `src/rulesets/resource-manager.ts`, with a
+  plain `false` value in both.
 - Core rules that are not applicable to ARM, or conflict with an ARM-specific
   rule, must still be explicitly listed in `resource-manager.ts` with a plain
   `false` value and no annotation or explanatory comment, matching the existing
@@ -457,7 +463,8 @@ promotion diff. The review should inspect:
   `website/src/content/docs/docs/libraries/<library>/reference/linter.md`, and
   any generated rule page links must reflect the official rule name and pass
   Prettier
-- ruleset registration
+- ruleset registration, including that every newly promoted rule is `false`
+  unless the user explicitly approved immediate enablement
 - absence of generated lintdiff corpus artifacts
 
 Commit only the promotion-worktree changes needed for the native-library PR.
