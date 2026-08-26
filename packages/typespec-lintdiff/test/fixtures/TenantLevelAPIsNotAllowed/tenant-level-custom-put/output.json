@@ -40,155 +40,40 @@
   "tags": [
     {
       "name": "Operations"
-    },
-    {
-      "name": "TenantConfigs"
     }
   ],
   "paths": {
-    "/providers/Microsoft.TestService/configurations": {
-      "get": {
-        "operationId": "TenantConfigs_List",
-        "tags": [
-          "TenantConfigs"
-        ],
-        "description": "List TenantConfig resources by tenant",
-        "parameters": [
-          {
-            "$ref": "../../../../../common-types/resource-management/v6/types.json#/parameters/ApiVersionParameter"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Azure operation completed successfully.",
-            "schema": {
-              "$ref": "#/definitions/TenantConfigListResult"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "../../../../../common-types/resource-management/v6/types.json#/definitions/ErrorResponse"
-            }
-          }
-        },
-        "x-ms-pageable": {
-          "nextLinkName": "nextLink"
-        }
-      }
-    },
-    "/providers/Microsoft.TestService/configurations/{configName}": {
-      "get": {
-        "operationId": "TenantConfigs_Get",
-        "tags": [
-          "TenantConfigs"
-        ],
-        "description": "Get a TenantConfig",
-        "parameters": [
-          {
-            "$ref": "../../../../../common-types/resource-management/v6/types.json#/parameters/ApiVersionParameter"
-          },
-          {
-            "name": "configName",
-            "in": "path",
-            "description": "The name of the config",
-            "required": true,
-            "type": "string",
-            "maxLength": 24,
-            "pattern": "^[a-zA-Z0-9-]{3,24}$"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Azure operation completed successfully.",
-            "schema": {
-              "$ref": "#/definitions/TenantConfig"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "../../../../../common-types/resource-management/v6/types.json#/definitions/ErrorResponse"
-            }
-          }
-        }
-      },
+    "/providers/Microsoft.TestService/configurations/{configName}/refresh": {
       "put": {
-        "operationId": "TenantConfigs_CreateOrUpdate",
-        "tags": [
-          "TenantConfigs"
-        ],
-        "description": "Create a TenantConfig",
+        "operationId": "RefreshTenantConfig",
+        "description": "Refresh a tenant-level configuration.",
         "parameters": [
-          {
-            "$ref": "../../../../../common-types/resource-management/v6/types.json#/parameters/ApiVersionParameter"
-          },
           {
             "name": "configName",
             "in": "path",
             "description": "The name of the config",
             "required": true,
-            "type": "string",
-            "maxLength": 24,
-            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+            "type": "string"
           },
           {
-            "name": "resource",
+            "$ref": "../../../../../common-types/resource-management/v6/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "body",
             "in": "body",
-            "description": "Resource create parameters.",
+            "description": "The updated settings",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/TenantConfig"
+              "$ref": "#/definitions/TenantConfigProperties"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Resource 'TenantConfig' update operation succeeded",
+            "description": "The request has succeeded.",
             "schema": {
               "$ref": "#/definitions/TenantConfig"
             }
-          },
-          "201": {
-            "description": "Resource 'TenantConfig' create operation succeeded",
-            "schema": {
-              "$ref": "#/definitions/TenantConfig"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "../../../../../common-types/resource-management/v6/types.json#/definitions/ErrorResponse"
-            }
-          }
-        }
-      },
-      "delete": {
-        "operationId": "TenantConfigs_Delete",
-        "tags": [
-          "TenantConfigs"
-        ],
-        "description": "Delete a TenantConfig",
-        "parameters": [
-          {
-            "$ref": "../../../../../common-types/resource-management/v6/types.json#/parameters/ApiVersionParameter"
-          },
-          {
-            "name": "configName",
-            "in": "path",
-            "description": "The name of the config",
-            "required": true,
-            "type": "string",
-            "maxLength": 24,
-            "pattern": "^[a-zA-Z0-9-]{3,24}$"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Resource deleted successfully."
-          },
-          "204": {
-            "description": "Resource does not exist."
           },
           "default": {
             "description": "An unexpected error response.",
@@ -275,27 +160,6 @@
         {
           "$ref": "../../../../../common-types/resource-management/v6/types.json#/definitions/ProxyResource"
         }
-      ]
-    },
-    "TenantConfigListResult": {
-      "type": "object",
-      "description": "The response of a TenantConfig list operation.",
-      "properties": {
-        "value": {
-          "type": "array",
-          "description": "The TenantConfig items on this page",
-          "items": {
-            "$ref": "#/definitions/TenantConfig"
-          }
-        },
-        "nextLink": {
-          "type": "string",
-          "format": "uri",
-          "description": "The link to the next page of items"
-        }
-      },
-      "required": [
-        "value"
       ]
     },
     "TenantConfigProperties": {
