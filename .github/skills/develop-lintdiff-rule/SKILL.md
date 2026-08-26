@@ -268,6 +268,34 @@ If a quick iteration is needed first, use the existing `--filter`, `--limit`,
 and `--concurrency` options. The final behavioral check should use the full
 corpus when practical.
 
+#### Long-running corpus status protocol
+
+Do not start the full corpus as a short foreground tool call and then wait
+silently after it detaches. A full run commonly takes 20 minutes or more and
+rewrites generated results incrementally.
+
+1. Before the full run, use filtered runs for the rule's known overlap and
+   one-sided projects when they can answer the current behavioral question
+   faster. Do not use a filtered run as the final full-corpus evidence.
+2. Report the command scope, project count, and expected duration before
+   starting a run expected to exceed five minutes.
+3. When a visible terminal canvas is available, run the full corpus there so
+   the user can continuously see the runner's `[current/total]` progress. Keep
+   the terminal open until the command exits.
+4. Otherwise, run the command as a persistent background process with output
+   captured to a rule-specific log outside the PR diff. Preserve the process
+   identifier and log path, and report progress at least every 50 projects or
+   five minutes whenever the host supports progress callbacks.
+5. Treat a missing process, missing final result files, or a result timestamp
+   older than the run start as an interrupted run. Report the interruption
+   immediately; do not describe it as still running.
+6. After interruption, restore tracked generated files under
+   `packages/typespec-lintdiff/specs` and remove only untracked generated
+   artifacts from that directory before retrying. Never leave the corpus in a
+   partially rewritten state.
+7. On completion, report the exit status and refreshed result timestamp before
+   beginning analysis.
+
 ### 5. Refresh the rule migration note
 
 After the final corpus run, update the rule's `migration.md` from the newly
@@ -427,3 +455,28 @@ Worker mode returns:
 - per-rule review findings adopted and rejected, with reasons
 - the explicit rule-related files ready for each PR
 - each created draft PR URL
+
+## Post-run process review
+
+After the worker draft PR is created and the deliverable is complete, briefly
+review the run before the final user response. Capture concrete suggestions for
+the next rule-development worker, especially:
+
+- steps that cost unexpected time and how to avoid or parallelize them next time
+- commands that were too broad, stalled, detached, were interrupted, or failed
+  for environmental reasons
+- long-running commands whose progress or completion state was not visible
+  enough to the user
+- narrower fixture, filtered-corpus, build, lint, or full-corpus commands that
+  proved sufficient
+- setup shortcuts that are safe to reuse, such as prepared worktrees,
+  initialized submodules, installed dependencies, package links, or already-built
+  dependency closures
+- evidence-analysis patterns that made one-sided projects, API-version
+  attribution, or diagnostic-count gaps easier to explain
+- skill instructions that should be updated based on the observed run
+
+Print the suggestions in the final handoff and ask the user whether any should
+be adopted into this skill. Do not update the skill automatically from the
+post-run review; only make skill changes after the user explicitly approves the
+specific suggestion(s).
