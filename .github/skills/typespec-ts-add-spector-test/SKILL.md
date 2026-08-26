@@ -216,8 +216,6 @@ The client phase removes this tracked rollup and the declaration phase restores 
 
 Review `git status` for the expected config, test, `.gitignore`, `tspconfig.yaml`, and `src/index.d.ts` changes.
 
-Never use `git add -A` for generated baselines, and do not accept unexpected baseline deletions.
-
 From the repository root, run the required formatting and lint commands:
 
 ```bash
