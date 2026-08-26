@@ -32,6 +32,7 @@ import { noOverridePropsRule } from "./rules/no-override-props.js";
 import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
+import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { resourceNameRule } from "./rules/resource-name.js";
@@ -89,6 +90,7 @@ const rules = [
   secretProprule,
   noEmptyModel,
   noReservedResourcePropertyRule,
+  noTenantLevelApisRule,
 ];
 
 export const $linter = defineLinter({
