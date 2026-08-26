@@ -43,53 +43,6 @@
     }
   ],
   "paths": {
-    "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.TestService/extensions/{extensionName}": {
-      "put": {
-        "operationId": "Extensions_CreateOrUpdate",
-        "description": "Create or update a management-group extension.",
-        "parameters": [
-          {
-            "name": "managementGroupName",
-            "in": "path",
-            "description": "The management group name.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "extensionName",
-            "in": "path",
-            "description": "The extension name.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/ExtensionResource"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Azure operation completed successfully.",
-            "schema": {
-              "$ref": "#/definitions/ExtensionResource"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
-            }
-          }
-        }
-      }
-    },
     "/providers/Microsoft.TestService/operations": {
       "get": {
         "operationId": "Operations_List",
@@ -119,19 +72,23 @@
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
         }
-      }
-    }
-  },
-  "definitions": {
-    "ExtensionResource": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "The extension resource ID."
+      },
+      "put": {
+        "operationId": "ProviderOperations_Update",
+        "description": "Update the provider operations endpoint.",
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "There is no content to send for this request, but the headers may be useful. "
+          }
         }
       }
     }
   },
+  "definitions": {},
   "parameters": {}
 }

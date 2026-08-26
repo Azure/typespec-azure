@@ -28,7 +28,9 @@ while TypeSpec reports every matching semantic operation.
    management-group extension PUT that starts with `/providers`.
 3. Add `providers-root-put` to cover Swagger's exact `startsWith("/providers")`
    behavior without requiring a trailing slash.
-4. Preserve the tenant-resource, subscription-resource, scope-based extension,
+4. Add `operations-put` as a compliant fixture for Swagger's `/operations`
+   suffix exemption.
+5. Preserve the tenant-resource, subscription-resource, scope-based extension,
    non-PUT, and custom-PUT fixtures as regression controls.
 
 No emitter, Swagger validator, corpus generator, or comparison normalization
@@ -174,10 +176,11 @@ The six failed projects were:
 `TenantActionGroups`, `Network`, and `Quota` failed with
 `@typespec/http/missing-uri-param`; `deployments`,
 `DeviceProvisioningServices`, and `ServiceLinker` failed with
-`@typespec/http/duplicate-body`. The first four projects had both raw Swagger
-and raw TypeSpec findings for this rule and were removed from both sides of the
-formal comparison. The other two had no finding for this rule. These failures
-reduce the assessed population but do not create a one-sided result.
+`@typespec/http/duplicate-body`. `TenantActionGroups`, `Network`, `Quota`, and
+`deployments` had both raw Swagger and raw TypeSpec findings for this rule and
+were removed from both sides of the formal comparison. `DeviceProvisioningServices`
+and `ServiceLinker` had no finding for this rule. These failures reduce the
+assessed population but do not create a one-sided result.
 
 ### Gap example: missing URI parameters exclude both engines
 
@@ -327,6 +330,7 @@ first-match-only behavior.
 | `tenant-level-custom-put`        | one violation  | one matching diagnostic |
 | `management-group-extension-put` | one violation  | one matching diagnostic |
 | `providers-root-put`             | one violation  | one matching diagnostic |
+| `operations-put`                 | no violation   | no mapped diagnostic    |
 | `subscription-level-put`         | no violation   | no mapped diagnostic    |
 | `extension-resource-put`         | no violation   | no mapped diagnostic    |
 | `tenant-level-no-put`            | no violation   | no mapped diagnostic    |

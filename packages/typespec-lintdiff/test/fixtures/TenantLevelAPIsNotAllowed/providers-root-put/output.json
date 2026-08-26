@@ -9,13 +9,21 @@
       }
     ]
   },
-  "schemes": ["https"],
+  "schemes": [
+    "https"
+  ],
   "host": "management.azure.com",
-  "produces": ["application/json"],
-  "consumes": ["application/json"],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
   "security": [
     {
-      "azure_auth": ["user_impersonation"]
+      "azure_auth": [
+        "user_impersonation"
+      ]
     }
   ],
   "securityDefinitions": {
@@ -50,7 +58,9 @@
     "/providers/Microsoft.TestService/operations": {
       "get": {
         "operationId": "Operations_List",
-        "tags": ["Operations"],
+        "tags": [
+          "Operations"
+        ],
         "description": "List the operations for the provider",
         "parameters": [
           {

@@ -46,22 +46,18 @@ union ProvisioningState {
   ResourceProvisioningState,
 }
 
-@armResourceOperations
-interface TenantConfigs {
-  get is ArmResourceRead<TenantConfig, Foundations.TenantBaseParameters>;
+/** Refresh a tenant-level configuration. */
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "Raw operation needed to test a custom tenant-level PUT."
+@route("/providers/Microsoft.TestService/configurations/{configName}/refresh")
+@put
+op refreshTenantConfig(
+  @doc("The name of the config")
+  @path
+  configName: string,
 
-  createOrUpdate is ArmResourceCreateOrReplaceSync<
-    TenantConfig,
-    Foundations.TenantBaseParameters
-  >;
+  ...ApiVersionParameter,
 
-  delete is ArmResourceDeleteSync<
-    TenantConfig,
-    Foundations.TenantBaseParameters
-  >;
-
-  list is ArmResourceListByParent<
-    TenantConfig,
-    Foundations.TenantBaseParameters
-  >;
-}
+  @doc("The updated settings")
+  @body
+  body: TenantConfigProperties,
+): TenantConfig | ErrorResponse;
