@@ -15,6 +15,12 @@ model Widget {
   @visibility(Lifecycle.Read)
   etag?: string;
 
+  @visibility(Lifecycle.Create)
+  createOnly: string;
+
+  @visibility(Lifecycle.Update)
+  updateOnly: string;
+
   displayName: string;
   weight: int32;
 }
@@ -146,32 +152,49 @@ export function metadataWidgetDeserializer(item: any): MetadataWidget {
 
 /** model interface WidgetCreate */
 export interface WidgetCreate {
+  createOnly: string;
   displayName: string;
   weight: number;
 }
 
 export function widgetCreateSerializer(item: WidgetCreate): any {
-  return { displayName: item["displayName"], weight: item["weight"] };
+  return {
+    createOnly: item["createOnly"],
+    displayName: item["displayName"],
+    weight: item["weight"],
+  };
 }
 
 /** model interface WidgetCreateOrUpdate */
 export interface WidgetCreateOrUpdate {
+  createOnly: string;
+  updateOnly: string;
   displayName: string;
   weight: number;
 }
 
 export function widgetCreateOrUpdateSerializer(item: WidgetCreateOrUpdate): any {
-  return { displayName: item["displayName"], weight: item["weight"] };
+  return {
+    createOnly: item["createOnly"],
+    updateOnly: item["updateOnly"],
+    displayName: item["displayName"],
+    weight: item["weight"],
+  };
 }
 
 /** model interface WidgetUpdate */
 export interface WidgetUpdate {
+  updateOnly: string;
   displayName: string;
   weight: number;
 }
 
 export function widgetUpdateSerializer(item: WidgetUpdate): any {
-  return { displayName: item["displayName"], weight: item["weight"] };
+  return {
+    updateOnly: item["updateOnly"],
+    displayName: item["displayName"],
+    weight: item["weight"],
+  };
 }
 
 /** model interface MetadataWidgetCreate */

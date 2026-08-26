@@ -81,7 +81,10 @@ export function applyVisibilityModelSplit(context: SdkContext): void {
   // Phase 3 — materialize projected models and wire their references.
   buildClones(state);
 
-  // Phase 4 — repoint operation parameters and payloads to projected models.
+  // Phase 4 — project the original response models to the canonical Read view.
+  projectResponseModelsToRead(state);
+
+  // Phase 5 — repoint operation parameters and payloads to projected models.
   for (const method of methods) {
     repointMethodBody(state, method);
   }
@@ -347,6 +350,21 @@ function buildClones(state: SplitState): void {
         );
       }
     }
+  }
+}
+
+/** Projects response-used models to the canonical Read visibility. */
+function projectResponseModelsToRead(state: SplitState): void {
+  for (const model of state.context.sdkPackage.models) {
+    if ((model.usage & responseUsageFlags) === 0) {
+      continue;
+    }
+    model.properties = model.properties.filter(
+      (property) =>
+        property.kind !== "property" ||
+        !property.__raw ||
+        isVisible(state.context.program, property.__raw, Visibility.Read),
+    );
   }
 }
 
