@@ -1,9 +1,11 @@
+import { getArmProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 import { createRule, paramMessage } from "@typespec/compiler";
 import { getAllHttpServices } from "@typespec/http";
 
 export const tenantLevelAPIsNotAllowedRule = createRule({
   name: "tenant-level-apis-not-allowed",
-  description: "Tenant ARM resource PUT operations are not allowed.",
+  description:
+    "ARM PUT operations whose resolved paths begin with '/providers' are not allowed, except paths ending in '/operations'.",
   severity: "warning",
   messages: {
     default: paramMessage`\
@@ -17,6 +19,10 @@ process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-contr
       root: (program) => {
         const [services] = getAllHttpServices(program);
         for (const service of services) {
+          if (!getArmProviderNamespace(program, service.namespace)) {
+            continue;
+          }
+
           for (const httpOperation of service.operations) {
             if (httpOperation.verb === "put" && isTenantPutPath(httpOperation.path)) {
               context.reportDiagnostic({

@@ -9,9 +9,9 @@ flags any PUT path that starts with `/providers`, except paths ending in
 tenant resources, so it missed management-group extension PUTs whose emitted
 paths also start with `/providers`.
 
-After changing the TypeSpec rule to inspect all HTTP operations, the full corpus
+After changing the TypeSpec rule to inspect all ARM HTTP operations, the full corpus
 run at specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`,
-generated at `2026-08-25T09:19:24Z`, produced 24 Swagger projects, 24
+generated at `2026-08-26T04:33:41Z`, produced 24 Swagger projects, 24
 TypeSpec projects, 24 overlapping projects, and no one-sided projects in the
 successfully compiled population. The migrated rule is functionally equivalent
 for the assessed population.
@@ -30,7 +30,9 @@ while TypeSpec reports every matching semantic operation.
    behavior without requiring a trailing slash.
 4. Add `operations-put` as a compliant fixture for Swagger's `/operations`
    suffix exemption.
-5. Preserve the tenant-resource, subscription-resource, scope-based extension,
+5. Restrict traversal to services with an ARM provider namespace and add
+   `data-plane-providers-put` as a compliance fixture for the ARM-only scope.
+6. Preserve the tenant-resource, subscription-resource, scope-based extension,
    non-PUT, and custom-PUT fixtures as regression controls.
 
 No emitter, Swagger validator, corpus generator, or comparison normalization
@@ -42,7 +44,7 @@ change is required.
 | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------- | --------------------------------------------- | -----------------: | ----------------: | --------------------: | ------------------: | ------------: | ----------------------- |
 | `docs/coverage_old.md`                                  | external report snapshot checked into this repository; generator revision not recorded             | 450 compiled projects, 210 validator rules         | `TenantLevelAPIsNotAllowed none 24 15 0 62.5` |                 24 |                15 | not listed separately | not reconstructable |    not listed | not listed              |
 | checked-in `specs/coverage-breakdown.md` before the fix | specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`; full run over 462/468 successful projects | 462 successful projects, 215 known validator rules | `TenantLevelAPIsNotAllowed production`        |                 24 |                15 |                    15 |                   9 |             0 | 24 Swagger, 48 TypeSpec |
-| refreshed full corpus after the fix                     | same specs commit; generated `2026-08-25T09:19:24Z`; full run over 462/468 successful projects     | 462 successful projects, 215 known validator rules | `TenantLevelAPIsNotAllowed production`        |                 24 |                24 |                    24 |                   0 |             0 | 24 Swagger, 69 TypeSpec |
+| refreshed full corpus after the fix                     | same specs commit; generated `2026-08-26T04:33:41Z`; full run over 462/468 successful projects     | 462 successful projects, 215 known validator rules | `TenantLevelAPIsNotAllowed production`        |                 24 |                24 |                    24 |                   0 |             0 | 24 Swagger, 69 TypeSpec |
 
 The external report provides aggregate migration credit and cannot reconstruct
 the individual unmatched projects. The lint-diff report requires observed
@@ -102,8 +104,9 @@ createOrUpdate is Extension.CreateOrReplaceSync<
 **Explanation:** Swagger classifies the emitted path text, not the ARM resource
 base type. The former TypeSpec traversal used a narrower semantic proxy.
 
-**Disposition:** The production rule now traverses resolved HTTP operations and
-applies the same verb, prefix, and `/operations` exemption checks.
+**Disposition:** The production rule now traverses resolved HTTP operations for
+ARM services and applies the same verb, prefix, and `/operations` exemption
+checks.
 
 ### Gap example: exact providers root
 
@@ -331,13 +334,17 @@ first-match-only behavior.
 | `management-group-extension-put` | one violation  | one matching diagnostic |
 | `providers-root-put`             | one violation  | one matching diagnostic |
 | `operations-put`                 | no violation   | no mapped diagnostic    |
+| `data-plane-providers-put`       | not applicable | no mapped diagnostic    |
 | `subscription-level-put`         | no violation   | no mapped diagnostic    |
 | `extension-resource-put`         | no violation   | no mapped diagnostic    |
 | `tenant-level-no-put`            | no violation   | no mapped diagnostic    |
 
 The management-group extension fixture directly covers the former semantic
-miss. Ambient fixture diagnostics from other rules remain recorded separately
-in snapshots.
+miss. The fixture harness can invoke the ARM Swagger rule directly against the
+data-plane fixture and records that otherwise out-of-scope validator diagnostic
+as a reviewed discrepancy; in production the Swagger rule is registered only
+in the ARM ruleset. Ambient fixture diagnostics from other rules remain
+recorded separately in snapshots.
 
 ## Final statement
 
