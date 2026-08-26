@@ -1,0 +1,17 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-core/no-openapi",
+    "severity": "warning",
+    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+    "severity": "warning",
+    "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+    "severity": "warning",
+    "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Widgets' should not appear after the underscore."
+  }
+]

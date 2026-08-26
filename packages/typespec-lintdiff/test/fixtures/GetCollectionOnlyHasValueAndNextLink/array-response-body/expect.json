@@ -1,0 +1,13 @@
+{
+  "violation": false,
+  "ambientDiagnostics": [
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/no-empty-model",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-core/no-openapi",
+      "count": 1
+    }
+  ]
+}

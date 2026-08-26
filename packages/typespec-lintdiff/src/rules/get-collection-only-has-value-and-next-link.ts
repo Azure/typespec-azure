@@ -1,9 +1,5 @@
-import {
-  createRule,
-  type Model,
-  type ModelProperty,
-} from "@typespec/compiler";
 import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
+import { createRule, isArrayModelType, type Model, type ModelProperty } from "@typespec/compiler";
 import { getHttpOperation, type HttpOperationResponse } from "@typespec/http";
 
 export const getCollectionOnlyHasValueAndNextLinkRule = createRule({
@@ -51,7 +47,12 @@ function isCollectionGetPath(path: string): boolean {
     return false;
   }
 
-  return path.split("/").length % 2 === 0;
+  const providerTail = path.split(".").at(-1);
+  return (
+    providerTail !== undefined &&
+    providerTail.includes("/") &&
+    providerTail.split("/").length % 2 === 0
+  );
 }
 
 function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefined {
@@ -61,9 +62,19 @@ function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefi
     }
 
     for (const content of response.responses) {
-      if (content.body?.type.kind === "Model") {
-        return content.body.type;
+      const body = content.body;
+      if (body?.type.kind !== "Model") {
+        continue;
       }
+
+      if (
+        isArrayModelType(body.type) ||
+        (body.property?.type.kind === "Model" && isArrayModelType(body.property.type))
+      ) {
+        continue;
+      }
+
+      return body.type;
     }
   }
 
@@ -71,6 +82,10 @@ function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefi
 }
 
 function getInvalidTarget(responseModel: Model): Model | ModelProperty | undefined {
+  if (isArrayModelType(responseModel)) {
+    return undefined;
+  }
+
   const properties = [...responseModel.properties.values()];
   if (
     properties.length === 2 &&
@@ -79,6 +94,8 @@ function getInvalidTarget(responseModel: Model): Model | ModelProperty | undefin
     return undefined;
   }
 
-  return properties.find((property) => property.name !== "value" && property.name !== "nextLink")
-    ?? responseModel;
+  return (
+    properties.find((property) => property.name !== "value" && property.name !== "nextLink") ??
+    responseModel
+  );
 }
