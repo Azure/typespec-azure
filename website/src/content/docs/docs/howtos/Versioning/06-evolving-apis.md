@@ -197,7 +197,7 @@ model Employee is TrackedResource<EmployeeProperties> {
 @@added(Employee.identity, Versions.v2);
 ```
 
-Without the `@@added` augment, the `identity` property would appear in all versions—including `v1`—which is a breaking change.
+Without the `@@added` augment, the `identity` property would appear in all versions—including `v1`—which unintentionally changes the API surface of earlier versions.
 
 **Scenario: Removing a spread-in property in v2**
 
