@@ -76,11 +76,7 @@ Scenarios.Azure_ClientGenerator_Core_Override_AddParameter_add = passOnSuccess([
   {
     uri: "/azure/client-generator-core/override/add",
     method: "get",
-    request: {
-      headers: {
-        "trace-id": "trace-id",
-      },
-    },
+    request: {},
     response: {
       status: 204,
     },
