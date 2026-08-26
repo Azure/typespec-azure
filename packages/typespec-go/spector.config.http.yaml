@@ -7,6 +7,7 @@
 specs:
   "authentication/api-key": { options: { module: apikeygroup } }
   "authentication/http/custom": { options: { module: customgroup } }
+  "authentication/noauth/union": { options: { module: noauthgroup } }
   "authentication/oauth2": { options: { module: oauth2group } }
   "authentication/union": { options: { module: unionauthgroup } }
   "documentation": { options: { module: documentationgroup } }
