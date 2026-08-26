@@ -268,6 +268,28 @@ If a quick iteration is needed first, use the existing `--filter`, `--limit`,
 and `--concurrency` options. The final behavioral check should use the full
 corpus when practical.
 
+#### Long-running corpus status protocol
+
+- Run a representative filtered corpus first to confirm the command, links, and
+  output paths before starting the full corpus.
+- Before each run, report its scope, project count, and expected duration.
+- When a visible terminal is available, run the corpus there so the user can
+  continuously see the runner's progress and heartbeat output. Do not require
+  an exact progress-message format.
+- Otherwise, run it as a persistent background process, preserve its output in
+  a log file outside generated corpus directories, and report periodic status
+  from the log until it finishes.
+- Detect interrupted or stale runs instead of assuming silence means progress.
+  Confirm the process is still active and that its log or generated output is
+  advancing; stop and report a run that has exited unexpectedly or stopped
+  making progress.
+- Before retrying an interrupted run, identify partial generated corpus
+  artifacts from that run and remove only those known generated paths. Never
+  use broad cleanup commands or remove source fixtures.
+- When the run ends, report its completion timestamp and final status,
+  including failures or interruption rather than presenting a partial run as
+  complete.
+
 ### 5. Refresh the rule migration note
 
 After the final corpus run, update the rule's `migration.md` from the newly
@@ -427,3 +449,26 @@ Worker mode returns:
 - per-rule review findings adopted and rejected, with reasons
 - the explicit rule-related files ready for each PR
 - each created draft PR URL
+
+## Post-run process review
+
+After the draft PR is created and the deliverable is complete, briefly review
+the run before the final user response. Capture concrete suggestions for the
+next lintdiff rule, especially:
+
+- steps that cost unexpected time and how to avoid or parallelize them next time
+- status reporting that was missing, stale, or too noisy, and the progress or
+  heartbeat evidence that proved the run was still healthy
+- commands that were too broad, stalled, or failed for environmental reasons,
+  together with narrower commands that proved sufficient
+- setup shortcuts that are safe to reuse, such as prepared worktrees,
+  initialized submodules, installed dependencies, direct comparison links, or
+  already-built package dependency closures
+- corpus, fixture, and migration evidence that made the equivalence conclusion
+  clearer or more reliable
+- skill instructions that should be updated based on the observed run
+
+Print the suggestions in the final handoff and ask the user whether any should
+be adopted into this skill. Do not update the skill automatically from the
+post-run review; only make skill changes after the user explicitly approves the
+specific suggestion(s).

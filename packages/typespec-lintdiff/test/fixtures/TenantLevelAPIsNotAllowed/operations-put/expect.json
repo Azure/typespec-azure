@@ -1,0 +1,25 @@
+{
+  "violation": false,
+  "ambientDiagnostics": [
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator",
+      "count": 1
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "count": 1
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+      "count": 1
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "count": 1
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/xms-examples-required",
+      "count": 1
+    }
+  ]
+}

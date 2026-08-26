@@ -9,6 +9,7 @@ import * as path from "path";
 import { pathToFileURL } from "url";
 import { promisify } from "util";
 import YAML from "yaml";
+import { formatProgressHeartbeat } from "./progress.js";
 import type { ProjectedEnumResult, ProjectedHttpGraphResult } from "./projected-enum-worker.js";
 
 const execFileAsync = promisify(execFile);
@@ -21,6 +22,7 @@ const VALID_QUERY_PARAMETERS_FOR_POINT_OPERATIONS_RULE =
   "tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations";
 const TSX_ESM_LOADER = import.meta.resolve("tsx/esm");
 const MAX_BUFFER = 256 * 1024 * 1024;
+const HEARTBEAT_INTERVAL_MS = 60_000;
 
 interface Config {
   specsRepo: string;
@@ -1740,6 +1742,7 @@ async function run(config: Config): Promise<void> {
   const targetCommit = git(config.specsRepo, ["rev-parse", `${meta.specsCommit}^{commit}`]);
   const requiresCheckout = originalCommit !== targetCommit;
   const packageDir = path.resolve(import.meta.dirname, "..", "..");
+  let heartbeat: ReturnType<typeof setInterval> | undefined;
 
   if (requiresCheckout) {
     console.log(`Checking out specs commit ${meta.specsCommit}.`);
@@ -1759,19 +1762,44 @@ async function run(config: Config): Promise<void> {
         .filter((metadata) => metadata.projectionScope === "http-reachable")
         .flatMap((metadata) => [...metadata.tspLints]),
     );
+    const activeProjects = new Set<string>();
+    let completedProjectCount = 0;
+    let analysisPhase = "compile";
+    heartbeat = setInterval(() => {
+      console.log(
+        formatProgressHeartbeat({
+          phase: analysisPhase,
+          completed: completedProjectCount,
+          total: selectedProjects.length,
+          activeProjects: [...activeProjects].sort(),
+          elapsedMs: Date.now() - analysisStarted,
+          memoryUsage: process.memoryUsage(),
+        }),
+      );
+    }, HEARTBEAT_INTERVAL_MS);
+    heartbeat.unref();
+
     const projectRuns = await mapWithConcurrency(
       selectedProjects,
       config.concurrency,
       async (project, index) => {
-        process.stdout.write(
-          `[${index + 1}/${selectedProjects.length}] ${project.sourcePath} ... `,
-        );
-        const result = await compileProject(config, project, projectedRules);
-        console.log(`${result.result.status}, ${result.diagnostics.length} diagnostic(s)`);
-        return result;
+        activeProjects.add(project.sourcePath);
+        console.log(`[start ${index + 1}/${selectedProjects.length}] ${project.sourcePath}`);
+        try {
+          const result = await compileProject(config, project, projectedRules);
+          completedProjectCount++;
+          console.log(
+            `[done ${completedProjectCount}/${selectedProjects.length}] ${project.sourcePath}: ` +
+              `${result.result.status}, ${result.diagnostics.length} diagnostic(s)`,
+          );
+          return result;
+        } finally {
+          activeProjects.delete(project.sourcePath);
+        }
       },
     );
 
+    analysisPhase = "aggregate";
     const generatedAt = new Date().toISOString();
     const projectResults = projectRuns.map((run) => run.result);
     const aggregate = aggregateTypeSpecResults(
@@ -1791,6 +1819,7 @@ async function run(config: Config): Promise<void> {
     const mappings = new Map(
       [...fixtureMetadata].map(([rule, metadata]) => [rule, metadata.tspLints]),
     );
+    analysisPhase = "report";
     const failedProjects = new Set(
       projectResults
         .filter((project) => project.status === "failed")
@@ -1916,6 +1945,9 @@ async function run(config: Config): Promise<void> {
     writeJson(path.join(config.datasetDir, "_meta.json"), meta);
     console.log(`TypeSpec analysis written to ${config.datasetDir}.`);
   } finally {
+    if (heartbeat) {
+      clearInterval(heartbeat);
+    }
     if (requiresCheckout) {
       console.log(`Restoring specs repo to ${originalRef}.`);
       git(config.specsRepo, ["checkout", "--quiet", originalRef]);

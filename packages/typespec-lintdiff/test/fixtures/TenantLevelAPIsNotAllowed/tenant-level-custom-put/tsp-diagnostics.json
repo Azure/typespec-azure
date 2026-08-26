@@ -2,7 +2,22 @@
   {
     "code": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
     "severity": "warning",
-    "message": "'createOrUpdate' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+    "message": "'refreshTenantConfig' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+    "severity": "warning",
+    "message": "ARM PUT path '/providers/Microsoft.TestService/configurations/{configName}/refresh' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/put-in-operation-name",
+    "severity": "warning",
+    "message": "'PUT' operation 'refreshTenantConfig' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
+    "severity": "warning",
+    "message": "PUT request body schema should match the 200 response schema."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
@@ -10,18 +25,8 @@
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
   },
   {
-    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "code": "tsp-lintdiff-local-linter/xms-resource-in-put-response",
     "severity": "warning",
-    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/xms-examples-required",
-    "severity": "warning",
-    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/xms-examples-required",
-    "severity": "warning",
-    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+    "message": "PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics."
   }
 ]
