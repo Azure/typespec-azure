@@ -59,7 +59,6 @@ model RequiredParameters {
 );
 
 model AddedParameters {
-  @header("trace-id")
   traceId?: string;
 }
 
