@@ -57,16 +57,3 @@ model RequiredParameters {
     "param4"
   )
 );
-
-model AddedParameters {
-  traceId?: string;
-}
-
-#suppress "experimental-feature" "Testing the addParameter function"
-@@override(
-  _Specs_.Azure.ClientGenerator.Core.Override.AddParameter.add,
-  addParameter(
-    _Specs_.Azure.ClientGenerator.Core.Override.AddParameter.add,
-    AddedParameters.traceId
-  )
-);
