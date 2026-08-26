@@ -84,8 +84,9 @@ interface AddParameter {
   @scenario
   @scenarioDoc("""
     Verify that `addParameter` adds an optional header to the generated client method.
-    Expected header:
+    Optional header:
     trace-id: trace-id
+    The request should succeed with or without this header.
     Expected response: 204 No Content
     """)
   @route("/add")
