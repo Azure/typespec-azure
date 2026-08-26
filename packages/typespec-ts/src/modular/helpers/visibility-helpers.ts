@@ -179,6 +179,10 @@ function collectNode(state: SplitState, model: SdkModelType, visibility: Visibil
     }
   }
 
+  if (model.additionalProperties) {
+    collectReferencedModels(state, model.additionalProperties, visibility, node.refKeys);
+  }
+
   if (model.baseModel) {
     node.refKeys.add(collectNode(state, model.baseModel, visibility));
   }
@@ -337,6 +341,14 @@ function buildClones(state: SplitState): void {
       properties.push(wiredProperty);
     }
     clone.properties = properties;
+
+    if (model.additionalProperties) {
+      clone.additionalProperties = projectTypeReferences(
+        state,
+        model.additionalProperties,
+        visibility,
+      );
+    }
 
     if (model.baseModel) {
       clone.baseModel =

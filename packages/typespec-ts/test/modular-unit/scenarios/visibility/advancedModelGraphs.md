@@ -1085,3 +1085,144 @@ export async function createNode(
   return _createNodeDeserialize(result);
 }
 ```
+
+# Project named model additional properties
+
+Verifies that model-valued additional properties reference the applicable visibility projection.
+
+## TypeSpec
+
+```tsp
+model Item {
+  @visibility(Lifecycle.Read)
+  id: string;
+
+  value: string;
+}
+
+model ItemMap is Record<Item>;
+
+@route("/items")
+@post
+op createItems(@body body: ItemMap): ItemMap;
+```
+
+## Configuration
+
+```yaml
+experimentalSplitModelsByVisibility: true
+```
+
+## Models
+
+```ts models
+/*
+ * This file contains only generated model types and their (de)serializers.
+ * Disable the following rules for internal models with '_' prefix and deserializers which require 'any' for raw JSON input.
+ */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { serializeRecord } from "../static-helpers/serialization/serialize-record.js";
+
+/** model interface ItemMap */
+export interface ItemMap {
+  /** Additional properties */
+  additionalProperties?: Record<string, Item>;
+}
+
+export function itemMapSerializer(item: ItemMap): any {
+  return { ...serializeRecord(item.additionalProperties ?? {}, undefined, itemSerializer) };
+}
+
+export function itemMapDeserializer(item: any): ItemMap {
+  return {
+    additionalProperties: serializeRecord(item, [], itemDeserializer),
+  };
+}
+
+/** model interface Item */
+export interface Item {
+  readonly id: string;
+  value: string;
+}
+
+export function itemSerializer(item: Item): any {
+  return { value: item["value"] };
+}
+
+export function itemDeserializer(item: any): Item {
+  return {
+    id: item["id"],
+    value: item["value"],
+  };
+}
+
+/** model interface ItemMapCreate */
+export interface ItemMapCreate {
+  /** Additional properties */
+  additionalProperties?: Record<string, ItemCreate>;
+}
+
+export function itemMapCreateSerializer(item: ItemMapCreate): any {
+  return { ...serializeRecord(item.additionalProperties ?? {}, undefined, itemCreateSerializer) };
+}
+
+/** model interface ItemCreate */
+export interface ItemCreate {
+  value: string;
+}
+
+export function itemCreateSerializer(item: ItemCreate): any {
+  return { value: item["value"] };
+}
+```
+
+## Operations
+
+```ts operations
+import { TestingContext as Client } from "./index.js";
+import {
+  ItemMap,
+  itemMapDeserializer,
+  ItemMapCreate,
+  itemMapCreateSerializer,
+} from "../models/models.js";
+import { CreateItemsOptionalParams } from "./options.js";
+import {
+  StreamableMethod,
+  PathUncheckedResponse,
+  createRestError,
+  operationOptionsToRequestParameters,
+} from "@azure-rest/core-client";
+
+export function _createItemsSend(
+  context: Client,
+  body: ItemMapCreate,
+  options: CreateItemsOptionalParams = { requestOptions: {} },
+): StreamableMethod {
+  return context.path("/items").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: itemMapCreateSerializer(body),
+  });
+}
+
+export async function _createItemsDeserialize(result: PathUncheckedResponse): Promise<ItemMap> {
+  const expectedStatuses = ["200"];
+  if (!expectedStatuses.includes(result.status)) {
+    throw createRestError(result);
+  }
+
+  return itemMapDeserializer(result.body);
+}
+
+export async function createItems(
+  context: Client,
+  body: ItemMapCreate,
+  options: CreateItemsOptionalParams = { requestOptions: {} },
+): Promise<ItemMap> {
+  const result = await _createItemsSend(context, body, options);
+  return _createItemsDeserialize(result);
+}
+```
