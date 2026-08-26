@@ -3,17 +3,18 @@
   "validatorRule": "QueryParametersInCollectionGet",
   "typeSpecRule": "tsp-lintdiff-local-linter/query-parameters-in-collection-get",
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "localLinterCommit": "e9f13c8d2c092a299a0d4ee5c13b0049f17402da",
-  "localLinterFingerprint": "sha256:80af93a11a238fcd140590da7e1a3f1f1a9c20fe866f50195669c045e25be433",
+  "localLinterCommit": "8749413574dd33905da6000273a9c62f89a05755",
+  "localLinterWorkingTreeDirty": false,
+  "localLinterFingerprint": "sha256:151352c7ce9ae14e1f0c5860bddcb7b9b63dcbcdd01e6e8fdf91b867da3c496b",
   "commands": {
     "validator": "mise exec -- pnpm --dir packages/typespec-lintdiff specs:staging specs QueryParametersInCollectionGet",
     "typeSpec": "$env:NODE_OPTIONS='--max-old-space-size=8192'; mise exec -- pnpm --dir packages/typespec-lintdiff specs:typespec --specs-repo C:\\dev\\worktrees\\azure-rest-api-specs-lintdiff-query-parameters-in-collection-get --concurrency 6"
   },
   "generatedAt": {
     "validator": "2026-08-26T05:23:37.562Z",
-    "typeSpec": "2026-08-26T05:51:19.547Z"
+    "typeSpec": "2026-08-26T08:45:57.719Z"
   },
-  "durationMs": 1757786,
+  "durationMs": 2135634,
   "fullPopulation": {
     "sourceProjects": 468,
     "validatorProjects": 126,
