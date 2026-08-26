@@ -172,6 +172,49 @@ These scenarios demonstrate more advanced versioning patterns, such as changing 
 
 ---
 
+### Version-Scoping Spread-In Properties with Augment Decorators
+
+When you spread a model into a resource (e.g. `...ManagedServiceIdentityProperty`), its properties are introduced into **all** API versions. To introduce a spread-in property in a specific version only, you must use the **augment decorator** (`@@`) form, because you cannot attach an inline `@added` decorator to a member that comes from a spread.
+
+:::note
+The augment decorator form `@@decorator(Target.member, ...)` applies a decorator to a member of a model from outside the model declaration. This is required for properties introduced via a spread (`...`), since there is no inline declaration site to attach `@added` or `@removed`.
+
+The same approach works for all versioning decorators: `@@removed`, `@@madeOptional`, `@@madeRequired`, `@@renamedFrom`, and `@@typeChangedFrom`.
+:::
+
+**Scenario: Adding a spread-in property in v2**
+
+In this ARM example, `ManagedServiceIdentityProperty` introduces an `identity` property. To make it appear only in `v2` and later, add an `@@added` augment statement:
+
+```tsp
+/** Employee resource */
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+  ...ManagedServiceIdentityProperty;
+}
+
+// Introduce the spread-in 'identity' property starting in v2 only.
+@@added(Employee.identity, Versions.v2);
+```
+
+Without the `@@added` augment, the `identity` property would appear in all versions—including `v1`—which is a breaking change.
+
+**Scenario: Removing a spread-in property in v2**
+
+If a spread-in property needs to be removed in a later version, use `@@removed`:
+
+```tsp
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+  ...ManagedServiceIdentityProperty;
+}
+
+// Remove the spread-in 'identity' property starting in v2.
+@@removed(Employee.identity, Versions.v2);
+```
+
+---
+
 ### Adding Decoration to an Existing Type
 
 This scenario demonstrates how to change a decorator’s usage across versions.
