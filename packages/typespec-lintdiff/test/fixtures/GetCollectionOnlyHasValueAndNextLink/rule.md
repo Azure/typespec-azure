@@ -34,6 +34,8 @@ coverage is warranted.
 - the local lint mirrors the upstream provider-tail path heuristic against ARM GET operations and
   requires object 200-response models to declare only `value` and `nextLink`
 - direct array response schemas do not expose `schema.properties` in Swagger and are skipped
+- non-collection point GET paths with an odd provider-tail segment count are skipped even when
+  their response shape would be invalid for a collection GET
 - ARM templates already tend to emit compliant list models; the clean repro comes from a manually
   routed ARM collection GET
 
@@ -46,3 +48,4 @@ coverage is warranted.
 | `only-value-and-nextlink`     | no        | Raw ARM collection GET response keeps only value and `nextLink`   |
 | `array-response-body`         | no        | Named array response body has no Swagger `schema.properties` node |
 | `direct-array-response-body`  | no        | Direct `T[]` response body has no Swagger `schema.properties` node |
+| `terminal-resource-invalid-response` | no | Odd provider-tail point GET skips an otherwise invalid response |
