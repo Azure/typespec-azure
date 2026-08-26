@@ -17,14 +17,9 @@ namespace Customization;
 op reorderParametersCustomization(@path param2: string, @path param1: string): void;
 
 #suppress "experimental-feature" "Testing the reorderParameters function"
-alias ReorderedParameters = reorderParameters(
-  reorderParametersCustomization,
-  #["param1", "param2"]
-);
-
 @@override(
   _Specs_.Azure.ClientGenerator.Core.Override.ReorderParameters.reorder,
-  ReorderedParameters
+  reorderParameters(reorderParametersCustomization, #["param1", "param2"])
 );
 
 model GroupParametersOptions {
@@ -43,15 +38,9 @@ model RequiredParameters {
 op requireOptionalCustomization(@path param1: string, @path param2?: string): void;
 
 #suppress "experimental-feature" "Testing the replaceParameter function"
-alias ReplacedParameter = replaceParameter(
-  requireOptionalCustomization,
-  "param2",
-  RequiredParameters.param2
-);
-
 @@override(
   _Specs_.Azure.ClientGenerator.Core.Override.RequireOptionalParameter.requireOptional,
-  ReplacedParameter
+  replaceParameter(requireOptionalCustomization, "param2", RequiredParameters.param2)
 );
 
 op removeOptionalCustomization(
@@ -61,24 +50,21 @@ op removeOptionalCustomization(
   @header param4?: string,
 ): void;
 
-alias WithoutParam3 = removeParameter(removeOptionalCustomization, "param3");
-
 #suppress "experimental-feature" "Testing the removeParameter function"
-alias WithoutOptionalParameters = removeParameter(WithoutParam3, "param4");
-
 @@override(
   _Specs_.Azure.ClientGenerator.Core.Override.RemoveOptionalParameter.removeOptional,
-  WithoutOptionalParameters
+  removeParameter(removeParameter(removeOptionalCustomization, "param3"), "param4")
 );
 
 model AddedParameters {
   @header("trace-id")
-  traceId: string;
+  traceId?: string;
 }
 
 op addParameterCustomization(): void;
 
 #suppress "experimental-feature" "Testing the addParameter function"
-alias WithTraceId = addParameter(addParameterCustomization, AddedParameters.traceId);
-
-@@override(_Specs_.Azure.ClientGenerator.Core.Override.AddParameter.add, WithTraceId);
+@@override(
+  _Specs_.Azure.ClientGenerator.Core.Override.AddParameter.add,
+  addParameter(addParameterCustomization, AddedParameters.traceId)
+);

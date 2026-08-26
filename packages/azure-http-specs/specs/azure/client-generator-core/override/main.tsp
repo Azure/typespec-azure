@@ -83,7 +83,7 @@ interface RemoveOptionalParameter {
 interface AddParameter {
   @scenario
   @scenarioDoc("""
-    Verify that `addParameter` adds a required header to the generated client method.
+    Verify that `addParameter` adds an optional header to the generated client method.
     Expected header:
     trace-id: trace-id
     Expected response: 204 No Content
