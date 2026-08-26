@@ -17,7 +17,9 @@ specs:
   azure/core/lro/standard: true
   azure/client-generator-core/access: true
   azure/client-generator-core/usage: true
+  parameters/body-root: true
   parameters/body-optionality: true
+  response/status-code-range: true
   type/model/usage: true
   client/structure/default: true
   client/structure/multi-client: true
