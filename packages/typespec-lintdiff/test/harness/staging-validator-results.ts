@@ -22,6 +22,20 @@ interface DatasetMetadata {
   }>;
 }
 
+interface StagingValidatorIndex {
+  schemaVersion: number;
+  specsCommit: string;
+  generatedAt: string;
+  rules: Record<
+    string,
+    {
+      count: number;
+      levels: Record<string, number>;
+      resultsFile: string;
+    }
+  >;
+}
+
 function writeJson(filePath: string, value: unknown): void {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
@@ -34,6 +48,16 @@ export async function generateStagingValidatorResults(
   const metadata = JSON.parse(
     fs.readFileSync(path.join(datasetDir, "_meta.json"), "utf8"),
   ) as DatasetMetadata;
+  const indexPath = path.join(datasetDir, "staging-validator-results.json");
+  const existingIndex = fs.existsSync(indexPath)
+    ? (JSON.parse(fs.readFileSync(indexPath, "utf8")) as StagingValidatorIndex)
+    : undefined;
+  if (existingIndex && existingIndex.specsCommit !== metadata.specsCommit) {
+    throw new Error(
+      `Existing staging validator results use specs commit ${existingIndex.specsCommit}; expected ${metadata.specsCommit}.`,
+    );
+  }
+
   const rule = cloneDeep(spectralRulesets.azARM.rules[ruleName]);
   if (rule === undefined) {
     throw new Error(`Unknown ARM validator rule: ${ruleName}`);
@@ -75,11 +99,12 @@ export async function generateStagingValidatorResults(
     count: results.length,
     results,
   });
-  writeJson(path.join(datasetDir, "staging-validator-results.json"), {
+  writeJson(indexPath, {
     schemaVersion: SCHEMA_VERSION,
     specsCommit: metadata.specsCommit,
     generatedAt,
     rules: {
+      ...existingIndex?.rules,
       [ruleName]: {
         count: results.length,
         levels: { error: results.length },
