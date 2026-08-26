@@ -1,5 +1,13 @@
 # Release History
 
+## 0.17.1
+
+### Bug Fixes
+
+- [#5272](https://github.com/Azure/typespec-azure/pull/5272) Parse text request bodies into their declared types in generated fake servers.
+- [#5233](https://github.com/Azure/typespec-azure/pull/5233) Fix fake server path param regex to exclude path delimiters
+
+
 ## 0.17.0
 
 ### Features
