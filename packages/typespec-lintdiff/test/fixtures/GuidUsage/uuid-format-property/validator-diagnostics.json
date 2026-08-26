@@ -1,0 +1,14 @@
+[
+  {
+    "code": "GuidUsage",
+    "message": "Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.",
+    "path": [
+      "definitions",
+      "WidgetProperties",
+      "properties",
+      "uniqueId",
+      "format"
+    ],
+    "severity": 0
+  }
+]
