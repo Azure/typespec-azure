@@ -194,7 +194,13 @@ function generateResponseUnmarshaller(
     switch (type.kind) {
       case "scalar":
         resultVar = "parsedBody";
-        unmarshallerText += emitScalarParsing(type, "string(body)", resultVar, imports, indent);
+        unmarshallerText += helpers.emitScalarParsing(
+          type,
+          "string(body)",
+          resultVar,
+          imports,
+          indent,
+        );
         unmarshallerText += `${indent.get()}${helpers.buildErrCheck(indent, "err", zeroValue)}\n`;
         break;
       case "string":
@@ -266,35 +272,20 @@ function formatHeaderResponseValue(
       text += `${indent.get()}}\n`;
       return text;
     case "scalar":
-      text += emitScalarParsing(headerResp.type, "val", name, imports, indent);
+      text += helpers.emitScalarParsing(headerResp.type, "val", name, imports, indent);
       break;
     case "string":
       text += `${indent.get()}${respObj}.${headerResp.fieldName} = &val\n`;
       text += `${indent.pop().get()}}\n`;
       return text;
     case "time":
-      imports.add("time");
-      switch (headerResp.type.format) {
-        case "RFC1123":
-        case "RFC3339":
-        case "RFC7231":
-          text += `${indent.get()}${name}, err := time.Parse(${headerResp.type.format === "RFC3339" ? helpers.RFC3339Format : helpers.RFC1123Format}, val)\n`;
-          break;
-        case "PlainDate":
-          text += `${indent.get()}${name}, err := time.Parse(${helpers.plainDateFormat}, val)\n`;
-          break;
-        case "PlainTime":
-          text += `${indent.get()}${name}, err := time.Parse(${helpers.plainTimeFormat}, val)\n`;
-          break;
-        case "Unix":
-          imports.add("strconv");
-          imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
-          text += `${indent.get()}sec, err := strconv.ParseInt(val, 10, 64)\n`;
-          name = "to.Ptr(time.Unix(sec, 0))";
-          byRef = "";
-          break;
-        default:
-          headerResp.type.format satisfies never;
+      if (headerResp.type.format === "Unix") {
+        imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
+        text += helpers.emitTimeParsing("val", headerResp.type, "sec", imports, indent);
+        name = "to.Ptr(time.Unix(sec, 0))";
+        byRef = "";
+      } else {
+        text += helpers.emitTimeParsing("val", headerResp.type, name, imports, indent);
       }
   }
 
@@ -305,48 +296,6 @@ function formatHeaderResponseValue(
   text += `${indent.get()}${respObj}.${headerResp.fieldName} = ${byRef}${name}\n`;
   text += `${indent.pop().get()}}\n`;
   return text;
-}
-
-/**
- * emits the code for parsing scalar types from a string.
- * note that the parsing error result is placed into a
- * local var named "err".
- *
- * @param scalar the type of scalar to parse
- * @param src the source var that contains the scalar in string format
- * @param dst the destination var that contains the result
- * @param imports the import manager currently in scope
- * @param indent the indentation helper currently in scope
- * @returns the scalar parsing code
- */
-function emitScalarParsing(
-  scalar: go.Scalar,
-  src: string,
-  dst: string,
-  imports: ImportManager,
-  indent: helpers.Indentation,
-): string {
-  imports.add("strconv");
-  switch (scalar.type) {
-    case "bool":
-      return `${indent.get()}${dst}, err := strconv.ParseBool(${src})\n`;
-    case "float32":
-      return (
-        `${indent.get()}${dst}32, err := strconv.ParseFloat(${src}, 32)\n` +
-        `${indent.get()}${dst} := float32(${dst}32)\n`
-      );
-    case "float64":
-      return `${indent.get()}${dst}, err := strconv.ParseFloat(${src}, 64)\n`;
-    case "int32":
-      return (
-        `${indent.get()}${dst}32, err := strconv.ParseInt(${src}, 10, 32)\n` +
-        `${indent.get()}${dst} := int32(${dst}32)\n`
-      );
-    case "int64":
-      return `${indent.get()}${dst}, err := strconv.ParseInt(${src}, 10, 64)\n`;
-    default:
-      throw new CodegenError("InternalError", `unhandled scalar type ${scalar.type}`);
-  }
 }
 
 function isArrayOfDateTime(
