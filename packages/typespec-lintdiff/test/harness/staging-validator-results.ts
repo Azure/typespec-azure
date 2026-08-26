@@ -2,17 +2,16 @@
 
 /* eslint-disable no-console */
 
-import spectralPkg from "@stoplight/spectral-core";
 import rulesetsPkg from "@microsoft.azure/openapi-validator-rulesets";
+import spectralPkg from "@stoplight/spectral-core";
 import * as fs from "fs";
 import cloneDeep from "lodash/cloneDeep.js";
 import * as path from "path";
 import { pathToFileURL } from "url";
 
-const { spectralRulesets, deleteRulesPropertiesInPayloadNotValidForSpectralRules } =
-  rulesetsPkg;
+const { spectralRulesets, deleteRulesPropertiesInPayloadNotValidForSpectralRules } = rulesetsPkg;
 const { Spectral } = spectralPkg;
-const RULE = "ValidQueryParametersForPointOperations";
+const DEFAULT_RULE = "ValidQueryParametersForPointOperations";
 const SCHEMA_VERSION = 6;
 
 interface DatasetMetadata {
@@ -28,14 +27,18 @@ function writeJson(filePath: string, value: unknown): void {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
-export async function generateStagingValidatorResults(datasetDir: string): Promise<void> {
+export async function generateStagingValidatorResults(
+  datasetDir: string,
+  ruleName = DEFAULT_RULE,
+): Promise<void> {
   const metadata = JSON.parse(
     fs.readFileSync(path.join(datasetDir, "_meta.json"), "utf8"),
   ) as DatasetMetadata;
-  const rule = cloneDeep(
-    spectralRulesets.azARM.rules[RULE],
-  );
-  const ruleset = { rules: { [RULE]: rule } };
+  const rule = cloneDeep(spectralRulesets.azARM.rules[ruleName]);
+  if (rule === undefined) {
+    throw new Error(`Unknown ARM validator rule: ${ruleName}`);
+  }
+  const ruleset = { rules: { [ruleName]: rule } };
   deleteRulesPropertiesInPayloadNotValidForSpectralRules(ruleset);
   const spectral = new Spectral();
   spectral.setRuleset(ruleset);
@@ -47,11 +50,11 @@ export async function generateStagingValidatorResults(datasetDir: string): Promi
         fs.readFileSync(path.join(datasetDir, ...swaggerFile.split("/")), "utf8"),
       );
       for (const diagnostic of await spectral.run(document)) {
-        if (String(diagnostic.code) !== RULE) {
+        if (String(diagnostic.code) !== ruleName) {
           continue;
         }
         results.push({
-          rule: RULE,
+          rule: ruleName,
           level: diagnostic.severity === 0 ? "error" : "warning",
           project: project.sourcePath,
           swaggerFile,
@@ -63,12 +66,12 @@ export async function generateStagingValidatorResults(datasetDir: string): Promi
   }
 
   const generatedAt = new Date().toISOString();
-  const resultsFile = `results/by-staging-rule/${RULE}.json`;
+  const resultsFile = `results/by-staging-rule/${ruleName}.json`;
   writeJson(path.join(datasetDir, resultsFile), {
     schemaVersion: SCHEMA_VERSION,
     specsCommit: metadata.specsCommit,
     generatedAt,
-    rule: RULE,
+    rule: ruleName,
     count: results.length,
     results,
   });
@@ -77,7 +80,7 @@ export async function generateStagingValidatorResults(datasetDir: string): Promi
     specsCommit: metadata.specsCommit,
     generatedAt,
     rules: {
-      [RULE]: {
+      [ruleName]: {
         count: results.length,
         levels: { error: results.length },
         resultsFile,
@@ -90,7 +93,8 @@ async function main(): Promise<void> {
   const datasetDir = path.resolve(
     process.argv[2] ?? path.join(import.meta.dirname, "..", "..", "specs"),
   );
-  await generateStagingValidatorResults(datasetDir);
+  const ruleName = process.argv[3] ?? DEFAULT_RULE;
+  await generateStagingValidatorResults(datasetDir, ruleName);
   console.log(`Staging validator results written to ${datasetDir}.`);
 }
 
