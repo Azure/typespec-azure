@@ -102,9 +102,9 @@ effort.
 1. Resolve the user input to both:
    - the validator rule id, usually `test/fixtures/<ValidatorRuleId>/rule.md`
    - the local TypeSpec rule name, usually `src/rules/<rule-name>.ts`
-   Then derive the canonical validator rule slug from the exact validator rule
-   id. Use this slug, not the local TypeSpec rule file name or destination
-   package, when naming or matching source branches and worktrees.
+     Then derive the canonical validator rule slug from the exact validator rule
+     id. Use this slug, not the local TypeSpec rule file name or destination
+     package, when naming or matching source branches and worktrees.
 2. Inspect the source rule and evidence:
    - `packages/typespec-lintdiff/src/rules/<rule-name>.ts`
    - `packages/typespec-lintdiff/src/linter.ts`
@@ -183,8 +183,8 @@ Stop until the user selects the destination.
    - `promote-lintdiff-<validator-rule-slug>`
    - `promote-<validator-rule-slug>-to-core`
    - `promote-<validator-rule-slug>-to-arm`
-   A matching worktree directory should use the same slug, for example
-   `C:\dev\worktrees\promote-lintdiff-<validator-rule-slug>`.
+     A matching worktree directory should use the same slug, for example
+     `C:\dev\worktrees\promote-lintdiff-<validator-rule-slug>`.
 4. Initialize repository prerequisites in the new worktree before installing or
    validating:
    - run `git submodule update --init` so the `core/` workspace packages such
@@ -361,7 +361,21 @@ an existing official rule.
 Chronus change files must use LF line endings. Do not run Prettier directly on a
 new change file when the Windows checkout would rewrite it with CRLF. After
 formatting, run `pnpm chronus status`; if it reports `missing-front-matter`,
-normalize the change file to LF and rerun the command.
+normalize the change file to LF and rerun the command. On Windows, a reliable
+workflow for a new change file is:
+
+```powershell
+$path = ".chronus/changes/<change-file>.md"
+git -c core.autocrlf=false add -- $path
+cmd /d /c "git show :$($path.Replace('\', '/')) > $path"
+$content = [System.IO.File]::ReadAllText((Resolve-Path $path))
+if ($content.Contains("`r`n")) { throw "Chronus change file still contains CRLF" }
+pnpm chronus status
+```
+
+Staging first creates an LF-normalized index blob according to the repository
+attributes; `cmd` writes that blob back without PowerShell text-encoding or
+line-ending conversion.
 
 ### 9. Validate narrowly, then broadly enough for PR
 
@@ -379,7 +393,18 @@ Optimized validation order:
 5. format check for generated markdown, especially package README and website
    linter reference files
 6. website-only build when the generated website reference changed, after the
-   target package dependency closure has already been built
+   target package dependency closure has already been built. In a fresh worktree,
+   first build the website's remaining dependency closure so its all-package docs
+   regeneration does not fail on unrelated missing `dist` outputs:
+
+   ```bash
+   pnpm -r --filter "@azure-tools/typespec-azure-website^..." \
+     --filter "!@typespec/monorepo" \
+     --filter "!@azure-tools/typespec-azure-monorepo" build
+   ```
+
+   Then run the website-only build.
+
 7. `@azure-tools/typespec-azure-rulesets` build and test when rulesets changed
 8. affected package test
 
@@ -388,7 +413,7 @@ loop, replacing `<rule-name>` with the promoted rule file stem:
 
 ```bash
 pnpm -r --filter "@azure-tools/typespec-azure-resource-manager..." build
-pnpm --filter @azure-tools/typespec-azure-resource-manager exec vitest run test/rules/<rule-name>.test.ts
+pnpm --filter @azure-tools/typespec-azure-resource-manager exec vitest run test/rules/ < rule-name > .test.ts
 pnpm --filter @azure-tools/typespec-azure-resource-manager build
 pnpm --filter @azure-tools/typespec-azure-resource-manager lint
 pnpm --filter @azure-tools/typespec-azure-resource-manager regen-docs
@@ -404,7 +429,7 @@ For core rule promotion, use the same shape with the core package:
 
 ```bash
 pnpm -r --filter "@azure-tools/typespec-azure-core..." build
-pnpm --filter @azure-tools/typespec-azure-core exec vitest run test/rules/<rule-name>.test.ts
+pnpm --filter @azure-tools/typespec-azure-core exec vitest run test/rules/ < rule-name > .test.ts
 pnpm --filter @azure-tools/typespec-azure-core build
 pnpm --filter @azure-tools/typespec-azure-core lint
 pnpm --filter @azure-tools/typespec-azure-core regen-docs
