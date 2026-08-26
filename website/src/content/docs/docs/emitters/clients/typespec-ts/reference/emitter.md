@@ -124,9 +124,7 @@ This option is used for special Key Auth, when the key has a shared prefix and t
 
 **Type:** `boolean`
 
-This option generates metadata files for a new package. These files include `package.json`, `README.md`, and `tsconfig.json`.
-Use `generate-metadata: true` only for a new package. It writes a complete `package.json` with `scripts.customize` set to `echo skipped`. It does not preserve scripts from an existing `package.json`.
-The option defaults to `true` when the package directory has no `package.json`. Set the option to `false` to disable metadata generation.
+Whether to generate metadata files which includes package.json, README.md and tsconfig.json etc. Defaults to `undefined`. If there's not a package.json under package-dir, defaults to `true`. but if you'd like to disable this feature you could set it as `false`.
 
 ### `generate-test`
 
