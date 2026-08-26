@@ -462,7 +462,7 @@ jobs:
             const taskBody = [
               "## Task: Verify and Implement Spector Integration Tests",
               "",
-              "Use the `spector-test-implementer` skill to verify and implement test files for the following not-implemented scenario groups.",
+              "Use the `typespec-ts-add-spector-test` skill to verify and implement test files for the following not-implemented scenario groups.",
               "",
               "**Not-implemented scenario groups:**",
               "",
@@ -471,7 +471,7 @@ jobs:
               "**Instructions:**",
               "",
               "1. For each scenario group above, check whether a `.test.ts` file already exists in `packages/typespec-ts/test/azure-modular-integration/`; skip groups that are already fully covered.",
-              "2. For remaining groups, follow the `spector-test-implementer` workflow to generate the client and verify the generated code before writing tests.",
+              "2. For remaining groups, follow the `typespec-ts-add-spector-test` workflow to generate the client and verify the generated code before writing tests.",
               "3. Read the `.tsp` and `mockapi.ts` files carefully to understand the expected behavior.",
               "4. Run each test and remove cases that fail because of emitter limitations; only commit passing tests.",
               "5. Report which tests passed and which were omitted because of emitter limitations.",
