@@ -218,7 +218,20 @@ Review `git status` for the expected config, test, `.gitignore`, `tspconfig.yaml
 
 Never use `git add -A` for generated baselines, and do not accept unexpected baseline deletions.
 
-Run the repository formatter and the smallest relevant lint command before completion.
+From the repository root, run the required formatting and lint commands:
+
+```bash
+pnpm format
+pnpm lint
+```
+
+If the changes will be submitted in a pull request, add a Chronus change description for `@azure-tools/typespec-ts`:
+
+```bash
+pnpm change add
+```
+
+Use the `internal` change kind for test-only Spector coverage unless the changes have a user-facing impact requiring another kind. Do not add a change description when no implementation pull request will be created.
 
 ### 10. Report
 
