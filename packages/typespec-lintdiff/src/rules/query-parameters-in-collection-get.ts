@@ -2,8 +2,9 @@ import { getArmProviderNamespace } from "@azure-tools/typespec-azure-resource-ma
 import {
   createRule,
   getLocationContext,
-  getNamespaceFullName,
+  type Namespace,
   paramMessage,
+  type Program,
 } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 
@@ -21,10 +22,12 @@ export const queryParametersInCollectionGetRule = createRule({
     return {
       operation: (operation) => {
         const namespace = operation.interface?.namespace ?? operation.namespace;
-        if (
-          namespace === undefined ||
-          getArmProviderNamespace(context.program, namespace) === undefined
-        ) {
+        if (namespace === undefined) {
+          return;
+        }
+
+        const providerNamespace = getArmProviderNamespace(context.program, namespace);
+        if (providerNamespace === undefined) {
           return;
         }
 
@@ -38,7 +41,12 @@ export const queryParametersInCollectionGetRule = createRule({
             continue;
           }
 
-          const key = `${getNamespaceFullName(namespace)}\0${httpOperation.path}\0${parameter.name}`;
+          const key = createReportedParameterKey(
+            context.program,
+            namespace,
+            httpOperation.path,
+            parameter.name,
+          );
           if (reportedParameters.has(key)) {
             continue;
           }
@@ -61,6 +69,21 @@ export const queryParametersInCollectionGetRule = createRule({
 
 function isAllowedQueryParameter(name: string): boolean {
   return name === "api-version" || name === "$filter";
+}
+
+export function createReportedParameterKey(
+  program: Program,
+  namespace: Namespace,
+  path: string,
+  parameterName: string,
+): string {
+  const providerNamespace = getArmProviderNamespace(program, namespace);
+  if (providerNamespace === undefined) {
+    throw new Error(
+      "Cannot create a collection query parameter key outside an ARM provider namespace.",
+    );
+  }
+  return `${providerNamespace}\0${path}\0${parameterName}`;
 }
 
 function isCollectionPath(path: string): boolean {
