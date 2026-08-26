@@ -30,6 +30,13 @@ model Gadget {
   weight: int32;
 }
 
+model WriteOnlyWidget {
+  @visibility(Lifecycle.Create)
+  createOnly: string;
+
+  value: string;
+}
+
 model MetadataWidget {
   @visibility(Lifecycle.Read)
   id: string;
@@ -70,6 +77,10 @@ op deleteWidget(@path widgetName: string): void;
 @route("/gadgets")
 @post
 op createGadget(@body body: Gadget): Gadget;
+
+@route("/write-only-widgets")
+@post
+op createWriteOnlyWidget(@body body: WriteOnlyWidget): WriteOnlyWidget;
 
 @route("/metadata-widgets")
 @post
@@ -129,6 +140,21 @@ export function gadgetDeserializer(item: any): Gadget {
   return {
     displayName: item["displayName"],
     weight: item["weight"],
+  };
+}
+
+/** model interface WriteOnlyWidget */
+export interface WriteOnlyWidget {
+  value: string;
+}
+
+export function writeOnlyWidgetSerializer(item: WriteOnlyWidget): any {
+  return { value: item["value"] };
+}
+
+export function writeOnlyWidgetDeserializer(item: any): WriteOnlyWidget {
+  return {
+    value: item["value"],
   };
 }
 
@@ -197,6 +223,16 @@ export function widgetUpdateSerializer(item: WidgetUpdate): any {
   };
 }
 
+/** model interface WriteOnlyWidgetCreate */
+export interface WriteOnlyWidgetCreate {
+  createOnly: string;
+  value: string;
+}
+
+export function writeOnlyWidgetCreateSerializer(item: WriteOnlyWidgetCreate): any {
+  return { createOnly: item["createOnly"], value: item["value"] };
+}
+
 /** model interface MetadataWidgetCreate */
 export interface MetadataWidgetCreate {
   token: string;
@@ -218,6 +254,8 @@ import {
   Gadget,
   gadgetSerializer,
   gadgetDeserializer,
+  WriteOnlyWidget,
+  writeOnlyWidgetDeserializer,
   MetadataWidget,
   metadataWidgetDeserializer,
   WidgetCreate,
@@ -226,12 +264,15 @@ import {
   widgetCreateOrUpdateSerializer,
   WidgetUpdate,
   widgetUpdateSerializer,
+  WriteOnlyWidgetCreate,
+  writeOnlyWidgetCreateSerializer,
   MetadataWidgetCreate,
   metadataWidgetCreateSerializer,
 } from "../models/models.js";
 import { expandUrlTemplate } from "../static-helpers/urlTemplate.js";
 import {
   CreateMetadataWidgetOptionalParams,
+  CreateWriteOnlyWidgetOptionalParams,
   CreateGadgetOptionalParams,
   DeleteWidgetOptionalParams,
   GetWidgetOptionalParams,
@@ -281,6 +322,39 @@ export async function createMetadataWidget(
 ): Promise<MetadataWidget> {
   const result = await _createMetadataWidgetSend(context, body, options);
   return _createMetadataWidgetDeserialize(result);
+}
+
+export function _createWriteOnlyWidgetSend(
+  context: Client,
+  body: WriteOnlyWidgetCreate,
+  options: CreateWriteOnlyWidgetOptionalParams = { requestOptions: {} },
+): StreamableMethod {
+  return context.path("/write-only-widgets").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: writeOnlyWidgetCreateSerializer(body),
+  });
+}
+
+export async function _createWriteOnlyWidgetDeserialize(
+  result: PathUncheckedResponse,
+): Promise<WriteOnlyWidget> {
+  const expectedStatuses = ["200"];
+  if (!expectedStatuses.includes(result.status)) {
+    throw createRestError(result);
+  }
+
+  return writeOnlyWidgetDeserializer(result.body);
+}
+
+export async function createWriteOnlyWidget(
+  context: Client,
+  body: WriteOnlyWidgetCreate,
+  options: CreateWriteOnlyWidgetOptionalParams = { requestOptions: {} },
+): Promise<WriteOnlyWidget> {
+  const result = await _createWriteOnlyWidgetSend(context, body, options);
+  return _createWriteOnlyWidgetDeserialize(result);
 }
 
 export function _createGadgetSend(
@@ -517,6 +591,7 @@ export async function createWidget(
 ```ts classicClient
 import {
   createMetadataWidget,
+  createWriteOnlyWidget,
   createGadget,
   deleteWidget,
   getWidget,
@@ -526,6 +601,7 @@ import {
 } from "./api/operations.js";
 import {
   CreateMetadataWidgetOptionalParams,
+  CreateWriteOnlyWidgetOptionalParams,
   CreateGadgetOptionalParams,
   DeleteWidgetOptionalParams,
   GetWidgetOptionalParams,
@@ -536,10 +612,12 @@ import {
 import {
   Widget,
   Gadget,
+  WriteOnlyWidget,
   MetadataWidget,
   WidgetCreate,
   WidgetCreateOrUpdate,
   WidgetUpdate,
+  WriteOnlyWidgetCreate,
   MetadataWidgetCreate,
 } from "./models/models.js";
 import { Pipeline } from "@azure/core-rest-pipeline";
@@ -561,6 +639,13 @@ export class TestingClient {
     options: CreateMetadataWidgetOptionalParams = { requestOptions: {} },
   ): Promise<MetadataWidget> {
     return createMetadataWidget(this._client, body, options);
+  }
+
+  createWriteOnlyWidget(
+    body: WriteOnlyWidgetCreate,
+    options: CreateWriteOnlyWidgetOptionalParams = { requestOptions: {} },
+  ): Promise<WriteOnlyWidget> {
+    return createWriteOnlyWidget(this._client, body, options);
   }
 
   createGadget(

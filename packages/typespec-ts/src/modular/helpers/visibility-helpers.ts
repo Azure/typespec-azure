@@ -50,9 +50,9 @@ interface ModelNode {
    * so the whole hierarchy is projected together.
    */
   refKeys: Set<string>;
-  /** True if the model drops at least one own property under `visibility`. */
-  ownPropertyDropped: boolean;
-  /** True if this node can reach any property-dropping node. */
+  /** True if the model's own properties differ between `visibility` and Read. */
+  ownShapeDiffers: boolean;
+  /** True if this node can reach any shape-differing node. */
   needsClone: boolean;
 }
 
@@ -156,20 +156,22 @@ function collectNode(state: SplitState, model: SdkModelType, visibility: Visibil
     model,
     visibility,
     refKeys: new Set<string>(),
-    ownPropertyDropped: false,
+    ownShapeDiffers: false,
     needsClone: false,
   };
   // Seed before recursing so cycles terminate at the already-seeded node.
   state.nodes.set(key, node);
 
   for (const property of model.properties) {
-    if (
-      property.kind === "property" &&
-      property.__raw &&
-      !isVisible(state.context.program, property.__raw, visibility)
-    ) {
-      node.ownPropertyDropped = true;
-      continue;
+    if (property.kind === "property" && property.__raw) {
+      const visibleInWrite = isVisible(state.context.program, property.__raw, visibility);
+      const visibleInRead = isVisible(state.context.program, property.__raw, Visibility.Read);
+      if (visibleInWrite !== visibleInRead) {
+        node.ownShapeDiffers = true;
+      }
+      if (!visibleInWrite) {
+        continue;
+      }
     }
 
     if (property.kind === "property") {
@@ -253,7 +255,7 @@ function findDiscriminatedRoot(model: SdkModelType): SdkModelType | undefined {
 
 /**
  * Marks nodes whose write graph differs from the read graph by
- * reverse-propagating from nodes that directly drop a property.
+ * reverse-propagating from nodes whose own property membership differs.
  */
 function markNodesNeedingClones(state: SplitState): void {
   // Reverse edges propagate a nested difference back to every parent.
@@ -271,7 +273,7 @@ function markNodesNeedingClones(state: SplitState): void {
 
   const queue: string[] = [];
   for (const [key, node] of state.nodes) {
-    if (node.ownPropertyDropped) {
+    if (node.ownShapeDiffers) {
       node.needsClone = true;
       queue.push(key);
     }
@@ -340,6 +342,7 @@ function buildClones(state: SplitState): void {
       clone.baseModel =
         state.cloneByKey.get(nodeKeyFor(state, model.baseModel, visibility)) ?? model.baseModel;
     }
+
     if (findDiscriminatedRoot(model)) {
       if (model.discriminatedSubtypes) {
         clone.discriminatedSubtypes = Object.fromEntries(
