@@ -79,14 +79,3 @@ interface RemoveOptionalParameter {
     @header param4?: string,
   ): void;
 }
-
-interface AddParameter {
-  @scenario
-  @scenarioDoc("""
-    Verify that `addParameter` adds an optional header to the generated client method.
-    Expected response: 204 No Content
-    """)
-  @route("/add")
-  @get
-  add(): void;
-}
