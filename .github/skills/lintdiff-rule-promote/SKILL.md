@@ -84,7 +84,7 @@ needs special investigation:
    build/test, affected package test. Escalate to broader validation only when
    the touched surface or a failure requires it.
 10. Run `pnpm validate:pr` with a bounded wait. If it makes no progress for
-    several minutes after an already-passed narrow validation set, stop it,
+    five minutes after an already-passed narrow validation set, stop it,
     classify it as an environmental/pre-existing validation blocker, and include
     the evidence in the PR instead of waiting indefinitely.
 
@@ -352,6 +352,11 @@ Add a change entry for every touched official package:
 Use `feature` for a new official rule and `fix` when folding the behavior into
 an existing official rule.
 
+Chronus change files must use LF line endings. Do not run Prettier directly on a
+new change file when the Windows checkout would rewrite it with CRLF. After
+formatting, run `pnpm chronus status`; if it reports `missing-front-matter`,
+normalize the change file to LF and rerun the command.
+
 ### 9. Validate narrowly, then broadly enough for PR
 
 Use the repo's mise-managed toolchain when available.
@@ -367,7 +372,8 @@ Optimized validation order:
 4. affected package `regen-docs`
 5. format check for generated markdown, especially package README and website
    linter reference files
-6. website build when the generated website reference changed
+6. website-only build when the generated website reference changed, after the
+   target package dependency closure has already been built
 7. `@azure-tools/typespec-azure-rulesets` build and test when rulesets changed
 8. affected package test
 
@@ -381,7 +387,7 @@ pnpm --filter @azure-tools/typespec-azure-resource-manager build
 pnpm --filter @azure-tools/typespec-azure-resource-manager lint
 pnpm --filter @azure-tools/typespec-azure-resource-manager regen-docs
 pnpm run format:check
-pnpm --filter "@azure-tools/typespec-azure-website..." run build
+pnpm --filter @azure-tools/typespec-azure-website run build
 pnpm --filter @azure-tools/typespec-azure-rulesets build
 pnpm --filter @azure-tools/typespec-azure-rulesets test
 pnpm --filter @azure-tools/typespec-azure-resource-manager test
@@ -397,7 +403,7 @@ pnpm --filter @azure-tools/typespec-azure-core build
 pnpm --filter @azure-tools/typespec-azure-core lint
 pnpm --filter @azure-tools/typespec-azure-core regen-docs
 pnpm run format:check
-pnpm --filter "@azure-tools/typespec-azure-website..." run build
+pnpm --filter @azure-tools/typespec-azure-website run build
 pnpm --filter @azure-tools/typespec-azure-rulesets build
 pnpm --filter @azure-tools/typespec-azure-rulesets test
 pnpm --filter @azure-tools/typespec-azure-core test
@@ -416,7 +422,7 @@ validation has already passed:
 pnpm validate:pr
 ```
 
-If `validate:pr` stalls with no new output for several minutes, stop it and
+If `validate:pr` stalls with no new output for five minutes, stop it and
 include a **Validation blocker** section in the PR body with the last observed
 step, elapsed time, and the successful narrower validations.
 
