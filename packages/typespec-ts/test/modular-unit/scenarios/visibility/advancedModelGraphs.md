@@ -11,12 +11,14 @@ model Patch<T> {
 
 model FooProperties {
   value: string;
+
   @visibility(Lifecycle.Read)
   fooStatus: string;
 }
 
 model BarProperties {
   count: int32;
+
   @visibility(Lifecycle.Read)
   barStatus: string;
 }
@@ -160,13 +162,11 @@ export function _updateBarSend(
   body: PatchBarPropertiesUpdate,
   options: UpdateBarOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/bar")
-    .patch({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: patchBarPropertiesUpdateSerializer(body),
-    });
+  return context.path("/bar").patch({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: patchBarPropertiesUpdateSerializer(body),
+  });
 }
 
 export async function _updateBarDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -192,13 +192,11 @@ export function _updateFooSend(
   body: PatchFooPropertiesUpdate,
   options: UpdateFooOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/foo")
-    .patch({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: patchFooPropertiesUpdateSerializer(body),
-    });
+  return context.path("/foo").patch({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: patchFooPropertiesUpdateSerializer(body),
+  });
 }
 
 export async function _updateFooDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -220,7 +218,6 @@ export async function updateFoo(
 }
 ```
 
-
 # Project models nested in arrays
 
 Verifies that array element models are projected and that the containing model references the projected element type.
@@ -231,6 +228,7 @@ Verifies that array element models are projected and that the containing model r
 model Item {
   @visibility(Lifecycle.Read)
   id: string;
+
   value: string;
 }
 
@@ -345,14 +343,12 @@ export function _createBatchSend(
   body: BatchCreate,
   options: CreateBatchOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: batchCreateSerializer(body),
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: batchCreateSerializer(body),
+  });
 }
 
 export async function _createBatchDeserialize(result: PathUncheckedResponse): Promise<Batch> {
@@ -374,7 +370,6 @@ export async function createBatch(
 }
 ```
 
-
 # Project model references through container properties
 
 Verifies that model references nested in dictionaries, nullable types, tuples, and unions are replaced with their projected equivalents.
@@ -385,6 +380,7 @@ Verifies that model references nested in dictionaries, nullable types, tuples, a
 model Item {
   @visibility(Lifecycle.Read)
   id: string;
+
   value: string;
 }
 
@@ -554,14 +550,12 @@ export function _createContainerSend(
   body: ContainerCreate,
   options: CreateContainerOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: containerCreateSerializer(body),
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: containerCreateSerializer(body),
+  });
 }
 
 export async function _createContainerDeserialize(
@@ -585,7 +579,6 @@ export async function createContainer(
 }
 ```
 
-
 # Project model references in non-model body roots
 
 Verifies that top-level array, nullable, and dictionary request bodies project their nested model types and expose those types in operation parameters.
@@ -596,6 +589,7 @@ Verifies that top-level array, nullable, and dictionary request bodies project t
 model Item {
   @visibility(Lifecycle.Read)
   id: string;
+
   value: string;
 }
 
@@ -689,13 +683,11 @@ export function _createItemMapSend(
   body: Record<string, ItemCreate>,
   options: CreateItemMapOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/item-map")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: itemCreateRecordSerializer(body),
-    });
+  return context.path("/item-map").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: itemCreateRecordSerializer(body),
+  });
 }
 
 export async function _createItemMapDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -721,13 +713,11 @@ export function _createNullableItemSend(
   body: ItemCreate | null,
   options: CreateNullableItemOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/nullable-item")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: !body ? body : itemCreateSerializer(body),
-    });
+  return context.path("/nullable-item").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: !body ? body : itemCreateSerializer(body),
+  });
 }
 
 export async function _createNullableItemDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -753,13 +743,11 @@ export function _createItemsSend(
   body: ItemCreate[],
   options: CreateItemsOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/items")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: itemCreateArraySerializer(body),
-    });
+  return context.path("/items").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: itemCreateArraySerializer(body),
+  });
 }
 
 export async function _createItemsDeserialize(result: PathUncheckedResponse): Promise<void> {
@@ -791,6 +779,7 @@ Verifies that writable scalar spread parameters remain unchanged while nested mo
 model Widget {
   @visibility(Lifecycle.Read)
   id: string;
+
   displayName: string;
   weight: int32;
 }
@@ -798,12 +787,14 @@ model Widget {
 model Detail {
   @visibility(Lifecycle.Read)
   detailId: string;
+
   note: string;
 }
 
 model Container {
   @visibility(Lifecycle.Read)
   containerId: string;
+
   title: string;
   detail: Detail;
 }
@@ -916,14 +907,12 @@ export function _createContainerSend(
   detail: DetailCreate,
   options: CreateContainerOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/containers")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: { title: title, detail: detailCreateSerializer(detail) },
-    });
+  return context.path("/containers").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: { title: title, detail: detailCreateSerializer(detail) },
+  });
 }
 
 export async function _createContainerDeserialize(
@@ -953,14 +942,12 @@ export function _createWidgetSend(
   weight: number,
   options: CreateWidgetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/widgets")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: { displayName: displayName, weight: weight },
-    });
+  return context.path("/widgets").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: { displayName: displayName, weight: weight },
+  });
 }
 
 export async function _createWidgetDeserialize(result: PathUncheckedResponse): Promise<Widget> {
@@ -993,6 +980,7 @@ Verifies that a self-referential request model uses its projected type for the r
 model Node {
   @visibility(Lifecycle.Read)
   nodeId: string;
+
   label: string;
   next?: Node;
 }
@@ -1071,14 +1059,12 @@ export function _createNodeSend(
   body: NodeCreate,
   options: CreateNodeOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: nodeCreateSerializer(body),
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: nodeCreateSerializer(body),
+  });
 }
 
 export async function _createNodeDeserialize(result: PathUncheckedResponse): Promise<Node> {

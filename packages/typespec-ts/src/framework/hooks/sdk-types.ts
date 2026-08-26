@@ -12,8 +12,8 @@ import { provideContext, useContext } from "../../context-manager.js";
 
 import { reportDiagnostic } from "../../lib.js";
 import { visitPackageTypes } from "../../modular/emit-models.js";
-import { applyVisibilityModelSplit } from "../../modular/helpers/visibility-helpers.js";
 import { getAllAncestors, getAllProperties } from "../../modular/helpers/operation-helpers.js";
+import { applyVisibilityModelSplit } from "../../modular/helpers/visibility-helpers.js";
 import { normalizeModelPropertyName } from "../../modular/type-expressions/get-type-expression.js";
 import type { SdkContext } from "../../utils/interfaces.js";
 import { NameType, normalizeName } from "../../utils/name-utils.js";

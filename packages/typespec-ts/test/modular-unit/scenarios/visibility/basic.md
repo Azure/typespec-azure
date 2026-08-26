@@ -8,10 +8,13 @@ Verifies the basic behavior across HTTP operations: read-only and metadata prope
 model Widget {
   @visibility(Lifecycle.Read)
   id: string;
+
   @visibility(Lifecycle.Read)
   name: string;
+
   @visibility(Lifecycle.Read)
   etag?: string;
+
   displayName: string;
   weight: int32;
 }
@@ -22,6 +25,9 @@ model Gadget {
 }
 
 model MetadataWidget {
+  @visibility(Lifecycle.Read)
+  id: string;
+
   @header token: string;
   value: string;
 }
@@ -49,10 +55,7 @@ op updateWidget(
 
 @route("/widgets/{widgetName}")
 @get
-op getWidget(
-  @path widgetName: string,
-  @query includeDetails?: boolean,
-): Widget;
+op getWidget(@path widgetName: string, @query includeDetails?: boolean): Widget;
 
 @route("/widgets/{widgetName}")
 @delete
@@ -125,6 +128,7 @@ export function gadgetDeserializer(item: any): Gadget {
 
 /** model interface MetadataWidget */
 export interface MetadataWidget {
+  readonly id: string;
   token: string;
   value: string;
 }
@@ -135,6 +139,7 @@ export function metadataWidgetSerializer(item: MetadataWidget): any {
 
 export function metadataWidgetDeserializer(item: any): MetadataWidget {
   return {
+    id: item["id"],
     value: item["value"],
   };
 }
@@ -171,6 +176,7 @@ export function widgetUpdateSerializer(item: WidgetUpdate): any {
 
 /** model interface MetadataWidgetCreate */
 export interface MetadataWidgetCreate {
+  token: string;
   value: string;
 }
 
@@ -222,18 +228,16 @@ export function _createMetadataWidgetSend(
   body: MetadataWidgetCreate,
   options: CreateMetadataWidgetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/metadata-widgets")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: {
-        token: body.token,
-        accept: "application/json",
-        ...options.requestOptions?.headers,
-      },
-      body: metadataWidgetCreateSerializer(body),
-    });
+  return context.path("/metadata-widgets").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: {
+      token: body.token,
+      accept: "application/json",
+      ...options.requestOptions?.headers,
+    },
+    body: metadataWidgetCreateSerializer(body),
+  });
 }
 
 export async function _createMetadataWidgetDeserialize(
@@ -261,14 +265,12 @@ export function _createGadgetSend(
   body: Gadget,
   options: CreateGadgetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/gadgets")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: gadgetSerializer(body),
-    });
+  return context.path("/gadgets").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: gadgetSerializer(body),
+  });
 }
 
 export async function _createGadgetDeserialize(result: PathUncheckedResponse): Promise<Gadget> {
@@ -339,12 +341,10 @@ export function _getWidgetSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .get({
-      ...operationOptionsToRequestParameters(options),
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-    });
+  return context.path(path).get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+  });
 }
 
 export async function _getWidgetDeserialize(result: PathUncheckedResponse): Promise<Widget> {
@@ -381,18 +381,16 @@ export function _updateWidgetSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .patch({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: {
-        ...(options?.ifMatch !== undefined ? { "if-match": options?.ifMatch } : {}),
-        accept: "application/json",
-        ...options.requestOptions?.headers,
-      },
-      body: widgetUpdateSerializer(body),
-    });
+  return context.path(path).patch({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: {
+      ...(options?.ifMatch !== undefined ? { "if-match": options?.ifMatch } : {}),
+      accept: "application/json",
+      ...options.requestOptions?.headers,
+    },
+    body: widgetUpdateSerializer(body),
+  });
 }
 
 export async function _updateWidgetDeserialize(result: PathUncheckedResponse): Promise<Widget> {
@@ -430,14 +428,12 @@ export function _createOrUpdateWidgetSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .put({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: widgetCreateOrUpdateSerializer(body),
-    });
+  return context.path(path).put({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: widgetCreateOrUpdateSerializer(body),
+  });
 }
 
 export async function _createOrUpdateWidgetDeserialize(
@@ -466,14 +462,12 @@ export function _createWidgetSend(
   body: WidgetCreate,
   options: CreateWidgetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/widgets")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: widgetCreateSerializer(body),
-    });
+  return context.path("/widgets").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: widgetCreateSerializer(body),
+  });
 }
 
 export async function _createWidgetDeserialize(result: PathUncheckedResponse): Promise<Widget> {
@@ -602,6 +596,7 @@ Verifies that visibility is applied recursively and that a nested model differen
 model Child {
   @visibility(Lifecycle.Read)
   id: string;
+
   value: string;
 }
 
@@ -616,10 +611,7 @@ op createParent(@body body: Parent): Parent;
 
 @route("/parents/{parentName}")
 @put
-op replaceParent(
-  @path parentName: string,
-  @body body: Parent,
-): Parent;
+op replaceParent(@path parentName: string, @body body: Parent): Parent;
 ```
 
 ## Configuration
@@ -747,14 +739,12 @@ export function _replaceParentSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
-  return context
-    .path(path)
-    .put({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: parentCreateOrUpdateSerializer(body),
-    });
+  return context.path(path).put({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: parentCreateOrUpdateSerializer(body),
+  });
 }
 
 export async function _replaceParentDeserialize(result: PathUncheckedResponse): Promise<Parent> {
@@ -781,14 +771,12 @@ export function _createParentSend(
   body: ParentCreate,
   options: CreateParentOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/parents")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: parentCreateSerializer(body),
-    });
+  return context.path("/parents").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: parentCreateSerializer(body),
+  });
 }
 
 export async function _createParentDeserialize(result: PathUncheckedResponse): Promise<Parent> {
@@ -857,6 +845,7 @@ Verifies that an existing user model keeps its name while the generated visibili
 model Widget {
   @visibility(Lifecycle.Read)
   id: string;
+
   displayName: string;
 }
 
@@ -960,14 +949,12 @@ export function _createOtherSend(
   body: WidgetCreate,
   options: CreateOtherOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/others")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: widgetCreateSerializer(body),
-    });
+  return context.path("/others").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: widgetCreateSerializer(body),
+  });
 }
 
 export async function _createOtherDeserialize(
@@ -995,14 +982,12 @@ export function _createWidgetSend(
   body: WidgetCreate_1,
   options: CreateWidgetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/widgets")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: widgetCreateSerializer_1(body),
-    });
+  return context.path("/widgets").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: widgetCreateSerializer_1(body),
+  });
 }
 
 export async function _createWidgetDeserialize(result: PathUncheckedResponse): Promise<Widget> {

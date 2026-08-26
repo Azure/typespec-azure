@@ -1,4 +1,3 @@
-import { UsageFlags } from "@azure-tools/typespec-client-generator-core";
 import type {
   SdkHttpOperation,
   SdkModelPropertyType,
@@ -6,13 +5,13 @@ import type {
   SdkServiceMethod,
   SdkType,
 } from "@azure-tools/typespec-client-generator-core";
+import { UsageFlags } from "@azure-tools/typespec-client-generator-core";
 import {
   Visibility,
-  createMetadataInfo,
   getVisibilitySuffix,
+  isVisible,
   resolveRequestVisibility,
 } from "@typespec/http";
-import type { MetadataInfo } from "@typespec/http";
 
 import { getAllOperationsFromClient } from "../../framework/hooks/sdk-types.js";
 import type { SdkContext } from "../../utils/interfaces.js";
@@ -27,8 +26,6 @@ const responseUsageFlags =
 
 interface SplitState {
   context: SdkContext;
-  /** Shared `@typespec/http` metadata oracle (canonical baseline = Read). */
-  metadata: MetadataInfo;
   /**
    * Every reachable `(model, visibility)` pair in the write-body graph, keyed by
    * an emitter-local model identity plus visibility.
@@ -99,7 +96,6 @@ export function applyVisibilityModelSplit(context: SdkContext): void {
 function createSplitState(context: SdkContext): SplitState {
   return {
     context,
-    metadata: createMetadataInfo(context.program, { canonicalVisibility: Visibility.Read }),
     nodes: new Map<string, ModelNode>(),
     cloneByKey: new Map<string, SdkModelType>(),
     modelIds: new WeakMap<SdkModelType, number>(),
@@ -167,7 +163,7 @@ function collectNode(state: SplitState, model: SdkModelType, visibility: Visibil
     if (
       property.kind === "property" &&
       property.__raw &&
-      !state.metadata.isPayloadProperty(property.__raw, visibility)
+      !isVisible(state.context.program, property.__raw, visibility)
     ) {
       node.ownPropertyDropped = true;
       continue;
@@ -322,7 +318,7 @@ function buildClones(state: SplitState): void {
       if (
         property.kind === "property" &&
         property.__raw &&
-        !state.metadata.isPayloadProperty(property.__raw, visibility)
+        !isVisible(state.context.program, property.__raw, visibility)
       ) {
         continue;
       }

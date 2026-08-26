@@ -9,13 +9,16 @@ Verifies that the base and all subtypes are projected together, reparented to th
 model Pet {
   @visibility(Lifecycle.Read)
   petId: string;
+
   name: string;
 }
 
 model Cat extends Pet {
   kind: "cat";
+
   @visibility(Lifecycle.Read)
   livesLeft: int32;
+
   meowVolume: int32;
 }
 
@@ -215,14 +218,12 @@ export function _createPetSend(
   body: PetCreateUnion,
   options: CreatePetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/pets")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: petCreateUnionSerializer(body),
-    });
+  return context.path("/pets").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: petCreateUnionSerializer(body),
+  });
 }
 
 export async function _createPetDeserialize(result: PathUncheckedResponse): Promise<PetUnion> {
@@ -248,14 +249,12 @@ export function _createCatSend(
   body: CatCreate,
   options: CreateCatOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/cats")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: catCreateSerializer(body),
-    });
+  return context.path("/cats").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: catCreateSerializer(body),
+  });
 }
 
 export async function _createCatDeserialize(result: PathUncheckedResponse): Promise<Cat> {
@@ -277,7 +276,6 @@ export async function createCat(
 }
 ```
 
-
 # Project the full discriminated hierarchy when only one subtype differs
 
 Verifies that when only Cat has a read-only property, the projected discriminated hierarchy still includes PetCreate, CatCreate, DogCreate, and PetCreateUnion.
@@ -292,8 +290,10 @@ model Pet {
 
 model Cat extends Pet {
   kind: "cat";
+
   @visibility(Lifecycle.Read)
   livesLeft: int32;
+
   meowVolume: int32;
 }
 
@@ -489,14 +489,12 @@ export function _createPetSend(
   body: PetCreateUnion,
   options: CreatePetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/pets")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: petCreateUnionSerializer(body),
-    });
+  return context.path("/pets").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: petCreateUnionSerializer(body),
+  });
 }
 
 export async function _createPetDeserialize(result: PathUncheckedResponse): Promise<PetUnion> {
@@ -522,14 +520,12 @@ export function _createCatSend(
   body: CatCreate,
   options: CreateCatOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/cats")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: catCreateSerializer(body),
-    });
+  return context.path("/cats").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: catCreateSerializer(body),
+  });
 }
 
 export async function _createCatDeserialize(result: PathUncheckedResponse): Promise<Cat> {
@@ -551,7 +547,6 @@ export async function createCat(
 }
 ```
 
-
 # Project inherited differences in a non-discriminated hierarchy
 
 Verifies that a derived request model is projected and reparented when its non-discriminated base model has a read-only property.
@@ -562,6 +557,7 @@ Verifies that a derived request model is projected and reparented when its non-d
 model Base {
   @visibility(Lifecycle.Read)
   id: string;
+
   value: string;
 }
 
@@ -665,14 +661,12 @@ export function _createDerivedSend(
   body: DerivedCreate,
   options: CreateDerivedOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: derivedCreateSerializer(body),
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: derivedCreateSerializer(body),
+  });
 }
 
 export async function _createDerivedDeserialize(result: PathUncheckedResponse): Promise<Derived> {
@@ -694,7 +688,6 @@ export async function createDerived(
 }
 ```
 
-
 # Propagate differences through multiple inheritance levels
 
 Verifies that a read-only property in a non-discriminated base propagates through multiple derived request-model levels.
@@ -705,6 +698,7 @@ Verifies that a read-only property in a non-discriminated base propagates throug
 model Base {
   @visibility(Lifecycle.Read)
   id: string;
+
   value: string;
 }
 
@@ -839,14 +833,12 @@ export function _createDerivedSend(
   body: DerivedCreate,
   options: CreateDerivedOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: derivedCreateSerializer(body),
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: derivedCreateSerializer(body),
+  });
 }
 
 export async function _createDerivedDeserialize(result: PathUncheckedResponse): Promise<Derived> {
@@ -868,7 +860,6 @@ export async function createDerived(
 }
 ```
 
-
 # Project only the affected subtype in a non-discriminated hierarchy
 
 Verifies that when only Cat has a read-only property, Cat is projected while the unchanged Pet base and Dog subtype reuse their original models.
@@ -883,6 +874,7 @@ model Pet {
 model Cat extends Pet {
   @visibility(Lifecycle.Read)
   livesLeft: int32;
+
   meowVolume: int32;
 }
 
@@ -1011,14 +1003,12 @@ export function _createPetSend(
   body: Pet,
   options: CreatePetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/pets")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: petSerializer(body),
-    });
+  return context.path("/pets").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: petSerializer(body),
+  });
 }
 
 export async function _createPetDeserialize(result: PathUncheckedResponse): Promise<Pet> {
@@ -1044,14 +1034,12 @@ export function _createDogSend(
   body: Dog,
   options: CreateDogOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/dogs")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: dogSerializer(body),
-    });
+  return context.path("/dogs").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: dogSerializer(body),
+  });
 }
 
 export async function _createDogDeserialize(result: PathUncheckedResponse): Promise<Dog> {
@@ -1077,14 +1065,12 @@ export function _createCatSend(
   body: CatCreate,
   options: CreateCatOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/cats")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: { accept: "application/json", ...options.requestOptions?.headers },
-      body: catCreateSerializer(body),
-    });
+  return context.path("/cats").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    body: catCreateSerializer(body),
+  });
 }
 
 export async function _createCatDeserialize(result: PathUncheckedResponse): Promise<Cat> {
@@ -1105,4 +1091,3 @@ export async function createCat(
   return _createCatDeserialize(result);
 }
 ```
-
