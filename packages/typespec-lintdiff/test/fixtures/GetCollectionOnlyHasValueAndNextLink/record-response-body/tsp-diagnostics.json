@@ -1,0 +1,12 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-core/no-openapi",
+    "severity": "warning",
+    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+    "severity": "warning",
+    "message": "Per the Noun_Verb convention for Operation Ids, the noun 'WidgetMetadata' should not appear after the underscore."
+  }
+]

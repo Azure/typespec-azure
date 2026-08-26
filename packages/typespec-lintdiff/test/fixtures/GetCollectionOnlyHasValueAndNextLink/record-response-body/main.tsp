@@ -16,27 +16,15 @@ enum Versions {
   v2024_01_01: "2024-01-01",
 }
 
-@doc("A widget.")
-model Widget {
-  @doc("The name of the widget")
-  name: string;
-}
-
-@doc("Response shape that would be invalid for a collection GET.")
-model WidgetValueOnlyResult {
-  @doc("List of widgets")
-  value: Widget[];
-}
-
 interface Operations extends Azure.ResourceManager.Operations {}
 
 @armResourceOperations
-interface Widgets {
-  @route("/scope/providers/Microsoft.TestService/widgets/exampleWidget?disambiguation_dummy")
-  @doc("Get a widget by name.")
+interface WidgetMetadata {
+  @route("/scope/providers/Microsoft.TestService/widgetMetadata")
+  @doc("List widget metadata.")
   @extension("x-ms-examples", #{})
   @get
-  getWidget(
+  listWidgetMetadata(
     ...Azure.ResourceManager.CommonTypes.ApiVersionParameter,
-  ): WidgetValueOnlyResult | ErrorResponse;
+  ): Record<string> | ErrorResponse;
 }

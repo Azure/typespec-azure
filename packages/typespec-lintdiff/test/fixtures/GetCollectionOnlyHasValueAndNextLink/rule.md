@@ -34,8 +34,16 @@ coverage is warranted.
 - the local lint mirrors the upstream provider-tail path heuristic against ARM GET operations and
   requires object 200-response models to declare only `value` and `nextLink`
 - direct array response schemas do not expose `schema.properties` in Swagger and are skipped
+- property-less object response schemas, such as direct `Record<T>` bodies, do not expose
+  `schema.properties` in Swagger and are skipped
 - non-collection point GET paths with an odd provider-tail segment count are skipped even when
   their response shape would be invalid for a collection GET
+- TypeSpec route query suffixes are ignored for terminal path-parameter and provider-tail path
+  classification to match emitted OpenAPI paths
+- paths ending with `operations` or `default` are skipped using the same string suffix test as
+  Swagger, even when the suffix is not a standalone path segment
+- query-bearing paths ending in `operations` before the query still run because Swagger applies
+  `endsWith("operations")` to the raw path key
 - ARM templates already tend to emit compliant list models; the clean repro comes from a manually
   routed ARM collection GET
 
@@ -48,4 +56,7 @@ coverage is warranted.
 | `only-value-and-nextlink`     | no        | Raw ARM collection GET response keeps only value and `nextLink`   |
 | `array-response-body`         | no        | Named array response body has no Swagger `schema.properties` node |
 | `direct-array-response-body`  | no        | Direct `T[]` response body has no Swagger `schema.properties` node |
-| `terminal-resource-invalid-response` | no | Odd provider-tail point GET skips an otherwise invalid response |
+| `record-response-body`        | no        | Direct `Record<T>` response body has no Swagger `schema.properties` node |
+| `terminal-resource-invalid-response` | no | Odd provider-tail point GET with a query suffix skips an otherwise invalid response |
+| `operations-suffix-invalid-response` | no | Path ending in `operations` skips an otherwise invalid response |
+| `operations-query-suffix-invalid-response` | yes | Raw path ending in `?disambiguation_dummy` does not match Swagger's `operations` suffix exclusion |

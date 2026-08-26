@@ -42,7 +42,7 @@
       "name": "Operations"
     },
     {
-      "name": "Widgets"
+      "name": "CustomOperations"
     }
   ],
   "paths": {
@@ -76,16 +76,14 @@
           "nextLinkName": "nextLink"
         }
       }
-    }
-  },
-  "x-ms-paths": {
-    "/scope/providers/Microsoft.TestService/widgets/exampleWidget?disambiguation_dummy": {
+    },
+    "/scope/providers/Microsoft.TestService/customoperations": {
       "get": {
-        "operationId": "Widgets_GetWidget",
+        "operationId": "CustomOperations_GetCustomOperations",
         "tags": [
-          "Widgets"
+          "CustomOperations"
         ],
-        "description": "Get a widget by name.",
+        "description": "Get custom operations.",
         "parameters": [
           {
             "$ref": "../../../../../common-types/resource-management/v6/types.json#/parameters/ApiVersionParameter"
@@ -116,7 +114,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "The name of the widget"
+          "description": "The widget name."
         }
       },
       "required": [
@@ -125,11 +123,11 @@
     },
     "WidgetValueOnlyResult": {
       "type": "object",
-      "description": "Response shape that would be invalid for a collection GET.",
+      "description": "Response shape that would be invalid if the route did not end with operations.",
       "properties": {
         "value": {
           "type": "array",
-          "description": "List of widgets",
+          "description": "The widget values.",
           "items": {
             "$ref": "#/definitions/Widget"
           }

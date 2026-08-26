@@ -16,27 +16,27 @@ enum Versions {
   v2024_01_01: "2024-01-01",
 }
 
+interface Operations extends Azure.ResourceManager.Operations {}
+
 @doc("A widget.")
 model Widget {
-  @doc("The name of the widget")
+  @doc("The widget name.")
   name: string;
 }
 
-@doc("Response shape that would be invalid for a collection GET.")
+@doc("Response shape that would be invalid if the route did not end with operations.")
 model WidgetValueOnlyResult {
-  @doc("List of widgets")
+  @doc("The widget values.")
   value: Widget[];
 }
 
-interface Operations extends Azure.ResourceManager.Operations {}
-
 @armResourceOperations
-interface Widgets {
-  @route("/scope/providers/Microsoft.TestService/widgets/exampleWidget?disambiguation_dummy")
-  @doc("Get a widget by name.")
+interface CustomOperations {
+  @route("/scope/providers/Microsoft.TestService/customoperations")
+  @doc("Get custom operations.")
   @extension("x-ms-examples", #{})
   @get
-  getWidget(
+  getCustomOperations(
     ...Azure.ResourceManager.CommonTypes.ApiVersionParameter,
   ): WidgetValueOnlyResult | ErrorResponse;
 }

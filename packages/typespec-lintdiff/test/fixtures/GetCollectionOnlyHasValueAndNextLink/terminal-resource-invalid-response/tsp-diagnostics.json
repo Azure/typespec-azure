@@ -15,6 +15,11 @@
     "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Widgets' should not appear after the underscore."
   },
   {
+    "code": "tsp-lintdiff-local-linter/path-characters",
+    "severity": "warning",
+    "message": "Path contains non-recommended characters."
+  },
+  {
     "code": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
     "severity": "warning",
     "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."

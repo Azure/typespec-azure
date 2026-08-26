@@ -1,5 +1,14 @@
 import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
-import { createRule, isArrayModelType, type Model, type ModelProperty } from "@typespec/compiler";
+import {
+  createRule,
+  getLocationContext,
+  isArrayModelType,
+  type Interface,
+  type Model,
+  type ModelProperty,
+  type Operation,
+  type Program,
+} from "@typespec/compiler";
 import { getHttpOperation, type HttpOperationResponse } from "@typespec/http";
 
 export const getCollectionOnlyHasValueAndNextLinkRule = createRule({
@@ -35,7 +44,7 @@ export const getCollectionOnlyHasValueAndNextLinkRule = createRule({
         }
 
         context.reportDiagnostic({
-          target: invalidTarget,
+          target: getDiagnosticTarget(context.program, operation, invalidTarget),
         });
       },
     };
@@ -43,11 +52,16 @@ export const getCollectionOnlyHasValueAndNextLinkRule = createRule({
 });
 
 function isCollectionGetPath(path: string): boolean {
-  if (path.endsWith("}") || path.endsWith("/operations") || path.endsWith("/default")) {
+  const pathWithoutQuery = path.split("?")[0];
+  if (
+    pathWithoutQuery.endsWith("}") ||
+    path.endsWith("operations") ||
+    path.endsWith("default")
+  ) {
     return false;
   }
 
-  const providerTail = path.split(".").at(-1);
+  const providerTail = pathWithoutQuery.split(".").at(-1);
   return (
     providerTail !== undefined &&
     providerTail.includes("/") &&
@@ -67,14 +81,15 @@ function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefi
         continue;
       }
 
+      const bodyModel = body.property?.type.kind === "Model" ? body.property.type : body.type;
       if (
-        isArrayModelType(body.type) ||
-        (body.property?.type.kind === "Model" && isArrayModelType(body.property.type))
+        isArrayModelType(bodyModel) ||
+        bodyModel.properties.size === 0
       ) {
         continue;
       }
 
-      return body.type;
+      return bodyModel;
     }
   }
 
@@ -98,4 +113,20 @@ function getInvalidTarget(responseModel: Model): Model | ModelProperty | undefin
     properties.find((property) => property.name !== "value" && property.name !== "nextLink") ??
     responseModel
   );
+}
+
+function getDiagnosticTarget(
+  program: Program,
+  operation: Operation,
+  invalidTarget: Model | ModelProperty,
+): Interface | Operation | Model | ModelProperty {
+  if (getLocationContext(program, invalidTarget).type === "project") {
+    return invalidTarget;
+  }
+
+  if (getLocationContext(program, operation).type === "project") {
+    return operation;
+  }
+
+  return operation.interface ?? operation;
 }

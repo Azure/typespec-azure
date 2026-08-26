@@ -1,0 +1,17 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-core/no-openapi",
+    "severity": "warning",
+    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/list-in-operation-name",
+    "severity": "warning",
+    "message": "Operation 'getCustomOperations' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/operation-id-noun-verb",
+    "severity": "warning",
+    "message": "Per the Noun_Verb convention for Operation Ids, the noun 'CustomOperations' should not appear after the underscore."
+  }
+]

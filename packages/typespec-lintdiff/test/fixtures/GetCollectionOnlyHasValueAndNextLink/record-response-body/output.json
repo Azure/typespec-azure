@@ -42,7 +42,7 @@
       "name": "Operations"
     },
     {
-      "name": "Widgets"
+      "name": "WidgetMetadata"
     }
   ],
   "paths": {
@@ -76,16 +76,14 @@
           "nextLinkName": "nextLink"
         }
       }
-    }
-  },
-  "x-ms-paths": {
-    "/scope/providers/Microsoft.TestService/widgets/exampleWidget?disambiguation_dummy": {
+    },
+    "/scope/providers/Microsoft.TestService/widgetMetadata": {
       "get": {
-        "operationId": "Widgets_GetWidget",
+        "operationId": "WidgetMetadata_ListWidgetMetadata",
         "tags": [
-          "Widgets"
+          "WidgetMetadata"
         ],
-        "description": "Get a widget by name.",
+        "description": "List widget metadata.",
         "parameters": [
           {
             "$ref": "../../../../../common-types/resource-management/v6/types.json#/parameters/ApiVersionParameter"
@@ -95,7 +93,10 @@
           "200": {
             "description": "The request has succeeded.",
             "schema": {
-              "$ref": "#/definitions/WidgetValueOnlyResult"
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
             }
           },
           "default": {
@@ -109,36 +110,6 @@
       }
     }
   },
-  "definitions": {
-    "Widget": {
-      "type": "object",
-      "description": "A widget.",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the widget"
-        }
-      },
-      "required": [
-        "name"
-      ]
-    },
-    "WidgetValueOnlyResult": {
-      "type": "object",
-      "description": "Response shape that would be invalid for a collection GET.",
-      "properties": {
-        "value": {
-          "type": "array",
-          "description": "List of widgets",
-          "items": {
-            "$ref": "#/definitions/Widget"
-          }
-        }
-      },
-      "required": [
-        "value"
-      ]
-    }
-  },
+  "definitions": {},
   "parameters": {}
 }

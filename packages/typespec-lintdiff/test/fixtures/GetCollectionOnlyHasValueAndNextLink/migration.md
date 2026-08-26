@@ -2,12 +2,17 @@
 
 ## Conclusion
 
-The migrated TypeSpec rule was updated and is now functionally aligned with the Swagger rule for the investigated ARM corpus, except for one remaining validator-only project caused by ARM common-types version behavior rather than a local rule semantic miss.
+The migrated TypeSpec rule was updated and is now functionally aligned with the Swagger rule for the investigated ARM corpus. The final full run has complete assessable project overlap, no validator-only projects, and no TypeSpec-only projects.
 
-The production rule needed two changes:
+The production rule needed seven changes:
 
 - Match the Swagger function's provider-tail collection path heuristic instead of counting all path segments from the leading slash.
 - Skip 200 responses whose emitted Swagger schema is a direct array, because the Swagger rule is bound to `responses.200.schema.properties` and never runs for array schemas.
+- Skip 200 response models with no declared properties, such as direct `Record<T>` response schemas, because Swagger has no `schema.properties` selector match for those shapes.
+- Target the authored operation when the invalid response envelope comes from library code so common-types response envelopes surface diagnostics in service projects.
+- Ignore TypeSpec route query suffixes for terminal path-parameter and provider-tail classification, matching emitted OpenAPI path behavior.
+- Match the Swagger `endsWith("operations")` and `endsWith("default")` suffix exclusions exactly, not only when those words are standalone path segments.
+- Apply `operations` and `default` suffix exclusions to the raw path key before query stripping, matching the Swagger selector order.
 
 Required rule and fixture/test changes are complete in:
 
@@ -16,6 +21,9 @@ Required rule and fixture/test changes are complete in:
 - `packages/typespec-lintdiff/test/fixtures/GetCollectionOnlyHasValueAndNextLink/array-response-body`
 - `packages/typespec-lintdiff/test/fixtures/GetCollectionOnlyHasValueAndNextLink/direct-array-response-body`
 - `packages/typespec-lintdiff/test/fixtures/GetCollectionOnlyHasValueAndNextLink/terminal-resource-invalid-response`
+- `packages/typespec-lintdiff/test/fixtures/GetCollectionOnlyHasValueAndNextLink/record-response-body`
+- `packages/typespec-lintdiff/test/fixtures/GetCollectionOnlyHasValueAndNextLink/operations-suffix-invalid-response`
+- `packages/typespec-lintdiff/test/fixtures/GetCollectionOnlyHasValueAndNextLink/operations-query-suffix-invalid-response`
 - `packages/typespec-lintdiff/test/fixtures/GetCollectionOnlyHasValueAndNextLink/rule.md`
 
 ## Report inputs
@@ -24,11 +32,11 @@ Required rule and fixture/test changes are complete in:
 | --- | --- | --- |
 | External migration coverage snapshot | `packages/typespec-lintdiff/docs/coverage_old.md` | `GetCollectionOnlyHasValueAndNextLink none 60 58 0 96.7`; aggregate-only row, no one-sided project list |
 | Checked-in LintDiff coverage report | `packages/typespec-lintdiff/specs/coverage-breakdown.md` | generated `2026-08-10T00:07:07.561Z`; baseline row is 61 validator projects, 60 TypeSpec projects, 58 overlap, 3 validator-only, 2 TypeSpec-only, 290 validator diagnostics, 267 TypeSpec diagnostics |
-| Fresh post-fix LintDiff run | generated local corpus artifacts under `packages/typespec-lintdiff/specs/results/**` and refreshed `packages/typespec-lintdiff/specs/coverage-breakdown.md` before restoring generated corpus files from the PR diff | specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`, TypeSpec generated `2026-08-26T04:04:27.140Z`, 468 projects, 6 compile failures |
+| Final post-fix LintDiff run | generated local corpus artifacts under `packages/typespec-lintdiff/specs/results/**` and refreshed `packages/typespec-lintdiff/specs/coverage-breakdown.md` before restoring generated corpus files from the PR diff | specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`, TypeSpec generated `2026-08-26T11:22:07.001Z`, 468 projects, 6 compile failures |
 
 The reports use different definitions. The external snapshot credits broad migration disposition at an older snapshot. The local coverage row measures observed same-project diagnostics in successfully compiled projects for mapped TypeSpec diagnostics.
 
-The post-fix coverage row is intentionally recorded here instead of replacing the checked-in
+The final post-fix coverage row is intentionally recorded here instead of replacing the checked-in
 generated corpus baseline. It is reproducible from this branch with:
 
 ```powershell
@@ -42,17 +50,17 @@ mise exec -- pnpm --dir packages\typespec-lintdiff specs:coverage --specs-repo C
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `coverage_old.md` | not reported | 60 | 58 local lint | not reported | not reconstructable | not reconstructable | not reported | local lint fired 58 projects |
 | checked-in `coverage-breakdown.md` baseline | production | 61 assessable | 60 assessable | 58 | 3 | 2 | 290 | 267 |
-| fresh post-fix `coverage-breakdown.md` run | production | 61 assessable | 60 assessable | 60 | 1 | 0 | 290 | 275 |
-| Raw rule shards | production | 63 all validator projects | 62 all TypeSpec projects | 62 | 1 | 0 | 429 | 290 |
+| final post-fix `coverage-breakdown.md` run | production | 61 assessable | 61 assessable | 61 | 0 | 0 | 290 | 290 |
+| Raw rule shards | production | 63 all validator projects | 63 all TypeSpec projects | 63 | 0 | 0 | 429 | 305 |
 
-The fresh coverage row excludes projects outside the assessable compiled population and normalizes the report population, so its project and diagnostic totals differ from the raw rule shard totals. Raw diagnostic equality is not expected because Swagger reports emitted OpenAPI occurrences while TypeSpec reports semantic source targets.
+The final coverage row excludes projects outside the assessable compiled population and normalizes the report population, so its project and diagnostic totals differ from the raw rule shard totals. Raw diagnostic equality is not expected because Swagger reports emitted OpenAPI occurrences while TypeSpec reports semantic source targets.
 
 ## Project-set comparison
 
 Final assessable coverage:
 
-- Same-project overlap: 60 projects.
-- Validator-only projects: `specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers`.
+- Same-project overlap: 61 assessable projects.
+- Validator-only projects: none.
 - TypeSpec-only projects: none.
 - Compile failures retained outside the assessed population:
   - `specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices`
@@ -66,13 +74,13 @@ Raw rule-shard diagnostic identities:
 
 | Identity | Validator | TypeSpec |
 | --- | ---: | ---: |
-| Raw diagnostics | 429 | 290 |
-| Deduplicated diagnostics | 401 by project + Swagger file + JSON path | 211 by project + source file + line + column |
+| Raw diagnostics | 429 | 305 |
+| Deduplicated diagnostics | 401 by project + Swagger file + JSON path | 226 by project + source file + line + column |
 
-The raw diagnostic comparison has 49 projects with equal raw counts, 12 validator-higher projects
-with 151 additional Swagger diagnostics, and 4 TypeSpec-higher projects with 5 additional TypeSpec
-diagnostics. After source-location and JSON-path deduplication, 43 projects have equal counts,
-18 are validator-higher by 199 total diagnostics, and 4 are TypeSpec-higher by 4 total diagnostics.
+The raw diagnostic comparison has 62 projects with equal raw counts, one validator-higher project
+with 124 additional Swagger diagnostics, and no TypeSpec-higher projects. After source-location and
+JSON-path deduplication, 50 projects have equal counts, 13 are validator-higher by 175 total
+diagnostics, and none are TypeSpec-higher.
 
 The remaining count deltas are expected source-to-emitted multiplicity and identity-domain
 differences. Swagger reports emitted OpenAPI occurrences by file and JSON path. TypeSpec reports
@@ -82,7 +90,7 @@ equivalence criterion.
 
 ## Fixture evidence
 
-Focused validation covers six cases:
+Focused validation covers nine cases:
 
 | Fixture | Expected | Evidence |
 | --- | --- | --- |
@@ -91,7 +99,10 @@ Focused validation covers six cases:
 | `only-value-and-nextlink` | compliant | Swagger and TypeSpec both skip a collection response with exactly `value` and `nextLink`. |
 | `array-response-body` | compliant | Swagger has no `schema.properties` node for a named array response body; TypeSpec now skips it. |
 | `direct-array-response-body` | compliant | Swagger has no `schema.properties` node for a direct `T[]` response body; TypeSpec now skips it. |
-| `terminal-resource-invalid-response` | compliant | Swagger and TypeSpec both skip a provider-tail point path whose response would be invalid for a collection. |
+| `record-response-body` | compliant | Swagger has no `schema.properties` node for a direct `Record<T>` object body; TypeSpec now skips it. |
+| `terminal-resource-invalid-response` | compliant | Swagger and TypeSpec both skip a provider-tail point path with a query suffix whose response would be invalid for a collection. |
+| `operations-suffix-invalid-response` | compliant | Swagger and TypeSpec both skip a collection-shaped path that ends with `operations`. |
+| `operations-query-suffix-invalid-response` | violation | Swagger and TypeSpec both report a collection-shaped path whose raw key no longer ends with `operations` because of a query suffix. |
 
 ## Gap examples
 
@@ -161,7 +172,7 @@ model WidgetListResult {
 **TypeSpec source**
 
 ```typespec
-@route("/scope/providers/Microsoft.TestService/widgets/exampleWidget")
+@route("/scope/providers/Microsoft.TestService/widgets/exampleWidget?disambiguation_dummy")
 @get
 getWidget(...Azure.ResourceManager.CommonTypes.ApiVersionParameter):
   WidgetValueOnlyResult | ErrorResponse;
@@ -176,7 +187,7 @@ model WidgetValueOnlyResult {
 ```json
 {
   "paths": {
-    "/scope/providers/Microsoft.TestService/widgets/exampleWidget": {
+    "/scope/providers/Microsoft.TestService/widgets/exampleWidget?disambiguation_dummy": {
       "get": {
         "responses": {
           "200": {
@@ -200,12 +211,108 @@ model WidgetValueOnlyResult {
 
 | Engine | Observed result |
 | --- | --- |
-| Swagger validator | Does not report because the final provider-tail fragment `TestService/widgets/exampleWidget` has an odd slash segment count, so the upstream function treats it as a point path. |
-| TypeSpec lint | Does not report after the fix because the migrated classifier uses the same provider-tail parity check. |
+| Swagger validator | Does not report because the final provider-tail fragment `TestService/widgets/exampleWidget?disambiguation_dummy` becomes a non-collection point path once emitted and selected like OpenAPI. |
+| TypeSpec lint | Does not report after the fix because the migrated classifier ignores the query suffix and then uses the same provider-tail parity check. |
 
 **Explanation:** This response shape would be invalid for a collection GET, but the route is not a
-collection path under the Swagger rule's provider-tail heuristic. The fixture protects the changed
-false-positive branch separately from the positive extension-scope collection fixture.
+collection path under the Swagger rule's provider-tail heuristic. The query suffix reproduces the
+`RoleDefinitions` corpus shape where the TypeSpec route contains `?disambiguation_dummy` but the
+emitted OpenAPI path comparison should still be based on the path portion. The fixture protects the
+changed false-positive branch separately from the positive extension-scope collection fixture.
+
+**Disposition:** Regression fixture.
+
+### Gap example: operations/default suffix exclusion
+
+- **Classification:** TypeSpec false-positive guard
+- **Status:** fixed by fixture coverage
+- **Project/API version:** fixture `GetCollectionOnlyHasValueAndNextLink/operations-suffix-invalid-response` / `2024-01-01`
+- **Source:** `test/fixtures/GetCollectionOnlyHasValueAndNextLink/operations-suffix-invalid-response/main.tsp`
+
+**TypeSpec source**
+
+```typespec
+@route("/scope/providers/Microsoft.TestService/customoperations")
+@get
+getCustomOperations(...Azure.ResourceManager.CommonTypes.ApiVersionParameter):
+  WidgetValueOnlyResult | ErrorResponse;
+```
+
+**Emitted OpenAPI or validator behavior**
+
+```json
+{
+  "paths": {
+    "/scope/providers/Microsoft.TestService/customoperations": {
+      "get": {
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/WidgetValueOnlyResult"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+| Engine | Observed result |
+| --- | --- |
+| Swagger validator | Does not report because the path property string ends with `operations`, and the Swagger selector uses `@property.endsWith('operations')`. |
+| TypeSpec lint | Does not report after the fix because the migrated classifier applies the same suffix test after query stripping. |
+
+**Explanation:** The Swagger rule does not require `/operations` to be a standalone segment. Matching
+that exact suffix behavior avoids over-reporting synthetic or unusual paths such as
+`customoperations`.
+
+**Disposition:** Regression fixture.
+
+### Gap example: operations/default suffix with query suffix
+
+- **Classification:** TypeSpec false-negative guard
+- **Status:** fixed by fixture coverage
+- **Project/API version:** fixture `GetCollectionOnlyHasValueAndNextLink/operations-query-suffix-invalid-response` / `2024-01-01`
+- **Source:** `test/fixtures/GetCollectionOnlyHasValueAndNextLink/operations-query-suffix-invalid-response/main.tsp`
+
+**TypeSpec source**
+
+```typespec
+@route("/scope/providers/Microsoft.TestService/customoperations?disambiguation_dummy")
+@get
+getCustomOperations(...Azure.ResourceManager.CommonTypes.ApiVersionParameter):
+  WidgetValueOnlyResult | ErrorResponse;
+```
+
+**Emitted OpenAPI or validator behavior**
+
+```json
+{
+  "x-ms-paths": {
+    "/scope/providers/Microsoft.TestService/customoperations?disambiguation_dummy": {
+      "get": {
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/WidgetValueOnlyResult"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+| Engine | Observed result |
+| --- | --- |
+| Swagger validator | Reports because the raw path key ends with `?disambiguation_dummy`, not `operations`, and the response model has only `value`. |
+| TypeSpec lint | Reports after the fix because only terminal path-parameter and provider-tail parity checks use the query-stripped path; `operations`/`default` suffix exclusions use the raw path key. |
+
+**Explanation:** Query stripping is needed for terminal path-parameter and provider-tail parity
+classification, but applying it before the Swagger selector's `operations` and `default` suffix
+exclusions would suppress paths that the Swagger rule still validates.
 
 **Disposition:** Regression fixture.
 
@@ -243,6 +350,46 @@ list(...): ArmResponse<ApplicationInsightsComponentAnalyticsItem[]>;
 | TypeSpec lint | Skips after the fix by recognizing both direct and named array response bodies. |
 
 **Explanation:** The migrated rule previously inspected the item model behind a direct `T[]` response, which is broader than Swagger's `schema.properties` binding.
+
+**Disposition:** Rule fix.
+
+### Gap example: property-less object response schemas
+
+- **Classification:** TypeSpec-only before fix
+- **Status:** fixed
+- **Project/API version:** fixture `GetCollectionOnlyHasValueAndNextLink/record-response-body` / `2024-01-01`
+- **Source:** `test/fixtures/GetCollectionOnlyHasValueAndNextLink/record-response-body/main.tsp`
+
+**TypeSpec source**
+
+```typespec
+@route("/scope/providers/Microsoft.TestService/widgetMetadata")
+@get
+listWidgetMetadata(...Azure.ResourceManager.CommonTypes.ApiVersionParameter):
+  Record<string> | ErrorResponse;
+```
+
+**Emitted OpenAPI or validator behavior**
+
+```json
+{
+  "schema": {
+    "type": "object",
+    "additionalProperties": {
+      "type": "string"
+    }
+  }
+}
+```
+
+| Engine | Observed result |
+| --- | --- |
+| Swagger validator | Does not run because the Spectral `given` path is `responses.200.schema.properties`, and this object schema has no `properties` object. |
+| TypeSpec lint | Skips after the fix by requiring a non-empty semantic property map before validating collection-envelope keys. |
+
+**Explanation:** A direct `Record<T>` response emits an object schema but does not expose the
+`schema.properties` node selected by the Swagger rule. Treating the empty TypeSpec property map as a
+violation was broader than Swagger.
 
 **Disposition:** Rule fix.
 
@@ -294,7 +441,7 @@ emitted paths do not demonstrate a missing semantic check.
 ### Gap example: common-types private link list result
 
 - **Classification:** validator-only
-- **Status:** intentional remaining gap
+- **Status:** fixed
 - **Project/API version:** `specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers` / `2025-12-01-preview`
 - **Source:** `typespec/PrivateLinkResource.tsp`
 
@@ -331,12 +478,15 @@ The referenced `v5/privatelinks.json` definition contains only a `value` propert
 | Engine | Observed result |
 | --- | --- |
 | Swagger validator | Reports against the emitted common-types v5 `PrivateLinkResourceListResult` `properties` object. |
-| TypeSpec lint | Does not report in the aligned corpus result. |
+| TypeSpec lint | Reports after the fix at the authored `listByServer` operation (`PrivateLinkResource.tsp:42`) because the invalid common-types model itself is library-defined. |
 
-**Explanation:** This is isolated to the ARM common-types v5 private-link list envelope used through an external common-types reference. The local rule change intentionally stays focused on authorable response-shape semantics and does not change common-types definitions or external reference handling.
+**Explanation:** The invalid response envelope is represented in the semantic program, but its
+declaration is in library/common-types source. Reporting directly on that library model does not
+surface as a project diagnostic for the service. The rule now falls back to the authored operation
+when the invalid model or property target is not in project source.
 
-**Disposition:** Remaining uncertainty / external common-types population gap, not a broad rule rewrite.
+**Disposition:** Rule fix verified by the final corpus run.
 
 ## Final assessment
 
-The migrated TypeSpec rule now covers the confirmed Swagger semantics for authorable ARM collection GET response object models and no longer reports direct array response bodies that Swagger cannot inspect. The final assessable corpus has 60 overlapping projects, no TypeSpec-only projects, and one validator-only common-types v5 private-link response. The rule is functionally equivalent for migrated authorable TypeSpec service models with the noted common-types v5 uncertainty.
+The migrated TypeSpec rule now covers the confirmed Swagger semantics for ARM collection GET response object models, including library-defined common-types envelopes, and no longer reports direct array, property-less object, query-suffixed point-path, or `operations`/`default` suffix shapes that Swagger cannot inspect as collection response `schema.properties`. The final assessable corpus has 61 overlapping projects, no validator-only projects, and no TypeSpec-only projects. The rule is functionally equivalent for the investigated corpus; remaining raw count differences are emitted-path/source-location cardinality differences, not behavioral gaps.
