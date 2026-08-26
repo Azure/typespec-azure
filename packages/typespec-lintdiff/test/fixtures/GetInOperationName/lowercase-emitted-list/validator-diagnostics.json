@@ -1,0 +1,13 @@
+[
+  {
+    "code": "GetInOperationName",
+    "message": "'GET' operation 'Widgets_listMigrations' should use method name 'Get' or Method name start with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.",
+    "path": [
+      "paths",
+      "/widgets/migrations",
+      "get",
+      "operationId"
+    ],
+    "severity": 0
+  }
+]
