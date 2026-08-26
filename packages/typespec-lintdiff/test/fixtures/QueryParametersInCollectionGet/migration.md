@@ -4,7 +4,7 @@
 
 The migrated TypeSpec rule required an update and is now functionally equivalent to the Swagger rule over the assessed corpus. It checks every ARM GET whose emitted path has collection shape, preserves the Swagger rule's case-sensitive exemptions for exactly `api-version` and `$filter`, reports library-provided query parameters on the local operation, and deduplicates repeated semantic visits by service namespace, emitted path, and parameter name.
 
-After projecting TypeSpec to each project's selected Swagger API version, both implementations report exactly 2,125 diagnostics across the same 126 projects. Raw equality is supporting evidence, not the equivalence criterion: Swagger reports emitted OpenAPI occurrences while TypeSpec reports semantic operations.
+Across all 468 source projects, both implementations report 2,125 diagnostics in the same 126 projects. After excluding the six TypeSpec compile failures from both sides, the aligned population contains 2,034 diagnostics in the same 122 projects. Raw equality is supporting evidence, not the equivalence criterion: Swagger reports emitted OpenAPI occurrences while TypeSpec reports semantic operations.
 
 ## Required changes
 
@@ -22,17 +22,17 @@ After projecting TypeSpec to each project's selected Swagger API version, both i
 | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | -----------------: | ----------------: | ------------: | ------------------: | ------------------: | -------------------------------- |
 | [`docs/coverage_old.md`](../../../docs/coverage_old.md)                                    | External snapshot; 450 compiled projects; migration credit rather than strict same-project overlap                                             |                119 |                88 | Not available | Not reconstructable | Not reconstructable | Not reported                     |
 | [`specs/coverage-breakdown.md`](../../../specs/coverage-breakdown.md), checked-in baseline | Commit `f6b53f105b95da05276530a0754a1c71b4f16397`; 462/468 successful projects; production validator mode                                      |                  0 |                93 |             0 |                   0 |                  93 | 0 validator / 1,439 TypeSpec     |
-| Final aligned staging analysis                                                             | Same commit; 462/468 successful projects; explicitly enabled `stagingOnly` Swagger rule; both sides selected to the latest Swagger API version |                126 |               126 |           126 |                   0 |                   0 | 2,125 validator / 2,125 TypeSpec |
+| Final aligned staging analysis                                                             | Same commit; 462/468 successful projects; explicitly enabled `stagingOnly` Swagger rule; both sides selected to the latest Swagger API version |                122 |               122 |           122 |                   0 |                   0 | 2,034 validator / 2,034 TypeSpec |
 
 The baseline production row is zero because the Swagger rule is marked `stagingOnly`; it is not evidence that the rule never fires. The older report used a different 450-project snapshot and coverage definition and provides aggregate counts only, so its missing projects cannot be reconstructed.
 
 ## Project-set comparison
 
-The full TypeSpec corpus run completed on 2026-08-25 against specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`. Of 468 source projects, 462 compiled successfully and form the aligned behavioral population.
+The final full TypeSpec corpus run completed on 2026-08-26 against specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` and local linter commit `e9f13c8d2c092a299a0d4ee5c13b0049f17402da`. Of 468 source projects, 462 compiled successfully and form the aligned behavioral population. [`corpus-evidence.json`](./corpus-evidence.json) retains the exact commands, timestamps, linter fingerprint, full and aligned counts, failed projects, and complete aligned project set.
 
-- Validator projects: 126
-- TypeSpec projects: 126
-- Same-project overlap: 126
+- Validator projects: 122
+- TypeSpec projects: 122
+- Same-project overlap: 122
 - Validator-only projects: none
 - TypeSpec-only projects: none
 
@@ -42,12 +42,12 @@ The selected-version analysis projects the TypeSpec service with the same versio
 
 | Identity                                       | Validator | TypeSpec |
 | ---------------------------------------------- | --------: | -------: |
-| Raw diagnostics in successful projects         |     2,125 |    2,125 |
-| Validator project + Swagger file + JSON path   |       874 |      N/A |
-| Validator project + JSON path                  |       874 |      N/A |
-| TypeSpec project + source file + line + column |       N/A |    1,981 |
+| Raw diagnostics in successful projects         |     2,034 |    2,034 |
+| Validator project + Swagger file + JSON path   |       830 |      N/A |
+| Validator project + JSON path                  |       830 |      N/A |
+| TypeSpec project + source file + line + column |       N/A |    1,890 |
 
-All 126 projects have equal raw counts after selected-version projection and service-aware deduplication. The deduplicated totals remain different because Swagger JSON paths and TypeSpec source locations are distinct identity domains and are intentionally not treated as interchangeable.
+All 122 aligned projects have equal raw counts after selected-version projection and service-aware deduplication. The full, unfiltered shards contain 2,125 diagnostics across 126 projects on each side; four affected projects are among the six TypeSpec compile failures and are therefore excluded from the behavioral comparison. The deduplicated totals remain different because Swagger JSON paths and TypeSpec source locations are distinct identity domains and are intentionally not treated as interchangeable.
 
 ### Gap example: declarations removed from the selected API version
 
@@ -105,6 +105,6 @@ Their exclusion leaves uncertainty only for those uncompiled projects; it does n
 
 ## Fixture evidence
 
-Five violating fixtures cover one and multiple direct parameters, raw collection-shaped GETs, case-sensitive allowed names, and parameters inherited from library models. Three compliant fixtures cover exact `api-version`/`$filter` exemptions, point GETs, and non-GET operations. The focused comparison reports no unresolved gaps.
+Six violating fixtures cover one and multiple direct parameters, raw collection-shaped GETs, nested ARM provider namespaces, case-sensitive allowed names, and parameters inherited from library models. Three compliant fixtures cover exact `api-version`/`$filter` exemptions, point GETs, and non-GET operations. The focused comparison reports no unresolved gaps.
 
 The final evidence supports functional equivalence for all successfully compiled projects at the selected latest Swagger API version. Raw counts happen to be equal, but equality is not required because the deduplicated identity domains differ.
