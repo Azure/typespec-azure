@@ -7,6 +7,14 @@ description: Add or update Spector end-to-end tests for the @azure-tools/typespe
 
 Work in `packages/typespec-ts` and process every requested Spector case.
 
+## Scope Boundary
+
+This skill adds Spector tests for behavior already supported by the TypeScript emitter.
+
+Do not modify emitter production code, shared runtime code, TypeSpec specifications, or Spector mock APIs while applying this skill. If a scenario exposes unsupported behavior or a defect, diagnose it only far enough to report a concise, evidence-based blocker. Defer the implementation or fix to a separate issue or pull request.
+
+Do not work around unsupported behavior by weakening assertions, changing expected requests, omitting required calls, or adding a skipped test.
+
 ## Inputs
 
 Accept one or more of:
@@ -142,7 +150,7 @@ Read generated `src/index.ts` and the referenced client and model files to deter
 
 Do not hand-write tests from TypeSpec names alone.
 
-If generation fails, diagnose the emitter or configuration instead of hiding the case or claiming it is covered.
+If generation fails, determine whether the failure comes from invalid test configuration or unsupported emitter behavior. Correct test configuration mistakes. For unsupported behavior or an emitter failure, stop implementing that scenario and report the observed blocker; do not modify emitter production code.
 
 ### 7. Implement the Vitest Test
 
@@ -166,9 +174,9 @@ Follow current nearby patterns for paging, long-running operations, credentials,
 
 Do not remove a failing scenario merely to make the file green.
 
-Treat a correctly written failing test as an emitter defect to fix or track.
+Treat a correctly written failing test as unsupported behavior or an emitter/runtime defect to report. Do not fix that defect as part of this skill.
 
-Only skip a scenario when there is a concrete known limitation and a linked issue; preserve existing skipped tests unless their issue is resolved and the test now passes.
+Do not add new skipped tests for unsuccessful scenarios. Exclude their incomplete test changes and report the failure instead. Preserve existing skipped tests unless their linked issue is resolved and the test now passes.
 
 ### 8. Validate Against Spector
 
@@ -190,7 +198,7 @@ Always stop the server afterward, including after failures:
 pnpm stop-test-server
 ```
 
-Fix failures by rechecking `mockapi.ts`, TypeSpec semantics, and generated signatures.
+For a failure, first correct mistakes in the test by rechecking `mockapi.ts`, TypeSpec semantics, and generated signatures. If the test is correct and the generated client still cannot satisfy the scenario, report the blocker and remove the incomplete test changes. Do not change production code.
 
 Do not run the full `spector-test` command for focused validation because it regenerates and tests every opted-in case.
 
@@ -214,6 +222,10 @@ Run the repository formatter and the smallest relevant lint command before compl
 
 ### 10. Report
 
-Report each processed spec path and output path, newly covered scenarios, already-covered scenarios, skipped scenarios with issue links, and any emitter defects blocking coverage.
+Report each processed spec path and output path, newly covered scenarios, already-covered scenarios, and unsuccessful scenarios.
+
+For each unsuccessful scenario, report the stage that failed (generation, compilation, request validation, or response validation), the observed generated-client behavior, the expected behavior from `mockapi.ts`, and an existing issue link when one is available.
+
+Do not propose or implement an emitter fix unless a separate task explicitly requests it.
 
 If working on a pull request, keep its implementation-status section accurate.
