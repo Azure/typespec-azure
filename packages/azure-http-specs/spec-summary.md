@@ -1302,13 +1302,6 @@ Expected response body:
 }
 ```
 
-### Azure_ClientGenerator_Core_Override_AddParameter_add
-
-- Endpoint: `get /azure/client-generator-core/override/add`
-
-Verify that `addParameter` adds an optional header to the generated client method.
-Expected response: 204 No Content
-
 ### Azure_ClientGenerator_Core_Override_GroupParameters_group
 
 - Endpoint: `get /azure/client-generator-core/override/group`
