@@ -494,7 +494,7 @@ jobs:
               "",
               "- ❌ Failed: `scenarioName1` — reason",
               "",
-              "List every requested scenario exactly once under its scenario group. Do not split the report into new and updated test-file sections.",
+              "List every requested scenario exactly once under its scenario group.",
               "",
               `Results should be commented on issue ${owner}/${repo}#${coverageIssueNumber}.`,
             ].join("\n");
