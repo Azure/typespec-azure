@@ -1,7 +1,7 @@
 ---
-changeKind: feature
+changeKind: internal
 packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Add Spector coverage for TCGC client controls and parameter transformation functions.
+Change override impl.
