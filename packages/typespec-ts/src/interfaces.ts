@@ -230,14 +230,6 @@ export interface ClientOptions {
   hierarchyClient?: boolean;
   compatibilityMode?: boolean;
   experimentalExtensibleEnums?: boolean;
-  /**
-   * When enabled (experimental), request bodies that contain properties which
-   * are not visible in the operation's write view (e.g. required
-   * `@visibility(Lifecycle.Read)` ARM properties) are projected to a dedicated
-   * split model (e.g. `WidgetCreate` / `WidgetCreateOrUpdate`) so those
-   * properties no longer leak into the input type. Off by default.
-   */
-  experimentalSplitModelsByVisibility?: boolean;
   clearOutputFolder?: boolean;
   ignorePropertyNameNormalize?: boolean;
   ignoreEnumMemberNameNormalize?: boolean;
@@ -268,6 +260,10 @@ export interface ClientOptions {
    * Defaults to false.
    */
   generateReactNativeTarget?: boolean;
+  /**
+   * Generates visibility-specific request models. Experimental and disabled by default.
+   */
+  experimentalSplitModelsByVisibility?: boolean;
 }
 
 export interface ServiceInfo {

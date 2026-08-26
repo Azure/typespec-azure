@@ -47,8 +47,6 @@ function extractClientOptions(
   const compatibilityMode = emitterOptions["compatibility-mode"];
   const compatibilityLro = emitterOptions["compatibility-lro"];
   const experimentalExtensibleEnums = emitterOptions["experimental-extensible-enums"];
-  const experimentalSplitModelsByVisibility =
-    emitterOptions["experimental-split-models-by-visibility"];
   const ignorePropertyNameNormalize = emitterOptions["ignore-property-name-normalize"];
   const ignoreEnumMemberNameNormalize = emitterOptions["ignore-enum-member-name-normalize"];
   const enableStorageCompat = emitterOptions["enable-storage-compat"] === true;
@@ -59,6 +57,8 @@ function extractClientOptions(
   const ignoreNullableOnOptional = getIgnoreNullableOnOptional(emitterOptions);
   const wrapNonModelReturn = getWrapNonModelReturn(emitterOptions);
   const isMultiService = (dpgContext.allServiceNamespaces?.length ?? 0) > 1;
+  const experimentalSplitModelsByVisibility =
+    emitterOptions["experimental-split-models-by-visibility"] === true;
 
   return {
     ...credentialInfo,
@@ -77,7 +77,6 @@ function extractClientOptions(
     compatibilityMode,
     compatibilityLro,
     experimentalExtensibleEnums,
-    experimentalSplitModelsByVisibility,
     ignorePropertyNameNormalize,
     typespecTitleMap,
     ignoreEnumMemberNameNormalize,
@@ -88,6 +87,7 @@ function extractClientOptions(
     enableStorageCompat,
     treatUnknownAsRecord,
     generateReactNativeTarget,
+    experimentalSplitModelsByVisibility,
   };
 }
 

@@ -61,7 +61,6 @@ export interface EmitterOptions {
   "compatibility-mode"?: boolean;
   "compatibility-lro"?: boolean;
   "experimental-extensible-enums"?: boolean;
-  "experimental-split-models-by-visibility"?: boolean;
   "clear-output-folder"?: boolean;
   "ignore-property-name-normalize"?: boolean;
   "typespec-title-map"?: Record<string, string>;
@@ -92,6 +91,7 @@ export interface EmitterOptions {
    * package.json exports). Defaults to `false`.
    */
   "generate-react-native-target"?: boolean;
+  "experimental-split-models-by-visibility"?: boolean;
 }
 
 export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
@@ -247,12 +247,6 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
       nullable: true,
       description: "Whether to transform union type enums to extensible enums",
     },
-    "experimental-split-models-by-visibility": {
-      type: "boolean",
-      nullable: true,
-      description:
-        "Whether to project request-body models to their write visibility (e.g. WidgetCreate/WidgetCreateOrUpdate) so read-only properties do not leak into input types",
-    },
     "clear-output-folder": {
       type: "boolean",
       nullable: true,
@@ -318,6 +312,12 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
       nullable: true,
       description:
         "When set to true, generates React Native build targets (tsconfig, warp target, package.json exports). Defaults to `false`.",
+    },
+    "experimental-split-models-by-visibility": {
+      type: "boolean",
+      nullable: true,
+      description:
+        "Whether to project request-body models to their write visibility (e.g. WidgetCreate/WidgetCreateOrUpdate) so read-only properties do not leak into input types. Defaults to false",
     },
   },
   required: [],
