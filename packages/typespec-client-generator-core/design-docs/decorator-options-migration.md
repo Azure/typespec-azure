@@ -53,7 +53,6 @@ of the positional string form would only be considered once:
 1. Migration guidance has been available for at least one full TCGC release cycle.
 2. The majority of first-party TCGC-based emitters (C#, Java, Python, JavaScript/TypeScript, Go)
    have migrated their own decorator usage to the options-bag form internally.
-3. Usage telemetry (see below) shows options-bag adoption is broadly viable for spec authors.
 
 If a deprecation is proposed in the future, it will follow the standard TypeSpec deprecation
 policy: a `@deprecated` warning period of at least two minor releases before any removal, tracked
