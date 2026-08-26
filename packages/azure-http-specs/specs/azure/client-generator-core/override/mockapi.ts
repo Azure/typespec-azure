@@ -86,12 +86,4 @@ Scenarios.Azure_ClientGenerator_Core_Override_AddParameter_add = passOnSuccess([
     },
     kind: "MockApiDefinition",
   },
-  {
-    uri: "/azure/client-generator-core/override/add",
-    method: "get",
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
 ]);
