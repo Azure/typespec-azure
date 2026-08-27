@@ -19,6 +19,22 @@ persistent subagents with separate responsibilities:
 The parent agent orchestrates handoffs and tracks loop state. It must not treat
 Copilot comments as automatically correct.
 
+## Skill immutability during the loop
+
+Treat this skill as orchestration input, not as part of the target pull
+request's review/fix scope.
+
+- Do not edit, commit, or push this skill while a review/fix loop is active,
+  even when a round exposes a process weakness.
+- Record process weaknesses and optimization ideas in the loop ledger for the
+  post-run process review. They must not trigger a fix round or another Copilot
+  review.
+- Comments about this skill are out of scope for the target pull request unless
+  the user explicitly made the skill itself the target deliverable before the
+  loop started.
+- Finish or stop the target loop first. Review all recorded process feedback
+  once, after termination, instead of modifying the skill between rounds.
+
 ## Required input
 
 Accept either:
@@ -278,10 +294,15 @@ suggestions for the next review-and-fix loop, especially:
 - loop limits, stop conditions, or skill instructions that should be updated
   based on the observed run
 
-Print the suggestions in the final handoff and ask the user whether any should
-be adopted into this skill. Do not update the skill automatically from the
-post-run review; only make skill changes after the user explicitly approves the
-specific suggestion(s).
+Print the consolidated suggestions in the final handoff and ask the user
+whether any should be adopted into this skill. Do not update the skill
+automatically from the post-run review; only make skill changes after the user
+explicitly approves the specific suggestion(s).
+
+Apply approved skill improvements once, after the loop has ended. Keep that
+change separate from target-rule fixes: use a dedicated commit and do not add it
+to the target pull request unless the user explicitly requests that placement.
+Do not restart the completed review loop merely to review the skill update.
 
 ## Result
 
