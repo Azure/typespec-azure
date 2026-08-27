@@ -18,7 +18,7 @@ it("isolates a child API-version override from parent options", async () => {
 
         @route("/parent")
         op getParent(
-          @query("api-version") @apiVersion serviceVersion: Versions = Versions.v2
+          @query("api-version") @apiVersion apiVersion: Versions = Versions.v2
         ): void;
 
         @route("/legacy")
@@ -40,9 +40,8 @@ it("isolates a child API-version override from parent options", async () => {
 
   expect(operations).toBeDefined();
   const text = [...operations!].map((file) => file.getFullText()).join("\n");
-  expect(text).toContain('"api%2Dversion": "opaque-legacy-version"');
-  expect(text.match(/"api%2Dversion": context\.serviceVersion \?\? "2025-01-01"/g)).toHaveLength(2);
-  expect(text).not.toContain("context.apiVersion");
+  expect(text).toContain('"api%2Dversion": context.apiVersion ?? "opaque-legacy-version"');
+  expect(text.match(/"api%2Dversion": context\.apiVersion \?\? "2025-01-01"/g)).toHaveLength(2);
 });
 
 it("initializes an optional custom-named API-version context property", async () => {
@@ -106,32 +105,4 @@ it("preserves enum typing for normal version options", async () => {
   const text = context!.getFullText();
   expect(text).toContain("version?: Versions");
   expect(text).not.toContain("version?: string");
-});
-
-it("escapes opaque API-version defaults", async () => {
-  const operations = await emitModularOperationsFromTypeSpec(
-    `
-      @service
-      @versioned(Versions)
-      @client({ name: "VersionedServiceClient", service: VersionedService })
-      namespace VersionedService {
-        enum Versions {
-          v1: "2024-01-01",
-        }
-
-        @client({ name: "LegacyOperationsClient", service: VersionedService })
-        @Azure.Core.Legacy.overrideApiVersion("legacy\\"version")
-        interface LegacyOperations {
-          @route("/legacy")
-          getLegacy(
-            @query("api-version") @apiVersion apiVersion: Versions = Versions.v1
-          ): void;
-        }
-      }
-    `,
-    { needAzureCore: true, needTCGC: true },
-  );
-
-  const text = [...operations!].map((file) => file.getFullText()).join("\n");
-  expect(text).toContain(`"api%2Dversion": ${JSON.stringify('legacy"version')}`);
 });

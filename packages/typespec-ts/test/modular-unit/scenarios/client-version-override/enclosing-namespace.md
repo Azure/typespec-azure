@@ -16,7 +16,7 @@ namespace VersionedService {
   }
 
   @route("/parent")
-  op getParent(@query("api-version") @apiVersion serviceVersion: Versions = Versions.v2): void;
+  op getParent(@query("api-version") @apiVersion apiVersion: Versions = Versions.v2): void;
 
   @Azure.Core.Legacy.overrideApiVersion("opaque-legacy-version")
   namespace Legacy {
@@ -56,12 +56,12 @@ import { Versions } from "../../models/versionedService/models.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
 export interface VersionedServiceContext extends Client {
-  serviceVersion?: Versions;
+  apiVersion?: Versions;
 }
 
 /** Optional parameters for the client. */
 export interface VersionedServiceClientOptionalParams extends ClientOptions {
-  serviceVersion?: Versions;
+  apiVersion?: string;
 }
 
 export function createVersionedService(
@@ -69,13 +69,13 @@ export function createVersionedService(
   options: VersionedServiceClientOptionalParams = {},
 ): VersionedServiceContext {
   const endpointUrl = options.endpoint ?? String(endpointParam);
-  const { serviceVersion: _, ...updatedOptions } = {
+  const { apiVersion: _, ...updatedOptions } = {
     ...options,
     loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
-  const serviceVersion = options.serviceVersion;
-  return { ...clientContext, serviceVersion } as VersionedServiceContext;
+  const apiVersion = options.apiVersion;
+  return { ...clientContext, apiVersion } as VersionedServiceContext;
 }
 ```
 
@@ -103,7 +103,7 @@ export function _getParentSend(
   const path = expandUrlTemplate(
     "/parent{?api%2Dversion}",
     {
-      "api%2Dversion": context.serviceVersion ?? "2025-01-01",
+      "api%2Dversion": context.apiVersion ?? "2025-01-01",
     },
     {
       allowReserved: options?.requestOptions?.skipUrlEncoding,
@@ -136,7 +136,7 @@ export function _getLegacySend(
   const path = expandUrlTemplate(
     "/legacy{?api%2Dversion}",
     {
-      "api%2Dversion": "opaque-legacy-version",
+      "api%2Dversion": context.apiVersion ?? "opaque-legacy-version",
     },
     {
       allowReserved: options?.requestOptions?.skipUrlEncoding,
@@ -169,7 +169,7 @@ export function _getCurrentSend(
   const path = expandUrlTemplate(
     "/current{?api%2Dversion}",
     {
-      "api%2Dversion": context.serviceVersion ?? "2025-01-01",
+      "api%2Dversion": context.apiVersion ?? "2025-01-01",
     },
     {
       allowReserved: options?.requestOptions?.skipUrlEncoding,

@@ -135,7 +135,7 @@ export function getSendPrivateFunction(
   let pathStr = `"${operationPath}"`;
   const urlTemplateParams = [
     ...getPathParameters(operation),
-    ...getQueryParameters(dpgContext, operation, client),
+    ...getQueryParameters(dpgContext, operation),
   ];
   if (urlTemplateParams.length > 0) {
     // Generate a unique local variable name that doesn't conflict with parameter names
@@ -1641,9 +1641,9 @@ export function getParameterMap(
   if (param.isApiVersionParam && param.clientDefaultValue) {
     // For multi-service, use only the default value (don't reference context.apiVersion)
     if (context.emitterOptions?.isMultiService) {
-      return `"${serializedName}": ${JSON.stringify(param.clientDefaultValue)}`;
+      return `"${serializedName}": "${param.clientDefaultValue}"`;
     }
-    return `"${serializedName}": ${param.onClient ? "context." : ""}${param.name} ?? ${JSON.stringify(param.clientDefaultValue)}`;
+    return `"${serializedName}": ${param.onClient ? "context." : ""}${param.name} ?? "${param.clientDefaultValue}"`;
   }
 
   if (hasCollectionFormatInfo(param.kind, (param as any).collectionFormat)) {
@@ -1862,11 +1862,7 @@ function getPathParameters(operation: ServiceOperation, optionalParamName: strin
 /**
  * Extract the query parameters
  */
-function getQueryParameters(
-  dpgContext: SdkContext,
-  operation: ServiceOperation,
-  client?: SdkClientType<SdkHttpOperation>,
-): string[] {
+function getQueryParameters(dpgContext: SdkContext, operation: ServiceOperation): string[] {
   if (!operation.parameters) {
     return [];
   }
@@ -1875,34 +1871,23 @@ function getQueryParameters(
     {
       query: [],
     };
-  const apiVersionContextParam = client?.clientInitialization.parameters.find(
-    (p) => p.isApiVersionParam,
-  );
 
   for (const param of operationParameters) {
     if (param.kind === "query") {
       // Check if this parameter still exists in the corresponding method params (after override)
       if (param.methodParameterSegments && param.methodParameterSegments.length > 0) {
         const paramAccessor = getParamAccessor(param);
-        const queryParam = {
-          ...param,
-          name:
-            param.isApiVersionParam && param.onClient && apiVersionContextParam
-              ? apiVersionContextParam.name
-              : param.name,
-          // TODO: remember to remove this hack once compiler gives us a name
-          // https://github.com/microsoft/typespec/issues/6743
-          serializedName: getUriTemplateQueryParamName(param.serializedName),
-        };
-        const useOperationApiVersionDefault =
-          param.isApiVersionParam &&
-          apiVersionContextParam !== undefined &&
-          param.clientDefaultValue !== undefined &&
-          param.clientDefaultValue !== apiVersionContextParam.clientDefaultValue;
         parametersImplementation[param.kind].push({
-          paramMap: useOperationApiVersionDefault
-            ? `"${queryParam.serializedName}": ${JSON.stringify(param.clientDefaultValue)}`
-            : getParameterMap(dpgContext, queryParam, paramAccessor),
+          paramMap: getParameterMap(
+            dpgContext,
+            {
+              ...param,
+              // TODO: remember to remove this hack once compiler gives us a name
+              // https://github.com/microsoft/typespec/issues/6743
+              serializedName: getUriTemplateQueryParamName(param.serializedName),
+            },
+            paramAccessor,
+          ),
           param,
         });
       }

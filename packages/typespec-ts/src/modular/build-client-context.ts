@@ -83,7 +83,7 @@ export function buildClientContext(
     .map((p) => {
       return {
         name: getClientParameterName(p),
-        type: shouldUseStringApiVersionType(p) ? "string" : getTypeExpression(dpgContext, p.type),
+        type: getTypeExpression(dpgContext, p.type),
         hasQuestionToken: false,
         docs: getDocsWithKnownVersion(dpgContext, p),
       };
@@ -108,7 +108,7 @@ export function buildClientContext(
     .map((p) => {
       return {
         name: getClientParameterName(p),
-        type: shouldUseStringApiVersionType(p) ? "string" : getTypeExpression(dpgContext, p.type),
+        type: getTypeExpression(dpgContext, p.type),
         hasQuestionToken: true,
         docs: getDocsWithKnownVersion(dpgContext, p),
       };
@@ -129,7 +129,8 @@ export function buildClientContext(
     .map((p) => {
       return {
         name: getClientParameterName(p),
-        type: shouldUseStringApiVersionType(p) ? "string" : getTypeExpression(dpgContext, p.type),
+        type:
+          p.name.toLowerCase() === "apiversion" ? "string" : getTypeExpression(dpgContext, p.type),
         hasQuestionToken: true,
         docs: getDocsWithKnownVersion(dpgContext, p),
       };
@@ -295,22 +296,6 @@ export function buildClientContext(
 
   clientContextFile.fixUnusedIdentifiers();
   return clientContextFile;
-}
-
-function shouldUseStringApiVersionType(
-  parameter: SdkMethodParameter | SdkHttpParameter | SdkEndpointParameter | SdkCredentialParameter,
-): boolean {
-  if (!parameter.isApiVersionParam) {
-    return false;
-  }
-  if (parameter.name.toLowerCase() === "apiversion") {
-    return true;
-  }
-  return (
-    typeof parameter.clientDefaultValue === "string" &&
-    parameter.type.kind === "enum" &&
-    !parameter.type.values.some((value) => value.value === parameter.clientDefaultValue)
-  );
 }
 
 function getDocsWithKnownVersion(
