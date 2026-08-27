@@ -309,6 +309,8 @@ function buildClones(state: SplitState): void {
       ...node.model,
       name: `${node.model.name}${getVisibilitySuffix(node.visibility, Visibility.Read)}`,
       properties: [],
+      // Write projections are request-only: preserve serialization flags, force Input,
+      // and remove inherited response roles.
       usage: (node.model.usage | UsageFlags.Input) & ~responseUsageFlags,
     };
     state.cloneByKey.set(key, clone);
