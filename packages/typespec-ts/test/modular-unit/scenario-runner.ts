@@ -84,8 +84,17 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
     if (result === undefined) {
       return "// (file was not generated)";
     }
-
-    return result.getFullText();
+    const modelFiles = result
+      .getProject()
+      .getSourceFiles()
+      .filter((file) => file.getBaseName() === "models.ts");
+    if (modelFiles.length === 1) {
+      return modelFiles[0]!.getFullText();
+    }
+    return modelFiles
+      .toSorted((a, b) => a.getFilePath().localeCompare(b.getFilePath()))
+      .map((file) => `/** This file path is ${file.getFilePath()} */\n\n${file.getFullText()}`)
+      .join("\n");
   },
 
   // Snapshot of the top-level index file

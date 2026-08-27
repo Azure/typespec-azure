@@ -18,6 +18,7 @@ import { renameClientName } from "../../src/index.js";
 import { ClientOptions } from "../../src/interfaces.js";
 import { buildClassicalClient } from "../../src/modular/build-classical-client.js";
 import { buildClassicOperationFiles } from "../../src/modular/build-classical-operation-groups.js";
+import { buildClientContext } from "../../src/modular/build-client-context.js";
 import { transformModularEmitterOptions } from "../../src/modular/build-modular-options.js";
 import { buildOperationFiles } from "../../src/modular/build-operations.js";
 import { buildRootIndex } from "../../src/modular/build-root-index.js";

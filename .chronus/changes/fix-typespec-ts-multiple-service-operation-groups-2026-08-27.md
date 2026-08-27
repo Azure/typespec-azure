@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-ts"
 ---
 
-Scope generated operation groups to their owning client when a package contains multiple services.
+Fix generated operation groups and model namespace paths when a package contains multiple services.
