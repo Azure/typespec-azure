@@ -191,36 +191,15 @@ subagent each round. It owns these steps:
 
 ### Linter source changes
 
-If a valid fix changes production linter source code or linter behavior, follow
-the corpus procedure in `/develop-lintdiff-rule`, especially **Run focused
-validation**, **Run the existing corpus analysis**, **Refresh the rule migration
-note**, and **Exclude generated corpus data from the PR**.
+Run the corpus procedure only when a valid fix changes production linter-rule
+code. Changes limited to tests, fixtures, snapshots, documentation, or
+`migration.md` do not require corpus validation.
 
-For `packages/typespec-lintdiff`, this includes:
-
-1. Run focused fixture tests, package build, and package lint first.
-2. Verify the isolated `azure-rest-api-specs` worktree and local linter link,
-   preparing them as documented by `/develop-lintdiff-rule` when needed.
-3. Run a representative filtered corpus before the full corpus.
-4. Run the existing full corpus runner when practical:
-
-   ```powershell
-   pnpm --dir packages/typespec-lintdiff specs:typespec -- `
-     --specs-repo <isolated-azure-rest-api-specs-worktree> `
-     --concurrency 6
-   ```
-
-5. Analyze overlap, one-sided projects, version attribution, and compile
-   failures rather than relying only on command success.
-6. Refresh the affected rule's `migration.md` with the new corpus evidence.
-7. Restore generated changes under `packages/typespec-lintdiff/specs`; corpus
-   output is validation evidence and must not be committed.
-8. Confirm the final diff contains only intended source, test, fixture,
-   snapshot, documentation, migration-note, or existing change-description
-   updates.
-
-Do not skip corpus validation merely because the review fix is small. Surface a
-corpus failure and stop the loop.
+When production linter-rule code changes, follow the current linter-source
+validation and corpus procedure in `/develop-lintdiff-rule` in full. Treat that
+skill as the source of truth for setup, commands, evidence updates, analysis,
+and generated-output cleanup. Surface any required validation or corpus failure
+and stop the loop.
 
 ### Commit and push
 
