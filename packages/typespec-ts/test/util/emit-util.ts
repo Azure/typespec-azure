@@ -18,7 +18,6 @@ import { renameClientName } from "../../src/index.js";
 import { ClientOptions } from "../../src/interfaces.js";
 import { buildClassicalClient } from "../../src/modular/build-classical-client.js";
 import { buildClassicOperationFiles } from "../../src/modular/build-classical-operation-groups.js";
-import { buildClientContext } from "../../src/modular/build-client-context.js";
 import { transformModularEmitterOptions } from "../../src/modular/build-modular-options.js";
 import { buildOperationFiles } from "../../src/modular/build-operations.js";
 import { buildRootIndex } from "../../src/modular/build-root-index.js";
@@ -300,23 +299,19 @@ export async function emitModularClientFromTypeSpec(
   const modularEmitterOptions = transformModularEmitterOptions(dpgContext, "", {
     casing: "camel",
   });
-  if (
-    dpgContext.sdkPackage.clients &&
-    dpgContext.sdkPackage.clients.length > 0 &&
-    dpgContext.sdkPackage.clients[0]
-  ) {
-    emitTypes(dpgContext, { sourceRoot: "" });
-    renameClientName(dpgContext.sdkPackage.clients[0], modularEmitterOptions);
-    const clientMap = Array.from(getClientHierarchyMap(dpgContext));
-    buildApiOptions(dpgContext, clientMap[0]!, modularEmitterOptions);
-    buildOperationFiles(dpgContext, clientMap[0]!, modularEmitterOptions);
-    buildClassicOperationFiles(dpgContext, clientMap[0]!, modularEmitterOptions);
-    const res = buildClassicalClient(dpgContext, clientMap[0]!, modularEmitterOptions);
-    binder.resolveAllReferences("/");
-    return res;
+  const clientMap = Array.from(getClientHierarchyMap(dpgContext));
+  emitTypes(dpgContext, { sourceRoot: "" });
+  const clients = [];
+  for (const client of clientMap) {
+    await renameClientName(client[1], modularEmitterOptions);
+    buildApiOptions(dpgContext, client, modularEmitterOptions);
+    buildOperationFiles(dpgContext, client, modularEmitterOptions);
+    buildClassicOperationFiles(dpgContext, client, modularEmitterOptions);
+    clients.push(buildClassicalClient(dpgContext, client, modularEmitterOptions));
   }
+  binder.resolveAllReferences("/");
   expectDiagnosticEmpty(dpgContext.program.diagnostics);
-  return undefined;
+  return clients;
 }
 
 export async function emitSamplesFromTypeSpec(
