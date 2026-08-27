@@ -22,7 +22,7 @@
   {
     "code": "tsp-lintdiff-local-linter/put-in-operation-name",
     "severity": "warning",
-    "message": "'PUT' operation 'setWidgetConfig' should use method name 'Create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    "message": "'PUT' operation 'setWidgetConfig' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
   },
   {
     "code": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
