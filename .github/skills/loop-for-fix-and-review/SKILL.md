@@ -143,14 +143,18 @@ ledger. It owns these steps:
    `pull_request_review_id == review_id`. Do not filter these comments by
    comment-author login. Do not discard a comment because its current line,
    original line, or diff position is null.
-6. Cross-check the result against available review metadata. If the review body
+6. Fetch the pull request's GraphQL review threads with pagination and map every
+   collected REST review comment ID to the GraphQL thread whose comments include
+   that `databaseId`. If any REST comment cannot be mapped to a review-thread ID,
+   return a collection failure and do not hand off a partial list.
+7. Cross-check the result against available review metadata. If the review body
    reports generated comments but the endpoint returns fewer comments, return a
    collection failure instead of `no-new-comments`.
-7. Return either:
+8. Return either:
    - `no-new-comments`, or
-   - a structured list containing review ID, review-thread ID when available,
-     comment ID, path, line or original line, diff hunk, comment body, URL,
-     reviewed head SHA, and submission time.
+   - a structured list containing review ID, review-thread ID, comment ID, path,
+     line or original line, diff hunk, comment body, URL, reviewed head SHA, and
+     submission time.
 
 The review subagent must not edit files, judge comment validity, or request the
 next review on its own.
@@ -227,11 +231,12 @@ For rounds 1 through 5:
 1. Send the current PR head SHA and ledger to the review subagent.
 2. Independently verify the review subagent's result using the numeric
    review-specific comments endpoint. Also refetch unresolved Copilot review
-   threads. A `no-new-comments` result is successful only when the endpoint
-   returns zero comments and no unresolved Copilot threads remain. If either
-   check disagrees, treat it as a collection failure or deliver the discovered
-   comments to the fix subagent; never report success from the subagent result
-   alone.
+   threads and verify that every collected REST comment is mapped to its GraphQL
+   review-thread ID before handoff. A `no-new-comments` result is successful only
+   when the endpoint returns zero comments and no unresolved Copilot threads
+   remain. If either check disagrees or any thread mapping is missing, treat it
+   as a collection failure or deliver the fully mapped discovered comments to
+   the fix subagent; never report success from the subagent result alone.
    If the independently verified result is `no-new-comments`, end the loop
    successfully here. The completed review's suppressed-comment section is
    informational and is not a new-comment queue. Do not continue to the fix
