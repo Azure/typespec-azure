@@ -37,6 +37,12 @@ If neither is available, ask the user for the pull request URL or number.
   backlog is empty.
 - Stop earlier when the new review has no comments or when the fix subagent
   finds no valid actionable comments.
+- Treat GitHub Copilot's completed-review declaration that it generated no new
+  comments as the review outcome. After the parent verifies that the
+  review-specific comment endpoint is empty and no unresolved Copilot threads
+  remain, end the loop immediately. Do not inspect suppressed-comment details,
+  send them to the fix subagent, change the reviewed head, or request another
+  review.
 - If the fifth round still produces valid findings, finish and push that
   round's valid fixes, then stop and report that the cap prevented another
   verification review.
@@ -140,6 +146,17 @@ subagent each round. It owns these steps:
 
 1. **Analyze before editing.** Investigate the relevant source, tests, call
    sites, repository conventions, and pull request intent for every comment.
+   Keep this investigation scoped to the target rule or feature changed by the
+   pull request, its tests and documentation, and direct implementation
+   dependencies.
+   - Other linter rules are prior-art references, not additional review scope.
+     Read them only when needed to identify an existing API or repository
+     pattern required by a delivered finding.
+   - Prefer exact symbol/API searches and stop after finding a small
+     representative set. Do not broadly audit neighboring rules.
+   - Never modify, validate, or report unrelated rules unless the delivered
+     comment directly identifies a shared dependency whose change is required
+     for the target fix.
 2. Classify each comment as:
    - `valid-actionable`
    - `invalid-or-not-applicable`
@@ -221,7 +238,9 @@ For rounds 1 through 5:
    comments to the fix subagent; never report success from the subagent result
    alone.
    If the independently verified result is `no-new-comments`, end the loop
-   successfully here. Do not continue to the fix handoff.
+   successfully here. The completed review's suppressed-comment section is
+   informational and is not a new-comment queue. Do not continue to the fix
+   handoff and do not request a verification review for the unchanged head.
 3. Send its new structured comments to the fix subagent.
 4. If the fix subagent returns `no-valid-comments`, reply with its rejection
    rationale, resolve the safely rejected threads, verify that no processed
