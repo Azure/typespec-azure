@@ -53,11 +53,7 @@ export const getCollectionOnlyHasValueAndNextLinkRule = createRule({
 
 function isCollectionGetPath(path: string): boolean {
   const pathWithoutQuery = path.split("?")[0];
-  if (
-    pathWithoutQuery.endsWith("}") ||
-    path.endsWith("operations") ||
-    path.endsWith("default")
-  ) {
+  if (pathWithoutQuery.endsWith("}") || path.endsWith("operations") || path.endsWith("default")) {
     return false;
   }
 
@@ -77,15 +73,12 @@ function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefi
 
     for (const content of response.responses) {
       const body = content.body;
-      if (body?.type.kind !== "Model") {
+      if (body?.bodyKind !== "single" || body.type.kind !== "Model") {
         continue;
       }
 
       const bodyModel = body.property?.type.kind === "Model" ? body.property.type : body.type;
-      if (
-        isArrayModelType(bodyModel) ||
-        bodyModel.properties.size === 0
-      ) {
+      if (isArrayModelType(bodyModel) || bodyModel.properties.size === 0) {
         continue;
       }
 

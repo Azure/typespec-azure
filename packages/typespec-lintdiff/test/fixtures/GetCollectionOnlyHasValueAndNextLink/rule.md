@@ -36,6 +36,8 @@ coverage is warranted.
 - direct array response schemas do not expose `schema.properties` in Swagger and are skipped
 - property-less object response schemas, such as direct `Record<T>` bodies, do not expose
   `schema.properties` in Swagger and are skipped
+- file and multipart response bodies emit Swagger `file` or `string` schemas without
+  `schema.properties` and are skipped
 - non-collection point GET paths with an odd provider-tail segment count are skipped even when
   their response shape would be invalid for a collection GET
 - TypeSpec route query suffixes are ignored for terminal path-parameter and provider-tail path
@@ -49,14 +51,16 @@ coverage is warranted.
 
 ## Test Cases
 
-| ID                            | Violation | Description                                                       |
-| ----------------------------- | --------- | ----------------------------------------------------------------- |
-| `extra-collection-props`      | yes       | Raw ARM collection GET response adds an extra top-level property  |
-| `extension-scope-value-only`  | yes       | Provider-tail collection path response declares only `value`      |
-| `only-value-and-nextlink`     | no        | Raw ARM collection GET response keeps only value and `nextLink`   |
-| `array-response-body`         | no        | Named array response body has no Swagger `schema.properties` node |
-| `direct-array-response-body`  | no        | Direct `T[]` response body has no Swagger `schema.properties` node |
-| `record-response-body`        | no        | Direct `Record<T>` response body has no Swagger `schema.properties` node |
-| `terminal-resource-invalid-response` | no | Odd provider-tail point GET with a query suffix skips an otherwise invalid response |
-| `operations-suffix-invalid-response` | no | Path ending in `operations` skips an otherwise invalid response |
-| `operations-query-suffix-invalid-response` | yes | Raw path ending in `?disambiguation_dummy` does not match Swagger's `operations` suffix exclusion |
+| ID                                         | Violation | Description                                                                                       |
+| ------------------------------------------ | --------- | ------------------------------------------------------------------------------------------------- |
+| `extra-collection-props`                   | yes       | Raw ARM collection GET response adds an extra top-level property                                  |
+| `extension-scope-value-only`               | yes       | Provider-tail collection path response declares only `value`                                      |
+| `only-value-and-nextlink`                  | no        | Raw ARM collection GET response keeps only value and `nextLink`                                   |
+| `array-response-body`                      | no        | Named array response body has no Swagger `schema.properties` node                                 |
+| `direct-array-response-body`               | no        | Direct `T[]` response body has no Swagger `schema.properties` node                                |
+| `record-response-body`                     | no        | Direct `Record<T>` response body has no Swagger `schema.properties` node                          |
+| `file-response-body`                       | no        | File response body emits a Swagger `type: file` schema                                            |
+| `multipart-response-body`                  | no        | Multipart response body emits a Swagger `type: string` schema                                     |
+| `terminal-resource-invalid-response`       | no        | Odd provider-tail point GET with a query suffix skips an otherwise invalid response               |
+| `operations-suffix-invalid-response`       | no        | Path ending in `operations` skips an otherwise invalid response                                   |
+| `operations-query-suffix-invalid-response` | yes       | Raw path ending in `?disambiguation_dummy` does not match Swagger's `operations` suffix exclusion |
