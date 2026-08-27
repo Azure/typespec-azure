@@ -115,16 +115,20 @@ export function createRequestHandler(
       if (pp.style === "literal") {
         // literals are always scalar types and require no empty checks
         paramValue = helpers.formatParamValue(pp, imports, indent);
-      } else if (pp.location === "client") {
-        // required/optional client params have already been resolved
-        // in the constructor, so we can just use the client param value here.
-        // NOTE: we must check this before style === "required"
+      } else if (pp.location === "client" && pp.kind === "pathScalarParam" && pp.isApiVersion) {
+        // path API version params have already been resolved in the constructor
+        // and will never be a factory method param so we can just use the value
         paramValue = helpers.getParamName(pp);
-      } else if (pp.style === "required") {
+      } else if (pp.style === "required" || pp.location === "client") {
         // NOTE: we include client params here since they behave
         // like required params (i.e. not grouped).
 
         // emit check to ensure path param isn't an empty string
+        // NOTE: we _must_ include the empty path param check for client
+        // path params even though they were already validated in the
+        // ctor. this is to handle the case of client accessor methods
+        // that take a path param since we can't validate it there as those
+        // methods don't return an error
         if (pp.kind === "pathScalarParam") {
           // we only need to do this for params that have an underlying type of string
           if (
@@ -132,7 +136,7 @@ export function createRequestHandler(
               (pp.type.kind === "constant" && pp.type.type === "string")) &&
             !pp.omitEmptyStringCheck
           ) {
-            text += helpers.emitEmptyPathParamCheck(pp, imports, indent);
+            text += helpers.emitEmptyPathParamCheck(pp, "method", imports, indent);
           }
         }
 
