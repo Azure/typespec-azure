@@ -42,8 +42,9 @@ validate, commit, push, or create a PR for a rejected invocation.
 ## Worker existing TypeSpec coverage check
 
 Dispatcher mode keeps its preparation-only behavior and does not perform this
-check. In worker mode, after verifying the dispatcher-prepared dependencies but
-before preparing the comparison harness or starting the Development workflow,
+check. In worker mode, after verifying the supplied worktrees but before
+installing or repairing dependencies, preparing the comparison harness, or
+starting the Development workflow,
 determine whether the requested Swagger validator rule is already enforced by
 an official TypeSpec Azure library or by the ARM TypeSpec templates. This is a
 mandatory semantic check, not an exact-name search.
@@ -141,10 +142,12 @@ An invocation with `--worker` handles exactly one rule interactively. Verify
 that the supplied typespec-azure worktree is on the rule branch, the supplied
 specs worktree is at the pinned `specsCommit`, and both are clean except for
 known in-progress changes for that rule. Skip branch and worktree creation,
-verify the dispatcher-prepared dependencies and prepare the fixture comparison
-harness as described below, then execute the Development workflow. Never accept
-multiple rule IDs in worker mode and never delegate the complete workflow to a
-development subagent.
+perform the existing TypeSpec coverage check, verify or repair the
+dispatcher-prepared dependencies, and prepare the fixture comparison harness as
+described below, then execute the Development workflow. A missing or incomplete
+dependency installation is recoverable worker setup, not a reason to require
+another user invocation. Never accept multiple rule IDs in worker mode and
+never delegate the complete workflow to a development subagent.
 
 ## Orchestration
 
@@ -212,6 +215,15 @@ separate VS Code windows and run independent top-level worker sessions.
    - verify the pnpm workspace install and the specs worktree's
      `node_modules/.bin/tsp`, and confirm the lintdiff package build succeeds;
      the existence of `node_modules` alone is not sufficient
+   - from the lintdiff package, resolve every package imported directly by the
+     fixture harness, including
+     `@microsoft.azure/openapi-validator-core`,
+     `@microsoft.azure/openapi-validator-rulesets`, and
+     `@microsoft.azure/openapi-validator`; a transitive package present only
+     under pnpm's virtual store does not satisfy a direct harness import
+   - run a lightweight fixture-harness smoke check that loads the validation
+     entry point far enough to expose missing-package and module-resolution
+     errors; do not rely only on build output that excludes the test harness
    - treat any install or verification failure as a dispatch failure and do not
      hand off that worker for interactive development
 8. Report the 1-based handoff ID, rule ID, canonical validator rule slug, target
@@ -235,24 +247,49 @@ linter when source changes.
 Before starting the Development workflow, the top-level worker must prepare
 its supplied worktrees:
 
-1. Ensure both worktrees are clean and verify the dispatcher-prepared
-   dependencies against their lockfiles. Confirm the typespec-azure worktree
-   has its initialized `core` submodule and usable pnpm workspace dependencies,
-   confirm the lintdiff dependency closure has built output, and confirm the
-   specs worktree has `node_modules/.bin/tsp`. Do not reinstall or rebuild
-   unchanged dependencies in worker mode. Stop and report an incomplete
-   dispatcher handoff if any verification fails.
-2. Perform the mandatory Worker existing TypeSpec coverage check. Stop without
-   preparing the comparison harness when the result is `already covered`,
+1. Ensure both worktrees are at the expected branch or commit and are clean
+   except for known in-progress changes for this rule. Stop only when continuing
+   would overwrite or mix unrelated changes.
+2. Perform the mandatory Worker existing TypeSpec coverage check before doing
+   dependency work. Stop without installing dependencies or preparing the
+   comparison harness when the result is `already covered`,
    `template-enforced`, or `uncertain`.
-3. Prepare the fixture comparison harness. Either:
+3. Verify the dispatcher-prepared dependencies against their lockfiles. Confirm
+   the typespec-azure worktree has its initialized `core` submodule and usable
+   pnpm workspace dependencies, confirm the lintdiff dependency closure has
+   built output, confirm direct fixture-harness imports resolve from the
+   lintdiff package, and confirm the specs worktree has
+   `node_modules/.bin/tsp`. Do not reinstall or rebuild dependencies that pass
+   these checks.
+4. If a dependency or build check fails, recover in the current worker session
+   instead of stopping for another user invocation:
+   - identify the narrow failed layer: submodule initialization, mise tools,
+     typespec-azure pnpm install, lintdiff dependency build, specs `npm ci`, or
+     direct harness package resolution
+   - rerun only that layer using the same pinned, lockfile-respecting commands
+     required in dispatcher mode, then repeat its concrete verification
+   - if `ERR_PNPM_OUTDATED_LOCKFILE` matches the documented lintdiff-importer
+     case, use the documented no-lockfile fallback rather than editing the
+     lockfile merely to complete local setup
+   - if harness source directly imports a package that is absent from its
+     manifest, treat that as a repository dependency defect rather than an
+     installation defect: add the narrow direct development dependency with
+     the repository package manager, retain the manifest and lockfile change as
+     an explicit harness prerequisite, and continue the rule workflow
+   - never use an unversioned global install, manually copy packages into
+     `node_modules`, or silently bypass the lockfile
+   - stop only after the bounded repair fails because of a concrete external
+     blocker such as unavailable credentials or network, insufficient disk,
+     an unsatisfied pinned toolchain, or conflicting unrelated worktree changes;
+     report the attempted repair and exact blocker
+5. Prepare the fixture comparison harness. Either:
    - run `pnpm --dir packages/typespec-lintdiff compare:setup -- --specs-repo
 <isolated-specs-worktree>`, or
    - set and verify `LINTDIFF_VALIDATOR_ROOT` and `LINTDIFF_COMMON_TYPES`
      against existing local checkouts.
      Do not assume a fresh rule worktree already contains
      `test/azure-openapi-validator` or `test/common-types`.
-4. Verify that the specs worktree's local
+6. Verify that the specs worktree's local
    `node_modules/tsp-lintdiff-local-linter` resolves directly to the supplied
    typespec-azure worktree. `compare:setup` creates a direct per-worktree link
    and does not use npm's shared global link registry, so separate specs
@@ -387,8 +424,10 @@ Before preparing the PR:
 1. Confirm `migration.md` contains the latest corpus evidence.
 2. Restore all generated changes under
    `packages/typespec-lintdiff/specs`.
-3. Confirm the remaining diff contains only the production TypeSpec rule and
-   directly related fixtures, snapshots, tests, and migration note.
+3. Confirm the remaining diff contains only the production TypeSpec rule,
+   directly related fixtures, snapshots, tests, and migration note, plus any
+   explicit package manifest and lockfile repair required for the fixture
+   harness to load its direct imports.
 4. Stage explicit rule-related paths. Never use a broad command that could
    include refreshed coverage data.
 
@@ -435,7 +474,8 @@ creating a draft PR.
    based directly on the user-supplied target branch.
 2. Confirm neither the rule commit nor generated coverage data was added to the
    target branch.
-3. Commit only the explicit rule-related paths identified above.
+3. Commit only the explicit rule-related paths and any required fixture-harness
+   dependency repair identified above.
 4. Push both the target branch and rule branch to the `origin` repository.
 5. Create the pull request in the `origin` repository as a **draft**, with the
    rule branch as head and the user-supplied target branch as base. Do not mark
@@ -488,12 +528,16 @@ creating a draft PR.
   `node_modules/tsp-lintdiff-local-linter` to the same rule worktree.
 - Worker mode must reuse and verify the supplied worktrees; it must not create
   replacements or dispatch another agent to own the complete workflow.
+- Worker mode must repair an incomplete dispatcher dependency handoff in place
+  when the bounded recovery steps can do so safely. It must not stop merely to
+  ask the user to rerun the dispatcher or invoke the worker again.
 - Stop if either worktree has unrelated changes before the workflow starts.
 - Surface compile, projection, linking, and corpus failures explicitly.
 - Do not silently omit failed projects from the conclusion.
 - Do not commit `packages/typespec-lintdiff/specs` changes in the rule PR.
 - Keep required changes focused on the TypeSpec rule and directly related
-  tests.
+  tests, except for a narrowly scoped fixture-harness dependency repair needed
+  to execute validation.
 - Do not stop after validation when the requested workflow includes a draft PR.
 - Do not skip independent review because focused tests or corpus coverage pass.
 
@@ -515,7 +559,8 @@ Worker mode returns:
 - per-rule full-run project overlap and one-sided project lists
 - per-rule compile failures or remaining uncertainty
 - per-rule review findings adopted and rejected, with reasons
-- the explicit rule-related files ready for each PR
+- the explicit rule-related files and any required fixture-harness dependency
+  repair ready for each PR
 - each created draft PR URL
 
 ## Post-run process review
