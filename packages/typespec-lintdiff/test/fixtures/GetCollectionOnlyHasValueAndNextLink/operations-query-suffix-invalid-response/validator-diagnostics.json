@@ -1,0 +1,16 @@
+[
+  {
+    "code": "GetCollectionOnlyHasValueAndNextLink",
+    "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model.",
+    "path": [
+      "x-ms-paths",
+      "/scope/providers/Microsoft.TestService/customoperations?disambiguation_dummy",
+      "get",
+      "responses",
+      "200",
+      "schema",
+      "properties"
+    ],
+    "severity": 0
+  }
+]
