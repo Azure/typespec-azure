@@ -58,7 +58,21 @@ mise exec -- pnpm --dir packages\typespec-lintdiff specs:coverage --specs-repo C
 | final post-fix `coverage-breakdown.md` run  | production   |             61 assessable |            61 assessable |           61 |                   0 |                   0 |                       290 |                          290 |
 | Raw rule shards                             | production   | 63 all validator projects | 63 all TypeSpec projects |           63 |                   0 |                   0 |                       429 |                          305 |
 
-The final coverage row excludes projects outside the assessable compiled population and normalizes the report population, so its project and diagnostic totals differ from the raw rule shard totals. Raw diagnostic equality is not expected because Swagger reports emitted OpenAPI occurrences while TypeSpec reports semantic source targets.
+The two raw-shard projects excluded from the 61-project assessable population are:
+
+- `specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices`
+- `specification/network/resource-manager/Microsoft.Network/Network/Network`
+
+Both have raw validator and TypeSpec rule-shard entries, but both are among the six TypeSpec compile
+failures listed below. The coverage harness builds `failedProjects` from TypeSpec project results
+whose status is `failed`, then removes diagnostics from those projects on both the validator and
+TypeSpec sides before constructing each rule's project sets and diagnostic totals. Consequently,
+neither failed project participates in overlap or one-sided-project classification: the raw
+63-project population becomes 61 assessable projects. This is a compile-status population
+exclusion, not diagnostic-identity deduplication.
+
+Raw diagnostic equality is not expected because Swagger reports emitted OpenAPI occurrences while
+TypeSpec reports semantic source targets.
 
 ## Project-set comparison
 
