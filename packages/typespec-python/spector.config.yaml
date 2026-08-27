@@ -110,7 +110,6 @@ specs:
   "special-headers/repeatability": true
   special-words: true
   "streaming/jsonl": true
-  "streaming/sse": true
   "type/array": true
   "type/dictionary": true
   "type/enum/extensible": true
@@ -140,3 +139,6 @@ specs:
   # --- Tracked skips ---
   # multi-file upload not yet supported by the Python emitter
   type/file: false
+  # `Unnamed.Info` and `Protocol.Info` collide once the Python emitter flattens
+  # models into a single `_models.py`: https://github.com/Azure/typespec-azure/issues/5332
+  "streaming/sse": false
