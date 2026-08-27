@@ -4,4 +4,5 @@ packages:
   - "@azure-tools/typespec-ts"
 ---
 
-Generate TypeScript clients with the opaque API-version default configured for each client.
+Generate TypeScript operations with inherited opaque API-version defaults without allowing a parent
+client option to override a child operation's distinct default.

@@ -1,8 +1,8 @@
-import { getEffectiveApiVersionOverride } from "@azure-tools/typespec-azure-core";
 import { createDiagnosticCollector, type Diagnostic, getDoc, getSummary } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { getServers, type HttpServer } from "@typespec/http";
 import {
+  getClientDefaultValue,
   getClientInitializationOptions,
   getClientNameOverride,
   getClientNamespace,
@@ -25,6 +25,7 @@ import {
   UsageFlags,
 } from "./interfaces.js";
 import {
+  createClientScopedMethodParameter,
   createGeneratedName,
   getActualClientType,
   getClientDoc,
@@ -204,11 +205,6 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     name = getLibraryName(context, client.type);
   }
   const clientType = getActualClientType(client);
-  const apiVersionDefaultValue = getEffectiveApiVersionOverride(
-    context.program,
-    clientType,
-    context.emitterName,
-  );
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -219,7 +215,6 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     methods: [],
     apiVersions: context.getApiVersionsForType(clientType),
     versionsEnum: getVersionsEnum(context, client),
-    ...(apiVersionDefaultValue !== undefined && { apiVersionDefaultValue }),
     namespace: getClientNamespace(context, clientType),
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),
@@ -269,6 +264,15 @@ function addDefaultClientParameters<
       // the api version param as well
       apiVersionParam = context.__clientParametersCache.get(sc)?.find((x) => x.isApiVersionParam);
       if (apiVersionParam) {
+        const explicitDefault = apiVersionParam.__raw
+          ? getClientDefaultValue(context, apiVersionParam.__raw)
+          : undefined;
+        apiVersionParam = createClientScopedMethodParameter(
+          context,
+          apiVersionParam,
+          client.__raw,
+          typeof explicitDefault === "string" ? explicitDefault : undefined,
+        );
         context.__clientParametersCache.get(client.__raw)?.push(apiVersionParam);
         break;
       }
@@ -286,14 +290,6 @@ function addDefaultClientParameters<
       multipleServiceApiVersionParam.optional = true;
       defaultClientParamters.push(multipleServiceApiVersionParam);
     } else {
-      if (client.apiVersionDefaultValue !== undefined) {
-        apiVersionParam = { ...apiVersionParam };
-        apiVersionParam.clientDefaultValue = client.apiVersionDefaultValue;
-      }
-      // For single-service clients, API version parameters are optional only when they have a client default value
-      if (apiVersionParam.clientDefaultValue !== undefined) {
-        apiVersionParam.optional = true;
-      }
       defaultClientParamters.push(apiVersionParam);
     }
   }
@@ -355,7 +351,16 @@ function createSdkClientInitializationType<
       );
       result.__raw = initializationOptions.parameters;
       for (const parameter of initializationOptions.parameters.properties.values()) {
-        const clientParameter = diagnostics.pipe(getSdkMethodParameter(context, parameter));
+        const methodParameter = diagnostics.pipe(getSdkMethodParameter(context, parameter));
+        const explicitDefault = getClientDefaultValue(context, parameter);
+        const clientParameter = methodParameter.isApiVersionParam
+          ? createClientScopedMethodParameter(
+              context,
+              methodParameter,
+              client,
+              typeof explicitDefault === "string" ? explicitDefault : undefined,
+            )
+          : methodParameter;
         clientParameter.onClient = true;
         result.parameters.push(clientParameter);
       }
@@ -422,7 +427,20 @@ function createSdkClientInitializationType<
     const childParamNames = new Set(result.parameters.map((p) => p.name));
 
     // Only add parent params that aren't already defined in child
-    const inheritedParams = parentParams.filter((p) => !childParamNames.has(p.name));
+    const inheritedParams = parentParams
+      .filter((p) => !childParamNames.has(p.name))
+      .map((p) => {
+        if (p.kind !== "method" || !p.isApiVersionParam) {
+          return p;
+        }
+        const explicitDefault = p.__raw ? getClientDefaultValue(context, p.__raw) : undefined;
+        return createClientScopedMethodParameter(
+          context,
+          p,
+          client,
+          typeof explicitDefault === "string" ? explicitDefault : undefined,
+        );
+      });
 
     result.parameters = [...inheritedParams, ...result.parameters];
 

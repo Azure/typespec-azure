@@ -21,6 +21,7 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 import {
   getAccess,
+  getClientDefaultValue,
   getDisablePageable,
   getMarkAsPageable,
   getNextLinkVerb,
@@ -64,6 +65,7 @@ import {
   UsageFlags,
 } from "./interfaces.js";
 import {
+  createClientScopedMethodParameter,
   createGeneratedName,
   findRootSourceProperty,
   getActualClientType,
@@ -707,7 +709,15 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
       // add API version and subscription ID parameters to the client parameters
       if (sdkMethodParam.isApiVersionParam) {
         if (!clientParams.find((x) => x.isApiVersionParam)) {
-          clientParams.push(sdkMethodParam);
+          const explicitDefault = getClientDefaultValue(context, param);
+          clientParams.push(
+            createClientScopedMethodParameter(
+              context,
+              sdkMethodParam,
+              client.__raw,
+              typeof explicitDefault === "string" ? explicitDefault : undefined,
+            ),
+          );
         }
       } else if (isSubscriptionId(context, param)) {
         if (!clientParams.find((x) => isSubscriptionId(context, x))) {

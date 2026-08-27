@@ -41,27 +41,27 @@ export const $overrideApiVersion: OverrideApiVersionDecorator = (
  *
  * @param program The TypeSpec program.
  * @param target The directly decorated namespace or interface.
- * @param emitterName The emitter language scope, such as `python`.
+ * @param scope The emitter language scope, such as `python`.
  */
 export function getApiVersionOverride(
   program: Program,
   target: Namespace | Interface,
-  emitterName?: string,
+  scope?: string,
 ): string | undefined {
   const values = getApiVersionOverrideState(program, target);
   if (values === undefined) {
     return undefined;
   }
 
-  if (emitterName !== undefined) {
-    const scope = normalizeEmitterName(emitterName);
-    const scopedValue = values[scope];
+  if (scope !== undefined) {
+    const normalizedScope = normalizeScope(scope);
+    const scopedValue = values[normalizedScope];
     if (typeof scopedValue === "string") {
       return scopedValue;
     }
 
     const negationScopes = values[negationScopesKey];
-    if (Array.isArray(negationScopes) && negationScopes.includes(scope)) {
+    if (Array.isArray(negationScopes) && negationScopes.includes(normalizedScope)) {
       return undefined;
     }
   }
@@ -75,12 +75,12 @@ export function getApiVersionOverride(
  *
  * @param program The TypeSpec program.
  * @param target The namespace, interface, or operation to resolve.
- * @param emitterName The emitter language scope, such as `python`.
+ * @param scope The emitter language scope, such as `python`.
  */
 export function getEffectiveApiVersionOverride(
   program: Program,
   target: Namespace | Interface | Operation,
-  emitterName?: string,
+  scope?: string,
 ): string | undefined {
   let namespace: Namespace | undefined;
 
@@ -89,7 +89,7 @@ export function getEffectiveApiVersionOverride(
       namespace = target;
       break;
     case "Interface": {
-      const override = getApiVersionOverride(program, target, emitterName);
+      const override = getApiVersionOverride(program, target, scope);
       if (override !== undefined) {
         return override;
       }
@@ -98,7 +98,7 @@ export function getEffectiveApiVersionOverride(
     }
     case "Operation": {
       if (target.interface) {
-        const override = getApiVersionOverride(program, target.interface, emitterName);
+        const override = getApiVersionOverride(program, target.interface, scope);
         if (override !== undefined) {
           return override;
         }
@@ -109,7 +109,7 @@ export function getEffectiveApiVersionOverride(
   }
 
   while (namespace) {
-    const override = getApiVersionOverride(program, namespace, emitterName);
+    const override = getApiVersionOverride(program, namespace, scope);
     if (override !== undefined) {
       return override;
     }
@@ -174,10 +174,10 @@ function parseScopes(scope: string): [negationScopes: string[], scopes: string[]
   return [negationScopes, scopes];
 }
 
-function normalizeEmitterName(emitterName: string): string {
-  const match = emitterName.match(/(?:cadl|typespec|client|server)-([^\\/-]*)/);
+function normalizeScope(scope: string): string {
+  const match = scope.match(/(?:cadl|typespec|client|server)-([^\\/-]*)/);
   if (!match || match.length < 2) {
-    return emitterName;
+    return scope;
   }
   return ["typescript", "ts"].includes(match[1]) ? "javascript" : match[1];
 }

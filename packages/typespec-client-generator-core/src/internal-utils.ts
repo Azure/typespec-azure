@@ -1,5 +1,6 @@
 import {
   FinalStateValue,
+  getEffectiveApiVersionOverride,
   getLroMetadata,
   isPreviewVersion,
   type LroMetadata,
@@ -328,12 +329,44 @@ export function updateWithApiVersionInformation(
   type: ModelProperty,
   client?: SdkClient,
   operation?: Operation,
+  explicitClientDefaultValue?: string,
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: string;
 } {
   const isApiVersionParam = isApiVersion(context, type);
-  if (!isApiVersionParam || !client) {
+  if (!isApiVersionParam) {
+    return { isApiVersionParam, clientDefaultValue: undefined };
+  }
+
+  let apiVersionOverride: string | undefined;
+  if (operation) {
+    let declaration: Operation | undefined = operation;
+    while (declaration && apiVersionOverride === undefined) {
+      apiVersionOverride = getEffectiveApiVersionOverride(
+        context.program,
+        declaration,
+        context.emitterName,
+      );
+      declaration = declaration.sourceOperation;
+    }
+  } else if (client) {
+    apiVersionOverride = getEffectiveApiVersionOverride(
+      context.program,
+      getActualClientType(client),
+      context.emitterName,
+    );
+  }
+
+  if (apiVersionOverride !== undefined) {
+    return { isApiVersionParam, clientDefaultValue: apiVersionOverride };
+  }
+
+  if (explicitClientDefaultValue !== undefined) {
+    return { isApiVersionParam, clientDefaultValue: explicitClientDefaultValue };
+  }
+
+  if (!client) {
     return { isApiVersionParam, clientDefaultValue: undefined };
   }
 
@@ -359,6 +392,39 @@ export function updateWithApiVersionInformation(
 
   // No operation provided for multi-service client, return undefined
   return { isApiVersionParam, clientDefaultValue: undefined };
+}
+
+export function createClientScopedMethodParameter(
+  context: TCGCContext,
+  parameter: SdkMethodParameter,
+  client: SdkClient,
+  explicitClientDefaultValue?: string,
+): SdkMethodParameter {
+  if (!parameter.isApiVersionParam || !parameter.__raw) {
+    return { ...parameter };
+  }
+
+  const apiVersionInfo = updateWithApiVersionInformation(
+    context,
+    parameter.__raw,
+    client,
+    undefined,
+    explicitClientDefaultValue,
+  );
+  const optional = parameter.__raw.optional || apiVersionInfo.clientDefaultValue !== undefined;
+  if (
+    parameter.isApiVersionParam === apiVersionInfo.isApiVersionParam &&
+    parameter.clientDefaultValue === apiVersionInfo.clientDefaultValue &&
+    parameter.optional === optional
+  ) {
+    return parameter;
+  }
+
+  return {
+    ...parameter,
+    ...apiVersionInfo,
+    optional,
+  };
 }
 
 export function filterApiVersionsWithDecorators(

@@ -1357,6 +1357,13 @@ export function getSdkModelPropertyTypeBase(
     encode = "newlineDelimited";
   }
   const clientDefaultValue = getClientDefaultValue(context, type);
+  const apiVersionInfo = updateWithApiVersionInformation(
+    context,
+    type,
+    operation ? context.getClientForOperation(operation) : undefined,
+    operation,
+    typeof clientDefaultValue === "string" ? clientDefaultValue : undefined,
+  );
   return diagnostics.wrap({
     __raw: type,
     doc: getClientDoc(context, type),
@@ -1367,12 +1374,7 @@ export function getSdkModelPropertyTypeBase(
     isGeneratedName: false,
     isExactName,
     optional: type.optional,
-    ...updateWithApiVersionInformation(
-      context,
-      type,
-      operation ? context.getClientForOperation(operation) : undefined,
-      operation,
-    ),
+    ...apiVersionInfo,
     onClient,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
@@ -1380,7 +1382,8 @@ export function getSdkModelPropertyTypeBase(
     access: getAccess(context, type),
     flatten: shouldFlattenProperty(context, type),
     encode,
-    ...(clientDefaultValue !== undefined && { clientDefaultValue }),
+    ...(clientDefaultValue !== undefined &&
+      !apiVersionInfo.isApiVersionParam && { clientDefaultValue }),
   });
 }
 

@@ -125,8 +125,7 @@ func (client *VersionedServiceClient) GetParent(ctx context.Context, options *Ve
 		return VersionedServiceClientGetParentResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return VersionedServiceClientGetParentResponse{}, err
+		return VersionedServiceClientGetParentResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return VersionedServiceClientGetParentResponse{}, nil
 }
@@ -187,8 +186,7 @@ func (client *VersionedServiceLegacyOperationsClient) GetLegacy(ctx context.Cont
 		return VersionedServiceLegacyOperationsClientGetLegacyResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return VersionedServiceLegacyOperationsClientGetLegacyResponse{}, err
+		return VersionedServiceLegacyOperationsClientGetLegacyResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return VersionedServiceLegacyOperationsClientGetLegacyResponse{}, nil
 }
@@ -249,8 +247,7 @@ func (client *VersionedServiceCurrentOperationsClient) GetCurrent(ctx context.Co
 		return VersionedServiceCurrentOperationsClientGetCurrentResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return VersionedServiceCurrentOperationsClientGetCurrentResponse{}, err
+		return VersionedServiceCurrentOperationsClientGetCurrentResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return VersionedServiceCurrentOperationsClientGetCurrentResponse{}, nil
 }

@@ -234,10 +234,7 @@ export function buildClientContext(
           : [];
     const apiVersionInEndpoint =
       templateArguments && templateArguments.find((p) => p.isApiVersionParam);
-    if (
-      !apiVersionInEndpoint &&
-      (apiVersionParam.optional || apiVersionParam.clientDefaultValue !== undefined)
-    ) {
+    if (!apiVersionInEndpoint && apiVersionParam.clientDefaultValue) {
       apiVersionStatement += `const ${apiVersionParamName} = options.${apiVersionParamName};`;
     }
   } else {
@@ -306,8 +303,14 @@ function shouldUseStringApiVersionType(
   if (!parameter.isApiVersionParam) {
     return false;
   }
-  const name = parameter.name.toLowerCase();
-  return name === "apiversion" || name === "serviceversion";
+  if (parameter.name.toLowerCase() === "apiversion") {
+    return true;
+  }
+  return (
+    typeof parameter.clientDefaultValue === "string" &&
+    parameter.type.kind === "enum" &&
+    !parameter.type.values.some((value) => value.value === parameter.clientDefaultValue)
+  );
 }
 
 function getDocsWithKnownVersion(

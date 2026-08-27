@@ -52,15 +52,16 @@ needTCGC: true
 
 ```ts clientContext
 import { logger } from "../../logger.js";
+import { Versions } from "../../models/versionedService/models.js";
 import { Client, ClientOptions, getClient } from "@azure-rest/core-client";
 
 export interface VersionedServiceContext extends Client {
-  serviceVersion?: string;
+  serviceVersion?: Versions;
 }
 
 /** Optional parameters for the client. */
 export interface VersionedServiceClientOptionalParams extends ClientOptions {
-  serviceVersion?: string;
+  serviceVersion?: Versions;
 }
 
 export function createVersionedService(
@@ -73,6 +74,7 @@ export function createVersionedService(
     loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
+  const serviceVersion = options.serviceVersion;
   return { ...clientContext, serviceVersion } as VersionedServiceContext;
 }
 ```
@@ -118,6 +120,7 @@ export async function _getParentDeserialize(result: PathUncheckedResponse): Prom
 
   return;
 }
+
 export async function getParent(
   context: Client,
   options: GetParentOptionalParams = { requestOptions: {} },
@@ -150,6 +153,7 @@ export async function _getLegacyDeserialize(result: PathUncheckedResponse): Prom
 
   return;
 }
+
 export async function getLegacy(
   context: Client,
   options: GetLegacyOptionalParams = { requestOptions: {} },
@@ -182,6 +186,7 @@ export async function _getCurrentDeserialize(result: PathUncheckedResponse): Pro
 
   return;
 }
+
 export async function getCurrent(
   context: Client,
   options: GetCurrentOptionalParams = { requestOptions: {} },

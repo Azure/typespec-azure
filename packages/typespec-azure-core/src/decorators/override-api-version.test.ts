@@ -87,7 +87,8 @@ it("preserves overrides on projected interfaces", async () => {
 });
 
 it("selects overrides by emitter scope", async () => {
-  const { program, Service, Widgets, ExcludingPython } = await Tester.compile(t.code`
+  const { program, Service, Widgets, MultipleScopes, ExcludingPython, ExcludingMultiple } =
+    await Tester.compile(t.code`
     @${decorator}("default-version")
     @${decorator}("python-version", "python")
     namespace ${t.namespace("Service")} {
@@ -97,8 +98,14 @@ it("selects overrides by emitter scope", async () => {
       }
     }
 
+    @${decorator}("python-java-version", "python, java")
+    namespace ${t.namespace("MultipleScopes")} {}
+
     @${decorator}("non-python-version", "!python")
     namespace ${t.namespace("ExcludingPython")} {}
+
+    @${decorator}("non-python-java-version", "!(python, java)")
+    namespace ${t.namespace("ExcludingMultiple")} {}
   `);
 
   expect(getApiVersionOverride(program, Service)).toBe("default-version");
@@ -117,8 +124,16 @@ it("selects overrides by emitter scope", async () => {
     ),
   ).toBe("javascript-version");
   expect(getEffectiveApiVersionOverride(program, Widgets, "csharp")).toBe("default-version");
+  expect(getApiVersionOverride(program, MultipleScopes, "python")).toBe("python-java-version");
+  expect(getApiVersionOverride(program, MultipleScopes, "java")).toBe("python-java-version");
+  expect(getApiVersionOverride(program, MultipleScopes, "csharp")).toBeUndefined();
   expect(getApiVersionOverride(program, ExcludingPython, "python")).toBeUndefined();
   expect(getApiVersionOverride(program, ExcludingPython, "csharp")).toBe("non-python-version");
+  expect(getApiVersionOverride(program, ExcludingMultiple, "python")).toBeUndefined();
+  expect(getApiVersionOverride(program, ExcludingMultiple, "java")).toBeUndefined();
+  expect(getApiVersionOverride(program, ExcludingMultiple, "csharp")).toBe(
+    "non-python-java-version",
+  );
 });
 
 it("returns undefined when no override applies", async () => {

@@ -1628,11 +1628,6 @@ export function getParameterMap(
   context: SdkContext,
   param: SdkHttpParameter,
   paramAccessor: string,
-  apiVersionOptions?: {
-    contextParamName?: string;
-    defaultValue?: string;
-    useDefaultOnly: boolean;
-  },
 ): string {
   // Use lowercase for header names since HTTP headers are case-insensitive
   const serializedName =
@@ -1643,18 +1638,12 @@ export function getParameterMap(
   }
 
   // Special case for api-version parameters with default values
-  if (
-    param.isApiVersionParam &&
-    (param.clientDefaultValue !== undefined || apiVersionOptions?.defaultValue !== undefined)
-  ) {
-    const defaultValue = apiVersionOptions?.defaultValue ?? param.clientDefaultValue;
-    // A parent client's runtime API-version option must not cross into a child
-    // client with a distinct API-version default.
-    if (context.emitterOptions?.isMultiService || apiVersionOptions?.useDefaultOnly) {
-      return `"${serializedName}": "${defaultValue}"`;
+  if (param.isApiVersionParam && param.clientDefaultValue) {
+    // For multi-service, use only the default value (don't reference context.apiVersion)
+    if (context.emitterOptions?.isMultiService) {
+      return `"${serializedName}": ${JSON.stringify(param.clientDefaultValue)}`;
     }
-    const paramName = apiVersionOptions?.contextParamName ?? param.name;
-    return `"${serializedName}": ${param.onClient ? "context." : ""}${paramName} ?? "${defaultValue}"`;
+    return `"${serializedName}": ${param.onClient ? "context." : ""}${param.name} ?? ${JSON.stringify(param.clientDefaultValue)}`;
   }
 
   if (hasCollectionFormatInfo(param.kind, (param as any).collectionFormat)) {
@@ -1886,36 +1875,34 @@ function getQueryParameters(
     {
       query: [],
     };
-  const owner = client ? findClientForOperation(client, operation) : undefined;
   const apiVersionContextParam = client?.clientInitialization.parameters.find(
     (p) => p.isApiVersionParam,
   );
-  const apiVersionOptions = {
-    contextParamName: apiVersionContextParam?.name,
-    defaultValue: owner?.apiVersionDefaultValue,
-    useDefaultOnly:
-      owner !== undefined &&
-      owner !== client &&
-      owner.apiVersionDefaultValue !== client?.apiVersionDefaultValue,
-  };
 
   for (const param of operationParameters) {
     if (param.kind === "query") {
       // Check if this parameter still exists in the corresponding method params (after override)
       if (param.methodParameterSegments && param.methodParameterSegments.length > 0) {
         const paramAccessor = getParamAccessor(param);
+        const queryParam = {
+          ...param,
+          name:
+            param.isApiVersionParam && param.onClient && apiVersionContextParam
+              ? apiVersionContextParam.name
+              : param.name,
+          // TODO: remember to remove this hack once compiler gives us a name
+          // https://github.com/microsoft/typespec/issues/6743
+          serializedName: getUriTemplateQueryParamName(param.serializedName),
+        };
+        const useOperationApiVersionDefault =
+          param.isApiVersionParam &&
+          apiVersionContextParam !== undefined &&
+          param.clientDefaultValue !== undefined &&
+          param.clientDefaultValue !== apiVersionContextParam.clientDefaultValue;
         parametersImplementation[param.kind].push({
-          paramMap: getParameterMap(
-            dpgContext,
-            {
-              ...param,
-              // TODO: remember to remove this hack once compiler gives us a name
-              // https://github.com/microsoft/typespec/issues/6743
-              serializedName: getUriTemplateQueryParamName(param.serializedName),
-            },
-            paramAccessor,
-            apiVersionOptions,
-          ),
+          paramMap: useOperationApiVersionDefault
+            ? `"${queryParam.serializedName}": ${JSON.stringify(param.clientDefaultValue)}`
+            : getParameterMap(dpgContext, queryParam, paramAccessor),
           param,
         });
       }
@@ -1925,22 +1912,6 @@ function getQueryParameters(
   const paramStr: string[] = parametersImplementation.query.map((i) => i.paramMap);
 
   return paramStr;
-}
-
-function findClientForOperation(
-  client: SdkClientType<SdkHttpOperation>,
-  operation: ServiceOperation,
-): SdkClientType<SdkHttpOperation> | undefined {
-  if (client.methods.includes(operation)) {
-    return client;
-  }
-  for (const child of client.children ?? []) {
-    const owner = findClientForOperation(child, operation);
-    if (owner) {
-      return owner;
-    }
-  }
-  return undefined;
 }
 
 function getUriTemplateQueryParamName(name: string) {

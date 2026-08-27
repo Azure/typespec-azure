@@ -17,10 +17,19 @@ import type {
  *
  * @param target The namespace or interface whose operations use the API-version override.
  * @param version The non-empty API-version wire value.
- * @param scope The language emitters to which the override applies.
+ * @param scope The language emitter scopes to which the override applies. Use a comma-separated
+ * list for multiple emitters, such as `"python, java"`, or exclude emitters with a negated scope,
+ * such as `"!(python, java)"`.
  * @example Override an interface API version
  * ```typespec
  * @Azure.Core.Legacy.overrideApiVersion("2021-11-01")
+ * interface Widgets {
+ *   get(): void;
+ * }
+ * ```
+ * @example Override an interface API version for Python and Java
+ * ```typespec
+ * @Azure.Core.Legacy.overrideApiVersion("2021-11-01", "python, java")
  * interface Widgets {
  *   get(): void;
  * }
