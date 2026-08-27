@@ -381,7 +381,7 @@ describe("Azure Arm Resources Rest Client", () => {
   });
 
   // extension tracked resource
-  // Skipped: tenant scope requires an empty resource URI; "." is not valid expected behavior.
+  // TODO: fix - tenant scope (empty resourceUri) now produces a double-slash URL ("//providers/...")
   // See https://github.com/Azure/typespec-azure/issues/5314.
   it.skip("should get ExtensionsResources ", async () => {
     const resourceGroupResult = await client.extensionsResources.get(

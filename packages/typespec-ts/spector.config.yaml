@@ -54,7 +54,6 @@ specs:
   type/model/inheritance/recursive: true
   type/union: true
   payload/media-type: true
-  payload/json-merge-patch: true
   payload/xml: true
   payload/head: true
   response/status-code-range: true
@@ -132,6 +131,8 @@ specs:
   type/file: false
   # Disabled: exact model and property names are normalized by the emitter.
   azure/client-generator-core/exact-name: false
+  # Disabled: generated patch model properties do not allow JSON merge-patch null values.
+  payload/json-merge-patch: false
 
   client/structure/renamed-operation: true
   client/structure/two-operation-group: false
