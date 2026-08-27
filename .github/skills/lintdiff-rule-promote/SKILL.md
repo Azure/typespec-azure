@@ -503,9 +503,12 @@ Use this stable PR title pattern:
 Write the PR description as an engineering explanation, not only a change list.
 It must include:
 
-- **Original Swagger linter:** paste the Swagger rule name and docs/source link
-  from the fixture `rule.md` or validator docs, then list a checklist of every
-  specific check the original rule performs.
+- **Original Swagger linter:** include both of these direct GitHub hyperlinks
+  before listing a checklist of every specific check the original rule performs:
+  - `linter code: [<ValidatorRuleId>](<validator source URL>)`
+  - `linter doc: [<validator-doc-file>.md](<validator documentation URL>)`
+  Use the rule name and links from the fixture `rule.md` or validator repository.
+  Do not omit either link or replace them with unlinked paths.
 - **How the Swagger linter works:** explain the Swagger objects it inspects,
   traversal or lookup strategy, conditions and exemptions, diagnostic locations,
   and any known validator defects, stale maps, emitted-occurrence duplication, or

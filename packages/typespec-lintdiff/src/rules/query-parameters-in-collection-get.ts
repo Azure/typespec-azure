@@ -1,6 +1,12 @@
-import { createRule, paramMessage } from "@typespec/compiler";
+import { getArmProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
+import {
+  createRule,
+  getLocationContext,
+  type Namespace,
+  paramMessage,
+  type Program,
+} from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
-import { getArmResourceOperationData } from "@azure-tools/typespec-azure-resource-manager";
 
 export const queryParametersInCollectionGetRule = createRule({
   name: "query-parameters-in-collection-get",
@@ -11,15 +17,22 @@ export const queryParametersInCollectionGetRule = createRule({
     default: paramMessage`Query parameter '${"name"}' should be removed. Collection GET/list operations must not have query parameters other than api-version and $filter.`,
   },
   create(context) {
+    const reportedParameters = new Set<string>();
+
     return {
       operation: (operation) => {
-        const armOperation = getArmResourceOperationData(context.program, operation);
-        if (armOperation?.kind !== "list") {
+        const namespace = operation.interface?.namespace ?? operation.namespace;
+        if (namespace === undefined) {
+          return;
+        }
+
+        const providerNamespace = getArmProviderNamespace(context.program, namespace);
+        if (providerNamespace === undefined) {
           return;
         }
 
         const [httpOperation] = getHttpOperation(context.program, operation);
-        if (httpOperation.verb !== "get") {
+        if (httpOperation.verb !== "get" || !isCollectionPath(httpOperation.path)) {
           return;
         }
 
@@ -28,8 +41,22 @@ export const queryParametersInCollectionGetRule = createRule({
             continue;
           }
 
+          const key = createReportedParameterKey(
+            context.program,
+            namespace,
+            httpOperation.path,
+            parameter.name,
+          );
+          if (reportedParameters.has(key)) {
+            continue;
+          }
+          reportedParameters.add(key);
+
           context.reportDiagnostic({
-            target: parameter.param,
+            target:
+              getLocationContext(context.program, parameter.param).type === "project"
+                ? parameter.param
+                : operation,
             format: {
               name: parameter.name,
             },
@@ -41,6 +68,33 @@ export const queryParametersInCollectionGetRule = createRule({
 });
 
 function isAllowedQueryParameter(name: string): boolean {
-  const normalized = name.toLowerCase();
-  return normalized === "api-version" || normalized === "$filter";
+  return name === "api-version" || name === "$filter";
+}
+
+export function createReportedParameterKey(
+  program: Program,
+  namespace: Namespace,
+  path: string,
+  parameterName: string,
+): string {
+  const providerNamespace = getArmProviderNamespace(program, namespace);
+  if (providerNamespace === undefined) {
+    throw new Error(
+      "Cannot create a collection query parameter key outside an ARM provider namespace.",
+    );
+  }
+  return `${providerNamespace}\0${path}\0${parameterName}`;
+}
+
+function isCollectionPath(path: string): boolean {
+  if (!path.includes(".")) {
+    return false;
+  }
+
+  const providerPath = path.split(".").at(-1);
+  return (
+    providerPath !== undefined &&
+    providerPath.includes("/") &&
+    providerPath.split("/").length % 2 === 0
+  );
 }
