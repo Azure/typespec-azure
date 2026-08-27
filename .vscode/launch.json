@@ -42,24 +42,6 @@
       "smartStep": true
     },
     {
-      "name": "Debug typespec-ts multiple services",
-      "type": "node",
-      "request": "launch",
-      "program": "${workspaceFolder}/packages/typespec-ts/node_modules/@typespec/compiler/cmd/tsp.js",
-      "cwd": "${workspaceFolder}/packages/typespec-ts/test/azure-modular-integration/generated/service/multiple-services",
-      "args": [
-        "compile",
-        "${workspaceFolder}/packages/typespec-ts/temp/specs/service/multiple-services/main.tsp",
-        "--config",
-        "tspconfig.yaml"
-      ],
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/packages/typespec-ts/dist/**/*.js"],
-      "skipFiles": ["<node_internals>/**"],
-      "smartStep": true,
-      "console": "integratedTerminal"
-    },
-    {
       "name": "Attach to Language Server",
       "type": "node",
       "request": "attach",
