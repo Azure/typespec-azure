@@ -39,6 +39,65 @@ eligible subset when any rule is rejected. Do not create worktrees, install
 dependencies, run `compare:setup`, inspect migration evidence, edit files,
 validate, commit, push, or create a PR for a rejected invocation.
 
+## Worker existing TypeSpec coverage check
+
+Dispatcher mode keeps its preparation-only behavior and does not perform this
+check. In worker mode, after verifying the dispatcher-prepared dependencies but
+before preparing the comparison harness or starting the Development workflow,
+determine whether the requested Swagger validator rule is already enforced by
+an official TypeSpec Azure library or by the ARM TypeSpec templates. This is a
+mandatory semantic check, not an exact-name search.
+
+Use the target branch as the source of truth and inspect all of the following:
+
+1. Search the rule documentation under
+   `packages/typespec-azure-core/src/rules` and
+   `packages/typespec-azure-resource-manager/src/rules` for the exact validator
+   rule ID. A matching `## LintDiff Equivalent` section is the strongest direct
+   mapping, but it is only a lead until the implementation is verified.
+2. Inspect the matching TypeSpec rule implementation and the package's
+   `src/linter.ts`. Confirm the rule is registered and compare its actual
+   conditions, exemptions, traversal, and diagnostic population with the
+   validator implementation and tests. Do not infer equivalence from similar
+   names or documentation alone.
+3. Check the maintained ARM rule inventory:
+   <https://azure.github.io/typespec-azure/docs/howtos/arm/arm-rules/>. In a
+   repository checkout, use the official package rule docs and linter
+   registration that generate this inventory as the verifiable source.
+4. Map the validator behavior to the relevant ARM RPC guideline, when one
+   exists, and inspect
+   `website/src/content/docs/docs/howtos/ARM/rpc-guidelines-coverage.md` (rendered
+   at
+   <https://azure.github.io/typespec-azure/docs/howtos/arm/rpc-guidelines-coverage/>).
+   Honor its distinction between full lint coverage, partial coverage,
+   template-enforced behavior, non-lintable behavior, and an actionable gap.
+   When it names template enforcement, inspect the referenced ARM templates or
+   decorators rather than assuming that a missing lint rule is a gap.
+5. Search related terminology and the validator's RPC or guideline identifier,
+   not only the validator rule ID. Older TypeSpec rules may use a different name,
+   and one TypeSpec rule may cover several validator rules.
+
+Classify each requested rule as:
+
+- `already covered`: an enabled official TypeSpec rule enforces all material
+  validator behavior
+- `template-enforced`: valid ARM TypeSpec authoring cannot express the violating
+  shape without bypassing the standard templates
+- `partial`: official rules or templates enforce only part of the validator
+  behavior; record the exact uncovered checks
+- `gap`: no official rule or template enforces the material behavior
+- `uncertain`: the available implementation, registration, or guideline evidence
+  is insufficient to decide safely
+
+For `already covered` or `template-enforced`, stop before preparing the
+comparison harness or changing the temporary lintdiff implementation. Report
+the official rule or template and the code-backed equivalence evidence. For
+`partial`, only continue when the proposed work is explicitly limited to the
+uncovered behavior; reuse or extend the official rule when that is the correct
+ownership instead of creating an overlapping temporary rule. For `uncertain`,
+stop and surface the missing evidence rather than assuming a gap. Only `gap`
+and well-scoped `partial` rules proceed to development.
+
 To continue one dispatched rule interactively in another session, use worker
 mode with the paths reported by the dispatcher:
 
@@ -183,14 +242,17 @@ its supplied worktrees:
    specs worktree has `node_modules/.bin/tsp`. Do not reinstall or rebuild
    unchanged dependencies in worker mode. Stop and report an incomplete
    dispatcher handoff if any verification fails.
-2. Prepare the fixture comparison harness. Either:
+2. Perform the mandatory Worker existing TypeSpec coverage check. Stop without
+   preparing the comparison harness when the result is `already covered`,
+   `template-enforced`, or `uncertain`.
+3. Prepare the fixture comparison harness. Either:
    - run `pnpm --dir packages/typespec-lintdiff compare:setup -- --specs-repo
 <isolated-specs-worktree>`, or
    - set and verify `LINTDIFF_VALIDATOR_ROOT` and `LINTDIFF_COMMON_TYPES`
      against existing local checkouts.
      Do not assume a fresh rule worktree already contains
      `test/azure-openapi-validator` or `test/common-types`.
-3. Verify that the specs worktree's local
+4. Verify that the specs worktree's local
    `node_modules/tsp-lintdiff-local-linter` resolves directly to the supplied
    typespec-azure worktree. `compare:setup` creates a direct per-worktree link
    and does not use npm's shared global link registry, so separate specs
@@ -446,6 +508,8 @@ Dispatcher mode returns only:
 
 Worker mode returns:
 
+- the existing TypeSpec coverage classification and supporting official rule,
+  template, or guideline evidence
 - for each rule, whether and how the TypeSpec rule changed
 - per-rule focused fixture evidence
 - per-rule full-run project overlap and one-sided project lists
