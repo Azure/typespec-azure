@@ -1,11 +1,20 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import { NoTarget, type DiagnosticTarget, type Program } from "@typespec/compiler";
+import { ts } from "ts-morph";
+import { reportDiagnostic } from "../lib.js";
+
 export interface NormalizeNameOption {
   shouldGuard?: boolean;
   customReservedNames?: ReservedName[];
   casingOverride?: CasingConvention;
   numberPrefixOverride?: string;
+}
+
+export interface SdkName {
+  name: string;
+  isExactName?: boolean;
 }
 
 export interface ReservedName {
@@ -206,6 +215,99 @@ export function normalizeName(
     ? guardReservedNames(normalized, nameType, customReservedNames)
     : normalized;
   return fixLeadingNumber(result, nameType, numberPrefixOverride);
+}
+
+export function normalizeSdkName(
+  sdkName: SdkName,
+  nameType: NameType,
+  options: NormalizeNameOption = {},
+): string {
+  if (!sdkName.isExactName) {
+    return normalizeName(sdkName.name, nameType, options);
+  }
+  return sdkName.name;
+}
+
+export function normalizeSdkPropertyName(sdkName: SdkName): string {
+  return sdkName.isExactName ? sdkName.name : normalizeName(sdkName.name, NameType.Property);
+}
+
+export function isValidTypeScriptIdentifierName(name: string): boolean {
+  return /^[$_\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/u.test(name);
+}
+
+export function isValidTypeScriptIdentifier(name: string): boolean {
+  if (!isValidTypeScriptIdentifierName(name)) {
+    return false;
+  }
+  const result = ts.transpileModule(`export const ${name} = 0;`, {
+    reportDiagnostics: true,
+    compilerOptions: {
+      target: ts.ScriptTarget.ES2022,
+      module: ts.ModuleKind.ESNext,
+    },
+  });
+  return (result.diagnostics?.length ?? 0) === 0;
+}
+
+const reportedInvalidExactNames = new WeakMap<Program, WeakSet<object>>();
+
+export function reportInvalidExactName(
+  program: Program,
+  item: SdkName & object,
+  nameType: NameType,
+  nameKind: string,
+  target: DiagnosticTarget | typeof NoTarget = NoTarget,
+): void {
+  if (
+    !item.isExactName ||
+    nameType === NameType.Property ||
+    nameType === NameType.EnumMemberName ||
+    nameType === NameType.File
+  ) {
+    return;
+  }
+
+  const isMethod = nameType === NameType.Method;
+  const isValid = isMethod
+    ? isValidTypeScriptIdentifierName(item.name) &&
+      isValidTypeScriptIdentifier(guardReservedNames(item.name, NameType.Method))
+    : isValidTypeScriptIdentifier(item.name);
+  if (isValid) {
+    return;
+  }
+
+  let reported = reportedInvalidExactNames.get(program);
+  if (!reported) {
+    reported = new WeakSet<object>();
+    reportedInvalidExactNames.set(program, reported);
+  }
+  if (reported.has(item)) {
+    return;
+  }
+  reported.add(item);
+
+  reportDiagnostic(program, {
+    code: "invalid-exact-name",
+    format: { nameKind, name: item.name },
+    target,
+  });
+}
+
+export function formatPropertyName(name: string): string {
+  return isValidTypeScriptIdentifierName(name) ? name : JSON.stringify(name);
+}
+
+export function formatPropertyAccess(base: string, name: string): string {
+  return isValidTypeScriptIdentifierName(name)
+    ? `${base}.${name}`
+    : `${base}[${JSON.stringify(name)}]`;
+}
+
+export function formatOptionalPropertyAccess(base: string, name: string): string {
+  return isValidTypeScriptIdentifierName(name)
+    ? `${base}?.${name}`
+    : `${base}?.[${JSON.stringify(name)}]`;
 }
 
 export function fixLeadingNumber(name: string, nameType: NameType, prefix: string = "_"): string {

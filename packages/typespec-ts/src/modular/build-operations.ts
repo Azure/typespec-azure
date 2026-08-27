@@ -24,7 +24,7 @@ import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
 import { getClientModuleInfo, isMultiEndpointClient } from "../utils/client-utils.js";
 import type { SdkContext } from "../utils/interfaces.js";
-import { NameType, normalizeName } from "../utils/name-utils.js";
+import { NameType, normalizeName, normalizeSdkName } from "../utils/name-utils.js";
 import {
   getMethodHierarchiesMap,
   hasDualFormatSupport,
@@ -187,7 +187,7 @@ export function buildOperationOptions(
           docs: getDocsFromDescription(p.doc),
           hasQuestionToken: true,
           type: getTypeExpression(context, p.type, { isOptional: true }),
-          name: normalizeName(p.name, NameType.Parameter),
+          name: normalizeSdkName(p, NameType.Parameter),
         };
       }),
     ),

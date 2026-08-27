@@ -17,7 +17,14 @@ import { AzureIdentityDependencies } from "../modular/external-dependencies.js";
 import { getSubscriptionId } from "../transform/transform-client-options.js";
 import { hasKeyCredential, hasTokenCredential } from "../utils/credential-utils.js";
 import type { SdkContext } from "../utils/interfaces.js";
-import { NameType, normalizeName } from "../utils/name-utils.js";
+import {
+  formatPropertyName,
+  NameType,
+  normalizeName,
+  normalizeSdkName,
+  normalizeSdkPropertyName,
+  type SdkName,
+} from "../utils/name-utils.js";
 import {
   getMethodHierarchiesMap,
   isTenantLevelOperation,
@@ -63,7 +70,10 @@ export function emitSamples(dpgContext: SdkContext): SourceFile[] {
       generatedFiles,
       subFolder:
         clients.length > 1
-          ? normalizeName(getClassicalClientName(client), NameType.File)
+          ? normalizeSdkName(
+              { name: getClassicalClientName(client), isExactName: client.isExactName },
+              NameType.File,
+            )
           : undefined,
     });
   }
@@ -193,9 +203,10 @@ function emitMethodSamples(
     }
     const prefix = options.classicalMethodPrefix ? `${options.classicalMethodPrefix}.` : "";
     const isPaging = method.kind === "paging";
-    const methodCall = `client.${prefix}${normalizeName(method.oriName ?? method.name, NameType.Property)}(${methodParams.join(
-      ", ",
-    )})`;
+    const methodCall = `client.${prefix}${normalizeSdkName(
+      { name: method.oriName ?? method.name, isExactName: method.isExactName },
+      NameType.Property,
+    )}(${methodParams.join(", ")})`;
     if (isPaging) {
       exampleFunctionBody.push(`const resArray = new Array();`);
       exampleFunctionBody.push(`for await (const item of ${methodCall}) { resArray.push(item); }`);
@@ -244,13 +255,14 @@ function buildParameterValueMap(example: SdkHttpOperationExample) {
 
 function prepareExampleValue(
   context: SdkContext,
-  name: string,
+  name: string | SdkName,
   value: SdkExampleValue | string,
   isOptional?: boolean,
   onClient?: boolean,
 ): ExampleValue {
+  const sdkName = typeof name === "string" ? { name } : name;
   return {
-    name: normalizeName(name, NameType.Parameter, true),
+    name: normalizeSdkName(sdkName, NameType.Parameter, { shouldGuard: true }),
     value: typeof value === "string" ? value : getParameterValue(context, value),
     isOptional: Boolean(isOptional),
     onClient: Boolean(onClient),
@@ -356,13 +368,7 @@ function prepareExampleParameters(
         subscriptionIdValue = getParameterValue(dpgContext, exampleValue.value);
       }
       result.push(
-        prepareExampleValue(
-          dpgContext,
-          param.name,
-          subscriptionIdValue,
-          param.optional,
-          param.onClient,
-        ),
+        prepareExampleValue(dpgContext, param, subscriptionIdValue, param.optional, param.onClient),
       );
       continue;
     }
@@ -413,7 +419,8 @@ function prepareExampleParameters(
       bodyExample.value.kind === "model"
     ) {
       for (const prop of bodyParam.type.properties) {
-        const propExample = bodyExample.value.value[prop.name];
+        const wireName = prop.serializationOptions.json?.name ?? prop.name;
+        const propExample = bodyExample.value.value[wireName] ?? bodyExample.value.value[prop.name];
         if (!propExample) {
           continue;
         }
@@ -422,7 +429,7 @@ function prepareExampleParameters(
           continue;
         }
         result.push(
-          prepareExampleValue(dpgContext, prop.name, propExample, prop.optional, prop.onClient),
+          prepareExampleValue(dpgContext, prop, propExample, prop.optional, prop.onClient),
         );
       }
     } else {
@@ -433,18 +440,17 @@ function prepareExampleParameters(
       if (isNestedBody) {
         const path = segments[0]!;
         // The first segment is the method-level wrapper param (e.g., "body")
-        const methodParamName = path[0]!.name;
         const methodParamOptional = path[0]!.optional;
         // Wrap the example value with the intermediate property names
         let wrappedValue = getParameterValue(dpgContext, bodyExample.value);
         for (let i = path.length - 1; i >= 1; i--) {
-          const propName = normalizeName(path[i]!.name, NameType.Property, true);
+          const propName = formatPropertyName(normalizeSdkPropertyName(path[i]!));
           wrappedValue = `{ ${propName}: ${wrappedValue} }`;
         }
         result.push(
           prepareExampleValue(
             dpgContext,
-            methodParamName,
+            path[0]!,
             wrappedValue,
             methodParamOptional,
             bodyParam.onClient,
@@ -454,7 +460,7 @@ function prepareExampleParameters(
         result.push(
           prepareExampleValue(
             dpgContext,
-            bodyParam.name,
+            bodyParam,
             bodyExample.value,
             bodyParam.optional,
             bodyParam.onClient,
@@ -467,7 +473,7 @@ function prepareExampleParameters(
   // a scalar value; a parameter with nested leaves carries an object literal.
   for (const arg of methodArguments.values()) {
     result.push({
-      name: normalizeName(arg.name, NameType.Parameter, true),
+      name: normalizeSdkName(arg, NameType.Parameter, { shouldGuard: true }),
       value: serializeNestedValue(arg.value),
       isOptional: arg.isOptional,
       onClient: false,
@@ -491,15 +497,20 @@ interface ValueTreeNode {
 function placeMethodArgument(
   methodArguments: Map<
     string,
-    { name: string; isOptional: boolean; value: ValueTreeNode | string }
+    { name: string; isExactName?: boolean; isOptional: boolean; value: ValueTreeNode | string }
   >,
-  path: readonly { name: string; optional?: boolean }[],
+  path: readonly { name: string; isExactName?: boolean; optional?: boolean }[],
   leaf: string,
 ): void {
   const root = path[0]!;
   let arg = methodArguments.get(root.name);
   if (!arg) {
-    arg = { name: root.name, isOptional: Boolean(root.optional), value: {} };
+    arg = {
+      name: root.name,
+      isExactName: root.isExactName,
+      isOptional: Boolean(root.optional),
+      value: {},
+    };
     methodArguments.set(root.name, arg);
   }
   if (path.length === 1) {
@@ -515,12 +526,12 @@ function placeMethodArgument(
 /** Places `leaf` at `path` (segments after the root), creating intermediate objects as needed. */
 function setNestedValue(
   root: ValueTreeNode,
-  path: readonly { name: string }[],
+  path: readonly { name: string; isExactName?: boolean }[],
   leaf: string,
 ): void {
   let node = root;
   for (let i = 0; i < path.length; i++) {
-    const key = normalizeName(path[i]!.name, NameType.Property, true);
+    const key = normalizeSdkPropertyName(path[i]!);
     if (i === path.length - 1) {
       node[key] = leaf;
     } else {
@@ -539,7 +550,7 @@ function serializeNestedValue(node: ValueTreeNode | string): string {
     return node;
   }
   const entries = Object.entries(node).map(
-    ([key, value]) => `${key}: ${serializeNestedValue(value)}`,
+    ([key, value]) => `${formatPropertyName(key)}: ${serializeNestedValue(value)}`,
   );
   return `{ ${entries.join(", ")} }`;
 }
@@ -635,7 +646,10 @@ function getParameterValue(
       }) {
         let property;
         if (value.type.kind === "model") {
-          property = value.type.properties.find((p) => p.name === propName);
+          property =
+            value.type.properties.find(
+              (p) => (p.serializationOptions.json?.name ?? p.name) === propName,
+            ) ?? value.type.properties.find((p) => p.name === propName);
         }
         const propValue = value.value[propName];
         if (propValue === undefined || propValue === null) {
@@ -668,7 +682,7 @@ function getParameterValue(
           // so that independent inner flattens at deeper levels still work.
           const childOptions = options?.overrides?.enableFlatten === false ? undefined : options;
           propRetValue =
-            `"${mapper.get(propName) ?? propName}": ` +
+            `${JSON.stringify(mapper.get(propName) ?? propName)}: ` +
             getParameterValue(context, propValue, childOptions);
         }
         if (propRetValue) values.push(propRetValue);
@@ -682,14 +696,15 @@ function getParameterValue(
           continue;
         }
         const propRetValue =
-          `"${mapper.get(propName) ?? propName}": ` + getParameterValue(context, propValue);
+          `${JSON.stringify(mapper.get(propName) ?? propName)}: ` +
+          getParameterValue(context, propValue);
         additionalBags.push(propRetValue);
       }
       if (additionalBags.length > 0) {
         const name = mapper.get("additionalProperties")
           ? "additionalPropertiesBag"
           : "additionalProperties";
-        values.push(`"${name}": {
+        values.push(`${JSON.stringify(name)}: {
           ${additionalBags.join(", ")}
           }`);
       }

@@ -12,11 +12,12 @@ import {
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   type Namespace,
+  NoTarget,
   type Operation,
 } from "@typespec/compiler";
 import type { ClientModuleInfo } from "../modular/interfaces.js";
 import type { SdkContext } from "./interfaces.js";
-import { NameType, normalizeName } from "./name-utils.js";
+import { NameType, normalizeSdkName, reportInvalidExactName } from "./name-utils.js";
 
 export function getClients(dpgContext: SdkContext): SdkClient[] {
   const clients = listClients(dpgContext);
@@ -116,8 +117,14 @@ export function isMultiEndpointClient(dpgContext: SdkContext): boolean {
 
 export function getClientModuleInfo(clientMap: [string[], SdkClientType<SdkServiceOperation>]) {
   const [hierarchy, client] = clientMap;
+  const rawClientName = client.name.replace(/Client$/, "");
+  const clientName = client.isExactName
+    ? normalizeSdkName({ name: rawClientName, isExactName: true }, NameType.Interface, {
+        shouldGuard: true,
+      })
+    : rawClientName;
   const clientModuleInfo: ClientModuleInfo = {
-    clientName: `${client.name.replace(/Client$/, "")}Context`,
+    clientName: `${clientName}Context`,
   };
   clientModuleInfo.subfolder = hierarchy.join("/");
   return clientModuleInfo;
@@ -131,15 +138,33 @@ export function getClientHierarchyMap(
     return client.clientInitialization.initializedBy & InitializedByFlags.Individually;
   });
   const clients = individualClients.map((client) => {
+    const clientName = {
+      name: client.name.replace(/Client$/, ""),
+      isExactName: client.isExactName,
+    };
     return [
-      context.sdkPackage.clients.length > 1
-        ? [normalizeName(client.name.replace("Client", ""), NameType.File)]
-        : [],
+      context.sdkPackage.clients.length > 1 ? [normalizeSdkName(clientName, NameType.File)] : [],
       client,
     ];
   }) as [string[], SdkClientType<SdkServiceOperation>][];
   for (let i = 0; i < clients.length; i++) {
     const [hierarchy, client] = clients[i]!;
+    reportInvalidExactName(
+      context.program,
+      client,
+      NameType.Class,
+      "client",
+      client.__raw.type ?? NoTarget,
+    );
+    for (const parameter of client.clientInitialization.parameters) {
+      reportInvalidExactName(
+        context.program,
+        parameter,
+        NameType.Parameter,
+        "parameter",
+        parameter.__raw ?? NoTarget,
+      );
+    }
     clientMap.push([hierarchy, client]);
     const childClientsToGenerate = client.children?.filter((child) => {
       return (
@@ -149,10 +174,11 @@ export function getClientHierarchyMap(
     });
     if (childClientsToGenerate && childClientsToGenerate.length > 0) {
       childClientsToGenerate.forEach((child) => {
-        const childHierarchy = [
-          ...hierarchy,
-          normalizeName(child.name.replace("Client", ""), NameType.File),
-        ];
+        const childName = {
+          name: child.name.replace(/Client$/, ""),
+          isExactName: child.isExactName,
+        };
+        const childHierarchy = [...hierarchy, normalizeSdkName(childName, NameType.File)];
         clients.push([childHierarchy, child]);
       });
     }

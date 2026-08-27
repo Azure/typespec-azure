@@ -15,7 +15,7 @@ import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
 import { getClientModuleInfo } from "../../utils/client-utils.js";
 import type { SdkContext } from "../../utils/interfaces.js";
-import { NameType, normalizeName } from "../../utils/name-utils.js";
+import { NameType, normalizeName, normalizeSdkName } from "../../utils/name-utils.js";
 import type { ServiceOperation } from "../../utils/operation-util.js";
 import { AzurePollingDependencies } from "../external-dependencies.js";
 import { PagingHelpers, SimplePollerHelpers } from "../static-helpers-metadata.js";
@@ -27,6 +27,8 @@ interface OperationDeclarationInfo {
   declaration: OptionalKind<FunctionDeclarationStructure>;
   // the original operation name
   oriName: string | undefined;
+  // whether the operation name should bypass casing transformations
+  isExactName: boolean;
   // the refkey of the operation declaration
   declarationRefKey: string | undefined;
   // the default is false
@@ -85,6 +87,7 @@ export function getClassicalOperation(
       operationDeclarationMap.set(declaration, {
         declaration,
         oriName: operation.oriName,
+        isExactName: operation.isExactName,
         declarationRefKey: resolveReference(refkey(operation, "api")),
         isLro: declaration.isLro,
         lroFinalReturnType: declaration.lroFinalReturnType,
@@ -367,11 +370,12 @@ export function getClassicalOperation(
       propertyName?: string;
     },
   ) {
-    return normalizeName(
-      operationDeclarationMap.get(declaration)?.oriName ??
-        declaration.propertyName ??
-        declaration.name ??
-        "FIXME",
+    const operationInfo = operationDeclarationMap.get(declaration);
+    return normalizeSdkName(
+      {
+        name: operationInfo?.oriName ?? declaration.propertyName ?? declaration.name ?? "FIXME",
+        isExactName: operationInfo?.isExactName,
+      },
       NameType.Method,
     );
   }

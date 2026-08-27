@@ -15,7 +15,16 @@ import { resolveReference } from "../../framework/reference.js";
 import { getSubscriptionId } from "../../transform/transform-client-options.js";
 import { hasKeyCredential, hasTokenCredential } from "../../utils/credential-utils.js";
 import type { SdkContext } from "../../utils/interfaces.js";
-import { NameType, normalizeName } from "../../utils/name-utils.js";
+import {
+  formatOptionalPropertyAccess,
+  formatPropertyAccess,
+  formatPropertyName,
+  NameType,
+  normalizeName,
+  normalizeSdkName,
+  normalizeSdkPropertyName,
+  type SdkName,
+} from "../../utils/name-utils.js";
 import { getMethodHierarchiesMap, type ServiceOperation } from "../../utils/operation-util.js";
 import { AzureIdentityDependencies, AzureTestDependencies } from "../external-dependencies.js";
 import { getClientParametersDeclaration } from "./client-helpers.js";
@@ -56,13 +65,14 @@ export function buildParameterValueMap(
  * Prepare a common value for tests
  */
 export function prepareCommonValue(
-  name: string,
+  name: string | SdkName,
   value: SdkExampleValue | string,
   isOptional?: boolean,
   onClient?: boolean,
 ): CommonValue {
+  const sdkName = typeof name === "string" ? { name } : name;
   return {
-    name: normalizeName(name, NameType.Parameter),
+    name: normalizeSdkName(sdkName, NameType.Parameter),
     value: typeof value === "string" ? value : serializeExampleValue(value),
     isOptional: Boolean(isOptional),
     onClient: Boolean(onClient),
@@ -187,7 +197,10 @@ export function serializeExampleValue(value: SdkExampleValue): string {
       }) {
         let property;
         if (value.type.kind === "model") {
-          property = value.type.properties.find((p) => p.name === propName);
+          property =
+            value.type.properties.find(
+              (p) => (p.serializationOptions.json?.name ?? p.name) === propName,
+            ) ?? value.type.properties.find((p) => p.name === propName);
         }
         const propValue = value.value[propName];
         if (propValue === undefined || propValue === null) {
@@ -205,19 +218,23 @@ export function serializeExampleValue(value: SdkExampleValue): string {
             if (innerPropValue === undefined || innerPropValue === null) {
               continue;
             }
-            const innerProperty = property.type.properties.find((p) => p.name === innerPropName);
+            const innerProperty =
+              property.type.properties.find(
+                (p) => (p.serializationOptions.json?.name ?? p.name) === innerPropName,
+              ) ?? property.type.properties.find((p) => p.name === innerPropName);
             if (innerProperty && isReadOnly(innerProperty as SdkModelPropertyType)) {
               continue;
             }
             values.push(
-              `"${innerMapper.get(innerPropName) ?? innerPropName}": ` +
+              `${JSON.stringify(innerMapper.get(innerPropName) ?? innerPropName)}: ` +
                 serializeExampleValue(innerPropValue),
             );
           }
           continue;
         }
         const propRetValue =
-          `"${mapper.get(propName) ?? propName}": ` + serializeExampleValue(propValue);
+          `${JSON.stringify(mapper.get(propName) ?? propName)}: ` +
+          serializeExampleValue(propValue);
         values.push(propRetValue);
       }
       const additionalBags = [];
@@ -229,14 +246,15 @@ export function serializeExampleValue(value: SdkExampleValue): string {
           continue;
         }
         const propRetValue =
-          `"${mapper.get(propName) ?? propName}": ` + serializeExampleValue(propValue);
+          `${JSON.stringify(mapper.get(propName) ?? propName)}: ` +
+          serializeExampleValue(propValue);
         additionalBags.push(propRetValue);
       }
       if (additionalBags.length > 0) {
         const name = mapper.get("additionalProperties")
           ? "additionalPropertiesBag"
           : "additionalProperties";
-        values.push(`"${name}": {
+        values.push(`${JSON.stringify(name)}: {
           ${additionalBags.join(", ")}
           }`);
       }
@@ -268,10 +286,7 @@ function buildTestPropertyNameMapper(type: SdkExampleValue["type"]) {
     if (prop.kind !== "property") {
       continue;
     }
-    mapper.set(
-      prop.serializationOptions.json?.name || prop.name,
-      normalizeName(prop.name, NameType.Property),
-    );
+    mapper.set(prop.serializationOptions.json?.name || prop.name, normalizeSdkPropertyName(prop));
   }
   return mapper;
 }
@@ -368,16 +383,14 @@ export function prepareCommonParameters(
     if (!exampleValue || !exampleValue.value) {
       if (!param.optional) {
         // Generate default values for required parameters without examples in tests
-        result.push(
-          prepareCommonValue(param.name, `"{Your ${param.name}}"`, false, param.onClient),
-        );
+        result.push(prepareCommonValue(param, `"{Your ${param.name}}"`, false, param.onClient));
       }
       continue;
     }
 
     result.push(
       prepareCommonValue(
-        exampleValue.parameter.name,
+        exampleValue.parameter,
         exampleValue.value,
         param.optional,
         param.onClient,
@@ -401,7 +414,8 @@ export function prepareCommonParameters(
       bodyExample.value.kind === "model"
     ) {
       for (const prop of bodyParam.type.properties) {
-        const propExample = bodyExample.value.value[prop.name];
+        const wireName = prop.serializationOptions.json?.name ?? prop.name;
+        const propExample = bodyExample.value.value[wireName] ?? bodyExample.value.value[prop.name];
         if (!propExample) {
           continue;
         }
@@ -409,7 +423,7 @@ export function prepareCommonParameters(
         if (isReadOnly(prop as SdkModelPropertyType)) {
           continue;
         }
-        result.push(prepareCommonValue(prop.name, propExample, prop.optional, prop.onClient));
+        result.push(prepareCommonValue(prop, propExample, prop.optional, prop.onClient));
       }
     } else {
       // Check if the body parameter is nested inside a wrapper (e.g., @bodyRoot)
@@ -419,30 +433,19 @@ export function prepareCommonParameters(
       if (isNestedBody) {
         const path = segments[0]!;
         // The first segment is the method-level wrapper param (e.g., "body")
-        const methodParamName = path[0]!.name;
         const methodParamOptional = path[0]!.optional;
         // Wrap the example value with the intermediate property names
         let wrappedValue = serializeExampleValue(bodyExample.value);
         for (let i = path.length - 1; i >= 1; i--) {
-          const propName = normalizeName(path[i]!.name, NameType.Property);
+          const propName = formatPropertyName(normalizeSdkPropertyName(path[i]!));
           wrappedValue = `{ ${propName}: ${wrappedValue} }`;
         }
         result.push(
-          prepareCommonValue(
-            methodParamName,
-            wrappedValue,
-            methodParamOptional,
-            bodyParam.onClient,
-          ),
+          prepareCommonValue(path[0]!, wrappedValue, methodParamOptional, bodyParam.onClient),
         );
       } else {
         result.push(
-          prepareCommonValue(
-            bodyParam.name,
-            bodyExample.value,
-            bodyParam.optional,
-            bodyParam.onClient,
-          ),
+          prepareCommonValue(bodyParam, bodyExample.value, bodyParam.optional, bodyParam.onClient),
         );
       }
     }
@@ -457,7 +460,7 @@ export function prepareCommonParameters(
     .forEach((param) => {
       const exampleValue = parameterMap[param.serializedName];
       if (exampleValue && exampleValue.value) {
-        result.push(prepareCommonValue(param.name, exampleValue.value, true, param.onClient));
+        result.push(prepareCommonValue(param, exampleValue.value, true, param.onClient));
       }
     });
 
@@ -494,7 +497,10 @@ export function iterateClientsAndMethods(
           classicalMethodPrefix: prefix,
           subFolder:
             clients.length > 1
-              ? normalizeName(getClassicalClientName(client), NameType.File)
+              ? normalizeSdkName(
+                  { name: getClassicalClientName(client), isExactName: client.isExactName },
+                  NameType.File,
+                )
               : undefined,
           hierarchies: hierarchies,
         });
@@ -564,7 +570,10 @@ export function generateMethodCall(
   }
 
   const prefix = options.classicalMethodPrefix ? `${options.classicalMethodPrefix}.` : "";
-  const methodCall = `client.${prefix}${normalizeName(method.oriName ?? method.name, NameType.Property)}(${methodParams.join(", ")})`;
+  const methodCall = `client.${prefix}${normalizeSdkName(
+    { name: method.oriName ?? method.name, isExactName: method.isExactName },
+    NameType.Property,
+  )}(${methodParams.join(", ")})`;
 
   return { methodCall, clientParams, clientParamDefs };
 }
@@ -681,7 +690,11 @@ export function generateAssertionsForValue(
             // Check if this property is flattened in the model type
             let property;
             if (value.kind === "model" && value.type.kind === "model") {
-              property = value.type.properties.find((p) => p.kind === "property" && p.name === key);
+              property =
+                value.type.properties.find(
+                  (p) =>
+                    p.kind === "property" && (p.serializationOptions.json?.name ?? p.name) === key,
+                ) ?? value.type.properties.find((p) => p.kind === "property" && p.name === key);
             }
             if (property?.flatten && (val as SdkExampleValue).kind === "model") {
               // For flattened properties, recurse using the parent path so
@@ -694,7 +707,12 @@ export function generateAssertionsForValue(
               );
               assertions.push(...innerAssertions);
             } else {
-              const propPath = `${path}.${key}`;
+              const propertyName = property ? normalizeSdkPropertyName(property) : key;
+              const optionalBase = path.endsWith("?");
+              const basePath = optionalBase ? path.slice(0, -1) : path;
+              const propPath = optionalBase
+                ? formatOptionalPropertyAccess(basePath, propertyName)
+                : formatPropertyAccess(basePath, propertyName);
               const nestedVal = val as SdkExampleValue;
               // For nested model/dict values, append "?" to the path so child
               // property accesses use optional chaining (e.g. result.systemData?.createdBy)
