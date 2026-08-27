@@ -27,6 +27,8 @@ Required rule and fixture/test changes are complete in:
 - `packages/typespec-lintdiff/test/fixtures/GetCollectionOnlyHasValueAndNextLink/multipart-response-body`
 - `packages/typespec-lintdiff/test/fixtures/GetCollectionOnlyHasValueAndNextLink/operations-suffix-invalid-response`
 - `packages/typespec-lintdiff/test/fixtures/GetCollectionOnlyHasValueAndNextLink/operations-query-suffix-invalid-response`
+- `packages/typespec-lintdiff/test/fixtures/GetCollectionOnlyHasValueAndNextLink/default-suffix-invalid-response`
+- `packages/typespec-lintdiff/test/fixtures/GetCollectionOnlyHasValueAndNextLink/default-query-suffix-invalid-response`
 - `packages/typespec-lintdiff/test/fixtures/GetCollectionOnlyHasValueAndNextLink/rule.md`
 
 ## Report inputs
@@ -93,7 +95,7 @@ equivalence criterion.
 
 ## Fixture evidence
 
-Focused validation covers eleven cases:
+Focused validation covers thirteen cases:
 
 | Fixture                                    | Expected  | Evidence                                                                                                                            |
 | ------------------------------------------ | --------- | ----------------------------------------------------------------------------------------------------------------------------------- |
@@ -108,6 +110,8 @@ Focused validation covers eleven cases:
 | `terminal-resource-invalid-response`       | compliant | Swagger and TypeSpec both skip a provider-tail point path with a query suffix whose response would be invalid for a collection.     |
 | `operations-suffix-invalid-response`       | compliant | Swagger and TypeSpec both skip a collection-shaped path that ends with `operations`.                                                |
 | `operations-query-suffix-invalid-response` | violation | Swagger and TypeSpec both report a collection-shaped path whose raw key no longer ends with `operations` because of a query suffix. |
+| `default-suffix-invalid-response`          | compliant | Swagger and TypeSpec both skip a collection-shaped path that ends with `default`.                                                   |
+| `default-query-suffix-invalid-response`    | violation | Swagger and TypeSpec both report a collection-shaped path whose raw key no longer ends with `default` because of a query suffix.    |
 
 ## Gap examples
 
@@ -272,7 +276,10 @@ getCustomOperations(...Azure.ResourceManager.CommonTypes.ApiVersionParameter):
 that exact suffix behavior avoids over-reporting synthetic or unusual paths such as
 `customoperations`.
 
-**Disposition:** Regression fixture.
+The `default-suffix-invalid-response` fixture independently covers the parallel
+`endsWith("default")` branch with `/customdefault`.
+
+**Disposition:** Regression fixtures.
 
 ### Gap example: operations/default suffix with query suffix
 
@@ -319,7 +326,11 @@ getCustomOperations(...Azure.ResourceManager.CommonTypes.ApiVersionParameter):
 classification, but applying it before the Swagger selector's `operations` and `default` suffix
 exclusions would suppress paths that the Swagger rule still validates.
 
-**Disposition:** Regression fixture.
+The `default-query-suffix-invalid-response` fixture independently confirms that
+`/customdefault?disambiguation_dummy` remains in scope because the raw key no longer ends in
+`default`.
+
+**Disposition:** Regression fixtures.
 
 ### Gap example: direct array response schemas
 

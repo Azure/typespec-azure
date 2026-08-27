@@ -44,8 +44,8 @@ coverage is warranted.
   classification to match emitted OpenAPI paths
 - paths ending with `operations` or `default` are skipped using the same string suffix test as
   Swagger, even when the suffix is not a standalone path segment
-- query-bearing paths ending in `operations` before the query still run because Swagger applies
-  `endsWith("operations")` to the raw path key
+- query-bearing paths ending in `operations` or `default` before the query still run because
+  Swagger applies the suffix exclusions to the raw path key
 - ARM templates already tend to emit compliant list models; the clean repro comes from a manually
   routed ARM collection GET
 
@@ -64,3 +64,5 @@ coverage is warranted.
 | `terminal-resource-invalid-response`       | no        | Odd provider-tail point GET with a query suffix skips an otherwise invalid response               |
 | `operations-suffix-invalid-response`       | no        | Path ending in `operations` skips an otherwise invalid response                                   |
 | `operations-query-suffix-invalid-response` | yes       | Raw path ending in `?disambiguation_dummy` does not match Swagger's `operations` suffix exclusion |
+| `default-suffix-invalid-response`          | no        | Path ending in `default` skips an otherwise invalid response                                      |
+| `default-query-suffix-invalid-response`    | yes       | Raw path ending in `?disambiguation_dummy` does not match Swagger's `default` suffix exclusion    |

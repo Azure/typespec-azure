@@ -50,7 +50,7 @@ If neither is available, ask the user for the pull request URL or number.
    branch, head branch, head repository owner, and current head SHA:
 
    ```bash
-   gh pr view url,number,state,isDraft,baseRefName,headRefName,headRepositoryOwner,headRefOid < pr > --json
+   gh pr view "$PR" --json url,number,state,isDraft,baseRefName,headRefName,headRepositoryOwner,headRefOid
    ```
 
 2. Confirm the pull request is open.
@@ -220,6 +220,8 @@ For rounds 1 through 5:
    check disagrees, treat it as a collection failure or deliver the discovered
    comments to the fix subagent; never report success from the subagent result
    alone.
+   If the independently verified result is `no-new-comments`, end the loop
+   successfully here. Do not continue to the fix handoff.
 3. Send its new structured comments to the fix subagent.
 4. If the fix subagent returns `no-valid-comments`, reply with its rejection
    rationale, resolve the safely rejected threads, verify that no processed
