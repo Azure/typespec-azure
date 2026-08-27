@@ -141,4 +141,4 @@ specs:
   type/file: false
   # `Unnamed.Info` and `Protocol.Info` collide once the Python emitter flattens
   # models into a single `_models.py`: https://github.com/Azure/typespec-azure/issues/5332
-  "streaming/sse": false
+  "streaming/sse": true
