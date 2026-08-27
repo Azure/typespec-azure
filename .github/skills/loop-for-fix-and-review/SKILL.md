@@ -1,6 +1,6 @@
 ---
 name: loop-for-fix-and-review
-description: Iterate on a pull request with two persistent subagents: one requests and collects GitHub Copilot reviews in Balanced mode, and one independently evaluates and fixes valid review findings. Use when the user wants a bounded Copilot review-and-fix loop until no new valid comments remain.
+description: "Iterate on a pull request with two persistent subagents: one requests and collects GitHub Copilot reviews in Balanced mode, and one independently evaluates and fixes valid review findings. Use when the user wants a bounded Copilot review-and-fix loop until no new valid comments remain."
 argument-hint: "<pull request URL or number>"
 user-invocable: true
 ---
