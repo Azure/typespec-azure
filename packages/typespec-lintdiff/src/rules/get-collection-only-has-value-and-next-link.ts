@@ -1,9 +1,14 @@
+import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 import {
   createRule,
+  getLocationContext,
+  isArrayModelType,
+  type Interface,
   type Model,
   type ModelProperty,
+  type Operation,
+  type Program,
 } from "@typespec/compiler";
-import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 import { getHttpOperation, type HttpOperationResponse } from "@typespec/http";
 
 export const getCollectionOnlyHasValueAndNextLinkRule = createRule({
@@ -39,7 +44,7 @@ export const getCollectionOnlyHasValueAndNextLinkRule = createRule({
         }
 
         context.reportDiagnostic({
-          target: invalidTarget,
+          target: getDiagnosticTarget(context.program, operation, invalidTarget),
         });
       },
     };
@@ -47,11 +52,17 @@ export const getCollectionOnlyHasValueAndNextLinkRule = createRule({
 });
 
 function isCollectionGetPath(path: string): boolean {
-  if (path.endsWith("}") || path.endsWith("/operations") || path.endsWith("/default")) {
+  const pathWithoutQuery = path.split("?")[0];
+  if (pathWithoutQuery.endsWith("}") || path.endsWith("operations") || path.endsWith("default")) {
     return false;
   }
 
-  return path.split("/").length % 2 === 0;
+  const providerTail = pathWithoutQuery.split(".").at(-1);
+  return (
+    providerTail !== undefined &&
+    providerTail.includes("/") &&
+    providerTail.split("/").length % 2 === 0
+  );
 }
 
 function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefined {
@@ -61,9 +72,17 @@ function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefi
     }
 
     for (const content of response.responses) {
-      if (content.body?.type.kind === "Model") {
-        return content.body.type;
+      const body = content.body;
+      if (body?.bodyKind !== "single" || body.type.kind !== "Model") {
+        continue;
       }
+
+      const bodyModel = body.property?.type.kind === "Model" ? body.property.type : body.type;
+      if (isArrayModelType(bodyModel) || bodyModel.properties.size === 0) {
+        continue;
+      }
+
+      return bodyModel;
     }
   }
 
@@ -71,6 +90,10 @@ function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefi
 }
 
 function getInvalidTarget(responseModel: Model): Model | ModelProperty | undefined {
+  if (isArrayModelType(responseModel)) {
+    return undefined;
+  }
+
   const properties = [...responseModel.properties.values()];
   if (
     properties.length === 2 &&
@@ -79,6 +102,24 @@ function getInvalidTarget(responseModel: Model): Model | ModelProperty | undefin
     return undefined;
   }
 
-  return properties.find((property) => property.name !== "value" && property.name !== "nextLink")
-    ?? responseModel;
+  return (
+    properties.find((property) => property.name !== "value" && property.name !== "nextLink") ??
+    responseModel
+  );
+}
+
+function getDiagnosticTarget(
+  program: Program,
+  operation: Operation,
+  invalidTarget: Model | ModelProperty,
+): Interface | Operation | Model | ModelProperty {
+  if (getLocationContext(program, invalidTarget).type === "project") {
+    return invalidTarget;
+  }
+
+  if (getLocationContext(program, operation).type === "project") {
+    return operation;
+  }
+
+  return operation.interface ?? operation;
 }
