@@ -276,6 +276,18 @@ its supplied worktrees:
      installation defect: add the narrow direct development dependency with
      the repository package manager, retain the manifest and lockfile change as
      an explicit harness prerequisite, and continue the rule workflow
+   - when that dependency repair requires refreshing `pnpm-lock.yaml`, inspect
+     the resulting churn. The target branch can lack a
+     `packages/typespec-lintdiff` importer, so adding the importer and its
+     necessary dependency closure can be correct. Preserve target-branch
+     entries and retain only that new importer plus dependency nodes genuinely
+     absent from the target branch. Do not silently accept unrelated resolution,
+     integrity, tarball, or private-feed URL rewrites caused by machine-specific
+     registry metadata.
+   - verify the normalized manifest and lockfile with a frozen-lockfile install,
+     preferably offline when the required artifacts are already in the pnpm
+     store. If the lockfile cannot be normalized and verified reliably, stop
+     and report that blocker rather than hand-editing an unverifiable lockfile.
    - never use an unversioned global install, manually copy packages into
      `node_modules`, or silently bypass the lockfile
    - stop only after the bounded repair fails because of a concrete external
@@ -294,6 +306,27 @@ its supplied worktrees:
    typespec-azure worktree. `compare:setup` creates a direct per-worktree link
    and does not use npm's shared global link registry, so separate specs
    worktrees can prepare concurrently without redirecting each other.
+
+### Temporary fixture-harness link lifecycle on Windows
+
+Focused fixture validation can require
+`packages/typespec-lintdiff/test/common-types` and
+`packages/typespec-lintdiff/test/azure-openapi-validator` links or junctions
+when those sources are not otherwise configured. Treat only those two known
+paths as temporary focused-validation setup; they are not needed for
+`specs:typespec` corpus runs.
+
+Create them immediately before the focused fixture validation that needs them.
+After the final focused validation, and before any repository-wide format or
+lint command, remove only those known temporary links or junctions. Repository-
+wide `pnpm format` (`prettier --write .`) and lint can follow them into external
+checkouts, format or lint their contents, create large unrelated diffs, and
+report their external lint errors. If focused validation must be rerun, recreate
+the two links, validate, and remove the same two links again before continuing.
+
+Corpus reruns remain safe without these test links: the corpus runner uses the
+isolated specs checkout, its copied dataset and common-types content, and the
+direct linter-package link within the specs checkout.
 
 ## Development workflow
 
