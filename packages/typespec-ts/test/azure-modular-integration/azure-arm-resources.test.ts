@@ -381,7 +381,9 @@ describe("Azure Arm Resources Rest Client", () => {
   });
 
   // extension tracked resource
-  it("should get ExtensionsResources ", async () => {
+  // Skipped: tenant scope requires an empty resource URI; "." is not valid expected behavior.
+  // See https://github.com/Azure/typespec-azure/issues/5314.
+  it.skip("should get ExtensionsResources ", async () => {
     const resourceGroupResult = await client.extensionsResources.get(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`,
       "extension",
@@ -400,7 +402,7 @@ describe("Azure Arm Resources Rest Client", () => {
       validSubscriptionExtensionsResource,
     );
 
-    const tenantResult = await client.extensionsResources.get(".", "extension");
+    const tenantResult = await client.extensionsResources.get("", "extension");
     assert.deepStrictEqual<ExtensionsResource>(tenantResult, validTenantExtensionsResource);
 
     const resourceResult = await client.extensionsResources.get(
@@ -410,7 +412,7 @@ describe("Azure Arm Resources Rest Client", () => {
     assert.deepStrictEqual<ExtensionsResource>(resourceResult, validResourceExtensionsResource);
   });
 
-  it("should createOrUpdate ExtensionsResources ", async () => {
+  it.skip("should createOrUpdate ExtensionsResources ", async () => {
     const resourceGroupResult = await client.extensionsResources.createOrUpdate(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`,
       "extension",
@@ -439,7 +441,7 @@ describe("Azure Arm Resources Rest Client", () => {
       validSubscriptionExtensionsResource,
     );
 
-    const tenantResult = await client.extensionsResources.createOrUpdate(".", "extension", {
+    const tenantResult = await client.extensionsResources.createOrUpdate("", "extension", {
       properties: {
         description: "valid",
       },
@@ -458,7 +460,7 @@ describe("Azure Arm Resources Rest Client", () => {
     assert.deepStrictEqual<ExtensionsResource>(resourceResult, validResourceExtensionsResource);
   });
 
-  it("should update ExtensionsResources ", async () => {
+  it.skip("should update ExtensionsResources ", async () => {
     const resourceGroupResult = await client.extensionsResources.update(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`,
       "extension",
@@ -493,7 +495,7 @@ describe("Azure Arm Resources Rest Client", () => {
       },
     });
 
-    const tenantResult = await client.extensionsResources.update(".", "extension", {
+    const tenantResult = await client.extensionsResources.update("", "extension", {
       properties: {
         description: "valid2",
       },
@@ -524,7 +526,7 @@ describe("Azure Arm Resources Rest Client", () => {
     });
   });
 
-  it("should delete ExtensionsResources ", async () => {
+  it.skip("should delete ExtensionsResources ", async () => {
     const resourceGroupResult = await client.extensionsResources.delete(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`,
       "extension",
@@ -537,7 +539,7 @@ describe("Azure Arm Resources Rest Client", () => {
     );
     assert.isUndefined(subscriptionResult);
 
-    const tenantResult = await client.extensionsResources.delete(".", "extension");
+    const tenantResult = await client.extensionsResources.delete("", "extension");
     assert.isUndefined(tenantResult);
 
     const resourceResult = await client.extensionsResources.delete(
@@ -547,7 +549,7 @@ describe("Azure Arm Resources Rest Client", () => {
     assert.isUndefined(resourceResult);
   });
 
-  it("should list ExtensionsResources ", async () => {
+  it.skip("should list ExtensionsResources ", async () => {
     const resourceGroupResult = await client.extensionsResources.listByScope(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`,
     );
@@ -572,7 +574,7 @@ describe("Azure Arm Resources Rest Client", () => {
       validSubscriptionExtensionsResource,
     ]);
 
-    const tenantResult = await client.extensionsResources.listByScope(".");
+    const tenantResult = await client.extensionsResources.listByScope("");
     const tenantItems: Array<ExtensionsResource> = [];
     for await (const item of tenantResult) {
       tenantItems.push(item);
