@@ -18,7 +18,7 @@ describe("@clientOption omitSlashFromEmptyRoute", () => {
   it("operation with @clientOption('omitSlashFromEmptyRoute', true) has empty path", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option" "testing"
-      #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "testing"
+      #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope" "testing"
       @clientOption("omitSlashFromEmptyRoute", true)
       @put
       op createBlob(): void;
@@ -33,7 +33,7 @@ describe("@clientOption omitSlashFromEmptyRoute", () => {
   it("interface with @clientOption('omitSlashFromEmptyRoute', true) applies to operations", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option" "testing"
-      #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "testing"
+      #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope" "testing"
       @clientOption("omitSlashFromEmptyRoute", true)
       interface BlobOperations {
         @put
@@ -55,7 +55,7 @@ describe("@clientOption omitSlashFromEmptyRoute", () => {
   it("does not affect operations with non-empty routes", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option" "testing"
-      #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "testing"
+      #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope" "testing"
       @clientOption("omitSlashFromEmptyRoute", true)
       @route("{blobName}")
       @get
@@ -101,7 +101,7 @@ describe("@clientOption omitSlashFromEmptyRoute", () => {
   it("namespace with @clientOption('omitSlashFromEmptyRoute', true) applies to nested operations", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option" "testing"
-      #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "testing"
+      #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope" "testing"
       @clientOption("omitSlashFromEmptyRoute", true)
       namespace BlobService {
         @put
@@ -123,11 +123,11 @@ describe("@clientOption omitSlashFromEmptyRoute", () => {
   it("operation-level false overrides namespace-level true", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option" "testing"
-      #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "testing"
+      #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope" "testing"
       @clientOption("omitSlashFromEmptyRoute", true)
       namespace BlobService {
         #suppress "@azure-tools/typespec-client-generator-core/client-option" "testing"
-        #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "testing"
+        #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope" "testing"
         @clientOption("omitSlashFromEmptyRoute", false)
         @put
         op createBlob(): void;
@@ -149,11 +149,11 @@ describe("@clientOption omitSlashFromEmptyRoute", () => {
   it("operation-level false overrides interface-level true", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option" "testing"
-      #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "testing"
+      #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope" "testing"
       @clientOption("omitSlashFromEmptyRoute", true)
       interface BlobOperations {
         #suppress "@azure-tools/typespec-client-generator-core/client-option" "testing"
-        #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "testing"
+        #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope" "testing"
         @clientOption("omitSlashFromEmptyRoute", false)
         @put
         createBlob(): void;

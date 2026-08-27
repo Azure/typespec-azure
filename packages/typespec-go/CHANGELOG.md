@@ -1,5 +1,55 @@
 # Release History
 
+## 0.17.2
+
+### Bug Fixes
+
+- [#5321](https://github.com/Azure/typespec-azure/pull/5321) Fix fake server route regex to allow path delimiters in captures for `allowReserved` path parameters (e.g. ARM scopes and resource IDs), which are inserted into the request path unescaped and can span multiple path segments.
+
+
+## 0.17.1
+
+### Bug Fixes
+
+- [#5272](https://github.com/Azure/typespec-azure/pull/5272) Parse text request bodies into their declared types in generated fake servers.
+- [#5233](https://github.com/Azure/typespec-azure/pull/5233) Fix fake server path param regex to exclude path delimiters
+
+
+## 0.17.0
+
+### Features
+
+- [#5261](https://github.com/Azure/typespec-azure/pull/5261) Add emit-content-type-header emitter option.
+- [#5198](https://github.com/Azure/typespec-azure/pull/5198) Add support for paged operations with next links that are parameterized or relative URLs.
+- [#5245](https://github.com/Azure/typespec-azure/pull/5245) Added support for tsp non-discriminated unions.
+- [#5152](https://github.com/Azure/typespec-azure/pull/5152) Support array encoding decorators.
+
+### Bug Fixes
+
+- [#5219](https://github.com/Azure/typespec-azure/pull/5219) Honor `@encode(string)` when serializing and deserializing boolean model properties.
+- [#5238](https://github.com/Azure/typespec-azure/pull/5238) Format text request body values as strings before creating readers.
+- [#5235](https://github.com/Azure/typespec-azure/pull/5235) Generate fake servers for operations with path-based API versions and additional path parameters.
+- [#5151](https://github.com/Azure/typespec-azure/pull/5151) Honor `ClientOptions.APIVersion` for API versions emitted in operation paths.
+- [#5220](https://github.com/Azure/typespec-azure/pull/5220) Generate scalar `x-ms-meta` request and response headers without treating them as metadata maps.
+
+
+## 0.16.0
+
+### Features
+
+- [#5032](https://github.com/Azure/typespec-azure/pull/5032) During SDK generation, if a go.mod file exists, its module identity is used as the source of truth, including any major version suffix. This alleviates the need to update tspconfig.yaml whenever a new major version is required.
+- [#5078](https://github.com/Azure/typespec-azure/pull/5078) Render bullet and numbered lists in doc comments following the native Go doc convention: list items are indented with aligned continuation lines, and a blank comment line is inserted around lists so `go doc`/`gofmt` recognize them. Emitted comments are byte-identical to what `gofmt` produces, including for docs that consist solely of a list. Nested (multi-level) lists are not supported, since the Go doc comment format has no concept of them.
+
+### Bug Fixes
+
+- [#5149](https://github.com/Azure/typespec-azure/pull/5149) Canonicalize generated header names passed to Go `Header.Get` and `Header.Set` methods.
+- [#4985](https://github.com/Azure/typespec-azure/pull/4985) Emit the `unpopulate` and `unpopulateTime` serde helpers using the `%s` verb with `err.Error()` instead of the non-wrapping `%v` verb, keeping the generated code `errorlint`-clean (follow-up to the earlier `unmarshalling type %T` fix).
+- [#5118](https://github.com/Azure/typespec-azure/pull/5118) Honor isExactName for types and model properties. Note that if the type/property is public, the exact name will be slightly transformed to follow Go export rules.
+- [#5104](https://github.com/Azure/typespec-azure/pull/5104) Fixed handling of @responseAsBool decorator.
+- [#5085](https://github.com/Azure/typespec-azure/pull/5085) Ensure UTC date-time values are converted to UTC before sending.  Update example generation for date-time values to use time.Date() instead of time.Parse() which leaks the wire format.
+- [#5073](https://github.com/Azure/typespec-azure/pull/5073) Always document raw JSON fields (emitted as `[]byte`) so callers know to marshal their data structure into the bytes.
+
+
 ## 0.15.0
 
 ### Features

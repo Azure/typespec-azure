@@ -141,7 +141,7 @@ export class ClientAdapter {
 
     let authType = AuthTypes.Default;
     if (
-      !this.ta.codeModel.options.omitConstructors &&
+      !this.ta.codeModel.options["omit-constructors"] &&
       this.ta.codeModel.root.kind === "containingModule"
     ) {
       // emit a diagnostic indicating that no ctors will be emitted due to containing-module.
@@ -153,11 +153,11 @@ export class ClientAdapter {
       });
     }
     if (
-      (this.ta.codeModel.options.omitConstructors ||
+      (this.ta.codeModel.options["omit-constructors"] ||
         this.ta.codeModel.root.kind === "containingModule") &&
-      this.ta.codeModel.options.generateExamples
+      this.ta.codeModel.options["generate-samples"]
     ) {
-      // emit a diagnostic indicating that no ctors will be emitted due to containing-module.
+      // emit a diagnostic indicating that no examples will be emitted due to containing-module.
       this.ta.ctx.program.reportDiagnostic({
         code: "UnsupportedConfiguration",
         severity: "warning",
@@ -214,7 +214,7 @@ export class ClientAdapter {
       // the module name and version info, and we can't make any
       // assumptions about the names/location.
       if (
-        !this.ta.codeModel.options.omitConstructors &&
+        !this.ta.codeModel.options["omit-constructors"] &&
         this.ta.codeModel.root.kind !== "containingModule"
       ) {
         constructable = new go.Constructable(
@@ -634,16 +634,6 @@ export class ClientAdapter {
         );
         break;
       case "paging":
-        if (
-          sdkMethod.pagingMetadata.nextLinkReInjectedParametersSegments !== undefined &&
-          sdkMethod.pagingMetadata.nextLinkReInjectedParametersSegments.length > 0
-        ) {
-          throw new AdapterError(
-            "UnsupportedTsp",
-            `paging with re-injected parameters is not supported`,
-            sdkMethod.__raw?.node,
-          );
-        }
         method = new go.PageableMethod(
           methodName,
           goClient,
@@ -736,9 +726,11 @@ export class ClientAdapter {
     if (sdkMethod.pagingMetadata.nextLinkOperation) {
       throw new AdapterError("UnsupportedTsp", "next page operation NYI", sdkMethod.__raw?.node);
     } else if (sdkMethod.pagingMetadata.nextLinkSegments) {
-      return new go.PageableStrategyNextLink(
+      const strategy = new go.PageableStrategyNextLink(
         buildNextLinkPath(sdkMethod.pagingMetadata.nextLinkSegments),
       );
+      strategy.reinjectedParams = this.adaptPageableMethodReinjectionParams(sdkMethod, paramsMap);
+      return strategy;
     } else if (
       sdkMethod.pagingMetadata.continuationTokenParameterSegments &&
       sdkMethod.pagingMetadata.continuationTokenResponseSegments
@@ -755,6 +747,13 @@ export class ClientAdapter {
             throw new AdapterError(
               "InternalError",
               `missing continuation token request parameter name ${tokenReq.name} for operation ${sdkMethod.name}`,
+              sdkMethod.__raw?.node,
+            );
+          }
+          if (tokenParam.kind === "queryCollectionParam") {
+            throw new AdapterError(
+              "InternalError",
+              `unexpected collection continuation token request parameter ${tokenReq.name} for operation ${sdkMethod.name}`,
               sdkMethod.__raw?.node,
             );
           }
@@ -802,6 +801,50 @@ export class ClientAdapter {
 
     // operation is pageable but doesn't yet support fetching subsequent pages
     return undefined;
+  }
+
+  /**
+   * converts the method parameters that must be added to next link requests.
+   *
+   * @param method the tcgc pageable method
+   * @param paramsMap maps tcgc method parameters to Go parameters
+   * @returns the query parameters to add to next link requests
+   */
+  private adaptPageableMethodReinjectionParams(
+    method:
+      | tcgc.SdkLroPagingServiceMethod<tcgc.SdkHttpOperation>
+      | tcgc.SdkPagingServiceMethod<tcgc.SdkHttpOperation>,
+    paramsMap: ParamsMapForPageable,
+  ): Array<go.QueryParameter> {
+    if (!method.pagingMetadata.nextLinkReInjectedParametersSegments) {
+      return [];
+    }
+
+    const paramsForReinjection = new Array<go.QueryParameter>();
+    for (const reinjectedParamSegment of method.pagingMetadata
+      .nextLinkReInjectedParametersSegments) {
+      for (const reinjectedParam of reinjectedParamSegment) {
+        if (reinjectedParam.kind !== "method") {
+          throw new AdapterError(
+            "InternalError",
+            `unexpected next link re-injection parameter kind ${reinjectedParam.kind}`,
+            reinjectedParam.__raw?.node,
+          );
+        }
+        const goParam = paramsMap.get(reinjectedParam);
+        if (!goParam) {
+          throw new AdapterError(
+            "InternalError",
+            `missing re-injection parameter name ${reinjectedParam.name} for operation ${method.name}`,
+            method.__raw?.node,
+          );
+        } else if (goParam.kind === "headerScalarParam") {
+          continue;
+        }
+        paramsForReinjection.push(goParam);
+      }
+    }
+    return paramsForReinjection;
   }
 
   private populateMethod(
@@ -895,7 +938,7 @@ export class ClientAdapter {
     // we must do this after adapting method params as it can add optional params
     this.ta.getPkg().paramGroups.push(this.adaptParameterGroup(method.optionalParamsGroup));
 
-    if (this.ta.codeModel.options.generateExamples) {
+    if (this.ta.codeModel.options["generate-samples"]) {
       this.adaptHttpOperationExamples(sdkMethod, method, paramMapping.exampleParams);
     }
 
@@ -1194,6 +1237,7 @@ export class ClientAdapter {
         if (method.kind !== "nextPageMethod" && go.isPageableMethod(method)) {
           switch (adaptedParam.kind) {
             case "headerScalarParam":
+            case "queryCollectionParam":
             case "queryScalarParam":
               pageableParamsMap.set(param, adaptedParam);
           }
@@ -1257,10 +1301,12 @@ export class ClientAdapter {
             return v.name === adaptedParam.name;
           })
         ) {
+          // we allow path scalar API version param for ARM as it's part of client options already
           if (
             this.ta.codeModel.type === "azure-arm" &&
             adaptedParam.style !== "literal" &&
-            adaptedParam.style !== "required"
+            adaptedParam.style !== "required" &&
+            (adaptedParam.kind !== "pathScalarParam" || !adaptedParam.isApiVersion)
           ) {
             throw new AdapterError(
               "UnsupportedTsp",
@@ -1362,7 +1408,7 @@ export class ClientAdapter {
             opParam.serializedName,
             true,
             paramType,
-            paramStyle,
+            paramType.kind === "literal" ? new go.ClientSideDefault(paramType) : paramStyle,
             true,
             paramLoc,
           );
@@ -1495,12 +1541,12 @@ export class ClientAdapter {
           opParam.__raw?.node,
         );
       case "header":
-        if (opParam.serializedName === "x-ms-meta") {
-          const type = this.ta.getWireType(methodParam.type, true, false);
-          if (type.kind !== "map") {
+        const type = this.ta.getWireType(methodParam.type, true, false);
+        if (type.kind === "map") {
+          if (opParam.serializedName !== "x-ms-meta") {
             throw new AdapterError(
               "InternalError",
-              `unexpected kind ${type.kind} for HeaderMapParameter ${methodParam.name}`,
+              `unexpected kind ${type.kind} for header ${opParam.serializedName}`,
               opParam.__raw?.node,
             );
           }
@@ -1732,16 +1778,16 @@ export class ClientAdapter {
             continue;
           }
 
+          const type = this.ta.getWireType(httpHeader.type, true, false);
           let headerResp: go.HeaderScalarResponse | go.HeaderMapResponse;
-          if (
-            httpHeader.serializedName === "x-ms-meta" ||
-            httpHeader.serializedName === "x-ms-or"
-          ) {
-            const type = this.ta.getWireType(httpHeader.type, true, false);
-            if (type.kind !== "map") {
+          if (type.kind === "map") {
+            if (
+              httpHeader.serializedName !== "x-ms-meta" &&
+              httpHeader.serializedName !== "x-ms-or"
+            ) {
               throw new AdapterError(
                 "InternalError",
-                `unexpected kind ${type.kind} for HeaderMapResponse ${httpHeader.name}`,
+                `unexpected kind ${type.kind} for header ${httpHeader.serializedName}`,
               );
             }
             headerResp = new go.HeaderMapResponse(
@@ -1764,7 +1810,14 @@ export class ClientAdapter {
           headerResp.docs.summary = httpHeader.summary;
           headerResp.docs.description = httpHeader.doc;
 
-          if (helpers.isOmittedResponseHeader(httpHeader, sdkMethod, this.ta.ctx.program)) {
+          if (
+            helpers.isOmittedResponseHeader(
+              httpHeader,
+              sdkMethod,
+              this.ta.ctx.program,
+              this.ta.codeModel.options,
+            )
+          ) {
             literalContentTypeHeader = headerResp as go.HeaderScalarResponse;
           } else {
             respEnv.headers.push(headerResp);
@@ -2009,7 +2062,7 @@ export class ClientAdapter {
         case "nullable":
           return this.recursiveTypeName(type.type, false);
         case "unknown":
-          return this.ta.codeModel.options.rawJSONAsBytes ? "RawJSON" : "Interface";
+          return this.ta.codeModel.options["rawjson-as-bytes"] ? "RawJSON" : "Interface";
         default:
           return "Value";
       }
@@ -2047,7 +2100,7 @@ export class ClientAdapter {
       case "url":
         return "String";
       case "unknown":
-        return this.ta.codeModel.options.rawJSONAsBytes ? "RawJSON" : "Interface";
+        return this.ta.codeModel.options["rawjson-as-bytes"] ? "RawJSON" : "Interface";
       default:
         throw new Error(`unhandled monomorphic response type kind ${type.kind}`);
     }
@@ -2235,7 +2288,12 @@ export class ClientAdapter {
                   // a matching go header. skip them here so example mapping stays in sync
                   // with envelope construction.
                   if (
-                    helpers.isOmittedResponseHeader(header.header, sdkMethod, this.ta.ctx.program)
+                    helpers.isOmittedResponseHeader(
+                      header.header,
+                      sdkMethod,
+                      this.ta.ctx.program,
+                      this.ta.codeModel.options,
+                    )
                   ) {
                     continue;
                   }
@@ -2464,7 +2522,7 @@ interface ParameterStyleInfo {
  */
 type ParamsMapForPageable = Map<
   tcgc.SdkMethodParameter,
-  go.HeaderScalarParameter | go.QueryScalarParameter
+  go.HeaderScalarParameter | go.QueryParameter
 >;
 
 /**

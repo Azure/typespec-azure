@@ -60,7 +60,7 @@ Use the [TCGC Playground](https://azure.github.io/typespec-azure/playground/?e=%
 
 ### TCGC Flags
 
-TCGC provides flags to control the client type graph style, such as enabling or disabling convenience APIs. See the [documentation](../reference/emitter/#emitter-options) for details.
+TCGC provides flags to control the client type graph style, such as enabling or disabling convenience and protocol APIs for Java and C# emitters. Other emitters should not set `generate-convenience-methods` or `generate-protocol-methods`; TCGC reports an `unnecessary-emitter-option` warning when either option is explicitly set for another language. See the [documentation](../reference/emitter/#emitter-options) for details.
 
 ## TCGC Raw Types and Helpers
 
@@ -81,8 +81,8 @@ Most TCGC types share the following common properties:
 - **`namespace`**: Indicates the type's namespace.
 - **`doc` and `summary`**: Contain documentation-related information.
 - **`apiVersions`**: Indicates which API versions the type exists in.
-- **`decorators`**: Stores all TypeSpec decorator info for advanced use cases.
-- **`crossLanguageDefinitionId`**: A unique ID for a TCGC type that can be used for output mapping across different emitters.
+- **`decorators`**: Stores TypeSpec decorator information for advanced use cases. Decorator arguments that reference TypeSpec models are converted to TCGC SDK types. For example, a model-reference value passed to `@clientOption` preserves scoped transformations such as `@alternateType`.
+- **`crossLanguageDefinitionId`**: A unique ID for a TCGC type that can be used for output mapping across different emitters. When `@alternateType` replaces a union, model, enum, scalar, or model property, the original type uses the replacement type's ID. This is resolved recursively, so a chain of alternate types has one identity.
 - **`name`** and **`isGeneratedName`**: The type's name and whether the name was created by TCGC.
 - **`isExactName`**: Indicates that the name was set via `@clientName` with the `exact()` function and must be used as-is by language emitters, without applying any casing transformations (e.g., no snake_case for Python, no camelCase for JavaScript).
 - **`access`**: Indicates whether the type has public or private accessibility.
@@ -118,6 +118,8 @@ Emitters can get package metadata from `SdkPackage.metadata`. The metadata curre
 
 - **`apiVersion`** _(deprecated)_: A single string representing the resolved API version for single-service packages. For multi-service packages this is `undefined`. Use `apiVersions` instead.
 - **`apiVersions`**: A `Map<string, string>` where each key is a service namespace's full qualified name and each value is the resolved API version for that service. For single-service packages, the map has one entry. For multi-service packages, each service has its own entry. If the `api-version` config is set to `"all"` (single-service only), the value is the string `"all"`.
+
+For a multi-service package, the `api-version` emitter option accepts a nested map. Each namespace segment must be represented as a nested object in `tspconfig.yaml`; omitted services resolve to their latest version. TCGC uses the resolved version both for the generated API surface and when loading versioned example files.
 
 ### License Information
 
@@ -207,7 +209,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 **Built-in Types:**
 
-- [`SdkBuiltInType`](../reference/js-api/interfaces/sdkbuiltintype/) represents a [built-in TypeSpec type](https://typespec.io/docs/language-basics/built-in-types/) or a [`scalar`](https://typespec.io/docs/language-basics/scalars/) type that derives from a built-in TypeSpec type, excluding `utcDateTime`, `offsetDateTime` and `duration`. The `encode` property indicates how to encode when sending to the service. It is set when the `@encode` decorator exists, or when the context determines a specific encoding — for example, `bytes` in a `multipart/form-data` part get `encode: "bytes"` (raw binary) rather than the default `"base64"`.
+- [`SdkBuiltInType`](../reference/js-api/interfaces/sdkbuiltintype/) represents a [built-in TypeSpec type](https://typespec.io/docs/language-basics/built-in-types/) or a [`scalar`](https://typespec.io/docs/language-basics/scalars/) type that derives from a built-in TypeSpec type, excluding `utcDateTime`, `offsetDateTime` and `duration`. The `encode` property indicates how to encode when sending to the service. It is set when the `@encode` decorator exists, or when the context determines a specific encoding — for example, `bytes` in a `multipart/form-data` part get `encode: "bytes"` (raw binary) rather than the default `"base64"`. When `@encode` specifies an `encodedAs` target type (for example encoding an `int32` as a `string`, or a `string` as an `int32`), the target wire type is exposed on the `wireType` property as its own `SdkBuiltInType`. Emitters should serialize the value using `wireType` while keeping the client-facing type unchanged.
 
 **Date and Time Types:**
 

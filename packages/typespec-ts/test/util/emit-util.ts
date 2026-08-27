@@ -32,6 +32,7 @@ export interface ModelConfigOptions extends ClientOptions {
   withRawContent?: boolean;
   needAzureCore?: boolean;
   needNamespaces?: boolean;
+  needArmTemplate?: boolean;
   mustEmptyDiagnostic?: boolean;
   withVersionedApiVersion?: boolean;
   [key: string]: any;
@@ -49,6 +50,7 @@ export async function emitModularModelsFromTypeSpec(
     needTCGC = false,
     withVersionedApiVersion = false,
     needArmTemplate = false,
+    needNamespaces = true,
   } = options;
   if (options["experimental-extensible-enums"] === undefined) {
     options["experimental-extensible-enums"] = false;
@@ -57,7 +59,7 @@ export async function emitModularModelsFromTypeSpec(
     options["compatibility-mode"] = false;
   }
   const context = await rlcEmitterFor(tspContent, {
-    needNamespaces: true,
+    needNamespaces,
     needAzureCore,
     needTCGC,
     withRawContent,
@@ -198,8 +200,9 @@ export async function emitModularOperationsFromTypeSpec(
     needTCGC: options["needTCGC"] ? true : false,
     withRawContent: options.withRawContent ? true : false,
     withVersionedApiVersion: options.withVersionedApiVersion ? true : false,
+    needArmTemplate: options.needArmTemplate === true,
   });
-  const dpgContext = await createDpgContextTestHelper(context.program);
+  const dpgContext = await createDpgContextTestHelper(context.program, false, options);
   const binder = useBinder();
   const includeResponseHeaders = options["include-headers-in-response"] === true;
   dpgContext.emitterOptions!.includeHeadersInResponse = includeResponseHeaders;
@@ -252,6 +255,7 @@ export async function emitModularClientContextFromTypeSpec(
     needTCGC: false,
     withRawContent: options.withRawContent ? true : false,
     withVersionedApiVersion: options.withVersionedApiVersion ? true : false,
+    needArmTemplate: options.needArmTemplate === true,
   });
   const dpgContext = await createDpgContextTestHelper(context.program);
   if (options.packageDetails) {
@@ -285,13 +289,14 @@ export async function emitModularClientFromTypeSpec(
   options: ModelConfigOptions = {},
 ) {
   const context = await rlcEmitterFor(tspContent, {
-    needNamespaces: true,
+    needNamespaces: options.needNamespaces ?? true,
     needAzureCore: false,
     needTCGC: false,
     withRawContent: options.withRawContent ? true : false,
     withVersionedApiVersion: options.withVersionedApiVersion ? true : false,
+    needArmTemplate: options.needArmTemplate === true,
   });
-  const dpgContext = await createDpgContextTestHelper(context.program);
+  const dpgContext = await createDpgContextTestHelper(context.program, false, options);
   const binder = useBinder();
   const includeResponseHeaders = options["include-headers-in-response"] === true;
   dpgContext.emitterOptions!.includeHeadersInResponse = includeResponseHeaders;

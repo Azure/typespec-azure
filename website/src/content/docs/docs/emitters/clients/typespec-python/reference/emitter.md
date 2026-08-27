@@ -76,7 +76,7 @@ Whether to generate test files, for basic testing of your generated sdks. Defaul
 
 **Type:** `string | object`
 
-Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace's full name to its desired version; services not listed default to their latest version.
+Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace to its desired version. Nested namespaces must be represented as nested objects in `tspconfig.yaml`; services not listed default to their latest version.
 
 **Options:**
 
@@ -174,6 +174,12 @@ options:
 **Type:** `boolean`
 
 Whether to keep the existing `setup.py` when `generate-packaging-files` is `true`. If set to `false` and by default, `pyproject.toml` will be generated instead. To generate `setup.py`, use `basic-setup-py`.
+
+### `generate-typeddict`
+
+**Type:** `boolean`
+
+Whether to add TypedDict typing for JSON dictionary input in `models-mode: dpg`, instead of accepting only generic JSON. This enriches the typing on the existing overloads rather than adding another request-body overload. Defaults to `true`.
 
 ### `keep-pyproject-fields`
 

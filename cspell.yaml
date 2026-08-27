@@ -105,7 +105,10 @@ words:
   - regionality
   - responseasbool
   - retarget
+  - reinjectable
   - reinjected
+  - reinjecting
+  - reinjection
   - Reranker
   - rpaasoneboxacr
   - rpass
@@ -142,6 +145,7 @@ words:
   - unmarshaller
   - unmarshallers
   - unmarshalling
+  - unmarshals
   - unpopulate
   - ervices
   - lient

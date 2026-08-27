@@ -123,6 +123,9 @@ interface PackageBase {
   /** all of the interfaces for discriminated types (interfaces.go file) */
   interfaces: Array<type.Interface>;
 
+  /** all of the union types to generate (unions.go file). can be empty */
+  unions: Array<type.UnionStruct>;
+
   /** any subpackages within this package. can be empty */
   packages: Array<Package>;
 }
@@ -136,6 +139,7 @@ class PackageBase implements PackageBase {
     this.packages = new Array<Package>();
     this.paramGroups = new Array<type.Struct>();
     this.responseEnvelopes = new Array<result.ResponseEnvelope>();
+    this.unions = new Array<type.UnionStruct>();
   }
 }
 

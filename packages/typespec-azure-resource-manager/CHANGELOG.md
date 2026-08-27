@@ -1,5 +1,66 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.71.0
+
+### Breaking Changes
+
+- [#5197](https://github.com/Azure/typespec-azure/pull/5197) Remove `modelDeploymentRef` from the experimental Agent base type `AgentDefinitionAppliance` model. The appliance owns the entire agent definition, so the property is now Platform-only and remains available on `AgentDefinitionPlatform`. As a result `AgentDefinitionAppliance` takes a single template parameter (`AgentDefinitionAppliance<HasInstructions>` instead of `AgentDefinitionAppliance<HasModelDeploymentRef, HasInstructions>`), and `AgentPropertiesAppliance.definition` is read-only again since it no longer needs to carry a client-writable field.
+
+### Features
+
+- [#4892](https://github.com/Azure/typespec-azure/pull/4892) Add the experimental Relationship base type for Azure Resource Manager extension resources. `RelationshipProperties` provides the `baseTypes` descriptor, source and target resource and tenant identifiers, and provisioning state. Resource providers can extend this property bag with relationship-specific information and expose the relationship against any ARM resource scope.
+  
+  Example of creating a dependency relationship with RP-specific metadata and operations:
+  
+  ```typespec
+  using Azure.ResourceManager;
+  using Azure.ResourceManager.BaseTypes.Relationships;
+  
+  model DependencyOfMetadata {
+    sourceType: string;
+    targetType: string;
+    description?: string;
+  }
+  
+  model DependencyOfProperties is RelationshipProperties {
+    metadata: DependencyOfMetadata;
+  }
+  
+  #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "Experimental BaseTypes"
+  model DependencyOf is Relationship<DependencyOfProperties> {
+    ...ResourceNameParameter<
+      Resource = DependencyOf,
+      KeyName = "relationshipName",
+      SegmentName = "dependencyOf",
+      NamePattern = "^[a-zA-Z0-9_.-]{1,64}$"
+    >;
+  }
+  
+  interface DependencyOfOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+    get is Extension.Read<Scope, DependencyOf>;
+    create is Extension.CreateOrReplaceAsync<Scope, DependencyOf>;
+    update is Extension.CustomPatchAsync<
+      Scope,
+      DependencyOf,
+      Azure.ResourceManager.Foundations.ResourceUpdateModel<DependencyOf, DependencyOfProperties>
+    >;
+    delete is Extension.DeleteWithoutOkAsync<Scope, DependencyOf>;
+    list is Extension.ListByTarget<Scope, DependencyOf>;
+  }
+  ```
+- [#4891](https://github.com/Azure/typespec-azure/pull/4891) Add built-in support for Azure service groups as extension resource targets and ARM resource identifier scopes.
+- [#5169](https://github.com/Azure/typespec-azure/pull/5169) Adding a new billing-data common type. This provides standardization of billing properties in e.g. prepaid resource types.
+- [#4808](https://github.com/Azure/typespec-azure/pull/4808) Split `arm-resource-operation` lint rule: add `use-operation-decorator`, `use-api-version`, and `use-interface` as separate rules replacing the original combined rule.
+
+### Bug Fixes
+
+- [#4904](https://github.com/Azure/typespec-azure/pull/4904) Constrain the `baseType` field of the experimental `BaseTypeInfo` to a new `BaseType` extensible enum (a union of `Agent` and `Relationship` with a `string` variant) instead of a free-form `string`, following the Azure `no-enum` / `no-closed-literal-union` conventions.
+- [#5100](https://github.com/Azure/typespec-azure/pull/5100) Refine the experimental Agent base type input model: add an `input` property to `ConversationProperties` (mirroring `ResponseProperties.input`, required on create), rename `ConversationItem` to `InputItem`, make its `role` property read-only, and change the `content` field on `InputItem`/`ResponseItem` to `Record<unknown>` to support polymorphic content.
+- [#5178](https://github.com/Azure/typespec-azure/pull/5178) Make `modelDeploymentRef` writable in the experimental Agent base type `AgentDefinitionAppliance` model instead of read-only, so the client can select the underlying model deployment in both the Appliance and Platform deployment models. `AgentPropertiesAppliance.definition` is no longer read-only either, since a read-only container would keep every nested field unsettable; the service-owned fields inside the definition remain read-only.
+- [#4978](https://github.com/Azure/typespec-azure/pull/4978) Fix the Agent base type contract version in the `@azureBaseType` decorator on the `Agent` resource template, correcting a typo where it was set to `2024-06-01` instead of `2026-04-01`.
+- [#5126](https://github.com/Azure/typespec-azure/pull/5126) Fix `visibility-sealed` errors reported for the resource `name` property when emitters or versioning re-apply the ARM resource decorators on a copy of the resource type
+
+
 ## 0.70.0
 
 ### Features

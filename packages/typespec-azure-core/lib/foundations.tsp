@@ -86,6 +86,7 @@ model LocationOfCreatedResourceResponse<Resource extends TypeSpec.Reflection.Mod
   is TypeSpec.Http.CreatedResponse {
   @finalLocation
   @TypeSpec.Http.header("Location")
+  @doc("The location of an instance of {name}", Resource)
   location: ResourceLocation<Resource>;
 }
 
@@ -97,6 +98,7 @@ model LocationOfCreatedResourceWithServiceProvidedNameResponse<Resource extends 
   is TypeSpec.Http.AcceptedResponse {
   @finalLocation
   @TypeSpec.Http.header("Location")
+  @doc("The location of an instance of {name} created with a service-provided name", Resource)
   location: ResourceLocation<Resource>;
 }
 

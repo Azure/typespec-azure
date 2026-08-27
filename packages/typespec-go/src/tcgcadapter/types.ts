@@ -67,6 +67,14 @@ export class TypeAdapter {
       this.getPkg().constants.push(constType);
     }
 
+    for (const sdkUnion of this.ctx.sdkPackage.unions.filter((u) => u.kind === "union")) {
+      const goUnion = this.getUnionStruct(
+        sdkUnion,
+        this.codeModel.options["slice-elements-byval"] ?? false,
+      );
+      this.getPkg().unions.push(goUnion);
+    }
+
     // we must adapt all interface/model types first. this is because models can contain cyclic references
     const modelTypes = new Array<ModelTypeSdkModelType>();
     const ifaceTypes = new Array<InterfaceTypeSdkModelType>();
@@ -235,7 +243,8 @@ export class TypeAdapter {
           ? true
           : nullable
             ? false
-            : this.codeModel.options.sliceElementsByval || helpers.isTypePassedByValue(elementType);
+            : this.codeModel.options["slice-elements-byval"] ||
+              helpers.isTypePassedByValue(elementType);
         const keyName = recursiveKeyName(
           `array-${myElementTypeByValue}`,
           elementType,
@@ -314,6 +323,15 @@ export class TypeAdapter {
         return this.getModel(type);
       case "nullable":
         return this.getWireType(type.type, elementTypeByValue, substituteDiscriminator);
+      case "union":
+        if (type.discriminatedOptions) {
+          throw new AdapterError(
+            "UnsupportedTsp",
+            `unsupported type kind ${type.kind}`,
+            type.__raw?.node,
+          );
+        }
+        return this.getUnionStruct(type, elementTypeByValue);
       default:
         throw new AdapterError(
           "UnsupportedTsp",
@@ -387,7 +405,7 @@ export class TypeAdapter {
   private getBuiltInType(type: tcgc.SdkBuiltInType): go.WireType {
     switch (type.kind) {
       case "unknown": {
-        if (this.codeModel.options.rawJSONAsBytes) {
+        if (this.codeModel.options["rawjson-as-bytes"]) {
           const anyRawJSONKey = "any-raw-json";
           let anyRawJSON = this.types.get(anyRawJSONKey);
           if (anyRawJSON) {
@@ -406,7 +424,7 @@ export class TypeAdapter {
         return anyType;
       }
       case "boolean": {
-        const boolKey = "boolean";
+        const boolKey = type.encode === "string" ? "boolean-string" : "boolean";
         let primitiveBool = this.types.get(boolKey);
         if (primitiveBool) {
           return primitiveBool;
@@ -610,7 +628,7 @@ export class TypeAdapter {
 
   private getInterfaceType(model: tcgc.SdkModelType): go.Interface {
     if (model.name.length === 0) {
-      throw new AdapterError("InternalError", "unnamed model");
+      throw new AdapterError("InternalError", "unnamed model", model.__raw?.node);
     }
     if (!helpers.isPolymorphicRoot(model)) {
       throw new AdapterError(
@@ -822,6 +840,27 @@ export class TypeAdapter {
     const field = new go.ModelField(fieldName, type, fieldByValue, serializedName, annotations);
     field.docs.summary = prop.summary;
     field.docs.description = prop.doc;
+
+    if (prop.encode && type.kind === "slice") {
+      if (
+        type.elementType.kind === "string" ||
+        (type.elementType.kind === "constant" && type.elementType.type === "string")
+      ) {
+        type = new go.SliceArray(
+          type.elementType,
+          type.elementTypeByValue,
+          getSliceArrayDelimiter(prop.encode),
+        );
+        field.type = type;
+      } else {
+        this.ctx.program.reportDiagnostic({
+          code: "UnsupportedArrayEncoding",
+          severity: "warning",
+          message: `The array property ${prop.name} uses ${prop.encode} encoding with unsupported element type ${prop.type.kind === "array" ? prop.type.valueType.kind : prop.type.kind}. The encoding will be ignored.`,
+          target: prop.__raw?.node ?? tsp.NoTarget,
+        });
+      }
+    }
 
     if (prop.discriminator && modelType.discriminatorValue) {
       // the presence of modelType.discriminatorValue tells us that this
@@ -1060,6 +1099,52 @@ export class TypeAdapter {
 
     // TODO: tcgc doesn't support duration as a literal value
   }
+
+  private getUnionStruct(sdkUnion: tcgc.SdkUnionType, elementTypeByValue: boolean): go.UnionStruct {
+    if (sdkUnion.name.length === 0) {
+      throw new AdapterError("InternalError", "unnamed union", sdkUnion.__raw?.node);
+    }
+
+    const unionName = helpers.getEffectiveName(sdkUnion);
+    let goUnion = this.types.get(unionName);
+    if (goUnion) {
+      return <go.UnionStruct>goUnion;
+    }
+
+    goUnion = new go.UnionStruct(this.getPkg(), unionName);
+    for (const variant of sdkUnion.variantTypes) {
+      const type = this.getWireType(variant, elementTypeByValue, false);
+      if (!go.isUnionVariantType(type)) {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `unsupported kind ${variant.kind} for union variant`,
+          variant.__raw?.node,
+        );
+      }
+      goUnion.fields.push(
+        new go.UnionField(
+          recursiveVariantFieldName(type),
+          type,
+          helpers.isTypePassedByValue(variant),
+        ),
+      );
+    }
+
+    goUnion.docs.summary = sdkUnion.summary;
+    goUnion.docs.description = sdkUnion.doc;
+    if (goUnion.docs.summary) {
+      if (!goUnion.docs.summary.startsWith(unionName)) {
+        goUnion.docs.summary = go.prefixDocWithName(unionName, goUnion.docs.summary);
+      }
+    } else if (goUnion.docs.description) {
+      if (!goUnion.docs.description.startsWith(unionName)) {
+        goUnion.docs.description = go.prefixDocWithName(unionName, goUnion.docs.description);
+      }
+    }
+
+    this.types.set(unionName, goUnion);
+    return goUnion;
+  }
 }
 
 function getPrimitiveType(
@@ -1080,6 +1165,21 @@ function getPrimitiveType(
         `unhandled tcgc.SdkBuiltInKinds: ${type.kind}`,
         type.__raw?.node,
       );
+  }
+}
+
+function getSliceArrayDelimiter(encoding: string): go.SliceArrayDelimiter {
+  switch (encoding) {
+    case "commaDelimited":
+      return "comma";
+    case "spaceDelimited":
+      return "space";
+    case "pipeDelimited":
+      return "pipe";
+    case "newlineDelimited":
+      return "newline";
+    default:
+      throw new AdapterError("UnsupportedTsp", `unsupported array encoding ${encoding}`);
   }
 }
 
@@ -1134,6 +1234,26 @@ function recursiveKeyName(
       return `${root}-timeRFC3339`;
     default:
       return `${root}-${obj.kind}`;
+  }
+}
+
+function recursiveVariantFieldName(type: go.WireType): string {
+  switch (type.kind) {
+    case "constant":
+    case "model":
+      return type.name;
+    case "encodedBytes":
+      return "Bytes";
+    case "literal":
+      return `Literal${recursiveVariantFieldName(type.type)}`;
+    case "map":
+      return `MapOf${recursiveVariantFieldName(type.valueType)}`;
+    case "slice":
+      return `SliceOf${recursiveVariantFieldName(type.elementType)}`;
+    case "scalar":
+      return naming.capitalize(type.type);
+    default:
+      return naming.capitalize(type.kind);
   }
 }
 
