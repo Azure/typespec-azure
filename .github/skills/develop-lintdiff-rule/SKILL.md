@@ -201,8 +201,9 @@ separate VS Code windows and run independent top-level worker sessions.
      worktree
    - if and only if pnpm reports `ERR_PNPM_OUTDATED_LOCKFILE` because the target
      branch's lintdiff importer is missing from `pnpm-lock.yaml`, run
-     `mise exec -- pnpm install --no-frozen-lockfile --lockfile=false --ignore-scripts`;
-     this creates all workspace links needed by the dependency build without
+     `mise exec -- pnpm install --filter "tsp-lintdiff-local-linter..." --no-frozen-lockfile --lockfile=false --ignore-scripts`;
+     the filter limits the fallback to lintdiff and its workspace dependency
+     closure while creating the links needed by the dependency build, without
      modifying the tracked lockfile or running unrelated monorepo lifecycle
      setup such as the Python package environment
    - use the same mise-managed Node.js to run `npm ci` in every specs worktree;
@@ -218,12 +219,15 @@ separate VS Code windows and run independent top-level worker sessions.
    - from the lintdiff package, resolve every package imported directly by the
      fixture harness, including
      `@microsoft.azure/openapi-validator-core`,
-     `@microsoft.azure/openapi-validator-rulesets`, and
-     `@microsoft.azure/openapi-validator`; a transitive package present only
-     under pnpm's virtual store does not satisfy a direct harness import
-   - run a lightweight fixture-harness smoke check that loads the validation
-     entry point far enough to expose missing-package and module-resolution
-     errors; do not rely only on build output that excludes the test harness
+     `@microsoft.azure/openapi-validator-rulesets`, `lodash`, and `yaml`;
+     also resolve the declared `@microsoft.azure/openapi-validator` harness
+     dependency and the `tsx` loader. A transitive package present only under
+     pnpm's virtual store does not satisfy a direct harness import
+   - run this lightweight smoke check from the repository root; it verifies
+     fixture-harness package and loader resolution without executing a full
+     fixture comparison:
+     `mise exec -- pnpm --dir packages/typespec-lintdiff exec node --import tsx/esm --input-type=module -e "await Promise.all(['@microsoft.azure/openapi-validator-core', '@microsoft.azure/openapi-validator-rulesets', '@microsoft.azure/openapi-validator', 'lodash', 'yaml'].map((specifier) => import(specifier)))"`
+     Do not rely only on build output that excludes the test harness
    - treat any install or verification failure as a dispatch failure and do not
      hand off that worker for interactive development
 8. Report the 1-based handoff ID, rule ID, canonical validator rule slug, target
@@ -284,10 +288,20 @@ its supplied worktrees:
      absent from the target branch. Do not silently accept unrelated resolution,
      integrity, tarball, or private-feed URL rewrites caused by machine-specific
      registry metadata.
+   - generate the lockfile separately from package installation with
+     `mise exec -- pnpm install --filter "tsp-lintdiff-local-linter..." --lockfile-only --ignore-scripts`.
+     Always use pnpm's configured default registry. Do not pass
+     `--registry=https://registry.npmjs.org/` locally; direct access is not
+     supported in the development environment. Inspect the diff before
+     proceeding and discard unrelated lockfile churn, including private-feed
+     tarball URL or integrity rewrites
    - verify the normalized manifest and lockfile with a frozen-lockfile install,
-     preferably offline when the required artifacts are already in the pnpm
-     store. If the lockfile cannot be normalized and verified reliably, stop
-     and report that blocker rather than hand-editing an unverifiable lockfile.
+     using
+     `mise exec -- pnpm install --filter "tsp-lintdiff-local-linter..." --frozen-lockfile --offline`
+     when the required artifacts are already in the pnpm store, or omit
+     `--offline` when they are not. If the lockfile cannot be normalized and
+     verified reliably, stop and report that blocker rather than hand-editing
+     an unverifiable lockfile.
    - never use an unversioned global install, manually copy packages into
      `node_modules`, or silently bypass the lockfile
    - stop only after the bounded repair fails because of a concrete external
