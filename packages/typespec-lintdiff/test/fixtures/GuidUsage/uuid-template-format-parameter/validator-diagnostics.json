@@ -1,0 +1,54 @@
+[
+  {
+    "code": "GuidUsage",
+    "message": "Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "get",
+      "parameters",
+      "3",
+      "format"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "GuidUsage",
+    "message": "Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "put",
+      "parameters",
+      "3",
+      "format"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "GuidUsage",
+    "message": "Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "parameters",
+      "3",
+      "format"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "GuidUsage",
+    "message": "Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "delete",
+      "parameters",
+      "3",
+      "format"
+    ],
+    "severity": 0
+  }
+]
