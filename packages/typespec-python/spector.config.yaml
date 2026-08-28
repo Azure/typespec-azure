@@ -135,10 +135,9 @@ specs:
   "versioning/renamedFrom": true
   "versioning/returnTypeChangedFrom": true
   "versioning/typeChangedFrom": true
+  "streaming/sse": true
 
   # --- Tracked skips ---
   # multi-file upload not yet supported by the Python emitter
   type/file: false
-  # `Unnamed.Info` and `Protocol.Info` collide once the Python emitter flattens
-  # models into a single `_models.py`: https://github.com/Azure/typespec-azure/issues/5332
-  "streaming/sse": true
+  
