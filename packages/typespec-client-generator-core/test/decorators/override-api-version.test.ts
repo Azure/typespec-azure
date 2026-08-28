@@ -222,7 +222,7 @@ describe("@overrideApiVersion", () => {
     strictEqual(getApiVersionDefault(client), "2099-01-01");
   });
 
-  it("selects the override by emitter scope", async () => {
+  it("applies the override for every emitter", async () => {
     const source = `
       @service
       @versioned(Versions)
@@ -232,7 +232,7 @@ describe("@overrideApiVersion", () => {
           v2: "2025-01-01",
         }
 
-        @${decorator}("2099-01-01", "python")
+        @${decorator}("2099-01-01")
         interface Widgets {
           op get(@query("api-version") apiVersion: string): void;
         }
@@ -251,7 +251,7 @@ describe("@overrideApiVersion", () => {
       emitterName: "@azure-tools/typespec-csharp",
     });
     const csharpClient = requireClient(csharpContext.sdkPackage.clients, "Widgets");
-    strictEqual(getApiVersionDefault(csharpClient), "2025-01-01");
+    strictEqual(getApiVersionDefault(csharpClient), "2099-01-01");
   });
 
   it("does not synthesize an API-version parameter when the client has none", async () => {

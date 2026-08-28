@@ -14,9 +14,6 @@ namespace Azure.Core.Legacy;
  *
  * @param target The namespace or interface whose operations use the API-version override.
  * @param version The non-empty API-version wire value.
- * @param scope The language emitter scopes to which the override applies. Use a comma-separated
- * list for multiple emitters, such as `"python, java"`, or exclude emitters with a negated scope,
- * such as `"!(python, java)"`.
  *
  * @example Override an interface API version
  * ```typespec
@@ -25,20 +22,8 @@ namespace Azure.Core.Legacy;
  *   get(): void;
  * }
  * ```
- *
- * @example Override an interface API version for Python and Java
- * ```typespec
- * @Azure.Core.Legacy.overrideApiVersion("2021-11-01", "python, java")
- * interface Widgets {
- *   get(): void;
- * }
- * ```
  */
-extern dec overrideApiVersion(
-  target: Namespace | Interface,
-  version: valueof string,
-  scope?: valueof string
-);
+extern dec overrideApiVersion(target: Namespace | Interface, version: valueof string);
 
 /**
  * A scalar type representing a next link that requires formatting with parameters to be used.

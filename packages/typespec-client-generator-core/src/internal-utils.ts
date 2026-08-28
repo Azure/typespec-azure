@@ -343,18 +343,13 @@ export function updateWithApiVersionInformation(
   if (operation) {
     let declaration: Operation | undefined = operation;
     while (declaration && apiVersionOverride === undefined) {
-      apiVersionOverride = getEffectiveApiVersionOverride(
-        context.program,
-        declaration,
-        context.emitterName,
-      );
+      apiVersionOverride = getEffectiveApiVersionOverride(context.program, declaration);
       declaration = declaration.sourceOperation;
     }
   } else if (client) {
     apiVersionOverride = getEffectiveApiVersionOverride(
       context.program,
       getActualClientType(client),
-      context.emitterName,
     );
   }
 

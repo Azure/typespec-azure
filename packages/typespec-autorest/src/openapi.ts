@@ -3418,11 +3418,7 @@ function applyClientApiVersionOverride(
   if (operations.length === 0) return;
 
   const overrides = operations.map((operation) =>
-    getEffectiveApiVersionOverride(
-      context.program,
-      operation.operation,
-      "@azure-tools/typespec-autorest",
-    ),
+    getEffectiveApiVersionOverride(context.program, operation.operation),
   );
   if (overrides.every((value) => value === undefined)) return;
 

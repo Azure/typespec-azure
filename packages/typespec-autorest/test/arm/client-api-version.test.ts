@@ -80,23 +80,6 @@ describe("client API version inference", () => {
     expect(openapi.info.version).toBe("2020-01-01");
   });
 
-  it("ignores overrides scoped to another emitter", async () => {
-    const [openapi, diagnostics] = await emitDefault(`
-      @service
-      @info(#{version: "fallback-version"})
-      @Azure.Core.Legacy.overrideApiVersion("2020-01-01", "python")
-      namespace Microsoft.Test {
-        interface Widgets {
-          ${suppressStandardOperations}
-          @get @route("/widgets") op list(): string[];
-        }
-      }
-    `);
-
-    expectDiagnosticEmpty(diagnostics);
-    expect(openapi.info.version).toBe("fallback-version");
-  });
-
   it("infers each feature document independently and leaves common on the fallback", async () => {
     const [openapi, diagnostics] = await emitFeatures(`
       @service

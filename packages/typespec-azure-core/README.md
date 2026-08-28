@@ -452,7 +452,7 @@ This decorator is considered legacy functionality and should only be used to pre
 compatibility with an existing SDK.
 
 ```typespec
-@Azure.Core.Legacy.overrideApiVersion(version: valueof string, scope?: valueof string)
+@Azure.Core.Legacy.overrideApiVersion(version: valueof string)
 ```
 
 ##### Target
@@ -462,10 +462,9 @@ The namespace or interface whose operations use the API-version override.
 
 ##### Parameters
 
-| Name    | Type             | Description                                                                                                                                                                                                             |
-| ------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| version | `valueof string` | The non-empty API-version wire value.                                                                                                                                                                                   |
-| scope   | `valueof string` | The language emitter scopes to which the override applies. Use a comma-separated<br />list for multiple emitters, such as `"python, java"`, or exclude emitters with a negated scope,<br />such as `"!(python, java)"`. |
+| Name    | Type             | Description                           |
+| ------- | ---------------- | ------------------------------------- |
+| version | `valueof string` | The non-empty API-version wire value. |
 
 ##### Examples
 
@@ -473,15 +472,6 @@ The namespace or interface whose operations use the API-version override.
 
 ```typespec
 @Azure.Core.Legacy.overrideApiVersion("2021-11-01")
-interface Widgets {
-  get(): void;
-}
-```
-
-###### Override an interface API version for Python and Java
-
-```typespec
-@Azure.Core.Legacy.overrideApiVersion("2021-11-01", "python, java")
 interface Widgets {
   get(): void;
 }

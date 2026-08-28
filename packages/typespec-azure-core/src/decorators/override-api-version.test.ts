@@ -86,56 +86,6 @@ it("preserves overrides on projected interfaces", async () => {
   );
 });
 
-it("selects overrides by emitter scope", async () => {
-  const { program, Service, Widgets, MultipleScopes, ExcludingPython, ExcludingMultiple } =
-    await Tester.compile(t.code`
-    @${decorator}("default-version")
-    @${decorator}("python-version", "python")
-    namespace ${t.namespace("Service")} {
-      @${decorator}("javascript-version", "javascript")
-      interface ${t.interface("Widgets")} {
-        op get(): void;
-      }
-    }
-
-    @${decorator}("python-java-version", "python, java")
-    namespace ${t.namespace("MultipleScopes")} {}
-
-    @${decorator}("non-python-version", "!python")
-    namespace ${t.namespace("ExcludingPython")} {}
-
-    @${decorator}("non-python-java-version", "!(python, java)")
-    namespace ${t.namespace("ExcludingMultiple")} {}
-  `);
-
-  expect(getApiVersionOverride(program, Service)).toBe("default-version");
-  expect(getApiVersionOverride(program, Service, "python")).toBe("python-version");
-  expect(getApiVersionOverride(program, Service, "@azure-tools/typespec-python")).toBe(
-    "python-version",
-  );
-  expect(getApiVersionOverride(program, Service, "csharp")).toBe("default-version");
-  expect(getEffectiveApiVersionOverride(program, Widgets, "python")).toBe("python-version");
-  expect(getEffectiveApiVersionOverride(program, Widgets, "javascript")).toBe("javascript-version");
-  expect(
-    getEffectiveApiVersionOverride(
-      program,
-      Widgets.operations.get("get")!,
-      "@azure-tools/typespec-typescript",
-    ),
-  ).toBe("javascript-version");
-  expect(getEffectiveApiVersionOverride(program, Widgets, "csharp")).toBe("default-version");
-  expect(getApiVersionOverride(program, MultipleScopes, "python")).toBe("python-java-version");
-  expect(getApiVersionOverride(program, MultipleScopes, "java")).toBe("python-java-version");
-  expect(getApiVersionOverride(program, MultipleScopes, "csharp")).toBeUndefined();
-  expect(getApiVersionOverride(program, ExcludingPython, "python")).toBeUndefined();
-  expect(getApiVersionOverride(program, ExcludingPython, "csharp")).toBe("non-python-version");
-  expect(getApiVersionOverride(program, ExcludingMultiple, "python")).toBeUndefined();
-  expect(getApiVersionOverride(program, ExcludingMultiple, "java")).toBeUndefined();
-  expect(getApiVersionOverride(program, ExcludingMultiple, "csharp")).toBe(
-    "non-python-java-version",
-  );
-});
-
 it("returns undefined when no override applies", async () => {
   const { program, Service, Widgets } = await Tester.compile(t.code`
     namespace ${t.namespace("Service")} {
