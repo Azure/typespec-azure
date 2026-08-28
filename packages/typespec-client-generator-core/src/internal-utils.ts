@@ -63,7 +63,6 @@ import {
 } from "@typespec/versioning";
 import {
   getAlternateType,
-  getClientDefaultValue,
   getClientDocExplicit,
   getClientLocation,
   getIsApiVersion,
@@ -357,11 +356,6 @@ export function updateWithApiVersionInformation(
     return { isApiVersionParam, clientDefaultValue: apiVersionOverride };
   }
 
-  const clientDefaultValue = getClientDefaultValue(context, type);
-  if (typeof clientDefaultValue === "string") {
-    return { isApiVersionParam, clientDefaultValue };
-  }
-
   if (!client) {
     return { isApiVersionParam, clientDefaultValue: undefined };
   }
@@ -388,37 +382,6 @@ export function updateWithApiVersionInformation(
 
   // No operation provided for multi-service client, return undefined
   return { isApiVersionParam, clientDefaultValue: undefined };
-}
-
-export function createClientScopedMethodParameter(
-  context: TCGCContext,
-  parameter: SdkMethodParameter,
-  client: SdkClient,
-): SdkMethodParameter {
-  if (!parameter.isApiVersionParam || !parameter.__raw) {
-    return { ...parameter };
-  }
-
-  const apiVersionInfo = updateWithApiVersionInformation(
-    context,
-    parameter.__raw,
-    client,
-    undefined,
-  );
-  const optional = parameter.__raw.optional || apiVersionInfo.clientDefaultValue !== undefined;
-  if (
-    parameter.isApiVersionParam === apiVersionInfo.isApiVersionParam &&
-    parameter.clientDefaultValue === apiVersionInfo.clientDefaultValue &&
-    parameter.optional === optional
-  ) {
-    return parameter;
-  }
-
-  return {
-    ...parameter,
-    ...apiVersionInfo,
-    optional,
-  };
 }
 
 export function filterApiVersionsWithDecorators(

@@ -64,7 +64,6 @@ import {
   UsageFlags,
 } from "./interfaces.js";
 import {
-  createClientScopedMethodParameter,
   createGeneratedName,
   findRootSourceProperty,
   getActualClientType,
@@ -708,9 +707,7 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
       // add API version and subscription ID parameters to the client parameters
       if (sdkMethodParam.isApiVersionParam) {
         if (!clientParams.find((x) => x.isApiVersionParam)) {
-          clientParams.push(
-            createClientScopedMethodParameter(context, sdkMethodParam, client.__raw),
-          );
+          clientParams.push(sdkMethodParam);
         }
       } else if (isSubscriptionId(context, param)) {
         if (!clientParams.find((x) => isSubscriptionId(context, x))) {
