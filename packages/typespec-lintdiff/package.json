@@ -70,10 +70,7 @@
     "@azure-tools/typespec-autorest": "workspace:^",
     "@azure-tools/typespec-azure-core": "workspace:^",
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
-    "@azure-tools/typespec-azure-rulesets": "workspace:^",
-    "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@microsoft.azure/openapi-validator": "^2.2.4",
-    "@microsoft.azure/openapi-validator-core": "^1.0.7",
     "@microsoft.azure/openapi-validator-rulesets": "^2.2.5",
     "@stoplight/spectral-core": "^1.21.0",
     "@types/node": "catalog:",
@@ -82,11 +79,9 @@
     "@typespec/openapi": "workspace:^",
     "@typespec/rest": "workspace:^",
     "@typespec/versioning": "workspace:^",
-    "lodash": "^4.18.1",
     "rimraf": "catalog:",
     "tsx": "^4.21.0",
     "typescript": "catalog:",
-    "vitest": "catalog:",
-    "yaml": "^2.9.0"
+    "vitest": "catalog:"
   }
 }
