@@ -63,6 +63,7 @@ import {
 } from "@typespec/versioning";
 import {
   getAlternateType,
+  getClientDefaultValue,
   getClientDocExplicit,
   getClientLocation,
   getIsApiVersion,
@@ -329,7 +330,6 @@ export function updateWithApiVersionInformation(
   type: ModelProperty,
   client?: SdkClient,
   operation?: Operation,
-  explicitClientDefaultValue?: string,
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: string;
@@ -357,8 +357,9 @@ export function updateWithApiVersionInformation(
     return { isApiVersionParam, clientDefaultValue: apiVersionOverride };
   }
 
-  if (explicitClientDefaultValue !== undefined) {
-    return { isApiVersionParam, clientDefaultValue: explicitClientDefaultValue };
+  const clientDefaultValue = getClientDefaultValue(context, type);
+  if (typeof clientDefaultValue === "string") {
+    return { isApiVersionParam, clientDefaultValue };
   }
 
   if (!client) {
@@ -393,7 +394,6 @@ export function createClientScopedMethodParameter(
   context: TCGCContext,
   parameter: SdkMethodParameter,
   client: SdkClient,
-  explicitClientDefaultValue?: string,
 ): SdkMethodParameter {
   if (!parameter.isApiVersionParam || !parameter.__raw) {
     return { ...parameter };
@@ -404,7 +404,6 @@ export function createClientScopedMethodParameter(
     parameter.__raw,
     client,
     undefined,
-    explicitClientDefaultValue,
   );
   const optional = parameter.__raw.optional || apiVersionInfo.clientDefaultValue !== undefined;
   if (

@@ -1362,7 +1362,6 @@ export function getSdkModelPropertyTypeBase(
     type,
     operation ? context.getClientForOperation(operation) : undefined,
     operation,
-    typeof clientDefaultValue === "string" ? clientDefaultValue : undefined,
   );
   return diagnostics.wrap({
     __raw: type,

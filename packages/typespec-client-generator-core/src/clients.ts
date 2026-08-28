@@ -2,7 +2,6 @@ import { createDiagnosticCollector, type Diagnostic, getDoc, getSummary } from "
 import { $ } from "@typespec/compiler/typekit";
 import { getServers, type HttpServer } from "@typespec/http";
 import {
-  getClientDefaultValue,
   getClientInitializationOptions,
   getClientNameOverride,
   getClientNamespace,
@@ -264,15 +263,7 @@ function addDefaultClientParameters<
       // the api version param as well
       apiVersionParam = context.__clientParametersCache.get(sc)?.find((x) => x.isApiVersionParam);
       if (apiVersionParam) {
-        const explicitDefault = apiVersionParam.__raw
-          ? getClientDefaultValue(context, apiVersionParam.__raw)
-          : undefined;
-        apiVersionParam = createClientScopedMethodParameter(
-          context,
-          apiVersionParam,
-          client.__raw,
-          typeof explicitDefault === "string" ? explicitDefault : undefined,
-        );
+        apiVersionParam = createClientScopedMethodParameter(context, apiVersionParam, client.__raw);
         context.__clientParametersCache.get(client.__raw)?.push(apiVersionParam);
         break;
       }
@@ -352,14 +343,8 @@ function createSdkClientInitializationType<
       result.__raw = initializationOptions.parameters;
       for (const parameter of initializationOptions.parameters.properties.values()) {
         const methodParameter = diagnostics.pipe(getSdkMethodParameter(context, parameter));
-        const explicitDefault = getClientDefaultValue(context, parameter);
         const clientParameter = methodParameter.isApiVersionParam
-          ? createClientScopedMethodParameter(
-              context,
-              methodParameter,
-              client,
-              typeof explicitDefault === "string" ? explicitDefault : undefined,
-            )
+          ? createClientScopedMethodParameter(context, methodParameter, client)
           : methodParameter;
         clientParameter.onClient = true;
         result.parameters.push(clientParameter);
@@ -433,13 +418,7 @@ function createSdkClientInitializationType<
         if (p.kind !== "method" || !p.isApiVersionParam) {
           return p;
         }
-        const explicitDefault = p.__raw ? getClientDefaultValue(context, p.__raw) : undefined;
-        return createClientScopedMethodParameter(
-          context,
-          p,
-          client,
-          typeof explicitDefault === "string" ? explicitDefault : undefined,
-        );
+        return createClientScopedMethodParameter(context, p, client);
       });
 
     result.parameters = [...inheritedParams, ...result.parameters];
