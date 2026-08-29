@@ -27,3 +27,5 @@ updates:
       actions:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
