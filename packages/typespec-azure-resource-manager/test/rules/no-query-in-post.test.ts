@@ -54,7 +54,7 @@ it("emits a warning for an ARM POST resource action with an extra query paramete
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/no-query-in-post",
       message:
-        "Query parameter 'mode' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.",
+        "Query parameter 'mode' should be moved into the POST request body. POST operations must not contain query parameters other than api-version.",
     });
 });
 
@@ -94,12 +94,12 @@ it("emits a warning for each extra query parameter on an ARM POST operation", as
       {
         code: "@azure-tools/typespec-azure-resource-manager/no-query-in-post",
         message:
-          "Query parameter 'mode' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.",
+          "Query parameter 'mode' should be moved into the POST request body. POST operations must not contain query parameters other than api-version.",
       },
       {
         code: "@azure-tools/typespec-azure-resource-manager/no-query-in-post",
         message:
-          "Query parameter 'format' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.",
+          "Query parameter 'format' should be moved into the POST request body. POST operations must not contain query parameters other than api-version.",
       },
     ]);
 });
@@ -128,7 +128,7 @@ it("emits a warning for a non-resource ARM POST operation with an extra query pa
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/no-query-in-post",
       message:
-        "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.",
+        "Query parameter '$filter' should be moved into the POST request body. POST operations must not contain query parameters other than api-version.",
     });
 });
 
@@ -188,7 +188,7 @@ it("emits a warning when the api-version query parameter uses different casing",
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/no-query-in-post",
       message:
-        "Query parameter 'API-Version' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.",
+        "Query parameter 'API-Version' should be moved into the POST request body. POST operations must not contain query parameters other than api-version.",
     });
 });
 
