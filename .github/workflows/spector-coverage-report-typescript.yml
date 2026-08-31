@@ -420,16 +420,17 @@ jobs:
             core.setOutput("not_implemented", JSON.stringify(actionableGroups));
 
   create-implementation-task:
-    name: Create Spector implementation task
+    name: Create or update Spector implementation task
     needs: report
     if: >-
       needs.report.outputs.not_implemented != '{}' &&
       !(github.event_name == 'workflow_dispatch' && inputs.report_only)
     permissions:
       issues: write
+      pull-requests: read
     runs-on: ubuntu-latest
     steps:
-      - name: Create task issue
+      - name: Create or update task issue
         uses: actions/github-script@v7
         env:
           COVERAGE_ISSUE_NUMBER: ${{ needs.report.outputs.issue_number }}
@@ -453,6 +454,63 @@ jobs:
               return;
             }
 
+            const taskMarker = "<!-- typespec-ts-spector-implementation-task -->";
+            const legacyTaskTitlePrefix = "[Copilot] Verify and implement Spector tests for ";
+            const openIssues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: "open",
+              labels: "emitter:typescript",
+              per_page: 100,
+            });
+            const taskIssues = openIssues
+              .filter(
+                (issue) =>
+                  !issue.pull_request &&
+                  (issue.body?.includes(taskMarker) ||
+                    issue.title.startsWith(legacyTaskTitlePrefix)),
+              )
+              .sort((a, b) => b.number - a.number);
+
+            for (const issue of taskIssues) {
+              const assignedToCopilot = issue.assignees?.some(
+                ({ login }) => login.toLowerCase() === "copilot",
+              );
+              const result = await github.graphql(
+                `query($owner: String!, $repo: String!, $issueNumber: Int!) {
+                  repository(owner: $owner, name: $repo) {
+                    issue(number: $issueNumber) {
+                      closedByPullRequestsReferences(first: 20) {
+                        nodes {
+                          number
+                          state
+                        }
+                      }
+                    }
+                  }
+                }`,
+                { owner, repo, issueNumber: issue.number },
+              );
+              const openPullRequest =
+                result.repository.issue.closedByPullRequestsReferences.nodes.find(
+                  ({ state }) => state === "OPEN",
+                );
+
+              if (assignedToCopilot || openPullRequest) {
+                const reasons = [];
+                if (assignedToCopilot) {
+                  reasons.push("it is assigned to Copilot");
+                }
+                if (openPullRequest) {
+                  reasons.push(`it has open implementation PR #${openPullRequest.number}`);
+                }
+                core.info(
+                  `Task issue #${issue.number} is active because ${reasons.join(" and ")}; no task issue will be created or updated.`,
+                );
+                return;
+              }
+            }
+
             const groupList = groups
               .map(
                 ({ group, scenarios }) =>
@@ -460,6 +518,8 @@ jobs:
               )
               .join("\n");
             const taskBody = [
+              taskMarker,
+              "",
               "## Task: Verify and Implement Spector Integration Tests",
               "",
               "Use the `typespec-ts-add-spector-test` skill to attempt every scenario listed below.",
@@ -499,19 +559,39 @@ jobs:
               `Results should be commented on issue ${owner}/${repo}#${coverageIssueNumber}.`,
             ].join("\n");
 
-            const created = await github.rest.issues.create({
-              owner,
-              repo,
-              title: `[Copilot] Verify and implement Spector tests for ${groups.length} scenario groups`,
-              body: taskBody,
-              labels: ["emitter:typescript"],
-            });
+            const title = `[Copilot] Verify and implement Spector tests for ${groups.length} scenario groups`;
+            const existingTask = taskIssues[0];
+            let taskIssue;
+            let action;
+            if (existingTask) {
+              const updated = await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: existingTask.number,
+                title,
+                body: taskBody,
+              });
+              taskIssue = updated.data;
+              action = "updated";
+            } else {
+              const created = await github.rest.issues.create({
+                owner,
+                repo,
+                title,
+                body: taskBody,
+                labels: ["emitter:typescript"],
+              });
+              taskIssue = created.data;
+              action = "created";
+            }
 
             await github.rest.issues.createComment({
               owner,
               repo,
               issue_number: coverageIssueNumber,
-              body: `🤖 A task issue has been created for ${groups.length} not-implemented scenario groups.\n\nTracking issue: #${created.data.number}`,
+              body: `🤖 Task issue #${taskIssue.number} has been ${action} for ${groups.length} not-implemented scenario groups.`,
             });
 
-            core.info(`Created task issue #${created.data.number} in ${owner}/${repo}.`);
+            core.info(
+              `${action === "created" ? "Created" : "Updated"} task issue #${taskIssue.number} in ${owner}/${repo}.`,
+            );
