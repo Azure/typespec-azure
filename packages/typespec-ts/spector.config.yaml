@@ -120,13 +120,13 @@ specs:
   azure/resource-manager/multi-service: true
   azure/resource-manager/multi-service-shared-models: true
   service/multi-service: true
+  service/multiple-services: true
   parameters/query: true
   azure/client-generator-core/client-doc: true
   azure/client-generator-core/response-as-bool: true
   documentation: true
 
-  # Disabled: operation-specific visibility is not applied to generated serializers.
-  type/model/visibility: false
+  type/model/visibility: true
   # Disabled: Http.File generates unresolved __PLACEHOLDER types and identifiers.
   type/file: false
   # Disabled: exact model and property names are normalized by the emitter.
@@ -135,7 +135,7 @@ specs:
   payload/json-merge-patch: false
 
   client/structure/renamed-operation: true
-  client/structure/two-operation-group: false
+  client/structure/two-operation-group: true
   client/structure/client-operation-group: true
   # Disabled: multipart not yet supported
   payload/multipart: false
