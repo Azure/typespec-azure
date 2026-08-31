@@ -9,7 +9,7 @@ export const noQueryParametersInPostRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-query-parameters-in-post",
   description: "ARM POST operations must not declare query parameters other than api-version.",
   messages: {
-    default: paramMessage`Query parameter '${"name"}' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.`,
+    default: paramMessage`Query parameter '${"name"}' should be moved into the POST request body. POST operations must not contain query parameters other than api-version.`,
   },
   create(context) {
     return {
