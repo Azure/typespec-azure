@@ -1,5 +1,5 @@
-import type { Type } from "@typespec/compiler";
 import { createRule, fileRef } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/typekit";
 
 export const noBooleanRule = createRule({
   name: "no-boolean",
@@ -13,9 +13,11 @@ export const noBooleanRule = createRule({
       "Consider using an extensible enum instead of a boolean property so the API shape is more descriptive.",
   },
   create(context) {
+    const tk = $(context.program);
+
     return {
       modelProperty: (property) => {
-        if (!isBooleanScalar(property)) {
+        if (!tk.scalar.isBoolean(property.type)) {
           return;
         }
 
@@ -24,7 +26,7 @@ export const noBooleanRule = createRule({
         });
       },
       operation: (operation) => {
-        if (isBooleanScalar(operation.returnType)) {
+        if (tk.scalar.isBoolean(operation.returnType)) {
           context.reportDiagnostic({
             target: operation,
           });
@@ -33,9 +35,3 @@ export const noBooleanRule = createRule({
     };
   },
 });
-
-function isBooleanScalar(type: Type): boolean {
-  return type.kind === "ModelProperty"
-    ? isBooleanScalar(type.type)
-    : type.kind === "Scalar" && type.name === "boolean";
-}
