@@ -557,6 +557,8 @@ jobs:
               "List every requested scenario exactly once under its scenario group.",
               "",
               `Results should be commented on issue ${owner}/${repo}#${coverageIssueNumber}.`,
+              "",
+              "cc: @JialinHuang803 @kazrael2119",
             ].join("\n");
 
             const title = `[Copilot] Verify and implement Spector tests for ${groups.length} scenario groups`;
