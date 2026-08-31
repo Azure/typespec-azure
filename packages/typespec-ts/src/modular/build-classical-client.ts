@@ -182,11 +182,10 @@ function importAllApis(clientFile: SourceFile, srcPath: string, subfolder: strin
 
 function generateMethod(
   context: SdkContext,
-  clientType: string,
   method: [string[], SdkServiceMethod<SdkServiceOperation>],
 ): MethodDeclarationStructure[] {
   const res: MethodDeclarationStructure[] = [];
-  const declaration = getOperationFunction(context, method, clientType);
+  const declaration = getOperationFunction(context, method, "Client");
   const methodName = declaration.propertyName ?? declaration.name ?? "FIXME";
   const methodParams = declaration.parameters?.filter((p) => p.name !== "context") ?? [];
   const declarationRefKey = resolveReference(refkey(method[1], "api"));
@@ -267,7 +266,7 @@ function buildClientOperationGroups(
     const layer = 0;
     if (prefixKey === "") {
       operations.forEach((op) => {
-        const methods = generateMethod(dpgContext, "Client", [prefixes, op]);
+        const methods = generateMethod(dpgContext, [prefixes, op]);
         clientClass.addMethods(methods);
       });
     } else {
