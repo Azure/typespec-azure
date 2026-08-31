@@ -83,6 +83,20 @@ it("does not emit when a versioned ARM service selects the latest namespace comm
   await tester.expect(`${serviceHeader(latestVersion)} ${widgetResource}`).toBeValid();
 });
 
+it("evaluates dependency type changes using the selected common-types version", async () => {
+  await tester
+    .expect(
+      `
+        ${serviceHeader(latestVersion)}
+
+        @route("/resource")
+        @get
+        op getResource(): Azure.ResourceManager.CommonTypes.ResourceModelWithAllowedPropertySet;
+      `,
+    )
+    .toBeValid();
+});
+
 it("emits diagnostic when a version enum member overrides the namespace back to an older common-types version", async () => {
   await tester
     .expect(
@@ -215,6 +229,156 @@ it("reports a versioned legacy property only for the projected API version that 
         @route("/identity")
         @get
         op getIdentity(): IdentityResult;
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types",
+      message: `This API version already selects the latest ARM common-types version '${latestVersion}', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${latestVersion}'.`,
+    });
+});
+
+it("applies the service version to types in child namespaces", async () => {
+  await tester
+    .expect(
+      `
+        ${serviceHeader(
+          latestVersion,
+          latestVersion,
+          `
+            @useDependency(Azure.ResourceManager.CommonTypes.Versions.${latestVersion})
+            v2025_01_01: "2025-01-01",
+          `,
+        )}
+
+        namespace Microsoft.TestService.Child {
+          model IdentityResult {
+            @added(Versions.v2025_01_01)
+            identity?: Azure.ResourceManager.Legacy.ManagedServiceIdentityV4;
+          }
+
+          @route("/identity")
+          @get
+          op getIdentity(): IdentityResult;
+        }
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types",
+      message: `This API version already selects the latest ARM common-types version '${latestVersion}', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${latestVersion}'.`,
+    });
+});
+
+it("reports a removed legacy property only for the API version that contains it", async () => {
+  await tester
+    .expect(
+      `
+        ${serviceHeader(
+          latestVersion,
+          latestVersion,
+          `
+            @useDependency(Azure.ResourceManager.CommonTypes.Versions.${latestVersion})
+            v2025_01_01: "2025-01-01",
+          `,
+        )}
+
+        model IdentityResult {
+          @removed(Versions.v2025_01_01)
+          identity?: Azure.ResourceManager.Legacy.ManagedServiceIdentityV4;
+        }
+
+        @route("/identity")
+        @get
+        op getIdentity(): IdentityResult;
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types",
+      message: `This API version already selects the latest ARM common-types version '${latestVersion}', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${latestVersion}'.`,
+    });
+});
+
+it("reports a legacy property type only before it changes", async () => {
+  await tester
+    .expect(
+      `
+        ${serviceHeader(
+          latestVersion,
+          latestVersion,
+          `
+            @useDependency(Azure.ResourceManager.CommonTypes.Versions.${latestVersion})
+            v2025_01_01: "2025-01-01",
+          `,
+        )}
+
+        model IdentityResult {
+          @typeChangedFrom(
+            Versions.v2025_01_01,
+            Azure.ResourceManager.Legacy.ManagedServiceIdentityV4
+          )
+          identity?: string;
+        }
+
+        @route("/identity")
+        @get
+        op getIdentity(): IdentityResult;
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types",
+      message: `This API version already selects the latest ARM common-types version '${latestVersion}', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${latestVersion}'.`,
+    });
+});
+
+it("reports a legacy return type only before it changes", async () => {
+  await tester
+    .expect(
+      `
+        ${serviceHeader(
+          latestVersion,
+          latestVersion,
+          `
+            @useDependency(Azure.ResourceManager.CommonTypes.Versions.${latestVersion})
+            v2025_01_01: "2025-01-01",
+          `,
+        )}
+
+        @route("/identity")
+        @get
+        @returnTypeChangedFrom(
+          Versions.v2025_01_01,
+          Azure.ResourceManager.Legacy.ManagedServiceIdentityV4
+        )
+        op getIdentity(): string;
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types",
+      message: `This API version already selects the latest ARM common-types version '${latestVersion}', but the common-type definition 'ManagedServiceIdentity' resolves to 'managedidentity.json' version 'v4'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${latestVersion}'.`,
+    });
+});
+
+it("follows an explicit response body in a historical return type", async () => {
+  await tester
+    .expect(
+      `
+        ${serviceHeader(
+          latestVersion,
+          latestVersion,
+          `
+            @useDependency(Azure.ResourceManager.CommonTypes.Versions.${latestVersion})
+            v2025_01_01: "2025-01-01",
+          `,
+        )}
+
+        model LegacyResponse {
+          @statusCode statusCode: 200;
+          @body body: Azure.ResourceManager.Legacy.ManagedServiceIdentityV4;
+        }
+
+        @route("/identity")
+        @get
+        @returnTypeChangedFrom(Versions.v2025_01_01, LegacyResponse)
+        op getIdentity(): string;
       `,
     )
     .toEmitDiagnostics({

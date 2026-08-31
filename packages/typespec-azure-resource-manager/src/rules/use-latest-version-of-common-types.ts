@@ -1,5 +1,4 @@
 import {
-  compilerAssert,
   createRule,
   fileRef,
   getLifecycleVisibilityEnum,
@@ -20,7 +19,6 @@ import {
   type Type,
   type Union,
 } from "@typespec/compiler";
-import { unsafe_mutateSubgraphWithNamespace } from "@typespec/compiler/experimental";
 import {
   Visibility,
   createMetadataInfo,
@@ -28,7 +26,15 @@ import {
   resolveRequestVisibility,
   type HttpOperation,
 } from "@typespec/http";
-import { getVersioningMutators } from "@typespec/versioning";
+import {
+  getAddedOnVersions,
+  getRemovedOnVersions,
+  getReturnTypeChangedFrom,
+  getTypeChangedFrom,
+  getVersions,
+  resolveVersions,
+  type Version,
+} from "@typespec/versioning";
 import {
   getArmCommonTypeOpenAPIRef,
   getArmCommonTypesVersion,
@@ -65,62 +71,38 @@ export const useLatestVersionOfCommonTypesRule = createRule({
             continue;
           }
 
-          const versioning = getVersioningMutators(program, service.type);
-          if (versioning?.kind === "versioned") {
-            for (const snapshot of versioning.snapshots) {
+          const versionResolutions = resolveVersions(program, service.type);
+          if (versionResolutions.some((resolution) => resolution.rootVersion !== undefined)) {
+            const [httpService] = getHttpService(program, service.type);
+            for (const resolution of versionResolutions) {
+              const version = resolution.rootVersion;
+              if (version === undefined) {
+                continue;
+              }
               const currentVersion =
-                getArmCommonTypesVersion(program, snapshot.version.enumMember) ??
+                getArmCommonTypesVersion(program, version.enumMember) ??
                 getArmCommonTypesVersion(program, service.type);
               if (isOutdated(currentVersion, latestVersion)) {
-                reportOutdatedSelection(
-                  context,
-                  snapshot.version.enumMember,
-                  currentVersion,
-                  latestVersion,
-                );
+                reportOutdatedSelection(context, version.enumMember, currentVersion, latestVersion);
                 continue;
               }
               if (currentVersion === undefined) {
                 continue;
               }
 
-              const projected = unsafe_mutateSubgraphWithNamespace(
-                program,
-                [snapshot.mutator],
-                service.type,
-              );
-              compilerAssert(
-                projected.type.kind === "Namespace",
-                "A versioned service must project to a namespace.",
-              );
-              const projectedService = getService(program, projected.type) ?? {
-                type: projected.type,
-              };
-              const [httpService] = getHttpService(program, projected.type);
               reportOutdatedUsages(
                 context,
-                collectCommonTypeUsages(program, httpService.operations),
-                projectedService,
-                snapshot.version.value,
+                collectCommonTypeUsages(program, httpService.operations, resolution.versions),
+                compilerService,
+                version.value,
                 latestVersion,
               );
             }
             continue;
           }
 
-          let analyzedService = service.type;
-          if (versioning?.kind === "transient") {
-            const projected = unsafe_mutateSubgraphWithNamespace(
-              program,
-              [versioning.mutator],
-              service.type,
-            );
-            compilerAssert(
-              projected.type.kind === "Namespace",
-              "A transiently versioned service must project to a namespace.",
-            );
-            analyzedService = projected.type;
-          }
+          const [httpService] = getHttpService(program, service.type);
+          const versionContext = versionResolutions[0]?.versions;
 
           const currentVersion = getArmCommonTypesVersion(program, service.type);
           if (isOutdated(currentVersion, latestVersion)) {
@@ -131,11 +113,10 @@ export const useLatestVersionOfCommonTypesRule = createRule({
             continue;
           }
 
-          const [httpService] = getHttpService(program, analyzedService);
           reportOutdatedUsages(
             context,
-            collectCommonTypeUsages(program, httpService.operations),
-            getService(program, analyzedService) ?? compilerService,
+            collectCommonTypeUsages(program, httpService.operations, versionContext),
+            compilerService,
             undefined,
             latestVersion,
           );
@@ -199,6 +180,7 @@ interface PayloadContext {
 function collectCommonTypeUsages(
   program: Program,
   operations: readonly HttpOperation[],
+  versions?: Map<Namespace, Version>,
 ): CommonTypeUsage[] {
   const usages: CommonTypeUsage[] = [];
   const seenTypes = new Map<ModelProperty | Operation, Map<Type, Set<string>>>();
@@ -233,6 +215,10 @@ function collectCommonTypeUsages(
     target: ModelProperty | Operation,
     payloadContext: PayloadContext,
   ) => {
+    if (!isAvailableAtVersion(program, type, versions)) {
+      return;
+    }
+
     let targetTypes = seenTypes.get(target);
     if (targetTypes === undefined) {
       targetTypes = new Map();
@@ -284,7 +270,9 @@ function collectCommonTypeUsages(
         addUsage(type, target);
         if (type.kind === "Union") {
           for (const variant of type.variants.values()) {
-            visitType(variant.type, target, payloadContext);
+            if (isAvailableAtVersion(program, variant, versions)) {
+              visitType(variant.type, target, payloadContext);
+            }
           }
         }
         break;
@@ -309,12 +297,19 @@ function collectCommonTypeUsages(
       current !== undefined;
       current = current.sourceProperty
     ) {
+      if (!isAvailableAtVersion(program, current, versions)) {
+        continue;
+      }
       addUsage(current, target);
-      visitType(current.type, target, payloadContext);
+      visitType(getTypeAtVersion(program, current, versions), target, payloadContext);
     }
   }
 
   for (const httpOperation of operations) {
+    if (!isAvailableAtVersion(program, httpOperation.operation, versions)) {
+      continue;
+    }
+
     const requestContext = {
       visibility: resolveRequestVisibility(program, httpOperation.operation, httpOperation.verb),
       inExplicitBody: false,
@@ -330,21 +325,146 @@ function collectCommonTypeUsages(
           body.bodyKind === "single" && body.isExplicit && body.containsMetadataAnnotations,
       });
     }
-    for (const response of httpOperation.responses) {
-      for (const responseContent of response.responses) {
-        if (responseContent.body) {
-          const body = responseContent.body;
-          visitType(body.type, httpOperation.operation, {
-            visibility: Visibility.Read,
-            inExplicitBody:
-              body.bodyKind === "single" && body.isExplicit && body.containsMetadataAnnotations,
-          });
+
+    const returnType = getReturnTypeAtVersion(program, httpOperation.operation, versions);
+    if (returnType !== httpOperation.operation.returnType) {
+      visitType(returnType, httpOperation.operation, {
+        visibility: Visibility.Read,
+        inExplicitBody: false,
+      });
+    } else {
+      for (const response of httpOperation.responses) {
+        for (const responseContent of response.responses) {
+          if (responseContent.body) {
+            const body = responseContent.body;
+            visitType(body.type, httpOperation.operation, {
+              visibility: Visibility.Read,
+              inExplicitBody:
+                body.bodyKind === "single" && body.isExplicit && body.containsMetadataAnnotations,
+            });
+          }
         }
       }
     }
   }
 
   return usages;
+}
+
+function isAvailableAtVersion(
+  program: Program,
+  type: Type,
+  versions: Map<Namespace, Version> | undefined,
+): boolean {
+  if (versions === undefined) {
+    return true;
+  }
+
+  for (let current: Type | undefined = type; current !== undefined; current = getParent(current)) {
+    const version = getVersionForType(program, current, versions);
+    if (version === undefined) {
+      continue;
+    }
+
+    const changes = [
+      ...(getAddedOnVersions(program, current) ?? []).map((changedAt) => ({
+        changedAt,
+        available: true,
+      })),
+      ...(getRemovedOnVersions(program, current) ?? []).map((changedAt) => ({
+        changedAt,
+        available: false,
+      })),
+    ].sort((left, right) => left.changedAt.index - right.changedAt.index);
+    if (changes.length > 0) {
+      let available = !changes[0].available;
+      for (const change of changes) {
+        if (change.changedAt.index > version.index) {
+          break;
+        }
+        available = change.available;
+      }
+      return available;
+    }
+  }
+  return true;
+}
+
+function getParent(type: Type): Type | undefined {
+  switch (type.kind) {
+    case "ModelProperty":
+      return type.model;
+    case "Operation":
+      return type.interface ?? type.namespace;
+    case "EnumMember":
+      return type.enum;
+    case "UnionVariant":
+      return type.union;
+    case "Interface":
+    case "Model":
+    case "Enum":
+    case "Union":
+    case "Scalar":
+    case "Namespace":
+      return type.namespace;
+    default:
+      return undefined;
+  }
+}
+
+function getTypeAtVersion(
+  program: Program,
+  property: ModelProperty,
+  versions: Map<Namespace, Version> | undefined,
+): Type {
+  const version = versions && getVersionForType(program, property, versions);
+  if (version === undefined) {
+    return property.type;
+  }
+
+  for (const [changedAtVersion, oldType] of getTypeChangedFrom(program, property) ?? []) {
+    if (version.index < changedAtVersion.index) {
+      return oldType;
+    }
+  }
+  return property.type;
+}
+
+function getReturnTypeAtVersion(
+  program: Program,
+  operation: Operation,
+  versions: Map<Namespace, Version> | undefined,
+): Type {
+  const version = versions && getVersionForType(program, operation, versions);
+  if (version === undefined) {
+    return operation.returnType;
+  }
+
+  for (const [changedAtVersion, oldType] of getReturnTypeChangedFrom(program, operation) ?? []) {
+    if (version.index < changedAtVersion.index) {
+      return oldType;
+    }
+  }
+  return operation.returnType;
+}
+
+function getVersionForType(
+  program: Program,
+  type: Type,
+  versions: Map<Namespace, Version>,
+): Version | undefined {
+  const [versionedNamespace] = getVersions(program, type);
+  for (
+    let namespace = versionedNamespace;
+    namespace !== undefined;
+    namespace = namespace.namespace
+  ) {
+    const version = versions.get(namespace);
+    if (version !== undefined) {
+      return version;
+    }
+  }
+  return undefined;
 }
 
 function canSharePropertyUsingReadonlyOrXmsMutability(
