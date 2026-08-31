@@ -48,6 +48,10 @@ export const pointOperationInvalidQueryParameterRule = createRule({
   },
 });
 
+/**
+ * Returns whether the path targets a specific ARM resource instance after the provider namespace.
+ * Each resource type segment must be followed by a resource name parameter or the `default` name.
+ */
 function isPointOperationPath(path: string): boolean {
   const index = path.lastIndexOf("/providers/");
   return index !== -1 && pointOperationPathRegExp.test(path.slice(index));
