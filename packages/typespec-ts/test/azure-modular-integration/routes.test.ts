@@ -161,6 +161,12 @@ describe("Routes Client", () => {
   it("Routes_QueryParameters_QueryExpansion_Explode_record", async () => {
     await client.queryParameters.queryExpansion.explode.record({ a: 1, b: 2 });
   });
+  it("Routes_QueryParameters_QueryExpansion_Explode_model", async () => {
+    await client.queryParameters.queryExpansion.explode.model({
+      field: "status",
+      value: "active",
+    });
+  });
   it("Routes_QueryParameters_QueryContinuation_Standard_primitive", async () => {
     await client.queryParameters.queryContinuation.standard.primitive("a");
   });
