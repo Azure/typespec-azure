@@ -129,6 +129,9 @@ type LROClient struct {
 //   - credential - used to authorize requests. Usually a credential from azidentity.
 //   - options - Contains optional client configuration. Pass nil to accept the default values.
 func NewLROClient(subscriptionID string, credential azcore.TokenCredential, options *arm.ClientOptions) (*LROClient, error) {
+	if subscriptionID == "" {
+		return nil, errors.New("parameter subscriptionID cannot be empty")
+	}
 	cl, err := arm.NewClient(moduleName, moduleVersion, credential, options)
 	if err != nil {
 		return nil, err
@@ -182,7 +185,7 @@ func (client *LROClient) okResponseWithAsyncHeader(ctx context.Context, apiVersi
 func (client *LROClient) okResponseWithAsyncHeaderCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, lroModelName string, resource TestLROModel, _ *LROClientBeginOkResponseWithAsyncHeaderOptions) (*policy.Request, error) {
 	urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/LROModels/{LROModelName}"
 	if client.subscriptionID == "" {
-		return nil, errors.New("parameter client.subscriptionID cannot be empty")
+		return nil, errors.New("parameter subscriptionID cannot be empty")
 	}
 	urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
 	if resourceGroupName == "" {
@@ -247,7 +250,7 @@ func (client *LROClient) scalarResult(ctx context.Context, apiVersion string, re
 func (client *LROClient) scalarResultCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, lroModelName string, body ActionRequest, _ *LROClientBeginScalarResultOptions) (*policy.Request, error) {
 	urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/LROModels/{LROModelName}/scalarResult"
 	if client.subscriptionID == "" {
-		return nil, errors.New("parameter client.subscriptionID cannot be empty")
+		return nil, errors.New("parameter subscriptionID cannot be empty")
 	}
 	urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
 	if resourceGroupName == "" {

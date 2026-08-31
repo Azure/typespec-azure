@@ -93,6 +93,8 @@ import {
   isReadOnly,
 } from "./types.js";
 
+const defaultFileContentType = "application/octet-stream";
+
 /**
  * Build serialization options from content types.
  * This provides a consistent way for emitters to determine the serialization format
@@ -459,6 +461,14 @@ function createContentTypeOrAcceptHeader(
   bodyObject: SdkBodyParameter | SdkHttpResponse | SdkHttpErrorResponse,
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
+  // @typespec/http uses */* as the unconstrained File content-type marker. For
+  // generated request clients, expose that as an optional Content-Type parameter
+  // with the binary payload default instead of sending */* as a concrete value.
+  const isDefaultFileContentType =
+    bodyObject.kind === "body" &&
+    httpOperation.parameters.body?.bodyKind === "file" &&
+    bodyObject.contentTypes?.length === 1 &&
+    bodyObject.contentTypes[0] === "*/*";
   let type: SdkType = getTypeSpecBuiltInType(context, "string");
   // Honor the content types from the HTTP library result.
   // For a single content type, create a constant.
@@ -471,7 +481,7 @@ function createContentTypeOrAcceptHeader(
   // should use `@sharedRoute` to split the operation per content type.
   // For File type bodies, the content type is constrained by the File type itself;
   // treat it the same as a user-defined content type/accept parameter.
-  if (bodyObject.contentTypes && bodyObject.contentTypes.length > 0) {
+  if (bodyObject.contentTypes && bodyObject.contentTypes.length > 0 && !isDefaultFileContentType) {
     const tk = $(context.program);
     context.__namingContextPath.push({
       name: httpOperation.operation.name,
@@ -522,8 +532,8 @@ function createContentTypeOrAcceptHeader(
       context.__namingContextPath.pop();
     }
   }
-  const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
-  // No need for clientDefaultValue because it's a constant, it only has one value
+  const optional =
+    bodyObject.kind === "body" ? bodyObject.optional || isDefaultFileContentType : false;
   return {
     type,
     name,
@@ -533,6 +543,7 @@ function createContentTypeOrAcceptHeader(
     isApiVersionParam: false,
     onClient: false,
     optional: optional,
+    ...(isDefaultFileContentType && { clientDefaultValue: defaultFileContentType }),
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
     decorators: [],
     access: "public",

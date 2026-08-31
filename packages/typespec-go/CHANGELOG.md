@@ -1,5 +1,45 @@
 # Release History
 
+## 0.17.3
+
+### Bug Fixes
+
+- [#5333](https://github.com/Azure/typespec-azure/pull/5333) Revert removal of empty client path parameter checks during request construction.
+
+
+## 0.17.2
+
+### Bug Fixes
+
+- [#5321](https://github.com/Azure/typespec-azure/pull/5321) Fix fake server route regex to allow path delimiters in captures for `allowReserved` path parameters (e.g. ARM scopes and resource IDs), which are inserted into the request path unescaped and can span multiple path segments.
+
+
+## 0.17.1
+
+### Bug Fixes
+
+- [#5272](https://github.com/Azure/typespec-azure/pull/5272) Parse text request bodies into their declared types in generated fake servers.
+- [#5233](https://github.com/Azure/typespec-azure/pull/5233) Fix fake server path param regex to exclude path delimiters
+
+
+## 0.17.0
+
+### Features
+
+- [#5261](https://github.com/Azure/typespec-azure/pull/5261) Add emit-content-type-header emitter option.
+- [#5198](https://github.com/Azure/typespec-azure/pull/5198) Add support for paged operations with next links that are parameterized or relative URLs.
+- [#5245](https://github.com/Azure/typespec-azure/pull/5245) Added support for tsp non-discriminated unions.
+- [#5152](https://github.com/Azure/typespec-azure/pull/5152) Support array encoding decorators.
+
+### Bug Fixes
+
+- [#5219](https://github.com/Azure/typespec-azure/pull/5219) Honor `@encode(string)` when serializing and deserializing boolean model properties.
+- [#5238](https://github.com/Azure/typespec-azure/pull/5238) Format text request body values as strings before creating readers.
+- [#5235](https://github.com/Azure/typespec-azure/pull/5235) Generate fake servers for operations with path-based API versions and additional path parameters.
+- [#5151](https://github.com/Azure/typespec-azure/pull/5151) Honor `ClientOptions.APIVersion` for API versions emitted in operation paths.
+- [#5220](https://github.com/Azure/typespec-azure/pull/5220) Generate scalar `x-ms-meta` request and response headers without treating them as metadata maps.
+
+
 ## 0.16.0
 
 ### Features
