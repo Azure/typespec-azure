@@ -24,15 +24,15 @@ export const noQueryParametersInPostRule = createRule({
           return;
         }
 
-        for (const parameter of httpOperation.parameters.parameters) {
-          if (parameter.type !== "query" || isApiVersionParameter(parameter.name)) {
+        for (const parameter of httpOperation.parameters.properties) {
+          if (parameter.kind !== "query" || isApiVersionParameter(parameter.options.name)) {
             continue;
           }
 
           context.reportDiagnostic({
-            target: parameter.param,
+            target: parameter.property,
             format: {
-              name: parameter.name,
+              name: parameter.options.name,
             },
           });
         }
