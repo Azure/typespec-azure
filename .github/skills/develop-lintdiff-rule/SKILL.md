@@ -396,12 +396,50 @@ The top-level worker works only in the supplied typespec-azure worktree.
 - Decide whether the production TypeSpec rule actually requires a change.
 - Do not require equal raw Swagger and TypeSpec diagnostic counts.
 
+#### Emission-dependent semantic completeness gate
+
+When the Swagger rule selects, resolves, or compares an emitted OpenAPI field,
+do not treat upstream validator tests, observed corpus overlap, or coverage of
+the containing authorable surface as complete semantic evidence. Before
+implementing or accepting the migrated rule:
+
+1. Trace the emitter path from the relevant TypeSpec semantic target to the
+   OpenAPI node and field inspected by the Swagger rule.
+2. Enumerate every authorable TypeSpec type family and meaningful subtype that
+   can reach that emitter path. Include default and fallthrough branches,
+   unsupported-but-emitted shapes, transformed or inherited types, and
+   decorator- or content-type-dependent branches when they affect the selected
+   OpenAPI field.
+3. Record a rule-local emission matrix with, at minimum:
+   - authored TypeSpec shape
+   - emitter function or branch
+   - whether the selected OpenAPI field is present
+   - its emitted value or value category when present
+   - expected Swagger result
+   - expected TypeSpec lint result
+   - the fixture that proves the row
+4. Distinguish **surface coverage** from **shape coverage**. A request-body,
+   response-body, parameter, or model fixture proves only the represented
+   shapes within that surface.
+5. Treat any reachable but unclassified emitter branch as unresolved
+   uncertainty. Do not claim functional equivalence or proceed to the PR until
+   the matrix is closed or the branch is proven unauthorable for the rule's
+   scope.
+
+The full corpus is observational regression evidence: it proves behavior only
+for shapes present in the selected projects and versions. Even complete
+same-project overlap cannot replace the emission matrix or establish universal
+semantic coverage.
+
 ### 2. Implement the focused rule change
 
 When evidence requires a rule update:
 
 - change the production TypeSpec rule
 - add directly related violating, compliant, and regression fixtures
+- for an emission-dependent rule, add fixtures for every distinct matrix
+  outcome and every implementation branch whose fallback behavior can change
+  whether the selected OpenAPI field exists
 - update snapshots and fixture `rule.md`
 - update the rule's `migration.md`
 
@@ -417,7 +455,7 @@ commands that cover the changed rule. Fix failures before running the corpus.
 Use the existing full runner; do not add a per-rule runner:
 
 ```powershell
-pnpm --dir packages/typespec-lintdiff specs:typespec -- `
+pnpm --dir packages/typespec-lintdiff specs:typespec `
   --specs-repo <isolated-azure-rest-api-specs-worktree> `
   --concurrency 6
 ```
@@ -533,6 +571,11 @@ The reviewer must:
   usage, version/projection mistakes, unstable diagnostic targets, ineffective
   deduplication, and misleading diagnostics
 - verify that fixture evidence covers the implementation's important branches
+- for an emission-dependent rule, independently audit the negative space:
+  compare the rule against every reachable emitter type branch, default path,
+  and fallthrough in the recorded emission matrix rather than limiting review
+  to branches made explicit by the TypeSpec rule implementation
+- confirm that corpus parity is not being used to close an untested matrix row
 - confirm generated corpus and coverage files are absent from the PR diff
 - report only concrete, actionable findings with file and line references
 
