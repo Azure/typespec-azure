@@ -1,11 +1,3 @@
----
-title: "use-application-json-content-type"
----
-
-```text title="Full name"
-@azure-tools/typespec-azure-resource-manager/use-application-json-content-type
-```
-
 ARM operations must use `application/json` for request and response bodies. The rule checks the
 resolved content types for every request and response body in an ARM provider namespace.
 
