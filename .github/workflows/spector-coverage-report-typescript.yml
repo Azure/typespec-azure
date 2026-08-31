@@ -456,6 +456,7 @@ jobs:
 
             const taskMarker = "<!-- typespec-ts-spector-implementation-task -->";
             const legacyTaskTitlePrefix = "[Copilot] Verify and implement Spector tests for ";
+            const taskAssignees = ["JialinHuang803", "kazrael2119"];
             const openIssues = await github.paginate(github.rest.issues.listForRepo, {
               owner,
               repo,
@@ -557,8 +558,6 @@ jobs:
               "List every requested scenario exactly once under its scenario group.",
               "",
               `Results should be commented on issue ${owner}/${repo}#${coverageIssueNumber}.`,
-              "",
-              "Assignment: @JialinHuang803 @kazrael2119",
             ].join("\n");
 
             const title = `[Copilot] Verify and implement Spector tests for ${groups.length} scenario groups`;
@@ -572,6 +571,7 @@ jobs:
                 issue_number: existingTask.number,
                 title,
                 body: taskBody,
+                assignees: taskAssignees,
               });
               taskIssue = updated.data;
               action = "updated";
@@ -582,6 +582,7 @@ jobs:
                 title,
                 body: taskBody,
                 labels: ["emitter:typescript"],
+                assignees: taskAssignees,
               });
               taskIssue = created.data;
               action = "created";
