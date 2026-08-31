@@ -1,6 +1,5 @@
 import type { Type } from "@typespec/compiler";
 import { createRule, fileRef } from "@typespec/compiler";
-import { getHttpOperation } from "@typespec/http";
 
 export const noBooleanRule = createRule({
   name: "no-boolean",
@@ -25,25 +24,10 @@ export const noBooleanRule = createRule({
         });
       },
       operation: (operation) => {
-        const [httpOperation] = getHttpOperation(context.program, operation);
-
-        for (const response of httpOperation.responses) {
-          if (isBooleanScalar(response.type)) {
-            context.reportDiagnostic({
-              target: operation,
-            });
-            continue;
-          }
-
-          for (const content of response.responses) {
-            if (content.body === undefined || !isBooleanScalar(content.body.type)) {
-              continue;
-            }
-
-            context.reportDiagnostic({
-              target: content.body.property ?? operation,
-            });
-          }
+        if (isBooleanScalar(operation.returnType)) {
+          context.reportDiagnostic({
+            target: operation,
+          });
         }
       },
     };
