@@ -1,5 +1,11 @@
-import { createRule } from "@typespec/compiler";
-import type { Type } from "@typespec/compiler";
+import type { Model, Type } from "@typespec/compiler";
+import {
+  createRule,
+  getLocationContext,
+  isArrayModelType,
+  isUnknownType,
+  isVoidType,
+} from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 
 export const parametersSchemaAsTypeObjectRule = createRule({
@@ -20,12 +26,19 @@ export const parametersSchemaAsTypeObjectRule = createRule({
           return;
         }
 
+        if (isVoidType(body.type) || isUnknownType(body.type)) {
+          return;
+        }
+
         if (isObjectSchemaType(body.type)) {
           return;
         }
 
         context.reportDiagnostic({
-          target: body.property ?? operation,
+          target:
+            body.property && getLocationContext(context.program, body.property).type === "project"
+              ? body.property
+              : operation,
         });
       },
     };
@@ -33,5 +46,29 @@ export const parametersSchemaAsTypeObjectRule = createRule({
 });
 
 function isObjectSchemaType(type: Type): boolean {
-  return type.kind === "Model" && type.name !== "Array";
+  return type.kind === "Model" && !isArraySchemaType(type);
+}
+
+function isArraySchemaType(model: Model): boolean {
+  const pending = [model];
+  const visited = new Set<Model>();
+
+  while (pending.length > 0) {
+    const current = pending.pop()!;
+    if (visited.has(current)) {
+      continue;
+    }
+    visited.add(current);
+
+    if (isArrayModelType(current)) {
+      return true;
+    }
+    if (current.baseModel) {
+      pending.push(current.baseModel);
+    }
+    if (current.sourceModel) {
+      pending.push(current.sourceModel);
+    }
+  }
+  return false;
 }
