@@ -102,7 +102,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/retry-after": false, // Disable https://github.com/Azure/typespec-azure/issues/3351
     "@azure-tools/typespec-azure-resource-manager/secret-prop": true,
     "@azure-tools/typespec-azure-resource-manager/unsupported-type": true,
-    "@azure-tools/typespec-azure-resource-manager/point-operation-invalid-query-parameter": false,
+    "@azure-tools/typespec-azure-resource-manager/no-query-param-point-op": false,
 
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
