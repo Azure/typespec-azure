@@ -1,11 +1,3 @@
----
-title: "use-enum-instead-of-boolean"
----
-
-```text title="Full name"
-@azure-tools/typespec-azure-core/use-enum-instead-of-boolean
-```
-
 Boolean values can be hard for API users to understand when the property or payload represents a
 domain state, option, or mode. Prefer a descriptive extensible enum modeled as a union so future
 values can be added without a breaking change.
