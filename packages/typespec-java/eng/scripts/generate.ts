@@ -110,7 +110,7 @@ async function compile(typeSpecFile: string, options: string[], timeout: number)
   const command = `pnpm ${arguments_.join(" ")}`;
   const start = performance.now();
   const result = await execa("pnpm", arguments_, {
-    cwd: emitterTestsRoot,
+    cwd: packageRoot,
     reject: false,
     timeout,
   });

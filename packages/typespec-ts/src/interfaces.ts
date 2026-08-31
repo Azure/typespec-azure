@@ -260,6 +260,10 @@ export interface ClientOptions {
    * Defaults to false.
    */
   generateReactNativeTarget?: boolean;
+  /**
+   * Generates visibility-specific request models. Experimental and disabled by default.
+   */
+  experimentalSplitModelsByVisibility?: boolean;
 }
 
 export interface ServiceInfo {

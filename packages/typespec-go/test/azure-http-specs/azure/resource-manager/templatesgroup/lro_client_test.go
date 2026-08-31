@@ -5,6 +5,7 @@ package templatesgroup_test
 
 import (
 	"context"
+	"fmt"
 	"templatesgroup"
 	"testing"
 	"time"
@@ -88,4 +89,17 @@ func TestNewLroClient_BeginExportArray(t *testing.T) {
 	require.NotNil(t, resp.ExportResultArray[1].Content)
 	require.Equal(t, "order1,product1,1", *resp.ExportResultArray[0].Content)
 	require.Equal(t, "order2,product2,2", *resp.ExportResultArray[1].Content)
+}
+
+func TestNewLroClient_BeginGetLro(t *testing.T) {
+	scope := fmt.Sprintf("subscriptions/%s/resourceGroups/%s", subscriptionIdExpected, RESOURCE_GROUP_EXPECTED)
+	poller, err := clientFactory.NewLroClient().BeginGetLro(context.Background(), scope, "report1", nil)
+	require.NoError(t, err)
+	resp, err := poller.PollUntilDone(context.Background(), &runtime.PollUntilDoneOptions{Frequency: time.Second})
+	require.NoError(t, err)
+	require.Equal(t, "report1", *resp.Name)
+	require.Equal(t, "Azure.ResourceManager.OperationTemplates/costReports", *resp.Type)
+	require.NotNil(t, resp.Properties)
+	require.Equal(t, "https://storage.blob.core.windows.net/reports/report1.csv", *resp.Properties.DownloadURL)
+	require.Equal(t, "Succeeded", *resp.Properties.ProvisioningState)
 }

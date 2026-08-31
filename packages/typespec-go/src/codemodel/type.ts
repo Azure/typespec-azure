@@ -43,8 +43,10 @@ export type WireType =
   | ReadSeekCloser
   | Scalar
   | Slice
+  | SliceArray
   | String
-  | Time;
+  | Time
+  | UnionStruct;
 
 /** defines a type within the Go type system */
 export type Type = SdkType | WireType;
@@ -320,6 +322,26 @@ export interface Slice {
   elementTypeByValue: boolean;
 }
 
+/** specialized slice type for arrays represented as delimited strings */
+export interface SliceArray {
+  kind: "sliceArray";
+
+  /** the element type for this slice */
+  elementType: SliceArrayElementType;
+
+  /** indicates if the slice's element type is pointer-to-type or not */
+  elementTypeByValue: boolean;
+
+  /** the delimiter used to separate elements */
+  delimiter: SliceArrayDelimiter;
+}
+
+/** the set of slice array delimiters */
+export type SliceArrayDelimiter = "comma" | "space" | "pipe" | "newline";
+
+/** the supported element types for arrays represented as delimited strings */
+export type SliceArrayElementType = String | Constant;
+
 /** the set of slice element types */
 export type SliceElementType = WireType;
 
@@ -374,6 +396,25 @@ export interface TokenCredential extends QualifiedType {
   /** the scopes to include for the credential */
   scopes: Array<string>;
 }
+
+/** a single variant within a union */
+export interface UnionField extends StructField {
+  /** the variant's underlying type */
+  type: UnionVariantType;
+}
+
+/** a Go struct modeling a non-discriminated union where exactly one field is set */
+export interface UnionStruct extends StructBase {
+  kind: "unionStruct";
+
+  /** the variant fields of the union. exactly one is populated at runtime */
+  fields: Array<UnionField>;
+}
+
+/**
+ * the subset of WireType kinds that can appear as a variant within a non-discriminated union.
+ */
+export type UnionVariantType = Constant | Literal | Map | Model | Scalar | Slice | String;
 
 /** bit flags indicating how a model/polymorphic type is used */
 export enum UsageFlags {
@@ -459,7 +500,8 @@ export function getTypeDeclaration(type: Client | Type, scope: PackageType): str
     case "model":
     case "paramGroup":
     case "polymorphicModel":
-    case "responseEnvelope": {
+    case "responseEnvelope":
+    case "unionStruct": {
       let pkg: PackageType;
       const typeName = type.kind === "paramGroup" ? type.groupName : type.name;
       switch (type.kind) {
@@ -493,6 +535,7 @@ export function getTypeDeclaration(type: Client | Type, scope: PackageType): str
     case "scalar":
       return type.type;
     case "slice":
+    case "sliceArray":
       return (
         `[]${type.elementTypeByValue ? "" : "*"}` + getTypeDeclaration(type.elementType, scope)
       );
@@ -517,6 +560,22 @@ export function isLiteralValueType(type: WireType): type is LiteralType {
     case "scalar":
     case "string":
     case "time":
+      return true;
+    default:
+      return false;
+  }
+}
+
+/** narrows type to a UnionVariantType within the conditional block */
+export function isUnionVariantType(type: WireType): type is UnionVariantType {
+  switch (type.kind) {
+    case "constant":
+    case "literal":
+    case "map":
+    case "model":
+    case "scalar":
+    case "slice":
+    case "string":
       return true;
     default:
       return false;
@@ -794,6 +853,19 @@ export class Slice implements Slice {
   }
 }
 
+export class SliceArray implements SliceArray {
+  constructor(
+    elementType: SliceArrayElementType,
+    elementTypeByValue: boolean,
+    delimiter: SliceArrayDelimiter,
+  ) {
+    this.kind = "sliceArray";
+    this.elementType = elementType;
+    this.elementTypeByValue = elementTypeByValue;
+    this.delimiter = delimiter;
+  }
+}
+
 export class String implements String {
   constructor() {
     this.kind = "string";
@@ -804,6 +876,20 @@ export class Struct extends StructBase implements Struct {
   constructor(pkg: PackageContent, name: string) {
     super(pkg, name);
     this.kind = "struct";
+  }
+}
+
+export class UnionField extends StructField implements UnionField {
+  constructor(name: string, type: UnionVariantType, byValue: boolean) {
+    super(name, type, byValue);
+  }
+}
+
+export class UnionStruct extends StructBase implements UnionStruct {
+  constructor(pkg: PackageContent, name: string) {
+    super(pkg, name);
+    this.kind = "unionStruct";
+    this.fields = new Array<UnionField>();
   }
 }
 

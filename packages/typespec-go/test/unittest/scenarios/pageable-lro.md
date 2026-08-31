@@ -79,6 +79,9 @@ type PageableLROsClient struct {
 //   - credential - used to authorize requests. Usually a credential from azidentity.
 //   - options - Contains optional client configuration. Pass nil to accept the default values.
 func NewPageableLROsClient(subscriptionID string, credential azcore.TokenCredential, options *arm.ClientOptions) (*PageableLROsClient, error) {
+	if subscriptionID == "" {
+		return nil, errors.New("parameter subscriptionID cannot be empty")
+	}
 	cl, err := arm.NewClient(moduleName, moduleVersion, credential, options)
 	if err != nil {
 		return nil, err
@@ -102,9 +105,11 @@ func (client *PageableLROsClient) BeginListPrivateEndPoints(ctx context.Context,
 			return page.NextLink != nil && len(*page.NextLink) > 0
 		},
 		Fetcher: func(ctx context.Context, page *PageableLROsClientListPrivateEndPointsResponse) (PageableLROsClientListPrivateEndPointsResponse, error) {
-			resp, err := runtime.FetcherForNextLink(ctx, client.internal.Pipeline(), *page.NextLink, func(ctx context.Context) (*policy.Request, error) {
-				return client.listPrivateEndPointsCreateRequest(ctx, apiVersion, resourceGroupName, resourceName, options)
-			}, nil)
+			req, err := client.listPrivateEndPointsCreateRequest(ctx, apiVersion, resourceGroupName, resourceName, *page.NextLink, options)
+			if err != nil {
+				return PageableLROsClientListPrivateEndPointsResponse{}, err
+			}
+			resp, err := client.internal.Pipeline().Do(req)
 			if err != nil {
 				return PageableLROsClientListPrivateEndPointsResponse{}, err
 			}
@@ -130,7 +135,7 @@ func (client *PageableLROsClient) BeginListPrivateEndPoints(ctx context.Context,
 // ListPrivateEndPoints - A long-running resource action.
 func (client *PageableLROsClient) listPrivateEndPoints(ctx context.Context, apiVersion string, resourceGroupName string, resourceName string, options *PageableLROsClientBeginListPrivateEndPointsOptions) (*http.Response, error) {
 	var err error
-	req, err := client.listPrivateEndPointsCreateRequest(ctx, apiVersion, resourceGroupName, resourceName, options)
+	req, err := client.listPrivateEndPointsCreateRequest(ctx, apiVersion, resourceGroupName, resourceName, "", options)
 	if err != nil {
 		return nil, err
 	}
@@ -145,28 +150,37 @@ func (client *PageableLROsClient) listPrivateEndPoints(ctx context.Context, apiV
 }
 
 // listPrivateEndPointsCreateRequest creates the ListPrivateEndPoints request.
-func (client *PageableLROsClient) listPrivateEndPointsCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, resourceName string, _ *PageableLROsClientBeginListPrivateEndPointsOptions) (*policy.Request, error) {
-	urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/PageableLROs/resourceSegment/{resourceName}"
-	if client.subscriptionID == "" {
-		return nil, errors.New("parameter client.subscriptionID cannot be empty")
+func (client *PageableLROsClient) listPrivateEndPointsCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, resourceName string, nextLink string, _ *PageableLROsClientBeginListPrivateEndPointsOptions) (*policy.Request, error) {
+	firstPage := nextLink == ""
+	var req *policy.Request
+	var err error
+	if firstPage {
+		urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/PageableLROs/resourceSegment/{resourceName}"
+		if client.subscriptionID == "" {
+			return nil, errors.New("parameter subscriptionID cannot be empty")
+		}
+		urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
+		if resourceGroupName == "" {
+			return nil, errors.New("parameter resourceGroupName cannot be empty")
+		}
+		urlPath = strings.ReplaceAll(urlPath, "{resourceGroupName}", url.PathEscape(resourceGroupName))
+		if resourceName == "" {
+			return nil, errors.New("parameter resourceName cannot be empty")
+		}
+		urlPath = strings.ReplaceAll(urlPath, "{resourceName}", url.PathEscape(resourceName))
+		req, err = runtime.NewRequest(ctx, http.MethodPost, runtime.JoinPaths(client.internal.Endpoint(), urlPath))
+	} else {
+		req, err = runtime.NewRequestForNextLink(ctx, http.MethodGet, client.internal.Endpoint(), nextLink)
 	}
-	urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
-	if resourceGroupName == "" {
-		return nil, errors.New("parameter resourceGroupName cannot be empty")
-	}
-	urlPath = strings.ReplaceAll(urlPath, "{resourceGroupName}", url.PathEscape(resourceGroupName))
-	if resourceName == "" {
-		return nil, errors.New("parameter resourceName cannot be empty")
-	}
-	urlPath = strings.ReplaceAll(urlPath, "{resourceName}", url.PathEscape(resourceName))
-	req, err := runtime.NewRequest(ctx, http.MethodPost, runtime.JoinPaths(client.internal.Endpoint(), urlPath))
 	if err != nil {
 		return nil, err
 	}
-	reqQP := req.Raw().URL.Query()
-	reqQP.Set("api-version", apiVersion)
-	req.Raw().URL.RawQuery = strings.ReplaceAll(reqQP.Encode(), "+", "%20")
-	req.Raw().Header["Accept"] = []string{"application/json"}
+	if firstPage {
+		reqQP := req.Raw().URL.Query()
+		reqQP.Set("api-version", apiVersion)
+		req.Raw().URL.RawQuery = strings.ReplaceAll(reqQP.Encode(), "+", "%20")
+		req.Raw().Header["Accept"] = []string{"application/json"}
+	}
 	return req, nil
 }
 
