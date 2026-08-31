@@ -30,15 +30,18 @@ export const noQueryParamPointOpRule = createRule({
           return;
         }
 
-        for (const parameter of httpOperation.parameters.parameters) {
-          if (parameter.type !== "query" || parameter.name.toLowerCase() === "api-version") {
+        for (const parameter of httpOperation.parameters.properties) {
+          if (
+            parameter.kind !== "query" ||
+            parameter.options.name.toLowerCase() === "api-version"
+          ) {
             continue;
           }
 
           context.reportDiagnostic({
-            target: parameter.param,
+            target: parameter.property,
             format: {
-              name: parameter.name,
+              name: parameter.options.name,
               verb: httpOperation.verb,
             },
           });
