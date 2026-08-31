@@ -1,7 +1,7 @@
 /**
  * `@azure-tools/typespec-azure-examples` — tooling for the Azure unified examples format
  * (`examples.yaml`). This entrypoint exposes the JSON Schema and the programmatic validation API
- * used by the `examples-validate` CLI.
+ * used by the `tsp-examples validate` command.
  */
 export { discoverExampleFiles, validateExamplesDir, type ValidateDirResult } from "./discover.js";
 export {
