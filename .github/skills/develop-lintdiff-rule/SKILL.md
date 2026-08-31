@@ -197,15 +197,35 @@ separate VS Code windows and run independent top-level worker sessions.
    - initialize the `core` submodule in every typespec-azure worktree
    - trust the typespec-azure mise configuration and run `mise install` before
      starting concurrent installs so tool installation cannot race
-   - run `mise exec -- pnpm install --frozen-lockfile` in every typespec-azure
-     worktree
+   - install only the repository-root tooling, the nested `core/` workspace-root
+     tooling, and the lintdiff package dependency closure with
+     `mise exec -- pnpm install --filter . --filter ./core --filter "tsp-lintdiff-local-linter..." --frozen-lockfile --ignore-scripts`
+     in every typespec-azure worktree. Both root filters are required: build
+     scripts in `core` packages load tools such as
+     `prettier-plugin-organize-imports` from the `core/` importer, while
+     repository commands use the top-level importer. The lintdiff closure
+     filter alone does not materialize either root's complete tooling. Do not
+     run an unfiltered 69-workspace install merely because a package link is
+     missing
    - if and only if pnpm reports `ERR_PNPM_OUTDATED_LOCKFILE` because the target
      branch's lintdiff importer is missing from `pnpm-lock.yaml`, run
-     `mise exec -- pnpm install --filter "tsp-lintdiff-local-linter..." --no-frozen-lockfile --lockfile=false --ignore-scripts`;
-     the filter limits the fallback to lintdiff and its workspace dependency
-     closure while creating the links needed by the dependency build, without
-     modifying the tracked lockfile or running unrelated monorepo lifecycle
-     setup such as the Python package environment
+     `mise exec -- pnpm install --filter . --filter ./core --filter "tsp-lintdiff-local-linter..." --no-frozen-lockfile --lockfile=false --ignore-scripts`;
+     the filters limit the fallback to both roots' build tooling plus lintdiff
+     and its workspace dependency closure while creating the links needed by
+     the dependency build, without modifying the tracked lockfile or running
+     unrelated monorepo lifecycle setup such as the Python package environment
+   - distinguish lockfile completeness from installation state:
+     `--frozen-lockfile` confirms that selected manifests agree with
+     `pnpm-lock.yaml`, but the lockfile does not contain installed package files
+     and does not prove that the selected `node_modules` links exist. A missing
+     package that is already present in the manifest and lockfile is an install
+     scope or incomplete-install problem, not a reason to regenerate the
+     lockfile
+   - on Windows, allow up to 10 minutes for a first install and require pnpm's
+     final `Done in ...` line plus a successful process exit before treating it
+     as complete. If the tool wait expires, inspect the tracked shell and its
+     `pnpm.exe` process, then continue reading that same shell; do not start a
+     duplicate install or infer completion from a quiet progress reporter
    - use the same mise-managed Node.js to run `npm ci` in every specs worktree;
      do not use `--ignore-scripts`, and confirm the pinned specs repository's
      Node.js engine requirement is satisfied
@@ -221,12 +241,16 @@ separate VS Code windows and run independent top-level worker sessions.
      `@microsoft.azure/openapi-validator-core`,
      `@microsoft.azure/openapi-validator-rulesets`, `lodash`, and `yaml`;
      also resolve the declared `@microsoft.azure/openapi-validator` harness
-     dependency and the `tsx` loader. A transitive package present only under
-     pnpm's virtual store does not satisfy a direct harness import
+     dependency and the `tsx` loader. Also resolve the official
+     `@azure-tools/typespec-azure-rulesets` package and its
+     `@azure-tools/typespec-client-generator-core` peer from the lintdiff
+     package because focused fixtures load the resource-manager ruleset. A
+     transitive package present only under pnpm's virtual store does not satisfy
+     a direct harness or fixture import
    - run this lightweight smoke check from the repository root; it verifies
      fixture-harness package and loader resolution without executing a full
      fixture comparison:
-     `mise exec -- pnpm --dir packages/typespec-lintdiff exec node --import tsx/esm --input-type=module -e "await Promise.all(['@microsoft.azure/openapi-validator-core', '@microsoft.azure/openapi-validator-rulesets', '@microsoft.azure/openapi-validator', 'lodash', 'yaml'].map((specifier) => import(specifier)))"`
+     `mise exec -- pnpm --dir packages/typespec-lintdiff exec node --import tsx/esm --input-type=module -e "await Promise.all(['@azure-tools/typespec-azure-rulesets', '@azure-tools/typespec-client-generator-core', '@microsoft.azure/openapi-validator-core', '@microsoft.azure/openapi-validator-rulesets', '@microsoft.azure/openapi-validator', 'lodash', 'yaml'].map((specifier) => import(specifier)))"`
      Do not rely only on build output that excludes the test harness
    - treat any install or verification failure as a dispatch failure and do not
      hand off that worker for interactive development
@@ -270,8 +294,11 @@ its supplied worktrees:
    - identify the narrow failed layer: submodule initialization, mise tools,
      typespec-azure pnpm install, lintdiff dependency build, specs `npm ci`, or
      direct harness package resolution
-   - rerun only that layer using the same pinned, lockfile-respecting commands
-     required in dispatcher mode, then repeat its concrete verification
+   - rerun only that layer using the same pinned, filtered,
+     lockfile-respecting commands required in dispatcher mode, then repeat its
+     concrete verification. When a declared and locked root build tool is
+     missing, rerun the two-roots-plus-lintdiff filtered install; do not
+     escalate directly to an unfiltered workspace install
    - if `ERR_PNPM_OUTDATED_LOCKFILE` matches the documented lintdiff-importer
      case, use the documented no-lockfile fallback rather than editing the
      lockfile merely to complete local setup
@@ -279,7 +306,15 @@ its supplied worktrees:
      manifest, treat that as a repository dependency defect rather than an
      installation defect: add the narrow direct development dependency with
      the repository package manager, retain the manifest and lockfile change as
-     an explicit harness prerequisite, and continue the rule workflow
+     an explicit harness prerequisite, and continue the rule workflow. Apply
+     the same rule when focused fixture compilation loads an official ruleset
+     whose package or required peer is absent from the lintdiff manifest
+   - for an existing workspace package, update the lintdiff manifest with
+     `pnpm pkg set` rather than `pnpm add`; `pnpm add` can resolve all lockfile
+     entries and rewrite machine-specific registry metadata even though no new
+     external package is needed. Then use the filtered lockfile-only command
+     below, discard unrelated churn, and verify the retained importer entry
+     with the frozen filtered install
    - when that dependency repair requires refreshing `pnpm-lock.yaml`, inspect
      the resulting churn. The target branch can lack a
      `packages/typespec-lintdiff` importer, so adding the importer and its
@@ -297,7 +332,7 @@ its supplied worktrees:
      tarball URL or integrity rewrites
    - verify the normalized manifest and lockfile with a frozen-lockfile install,
      using
-     `mise exec -- pnpm install --filter "tsp-lintdiff-local-linter..." --frozen-lockfile --offline`
+     `mise exec -- pnpm install --filter . --filter ./core --filter "tsp-lintdiff-local-linter..." --frozen-lockfile --offline --ignore-scripts`
      when the required artifacts are already in the pnpm store, or omit
      `--offline` when they are not. If the lockfile cannot be normalized and
      verified reliably, stop and report that blocker rather than hand-editing
@@ -308,13 +343,16 @@ its supplied worktrees:
      blocker such as unavailable credentials or network, insufficient disk,
      an unsatisfied pinned toolchain, or conflicting unrelated worktree changes;
      report the attempted repair and exact blocker
-5. Prepare the fixture comparison harness. Either:
+5. Prepare the fixture comparison harness:
    - run `pnpm --dir packages/typespec-lintdiff compare:setup -- --specs-repo
-<isolated-specs-worktree>`, or
-   - set and verify `LINTDIFF_VALIDATOR_ROOT` and `LINTDIFF_COMMON_TYPES`
-     against existing local checkouts.
-     Do not assume a fresh rule worktree already contains
-     `test/azure-openapi-validator` or `test/common-types`.
+<isolated-specs-worktree>` to build the linter and create the direct link in the
+     specs worktree
+   - separately provide the focused fixture source inputs immediately before
+     focused validation: either set and verify `LINTDIFF_VALIDATOR_ROOT` and
+     `LINTDIFF_COMMON_TYPES` against existing local sources, or create the two
+     documented temporary links. `compare:setup` does not populate these
+     sources. Do not assume a fresh rule worktree already contains
+     `test/azure-openapi-validator` or `test/common-types`
 6. Verify that the specs worktree's local
    `node_modules/tsp-lintdiff-local-linter` resolves directly to the supplied
    typespec-azure worktree. `compare:setup` creates a direct per-worktree link
@@ -538,8 +576,8 @@ creating a draft PR.
      performs:
      - `linter code: [<ValidatorRuleId>](<validator source URL>)`
      - `linter doc: [<validator-doc-file>.md](<validator documentation URL>)`
-     Use the rule name and links from the fixture `rule.md` or validator
-     repository. Do not omit either link or replace them with unlinked paths.
+       Use the rule name and links from the fixture `rule.md` or validator
+       repository. Do not omit either link or replace them with unlinked paths.
    - **How the Swagger linter works:** explain the Swagger objects it inspects,
      traversal or lookup strategy, conditions and exemptions, diagnostic
      locations, and any known validator defects, stale maps, emitted-occurrence
