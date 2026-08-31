@@ -41,7 +41,7 @@ jobs:
       - uses: ./.github/actions/setup
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 8.0.x
 
@@ -83,7 +83,7 @@ jobs:
         run: echo "${{ github.event.pull_request.number }}" > ./temp/bundle-size/pr-number.txt
 
       - name: Upload comment artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: package-size-comment
           path: |
