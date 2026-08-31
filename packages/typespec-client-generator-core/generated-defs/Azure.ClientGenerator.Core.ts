@@ -1260,26 +1260,42 @@ export type ReorderParametersFunctionImplementation = (
 ) => Operation;
 
 /**
- * Replace the method response type of an operation.
- * This preserves the HTTP response metadata and only changes the return type
- * of the generated client method when used with `@@override`.
- * The replacement type is not mapped to or validated against the HTTP body;
- * it is the customization author's responsibility to ensure it matches the
- * runtime response.
+ * Replace the method response type of an operation with `void`, discarding the client method
+ * return value while preserving the HTTP response metadata used for the wire protocol.
+ * Use this with `@@override` when the runtime response body should no longer be surfaced
+ * to callers of the generated client method, for example when a "delete" operation returns
+ * a body today but should return nothing to the SDK consumer.
  *
  * @param operation The operation to transform.
- * @param response The replacement method response type.
- * @returns A new operation with the response type replaced.
+ * @returns A new operation whose method response type is `void`.
  * @example Replace a response with void
  * ```typespec
- * alias DeleteResponse = replaceResponse(MyService.delete, void);
+ * alias DeleteResponse = replaceResponseWithVoid(MyService.delete);
  * @@override(MyService.delete, DeleteResponse);
  * ```
  */
-export type ReplaceResponseFunctionImplementation = (
+export type ReplaceResponseWithVoidFunctionImplementation = (
   context: FunctionContext,
   operation: Operation,
-  response: Type,
+) => Operation;
+
+/**
+ * Replace the method response type of an operation with the raw bytes of the HTTP response body,
+ * preserving the HTTP response metadata used for the wire protocol. Use this with `@@override`
+ * when callers of the generated client method should receive the unparsed response body instead
+ * of the modeled response type.
+ *
+ * @param operation The operation to transform.
+ * @returns A new operation whose method response type is `bytes`.
+ * @example Replace a response with the raw response bytes
+ * ```typespec
+ * alias DownloadResponse = replaceResponseWithBytes(MyService.download);
+ * @@override(MyService.download, DownloadResponse);
+ * ```
+ */
+export type ReplaceResponseWithBytesFunctionImplementation = (
+  context: FunctionContext,
+  operation: Operation,
 ) => Operation;
 
 /**
@@ -1309,6 +1325,7 @@ export type AzureClientGeneratorCoreFunctions = {
   removeParameter: RemoveParameterFunctionImplementation;
   addParameter: AddParameterFunctionImplementation;
   reorderParameters: ReorderParametersFunctionImplementation;
-  replaceResponse: ReplaceResponseFunctionImplementation;
+  replaceResponseWithVoid: ReplaceResponseWithVoidFunctionImplementation;
+  replaceResponseWithBytes: ReplaceResponseWithBytesFunctionImplementation;
   exact: ExactFunctionImplementation;
 };
