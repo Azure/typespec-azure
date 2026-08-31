@@ -1,8 +1,10 @@
+import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import type { Model, Type } from "@typespec/compiler";
 import {
   createRule,
   getLocationContext,
   isArrayModelType,
+  isNullType,
   isUnknownType,
   isVoidType,
 } from "@typespec/compiler";
@@ -26,11 +28,15 @@ export const parametersSchemaAsTypeObjectRule = createRule({
           return;
         }
 
-        if (isVoidType(body.type) || isUnknownType(body.type)) {
+        const schemaType = getEmittedSchemaType(body.type);
+        if (schemaType === undefined) {
+          return;
+        }
+        if (isVoidType(schemaType) || isUnknownType(schemaType)) {
           return;
         }
 
-        if (isObjectSchemaType(body.type)) {
+        if (isObjectSchemaType(schemaType)) {
           return;
         }
 
@@ -47,6 +53,21 @@ export const parametersSchemaAsTypeObjectRule = createRule({
 
 function isObjectSchemaType(type: Type): boolean {
   return type.kind === "Model" && !isArraySchemaType(type);
+}
+
+function getEmittedSchemaType(type: Type): Type | undefined {
+  while (type.kind === "Union") {
+    const nonNullVariants = [...type.variants.values()]
+      .map((variant) => variant.type)
+      .filter((variant) => !isNullType(variant));
+
+    if (nonNullVariants.length !== 1) {
+      const [unionEnum] = getUnionAsEnum(type);
+      return unionEnum ? type : undefined;
+    }
+    type = nonNullVariants[0];
+  }
+  return type;
 }
 
 function isArraySchemaType(model: Model): boolean {

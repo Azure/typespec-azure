@@ -2,16 +2,18 @@
 
 ## Conclusion
 
-The migrated TypeSpec rule required an update. The Swagger rule rejects every
+The migrated TypeSpec rule required a further repair. The Swagger rule rejects every
 explicit request-body `schema.type` other than `object`. The former TypeSpec
 implementation missed named models derived from arrays and could lose
 diagnostics when an ARM template supplied the body property. It also reported
 synthetic `void` bodies and `unknown` bodies that the Swagger JSONPath does not
-select.
+select. A subsequent promotion review found that it also reported nullable
+object bodies even though AutoRest emits the object schema reference with
+`x-nullable` and no non-object `type`.
 
-After correcting those differences, the full corpus run at specs commit
+After correcting those differences, including emitted union handling, the full corpus run at specs commit
 `f6b53f105b95da05276530a0754a1c71b4f16397`, generated at
-`2026-08-27T06:39:39.644Z`, produced 9 Swagger projects, 9 TypeSpec projects,
+`2026-08-31T06:12:48.791Z`, produced 9 Swagger projects, 9 TypeSpec projects,
 9 overlapping projects, and no one-sided projects in the successfully compiled
 population. The migrated TypeSpec rule is functionally equivalent to the
 Swagger rule for the assessed population.
@@ -34,6 +36,14 @@ their respective conservative identities.
    diagnostics as library-originated.
 5. Add violating coverage for a named array model and compliant controls for
    `void` and `unknown` action requests.
+6. Treat a union containing exactly one object model and `null` as an object
+   schema, matching AutoRest's emitted `$ref` plus `x-nullable`.
+7. Normalize any union with one effective non-null variant before applying the
+   object, `unknown`, and `void` checks. AutoRest emits the underlying schema
+   for singleton unions and adds `x-nullable` when needed.
+8. Use the same union-enum classification as AutoRest for multi-variant unions.
+   Ignore unsupported unions that emit `{}`, but continue diagnosing unions that
+   emit string or number enum schemas.
 
 No emitter, validator, corpus-generator, or comparison-normalization changes
 are required.
@@ -52,7 +62,7 @@ the uncovered behavior.
 | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------: | ---------------------------------------------- | ---------------: | ----------------: | --------------------: | ------------------: | ------------: | ----------------------: |
 | `docs/coverage_old.md`                                   | External report snapshot; source URL is recorded in the file, but no spec or generator revision is provided |         450 compiled projects, 210 validator rules | `ParametersSchemaAsTypeObject none 9 4 0 44.4` |                9 |                 4 | not listed separately | not reconstructable |    not listed |              not listed |
 | Checked-in `specs/coverage-breakdown.md` before this fix | Specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`; 462/468 successful projects                        | 462 successful projects, 215 known validator rules | `ParametersSchemaAsTypeObject production`      |                9 |                10 |                     4 |                   5 |             6 | 18 Swagger, 63 TypeSpec |
-| Refreshed full corpus after this fix                     | Same specs commit; generated `2026-08-27T06:39:39.644Z`; full run over 462/468 successful projects          | 462 successful projects, 215 known validator rules | `ParametersSchemaAsTypeObject production`      |                9 |                 9 |                     9 |                   0 |             0 | 18 Swagger, 19 TypeSpec |
+| Refreshed full corpus after this repair                  | Same specs commit; generated `2026-08-31T06:12:48.791Z`; full run over 462/468 successful projects          | 462 successful projects, 215 known validator rules | `ParametersSchemaAsTypeObject production`      |                9 |                 9 |                     9 |                   0 |             0 | 18 Swagger, 19 TypeSpec |
 
 The reports answer different questions. The external report gives aggregate
 coverage credit and does not expose the unmatched projects, so they cannot be
@@ -254,6 +264,74 @@ that selection even though it is not an object schema.
 **Disposition:** Exclude `unknown` to preserve the validator's implemented
 behavior. The `unknown-body-action` fixture records this limitation.
 
+### Gap example: nullable object body
+
+- **Classification:** TypeSpec-only
+- **Status:** fixed
+- **Project/API version:** focused fixture / `2024-01-01`
+- **Source:** `nullable-object-body/main.tsp`, `Widgets.doAction`
+
+**TypeSpec source**
+
+```typespec
+@body body: ActionRequest | null
+```
+
+**Emitted OpenAPI**
+
+```json
+{
+  "schema": {
+    "$ref": "#/definitions/ActionRequest",
+    "x-nullable": true
+  }
+}
+```
+
+| Engine            | Observed result                                                                  |
+| ----------------- | -------------------------------------------------------------------------------- |
+| Swagger validator | No diagnostic because the resolved object schema does not have a non-object type |
+| TypeSpec lint     | Formerly diagnosed the union; now no diagnostic                                  |
+
+**Explanation:** AutoRest unwraps a nullable union with one non-null option,
+emits the underlying object schema, and adds `x-nullable`. Nullability does not
+change the schema type selected by the validator JSONPath.
+
+**Disposition:** Unwrap the nullable union for object-schema classification.
+The `nullable-object-body` fixture preserves this compliant boundary.
+
+### Gap example: single-effective-variant unions
+
+- **Classification:** TypeSpec-only
+- **Status:** fixed
+- **Project/API version:** focused fixture / `2024-01-01`
+- **Source:** `single-variant-unions/main.tsp`, `Widgets.submitObject` and `Widgets.submitUnknown`
+
+A singleton union containing an object model emits the model's object schema. A
+nullable union whose only non-null variant is `unknown` emits a schema with
+`x-nullable` but no `type`. Neither output is selected by the Swagger rule.
+
+**Disposition:** Normalize unions with exactly one non-null variant before
+applying the existing object and untyped-schema exemptions. The
+`single-variant-unions` fixture covers both emitted-schema branches.
+
+### Gap example: unsupported and enum unions
+
+- **Classification:** TypeSpec-only
+- **Status:** fixed
+- **Project/API version:** focused fixtures / `2024-01-01`
+- **Source:** `unsupported-union-body/main.tsp` and `enum-union-body/main.tsp`
+
+AutoRest emits `{}` for a union of unrelated model types and reports its own
+`union-unsupported` diagnostic. Because the emitted body schema has no `type`,
+the Swagger selector ignores it. In contrast, a union of same-kind literals is
+emitted as a string or number enum schema and the Swagger rule diagnoses its
+non-object `type`.
+
+**Disposition:** Reuse Azure Core's `getUnionAsEnum`, which AutoRest itself uses,
+to distinguish emitted enum schemas from unsupported untyped unions. Separate
+fixtures preserve both the compliant and violating branches.
+
 ### Gap example: duplicated semantic report
 
 - **Classification:** count-only
@@ -304,10 +382,14 @@ the comparison output.
 | `named-array-model-body` | named array body violation              | matching diagnostic |
 | `object-body`            | no violation                            | no rule diagnostic  |
 | `inline-object-body`     | no violation                            | no rule diagnostic  |
+| `nullable-object-body`   | nullable object; no violation           | no rule diagnostic  |
+| `single-variant-unions`  | singleton object and nullable unknown   | no rule diagnostic  |
+| `unsupported-union-body` | unsupported union emits no schema type  | no rule diagnostic  |
+| `enum-union-body`        | string enum schema violation            | matching diagnostic |
 | `no-body-action`         | no body and no violation                | no rule diagnostic  |
 | `unknown-body-action`    | body schema has no `type`; no violation | no rule diagnostic  |
 
-The seven-case suite covers three violating shapes and four compliant controls.
+The eleven-fixture suite covers four violating shapes and eight compliant semantic branches.
 Ambient diagnostics from other rules are declared in each fixture snapshot and
 do not establish this rule's target identity.
 
