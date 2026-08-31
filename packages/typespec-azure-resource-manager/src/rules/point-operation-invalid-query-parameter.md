@@ -1,11 +1,3 @@
----
-title: "point-operation-invalid-query-parameter"
----
-
-```text title="Full name"
-@azure-tools/typespec-azure-resource-manager/point-operation-invalid-query-parameter
-```
-
 ARM point operations using GET, PUT, PATCH, or DELETE must not define query parameters other than `api-version`.
 
 ## Impact
