@@ -1,11 +1,3 @@
----
-title: "no-uuid"
----
-
-```text title="Full name"
-@azure-tools/typespec-azure-resource-manager/no-uuid
-```
-
 Avoid UUID-typed schemas in Azure Resource Manager APIs unless their use has explicit Azure API review approval.
 
 ## Impact
