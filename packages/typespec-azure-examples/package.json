@@ -2,7 +2,7 @@
   "name": "@azure-tools/typespec-azure-examples",
   "version": "0.1.0",
   "author": "Microsoft Corporation",
-  "description": "Tooling for the Azure unified examples format (examples.yaml): JSON Schema and the examples-validate CLI",
+  "description": "Tooling for the Azure unified examples format (examples.yaml): JSON Schema and the tsp-examples CLI",
   "homepage": "https://azure.github.io/typespec-azure",
   "readme": "https://github.com/Azure/typespec-azure/blob/main/README.md",
   "license": "MIT",
@@ -27,7 +27,7 @@
     }
   },
   "bin": {
-    "examples-validate": "./dist/src/cli.js"
+    "tsp-examples": "./dist/src/cli.js"
   },
   "engines": {
     "node": ">=22.0.0"

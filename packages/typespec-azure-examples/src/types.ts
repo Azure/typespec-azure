@@ -1,5 +1,5 @@
 /**
- * Public types for the unified examples format (`examples.yaml`) and the `examples-validate`
+ * Public types for the unified examples format (`examples.yaml`) and the `tsp-examples validate`
  * diagnostics. These mirror the schema in `schema/examples-yaml.tsp`.
  */
 

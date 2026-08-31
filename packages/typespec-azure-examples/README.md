@@ -1,7 +1,7 @@
 # @azure-tools/typespec-azure-examples
 
 Tooling for the Azure **unified examples format** (`examples.yaml`): the published JSON Schema
-and the `examples-validate` CLI.
+and the `tsp-examples` CLI.
 
 The unified examples format replaces the ~282K per-version `x-ms-examples` JSON files with a
 single version-aware `examples.yaml` per service (or `examples/<Interface>.yaml` for large
@@ -45,12 +45,12 @@ CaCertificates.get:
 - Response status codes are bare integer keys. `api-version` is implicit; use the
   `{api-version}` placeholder where a version must be embedded in a value.
 
-## `examples-validate`
+## `tsp-examples validate`
 
 Validate a service's example files against the JSON Schema and the format rules:
 
 ```bash
-examples-validate <service-dir>
+tsp-examples validate <service-dir>
 ```
 
 It discovers `examples.yaml` and `examples/*.yaml` in the directory, reads the adjacent
