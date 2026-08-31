@@ -32,6 +32,7 @@ export interface ModelConfigOptions extends ClientOptions {
   withRawContent?: boolean;
   needAzureCore?: boolean;
   needNamespaces?: boolean;
+  needArmTemplate?: boolean;
   mustEmptyDiagnostic?: boolean;
   withVersionedApiVersion?: boolean;
   [key: string]: any;
@@ -49,6 +50,7 @@ export async function emitModularModelsFromTypeSpec(
     needTCGC = false,
     withVersionedApiVersion = false,
     needArmTemplate = false,
+    needNamespaces = true,
   } = options;
   if (options["experimental-extensible-enums"] === undefined) {
     options["experimental-extensible-enums"] = false;
@@ -57,7 +59,7 @@ export async function emitModularModelsFromTypeSpec(
     options["compatibility-mode"] = false;
   }
   const context = await rlcEmitterFor(tspContent, {
-    needNamespaces: true,
+    needNamespaces,
     needAzureCore,
     needTCGC,
     withRawContent,
@@ -198,8 +200,9 @@ export async function emitModularOperationsFromTypeSpec(
     needTCGC: options["needTCGC"] ? true : false,
     withRawContent: options.withRawContent ? true : false,
     withVersionedApiVersion: options.withVersionedApiVersion ? true : false,
+    needArmTemplate: options.needArmTemplate === true,
   });
-  const dpgContext = await createDpgContextTestHelper(context.program);
+  const dpgContext = await createDpgContextTestHelper(context.program, false, options);
   const binder = useBinder();
   const includeResponseHeaders = options["include-headers-in-response"] === true;
   dpgContext.emitterOptions!.includeHeadersInResponse = includeResponseHeaders;
@@ -210,6 +213,12 @@ export async function emitModularOperationsFromTypeSpec(
   dpgContext.emitterOptions!.enableStorageCompat = options["enable-storage-compat"] === true;
   if (options["treat-unknown-as-record"] !== undefined) {
     dpgContext.emitterOptions!.treatUnknownAsRecord = options["treat-unknown-as-record"] === true;
+  }
+  if (options["enable-operation-group"] !== undefined) {
+    dpgContext.emitterOptions!.enableOperationGroup = options["enable-operation-group"] === true;
+  }
+  if (options["hierarchy-client"] !== undefined) {
+    dpgContext.emitterOptions!.hierarchyClient = options["hierarchy-client"] === true;
   }
   const modularEmitterOptions = transformModularEmitterOptions(dpgContext, "", {
     casing: "camel",
@@ -246,6 +255,7 @@ export async function emitModularClientContextFromTypeSpec(
     needTCGC: false,
     withRawContent: options.withRawContent ? true : false,
     withVersionedApiVersion: options.withVersionedApiVersion ? true : false,
+    needArmTemplate: options.needArmTemplate === true,
   });
   const dpgContext = await createDpgContextTestHelper(context.program);
   if (options.packageDetails) {
@@ -279,13 +289,14 @@ export async function emitModularClientFromTypeSpec(
   options: ModelConfigOptions = {},
 ) {
   const context = await rlcEmitterFor(tspContent, {
-    needNamespaces: true,
+    needNamespaces: options.needNamespaces ?? true,
     needAzureCore: false,
     needTCGC: false,
     withRawContent: options.withRawContent ? true : false,
     withVersionedApiVersion: options.withVersionedApiVersion ? true : false,
+    needArmTemplate: options.needArmTemplate === true,
   });
-  const dpgContext = await createDpgContextTestHelper(context.program);
+  const dpgContext = await createDpgContextTestHelper(context.program, false, options);
   const binder = useBinder();
   const includeResponseHeaders = options["include-headers-in-response"] === true;
   dpgContext.emitterOptions!.includeHeadersInResponse = includeResponseHeaders;
@@ -294,23 +305,19 @@ export async function emitModularClientFromTypeSpec(
   const modularEmitterOptions = transformModularEmitterOptions(dpgContext, "", {
     casing: "camel",
   });
-  if (
-    dpgContext.sdkPackage.clients &&
-    dpgContext.sdkPackage.clients.length > 0 &&
-    dpgContext.sdkPackage.clients[0]
-  ) {
-    emitTypes(dpgContext, { sourceRoot: "" });
-    renameClientName(dpgContext.sdkPackage.clients[0], modularEmitterOptions);
-    const clientMap = Array.from(getClientHierarchyMap(dpgContext));
-    buildApiOptions(dpgContext, clientMap[0]!, modularEmitterOptions);
-    buildOperationFiles(dpgContext, clientMap[0]!, modularEmitterOptions);
-    buildClassicOperationFiles(dpgContext, clientMap[0]!, modularEmitterOptions);
-    const res = buildClassicalClient(dpgContext, clientMap[0]!, modularEmitterOptions);
-    binder.resolveAllReferences("/");
-    return res;
+  const clientMap = Array.from(getClientHierarchyMap(dpgContext));
+  emitTypes(dpgContext, { sourceRoot: "" });
+  const clients = [];
+  for (const client of clientMap) {
+    await renameClientName(client[1], modularEmitterOptions);
+    buildApiOptions(dpgContext, client, modularEmitterOptions);
+    buildOperationFiles(dpgContext, client, modularEmitterOptions);
+    buildClassicOperationFiles(dpgContext, client, modularEmitterOptions);
+    clients.push(buildClassicalClient(dpgContext, client, modularEmitterOptions));
   }
+  binder.resolveAllReferences("/");
   expectDiagnosticEmpty(dpgContext.program.diagnostics);
-  return undefined;
+  return clients;
 }
 
 export async function emitSamplesFromTypeSpec(

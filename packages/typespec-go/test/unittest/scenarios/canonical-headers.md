@@ -1,7 +1,8 @@
 # Header names passed to `Get` and `Set` use Go canonical MIME casing
 
 Header names passed to `http.Header.Get` and `http.Header.Set` are canonicalized at generation
-time. Direct map access preserves the TypeSpec-provided header name.
+time. Direct map access preserves the TypeSpec-provided header name. Scalar `x-ms-meta` headers
+remain scalar instead of being treated as metadata maps.
 
 ## Emitter configuration
 
@@ -19,10 +20,14 @@ model HeaderResponse {
   @statusCode statusCode: 200;
   @header("x-response-header") responseHeader: string;
   @header("X-MS-FOO") uppercaseHeader: string;
+  @header("x-ms-meta") metadata: string;
 }
 
 @get
-op read(@header("x-request-header") requestHeader: string): HeaderResponse;
+op read(
+  @header("x-request-header") requestHeader: string,
+  @header("x-ms-meta") requestMetadata: string,
+): HeaderResponse;
 ```
 
 ## The generated client canonicalizes response header names but preserves direct map access
@@ -75,10 +80,10 @@ func NewHeadersClientWithNoCredential(endpoint string, options *HeadersClientOpt
 // Read -
 // If the operation fails it returns an *azcore.ResponseError type.
 //   - options - HeadersClientReadOptions contains the optional parameters for the HeadersClient.Read method.
-func (client *HeadersClient) Read(ctx context.Context, requestHeader string, options *HeadersClientReadOptions) (HeadersClientReadResponse, error) {
+func (client *HeadersClient) Read(ctx context.Context, requestHeader string, requestMetadata string, options *HeadersClientReadOptions) (HeadersClientReadResponse, error) {
 	var err error
 	ctx = context.WithValue(ctx, runtime.CtxAPINameKey{}, "HeadersClient.Read")
-	req, err := client.readCreateRequest(ctx, requestHeader, options)
+	req, err := client.readCreateRequest(ctx, requestHeader, requestMetadata, options)
 	if err != nil {
 		return HeadersClientReadResponse{}, err
 	}
@@ -86,27 +91,29 @@ func (client *HeadersClient) Read(ctx context.Context, requestHeader string, opt
 	if err != nil {
 		return HeadersClientReadResponse{}, err
 	}
-	if !runtime.HasStatusCode(httpResp, http.StatusOK) {
-		err = runtime.NewResponseError(httpResp)
-		return HeadersClientReadResponse{}, err
-	}
-	resp, err := client.readHandleResponse(httpResp)
-	return resp, err
+	return client.readHandleResponse(httpResp, http.StatusOK)
 }
 
 // readCreateRequest creates the Read request.
-func (client *HeadersClient) readCreateRequest(ctx context.Context, requestHeader string, _ *HeadersClientReadOptions) (*policy.Request, error) {
+func (client *HeadersClient) readCreateRequest(ctx context.Context, requestHeader string, requestMetadata string, _ *HeadersClientReadOptions) (*policy.Request, error) {
 	req, err := runtime.NewRequest(ctx, http.MethodGet, client.endpoint)
 	if err != nil {
 		return nil, err
 	}
+	req.Raw().Header["x-ms-meta"] = []string{requestMetadata}
 	req.Raw().Header["x-request-header"] = []string{requestHeader}
 	return req, nil
 }
 
 // readHandleResponse handles the Read response.
-func (client *HeadersClient) readHandleResponse(resp *http.Response) (HeadersClientReadResponse, error) {
+func (client *HeadersClient) readHandleResponse(resp *http.Response, successCodes ...int) (HeadersClientReadResponse, error) {
 	result := HeadersClientReadResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
+	if val := resp.Header.Get("X-Ms-Meta"); val != "" {
+		result.Metadata = &val
+	}
 	if val := resp.Header.Get("X-Response-Header"); val != "" {
 		result.ResponseHeader = &val
 	}
@@ -142,7 +149,7 @@ import (
 type HeadersServer struct {
 	// Read is the fake for method HeadersClient.Read
 	// HTTP status codes to indicate success: http.StatusOK
-	Read func(ctx context.Context, requestHeader string, options *testmodule.HeadersClientReadOptions) (resp azfake.Responder[testmodule.HeadersClientReadResponse], errResp azfake.ErrorResponder)
+	Read func(ctx context.Context, requestHeader string, requestMetadata string, options *testmodule.HeadersClientReadOptions) (resp azfake.Responder[testmodule.HeadersClientReadResponse], errResp azfake.ErrorResponder)
 }
 
 // NewHeadersServerTransport creates a new instance of HeadersServerTransport with the provided implementation.
@@ -201,7 +208,7 @@ func (h *HeadersServerTransport) dispatchRead(req *http.Request) (*http.Response
 	if h.srv.Read == nil {
 		return nil, &nonRetriableError{errors.New("fake for method Read not implemented")}
 	}
-	respr, errRespr := h.srv.Read(req.Context(), getHeaderValue(req.Header, "x-request-header"), nil)
+	respr, errRespr := h.srv.Read(req.Context(), getHeaderValue(req.Header, "x-request-header"), getHeaderValue(req.Header, "x-ms-meta"), nil)
 	if respErr := server.GetError(errRespr, req); respErr != nil {
 		return nil, respErr
 	}
@@ -212,6 +219,9 @@ func (h *HeadersServerTransport) dispatchRead(req *http.Request) (*http.Response
 	resp, err := server.NewResponse(respContent, req, nil)
 	if err != nil {
 		return nil, err
+	}
+	if val := server.GetResponse(respr).Metadata; val != nil {
+		resp.Header.Set("X-Ms-Meta", *val)
 	}
 	if val := server.GetResponse(respr).ResponseHeader; val != nil {
 		resp.Header.Set("X-Response-Header", *val)

@@ -75,8 +75,7 @@ func (client *RegressionsClient) WithExpandParam(ctx context.Context, expand str
 		return RegressionsClientWithExpandParamResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return RegressionsClientWithExpandParamResponse{}, err
+		return RegressionsClientWithExpandParamResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return RegressionsClientWithExpandParamResponse{}, nil
 }

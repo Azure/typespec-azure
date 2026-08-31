@@ -8,7 +8,6 @@ import * as naming from "../../naming/naming.js";
 import { CodegenError } from "../core/errors.js";
 import * as helpers from "../core/helpers.js";
 import { ImportManager } from "../core/imports.js";
-import { fixUpMethodName } from "../core/operations.js";
 import { generateServerInternal, RequiredHelpers } from "./internal.js";
 
 // contains the generated content for all servers and the required helpers
@@ -117,7 +116,7 @@ export function generateServers(pkg: go.FakePackage, target: go.CodeModelType): 
           break;
       }
 
-      const operationName = fixUpMethodName(method);
+      const operationName = helpers.fixUpMethodName(method);
       content += `${indent.get()}// ${operationName} is the fake for method ${client.name}.${operationName}\n`;
       const successCodes = new Array<string>();
       if (method.returns.result?.kind === "anyResult") {
@@ -181,11 +180,11 @@ export function generateServers(pkg: go.FakePackage, target: go.CodeModelType): 
               respType = `azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]`;
             }
             requiredHelpers.tracker = true;
-            content += `${indent.get()}${naming.uncapitalize(fixUpMethodName(method))}: newTracker[azfake.PollerResponder[${respType}]](),\n`;
+            content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))}: newTracker[azfake.PollerResponder[${respType}]](),\n`;
             break;
           case "pageableMethod":
             requiredHelpers.tracker = true;
-            content += `${indent.get()}${naming.uncapitalize(fixUpMethodName(method))}: newTracker[azfake.PagerResponder[${respType}]](),\n`;
+            content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))}: newTracker[azfake.PagerResponder[${respType}]](),\n`;
             break;
         }
       }
@@ -219,11 +218,11 @@ export function generateServers(pkg: go.FakePackage, target: go.CodeModelType): 
             respType = `azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]`;
           }
           requiredHelpers.tracker = true;
-          content += `${indent.get()}${naming.uncapitalize(fixUpMethodName(method))} *tracker[azfake.PollerResponder[${respType}]]\n`;
+          content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))} *tracker[azfake.PollerResponder[${respType}]]\n`;
           break;
         case "pageableMethod":
           requiredHelpers.tracker = true;
-          content += `${indent.get()}${naming.uncapitalize(fixUpMethodName(method))} *tracker[azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]]\n`;
+          content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))} *tracker[azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]]\n`;
           break;
       }
     }
@@ -400,7 +399,7 @@ function generateServerTransportMethodDispatch(
   content += `${indent.get()}switch method {\n`;
 
   for (const method of finalMethods) {
-    const operationName = fixUpMethodName(method);
+    const operationName = helpers.fixUpMethodName(method);
     content += `${indent.get()}case "${client.name}.${operationName}":\n`;
     content += `${indent.push().get()}res.resp, res.err = ${receiverName}.dispatch${operationName}(req)\n`;
     indent.pop();
@@ -454,9 +453,9 @@ function generateServerTransportMethods(
 
   let content = "";
   for (const method of finalMethods) {
-    content += `func (${receiverName} *${serverTransport}) dispatch${fixUpMethodName(method)}(req *http.Request) (*http.Response, error) {\n`;
-    content += `${indent.get()}if ${receiverName}.srv.${fixUpMethodName(method)} == nil {\n`;
-    content += `${indent.push().get()}return nil, &nonRetriableError{errors.New("fake for method ${fixUpMethodName(method)} not implemented")}\n`;
+    content += `func (${receiverName} *${serverTransport}) dispatch${helpers.fixUpMethodName(method)}(req *http.Request) (*http.Response, error) {\n`;
+    content += `${indent.get()}if ${receiverName}.srv.${helpers.fixUpMethodName(method)} == nil {\n`;
+    content += `${indent.push().get()}return nil, &nonRetriableError{errors.New("fake for method ${helpers.fixUpMethodName(method)} not implemented")}\n`;
     content += `${indent.pop().get()}}\n`;
 
     switch (method.kind) {
@@ -602,7 +601,8 @@ function dispatchForOperationBody(
 ): string {
   const methodParamGroups = helpers.getMethodParamGroups(method);
   const numPathParams = methodParamGroups.pathParams.filter(
-    (each: go.PathParameter) => !go.isLiteralParameter(each.style),
+    (each: go.PathParameter) =>
+      !go.isLiteralParameter(each.style) && !go.isAPIVersionParameter(each),
   ).length;
   let content = "";
   if (numPathParams > 0) {
@@ -672,8 +672,7 @@ function dispatchForOperationBody(
       case "Text":
         if (bodyParam && !go.isLiteralParameter(bodyParam.style)) {
           imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/fake", "azfake");
-          content += `${indent.get()}body, err := server.UnmarshalRequestAsText(req)\n`;
-          content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+          content += emitTextBodyUnmarshal(pkg, bodyParam, imports, indent);
         }
         break;
     }
@@ -919,7 +918,7 @@ function dispatchForOperationBody(
     );
   }
 
-  const apiCall = `:= ${receiverName}.srv.${fixUpMethodName(method)}(${populateApiParams(pkg, method, result.params, imports)})`;
+  const apiCall = `:= ${receiverName}.srv.${helpers.fixUpMethodName(method)}(${populateApiParams(pkg, method, result.params, imports)})`;
   if (method.kind === "pageableMethod") {
     content += `resp ${apiCall}\n`;
     return content;
@@ -927,6 +926,76 @@ function dispatchForOperationBody(
   content += `${indent.get()}respr, errRespr ${apiCall}\n`;
   content += `${indent.get()}if respErr := server.GetError(errRespr, req); respErr != nil {\n`;
   content += `${indent.push().get()}return nil, respErr\n${indent.pop().get()}}\n`;
+  return content;
+}
+
+function emitTextBodyUnmarshal(
+  pkg: go.FakePackage,
+  bodyParam: go.BodyParameter,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+): string {
+  const typeName = go.getTypeDeclaration(bodyParam.type, pkg);
+  const optional = !go.isRequiredParameter(bodyParam.style);
+
+  let content = "";
+  if (optional) {
+    imports.addForType(bodyParam.type);
+    content += `${indent.get()}var body ${typeName}\n`;
+    content += `${indent.get()}if req.Body != nil {\n`;
+    indent.push();
+  }
+
+  content += `${indent.get()}bodyRaw, err := server.UnmarshalRequestAsText(req)\n`;
+  content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
+
+  const assignOrDecl = optional ? "=" : ":=";
+
+  switch (bodyParam.type.kind) {
+    case "string":
+      content += `${indent.get()}body ${assignOrDecl} bodyRaw\n`;
+      break;
+    case "constant":
+      imports.addForType(bodyParam.type);
+      if (bodyParam.type.type === "string") {
+        content += `${indent.get()}body ${assignOrDecl} ${typeName}(bodyRaw)\n`;
+      } else {
+        content += helpers.emitScalarParsing(
+          bodyParam.type,
+          "bodyRaw",
+          "bodyParsed",
+          imports,
+          indent,
+        );
+        content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
+        content += `${indent.get()}body ${assignOrDecl} ${typeName}(bodyParsed)\n`;
+      }
+      break;
+    case "scalar":
+      content += helpers.emitScalarParsing(
+        bodyParam.type,
+        "bodyRaw",
+        optional ? "bodyParsed" : "body",
+        imports,
+        indent,
+      );
+      content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
+      if (optional) {
+        content += `${indent.get()}body = bodyParsed\n`;
+      }
+      break;
+    case "time":
+      content += helpers.emitTimeParsing("bodyRaw", bodyParam.type, "bodyParsed", imports, indent);
+      content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
+      content += `${indent.get()}body ${assignOrDecl} bodyParsed\n`;
+      break;
+    default:
+      throw new CodegenError("InternalError", `unhandled text body type ${bodyParam.type.kind}`);
+  }
+
+  if (optional) {
+    content += `${indent.pop().get()}}\n`;
+  }
   return content;
 }
 
@@ -966,7 +1035,7 @@ function dispatchForLROBody(
   imports: ImportManager,
   indent: helpers.Indentation,
 ): string {
-  const operationName = fixUpMethodName(method);
+  const operationName = helpers.fixUpMethodName(method);
   const localVarName = naming.uncapitalize(operationName);
   const operationStateMachine = `${receiverName}.${naming.uncapitalize(operationName)}`;
   let content = `${indent.get()}${localVarName} := ${operationStateMachine}.get(req)\n`;
@@ -1013,7 +1082,7 @@ function dispatchForPagerBody(
   imports: ImportManager,
   indent: helpers.Indentation,
 ): string {
-  const operationName = fixUpMethodName(method);
+  const operationName = helpers.fixUpMethodName(method);
   const localVarName = naming.uncapitalize(operationName);
   const operationStateMachine = `${receiverName}.${naming.uncapitalize(operationName)}`;
   let content = `${indent.get()}${localVarName} := ${operationStateMachine}.get(req)\n`;
@@ -1065,7 +1134,15 @@ function createPathParamsRegex(method: go.MethodType, pathParams: Array<go.PathP
   urlPath = urlPath.replace(/([.$*+()])/g, "\\$1");
   for (const param of pathParams) {
     const toReplace = `{${param.pathSegment}}`;
-    let replaceWith = `(?P<${sanitizeRegexpCaptureGroupName(param.pathSegment)}>[!#&$-;=?-\\[\\]_a-zA-Z0-9~%@]+)`;
+    // most path params are URL encoded by the client, so their values never
+    // contain a path delimiter and the capture must exclude '/' to avoid
+    // consuming subsequent path segments. however, skip-encoding params
+    // (allowReserved, e.g. ARM scopes/resource IDs such as {+scope}) are
+    // inserted unescaped and can span multiple path segments, so their
+    // captures must also admit '/'.
+    // NOTE: Use "$$" because "$&" and "$'" are special replacement patterns.
+    const pathDelimiter = param.isEncoded ? "" : "/";
+    let replaceWith = `(?P<${sanitizeRegexpCaptureGroupName(param.pathSegment)}>[a-zA-Z0-9._~%!$$&'()*+,;=:@${pathDelimiter}-]+)`;
     if (param.style === "optional" || param.style === "flag") {
       replaceWith += "?";
     }
@@ -1454,6 +1531,8 @@ function parseHeaderPathQueryParams(
             if (param.bodyFormat === "binary") {
               imports.add("io");
               paramNilCheck.push("req.Body != nil");
+            } else if (param.bodyFormat === "Text") {
+              paramNilCheck.push("req.Body != nil");
             } else {
               imports.add("reflect");
               paramNilCheck.push("!reflect.ValueOf(body).IsZero()");
@@ -1616,7 +1695,8 @@ function getFinalParamValue(
     (param.kind === "bodyParam" ||
       go.isFormBodyParameter(param) ||
       param.kind === "multipartFormBodyParam") &&
-    param.type.kind === "time"
+    param.type.kind === "time" &&
+    (param.kind !== "bodyParam" || param.bodyFormat !== "Text")
   ) {
     // time types in the body have been unmarshalled into our time helpers thus require a cast to time.Time
     return `time.Time(${paramValue})`;

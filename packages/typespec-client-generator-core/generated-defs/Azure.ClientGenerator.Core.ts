@@ -76,22 +76,22 @@ export type ClientNameDecorator = (
  *
  * @param target The target operation, namespace, or interface.
  * @param flag Whether to generate the operation as a convenience method or not.
- * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * @param scope Specifies the Java and/or C# emitters to which the decorator applies. The scope must include `java`, `csharp`, or both. Omitting the scope or excluding both languages produces a warning.
  *
- * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ * **Supported language identifiers:** `csharp` and `java`.
  *
  * **Valid patterns:**
- * - Single language: `"python"`
- * - Multiple languages (comma-separated): `"python, java"`
- * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
+ * - Single language: `"java"`
+ * - Both languages (comma-separated): `"java, csharp"`
+ * - Negation that leaves at least one supported language: `"!java"`
  * @example Apply to a single operation
  * ```typespec
- * @convenientAPI(false)
- * op test: void;
+ * @convenientAPI(false, "java")
+ * op test(): void;
  * ```
  * @example Apply to all operations in an interface
  * ```typespec
- * @convenientAPI(false)
+ * @convenientAPI(false, "java, csharp")
  * interface MyOperations {
  *   op test1(): void;
  *   op test2(): void;
@@ -99,7 +99,7 @@ export type ClientNameDecorator = (
  * ```
  * @example Apply to all operations in a namespace
  * ```typespec
- * @convenientAPI(false)
+ * @convenientAPI(false, "csharp")
  * namespace MyService {
  *   op test1(): void;
  *   op test2(): void;
@@ -119,22 +119,22 @@ export type ConvenientAPIDecorator = (
  *
  * @param target The target operation, namespace, or interface.
  * @param flag Whether to generate the operation as a protocol method or not.
- * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * @param scope Specifies the Java and/or C# emitters to which the decorator applies. The scope must include `java`, `csharp`, or both. Omitting the scope or excluding both languages produces a warning.
  *
- * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ * **Supported language identifiers:** `csharp` and `java`.
  *
  * **Valid patterns:**
- * - Single language: `"python"`
- * - Multiple languages (comma-separated): `"python, java"`
- * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
+ * - Single language: `"csharp"`
+ * - Both languages (comma-separated): `"java, csharp"`
+ * - Negation that leaves at least one supported language: `"!csharp"`
  * @example Apply to a single operation
  * ```typespec
- * @protocolAPI(false)
- * op test: void;
+ * @protocolAPI(false, "csharp")
+ * op test(): void;
  * ```
  * @example Apply to all operations in an interface
  * ```typespec
- * @protocolAPI(false)
+ * @protocolAPI(false, "java, csharp")
  * interface MyOperations {
  *   op test1(): void;
  *   op test2(): void;
@@ -142,7 +142,7 @@ export type ConvenientAPIDecorator = (
  * ```
  * @example Apply to all operations in a namespace
  * ```typespec
- * @protocolAPI(false)
+ * @protocolAPI(false, "java")
  * namespace MyService {
  *   op test1(): void;
  *   op test2(): void;
@@ -197,13 +197,12 @@ export type ClientDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
- *
- *
- *
- * @deprecated Use `@client` instead. The `@operationGroup` decorator is deprecated. Sub clients should be represented using `@client`.
  * Define the sub client generated in the client SDK.
  * If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
  * This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
+ *
+ * Deprecated: use `@client` instead. Sub clients should be represented using `@client`.
+ *
  * @param target The target namespace or interface that you want to define as a sub client.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
@@ -1090,8 +1089,10 @@ export type ClientDocDecorator = (
  *
  * @param target The type you want to apply the option to.
  * @param name The name of the option (e.g., "enableFeatureFoo").
- * @param value The value of the option. Can be any type; emitters will cast as needed.
- * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * @param value The value of the option. Can be a literal value (string, boolean, number, etc.) or a
+ * reference to a TypeSpec model, in which case the referenced model (including its own decorators,
+ * such as `@alternateType`) is preserved so the scoped emitter can resolve it. Emitters will cast as needed.
+ * @param scope Specifies the target language emitters to which the decorator applies. Every use must provide an explicit scope; omitting it produces an additional warning.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
  *
@@ -1107,12 +1108,18 @@ export type ClientDocDecorator = (
  *   prop: string;
  * }
  * ```
+ * @example Apply an experimental option that references a model
+ * ```typespec
+ * #suppress "@azure-tools/typespec-client-generator-core/client-option" "preview feature for csharp"
+ * @clientOption("composes", OpenAICreateResponseOptions, "csharp")
+ * model FoundryCreateResponseOptions {}
+ * ```
  */
 export type ClientOptionDecorator = (
   context: DecoratorContext,
   target: Type,
   name: string,
-  value: unknown,
+  value: Type | unknown,
   scope?: string,
 ) => DecoratorValidatorCallbacks | void;
 

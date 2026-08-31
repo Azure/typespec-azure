@@ -207,6 +207,9 @@ type BodyRootsClient struct {
 //   - credential - used to authorize requests. Usually a credential from azidentity.
 //   - options - Contains optional client configuration. Pass nil to accept the default values.
 func NewBodyRootsClient(subscriptionID string, credential azcore.TokenCredential, options *arm.ClientOptions) (*BodyRootsClient, error) {
+	if subscriptionID == "" {
+		return nil, errors.New("parameter subscriptionID cannot be empty")
+	}
 	cl, err := arm.NewClient(moduleName, moduleVersion, credential, options)
 	if err != nil {
 		return nil, err
@@ -235,8 +238,7 @@ func (client *BodyRootsClient) Action(ctx context.Context, apiVersion string, re
 		return BodyRootsClientActionResponse{}, err
 	}
 	if !runtime.HasStatusCode(httpResp, http.StatusNoContent) {
-		err = runtime.NewResponseError(httpResp)
-		return BodyRootsClientActionResponse{}, err
+		return BodyRootsClientActionResponse{}, runtime.NewResponseError(httpResp)
 	}
 	return BodyRootsClientActionResponse{}, nil
 }
@@ -245,7 +247,7 @@ func (client *BodyRootsClient) Action(ctx context.Context, apiVersion string, re
 func (client *BodyRootsClient) actionCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, bodyRootName string, action ActionRequest, _ *BodyRootsClientActionOptions) (*policy.Request, error) {
 	urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/bodyRoots/{bodyRootName}/action"
 	if client.subscriptionID == "" {
-		return nil, errors.New("parameter client.subscriptionID cannot be empty")
+		return nil, errors.New("parameter subscriptionID cannot be empty")
 	}
 	urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
 	if resourceGroupName == "" {
@@ -286,19 +288,14 @@ func (client *BodyRootsClient) Get(ctx context.Context, apiVersion string, resou
 	if err != nil {
 		return BodyRootsClientGetResponse{}, err
 	}
-	if !runtime.HasStatusCode(httpResp, http.StatusOK) {
-		err = runtime.NewResponseError(httpResp)
-		return BodyRootsClientGetResponse{}, err
-	}
-	resp, err := client.getHandleResponse(httpResp)
-	return resp, err
+	return client.getHandleResponse(httpResp, http.StatusOK)
 }
 
 // getCreateRequest creates the Get request.
 func (client *BodyRootsClient) getCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, bodyRootName string, _ *BodyRootsClientGetOptions) (*policy.Request, error) {
 	urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/bodyRoots/{bodyRootName}"
 	if client.subscriptionID == "" {
-		return nil, errors.New("parameter client.subscriptionID cannot be empty")
+		return nil, errors.New("parameter subscriptionID cannot be empty")
 	}
 	urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
 	if resourceGroupName == "" {
@@ -321,8 +318,11 @@ func (client *BodyRootsClient) getCreateRequest(ctx context.Context, apiVersion 
 }
 
 // getHandleResponse handles the Get response.
-func (client *BodyRootsClient) getHandleResponse(resp *http.Response) (BodyRootsClientGetResponse, error) {
+func (client *BodyRootsClient) getHandleResponse(resp *http.Response, successCodes ...int) (BodyRootsClientGetResponse, error) {
 	result := BodyRootsClientGetResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	if err := runtime.UnmarshalAsJSON(resp, &result.BodyRoot); err != nil {
 		return BodyRootsClientGetResponse{}, err
 	}
@@ -345,19 +345,14 @@ func (client *BodyRootsClient) Put(ctx context.Context, apiVersion string, resou
 	if err != nil {
 		return BodyRootsClientPutResponse{}, err
 	}
-	if !runtime.HasStatusCode(httpResp, http.StatusOK, http.StatusCreated) {
-		err = runtime.NewResponseError(httpResp)
-		return BodyRootsClientPutResponse{}, err
-	}
-	resp, err := client.putHandleResponse(httpResp)
-	return resp, err
+	return client.putHandleResponse(httpResp, http.StatusOK, http.StatusCreated)
 }
 
 // putCreateRequest creates the Put request.
 func (client *BodyRootsClient) putCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, bodyRootName string, resource BodyRoot, _ *BodyRootsClientPutOptions) (*policy.Request, error) {
 	urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/bodyRoots/{bodyRootName}"
 	if client.subscriptionID == "" {
-		return nil, errors.New("parameter client.subscriptionID cannot be empty")
+		return nil, errors.New("parameter subscriptionID cannot be empty")
 	}
 	urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
 	if resourceGroupName == "" {
@@ -384,8 +379,11 @@ func (client *BodyRootsClient) putCreateRequest(ctx context.Context, apiVersion 
 }
 
 // putHandleResponse handles the Put response.
-func (client *BodyRootsClient) putHandleResponse(resp *http.Response) (BodyRootsClientPutResponse, error) {
+func (client *BodyRootsClient) putHandleResponse(resp *http.Response, successCodes ...int) (BodyRootsClientPutResponse, error) {
 	result := BodyRootsClientPutResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	if err := runtime.UnmarshalAsJSON(resp, &result.BodyRoot); err != nil {
 		return BodyRootsClientPutResponse{}, err
 	}

@@ -239,12 +239,7 @@ func (client *TenantItemsClient) Get(ctx context.Context, apiVersion string, ten
 	if err != nil {
 		return TenantItemsClientGetResponse{}, err
 	}
-	if !runtime.HasStatusCode(httpResp, http.StatusOK) {
-		err = runtime.NewResponseError(httpResp)
-		return TenantItemsClientGetResponse{}, err
-	}
-	resp, err := client.getHandleResponse(httpResp)
-	return resp, err
+	return client.getHandleResponse(httpResp, http.StatusOK)
 }
 
 // getCreateRequest creates the Get request.
@@ -266,8 +261,11 @@ func (client *TenantItemsClient) getCreateRequest(ctx context.Context, apiVersio
 }
 
 // getHandleResponse handles the Get response.
-func (client *TenantItemsClient) getHandleResponse(resp *http.Response) (TenantItemsClientGetResponse, error) {
+func (client *TenantItemsClient) getHandleResponse(resp *http.Response, successCodes ...int) (TenantItemsClientGetResponse, error) {
 	result := TenantItemsClientGetResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	if err := runtime.UnmarshalAsJSON(resp, &result.TenantItem); err != nil {
 		return TenantItemsClientGetResponse{}, err
 	}
@@ -287,34 +285,48 @@ func (client *TenantItemsClient) NewListPager(apiVersion string, options *Tenant
 			if page != nil {
 				nextLink = *page.NextLink
 			}
-			resp, err := runtime.FetcherForNextLink(ctx, client.internal.Pipeline(), nextLink, func(ctx context.Context) (*policy.Request, error) {
-				return client.listCreateRequest(ctx, apiVersion, options)
-			}, nil)
+			req, err := client.listCreateRequest(ctx, apiVersion, nextLink, options)
 			if err != nil {
 				return TenantItemsClientListResponse{}, err
 			}
-			return client.listHandleResponse(resp)
+			resp, err := client.internal.Pipeline().Do(req)
+			if err != nil {
+				return TenantItemsClientListResponse{}, err
+			}
+			return client.listHandleResponse(resp, http.StatusOK)
 		},
 	})
 }
 
 // listCreateRequest creates the List request.
-func (client *TenantItemsClient) listCreateRequest(ctx context.Context, apiVersion string, _ *TenantItemsClientListOptions) (*policy.Request, error) {
-	urlPath := "/providers/Microsoft.Test/tenantItems"
-	req, err := runtime.NewRequest(ctx, http.MethodGet, runtime.JoinPaths(client.internal.Endpoint(), urlPath))
+func (client *TenantItemsClient) listCreateRequest(ctx context.Context, apiVersion string, nextLink string, _ *TenantItemsClientListOptions) (*policy.Request, error) {
+	firstPage := nextLink == ""
+	var req *policy.Request
+	var err error
+	if firstPage {
+		urlPath := "/providers/Microsoft.Test/tenantItems"
+		req, err = runtime.NewRequest(ctx, http.MethodGet, runtime.JoinPaths(client.internal.Endpoint(), urlPath))
+	} else {
+		req, err = runtime.NewRequestForNextLink(ctx, http.MethodGet, client.internal.Endpoint(), nextLink)
+	}
 	if err != nil {
 		return nil, err
 	}
-	reqQP := req.Raw().URL.Query()
-	reqQP.Set("api-version", apiVersion)
-	req.Raw().URL.RawQuery = strings.ReplaceAll(reqQP.Encode(), "+", "%20")
-	req.Raw().Header["Accept"] = []string{"application/json"}
+	if firstPage {
+		reqQP := req.Raw().URL.Query()
+		reqQP.Set("api-version", apiVersion)
+		req.Raw().URL.RawQuery = strings.ReplaceAll(reqQP.Encode(), "+", "%20")
+		req.Raw().Header["Accept"] = []string{"application/json"}
+	}
 	return req, nil
 }
 
 // listHandleResponse handles the List response.
-func (client *TenantItemsClient) listHandleResponse(resp *http.Response) (TenantItemsClientListResponse, error) {
+func (client *TenantItemsClient) listHandleResponse(resp *http.Response, successCodes ...int) (TenantItemsClientListResponse, error) {
 	result := TenantItemsClientListResponse{}
+	if !runtime.HasStatusCode(resp, successCodes...) {
+		return result, runtime.NewResponseError(resp)
+	}
 	if err := runtime.UnmarshalAsJSON(resp, &result.TenantItemListResult); err != nil {
 		return TenantItemsClientListResponse{}, err
 	}
