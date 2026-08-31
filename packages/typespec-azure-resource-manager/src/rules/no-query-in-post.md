@@ -43,13 +43,19 @@ model ActionResponse {
   result: string;
 }
 
+model ActionParameters {
+  @query mode?: string;
+}
+
 @armResourceOperations
 interface Widgets {
-  @post
-  @armResourceAction(Widget)
-  doAction(...ResourceInstanceParameters<Widget>, @query mode?: string, @body body: ActionRequest):
-    | ArmResponse<ActionResponse>
-    | ErrorResponse;
+  doAction is ArmResourceActionSync<
+    Widget,
+    ActionRequest,
+    ActionResponse,
+    DefaultBaseParameters<Widget>,
+    ActionParameters
+  >;
 }
 ```
 
