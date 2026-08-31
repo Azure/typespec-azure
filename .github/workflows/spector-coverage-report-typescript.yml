@@ -558,7 +558,7 @@ jobs:
               "",
               `Results should be commented on issue ${owner}/${repo}#${coverageIssueNumber}.`,
               "",
-              "cc: @JialinHuang803 @kazrael2119",
+              "Assignment: @JialinHuang803 @kazrael2119",
             ].join("\n");
 
             const title = `[Copilot] Verify and implement Spector tests for ${groups.length} scenario groups`;
