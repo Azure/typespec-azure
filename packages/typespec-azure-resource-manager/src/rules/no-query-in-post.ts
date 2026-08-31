@@ -2,11 +2,11 @@ import { createRule, fileRef, paramMessage } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 import { isArmProviderNamespace } from "../namespace.js";
 
-export const noQueryParametersInPostRule = createRule({
-  name: "no-query-parameters-in-post",
-  docs: fileRef.fromPackageRoot("src/rules/no-query-parameters-in-post.md"),
+export const noQueryInPostRule = createRule({
+  name: "no-query-in-post",
+  docs: fileRef.fromPackageRoot("src/rules/no-query-in-post.md"),
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-query-parameters-in-post",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-query-in-post",
   description: "ARM POST operations must not declare query parameters other than api-version.",
   messages: {
     default: paramMessage`Query parameter '${"name"}' should be moved into the POST request body. POST operations must not contain query parameters other than api-version.`,

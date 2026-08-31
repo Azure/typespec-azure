@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
-import { noQueryParametersInPostRule } from "../../src/rules/no-query-parameters-in-post.js";
+import { noQueryInPostRule } from "../../src/rules/no-query-in-post.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -15,7 +15,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    noQueryParametersInPostRule,
+    noQueryInPostRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
@@ -52,7 +52,7 @@ it("emits a warning for an ARM POST resource action with an extra query paramete
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/no-query-parameters-in-post",
+      code: "@azure-tools/typespec-azure-resource-manager/no-query-in-post",
       message:
         "Query parameter 'mode' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.",
     });
@@ -92,12 +92,12 @@ it("emits a warning for each extra query parameter on an ARM POST operation", as
     )
     .toEmitDiagnostics([
       {
-        code: "@azure-tools/typespec-azure-resource-manager/no-query-parameters-in-post",
+        code: "@azure-tools/typespec-azure-resource-manager/no-query-in-post",
         message:
           "Query parameter 'mode' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.",
       },
       {
-        code: "@azure-tools/typespec-azure-resource-manager/no-query-parameters-in-post",
+        code: "@azure-tools/typespec-azure-resource-manager/no-query-in-post",
         message:
           "Query parameter 'format' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.",
       },
@@ -126,7 +126,7 @@ it("emits a warning for a non-resource ARM POST operation with an extra query pa
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/no-query-parameters-in-post",
+      code: "@azure-tools/typespec-azure-resource-manager/no-query-in-post",
       message:
         "Query parameter '$filter' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.",
     });
@@ -186,7 +186,7 @@ it("emits a warning when the api-version query parameter uses different casing",
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/no-query-parameters-in-post",
+      code: "@azure-tools/typespec-azure-resource-manager/no-query-in-post",
       message:
         "Query parameter 'API-Version' should be moved into the POST payload. POST operations must not contain query parameters other than api-version.",
     });

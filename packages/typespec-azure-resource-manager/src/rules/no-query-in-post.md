@@ -1,9 +1,9 @@
 ---
-title: "no-query-parameters-in-post"
+title: "no-query-in-post"
 ---
 
 ```text title="Full name"
-@azure-tools/typespec-azure-resource-manager/no-query-parameters-in-post
+@azure-tools/typespec-azure-resource-manager/no-query-in-post
 ```
 
 ARM POST operations should pass request-specific input in the request body, not
