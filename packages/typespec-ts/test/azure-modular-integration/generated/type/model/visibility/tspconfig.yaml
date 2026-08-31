@@ -3,5 +3,6 @@ emit:
 options:
   "@azure-tools/typespec-ts":
     emitter-output-dir: "{project-root}"
+    experimental-split-models-by-visibility: true
     package-details:
-      name: "@msinternal/client-structure-twoopgroup"
+      name: "@msinternal/type-model-visibility"
