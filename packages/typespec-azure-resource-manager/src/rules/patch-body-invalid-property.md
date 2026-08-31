@@ -1,11 +1,3 @@
----
-title: "patch-body-invalid-property"
----
-
-```text title="Full name"
-@azure-tools/typespec-azure-resource-manager/patch-body-invalid-property
-```
-
 ARM PATCH request body properties must be update-safe. A property emitted in an ARM PATCH body must not be required, must not define a default value, and must not be create-only.
 
 ## Impact
