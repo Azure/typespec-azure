@@ -1,11 +1,3 @@
----
-title: "no-query-in-post"
----
-
-```text title="Full name"
-@azure-tools/typespec-azure-resource-manager/no-query-in-post
-```
-
 ARM POST operations should pass request-specific input in the request body, not
 as query parameters. Keeping POST inputs in the payload gives SDKs a stable
 request shape and keeps ARM APIs consistent with Azure Resource Manager RPC
