@@ -531,6 +531,13 @@ describe("url-template", () => {
       assert("{?%24Select}", "?%24Select=name,value");
     });
 
+    it("should not double encode a pre-encoded query parameter name while still encoding values that need it", () => {
+      const assert = createAssertion({
+        "%24Select": ["a b", "x=y", "*"],
+      });
+      assert("{?%24Select*}", "?%24Select=a%20b&%24Select=x%3Dy&%24Select=%2A");
+    });
+
     it("should not double encode a pre-encoded query parameter name with an associative array value", () => {
       const assert = createAssertion({
         "%24Select": { name: "value" },
