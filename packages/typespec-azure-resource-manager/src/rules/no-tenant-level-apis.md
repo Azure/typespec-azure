@@ -1,11 +1,3 @@
----
-title: "no-tenant-level-apis"
----
-
-```text title="Full name"
-@azure-tools/typespec-azure-resource-manager/no-tenant-level-apis
-```
-
 Tenant-level ARM APIs are strongly discouraged because they operate outside subscription and
 resource-group boundaries and require additional security review. Define resource operations at
 subscription or resource-group scope whenever possible.
