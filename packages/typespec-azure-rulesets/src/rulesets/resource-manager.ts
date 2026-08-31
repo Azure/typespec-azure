@@ -62,7 +62,6 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/no-override-props": true,
     "@azure-tools/typespec-azure-resource-manager/no-empty-model": true,
     "@azure-tools/typespec-azure-resource-manager/arm-common-types-version": true,
-    // Disabled for staged rollout: existing Azure specs and samples still use older ARM common-types versions.
     "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types": false,
     "@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-child-resources": true,
     "@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-lifecycle-operations": true,
