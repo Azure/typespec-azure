@@ -291,22 +291,8 @@ Use the lintdiff `rule.md` as source material, but rewrite it as official
 library documentation:
 
 - remove lintdiff front matter and harness-only notes
-- add Docusaurus front matter with the official TypeSpec rule name:
-
-  ```md
-  ---
-  title: "<rule-name>"
-  ---
-  ```
-
-- include a full-name block immediately after the front matter:
-
-  ````md
-  ```text title="Full name"
-  @azure-tools/<target-package>/<rule-name>
-  ```
-  ````
-
+- do not add a rule heading or `Full name` block; `tspd doc` generates that
+  metadata
 - explain what the rule checks and why for TypeSpec authors
 - focus the rationale on TypeSpec authoring, generated SDKs, API consistency, and
   Azure emitter/tooling behavior
