@@ -80,10 +80,6 @@ model ActionResponse {
 
 @armResourceOperations
 interface Widgets {
-  @post
-  @armResourceAction(Widget)
-  doAction(...ResourceInstanceParameters<Widget>, @body body: ActionRequest):
-    | ArmResponse<ActionResponse>
-    | ErrorResponse;
+  doAction is ArmResourceActionSync<Widget, ActionRequest, ActionResponse>;
 }
 ```
