@@ -1,17 +1,13 @@
 import { Tester } from "#test/test-host.js";
 import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { useEnumInsteadOfBooleanRule } from "../../src/rules/use-enum-instead-of-boolean.js";
+import { noBooleanRule } from "../../src/rules/no-boolean.js";
 
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
   const runner = await Tester.createInstance();
-  tester = createLinterRuleTester(
-    runner,
-    useEnumInsteadOfBooleanRule,
-    "@azure-tools/typespec-azure-core",
-  );
+  tester = createLinterRuleTester(runner, noBooleanRule, "@azure-tools/typespec-azure-core");
 });
 
 describe("boolean shapes should use descriptive extensible enums", () => {
@@ -25,7 +21,7 @@ describe("boolean shapes should use descriptive extensible enums", () => {
         `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-core/use-enum-instead-of-boolean",
+        code: "@azure-tools/typespec-azure-core/no-boolean",
         message:
           "Consider using an extensible enum instead of a boolean property so the API shape is more descriptive.",
       });
@@ -41,7 +37,7 @@ describe("boolean shapes should use descriptive extensible enums", () => {
         `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-core/use-enum-instead-of-boolean",
+        code: "@azure-tools/typespec-azure-core/no-boolean",
       });
   });
 
@@ -54,7 +50,7 @@ describe("boolean shapes should use descriptive extensible enums", () => {
         `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-core/use-enum-instead-of-boolean",
+        code: "@azure-tools/typespec-azure-core/no-boolean",
       });
   });
 
@@ -67,7 +63,7 @@ describe("boolean shapes should use descriptive extensible enums", () => {
         `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-core/use-enum-instead-of-boolean",
+        code: "@azure-tools/typespec-azure-core/no-boolean",
       });
   });
 

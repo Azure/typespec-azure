@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-Add the `use-enum-instead-of-boolean` lint rule that recommends descriptive extensible enums instead of boolean API shapes when semantic values matter.
+Add the `no-boolean` lint rule that recommends descriptive extensible enums instead of boolean API shapes when semantic values matter.
