@@ -1,7 +1,3 @@
----
-title: "use-latest-version-of-common-types"
----
-
 ARM services should use the latest ARM common-types version available in
 `Azure.ResourceManager.CommonTypes.Versions`. This keeps TypeSpec services,
 generated SDKs, and Azure tooling aligned with the current ARM common schemas.
