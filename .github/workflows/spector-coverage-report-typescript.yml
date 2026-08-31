@@ -39,7 +39,7 @@ jobs:
       - uses: ./.github/actions/setup
 
       - name: Install dependencies
-        run: pnpm install --filter "@azure-tools/typespec-ts..."
+        run: pnpm install --filter "@azure-tools/typespec-ts..." --filter "@typespec/monorepo"
         timeout-minutes: 15
 
       - name: Build typespec-ts package
