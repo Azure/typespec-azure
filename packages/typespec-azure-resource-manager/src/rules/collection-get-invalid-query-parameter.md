@@ -1,11 +1,3 @@
----
-title: "collection-get-invalid-query-parameter"
----
-
-```text title="Full name"
-@azure-tools/typespec-azure-resource-manager/collection-get-invalid-query-parameter
-```
-
 ARM collection GET operations may use only the standard `api-version` and `$filter` query parameters. Additional query parameters make list operations inconsistent across resource providers and introduce nonstandard method parameters in generated SDKs.
 
 The rule applies to GET operations whose emitted ARM path identifies a resource collection. Query parameter names are case-sensitive, so `$FILTER` is not equivalent to `$filter`.
