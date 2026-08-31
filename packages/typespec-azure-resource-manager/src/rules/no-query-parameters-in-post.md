@@ -11,7 +11,7 @@ as query parameters. Keeping POST inputs in the payload gives SDKs a stable
 request shape and keeps ARM APIs consistent with Azure Resource Manager RPC
 guidelines.
 
-The `api-version` query parameter is allowed.
+Only the standard  `api-version` query parameter is allowed.
 
 ## Impact
 
