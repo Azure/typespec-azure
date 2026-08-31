@@ -456,6 +456,7 @@ jobs:
 
             const taskMarker = "<!-- typespec-ts-spector-implementation-task -->";
             const legacyTaskTitlePrefix = "[Copilot] Verify and implement Spector tests for ";
+            // cspell:ignore Jialin kazrael
             const taskAssignees = ["JialinHuang803", "kazrael2119"];
             const openIssues = await github.paginate(github.rest.issues.listForRepo, {
               owner,
