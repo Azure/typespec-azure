@@ -1,5 +1,7 @@
 ARM point operations using GET, PUT, PATCH, or DELETE must not define query parameters other than `api-version`.
 
+A point operation targets one specific ARM resource instance. Its path contains the provider namespace followed by one or more resource type and resource name pairs, such as `/providers/Microsoft.Contoso/widgets/{widgetName}`. Collection and action operations are not point operations.
+
 ## Impact
 
 - **Area:** API, SDK
