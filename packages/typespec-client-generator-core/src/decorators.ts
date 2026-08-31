@@ -102,6 +102,28 @@ import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
+function isSemanticallyEqualScope(left: string, right: string): boolean {
+  const [leftNegationScopes, leftScopes] = parseScopes(left);
+  const [rightNegationScopes, rightScopes] = parseScopes(right);
+  return (
+    isEqualScopeList(leftNegationScopes, rightNegationScopes) &&
+    isEqualScopeList(leftScopes, rightScopes)
+  );
+}
+
+function isEqualScopeList(left: string[] | undefined, right: string[] | undefined): boolean {
+  const normalizedLeft = normalizeScopeList(left);
+  const normalizedRight = normalizeScopeList(right);
+  return (
+    normalizedLeft.length === normalizedRight.length &&
+    normalizedLeft.every((scope, index) => scope === normalizedRight[index])
+  );
+}
+
+function normalizeScopeList(scopes: string[] | undefined): string[] {
+  return [...new Set(scopes?.filter((scope) => scope !== "") ?? [])].sort();
+}
+
 function setScopedDecoratorData(
   context: DecoratorContext,
   decorator: DecoratorFunction,
@@ -181,7 +203,11 @@ export const $client: ClientDecorator = (
     optionsScopeConfig?.kind === "String" ? optionsScopeConfig.value : undefined;
   const legacyScope = normalizeScope(scope);
 
-  if (optionsScope !== undefined && legacyScope !== undefined && optionsScope !== legacyScope) {
+  if (
+    optionsScope !== undefined &&
+    legacyScope !== undefined &&
+    !isSemanticallyEqualScope(optionsScope, legacyScope)
+  ) {
     reportDiagnostic(context.program, {
       code: "conflicting-scope",
       format: {
@@ -1989,9 +2015,33 @@ export const $clientOption: ClientOptionDecorator = (
     target: context.decoratorTarget,
   });
 
+  const normalizedScope = normalizeScope(scope);
+
+  if (scope !== undefined && normalizedScope === undefined) {
+    return {
+      onTargetFinish: () => [
+        createDiagnostic({
+          code: "decorator-requires-scope",
+          format: {
+            decoratorName: "clientOption",
+            allowedScopes: "a language scope",
+          },
+          target: context.decoratorTarget,
+        }),
+      ],
+    };
+  }
+
   // Store the option data - each decorator application is stored separately
   // The decorator info will be exposed via the decorators array on SDK types
-  setScopedDecoratorData(context, $clientOption, clientOptionKey, target, { name, value }, scope);
+  setScopedDecoratorData(
+    context,
+    $clientOption,
+    clientOptionKey,
+    target,
+    { name, value },
+    normalizedScope,
+  );
 
   // clientOption must be scoped to any language
   if (scope === undefined) {

@@ -1,7 +1,7 @@
 import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { getAccess, getClientNameOverride } from "../../src/decorators.js";
+import { getAccess, getClientNameOverride, getClientOptionValue } from "../../src/decorators.js";
 import { getSdkModel } from "../../src/types.js";
 import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
@@ -130,6 +130,31 @@ describe("Azure.ClientGenerator.Core.DecoratorOptions", () => {
     });
     strictEqual(getClientNameOverride(javaContext, func), undefined);
     strictEqual(getAccess(javaContext, func), "public");
+  });
+});
+
+describe("@clientOption scope requirement", () => {
+  it("reports decorator-requires-scope for an empty DecoratorOptions bag", async () => {
+    const [{ program, UseOption }, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+      @clientOption("x", "y", #{})
+      model ${t.model("UseOption")} {}
+    `);
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/client-option",
+        severity: "warning",
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
+        severity: "warning",
+      },
+    ]);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(getClientOptionValue(context, UseOption, "x"), undefined);
   });
 });
 

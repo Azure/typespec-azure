@@ -237,6 +237,26 @@ describe("@client scope in ClientOptions", () => {
     });
     strictEqual(listClients(pythonContext).length, 0);
   });
+
+  it("does not report a warning when ClientOptions.scope and the legacy positional scope are semantically equivalent", async () => {
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+        @client({service: MyClient, scope: "csharp, python"}, "python,csharp")
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    expectDiagnosticEmpty(diagnostics);
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(listClients(pythonContext).length, 1);
+  });
 });
 
 describe("listClients without @client", () => {
