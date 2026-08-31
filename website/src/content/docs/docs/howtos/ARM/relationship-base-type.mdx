@@ -1,0 +1,93 @@
+---
+title: Relationship Base Type
+description: Defining ARM Relationship extension resources
+---
+
+:::caution
+The Relationship base type is **experimental**. Applying it in a provider namespace emits the
+`basetypes-experimental` warning, which you must explicitly suppress while the feature is
+experimental.
+:::
+
+A _Relationship_ is an extension resource that records a connection from a source ARM resource to
+a target ARM resource. Import the Relationship base-type namespace:
+
+```typespec
+using Azure.ResourceManager.BaseTypes.Relationships;
+```
+
+## Define relationship properties
+
+Derive your property bag from `RelationshipProperties`. It provides the ARM-managed base-type
+descriptor, source and target resource and tenant identifiers, and a read-only provisioning state.
+You can supply a service-specific provisioning-state union and add service-specific metadata:
+
+```typespec
+@Azure.Core.lroStatus
+union DependencyOfProvisioningState {
+  ResourceProvisioningState,
+  Accepted: "Accepted",
+  Provisioning: "Provisioning",
+  Deleting: "Deleting",
+  string,
+}
+
+model DependencyOfMetadata {
+  sourceType: string;
+  targetType: string;
+  description?: string;
+}
+
+model DependencyOfProperties
+  is RelationshipProperties<ProvisioningState = DependencyOfProvisioningState> {
+  /** Service-specific metadata about the relationship. */
+  metadata: DependencyOfMetadata;
+}
+```
+
+## Define the relationship resource
+
+The `Relationship<Properties>` template creates an extension resource and automatically applies
+`@azureBaseType` for the Relationship contract. Add the standard resource-name spread. Override
+its defaults only when your API requires a different key, path segment, or pattern:
+
+```typespec
+#suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "Experimental BaseTypes"
+model DependencyOf is Relationship<DependencyOfProperties> {
+  ...ResourceNameParameter<
+    Resource = DependencyOf,
+    KeyName = "relationshipName",
+    SegmentName = "dependencyOf",
+    NamePattern = "^[a-zA-Z0-9_.-]{1,64}$"
+  >;
+}
+```
+
+The
+[`use-relationship-required-properties`](/docs/libraries/azure-resource-manager/rules/use-relationship-required-properties)
+rule validates that Relationship base-type declarations are extension resources with the required
+Relationship schema.
+
+## Define extension-resource operations
+
+Use the extension operation templates so the relationship can target the required source scope:
+
+```typespec
+interface DependencyOfOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+  get is Extension.Read<Scope, DependencyOf>;
+  create is Extension.CreateOrReplaceAsync<Scope, DependencyOf>;
+  update is Extension.CustomPatchAsync<
+    Scope,
+    DependencyOf,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<DependencyOf, DependencyOfProperties>
+  >;
+  delete is Extension.DeleteWithoutOkAsync<Scope, DependencyOf>;
+  list is Extension.ListByTarget<Scope, DependencyOf>;
+}
+
+@armResourceOperations
+interface DependencyOfRelationships extends DependencyOfOps<Extension.ScopeParameter> {}
+```
+
+For a complete working specification, see the
+[Relationship Base Type sample](https://github.com/Azure/typespec-azure/tree/main/packages/samples/specs/resource-manager/resource-types/relationship).

@@ -632,7 +632,7 @@ model Foo is TrackedResource<FooProperties> {
 ### `BillingDataProperty` {#Azure.ResourceManager.BillingDataProperty}
 
 Standard resource billing data property to represent the resource's current billing state.
-Spread this model directly into your resource property model when modeling e.g. prepaid resources.
+Spread this model directly into your resource properties model when modeling, for example, prepaid resources.
 
 ```typespec
 model Azure.ResourceManager.BillingDataProperty
@@ -3469,7 +3469,7 @@ union Azure.ResourceManager.CommonTypes.BillingState
 | Name     | Type         | Description                               |
 | -------- | ------------ | ----------------------------------------- |
 | Pending  | `"Pending"`  | Resource's billing has not yet started.   |
-| Active   | `"Active"`   | Resource's billing is activate.           |
+| Active   | `"Active"`   | Resource's billing is active.             |
 | Warned   | `"Warned"`   | Resource's billing is in a warning state. |
 | Inactive | `"Inactive"` | Resource's billing is inactive.           |
 
