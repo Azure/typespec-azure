@@ -40,6 +40,21 @@
     "message": "The ModelProperty named 'inlinePrimitive' should have a documentation or description, use doc comment /** */ to provide it."
   },
   {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'defaultedEnum' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'defaultedUnion' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'inlineAzureScalar' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
     "code": "@azure-tools/typespec-azure-core/known-encoding",
     "severity": "warning",
     "message": "Encoding \"custom\" is not supported for Azure Services. Known encodings are: rfc3339,rfc7231,unixTimestamp,ISO8601,seconds,base64,base64url"
@@ -73,6 +88,51 @@
     "code": "@azure-tools/typespec-azure-core/known-encoding",
     "severity": "warning",
     "message": "Encoding \"custom\" is not supported for Azure Services. Known encodings are: rfc3339,rfc7231,unixTimestamp,ISO8601,seconds,base64,base64url"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/known-encoding",
+    "severity": "warning",
+    "message": "Encoding \"custom\" is not supported for Azure Services. Known encodings are: rfc3339,rfc7231,unixTimestamp,ISO8601,seconds,base64,base64url"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-enum",
+    "severity": "warning",
+    "message": "Azure services should not use the enum keyword. Extensible enums should be defined as unions with \"string\" as an accepted variant (ex: `union Choice { Yes: \"yes\", No: \"no\", string };`)."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/known-encoding",
+    "severity": "warning",
+    "message": "Encoding \"custom\" is not supported for Azure Services. Known encodings are: rfc3339,rfc7231,unixTimestamp,ISO8601,seconds,base64,base64url"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-closed-literal-union",
+    "severity": "warning",
+    "message": "Union of literals should include the base scalar as a variant to make it an open enum. (ex: `union Choice { Yes: \"yes\", No: \"no\", string };`)."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Union named 'RequestKind' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The UnionVariant named 'standard' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The UnionVariant named 'premium' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/known-encoding",
+    "severity": "warning",
+    "message": "Encoding \"custom\" is not supported for Azure Services. Known encodings are: rfc3339,rfc7231,unixTimestamp,ISO8601,seconds,base64,base64url"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-private-usage",
+    "severity": "warning",
+    "message": "Referencing elements inside Private namespace \"Azure.ResourceManager.CommonTypes.Private\" is not allowed."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
@@ -223,6 +283,96 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'submitDefaultedEnumEncodedProperty' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'body' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'submitDefaultedUnionEncodedProperty' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'body' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'submitInlineAzureScalarEncodedProperty' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'body' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-autorest/unknown-format",
+    "severity": "warning",
+    "message": "'string' encoding format 'custom' is not supported in Autorest. It will not be emitted."
+  },
+  {
+    "code": "@azure-tools/typespec-autorest/unknown-format",
+    "severity": "warning",
+    "message": "'string' encoding format 'custom' is not supported in Autorest. It will not be emitted."
+  },
+  {
+    "code": "@azure-tools/typespec-autorest/unknown-format",
+    "severity": "warning",
+    "message": "'string' encoding format 'custom' is not supported in Autorest. It will not be emitted."
+  },
+  {
+    "code": "@azure-tools/typespec-autorest/unknown-format",
+    "severity": "warning",
+    "message": "'string' encoding format 'custom' is not supported in Autorest. It will not be emitted."
+  },
+  {
+    "code": "@azure-tools/typespec-autorest/unknown-format",
+    "severity": "warning",
+    "message": "'string' encoding format 'custom' is not supported in Autorest. It will not be emitted."
+  },
+  {
+    "code": "@azure-tools/typespec-autorest/unknown-format",
+    "severity": "warning",
+    "message": "'string' encoding format 'custom' is not supported in Autorest. It will not be emitted."
   },
   {
     "code": "@azure-tools/typespec-autorest/unknown-format",

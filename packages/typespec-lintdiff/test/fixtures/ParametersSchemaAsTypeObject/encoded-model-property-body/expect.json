@@ -3,11 +3,11 @@
   "ambientDiagnostics": [
     {
       "code": "@azure-tools/typespec-autorest/unknown-format",
-      "count": 2
+      "count": 8
     },
     {
       "code": "@azure-tools/typespec-azure-core/documentation-required",
-      "count": 17
+      "count": 29
     },
     {
       "code": "@azure-tools/typespec-azure-core/friendly-name",
@@ -15,10 +15,22 @@
     },
     {
       "code": "@azure-tools/typespec-azure-core/known-encoding",
-      "count": 4
+      "count": 7
+    },
+    {
+      "code": "@azure-tools/typespec-azure-core/no-closed-literal-union",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-core/no-enum",
+      "count": 1
     },
     {
       "code": "@azure-tools/typespec-azure-core/no-nullable",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-core/no-private-usage",
       "count": 1
     },
     {
@@ -27,7 +39,7 @@
     },
     {
       "code": "tsp-lintdiff-local-linter/non-application-json-type",
-      "count": 4
+      "count": 7
     },
     {
       "code": "tsp-lintdiff-local-linter/path-parameter-schema",
@@ -43,7 +55,7 @@
     },
     {
       "code": "tsp-lintdiff-local-linter/xms-examples-required",
-      "count": 8
+      "count": 11
     }
   ]
 }

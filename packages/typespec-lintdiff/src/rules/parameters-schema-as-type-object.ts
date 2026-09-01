@@ -1,4 +1,5 @@
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
+import { getInlineAzureType } from "@azure-tools/typespec-azure-resource-manager";
 import type { Model, ModelProperty, Program, Scalar, Type } from "@typespec/compiler";
 import {
   createRule,
@@ -6,6 +7,7 @@ import {
   getFormat,
   getFriendlyName,
   getLocationContext,
+  getNamespaceFullName,
   isArrayModelType,
   isNullType,
   isSecret,
@@ -79,7 +81,7 @@ function getEmittedSchemaType(
     case "Enum":
       return type.members.size > 0 ? type : undefined;
     case "ModelProperty": {
-      if (path === "schema-or-ref" && isResolvedSchemaInline(program, type.type)) {
+      if (path === "schema-or-ref" && isResolvedPropertySchemaInline(program, type)) {
         const encodingType = getEmittedEncodingType(program, type);
         if (encodingType === "typed") {
           return type;
@@ -126,6 +128,31 @@ function getEmittedEncodingType(
     encodedSchema.format,
   );
   return !mergedFormat ? "none" : encodedSchema.hasType ? "typed" : "untyped";
+}
+
+function isResolvedPropertySchemaInline(program: Program, property: ModelProperty): boolean {
+  if (property.defaultValue) {
+    if (property.type.kind === "Enum") {
+      return true;
+    }
+    if (property.type.kind === "Union" && getUnionAsEnum(property.type)[0]) {
+      return true;
+    }
+  }
+  if (shouldInlineCoreScalarProperty(program, property)) {
+    return true;
+  }
+  return isResolvedSchemaInline(program, property.type);
+}
+
+function shouldInlineCoreScalarProperty(program: Program, property: ModelProperty): boolean {
+  const type = property.type;
+  return (
+    type.kind === "Scalar" &&
+    type.namespace !== undefined &&
+    getNamespaceFullName(type.namespace) === "Azure.Core" &&
+    getInlineAzureType(program, property) === true
+  );
 }
 
 function isResolvedSchemaInline(program: Program, type: Type): boolean {

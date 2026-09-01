@@ -244,6 +244,144 @@
         "x-ms-long-running-operation": true
       }
     },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitDefaultedEnumEncodedProperty": {
+      "post": {
+        "operationId": "Widgets_SubmitDefaultedEnumEncodedProperty",
+        "tags": [
+          "Widgets"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "enum": [
+                "Automatic",
+                "Manual"
+              ],
+              "x-ms-enum": {
+                "name": "RequestMode",
+                "modelAsString": false,
+                "values": [
+                  {
+                    "name": "automatic",
+                    "value": "Automatic"
+                  },
+                  {
+                    "name": "manual",
+                    "value": "Manual"
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitDefaultedUnionEncodedProperty": {
+      "post": {
+        "operationId": "Widgets_SubmitDefaultedUnionEncodedProperty",
+        "tags": [
+          "Widgets"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "enum": [
+                "Standard",
+                "Premium"
+              ],
+              "x-ms-enum": {
+                "name": "RequestKind",
+                "modelAsString": false,
+                "values": [
+                  {
+                    "name": "standard",
+                    "value": "Standard"
+                  },
+                  {
+                    "name": "premium",
+                    "value": "Premium"
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitEncodedProperty": {
       "post": {
         "operationId": "Widgets_SubmitEncodedProperty",
@@ -333,6 +471,58 @@
               "$ref": "#/definitions/FriendlyTemplatePayload",
               "type": "integer",
               "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitInlineAzureScalarEncodedProperty": {
+      "post": {
+        "operationId": "Widgets_SubmitInlineAzureScalarEncodedProperty",
+        "tags": [
+          "Widgets"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "description": "Represents an Azure geography region where supported resource providers live."
             }
           }
         ],
@@ -558,13 +748,61 @@
           "type": "integer",
           "format": "int32"
         },
-        "inlinePrimitive": {}
+        "inlinePrimitive": {},
+        "defaultedEnum": {
+          "default": "Automatic",
+          "enum": [
+            "Automatic",
+            "Manual"
+          ],
+          "x-ms-enum": {
+            "name": "RequestMode",
+            "modelAsString": false,
+            "values": [
+              {
+                "name": "automatic",
+                "value": "Automatic"
+              },
+              {
+                "name": "manual",
+                "value": "Manual"
+              }
+            ]
+          }
+        },
+        "defaultedUnion": {
+          "default": "Standard",
+          "enum": [
+            "Standard",
+            "Premium"
+          ],
+          "x-ms-enum": {
+            "name": "RequestKind",
+            "modelAsString": false,
+            "values": [
+              {
+                "name": "standard",
+                "value": "Standard"
+              },
+              {
+                "name": "premium",
+                "value": "Premium"
+              }
+            ]
+          }
+        },
+        "inlineAzureScalar": {
+          "description": "Represents an Azure geography region where supported resource providers live."
+        }
       },
       "required": [
         "payload",
         "choice",
         "friendlyTemplatePayload",
-        "inlinePrimitive"
+        "inlinePrimitive",
+        "defaultedEnum",
+        "defaultedUnion",
+        "inlineAzureScalar"
       ]
     },
     "FriendlyTemplatePayload": {
@@ -592,6 +830,48 @@
     },
     "PropertyRequest": {
       "description": "An unbased scalar used by an encoded body property."
+    },
+    "RequestKind": {
+      "type": "string",
+      "enum": [
+        "Standard",
+        "Premium"
+      ],
+      "x-ms-enum": {
+        "name": "RequestKind",
+        "modelAsString": false,
+        "values": [
+          {
+            "name": "standard",
+            "value": "Standard"
+          },
+          {
+            "name": "premium",
+            "value": "Premium"
+          }
+        ]
+      }
+    },
+    "RequestMode": {
+      "type": "string",
+      "enum": [
+        "Automatic",
+        "Manual"
+      ],
+      "x-ms-enum": {
+        "name": "RequestMode",
+        "modelAsString": false,
+        "values": [
+          {
+            "name": "automatic",
+            "value": "Automatic"
+          },
+          {
+            "name": "manual",
+            "value": "Manual"
+          }
+        ]
+      }
     },
     "Widget": {
       "type": "object",

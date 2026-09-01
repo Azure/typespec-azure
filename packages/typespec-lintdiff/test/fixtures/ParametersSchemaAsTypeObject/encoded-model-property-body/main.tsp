@@ -43,6 +43,16 @@ model FriendlyTemplatePayload<T> {
   value: T;
 }
 
+enum RequestMode {
+  automatic: "Automatic",
+  manual: "Manual",
+}
+
+union RequestKind {
+  standard: "Standard",
+  premium: "Premium",
+}
+
 model EncodedWire {
   @encode("custom", int32)
   payload: PropertyRequest;
@@ -55,6 +65,16 @@ model EncodedWire {
 
   @encode("custom", PropertyRequest)
   inlinePrimitive: string;
+
+  @encode("custom", PropertyRequest)
+  defaultedEnum: RequestMode = RequestMode.automatic;
+
+  @encode("custom", PropertyRequest)
+  defaultedUnion: RequestKind = RequestKind.standard;
+
+  @Azure.ResourceManager.CommonTypes.Private.inlineAzureType
+  @encode("custom", PropertyRequest)
+  inlineAzureScalar: Azure.Core.azureLocation;
 }
 
 union ObjectChoice {
@@ -103,5 +123,26 @@ interface Widgets {
   submitInlineUntypedEncodedProperty(
     ...ResourceInstanceParameters<Widget>,
     @body body: EncodedWire.inlinePrimitive,
+  ): ArmResponse<Widget> | ErrorResponse;
+
+  @post
+  @armResourceAction(Widget)
+  submitDefaultedEnumEncodedProperty(
+    ...ResourceInstanceParameters<Widget>,
+    @body body: EncodedWire.defaultedEnum,
+  ): ArmResponse<Widget> | ErrorResponse;
+
+  @post
+  @armResourceAction(Widget)
+  submitDefaultedUnionEncodedProperty(
+    ...ResourceInstanceParameters<Widget>,
+    @body body: EncodedWire.defaultedUnion,
+  ): ArmResponse<Widget> | ErrorResponse;
+
+  @post
+  @armResourceAction(Widget)
+  submitInlineAzureScalarEncodedProperty(
+    ...ResourceInstanceParameters<Widget>,
+    @body body: EncodedWire.inlineAzureScalar,
   ): ArmResponse<Widget> | ErrorResponse;
 }
