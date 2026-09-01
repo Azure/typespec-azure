@@ -49,7 +49,10 @@ determine whether the requested Swagger validator rule is already enforced by
 an official TypeSpec Azure library or by the ARM TypeSpec templates. This is a
 mandatory semantic check, not an exact-name search.
 
-Use the target branch as the source of truth and inspect all of the following:
+Fetch the user-supplied target branch from `origin` and use
+`refs/remotes/origin/<target-branch>` as the source of truth. Do not use or
+update a same-named local branch; it may be stale or checked out in another
+worktree. Inspect all of the following:
 
 1. Search the rule documentation under
    `packages/typespec-azure-core/src/rules` and
@@ -168,10 +171,13 @@ and azure-rest-api-specs worktree. Create and verify the worktrees serially to
 avoid competing large checkouts. The user may then open the worktrees in
 separate VS Code windows and run independent top-level worker sessions.
 
-1. Treat the user-supplied branch as the target branch, not as the
-   rule-development branch.
-2. Create a new rule-specific branch from the target branch. Its name must use
-   the canonical validator rule slug, for example
+1. Treat the user-supplied branch name as the target branch, not as the
+   rule-development branch. Fetch that branch explicitly from `origin`, verify
+   `refs/remotes/origin/<target-branch>` exists, and record its commit. Do not
+   require, update, or compare against a same-named local branch.
+2. Create a new rule-specific branch from
+   `refs/remotes/origin/<target-branch>`. Its name must use the canonical
+   validator rule slug, for example
    `feature/lintdiff-latest-version-of-common-types-must-be-used`. If the repo
    or user supplies a different branch prefix, keep that prefix but keep the
    suffix as `lintdiff-<validator-rule-slug>`.
@@ -278,6 +284,15 @@ its supplied worktrees:
 1. Ensure both worktrees are at the expected branch or commit and are clean
    except for known in-progress changes for this rule. Stop only when continuing
    would overwrite or mix unrelated changes.
+   Fetch the user-supplied target branch explicitly from `origin` and use
+   `refs/remotes/origin/<target-branch>` for base verification and all target
+   comparisons; never substitute a same-named local branch. If the dedicated
+   rule branch has no rule-specific commits or changes and is behind the remote
+   target, fast-forward it to the fetched remote target before continuing. If
+   rule work already exists, preserve it and verify that the diff from its
+   merge base contains only known work for this rule. Do not treat commits that
+   exist only on the advancing remote target as unrelated rule-branch changes,
+   and do not rebase or reset the rule branch automatically.
 2. Perform the mandatory Worker existing TypeSpec coverage check before doing
    dependency work. Stop without installing dependencies or preparing the
    comparison harness when the result is `already covered`,
@@ -564,7 +579,8 @@ rule-related diff to a separate code-review subagent.
 
 The reviewer must:
 
-- compare the rule branch against the user-supplied target branch
+- compare the rule branch against the freshly fetched
+  `refs/remotes/origin/<target-branch>`, not a same-named local branch
 - inspect the production rule, fixtures, snapshots, `rule.md`, and
   `migration.md`
 - check for semantic misses, false positives, incorrect TypeSpec compiler API
@@ -598,13 +614,15 @@ Finishing validation is not the end of this skill. The top-level worker must
 complete the GitHub handoff unless the user explicitly asks to stop before
 creating a draft PR.
 
-1. Confirm the current branch is the dedicated rule-specific branch and is
-   based directly on the user-supplied target branch.
+1. Fetch the user-supplied target branch from `origin`, then confirm the current
+   branch is the dedicated rule-specific branch and is based on that remote
+   target. Do not use a same-named local branch for this check.
 2. Confirm neither the rule commit nor generated coverage data was added to the
    target branch.
 3. Commit only the explicit rule-related paths and any required fixture-harness
    dependency repair identified above.
-4. Push both the target branch and rule branch to the `origin` repository.
+4. Push the rule branch to the `origin` repository. Do not push or update the
+   target branch; the fetched remote target is the source of truth.
 5. Create the pull request in the `origin` repository as a **draft**, with the
    rule branch as head and the user-supplied target branch as base. Do not mark
    it ready for review; the user decides when the migration evidence and rule
