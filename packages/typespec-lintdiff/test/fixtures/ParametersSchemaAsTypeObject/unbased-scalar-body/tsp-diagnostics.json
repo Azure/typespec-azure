@@ -15,6 +15,11 @@
     "message": "Tracked resource 'Widget' must have patch operation that at least supports the update of tags."
   },
   {
+    "code": "@azure-tools/typespec-azure-core/known-encoding",
+    "severity": "warning",
+    "message": "Encoding \"unsupported\" is not supported for Azure Services. Known encodings are: rfc3339,rfc7231,unixTimestamp,ISO8601,seconds,base64,base64url"
+  },
+  {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
@@ -73,5 +78,20 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-autorest/unknown-format",
+    "severity": "warning",
+    "message": "'string' encoding format 'unsupported' is not supported in Autorest. It will not be emitted."
   }
 ]

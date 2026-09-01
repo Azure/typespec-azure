@@ -297,6 +297,60 @@
           }
         }
       }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitBasedEncodedAsUntyped": {
+      "post": {
+        "operationId": "Widgets_SubmitBasedEncodedAsUntyped",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Action with a based scalar encoded as an untyped scalar",
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "The request body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BasedEncodedAsUntypedRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -330,9 +384,13 @@
         ]
       }
     },
+    "BasedEncodedAsUntypedRequest": {
+      "description": "A based scalar whose unsupported encoding replaces its inherited type with no type."
+    },
     "OpaqueRequest": {
       "description": "An opaque request body with no scalar base."
     },
+    "UntypedWire": {},
     "Widget": {
       "type": "object",
       "description": "Concrete tracked resource types can be created by aliasing this type using a specific property type.",

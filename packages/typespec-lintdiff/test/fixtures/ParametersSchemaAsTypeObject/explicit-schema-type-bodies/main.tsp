@@ -52,6 +52,10 @@ scalar NestedWire;
 @encode("", NestedWire)
 scalar NestedEncodedRequest;
 
+@doc("An unbased scalar whose unsupported encoding still supplies a string schema type.")
+@encode("unsupported", string)
+scalar UnsupportedEncodedRequest;
+
 scalar UntypedWire;
 
 @encode("unsupported", UntypedWire)
@@ -112,6 +116,13 @@ interface Widgets {
   submitNestedEncoding(...ResourceInstanceParameters<Widget>, @body body: NestedEncodedRequest):
     | ArmResponse<Widget>
     | ErrorResponse;
+
+  @post
+  @armResourceAction(Widget)
+  submitUnsupportedEncoding(
+    ...ResourceInstanceParameters<Widget>,
+    @body body: UnsupportedEncodedRequest,
+  ): ArmResponse<Widget> | ErrorResponse;
 
   @post
   @armResourceAction(Widget)

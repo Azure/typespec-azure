@@ -824,6 +824,58 @@
         }
       }
     },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitUnsupportedEncoding": {
+      "post": {
+        "operationId": "Widgets_SubmitUnsupportedEncoding",
+        "tags": [
+          "Widgets"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UnsupportedEncodedRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitUnsupportedNestedEncoding": {
       "post": {
         "operationId": "Widgets_SubmitUnsupportedNestedEncoding",
@@ -1024,6 +1076,10 @@
     "StringRequest": {
       "type": "string",
       "description": "A named scalar with an explicit string base."
+    },
+    "UnsupportedEncodedRequest": {
+      "type": "string",
+      "description": "An unbased scalar whose unsupported encoding still supplies a string schema type."
     },
     "UnsupportedNestedEncodingRequest": {
       "type": "string"

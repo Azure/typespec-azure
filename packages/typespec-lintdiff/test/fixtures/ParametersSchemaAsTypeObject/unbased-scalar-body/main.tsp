@@ -1,5 +1,5 @@
 // Test: unbased-scalar-body
-// Violation: none. AutoRest emits an untyped schema for an unbased custom scalar.
+// Violation: none. AutoRest emits untyped schemas for both request scalars.
 
 import "../../lib/imports.tsp";
 
@@ -38,6 +38,12 @@ model WidgetProperties {
 @doc("An opaque request body with no scalar base.")
 scalar OpaqueRequest;
 
+scalar UntypedWire;
+
+@doc("A based scalar whose unsupported encoding replaces its inherited type with no type.")
+@encode("unsupported", UntypedWire)
+scalar BasedEncodedAsUntypedRequest extends string;
+
 interface Operations extends Azure.ResourceManager.Operations {}
 
 @armResourceOperations
@@ -52,5 +58,13 @@ interface Widgets {
   submit(
     ...ResourceInstanceParameters<Widget>,
     @doc("The request body") @body body: OpaqueRequest,
+  ): ArmResponse<Widget> | ErrorResponse;
+
+  @doc("Action with a based scalar encoded as an untyped scalar")
+  @post
+  @armResourceAction(Widget)
+  submitBasedEncodedAsUntyped(
+    ...ResourceInstanceParameters<Widget>,
+    @doc("The request body") @body body: BasedEncodedAsUntypedRequest,
   ): ArmResponse<Widget> | ErrorResponse;
 }

@@ -14,7 +14,7 @@ object bodies even though AutoRest emits the object schema reference with
 After correcting those differences, including emitted union handling, the full
 corpus run at specs commit
 `f6b53f105b95da05276530a0754a1c71b4f16397`, generated at
-`2026-08-31T11:34:40.903Z`, produced 9 Swagger projects, 9 TypeSpec projects,
+`2026-09-01T02:59:51.460Z`, produced 9 Swagger projects, 9 TypeSpec projects,
 9 overlapping projects, and no one-sided projects in the successfully compiled
 population. The migrated TypeSpec rule is functionally equivalent to the
 Swagger rule for natively observable schemas in the assessed population.
@@ -67,13 +67,14 @@ appears in the aligned corpus; the equivalence conclusion excludes it.
     scalar encoding can add an explicit schema type even when the scalar is
     unbased. An empty encoding also adds a type when the encode-as scalar has a
     direct or encoding-derived format, but not for an unformatted scalar such as
-    `string`. Secret scalars contribute the supported `password` format, while
-    unsupported formats are diagnosed but not retained. An encoding on a model
-    property backed by a referenced scalar or named union, including nullable
-    wrappers, emits the type beside `$ref`; the resolved Swagger selector
-    follows the reference and does not diagnose that sibling. The same property
-    encoding replaces the schema type when the resolved underlying schema is
-    inline, so that case remains a violation.
+    `string`. Secret scalars contribute the supported `password` format.
+    Unsupported formats are diagnosed and not retained, but AutoRest still
+    replaces the schema type with the encode-as scalar's type. An encoding on a
+    model property backed by a referenced scalar or named union, including
+    nullable wrappers, emits the type beside `$ref`; the resolved Swagger
+    selector follows the referenced schema and classifies its resolved type
+    rather than that sibling. The same property encoding replaces the schema
+    type when the resolved underlying schema is inline.
 
 No emitter, validator, corpus-generator, or comparison-normalization changes
 are required.
@@ -92,7 +93,7 @@ the uncovered behavior.
 | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------: | ---------------------------------------------- | ---------------: | ----------------: | --------------------: | ------------------: | ------------: | ----------------------: |
 | `docs/coverage_old.md`                                   | External report snapshot; source URL is recorded in the file, but no spec or generator revision is provided |         450 compiled projects, 210 validator rules | `ParametersSchemaAsTypeObject none 9 4 0 44.4` |                9 |                 4 | not listed separately | not reconstructable |    not listed |              not listed |
 | Checked-in `specs/coverage-breakdown.md` before this fix | Specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`; 462/468 successful projects                        | 462 successful projects, 215 known validator rules | `ParametersSchemaAsTypeObject production`      |                9 |                10 |                     4 |                   5 |             6 | 18 Swagger, 63 TypeSpec |
-| Refreshed full corpus after this repair                  | Same specs commit; generated `2026-08-31T11:34:40.903Z`; full run over 462/468 successful projects          | 462 successful projects, 215 known validator rules | `ParametersSchemaAsTypeObject production`      |                9 |                 9 |                     9 |                   0 |             0 | 18 Swagger, 19 TypeSpec |
+| Refreshed full corpus after this repair                  | Same specs commit; generated `2026-09-01T02:59:51.460Z`; full run over 462/468 successful projects          | 462 successful projects, 215 known validator rules | `ParametersSchemaAsTypeObject production`      |                9 |                 9 |                     9 |                   0 |             0 | 18 Swagger, 19 TypeSpec |
 
 The reports answer different questions. The external report gives aggregate
 coverage credit and does not expose the unmatched projects, so they cannot be
@@ -443,15 +444,18 @@ non-empty scalar encoding can supply an explicit wire type for an otherwise
 unbased scalar.
 
 **Disposition:** Handle file bodies directly and inspect encoding metadata and
-the encode-as scalar's effective format on scalar ancestry. The compliant
+the encode-as scalar's effective schema on scalar ancestry. The compliant
 `empty-encoded-scalar-body` fixture preserves the boundary where an empty
 encoding to unformatted `string` does not cause AutoRest to assign
 `schema.type`; the violating fixture includes empty encoding to formatted
-`int32` and an encode-as scalar whose format comes from its own encoding.
+`int32`, an encode-as scalar whose format comes from its own encoding, and an
+unsupported encoding whose typed encode-as scalar still replaces `schema.type`.
 It also proves that an unsupported nested format is not retained and therefore
-does not erase an inherited primitive type. The compliant fixture covers an
-untyped secret encode-as scalar, whose `password` format causes AutoRest to
-erase the inherited type. `multipart-body` preserves the non-body-schema branch.
+does not erase an inherited primitive type. The compliant fixtures cover both
+an untyped secret encode-as scalar, whose `password` format causes AutoRest to
+erase the inherited type, and a based scalar whose unsupported encoding replaces
+its inherited primitive type with an untyped encode-as scalar.
+`multipart-body` preserves the non-body-schema branch.
 
 ### Gap example: encoded property reference resolution
 
@@ -493,7 +497,7 @@ the property type, producing a `$ref` with sibling type metadata. The validator
 runs Spectral with resolved references, so its JSONPath observes the referenced
 untyped definition rather than the sibling metadata.
 
-**Disposition:** Unwrap the model property and classify the referenced scalar
+**Disposition:** Unwrap the model property and classify the referenced schema
 instead of treating property encoding alone as a validator-visible schema type.
 Decide whether the outer type is referenced before normalizing anonymous
 singleton and nullable union wrappers. For an inline underlying schema, retain
@@ -543,25 +547,25 @@ the comparison output.
 
 ## Fixture evidence
 
-| Fixture                       | Swagger result                          | TypeSpec result               |
-| ----------------------------- | --------------------------------------- | ----------------------------- |
-| `non-object-body`             | primitive POST body violation           | matching diagnostic           |
-| `put-non-object-body`         | primitive PUT body violation            | matching diagnostic           |
-| `named-array-model-body`      | named array body violation              | matching diagnostic           |
-| `object-body`                 | no violation                            | no rule diagnostic            |
-| `inline-object-body`          | no violation                            | no rule diagnostic            |
-| `nullable-object-body`        | nullable object; no violation           | no rule diagnostic            |
-| `single-variant-unions`       | singleton object and nullable unknown   | no rule diagnostic            |
-| `unsupported-union-body`      | unsupported union emits no schema type  | no rule diagnostic            |
-| `enum-union-body`             | string enum schema violation            | matching diagnostic           |
-| `unbased-scalar-body`         | unbased scalar emits no schema type     | no rule diagnostic            |
-| `empty-enum-body`             | empty enum emits no schema type         | no rule diagnostic            |
-| `empty-encoded-scalar-body`   | empty encoding emits no schema type     | no rule diagnostic            |
-| `encoded-model-property-body` | resolved scalar reference is untyped    | no rule diagnostic            |
-| `multipart-body`              | parts emit as form-data parameters      | no rule diagnostic            |
-| `explicit-schema-type-bodies` | thirteen explicit non-object branches   | thirteen matching diagnostics |
-| `no-body-action`              | no body and no violation                | no rule diagnostic            |
-| `unknown-body-action`         | body schema has no `type`; no violation | no rule diagnostic            |
+| Fixture                       | Swagger result                           | TypeSpec result               |
+| ----------------------------- | ---------------------------------------- | ----------------------------- |
+| `non-object-body`             | primitive POST body violation            | matching diagnostic           |
+| `put-non-object-body`         | primitive PUT body violation             | matching diagnostic           |
+| `named-array-model-body`      | named array body violation               | matching diagnostic           |
+| `object-body`                 | no violation                             | no rule diagnostic            |
+| `inline-object-body`          | no violation                             | no rule diagnostic            |
+| `nullable-object-body`        | nullable object; no violation            | no rule diagnostic            |
+| `single-variant-unions`       | singleton object and nullable unknown    | no rule diagnostic            |
+| `unsupported-union-body`      | unsupported union emits no schema type   | no rule diagnostic            |
+| `enum-union-body`             | string enum schema violation             | matching diagnostic           |
+| `unbased-scalar-body`         | unbased and encoded scalars emit no type | no rule diagnostic            |
+| `empty-enum-body`             | empty enum emits no schema type          | no rule diagnostic            |
+| `empty-encoded-scalar-body`   | empty encoding emits no schema type      | no rule diagnostic            |
+| `encoded-model-property-body` | resolved scalar reference is untyped     | no rule diagnostic            |
+| `multipart-body`              | parts emit as form-data parameters       | no rule diagnostic            |
+| `explicit-schema-type-bodies` | fourteen explicit non-object branches    | fourteen matching diagnostics |
+| `no-body-action`              | no body and no violation                 | no rule diagnostic            |
+| `unknown-body-action`         | body schema has no `type`; no violation  | no rule diagnostic            |
 
 The seventeen-fixture suite covers five violating fixtures and twelve compliant fixtures.
 Ambient diagnostics from other rules are declared in each fixture snapshot and

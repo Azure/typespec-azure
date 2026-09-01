@@ -194,10 +194,10 @@ function getEmittedScalarSchema(
       encoding.encoding,
       encodedSchema.format,
     );
-    if (mergedFormat && isSupportedAutorestFormat(mergedFormat)) {
+    if (mergedFormat) {
       schema = {
         hasType: encodedSchema.hasType,
-        format: mergedFormat,
+        format: isSupportedAutorestFormat(mergedFormat) ? mergedFormat : schema.format,
       };
     }
   }
