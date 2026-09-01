@@ -543,6 +543,9 @@ overrides:
   diff@>=6.0.0 <8.0.3: '>=8.0.3'
   dompurify: ^3.3.3
   yaml@>=2.0.0 <2.8.3: '>=2.8.3'
+  brace-expansion: 5.0.9
+  fast-uri: 3.1.6
+  minimatch: 10.2.6
 
 importers:
 
@@ -10080,10 +10083,6 @@ packages:
     resolution: {integrity: sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==}
     engines: {node: '>=4'}
 
-  minimatch@10.2.3:
-    resolution: {integrity: sha512-Rwi3pnapEqirPSbWbrZaa6N3nmqq4Xer/2XooiOKyV3q12ML06f7MOuc5DVH8ONZIFhwIYQ3yzPH4nt7iWHaTg==}
-    engines: {node: 18 || 20 || >=22}
-
   minimatch@10.2.6:
     resolution: {integrity: sha512-vpLQEs+VLCr1nU0BXS07maYoFwlDAH0gngQuuttxIwutDFEMHq2blX+8vpgxDdK3J1PwjCJiep77OitTZ4Ll1A==}
     engines: {node: 18 || 20 || >=22}
@@ -15295,7 +15294,7 @@ snapshots:
       '@rushstack/terminal': 0.24.3(@types/node@26.3.0)
       '@rushstack/ts-command-line': 5.3.13(@types/node@26.3.0)
       diff: 9.0.0
-      minimatch: 10.2.3
+      minimatch: 10.2.6
       resolve: 1.22.12
       semver: 7.7.4
       source-map: 0.6.1
@@ -19573,10 +19572,6 @@ snapshots:
     optional: true
 
   min-indent@1.0.1: {}
-
-  minimatch@10.2.3:
-    dependencies:
-      brace-expansion: 5.0.9
 
   minimatch@10.2.6:
     dependencies:

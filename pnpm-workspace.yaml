@@ -19,6 +19,13 @@ overrides:
   "diff@>=6.0.0 <8.0.3": ">=8.0.3"
   dompurify: ^3.3.3
   "yaml@>=2.0.0 <2.8.3": ">=2.8.3"
+  # Pinned exactly (rather than left to range resolution) because CI's minimumReleaseAge
+  # policy can otherwise resolve a different patch version than what's in the committed
+  # lockfile, causing generated files like ThirdPartyNotices.txt to regenerate differently
+  # and fail the "Check Git Status For Changed Files" gate.
+  brace-expansion: 5.0.9
+  fast-uri: 3.1.6
+  minimatch: 10.2.6
 
 onlyBuiltDependencies:
   - tree-sitter
