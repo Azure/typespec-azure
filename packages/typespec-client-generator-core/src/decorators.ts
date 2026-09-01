@@ -102,21 +102,40 @@ import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
-function isSemanticallyEqualScope(left: string, right: string): boolean {
-  const [leftNegationScopes, leftScopes] = parseScopes(left);
-  const [rightNegationScopes, rightScopes] = parseScopes(right);
-  return (
-    isEqualScopeList(leftNegationScopes, rightNegationScopes) &&
-    isEqualScopeList(leftScopes, rightScopes)
-  );
+/**
+ * The set of emitters a scope string effectively selects.
+ * - `all-except`: applies to every emitter except the excluded ones.
+ * - `only`: applies solely to the included emitters.
+ */
+type EffectiveScope = { kind: "all-except"; scopes: string[] } | { kind: "only"; scopes: string[] };
+
+/**
+ * Canonicalize a scope string into the set of emitters it actually selects, mirroring how
+ * `setScopedDecoratorData` and `getScopedDecoratorData` resolve scopes. A scope with any negation
+ * applies to all emitters minus the negated ones, and explicitly listed positive scopes take
+ * precedence over an overlapping negation.
+ */
+function getEffectiveScope(scope: string): EffectiveScope {
+  const [negationScopes, scopes] = parseScopes(scope);
+  const positives = normalizeScopeList(scopes);
+  const negations = normalizeScopeList(negationScopes);
+  if (negations.length > 0) {
+    // positive scopes are already covered by "all", they only cancel an overlapping negation
+    return { kind: "all-except", scopes: negations.filter((s) => !positives.includes(s)) };
+  }
+  // no positive and no negative scope means the value applies everywhere
+  return positives.length === 0
+    ? { kind: "all-except", scopes: [] }
+    : { kind: "only", scopes: positives };
 }
 
-function isEqualScopeList(left: string[] | undefined, right: string[] | undefined): boolean {
-  const normalizedLeft = normalizeScopeList(left);
-  const normalizedRight = normalizeScopeList(right);
+function isSemanticallyEqualScope(left: string, right: string): boolean {
+  const leftEffective = getEffectiveScope(left);
+  const rightEffective = getEffectiveScope(right);
   return (
-    normalizedLeft.length === normalizedRight.length &&
-    normalizedLeft.every((scope, index) => scope === normalizedRight[index])
+    leftEffective.kind === rightEffective.kind &&
+    leftEffective.scopes.length === rightEffective.scopes.length &&
+    leftEffective.scopes.every((scope, index) => scope === rightEffective.scopes[index])
   );
 }
 

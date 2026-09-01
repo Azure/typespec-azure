@@ -257,6 +257,77 @@ describe("@client scope in ClientOptions", () => {
     });
     strictEqual(listClients(pythonContext).length, 1);
   });
+
+  it("does not report a warning when mixed scopes select the same emitters", async () => {
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+        @client({service: MyClient, scope: "!java"}, "csharp, !java")
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    expectDiagnosticEmpty(diagnostics);
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(listClients(pythonContext).length, 1);
+
+    const javaContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+    strictEqual(listClients(javaContext).length, 0);
+  });
+
+  it("does not report a warning when grouped and individual negation select the same emitters", async () => {
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+        @client({service: MyClient, scope: "!(java, python)"}, "!python, !java")
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    expectDiagnosticEmpty(diagnostics);
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(listClients(pythonContext).length, 0);
+  });
+
+  it("reports a warning when mixed scopes select different emitters", async () => {
+    const [, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+        @client({service: MyClient, scope: "!java"}, "csharp, !python")
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflicting-scope",
+      severity: "warning",
+    });
+  });
+
+  it("reports a warning when a negation scope conflicts with a positive-only scope", async () => {
+    const [, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+        @client({service: MyClient, scope: "!java"}, "csharp")
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflicting-scope",
+      severity: "warning",
+    });
+  });
 });
 
 describe("listClients without @client", () => {
