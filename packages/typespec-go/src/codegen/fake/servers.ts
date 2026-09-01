@@ -1244,9 +1244,10 @@ function parseHeaderPathQueryParams(
     // contains the unescaped value.
     let paramValue = getRawParamValue(param);
 
-    // path params are escaped, so we need to unescape them first.
+    // encoded path params are escaped, so we need to unescape them first.
+    // non-encoded path params are already in their final form (the client
+    // skips url.PathEscape for them), so they're passed through verbatim.
     if (go.isPathParameter(param)) {
-      imports.add("net/url");
       let paramVar = createLocalVariableName(param, "Unescaped");
       if (
         go.isRequiredParameter(param.style) &&
@@ -1254,27 +1255,42 @@ function parseHeaderPathQueryParams(
         param.type.type === "string"
       ) {
         // for string-based enums, we perform the conversion as part of unescaping
-        requiredHelpers.parseWithCast = true;
         paramVar = createLocalVariableName(param, "Param");
-        content += `${indent.get()}${paramVar}, err := parseWithCast(${paramValue}, func (v string) (${go.getTypeDeclaration(param.type, pkg)}, error) {\n`;
-        content += `${indent.push().get()}p, unescapeErr := url.PathUnescape(v)\n`;
-        content += `${indent.get()}if unescapeErr != nil {\n${indent.push().get()}return "", unescapeErr\n${indent.pop().get()}}\n`;
-        content += `${indent.get()}return ${go.getTypeDeclaration(param.type, pkg)}(p), nil\n${indent.pop().get()}})\n`;
+        if (param.isEncoded) {
+          imports.add("net/url");
+          requiredHelpers.parseWithCast = true;
+          content += `${indent.get()}${paramVar}, err := parseWithCast(${paramValue}, func (v string) (${go.getTypeDeclaration(param.type, pkg)}, error) {\n`;
+          content += `${indent.push().get()}p, unescapeErr := url.PathUnescape(v)\n`;
+          content += `${indent.get()}if unescapeErr != nil {\n${indent.push().get()}return "", unescapeErr\n${indent.pop().get()}}\n`;
+          content += `${indent.get()}return ${go.getTypeDeclaration(param.type, pkg)}(p), nil\n${indent.pop().get()}})\n`;
+          content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+        } else {
+          content += `${indent.get()}${paramVar} := ${go.getTypeDeclaration(param.type, pkg)}(${paramValue})\n`;
+        }
+        paramValue = paramVar;
       } else {
-        if (
+        const isStringParam =
           go.isRequiredParameter(param.style) &&
           (param.type.kind === "string" ||
-            (param.type.kind === "slice" && param.type.elementType.kind === "string"))
-        ) {
+            (param.type.kind === "slice" && param.type.elementType.kind === "string"));
+        if (isStringParam) {
           // by convention, if the value is in its "final form" (i.e. no parsing required)
           // then its var is to have the "Param" suffix. the only case is string, everything
           // else requires some amount of parsing/conversion.
           paramVar = createLocalVariableName(param, "Param");
         }
-        content += `${indent.get()}${paramVar}, err := url.PathUnescape(${paramValue})\n`;
+        if (param.isEncoded) {
+          imports.add("net/url");
+          content += `${indent.get()}${paramVar}, err := url.PathUnescape(${paramValue})\n`;
+          content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+          paramValue = paramVar;
+        } else if (isStringParam) {
+          content += `${indent.get()}${paramVar} := ${paramValue}\n`;
+          paramValue = paramVar;
+        }
+        // otherwise (non-encoded, non-string) the raw matched value is passed
+        // directly to the parsing code below.
       }
-      content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
-      paramValue = paramVar;
     }
 
     // parse params as required
