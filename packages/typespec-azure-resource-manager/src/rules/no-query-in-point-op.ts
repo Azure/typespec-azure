@@ -10,12 +10,12 @@ const pointOperationPathRegExp = new RegExp(
   "i",
 );
 
-export const noQueryParamPointOpRule = createRule({
-  name: "no-query-param-point-op",
-  docs: fileRef.fromPackageRoot("src/rules/no-query-param-point-op.md"),
+export const noQueryInPointOpRule = createRule({
+  name: "no-query-in-point-op",
+  docs: fileRef.fromPackageRoot("src/rules/no-query-in-point-op.md"),
   description: "Point operations must not declare query parameters beyond api-version.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-query-param-point-op",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-query-in-point-op",
   messages: {
     default: paramMessage`Query parameter '${"name"}' should be removed. Point operation '${"verb"}' MUST not have query parameters other than api-version.`,
   },

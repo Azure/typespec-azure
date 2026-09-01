@@ -29,7 +29,7 @@ import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
 import { noOverridePropsRule } from "./rules/no-override-props.js";
-import { noQueryParamPointOpRule } from "./rules/no-query-param-point-op.js";
+import { noQueryInPointOpRule } from "./rules/no-query-in-point-op.js";
 import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
@@ -90,7 +90,7 @@ const rules = [
   secretProprule,
   noEmptyModel,
   noReservedResourcePropertyRule,
-  noQueryParamPointOpRule,
+  noQueryInPointOpRule,
 ];
 
 export const $linter = defineLinter({

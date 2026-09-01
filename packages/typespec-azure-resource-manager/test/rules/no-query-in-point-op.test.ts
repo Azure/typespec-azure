@@ -5,7 +5,7 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { noQueryParamPointOpRule } from "../../src/rules/no-query-param-point-op.js";
+import { noQueryInPointOpRule } from "../../src/rules/no-query-in-point-op.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -14,7 +14,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    noQueryParamPointOpRule,
+    noQueryInPointOpRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
@@ -51,22 +51,22 @@ it("emits for extra query parameters on top-level GET, PUT, PATCH, and DELETE op
     )
     .toEmitDiagnostics([
       {
-        code: "@azure-tools/typespec-azure-resource-manager/no-query-param-point-op",
+        code: "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op",
         message:
           "Query parameter 'expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.",
       },
       {
-        code: "@azure-tools/typespec-azure-resource-manager/no-query-param-point-op",
+        code: "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op",
         message:
           "Query parameter 'modeHint' should be removed. Point operation 'put' MUST not have query parameters other than api-version.",
       },
       {
-        code: "@azure-tools/typespec-azure-resource-manager/no-query-param-point-op",
+        code: "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op",
         message:
           "Query parameter 'patchMode' should be removed. Point operation 'patch' MUST not have query parameters other than api-version.",
       },
       {
-        code: "@azure-tools/typespec-azure-resource-manager/no-query-param-point-op",
+        code: "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op",
         message:
           "Query parameter 'deleteMode' should be removed. Point operation 'delete' MUST not have query parameters other than api-version.",
       },
@@ -95,12 +95,12 @@ it("emits for extra query parameters on nested point GET and PUT operations", as
     )
     .toEmitDiagnostics([
       {
-        code: "@azure-tools/typespec-azure-resource-manager/no-query-param-point-op",
+        code: "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op",
         message:
           "Query parameter 'expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.",
       },
       {
-        code: "@azure-tools/typespec-azure-resource-manager/no-query-param-point-op",
+        code: "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op",
         message:
           "Query parameter 'validationMode' should be removed. Point operation 'put' MUST not have query parameters other than api-version.",
       },
@@ -124,12 +124,12 @@ it("emits one diagnostic for each extra query parameter", async () => {
     )
     .toEmitDiagnostics([
       {
-        code: "@azure-tools/typespec-azure-resource-manager/no-query-param-point-op",
+        code: "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op",
         message:
           "Query parameter 'expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.",
       },
       {
-        code: "@azure-tools/typespec-azure-resource-manager/no-query-param-point-op",
+        code: "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op",
         message:
           "Query parameter 'view' should be removed. Point operation 'get' MUST not have query parameters other than api-version.",
       },
@@ -152,7 +152,7 @@ it("classifies a GET operation by point-path shape regardless of its authoring t
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/no-query-param-point-op",
+      code: "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op",
       message:
         "Query parameter '$expand' should be removed. Point operation 'get' MUST not have query parameters other than api-version.",
     });
