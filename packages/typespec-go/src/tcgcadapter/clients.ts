@@ -2102,7 +2102,11 @@ export class ClientAdapter {
       case "unknown":
         return this.ta.codeModel.options["rawjson-as-bytes"] ? "RawJSON" : "Interface";
       default:
-        throw new Error(`unhandled monomorphic response type kind ${type.kind}`);
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `unsupported kind ${type.kind} for monomorphic response`,
+          type.__raw?.node,
+        );
     }
   }
 

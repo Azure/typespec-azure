@@ -264,7 +264,11 @@ export class TypeAdapter {
           case "constantValue":
           case "etag":
           case "literal":
-            throw new Error("todo elementType");
+            throw new AdapterError(
+              "UnsupportedTsp",
+              `unsupported kind ${goElementType.kind} for slice element type`,
+              type.valueType.__raw?.node,
+            );
         }
         arrayType = new go.Slice(goElementType, myElementTypeByValue);
         this.types.set(keyName, arrayType);
