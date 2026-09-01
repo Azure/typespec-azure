@@ -85,7 +85,14 @@ If neither is available, ask the user for the pull request URL or number.
 5. Maintain a round ledger containing:
    - round number
    - head SHA reviewed
-   - review-request event timestamp
+   - pre-request and post-request timeline request-event cursors, including the
+     event ID and timestamp or an explicit `none`
+   - Copilot's requested-reviewer state immediately before and after the
+     request attempt
+   - request verification result: `new-verified`,
+     `already-pending-active`, or `failed-or-unverified`
+   - verified request-event ID and timestamp, and the PR head SHA to which the
+     active request applies
    - Copilot review ID and submission timestamp
    - comment IDs delivered to the fix subagent
    - validity decision for each comment
@@ -127,34 +134,54 @@ Give the review subagent the canonical pull request URL and the current round
 ledger. It owns these steps:
 
 1. Record the current PR head SHA and latest Copilot review ID and timestamp.
-   These form the round cursor.
+   Also fetch and record the latest Copilot timeline review-request event as the
+   pre-request cursor, including its event ID and timestamp or an explicit
+   `none`, and fetch whether Copilot is currently present in the pull request's
+   requested-reviewers API response.
 2. Invoke `/trigger-copilot-review-for-pr` with the canonical pull request URL.
-   This requests `@copilot`, which uses **Balanced** mode, and verifies the new
-   timeline request event.
-3. Wait for a new review submitted by
-   `copilot-pull-request-reviewer[bot]` after that request event. Poll GitHub at
-   a moderate interval rather than repeatedly requesting reviews. Allow up to
-   30 minutes.
-4. Confirm the completed review applies to the round's head SHA. If the PR head
+   This requests `@copilot`, which uses **Balanced** mode.
+3. Immediately refetch the PR head SHA, latest Copilot timeline review-request
+   event, and requested reviewers. Record the post-request event cursor and
+   whether Copilot is present in the requested-reviewers API response.
+4. Classify the request attempt before polling for a completed review:
+   - `new-verified` only when the PR head is unchanged and the post-request
+     cursor advances beyond the pre-request cursor to a new Copilot
+     review-request event. Record that event against the current PR head.
+   - `already-pending-active` only when Copilot was requested before the
+     attempt, the post-request API response explicitly confirms Copilot remains
+     requested, and the ledger's recorded pending request applies to the
+     unchanged current PR head.
+   - `failed-or-unverified` for every other outcome, including a trigger that
+     reports success without either form of positive API evidence. Return the
+     evidence and stop the round.
+
+   Do not poll for a completed review, report a successful request, or continue
+   the round unless the result is `new-verified` or
+   `already-pending-active`.
+5. Wait for a new review submitted by
+   `copilot-pull-request-reviewer[bot]` after the active request event. Poll
+   GitHub at a moderate interval rather than repeatedly requesting reviews.
+   Allow up to 30 minutes.
+6. Confirm the completed review applies to the round's head SHA. If the PR head
    changed while review was pending, stop the round as stale.
-5. Fetch all inline comments belonging to the new review by its numeric review
+7. Fetch all inline comments belonging to the new review by its numeric review
    ID, using `GET /repos/{owner}/{repo}/pulls/{number}/reviews/{review_id}/comments`
    with pagination or by filtering all PR review comments on
    `pull_request_review_id == review_id`. Do not filter these comments by
    comment-author login. Do not discard a comment because its current line,
    original line, or diff position is null.
-6. Fetch the pull request's GraphQL review threads with pagination and map every
+8. Fetch the pull request's GraphQL review threads with pagination and map every
    collected REST review comment ID to the GraphQL thread whose comments include
    that `databaseId`. If any REST comment cannot be mapped to a review-thread ID,
    return a collection failure and do not hand off a partial list.
-7. Cross-check the result against available review metadata. If the review body
+9. Cross-check the result against available review metadata. If the review body
    reports generated comments but the endpoint returns fewer comments, return a
    collection failure instead of `no-new-comments`.
-8. Return either:
-   - `no-new-comments`, or
-   - a structured list containing review ID, review-thread ID, comment ID, path,
-     line or original line, diff hunk, comment body, URL, reviewed head SHA, and
-     submission time.
+10. Return either:
+    - `no-new-comments`, or
+    - a structured list containing review ID, review-thread ID, comment ID,
+      path, line or original line, diff hunk, comment body, URL, reviewed head
+      SHA, and submission time.
 
 The review subagent must not edit files, judge comment validity, or request the
 next review on its own.

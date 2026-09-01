@@ -1,0 +1,240 @@
+[
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitDateTimeSecretEncoding",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitEmptyEncodedInteger",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitEncodedScalar",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitEnum",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitNestedEncoding",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitScalar",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitUnsupportedEncoding",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitUnsupportedNestedEncoding",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitBinaryBytes",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitEnumMember",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitInlineEncodedProperty",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitInlineTemplateEncodedProperty",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitLiteral",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitStringTemplate",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitTuple",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitUnionVariant",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/uploadFile",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  }
+]
