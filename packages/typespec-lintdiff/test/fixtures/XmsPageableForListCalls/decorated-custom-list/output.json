@@ -52,20 +52,20 @@
         "description": "List the operations for the provider",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v5/types.json#/definitions/OperationListResult"
+              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/OperationListResult"
             }
           },
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -85,7 +85,7 @@
             "type": "string"
           },
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -98,7 +98,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -110,13 +110,13 @@
         "description": "Get a Widget",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "widgetName",
@@ -135,7 +135,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -154,7 +154,7 @@
       },
       "allOf": [
         {
-          "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v5/types.json#/definitions/ProxyResource"
+          "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ProxyResource"
         }
       ]
     },

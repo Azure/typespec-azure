@@ -52,7 +52,7 @@
         "description": "List widgets beneath an arbitrary ARM resource URI.",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
             "name": "resourceUri",
@@ -72,7 +72,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -84,7 +84,7 @@
         "description": "Get a specific nested widget.",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
             "name": "resourceUri",
@@ -111,7 +111,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -123,7 +123,7 @@
         "description": "Get the default nested widget configuration.",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
             "name": "resourceUri",
@@ -143,7 +143,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -158,20 +158,20 @@
         "description": "List the operations for the provider",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/definitions/OperationListResult"
+              "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/OperationListResult"
             }
           },
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -186,10 +186,10 @@
         "description": "List all widgets.",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -202,7 +202,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -217,10 +217,10 @@
         "description": "List Widget resources by subscription ID",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -233,7 +233,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -251,13 +251,13 @@
         "description": "List Widget resources by resource group",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           }
         ],
         "responses": {
@@ -270,7 +270,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -288,13 +288,13 @@
         "description": "Get a Widget",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "widgetName",
@@ -315,7 +315,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -328,13 +328,13 @@
         "description": "Create a Widget",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "widgetName",
@@ -381,7 +381,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -398,13 +398,13 @@
         "description": "Update a Widget",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "widgetName",
@@ -448,7 +448,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -465,13 +465,13 @@
         "description": "Delete a Widget",
         "parameters": [
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "widgetName",
@@ -503,7 +503,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
+              "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -530,7 +530,7 @@
       },
       "allOf": [
         {
-          "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/definitions/Resource"
+          "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/Resource"
         }
       ]
     },
@@ -591,7 +591,7 @@
       },
       "allOf": [
         {
-          "$ref": "../../../../../../../../../azure-rest-api-specs-lintdiff-xms-pageable-for-list-calls/specification/common-types/resource-management/v3/types.json#/definitions/TrackedResource"
+          "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/TrackedResource"
         }
       ]
     },
