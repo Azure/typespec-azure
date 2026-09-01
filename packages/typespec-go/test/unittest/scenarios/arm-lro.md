@@ -184,6 +184,9 @@ func (client *LROClient) okResponseWithAsyncHeader(ctx context.Context, apiVersi
 // okResponseWithAsyncHeaderCreateRequest creates the OkResponseWithAsyncHeader request.
 func (client *LROClient) okResponseWithAsyncHeaderCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, lroModelName string, resource TestLROModel, _ *LROClientBeginOkResponseWithAsyncHeaderOptions) (*policy.Request, error) {
 	urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/LROModels/{LROModelName}"
+	if client.subscriptionID == "" {
+		return nil, errors.New("parameter subscriptionID cannot be empty")
+	}
 	urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
 	if resourceGroupName == "" {
 		return nil, errors.New("parameter resourceGroupName cannot be empty")
@@ -246,6 +249,9 @@ func (client *LROClient) scalarResult(ctx context.Context, apiVersion string, re
 // scalarResultCreateRequest creates the ScalarResult request.
 func (client *LROClient) scalarResultCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, lroModelName string, body ActionRequest, _ *LROClientBeginScalarResultOptions) (*policy.Request, error) {
 	urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/LROModels/{LROModelName}/scalarResult"
+	if client.subscriptionID == "" {
+		return nil, errors.New("parameter subscriptionID cannot be empty")
+	}
 	urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
 	if resourceGroupName == "" {
 		return nil, errors.New("parameter resourceGroupName cannot be empty")
