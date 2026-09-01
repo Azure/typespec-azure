@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "validatorRule": "GetInOperationName",
+  "typeSpecRule": "tsp-lintdiff-local-linter/get-in-operation-name",
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "runBaseCommit": "c01a2c423eb1798e0d908fa48efdb9fff730186d",
+  "runWorkingTreeDirty": true,
+  "reproductionSourceCommit": "07f9cbd66c6212ad9809e94348208fc1dc180e16",
+  "reproductionSourceNote": "The full run used the uncommitted rule implementation later retained in the reproduction commit. The commit also adds the empty-client-location guard, which does not change the aligned corpus population and has a focused fixture.",
+  "commands": {
+    "typeSpec": "$env:LINTDIFF_COMMON_TYPES='C:\\dev\\worktrees\\azure-rest-api-specs-lintdiff-get-in-operation-name\\specification\\common-types'; mise exec -- pnpm --dir packages/typespec-lintdiff specs:typespec --specs-repo 'C:\\dev\\worktrees\\azure-rest-api-specs-lintdiff-get-in-operation-name' --concurrency 6"
+  },
+  "generatedAt": {
+    "typeSpec": "2026-08-26T08:04:23.939Z"
+  },
+  "durationMs": 2368723,
+  "fullPopulation": {
+    "sourceProjects": 468,
+    "successfulTypeSpecProjects": 462,
+    "failedTypeSpecProjects": 6,
+    "validatorProjects": 26,
+    "validatorDiagnostics": 89,
+    "typeSpecProjects": 28,
+    "typeSpecDiagnostics": 48
+  },
+  "alignedSuccessfulPopulation": {
+    "projects": 26,
+    "validatorDiagnostics": 39,
+    "typeSpecDiagnostics": 39,
+    "validatorOnlyProjects": [],
+    "typeSpecOnlyProjects": [],
+    "overlapProjects": [
+      "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertsManagement",
+      "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+      "specification/app/resource-manager/Microsoft.App/ContainerApps",
+      "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi",
+      "specification/automation/Automation.Management",
+      "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+      "specification/compute/resource-manager/Microsoft.Compute/Bulkactions",
+      "specification/compute/resource-manager/Microsoft.Compute/Compute/Compute",
+      "specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB",
+      "specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement",
+      "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+      "specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration",
+      "specification/developerhub/resource-manager/Microsoft.DevHub/DeveloperHub",
+      "specification/devopsinfrastructure/resource-manager/Microsoft.DevOpsInfrastructure/DevOpsInfrastructure",
+      "specification/guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments",
+      "specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensionTypes",
+      "specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace",
+      "specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers",
+      "specification/netapp/resource-manager/Microsoft.NetApp/NetApp",
+      "specification/resources/resource-manager/Microsoft.Resources/resources",
+      "specification/search/resource-manager/Microsoft.Search/Search",
+      "specification/security/resource-manager/Microsoft.Security/Security/GovernanceAPI",
+      "specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights",
+      "specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync",
+      "specification/subscription/resource-manager/Microsoft.Subscription/Subscription",
+      "specification/web/resource-manager/Microsoft.Web/AppService"
+    ]
+  },
+  "diagnosticCardinality": {
+    "validatorRawShard": 89,
+    "validatorRawProjectSwaggerPathIdentity": 76,
+    "validatorProjectPathIdentity": 44,
+    "typeSpecRawShard": 48,
+    "typeSpecSourceIdentity": 48,
+    "alignedValidatorConservativeIdentity": 39,
+    "alignedTypeSpecConservativeIdentity": 39
+  },
+  "failedProjects": [
+    {
+      "project": "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+      "targetDiagnostics": 5
+    },
+    {
+      "project": "specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups",
+      "targetDiagnostics": 0
+    },
+    {
+      "project": "specification/network/resource-manager/Microsoft.Network/Network/Network",
+      "targetDiagnostics": 4
+    },
+    {
+      "project": "specification/quota/resource-manager/Microsoft.Quota/Quota",
+      "targetDiagnostics": 0
+    },
+    {
+      "project": "specification/resources/resource-manager/Microsoft.Resources/deployments",
+      "targetDiagnostics": 0
+    },
+    {
+      "project": "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker",
+      "targetDiagnostics": 0
+    }
+  ]
+}
