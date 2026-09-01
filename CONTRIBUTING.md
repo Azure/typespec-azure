@@ -349,10 +349,6 @@ TypeSpec X.X and Azure libraries Y.Y were just released
 See the release notes for the complete list of changes.
 ```
 
-### Open questions
-
-1. Define how skills that depend on TypeSpec can remain independently updatable when a TypeSpec package release causes their validation to fail. In particular, investigate how to make the [data-plane linter-rule coverage guidance](https://github.com/Azure/azure-rest-api-specs/blob/main/.github/skills/azure-api-review/references/data-plane-linter-rule-coverage.md#-landing----merged-upstream-not-yet-running-here) robust to TypeSpec changes and allow skill owners a short update window after a TypeSpec library version update.
-
 **NOTE**: The reason for step 1 to ask for folks to avoid merging while
 publishing is in progress is that any changes merged to the repo while the
 publish PR would become part of the release, but the release changelogs
