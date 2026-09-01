@@ -143,6 +143,53 @@ function normalizeScopeList(scopes: string[] | undefined): string[] {
   return [...new Set(scopes?.filter((scope) => scope !== "") ?? [])].sort();
 }
 
+/**
+ * Reconcile the scope for a decorator that has its own options bag (a model that extends
+ * `DecoratorOptions`). The scope can be provided in two ways during migration:
+ * - inside the options bag via its `scope` property (the preferred, evolvable form), or
+ * - through the legacy positional `scope` argument (kept for backward compatibility).
+ *
+ * When both are provided and select a different set of emitters, a `conflicting-scope` diagnostic
+ * is reported and the options bag value wins. This centralizes the compatibility behavior so
+ * individual decorators do not each re-implement it.
+ *
+ * @param context The decorator context.
+ * @param decoratorName The decorator name, used for diagnostics.
+ * @param options The options bag argument, if any.
+ * @param legacyScope The legacy positional scope argument, if any.
+ * @returns The effective scope string, or `undefined` when no scope was specified.
+ */
+function resolveScopeFromOptions(
+  context: DecoratorContext,
+  decoratorName: string,
+  options: Type | undefined,
+  legacyScope?: string,
+): string | undefined {
+  const optionsScopeConfig =
+    options?.kind === "Model" ? options.properties.get("scope")?.type : undefined;
+  const optionsScope: string | undefined =
+    optionsScopeConfig?.kind === "String" ? optionsScopeConfig.value : undefined;
+
+  if (
+    optionsScope !== undefined &&
+    legacyScope !== undefined &&
+    !isSemanticallyEqualScope(optionsScope, legacyScope)
+  ) {
+    reportDiagnostic(context.program, {
+      code: "conflicting-scope",
+      format: {
+        decoratorName,
+        optionsScope,
+        legacyScope,
+      },
+      target: context.decoratorTarget,
+    });
+  }
+  // Prefer the options bag scope when both are set (ignoring the legacy positional argument in
+  // that case), otherwise use whichever one was set.
+  return optionsScope ?? legacyScope;
+}
+
 function setScopedDecoratorData(
   context: DecoratorContext,
   decorator: DecoratorFunction,
@@ -216,30 +263,7 @@ export const $client: ClientDecorator = (
     options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
   const autoMergeServiceConfig =
     options?.kind === "Model" ? options?.properties.get("autoMergeService")?.type : undefined;
-  const optionsScopeConfig =
-    options?.kind === "Model" ? options?.properties.get("scope")?.type : undefined;
-  const optionsScope: string | undefined =
-    optionsScopeConfig?.kind === "String" ? optionsScopeConfig.value : undefined;
-  const legacyScope = scope;
-
-  if (
-    optionsScope !== undefined &&
-    legacyScope !== undefined &&
-    !isSemanticallyEqualScope(optionsScope, legacyScope)
-  ) {
-    reportDiagnostic(context.program, {
-      code: "conflicting-scope",
-      format: {
-        decoratorName: "client",
-        optionsScope,
-        legacyScope,
-      },
-      target: context.decoratorTarget,
-    });
-  }
-  // Prefer the options bag scope when both are set (ignoring the legacy positional argument in
-  // that case), otherwise use whichever one was set.
-  const effectiveScope = optionsScope ?? legacyScope;
+  const effectiveScope = resolveScopeFromOptions(context, "client", options, scope);
 
   if (serviceConfig?.kind === "Namespace") {
     // Explicit single service
@@ -1224,7 +1248,7 @@ export const $clientInitialization: ClientInitializationDecorator = (
       clientInitializationKey,
       target,
       options,
-      scope,
+      resolveScopeFromOptions(context, "clientInitialization", options, scope),
     );
   }
 };

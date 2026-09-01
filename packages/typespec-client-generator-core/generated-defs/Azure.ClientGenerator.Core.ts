@@ -561,7 +561,10 @@ export type UseSystemTextJsonConverterDecorator = (
  * This decorator can be combined with `@paramAlias` decorator to change the parameter name in client initialization.
  *
  * @param target The target client that you want to customize client initialization for.
- * @param options The options for client initialization. You can use `ClientInitializationOptions` model to set the options.
+ * @param options The options for client initialization. You can use `ClientInitializationOptions` model to set the options. `options.scope` can also be used to set the
+ * language scope instead of (or in addition to) the legacy third positional `scope` argument. If
+ * both are set with conflicting values, a warning diagnostic is reported and the `options.scope`
+ * value is used.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).

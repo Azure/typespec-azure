@@ -28,10 +28,18 @@ settings without introducing more positional parameters or a breaking signature 
   `model FooOptions extends DecoratorOptions { extra?: string }`) without breaking other decorators
   still using the shared base options model, and without breaking existing callers of that
   decorator (since new fields on the extended model should remain optional).
-- `@client` additionally accepts `scope` directly on its existing `ClientOptions` bag. The legacy
-  third positional `scope` argument is still accepted. If both are specified with **conflicting**
-  values, TCGC reports the `conflicting-scope` warning diagnostic, uses the options bag value, and
-  ignores the legacy positional argument.
+- Decorators that **already have their own options bag** (`@client` with `ClientOptions`, and
+  `@clientInitialization` with `ClientInitializationOptions`) do not add a second bag. Their options
+  model `extends DecoratorOptions`, so `scope` is set directly on that single existing bag, and the
+  final `scope` parameter stays a plain `valueof string`. The legacy positional `scope` argument is
+  still accepted for backward compatibility. If both the options-bag `scope` and the legacy
+  positional argument are specified with **conflicting** values, TCGC reports the
+  `conflicting-scope` warning diagnostic, uses the options bag value, and ignores the legacy
+  positional argument.
+- Reconciling the options-bag `scope` against the legacy positional argument (including the conflict
+  diagnostic and precedence) is centralized in a single `resolveScopeFromOptions` helper in
+  `decorators.ts`, so every options-bag decorator behaves identically instead of re-implementing the
+  compatibility logic.
 - Scope normalization (turning either shape into the internal string representation) is
   centralized in `internal-utils.ts` (`normalizeScope`), so decorator implementations do not need
   to special-case both forms themselves.
@@ -92,6 +100,29 @@ interface MyInterface {}
   scope: "csharp",
 })
 interface MyInterface {}
+```
+
+The same applies to `@clientInitialization`, whose `ClientInitializationOptions` also extends
+`DecoratorOptions`:
+
+```typespec
+// Before
+@@clientInitialization(
+  MyService,
+  {
+    parameters: MyParams,
+  },
+  "csharp"
+);
+
+// After
+@@clientInitialization(
+  MyService,
+  {
+    parameters: MyParams,
+    scope: "csharp",
+  }
+);
 ```
 
 ## Passing extended options models

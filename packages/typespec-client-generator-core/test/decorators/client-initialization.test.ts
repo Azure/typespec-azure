@@ -1,6 +1,6 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { it } from "vitest";
+import { describe, it } from "vitest";
 import {
   InitializedByFlags,
   type SdkClientType,
@@ -766,4 +766,99 @@ it("client initialized with None", async () => {
   const blobName = client.clientInitialization.parameters.find((x) => x.name === "blobName");
   ok(blobName);
   strictEqual(blobName.onClient, true);
+});
+
+describe("@clientInitialization scope in ClientInitializationOptions", () => {
+  const mainCode = `
+      @service
+      namespace MyService;
+
+      op download(@path blobName: string): void;
+      `;
+
+  function customization(scopeArgs: string): string {
+    return `
+      namespace MyCustomizations;
+
+      model MyClientInitialization {
+        blobName: string;
+      }
+
+      @@clientInitialization(MyService, ${scopeArgs});
+      `;
+  }
+
+  it("accepts scope through ClientInitializationOptions.scope instead of the legacy positional argument", async () => {
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(
+        mainCode,
+        customization(`{parameters: MyCustomizations.MyClientInitialization, scope: "csharp"}`),
+      ),
+    );
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(
+      csharpContext.sdkPackage.clients[0].clientInitialization.parameters.length,
+      2,
+      "csharp is in scope, so the customization applies",
+    );
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(
+      pythonContext.sdkPackage.clients[0].clientInitialization.parameters.length,
+      1,
+      "python is out of scope, so only the default endpoint parameter remains",
+    );
+  });
+
+  it("reports a warning and prefers the options bag scope when ClientInitializationOptions.scope conflicts with the legacy positional argument", async () => {
+    const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        mainCode,
+        customization(
+          `{parameters: MyCustomizations.MyClientInitialization, scope: "csharp"}, "python"`,
+        ),
+      ),
+    );
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflicting-scope",
+      severity: "warning",
+    });
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(
+      csharpContext.sdkPackage.clients[0].clientInitialization.parameters.length,
+      2,
+      "the options bag scope wins, so csharp gets the customization",
+    );
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(
+      pythonContext.sdkPackage.clients[0].clientInitialization.parameters.length,
+      1,
+      "the legacy positional scope is ignored, so python does not get the customization",
+    );
+  });
+
+  it("does not report a warning when the options bag scope and the legacy positional scope are semantically equivalent", async () => {
+    const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        mainCode,
+        customization(
+          `{parameters: MyCustomizations.MyClientInitialization, scope: "csharp, python"}, "python,csharp"`,
+        ),
+      ),
+    );
+
+    expectDiagnostics(diagnostics, []);
+  });
 });
