@@ -336,9 +336,9 @@ Do the following to publish a new release:
 2. Upgrade https://github.com/Azure/azure-rest-api-specs-pr to use new versions of TypeSpec.
    1. Example PR: https://github.com/Azure/azure-rest-api-specs-pr/pull/20878
    2. Merge the `typespec-next` changes into the `RPSaasMaster` branch for the `-pr` repository.
-3. Reset `typespec-next` to `main` after completing the upgrades.
+3. Use the [bidirectional specification upgrade prompt](https://github.com/Azure/azure-rest-api-specs/blob/main/.github/prompts/bidirectional-spec-upgrade.prompt.md) to synchronize `main` and `typespec-next`.
 4. Send an email to the `TypeSpec Partners` group, with the `TypeSpec Team` in CC, announcing the release and linking to the TypeSpec and TypeSpec Azure release notes. Include highlights when appropriate rather than duplicating the complete release notes.
-5. Run `pnpm upgrade --latest -r -i` on each repo and create PR to update dependencies and vulnerabilities.
+5. Run `pnpm upgrade --latest -r -i` on each repo and create PRs to update dependencies and vulnerabilities. Update as many dependencies as possible to avoid debt, but defer version upgrades that require substantial changes to separate PRs.
 6. After update PRs have been merged, review any remaining reported vulnerabilities in both the Repos' `Security` tabs and initiate a discussion on the `Engineering` channel regarding potential mitigations. `Security` tab links: [typespec](https://github.com/microsoft/typespec/security) and [typespec-azure](https://github.com/Azure/typespec-azure/security).
 
 ```md
@@ -349,12 +349,9 @@ TypeSpec X.X and Azure libraries Y.Y were just released
 See the release notes for the complete list of changes.
 ```
 
-### Open questions and TODOs
+### Open questions
 
 1. Define how skills that depend on TypeSpec can remain independently updatable when a TypeSpec package release causes their validation to fail. In particular, investigate how to make the [data-plane linter-rule coverage guidance](https://github.com/Azure/azure-rest-api-specs/blob/main/.github/skills/azure-api-review/references/data-plane-linter-rule-coverage.md#-landing----merged-upstream-not-yet-running-here) robust to TypeSpec changes and allow skill owners a short update window after a TypeSpec library version update.
-2. Define a safe process for updating specification files in the specification repositories without overwriting changes merged to `main` while the update PR is being prepared.
-3. Confirm with Mark and Timothee which files should be updated after running `pnpm upgrade --latest -r -i`, including whether to prefer broader or narrower dependency updates.
-4. Automate bidirectional synchronization between `typespec-next` and `main` in `azure-rest-api-specs`, including the associated specification updates.
 
 **NOTE**: The reason for step 1 to ask for folks to avoid merging while
 publishing is in progress is that any changes merged to the repo while the
