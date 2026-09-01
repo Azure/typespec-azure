@@ -1,0 +1,14 @@
+[
+  {
+    "code": "UnSupportedPatchProperties",
+    "message": "Mark the property \"properties.provisioningState\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "parameters",
+      "4"
+    ],
+    "severity": 0
+  }
+]
