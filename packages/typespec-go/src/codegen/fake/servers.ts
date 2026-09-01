@@ -1134,8 +1134,15 @@ function createPathParamsRegex(method: go.MethodType, pathParams: Array<go.PathP
   urlPath = urlPath.replace(/([.$*+()])/g, "\\$1");
   for (const param of pathParams) {
     const toReplace = `{${param.pathSegment}}`;
+    // most path params are URL encoded by the client, so their values never
+    // contain a path delimiter and the capture must exclude '/' to avoid
+    // consuming subsequent path segments. however, skip-encoding params
+    // (allowReserved, e.g. ARM scopes/resource IDs such as {+scope}) are
+    // inserted unescaped and can span multiple path segments, so their
+    // captures must also admit '/'.
     // NOTE: Use "$$" because "$&" and "$'" are special replacement patterns.
-    let replaceWith = `(?P<${sanitizeRegexpCaptureGroupName(param.pathSegment)}>[a-zA-Z0-9._~%!$$&'()*+,;=:@-]+)`;
+    const pathDelimiter = param.isEncoded ? "" : "/";
+    let replaceWith = `(?P<${sanitizeRegexpCaptureGroupName(param.pathSegment)}>[a-zA-Z0-9._~%!$$&'()*+,;=:@${pathDelimiter}-]+)`;
     if (param.style === "optional" || param.style === "flag") {
       replaceWith += "?";
     }
