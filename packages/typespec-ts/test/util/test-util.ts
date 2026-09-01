@@ -346,6 +346,15 @@ export async function createDpgContextTestHelper(
   });
 
   await provideBinderWithAzureDependencies(outputProject);
+  // The real emit path (index.ts) passes `provideSdkTypes` a context whose
+  // `emitterOptions` carry the resolved emitter ClientOptions. This test helper
+  // otherwise passes the bare TCGC context, so opt-in emitter flags that must be
+  // read during `provideSdkTypes` (e.g. experimental-split-models-by-visibility)
+  // would never be seen. Only bridge it when the flag is set, to keep existing
+  // tests' behavior byte-for-byte identical.
+  if ((sdkContext.emitterOptions as any)?.experimentalSplitModelsByVisibility) {
+    (context as any).emitterOptions = sdkContext.emitterOptions;
+  }
   provideSdkTypes(context);
 
   return sdkContext;
