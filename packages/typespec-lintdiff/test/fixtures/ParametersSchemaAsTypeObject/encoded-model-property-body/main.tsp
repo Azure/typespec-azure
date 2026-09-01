@@ -52,6 +52,9 @@ model EncodedWire {
 
   @encode("custom", int32)
   friendlyTemplatePayload: FriendlyTemplatePayload<string>;
+
+  @encode("custom", PropertyRequest)
+  inlinePrimitive: string;
 }
 
 union ObjectChoice {
@@ -93,5 +96,12 @@ interface Widgets {
   submitFriendlyTemplateEncodedProperty(
     ...ResourceInstanceParameters<Widget>,
     @body body: EncodedWire.friendlyTemplatePayload,
+  ): ArmResponse<Widget> | ErrorResponse;
+
+  @post
+  @armResourceAction(Widget)
+  submitInlineUntypedEncodedProperty(
+    ...ResourceInstanceParameters<Widget>,
+    @body body: EncodedWire.inlinePrimitive,
   ): ArmResponse<Widget> | ErrorResponse;
 }

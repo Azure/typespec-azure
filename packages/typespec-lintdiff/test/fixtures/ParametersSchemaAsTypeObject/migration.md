@@ -14,7 +14,7 @@ object bodies even though AutoRest emits the object schema reference with
 After correcting those differences, including emitted union handling, the full
 corpus run at specs commit
 `f6b53f105b95da05276530a0754a1c71b4f16397`, generated at
-`2026-09-01T02:59:51.460Z`, produced 9 Swagger projects, 9 TypeSpec projects,
+`2026-09-01T05:13:25.365Z`, produced 9 Swagger projects, 9 TypeSpec projects,
 9 overlapping projects, and no one-sided projects in the successfully compiled
 population. The migrated TypeSpec rule is functionally equivalent to the
 Swagger rule for natively observable schemas in the assessed population.
@@ -77,7 +77,9 @@ appears in the aligned corpus; the equivalence conclusion excludes it.
     nullable wrappers, emits the type beside `$ref`; the resolved Swagger
     selector follows the referenced schema and classifies its resolved type
     rather than that sibling. The same property encoding replaces the schema
-    type when the resolved underlying schema is inline. Unnamed template
+    type when the resolved underlying schema is inline: typed replacements are
+    violations, untyped replacements remove the original type and pass, and a
+    falsey merged format leaves the original type unchanged. Unnamed template
     instances are inline; `@friendlyName` makes a template instance referenced.
     The date-time format merge branch also preserves an inherited string type
     when its encoding string is empty, rather than applying the default branch's
@@ -100,7 +102,7 @@ the uncovered behavior.
 | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------: | ---------------------------------------------- | ---------------: | ----------------: | --------------------: | ------------------: | ------------: | ----------------------: |
 | `docs/coverage_old.md`                                   | External report snapshot; source URL is recorded in the file, but no spec or generator revision is provided |         450 compiled projects, 210 validator rules | `ParametersSchemaAsTypeObject none 9 4 0 44.4` |                9 |                 4 | not listed separately | not reconstructable |    not listed |              not listed |
 | Checked-in `specs/coverage-breakdown.md` before this fix | Specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`; 462/468 successful projects                        | 462 successful projects, 215 known validator rules | `ParametersSchemaAsTypeObject production`      |                9 |                10 |                     4 |                   5 |             6 | 18 Swagger, 63 TypeSpec |
-| Refreshed full corpus after this repair                  | Same specs commit; generated `2026-09-01T02:59:51.460Z`; full run over 462/468 successful projects          | 462 successful projects, 215 known validator rules | `ParametersSchemaAsTypeObject production`      |                9 |                 9 |                     9 |                   0 |             0 | 18 Swagger, 19 TypeSpec |
+| Refreshed full corpus after this repair                  | Same specs commit; generated `2026-09-01T05:13:25.365Z`; full run over 462/468 successful projects          | 462 successful projects, 215 known validator rules | `ParametersSchemaAsTypeObject production`      |                9 |                 9 |                     9 |                   0 |             0 | 18 Swagger, 19 TypeSpec |
 
 The reports answer different questions. The external report gives aggregate
 coverage credit and does not expose the unmatched projects, so they cannot be
@@ -511,10 +513,49 @@ untyped definition rather than the sibling metadata.
 instead of treating property encoding alone as a validator-visible schema type.
 Decide whether the outer type is referenced before normalizing anonymous
 singleton and nullable union wrappers. For an inline underlying schema,
-including an unnamed template instance, retain the property encoding as a
-violation because AutoRest applies it directly to the selected schema object.
-A paired `@friendlyName` template control proves that named instances instead
-emit a reference whose resolved object schema remains compliant.
+including an unnamed template instance, classify the replacement type because
+AutoRest applies it directly to the selected schema object. Typed replacements
+violate. A paired `@friendlyName` template control proves that named instances
+instead emit a reference whose resolved object schema remains compliant.
+
+### Gap example: inline untyped property replacement
+
+- **Classification:** TypeSpec-only
+- **Status:** fixed
+- **Project/API version:** focused fixture / `2024-01-01`
+- **Source:** `encoded-model-property-body/main.tsp`
+
+**TypeSpec source**
+
+```typespec
+scalar PropertyRequest;
+
+model EncodedWire {
+  @encode("custom", PropertyRequest)
+  inlinePrimitive: string;
+}
+```
+
+**Emitted OpenAPI**
+
+```json
+{
+  "schema": {}
+}
+```
+
+| Engine            | Observed result                                                     |
+| ----------------- | ------------------------------------------------------------------- |
+| Swagger validator | No diagnostic because the replacement schema has no `type`          |
+| TypeSpec lint     | Formerly recursed to `string` and reported; now emits no diagnostic |
+
+**Explanation:** The non-empty `custom` format makes AutoRest apply the property
+encoding to the inline string schema. It assigns the unbased encode-as scalar's
+undefined type, removing the original `type: string`.
+
+**Disposition:** Distinguish typed replacement, untyped replacement, and no
+replacement. Diagnose only a typed non-object replacement; accept an untyped
+replacement and recurse to the authored type only when no replacement occurs.
 
 ### Gap example: duplicated semantic report
 
@@ -559,25 +600,25 @@ the comparison output.
 
 ## Fixture evidence
 
-| Fixture                       | Swagger result                            | TypeSpec result                |
-| ----------------------------- | ----------------------------------------- | ------------------------------ |
-| `non-object-body`             | primitive POST body violation             | matching diagnostic            |
-| `put-non-object-body`         | primitive PUT body violation              | matching diagnostic            |
-| `named-array-model-body`      | named array body violation                | matching diagnostic            |
-| `object-body`                 | no violation                              | no rule diagnostic             |
-| `inline-object-body`          | no violation                              | no rule diagnostic             |
-| `nullable-object-body`        | nullable object; no violation             | no rule diagnostic             |
-| `single-variant-unions`       | singleton object and nullable unknown     | no rule diagnostic             |
-| `unsupported-union-body`      | unsupported union emits no schema type    | no rule diagnostic             |
-| `enum-union-body`             | string enum schema violation              | matching diagnostic            |
-| `unbased-scalar-body`         | unbased and encoded scalars emit no type  | no rule diagnostic             |
-| `empty-enum-body`             | empty enum emits no schema type           | no rule diagnostic             |
-| `empty-encoded-scalar-body`   | empty encodings can replace with no type  | no rule diagnostic             |
-| `encoded-model-property-body` | resolved references remain object/untyped | no rule diagnostic             |
-| `multipart-body`              | parts emit as form-data parameters        | no rule diagnostic             |
-| `explicit-schema-type-bodies` | seventeen explicit non-object branches    | seventeen matching diagnostics |
-| `no-body-action`              | no body and no violation                  | no rule diagnostic             |
-| `unknown-body-action`         | body schema has no `type`; no violation   | no rule diagnostic             |
+| Fixture                       | Swagger result                                                             | TypeSpec result                |
+| ----------------------------- | -------------------------------------------------------------------------- | ------------------------------ |
+| `non-object-body`             | primitive POST body violation                                              | matching diagnostic            |
+| `put-non-object-body`         | primitive PUT body violation                                               | matching diagnostic            |
+| `named-array-model-body`      | named array body violation                                                 | matching diagnostic            |
+| `object-body`                 | no violation                                                               | no rule diagnostic             |
+| `inline-object-body`          | no violation                                                               | no rule diagnostic             |
+| `nullable-object-body`        | nullable object; no violation                                              | no rule diagnostic             |
+| `single-variant-unions`       | singleton object and nullable unknown                                      | no rule diagnostic             |
+| `unsupported-union-body`      | unsupported union emits no schema type                                     | no rule diagnostic             |
+| `enum-union-body`             | string enum schema violation                                               | matching diagnostic            |
+| `unbased-scalar-body`         | unbased and encoded scalars emit no type                                   | no rule diagnostic             |
+| `empty-enum-body`             | empty enum emits no schema type                                            | no rule diagnostic             |
+| `empty-encoded-scalar-body`   | empty encodings can replace with no type                                   | no rule diagnostic             |
+| `encoded-model-property-body` | resolved references and inline untyped replacement emit no non-object type | no rule diagnostic             |
+| `multipart-body`              | parts emit as form-data parameters                                         | no rule diagnostic             |
+| `explicit-schema-type-bodies` | seventeen explicit non-object branches                                     | seventeen matching diagnostics |
+| `no-body-action`              | no body and no violation                                                   | no rule diagnostic             |
+| `unknown-body-action`         | body schema has no `type`; no violation                                    | no rule diagnostic             |
 
 The seventeen-fixture suite covers five violating fixtures and twelve compliant fixtures.
 Ambient diagnostics from other rules are declared in each fixture snapshot and

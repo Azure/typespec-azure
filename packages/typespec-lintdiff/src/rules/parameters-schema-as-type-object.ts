@@ -79,12 +79,14 @@ function getEmittedSchemaType(
     case "Enum":
       return type.members.size > 0 ? type : undefined;
     case "ModelProperty": {
-      if (
-        path === "schema-or-ref" &&
-        isResolvedSchemaInline(program, type.type) &&
-        hasEmittedEncodingType(program, type)
-      ) {
-        return type;
+      if (path === "schema-or-ref" && isResolvedSchemaInline(program, type.type)) {
+        const encodingType = getEmittedEncodingType(program, type);
+        if (encodingType === "typed") {
+          return type;
+        }
+        if (encodingType === "untyped") {
+          return undefined;
+        }
       }
       return getEmittedSchemaType(program, type.type, path);
     }
@@ -108,17 +110,22 @@ function hasEmittedScalarType(program: Program, scalar: Scalar): boolean {
   return getEmittedScalarSchema(program, scalar).hasType;
 }
 
-function hasEmittedEncodingType(program: Program, target: Scalar | ModelProperty): boolean {
+function getEmittedEncodingType(
+  program: Program,
+  target: Scalar | ModelProperty,
+): "none" | "typed" | "untyped" {
   const encoding = getEncode(program, target);
   if (!encoding || encoding.type === target) {
-    return false;
+    return "none";
   }
   const targetFormat = isSecret(program, target) ? "password" : getFormat(program, target);
   const encodedSchema = getEmittedScalarSchema(program, encoding.type);
-  return (
-    encodedSchema.hasType &&
-    Boolean(mergeFormatAndEncoding(targetFormat, encoding.encoding, encodedSchema.format))
+  const mergedFormat = mergeFormatAndEncoding(
+    targetFormat,
+    encoding.encoding,
+    encodedSchema.format,
   );
+  return !mergedFormat ? "none" : encodedSchema.hasType ? "typed" : "untyped";
 }
 
 function isResolvedSchemaInline(program: Program, type: Type): boolean {
