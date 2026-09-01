@@ -84,8 +84,17 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
     if (result === undefined) {
       return "// (file was not generated)";
     }
-
-    return result.getFullText();
+    const modelFiles = result
+      .getProject()
+      .getSourceFiles()
+      .filter((file) => file.getBaseName() === "models.ts");
+    if (modelFiles.length === 1) {
+      return modelFiles[0]!.getFullText();
+    }
+    return modelFiles
+      .toSorted((a, b) => a.getFilePath().localeCompare(b.getFilePath()))
+      .map((file) => `/** This file path is ${file.getFilePath()} */\n\n${file.getFullText()}`)
+      .join("\n");
   },
 
   // Snapshot of the top-level index file
@@ -175,8 +184,24 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
   //Snapshot of the classicClient file for a given typespec
   "(ts|typescript) classicClient": async (tsp, _, namedUnknownArgs) => {
     const configs = namedUnknownArgs ? (namedUnknownArgs["configs"] as Record<string, string>) : {};
-    const result = await emitModularClientFromTypeSpec(tsp, configs);
-    return result ? result!.getFullText()! : "";
+    const clients = await emitModularClientFromTypeSpec(tsp, configs);
+    if (clients.length === 1) {
+      return clients[0]!.getFullText();
+    }
+    return clients
+      .toSorted((a, b) => a.getFilePath().localeCompare(b.getFilePath()))
+      .map((file) => `/** This file path is ${file.getFilePath()} */\n\n${file.getFullText()}`)
+      .join("\n");
+  },
+
+  // Snapshot of a named classic client when the TypeSpec defines multiple services
+  "(ts|typescript) classicClient {name}": async (tsp, { name }, namedUnknownArgs) => {
+    const configs = namedUnknownArgs ? (namedUnknownArgs["configs"] as Record<string, string>) : {};
+    const clients = await emitModularClientFromTypeSpec(tsp, configs);
+    const sourceFile = clients.find(
+      (file) => file.getClass(name ?? "No name specified!") !== undefined,
+    );
+    return sourceFile?.getFullText() ?? "";
   },
 
   // Pattern for a specific test file - look it up by file name

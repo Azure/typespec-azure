@@ -313,6 +313,7 @@ Do the following to publish a new release:
    1. In your fork of the typespec-azure repo, run `pnpm exec chronus changelog --policy typespec-azure > out.md`.
    2. Create a new entry in `./website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/Azure/typespec-azure/pull/1306
+   3. Merge the TypeSpec and TypeSpec Azure release notes PRs. This is not a blocker for the following steps and can be done at any point after they are opened.
 
 6. Run `pnpm prepare-publish` in TypeSpec-Azure repo to stage the publishing changes.
    - This creates `publish/xxxxxx` branches for TypeSpec-Azure and TypeSpec repos.
@@ -334,22 +335,18 @@ Do the following to publish a new release:
    1. Example PR: https://github.com/Azure/azure-rest-api-specs/pull/30122
 2. Upgrade https://github.com/Azure/azure-rest-api-specs-pr to use new versions of TypeSpec.
    1. Example PR: https://github.com/Azure/azure-rest-api-specs-pr/pull/20878
-3. Send an email to the `TypeSpec Partners` group announcing the release.
-   - Include the TypeSpec/TypeSpec-Azure release notes (links plus contents) as part of the announcement.
-     Example:
-4. Run `pnpm upgrade --latest -r -i` on each repo and create PR to update dependencies and vulnerabilities.
-5. After update PRs have been merged, review any remaining reported vulnerabilities in both the Repos' `Security` tabs and initiate a discussion on the `Engineering` channel regarding potential mitigations. `Security` tab links: [typespec](https://github.com/microsoft/typespec/security) and [typespec-azure](https://github.com/Azure/typespec-azure/security).
+   2. Merge the `typespec-next` changes into the `RPSaasMaster` branch for the `-pr` repository.
+3. Use the [bidirectional specification upgrade prompt](https://github.com/Azure/azure-rest-api-specs/blob/main/.github/prompts/bidirectional-spec-upgrade.prompt.md) to synchronize `main` and `typespec-next`.
+4. Send an email to the `TypeSpec Partners` group, with the `TypeSpec Team` in CC, announcing the release and linking to the TypeSpec and TypeSpec Azure release notes. Include highlights when appropriate rather than duplicating the complete release notes.
+5. Run `pnpm upgrade --latest -r -i` on each repo and create PRs to update dependencies and vulnerabilities. Update as many dependencies as possible to avoid debt, but defer version upgrades that require substantial changes to separate PRs.
+6. After update PRs have been merged, review any remaining reported vulnerabilities in both the Repos' `Security` tabs and initiate a discussion on the `Engineering` channel regarding potential mitigations. `Security` tab links: [typespec](https://github.com/microsoft/typespec/security) and [typespec-azure](https://github.com/Azure/typespec-azure/security).
 
 ```md
 TypeSpec X.X and Azure libraries Y.Y were just released
 [TypeSpec X.X Release Notes](link/to/published/release-notes)
 [TypeSpec Azure Y.Y Release Notes](link/to/published/release-notes)
 
-Take a look at what's included in TypeSpec X.X!
-<-- Copy of release notes -->
-
-And here's what changed with TypeSpec Azure Y.Y libraries!
-<-- Copy of release notes -->
+See the release notes for the complete list of changes.
 ```
 
 **NOTE**: The reason for step 1 to ask for folks to avoid merging while
