@@ -147,7 +147,7 @@ export class TypeAdapter {
       if (content.addlProps) {
         const annotations = new go.ModelFieldAnnotations(false, false, true, false);
         const addlPropsType = new go.Map(
-          this.getWireType(content.addlProps, false, false),
+          this.getMapValueType(content.addlProps, false, false),
           helpers.isTypePassedByValue(content.addlProps),
         );
         const addlProps = new go.ModelField(
@@ -254,10 +254,19 @@ export class TypeAdapter {
         if (arrayType) {
           return arrayType;
         }
-        arrayType = new go.Slice(
-          this.getWireType(elementType, elementTypeByValue, substituteDiscriminator),
-          myElementTypeByValue,
+        const goElementType = this.getWireType(
+          type.valueType,
+          elementTypeByValue,
+          substituteDiscriminator,
         );
+        switch (goElementType.kind) {
+          case "constantDef":
+          case "constantValue":
+          case "etag":
+          case "literal":
+            throw new Error("todo elementType");
+        }
+        arrayType = new go.Slice(goElementType, myElementTypeByValue);
         this.types.set(keyName, arrayType);
         return arrayType;
       }
@@ -288,7 +297,7 @@ export class TypeAdapter {
           return mapType;
         }
         mapType = new go.Map(
-          this.getWireType(type.valueType, elementTypeByValue, substituteDiscriminator),
+          this.getMapValueType(type.valueType, elementTypeByValue, substituteDiscriminator),
           valueTypeByValue,
         );
         this.types.set(keyName, mapType);
@@ -842,10 +851,7 @@ export class TypeAdapter {
     field.docs.description = prop.doc;
 
     if (prop.encode && type.kind === "slice") {
-      if (
-        type.elementType.kind === "string" ||
-        (type.elementType.kind === "constant" && type.elementType.type === "string")
-      ) {
+      if (type.elementType.kind === "string" || go.isConstant(type.elementType, "string")) {
         type = new go.SliceArray(
           type.elementType,
           type.elementTypeByValue,
@@ -1098,6 +1104,29 @@ export class TypeAdapter {
     }
 
     // TODO: tcgc doesn't support duration as a literal value
+  }
+
+  /** adapts the SDK type to a Go map value type */
+  private getMapValueType(
+    sdkType: tcgc.SdkType,
+    elementTypeByValue: boolean,
+    substituteDiscriminator: boolean,
+  ): go.MapValueType {
+    const valueType = this.getWireType(sdkType, elementTypeByValue, substituteDiscriminator);
+    switch (valueType.kind) {
+      case "constantDef":
+      case "constantValue":
+      case "etag":
+      case "multipartContent":
+      case "literal":
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `unsupported kind ${valueType.kind} for map value type`,
+          sdkType.__raw?.node,
+        );
+      default:
+        return valueType;
+    }
   }
 
   private getUnionStruct(sdkUnion: tcgc.SdkUnionType, elementTypeByValue: boolean): go.UnionStruct {

@@ -2467,21 +2467,14 @@ export class ClientAdapter {
           if (exampleType.additionalPropertiesValue) {
             ret.additionalProperties = {};
             for (const [k, v] of Object.entries(exampleType.additionalPropertiesValue)) {
-              const filed = concreteType.fields.find((f) => f.annotations.isAdditionalProperties);
-              if (!filed) {
+              const field = concreteType.fields.find((f) => go.isAdditionalProperties(f));
+              if (!field) {
                 throw new AdapterError(
                   "InternalError",
                   `additional properties field not found in model '${concreteType.name}'.`,
                 );
               }
-              if (filed.type.kind === "map") {
-                ret.additionalProperties[k] = this.adaptExampleType(v, filed.type.valueType);
-              } else {
-                throw new AdapterError(
-                  "InternalError",
-                  `additional properties field type should be map type, but got '${filed.type.kind}' in model '${concreteType.name}'`,
-                );
-              }
+              ret.additionalProperties[k] = this.adaptExampleType(v, field.type.valueType);
             }
           }
           return ret;
