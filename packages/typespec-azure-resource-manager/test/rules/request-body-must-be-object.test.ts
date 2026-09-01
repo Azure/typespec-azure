@@ -207,12 +207,48 @@ it("allows an unsupported model union request body", async () => {
     .toBeValid();
 });
 
-it("allows an operation without a request body", async () => {
+it("allows an ARM action with a synthetic void request body", async () => {
   await tester
     .expect(
       `
-      @post
-      op run(): void;
+      @armProviderNamespace
+      @service(#{ title: "Test service" })
+      @versioned(Versions)
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v6)
+      namespace Microsoft.Test;
+
+      enum Versions {
+        @useDependency(Azure.ResourceManager.CommonTypes.Versions.v6)
+        v2024_01_01: "2024-01-01",
+      }
+
+      model Widget is TrackedResource<WidgetProperties> {
+        ...ResourceNameParameter<
+          Resource = Widget,
+          KeyName = "widgetName",
+          SegmentName = "widgets",
+          NamePattern = ""
+        >;
+      }
+
+      model WidgetProperties {
+        @visibility(Lifecycle.Read)
+        provisioningState?: ResourceProvisioningState;
+      }
+
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      @armResourceOperations
+      interface Widgets {
+        get is ArmResourceRead<Widget>;
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        update is ArmResourcePatchAsync<Widget, WidgetProperties>;
+        delete is ArmResourceDeleteWithoutOkAsync<Widget>;
+        listByResourceGroup is ArmResourceListByParent<Widget>;
+
+        @action("run")
+        run is ArmResourceActionSync<Widget, void, ArmResponse<Widget>>;
+      }
     `,
     )
     .toBeValid();

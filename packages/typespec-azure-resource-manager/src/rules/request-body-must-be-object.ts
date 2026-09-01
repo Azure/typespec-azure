@@ -31,13 +31,15 @@ export const requestBodyMustBeObjectRule = createRule({
       operation: (operation) => {
         const [httpOperation] = getHttpOperation(context.program, operation);
         const body = httpOperation.parameters.body;
-        if (body === undefined || body.bodyKind !== "single") {
+        if (body === undefined || body.bodyKind === "multipart") {
           return;
         }
 
-        const schemaType = getEmittedSchemaType(context.program, body.type);
-        if (schemaType === undefined || isObjectSchemaType(schemaType)) {
-          return;
+        if (body.bodyKind === "single") {
+          const schemaType = getEmittedSchemaType(context.program, body.type);
+          if (schemaType === undefined || isObjectSchemaType(schemaType)) {
+            return;
+          }
         }
 
         context.reportDiagnostic({
