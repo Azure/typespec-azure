@@ -11,14 +11,14 @@ interface ScopeAccessReviewHistoryDefinitionInstances {
   @doc("Lists access review history definitions.")
   @route("/accessReviewHistoryDefinitions")
   @get
-  listByScope(): {
+  fetchByScope(): {
     @statusCode statusCode: 200;
     @body definitions: string[];
   };
 }
 
 @@clientLocation(
-  ScopeAccessReviewHistoryDefinitionInstances.listByScope,
+  ScopeAccessReviewHistoryDefinitionInstances.fetchByScope,
   "ScopeAccessReviewHistoryDefinitions"
 );
-@@clientName(ScopeAccessReviewHistoryDefinitionInstances.listByScope, "List");
+@@clientName(ScopeAccessReviewHistoryDefinitionInstances.fetchByScope, "List");
