@@ -264,10 +264,25 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
     // Defaults are merged in api-extractor when the config file is read from disk with
     // `ExtractorConfig.loadFile`. This is derived from that method.
     // https://github.com/microsoft/rushstack/blob/1a92f17fa537b55529adbec80203bd99afd8cd24/apps/api-extractor/src/api/ExtractorConfig.ts#L624-L627
-    const configObject = deepMerge(
-      structuredClone((ExtractorConfig as any)._defaultConfig),
-      baseConfigObject,
-    );
+    // In api-extractor >=7.59.0 the _defaultConfig static was moved to a module-level
+    // constant, so we load the defaults file directly. The file is JSONC (has comments),
+    // so it must go through JsonFile.load rather than plain JSON.parse.
+    // See: https://github.com/Azure/typespec-azure/issues/5370
+    let defaultConfig = (ExtractorConfig as any)._defaultConfig;
+    if (defaultConfig === undefined) {
+      const apiExtractorRequire = createRequire(
+        createRequire(import.meta.url).resolve("@microsoft/api-extractor"),
+      );
+      const { JsonFile } = apiExtractorRequire("@rushstack/node-core-library") as {
+        JsonFile: { load(path: string): unknown };
+      };
+      const defaultConfigPath = joinPath(
+        dirname(createRequire(import.meta.url).resolve("@microsoft/api-extractor")),
+        "schemas/api-extractor-defaults.json",
+      );
+      defaultConfig = JsonFile.load(defaultConfigPath);
+    }
+    const configObject = deepMerge(structuredClone(defaultConfig), baseConfigObject);
     ExtractorConfig.jsonSchema.validateObject(configObject, "api extractor config object");
 
     const config: IExtractorConfigPrepareOptions = {
