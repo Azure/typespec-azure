@@ -234,6 +234,12 @@ export async function createOrUpdateImplementationTask({
   for (const issue of taskIssues) {
     const activeReason = await getActiveTaskReason(github, owner, repo, issue);
     if (activeReason) {
+      await github.rest.issues.createComment({
+        owner,
+        repo,
+        issue_number: coverageIssueNumber,
+        body: `🤖 Task issue #${issue.number} is already active because ${activeReason}; no task issue was created or updated.`,
+      });
       core.info(
         `Task issue #${issue.number} is active because ${activeReason}; no task issue will be created or updated.`,
       );
