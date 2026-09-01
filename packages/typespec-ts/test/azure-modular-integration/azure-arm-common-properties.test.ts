@@ -159,23 +159,55 @@ describe("Azure Arm Resources Rest Client", () => {
         );
       }
     });
-    // skipping this test as https://github.com/Azure/autorest.typescript/issues/2965
-    it.skip("should handle user-defined error for bad request (400)", async () => {
+    it("should handle user-defined error for bad request (400)", async () => {
       try {
         await client.error.createForUserDefinedError(RESOURCE_GROUP_EXPECTED, "confidential", {
           location: "eastus",
           properties: {
             username: "00",
-            provisioningState: "",
+            provisioningState: "Succeeded",
           },
         });
         assert.fail("Should have thrown an error for bad request");
       } catch (error: any) {
-        // Azure Modular clients use createRestError which creates errors with statusCode property
         assert.strictEqual(error.statusCode, 400);
-        assert.strictEqual(error.code, "BadRequest");
-        assert.strictEqual(error.message, "Username should not contain only numbers.");
+        assert.strictEqual(error.details.error.code, "BadRequest");
+        assert.strictEqual(
+          error.details.error.message,
+          "Username should not contain only numbers.",
+        );
       }
+    });
+  });
+
+  describe("ARM Resource Identifiers", () => {
+    const resourceName = "armId";
+    const resourceId = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Microsoft.Network/virtualNetworks/myVnet`;
+    const groupScopedResourceId = `/providers/Microsoft.Management/serviceGroups/test-sg/providers/Microsoft.Authorization/roleDefinitions/${SUBSCRIPTION_ID_EXPECTED}`;
+    const properties = {
+      simpleArmId: resourceId,
+      armIdWithType: resourceId,
+      armIdWithTypeAndScope: resourceId,
+      armIdWithAllScopes: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Microsoft.Compute/virtualMachines/myVm`,
+      armIdWithGroupScope: groupScopedResourceId,
+    };
+
+    it("should get ARM resource identifiers", async () => {
+      const result = await client.armResourceIdentifiers.get(RESOURCE_GROUP_EXPECTED, resourceName);
+
+      assert.strictEqual(result.name, resourceName);
+      assert.deepInclude(result.properties, properties);
+    });
+
+    it("should create or replace ARM resource identifiers", async () => {
+      const result = await client.armResourceIdentifiers.createOrReplace(
+        RESOURCE_GROUP_EXPECTED,
+        resourceName,
+        { location: LOCATION_REGION_EXPECTED, properties },
+      );
+
+      assert.strictEqual(result.name, resourceName);
+      assert.deepInclude(result.properties, properties);
     });
   });
 });
