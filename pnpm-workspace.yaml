@@ -21,7 +21,7 @@ overrides:
   "yaml@>=2.0.0 <2.8.3": ">=2.8.3"
   # Pin api-extractor to 7.58.x — 7.59.0 moved _defaultConfig to a private module-level
   # constant, breaking the in-memory config construction in typespec-ts spector tests.
-  # See: https://github.com/Azure/typespec-azure/issues/XXXX
+  # See: https://github.com/Azure/typespec-azure/issues/5370
   "@microsoft/api-extractor": "~7.58.1"
 
 onlyBuiltDependencies:
