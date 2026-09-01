@@ -200,7 +200,7 @@ export type ClientDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   options?: Type,
-  scope?: DecoratorOptions | string,
+  scope?: string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -228,7 +228,7 @@ export type ClientDecorator = (
 export type OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  scope?: DecoratorOptions | string,
+  scope?: string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -593,7 +593,7 @@ export type ClientInitializationDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   options: Type,
-  scope?: DecoratorOptions | string,
+  scope?: string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**
