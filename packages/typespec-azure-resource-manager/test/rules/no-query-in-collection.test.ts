@@ -1,14 +1,11 @@
 import { Tester } from "#test/tester.js";
 import {
+  createLinterRuleTester,
   type LinterRuleTester,
   type TesterInstance,
-  createLinterRuleTester,
 } from "@typespec/compiler/testing";
-import { beforeEach, expect, it } from "vitest";
-import {
-  collectionGetInvalidQueryParameterRule,
-  createReportedParameterKey,
-} from "../../src/rules/collection-get-invalid-query-parameter.js";
+import { beforeEach, it } from "vitest";
+import { noQueryInCollectionRule } from "../../src/rules/no-query-in-collection.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -17,13 +14,12 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    collectionGetInvalidQueryParameterRule,
+    noQueryInCollectionRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
 
-const diagnosticCode =
-  "@azure-tools/typespec-azure-resource-manager/collection-get-invalid-query-parameter";
+const diagnosticCode = "@azure-tools/typespec-azure-resource-manager/no-query-in-collection";
 
 it("reports one extra query parameter on an ARM collection list operation", async () => {
   await tester
@@ -149,7 +145,7 @@ it("reports a mis-cased $FILTER query parameter", async () => {
     });
 });
 
-it("reports library-provided query parameters on the local operation", async () => {
+it("ignores library-provided query parameters", async () => {
   await tester
     .expect(
       `
@@ -165,11 +161,7 @@ it("reports library-provided query parameters on the local operation", async () 
       ): void;
       `,
     )
-    .toEmitDiagnostics([
-      { code: diagnosticCode, target: "listWidgets" },
-      { code: diagnosticCode, target: "listWidgets" },
-      { code: diagnosticCode, target: "listWidgets" },
-    ]);
+    .toBeValid();
 });
 
 it("checks operations in a child namespace of an ARM provider", async () => {
@@ -236,57 +228,20 @@ it("allows extra query parameters on a non-GET collection operation", async () =
     .toBeValid();
 });
 
-it("does not report collection GETs outside an ARM provider namespace", async () => {
+it("reports collection GETs outside an ARM provider namespace when enabled directly", async () => {
   await tester
     .expect(
       `
       namespace Contoso;
 
-      @route("/widgets")
+      @route("/providers/Contoso.Widgets/widgets")
       @get
       op listWidgets(@query continuationToken?: string): void;
       `,
     )
-    .toBeValid();
-});
-
-it("deduplicates sibling child namespaces by their ARM provider namespace", async () => {
-  await runner.compile(`
-    @armProviderNamespace
-    namespace Microsoft.Contoso {
-      namespace First {}
-      namespace Second {}
-    }
-  `);
-
-  const microsoft = runner.program.getGlobalNamespaceType().namespaces.get("Microsoft")!;
-  const provider = microsoft.namespaces.get("Contoso")!;
-  const firstChild = provider.namespaces.get("First")!;
-  const secondChild = provider.namespaces.get("Second")!;
-  const path = "/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/widgets";
-
-  expect(createReportedParameterKey(runner.program, firstChild, path, "continuationToken")).toBe(
-    createReportedParameterKey(runner.program, secondChild, path, "continuationToken"),
-  );
-});
-
-it("keeps identical paths from different ARM providers distinct", async () => {
-  await runner.compile(`
-    namespace Microsoft {
-      @armProviderNamespace
-      namespace First {}
-
-      @armProviderNamespace
-      namespace Second {}
-    }
-  `);
-
-  const microsoft = runner.program.getGlobalNamespaceType().namespaces.get("Microsoft")!;
-  const firstProvider = microsoft.namespaces.get("First")!;
-  const secondProvider = microsoft.namespaces.get("Second")!;
-  const path = "/subscriptions/{subscriptionId}/providers/Microsoft.Shared/widgets";
-
-  expect(
-    createReportedParameterKey(runner.program, firstProvider, path, "continuationToken"),
-  ).not.toBe(createReportedParameterKey(runner.program, secondProvider, path, "continuationToken"));
+    .toEmitDiagnostics({
+      code: diagnosticCode,
+      message:
+        "Query parameter 'continuationToken' should be removed. Collection GET operations must not have query parameters other than api-version and $filter.",
+    });
 });

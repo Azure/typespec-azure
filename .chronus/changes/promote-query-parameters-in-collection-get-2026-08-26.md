@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-Add the `collection-get-invalid-query-parameter` ARM lint rule, disabled by default in the resource-manager ruleset.
+Add the `no-query-in-collection` ARM lint rule, disabled by default in the resource-manager ruleset.

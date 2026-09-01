@@ -1,67 +1,41 @@
-import {
-  createRule,
-  fileRef,
-  getLocationContext,
-  type Namespace,
-  paramMessage,
-  type Program,
-} from "@typespec/compiler";
+import { createRule, fileRef, paramMessage } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
-import { getArmProviderNamespace } from "../namespace.js";
 
-export const collectionGetInvalidQueryParameterRule = createRule({
-  name: "collection-get-invalid-query-parameter",
-  docs: fileRef.fromPackageRoot("src/rules/collection-get-invalid-query-parameter.md"),
+export const noQueryInCollectionRule = createRule({
+  name: "no-query-in-collection",
+  docs: fileRef.fromPackageRoot("src/rules/no-query-in-collection.md"),
   description:
     "ARM collection GET operations must not declare query parameters beyond api-version and $filter.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/collection-get-invalid-query-parameter",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-query-in-collection",
   messages: {
     default: paramMessage`Query parameter '${"name"}' should be removed. Collection GET operations must not have query parameters other than api-version and $filter.`,
   },
   create(context) {
-    const reportedParameters = new Set<string>();
+    const reportedParameters = new Set<object>();
 
     return {
       operation: (operation) => {
-        const namespace = operation.interface?.namespace ?? operation.namespace;
-        if (namespace === undefined) {
-          return;
-        }
-
-        const providerNamespace = getArmProviderNamespace(context.program, namespace);
-        if (providerNamespace === undefined) {
-          return;
-        }
-
         const [httpOperation] = getHttpOperation(context.program, operation);
         if (httpOperation.verb !== "get" || !isCollectionPath(httpOperation.path)) {
           return;
         }
 
-        for (const parameter of httpOperation.parameters.parameters) {
-          if (parameter.type !== "query" || isAllowedQueryParameter(parameter.name)) {
+        for (const parameter of httpOperation.parameters.properties) {
+          const parameterSource = parameter.property.node ?? parameter.property;
+          if (
+            parameter.kind !== "query" ||
+            isAllowedQueryParameter(parameter.options.name) ||
+            reportedParameters.has(parameterSource)
+          ) {
             continue;
           }
-
-          const key = createReportedParameterKey(
-            context.program,
-            namespace,
-            httpOperation.path,
-            parameter.name,
-          );
-          if (reportedParameters.has(key)) {
-            continue;
-          }
-          reportedParameters.add(key);
+          reportedParameters.add(parameterSource);
 
           context.reportDiagnostic({
-            target:
-              getLocationContext(context.program, parameter.param).type === "project"
-                ? parameter.param
-                : operation,
+            target: parameter.property,
             format: {
-              name: parameter.name,
+              name: parameter.options.name,
             },
           });
         }
@@ -72,21 +46,6 @@ export const collectionGetInvalidQueryParameterRule = createRule({
 
 function isAllowedQueryParameter(name: string): boolean {
   return name === "api-version" || name === "$filter";
-}
-
-export function createReportedParameterKey(
-  program: Program,
-  namespace: Namespace,
-  path: string,
-  parameterName: string,
-): string {
-  const providerNamespace = getArmProviderNamespace(program, namespace);
-  if (providerNamespace === undefined) {
-    throw new Error(
-      "Cannot create a collection query parameter key outside an ARM provider namespace.",
-    );
-  }
-  return `${providerNamespace}\0${path}\0${parameterName}`;
 }
 
 function isCollectionPath(path: string): boolean {
