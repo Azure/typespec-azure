@@ -212,7 +212,7 @@ extern dec protocolAPI(
 extern dec client(
   target: Namespace | Interface,
   options?: ClientOptions,
-  scope?: valueof DecoratorOptions | string
+  scope?: valueof string
 );
 
 /**
@@ -258,7 +258,7 @@ model ClientOptions extends DecoratorOptions {
  * interface MyInterface{}
  * ```
  */
-extern dec operationGroup(target: Namespace | Interface, scope?: valueof DecoratorOptions | string);
+extern dec operationGroup(target: Namespace | Interface, scope?: valueof string);
 
 /**
  * Usage value.
@@ -676,13 +676,13 @@ enum InitializedBy {
 extern dec clientInitialization(
   target: Namespace | Interface,
   options: ClientInitializationOptions,
-  scope?: valueof DecoratorOptions | string
+  scope?: valueof string
 );
 
 /**
  * Client initialization customization options.
  */
-model ClientInitializationOptions {
+model ClientInitializationOptions extends DecoratorOptions {
   /**
    * Redefine the client initialization parameters you would like to add to the client. All the model properties should have corresponding operation level parameters.
    * By default, we apply endpoint, credential, and API version parameters. If you specify a parameters model, we will append the properties of the model to the parameters list of the client initialization.

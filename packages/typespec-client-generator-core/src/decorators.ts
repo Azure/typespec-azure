@@ -199,7 +199,7 @@ export const $client: ClientDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   options?: Type,
-  scope?: LanguageScopes | DecoratorOptions,
+  scope?: LanguageScopes,
 ) => {
   if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
     reportDiagnostic(context.program, {
@@ -220,7 +220,7 @@ export const $client: ClientDecorator = (
     options?.kind === "Model" ? options?.properties.get("scope")?.type : undefined;
   const optionsScope: string | undefined =
     optionsScopeConfig?.kind === "String" ? optionsScopeConfig.value : undefined;
-  const legacyScope = normalizeScope(scope);
+  const legacyScope = scope;
 
   if (
     optionsScope !== undefined &&
@@ -239,7 +239,7 @@ export const $client: ClientDecorator = (
   }
   // Prefer the options bag scope when both are set (ignoring the legacy positional argument in
   // that case), otherwise use whichever one was set.
-  const effectiveScope = optionsScope ?? scope;
+  const effectiveScope = optionsScope ?? legacyScope;
 
   if (serviceConfig?.kind === "Namespace") {
     // Explicit single service
@@ -409,7 +409,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
 export const $operationGroup: OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  scope?: LanguageScopes | DecoratorOptions,
+  scope?: LanguageScopes,
 ) => {
   // Delegate to $client - @operationGroup is now just an alias for @client
   context.call($client, target, undefined, scope);
@@ -1169,7 +1169,7 @@ export const $clientInitialization: ClientInitializationDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   options: Type,
-  scope?: LanguageScopes | DecoratorOptions,
+  scope?: LanguageScopes,
 ) => {
   if (options.kind === "Model") {
     if (options.properties.get("initializedBy")) {
