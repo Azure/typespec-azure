@@ -73,5 +73,10 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-unnamed-types",
+    "severity": "warning",
+    "message": "Anonymous model should be defined as a named model declaration."
   }
 ]

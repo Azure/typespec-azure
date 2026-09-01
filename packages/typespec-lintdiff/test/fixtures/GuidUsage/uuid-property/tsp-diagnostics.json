@@ -1,5 +1,10 @@
 [
   {
+    "code": "tsp-lintdiff-local-linter/guid-usage",
+    "severity": "warning",
+    "message": "Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board."
+  },
+  {
     "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
     "severity": "warning",
     "message": "Use the latest ARM common-types version 'v6' instead of 'v5'."
@@ -8,11 +13,6 @@
     "code": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
     "severity": "warning",
     "message": "Top-level resource 'Widget' should define a list by resource group operation."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/guid-usage",
-    "severity": "warning",
-    "message": "Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board."
   },
   {
     "code": "tsp-lintdiff-local-linter/description-must-not-be-node-name",

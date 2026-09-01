@@ -78,22 +78,25 @@ needs special investigation:
    package validation. If the review finds a source-semantic issue, stop and
    report that promotion is blocked by a source-rule gap; do not repair the
    lintdiff source as part of promotion.
-9. Validate in this order: one-time dependency-closure build if needed, focused
-   rule test, affected package build/lint, docs regeneration, format newly
-   added or edited rule source/docs/tests before broad validation, rulesets
-   build/test, affected package test. Escalate to broader validation only when
-   the touched surface or a failure requires it.
-10. Run `pnpm validate:pr` with a bounded wait. If it makes no progress for
-    five minutes after an already-passed narrow validation set, stop it,
-    classify it as an environmental/pre-existing validation blocker, and include
-    the evidence in the PR instead of waiting indefinitely.
+9. Validate in this order: one-time target-package dependency-closure build if
+   needed, focused rule test, affected package build/lint, required target-package
+   `regen-docs`, inspection and formatting of the generated package README and
+   website linter/rule references, rulesets build/test, affected package test.
+   Do not build the website or its dependency closure locally.
+10. For broad local validation, set `TYPESPEC_SKIP_WEBSITE_BUILD=true` when
+    running the repo build or `pnpm validate:pr`. Keep a bounded wait; if
+    validation makes no progress for five minutes after an already-passed narrow
+    validation set, stop it, classify it as an environmental/pre-existing
+    validation blocker, and include the evidence in the PR instead of waiting
+    indefinitely. Rely on CI's dedicated Website job for the authoritative Astro
+    check and build.
 
 `pnpm validate:pr` is intentionally broad: it fetches/checks the branch, then
 runs full-repo build, test, lint, format check, spelling check, docs regen,
 changeset validation, and diff hygiene. It is not affected-file-aware except for
 the changeset and final diff checks. For promotion PRs, prefer the targeted
-validation commands below and only use bounded `validate:pr` as a final best
-effort.
+validation commands below and only use bounded `validate:pr` with
+`TYPESPEC_SKIP_WEBSITE_BUILD=true` as a final best effort.
 
 ## Process
 
@@ -291,22 +294,8 @@ Use the lintdiff `rule.md` as source material, but rewrite it as official
 library documentation:
 
 - remove lintdiff front matter and harness-only notes
-- add Docusaurus front matter with the official TypeSpec rule name:
-
-  ```md
-  ---
-  title: "<rule-name>"
-  ---
-  ```
-
-- include a full-name block immediately after the front matter:
-
-  ````md
-  ```text title="Full name"
-  @azure-tools/<target-package>/<rule-name>
-  ```
-  ````
-
+- do not add a rule heading or `Full name` block; `tspd doc` generates that
+  metadata
 - explain what the rule checks and why for TypeSpec authors
 - focus the rationale on TypeSpec authoring, generated SDKs, API consistency, and
   Azure emitter/tooling behavior
@@ -323,8 +312,10 @@ the command complete; `tspd doc` can be quiet for several minutes after printing
 the experimental banner, and stopping it early can leave generated rule indexes
 and table formatting stale. Do not hand-edit generated README or website
 reference entries as a substitute for regeneration. After docs regeneration,
-format the changed markdown files or run the repo format check so generated
-tables use the expected Prettier layout.
+inspect the generated target-package README and website linter/rule references
+for the official rule name, page path, links, and table entry. Format the changed
+Markdown files and check them with Prettier so generated tables use the expected
+layout.
 
 ### 7. Update rulesets
 
@@ -389,55 +380,56 @@ Optimized validation order:
 1. affected rule test file
 2. affected package build
 3. affected package lint, if available
-4. affected package `regen-docs`
-5. format check for generated markdown, especially package README and website
-   linter reference files
-6. website-only build when the generated website reference changed, after the
-   target package dependency closure has already been built. In a fresh worktree,
-   first build the website's remaining dependency closure so its all-package docs
-   regeneration does not fail on unrelated missing `dist` outputs:
-
-   ```bash
-   pnpm -r --filter "@azure-tools/typespec-azure-website^..." \
-     --filter "!@typespec/monorepo" \
-     --filter "!@azure-tools/typespec-azure-monorepo" build
-   ```
-
-   Then run the website-only build.
-
+4. required affected-package `regen-docs`
+5. inspect the generated package README and website linter/rule references for
+   the official rule name, page path, links, and table entry
+6. format changed Markdown and run a Prettier check over the generated package
+   README, rule documentation, and website linter/rule references
 7. `@azure-tools/typespec-azure-rulesets` build and test when rulesets changed
 8. affected package test
+9. if broad local validation is warranted, run the repo build or
+   `pnpm validate:pr` with `TYPESPEC_SKIP_WEBSITE_BUILD=true`
+
+Do not manually build the website package or its dependency closure during local
+promotion validation. The website build script honors
+`TYPESPEC_SKIP_WEBSITE_BUILD=true`, matching the general CI build jobs. CI's
+dedicated Website job runs without the skip and is the authoritative Astro check
+and build for generated website content.
 
 For ARM rule promotion, use this command set as the default targeted validation
 loop, replacing `<rule-name>` with the promoted rule file stem:
 
 ```bash
+RULE_NAME="replace-with-rule-name"
 pnpm -r --filter "@azure-tools/typespec-azure-resource-manager..." build
-pnpm --filter @azure-tools/typespec-azure-resource-manager exec vitest run test/rules/ < rule-name > .test.ts
+pnpm --filter @azure-tools/typespec-azure-resource-manager exec vitest run "test/rules/${RULE_NAME}.test.ts"
 pnpm --filter @azure-tools/typespec-azure-resource-manager build
 pnpm --filter @azure-tools/typespec-azure-resource-manager lint
 pnpm --filter @azure-tools/typespec-azure-resource-manager regen-docs
-pnpm run format:check
-pnpm --filter @azure-tools/typespec-azure-website run build
+pnpm exec prettier --write packages/typespec-azure-resource-manager/README.md "packages/typespec-azure-resource-manager/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-resource-manager/reference/linter.md
+pnpm exec prettier --check packages/typespec-azure-resource-manager/README.md "packages/typespec-azure-resource-manager/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-resource-manager/reference/linter.md
 pnpm --filter @azure-tools/typespec-azure-rulesets build
 pnpm --filter @azure-tools/typespec-azure-rulesets test
 pnpm --filter @azure-tools/typespec-azure-resource-manager test
+pnpm exec cross-env TYPESPEC_SKIP_WEBSITE_BUILD=true pnpm validate:pr
 git diff --check
 ```
 
 For core rule promotion, use the same shape with the core package:
 
 ```bash
+RULE_NAME="replace-with-rule-name"
 pnpm -r --filter "@azure-tools/typespec-azure-core..." build
-pnpm --filter @azure-tools/typespec-azure-core exec vitest run test/rules/ < rule-name > .test.ts
+pnpm --filter @azure-tools/typespec-azure-core exec vitest run "test/rules/${RULE_NAME}.test.ts"
 pnpm --filter @azure-tools/typespec-azure-core build
 pnpm --filter @azure-tools/typespec-azure-core lint
 pnpm --filter @azure-tools/typespec-azure-core regen-docs
-pnpm run format:check
-pnpm --filter @azure-tools/typespec-azure-website run build
+pnpm exec prettier --write packages/typespec-azure-core/README.md "packages/typespec-azure-core/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-core/reference/linter.md
+pnpm exec prettier --check packages/typespec-azure-core/README.md "packages/typespec-azure-core/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-core/reference/linter.md
 pnpm --filter @azure-tools/typespec-azure-rulesets build
 pnpm --filter @azure-tools/typespec-azure-rulesets test
 pnpm --filter @azure-tools/typespec-azure-core test
+pnpm exec cross-env TYPESPEC_SKIP_WEBSITE_BUILD=true pnpm validate:pr
 git diff --check
 ```
 
@@ -445,12 +437,12 @@ Run a focused code review after steps 1-2 pass and before steps 3-6 when the
 rule logic is non-trivial. This catches semantic gaps before expensive full
 package validation.
 
-Before PR creation, run the repo's pre-PR validation if available, but bound the
-wait and do not let it consume the rest of the session after the required narrow
-validation has already passed:
+Before PR creation, run the repo's pre-PR validation if available with the
+website build skipped, but bound the wait and do not let it consume the rest of
+the session after the required narrow validation has already passed:
 
 ```bash
-pnpm validate:pr
+pnpm exec cross-env TYPESPEC_SKIP_WEBSITE_BUILD=true pnpm validate:pr
 ```
 
 If `validate:pr` stalls with no new output for five minutes, stop it and
@@ -503,9 +495,14 @@ Use this stable PR title pattern:
 Write the PR description as an engineering explanation, not only a change list.
 It must include:
 
-- **Original Swagger linter:** paste the Swagger rule name and docs/source link
-  from the fixture `rule.md` or validator docs, then list a checklist of every
-  specific check the original rule performs.
+- **Original Swagger linter:** include both of these direct GitHub hyperlinks
+  before listing a checklist of every specific check the original rule performs:
+  - `linter code: [<ValidatorRuleId>](<validator source URL>)`
+  - `linter doc: [<validator-doc-file>.md](<validator documentation URL>)`
+
+  Use the rule name and links from the fixture `rule.md` or validator repository.
+  Do not omit either link or replace them with unlinked paths.
+
 - **How the Swagger linter works:** explain the Swagger objects it inspects,
   traversal or lookup strategy, conditions and exemptions, diagnostic locations,
   and any known validator defects, stale maps, emitted-occurrence duplication, or
