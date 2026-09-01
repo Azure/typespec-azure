@@ -2,6 +2,7 @@ import type { IExtractorConfigPrepareOptions } from "@microsoft/api-extractor";
 import { Extractor, ExtractorConfig, ExtractorLogLevel } from "@microsoft/api-extractor";
 import { existsSync } from "fs";
 import * as fs from "fs/promises";
+import { createRequire } from "module";
 import { dirname, join as joinPath } from "path";
 import type { CompilerOptions } from "typescript";
 import { createProgram } from "typescript";
