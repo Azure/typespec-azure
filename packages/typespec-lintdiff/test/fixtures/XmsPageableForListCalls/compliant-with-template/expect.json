@@ -6,10 +6,6 @@
       "count": 1
     },
     {
-      "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
-      "count": 1
-    },
-    {
       "code": "tsp-lintdiff-local-linter/path-parameter-schema",
       "count": 10
     },

@@ -1,0 +1,12 @@
+[
+  {
+    "code": "XmsPageableForListCalls",
+    "message": "`x-ms-pageable` extension must be specified for LIST APIs.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/providers/Microsoft.TestService/widgetSummaries",
+      "get"
+    ],
+    "severity": 0
+  }
+]
