@@ -3,11 +3,15 @@
   "ambientDiagnostics": [
     {
       "code": "@azure-tools/typespec-azure-core/documentation-required",
-      "count": 11
+      "count": 14
+    },
+    {
+      "code": "@azure-tools/typespec-azure-core/friendly-name",
+      "count": 1
     },
     {
       "code": "@azure-tools/typespec-azure-core/known-encoding",
-      "count": 2
+      "count": 3
     },
     {
       "code": "@azure-tools/typespec-azure-core/no-nullable",
@@ -19,7 +23,7 @@
     },
     {
       "code": "tsp-lintdiff-local-linter/non-application-json-type",
-      "count": 2
+      "count": 3
     },
     {
       "code": "tsp-lintdiff-local-linter/path-parameter-schema",
@@ -35,7 +39,7 @@
     },
     {
       "code": "tsp-lintdiff-local-linter/xms-examples-required",
-      "count": 6
+      "count": 7
     }
   ]
 }

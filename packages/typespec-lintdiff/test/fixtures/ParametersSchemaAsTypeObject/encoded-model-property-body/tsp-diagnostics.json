@@ -30,6 +30,11 @@
     "message": "The ModelProperty named 'choice' should have a documentation or description, use doc comment /** */ to provide it."
   },
   {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'friendlyTemplatePayload' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
     "code": "@azure-tools/typespec-azure-core/known-encoding",
     "severity": "warning",
     "message": "Encoding \"custom\" is not supported for Azure Services. Known encodings are: rfc3339,rfc7231,unixTimestamp,ISO8601,seconds,base64,base64url"
@@ -48,6 +53,16 @@
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The UnionVariant named 'value' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/known-encoding",
+    "severity": "warning",
+    "message": "Encoding \"custom\" is not supported for Azure Services. Known encodings are: rfc3339,rfc7231,unixTimestamp,ISO8601,seconds,base64,base64url"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/friendly-name",
+    "severity": "warning",
+    "message": "@friendlyName should decorate template and use template parameter's properties in friendly name."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
@@ -143,6 +158,26 @@
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The Operation named 'submitNamedUnionEncodedProperty' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'body' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'submitFriendlyTemplateEncodedProperty' should have a documentation or description, use doc comment /** */ to provide it."
   },
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",

@@ -298,6 +298,60 @@
         }
       }
     },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitFriendlyTemplateEncodedProperty": {
+      "post": {
+        "operationId": "Widgets_SubmitFriendlyTemplateEncodedProperty",
+        "tags": [
+          "Widgets"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FriendlyTemplatePayload",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitNamedUnionEncodedProperty": {
       "post": {
         "operationId": "Widgets_SubmitNamedUnionEncodedProperty",
@@ -448,11 +502,28 @@
           "$ref": "#/definitions/ObjectChoice",
           "type": "integer",
           "format": "int32"
+        },
+        "friendlyTemplatePayload": {
+          "$ref": "#/definitions/FriendlyTemplatePayload",
+          "type": "integer",
+          "format": "int32"
         }
       },
       "required": [
         "payload",
-        "choice"
+        "choice",
+        "friendlyTemplatePayload"
+      ]
+    },
+    "FriendlyTemplatePayload": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
       ]
     },
     "ObjectChoice": {

@@ -38,12 +38,20 @@ model WidgetProperties {
 @doc("An unbased scalar used by an encoded body property.")
 scalar PropertyRequest;
 
+@friendlyName("FriendlyTemplatePayload")
+model FriendlyTemplatePayload<T> {
+  value: T;
+}
+
 model EncodedWire {
   @encode("custom", int32)
   payload: PropertyRequest;
 
   @encode("custom", int32)
   choice: ObjectChoice;
+
+  @encode("custom", int32)
+  friendlyTemplatePayload: FriendlyTemplatePayload<string>;
 }
 
 union ObjectChoice {
@@ -78,5 +86,12 @@ interface Widgets {
   submitNamedUnionEncodedProperty(
     ...ResourceInstanceParameters<Widget>,
     @body body: EncodedWire.choice,
+  ): ArmResponse<Widget> | ErrorResponse;
+
+  @post
+  @armResourceAction(Widget)
+  submitFriendlyTemplateEncodedProperty(
+    ...ResourceInstanceParameters<Widget>,
+    @body body: EncodedWire.friendlyTemplatePayload,
   ): ArmResponse<Widget> | ErrorResponse;
 }

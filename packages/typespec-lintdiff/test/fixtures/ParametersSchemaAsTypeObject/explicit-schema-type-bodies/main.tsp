@@ -64,11 +64,18 @@ scalar UnsupportedWire;
 @encode("", UnsupportedWire)
 scalar UnsupportedNestedEncodingRequest extends string;
 
+model TemplatePayload<T> {
+  value: T;
+}
+
 model InlineEncodedWire {
   @encode("custom", int32)
   payload: {
     value: string;
   };
+
+  @encode("custom", int32)
+  templatePayload: TemplatePayload<string>;
 }
 
 @doc("A non-empty request enum.")
@@ -136,6 +143,13 @@ interface Widgets {
   submitInlineEncodedProperty(
     ...ResourceInstanceParameters<Widget>,
     @body body: InlineEncodedWire.payload,
+  ): ArmResponse<Widget> | ErrorResponse;
+
+  @post
+  @armResourceAction(Widget)
+  submitInlineTemplateEncodedProperty(
+    ...ResourceInstanceParameters<Widget>,
+    @body body: InlineEncodedWire.templatePayload,
   ): ArmResponse<Widget> | ErrorResponse;
 
   @post
