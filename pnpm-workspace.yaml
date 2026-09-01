@@ -19,14 +19,10 @@ overrides:
   "diff@>=6.0.0 <8.0.3": ">=8.0.3"
   dompurify: ^3.3.3
   "yaml@>=2.0.0 <2.8.3": ">=2.8.3"
-  # Pinned exactly (rather than left to range resolution) to match the versions baked into
-  # core/packages/typespec-vscode/ThirdPartyNotices.txt (which we cannot regenerate here).
-  # Without this, CI's minimumReleaseAge-gated resolution can pick a different patch version
-  # than what's committed, causing ThirdPartyNotices.txt to regenerate differently and fail
-  # the "Check Git Status For Changed Files" gate.
-  brace-expansion: 5.0.7
-  fast-uri: 3.1.4
-  minimatch: 10.2.5
+  # Pin api-extractor to 7.58.x — 7.59.0 moved _defaultConfig to a private module-level
+  # constant, breaking the in-memory config construction in typespec-ts spector tests.
+  # See: https://github.com/Azure/typespec-azure/issues/XXXX
+  "@microsoft/api-extractor": "~7.58.1"
 
 onlyBuiltDependencies:
   - tree-sitter
