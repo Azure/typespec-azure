@@ -31,13 +31,13 @@ catalogs:
       specifier: ^0.24.0
       version: 0.24.0
     '@astrojs/check':
-      specifier: ^0.9.10
+      specifier: ^0.9.8
       version: 0.9.10
     '@astrojs/react':
-      specifier: ^6.0.4
+      specifier: ^6.0.0
       version: 6.0.4
     '@astrojs/starlight':
-      specifier: ^0.41.8
+      specifier: ^0.41.3
       version: 0.41.8
     '@autorest/codemodel':
       specifier: ~4.20.1
@@ -67,20 +67,20 @@ catalogs:
       specifier: ^1.14.0
       version: 1.14.0
     '@azure/identity':
-      specifier: ^4.13.2
+      specifier: ^4.13.1
       version: 4.13.2
     '@azure/logger':
       specifier: ^1.4.0
       version: 1.4.0
     '@azure/storage-blob':
-      specifier: ^12.33.0
+      specifier: ^12.31.0
       version: 12.33.0
     '@babel/code-frame':
-      specifier: ^8.0.0
-      version: 8.0.0
+      specifier: ^7.29.0
+      version: 7.29.7
     '@babel/core':
-      specifier: ^8.0.1
-      version: 8.0.1
+      specifier: ^7.29.0
+      version: 7.29.7
     '@chronus/chronus':
       specifier: ^1.5.0
       version: 1.5.0
@@ -91,31 +91,31 @@ catalogs:
       specifier: ^1.1.1
       version: 1.1.1
     '@docsearch/css':
-      specifier: ^5.0.4
-      version: 5.0.4
+      specifier: ^4.6.2
+      version: 4.7.0
     '@docsearch/js':
-      specifier: ^5.0.4
-      version: 5.0.4
+      specifier: ^4.6.2
+      version: 4.7.0
     '@expressive-code/core':
-      specifier: ^0.44.1
+      specifier: ^0.44.0
       version: 0.44.1
     '@fluentui/react-components':
-      specifier: ^9.74.7
+      specifier: ^9.73.7
       version: 9.74.7
     '@fluentui/react-icons':
-      specifier: ^2.0.338
+      specifier: ^2.0.323
       version: 2.0.338
     '@fluentui/react-list':
-      specifier: ^9.6.18
+      specifier: ^9.6.13
       version: 9.6.18
     '@inquirer/prompts':
-      specifier: ^8.6.0
+      specifier: ^8.4.1
       version: 8.6.0
     '@microsoft/api-extractor':
-      specifier: ^7.59.0
+      specifier: ^7.58.1
       version: 7.59.0
     '@microsoft/api-extractor-model':
-      specifier: ^7.33.11
+      specifier: ^7.33.5
       version: 7.33.11
     '@microsoft/tsdoc':
       specifier: ^0.16.0
@@ -124,37 +124,37 @@ catalogs:
       specifier: ^0.18.1
       version: 0.18.1
     '@octokit/core':
-      specifier: ^7.0.7
+      specifier: ^7.0.6
       version: 7.0.7
     '@octokit/plugin-paginate-graphql':
       specifier: ^6.0.0
       version: 6.0.0
     '@octokit/plugin-rest-endpoint-methods':
-      specifier: ^18.0.0
-      version: 18.0.0
+      specifier: ^17.0.0
+      version: 17.0.0
     '@pinterest/alloy-graphql':
-      specifier: ^1.1.1
+      specifier: ^1.1.0
       version: 1.1.1
     '@playwright/test':
-      specifier: ^1.62.1
+      specifier: ^1.60.0
       version: 1.62.1
     '@scalar/json-magic':
-      specifier: ^0.13.2
-      version: 0.13.2
+      specifier: ^0.12.15
+      version: 0.12.20
     '@scalar/openapi-parser':
-      specifier: ^0.28.16
+      specifier: ^0.28.6
       version: 0.28.16
     '@scalar/openapi-types':
-      specifier: ^0.9.5
+      specifier: ^0.9.1
       version: 0.9.5
     '@storybook/react-vite':
-      specifier: ^10.5.10
+      specifier: ^10.3.5
       version: 10.5.10
     '@testing-library/dom':
       specifier: ^10.4.1
       version: 10.4.1
     '@testing-library/jest-dom':
-      specifier: ^7.0.1
+      specifier: ^7.0.0
       version: 7.0.1
     '@testing-library/react':
       specifier: ^16.3.2
@@ -181,28 +181,28 @@ catalogs:
       specifier: ^1.9.10
       version: 1.9.10
     '@types/multer':
-      specifier: ^2.2.0
+      specifier: ^2.1.0
       version: 2.2.0
     '@types/mustache':
       specifier: ^4.2.6
       version: 4.2.6
     '@types/node':
-      specifier: ^26.3.0
+      specifier: ^26.0.0
       version: 26.3.0
     '@types/pluralize':
       specifier: ^0.0.33
       version: 0.0.33
     '@types/react':
-      specifier: ^19.2.18
+      specifier: ^19.2.16
       version: 19.2.18
     '@types/react-dom':
-      specifier: ^19.2.5
+      specifier: ^19.2.3
       version: 19.2.5
     '@types/remark-heading-id':
       specifier: ^1.0.0
       version: 1.0.0
     '@types/semver':
-      specifier: ^7.8.0
+      specifier: ^7.7.1
       version: 7.8.0
     '@types/swagger-ui':
       specifier: ^5.32.0
@@ -223,43 +223,43 @@ catalogs:
       specifier: ^0.36.0
       version: 0.36.0
     '@typespec/ts-http-runtime':
-      specifier: 0.3.8
-      version: 0.3.8
+      specifier: 0.3.7
+      version: 0.3.7
     '@vitejs/plugin-react':
-      specifier: ^6.1.0
+      specifier: ^6.0.1
       version: 6.1.0
     '@vitest/coverage-v8':
-      specifier: ^4.1.11
+      specifier: ^4.1.3
       version: 4.1.11
     '@vitest/ui':
-      specifier: ^4.1.11
+      specifier: ^4.1.3
       version: 4.1.11
     '@vscode/extension-telemetry':
-      specifier: ^1.5.2
+      specifier: ^1.5.1
       version: 1.5.2
     '@vscode/test-electron':
-      specifier: ^3.1.0
+      specifier: ^3.0.0
       version: 3.1.0
     '@vscode/test-web':
       specifier: ^0.0.81
       version: 0.0.81
     '@vscode/vsce':
-      specifier: ^3.9.2
+      specifier: ^3.7.1
       version: 3.9.2
     ajv:
-      specifier: ^8.20.0
+      specifier: ^8.18.0
       version: 8.20.0
     ajv-formats:
       specifier: ^3.0.1
       version: 3.0.1
     astro:
-      specifier: ^7.2.6
+      specifier: ^7.1.0
       version: 7.2.6
     astro-expressive-code:
-      specifier: ^0.44.1
+      specifier: ^0.44.0
       version: 0.44.1
     astro-rehype-relative-markdown-links:
-      specifier: ^0.19.2
+      specifier: ^0.19.0
       version: 0.19.2
     autorest:
       specifier: ^3.8.0
@@ -280,7 +280,7 @@ catalogs:
       specifier: ^2.1.1
       version: 2.1.1
     concurrently:
-      specifier: ^10.0.5
+      specifier: ^10.0.4
       version: 10.0.5
     cross-env:
       specifier: ^10.1.0
@@ -289,7 +289,7 @@ catalogs:
       specifier: ^7.0.6
       version: 7.0.6
     cspell:
-      specifier: ^10.1.1
+      specifier: ^10.0.0
       version: 10.1.1
     debounce:
       specifier: ^3.0.0
@@ -301,34 +301,34 @@ catalogs:
       specifier: ^17.4.2
       version: 17.4.2
     ecmarkup:
-      specifier: ~25.0.1
-      version: 25.0.1
+      specifier: ~23.0.2
+      version: 23.0.2
     env-paths:
       specifier: ^4.0.0
       version: 4.0.0
     es-module-shims:
-      specifier: ^2.8.4
+      specifier: ^2.8.0
       version: 2.8.4
     esbuild:
-      specifier: ^0.28.2
+      specifier: ^0.28.0
       version: 0.28.2
     esbuild-plugins-node-modules-polyfill:
-      specifier: ^1.8.3
+      specifier: ^1.8.1
       version: 1.8.3
     execa:
-      specifier: ^10.0.1
-      version: 10.0.1
+      specifier: ^9.6.1
+      version: 9.6.1
     express:
       specifier: ^5.2.1
       version: 5.2.1
     fast-xml-parser:
-      specifier: ^5.11.0
+      specifier: ^5.10.1
       version: 5.11.0
     graphql:
-      specifier: ^17.0.2
+      specifier: ^17.0.0-alpha.9
       version: 17.0.2
     happy-dom:
-      specifier: ^20.11.6
+      specifier: ^20.11.0
       version: 20.11.6
     hast-util-to-html:
       specifier: ^9.0.5
@@ -352,7 +352,7 @@ catalogs:
       specifier: ^0.55.1
       version: 0.55.1
     morgan:
-      specifier: ^1.11.0
+      specifier: ^1.10.1
       version: 1.11.0
     multer:
       specifier: ^2.2.0
@@ -361,16 +361,16 @@ catalogs:
       specifier: ^4.2.0
       version: 4.2.0
     ora:
-      specifier: ^9.4.1
+      specifier: ^9.3.0
       version: 9.4.1
     oxlint:
-      specifier: ^1.80.0
+      specifier: ^1.69.0
       version: 1.80.0
     oxlint-tsgolint:
-      specifier: ^7.0.2001
-      version: 7.0.2001
+      specifier: ^0.24.0
+      version: 0.24.0
     p-limit:
-      specifier: ^7.3.1
+      specifier: ^7.3.0
       version: 7.3.1
     pathe:
       specifier: ^2.0.3
@@ -379,7 +379,7 @@ catalogs:
       specifier: ^1.1.1
       version: 1.1.1
     playwright:
-      specifier: ^1.62.1
+      specifier: ^1.60.0
       version: 1.62.1
     plist:
       specifier: ^5.0.0
@@ -388,7 +388,7 @@ catalogs:
       specifier: ^8.0.0
       version: 8.0.0
     prettier:
-      specifier: ^3.9.6
+      specifier: ^3.9.5
       version: 3.9.6
     prettier-plugin-astro:
       specifier: ^0.14.1
@@ -400,19 +400,19 @@ catalogs:
       specifier: ^0.19.0
       version: 0.19.0
     react:
-      specifier: ^19.2.8
+      specifier: ^19.2.7
       version: 19.2.8
     react-chartjs-2:
       specifier: ^5.3.1
       version: 5.3.1
     react-dom:
-      specifier: ^19.2.8
+      specifier: ^19.2.7
       version: 19.2.8
     react-error-boundary:
-      specifier: ^6.1.3
+      specifier: ^6.1.1
       version: 6.1.3
     react-hotkeys-hook:
-      specifier: ^5.3.3
+      specifier: ^5.2.4
       version: 5.3.3
     react-markdown:
       specifier: ^10.1.0
@@ -430,37 +430,37 @@ catalogs:
       specifier: ^6.1.3
       version: 6.1.3
     rollup-plugin-visualizer:
-      specifier: 7.1.1
-      version: 7.1.1
+      specifier: 7.0.1
+      version: 7.0.1
     semver:
-      specifier: ^7.8.5
+      specifier: ^7.7.4
       version: 7.8.5
     sharp:
-      specifier: ^0.35.3
+      specifier: ^0.35.2
       version: 0.35.3
     simple-git:
       specifier: ^3.36.0
       version: 3.36.0
     storybook:
-      specifier: ^10.5.10
+      specifier: ^10.3.5
       version: 10.5.10
     strip-json-comments:
       specifier: ^5.0.3
       version: 5.0.3
     swagger-ui-dist:
-      specifier: ^5.32.14
+      specifier: ^5.32.2
       version: 5.32.14
     swagger-ui-express:
       specifier: ^5.0.1
       version: 5.0.1
     tar:
-      specifier: ^7.5.22
+      specifier: ^7.5.21
       version: 7.5.22
     temporal-polyfill:
-      specifier: ^1.0.4
+      specifier: ^1.0.1
       version: 1.0.4
     tree-sitter-c-sharp:
-      specifier: ^0.23.5
+      specifier: ^0.23.1
       version: 0.23.5
     tree-sitter-java:
       specifier: ^0.23.5
@@ -481,13 +481,13 @@ catalogs:
       specifier: ^2.8.1
       version: 2.8.1
     turbo:
-      specifier: 2.10.11
-      version: 2.10.11
+      specifier: 2.9.14
+      version: 2.9.14
     typedoc:
-      specifier: ^0.28.20
+      specifier: ^0.28.19
       version: 0.28.20
     typedoc-plugin-markdown:
-      specifier: ^4.12.0
+      specifier: ^4.11.0
       version: 4.12.0
     typescript:
       specifier: ~6.0.2
@@ -499,25 +499,25 @@ catalogs:
       specifier: ^2.0.0
       version: 2.0.0
     vite:
-      specifier: ^8.2.2
+      specifier: ^8.1.2
       version: 8.2.2
     vite-plugin-checker:
-      specifier: ^0.14.5
+      specifier: ^0.14.1
       version: 0.14.5
     vite-plugin-dts:
       specifier: 5.0.3
       version: 5.0.3
     vitest:
-      specifier: ^4.1.11
+      specifier: ^4.1.3
       version: 4.1.11
     vscode-languageclient:
-      specifier: ^10.1.0
+      specifier: ^10.0.0
       version: 10.1.0
     vscode-languageserver:
-      specifier: ^10.1.0
+      specifier: ^10.0.0
       version: 10.1.0
     vscode-languageserver-textdocument:
-      specifier: ^1.0.13
+      specifier: ^1.0.12
       version: 1.0.13
     vscode-oniguruma:
       specifier: ^2.0.1
@@ -526,16 +526,16 @@ catalogs:
       specifier: ^9.3.2
       version: 9.3.2
     web-tree-sitter:
-      specifier: ^0.26.13
+      specifier: ^0.26.8
       version: 0.26.13
     which:
       specifier: ^7.0.0
       version: 7.0.0
     yaml:
-      specifier: ^2.9.0
+      specifier: ^2.8.3
       version: 2.9.0
     yargs:
-      specifier: ^18.1.0
+      specifier: ^18.0.0
       version: 18.1.0
 
 overrides:
@@ -575,10 +575,10 @@ importers:
         version: 10.1.1
       oxlint:
         specifier: 'catalog:'
-        version: 1.80.0(oxlint-tsgolint@7.0.2001)
+        version: 1.80.0(oxlint-tsgolint@0.24.0)
       oxlint-tsgolint:
         specifier: 'catalog:'
-        version: 7.0.2001
+        version: 0.24.0
       playwright:
         specifier: 'catalog:'
         version: 1.62.1
@@ -599,7 +599,7 @@ importers:
         version: 6.1.3
       turbo:
         specifier: 'catalog:'
-        version: 2.10.11
+        version: 2.9.14
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -629,7 +629,7 @@ importers:
         version: 6.0.0(@octokit/core@7.0.7)
       '@octokit/plugin-rest-endpoint-methods':
         specifier: 'catalog:'
-        version: 18.0.0(@octokit/core@7.0.7)
+        version: 17.0.0(@octokit/core@7.0.7)
       '@types/micromatch':
         specifier: 'catalog:'
         version: 4.0.10
@@ -647,16 +647,16 @@ importers:
         version: 10.1.1
       execa:
         specifier: 'catalog:'
-        version: 10.0.1
+        version: 9.6.1
       micromatch:
         specifier: 'catalog:'
         version: 4.0.8
       oxlint:
         specifier: 'catalog:'
-        version: 1.80.0(oxlint-tsgolint@7.0.2001)
+        version: 1.80.0(oxlint-tsgolint@0.24.0)
       oxlint-tsgolint:
         specifier: 'catalog:'
-        version: 7.0.2001
+        version: 0.24.0
       picocolors:
         specifier: 'catalog:'
         version: 1.1.1
@@ -680,7 +680,7 @@ importers:
         version: 6.1.3
       turbo:
         specifier: 'catalog:'
-        version: 2.10.11
+        version: 2.9.14
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -863,7 +863,7 @@ importers:
     dependencies:
       '@babel/code-frame':
         specifier: 'catalog:'
-        version: 8.0.0
+        version: 7.29.7
       '@inquirer/prompts':
         specifier: 'catalog:'
         version: 8.6.0(@types/node@26.3.0)
@@ -1125,7 +1125,7 @@ importers:
     devDependencies:
       '@babel/core':
         specifier: 'catalog:'
-        version: 8.0.1
+        version: 7.29.7
       '@testing-library/dom':
         specifier: 'catalog:'
         version: 10.4.1
@@ -1325,7 +1325,7 @@ importers:
         version: link:../spector
       '@typespec/ts-http-runtime':
         specifier: 'catalog:'
-        version: 0.3.8
+        version: 0.3.7
       '@typespec/tspd':
         specifier: workspace:^
         version: link:../tspd
@@ -1346,7 +1346,7 @@ importers:
         version: 10.1.0
       execa:
         specifier: 'catalog:'
-        version: 10.0.1
+        version: 9.6.1
       ora:
         specifier: 'catalog:'
         version: 9.4.1
@@ -1814,7 +1814,7 @@ importers:
     dependencies:
       '@scalar/json-magic':
         specifier: 'catalog:'
-        version: 0.13.2
+        version: 0.12.20
       '@scalar/openapi-parser':
         specifier: 'catalog:'
         version: 0.28.16
@@ -1991,7 +1991,7 @@ importers:
     devDependencies:
       '@babel/core':
         specifier: 'catalog:'
-        version: 8.0.1
+        version: 7.29.7
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.62.1
@@ -2136,7 +2136,7 @@ importers:
     devDependencies:
       '@babel/core':
         specifier: 'catalog:'
-        version: 8.0.1
+        version: 7.29.7
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.62.1
@@ -2172,7 +2172,7 @@ importers:
         version: 6.1.3
       rollup-plugin-visualizer:
         specifier: 'catalog:'
-        version: 7.1.1(rolldown@1.2.5)
+        version: 7.0.1(rolldown@1.2.5)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -2258,7 +2258,7 @@ importers:
     devDependencies:
       '@babel/core':
         specifier: 'catalog:'
-        version: 8.0.1
+        version: 7.29.7
       '@testing-library/dom':
         specifier: 'catalog:'
         version: 10.4.1
@@ -2427,7 +2427,7 @@ importers:
         version: link:../internal-build-utils
       ecmarkup:
         specifier: 'catalog:'
-        version: 25.0.1
+        version: 23.0.2
 
   core/packages/spec-api:
     dependencies:
@@ -2523,7 +2523,7 @@ importers:
         version: 6.1.3
       rollup-plugin-visualizer:
         specifier: 'catalog:'
-        version: 7.1.1(rolldown@1.2.5)
+        version: 7.0.1(rolldown@1.2.5)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -2672,7 +2672,7 @@ importers:
         version: 0.28.2
       execa:
         specifier: 'catalog:'
-        version: 10.0.1
+        version: 9.6.1
       ora:
         specifier: 'catalog:'
         version: 9.4.1
@@ -2742,7 +2742,7 @@ importers:
         version: link:../internal-build-utils
       execa:
         specifier: 'catalog:'
-        version: 10.0.1
+        version: 9.6.1
       log-symbols:
         specifier: 'catalog:'
         version: 7.0.1
@@ -3876,7 +3876,7 @@ importers:
         version: link:../../core/packages/xml
       execa:
         specifier: 'catalog:'
-        version: 10.0.1
+        version: 9.6.1
       rimraf:
         specifier: 'catalog:'
         version: 6.1.3
@@ -4116,7 +4116,7 @@ importers:
         version: link:../../core/packages/spector
       '@typespec/ts-http-runtime':
         specifier: 'catalog:'
-        version: 0.3.8
+        version: 0.3.7
       '@typespec/tspd':
         specifier: workspace:^
         version: link:../../core/packages/tspd
@@ -4158,10 +4158,10 @@ importers:
         version: 0.41.8(@astrojs/markdown-remark@7.2.4)(astro@7.2.6(@astrojs/markdown-remark@7.2.4)(@azure/identity@4.13.2)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@26.3.0)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))(typescript@6.0.3)
       '@docsearch/css':
         specifier: 'catalog:'
-        version: 5.0.4
+        version: 4.7.0
       '@docsearch/js':
         specifier: 'catalog:'
-        version: 5.0.4
+        version: 4.7.0
       '@fluentui/react-components':
         specifier: 'catalog:'
         version: 9.74.7(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
@@ -5174,11 +5174,11 @@ packages:
     resolution: {integrity: sha512-kzyuwOAQnXJNLS9PSyrk0CWk35nWJW/zl/6KvnTBMFK65gm7U1/Z5BqjxeapjZCIhQcM/DsrEmcbRwDyXyXK4A==}
     engines: {node: '>=14'}
 
-  '@docsearch/css@5.0.4':
-    resolution: {integrity: sha512-Bg2VmrPbhBmqKBrt6FL8bvd66f9IaU448Ip9K+elLlX2rivtV5FvBJq7iGsMvvj42etsdJe6VqisoTKZMv0Qdg==}
+  '@docsearch/css@4.7.0':
+    resolution: {integrity: sha512-Sk5xkdRFeE7PeWjG9l4AfTwdvMfr9wHiwNNCpHXT4v4SNyNMKdHGvEILc31BgaVFGDDNbv5u/a73tofRiwbEZw==}
 
-  '@docsearch/js@5.0.4':
-    resolution: {integrity: sha512-eKoVwAWKWXYPDZiDXBX4g1RVQnvHHCX91+Z+1ZEJuHPkZjTANk+L4/9t6xM5wxiiNcwD6YjfDMhcE/99sWT4SA==}
+  '@docsearch/js@4.7.0':
+    resolution: {integrity: sha512-x5lCqu1tetgsJFkjQ6VSocbHldsRkGEgwg5N98Vx21sq/V5wcmj4u226PY9k+TEpIgQ772zlYbPLTPicWyGnpA==}
 
   '@emmetio/abbreviation@2.3.3':
     resolution: {integrity: sha512-mgv58UrU3rh4YgbE/TzgLQwJ3pFsHHhCLqY20aJq+9comytTXUDNGG/SMtSeMJdkpxgXSXunBGLD8Boka3JyVA==}
@@ -6484,12 +6484,6 @@ packages:
     peerDependencies:
       '@octokit/core': '>=6'
 
-  '@octokit/plugin-rest-endpoint-methods@18.0.0':
-    resolution: {integrity: sha512-1wM02pQTHEarWYij0Bb4gu8X8fBy2FJdI4HMTSFDxtYLbOkJErGVx5ywmM6jeS8tOmC0iCiRLrn6YsSIecUeOQ==}
-    engines: {node: '>= 20'}
-    peerDependencies:
-      '@octokit/core': '>=6'
-
   '@octokit/plugin-retry@8.1.1':
     resolution: {integrity: sha512-VCVvZ/R1+u3WuiBWpNavZ0mY4aaJNAsENrpBP9aLSR2QyOpQgd7DhM5j4AW7z4MQpnJYgwBPf0XqPQoNBRdQwg==}
     engines: {node: '>= 20'}
@@ -6767,9 +6761,19 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@oxlint-tsgolint/darwin-arm64@0.24.0':
+    resolution: {integrity: sha512-C2uMmwK5Bc4ri4ysZ6sA8Rcu+A5zBQTp6ml2u0CLLbRZp4kMFPV3yWk8B5DK9Aw7y9bbjogIm75tUwGLFzlsYQ==}
+    cpu: [arm64]
+    os: [darwin]
+
   '@oxlint-tsgolint/darwin-arm64@7.0.2001':
     resolution: {integrity: sha512-CUJEdbSZ54+Xy9OXqOhWLTKZKV0BBiV7C2i/ygyVmXtkUNXx5YCzN8DpSSshTAKktoL7S+tnQ/ftFG/i7X896w==}
     cpu: [arm64]
+    os: [darwin]
+
+  '@oxlint-tsgolint/darwin-x64@0.24.0':
+    resolution: {integrity: sha512-Wgvt/1lRbDxmoNqWQKKcL+UIiqLmdJ+EWLpQa1qzoNVAfNB0PJpa82/8dH1twT/3rSs4zrP5TXPWl4juB71WuQ==}
+    cpu: [x64]
     os: [darwin]
 
   '@oxlint-tsgolint/darwin-x64@7.0.2001':
@@ -6777,9 +6781,19 @@ packages:
     cpu: [x64]
     os: [darwin]
 
+  '@oxlint-tsgolint/linux-arm64@0.24.0':
+    resolution: {integrity: sha512-PB1rxII7KV83+ASY4sSkXtqvpij6ME66+QCRL49uksi/ofs2Rf/UVboYr095n0Rkbl2wgvlsHGl6DHC361jQUQ==}
+    cpu: [arm64]
+    os: [linux]
+
   '@oxlint-tsgolint/linux-arm64@7.0.2001':
     resolution: {integrity: sha512-roP7zujb/QDPzDwEKsFFpzNHHy91/Y7oX9vQXk78ekyZtcQj1QXDIMH33gjDdHBfRl4K9pZ36xhRgrP4Zr+R8A==}
     cpu: [arm64]
+    os: [linux]
+
+  '@oxlint-tsgolint/linux-x64@0.24.0':
+    resolution: {integrity: sha512-xcz3CxKmjTQLREtE/UShh+ruWmm9nAb7UM9zKcD65BStiuYgOakAKkPHl4YS5DztpVcDrE0+HqbOolTlRKYWmw==}
+    cpu: [x64]
     os: [linux]
 
   '@oxlint-tsgolint/linux-x64@7.0.2001':
@@ -6787,9 +6801,19 @@ packages:
     cpu: [x64]
     os: [linux]
 
+  '@oxlint-tsgolint/win32-arm64@0.24.0':
+    resolution: {integrity: sha512-A2i6ZGBec3i20S7RaxkgHc6r3HYtD5Mn7j/mb22NkTz14u0JuudvTu6JggAnbGMcv8+dBKQI//EasxSPJLD8pw==}
+    cpu: [arm64]
+    os: [win32]
+
   '@oxlint-tsgolint/win32-arm64@7.0.2001':
     resolution: {integrity: sha512-uJZhqB6pdXLuN+AD1F5082byyQti/NPmJA77GtcFlmT2HzRelqbNls3SaIqxpjdFgvSBF9g0yOKGBkGFg7kX8Q==}
     cpu: [arm64]
+    os: [win32]
+
+  '@oxlint-tsgolint/win32-x64@0.24.0':
+    resolution: {integrity: sha512-0ZbGd9qRB6zs82moekaKdEvncRANq49EAwfNX62JpTS46feXUhKAuoyVDvZMj6Rywejylrmmu79Wo6faYCo4Ew==}
+    cpu: [x64]
     os: [win32]
 
   '@oxlint-tsgolint/win32-x64@7.0.2001':
@@ -7154,8 +7178,16 @@ packages:
     resolution: {integrity: sha512-+jNbxhh8CkrZYxMk9X3GRYM2+Myr1xCCj+eHbJ9Vp+PCdNHS0TUl5QQFT6UbM/aTFRCzs5jiBTKYzBRpe5uYbQ==}
     engines: {node: '>=20.9.0'}
 
+  '@scalar/helpers@0.10.0':
+    resolution: {integrity: sha512-IAfnpIZnXY6ni+zyFMwWHBa5b/7yr4mCSvoTGR84oS9q4Quy2wjgafnr7CyfL65ney3iilBZHigZYLYqdqCu3Q==}
+    engines: {node: '>=22'}
+
   '@scalar/helpers@0.11.1':
     resolution: {integrity: sha512-Knwbe0IYqFk0PPDoOKLasqglBHfyf9/zwWWqFsSNi/AtdjM29wSZXN6p8DFid6iB5B9epYH9YiSgJ6tpD00TEw==}
+    engines: {node: '>=22'}
+
+  '@scalar/json-magic@0.12.20':
+    resolution: {integrity: sha512-5JawJ1L3+ddDoKefkXsklKs6CmmTIcPDmkJPpAkbRi9QQiU9MUONQ4VSi2z3ij+8Ka4neNhsXBNG4itPjurBLg==}
     engines: {node: '>=22'}
 
   '@scalar/json-magic@0.13.2':
@@ -7421,33 +7453,33 @@ packages:
   '@ts-morph/common@0.29.0':
     resolution: {integrity: sha512-35oUmphHbJvQ/+UTwFNme/t2p3FoKiGJ5auTjjpNTop2dyREspirjMy82PLSC1pnDJ8ah1GU98hwpVt64YXQsg==}
 
-  '@turbo/darwin-64@2.10.11':
-    resolution: {integrity: sha512-v3R+1R/Ysozyo+p7Ri8MCIbndOvYt3DgPFrGLhrhQHfvyvbxyH3WyJj+A/2JTNmNleuAlh3JUyCV0iSVHIONTA==}
+  '@turbo/darwin-64@2.9.14':
+    resolution: {integrity: sha512-t7QiPflaEyBE4oayeZtSmu4mEfjgIrcNlNNl1z1dmIVPqEdtA7+CfTf8d7KXsOGPh6aNgWjKxyvQg9uGfDQF+A==}
     cpu: [x64]
     os: [darwin]
 
-  '@turbo/darwin-arm64@2.10.11':
-    resolution: {integrity: sha512-R0a0CvGAeYYsBgPIgFNB3agGXh6qukjduNhFlwVVX1Ss2IdBJLXmgjytNGmo084bLKS0B6UdLRwKhXMHKKaObQ==}
+  '@turbo/darwin-arm64@2.9.14':
+    resolution: {integrity: sha512-d23147mC9BsCPA9mJ0h/ubcpbRgcJBXbcG3+Vq7YLhjz3IXuvQsJ1UXH8f4MD76ZjJ4m/E4aRdJV+MW88CDfbw==}
     cpu: [arm64]
     os: [darwin]
 
-  '@turbo/linux-64@2.10.11':
-    resolution: {integrity: sha512-dGlY2vg7jpsLjGS1bf9sD/cw1sGMAYbeHGQKGRFxd5Zaj+Ufbj8cNXl/vIit8ueCU97zhL/znn60ZV5iSfZAxw==}
+  '@turbo/linux-64@2.9.14':
+    resolution: {integrity: sha512-P3ZKB5tuUDdDQWuAsACGUR1qv9W7BNWxdxqVJ0kZNuNNPRaVYTPPikLcp79+GiEcW3npsR+KyP38lnQiBc5aSA==}
     cpu: [x64]
-    os: [android, linux]
+    os: [linux]
 
-  '@turbo/linux-arm64@2.10.11':
-    resolution: {integrity: sha512-eSP9+jjsSCBs2x0QpJZlp49dSD1EIMwXH7PsMIhdWk7w6IThhuKJ+jL95JQ2IW7tRjRmdh8gKcKQtrHLD5R5lA==}
+  '@turbo/linux-arm64@2.9.14':
+    resolution: {integrity: sha512-ZRTlzcUMrrPv9ZuDzRF9n60Ym13bKeG9jDB8WjxyLhWNzV+AJQN+zdpIk3NJYf2zQsGUm1mNar2P0elRzLw25g==}
     cpu: [arm64]
-    os: [android, linux]
+    os: [linux]
 
-  '@turbo/windows-64@2.10.11':
-    resolution: {integrity: sha512-4aD7edogJ8arK8DOyvjTI2KKwmchD5M/WM4BZgidrtFf7aSgn8Ce2rJnDwmriw980c2cKlHnhXtlGy38VtKB8g==}
+  '@turbo/windows-64@2.9.14':
+    resolution: {integrity: sha512-exanwN6sIduZwykYeiTQj8kCmOhazP5WOz3bvXMcYtjhL6Z3iRWLewKrXCBq0bqwSP3iBMb/AerRCnHI4lx46A==}
     cpu: [x64]
     os: [win32]
 
-  '@turbo/windows-arm64@2.10.11':
-    resolution: {integrity: sha512-m8tJkIrTrbQ9O1uHxV0GUq623Zg1678xGna8eMsy4KbygUX/wVFgdZDYV/AxyoyaW/U7nyKoBvaDVwm22p9xqA==}
+  '@turbo/windows-arm64@2.9.14':
+    resolution: {integrity: sha512-fVdCsnmYoKICsycbWuuGp6Jvi51/3G/UluFWuAUCvR8PIW5IJkAk5BM9UF8PSm0Q2IphWHFZjYEgjHsh3B9y/g==}
     cpu: [arm64]
     os: [win32]
 
@@ -7660,6 +7692,10 @@ packages:
       '@typespec/streams': '>=0.85.0 <1.0.0'
       '@typespec/versioning': '>=0.85.0 <1.0.0'
       '@typespec/xml': '>=0.85.0 <1.0.0'
+
+  '@typespec/ts-http-runtime@0.3.7':
+    resolution: {integrity: sha512-JVUD8X2tfDMWjcjLs4yVxxVrS8yR5vnh386GAXT9Qj79nBxxXSaHFQZg5FweLmT8HlPQ3kii6noUB+Z9RN7DvQ==}
+    engines: {node: '>=22.0.0'}
 
   '@typespec/ts-http-runtime@0.3.8':
     resolution: {integrity: sha512-bLMpVcWZNzq6lYOybwFwOAR1IXKcHnhUNqYeHjl1bET/qE3jFPFH+p8Wrh3rU4xwdnifPxmKNESBYnvnmc75aA==}
@@ -8191,9 +8227,6 @@ packages:
     resolution: {integrity: sha512-+ys997U96po4Kx/ABpBCqhA9EuxJaQWDQg7295H4hBphv3IZg0boBKuwYpt4YXp6MZ5AmZQnU/tyMTlRpaSejg==}
     engines: {node: '>= 0.4'}
 
-  camel-case@4.1.2:
-    resolution: {integrity: sha512-gxGWBrTT1JuMx6R+o5PTXMmUnhnVzLQ9SNutD4YqKtI6ap897t3tKECYla6gCWEkplXnlNybEkZg9GEGxKFCgw==}
-
   caniuse-lite@1.0.30001810:
     resolution: {integrity: sha512-TITQPUkaz+aVk5GL6NhOdwk1aEaNTSDPsGFWrTuhKGtjTF70jL/Oht2W4c6rXUe5fu7Ie19VIahAXHIIiWWNeg==}
 
@@ -8283,10 +8316,6 @@ packages:
     resolution: {integrity: sha512-77PSwercCZU2Fc4sX94eF8k8Pxte6JAwL4/ICZLFjJLqegs7kCuAsqqj/70NQF6TvDpgFjkubQB2FW2ZZddvQg==}
     engines: {node: '>=8'}
 
-  clean-css@5.3.3:
-    resolution: {integrity: sha512-D5J+kHaVb/wKSFcyyV75uCn8fiY4sV38XJoe4CUyGQ+mOU/fMVYUdH1hJC+CJQ5uY3EnW27SbJYS4X8BiLrAFg==}
-    engines: {node: '>= 10.0'}
-
   cli-cursor@5.0.0:
     resolution: {integrity: sha512-aCj4O5wKyszjMmDT4tZj93kxyydN/K5zPWSCe6/0AV/AA1pqe5ZBIw0a2ZfPQV7lL5/yb5HsUreJ6UFAF1tEQw==}
     engines: {node: '>=18'}
@@ -8352,10 +8381,6 @@ packages:
   command-line-usage@6.1.3:
     resolution: {integrity: sha512-sH5ZSPr+7UStsloltmDh7Ce5fb8XPlHyoPzTpyyMuYCtervL65+ubVZ6Q61cFtFl62UyJlc8/JwERRbAFPUqgw==}
     engines: {node: '>=8.0.0'}
-
-  commander@10.0.1:
-    resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
-    engines: {node: '>=14'}
 
   commander@11.1.0:
     resolution: {integrity: sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ==}
@@ -8686,9 +8711,6 @@ packages:
   domutils@3.2.2:
     resolution: {integrity: sha512-6kZKyUajlDuqlHKVX1w7gyslj9MPIXzIFiz/rGu35uC1wMi+kMhQwGhl4lt9unC9Vb9INnY9Z3/ZA3+FhASLaw==}
 
-  dot-case@3.0.4:
-    resolution: {integrity: sha512-Kv5nKlh6yRrdrGvxeJ2e5y2eRUpkUosIW4A2AS38zwSz27zu7ufDwQPi5Jhs3XAlGNetl3bmnGhQsMtkKJnj3w==}
-
   dotenv@17.4.2:
     resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
     engines: {node: '>=12'}
@@ -8710,9 +8732,9 @@ packages:
   ecmarkdown@8.1.0:
     resolution: {integrity: sha512-dx6cM6RFjzAXkWr2KQRikED4gy70NFQ0vTI4XUQM/LWcjUYRJUbGdd7nd++trXi5az1JSe49TeeCIVMKDXOtcQ==}
 
-  ecmarkup@25.0.1:
-    resolution: {integrity: sha512-niW1wmHD67pOqaZhRiwtkH8utUWj8U7/wOxsQjxhK3BrMmXoLwDMInYyzHjHfuKXib9/skwMh9afpW/E4ujLUg==}
-    engines: {node: '>= 24'}
+  ecmarkup@23.0.2:
+    resolution: {integrity: sha512-hnCtidy6d8o3TJcT64PTSRFwH+lgQXtr8F8eyImDaygzbh38OZWILqIphYTpDMd0wwoBai8nG5oB+QFms6eLGA==}
+    engines: {node: '>= 18'}
     hasBin: true
 
   editions@6.22.0:
@@ -8890,9 +8912,9 @@ packages:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
     engines: {node: '>=0.8.x'}
 
-  execa@10.0.1:
-    resolution: {integrity: sha512-ge98qjkRK4IB7tL7Ju/6qmm5LHoH1eEMt5FNZrz3f4UIYhF28lggX20z3FaX1sgc67msLEn0N0BscOs29iuwyw==}
-    engines: {node: '>=22'}
+  execa@9.6.1:
+    resolution: {integrity: sha512-9Be3ZoN4LmYR90tUoVu2te2BsbzHfhJyfEiAVfz7N5/zv+jduIfLrV2xdQXOHbaD6KgpGdO9PRPM1Y4Q9QkPkA==}
+    engines: {node: ^18.19.0 || >=20.5.0}
 
   expand-template@2.0.3:
     resolution: {integrity: sha512-XYfuKMvj4O35f/pOXLObndIRvyQ+/+6AhODh+OKWj9S9498pHHn/IMszH+gt0fBCRWMNfk1ZSp5x3AifmnI2vg==}
@@ -9247,11 +9269,6 @@ packages:
 
   html-escaper@3.0.3:
     resolution: {integrity: sha512-RuMffC89BOWQoY0WKGpIhn5gX3iI54O6nRA0yC124NYVtzjmFWBIiFd8M0x+ZdX0P9R4lADg1mgP8C7PxGOWuQ==}
-
-  html-minifier-terser@7.2.0:
-    resolution: {integrity: sha512-tXgn3QfqPIpGl9o+K5tpcj3/MN4SfLtsx2GWwBC3SSd0tXQGyF3gsSqad8loJgKZGM3ZxbYDd5yhiBIdWpmvLA==}
-    engines: {node: ^14.13.1 || >=16.0.0}
-    hasBin: true
 
   html-url-attributes@3.0.1:
     resolution: {integrity: sha512-ol6UPyBWqsrO6EJySPz2O7ZSr856WDrEzM5zMqp+FJJLGMW35cLYmmZnl0vztAZxRUoNZJFTCohfjuIJ8I4QBQ==}
@@ -9772,9 +9789,6 @@ packages:
   loupe@3.2.1:
     resolution: {integrity: sha512-CdzqowRJCeLU72bHvWqwRBBlLcMEtIvGrlvef74kMnV2AolS9Y8xUv1I0U/MNAWMhBlKIoyuEgoJ0t/bbwHbLQ==}
 
-  lower-case@2.0.2:
-    resolution: {integrity: sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==}
-
   lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
 
@@ -10155,9 +10169,6 @@ packages:
   nlcst-to-string@4.0.0:
     resolution: {integrity: sha512-YKLBCcUYKAg0FNlOBT6aI91qFmSiFKiluk655WzPF+DDMA02qIyy8uiRqI8QXtcFpEvll12LpL5MXqEmAZ+dcA==}
 
-  no-case@3.0.4:
-    resolution: {integrity: sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==}
-
   node-abi@3.95.0:
     resolution: {integrity: sha512-T9iGctuocf0qIWFFOTxPzjT5q0SILqaBYXt272tlBHvTKC5+3JnkMirLxNJNkXHtFyBjU2Jx+NL4Zipr0B/c6Q==}
     engines: {node: '>=10'}
@@ -10270,6 +10281,10 @@ packages:
   oxc-resolver@11.21.2:
     resolution: {integrity: sha512-w5tLwYN3Zo24w5EeWJjJWZOwhYqTtC8PS2B1tIt7BZUuqTIcU07sQValbDw+rq7+AuAGzOHklgK+ifsy4lpXfw==}
 
+  oxlint-tsgolint@0.24.0:
+    resolution: {integrity: sha512-giCk5sEvG02d5tzPmFMX3hem8ndzEEu1xvGYS5OwNfO2WGl6ZVxt5LjE0yiMDoz94INI7XkXwgFAQiydPvVHDw==}
+    hasBin: true
+
   oxlint-tsgolint@7.0.2001:
     resolution: {integrity: sha512-KjK/XLcXr1DSyonKhsuFqJRiuKqcyG9j3LJ8nkOsrLzGvodBPqzHOKauy10asLMDI0sUpvb+1sxlzff3udZvfg==}
     hasBin: true
@@ -10327,9 +10342,6 @@ packages:
   pako@1.0.11:
     resolution: {integrity: sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==}
 
-  param-case@3.0.4:
-    resolution: {integrity: sha512-RXlj7zCYokReqWpOPH9oYivUzLYZ5vAPIfEmCTNViosC78F8F0H9y7T7gG2M39ymgutxF5gcFEsyZQSph9Bp3A==}
-
   parse-entities@4.0.2:
     resolution: {integrity: sha512-GG2AQYWoLgL877gQIKeRPGO1xF9+eG1ujIb5soS5gPvLQ1y2o8FL90w2QWNdf9I361Mpp7726c+lj3U0qK1uGw==}
 
@@ -10362,9 +10374,6 @@ packages:
   parseurl@1.3.3:
     resolution: {integrity: sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==}
     engines: {node: '>= 0.8'}
-
-  pascal-case@3.1.2:
-    resolution: {integrity: sha512-uWlGT3YSnK9x3BQJaOdcZwrnV6hPpd8jFH1/ucpiLRPh/2zCVJKS19E4GvYHvaCcACn3foXZ0cLB9Wrx1KGe5g==}
 
   path-browserify@1.0.1:
     resolution: {integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==}
@@ -10754,10 +10763,6 @@ packages:
   rehype@13.0.2:
     resolution: {integrity: sha512-j31mdaRFrwFRUIlxGeuPXXKWQxet52RBQRvCmzl5eCefn/KGbomK5GMHNMsOJf55fgo3qw5tST5neDuarDYR2A==}
 
-  relateurl@0.2.7:
-    resolution: {integrity: sha512-G08Dxvm4iDN3MLM0EsP62EDV9IuhXPR6blNz6Utcp7zyV3tr4HVNINt6MpaRWbxoOHT3Q7YN2P+jaHX8vUbgog==}
-    engines: {node: '>= 0.10'}
-
   remark-directive@4.0.0:
     resolution: {integrity: sha512-7sxn4RfF1o3izevPV1DheyGDD6X4c9hrGpfdUpm7uC++dqrnJxIZVkk7CoKqcLm0VUMAuOol7Mno3m6g8cfMuA==}
 
@@ -10851,8 +10856,8 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
-  rollup-plugin-visualizer@7.1.1:
-    resolution: {integrity: sha512-ThaGiHTU8XW02OkK80TrTHATraJmM9OAduU4otal+7gyXLpYEtmGBLfx5kW+EHvvLwn03YGW2NnwKUIqsYlJAA==}
+  rollup-plugin-visualizer@7.0.1:
+    resolution: {integrity: sha512-UJUT4+1Ho4OcWmPYU3sYXgUqI8B8Ayfe06MX7y0qCJ1K8aGoKtR/NDd/2nZqM7ADkrzny+I99Ul7GgyoiVNAgg==}
     engines: {node: '>=22'}
     hasBin: true
     peerDependencies:
@@ -11069,10 +11074,6 @@ packages:
 
   source-map@0.7.6:
     resolution: {integrity: sha512-i5uvt8C3ikiWeNZSVZNWcfZPItFQOsYTUAOkcUPGd8DqDy1uOUikjt5dG+uRlwyvR108Fb9DOd4GvXfT0N2/uQ==}
-    engines: {node: '>= 12'}
-
-  source-map@0.8.0:
-    resolution: {integrity: sha512-d8EqvL+k/SOXCreS/SUzg2ciyHqBBLcN/yuRjFsbvVhHTE2pgei7oAhmPM7kWFbkX6OSMQfUq4KbkF3au9lhYQ==}
     engines: {node: '>= 12'}
 
   space-separated-tokens@2.0.2:
@@ -11485,8 +11486,8 @@ packages:
     resolution: {integrity: sha512-1h/Lnq9yajKY2PEbBadPXj3VxsDDu844OnaAo52UVmIzIvwwtBPIuNvkjuzBlTWpfJyUbG3ez0KSBibQkj4ojg==}
     engines: {node: '>=0.6.11 <=0.7.0 || >=0.7.3'}
 
-  turbo@2.10.11:
-    resolution: {integrity: sha512-yQfwQVoRXwOuyX1LxiJFBFNg6VfuYh+/RyZLd82+isgyLkBXw3S5XRRzvcck1FAjSCG5sVyLd+O1eDMvYa3J7g==}
+  turbo@2.9.14:
+    resolution: {integrity: sha512-BQqXRr4UoWI3UPFrtznCLykYHxwxWh53iCB57x092jPMjIlW1wnm3N895g5irpiXmnxUhREBB0n6+y8BHhs4nw==}
     hasBin: true
 
   type-fest@4.41.0:
@@ -12077,11 +12078,6 @@ packages:
   whatwg-url@14.2.0:
     resolution: {integrity: sha512-De72GdQZzNTUBBChsXueQUnPKDkg/5A5zp7pFDuQAj5UFoENpiACU0wlCvzpAGnTkj++ihpKwKyYewn/XNUbKw==}
     engines: {node: '>=18'}
-
-  which-command@0.1.0:
-    resolution: {integrity: sha512-XZyoF5/5hZtXitIwzrU4NKK+Wtbb9aB9CezUEw2Q0wlYK8NUYQxC1rRXgNueYLtBAJwXIb+/tFVk4dozciNJMA==}
-    engines: {node: '>=22'}
-    hasBin: true
 
   which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
@@ -13543,9 +13539,9 @@ snapshots:
 
   '@ctrl/tinycolor@4.2.0': {}
 
-  '@docsearch/css@5.0.4': {}
+  '@docsearch/css@4.7.0': {}
 
-  '@docsearch/js@5.0.4': {}
+  '@docsearch/js@4.7.0': {}
 
   '@emmetio/abbreviation@2.3.3':
     dependencies:
@@ -15196,6 +15192,7 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
+    optional: true
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
@@ -15527,11 +15524,6 @@ snapshots:
       '@octokit/core': 7.0.7
       '@octokit/types': 16.0.0
 
-  '@octokit/plugin-rest-endpoint-methods@18.0.0(@octokit/core@7.0.7)':
-    dependencies:
-      '@octokit/core': 7.0.7
-      '@octokit/types': 17.0.0
-
   '@octokit/plugin-retry@8.1.1(@octokit/core@7.0.7)':
     dependencies:
       '@octokit/core': 7.0.7
@@ -15712,19 +15704,37 @@ snapshots:
   '@oxc-resolver/binding-win32-x64-msvc@11.21.2':
     optional: true
 
+  '@oxlint-tsgolint/darwin-arm64@0.24.0':
+    optional: true
+
   '@oxlint-tsgolint/darwin-arm64@7.0.2001':
+    optional: true
+
+  '@oxlint-tsgolint/darwin-x64@0.24.0':
     optional: true
 
   '@oxlint-tsgolint/darwin-x64@7.0.2001':
     optional: true
 
+  '@oxlint-tsgolint/linux-arm64@0.24.0':
+    optional: true
+
   '@oxlint-tsgolint/linux-arm64@7.0.2001':
+    optional: true
+
+  '@oxlint-tsgolint/linux-x64@0.24.0':
     optional: true
 
   '@oxlint-tsgolint/linux-x64@7.0.2001':
     optional: true
 
+  '@oxlint-tsgolint/win32-arm64@0.24.0':
+    optional: true
+
   '@oxlint-tsgolint/win32-arm64@7.0.2001':
+    optional: true
+
+  '@oxlint-tsgolint/win32-x64@0.24.0':
     optional: true
 
   '@oxlint-tsgolint/win32-x64@7.0.2001':
@@ -15954,7 +15964,15 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
+  '@scalar/helpers@0.10.0': {}
+
   '@scalar/helpers@0.11.1': {}
+
+  '@scalar/json-magic@0.12.20':
+    dependencies:
+      '@scalar/helpers': 0.10.0
+      pathe: 2.0.3
+      yaml: 2.9.0
 
   '@scalar/json-magic@0.13.2':
     dependencies:
@@ -16288,22 +16306,22 @@ snapshots:
       path-browserify: 1.0.1
       tinyglobby: 0.2.17
 
-  '@turbo/darwin-64@2.10.11':
+  '@turbo/darwin-64@2.9.14':
     optional: true
 
-  '@turbo/darwin-arm64@2.10.11':
+  '@turbo/darwin-arm64@2.9.14':
     optional: true
 
-  '@turbo/linux-64@2.10.11':
+  '@turbo/linux-64@2.9.14':
     optional: true
 
-  '@turbo/linux-arm64@2.10.11':
+  '@turbo/linux-arm64@2.9.14':
     optional: true
 
-  '@turbo/windows-64@2.10.11':
+  '@turbo/windows-64@2.9.14':
     optional: true
 
-  '@turbo/windows-arm64@2.10.11':
+  '@turbo/windows-arm64@2.9.14':
     optional: true
 
   '@tybys/wasm-util@0.10.3':
@@ -16532,6 +16550,14 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+
+  '@typespec/ts-http-runtime@0.3.7':
+    dependencies:
+      http-proxy-agent: 7.0.2
+      https-proxy-agent: 7.0.6
+      tslib: 2.8.1
+    transitivePeerDependencies:
+      - supports-color
 
   '@typespec/ts-http-runtime@0.3.8':
     dependencies:
@@ -17230,11 +17256,6 @@ snapshots:
       call-bind-apply-helpers: 1.0.2
       get-intrinsic: 1.3.0
 
-  camel-case@4.1.2:
-    dependencies:
-      pascal-case: 3.1.2
-      tslib: 2.8.1
-
   caniuse-lite@1.0.30001810: {}
 
   catch-unknown@2.0.0: {}
@@ -17326,10 +17347,6 @@ snapshots:
 
   ci-info@4.4.0: {}
 
-  clean-css@5.3.3:
-    dependencies:
-      source-map: 0.6.1
-
   cli-cursor@5.0.0:
     dependencies:
       restore-cursor: 5.1.0
@@ -17392,8 +17409,6 @@ snapshots:
       table-layout: 1.0.2
       typical: 5.2.0
 
-  commander@10.0.1: {}
-
   commander@11.1.0: {}
 
   commander@12.1.0: {}
@@ -17402,7 +17417,8 @@ snapshots:
 
   commander@15.0.0: {}
 
-  commander@2.20.3: {}
+  commander@2.20.3:
+    optional: true
 
   comment-json@5.0.0:
     dependencies:
@@ -17717,11 +17733,6 @@ snapshots:
       domelementtype: 2.3.0
       domhandler: 5.0.3
 
-  dot-case@3.0.4:
-    dependencies:
-      no-case: 3.0.4
-      tslib: 2.8.1
-
   dotenv@17.4.2: {}
 
   dset@3.1.4: {}
@@ -17747,10 +17758,9 @@ snapshots:
     dependencies:
       escape-html: 1.0.3
 
-  ecmarkup@25.0.1:
+  ecmarkup@23.0.2:
     dependencies:
       chalk: 4.1.2
-      clean-css: 5.3.3
       command-line-args: 5.2.1
       command-line-usage: 6.1.3
       dedent-js: 1.0.1
@@ -17760,15 +17770,12 @@ snapshots:
       grammarkdown: 3.3.2
       highlight.js: 11.0.1
       html-escape: 1.0.2
-      html-minifier-terser: 7.2.0
       js-yaml: 3.15.1
       jsdom: 25.0.1
       nwsapi: 2.2.0
       parse5: 6.0.1
       prex: 0.4.9
       promise-debounce: 1.0.1
-      svgo: 4.1.0
-      terser: 5.50.0
     transitivePeerDependencies:
       - bufferutil
       - canvas
@@ -17962,9 +17969,10 @@ snapshots:
 
   events@3.3.0: {}
 
-  execa@10.0.1:
+  execa@9.6.1:
     dependencies:
       '@sindresorhus/merge-streams': 4.0.0
+      cross-spawn: 7.0.6
       figures: 6.1.0
       get-stream: 9.0.1
       human-signals: 8.0.1
@@ -17974,7 +17982,6 @@ snapshots:
       pretty-ms: 9.3.0
       signal-exit: 4.1.0
       strip-final-newline: 4.0.0
-      which-command: 0.1.0
       yoctocolors: 2.2.0
 
   expand-template@2.0.3:
@@ -18521,16 +18528,6 @@ snapshots:
 
   html-escaper@3.0.3: {}
 
-  html-minifier-terser@7.2.0:
-    dependencies:
-      camel-case: 4.1.2
-      clean-css: 5.3.3
-      commander: 10.0.1
-      entities: 4.5.0
-      param-case: 3.0.4
-      relateurl: 0.2.7
-      terser: 5.50.0
-
   html-url-attributes@3.0.1: {}
 
   html-void-elements@3.0.0: {}
@@ -19020,10 +19017,6 @@ snapshots:
   longest-streak@3.1.0: {}
 
   loupe@3.2.1: {}
-
-  lower-case@2.0.2:
-    dependencies:
-      tslib: 2.8.1
 
   lru-cache@10.4.3: {}
 
@@ -19667,11 +19660,6 @@ snapshots:
     dependencies:
       '@types/nlcst': 2.0.3
 
-  no-case@3.0.4:
-    dependencies:
-      lower-case: 2.0.2
-      tslib: 2.8.1
-
   node-abi@3.95.0:
     dependencies:
       semver: 7.8.5
@@ -19850,6 +19838,15 @@ snapshots:
       '@oxc-resolver/binding-win32-arm64-msvc': 11.21.2
       '@oxc-resolver/binding-win32-x64-msvc': 11.21.2
 
+  oxlint-tsgolint@0.24.0:
+    optionalDependencies:
+      '@oxlint-tsgolint/darwin-arm64': 0.24.0
+      '@oxlint-tsgolint/darwin-x64': 0.24.0
+      '@oxlint-tsgolint/linux-arm64': 0.24.0
+      '@oxlint-tsgolint/linux-x64': 0.24.0
+      '@oxlint-tsgolint/win32-arm64': 0.24.0
+      '@oxlint-tsgolint/win32-x64': 0.24.0
+
   oxlint-tsgolint@7.0.2001:
     optionalDependencies:
       '@oxlint-tsgolint/darwin-arm64': 7.0.2001
@@ -19858,6 +19855,30 @@ snapshots:
       '@oxlint-tsgolint/linux-x64': 7.0.2001
       '@oxlint-tsgolint/win32-arm64': 7.0.2001
       '@oxlint-tsgolint/win32-x64': 7.0.2001
+    optional: true
+
+  oxlint@1.80.0(oxlint-tsgolint@0.24.0):
+    optionalDependencies:
+      '@oxlint/binding-android-arm-eabi': 1.80.0
+      '@oxlint/binding-android-arm64': 1.80.0
+      '@oxlint/binding-darwin-arm64': 1.80.0
+      '@oxlint/binding-darwin-x64': 1.80.0
+      '@oxlint/binding-freebsd-x64': 1.80.0
+      '@oxlint/binding-linux-arm-gnueabihf': 1.80.0
+      '@oxlint/binding-linux-arm-musleabihf': 1.80.0
+      '@oxlint/binding-linux-arm64-gnu': 1.80.0
+      '@oxlint/binding-linux-arm64-musl': 1.80.0
+      '@oxlint/binding-linux-ppc64-gnu': 1.80.0
+      '@oxlint/binding-linux-riscv64-gnu': 1.80.0
+      '@oxlint/binding-linux-riscv64-musl': 1.80.0
+      '@oxlint/binding-linux-s390x-gnu': 1.80.0
+      '@oxlint/binding-linux-x64-gnu': 1.80.0
+      '@oxlint/binding-linux-x64-musl': 1.80.0
+      '@oxlint/binding-openharmony-arm64': 1.80.0
+      '@oxlint/binding-win32-arm64-msvc': 1.80.0
+      '@oxlint/binding-win32-ia32-msvc': 1.80.0
+      '@oxlint/binding-win32-x64-msvc': 1.80.0
+      oxlint-tsgolint: 0.24.0
 
   oxlint@1.80.0(oxlint-tsgolint@7.0.2001):
     optionalDependencies:
@@ -19881,6 +19902,7 @@ snapshots:
       '@oxlint/binding-win32-ia32-msvc': 1.80.0
       '@oxlint/binding-win32-x64-msvc': 1.80.0
       oxlint-tsgolint: 7.0.2001
+    optional: true
 
   p-limit@3.1.0:
     dependencies:
@@ -19920,11 +19942,6 @@ snapshots:
   pako@0.2.9: {}
 
   pako@1.0.11: {}
-
-  param-case@3.0.4:
-    dependencies:
-      dot-case: 3.0.4
-      tslib: 2.8.1
 
   parse-entities@4.0.2:
     dependencies:
@@ -19973,11 +19990,6 @@ snapshots:
       entities: 6.0.1
 
   parseurl@1.3.3: {}
-
-  pascal-case@3.1.2:
-    dependencies:
-      no-case: 3.0.4
-      tslib: 2.8.1
 
   path-browserify@1.0.1: {}
 
@@ -20422,8 +20434,6 @@ snapshots:
       rehype-stringify: 10.0.1
       unified: 11.0.5
 
-  relateurl@0.2.7: {}
-
   remark-directive@4.0.0:
     dependencies:
       '@types/mdast': 4.0.4
@@ -20572,11 +20582,11 @@ snapshots:
       '@rolldown/binding-win32-arm64-msvc': 1.2.5
       '@rolldown/binding-win32-x64-msvc': 1.2.5
 
-  rollup-plugin-visualizer@7.1.1(rolldown@1.2.5):
+  rollup-plugin-visualizer@7.0.1(rolldown@1.2.5):
     dependencies:
       open: 11.0.1
       picomatch: 4.0.7
-      source-map: 0.8.0
+      source-map: 0.7.6
       yargs: 18.1.0
     optionalDependencies:
       rolldown: 1.2.5
@@ -20860,12 +20870,11 @@ snapshots:
     dependencies:
       buffer-from: 1.1.2
       source-map: 0.6.1
+    optional: true
 
   source-map@0.6.1: {}
 
   source-map@0.7.6: {}
-
-  source-map@0.8.0: {}
 
   space-separated-tokens@2.0.2: {}
 
@@ -21155,6 +21164,7 @@ snapshots:
       acorn: 8.18.0
       commander: 2.20.3
       source-map-support: 0.5.21
+    optional: true
 
   test-exclude@8.0.0:
     dependencies:
@@ -21293,14 +21303,14 @@ snapshots:
 
   tunnel@0.0.6: {}
 
-  turbo@2.10.11:
+  turbo@2.9.14:
     optionalDependencies:
-      '@turbo/darwin-64': 2.10.11
-      '@turbo/darwin-arm64': 2.10.11
-      '@turbo/linux-64': 2.10.11
-      '@turbo/linux-arm64': 2.10.11
-      '@turbo/windows-64': 2.10.11
-      '@turbo/windows-arm64': 2.10.11
+      '@turbo/darwin-64': 2.9.14
+      '@turbo/darwin-arm64': 2.9.14
+      '@turbo/linux-64': 2.9.14
+      '@turbo/linux-arm64': 2.9.14
+      '@turbo/windows-64': 2.9.14
+      '@turbo/windows-arm64': 2.9.14
 
   type-fest@4.41.0: {}
 
@@ -21770,8 +21780,6 @@ snapshots:
     dependencies:
       tr46: 5.1.1
       webidl-conversions: 7.0.0
-
-  which-command@0.1.0: {}
 
   which@2.0.2:
     dependencies:
