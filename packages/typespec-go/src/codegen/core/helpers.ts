@@ -91,17 +91,19 @@ export function canonicalizeHeaderName(name: string): string {
  * emits code to verify that a path parameter is not empty
  *
  * @param param the path parameter to check
+ * @param paramIn where the path parameter check is being emitted
  * @param imports the import manager currently in scope
  * @param indent the indentation helper currently in scope
  * @returns the code to check the path parameter for emptiness
  */
 export function emitEmptyPathParamCheck(
   param: go.PathParameter,
+  paramIn: "ctor" | "method",
   imports: ImportManager,
   indent: Indentation,
 ): string {
   imports.add("errors");
-  let text = `${indent.get()}if ${param.name} == "" {\n`;
+  let text = `${indent.get()}if ${paramIn === "ctor" ? param.name : getParamName(param)} == "" {\n`;
   text += `${indent.push().get()}return nil, errors.New("parameter ${param.name} cannot be empty")\n`;
   text += `${indent.pop().get()}}\n`;
   return text;
@@ -540,7 +542,13 @@ export function emitScalarParsing(
  * @param indent the indentation helper currently in scope
  * @returns the time parsing code
  */
-export function emitTimeParsing(srcVar: string, time: go.Time, dstVar: string, imports: ImportManager, indent: Indentation): string {
+export function emitTimeParsing(
+  srcVar: string,
+  time: go.Time,
+  dstVar: string,
+  imports: ImportManager,
+  indent: Indentation,
+): string {
   imports.add("time");
   let text: string;
   switch (time.format) {
