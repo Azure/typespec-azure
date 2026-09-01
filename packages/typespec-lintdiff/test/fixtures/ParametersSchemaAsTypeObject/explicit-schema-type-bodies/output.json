@@ -244,6 +244,111 @@
         "x-ms-long-running-operation": true
       }
     },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitBinaryBytes": {
+      "post": {
+        "operationId": "Widgets_SubmitBinaryBytes",
+        "tags": [
+          "Widgets"
+        ],
+        "consumes": [
+          "application/octet-stream"
+        ],
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "binary"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitDateTimeSecretEncoding": {
+      "post": {
+        "operationId": "Widgets_SubmitDateTimeSecretEncoding",
+        "tags": [
+          "Widgets"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "widgetName",
+            "in": "path",
+            "description": "The name of the widget",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DateTimeSecretEncodedRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitEmptyEncodedInteger": {
       "post": {
         "operationId": "Widgets_SubmitEmptyEncodedInteger",
@@ -1069,6 +1174,10 @@
         ]
       }
     },
+    "DateTimeSecretEncodedRequest": {
+      "type": "string",
+      "format": "date-time"
+    },
     "EmptyEncodedIntegerRequest": {
       "type": "integer",
       "format": "int32",
@@ -1136,6 +1245,10 @@
           }
         ]
       }
+    },
+    "SecretWire": {
+      "format": "password",
+      "x-ms-secret": true
     },
     "StringRequest": {
       "type": "string",

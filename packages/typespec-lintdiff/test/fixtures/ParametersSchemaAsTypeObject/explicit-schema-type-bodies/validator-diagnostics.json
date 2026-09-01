@@ -4,6 +4,20 @@
     "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
     "path": [
       "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitDateTimeSecretEncoding",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitEmptyEncodedInteger",
       "post",
       "parameters",
@@ -89,6 +103,20 @@
     "path": [
       "paths",
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitUnsupportedNestedEncoding",
+      "post",
+      "parameters",
+      "4",
+      "schema",
+      "type"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "ParametersSchemaAsTypeObject",
+    "message": "The schema for body parameters must specify type:object and include a definition for its reference model.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/submitBinaryBytes",
       "post",
       "parameters",
       "4",

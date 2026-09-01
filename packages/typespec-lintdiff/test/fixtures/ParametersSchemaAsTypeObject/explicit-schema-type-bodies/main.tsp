@@ -64,6 +64,12 @@ scalar UnsupportedWire;
 @encode("", UnsupportedWire)
 scalar UnsupportedNestedEncodingRequest extends string;
 
+@secret
+scalar SecretWire;
+
+@encode("", SecretWire)
+scalar DateTimeSecretEncodedRequest extends utcDateTime;
+
 model TemplatePayload<T> {
   value: T;
 }
@@ -140,6 +146,13 @@ interface Widgets {
 
   @post
   @armResourceAction(Widget)
+  submitDateTimeSecretEncoding(
+    ...ResourceInstanceParameters<Widget>,
+    @body body: DateTimeSecretEncodedRequest,
+  ): ArmResponse<Widget> | ErrorResponse;
+
+  @post
+  @armResourceAction(Widget)
   submitInlineEncodedProperty(
     ...ResourceInstanceParameters<Widget>,
     @body body: InlineEncodedWire.payload,
@@ -187,6 +200,14 @@ interface Widgets {
   submitStringTemplate(...ResourceInstanceParameters<Widget>, @body body: "prefix-${string}"):
     | ArmResponse<Widget>
     | ErrorResponse;
+
+  @post
+  @armResourceAction(Widget)
+  submitBinaryBytes(
+    ...ResourceInstanceParameters<Widget>,
+    @header contentType: "application/octet-stream",
+    @body body: bytes,
+  ): ArmResponse<Widget> | ErrorResponse;
 
   @post
   @armResourceAction(Widget)

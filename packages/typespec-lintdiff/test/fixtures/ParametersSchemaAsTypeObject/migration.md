@@ -57,12 +57,14 @@ appears in the aligned corpus; the equivalence conclusion excludes it.
 9. Classify all request-body type families against AutoRest's emitted
    `schema.type`, rather than treating every non-model type as an explicit
    non-object schema.
-10. Ignore unbased custom scalars and empty enums because AutoRest emits `{}` for
-    both; retain diagnostics for standard-based scalars, non-empty enums,
-    literals, string templates, enum members, union variants, and tuples.
-11. Diagnose file bodies because AutoRest emits `type: string` with
-    `format: binary`; continue ignoring multipart bodies because OpenAPI 2 emits
-    their parts as form-data parameters without body schemas.
+10. Ignore unbased custom scalars without an effective encoding and empty enums
+    because AutoRest emits `{}` for both; retain diagnostics for encoded or
+    standard-based scalars, non-empty enums, literals, string templates, enum
+    members, union variants, and tuples.
+11. Diagnose file bodies and `bytes` single bodies with non-JSON/non-text media
+    types because AutoRest emits `type: string` with `format: binary`; continue
+    ignoring multipart bodies because OpenAPI 2 emits their parts as form-data
+    parameters without body schemas.
 12. Account for `@encode` and validator reference resolution. A non-empty
     scalar encoding can add an explicit schema type even when the scalar is
     unbased. A non-empty effective encoding format triggers schema replacement,
@@ -77,6 +79,9 @@ appears in the aligned corpus; the equivalence conclusion excludes it.
     rather than that sibling. The same property encoding replaces the schema
     type when the resolved underlying schema is inline. Unnamed template
     instances are inline; `@friendlyName` makes a template instance referenced.
+    The date-time format merge branch also preserves an inherited string type
+    when its encoding string is empty, rather than applying the default branch's
+    encode-as format.
 
 No emitter, validator, corpus-generator, or comparison-normalization changes
 are required.
@@ -393,11 +398,11 @@ enum EmptyRequest {}
 | Swagger validator | No diagnostic because the resolved body schemas have no `type` property |
 | TypeSpec lint     | Formerly diagnosed both types; now no diagnostic                        |
 
-**Explanation:** AutoRest emits a scalar type only when the scalar is standard
-or eventually derives from a standard scalar. It also emits no type for an
-empty enum and reports its own `union-unsupported` warning. The former generic
-non-model fallback incorrectly assumed both shapes had explicit non-object
-types.
+**Explanation:** Without an effective encoding, AutoRest emits a scalar type
+only when the scalar is standard or eventually derives from a standard scalar.
+It also emits no type for an empty enum and reports its own `union-unsupported`
+warning. The former generic non-model fallback incorrectly assumed both shapes
+had explicit non-object types.
 
 **Disposition:** Mirror AutoRest's scalar-base and enum-member classifications.
 The `explicit-schema-type-bodies` fixture provides the corresponding violating
@@ -441,9 +446,11 @@ model UploadRequest extends TypeSpec.Http.File {}
 | TypeSpec lint     | Formerly missed these branches; now reports both bodies         |
 
 **Explanation:** File bodies do not use the HTTP `single` body kind, but
-AutoRest still emits a body schema with an explicit string type. Separately, a
-non-empty scalar encoding can supply an explicit wire type for an otherwise
-unbased scalar.
+AutoRest still emits a body schema with an explicit string type. A `bytes`
+single body with a non-JSON/non-text media type takes a separate binary branch
+that emits the same string/binary schema without calling `getSchemaOrRef`.
+Separately, a non-empty scalar encoding can supply an explicit wire type for an
+otherwise unbased scalar.
 
 **Disposition:** Handle file bodies directly and inspect encoding metadata and
 the encode-as scalar's effective schema on scalar ancestry. The compliant
@@ -453,10 +460,11 @@ encoding to unformatted `string` does not cause AutoRest to assign
 `int32`, an encode-as scalar whose format comes from its own encoding, and an
 unsupported encoding whose typed encode-as scalar still replaces `schema.type`.
 It also proves that an unsupported nested format is not retained and therefore
-does not erase an inherited primitive type. The compliant fixtures cover both
-an untyped secret encode-as scalar, whose `password` format causes AutoRest to
-erase the inherited type, and a based scalar whose unsupported encoding replaces
-its inherited primitive type with an untyped encode-as scalar.
+does not erase an inherited primitive type, while the date-time merge branch
+retains its inherited string type for an empty encoding. The compliant fixtures
+cover both an untyped secret encode-as scalar, whose `password` format causes
+AutoRest to erase the inherited type, and a based scalar whose unsupported
+encoding replaces its inherited primitive type with an untyped encode-as scalar.
 `multipart-body` preserves the non-body-schema branch.
 
 ### Gap example: encoded property reference resolution
@@ -551,25 +559,25 @@ the comparison output.
 
 ## Fixture evidence
 
-| Fixture                       | Swagger result                            | TypeSpec result              |
-| ----------------------------- | ----------------------------------------- | ---------------------------- |
-| `non-object-body`             | primitive POST body violation             | matching diagnostic          |
-| `put-non-object-body`         | primitive PUT body violation              | matching diagnostic          |
-| `named-array-model-body`      | named array body violation                | matching diagnostic          |
-| `object-body`                 | no violation                              | no rule diagnostic           |
-| `inline-object-body`          | no violation                              | no rule diagnostic           |
-| `nullable-object-body`        | nullable object; no violation             | no rule diagnostic           |
-| `single-variant-unions`       | singleton object and nullable unknown     | no rule diagnostic           |
-| `unsupported-union-body`      | unsupported union emits no schema type    | no rule diagnostic           |
-| `enum-union-body`             | string enum schema violation              | matching diagnostic          |
-| `unbased-scalar-body`         | unbased and encoded scalars emit no type  | no rule diagnostic           |
-| `empty-enum-body`             | empty enum emits no schema type           | no rule diagnostic           |
-| `empty-encoded-scalar-body`   | empty encodings can replace with no type  | no rule diagnostic           |
-| `encoded-model-property-body` | resolved references remain object/untyped | no rule diagnostic           |
-| `multipart-body`              | parts emit as form-data parameters        | no rule diagnostic           |
-| `explicit-schema-type-bodies` | fifteen explicit non-object branches      | fifteen matching diagnostics |
-| `no-body-action`              | no body and no violation                  | no rule diagnostic           |
-| `unknown-body-action`         | body schema has no `type`; no violation   | no rule diagnostic           |
+| Fixture                       | Swagger result                            | TypeSpec result                |
+| ----------------------------- | ----------------------------------------- | ------------------------------ |
+| `non-object-body`             | primitive POST body violation             | matching diagnostic            |
+| `put-non-object-body`         | primitive PUT body violation              | matching diagnostic            |
+| `named-array-model-body`      | named array body violation                | matching diagnostic            |
+| `object-body`                 | no violation                              | no rule diagnostic             |
+| `inline-object-body`          | no violation                              | no rule diagnostic             |
+| `nullable-object-body`        | nullable object; no violation             | no rule diagnostic             |
+| `single-variant-unions`       | singleton object and nullable unknown     | no rule diagnostic             |
+| `unsupported-union-body`      | unsupported union emits no schema type    | no rule diagnostic             |
+| `enum-union-body`             | string enum schema violation              | matching diagnostic            |
+| `unbased-scalar-body`         | unbased and encoded scalars emit no type  | no rule diagnostic             |
+| `empty-enum-body`             | empty enum emits no schema type           | no rule diagnostic             |
+| `empty-encoded-scalar-body`   | empty encodings can replace with no type  | no rule diagnostic             |
+| `encoded-model-property-body` | resolved references remain object/untyped | no rule diagnostic             |
+| `multipart-body`              | parts emit as form-data parameters        | no rule diagnostic             |
+| `explicit-schema-type-bodies` | seventeen explicit non-object branches    | seventeen matching diagnostics |
+| `no-body-action`              | no body and no violation                  | no rule diagnostic             |
+| `unknown-body-action`         | body schema has no `type`; no violation   | no rule diagnostic             |
 
 The seventeen-fixture suite covers five violating fixtures and twelve compliant fixtures.
 Ambient diagnostics from other rules are declared in each fixture snapshot and

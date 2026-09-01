@@ -282,6 +282,31 @@
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
+    "message": "The Operation named 'submitDateTimeSecretEncoding' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'body' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+    "severity": "warning",
+    "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
     "message": "The Operation named 'submitInlineEncodedProperty' should have a documentation or description, use doc comment /** */ to provide it."
   },
   {
@@ -443,6 +468,41 @@
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The Operation named 'submitStringTemplate' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'body' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+    "severity": "warning",
+    "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/byos",
+    "severity": "warning",
+    "message": "The content type \"application/octet-stream\" indicates this operation is storing or retrieving binary data. It is recommended to use the BYOS pattern for Azure Services. https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#bring-your-own-storage-byos"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'submitBinaryBytes' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'contentType' should have a documentation or description, use doc comment /** */ to provide it."
   },
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
