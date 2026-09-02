@@ -18,7 +18,7 @@ export const listOperationMissingPageableRule = createRule({
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/list-operation-missing-pageable",
   messages: {
     default:
-      "This GET operation uses a collection route but does not emit `x-ms-pageable`. Use an ARM list operation template, or add `@list` and annotate the response with `@pageItems` and `@nextLink`.",
+      "This GET operation uses a collection route but does not emit `x-ms-pageable`. Use an ARM list operation template, add `@list` with `@pageItems` and `@nextLink`, or explicitly author a truthy `x-ms-pageable` extension.",
   },
   create(context) {
     return {
