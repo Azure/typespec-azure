@@ -210,7 +210,7 @@ describe("invalid cases", () => {
       });
   });
 
-  it("retargets library property diagnostics to project properties", async () => {
+  it("reports library property diagnostics on project properties", async () => {
     await tester
       .expect(
         `
