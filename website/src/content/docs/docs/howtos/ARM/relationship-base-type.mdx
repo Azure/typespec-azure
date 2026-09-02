@@ -54,12 +54,7 @@ its defaults only when your API requires a different key, path segment, or patte
 ```typespec
 #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "Experimental BaseTypes"
 model DependencyOf is Relationship<DependencyOfProperties> {
-  ...ResourceNameParameter<
-    Resource = DependencyOf,
-    KeyName = "relationshipName",
-    SegmentName = "dependencyOf",
-    NamePattern = "^[a-zA-Z0-9_.-]{1,64}$"
-  >;
+  ...ResourceNameParameter<DependencyOf>;
 }
 ```
 
@@ -90,4 +85,4 @@ interface DependencyOfRelationships extends DependencyOfOps<Extension.ScopeParam
 ```
 
 For a complete working specification, see the
-[Relationship Base Type sample](https://github.com/Azure/typespec-azure/tree/main/packages/samples/specs/resource-manager/resource-types/relationship).
+[Relationship Base Type sample](https://azure.github.io/typespec-azure/docs/samples/resource-manager/resource-types/relationship/).
