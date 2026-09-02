@@ -35,6 +35,29 @@ it("reports a custom tenant-level PUT", async () => {
   });
 });
 
+it("reports every tenant-level PUT", async () => {
+  await expectArmOperation(`
+    @put
+    @route("/providers/Microsoft.Test/configurations/{configName}")
+    op createOrUpdate(@path configName: string): void;
+
+    @put
+    @route("/providers/Microsoft.Test/settings/{settingName}")
+    op updateSetting(@path settingName: string): void;
+  `).toEmitDiagnostics([
+    {
+      code: "@azure-tools/typespec-azure-resource-manager/no-tenant-level-apis",
+      message:
+        "Operation 'createOrUpdate' defines a tenant-level ARM API. Prefer a subscription- or resource-group-level API instead.",
+    },
+    {
+      code: "@azure-tools/typespec-azure-resource-manager/no-tenant-level-apis",
+      message:
+        "Operation 'updateSetting' defines a tenant-level ARM API. Prefer a subscription- or resource-group-level API instead.",
+    },
+  ]);
+});
+
 it("reports a management-group extension PUT whose path begins with /providers", async () => {
   await expectArmOperation(`
     @put
