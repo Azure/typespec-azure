@@ -9,8 +9,8 @@ const [mainTspPath, outputDir, ruleset, enableLocalLinterArg] = process.argv.sli
 const enableLocalLinter = enableLocalLinterArg === "true";
 
 const projectRoot = path.resolve(import.meta.dirname, "..");
-const commonTypesRoot = process.env.LINTDIFF_COMMON_TYPES ?? path.join(projectRoot, "common-types");
-const armTypesDir = path.join(commonTypesRoot, "resource-management");
+// Keep emitted refs portable even when validation reads common-types from an external checkout.
+const armTypesDir = path.join(projectRoot, "common-types", "resource-management");
 
 const [resolvedOptions, configDiagnostics] = await resolveCompilerOptions(NodeHost, {
   entrypoint: path.resolve(mainTspPath),
