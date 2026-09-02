@@ -1,4 +1,4 @@
-ARM PATCH request body properties must be update-safe. A property emitted in an ARM PATCH body must not be required, must not define a default value, and must not be create-only.
+ARM PATCH request body properties must be safe for partial updates. A property emitted in an ARM PATCH body must not be required, must not define a default value, and must not be create-only.
 
 ## Impact
 

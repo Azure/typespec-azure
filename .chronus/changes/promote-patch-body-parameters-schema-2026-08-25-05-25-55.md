@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-Add an ARM linter rule that reports required, default-valued, and create-only properties emitted in PATCH request bodies.
+Add the `no-unsafe-patch-body-properties` ARM linter rule to report required, default-valued, and create-only properties emitted in PATCH request bodies.

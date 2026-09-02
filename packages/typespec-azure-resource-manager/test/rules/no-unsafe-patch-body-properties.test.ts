@@ -5,9 +5,9 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { patchBodyInvalidPropertyRule } from "../../src/rules/patch-body-invalid-property.js";
+import { noUnsafePatchBodyPropertiesRule } from "../../src/rules/no-unsafe-patch-body-properties.js";
 
-const ruleCode = "@azure-tools/typespec-azure-resource-manager/patch-body-invalid-property";
+const ruleCode = "@azure-tools/typespec-azure-resource-manager/no-unsafe-patch-body-properties";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -16,7 +16,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    patchBodyInvalidPropertyRule,
+    noUnsafePatchBodyPropertiesRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });

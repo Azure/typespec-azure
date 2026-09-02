@@ -25,12 +25,12 @@ import {
 } from "@typespec/http";
 import { resolveProviderNamespace } from "../namespace.js";
 
-export const patchBodyInvalidPropertyRule = createRule({
-  name: "patch-body-invalid-property",
-  docs: fileRef.fromPackageRoot("src/rules/patch-body-invalid-property.md"),
+export const noUnsafePatchBodyPropertiesRule = createRule({
+  name: "no-unsafe-patch-body-properties",
+  docs: fileRef.fromPackageRoot("src/rules/no-unsafe-patch-body-properties.md"),
   severity: "warning",
   description: "ARM PATCH body properties must not be required, have defaults, or be create-only.",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/patch-body-invalid-property",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-unsafe-patch-body-properties",
   messages: {
     required: paramMessage`Properties of a PATCH request body must not be required, property:${"propertyName"}.`,
     default: paramMessage`Properties of a PATCH request body must not have default value, property:${"propertyName"}.`,

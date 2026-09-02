@@ -32,8 +32,8 @@ import { noOverridePropsRule } from "./rules/no-override-props.js";
 import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
+import { noUnsafePatchBodyPropertiesRule } from "./rules/no-unsafe-patch-body-properties.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
-import { patchBodyInvalidPropertyRule } from "./rules/patch-body-invalid-property.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
@@ -82,7 +82,7 @@ const rules = [
   missingXmsIdentifiersRule,
   noResponseBodyRule,
   operationsInterfaceMissingRule,
-  patchBodyInvalidPropertyRule,
+  noUnsafePatchBodyPropertiesRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
   resourceNameRule,
