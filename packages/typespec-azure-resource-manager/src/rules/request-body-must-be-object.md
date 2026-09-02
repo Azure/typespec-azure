@@ -49,6 +49,10 @@ op submitItems(@body body: SubmitItemsRequest): void;
 op submitNullable(@body body: SubmitRequest | null): void;
 ```
 
+## Suppression
+
+Suppress only when required to preserve an existing API; otherwise replace the request body with an object model.
+
 ## LintDiff Equivalent
 
 This rule corresponds to the Swagger validator rule [ParametersSchemaAsTypeObject](https://github.com/Azure/azure-openapi-validator/blob/main/docs/parameters-schema-as-type-object.md).
