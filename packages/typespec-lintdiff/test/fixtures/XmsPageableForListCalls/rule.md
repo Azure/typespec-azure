@@ -73,6 +73,8 @@ The repaired local suite covers the authorable ARM matrix needed for migration s
 - falsy explicit `x-ms-pageable` value => violation because the validator requires a truthy value
 - dynamic provider path without a literal dotted namespace => ignored to match the validator helper
 - non-emitted operation or interface template declaration => ignored
+- emitted operations in child namespaces of the ARM provider => violation when pageable metadata is
+  absent
 
 The upstream `{scope}` placeholder variant is the same selector-parity behavior after the provider
 namespace as the `/{resourceUri}` raw fixture, so it is documented source-of-truth coverage rather
@@ -88,5 +90,6 @@ than a separate local authoring case.
 | `falsy-pageable-extension`    | true      | A present but falsy `x-ms-pageable` value does not satisfy the validator                                                                            |
 | `list-without-next-link`      | true      | `@list` without next-link metadata does not emit `x-ms-pageable`                                                                                    |
 | `list-without-pageable`       | true      | Raw ARM list paths omit `x-ms-pageable`; sibling singleton and `/default` paths stay ignored while raw operations warn via `arm-resource-operation` |
+| `nested-provider-namespace`   | true      | A collection GET in a child namespace inherits ARM provider membership and remains in the emitted validator population                              |
 | `operations-path`             | true      | The upstream validator treats `/operations` as a list path                                                                                          |
 | `selector-boundaries`         | false     | Dynamic-provider paths and non-emitted templates stay outside the validator population                                                              |

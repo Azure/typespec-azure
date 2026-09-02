@@ -2,9 +2,11 @@
 
 ## Conclusion
 
-The migrated TypeSpec rule required updates and is now functionally equivalent to the Swagger
-`XmsPageableForListCalls` rule over the aligned ARM corpus. The final run has complete assessable
-project overlap, no one-sided projects, equal diagnostic counts, and no deduplicated count outliers.
+The migrated TypeSpec rule required an additional update after promotion review and is now
+functionally equivalent to the Swagger `XmsPageableForListCalls` rule over the aligned ARM corpus.
+The final run has complete assessable project overlap, no one-sided projects, equal diagnostic
+counts, and no deduplicated count outliers. The added fixture also closes the previously untested
+child-namespace branch even though that branch did not change the selected corpus counts.
 
 The production rule and directly related fixtures now:
 
@@ -13,8 +15,9 @@ The production rule and directly related fixtures now:
 - ignore response shape because the Swagger rule checks only path and `x-ms-pageable`;
 - treat `@list` as pageable only when AutoRest can resolve a next-link property;
 - accept an explicitly authored truthy `x-ms-pageable` extension while rejecting falsy values;
-- skip dynamic provider paths without a literal dotted namespace; and
-- skip non-emitted operation and interface template declarations.
+- skip dynamic provider paths without a literal dotted namespace;
+- skip non-emitted operation and interface template declarations; and
+- recognize emitted operations in child namespaces beneath the ARM provider namespace.
 
 Required changes are complete in:
 
@@ -23,18 +26,19 @@ Required changes are complete in:
 - `packages/typespec-lintdiff/test/fixtures/XmsPageableForListCalls/explicit-pageable-extension`
 - `packages/typespec-lintdiff/test/fixtures/XmsPageableForListCalls/falsy-pageable-extension`
 - `packages/typespec-lintdiff/test/fixtures/XmsPageableForListCalls/list-without-next-link`
+- `packages/typespec-lintdiff/test/fixtures/XmsPageableForListCalls/nested-provider-namespace`
 - `packages/typespec-lintdiff/test/fixtures/XmsPageableForListCalls/operations-path`
 - `packages/typespec-lintdiff/test/fixtures/XmsPageableForListCalls/selector-boundaries`
 - `packages/typespec-lintdiff/test/fixtures/XmsPageableForListCalls/rule.md`
 
 ## Report inputs
 
-| Source                       | Path                                                                           | Revision / population                                                                                                                                                                      |
-| ---------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| External migration snapshot  | `packages/typespec-lintdiff/docs/coverage_old.md`                              | Added at `6a418911dbe5d35992fb5845cf4460d45643fec8`; 450 compiled projects and 210 validator rules; aggregate-only rule row                                                                |
-| Checked-in LintDiff baseline | `packages/typespec-lintdiff/specs/coverage-breakdown.md` at `HEAD`             | Added at `bf4e84189edc4ebcfcd2fc6ef881e74e3f485ece`; specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`; 462 of 468 projects                                                          |
-| Final local run | generated corpus artifacts before restoring `packages/typespec-lintdiff/specs` | specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`; generated `2026-09-01T11:25:11.642Z`; harness revision `d7bf1cd7ecc3e46273c48d2b040246fe569fbb17` plus this working-tree rule fix |
-| Swagger validator            | `azure-openapi-validator` checkout                                             | `6243cb01c16c7535cd3b8df6f45fbeb3c095ed7f`                                                                                                                                                 |
+| Source                       | Path                                                                           | Revision / population                                                                                                                                                                                    |
+| ---------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| External migration snapshot  | `packages/typespec-lintdiff/docs/coverage_old.md`                              | Added at `6a418911dbe5d35992fb5845cf4460d45643fec8`; 450 compiled projects and 210 validator rules; aggregate-only rule row                                                                              |
+| Checked-in LintDiff baseline | `packages/typespec-lintdiff/specs/coverage-breakdown.md` at `HEAD`             | Added at `bf4e84189edc4ebcfcd2fc6ef881e74e3f485ece`; specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`; 462 of 468 projects                                                                        |
+| Final local run              | generated corpus artifacts before restoring `packages/typespec-lintdiff/specs` | specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`; generated `2026-09-02T09:42:24.336Z`; harness revision `67932be3dccc11472cc82f6555dd6d01943d78df` plus this working-tree child-namespace repair |
+| Swagger validator            | `azure-openapi-validator` checkout                                             | `6243cb01c16c7535cd3b8df6f45fbeb3c095ed7f`                                                                                                                                                               |
 
 The reports use different coverage definitions. The external snapshot credits the number of projects
 where the then-current local lint fired. LintDiff requires mapped diagnostics in the same successfully
@@ -112,6 +116,7 @@ stable operation identities.
 | `falsy-pageable-extension`    | violation | A present but falsy OpenAPI extension fails the validator's truthiness check.                                  |
 | `list-without-next-link`      | violation | `@list` plus `@pageItems` without a next link does not cause AutoRest to emit `x-ms-pageable`.                 |
 | `list-without-pageable`       | violation | Raw top-level and resource-URI list routes violate; sibling singleton and `/default` routes are ignored.       |
+| `nested-provider-namespace`   | violation | An emitted collection GET in a child namespace inherits ARM provider membership and omits `x-ms-pageable`.     |
 | `operations-path`             | violation | The Swagger selector and helper classify `/operations` as a list route.                                        |
 | `selector-boundaries`         | compliant | A dynamic provider namespace lacks the required dot, and generic templates are not independently emitted.      |
 
@@ -130,6 +135,7 @@ extensions are read from the OpenAPI extension state.
 | Explicit falsy extension                                 | authored OpenAPI extension                        | `null`          | violation    | violation     | `falsy-pageable-extension`    |
 | Raw ARM collection GET                                   | no paging metadata                                | absent          | violation    | violation     | `list-without-pageable`       |
 | Raw singleton or `/default` GET                          | selector exclusion                                | irrelevant      | clean        | clean         | `list-without-pageable`       |
+| Child-namespace ARM collection GET                       | no paging metadata                                | absent          | violation    | violation     | `nested-provider-namespace`   |
 | Literal `/operations` GET without paging metadata        | collection-path selector                          | absent          | violation    | violation     | `operations-path`             |
 | Dynamic provider namespace with no literal dot           | path helper rejects before extension check        | absent          | clean        | clean         | `selector-boundaries`         |
 | Generic operation/interface declaration                  | no independently emitted operation                | no OpenAPI node | not assessed | skipped       | `selector-boundaries`         |
@@ -389,9 +395,64 @@ OpenAPI representation. Diagnosing them created the former TypeSpec-only Marketp
 
 **Disposition:** Rule fix.
 
+### Gap example: child ARM namespaces
+
+- **Classification:** validator-only before fix
+- **Status:** fixed
+- **Project/API version:** fixture `XmsPageableForListCalls/nested-provider-namespace` / `2024-01-01`
+- **Source:** `nested-provider-namespace/main.tsp`
+
+**TypeSpec source**
+
+```typespec
+@armProviderNamespace
+namespace Microsoft.TestService;
+
+namespace Inventory {
+  interface Widgets {
+    @route("/subscriptions/{subscriptionId}/providers/Microsoft.TestService/widgetSummaries")
+    @get
+    @armResourceList(Widget)
+    listSummaries(@path subscriptionId: string, ...ApiVersionParameter):
+      | ArmResponse<WidgetSummary>
+      | ErrorResponse;
+  }
+}
+```
+
+**Emitted OpenAPI**
+
+```json
+"/subscriptions/{subscriptionId}/providers/Microsoft.TestService/widgetSummaries": {
+  "get": {
+    "operationId": "Widgets_ListSummaries",
+    "responses": {
+      "200": {
+        "schema": { "$ref": "#/definitions/Inventory.WidgetSummary" }
+      }
+    }
+  }
+}
+```
+
+| Engine            | Observed result                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Swagger validator | Reports because the emitted collection GET omits `x-ms-pageable`; TypeSpec namespace nesting is not represented in the selected path. |
+| TypeSpec lint     | Reports after using ancestor-aware ARM provider lookup for the operation's child namespace.                                           |
+
+**Explanation:** The previous TypeSpec implementation passed the operation's immediate namespace to
+`resolveProviderNamespace`, which searches that namespace and its descendants for a provider
+declaration. It did not walk to an `@armProviderNamespace` ancestor, so emitted operations in child
+namespaces were incorrectly skipped. `getArmProviderNamespace` performs the required ancestor lookup.
+
+**Disposition:** Rule fix and regression fixture added after promotion review.
+
 ## Final determination
 
 The migrated TypeSpec rule is functionally equal to the related Swagger rule for the pinned,
 successfully compiled, version-aligned ARM population. Raw Swagger event counts remain higher only
 because the validator observes repeated emitted files and API versions; stable deduplicated
-operation identities and the aligned comparison are exact. No rule-specific uncertainty remains.
+operation identities and the aligned comparison are exact. The child-namespace regression fixture
+closes the negative-space gap found during promotion review, while the final full-corpus row remains
+75 overlapping projects and 254 aligned diagnostics on each side. No rule-specific uncertainty
+remains.

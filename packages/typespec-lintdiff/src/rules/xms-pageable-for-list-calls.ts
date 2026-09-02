@@ -1,4 +1,4 @@
-import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
+import { getArmProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 import { createRule, getPagingOperation, isList, isTemplateDeclaration } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 import { getExtensions } from "@typespec/openapi";
@@ -22,7 +22,10 @@ export const xmsPageableForListCallsRule = createRule({
         }
 
         const namespace = operation.interface?.namespace ?? operation.namespace;
-        if (resolveProviderNamespace(context.program, namespace) === undefined) {
+        if (
+          namespace === undefined ||
+          getArmProviderNamespace(context.program, namespace) === undefined
+        ) {
           return;
         }
 
