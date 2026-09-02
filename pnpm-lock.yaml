@@ -31,13 +31,13 @@ catalogs:
       specifier: ^0.24.0
       version: 0.24.0
     '@astrojs/check':
-      specifier: ^0.9.8
+      specifier: ^0.9.10
       version: 0.9.10
     '@astrojs/react':
-      specifier: ^6.0.0
+      specifier: ^6.0.4
       version: 6.0.4
     '@astrojs/starlight':
-      specifier: ^0.41.3
+      specifier: ^0.41.8
       version: 0.41.8
     '@autorest/codemodel':
       specifier: ~4.20.1
@@ -67,13 +67,13 @@ catalogs:
       specifier: ^1.14.0
       version: 1.14.0
     '@azure/identity':
-      specifier: ^4.13.1
+      specifier: ^4.13.2
       version: 4.13.2
     '@azure/logger':
       specifier: ^1.4.0
       version: 1.4.0
     '@azure/storage-blob':
-      specifier: ^12.31.0
+      specifier: ^12.33.0
       version: 12.33.0
     '@babel/code-frame':
       specifier: ^7.29.0
@@ -91,31 +91,31 @@ catalogs:
       specifier: ^1.1.1
       version: 1.1.1
     '@docsearch/css':
-      specifier: ^4.6.2
+      specifier: ^4.7.0
       version: 4.7.0
     '@docsearch/js':
-      specifier: ^4.6.2
+      specifier: ^4.7.0
       version: 4.7.0
     '@expressive-code/core':
-      specifier: ^0.44.0
+      specifier: ^0.44.1
       version: 0.44.1
     '@fluentui/react-components':
-      specifier: ^9.73.7
-      version: 9.74.7
+      specifier: 9.74.3
+      version: 9.74.3
     '@fluentui/react-icons':
-      specifier: ^2.0.323
-      version: 2.0.338
+      specifier: 2.0.333
+      version: 2.0.333
     '@fluentui/react-list':
-      specifier: ^9.6.13
-      version: 9.6.18
+      specifier: 9.6.16
+      version: 9.6.16
     '@inquirer/prompts':
-      specifier: ^8.4.1
+      specifier: ^8.6.0
       version: 8.6.0
     '@microsoft/api-extractor':
       specifier: ~7.58.1
       version: 7.58.13
     '@microsoft/api-extractor-model':
-      specifier: ^7.33.5
+      specifier: ^7.33.11
       version: 7.33.11
     '@microsoft/tsdoc':
       specifier: ^0.16.0
@@ -124,37 +124,37 @@ catalogs:
       specifier: ^0.18.1
       version: 0.18.1
     '@octokit/core':
-      specifier: ^7.0.6
+      specifier: ^7.0.7
       version: 7.0.7
     '@octokit/plugin-paginate-graphql':
       specifier: ^6.0.0
       version: 6.0.0
     '@octokit/plugin-rest-endpoint-methods':
-      specifier: ^17.0.0
-      version: 17.0.0
+      specifier: ^18.0.0
+      version: 18.0.0
     '@pinterest/alloy-graphql':
-      specifier: ^1.1.0
+      specifier: ^1.1.1
       version: 1.1.1
     '@playwright/test':
-      specifier: ^1.60.0
+      specifier: ^1.62.1
       version: 1.62.1
     '@scalar/json-magic':
-      specifier: ^0.12.15
-      version: 0.12.20
+      specifier: ^0.13.2
+      version: 0.13.2
     '@scalar/openapi-parser':
-      specifier: ^0.28.6
+      specifier: ^0.28.16
       version: 0.28.16
     '@scalar/openapi-types':
-      specifier: ^0.9.1
+      specifier: ^0.9.5
       version: 0.9.5
     '@storybook/react-vite':
-      specifier: ^10.3.5
+      specifier: ^10.5.10
       version: 10.5.10
     '@testing-library/dom':
       specifier: ^10.4.1
       version: 10.4.1
     '@testing-library/jest-dom':
-      specifier: ^7.0.0
+      specifier: ^7.0.1
       version: 7.0.1
     '@testing-library/react':
       specifier: ^16.3.2
@@ -181,28 +181,28 @@ catalogs:
       specifier: ^1.9.10
       version: 1.9.10
     '@types/multer':
-      specifier: ^2.1.0
+      specifier: ^2.2.0
       version: 2.2.0
     '@types/mustache':
       specifier: ^4.2.6
       version: 4.2.6
     '@types/node':
-      specifier: ^26.0.0
+      specifier: ^26.3.0
       version: 26.3.0
     '@types/pluralize':
       specifier: ^0.0.33
       version: 0.0.33
     '@types/react':
-      specifier: ^19.2.16
+      specifier: ^19.2.18
       version: 19.2.18
     '@types/react-dom':
-      specifier: ^19.2.3
+      specifier: ^19.2.5
       version: 19.2.5
     '@types/remark-heading-id':
       specifier: ^1.0.0
       version: 1.0.0
     '@types/semver':
-      specifier: ^7.7.1
+      specifier: ^7.8.0
       version: 7.8.0
     '@types/swagger-ui':
       specifier: ^5.32.0
@@ -223,43 +223,43 @@ catalogs:
       specifier: '>=0.37.0 <1.0.0'
       version: 0.37.0
     '@typespec/ts-http-runtime':
-      specifier: 0.3.7
-      version: 0.3.7
+      specifier: 0.3.8
+      version: 0.3.8
     '@vitejs/plugin-react':
-      specifier: ^6.0.1
+      specifier: ^6.1.0
       version: 6.1.0
     '@vitest/coverage-v8':
-      specifier: ^4.1.3
+      specifier: ^4.1.11
       version: 4.1.11
     '@vitest/ui':
-      specifier: ^4.1.3
+      specifier: ^4.1.11
       version: 4.1.11
     '@vscode/extension-telemetry':
-      specifier: ^1.5.1
+      specifier: ^1.5.2
       version: 1.5.2
     '@vscode/test-electron':
-      specifier: ^3.0.0
+      specifier: ^3.1.0
       version: 3.1.0
     '@vscode/test-web':
       specifier: ^0.0.81
       version: 0.0.81
     '@vscode/vsce':
-      specifier: ^3.7.1
+      specifier: ^3.9.2
       version: 3.9.2
     ajv:
-      specifier: ^8.18.0
+      specifier: ^8.20.0
       version: 8.20.0
     ajv-formats:
       specifier: ^3.0.1
       version: 3.0.1
     astro:
-      specifier: ^7.1.0
+      specifier: ^7.2.6
       version: 7.2.6
     astro-expressive-code:
-      specifier: ^0.44.0
+      specifier: ^0.44.1
       version: 0.44.1
     astro-rehype-relative-markdown-links:
-      specifier: ^0.19.0
+      specifier: ^0.19.2
       version: 0.19.2
     autorest:
       specifier: ^3.8.0
@@ -280,7 +280,7 @@ catalogs:
       specifier: ^2.1.1
       version: 2.1.1
     concurrently:
-      specifier: ^10.0.4
+      specifier: ^10.0.5
       version: 10.0.5
     cross-env:
       specifier: ^10.1.0
@@ -289,7 +289,7 @@ catalogs:
       specifier: ^7.0.6
       version: 7.0.6
     cspell:
-      specifier: ^10.0.0
+      specifier: ^10.1.1
       version: 10.1.1
     debounce:
       specifier: ^3.0.0
@@ -301,34 +301,34 @@ catalogs:
       specifier: ^17.4.2
       version: 17.4.2
     ecmarkup:
-      specifier: ~23.0.2
+      specifier: ^23.0.2
       version: 23.0.2
     env-paths:
       specifier: ^4.0.0
       version: 4.0.0
     es-module-shims:
-      specifier: ^2.8.0
+      specifier: ^2.8.4
       version: 2.8.4
     esbuild:
-      specifier: ^0.28.0
+      specifier: ^0.28.2
       version: 0.28.2
     esbuild-plugins-node-modules-polyfill:
-      specifier: ^1.8.1
+      specifier: ^1.8.3
       version: 1.8.3
     execa:
-      specifier: ^9.6.1
-      version: 9.6.1
+      specifier: ^10.0.1
+      version: 10.0.1
     express:
       specifier: ^5.2.1
       version: 5.2.1
     fast-xml-parser:
-      specifier: ^5.10.1
+      specifier: ^5.11.0
       version: 5.11.0
     graphql:
-      specifier: ^17.0.0-alpha.9
+      specifier: ^17.0.2
       version: 17.0.2
     happy-dom:
-      specifier: ^20.11.0
+      specifier: ^20.11.6
       version: 20.11.6
     hast-util-to-html:
       specifier: ^9.0.5
@@ -346,13 +346,13 @@ catalogs:
       specifier: ^4.0.8
       version: 4.0.8
     monaco-editor:
-      specifier: ^0.55.1
-      version: 0.55.1
+      specifier: ^0.56.0
+      version: 0.56.0
     monaco-editor-core:
-      specifier: ^0.55.1
-      version: 0.55.1
+      specifier: ^0.56.0
+      version: 0.56.0
     morgan:
-      specifier: ^1.10.1
+      specifier: ^1.11.0
       version: 1.11.0
     multer:
       specifier: ^2.2.0
@@ -361,16 +361,16 @@ catalogs:
       specifier: ^4.2.0
       version: 4.2.0
     ora:
-      specifier: ^9.3.0
+      specifier: ^9.4.1
       version: 9.4.1
     oxlint:
-      specifier: ^1.69.0
+      specifier: ^1.80.0
       version: 1.80.0
     oxlint-tsgolint:
-      specifier: ^0.24.0
-      version: 0.24.0
+      specifier: ^7.0.2001
+      version: 7.0.2001
     p-limit:
-      specifier: ^7.3.0
+      specifier: ^7.3.1
       version: 7.3.1
     pathe:
       specifier: ^2.0.3
@@ -379,7 +379,7 @@ catalogs:
       specifier: ^1.1.1
       version: 1.1.1
     playwright:
-      specifier: ^1.60.0
+      specifier: ^1.62.1
       version: 1.62.1
     plist:
       specifier: ^5.0.0
@@ -388,7 +388,7 @@ catalogs:
       specifier: ^8.0.0
       version: 8.0.0
     prettier:
-      specifier: ^3.9.5
+      specifier: ^3.9.6
       version: 3.9.6
     prettier-plugin-astro:
       specifier: ^0.14.1
@@ -400,19 +400,19 @@ catalogs:
       specifier: ^0.19.0
       version: 0.19.0
     react:
-      specifier: ^19.2.7
+      specifier: ^19.2.8
       version: 19.2.8
     react-chartjs-2:
       specifier: ^5.3.1
       version: 5.3.1
     react-dom:
-      specifier: ^19.2.7
+      specifier: ^19.2.8
       version: 19.2.8
     react-error-boundary:
-      specifier: ^6.1.1
+      specifier: ^6.1.3
       version: 6.1.3
     react-hotkeys-hook:
-      specifier: ^5.2.4
+      specifier: ^5.3.3
       version: 5.3.3
     react-markdown:
       specifier: ^10.1.0
@@ -430,37 +430,37 @@ catalogs:
       specifier: ^6.1.3
       version: 6.1.3
     rollup-plugin-visualizer:
-      specifier: 7.0.1
-      version: 7.0.1
+      specifier: 7.1.1
+      version: 7.1.1
     semver:
-      specifier: ^7.7.4
+      specifier: ^7.8.5
       version: 7.8.5
     sharp:
-      specifier: ^0.35.2
+      specifier: ^0.35.3
       version: 0.35.3
     simple-git:
       specifier: ^3.36.0
       version: 3.36.0
     storybook:
-      specifier: ^10.3.5
+      specifier: ^10.5.10
       version: 10.5.10
     strip-json-comments:
       specifier: ^5.0.3
       version: 5.0.3
     swagger-ui-dist:
-      specifier: ^5.32.2
+      specifier: ^5.32.14
       version: 5.32.14
     swagger-ui-express:
       specifier: ^5.0.1
       version: 5.0.1
     tar:
-      specifier: ^7.5.21
+      specifier: ^7.5.22
       version: 7.5.22
     temporal-polyfill:
-      specifier: ^1.0.1
+      specifier: ^1.0.4
       version: 1.0.4
     tree-sitter-c-sharp:
-      specifier: ^0.23.1
+      specifier: ^0.23.5
       version: 0.23.5
     tree-sitter-java:
       specifier: ^0.23.5
@@ -481,13 +481,13 @@ catalogs:
       specifier: ^2.8.1
       version: 2.8.1
     turbo:
-      specifier: 2.9.14
-      version: 2.9.14
+      specifier: ^2.10.11
+      version: 2.10.12
     typedoc:
-      specifier: ^0.28.19
+      specifier: ^0.28.20
       version: 0.28.20
     typedoc-plugin-markdown:
-      specifier: ^4.11.0
+      specifier: ^4.12.0
       version: 4.12.0
     typescript:
       specifier: ~6.0.2
@@ -499,25 +499,25 @@ catalogs:
       specifier: ^2.0.0
       version: 2.0.0
     vite:
-      specifier: ^8.1.2
+      specifier: ^8.2.2
       version: 8.2.2
     vite-plugin-checker:
-      specifier: ^0.14.1
+      specifier: ^0.14.5
       version: 0.14.5
     vite-plugin-dts:
       specifier: 5.0.3
       version: 5.0.3
     vitest:
-      specifier: ^4.1.3
+      specifier: ^4.1.11
       version: 4.1.11
     vscode-languageclient:
-      specifier: ^10.0.0
+      specifier: ^10.1.0
       version: 10.1.0
     vscode-languageserver:
-      specifier: ^10.0.0
+      specifier: ^10.1.0
       version: 10.1.0
     vscode-languageserver-textdocument:
-      specifier: ^1.0.12
+      specifier: ^1.0.13
       version: 1.0.13
     vscode-oniguruma:
       specifier: ^2.0.1
@@ -526,16 +526,16 @@ catalogs:
       specifier: ^9.3.2
       version: 9.3.2
     web-tree-sitter:
-      specifier: ^0.26.8
+      specifier: ^0.26.13
       version: 0.26.13
     which:
       specifier: ^7.0.0
       version: 7.0.0
     yaml:
-      specifier: ^2.8.3
+      specifier: ^2.9.0
       version: 2.9.0
     yargs:
-      specifier: ^18.0.0
+      specifier: ^18.1.0
       version: 18.1.0
 
 overrides:
@@ -575,10 +575,10 @@ importers:
         version: 10.1.1
       oxlint:
         specifier: 'catalog:'
-        version: 1.80.0(oxlint-tsgolint@0.24.0)
+        version: 1.80.0(oxlint-tsgolint@7.0.2001)
       oxlint-tsgolint:
         specifier: 'catalog:'
-        version: 0.24.0
+        version: 7.0.2001
       playwright:
         specifier: 'catalog:'
         version: 1.62.1
@@ -599,7 +599,7 @@ importers:
         version: 6.1.3
       turbo:
         specifier: 'catalog:'
-        version: 2.9.14
+        version: 2.10.12
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -629,7 +629,7 @@ importers:
         version: 6.0.0(@octokit/core@7.0.7)
       '@octokit/plugin-rest-endpoint-methods':
         specifier: 'catalog:'
-        version: 17.0.0(@octokit/core@7.0.7)
+        version: 18.0.0(@octokit/core@7.0.7)
       '@types/micromatch':
         specifier: 'catalog:'
         version: 4.0.10
@@ -647,16 +647,16 @@ importers:
         version: 10.1.1
       execa:
         specifier: 'catalog:'
-        version: 9.6.1
+        version: 10.0.1
       micromatch:
         specifier: 'catalog:'
         version: 4.0.8
       oxlint:
         specifier: 'catalog:'
-        version: 1.80.0(oxlint-tsgolint@0.24.0)
+        version: 1.80.0(oxlint-tsgolint@7.0.2001)
       oxlint-tsgolint:
         specifier: 'catalog:'
-        version: 0.24.0
+        version: 7.0.2001
       picocolors:
         specifier: 'catalog:'
         version: 1.1.1
@@ -680,7 +680,7 @@ importers:
         version: 6.1.3
       turbo:
         specifier: 'catalog:'
-        version: 2.9.14
+        version: 2.10.12
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -1106,13 +1106,13 @@ importers:
     dependencies:
       '@fluentui/react-components':
         specifier: 'catalog:'
-        version: 9.74.7(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
+        version: 9.74.3(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@fluentui/react-icons':
         specifier: 'catalog:'
-        version: 2.0.338(react@19.2.8)
+        version: 2.0.333(react@19.2.8)
       '@fluentui/react-list':
         specifier: 'catalog:'
-        version: 9.6.18(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
+        version: 9.6.16(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       react:
         specifier: 'catalog:'
         version: 19.2.8
@@ -1173,7 +1173,7 @@ importers:
         version: 0.14.5(oxlint@1.80.0(oxlint-tsgolint@7.0.2001))(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
       vite-plugin-dts:
         specifier: 'catalog:'
-        version: 5.0.3(@microsoft/api-extractor@7.58.13(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
+        version: 5.0.3(@microsoft/api-extractor@7.59.0(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
       vitest:
         specifier: 'catalog:'
         version: 4.1.11(@types/node@26.3.0)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(happy-dom@20.11.6)(jsdom@25.0.1)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
@@ -1325,7 +1325,7 @@ importers:
         version: link:../spector
       '@typespec/ts-http-runtime':
         specifier: 'catalog:'
-        version: 0.3.7
+        version: 0.3.8
       '@typespec/tspd':
         specifier: workspace:^
         version: link:../tspd
@@ -1346,7 +1346,7 @@ importers:
         version: 10.1.0
       execa:
         specifier: 'catalog:'
-        version: 9.6.1
+        version: 10.0.1
       ora:
         specifier: 'catalog:'
         version: 9.4.1
@@ -1735,7 +1735,7 @@ importers:
     dependencies:
       monaco-editor-core:
         specifier: 'catalog:'
-        version: 0.55.1
+        version: 0.56.0
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -1814,7 +1814,7 @@ importers:
     dependencies:
       '@scalar/json-magic':
         specifier: 'catalog:'
-        version: 0.12.20
+        version: 0.13.2
       '@scalar/openapi-parser':
         specifier: 'catalog:'
         version: 0.28.16
@@ -1924,10 +1924,10 @@ importers:
     dependencies:
       '@fluentui/react-components':
         specifier: 'catalog:'
-        version: 9.74.7(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
+        version: 9.74.3(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@fluentui/react-icons':
         specifier: 'catalog:'
-        version: 2.0.338(react@19.2.8)
+        version: 2.0.333(react@19.2.8)
       '@typespec/bundler':
         specifier: workspace:^
         version: link:../bundler
@@ -1966,7 +1966,7 @@ importers:
         version: 0.6.3
       monaco-editor:
         specifier: 'catalog:'
-        version: 0.55.1
+        version: 0.56.0
       react:
         specifier: 'catalog:'
         version: 19.2.8
@@ -2051,7 +2051,7 @@ importers:
         version: 0.14.5(oxlint@1.80.0(oxlint-tsgolint@7.0.2001))(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
       vite-plugin-dts:
         specifier: 'catalog:'
-        version: 5.0.3(@microsoft/api-extractor@7.58.13(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
+        version: 5.0.3(@microsoft/api-extractor@7.59.0(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
       vitest:
         specifier: 'catalog:'
         version: 4.1.11(@types/node@26.3.0)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(happy-dom@20.11.6)(jsdom@25.0.1)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
@@ -2060,10 +2060,10 @@ importers:
     dependencies:
       '@fluentui/react-components':
         specifier: 'catalog:'
-        version: 9.74.7(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
+        version: 9.74.3(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@fluentui/react-icons':
         specifier: 'catalog:'
-        version: 2.0.338(react@19.2.8)
+        version: 2.0.333(react@19.2.8)
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../compiler
@@ -2172,7 +2172,7 @@ importers:
         version: 6.1.3
       rollup-plugin-visualizer:
         specifier: 'catalog:'
-        version: 7.0.1(rolldown@1.2.5)
+        version: 7.1.1(rolldown@1.2.5)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -2181,7 +2181,7 @@ importers:
         version: 8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0)
       vite-plugin-dts:
         specifier: 'catalog:'
-        version: 5.0.3(@microsoft/api-extractor@7.58.13(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
+        version: 5.0.3(@microsoft/api-extractor@7.59.0(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
       vitest:
         specifier: 'catalog:'
         version: 4.1.11(@types/node@26.3.0)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(happy-dom@20.11.6)(jsdom@25.0.1)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
@@ -2245,10 +2245,10 @@ importers:
     dependencies:
       '@fluentui/react-components':
         specifier: 'catalog:'
-        version: 9.74.7(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
+        version: 9.74.3(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@fluentui/react-icons':
         specifier: 'catalog:'
-        version: 2.0.338(react@19.2.8)
+        version: 2.0.333(react@19.2.8)
       react:
         specifier: 'catalog:'
         version: 19.2.8
@@ -2300,7 +2300,7 @@ importers:
         version: 0.14.5(oxlint@1.80.0(oxlint-tsgolint@7.0.2001))(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
       vite-plugin-dts:
         specifier: 'catalog:'
-        version: 5.0.3(@microsoft/api-extractor@7.58.13(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
+        version: 5.0.3(@microsoft/api-extractor@7.59.0(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
       vitest:
         specifier: 'catalog:'
         version: 4.1.11(@types/node@26.3.0)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(happy-dom@20.11.6)(jsdom@25.0.1)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
@@ -2492,10 +2492,10 @@ importers:
     dependencies:
       '@fluentui/react-components':
         specifier: 'catalog:'
-        version: 9.74.7(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
+        version: 9.74.3(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@fluentui/react-icons':
         specifier: 'catalog:'
-        version: 2.0.338(react@19.2.8)
+        version: 2.0.333(react@19.2.8)
       '@typespec/spec-coverage-sdk':
         specifier: workspace:^
         version: link:../spec-coverage-sdk
@@ -2523,7 +2523,7 @@ importers:
         version: 6.1.3
       rollup-plugin-visualizer:
         specifier: 'catalog:'
-        version: 7.0.1(rolldown@1.2.5)
+        version: 7.1.1(rolldown@1.2.5)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -2535,7 +2535,7 @@ importers:
         version: 0.14.5(oxlint@1.80.0(oxlint-tsgolint@7.0.2001))(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
       vite-plugin-dts:
         specifier: 'catalog:'
-        version: 5.0.3(@microsoft/api-extractor@7.58.13(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
+        version: 5.0.3(@microsoft/api-extractor@7.59.0(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
 
   core/packages/spector:
     dependencies:
@@ -2672,7 +2672,7 @@ importers:
         version: 0.28.2
       execa:
         specifier: 'catalog:'
-        version: 9.6.1
+        version: 10.0.1
       ora:
         specifier: 'catalog:'
         version: 9.4.1
@@ -2742,7 +2742,7 @@ importers:
         version: link:../internal-build-utils
       execa:
         specifier: 'catalog:'
-        version: 9.6.1
+        version: 10.0.1
       log-symbols:
         specifier: 'catalog:'
         version: 7.0.1
@@ -3391,10 +3391,10 @@ importers:
         version: link:../typespec-ts
       '@fluentui/react-components':
         specifier: 'catalog:'
-        version: 9.74.7(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
+        version: 9.74.3(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@fluentui/react-icons':
         specifier: 'catalog:'
-        version: 2.0.338(react@19.2.8)
+        version: 2.0.333(react@19.2.8)
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../../core/packages/compiler
@@ -3876,7 +3876,7 @@ importers:
         version: link:../../core/packages/xml
       execa:
         specifier: 'catalog:'
-        version: 9.6.1
+        version: 10.0.1
       rimraf:
         specifier: 'catalog:'
         version: 6.1.3
@@ -4116,7 +4116,7 @@ importers:
         version: link:../../core/packages/spector
       '@typespec/ts-http-runtime':
         specifier: 'catalog:'
-        version: 0.3.7
+        version: 0.3.8
       '@typespec/tspd':
         specifier: workspace:^
         version: link:../../core/packages/tspd
@@ -4164,7 +4164,7 @@ importers:
         version: 4.7.0
       '@fluentui/react-components':
         specifier: 'catalog:'
-        version: 9.74.7(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
+        version: 9.74.3(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@typespec/playground':
         specifier: workspace:^
         version: link:../core/packages/playground
@@ -5445,8 +5445,8 @@ packages:
       react: '>=16.14.0 <20.0.0'
       react-dom: '>=16.14.0 <20.0.0'
 
-  '@fluentui/react-alert@9.0.2-0':
-    resolution: {integrity: sha512-EBDZINmZABgcusZiwd2tpr7A0ibUnNXzQXEEq654fdb9txhk0zDV+TotudbDmusSRmz69GHCjiUYyv1kUp3yCg==}
+  '@fluentui/react-alert@9.0.0-beta.142':
+    resolution: {integrity: sha512-YrbMX1wF7huOByxP2J+2aUWatpODd1MXhqam95oeLUnoJUViBK6ZZuBYba7m0OTsRMUA4pB1WfjvuIGsnSQKtw==}
     peerDependencies:
       '@types/react': '>=16.14.0 <20.0.0'
       '@types/react-dom': '>=16.9.0 <20.0.0'
@@ -5533,8 +5533,8 @@ packages:
       react: '>=16.14.0 <20.0.0'
       react-dom: '>=16.14.0 <20.0.0'
 
-  '@fluentui/react-components@9.74.7':
-    resolution: {integrity: sha512-6CsXxSnhr55zflwNOB7mD/iqtv5kmr8PXfQdlwJPLkbLOiZXniTtvjaJKXhRFaJcVtZGAJ5vh1leQRyK1R+DQQ==}
+  '@fluentui/react-components@9.74.3':
+    resolution: {integrity: sha512-HdcLR4V9KZnduui0v4UfBIyJrO4G8eZf3W4iu8hssykl0hN1uneNNJmsVZExT8G8ybFen85ucqMOxCXQ3L7raw==}
     peerDependencies:
       '@types/react': '>=16.14.0 <20.0.0'
       '@types/react-dom': '>=16.9.0 <20.0.0'
@@ -5582,6 +5582,11 @@ packages:
       react: '>=16.14.0 <20.0.0'
       react-dom: '>=16.14.0 <20.0.0'
 
+  '@fluentui/react-icons@2.0.333':
+    resolution: {integrity: sha512-HvS5kKw9tGweI3Poy6OGAiFqrt6HGElO46DFhNBeoIQRK/q35mZ2ep0u762MFuvOfLX3bVGSB8frORFTjh1E7A==}
+    peerDependencies:
+      react: '>=16.8.0 <20.0.0'
+
   '@fluentui/react-icons@2.0.338':
     resolution: {integrity: sha512-KiGhAh9ue59nAxRGjPAgMH+hh4l89I37e7Wh8+iw0bKmfAqWaOtEiDXgBx11NYZfKV3DDlo+DfOMAAvpbXtYQg==}
     peerDependencies:
@@ -5595,8 +5600,8 @@ packages:
       react: '>=16.14.0 <20.0.0'
       react-dom: '>=16.14.0 <20.0.0'
 
-  '@fluentui/react-infobutton@9.0.1-0':
-    resolution: {integrity: sha512-ZL34XO7sftGyOdr6DvJFW70eyleASyO647X9FLkAAjuoiZc5Qn7T4C391CZ7FrV+qqdYnVl5hQpSgHLzEPhBMA==}
+  '@fluentui/react-infobutton@9.0.0-beta.117':
+    resolution: {integrity: sha512-h01PQzH736I/7mhjNcYi8cFjspCqgSmQukXbzCsESzB1VnAkx8djqy5A8f/mV1HmHw7vBAIX8VdH+ddtx8WyXQ==}
     peerDependencies:
       '@types/react': '>=16.14.0 <20.0.0'
       '@types/react-dom': '>=16.9.0 <20.0.0'
@@ -5640,6 +5645,14 @@ packages:
       '@types/react-dom': '>=16.9.0 <20.0.0'
       react: '>=16.14.0 <20.0.0'
       react-dom: '>=16.14.0 <20.0.0'
+
+  '@fluentui/react-list@9.6.16':
+    resolution: {integrity: sha512-ZWsLxr1ZDe6hmvGLGlHQIPt1E70xsWHaHn+QGxB0XUxjq64SnxCDm4HCSPZ40MS3Hqgd4eQdnmPUS9d6odcYUA==}
+    peerDependencies:
+      '@types/react': '>=16.8.0 <20.0.0'
+      '@types/react-dom': '>=16.8.0 <20.0.0'
+      react: '>=16.14.0 <20.0.0'
+      react-dom: '>=16.8.0 <20.0.0'
 
   '@fluentui/react-list@9.6.18':
     resolution: {integrity: sha512-P//HDgG3ezE8tCU9GfFjEFBRF6Eln98JtZUY7eGAymR2RQ0hm1gHpUlImQ/LHURSGtRzLRrYtB+oVCY41CLRgA==}
@@ -5936,8 +5949,8 @@ packages:
       '@types/react': '>=16.14.0 <20.0.0'
       react: '>=16.14.0 <20.0.0'
 
-  '@fluentui/react-virtualizer@9.0.0-alpha.115':
-    resolution: {integrity: sha512-8ZOFmt5eSkiH9jWYvfmMkef+2jGvWrDeXjUptZeesgn4VRXwQu4SUKPLWqZ+ETcYXX/0leGEDl6KItdp/XxbmA==}
+  '@fluentui/react-virtualizer@9.0.0-alpha.114':
+    resolution: {integrity: sha512-hD44CrZh84P1Rsd+ACPdmre3j20OevkoMKxMRzMXWlSIYKbT+m5I5yM3XxxSvKb1Qr77LeBPTTJs6apvMcfRiA==}
     peerDependencies:
       '@types/react': '>=16.14.0 <20.0.0'
       '@types/react-dom': '>=16.9.0 <20.0.0'
@@ -6333,6 +6346,11 @@ packages:
     engines: {node: '>=20.9.0'}
     hasBin: true
 
+  '@microsoft/api-extractor@7.59.0':
+    resolution: {integrity: sha512-KDYV8kSVjmG8JJWVg1f1aKxteNG1IQ44D07Rjhlcci8wlqrSFNhUfgv7dJhwT0W2h3NDIL5Vz2f+/DfO4OpDHw==}
+    engines: {node: '>=20.9.0'}
+    hasBin: true
+
   '@microsoft/applicationinsights-channel-js@3.4.3':
     resolution: {integrity: sha512-9EeGdGkpgmTH0UEAn9AwbSGfEAdPK1GQdZ1vmbsy+H4t01oFgW4drteykVvYUcXnNHNIjo4mI8hhN6taou5Ogg==}
     peerDependencies:
@@ -6480,6 +6498,12 @@ packages:
 
   '@octokit/plugin-rest-endpoint-methods@17.0.0':
     resolution: {integrity: sha512-B5yCyIlOJFPqUUeiD0cnBJwWJO8lkJs5d8+ze9QDP6SvfiXSz1BF+91+0MeI1d2yxgOhU/O+CvtiZ9jSkHhFAw==}
+    engines: {node: '>= 20'}
+    peerDependencies:
+      '@octokit/core': '>=6'
+
+  '@octokit/plugin-rest-endpoint-methods@18.0.0':
+    resolution: {integrity: sha512-1wM02pQTHEarWYij0Bb4gu8X8fBy2FJdI4HMTSFDxtYLbOkJErGVx5ywmM6jeS8tOmC0iCiRLrn6YsSIecUeOQ==}
     engines: {node: '>= 20'}
     peerDependencies:
       '@octokit/core': '>=6'
@@ -6761,19 +6785,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@oxlint-tsgolint/darwin-arm64@0.24.0':
-    resolution: {integrity: sha512-C2uMmwK5Bc4ri4ysZ6sA8Rcu+A5zBQTp6ml2u0CLLbRZp4kMFPV3yWk8B5DK9Aw7y9bbjogIm75tUwGLFzlsYQ==}
-    cpu: [arm64]
-    os: [darwin]
-
   '@oxlint-tsgolint/darwin-arm64@7.0.2001':
     resolution: {integrity: sha512-CUJEdbSZ54+Xy9OXqOhWLTKZKV0BBiV7C2i/ygyVmXtkUNXx5YCzN8DpSSshTAKktoL7S+tnQ/ftFG/i7X896w==}
     cpu: [arm64]
-    os: [darwin]
-
-  '@oxlint-tsgolint/darwin-x64@0.24.0':
-    resolution: {integrity: sha512-Wgvt/1lRbDxmoNqWQKKcL+UIiqLmdJ+EWLpQa1qzoNVAfNB0PJpa82/8dH1twT/3rSs4zrP5TXPWl4juB71WuQ==}
-    cpu: [x64]
     os: [darwin]
 
   '@oxlint-tsgolint/darwin-x64@7.0.2001':
@@ -6781,19 +6795,9 @@ packages:
     cpu: [x64]
     os: [darwin]
 
-  '@oxlint-tsgolint/linux-arm64@0.24.0':
-    resolution: {integrity: sha512-PB1rxII7KV83+ASY4sSkXtqvpij6ME66+QCRL49uksi/ofs2Rf/UVboYr095n0Rkbl2wgvlsHGl6DHC361jQUQ==}
-    cpu: [arm64]
-    os: [linux]
-
   '@oxlint-tsgolint/linux-arm64@7.0.2001':
     resolution: {integrity: sha512-roP7zujb/QDPzDwEKsFFpzNHHy91/Y7oX9vQXk78ekyZtcQj1QXDIMH33gjDdHBfRl4K9pZ36xhRgrP4Zr+R8A==}
     cpu: [arm64]
-    os: [linux]
-
-  '@oxlint-tsgolint/linux-x64@0.24.0':
-    resolution: {integrity: sha512-xcz3CxKmjTQLREtE/UShh+ruWmm9nAb7UM9zKcD65BStiuYgOakAKkPHl4YS5DztpVcDrE0+HqbOolTlRKYWmw==}
-    cpu: [x64]
     os: [linux]
 
   '@oxlint-tsgolint/linux-x64@7.0.2001':
@@ -6801,19 +6805,9 @@ packages:
     cpu: [x64]
     os: [linux]
 
-  '@oxlint-tsgolint/win32-arm64@0.24.0':
-    resolution: {integrity: sha512-A2i6ZGBec3i20S7RaxkgHc6r3HYtD5Mn7j/mb22NkTz14u0JuudvTu6JggAnbGMcv8+dBKQI//EasxSPJLD8pw==}
-    cpu: [arm64]
-    os: [win32]
-
   '@oxlint-tsgolint/win32-arm64@7.0.2001':
     resolution: {integrity: sha512-uJZhqB6pdXLuN+AD1F5082byyQti/NPmJA77GtcFlmT2HzRelqbNls3SaIqxpjdFgvSBF9g0yOKGBkGFg7kX8Q==}
     cpu: [arm64]
-    os: [win32]
-
-  '@oxlint-tsgolint/win32-x64@0.24.0':
-    resolution: {integrity: sha512-0ZbGd9qRB6zs82moekaKdEvncRANq49EAwfNX62JpTS46feXUhKAuoyVDvZMj6Rywejylrmmu79Wo6faYCo4Ew==}
-    cpu: [x64]
     os: [win32]
 
   '@oxlint-tsgolint/win32-x64@7.0.2001':
@@ -7178,16 +7172,8 @@ packages:
     resolution: {integrity: sha512-+jNbxhh8CkrZYxMk9X3GRYM2+Myr1xCCj+eHbJ9Vp+PCdNHS0TUl5QQFT6UbM/aTFRCzs5jiBTKYzBRpe5uYbQ==}
     engines: {node: '>=20.9.0'}
 
-  '@scalar/helpers@0.10.0':
-    resolution: {integrity: sha512-IAfnpIZnXY6ni+zyFMwWHBa5b/7yr4mCSvoTGR84oS9q4Quy2wjgafnr7CyfL65ney3iilBZHigZYLYqdqCu3Q==}
-    engines: {node: '>=22'}
-
   '@scalar/helpers@0.11.1':
     resolution: {integrity: sha512-Knwbe0IYqFk0PPDoOKLasqglBHfyf9/zwWWqFsSNi/AtdjM29wSZXN6p8DFid6iB5B9epYH9YiSgJ6tpD00TEw==}
-    engines: {node: '>=22'}
-
-  '@scalar/json-magic@0.12.20':
-    resolution: {integrity: sha512-5JawJ1L3+ddDoKefkXsklKs6CmmTIcPDmkJPpAkbRi9QQiU9MUONQ4VSi2z3ij+8Ka4neNhsXBNG4itPjurBLg==}
     engines: {node: '>=22'}
 
   '@scalar/json-magic@0.13.2':
@@ -7453,33 +7439,33 @@ packages:
   '@ts-morph/common@0.29.0':
     resolution: {integrity: sha512-35oUmphHbJvQ/+UTwFNme/t2p3FoKiGJ5auTjjpNTop2dyREspirjMy82PLSC1pnDJ8ah1GU98hwpVt64YXQsg==}
 
-  '@turbo/darwin-64@2.9.14':
-    resolution: {integrity: sha512-t7QiPflaEyBE4oayeZtSmu4mEfjgIrcNlNNl1z1dmIVPqEdtA7+CfTf8d7KXsOGPh6aNgWjKxyvQg9uGfDQF+A==}
+  '@turbo/darwin-64@2.10.12':
+    resolution: {integrity: sha512-9nKgKoF6ZOUsM+or0OtNf+TTJSfGvDNP7ZFv/ZGWVwOSCkumyctQiTeHwB4UNljHTnC41AqylgbunLDHoccNrA==}
     cpu: [x64]
     os: [darwin]
 
-  '@turbo/darwin-arm64@2.9.14':
-    resolution: {integrity: sha512-d23147mC9BsCPA9mJ0h/ubcpbRgcJBXbcG3+Vq7YLhjz3IXuvQsJ1UXH8f4MD76ZjJ4m/E4aRdJV+MW88CDfbw==}
+  '@turbo/darwin-arm64@2.10.12':
+    resolution: {integrity: sha512-H4Elb1jqTZVeIC9bbcNwjSzemZ6RegoTOVHeuV5Osirt2Z8UguTyisMEkvZjPVZgMeN9J4ERZBFad40tFnkb7w==}
     cpu: [arm64]
     os: [darwin]
 
-  '@turbo/linux-64@2.9.14':
-    resolution: {integrity: sha512-P3ZKB5tuUDdDQWuAsACGUR1qv9W7BNWxdxqVJ0kZNuNNPRaVYTPPikLcp79+GiEcW3npsR+KyP38lnQiBc5aSA==}
+  '@turbo/linux-64@2.10.12':
+    resolution: {integrity: sha512-lr7KIotukvjZwEXiFSYAeOH3BWzjFVBbSzTbv0fuGFsNukYyH0+g1hB5ecqnJkgkYU+KHEMG1edOhnjiKON1wQ==}
     cpu: [x64]
-    os: [linux]
+    os: [android, linux]
 
-  '@turbo/linux-arm64@2.9.14':
-    resolution: {integrity: sha512-ZRTlzcUMrrPv9ZuDzRF9n60Ym13bKeG9jDB8WjxyLhWNzV+AJQN+zdpIk3NJYf2zQsGUm1mNar2P0elRzLw25g==}
+  '@turbo/linux-arm64@2.10.12':
+    resolution: {integrity: sha512-f0pZDTtvzB5SuNwuXBaKbZHUCMCukgc8nMlHEuvLmj91Fzec+MEbr3cAvGNor5htEDqZnO6Lxt9N/GPI/77oGA==}
     cpu: [arm64]
-    os: [linux]
+    os: [android, linux]
 
-  '@turbo/windows-64@2.9.14':
-    resolution: {integrity: sha512-exanwN6sIduZwykYeiTQj8kCmOhazP5WOz3bvXMcYtjhL6Z3iRWLewKrXCBq0bqwSP3iBMb/AerRCnHI4lx46A==}
+  '@turbo/windows-64@2.10.12':
+    resolution: {integrity: sha512-SDOueJRjS/QcykWf2KCRtTLmIl5YMKsLbXkXQGhDwcTXvKXZiS5ih5lBl/gkwZIpYFjqA/rAlfMzlAFcVHNe0g==}
     cpu: [x64]
     os: [win32]
 
-  '@turbo/windows-arm64@2.9.14':
-    resolution: {integrity: sha512-fVdCsnmYoKICsycbWuuGp6Jvi51/3G/UluFWuAUCvR8PIW5IJkAk5BM9UF8PSm0Q2IphWHFZjYEgjHsh3B9y/g==}
+  '@turbo/windows-arm64@2.10.12':
+    resolution: {integrity: sha512-0i0mVUa4kKk+/B3RwEwPMf9CB+T7ul56hn5FFHNA4VUNTOoLBEd6aNf3FaKfCatDNZ6cicCEf6if9QUTVyzzcA==}
     cpu: [arm64]
     os: [win32]
 
@@ -7692,10 +7678,6 @@ packages:
       '@typespec/streams': '>=0.85.0 <1.0.0'
       '@typespec/versioning': '>=0.85.0 <1.0.0'
       '@typespec/xml': '>=0.85.0 <1.0.0'
-
-  '@typespec/ts-http-runtime@0.3.7':
-    resolution: {integrity: sha512-JVUD8X2tfDMWjcjLs4yVxxVrS8yR5vnh386GAXT9Qj79nBxxXSaHFQZg5FweLmT8HlPQ3kii6noUB+Z9RN7DvQ==}
-    engines: {node: '>=22.0.0'}
 
   '@typespec/ts-http-runtime@0.3.8':
     resolution: {integrity: sha512-bLMpVcWZNzq6lYOybwFwOAR1IXKcHnhUNqYeHjl1bET/qE3jFPFH+p8Wrh3rU4xwdnifPxmKNESBYnvnmc75aA==}
@@ -8912,9 +8894,9 @@ packages:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
     engines: {node: '>=0.8.x'}
 
-  execa@9.6.1:
-    resolution: {integrity: sha512-9Be3ZoN4LmYR90tUoVu2te2BsbzHfhJyfEiAVfz7N5/zv+jduIfLrV2xdQXOHbaD6KgpGdO9PRPM1Y4Q9QkPkA==}
-    engines: {node: ^18.19.0 || >=20.5.0}
+  execa@10.0.1:
+    resolution: {integrity: sha512-ge98qjkRK4IB7tL7Ju/6qmm5LHoH1eEMt5FNZrz3f4UIYhF28lggX20z3FaX1sgc67msLEn0N0BscOs29iuwyw==}
+    engines: {node: '>=22'}
 
   expand-template@2.0.3:
     resolution: {integrity: sha512-XYfuKMvj4O35f/pOXLObndIRvyQ+/+6AhODh+OKWj9S9498pHHn/IMszH+gt0fBCRWMNfk1ZSp5x3AifmnI2vg==}
@@ -10105,11 +10087,11 @@ packages:
   mlly@1.8.2:
     resolution: {integrity: sha512-d+ObxMQFmbt10sretNDytwt85VrbkhhUA/JBGm1MPaWJ65Cl4wOgLaB1NYvJSZ0Ef03MMEU/0xpPMXUIQ29UfA==}
 
-  monaco-editor-core@0.55.1:
-    resolution: {integrity: sha512-UTk7U9VkSFy2qruSYC70+vHHo5DffN164QGkDn4vTaaO40a1UMSNHVqS2MF6Z+s0LWOeAzez/Kp85oAPZG2d0g==}
+  monaco-editor-core@0.56.0:
+    resolution: {integrity: sha512-zuY3UTjedTxWnEUDs84Us/6tvYH9mG89fkHMpzXuvrqTdyWgybn536GR/TG6XNyG5N5heYICRMxT1ox5hZ7rxQ==}
 
-  monaco-editor@0.55.1:
-    resolution: {integrity: sha512-jz4x+TJNFHwHtwuV9vA9rMujcZRb0CEilTEwG2rRSpe/A7Jdkuj8xPKttCgOh+v/lkHy7HsZ64oj+q3xoAFl9A==}
+  monaco-editor@0.56.0:
+    resolution: {integrity: sha512-sXboRm3BeBeLm938eaiyLMe0OxzfXIlZvbv4ir/jVgQy1zDhWjgmny0WoN45fuDKhCCQsYMbBJrv/A6jd8aCUg==}
 
   morgan@1.11.0:
     resolution: {integrity: sha512-zSkVu3t18r39pw4ixfBKvfZi3y2UOqr7d4WYwcj3m8nXpEQK4rPO6GLzs/CExoRgmX3y9EjmmcXqv6jq0SK46g==}
@@ -10280,10 +10262,6 @@ packages:
 
   oxc-resolver@11.21.2:
     resolution: {integrity: sha512-w5tLwYN3Zo24w5EeWJjJWZOwhYqTtC8PS2B1tIt7BZUuqTIcU07sQValbDw+rq7+AuAGzOHklgK+ifsy4lpXfw==}
-
-  oxlint-tsgolint@0.24.0:
-    resolution: {integrity: sha512-giCk5sEvG02d5tzPmFMX3hem8ndzEEu1xvGYS5OwNfO2WGl6ZVxt5LjE0yiMDoz94INI7XkXwgFAQiydPvVHDw==}
-    hasBin: true
 
   oxlint-tsgolint@7.0.2001:
     resolution: {integrity: sha512-KjK/XLcXr1DSyonKhsuFqJRiuKqcyG9j3LJ8nkOsrLzGvodBPqzHOKauy10asLMDI0sUpvb+1sxlzff3udZvfg==}
@@ -10856,8 +10834,8 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
-  rollup-plugin-visualizer@7.0.1:
-    resolution: {integrity: sha512-UJUT4+1Ho4OcWmPYU3sYXgUqI8B8Ayfe06MX7y0qCJ1K8aGoKtR/NDd/2nZqM7ADkrzny+I99Ul7GgyoiVNAgg==}
+  rollup-plugin-visualizer@7.1.1:
+    resolution: {integrity: sha512-ThaGiHTU8XW02OkK80TrTHATraJmM9OAduU4otal+7gyXLpYEtmGBLfx5kW+EHvvLwn03YGW2NnwKUIqsYlJAA==}
     engines: {node: '>=22'}
     hasBin: true
     peerDependencies:
@@ -11074,6 +11052,10 @@ packages:
 
   source-map@0.7.6:
     resolution: {integrity: sha512-i5uvt8C3ikiWeNZSVZNWcfZPItFQOsYTUAOkcUPGd8DqDy1uOUikjt5dG+uRlwyvR108Fb9DOd4GvXfT0N2/uQ==}
+    engines: {node: '>= 12'}
+
+  source-map@0.8.0:
+    resolution: {integrity: sha512-d8EqvL+k/SOXCreS/SUzg2ciyHqBBLcN/yuRjFsbvVhHTE2pgei7oAhmPM7kWFbkX6OSMQfUq4KbkF3au9lhYQ==}
     engines: {node: '>= 12'}
 
   space-separated-tokens@2.0.2:
@@ -11486,8 +11468,8 @@ packages:
     resolution: {integrity: sha512-1h/Lnq9yajKY2PEbBadPXj3VxsDDu844OnaAo52UVmIzIvwwtBPIuNvkjuzBlTWpfJyUbG3ez0KSBibQkj4ojg==}
     engines: {node: '>=0.6.11 <=0.7.0 || >=0.7.3'}
 
-  turbo@2.9.14:
-    resolution: {integrity: sha512-BQqXRr4UoWI3UPFrtznCLykYHxwxWh53iCB57x092jPMjIlW1wnm3N895g5irpiXmnxUhREBB0n6+y8BHhs4nw==}
+  turbo@2.10.12:
+    resolution: {integrity: sha512-AswgMPnpOoaVZHrrSBejETzEbuIA69OVGwfkHwfrY0A23VjWXBANzgq9+OymWOHAIArB7D1+1z498WY8fGg1Jw==}
     hasBin: true
 
   type-fest@4.41.0:
@@ -12078,6 +12060,11 @@ packages:
   whatwg-url@14.2.0:
     resolution: {integrity: sha512-De72GdQZzNTUBBChsXueQUnPKDkg/5A5zp7pFDuQAj5UFoENpiACU0wlCvzpAGnTkj++ihpKwKyYewn/XNUbKw==}
     engines: {node: '>=18'}
+
+  which-command@0.1.0:
+    resolution: {integrity: sha512-XZyoF5/5hZtXitIwzrU4NKK+Wtbb9aB9CezUEw2Q0wlYK8NUYQxC1rRXgNueYLtBAJwXIb+/tFVk4dozciNJMA==}
+    engines: {node: '>=22'}
+    hasBin: true
 
   which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
@@ -13790,7 +13777,7 @@ snapshots:
     transitivePeerDependencies:
       - scheduler
 
-  '@fluentui/react-alert@9.0.2-0(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)':
+  '@fluentui/react-alert@9.0.0-beta.142(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)':
     dependencies:
       '@fluentui/react-avatar': 9.11.6(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@fluentui/react-button': 9.11.0(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -13990,10 +13977,10 @@ snapshots:
     transitivePeerDependencies:
       - scheduler
 
-  '@fluentui/react-components@9.74.7(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)':
+  '@fluentui/react-components@9.74.3(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)':
     dependencies:
       '@fluentui/react-accordion': 9.12.3(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
-      '@fluentui/react-alert': 9.0.2-0(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
+      '@fluentui/react-alert': 9.0.0-beta.142(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@fluentui/react-aria': 9.17.14(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@fluentui/react-avatar': 9.11.6(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@fluentui/react-badge': 9.5.5(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -14009,7 +13996,7 @@ snapshots:
       '@fluentui/react-drawer': 9.13.3(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@fluentui/react-field': 9.5.4(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@fluentui/react-image': 9.4.4(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@fluentui/react-infobutton': 9.0.1-0(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
+      '@fluentui/react-infobutton': 9.0.0-beta.117(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@fluentui/react-infolabel': 9.4.25(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@fluentui/react-input': 9.8.6(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@fluentui/react-label': 9.4.4(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -14051,7 +14038,7 @@ snapshots:
       '@fluentui/react-tooltip': 9.10.5(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@fluentui/react-tree': 9.16.6(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
       '@fluentui/react-utilities': 9.26.6(@types/react@19.2.18)(react@19.2.8)
-      '@fluentui/react-virtualizer': 9.0.0-alpha.115(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@fluentui/react-virtualizer': 9.0.0-alpha.114(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@griffel/react': 1.7.7(react@19.2.8)
       '@swc/helpers': 0.5.23
       '@types/react': 19.2.18
@@ -14145,6 +14132,12 @@ snapshots:
     transitivePeerDependencies:
       - scheduler
 
+  '@fluentui/react-icons@2.0.333(react@19.2.8)':
+    dependencies:
+      '@griffel/react': 1.7.7(react@19.2.8)
+      react: 19.2.8
+      tslib: 2.8.1
+
   '@fluentui/react-icons@2.0.338(react@19.2.8)':
     dependencies:
       '@griffel/react': 1.7.7(react@19.2.8)
@@ -14164,7 +14157,7 @@ snapshots:
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
 
-  '@fluentui/react-infobutton@9.0.1-0(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)':
+  '@fluentui/react-infobutton@9.0.0-beta.117(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)':
     dependencies:
       '@fluentui/react-icons': 2.0.338(react@19.2.8)
       '@fluentui/react-jsx-runtime': 9.4.5(@types/react@19.2.18)(react@19.2.8)
@@ -14251,6 +14244,25 @@ snapshots:
       '@types/react-dom': 19.2.5(@types/react@19.2.18)
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
+
+  '@fluentui/react-list@9.6.16(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)':
+    dependencies:
+      '@fluentui/keyboard-keys': 9.0.9
+      '@fluentui/react-checkbox': 9.6.4(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
+      '@fluentui/react-context-selector': 9.2.19(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
+      '@fluentui/react-jsx-runtime': 9.4.5(@types/react@19.2.18)(react@19.2.8)
+      '@fluentui/react-shared-contexts': 9.26.3(@types/react@19.2.18)(react@19.2.8)
+      '@fluentui/react-tabster': 9.26.17(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@fluentui/react-theme': 9.2.2
+      '@fluentui/react-utilities': 9.26.6(@types/react@19.2.18)(react@19.2.8)
+      '@griffel/react': 1.7.7(react@19.2.8)
+      '@swc/helpers': 0.5.23
+      '@types/react': 19.2.18
+      '@types/react-dom': 19.2.5(@types/react@19.2.18)
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
+    transitivePeerDependencies:
+      - scheduler
 
   '@fluentui/react-list@9.6.18(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)':
     dependencies:
@@ -14894,7 +14906,7 @@ snapshots:
       '@types/react': 19.2.18
       react: 19.2.8
 
-  '@fluentui/react-virtualizer@9.0.0-alpha.115(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@fluentui/react-virtualizer@9.0.0-alpha.114(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@fluentui/react-jsx-runtime': 9.4.5(@types/react@19.2.18)(react@19.2.8)
       '@fluentui/react-shared-contexts': 9.26.3(@types/react@19.2.18)(react@19.2.8)
@@ -15303,6 +15315,25 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
+  '@microsoft/api-extractor@7.59.0(@types/node@26.3.0)':
+    dependencies:
+      '@microsoft/api-extractor-model': 7.33.11(@types/node@26.3.0)
+      '@microsoft/tsdoc': 0.16.0
+      '@microsoft/tsdoc-config': 0.18.1
+      '@rushstack/node-core-library': 5.24.0(@types/node@26.3.0)
+      '@rushstack/rig-package': 0.7.3
+      '@rushstack/terminal': 0.24.3(@types/node@26.3.0)
+      '@rushstack/ts-command-line': 5.3.13(@types/node@26.3.0)
+      diff: 9.0.0
+      minimatch: 10.2.3
+      resolve: 1.22.12
+      semver: 7.7.4
+      source-map: 0.6.1
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - '@types/node'
+    optional: true
+
   '@microsoft/applicationinsights-channel-js@3.4.3(tslib@2.8.1)':
     dependencies:
       '@microsoft/applicationinsights-core-js': 3.4.3(tslib@2.8.1)
@@ -15524,6 +15555,11 @@ snapshots:
       '@octokit/core': 7.0.7
       '@octokit/types': 16.0.0
 
+  '@octokit/plugin-rest-endpoint-methods@18.0.0(@octokit/core@7.0.7)':
+    dependencies:
+      '@octokit/core': 7.0.7
+      '@octokit/types': 17.0.0
+
   '@octokit/plugin-retry@8.1.1(@octokit/core@7.0.7)':
     dependencies:
       '@octokit/core': 7.0.7
@@ -15704,37 +15740,19 @@ snapshots:
   '@oxc-resolver/binding-win32-x64-msvc@11.21.2':
     optional: true
 
-  '@oxlint-tsgolint/darwin-arm64@0.24.0':
-    optional: true
-
   '@oxlint-tsgolint/darwin-arm64@7.0.2001':
-    optional: true
-
-  '@oxlint-tsgolint/darwin-x64@0.24.0':
     optional: true
 
   '@oxlint-tsgolint/darwin-x64@7.0.2001':
     optional: true
 
-  '@oxlint-tsgolint/linux-arm64@0.24.0':
-    optional: true
-
   '@oxlint-tsgolint/linux-arm64@7.0.2001':
-    optional: true
-
-  '@oxlint-tsgolint/linux-x64@0.24.0':
     optional: true
 
   '@oxlint-tsgolint/linux-x64@7.0.2001':
     optional: true
 
-  '@oxlint-tsgolint/win32-arm64@0.24.0':
-    optional: true
-
   '@oxlint-tsgolint/win32-arm64@7.0.2001':
-    optional: true
-
-  '@oxlint-tsgolint/win32-x64@0.24.0':
     optional: true
 
   '@oxlint-tsgolint/win32-x64@7.0.2001':
@@ -15964,15 +15982,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@scalar/helpers@0.10.0': {}
-
   '@scalar/helpers@0.11.1': {}
-
-  '@scalar/json-magic@0.12.20':
-    dependencies:
-      '@scalar/helpers': 0.10.0
-      pathe: 2.0.3
-      yaml: 2.9.0
 
   '@scalar/json-magic@0.13.2':
     dependencies:
@@ -16306,22 +16316,22 @@ snapshots:
       path-browserify: 1.0.1
       tinyglobby: 0.2.17
 
-  '@turbo/darwin-64@2.9.14':
+  '@turbo/darwin-64@2.10.12':
     optional: true
 
-  '@turbo/darwin-arm64@2.9.14':
+  '@turbo/darwin-arm64@2.10.12':
     optional: true
 
-  '@turbo/linux-64@2.9.14':
+  '@turbo/linux-64@2.10.12':
     optional: true
 
-  '@turbo/linux-arm64@2.9.14':
+  '@turbo/linux-arm64@2.10.12':
     optional: true
 
-  '@turbo/windows-64@2.9.14':
+  '@turbo/windows-64@2.10.12':
     optional: true
 
-  '@turbo/windows-arm64@2.9.14':
+  '@turbo/windows-arm64@2.10.12':
     optional: true
 
   '@tybys/wasm-util@0.10.3':
@@ -16550,14 +16560,6 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
-
-  '@typespec/ts-http-runtime@0.3.7':
-    dependencies:
-      http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.6
-      tslib: 2.8.1
-    transitivePeerDependencies:
-      - supports-color
 
   '@typespec/ts-http-runtime@0.3.8':
     dependencies:
@@ -17969,10 +17971,9 @@ snapshots:
 
   events@3.3.0: {}
 
-  execa@9.6.1:
+  execa@10.0.1:
     dependencies:
       '@sindresorhus/merge-streams': 4.0.0
-      cross-spawn: 7.0.6
       figures: 6.1.0
       get-stream: 9.0.1
       human-signals: 8.0.1
@@ -17982,6 +17983,7 @@ snapshots:
       pretty-ms: 9.3.0
       signal-exit: 4.1.0
       strip-final-newline: 4.0.0
+      which-command: 0.1.0
       yoctocolors: 2.2.0
 
   expand-template@2.0.3:
@@ -19600,12 +19602,12 @@ snapshots:
       pkg-types: 1.3.1
       ufo: 1.6.4
 
-  monaco-editor-core@0.55.1:
+  monaco-editor-core@0.56.0:
     dependencies:
       dompurify: 3.4.14
       marked: 14.0.0
 
-  monaco-editor@0.55.1:
+  monaco-editor@0.56.0:
     dependencies:
       dompurify: 3.4.14
       marked: 14.0.0
@@ -19838,15 +19840,6 @@ snapshots:
       '@oxc-resolver/binding-win32-arm64-msvc': 11.21.2
       '@oxc-resolver/binding-win32-x64-msvc': 11.21.2
 
-  oxlint-tsgolint@0.24.0:
-    optionalDependencies:
-      '@oxlint-tsgolint/darwin-arm64': 0.24.0
-      '@oxlint-tsgolint/darwin-x64': 0.24.0
-      '@oxlint-tsgolint/linux-arm64': 0.24.0
-      '@oxlint-tsgolint/linux-x64': 0.24.0
-      '@oxlint-tsgolint/win32-arm64': 0.24.0
-      '@oxlint-tsgolint/win32-x64': 0.24.0
-
   oxlint-tsgolint@7.0.2001:
     optionalDependencies:
       '@oxlint-tsgolint/darwin-arm64': 7.0.2001
@@ -19855,30 +19848,6 @@ snapshots:
       '@oxlint-tsgolint/linux-x64': 7.0.2001
       '@oxlint-tsgolint/win32-arm64': 7.0.2001
       '@oxlint-tsgolint/win32-x64': 7.0.2001
-    optional: true
-
-  oxlint@1.80.0(oxlint-tsgolint@0.24.0):
-    optionalDependencies:
-      '@oxlint/binding-android-arm-eabi': 1.80.0
-      '@oxlint/binding-android-arm64': 1.80.0
-      '@oxlint/binding-darwin-arm64': 1.80.0
-      '@oxlint/binding-darwin-x64': 1.80.0
-      '@oxlint/binding-freebsd-x64': 1.80.0
-      '@oxlint/binding-linux-arm-gnueabihf': 1.80.0
-      '@oxlint/binding-linux-arm-musleabihf': 1.80.0
-      '@oxlint/binding-linux-arm64-gnu': 1.80.0
-      '@oxlint/binding-linux-arm64-musl': 1.80.0
-      '@oxlint/binding-linux-ppc64-gnu': 1.80.0
-      '@oxlint/binding-linux-riscv64-gnu': 1.80.0
-      '@oxlint/binding-linux-riscv64-musl': 1.80.0
-      '@oxlint/binding-linux-s390x-gnu': 1.80.0
-      '@oxlint/binding-linux-x64-gnu': 1.80.0
-      '@oxlint/binding-linux-x64-musl': 1.80.0
-      '@oxlint/binding-openharmony-arm64': 1.80.0
-      '@oxlint/binding-win32-arm64-msvc': 1.80.0
-      '@oxlint/binding-win32-ia32-msvc': 1.80.0
-      '@oxlint/binding-win32-x64-msvc': 1.80.0
-      oxlint-tsgolint: 0.24.0
 
   oxlint@1.80.0(oxlint-tsgolint@7.0.2001):
     optionalDependencies:
@@ -19902,7 +19871,6 @@ snapshots:
       '@oxlint/binding-win32-ia32-msvc': 1.80.0
       '@oxlint/binding-win32-x64-msvc': 1.80.0
       oxlint-tsgolint: 7.0.2001
-    optional: true
 
   p-limit@3.1.0:
     dependencies:
@@ -20582,11 +20550,11 @@ snapshots:
       '@rolldown/binding-win32-arm64-msvc': 1.2.5
       '@rolldown/binding-win32-x64-msvc': 1.2.5
 
-  rollup-plugin-visualizer@7.0.1(rolldown@1.2.5):
+  rollup-plugin-visualizer@7.1.1(rolldown@1.2.5):
     dependencies:
       open: 11.0.1
       picomatch: 4.0.7
-      source-map: 0.7.6
+      source-map: 0.8.0
       yargs: 18.1.0
     optionalDependencies:
       rolldown: 1.2.5
@@ -20875,6 +20843,8 @@ snapshots:
   source-map@0.6.1: {}
 
   source-map@0.7.6: {}
+
+  source-map@0.8.0: {}
 
   space-separated-tokens@2.0.2: {}
 
@@ -21303,14 +21273,14 @@ snapshots:
 
   tunnel@0.0.6: {}
 
-  turbo@2.9.14:
+  turbo@2.10.12:
     optionalDependencies:
-      '@turbo/darwin-64': 2.9.14
-      '@turbo/darwin-arm64': 2.9.14
-      '@turbo/linux-64': 2.9.14
-      '@turbo/linux-arm64': 2.9.14
-      '@turbo/windows-64': 2.9.14
-      '@turbo/windows-arm64': 2.9.14
+      '@turbo/darwin-64': 2.10.12
+      '@turbo/darwin-arm64': 2.10.12
+      '@turbo/linux-64': 2.10.12
+      '@turbo/linux-arm64': 2.10.12
+      '@turbo/windows-64': 2.10.12
+      '@turbo/windows-arm64': 2.10.12
 
   type-fest@4.41.0: {}
 
@@ -21464,7 +21434,7 @@ snapshots:
 
   unpipe@1.0.0: {}
 
-  unplugin-dts@1.0.3(@microsoft/api-extractor@7.58.13(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0)):
+  unplugin-dts@1.0.3(@microsoft/api-extractor@7.59.0(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0)):
     dependencies:
       '@rollup/pluginutils': 5.4.0
       '@volar/typescript': 2.4.28
@@ -21476,7 +21446,7 @@ snapshots:
       typescript: 6.0.3
       unplugin: 2.3.11
     optionalDependencies:
-      '@microsoft/api-extractor': 7.58.13(@types/node@26.3.0)
+      '@microsoft/api-extractor': 7.59.0(@types/node@26.3.0)
       esbuild: 0.28.2
       rolldown: 1.2.5
       vite: 8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0)
@@ -21570,11 +21540,11 @@ snapshots:
       oxlint: 1.80.0(oxlint-tsgolint@7.0.2001)
       typescript: 6.0.3
 
-  vite-plugin-dts@5.0.3(@microsoft/api-extractor@7.58.13(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0)):
+  vite-plugin-dts@5.0.3(@microsoft/api-extractor@7.59.0(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0)):
     dependencies:
-      unplugin-dts: 1.0.3(@microsoft/api-extractor@7.58.13(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
+      unplugin-dts: 1.0.3(@microsoft/api-extractor@7.59.0(@types/node@26.3.0))(esbuild@0.28.2)(rolldown@1.2.5)(typescript@6.0.3)(vite@8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
     optionalDependencies:
-      '@microsoft/api-extractor': 7.58.13(@types/node@26.3.0)
+      '@microsoft/api-extractor': 7.59.0(@types/node@26.3.0)
       vite: 8.2.2(@types/node@26.3.0)(esbuild@0.28.2)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@rspack/core'
@@ -21780,6 +21750,8 @@ snapshots:
     dependencies:
       tr46: 5.1.1
       webidl-conversions: 7.0.0
+
+  which-command@0.1.0: {}
 
   which@2.0.2:
     dependencies:
