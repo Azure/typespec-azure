@@ -32,7 +32,7 @@
   {
     "code": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
     "severity": "warning",
-    "message": "`x-ms-pageable` extension must be specified for LIST APIs."
+    "message": "This GET operation uses a collection route but does not emit `x-ms-pageable`. Use an ARM list operation template, or add `@list` and annotate the response with `@pageItems` and `@nextLink`."
   },
   {
     "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
@@ -52,7 +52,7 @@
   {
     "code": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
     "severity": "warning",
-    "message": "`x-ms-pageable` extension must be specified for LIST APIs."
+    "message": "This GET operation uses a collection route but does not emit `x-ms-pageable`. Use an ARM list operation template, or add `@list` and annotate the response with `@pageItems` and `@nextLink`."
   },
   {
     "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",

@@ -8,7 +8,8 @@ export const xmsPageableForListCallsRule = createRule({
   description: "ARM GET operations on list paths must emit x-ms-pageable metadata.",
   severity: "warning",
   messages: {
-    default: "`x-ms-pageable` extension must be specified for LIST APIs.",
+    default:
+      "This GET operation uses a collection route but does not emit `x-ms-pageable`. Use an ARM list operation template, or add `@list` and annotate the response with `@pageItems` and `@nextLink`.",
   },
   create(context) {
     return {
