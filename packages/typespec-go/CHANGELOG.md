@@ -1,5 +1,19 @@
 # Release History
 
+## 0.17.3
+
+### Bug Fixes
+
+- [#5333](https://github.com/Azure/typespec-azure/pull/5333) Revert removal of empty client path parameter checks during request construction.
+
+
+## 0.17.2
+
+### Bug Fixes
+
+- [#5321](https://github.com/Azure/typespec-azure/pull/5321) Fix fake server route regex to allow path delimiters in captures for `allowReserved` path parameters (e.g. ARM scopes and resource IDs), which are inserted into the request path unescaped and can span multiple path segments.
+
+
 ## 0.17.1
 
 ### Bug Fixes
