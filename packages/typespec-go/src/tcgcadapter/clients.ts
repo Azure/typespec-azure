@@ -141,7 +141,7 @@ export class ClientAdapter {
 
     let authType = AuthTypes.Default;
     if (
-      !this.ta.codeModel.options.omitConstructors &&
+      !this.ta.codeModel.options["omit-constructors"] &&
       this.ta.codeModel.root.kind === "containingModule"
     ) {
       // emit a diagnostic indicating that no ctors will be emitted due to containing-module.
@@ -153,11 +153,11 @@ export class ClientAdapter {
       });
     }
     if (
-      (this.ta.codeModel.options.omitConstructors ||
+      (this.ta.codeModel.options["omit-constructors"] ||
         this.ta.codeModel.root.kind === "containingModule") &&
-      this.ta.codeModel.options.generateExamples
+      this.ta.codeModel.options["generate-samples"]
     ) {
-      // emit a diagnostic indicating that no ctors will be emitted due to containing-module.
+      // emit a diagnostic indicating that no examples will be emitted due to containing-module.
       this.ta.ctx.program.reportDiagnostic({
         code: "UnsupportedConfiguration",
         severity: "warning",
@@ -214,7 +214,7 @@ export class ClientAdapter {
       // the module name and version info, and we can't make any
       // assumptions about the names/location.
       if (
-        !this.ta.codeModel.options.omitConstructors &&
+        !this.ta.codeModel.options["omit-constructors"] &&
         this.ta.codeModel.root.kind !== "containingModule"
       ) {
         constructable = new go.Constructable(
@@ -938,7 +938,7 @@ export class ClientAdapter {
     // we must do this after adapting method params as it can add optional params
     this.ta.getPkg().paramGroups.push(this.adaptParameterGroup(method.optionalParamsGroup));
 
-    if (this.ta.codeModel.options.generateExamples) {
+    if (this.ta.codeModel.options["generate-samples"]) {
       this.adaptHttpOperationExamples(sdkMethod, method, paramMapping.exampleParams);
     }
 
@@ -1301,10 +1301,12 @@ export class ClientAdapter {
             return v.name === adaptedParam.name;
           })
         ) {
+          // we allow path scalar API version param for ARM as it's part of client options already
           if (
             this.ta.codeModel.type === "azure-arm" &&
             adaptedParam.style !== "literal" &&
-            adaptedParam.style !== "required"
+            adaptedParam.style !== "required" &&
+            (adaptedParam.kind !== "pathScalarParam" || !adaptedParam.isApiVersion)
           ) {
             throw new AdapterError(
               "UnsupportedTsp",
@@ -1406,7 +1408,7 @@ export class ClientAdapter {
             opParam.serializedName,
             true,
             paramType,
-            paramStyle,
+            paramType.kind === "literal" ? new go.ClientSideDefault(paramType) : paramStyle,
             true,
             paramLoc,
           );
@@ -1539,12 +1541,12 @@ export class ClientAdapter {
           opParam.__raw?.node,
         );
       case "header":
-        if (opParam.serializedName === "x-ms-meta") {
-          const type = this.ta.getWireType(methodParam.type, true, false);
-          if (type.kind !== "map") {
+        const type = this.ta.getWireType(methodParam.type, true, false);
+        if (type.kind === "map") {
+          if (opParam.serializedName !== "x-ms-meta") {
             throw new AdapterError(
               "InternalError",
-              `unexpected kind ${type.kind} for HeaderMapParameter ${methodParam.name}`,
+              `unexpected kind ${type.kind} for header ${opParam.serializedName}`,
               opParam.__raw?.node,
             );
           }
@@ -1776,16 +1778,16 @@ export class ClientAdapter {
             continue;
           }
 
+          const type = this.ta.getWireType(httpHeader.type, true, false);
           let headerResp: go.HeaderScalarResponse | go.HeaderMapResponse;
-          if (
-            httpHeader.serializedName === "x-ms-meta" ||
-            httpHeader.serializedName === "x-ms-or"
-          ) {
-            const type = this.ta.getWireType(httpHeader.type, true, false);
-            if (type.kind !== "map") {
+          if (type.kind === "map") {
+            if (
+              httpHeader.serializedName !== "x-ms-meta" &&
+              httpHeader.serializedName !== "x-ms-or"
+            ) {
               throw new AdapterError(
                 "InternalError",
-                `unexpected kind ${type.kind} for HeaderMapResponse ${httpHeader.name}`,
+                `unexpected kind ${type.kind} for header ${httpHeader.serializedName}`,
               );
             }
             headerResp = new go.HeaderMapResponse(
@@ -1808,7 +1810,14 @@ export class ClientAdapter {
           headerResp.docs.summary = httpHeader.summary;
           headerResp.docs.description = httpHeader.doc;
 
-          if (helpers.isOmittedResponseHeader(httpHeader, sdkMethod, this.ta.ctx.program)) {
+          if (
+            helpers.isOmittedResponseHeader(
+              httpHeader,
+              sdkMethod,
+              this.ta.ctx.program,
+              this.ta.codeModel.options,
+            )
+          ) {
             literalContentTypeHeader = headerResp as go.HeaderScalarResponse;
           } else {
             respEnv.headers.push(headerResp);
@@ -2053,7 +2062,7 @@ export class ClientAdapter {
         case "nullable":
           return this.recursiveTypeName(type.type, false);
         case "unknown":
-          return this.ta.codeModel.options.rawJSONAsBytes ? "RawJSON" : "Interface";
+          return this.ta.codeModel.options["rawjson-as-bytes"] ? "RawJSON" : "Interface";
         default:
           return "Value";
       }
@@ -2091,9 +2100,13 @@ export class ClientAdapter {
       case "url":
         return "String";
       case "unknown":
-        return this.ta.codeModel.options.rawJSONAsBytes ? "RawJSON" : "Interface";
+        return this.ta.codeModel.options["rawjson-as-bytes"] ? "RawJSON" : "Interface";
       default:
-        throw new Error(`unhandled monomorphic response type kind ${type.kind}`);
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `unsupported kind ${type.kind} for monomorphic response`,
+          type.__raw?.node,
+        );
     }
   }
 
@@ -2279,7 +2292,12 @@ export class ClientAdapter {
                   // a matching go header. skip them here so example mapping stays in sync
                   // with envelope construction.
                   if (
-                    helpers.isOmittedResponseHeader(header.header, sdkMethod, this.ta.ctx.program)
+                    helpers.isOmittedResponseHeader(
+                      header.header,
+                      sdkMethod,
+                      this.ta.ctx.program,
+                      this.ta.codeModel.options,
+                    )
                   ) {
                     continue;
                   }
@@ -2453,21 +2471,14 @@ export class ClientAdapter {
           if (exampleType.additionalPropertiesValue) {
             ret.additionalProperties = {};
             for (const [k, v] of Object.entries(exampleType.additionalPropertiesValue)) {
-              const filed = concreteType.fields.find((f) => f.annotations.isAdditionalProperties);
-              if (!filed) {
+              const field = concreteType.fields.find((f) => go.isAdditionalProperties(f));
+              if (!field) {
                 throw new AdapterError(
                   "InternalError",
                   `additional properties field not found in model '${concreteType.name}'.`,
                 );
               }
-              if (filed.type.kind === "map") {
-                ret.additionalProperties[k] = this.adaptExampleType(v, filed.type.valueType);
-              } else {
-                throw new AdapterError(
-                  "InternalError",
-                  `additional properties field type should be map type, but got '${filed.type.kind}' in model '${concreteType.name}'`,
-                );
-              }
+              ret.additionalProperties[k] = this.adaptExampleType(v, field.type.valueType);
             }
           }
           return ret;

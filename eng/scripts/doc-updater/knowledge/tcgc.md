@@ -6,15 +6,15 @@
 - The `tspd` tool for regenerating reference docs requires the core submodule to be built first (`git submodule update --init && cd core && pnpm install && pnpm build`).
 - To regenerate reference docs: `cd packages/typespec-client-generator-core && pnpm regen-docs`.
 - To build azure-http-specs: `cd packages/azure-http-specs && pnpm build && pnpm validate-mock-apis`.
-- `pnpm` is not pre-installed globally; install with `npm install -g pnpm`.
+- Prefer the repository's mise-managed tools. If mise is unavailable and `pnpm` is not on `PATH`, invoke the pinned package-manager version with Corepack.
 
 ## Decorator Catalog
 
 ### Core Decorators (lib/decorators.tsp) — 21 decorators
 
 1. `@clientName(rename, scope?)` — rename any type/operation
-2. `@convenientAPI(target, flag?, scope?)` — control convenience method generation
-3. `@protocolAPI(target, flag?, scope?)` — control protocol method generation
+2. `@convenientAPI(target, flag?, scope?)` — control convenience method generation; scope must include Java and/or C#
+3. `@protocolAPI(target, flag?, scope?)` — control protocol method generation; scope must include Java and/or C#
 4. `@client(target, options?, scope?)` — define explicit client; ClientOptions has service, name, autoMergeService
 5. `@operationGroup(target, scope?)` — DEPRECATED, use @client
 6. `@usage(target, value, scope?)` — mark model/enum/union/namespace usage (input/output/json/xml); on namespace, propagates recursively to all contained types
@@ -32,7 +32,7 @@
 18. `@responseAsBool(target, scope?)` — HEAD operations return boolean (2xx=true, 404=false)
 19. `@clientLocation(source, target, scope?)` — move operations/params between clients
 20. `@clientDoc(target, documentation, mode, scope?)` — override docs with append/replace mode
-21. `@clientOption(target, name, value, scope?)` — pass experimental flags to emitters
+21. `@clientOption(target, name, value, scope?)` — pass experimental flags to emitters; an explicit language scope is required
 
 ### Legacy Decorators (lib/legacy.tsp) — 7 decorators
 
@@ -88,25 +88,18 @@
 
 ### Covered in azure/client-generator-core/
 
-access, alternate-type, api-version, client-default-value, client-doc, client-initialization, client-location, deserialize-empty-string-as-null, exact-name, flatten-property, hierarchy-building, next-link-verb, override, response-as-bool, usage
+access, alternate-type, api-version, client-control, client-default-value, client-doc, client-initialization, client-location, deserialize-empty-string-as-null, exact-name, flatten-property, hierarchy-building, next-link-verb, override, response-as-bool, usage
 
 ### Covered in client/
 
 namespace (@clientNamespace), naming (@clientName), overload, structure (@client)
 
-### Not Yet Covered (candidates for future specs)
+### Carrier Coverage for Client-Generation Controls
 
-- `@scope` — language-specific scoping
-- `@markAsLro` — force LRO behavior
-- `@markAsPageable` / `@disablePageable` — force/disable pagination
-- `@clientOption` — experimental flags
-- `@clientApiVersions` — extend API versions
-- `@useSystemTextJsonConverter` — C# specific
-- Functions (replaceParameter, removeParameter, addParameter, reorderParameters)
-
-### Specs Removed (feedback from PR #4268)
-
-- `convenient-api` — removed because @convenientAPI/@protocolAPI are code-generation controls that aren't testable at the wire level via Spector
+- `client-control` provides mocked carrier operations for `@protocolAPI`, `@scope`, `@useSystemTextJsonConverter`, model-valued `@clientOption`, and `@disablePageable`.
+- `override` exercises `replaceParameter`, `removeParameter`, `addParameter`, and `reorderParameters` while preserving each operation's wire contract.
+- `@convenientAPI` has carrier coverage in `azure/core/basic`; `@markAsLro` and `@markAsPageable` are exercised by resource-manager operation-template scenarios.
+- These scenarios give emitters a shared generation target. Unit tests remain responsible for detailed language-specific type-graph assertions when the decorator has no distinct wire behavior.
 
 ## Guideline.md (Emitter Developer Docs) Notes
 
@@ -120,6 +113,7 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 
 - `operation-not-in-client`: REMOVED in May 2026. This diagnostic no longer exists.
 - `inconsistent-multiple-service-dependency` (warning): Emitted when services merged into the same client depend on different versions of a shared library dependency. Documented in 03client.mdx under the "One Client from Multiple Services" section and in guideline.md under "Client Detection".
+- `duplicate-client-name-warning` (warning): C# operation-name collisions are warnings because distinct signatures may be valid overloads, including when operations from multiple services are combined into one client. Other language scopes continue to report `duplicate-client-name` errors. Suppress only after confirming the generated C# signatures form valid overloads.
 - `legacy-hierarchy-building-conflict` (warning): Now only has `property-type-mismatch` message ID (the old `property-missing` and `type-mismatch` message IDs were removed). Emitted during property reconciliation when a dropped property's type is incompatible with the same-named property on the new base chain.
 - `override-parameters-mismatch` (error): In addition to the general "different parameters definition" case, `@override` now reports this when the override operation drops a parameter that is realized as a `@path` parameter in the original operation's HTTP route, or redeclares it without `@path` (the underlying route still needs it). The check is skipped when any override parameter carries `@clientLocation` (intentional relocation). Matching between original/override parameters is by **name**, not position (so overrides may add/remove/regroup parameters). "Realized path parameter" is resolved from `getHttpOperation(...).parameters` (route ground truth), not from the `@path` decorator alone, because templated params (e.g. ARM scope models) can carry `@path` without appearing in the route. Documented in 04method.mdx `@override` section as a `:::caution`.
 - `client-location-conflict` / `parameterTypeConflict` (warning): `@clientLocation` cannot move multiple parameters that share a name but have different types to the same client. Common when `@clientLocation` is on a templated parameter instantiated with different types across operations; the client parameter collapses to a single (last) type, breaking the SDK. Fix: move the parameter on each operation instead. Validated in `src/validations/types.ts` (`validateClientLocationParameterTypes`). Documented in 04method.mdx `@clientLocation` section as a `:::caution`.
@@ -143,7 +137,9 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - The guideline.md previously said `encode` is set only when `@encode` exists — this was inaccurate since encode can also be set contextually (e.g., multipart).
 - Use `// NOT_SUPPORTED` for language examples where an emitter doesn't support a feature. Do NOT use `// TODO: fill in X example manually`.
 - Separate changesets: TCGC documentation updates use "internal" changeKind. Spector spec additions use "feature" changeKind with a separate changeset file.
-- Don't add Spector specs for code-generation controls like @convenientAPI/@protocolAPI — they aren't testable at the HTTP wire level.
+- Code-generation controls still need Spector carrier scenarios: use a normal HTTP operation and mock to provide emitters a shared generation target, while keeping detailed language-specific metadata assertions in unit tests.
+- `@convenientAPI` and `@protocolAPI` only apply to Java and C#; an omitted scope or a scope that leaves neither supported language enabled warns. Negated scopes are valid when Java or C# remains enabled (for example, excluding only Python). Likewise, their global emitter options warn when explicitly set for another language.
+- `@clientOption` requires an explicit language scope and accepts arbitrary values, including arrays, objects, and nested combinations. `getClientOptions(type, key)` returns one value as `unknown`.
 - The `@deserializeEmptyStringAsNull` section was removed from 08types.mdx in feedback PR #4268. Don't re-add it unless specifically requested.
 - Spector response-as-bool spec needs BOTH a success (200) case AND a 404 case to be complete.
 - TypeSpec examples in docs with operations MUST include `@route` decorators to be valid TypeSpec (feedback PR #4398).
@@ -224,17 +220,31 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - When creating exact-name Spector specs, the namespace needs `@clientNamespace` for BOTH Java (`"azure.clientgenerator.core.exactname"`) AND Python (`"specs.azure.clientgenerator.core.exactname"`) so tests pass in both language emitter test suites.
 - The @clientNamespace for python should be formatted multi-line if it exceeds a reasonable line length.
 
-## Per-Service API Version (June 2026)
+## Per-Service API Version
 
-- The `api-version` emitter option now accepts `string | Record<string, string>`. The Record form maps service namespace full names to version strings, enabling per-service API version control in multi-service packages.
-- `resolveApiVersionForService` in `src/internal-utils.ts` is the central resolution function (internal, not exported). It handles string vs Record config dispatch.
+- The `api-version` emitter option accepts `ApiVersionConfig`, either a string or a recursive `ApiVersionServiceMap`. A map can use a full service namespace as one key or nested objects for each dot-separated namespace segment. The nested form is required for natural YAML such as `Microsoft: { Network: "2024-01-01" }`.
+- `resolveApiVersionForService` in `src/internal-utils.ts` is the central resolution function (internal, not exported). It checks an exact full-namespace key first, then traverses nested namespace segments.
 - For multi-service packages, `"all"` is NOT supported — it falls back to `undefined` (latest version). This applies in both the string and Record forms.
 - `"latest"` is a global keyword that applies regardless of single/multi-service.
 - In the Record form, services not listed in the map return `undefined` (latest version).
 - `SdkPackage.metadata.apiVersions` (Map) stores the resolved version per service. `metadata.apiVersion` (string, deprecated) is `undefined` for multi-service.
-- No Spector spec was added for this feature — it's a code-generation-time config behavior, not a wire-level behavior. The unit tests in `test/package/api-versions-metadata.test.ts` and `test/clients/structure.test.ts` thoroughly cover it.
+- The resolved version is also used when loading versioned example files, so each service gets examples from its configured version rather than always from latest.
+- No Spector spec is needed for this feature: nested emitter configuration and example loading are compile-time behaviors covered by `test/package/api-versions-metadata.test.ts` and `test/examples/load.test.ts`.
 - The guideline.md was updated to document `SdkPackage.metadata` (both `apiVersion` and `apiVersions`).
-- The 10versioning.mdx was updated to mention the Record form and add a "Per-service versioning (multi-service packages)" section.
+- The 10versioning.mdx documents nested namespace maps in "Per-service versioning (multi-service packages)."
+
+## Alternate-Type Cross-Language Identity
+
+- `getCrossLanguageDefinitionId` recursively follows `@alternateType` for unions, models, enums, scalars, and model properties. The original and replacement types therefore use the replacement type's `crossLanguageDefinitionId`.
+- Chained replacements converge on the final replacement's ID. This keeps cross-emitter mappings aligned with the type that an emitter actually consumes.
+- This is emitter-consumed type-graph metadata with unit coverage in `test/public-utils.test.ts`; it does not create a distinct Spector wire scenario.
+
+## Model References in @clientOption
+
+- `@clientOption` accepts model references in addition to value literals. TCGC converts the reference with `getClientTypeWithDiagnostics`, so `getClientOptions` returns an SDK type rather than a raw TypeSpec model.
+- Scoped transformations on the referenced model, including `@alternateType`, are applied for the consuming emitter.
+- The decorator requires an explicit language scope even though the TypeSpec signature keeps `scope` optional to produce the targeted `decorator-requires-scope` diagnostic.
+- This behavior is emitter-defined metadata, so unit tests in `test/decorators/client-option.test.ts` cover model conversion and alternate-type preservation. The `client-control` Spector spec supplies a model-reference carrier operation for emitter integration.
 
 ## Linter Rules Documentation
 

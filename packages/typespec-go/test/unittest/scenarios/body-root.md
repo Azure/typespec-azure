@@ -207,6 +207,9 @@ type BodyRootsClient struct {
 //   - credential - used to authorize requests. Usually a credential from azidentity.
 //   - options - Contains optional client configuration. Pass nil to accept the default values.
 func NewBodyRootsClient(subscriptionID string, credential azcore.TokenCredential, options *arm.ClientOptions) (*BodyRootsClient, error) {
+	if subscriptionID == "" {
+		return nil, errors.New("parameter subscriptionID cannot be empty")
+	}
 	cl, err := arm.NewClient(moduleName, moduleVersion, credential, options)
 	if err != nil {
 		return nil, err
@@ -244,7 +247,7 @@ func (client *BodyRootsClient) Action(ctx context.Context, apiVersion string, re
 func (client *BodyRootsClient) actionCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, bodyRootName string, action ActionRequest, _ *BodyRootsClientActionOptions) (*policy.Request, error) {
 	urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/bodyRoots/{bodyRootName}/action"
 	if client.subscriptionID == "" {
-		return nil, errors.New("parameter client.subscriptionID cannot be empty")
+		return nil, errors.New("parameter subscriptionID cannot be empty")
 	}
 	urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
 	if resourceGroupName == "" {
@@ -292,7 +295,7 @@ func (client *BodyRootsClient) Get(ctx context.Context, apiVersion string, resou
 func (client *BodyRootsClient) getCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, bodyRootName string, _ *BodyRootsClientGetOptions) (*policy.Request, error) {
 	urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/bodyRoots/{bodyRootName}"
 	if client.subscriptionID == "" {
-		return nil, errors.New("parameter client.subscriptionID cannot be empty")
+		return nil, errors.New("parameter subscriptionID cannot be empty")
 	}
 	urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
 	if resourceGroupName == "" {
@@ -349,7 +352,7 @@ func (client *BodyRootsClient) Put(ctx context.Context, apiVersion string, resou
 func (client *BodyRootsClient) putCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, bodyRootName string, resource BodyRoot, _ *BodyRootsClientPutOptions) (*policy.Request, error) {
 	urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/bodyRoots/{bodyRootName}"
 	if client.subscriptionID == "" {
-		return nil, errors.New("parameter client.subscriptionID cannot be empty")
+		return nil, errors.New("parameter subscriptionID cannot be empty")
 	}
 	urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
 	if resourceGroupName == "" {
