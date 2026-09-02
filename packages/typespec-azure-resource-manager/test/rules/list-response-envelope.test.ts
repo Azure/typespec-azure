@@ -5,7 +5,7 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { collectionResponseOnlyValueAndNextLinkRule } from "../../src/rules/collection-response-only-value-and-next-link.js";
+import { listResponseEnvelopeRule } from "../../src/rules/list-response-envelope.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -14,7 +14,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    collectionResponseOnlyValueAndNextLinkRule,
+    listResponseEnvelopeRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
@@ -33,8 +33,7 @@ function armGet(route: string, response: string, models: string): string {
 }
 
 const widgetModel = `model Widget { name: string; }`;
-const diagnosticCode =
-  "@azure-tools/typespec-azure-resource-manager/collection-response-only-value-and-next-link";
+const diagnosticCode = "@azure-tools/typespec-azure-resource-manager/list-response-envelope";
 
 it("reports an extra property on a collection response", async () => {
   await tester
@@ -53,6 +52,40 @@ it("reports an extra property on a collection response", async () => {
     .toEmitDiagnostics({ code: diagnosticCode });
 });
 
+it("reports every extra property on a collection response", async () => {
+  await tester
+    .expect(
+      armGet(
+        "/scope/providers/Microsoft.TestService/widgets",
+        "WidgetListResult",
+        `${widgetModel}
+         model WidgetListResult {
+           value: Widget[];
+           nextLink?: string;
+           totalCount?: int32;
+           metadata?: string;
+         }`,
+      ),
+    )
+    .toEmitDiagnostics([{ code: diagnosticCode }, { code: diagnosticCode }]);
+});
+
+it("reports extra and missing envelope properties", async () => {
+  await tester
+    .expect(
+      armGet(
+        "/scope/providers/Microsoft.TestService/widgets",
+        "WidgetListResult",
+        `${widgetModel}
+         model WidgetListResult {
+           value: Widget[];
+           totalCount?: int32;
+         }`,
+      ),
+    )
+    .toEmitDiagnostics([{ code: diagnosticCode }, { code: diagnosticCode }]);
+});
+
 it("reports a value-only response on an extension-scope collection path", async () => {
   await tester
     .expect(
@@ -64,6 +97,43 @@ it("reports a value-only response on an extension-scope collection path", async 
       ),
     )
     .toEmitDiagnostics({ code: diagnosticCode });
+});
+
+it("reports operations in a nested provider namespace", async () => {
+  await tester
+    .expect(
+      `
+        @armProviderNamespace
+        namespace Microsoft.TestService {
+          namespace V1 {
+            ${widgetModel}
+            model WidgetListResult { value: Widget[]; }
+
+            @route("/scope/providers/Microsoft.TestService/widgets")
+            @get
+            op getCollection(): WidgetListResult;
+          }
+        }
+      `,
+    )
+    .toEmitDiagnostics({ code: diagnosticCode });
+});
+
+it("ignores operations outside an ARM provider namespace", async () => {
+  await tester
+    .expect(
+      `
+        namespace Contoso {
+          ${widgetModel}
+          model WidgetListResult { value: Widget[]; }
+
+          @route("/scope/providers/Contoso/widgets")
+          @get
+          op getCollection(): WidgetListResult;
+        }
+      `,
+    )
+    .toBeValid();
 });
 
 it("accepts a response containing only value and nextLink", async () => {

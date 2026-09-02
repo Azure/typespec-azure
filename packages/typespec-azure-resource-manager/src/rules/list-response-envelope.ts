@@ -10,15 +10,15 @@ import {
   isArrayModelType,
 } from "@typespec/compiler";
 import { type HttpOperationResponse, getHttpOperation } from "@typespec/http";
-import { resolveProviderNamespace } from "../namespace.js";
+import { getArmProviderNamespace } from "../namespace.js";
 
-export const collectionResponseOnlyValueAndNextLinkRule = createRule({
-  name: "collection-response-only-value-and-next-link",
-  docs: fileRef.fromPackageRoot("src/rules/collection-response-only-value-and-next-link.md"),
+export const listResponseEnvelopeRule = createRule({
+  name: "list-response-envelope",
+  docs: fileRef.fromPackageRoot("src/rules/list-response-envelope.md"),
   description:
     "ARM collection GET response models must declare only the `value` and `nextLink` properties.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/collection-response-only-value-and-next-link",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/list-response-envelope",
   messages: {
     default:
       "Collection GET response models must declare exactly the `value` and `nextLink` properties.",
@@ -26,8 +26,10 @@ export const collectionResponseOnlyValueAndNextLinkRule = createRule({
   create(context) {
     return {
       operation: (operation) => {
-        const namespace = operation.interface?.namespace ?? operation.namespace;
-        if (resolveProviderNamespace(context.program, namespace) === undefined) {
+        if (
+          operation.namespace === undefined ||
+          getArmProviderNamespace(context.program, operation.namespace) === undefined
+        ) {
           return;
         }
 
@@ -41,14 +43,11 @@ export const collectionResponseOnlyValueAndNextLinkRule = createRule({
           return;
         }
 
-        const invalidTarget = getInvalidTarget(responseModel);
-        if (invalidTarget === undefined) {
-          return;
+        for (const invalidTarget of getInvalidTargets(responseModel)) {
+          context.reportDiagnostic({
+            target: getDiagnosticTarget(context.program, operation, invalidTarget),
+          });
         }
-
-        context.reportDiagnostic({
-          target: getDiagnosticTarget(context.program, operation, invalidTarget),
-        });
       },
     };
   },
@@ -92,19 +91,20 @@ function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefi
   return undefined;
 }
 
-function getInvalidTarget(responseModel: Model): Model | ModelProperty | undefined {
+function getInvalidTargets(responseModel: Model): (Model | ModelProperty)[] {
   const properties = [...responseModel.properties.values()];
+  const invalidTargets: (Model | ModelProperty)[] = properties.filter(
+    (property) => property.name !== "value" && property.name !== "nextLink",
+  );
+
   if (
-    properties.length === 2 &&
-    properties.every((property) => property.name === "value" || property.name === "nextLink")
+    !properties.some((property) => property.name === "value") ||
+    !properties.some((property) => property.name === "nextLink")
   ) {
-    return undefined;
+    invalidTargets.push(responseModel);
   }
 
-  return (
-    properties.find((property) => property.name !== "value" && property.name !== "nextLink") ??
-    responseModel
-  );
+  return invalidTargets;
 }
 
 function getDiagnosticTarget(
