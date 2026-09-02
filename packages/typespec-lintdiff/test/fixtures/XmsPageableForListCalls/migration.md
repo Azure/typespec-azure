@@ -15,7 +15,7 @@ The production rule and directly related fixtures now:
 - ignore response shape because the Swagger rule checks only path and `x-ms-pageable`;
 - treat `@list` as pageable only when AutoRest can resolve a next-link property;
 - accept an explicitly authored truthy `x-ms-pageable` extension while rejecting falsy values;
-- skip dynamic provider paths without a literal dotted namespace; and
+- skip dynamic provider paths without a literal dotted namespace;
 - skip non-emitted operation and interface template declarations; and
 - recognize emitted operations in child namespaces beneath the ARM provider namespace.
 
