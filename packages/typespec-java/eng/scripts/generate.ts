@@ -81,6 +81,10 @@ function getGenerationOptions(typeSpecFile: string): string[] {
       `${emitterName}.generate-async-methods=true`,
       `${emitterName}.enable-sync-stack=false`,
     );
+  } else if (/tsp\/protocol-api-sync-over-async\.tsp$/.test(normalized)) {
+    options.push(`${emitterName}.enable-sync-stack=false`);
+  } else if (/tsp\/max-overload-model\.tsp$/.test(normalized)) {
+    options.push(`${emitterName}.max-overload=model`, `${emitterName}.advanced-versioning=true`);
   } else if (/tsp\/subclient\.tsp$/.test(normalized)) {
     options.push(
       `${emitterName}.enable-subclient=true`,
