@@ -1,5 +1,12 @@
 # Release History
 
+## 0.17.3
+
+### Bug Fixes
+
+- [#5333](https://github.com/Azure/typespec-azure/pull/5333) Revert removal of empty client path parameter checks during request construction.
+
+
 ## 0.17.2
 
 ### Bug Fixes
