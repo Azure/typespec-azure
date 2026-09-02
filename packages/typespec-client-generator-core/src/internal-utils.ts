@@ -542,7 +542,20 @@ export function getTypeDecorators(
           arguments: {},
         };
         for (let i = 0; i < decorator.args.length; i++) {
-          decoratorInfo.arguments[decorator.definition.parameters[i].name] = diagnostics.pipe(
+          const parameterName = decorator.definition.parameters[i].name;
+          // The `scope` argument is emitter-selection metadata, not a client type. It can be
+          // provided either as the legacy plain string or as a typed options bag
+          // (`DecoratorOptions`). Normalize it to its plain-string form before materializing the
+          // remaining decorator arguments, otherwise the options-bag form is run through
+          // `getDecoratorArgValue` (which converts it to an SDK model) and later handed to the
+          // string-only `isScopeApplicable`, crashing with `scope.match is not a function`.
+          if (parameterName === "scope") {
+            decoratorInfo.arguments[parameterName] = normalizeScope(
+              decorator.args[i].jsValue as LanguageScopes | DecoratorOptions | undefined,
+            );
+            continue;
+          }
+          decoratorInfo.arguments[parameterName] = diagnostics.pipe(
             getDecoratorArgValue(context, decorator.args[i].jsValue, type, decoratorName),
           );
         }

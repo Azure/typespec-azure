@@ -254,7 +254,7 @@ model ClientOptions extends DecoratorOptions {
  * interface MyInterface{}
  * ```
  */
-extern dec operationGroup(target: Namespace | Interface, scope?: valueof string);
+extern dec operationGroup(target: Namespace | Interface, scope?: valueof DecoratorOptions | string);
 
 /**
  * Usage value.

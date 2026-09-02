@@ -701,6 +701,52 @@ describe("@operationGroup", () => {
       strictEqual(client.length, 0);
     }
   });
+
+  it("@operationGroup accepts a DecoratorOptions bag scope", async () => {
+    // Regression: @operationGroup must accept the typed options-bag scope form
+    // (`#{ scope: "python" }`) and normalize it before delegating to @client, otherwise it fails
+    // with invalid-argument.
+    const mainCode = `
+        @service(#{
+          title: "DeviceUpdateClient",
+        })
+        namespace Azure.IoT.DeviceUpdate;
+      `;
+    const clientCode = `
+        @client({name: "DeviceUpdateClient", service: Azure.IoT.DeviceUpdate}, "python, java")
+        namespace Customizations;
+
+        @operationGroup(#{ scope: "python" })
+        interface SubClientOnlyForPython {
+        }
+      `;
+
+    // python should have one sub client
+    {
+      const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+        createClientCustomizationInput(mainCode, clientCode),
+      );
+      expectDiagnosticEmpty(diagnostics);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const client = listClients(context)[0];
+      strictEqual(listSubClients(context, client).length, 1);
+    }
+
+    // java should have no sub client
+    {
+      const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+        createClientCustomizationInput(mainCode, clientCode),
+      );
+      expectDiagnosticEmpty(diagnostics);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-java",
+      });
+      const client = listClients(context)[0];
+      strictEqual(listSubClients(context, client).length, 0);
+    }
+  });
 });
 
 describe("listOperationGroups without @client and @operationGroup", () => {

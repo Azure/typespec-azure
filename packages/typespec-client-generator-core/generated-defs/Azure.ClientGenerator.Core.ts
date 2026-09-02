@@ -228,7 +228,7 @@ export type ClientDecorator = (
 export type OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  scope?: string,
+  scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
 /**

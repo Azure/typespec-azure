@@ -433,10 +433,12 @@ export function listClients(context: TCGCContext): SdkClient[] {
 export const $operationGroup: OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
-  // Delegate to $client - @operationGroup is now just an alias for @client
-  context.call($client, target, undefined, scope);
+  // Delegate to $client - @operationGroup is now just an alias for @client. `@operationGroup` does
+  // not have its own options bag, so normalize the accepted `DecoratorOptions | string` scope to
+  // the plain-string form that $client's legacy positional scope argument expects.
+  context.call($client, target, undefined, normalizeScope(scope));
 };
 
 /**
@@ -1189,6 +1191,35 @@ export const $useSystemTextJsonConverter: DecoratorFunction = (
 
 const clientInitializationKey = createStateSymbol("clientInitialization");
 
+/**
+ * The properties that belong to the `ClientInitializationOptions` options bag (including `scope`,
+ * inherited from `DecoratorOptions`).
+ */
+const clientInitializationOptionKeys = new Set(["parameters", "initializedBy", "scope"]);
+
+/**
+ * Distinguish a real `ClientInitializationOptions` options bag from the legacy form where a raw
+ * client-parameters model is passed directly as the second argument.
+ *
+ * The structural options `parameters` and `initializedBy` unambiguously identify the options bag.
+ * When neither is present the model could be a legacy raw parameters model that merely happens to
+ * contain a `scope` property (e.g. a credential scope), so only an anonymous inline bag whose
+ * members are all known option keys (such as `{ scope: "csharp" }`) is treated as the options bag.
+ * A named model, or one carrying any non-option property, is treated as legacy client parameters.
+ */
+function isClientInitializationOptionsBag(options: Type): boolean {
+  if (options.kind !== "Model") {
+    return false;
+  }
+  if (options.properties.has("parameters") || options.properties.has("initializedBy")) {
+    return true;
+  }
+  return (
+    options.name === "" &&
+    [...options.properties.keys()].every((key) => clientInitializationOptionKeys.has(key))
+  );
+}
+
 export const $clientInitialization: ClientInitializationDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
@@ -1248,7 +1279,12 @@ export const $clientInitialization: ClientInitializationDecorator = (
       clientInitializationKey,
       target,
       options,
-      resolveScopeFromOptions(context, "clientInitialization", options, scope),
+      resolveScopeFromOptions(
+        context,
+        "clientInitialization",
+        isClientInitializationOptionsBag(options) ? options : undefined,
+        scope,
+      ),
     );
   }
 };
@@ -1267,11 +1303,10 @@ export function getClientInitializationOptions(
   const options = getScopedDecoratorData(context, clientInitializationKey, entity);
 
   // backward compatibility
-  if (
-    options &&
-    options.properties.get("initializedBy") === undefined &&
-    options.properties.get("parameters") === undefined
-  ) {
+  // A legacy raw client-parameters model was passed directly (rather than a `ClientInitializationOptions`
+  // options bag). Treat the whole model as the parameters model. A scope-only options bag (e.g.
+  // `{ scope: "csharp" }`) is NOT the legacy form, so it must not be surfaced as client parameters.
+  if (options && !isClientInitializationOptionsBag(options)) {
     return {
       parameters: options,
     };

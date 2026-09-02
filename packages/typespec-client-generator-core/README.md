@@ -1006,7 +1006,7 @@ This decorator cannot be used along with `@clientLocation`. This decorator canno
 Deprecated: use `@client` instead. Sub clients should be represented using `@client`.
 
 ```typespec
-@Azure.ClientGenerator.Core.operationGroup(scope?: valueof string)
+@Azure.ClientGenerator.Core.operationGroup(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
 ```
 
 ##### Target
@@ -1016,9 +1016,9 @@ The target namespace or interface that you want to define as a sub client.
 
 ##### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
+| Name  | Type                                                            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />- Single language: `"python"`<br />- Multiple languages (comma-separated): `"python, java"`<br />- Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 ##### Examples
 

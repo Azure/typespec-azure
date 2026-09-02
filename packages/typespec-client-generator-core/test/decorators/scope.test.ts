@@ -156,6 +156,32 @@ describe("@clientOption scope requirement", () => {
     });
     strictEqual(getClientOptionValue(context, UseOption, "x"), undefined);
   });
+
+  it("materializes an SDK package when a referenced model carries a DecoratorOptions bag scope", async () => {
+    // Regression: the options-bag scope on @clientOption must be normalized to its plain-string
+    // form before decorator arguments are materialized. Otherwise the model is run through
+    // getDecoratorArgValue and later handed to the string-only isScopeApplicable, crashing with
+    // "scope.match is not a function" once the model is referenced by an operation.
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option" "test"
+      @clientOption("flag", true, #{ scope: "python" })
+      model Payload {
+        id: string;
+      }
+
+      op get(): Payload;
+    `);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    ok(pythonContext.sdkPackage.models.find((x) => x.name === "Payload"));
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    ok(csharpContext.sdkPackage.models.find((x) => x.name === "Payload"));
+  });
 });
 
 it("emitter with same scope as decorator", async () => {

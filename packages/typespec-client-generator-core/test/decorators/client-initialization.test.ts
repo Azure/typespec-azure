@@ -861,4 +861,65 @@ describe("@clientInitialization scope in ClientInitializationOptions", () => {
 
     expectDiagnostics(diagnostics, []);
   });
+
+  it("applies a scope-only options bag without surfacing scope as a client parameter", async () => {
+    // Regression: `{ scope: "csharp" }` is a ClientInitializationOptions bag, not a legacy raw
+    // parameters model. It must select the emitter without exposing a `scope` client parameter.
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(mainCode, customization(`{scope: "csharp"}`)),
+    );
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const csharpInit = csharpContext.sdkPackage.clients[0].clientInitialization;
+    ok(
+      !csharpInit.parameters.find((x) => x.name === "scope"),
+      "the scope option must not become a client initialization parameter",
+    );
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    ok(
+      !pythonContext.sdkPackage.clients[0].clientInitialization.parameters.find(
+        (x) => x.name === "scope",
+      ),
+      "python is out of scope and must not receive a scope parameter either",
+    );
+  });
+
+  it("treats a legacy raw parameters model with a scope property as client parameters", async () => {
+    // Regression: a legacy client-parameters model that happens to contain a `scope` property must
+    // not be interpreted as an emitter selector. The `scope` must remain a real client parameter
+    // and the customization must apply to every emitter.
+    const legacyMain = `
+      @service
+      namespace MyService;
+
+      op download(@path blobName: string, @query scope: "https://management.azure.com/.default"): void;
+      `;
+    const legacyCustomization = `
+      namespace MyCustomizations;
+
+      model LegacyClientParameters {
+        scope: "https://management.azure.com/.default";
+      }
+
+      @@clientInitialization(MyService, MyCustomizations.LegacyClientParameters);
+      `;
+
+    const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(legacyMain, legacyCustomization),
+    );
+    expectDiagnostics(diagnostics, []);
+
+    for (const emitterName of ["@azure-tools/typespec-csharp", "@azure-tools/typespec-python"]) {
+      const context = await createSdkContextForTester(program, { emitterName });
+      const scopeParam = context.sdkPackage.clients[0].clientInitialization.parameters.find(
+        (x) => x.name === "scope",
+      );
+      ok(scopeParam, `scope must remain a client parameter for ${emitterName}`);
+    }
+  });
 });
