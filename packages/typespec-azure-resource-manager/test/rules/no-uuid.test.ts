@@ -155,6 +155,21 @@ it("reports a custom scalar derived from UUID", async () => {
     .toEmitDiagnostics(diagnostic);
 });
 
+it("reports a custom scalar with an explicit UUID format", async () => {
+  await tester
+    .expect(
+      inArmService(`
+        @format("uuid")
+        scalar WidgetId extends string;
+
+        model WidgetProperties {
+          id: WidgetId;
+        }
+      `),
+    )
+    .toEmitDiagnostics(diagnostic);
+});
+
 it("reports a property-level UUID format", async () => {
   await tester
     .expect(

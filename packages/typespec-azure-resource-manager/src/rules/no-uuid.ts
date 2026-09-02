@@ -6,6 +6,7 @@ import {
   type Operation,
   type Program,
   type RecordModelType,
+  type Scalar,
   type Type,
   createRule,
   fileRef,
@@ -34,6 +35,8 @@ export const noUuidRule = createRule({
   },
   create(context) {
     const reportedTargets = new Set<ModelProperty | Operation>();
+    const [uuidType] = context.program.resolveTypeReference("Azure.Core.uuid");
+    const uuidScalar = uuidType?.kind === "Scalar" ? uuidType : undefined;
     const [services] = getAllHttpServices(context.program);
     const armServices = services.filter((service) =>
       getArmProviderNamespace(context.program, service.namespace),
@@ -56,6 +59,7 @@ export const noUuidRule = createRule({
         if (target !== undefined) {
           reportUuidUsage(
             context,
+            uuidScalar,
             property.type,
             target,
             reportedTargets,
@@ -78,7 +82,13 @@ export const noUuidRule = createRule({
                 if (getFormat(context.program, parameter.param) === "uuid") {
                   reportTarget(context, target, reportedTargets);
                 } else {
-                  reportUuidUsage(context, parameter.param.type, target, reportedTargets);
+                  reportUuidUsage(
+                    context,
+                    uuidScalar,
+                    parameter.param.type,
+                    target,
+                    reportedTargets,
+                  );
                 }
               }
             }
@@ -87,6 +97,7 @@ export const noUuidRule = createRule({
             if (requestBody !== undefined) {
               reportUuidUsage(
                 context,
+                uuidScalar,
                 requestBody.type,
                 getPayloadTarget(context.program, requestBody.property, operation),
                 reportedTargets,
@@ -98,6 +109,7 @@ export const noUuidRule = createRule({
                 if (content.body !== undefined) {
                   reportUuidUsage(
                     context,
+                    uuidScalar,
                     content.body.type,
                     getPayloadTarget(context.program, content.body.property, operation),
                     reportedTargets,
@@ -107,7 +119,7 @@ export const noUuidRule = createRule({
                 for (const header of Object.values(content.headers ?? {})) {
                   const target = getProjectProperty(context.program, header);
                   if (target !== undefined) {
-                    reportUuidUsage(context, header.type, target, reportedTargets);
+                    reportUuidUsage(context, uuidScalar, header.type, target, reportedTargets);
                   }
                 }
               }
@@ -151,6 +163,7 @@ function isWithinNamespace(namespace: Namespace, ancestor: Namespace): boolean {
 
 function reportUuidUsage(
   context: Parameters<typeof noUuidRule.create>[0],
+  uuidScalar: Scalar | undefined,
   type: Type,
   target: ModelProperty | Operation,
   reportedTargets: Set<ModelProperty | Operation>,
@@ -176,18 +189,27 @@ function reportUuidUsage(
 
   switch (type.kind) {
     case "Scalar":
-      if (getFormat(context.program, type) === "uuid") {
+      if (type === uuidScalar || getFormat(context.program, type) === "uuid") {
         if (canReportTarget && isProjectDeclaration(context.program, target)) {
           reportTarget(context, target, reportedTargets);
         }
       } else if (type.baseScalar !== undefined) {
-        reportUuidUsage(context, type.baseScalar, target, reportedTargets, seen, canReportTarget);
+        reportUuidUsage(
+          context,
+          uuidScalar,
+          type.baseScalar,
+          target,
+          reportedTargets,
+          seen,
+          canReportTarget,
+        );
       }
       return;
     case "Model":
       if (isContainerModel(type)) {
         reportUuidUsage(
           context,
+          uuidScalar,
           type.indexer.value,
           target,
           reportedTargets,
@@ -200,6 +222,7 @@ function reportUuidUsage(
         const propertyTarget = getProjectProperty(context.program, property);
         reportUuidUsage(
           context,
+          uuidScalar,
           property.type,
           propertyTarget ?? target,
           reportedTargets,
@@ -211,13 +234,22 @@ function reportUuidUsage(
       return;
     case "Tuple":
       for (const value of type.values) {
-        reportUuidUsage(context, value, target, reportedTargets, new Set(seen), canReportTarget);
+        reportUuidUsage(
+          context,
+          uuidScalar,
+          value,
+          target,
+          reportedTargets,
+          new Set(seen),
+          canReportTarget,
+        );
       }
       return;
     case "Union":
       for (const variant of type.variants.values()) {
         reportUuidUsage(
           context,
+          uuidScalar,
           variant.type,
           target,
           reportedTargets,
