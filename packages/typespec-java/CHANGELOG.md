@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
-- [#5362](https://github.com/Azure/typespec-azure/pull/5362) Sync core to microsoft/typespec commit `a32575719`. Add model maximum overloads to Java clients and preserve internal protocol method names (core [#11803](https://github.com/microsoft/typespec/pull/11803)).
+- Sync core to microsoft/typespec commit `a32575719`. Add model maximum overloads to Java clients and preserve internal protocol method names (core [#11803](https://github.com/microsoft/typespec/pull/11803)).
 
 
 ## 0.46.1
