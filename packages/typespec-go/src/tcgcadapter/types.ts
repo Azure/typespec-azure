@@ -807,30 +807,30 @@ export class TypeAdapter {
     // for multipart/form data containing models, default to fields not being pointer-to-type as we
     // don't have to deal with JSON patch shenanigans. only the optional fields will be pointer-to-type.
     const isMultipartFormData = (modelType.usage & tcgc.UsageFlags.MultipartFormData) !== 0;
-    let fieldByValue = isMultipartFormData ? true : helpers.isTypePassedByValue(prop.type);
-    if (isMultipartFormData && prop.kind === "property" && prop.optional) {
-      fieldByValue = false;
+
+    let type: go.WireType;
+    if (prop.encode && prop.type.kind === "array") {
+      type = this.getSliceArray(prop.type, prop.encode);
+    } else if (prop.serializationOptions.multipart?.isFilePart) {
+      // for file parts, check if the tsp defines a fixed content type
+      // (e.g. HttpPart<File<"image/png">>). if so, bake it into the MultipartContent type.
+      const multipartOpts = prop.serializationOptions.multipart;
+      const fixedContentType =
+        multipartOpts?.contentType?.type.kind === "constant" &&
+        multipartOpts.defaultContentTypes.length === 1
+          ? multipartOpts.defaultContentTypes[0]
+          : undefined;
+      type = this.getMultipartContent(prop.type.kind === "array", fixedContentType);
+    } else {
+      type = this.getWireType(prop.type, isMultipartFormData, true);
     }
-    let type = this.getWireType(prop.type, isMultipartFormData, true);
-    if (prop.kind === "property") {
-      if (prop.serializationOptions.multipart?.isFilePart) {
-        // for file parts, check if the tsp defines a fixed content type
-        // (e.g. HttpPart<File<"image/png">>). if so, bake it into the MultipartContent type.
-        const multipartOpts = prop.serializationOptions.multipart;
-        const fixedContentType =
-          multipartOpts?.contentType?.type.kind === "constant" &&
-          multipartOpts.defaultContentTypes.length === 1
-            ? multipartOpts.defaultContentTypes[0]
-            : undefined;
-        type = this.getMultipartContent(prop.type.kind === "array", fixedContentType);
-      }
-      if (prop.visibility) {
-        // the field is read-only IFF the only visibility attribute present is Read.
-        // a field can have Read & Create set which means it's required on input and
-        // returned on output.
-        if (prop.visibility.length === 1 && prop.visibility[0] === http.Visibility.Read) {
-          annotations.readOnly = true;
-        }
+
+    if (prop.visibility) {
+      // the field is read-only IFF the only visibility attribute present is Read.
+      // a field can have Read & Create set which means it's required on input and
+      // returned on output.
+      if (prop.visibility.length === 1 && prop.visibility[0] === http.Visibility.Read) {
+        annotations.readOnly = true;
       }
     }
 
@@ -850,27 +850,13 @@ export class TypeAdapter {
       isExactName: prop.isExactName,
       access: prop.access,
     });
+
+    const fieldByValue = isMultipartFormData
+      ? !prop.optional
+      : helpers.isTypePassedByValue(prop.type);
     const field = new go.ModelField(fieldName, type, fieldByValue, serializedName, annotations);
     field.docs.summary = prop.summary;
     field.docs.description = prop.doc;
-
-    if (prop.encode && type.kind === "slice") {
-      if (type.elementType.kind === "string" || go.isConstant(type.elementType, "string")) {
-        type = new go.SliceArray(
-          type.elementType,
-          type.elementTypeByValue,
-          getSliceArrayDelimiter(prop.encode),
-        );
-        field.type = type;
-      } else {
-        this.ctx.program.reportDiagnostic({
-          code: "UnsupportedArrayEncoding",
-          severity: "warning",
-          message: `The array property ${prop.name} uses ${prop.encode} encoding with unsupported element type ${prop.type.kind === "array" ? prop.type.valueType.kind : prop.type.kind}. The encoding will be ignored.`,
-          target: prop.__raw?.node ?? tsp.NoTarget,
-        });
-      }
-    }
 
     if (prop.discriminator && modelType.discriminatorValue) {
       // the presence of modelType.discriminatorValue tells us that this
@@ -1131,6 +1117,62 @@ export class TypeAdapter {
       default:
         return valueType;
     }
+  }
+
+  /** adapts the SDK type to an encoded string array type */
+  private getSliceArray(
+    sdkType: tcgc.SdkArrayType,
+    encoding: tcgc.ArrayKnownEncoding,
+  ): go.SliceArray {
+    let keySegment: string;
+    switch (sdkType.valueType.kind) {
+      case "enum":
+        keySegment = `enum-${sdkType.valueType.name}`;
+        break;
+      default:
+        keySegment = sdkType.valueType.kind;
+    }
+
+    const keyName = `array-encoded-${keySegment}-${encoding}`;
+    let sliceArray = this.types.get(keyName);
+    if (sliceArray) {
+      return <go.SliceArray>sliceArray;
+    }
+
+    let elementType: go.SliceArrayElementType;
+    switch (sdkType.valueType.kind) {
+      case "enum":
+        switch (sdkType.valueType.valueType.kind) {
+          case "string":
+            elementType = this.getConstantType(sdkType.valueType);
+            break;
+          default:
+            throw new AdapterError(
+              "UnsupportedTsp",
+              `unsupported enum value kind ${sdkType.valueType.valueType.kind} for string encoded array`,
+              sdkType.__raw?.node,
+            );
+        }
+        break;
+      case "string":
+        elementType = this.getStringType();
+        break;
+      default:
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `unsupported kind ${sdkType.valueType.kind} for string encoded array`,
+          sdkType.__raw?.node,
+        );
+    }
+
+    sliceArray = new go.SliceArray(
+      elementType,
+      this.codeModel.options["slice-elements-byval"] ?? false,
+      getSliceArrayDelimiter(encoding),
+    );
+
+    this.types.set(keyName, sliceArray);
+    return sliceArray;
   }
 
   private getUnionStruct(sdkUnion: tcgc.SdkUnionType, elementTypeByValue: boolean): go.UnionStruct {

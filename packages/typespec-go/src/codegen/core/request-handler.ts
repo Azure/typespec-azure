@@ -632,7 +632,7 @@ function emitBody(
         text += `${indent.pop().get()}}\n`;
       }
     }
-    // TODO: spread params are JSON only https://github.com/Azure/autorest.go/issues/1455
+    // TODO: spread params are JSON only https://github.com/Azure/typespec-azure/issues/4949
     text += `${indent.get()}req.Raw().Header["Content-Type"] = []string{"application/json"}\n`;
     text += `${indent.get()}if err := runtime.MarshalAsJSON(req, body); err != nil {\n`;
     text += `${indent.push().get()}return nil, err\n`;
