@@ -216,10 +216,10 @@ allowBuilds:
   "@typespec/http-client-python": false
   "@vscode/vsce-sign": false
   autorest: false
-  esbuild: ^0.28.2
+  esbuild: false
   keytar: false
-  tree-sitter-c-sharp: ^0.23.5
-  tree-sitter-java: ^0.23.5
-  tree-sitter-javascript: ^0.25.0
-  tree-sitter-python: ^0.25.0
-  tree-sitter-typescript: ^0.23.2
+  tree-sitter-c-sharp: false
+  tree-sitter-java: false
+  tree-sitter-javascript: false
+  tree-sitter-python: false
+  tree-sitter-typescript: false
