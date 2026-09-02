@@ -32,12 +32,37 @@
   {
     "code": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
     "severity": "warning",
-    "message": "ARM GET operations on list paths that return collection payloads should define x-ms-pageable metadata."
+    "message": "This GET operation uses a collection route but does not emit `x-ms-pageable`. Use an ARM list operation template, or add `@list` and annotate the response with `@pageItems` and `@nextLink`."
   },
   {
     "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
     "severity": "warning",
     "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/get-collection-only-has-value-and-next-link",
+    "severity": "warning",
+    "message": "Get endpoints for collections of resources must only have the `value` and `nextLink` properties in their model."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+    "severity": "warning",
+    "message": "This GET operation uses a collection route but does not emit `x-ms-pageable`. Use an ARM list operation template, or add `@list` and annotate the response with `@pageItems` and `@nextLink`."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/list-in-operation-name",
+    "severity": "warning",
+    "message": "Operation 'getWidgetByResourceUri' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
@@ -52,22 +77,7 @@
   {
     "code": "tsp-lintdiff-local-linter/list-in-operation-name",
     "severity": "warning",
-    "message": "Operation 'getWidgetByResourceUri' returns a list/pageable response and should use method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/xms-examples-required",
-    "severity": "warning",
-    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
-    "severity": "warning",
-    "message": "All operations must be inside an interface declaration."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/list-in-operation-name",
-    "severity": "warning",
-    "message": "Operation 'getDefaultWidgetByResourceUri' returns a list/pageable response and should use method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    "message": "Operation 'getDefaultWidgetByResourceUri' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
@@ -108,11 +118,6 @@
     "code": "tsp-lintdiff-local-linter/path-parameter-schema",
     "severity": "warning",
     "message": "Path parameter should specify a maximum length (maxLength)."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
-    "severity": "warning",
-    "message": "Properties of a PATCH request body must not be required, property:name."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
