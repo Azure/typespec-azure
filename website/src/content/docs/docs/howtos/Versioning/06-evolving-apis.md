@@ -172,9 +172,9 @@ These scenarios demonstrate more advanced versioning patterns, such as changing 
 
 ---
 
-### Version-Scoping Spread-In Properties with Augment Decorators
+### Versioning Spread-In Properties with Augment Decorators
 
-When you spread a model into a resource (e.g. `...ManagedServiceIdentityProperty`), its properties are introduced into **all** API versions. To introduce a spread-in property in a specific version only, you must use the **augment decorator** (`@@`) form, because you cannot attach an inline `@added` decorator to a member that comes from a spread.
+When you spread a model into a resource (e.g. `...ManagedServiceIdentityProperty`), its properties are introduced into **all** API versions. To introduce a spread-in property in a specific version, you must use the **augment decorator** (`@@added`), because you cannot attach an inline `@added` decorator to a member that comes from a spread.
 
 :::note
 The augment decorator form `@@decorator(Target.member, ...)` applies a decorator to a member of a model from outside the model declaration. This is required for properties introduced via a spread (`...`), since there is no inline declaration site to attach `@added` or `@removed`.
