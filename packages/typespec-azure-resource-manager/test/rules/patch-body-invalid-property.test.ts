@@ -209,6 +209,36 @@ describe("invalid cases", () => {
         message: "Properties of a PATCH request body must not be required, property:notIdentity.",
       });
   });
+
+  it("retargets library property diagnostics to project properties", async () => {
+    await tester
+      .expect(
+        `
+        ${patchOperation("WidgetPatchBody")}
+
+        model Item {}
+
+        model WidgetPatchBody {
+          /*core*/page?: Azure.Core.Page<Item>;
+          /*arm*/managedIdentity?: Azure.ResourceManager.CommonTypes.ManagedServiceIdentity;
+          identity: Azure.ResourceManager.CommonTypes.ManagedServiceIdentity;
+        }
+        `,
+      )
+      .toEmitDiagnostics((x) => [
+        {
+          code: ruleCode,
+          message: "Properties of a PATCH request body must not be required, property:page.value.",
+          pos: x.pos.core.pos,
+        },
+        {
+          code: ruleCode,
+          message:
+            "Properties of a PATCH request body must not be required, property:managedIdentity.type.",
+          pos: x.pos.arm.pos,
+        },
+      ]);
+  });
 });
 
 describe("valid cases", () => {
