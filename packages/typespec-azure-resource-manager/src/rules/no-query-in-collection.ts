@@ -1,5 +1,6 @@
 import { createRule, fileRef, paramMessage } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
+import { isCollectionPath } from "./utils.js";
 
 export const noQueryInCollectionRule = createRule({
   name: "no-query-in-collection",
@@ -46,17 +47,4 @@ export const noQueryInCollectionRule = createRule({
 
 function isAllowedQueryParameter(name: string): boolean {
   return name === "api-version" || name === "$filter";
-}
-
-function isCollectionPath(path: string): boolean {
-  if (!path.includes(".")) {
-    return false;
-  }
-
-  const providerPath = path.split(".").at(-1);
-  return (
-    providerPath !== undefined &&
-    providerPath.includes("/") &&
-    providerPath.split("/").length % 2 === 0
-  );
 }

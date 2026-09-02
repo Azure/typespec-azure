@@ -8,6 +8,7 @@ import {
 import { getHttpOperation } from "@typespec/http";
 import { getExtensions } from "@typespec/openapi";
 import { getArmProviderNamespace } from "../namespace.js";
+import { isCollectionPath } from "./utils.js";
 
 export const listOperationMissingPageableRule = createRule({
   name: "list-operation-missing-pageable",
@@ -38,7 +39,13 @@ export const listOperationMissingPageableRule = createRule({
         }
 
         const [httpOperation] = getHttpOperation(context.program, operation);
-        if (httpOperation.verb !== "get" || !isCollectionGetPath(httpOperation.path)) {
+        if (
+          httpOperation.verb !== "get" ||
+          !isCollectionPath(httpOperation.path, {
+            excludeTerminalPathParameter: true,
+            excludeDefaultSegment: true,
+          })
+        ) {
           return;
         }
 
@@ -59,16 +66,3 @@ export const listOperationMissingPageableRule = createRule({
     };
   },
 });
-
-function isCollectionGetPath(path: string): boolean {
-  if (!path.includes(".") || path.endsWith("}") || path.endsWith("/default")) {
-    return false;
-  }
-
-  const providerTail = path.split(".").at(-1);
-  return (
-    providerTail !== undefined &&
-    providerTail.includes("/") &&
-    providerTail.split("/").length % 2 === 0
-  );
-}
