@@ -1,45 +1,9 @@
+import type { Octokit } from "@octokit/rest";
 import fs from "node:fs";
 import path from "node:path";
 
-type Issue = {
-  number: number;
-  title: string;
-  body?: string | null;
-  pull_request?: object;
-  assignees?: Array<{ login: string }>;
-};
-
-type GitHub = {
-  paginate: (route: unknown, parameters: Record<string, unknown>) => Promise<Issue[]>;
-  graphql: <T>(query: string, variables: Record<string, unknown>) => Promise<T>;
-  rest: {
-    issues: {
-      listForRepo: unknown;
-      create: (parameters: {
-        owner: string;
-        repo: string;
-        title: string;
-        body: string;
-        labels?: string[];
-        assignees?: string[];
-      }) => Promise<{ data: Issue }>;
-      update: (parameters: {
-        owner: string;
-        repo: string;
-        issue_number: number;
-        title?: string;
-        body?: string;
-        assignees?: string[];
-      }) => Promise<{ data: Issue }>;
-      createComment: (parameters: {
-        owner: string;
-        repo: string;
-        issue_number: number;
-        body: string;
-      }) => Promise<unknown>;
-    };
-  };
-};
+type GitHub = InstanceType<typeof Octokit>;
+type Issue = Awaited<ReturnType<GitHub["rest"]["issues"]["listForRepo"]>>["data"][number];
 
 type Context = {
   repo: {

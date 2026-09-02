@@ -72,6 +72,7 @@ catalog:
   "@octokit/core": ^7.0.6
   "@octokit/plugin-paginate-graphql": ^6.0.0
   "@octokit/plugin-rest-endpoint-methods": ^17.0.0
+  "@octokit/rest": ^22.0.1
   "@pinterest/alloy-graphql": ^1.1.0
   "@playwright/test": ^1.60.0
   "@scalar/json-magic": ^0.12.15
