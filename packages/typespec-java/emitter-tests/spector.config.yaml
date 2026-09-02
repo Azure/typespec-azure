@@ -125,7 +125,7 @@ specs:
   type/scalar: true
   type/union: true
   type/union/discriminated: true
-  versioning/added: true
+  versioning/added: { options: { max-overload: model } }
   versioning/madeOptional: true
   versioning/removed: true
   versioning/renamedFrom: true
