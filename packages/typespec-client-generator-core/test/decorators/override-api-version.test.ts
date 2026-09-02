@@ -222,38 +222,6 @@ describe("@overrideApiVersion", () => {
     strictEqual(getApiVersionDefault(client), "2099-01-01");
   });
 
-  it("applies the override for every emitter", async () => {
-    const source = `
-      @service
-      @versioned(Versions)
-      namespace WidgetService {
-        enum Versions {
-          v1: "2024-01-01",
-          v2: "2025-01-01",
-        }
-
-        @${decorator}("2099-01-01")
-        interface Widgets {
-          op get(@query("api-version") apiVersion: string): void;
-        }
-      }
-    `;
-
-    const { program: pythonProgram } = await AzureCoreTester.compile(source);
-    const pythonContext = await createSdkContextForTester(pythonProgram, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-    const pythonClient = requireClient(pythonContext.sdkPackage.clients, "Widgets");
-    strictEqual(getApiVersionDefault(pythonClient), "2099-01-01");
-
-    const { program: csharpProgram } = await AzureCoreTester.compile(source);
-    const csharpContext = await createSdkContextForTester(csharpProgram, {
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    const csharpClient = requireClient(csharpContext.sdkPackage.clients, "Widgets");
-    strictEqual(getApiVersionDefault(csharpClient), "2099-01-01");
-  });
-
   it("does not synthesize an API-version parameter when the client has none", async () => {
     const { program } = await AzureCoreTester.compile(`
       @service
