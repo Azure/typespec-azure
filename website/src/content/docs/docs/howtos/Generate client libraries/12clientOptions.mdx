@@ -21,11 +21,11 @@ The `@clientOption` decorator allows spec authors to pass arbitrary key-value op
 
 ### Parameters
 
-| Parameter | Type                       | Description                                                                                                                       |
-| --------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `name`    | `string`                   | The name of the option to set                                                                                                     |
-| `value`   | `unknown`                  | The option value. Primitive, array, object, and nested values are supported; the consuming emitter determines the expected shape. |
-| `scope`   | `string` (syntax optional) | The target language scope. Every use must provide an explicit scope; omitting it produces a `decorator-requires-scope` warning.   |
+| Parameter | Type                       | Description                                                                                                                                        |
+| --------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`    | `string`                   | The name of the option to set                                                                                                                      |
+| `value`   | `unknown`                  | The option value. Primitive, array, object, nested, and model-reference values are supported; the consuming emitter determines the expected shape. |
+| `scope`   | `string` (syntax optional) | The target language scope. Every use must provide an explicit scope; omitting it produces a `decorator-requires-scope` warning.                    |
 
 The declaration keeps `scope` syntactically optional so TCGC can report a targeted diagnostic for legacy unscoped uses. New and updated specifications must always provide it.
 
@@ -87,7 +87,7 @@ model MyModel {
 
 ### Different Value Types
 
-The decorator supports arbitrary values, including primitives, arrays, objects, and nested combinations:
+The decorator supports arbitrary values, including primitives, arrays, objects, nested combinations, and references to TypeSpec models:
 
 ```typespec title=client.tsp
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
@@ -115,6 +115,8 @@ model StructuredExample {
 }
 ```
 
+Model references are converted to TCGC SDK types for the scoped emitter. Scoped customizations on the referenced model, such as `@alternateType`, are applied before the emitter receives the option value.
+
 ## How Emitters Access Client Options
 
 TCGC provides the `getClientOptions` helper function to extract an option by name from any decorated SDK type.
@@ -133,7 +135,7 @@ if (enableFeatureFoo === true) {
 }
 ```
 
-The function returns the option value as `unknown`, or `undefined` when the named option isn't present. Narrow or validate the value before using it, then call it once for each option key your emitter supports.
+The function returns the option value as `unknown`, or `undefined` when the named option isn't present. Model-reference values are returned as their converted TCGC SDK type rather than as raw TypeSpec models. Narrow or validate the value before using it, then call it once for each option key your emitter supports.
 
 ### Works with Any Decorated SDK Type
 

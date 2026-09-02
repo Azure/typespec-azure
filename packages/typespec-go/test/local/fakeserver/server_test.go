@@ -7,6 +7,8 @@ import (
 	"context"
 	"fakeserver"
 	"fakeserver/fake"
+	"math"
+	"strconv"
 	"testing"
 	"time"
 
@@ -156,6 +158,90 @@ func TestDoubleDecodeQueryParamPlusAndSpace(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, tt.path, receivedPath, "path param mismatch")
 			require.Equal(t, tt.query, receivedQuery, "query param mismatch")
+		})
+	}
+}
+
+// TestReservedCharactersFake verifies that a path parameter allowing reserved characters
+// (RFC 6570 reserved expansion) round-trips verbatim through the fake server. The client
+// skips url.PathEscape for these values, so the fake must not call url.PathUnescape,
+// otherwise reserved characters such as '/' and any '%' sequences would be corrupted.
+func TestReservedCharactersFake(t *testing.T) {
+	for _, pathValue := range []string{
+		"subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg",
+		"a/b:c@d!e$f&g'h(i)j*k+l,m;n=o.p_q~r-s",
+		"single-segment",
+	} {
+		t.Run(pathValue, func(t *testing.T) {
+			var receivedPath string
+			client, err := fakeserver.NewClientWithNoCredential("https://fake.endpoint", &fakeserver.ClientOptions{
+				ClientOptions: policy.ClientOptions{
+					Transport: fake.NewServerTransport(&fake.Server{
+						ReservedCharacters: func(_ context.Context, pathParam string, _ *fakeserver.ClientReservedCharactersOptions) (resp azfake.Responder[fakeserver.ClientReservedCharactersResponse], errResp azfake.ErrorResponder) {
+							receivedPath = pathParam
+							resp.SetResponse(http.StatusNoContent, fakeserver.ClientReservedCharactersResponse{}, nil)
+							return
+						},
+					}),
+				},
+			})
+			require.NoError(t, err)
+
+			_, err = client.ReservedCharacters(context.Background(), pathValue, nil)
+			require.NoError(t, err)
+			require.Equal(t, pathValue, receivedPath, "reserved-character path param did not round-trip")
+		})
+	}
+}
+
+// TestIntPathFake verifies that a non-string (int32) path parameter is parsed correctly
+// by the fake server rather than being treated as a string.
+func TestIntPathFake(t *testing.T) {
+	for _, value := range []int32{0, 42, -7, math.MaxInt32, math.MinInt32} {
+		t.Run(strconv.FormatInt(int64(value), 10), func(t *testing.T) {
+			var received int32
+			client, err := fakeserver.NewClientWithNoCredential("https://fake.endpoint", &fakeserver.ClientOptions{
+				ClientOptions: policy.ClientOptions{
+					Transport: fake.NewServerTransport(&fake.Server{
+						IntPath: func(_ context.Context, v int32, _ *fakeserver.ClientIntPathOptions) (resp azfake.Responder[fakeserver.ClientIntPathResponse], errResp azfake.ErrorResponder) {
+							received = v
+							resp.SetResponse(http.StatusNoContent, fakeserver.ClientIntPathResponse{}, nil)
+							return
+						},
+					}),
+				},
+			})
+			require.NoError(t, err)
+
+			_, err = client.IntPath(context.Background(), value, nil)
+			require.NoError(t, err)
+			require.Equal(t, value, received, "int path param did not round-trip")
+		})
+	}
+}
+
+// TestIntEnumPathFake verifies that a path parameter whose type is an int-based enum is
+// parsed and cast to the enum type by the fake server.
+func TestIntEnumPathFake(t *testing.T) {
+	for _, value := range fakeserver.PossibleIntEnumValues() {
+		t.Run(strconv.FormatInt(int64(value), 10), func(t *testing.T) {
+			var received fakeserver.IntEnum
+			client, err := fakeserver.NewClientWithNoCredential("https://fake.endpoint", &fakeserver.ClientOptions{
+				ClientOptions: policy.ClientOptions{
+					Transport: fake.NewServerTransport(&fake.Server{
+						IntEnumPath: func(_ context.Context, v fakeserver.IntEnum, _ *fakeserver.ClientIntEnumPathOptions) (resp azfake.Responder[fakeserver.ClientIntEnumPathResponse], errResp azfake.ErrorResponder) {
+							received = v
+							resp.SetResponse(http.StatusNoContent, fakeserver.ClientIntEnumPathResponse{}, nil)
+							return
+						},
+					}),
+				},
+			})
+			require.NoError(t, err)
+
+			_, err = client.IntEnumPath(context.Background(), value, nil)
+			require.NoError(t, err)
+			require.Equal(t, value, received, "int-enum path param did not round-trip")
 		})
 	}
 }

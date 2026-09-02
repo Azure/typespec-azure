@@ -312,7 +312,7 @@ function generateConstructors(
         // emit empty path param checks
         if (param.kind === "pathScalarParam") {
           if (!param.isApiVersion) {
-            bodyText += helpers.emitEmptyPathParamCheck(param, imports, indent);
+            bodyText += helpers.emitEmptyPathParamCheck(param, "ctor", imports, indent);
           }
         }
 
@@ -424,7 +424,7 @@ function generateConstructors(
                 // emit empty path param checks
                 if (param.kind === "pathScalarParam") {
                   if (!param.isApiVersion) {
-                    prolog += helpers.emitEmptyPathParamCheck(param, imports, indent);
+                    prolog += helpers.emitEmptyPathParamCheck(param, "ctor", imports, indent);
                   }
                 }
               }
