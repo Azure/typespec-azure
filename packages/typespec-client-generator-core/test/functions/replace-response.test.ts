@@ -22,6 +22,7 @@ it("replaces the generated method response with void without changing HTTP respo
     @post op create(): Widget | Error;
 
     alias CustomizedCreate = replaceResponseWithVoid(TestService.create);
+    #suppress "@azure-tools/typespec-client-generator-core/override-response-replacement" "intentional response replacement"
     @@override(TestService.create, CustomizedCreate);
   `);
 
@@ -46,6 +47,7 @@ it("replaces a response with bytes", async () => {
     @get op download(): Metadata;
 
     #suppress "experimental-feature" "testing replaceResponseWithBytes"
+    #suppress "@azure-tools/typespec-client-generator-core/override-response-replacement" "intentional response replacement"
     @@override(TestService.download, replaceResponseWithBytes(TestService.download));
   `);
 
@@ -69,6 +71,7 @@ it("removes pageable behavior when overriding a list operation with bytes", asyn
     @list
     op listBlobs(): BlobPage;
 
+    #suppress "@azure-tools/typespec-client-generator-core/override-response-replacement" "intentional response replacement"
     @@override(
       TestService.listBlobs,
       replaceResponseWithBytes(TestService.listBlobs),
@@ -108,6 +111,7 @@ it("composes response replacement with other operation transformations", async (
         #suppress "experimental-feature" "testing replaceParameter"
         alias WithRequiredName = replaceParameter(TestService.create, "name", CreateResult.id);
         #suppress "experimental-feature" "testing replaceResponseWithVoid"
+        #suppress "@azure-tools/typespec-client-generator-core/override-response-replacement" "intentional response replacement"
         @@override(TestService.create, replaceResponseWithVoid(WithRequiredName));
       `,
     ),
@@ -136,6 +140,7 @@ describe("scoped response replacement", () => {
 
   const customizationCode = `
     #suppress "experimental-feature" "testing replaceResponseWithVoid"
+    #suppress "@azure-tools/typespec-client-generator-core/override-response-replacement" "intentional response replacement"
     @@override(TestService.create, replaceResponseWithVoid(TestService.create), "python");
   `;
 

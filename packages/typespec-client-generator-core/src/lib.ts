@@ -267,6 +267,20 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Method "${"methodName"}" has different parameters definition from the override operation. Please check the parameter defined in the override operation: "${"checkParameter"}".`,
       },
     },
+    "override-response-mismatch": {
+      ...doc("override-response-mismatch"),
+      severity: "error",
+      messages: {
+        default: paramMessage`Method "${"methodName"}" has a different response type in the override operation. Use replaceResponseWithVoid or replaceResponseWithBytes for an intentional response replacement.`,
+      },
+    },
+    "override-response-replacement": {
+      ...doc("override-response-replacement"),
+      severity: "warning",
+      messages: {
+        default: paramMessage`Method "${"methodName"}" has an intentional response replacement in the override operation. Suppress this warning if the replacement is expected.`,
+      },
+    },
     "duplicate-client-name": {
       ...doc("duplicate-client-name"),
       severity: "error",
