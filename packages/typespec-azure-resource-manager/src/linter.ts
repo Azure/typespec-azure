@@ -34,13 +34,13 @@ import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
-import { requestBodyMustBeObjectRule } from "./rules/request-body-must-be-object.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 import { useApiVersionRule } from "./rules/use-api-version.js";
 import { useInterfaceRule } from "./rules/use-interface.js";
+import { useModelRequestBodyRule } from "./rules/use-model-request-body.js";
 import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
@@ -84,10 +84,10 @@ const rules = [
   operationsInterfaceMissingRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
-  requestBodyMustBeObjectRule,
   resourceNameRule,
   retryAfterRule,
   unsupportedTypeRule,
+  useModelRequestBodyRule,
   secretProprule,
   noEmptyModel,
   noReservedResourcePropertyRule,

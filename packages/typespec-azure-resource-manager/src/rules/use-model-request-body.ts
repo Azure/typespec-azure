@@ -5,7 +5,6 @@ import {
   createRule,
   fileRef,
   getEncode,
-  getFormat,
   getFriendlyName,
   getLocationContext,
   getNamespaceFullName,
@@ -16,15 +15,14 @@ import {
 } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 
-export const requestBodyMustBeObjectRule = createRule({
-  name: "request-body-must-be-object",
-  docs: fileRef.fromPackageRoot("src/rules/request-body-must-be-object.md"),
-  description: "Request bodies must resolve to object schemas.",
+export const useModelRequestBodyRule = createRule({
+  name: "use-model-request-body",
+  docs: fileRef.fromPackageRoot("src/rules/use-model-request-body.md"),
+  description: "Request bodies must use models.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/request-body-must-be-object",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-model-request-body",
   messages: {
-    default:
-      "Request bodies must resolve to object schemas. Replace this non-object body type with a model.",
+    default: "Request bodies must use models. Replace this non-model body type with a model.",
   },
   create(context) {
     return {
@@ -37,7 +35,7 @@ export const requestBodyMustBeObjectRule = createRule({
 
         if (body.bodyKind === "single") {
           const schemaType = getEmittedSchemaType(context.program, body.type);
-          if (schemaType === undefined || isObjectSchemaType(schemaType)) {
+          if (schemaType === undefined || isModelSchemaType(schemaType)) {
             return;
           }
         }
@@ -53,7 +51,7 @@ export const requestBodyMustBeObjectRule = createRule({
   },
 });
 
-function isObjectSchemaType(type: Type): boolean {
+function isModelSchemaType(type: Type): boolean {
   return type.kind === "Model" && !isArraySchemaType(type);
 }
 
@@ -122,7 +120,7 @@ function getEmittedEncodingType(
   if (!encoding || encoding.type === target) {
     return "none";
   }
-  const targetFormat = isSecret(program, target) ? "password" : getFormat(program, target);
+  const targetFormat = isSecret(program, target) ? "password" : undefined;
   const encodedSchema = getEmittedScalarSchema(program, encoding.type);
   const mergedFormat = mergeFormatAndEncoding(
     targetFormat,
@@ -214,10 +212,6 @@ function getEmittedScalarSchema(
       ? getEmittedScalarSchema(program, scalar.baseScalar, activePath)
       : { hasType: false };
 
-  const format = getFormat(program, scalar);
-  if (format && isSupportedAutorestFormat(format)) {
-    schema = { ...schema, format };
-  }
   if (isSecret(program, scalar)) {
     schema = { ...schema, format: "password" };
   }
@@ -233,51 +227,11 @@ function getEmittedScalarSchema(
     if (mergedFormat) {
       schema = {
         hasType: encodedSchema.hasType,
-        format: isSupportedAutorestFormat(mergedFormat) ? mergedFormat : schema.format,
+        format: mergedFormat,
       };
     }
   }
   return schema;
-}
-
-const allowedAutorestFormats = new Set([
-  "int32",
-  "int64",
-  "float",
-  "double",
-  "unixtime",
-  "decimal",
-  "byte",
-  "binary",
-  "date",
-  "date-time",
-  "password",
-  "char",
-  "time",
-  "date-time-rfc1123",
-  "date-time-rfc7231",
-  "duration",
-  "uuid",
-  "base64url",
-  "url",
-  "odata-query",
-  "certificate",
-  "uri",
-  "uri-reference",
-  "uri-template",
-  "email",
-  "hostname",
-  "ipv4",
-  "ipv6",
-  "regex",
-  "json-pointer",
-  "relative-json-pointer",
-  "arm-id",
-  "duration-constant",
-]);
-
-function isSupportedAutorestFormat(format: string): boolean {
-  return allowedAutorestFormats.has(format.toLowerCase());
 }
 
 function getStandardScalarSchema(name: string): EmittedScalarSchema {

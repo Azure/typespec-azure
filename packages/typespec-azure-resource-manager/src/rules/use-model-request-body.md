@@ -1,10 +1,10 @@
-Use an object model for every Azure Resource Manager request body that has an explicit schema type.
+Use a model for every Azure Resource Manager request body that has an explicit schema type.
 
 ## Impact
 
 - **Area:** API, SDK
 
-Object request bodies can evolve by adding optional properties without changing the top-level wire shape. Primitive and array bodies cannot gain new fields without a breaking API and generated-SDK change.
+Model request bodies can evolve by adding optional properties without changing the top-level wire shape. Primitive and array bodies cannot gain new fields without a breaking API and generated-SDK change.
 
 Schemas without an explicit type, such as `unknown` and unsupported model unions, are outside this rule's scope. Nullable and singleton unions use their effective emitted schema type, while unions emitted as string or number enums are rejected. Operations without a request body are also allowed.
 
@@ -51,7 +51,7 @@ op submitNullable(@body body: SubmitRequest | null): void;
 
 ## Suppression
 
-Suppress only when required to preserve an existing API; otherwise replace the request body with an object model.
+Suppress only when required to preserve an existing API; otherwise replace the request body with a model.
 
 ## LintDiff Equivalent
 

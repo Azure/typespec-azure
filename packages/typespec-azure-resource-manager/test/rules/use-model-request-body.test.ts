@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
-import { requestBodyMustBeObjectRule } from "../../src/rules/request-body-must-be-object.js";
+import { useModelRequestBodyRule } from "../../src/rules/use-model-request-body.js";
 
 let tester: LinterRuleTester;
 
@@ -14,15 +14,14 @@ beforeEach(async () => {
   const runner: TesterInstance = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    requestBodyMustBeObjectRule,
+    useModelRequestBodyRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
 
 const diagnostic = {
-  code: "@azure-tools/typespec-azure-resource-manager/request-body-must-be-object",
-  message:
-    "Request bodies must resolve to object schemas. Replace this non-object body type with a model.",
+  code: "@azure-tools/typespec-azure-resource-manager/use-model-request-body",
+  message: "Request bodies must use models. Replace this non-model body type with a model.",
 };
 
 it("reports a primitive POST request body", async () => {
@@ -385,7 +384,7 @@ it("reports scalar and inline-property encodings that emit a schema type", async
     .toEmitDiagnostics(Array.from({ length: 5 }, () => diagnostic));
 });
 
-it("reports nested encodings and preserves the date-time type for an empty encoding", async () => {
+it("reports typed nested encodings and ignores untyped replacements", async () => {
   await tester
     .expect(
       `
@@ -418,7 +417,7 @@ it("reports nested encodings and preserves the date-time type for an empty encod
       ): void;
     `,
     )
-    .toEmitDiagnostics(Array.from({ length: 3 }, () => diagnostic));
+    .toEmitDiagnostics(Array.from({ length: 2 }, () => diagnostic));
 });
 
 it("allows schema-less scalar, enum, and encoded scalar request bodies", async () => {
