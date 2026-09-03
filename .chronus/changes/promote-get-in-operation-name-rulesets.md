@@ -4,4 +4,5 @@ packages:
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-Register the Azure Core `get-operation-name` rule as disabled by default.
+Register the `@azure-tools/typespec-client-generator-core` `get-operation-name` rule as disabled by
+default.

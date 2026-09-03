@@ -4,6 +4,14 @@ with `Get` or `List`, either directly or after an operation-group prefix.
 
 Changing an operation ID after publishing an SDK can be a breaking change.
 
+## Impact
+
+- **Area:** SDK generation. The operation ID determines the generated method name, so a GET
+  operation without `Get` or `List` is less discoverable and does not clearly communicate whether
+  it returns one resource or a collection.
+- **Compatibility:** Renaming an operation ID after an SDK has shipped can rename generated methods
+  and break existing client code.
+
 ## Examples
 
 ### Incorrect
@@ -30,8 +38,19 @@ List operations may start with `list`.
 op listWidgets(): Widget[];
 ```
 
+## Suppression
+
+Suppress this warning only when the operation ID has already shipped and renaming the generated SDK
+method would be a breaking change. Document the compatibility reason in the suppression:
+
+```tsp
+#suppress "@azure-tools/typespec-client-generator-core/get-operation-name" "Preserve the shipped SDK method name."
+@route("/widgets/{name}")
+@get
+op fetchWidget(@path name: string): Widget;
+```
+
 ## LintDiff Equivalent
 
-This rule is equivalent to the Azure OpenAPI Validator
-[`GetInOperationName`](https://github.com/Azure/azure-openapi-validator/blob/main/docs/get-in-operation-name.md)
-rule.
+This rule corresponds to the Azure OpenAPI Validator
+[`GetInOperationName` (R1005)](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r1005).
