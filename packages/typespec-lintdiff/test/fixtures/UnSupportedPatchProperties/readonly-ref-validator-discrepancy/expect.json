@@ -1,0 +1,9 @@
+{
+  "violation": false,
+  "validatorDiagnostics": [
+    {
+      "code": "UnSupportedPatchProperties",
+      "count": 1
+    }
+  ]
+}
