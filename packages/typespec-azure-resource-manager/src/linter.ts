@@ -30,6 +30,7 @@ import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
 import { noOverridePropsRule } from "./rules/no-override-props.js";
 import { noQueryInCollectionRule } from "./rules/no-query-in-collection.js";
+import { noQueryInPointOpRule } from "./rules/no-query-in-point-op.js";
 import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
@@ -91,6 +92,7 @@ const rules = [
   secretProprule,
   noEmptyModel,
   noReservedResourcePropertyRule,
+  noQueryInPointOpRule,
 ];
 
 export const $linter = defineLinter({
