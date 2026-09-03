@@ -63,10 +63,9 @@ model CustomWidgetListResult {
 /** List all widgets. */
 @route("/subscriptions/{subscriptionId}/providers/Microsoft.TestService/allWidgets")
 @get
-op listAllWidgets(
-  ...ApiVersionParameter,
-  ...SubscriptionIdParameter,
-): CustomWidgetListResult | ErrorResponse;
+op listAllWidgets(...ApiVersionParameter, ...SubscriptionIdParameter):
+  | CustomWidgetListResult
+  | ErrorResponse;
 
 /** List widgets beneath an arbitrary ARM resource URI. */
 @route("/{resourceUri}/providers/Microsoft.TestService/nestedWidgets")

@@ -44,6 +44,26 @@ Accept either:
 
 If neither is available, ask the user for the pull request URL or number.
 
+## Pull request modes
+
+Classify the target before creating subagents:
+
+- **standard PR mode** applies to ordinary pull requests, including lintdiff
+  rule-development or repair pull requests.
+- **promotion PR mode** applies when the semantic PR diff promotes a rule from
+  `packages/typespec-lintdiff` into an official TypeSpec Azure library under the
+  `/lintdiff-rule-promote` workflow. Detect promotion candidates from the files
+  and behavior in the PR diff independently of whether their recorded lintdiff
+  source provenance is complete; do not infer promotion mode from a title or
+  label alone. A promotion candidate with missing or unverifiable provenance is
+  a blocker, not a standard PR.
+
+In promotion PR mode, the promoted library copy is a handoff from an immutable
+lintdiff source rule. Review fixes may correct promotion adaptation, native
+tests, documentation, generated official-library references, ruleset
+registration, or change metadata. They must not silently change the source
+rule's semantics only in the promoted copy.
+
 ## Loop limits
 
 - Run at most **five review/fix rounds**.
@@ -76,13 +96,41 @@ If neither is available, ask the user for the pull request URL or number.
    ```
 
 2. Confirm the pull request is open.
-3. Confirm the current worktree is the pull request's head branch and has no
-   unrelated changes. Do not overwrite, discard, or include unrelated work.
-4. Create the two persistent subagents once. Pin the fix subagent to
+3. In standard PR mode, confirm the current worktree is the pull request's head
+   branch and has no unrelated changes. Do not overwrite, discard, or include
+   unrelated work.
+   In promotion PR mode, the orchestrating session may start in another
+   worktree or a folder outside the target checkout. Discover an existing local
+   promotion worktree from the available repository worktree or workspace
+   inventory and pin its absolute path as the `target worktree`. Require that
+   target worktree to be checked out at the pull request's head branch and head
+   SHA, with a completely clean index and working tree. If no such worktree can
+   be discovered, stop immediately and report that an existing local promotion
+   worktree is required. Do not create a worktree, check out the promotion
+   branch in another worktree, invoke `/lintdiff-rule-promote` to reconstruct
+   one, or otherwise prepare promotion state as part of this loop. If a
+   candidate target worktree has any local changes, stop and report its path and
+   changed files. Do not clean, stash, overwrite, or include those changes.
+   After pinning the path, run every promotion filesystem inspection,
+   validation, edit, commit, and push explicitly in that target worktree; never
+   rely on the orchestrating session's current directory.
+4. In promotion PR mode, resolve and record the immutable lintdiff source rule,
+   source branch or ref, source commit, and migration evidence identified by the
+   promotion PR. If this provenance is missing or cannot be verified, stop as a
+   blocker rather than guessing the source behavior.
+5. Create the two persistent subagents once in background mode so the parent can
+   deliver later rounds with `write_agent`. A sync-mode task is not persistent
+   for this workflow and must not be used. Pin the fix subagent to
    `gpt-5.6-sol`; do not allow automatic model selection or substitution for
    that role. The review subagent does not require this model pin. Reuse the
-   same agents in every round so each retains its prior context.
-5. Maintain a round ledger containing:
+   same agents in every round so each retains its prior context. Before
+   processing backlog comments or requesting a review, verify that both agent
+   IDs accept follow-up messages; if either does not, stop before GitHub or
+   worktree side effects.
+6. Maintain a round ledger containing:
+   - pull request mode: `standard` or `promotion`
+   - absolute target worktree path in promotion PR mode
+   - promotion source provenance when applicable
    - round number
    - head SHA reviewed
    - pre-request and post-request timeline request-event cursors, including the
@@ -96,7 +144,8 @@ If neither is available, ask the user for the pull request URL or number.
    - Copilot review ID and submission timestamp
    - comment IDs delivered to the fix subagent
    - validity decision for each comment
-   - validation and corpus results
+   - promotion finding category when applicable
+   - validation procedure and corpus results when applicable
    - pushed fix commit SHA
    - processed review-thread IDs and their final resolution state
 
@@ -116,7 +165,9 @@ Before requesting the first review, the parent agent owns these steps:
    comments whose current `line` or `originalLine` is null; an outdated
    position does not make an unresolved finding disappear.
 4. Deliver the backlog to the fix subagent before requesting another review.
-   If it changes production linter behavior, run the required corpus procedure.
+   In standard PR mode, if it changes production linter behavior, run the
+   required corpus procedure. In promotion PR mode, use the promotion validation
+   procedure below and never run the lintdiff corpus harness.
 5. After a valid fix is pushed, reply to each processed thread with the fix
    commit or rationale and resolve it. For an invalid or inapplicable finding,
    reply with the technical rationale and resolve it without changing code.
@@ -158,10 +209,43 @@ ledger. It owns these steps:
    Do not poll for a completed review, report a successful request, or continue
    the round unless the result is `new-verified` or
    `already-pending-active`.
+
 5. Wait for a new review submitted by
    `copilot-pull-request-reviewer[bot]` after the active request event. Poll
    GitHub at a moderate interval rather than repeatedly requesting reviews.
    Allow up to 30 minutes.
+   - Compare submission timestamps without changing their timezone. Prefer
+     filtering the raw GitHub JSON with `gh api --jq` and comparing normalized
+     UTC instants. If PowerShell parses the response with `ConvertFrom-Json`,
+     compare its UTC `DateTime` value directly with the request event's
+     `UtcDateTime`. Never pass that converted `DateTime` back through
+     `[DateTimeOffset]::Parse(...)`: PowerShell can stringify it without the
+     `Z`, reinterpret it in the local timezone, and make a new review appear
+     older than the request.
+     A safe PowerShell comparison for `ConvertFrom-Json` output is:
+
+     ```powershell
+     $eventUtc = [DateTimeOffset]::Parse($activeRequestCreatedAt).UtcDateTime
+     $submittedUtc = if ($review.submitted_at -is [DateTime]) {
+       $review.submitted_at.ToUniversalTime()
+     } else {
+       [DateTimeOffset]::Parse(
+         [string]$review.submitted_at,
+         [Globalization.CultureInfo]::InvariantCulture
+       ).UtcDateTime
+     }
+     $isNewReview = $submittedUtc -gt $eventUtc
+     ```
+
+   - On every poll, record the current head and the newest Copilot review ID and
+     submitted timestamp observed, even when it predates the active request.
+     Treat a missing or unparseable timestamp as a polling failure instead of
+     silently reporting `no new review`.
+   - Once the review-list endpoint includes a matching review, detect it within
+     the current polling interval. If a final or differently implemented
+     refetch finds a review that earlier polls missed, report the poll as
+     unreliable and retain both observations in the ledger; do not attribute
+     the delay to Copilot.
 6. Confirm the completed review applies to the round's head SHA. If the PR head
    changed while review was pending, stop the round as stale.
 7. Fetch all inline comments belonging to the new review by its numeric review
@@ -189,7 +273,14 @@ next review on its own.
 ## Fix subagent
 
 Deliver the complete structured comment list to the same persistent fix
-subagent each round. It owns these steps:
+subagent each round. In promotion PR mode, every backlog and round handoff must
+also include the absolute target worktree path; instruct the subagent to perform
+all file reads, edits, validation, git status checks, staging, commits, and
+pushes from that path. Include the pinned lintdiff source ref and commit, exact
+source rule and migration-evidence paths, and the verified source-semantics
+summary recorded in the ledger. The fix subagent must use that evidence when
+distinguishing a promotion adaptation issue from a source semantic issue. It
+owns these steps:
 
 1. **Analyze before editing.** Investigate the relevant source, tests, call
    sites, repository conventions, and pull request intent for every comment.
@@ -208,35 +299,60 @@ subagent each round. It owns these steps:
    - `valid-actionable`
    - `invalid-or-not-applicable`
    - `uncertain-or-blocked`
+     In promotion PR mode, also classify each non-invalid finding as:
+   - `promotion-adaptation-issue`: the promoted copy, native tests,
+     documentation, generated official-library references, ruleset
+     registration, or change metadata incorrectly adapts the verified immutable
+     source
+   - `source-semantic-issue`: the finding would require changing the intended
+     semantics of the immutable lintdiff source rule or making the promoted copy
+     intentionally diverge from it
 3. Give a concrete technical rationale for every classification. A Copilot
    suggestion is not evidence by itself.
 4. Stop and return the evidence for parent/user guidance if any finding is
-   `uncertain-or-blocked`.
+   `uncertain-or-blocked`. In promotion PR mode, always classify a verified
+   `source-semantic-issue` as `uncertain-or-blocked` for this loop and stop the
+   promotion. Report that the source rule must return to lintdiff repair; do not
+   edit either the immutable source or the promoted copy.
 5. If no finding is `valid-actionable`, make no changes and return
    `no-valid-comments`.
 6. Apply all and only the `valid-actionable` findings that are in the pull
-   request's scope. Add or update regression tests where appropriate.
+   request's scope. In promotion PR mode, every applied finding must also be a
+   `promotion-adaptation-issue`. Add or update regression tests where
+   appropriate.
 7. Run the narrowest existing tests, build, and lint commands that cover the
    changed behavior. Follow all repository commit-time formatting and linting
    requirements before committing.
 
 ### Linter source changes
 
-Run the corpus procedure only when a valid fix changes production linter-rule
-code. Changes limited to tests, fixtures, snapshots, documentation, or
-`migration.md` do not require corpus validation.
+In standard PR mode, run the corpus procedure only when a valid fix changes
+production linter-rule code. Changes limited to tests, fixtures, snapshots,
+documentation, or `migration.md` do not require corpus validation. When
+production linter-rule code changes, follow the current linter-source validation
+and corpus procedure in `/develop-lintdiff-rule` in full. Treat that skill as
+the source of truth for setup, commands, evidence updates, analysis, and
+generated-output cleanup. Surface any required validation or corpus failure and
+stop the loop.
 
-When production linter-rule code changes, follow the current linter-source
-validation and corpus procedure in `/develop-lintdiff-rule` in full. Treat that
-skill as the source of truth for setup, commands, evidence updates, analysis,
-and generated-output cleanup. Surface any required validation or corpus failure
-and stop the loop.
+In promotion PR mode, do not run `/develop-lintdiff-rule`, the lintdiff fixture
+harness, or corpus validation. Follow the current targeted validation procedure
+in `/lintdiff-rule-promote`, including focused native rule tests, affected
+package build and lint, required documentation regeneration and formatting,
+rulesets build and test when applicable, affected package tests, and bounded
+broader validation when warranted. Treat `/lintdiff-rule-promote` as the source
+of truth for the exact current commands and generated-output checks. A
+production rule edit is permitted only when it is a verified
+`promotion-adaptation-issue` that preserves the immutable source semantics.
+Surface any required promotion validation failure and stop the loop.
 
 ### Commit and push
 
 After all required validation succeeds:
 
-1. Reconfirm the worktree diff contains no unrelated or generated corpus data.
+1. Reconfirm the target worktree diff contains no unrelated or generated corpus
+   data. In promotion PR mode, run this and all remaining git commands from the
+   ledger's absolute target worktree path.
 2. Stage only explicit files belonging to the accepted findings. Do not use a
    broad staging command.
 3. Create a new commit; do not amend an existing commit.

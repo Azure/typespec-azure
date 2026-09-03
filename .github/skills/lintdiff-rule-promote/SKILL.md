@@ -27,6 +27,11 @@ official-library PR is prepared in a clean worktree.
   lintdiff development or repair flow first.
 - Do not edit or clean up the current lintdiff worktree as part of promotion.
   The promotion PR must be created from a separate worktree.
+- Create and push the promotion PR's source branch in the canonical
+  `Azure/typespec-azure` repository through the `origin` remote, not in a
+  personal fork. Verify that `origin` points to `Azure/typespec-azure` before
+  creating the worktree. If `origin` is not writable, stop and report the
+  permission blocker; do not silently fall back to a fork.
 - Treat the user-marked done lintdiff rule as immutable during promotion. Do not
   change `packages/typespec-lintdiff` source, fixtures, snapshots, package
   manifests, or docs unless the user explicitly redirects from promotion back to
@@ -177,9 +182,10 @@ Stop until the user selects the destination.
 ### 3. Create a clean promotion worktree
 
 1. Keep the current lintdiff worktree untouched.
-2. Fetch the Azure main branch (`upstream/main` or `origin/main`, depending on
-   local remotes).
-3. Create a new worktree and dedicated branch from the Azure main branch. Use the
+2. Verify that `origin` points to the canonical `Azure/typespec-azure`
+   repository, then fetch `origin/main`. Do not use a personal-fork remote for
+   either the base or the eventual PR source branch.
+3. Create a new worktree and dedicated branch from `origin/main`. Use the
    canonical validator rule slug in both the branch and worktree directory name
    so the promotion source can be linked and the worktree can be reused later,
    for example:
@@ -485,8 +491,11 @@ promotion diff. The review should inspect:
 - absence of generated lintdiff corpus artifacts
 
 Commit only the promotion-worktree changes needed for the native-library PR.
-Push the promotion branch to the user's fork and create a draft PR against
-`Azure/typespec-azure` `main`.
+Push the promotion branch to `origin` (for example,
+`git push --set-upstream origin HEAD`) and create a same-repository draft PR
+whose head branch and `main` base both belong to `Azure/typespec-azure`. If the
+push is rejected, stop and report the permission blocker; do not push the branch
+to a personal fork instead.
 
 Use this stable PR title pattern:
 
