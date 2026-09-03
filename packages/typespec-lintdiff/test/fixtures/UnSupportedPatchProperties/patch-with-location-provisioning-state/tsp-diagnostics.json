@@ -1,0 +1,147 @@
+[
+  {
+    "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+    "severity": "warning",
+    "message": "Use the latest ARM common-types version 'v6' instead of 'v5'."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
+    "severity": "warning",
+    "message": "Top-level resource 'Widget' should define a list by resource group operation."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Model named 'WidgetProperties' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'description' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
+    "severity": "warning",
+    "message": "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum or a union of string values, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/patch-envelope",
+    "severity": "warning",
+    "message": "The Resource PATCH request for resource 'Widget' is missing envelope properties:  [tags]. Since these properties are supported in the resource, they must also be updatable via PATCH."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Model named 'WidgetPatch' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'location' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'properties' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Model named 'WidgetPatchProperties' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'provisioningState' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'description' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'update' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'body' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+    "severity": "warning",
+    "message": "Resource PATCH models must be a subset of the resource type. The following properties: [body] do not exist in resource Model 'Widget'."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+    "severity": "warning",
+    "message": "PATCH request body property 'location' is not patchable and should be removed or made read-only/immutable."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+    "severity": "warning",
+    "message": "PATCH request body property 'properties.provisioningState' is not patchable and should be removed or made read-only/immutable."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-nullable",
+    "severity": "warning",
+    "message": "Don't use `| null`. If you meant to have an optional property, use `?`. (e.g. `myProp?: string`)"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  }
+]

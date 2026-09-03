@@ -1,0 +1,27 @@
+{
+  "violation": false,
+  "ambientDiagnostics": [
+    "@azure-tools/typespec-autorest/union-unsupported",
+    {
+      "code": "@azure-tools/typespec-azure-core/documentation-required",
+      "count": 10
+    },
+    "@azure-tools/typespec-azure-core/no-unnamed-types",
+    {
+      "code": "@azure-tools/typespec-azure-core/operation-missing-api-version",
+      "count": 2
+    },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+      "count": 4
+    },
+    "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
+    "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+    "tsp-lintdiff-local-linter/non-application-json-type",
+    "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
+    {
+      "code": "tsp-lintdiff-local-linter/xms-examples-required",
+      "count": 2
+    }
+  ]
+}
