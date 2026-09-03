@@ -281,10 +281,8 @@ function buildClientOperationGroups(
       const propertyType = `${rawGroupName}Operations`;
       // The `groupName` is used to any places where we don't need normalized name again
       const groupName = normalizeName(prefixes[0] ?? "", NameType.Property);
-      const existProperty = clientClass.getProperties().filter((p) => {
-        return p.getName() === normalizeName(groupName, NameType.Property);
-      });
-      if (!existProperty || existProperty.length === 0) {
+      const existingProperty = clientClass.getProperty(groupName);
+      if (!existingProperty) {
         clientClass.addProperty({
           name: groupName,
           type: resolveReference(refkey(client, propertyType, layer, "classicOperations")),

@@ -378,6 +378,64 @@ export interface my_groupOperations {
 }
 ```
 
+# Nested exact operation groups
+
+Nested operation groups with the same exact root name should add only one property to the
+classic client.
+
+## TypeSpec
+
+```tsp
+namespace Operations {
+  @route("/direct")
+  @get
+  op directOperation(): void;
+
+  namespace ChildOne {
+    @route("/child-one")
+    @get
+    op childOneOperation(): void;
+  }
+
+  namespace ChildTwo {
+    @route("/child-two")
+    @get
+    op childTwoOperation(): void;
+  }
+}
+
+#suppress "experimental-feature" "exact name test"
+@@clientName(Operations, exact("my_group"));
+```
+
+```yaml
+needTCGC: true
+```
+
+## Classic client
+
+```ts classicClient
+import { my_groupOperations, _getmy_groupOperations } from "./classic/my_group/index.js";
+import { Pipeline } from "@azure/core-rest-pipeline";
+
+export type { TestingClientOptionalParams } from "./api/testingContext.js";
+
+export class TestingClient {
+  private _client: TestingContext;
+  /** The pipeline used by this client to make requests */
+  public readonly pipeline: Pipeline;
+
+  constructor(endpointParam: string, options: TestingClientOptionalParams = {}) {
+    this._client = createTesting(endpointParam, options);
+    this.pipeline = this._client.pipeline;
+    this.my_group = _getmy_groupOperations(this._client);
+  }
+
+  /** The operation groups for my_group */
+  public readonly my_group: my_groupOperations;
+}
+```
+
 # Exact client name
 
 An exact client name should be emitted without normalization.
