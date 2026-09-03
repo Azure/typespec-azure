@@ -1415,7 +1415,9 @@ export function getSdkModelPropertyType(
       kind: "property",
       optional: type.optional,
       discriminator: false,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- kept for backward compatibility alongside serializationOptions
       serializedName: getPropertyNames(context, type)[1],
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- kept for backward compatibility alongside multipartOptions
       isMultipartFileInput: false,
       serializationOptions: {},
     };
