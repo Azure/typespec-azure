@@ -22,23 +22,27 @@ This rule is now covered by
 the emitted JSON property when it is writable in PATCH. Read-only properties
 and properties whose lifecycle visibility excludes update are compliant.
 
-| ID                                        | Violation | Description                                                       |
-| ----------------------------------------- | --------- | ----------------------------------------------------------------- |
-| `patch-with-id-name`                      | true      | PATCH body includes writable `id`, `name`, and `type`             |
-| `patch-with-location-provisioning-state`  | true      | PATCH includes writable `location` and nested `provisioningState` |
-| `encoded-inherited-properties`            | true      | Encoded and inherited JSON properties are checked                 |
-| `readonly-immutable-properties-compliant` | false     | Read-only and immutable properties are accepted                   |
-| `readonly-ref-validator-discrepancy`      | false     | Records the validator's `$ref` sibling-resolution false positive  |
-| `non-object-bodies-compliant`             | false     | Scalar and multi-model-union schemas expose no selected property  |
+| ID                                        | Violation | Description                                                        |
+| ----------------------------------------- | --------- | ------------------------------------------------------------------ |
+| `patch-with-id-name`                      | true      | PATCH body includes writable `id`, `name`, and `type`              |
+| `patch-with-location-provisioning-state`  | true      | PATCH includes writable `location` and nested `provisioningState`  |
+| `encoded-inherited-properties`            | true      | Encoded and inherited JSON properties are checked                  |
+| `nested-arm-namespace`                    | true      | PATCH operations inherit ARM provider scope from parent namespaces |
+| `readonly-immutable-properties-compliant` | false     | Read-only and immutable properties are accepted                    |
+| `readonly-ref-validator-discrepancy`      | false     | Records the validator's `$ref` sibling-resolution false positive   |
+| `non-object-bodies-compliant`             | false     | Scalar and multi-model-union schemas expose no selected property   |
+| `global-operation-compliant`              | false     | Global operations are not ARM-scoped by a separate provider        |
 
 ## Emission matrix
 
-| Authored TypeSpec shape                      | AutoRest emitter branch                                                                    | Emitted field                                                                          | Swagger                  | TypeSpec lint | Fixture                                   |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- | ------------------------ | ------------- | ----------------------------------------- |
-| Direct writable model property               | `getSchemaForType` payload-property loop                                                   | Top-level `id`, `name`, or `type` without exemption                                    | Error                    | Warning       | `patch-with-id-name`                      |
-| Writable `location` on a nullable model body | Nullable-union unwrap, then property mutability emission with default lifecycle visibility | Top-level `location` without exemption                                                 | Error                    | Warning       | `patch-with-location-provisioning-state`  |
-| Writable nested property                     | Nested model through `resolveProperty` / `getSchemaOrRef`                                  | `properties.provisioningState` without exemption                                       | Error                    | Warning       | `patch-with-location-provisioning-state`  |
-| Inherited or JSON-encoded property           | Base-model `allOf` and `resolveEncodedName`                                                | Reserved emitted JSON name                                                             | Error                    | Warning       | `encoded-inherited-properties`            |
-| Read-only or update-excluded property        | `readOnly` or `x-ms-mutability` emission                                                   | Field absent or exempt from update                                                     | No error                 | No warning    | `readonly-immutable-properties-compliant` |
-| Read-only property with a referenced type    | `resolveProperty` emits `$ref` with a `readOnly` sibling                                   | `properties.provisioningState` is read-only, but Spectral resolution drops the sibling | Validator false positive | No warning    | `readonly-ref-validator-discrepancy`      |
-| Scalar or multi-model-union body             | Scalar and unsupported union schema                                                        | No object property selected by `getProperties`                                         | No error                 | No warning    | `non-object-bodies-compliant`             |
+| Authored TypeSpec shape                        | AutoRest emitter branch                                                                    | Emitted field                                                                          | Swagger                  | TypeSpec lint | Fixture                                   |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- | ------------------------ | ------------- | ----------------------------------------- |
+| Direct writable model property                 | `getSchemaForType` payload-property loop                                                   | Top-level `id`, `name`, or `type` without exemption                                    | Error                    | Warning       | `patch-with-id-name`                      |
+| Writable `location` on a nullable model body   | Nullable-union unwrap, then property mutability emission with default lifecycle visibility | Top-level `location` without exemption                                                 | Error                    | Warning       | `patch-with-location-provisioning-state`  |
+| Writable nested property                       | Nested model through `resolveProperty` / `getSchemaOrRef`                                  | `properties.provisioningState` without exemption                                       | Error                    | Warning       | `patch-with-location-provisioning-state`  |
+| Inherited or JSON-encoded property             | Base-model `allOf` and `resolveEncodedName`                                                | Reserved emitted JSON name                                                             | Error                    | Warning       | `encoded-inherited-properties`            |
+| PATCH operation in a nested provider namespace | Namespace ownership inherited from the decorated ARM provider namespace                    | Writable top-level `id`                                                                | Error                    | Warning       | `nested-arm-namespace`                    |
+| Read-only or update-excluded property          | `readOnly` or `x-ms-mutability` emission                                                   | Field absent or exempt from update                                                     | No error                 | No warning    | `readonly-immutable-properties-compliant` |
+| Read-only property with a referenced type      | `resolveProperty` emits `$ref` with a `readOnly` sibling                                   | `properties.provisioningState` is read-only, but Spectral resolution drops the sibling | Validator false positive | No warning    | `readonly-ref-validator-discrepancy`      |
+| Scalar or multi-model-union body               | Scalar and unsupported union schema                                                        | No object property selected by `getProperties`                                         | No error                 | No warning    | `non-object-bodies-compliant`             |
+| Global PATCH operation beside an ARM service   | Not emitted as part of the separate ARM service                                            | No ARM-scoped PATCH body                                                               | No error                 | No warning    | `global-operation-compliant`              |

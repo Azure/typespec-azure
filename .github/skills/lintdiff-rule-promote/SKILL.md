@@ -168,6 +168,11 @@ Use these signals:
 - Check for existing official rules with equivalent coverage before promoting.
   If the official rule already exists, recommend updating that rule instead of
   adding a duplicate.
+- Identify applicability guards that exist only because the lintdiff package
+  enables ARM and data-plane rules together. Record whether the destination
+  package and official ruleset already provide the same applicability boundary,
+  and compare neighboring destination rules before deciding whether the guard
+  belongs in the promoted implementation.
 
 The recommendation should include:
 
@@ -234,6 +239,20 @@ Then adapt it to the destination package:
 - update imports to use destination-package helpers and relative paths
 - reuse existing `src/rules/utils.ts` helpers before adding new helpers
 - remove any dependency on `tsp-lintdiff-local-linter`
+- evaluate lintdiff-only applicability guards instead of copying or removing
+  them mechanically:
+  - remove a guard when it exists only to isolate an ARM-only rule from
+    data-plane programs (or the reverse) in lintdiff's combined rulesets, and
+    the selected official package and ruleset already guarantee that boundary
+  - preserve a guard when the rule must still distinguish applicable and
+    inapplicable services, namespaces, or declarations within the destination
+    ruleset, or when provider metadata is part of the rule's semantics
+  - use neighboring destination rules and ruleset registration as evidence,
+    document the deliberate adaptation in the PR, and add a native test that
+    would fail if the destination unnecessarily retained the lintdiff-only
+    guard
+  - do not remove a guard when destination ownership is ambiguous; return to
+    destination analysis rather than broadening the rule speculatively
 - update exported rule variable names to match neighboring rules
 - preserve severity and diagnostic intent unless the target package convention
   or existing equivalent rule requires a better fit

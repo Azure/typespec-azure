@@ -1,0 +1,80 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "host": "management.azure.com",
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "azure_auth": [
+        "user_impersonation"
+      ]
+    }
+  ],
+  "securityDefinitions": {
+    "azure_auth": {
+      "type": "oauth2",
+      "description": "Azure Active Directory OAuth2 Flow.",
+      "flow": "implicit",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/authorize",
+      "scopes": {
+        "user_impersonation": "impersonate your user account"
+      }
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/widgets/{widgetName}": {
+      "patch": {
+        "operationId": "Nested_Update",
+        "parameters": [
+          {
+            "name": "widgetName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Nested.WidgetPatch"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "There is no content to send for this request, but the headers may be useful. "
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Nested.WidgetPatch": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "parameters": {}
+}

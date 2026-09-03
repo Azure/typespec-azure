@@ -1,4 +1,4 @@
-import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
+import { getArmProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 import {
   createRule,
   getLifecycleVisibilityEnum,
@@ -37,7 +37,10 @@ export const unsupportedPatchPropertiesRule = createRule({
     return {
       operation: (operation) => {
         const namespace = operation.interface?.namespace ?? operation.namespace;
-        if (resolveProviderNamespace(context.program, namespace) === undefined) {
+        if (
+          namespace === undefined ||
+          getArmProviderNamespace(context.program, namespace) === undefined
+        ) {
           return;
         }
 
