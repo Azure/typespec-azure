@@ -1527,7 +1527,7 @@ export class ClientAdapter {
             byVal,
           );
           if (contentType === "XML" && methodParam.type.kind === "array") {
-            // this is for compat with autorest.go
+            // this is for compat with legacy behavior
             adaptedParam.xml = new go.XMLInfo();
             adaptedParam.xml.wrapper = methodParam.type.name;
           }
@@ -1998,7 +1998,7 @@ export class ClientAdapter {
         let fieldName: string | undefined;
         let xmlInfo: go.XMLInfo | undefined;
         if (contentType === "XML" && sdkResponseType.kind === "array") {
-          // this is for compat with autorest.go
+          // this is for compat with legacy behavior
           xmlInfo = new go.XMLInfo();
           fieldName = sdkResponseType.name;
           const elementType = (<go.Slice>resultType).elementType;
@@ -2102,7 +2102,11 @@ export class ClientAdapter {
       case "unknown":
         return this.ta.codeModel.options["rawjson-as-bytes"] ? "RawJSON" : "Interface";
       default:
-        throw new Error(`unhandled monomorphic response type kind ${type.kind}`);
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `unsupported kind ${type.kind} for monomorphic response`,
+          type.__raw?.node,
+        );
     }
   }
 
@@ -2467,21 +2471,14 @@ export class ClientAdapter {
           if (exampleType.additionalPropertiesValue) {
             ret.additionalProperties = {};
             for (const [k, v] of Object.entries(exampleType.additionalPropertiesValue)) {
-              const filed = concreteType.fields.find((f) => f.annotations.isAdditionalProperties);
-              if (!filed) {
+              const field = concreteType.fields.find((f) => go.isAdditionalProperties(f));
+              if (!field) {
                 throw new AdapterError(
                   "InternalError",
                   `additional properties field not found in model '${concreteType.name}'.`,
                 );
               }
-              if (filed.type.kind === "map") {
-                ret.additionalProperties[k] = this.adaptExampleType(v, filed.type.valueType);
-              } else {
-                throw new AdapterError(
-                  "InternalError",
-                  `additional properties field type should be map type, but got '${filed.type.kind}' in model '${concreteType.name}'`,
-                );
-              }
+              ret.additionalProperties[k] = this.adaptExampleType(v, field.type.valueType);
             }
           }
           return ret;

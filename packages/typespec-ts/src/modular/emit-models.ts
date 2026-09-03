@@ -321,6 +321,35 @@ export function getModelsPath(sourceRoot: string, modelNamespace: string[] = [])
   );
 }
 
+/** Finds the namespace prefix shared by every service in the package. */
+function getCommonServiceNamespace(context: SdkContext): string[] {
+  if (context.commonServiceNamespace) {
+    return context.commonServiceNamespace;
+  }
+
+  const serviceNamespaces = context.allServiceNamespaces ?? listAllServiceNamespaces(context);
+  if (serviceNamespaces.length === 0) {
+    context.commonServiceNamespace = [];
+    return context.commonServiceNamespace;
+  }
+
+  // Start with the first namespace and shorten it at the first segment that
+  // differs in each subsequent service namespace.
+  const commonNamespace = getNamespaceFullName(serviceNamespaces[0]!).split(".");
+  for (const serviceNamespace of serviceNamespaces.slice(1)) {
+    const segments = getNamespaceFullName(serviceNamespace).split(".");
+    const commonLength = commonNamespace.findIndex((segment, index) => segment !== segments[index]);
+    if (commonLength !== -1) {
+      commonNamespace.length = commonLength;
+    }
+    if (commonNamespace.length === 0) {
+      break;
+    }
+  }
+  context.commonServiceNamespace = commonNamespace;
+  return context.commonServiceNamespace;
+}
+
 export function getModelNamespaces(context: SdkContext, model: SdkType): string[] {
   if (model.kind === "model" || model.kind === "enum" || model.kind === "union") {
     if (
@@ -332,22 +361,11 @@ export function getModelNamespaces(context: SdkContext, model: SdkType): string[
       return [];
     }
     const segments = model.namespace.split(".");
-    // Keep full namespace segments if multiple services are present because there isn't a root namespace to trim
-    if (context.emitterOptions?.isMultiService) {
-      return segments;
-    }
-
-    const allServiceNamespaces = context.allServiceNamespaces ?? listAllServiceNamespaces(context);
-    const deepestNamespace = getNamespaceFullName(allServiceNamespaces[0]!);
-    const rootNamespace = deepestNamespace.split(".") ?? [];
-    if (segments.length > rootNamespace.length) {
-      while (segments[0] === rootNamespace[0]) {
-        segments.shift();
-        rootNamespace.shift();
-      }
-      return segments;
-    }
-    return [];
+    const commonNamespace = getCommonServiceNamespace(context);
+    const modelUsesCommonNamespace = commonNamespace.every(
+      (segment, index) => segment === segments[index],
+    );
+    return modelUsesCommonNamespace ? segments.slice(commonNamespace.length) : segments;
   } else if (model.kind === "array" || model.kind === "dict") {
     return getModelNamespaces(context, model.valueType);
   } else if (model.kind === "nullable") {
