@@ -48,7 +48,7 @@ names that emit the same `Noun_Verb` shapes the upstream Spectral rule inspects:
 - `Paths_List` => valid
 - `GetWidget` (no underscore) => valid and ignored
 - explicit `@operationId("Certificates_GetCertificate")` => invalid
-- namespace fallback `Admins_listAdmins` => invalid
+- namespace fallback `Admins_ListAdmins` => invalid
 
 That evidence supports a native local lint that inspects the resolved emitted
 operationId and reproduces the upstream noun-repetition check directly. The

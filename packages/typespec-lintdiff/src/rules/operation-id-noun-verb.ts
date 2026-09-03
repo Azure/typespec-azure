@@ -24,7 +24,7 @@ export const operationIdNounVerbRule = createRule({
     "OperationIds should follow the Noun_Verb convention without repeating the noun after the underscore.",
   severity: "warning",
   messages: {
-    default: paramMessage`Per the Noun_Verb convention for Operation Ids, the noun '${"noun"}' should not appear after the underscore.`,
+    default: paramMessage`Per the Noun_Verb convention for Operation Ids, the noun '${"noun"}' should not appear after the underscore. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.`,
   },
   create(context) {
     const tcgcContext = createTCGCContext(context.program, "@azure-tools/typespec-autorest", {
