@@ -2039,6 +2039,8 @@ You could define a single client that combines operations from multiple services
 
 6. **@clientLocation with Multiple Services**: You can use `@clientLocation` to move operations from different services to the same sub client. The resulting sub client will have empty `apiVersions` and a `string` type for the API version parameter, allowing it to handle operations with different API versions.
 
+7. **Operation Names**: Operations combined into the same generated client must have distinct client names for most languages. C# supports same-named operations with distinct signatures as overloads, so TCGC reports `duplicate-client-name-warning` instead of an error for C# operation-name collisions. Verify that the generated signatures form valid overloads and suppress the warning only when the collision is intentional; otherwise, use `@clientName` to resolve it.
+
 :::caution
 All services being merged must share the same endpoint and authentication method. If not, you will get diagnostics error.
 TCGC automatically merges sub clients with the same name, but you still need to ensure that there are no naming conflicts between models, enums, and other types in the services being merged. If there are conflicts, you may need to rename the types in the original services to avoid collisions.

@@ -35,6 +35,12 @@ import type { ContextNode } from "./internal-utils.js";
 
 type SourceKind = "RequestParameter" | "RequestBody" | "ResponseBody";
 
+export type ApiVersionConfig = string | ApiVersionServiceMap;
+
+export interface ApiVersionServiceMap {
+  [namespaceSegment: string]: string | ApiVersionServiceMap;
+}
+
 export interface TCGCContext {
   program: Program;
   diagnostics: readonly Diagnostic[];

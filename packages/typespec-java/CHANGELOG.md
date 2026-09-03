@@ -1,10 +1,37 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.46.2
+
+### Bug Fixes
+
+- Sync core to microsoft/typespec commit `a32575719`. Add model maximum overloads to Java clients and preserve internal protocol method names (core [#11803](https://github.com/microsoft/typespec/pull/11803)).
+
+
+## 0.46.1
+
+### Bug Fixes
+
+- Sync core to microsoft/typespec commit `5b9cd21d2`. Includes fixes for management `remove-model` generation (core [#11698](https://github.com/microsoft/typespec/pull/11698)), Javadocs containing `*/` (core [#11766](https://github.com/microsoft/typespec/pull/11766)), and response headers following a constant header (core [#11793](https://github.com/microsoft/typespec/pull/11793)).
+
+
+## 0.46.0
+
+### Features
+
+- Sync core to microsoft/typespec commit `27b39b71b`. Support removing models from management clients with the `remove-model` emitter option (core [#11658](https://github.com/microsoft/typespec/pull/11658)).
+
+### Bug Fixes
+
+- Fix Fluent Premium samples to use the correct service client for resource metadata suffixes (core [#11633](https://github.com/microsoft/typespec/pull/11633)).
+- Preserve existing properties files for applicable libraries during SDK integration (core [#11635](https://github.com/microsoft/typespec/pull/11635)).
+- Document response headers in protocol API Javadocs (core [#11610](https://github.com/microsoft/typespec/pull/11610)).
+
+
 ## 0.45.13
 
 ### Features
 
-- [#5138](https://github.com/Azure/typespec-azure/pull/5138) Sync core to microsoft/typespec commit `2e1649b83`. Includes support for nested property paths and XML payloads in Azure pageable responses (core [#11504](https://github.com/microsoft/typespec/pull/11504)).
+- Sync core to microsoft/typespec commit `2e1649b83`. Includes support for nested property paths and XML payloads in Azure pageable responses (core [#11504](https://github.com/microsoft/typespec/pull/11504)).
 
 
 ## 0.45.12

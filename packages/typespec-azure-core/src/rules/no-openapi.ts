@@ -27,6 +27,11 @@ export const noOpenAPIRule = createRule({
     function checkDecorators(type: DecoratedType & Type) {
       for (const dec of type.decorators) {
         if (dec.definition) {
+          // `@extension` is allowed by this rule. Client-altering extensions are
+          // handled by the `no-openapi-client-extensions` rule instead.
+          if (dec.definition.name === "@extension") {
+            continue;
+          }
           const id = getTypeName(dec.definition.namespace);
           if (id === "TypeSpec.OpenAPI" || id === "Autorest") {
             context.reportDiagnostic({
