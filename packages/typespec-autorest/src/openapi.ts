@@ -10,8 +10,6 @@ import {
   hasUniqueItems,
 } from "@azure-tools/typespec-azure-core";
 import {
-  $featureFiles,
-  $features,
   type ArmFeatureOptions,
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
@@ -19,6 +17,8 @@ import {
   getCustomResourceOptions,
   getExternalTypeRef,
   getFeature,
+  getFeatureFileSet,
+  getFeatureOptions,
   getInlineAzureType,
   getResourceFeatureSet,
   isArmCommonType,
@@ -1610,7 +1610,7 @@ export async function getOpenAPIForService(
       if (
         options.versionEnumStrategy !== "include" &&
         type.kind === "Enum" &&
-        (isVersionEnum(program, type) || isFeatureEnum(serviceNamespace, type))
+        (isVersionEnum(program, type) || isFeatureEnum(program, serviceNamespace, type))
       ) {
         return true;
       }
@@ -1626,11 +1626,31 @@ export async function getOpenAPIForService(
     return false;
   }
 
-  function isFeatureEnum(serviceNamespace: Namespace, enumObj: Enum): boolean {
-    return serviceNamespace.decorators.some(
-      (decorator) =>
-        (decorator.decorator === $featureFiles || decorator.decorator === $features) &&
-        decorator.args[0]?.value === enumObj,
+  function isFeatureEnum(program: Program, serviceNamespace: Namespace, enumObj: Enum): boolean {
+    if (!getFeatureFileSet(program, serviceNamespace)) {
+      return false;
+    }
+
+    const featureSet = getResourceFeatureSet(program, serviceNamespace);
+    if (featureSet === undefined) {
+      return false;
+    }
+
+    const enumFeatureNames = new Set(
+      [...enumObj.members.values()].map((member) =>
+        getFeatureOptions(program, member).featureName.toLowerCase(),
+      ),
+    );
+    const configuredFeatureNames = new Set(
+      [...featureSet.keys()].map((featureName) => featureName.toLowerCase()),
+    );
+    if (!enumFeatureNames.has("common")) {
+      configuredFeatureNames.delete("common");
+    }
+
+    return (
+      enumFeatureNames.size === configuredFeatureNames.size &&
+      [...enumFeatureNames].every((featureName) => configuredFeatureNames.has(featureName))
     );
   }
 
@@ -3312,10 +3332,10 @@ function createFeatureDocumentProxy(
         for (const [defName, [_, defSchema]] of definitionsForFeature) {
           featureItem.document.definitions![defName] = defSchema;
         }
+        finalizeOpenApi2Document(featureItem.document, featureItem.tags);
         if (!hasOpenApiContent(featureItem.document)) {
           continue;
         }
-        finalizeOpenApi2Document(featureItem.document, featureItem.tags);
         docs.push({
           document: featureItem.document,
           operationExamples: featureExamples,

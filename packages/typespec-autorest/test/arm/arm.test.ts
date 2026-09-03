@@ -602,6 +602,10 @@ it("does not emit empty feature files for versions without feature content", asy
       @added(Versions.v2)
       @route("/students")
       op getStudent(): string;
+
+      @Azure.ResourceManager.featureFile(Features.Teacher)
+      @route("/teachers")
+      op getTeacher(): string;
     `,
     {
       compilerOptions: {
@@ -618,6 +622,8 @@ it("does not emit empty feature files for versions without feature content", asy
   expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
   ok(!outputs[resolvePath("stable", "v1", "student.json")]);
   ok(outputs[resolvePath("stable", "v2", "student.json")]);
+  ok(outputs[resolvePath("stable", "v1", "teacher.json")]);
+  ok(outputs[resolvePath("stable", "v2", "teacher.json")]);
 });
 
 it.each([
