@@ -16,7 +16,12 @@ import { refkey } from "../../framework/refkey.js";
 import { reportDiagnostic } from "../../lib.js";
 import type { SdkContext } from "../../utils/interfaces.js";
 import { isAzureCoreErrorType } from "../../utils/model-utils.js";
-import { NameType, normalizeName } from "../../utils/name-utils.js";
+import {
+  formatPropertyAccess,
+  NameType,
+  normalizeName,
+  normalizeSdkPropertyName,
+} from "../../utils/name-utils.js";
 import { getAdditionalPropertiesName, normalizeModelName } from "../emit-models.js";
 import {
   getAllAncestors,
@@ -185,7 +190,6 @@ function buildPolymorphicSerializer(
     ) {
       return;
     }
-    const union = subType?.discriminatedSubtypes ? "_Union" : "";
     if (!subType || !subType?.name) {
       reportDiagnostic(context.program, {
         code: "anonymous-type-serialization",
@@ -193,13 +197,12 @@ function buildPolymorphicSerializer(
       });
       return; // Skip this subtype
     }
-    const rawSubTypeName = `${subType.name}${union}`;
-    const subTypeName = `${normalizeName(rawSubTypeName, NameType.Interface, true)}`;
-    const subtypeSerializerName = normalizeName(
-      `${rawSubTypeName}_Serializer`,
-      NameType.Method,
-      true,
-    );
+    const union = subType.discriminatedSubtypes ? "Union" : "";
+    const subTypeName = normalizeModelName(context, subType, NameType.Interface, !union);
+    const subtypeSerializerName = buildModelSerializer(context, subType, {
+      nameOnly: true,
+      skipDiscriminatedUnionSuffix: false,
+    }) as string;
 
     cases.push(`
         case "${discriminatedValue}":
@@ -208,7 +211,7 @@ function buildPolymorphicSerializer(
   });
 
   statements.push(`
-      switch (item.${normalizeName(type.discriminatorProperty.name, NameType.Property)}) {
+      switch (${formatPropertyAccess("item", normalizeSdkPropertyName(type.discriminatorProperty))}) {
        ${cases.join("\n")}
         default:
           return item;
@@ -281,7 +284,7 @@ function buildDiscriminatedUnionSerializer(
     `);
   }
   output.push(`
-    switch (item.${type.discriminatorProperty ? normalizeName(type.discriminatorProperty.name, NameType.Property) : "unknown"}) {
+    switch (${formatPropertyAccess("item", type.discriminatorProperty ? normalizeSdkPropertyName(type.discriminatorProperty) : "unknown")}) {
      ${cases.join("\n")}
       default:
         return ${baseSerializerName}(item);
