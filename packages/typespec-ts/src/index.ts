@@ -26,7 +26,9 @@ import {
   PollingHelpers,
   SerializationHelpers,
   SimplePollerHelpers,
+  SseStreamingHelpers,
   StorageCompatHelpers,
+  StreamingHelpers,
   UrlTemplateHelpers,
   XmlHelpers,
 } from "./modular/static-helpers-metadata.js";
@@ -87,6 +89,10 @@ import { emitNonModelResponseTypes, emitTypes } from "./modular/emit-models.js";
 import { emitSamples } from "./modular/emit-samples.js";
 import { emitTests } from "./modular/emit-tests.js";
 import { getClassicalClientName } from "./modular/helpers/naming-helpers.js";
+import {
+  packageHasSseStreaming,
+  packageHasStructuredStreaming,
+} from "./modular/helpers/operation-helpers.js";
 import type { ModularEmitterOptions } from "./modular/interfaces.js";
 import { packageUsesXmlSerialization } from "./modular/serialization/build-xml-serializer-function.js";
 import { transformClientOptions } from "./transform/transform-client-options.js";
@@ -140,6 +146,8 @@ export async function $onEmit(context: EmitContext) {
       ...MultipartHelpers,
       ...CloudSettingHelpers,
       ...XmlHelpers,
+      ...(packageHasStructuredStreaming(dpgContext) ? StreamingHelpers : {}),
+      ...(packageHasSseStreaming(dpgContext) ? SseStreamingHelpers : {}),
       ...(resolvedEmitterOptions.generateTest ? CreateRecorderHelpers : {}),
       ...(resolvedEmitterOptions.enableStorageCompat ? StorageCompatHelpers : {}),
     },
@@ -449,6 +457,10 @@ export async function $onEmit(context: EmitContext) {
         if (packageUsesXmlSerialization(dpgContext.sdkPackage)) {
           dependencies["fast-xml-parser"] = "^4.5.0";
         }
+        // Add @azure/core-sse if structured SSE streaming is used
+        if (packageHasSseStreaming(dpgContext)) {
+          dependencies["@azure/core-sse"] = "^2.1.3";
+        }
         modularPackageInfo = {
           ...modularPackageInfo,
           dependencies,
@@ -501,6 +513,9 @@ export async function $onEmit(context: EmitContext) {
       const additionalDependencies: Record<string, string> = {};
       if (packageUsesXmlSerialization(dpgContext.sdkPackage)) {
         additionalDependencies["fast-xml-parser"] = "^4.5.0";
+      }
+      if (packageHasSseStreaming(dpgContext)) {
+        additionalDependencies["@azure/core-sse"] = "^2.1.3";
       }
       const modularPackageInfo = {
         exports: getModuleExports(context, modularEmitterOptions),
