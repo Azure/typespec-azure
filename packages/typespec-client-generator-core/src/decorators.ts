@@ -1192,20 +1192,23 @@ export const $useSystemTextJsonConverter: DecoratorFunction = (
 const clientInitializationKey = createStateSymbol("clientInitialization");
 
 /**
- * The properties that belong to the `ClientInitializationOptions` options bag (including `scope`,
- * inherited from `DecoratorOptions`).
- */
-const clientInitializationOptionKeys = new Set(["parameters", "initializedBy", "scope"]);
-
-/**
  * Distinguish a real `ClientInitializationOptions` options bag from the legacy form where a raw
  * client-parameters model is passed directly as the second argument.
  *
- * The structural options `parameters` and `initializedBy` unambiguously identify the options bag.
- * When neither is present the model could be a legacy raw parameters model that merely happens to
- * contain a `scope` property (e.g. a credential scope), so only an anonymous inline bag whose
- * members are all known option keys (such as `{ scope: "csharp" }`) is treated as the options bag.
- * A named model, or one carrying any non-option property, is treated as legacy client parameters.
+ * Detection is based on model provenance rather than the model name alone:
+ * - The structural options `parameters` and `initializedBy` are declared only on
+ *   `ClientInitializationOptions`, so their presence unambiguously identifies the options bag
+ *   (this covers the common inline literal form `{ parameters: ..., scope: ... }`).
+ * - A *named* model that explicitly derives from `ClientInitializationOptions` through its
+ *   inheritance chain is an options bag even when it only sets `scope` (e.g. `model Foo extends
+ *   ClientInitializationOptions { scope: "csharp"; }`).
+ *
+ * Anonymous model expressions are intentionally excluded from the ancestry check: the compiler links
+ * an inline literal to the expected `ClientInitializationOptions` parameter type, so an anonymous
+ * legacy parameters model such as `{ scope: "https://management.azure.com/.default" }` would
+ * otherwise look like an options bag. Treating the anonymous scope-only shape as a legacy raw
+ * client-parameters model keeps its `scope` property a real client parameter, preserving backward
+ * compatibility for that previously supported form.
  */
 function isClientInitializationOptionsBag(options: Type): boolean {
   if (options.kind !== "Model") {
@@ -1214,10 +1217,23 @@ function isClientInitializationOptionsBag(options: Type): boolean {
   if (options.properties.has("parameters") || options.properties.has("initializedBy")) {
     return true;
   }
-  return (
-    options.name === "" &&
-    [...options.properties.keys()].every((key) => clientInitializationOptionKeys.has(key))
-  );
+  if (options.name === "") {
+    return false;
+  }
+  for (
+    let current: Model | undefined = options.baseModel;
+    current !== undefined;
+    current = current.baseModel
+  ) {
+    if (
+      current.name === "ClientInitializationOptions" &&
+      current.namespace !== undefined &&
+      getNamespaceFullName(current.namespace) === "Azure.ClientGenerator.Core"
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export const $clientInitialization: ClientInitializationDecorator = (
