@@ -70,7 +70,7 @@ it("reports every extra property on a collection response", async () => {
     .toEmitDiagnostics([{ code: diagnosticCode }, { code: diagnosticCode }]);
 });
 
-it("reports extra and missing envelope properties", async () => {
+it("does not report a redundant missing-property diagnostic when an extra property is reported", async () => {
   await tester
     .expect(
       armGet(
@@ -83,7 +83,7 @@ it("reports extra and missing envelope properties", async () => {
          }`,
       ),
     )
-    .toEmitDiagnostics([{ code: diagnosticCode }, { code: diagnosticCode }]);
+    .toEmitDiagnostics({ code: diagnosticCode });
 });
 
 it("reports a value-only response on an extension-scope collection path", async () => {

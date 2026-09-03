@@ -92,19 +92,23 @@ function get200ResponseModel(responses: HttpOperationResponse[]): Model | undefi
 }
 
 function getInvalidTargets(responseModel: Model): (Model | ModelProperty)[] {
-  const properties = [...responseModel.properties.values()];
-  const invalidTargets: (Model | ModelProperty)[] = properties.filter(
-    (property) => property.name !== "value" && property.name !== "nextLink",
-  );
+  const invalidTargets: ModelProperty[] = [];
+  let hasValue = false;
+  let hasNextLink = false;
 
-  if (
-    !properties.some((property) => property.name === "value") ||
-    !properties.some((property) => property.name === "nextLink")
-  ) {
-    invalidTargets.push(responseModel);
+  for (const property of responseModel.properties.values()) {
+    if (property.name === "value") {
+      hasValue = true;
+    } else if (property.name === "nextLink") {
+      hasNextLink = true;
+    } else {
+      invalidTargets.push(property);
+    }
   }
 
-  return invalidTargets;
+  return invalidTargets.length === 0 && (!hasValue || !hasNextLink)
+    ? [responseModel]
+    : invalidTargets;
 }
 
 function getDiagnosticTarget(
