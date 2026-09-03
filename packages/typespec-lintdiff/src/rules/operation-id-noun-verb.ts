@@ -52,7 +52,7 @@ export const operationIdNounVerbRule = createRule({
           return;
         }
 
-        const [nounPart, verbPart = ""] = operationId.split("_", 2);
+        const [nounPart, verbPart = ""] = operationId.split("_");
         if (nounPart.length === 0 || verbPart.length === 0) {
           return;
         }
