@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  formatPropertyName,
+  isValidTypeScriptIdentifierName,
   NameType,
   normalizeName,
   normalizeSdkName,
@@ -167,5 +169,23 @@ describe("#normalizeSdkName", () => {
     expect(normalizeSdkPropertyName({ name: "property-name", isExactName: true })).to.equal(
       "property-name",
     );
+  });
+});
+
+describe("#isValidTypeScriptIdentifierName", () => {
+  it("accepts identifier names, including keywords and Unicode", () => {
+    expect(isValidTypeScriptIdentifierName("model_name")).toBe(true);
+    expect(isValidTypeScriptIdentifierName("你好")).toBe(true);
+    expect(isValidTypeScriptIdentifierName("class")).toBe(true);
+  });
+
+  it("rejects invalid identifier names", () => {
+    expect(isValidTypeScriptIdentifierName("model-name")).toBe(false);
+    expect(isValidTypeScriptIdentifierName("123model")).toBe(false);
+  });
+
+  it("allows reserved words as property names", () => {
+    expect(formatPropertyName("class")).toBe("class");
+    expect(formatPropertyName("model-name")).toBe('"model-name"');
   });
 });

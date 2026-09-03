@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 import { NoTarget, type DiagnosticTarget, type Program } from "@typespec/compiler";
-import { ts } from "ts-morph";
 import { reportDiagnostic } from "../lib.js";
 
 export interface NormalizeNameOption {
@@ -244,20 +243,6 @@ export function isValidTypeScriptIdentifierName(name: string): boolean {
   return /^[$_\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/u.test(name);
 }
 
-export function isValidTypeScriptIdentifier(name: string): boolean {
-  if (!isValidTypeScriptIdentifierName(name)) {
-    return false;
-  }
-  const result = ts.transpileModule(`export const ${name} = 0;`, {
-    reportDiagnostics: true,
-    compilerOptions: {
-      target: ts.ScriptTarget.ES2022,
-      module: ts.ModuleKind.ESNext,
-    },
-  });
-  return (result.diagnostics?.length ?? 0) === 0;
-}
-
 const reportedInvalidExactNames = new WeakMap<Program, WeakSet<object>>();
 
 export function reportInvalidExactName(
@@ -276,11 +261,10 @@ export function reportInvalidExactName(
     return;
   }
 
-  const isMethod = nameType === NameType.Method;
-  const isValid = isMethod
-    ? isValidTypeScriptIdentifierName(item.name) &&
-      isValidTypeScriptIdentifier(guardReservedNames(item.name, NameType.Method))
-    : isValidTypeScriptIdentifier(item.name);
+  const requiresMethodGuard = guardReservedNames(item.name, NameType.Method) !== item.name;
+  const isValid =
+    isValidTypeScriptIdentifierName(item.name) &&
+    (nameType === NameType.Method || !requiresMethodGuard);
   if (isValid) {
     return;
   }
