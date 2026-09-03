@@ -848,21 +848,15 @@ export function normalizeModelName(
       unionSuffix = "Union";
     }
   }
-  const namespacePrefix = context.emitterOptions?.enableModelNamespace ? segments.join("") : "";
+  const namespacePrefix = context.emitterOptions?.enableModelNamespace
+    ? normalizeName(segments.join(""), nameType)
+    : "";
   const internalModelPrefix =
     (isPagedResultModel(context, type) && !pagedModelsKeptPublic.has(type)) || type.isGeneratedName
       ? "_"
       : "";
-  const normalizedNamespacePrefix =
-    type.isExactName && namespacePrefix
-      ? normalizeName(namespacePrefix, nameType)
-      : namespacePrefix;
-  const modelName = normalizeSdkName(
-    { name: normalizedNamespacePrefix + type.name, isExactName: type.isExactName },
-    nameType,
-    { shouldGuard: true },
-  );
-  return `${internalModelPrefix}${modelName}${unionSuffix}`;
+  const modelName = normalizeSdkName(type, nameType, { shouldGuard: true });
+  return `${internalModelPrefix}${namespacePrefix}${modelName}${unionSuffix}`;
 }
 
 function buildModelPolymorphicType(context: SdkContext, type: SdkModelType) {

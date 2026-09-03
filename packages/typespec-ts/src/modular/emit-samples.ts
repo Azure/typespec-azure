@@ -68,13 +68,7 @@ export function emitSamples(dpgContext: SdkContext): SourceFile[] {
     emitClientSamples(dpgContext, client, {
       topLevelClient: client,
       generatedFiles,
-      subFolder:
-        clients.length > 1
-          ? normalizeSdkName(
-              { name: getClassicalClientName(client), isExactName: client.isExactName },
-              NameType.File,
-            )
-          : undefined,
+      subFolder: clients.length > 1 ? normalizeSdkName(client, NameType.File) : undefined,
     });
   }
   return generatedFiles;
@@ -203,10 +197,9 @@ function emitMethodSamples(
     }
     const prefix = options.classicalMethodPrefix ? `${options.classicalMethodPrefix}.` : "";
     const isPaging = method.kind === "paging";
-    const methodCall = `client.${prefix}${normalizeSdkName(
-      { name: method.oriName ?? method.name, isExactName: method.isExactName },
-      NameType.Property,
-    )}(${methodParams.join(", ")})`;
+    const methodCall = `client.${prefix}${normalizeSdkName(method, NameType.Property, {
+      nameOverride: method.oriName ?? method.name,
+    })}(${methodParams.join(", ")})`;
     if (isPaging) {
       exampleFunctionBody.push(`const resArray = new Array();`);
       exampleFunctionBody.push(`for await (const item of ${methodCall}) { resArray.push(item); }`);

@@ -495,13 +495,7 @@ export function iterateClientsAndMethods(
           client,
           generatedFiles,
           classicalMethodPrefix: prefix,
-          subFolder:
-            clients.length > 1
-              ? normalizeSdkName(
-                  { name: getClassicalClientName(client), isExactName: client.isExactName },
-                  NameType.File,
-                )
-              : undefined,
+          subFolder: clients.length > 1 ? normalizeSdkName(client, NameType.File) : undefined,
           hierarchies: hierarchies,
         });
       }
@@ -570,10 +564,9 @@ export function generateMethodCall(
   }
 
   const prefix = options.classicalMethodPrefix ? `${options.classicalMethodPrefix}.` : "";
-  const methodCall = `client.${prefix}${normalizeSdkName(
-    { name: method.oriName ?? method.name, isExactName: method.isExactName },
-    NameType.Property,
-  )}(${methodParams.join(", ")})`;
+  const methodCall = `client.${prefix}${normalizeSdkName(method, NameType.Property, {
+    nameOverride: method.oriName ?? method.name,
+  })}(${methodParams.join(", ")})`;
 
   return { methodCall, clientParams, clientParamDefs };
 }

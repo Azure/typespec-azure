@@ -12,6 +12,10 @@ export interface NormalizeNameOption {
   numberPrefixOverride?: string;
 }
 
+export interface NormalizeSdkNameOption extends NormalizeNameOption {
+  nameOverride?: string;
+}
+
 export interface SdkName {
   name: string;
   isExactName?: boolean;
@@ -220,16 +224,20 @@ export function normalizeName(
 export function normalizeSdkName(
   sdkName: SdkName,
   nameType: NameType,
-  options: NormalizeNameOption = {},
+  options: NormalizeSdkNameOption = {},
 ): string {
+  const { nameOverride, ...normalizeOptions } = options;
+  const name = nameOverride ?? sdkName.name;
   if (!sdkName.isExactName) {
-    return normalizeName(sdkName.name, nameType, options);
+    return normalizeName(name, nameType, normalizeOptions);
   }
-  return sdkName.name;
+  return normalizeOptions.shouldGuard && nameType === NameType.Method
+    ? guardReservedNames(name, nameType, normalizeOptions.customReservedNames)
+    : name;
 }
 
 export function normalizeSdkPropertyName(sdkName: SdkName): string {
-  return sdkName.isExactName ? sdkName.name : normalizeName(sdkName.name, NameType.Property);
+  return normalizeSdkName(sdkName, NameType.Property);
 }
 
 export function isValidTypeScriptIdentifierName(name: string): boolean {

@@ -6,7 +6,6 @@ import {
 import pluralize from "pluralize";
 import type { SdkContext } from "../../utils/interfaces.js";
 import {
-  guardReservedNames,
   NameType,
   normalizeName,
   normalizeSdkName,
@@ -15,16 +14,11 @@ import {
 import type { ServiceOperation } from "../../utils/operation-util.js";
 
 export function getClientName(client: SdkClientType<SdkServiceOperation>): string {
-  const name = client.name.replace(/Client$/, "");
-  return client.isExactName
-    ? normalizeSdkName({ name, isExactName: true }, NameType.Interface, { shouldGuard: true })
-    : name;
+  return client.name.replace(/Client$/, "");
 }
 
 export function getClassicalClientName(client: SdkClientType<SdkServiceOperation>): string {
-  return client.isExactName
-    ? normalizeSdkName(client, NameType.Class, { shouldGuard: true })
-    : client.name;
+  return client.name;
 }
 
 export interface GuardedName {
@@ -40,9 +34,7 @@ export function getOperationName(
   dpgContext?: SdkContext,
   prefixes: string[] = [],
 ): GuardedName {
-  const name = operation.isExactName
-    ? guardReservedNames(operation.name, NameType.Method)
-    : normalizeSdkName(operation, NameType.Method, { shouldGuard: true });
+  const name = normalizeSdkName(operation, NameType.Method, { shouldGuard: true });
   const propertyName = normalizeSdkName(operation, NameType.Property);
   const isDataplane = dpgContext !== undefined && !dpgContext.emitterOptions?.azureArm;
   // An explicit `@clientName` override is an intentional naming choice by the user, so we

@@ -41,10 +41,7 @@ async function cleanupTestFolder(dpgContext: SdkContext, host: CompilerHost) {
   // If there are multiple clients, clean up subfolders
   if (clients.length > 1) {
     for (const client of clients) {
-      const subFolder = normalizeSdkName(
-        { name: getClassicalClientName(client), isExactName: client.isExactName },
-        NameType.File,
-      );
+      const subFolder = normalizeSdkName(client, NameType.File);
       const clientTestFolder = joinPaths(baseTestFolder, subFolder);
       if (await dirExists(clientTestFolder)) {
         await host.rm(clientTestFolder, { recursive: true });

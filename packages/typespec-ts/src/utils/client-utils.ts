@@ -117,12 +117,7 @@ export function isMultiEndpointClient(dpgContext: SdkContext): boolean {
 
 export function getClientModuleInfo(clientMap: [string[], SdkClientType<SdkServiceOperation>]) {
   const [hierarchy, client] = clientMap;
-  const rawClientName = client.name.replace(/Client$/, "");
-  const clientName = client.isExactName
-    ? normalizeSdkName({ name: rawClientName, isExactName: true }, NameType.Interface, {
-        shouldGuard: true,
-      })
-    : rawClientName;
+  const clientName = client.name.replace(/Client$/, "");
   const clientModuleInfo: ClientModuleInfo = {
     clientName: `${clientName}Context`,
   };
@@ -138,12 +133,14 @@ export function getClientHierarchyMap(
     return client.clientInitialization.initializedBy & InitializedByFlags.Individually;
   });
   const clients = individualClients.map((client) => {
-    const clientName = {
-      name: client.name.replace(/Client$/, ""),
-      isExactName: client.isExactName,
-    };
     return [
-      context.sdkPackage.clients.length > 1 ? [normalizeSdkName(clientName, NameType.File)] : [],
+      context.sdkPackage.clients.length > 1
+        ? [
+            normalizeSdkName(client, NameType.File, {
+              nameOverride: client.name.replace(/Client$/, ""),
+            }),
+          ]
+        : [],
       client,
     ];
   }) as [string[], SdkClientType<SdkServiceOperation>][];
@@ -174,11 +171,12 @@ export function getClientHierarchyMap(
     });
     if (childClientsToGenerate && childClientsToGenerate.length > 0) {
       childClientsToGenerate.forEach((child) => {
-        const childName = {
-          name: child.name.replace(/Client$/, ""),
-          isExactName: child.isExactName,
-        };
-        const childHierarchy = [...hierarchy, normalizeSdkName(childName, NameType.File)];
+        const childHierarchy = [
+          ...hierarchy,
+          normalizeSdkName(child, NameType.File, {
+            nameOverride: child.name.replace(/Client$/, ""),
+          }),
+        ];
         clients.push([childHierarchy, child]);
       });
     }

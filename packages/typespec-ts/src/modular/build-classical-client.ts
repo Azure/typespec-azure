@@ -145,13 +145,9 @@ export function buildClassicalClient(
       `this._clientParams = {${classicalParams.map((p) => p.name).join(",")}};`,
     );
     for (const childClient of client.children) {
-      const subfolder = normalizeSdkName(
-        {
-          name: childClient.name.replace(/Client$/, ""),
-          isExactName: childClient.isExactName,
-        },
-        NameType.File,
-      );
+      const subfolder = normalizeSdkName(childClient, NameType.File, {
+        nameOverride: childClient.name.replace(/Client$/, ""),
+      });
       clientFile.addImportDeclaration({
         moduleSpecifier: `./${subfolder}/${normalizeName(
           getClassicalClientName(childClient),

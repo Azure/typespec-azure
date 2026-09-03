@@ -179,6 +179,18 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
     return result ? result!.getFullText()! : "";
   },
 
+  "(ts|typescript) classicOperations interface {name}": async (tsp, { name }, namedUnknownArgs) => {
+    const configs = namedUnknownArgs ? (namedUnknownArgs["configs"] as Record<string, string>) : {};
+    const result = await emitModularClientFromTypeSpec(tsp, configs);
+    for (const sourceFile of result?.getProject().getSourceFiles() ?? []) {
+      const operationGroup = sourceFile.getInterface(name ?? "No name specified!");
+      if (operationGroup) {
+        return operationGroup.getFullText();
+      }
+    }
+    throw new Error(`Classic operations interface '${name}' was not generated`);
+  },
+
   // Pattern for a specific test file - look it up by file name
   "(ts|typescript) tests {fileName}": async (tsp, { fileName }, namedUnknownArgs) => {
     if (!namedUnknownArgs || !namedUnknownArgs["examples"]) {

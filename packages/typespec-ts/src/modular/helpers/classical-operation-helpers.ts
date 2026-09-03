@@ -25,10 +25,7 @@ import { getOperationFunction } from "./operation-helpers.js";
 interface OperationDeclarationInfo {
   // the operation function
   declaration: OptionalKind<FunctionDeclarationStructure>;
-  // the original operation name
-  oriName: string | undefined;
-  // whether the operation name should bypass casing transformations
-  isExactName: boolean;
+  operation: ServiceOperation;
   // the refkey of the operation declaration
   declarationRefKey: string | undefined;
   // the default is false
@@ -86,8 +83,7 @@ export function getClassicalOperation(
       const declaration = getOperationFunction(dpgContext, [prefixes, operation], clientName);
       operationDeclarationMap.set(declaration, {
         declaration,
-        oriName: operation.oriName,
-        isExactName: operation.isExactName,
+        operation,
         declarationRefKey: resolveReference(refkey(operation, "api")),
         isLro: declaration.isLro,
         lroFinalReturnType: declaration.lroFinalReturnType,
@@ -371,12 +367,10 @@ export function getClassicalOperation(
     },
   ) {
     const operationInfo = operationDeclarationMap.get(declaration);
-    return normalizeSdkName(
-      {
-        name: operationInfo?.oriName ?? declaration.propertyName ?? declaration.name ?? "FIXME",
-        isExactName: operationInfo?.isExactName,
-      },
-      NameType.Method,
-    );
+    const name =
+      operationInfo?.operation.oriName ?? declaration.propertyName ?? declaration.name ?? "FIXME";
+    return normalizeSdkName(operationInfo?.operation ?? { name }, NameType.Method, {
+      nameOverride: name,
+    });
   }
 }

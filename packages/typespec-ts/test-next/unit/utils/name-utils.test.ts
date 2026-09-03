@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { NameType, normalizeName } from "../../../src/utils/name-utils.js";
+import {
+  NameType,
+  normalizeName,
+  normalizeSdkName,
+  normalizeSdkPropertyName,
+} from "../../../src/utils/name-utils.js";
 
 describe("#normalizeName", () => {
   describe("general cases", () => {
@@ -115,5 +120,52 @@ describe("#normalizeName", () => {
     it("should normalize the name", () => {
       expect(normalizeName("create_ widget", NameType.Parameter)).to.equal("createWidget");
     });
+  });
+});
+
+describe("#normalizeSdkName", () => {
+  it("normalizes non-exact names", () => {
+    expect(normalizeSdkName({ name: "model_name" }, NameType.Interface)).to.equal("ModelName");
+  });
+
+  it("preserves exact names", () => {
+    expect(
+      normalizeSdkName({ name: "model_name", isExactName: true }, NameType.Interface, {
+        shouldGuard: true,
+      }),
+    ).to.equal("model_name");
+    expect(
+      normalizeSdkName({ name: "endpoint", isExactName: true }, NameType.Parameter, {
+        shouldGuard: true,
+      }),
+    ).to.equal("endpoint");
+  });
+
+  it("guards exact method names when required by TypeScript syntax", () => {
+    expect(
+      normalizeSdkName({ name: "class", isExactName: true }, NameType.Method, {
+        shouldGuard: true,
+      }),
+    ).to.equal("$class");
+  });
+
+  it("normalizes a name override while retaining exact-name metadata", () => {
+    expect(
+      normalizeSdkName({ name: "OriginalClient", isExactName: true }, NameType.Interface, {
+        nameOverride: "my_client",
+      }),
+    ).to.equal("my_client");
+    expect(
+      normalizeSdkName({ name: "OriginalClient" }, NameType.Interface, {
+        nameOverride: "my_client",
+      }),
+    ).to.equal("MyClient");
+  });
+
+  it("uses SDK normalization for property names", () => {
+    expect(normalizeSdkPropertyName({ name: "property_name" })).to.equal("propertyName");
+    expect(normalizeSdkPropertyName({ name: "property-name", isExactName: true })).to.equal(
+      "property-name",
+    );
   });
 });

@@ -753,11 +753,10 @@ function resolveParameterNameConflict(
   // subsequent calls (e.g. emitNonModelResponseTypes then buildApiOptions both call
   // getMethodHierarchiesMap on the same TCGC object) always normalize from the
   // original, not from the already-mutated value.
-  const paramName = normalizeSdkName(
-    { name: p.oriName ?? p.name, isExactName: p.isExactName },
-    NameType.Parameter,
-    { shouldGuard: true },
-  );
+  const paramName = normalizeSdkName(p, NameType.Parameter, {
+    shouldGuard: true,
+    nameOverride: p.oriName ?? p.name,
+  });
   if (!p.oriName) {
     p.oriName = p.name;
   }
