@@ -23,8 +23,6 @@ import {
   type MetadataInfo,
 } from "@typespec/http";
 
-import { resolveProviderNamespace } from "../namespace.js";
-
 const unsupportedPatchProperties = new Set(["id", "name", "type", "location"]);
 
 export const noUnsupportedPatchPropertiesRule = createRule({
@@ -40,11 +38,6 @@ export const noUnsupportedPatchPropertiesRule = createRule({
   create(context) {
     return {
       operation: (operation) => {
-        const namespace = operation.interface?.namespace ?? operation.namespace;
-        if (resolveProviderNamespace(context.program, namespace) === undefined) {
-          return;
-        }
-
         const [httpOperation] = getHttpOperation(context.program, operation);
         if (httpOperation.verb !== "patch" || httpOperation.parameters.body === undefined) {
           return;

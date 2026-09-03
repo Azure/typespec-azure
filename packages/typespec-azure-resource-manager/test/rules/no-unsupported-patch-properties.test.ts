@@ -55,6 +55,49 @@ it("reports writable id, name, and type properties", async () => {
     ]);
 });
 
+it("reports unsupported properties in nested ARM namespaces", async () => {
+  await tester
+    .expect(
+      `
+        @armProviderNamespace
+        namespace Microsoft.Test {
+          namespace Nested {
+            model WidgetPatch {
+              id?: string;
+            }
+
+            @route("/widgets/{widgetName}") @patch
+            op update(@path widgetName: string, @body body: WidgetPatch): void;
+          }
+        }
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/no-unsupported-patch-properties",
+      message:
+        "PATCH request body property 'id' is not patchable and should be removed or made read-only or immutable.",
+    });
+});
+
+it("does not require provider namespace decoration when the ARM rule is enabled", async () => {
+  await tester
+    .expect(
+      `
+        model WidgetPatch {
+          id?: string;
+        }
+
+        @route("/widgets/{widgetName}") @patch
+        op update(@path widgetName: string, @body body: WidgetPatch): void;
+      `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/no-unsupported-patch-properties",
+      message:
+        "PATCH request body property 'id' is not patchable and should be removed or made read-only or immutable.",
+    });
+});
+
 it("reports writable location and properties.provisioningState on a nullable body", async () => {
   await tester
     .expect(
