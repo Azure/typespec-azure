@@ -17,6 +17,7 @@ import {
   isRecordModelType,
   walkPropertiesInherited,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/typekit";
 import { getAllHttpServices } from "@typespec/http";
 
 import { getArmProviderNamespace } from "../namespace.js";
@@ -35,8 +36,7 @@ export const noUuidRule = createRule({
   },
   create(context) {
     const reportedTargets = new Set<ModelProperty | Operation>();
-    const [uuidType] = context.program.resolveTypeReference("Azure.Core.uuid");
-    const uuidScalar = uuidType?.kind === "Scalar" ? uuidType : undefined;
+    const uuidScalar = $(context.program).type.resolve("Azure.Core.uuid", "Scalar");
     const [services] = getAllHttpServices(context.program);
     const armServices = services.filter((service) =>
       getArmProviderNamespace(context.program, service.namespace),
