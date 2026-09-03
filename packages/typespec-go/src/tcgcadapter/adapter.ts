@@ -217,7 +217,7 @@ function fixStutteringTypeNames(
     return newName;
   };
 
-  // to keep compat with autorest.go, this is off by default
+  // to keep compat with legacy behavior, this is off by default
   if (options["fix-const-stuttering"] === true) {
     for (const sdkEnum of sdkPackage.enums) {
       sdkEnum.name = renameType(sdkEnum.name);
