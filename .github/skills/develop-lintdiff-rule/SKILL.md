@@ -384,12 +384,17 @@ paths as temporary focused-validation setup; they are not needed for
 `specs:typespec` corpus runs.
 
 Create them immediately before the focused fixture validation that needs them.
-After the final focused validation, and before any repository-wide format or
-lint command, remove only those known temporary links or junctions. Repository-
-wide `pnpm format` (`prettier --write .`) and lint can follow them into external
-checkouts, format or lint their contents, create large unrelated diffs, and
-report their external lint errors. If focused validation must be rerun, recreate
-the two links, validate, and remove the same two links again before continuing.
+After the final focused validation, remove only those known temporary links or
+junctions. If focused validation must be rerun, recreate the two links, validate,
+and remove the same two links again before continuing.
+
+Never run repository-wide `pnpm format` (`prettier --write .`) or `pnpm lint`
+from a lintdiff worker. Their recursive scope can follow temporary links into
+external checkouts, rewrite thousands of unrelated files when the target branch
+has formatting drift, reformat harness-owned snapshots incompatibly with the
+snapshot serializer, and fail on unrelated package baseline warnings. The
+targeted formatting and linting procedure below is the task-specific exception
+to the repository's default commit-time commands.
 
 Corpus reruns remain safe without these test links: the corpus runner uses the
 isolated specs checkout, its copied dataset and common-types content, and the
@@ -572,7 +577,34 @@ Before preparing the PR:
 Canonical coverage is rebuilt separately and serially on the target branch
 after rule PRs merge.
 
-### 7. Run an independent code review
+### 7. Format and lint only the rule diff
+
+After restoring generated corpus data and removing temporary fixture links:
+
+1. Build a flat list of manually maintained files changed by the rule:
+   production `.ts` files, fixture `main.tsp` and `expect.json` files,
+   `rule.md`, `migration.md`, and any directly changed tests. On PowerShell,
+   append each command result to the same array; do not create a nested array
+   whose entries become space-joined formatter arguments.
+2. Run Prettier with those explicit paths only. Do not include harness-owned
+   `output.json`, `tsp-diagnostics.json`, or `validator-diagnostics.json`
+   snapshots, and never use `prettier --write .`.
+3. Run the package build and invoke `oxlint` only on the changed TypeScript
+   source and test files. Do not use package- or repository-wide lint as a
+   proxy when it has unrelated baseline warnings.
+4. Run focused fixture validation after formatting. If snapshots need updates,
+   use `validate --rule <ValidatorRuleId> --update-snapshots`, then rerun the
+   same command without `--update-snapshots`. Do not format snapshots afterward.
+5. Check `git status`, `git diff --check`, and the staged file list. If a broad
+   tool was accidentally run, restore unrelated tracked paths in one bulk
+   operation with a reviewed pathspec; do not execute thousands of individual
+   `git restore` processes.
+
+This procedure satisfies the repository formatting and linting requirement for
+lintdiff worker PRs while preserving generated snapshot fidelity and keeping
+validation scoped to the change.
+
+### 8. Run an independent code review
 
 Before committing or creating the PR, the main agent must assign the complete
 rule-related diff to a separate code-review subagent.
@@ -608,7 +640,7 @@ After the review:
    alter the reviewed implementation.
 6. Proceed only when no unresolved high-confidence correctness findings remain.
 
-### 8. Commit, push, and create the draft PR
+### 9. Commit, push, and create the draft PR
 
 Finishing validation is not the end of this skill. The top-level worker must
 complete the GitHub handoff unless the user explicitly asks to stop before

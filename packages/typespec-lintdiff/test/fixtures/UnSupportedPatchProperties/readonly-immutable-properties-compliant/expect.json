@@ -1,0 +1,22 @@
+{
+  "violation": false,
+  "ambientDiagnostics": [
+    {
+      "code": "@azure-tools/typespec-azure-core/documentation-required",
+      "count": 13
+    },
+    "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
+    "@azure-tools/typespec-azure-resource-manager/patch-envelope",
+    "tsp-lintdiff-local-linter/consistent-patch-properties",
+    "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+    {
+      "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "count": 7
+    },
+    "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
+    {
+      "code": "tsp-lintdiff-local-linter/xms-examples-required",
+      "count": 4
+    }
+  ]
+}

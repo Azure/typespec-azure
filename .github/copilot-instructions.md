@@ -24,7 +24,10 @@ This repo pins its development tools with [mise](https://mise.jdx.dev) via `mise
 
 ## Commit Rules
 
-- Always run `pnpm format && pnpm lint` before committing.
+- Always run formatting and linting before committing. Use
+  `pnpm format && pnpm lint` by default, but follow task-specific instructions
+  that require narrower commands when repository-wide tools would rewrite
+  generated artifacts or fail on unrelated baseline issues.
 - Always describe changes (see "Describing changes" section below).
 - Do not commit the file `core` or `pnpm-lock.yaml` unless your change specifically requires updating them (e.g., the nightly bot updates the `core` submodule dependency). If these appear in your staged changes unintentionally, unstage them before committing.
 
