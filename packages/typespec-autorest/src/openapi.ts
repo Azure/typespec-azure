@@ -10,6 +10,8 @@ import {
   hasUniqueItems,
 } from "@azure-tools/typespec-azure-core";
 import {
+  $featureFiles,
+  $features,
   type ArmFeatureOptions,
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
@@ -1608,7 +1610,7 @@ export async function getOpenAPIForService(
       if (
         options.versionEnumStrategy !== "include" &&
         type.kind === "Enum" &&
-        isVersionEnum(program, type)
+        (isVersionEnum(program, type) || isFeatureEnum(serviceNamespace, type))
       ) {
         return true;
       }
@@ -1622,6 +1624,14 @@ export async function getOpenAPIForService(
       return true;
     }
     return false;
+  }
+
+  function isFeatureEnum(serviceNamespace: Namespace, enumObj: Enum): boolean {
+    return serviceNamespace.decorators.some(
+      (decorator) =>
+        (decorator.decorator === $featureFiles || decorator.decorator === $features) &&
+        decorator.args[0]?.value === enumObj,
+    );
   }
 
   function getSchemaForType(
@@ -3302,6 +3312,9 @@ function createFeatureDocumentProxy(
         for (const [defName, [_, defSchema]] of definitionsForFeature) {
           featureItem.document.definitions![defName] = defSchema;
         }
+        if (!hasOpenApiContent(featureItem.document)) {
+          continue;
+        }
         finalizeOpenApi2Document(featureItem.document, featureItem.tags);
         docs.push({
           document: featureItem.document,
@@ -3359,6 +3372,15 @@ function createFeatureDocumentProxy(
     const ops = operationFeatures.get(featureName)!;
     ops.add(operationId);
   }
+}
+
+function hasOpenApiContent(document: OpenAPI2Document): boolean {
+  return (
+    Object.keys(document.paths).length > 0 ||
+    Object.keys(document["x-ms-paths"] ?? {}).length > 0 ||
+    Object.keys(document.parameters ?? {}).length > 0 ||
+    Object.keys(document.definitions ?? {}).length > 0
+  );
 }
 
 function reportDuplicateOperationIds(
