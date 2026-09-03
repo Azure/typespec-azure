@@ -18,7 +18,6 @@ import {
   getExternalTypeRef,
   getFeature,
   getFeatureFileSet,
-  getFeatureOptions,
   getInlineAzureType,
   getResourceFeatureSet,
   isArmCommonType,
@@ -1627,31 +1626,7 @@ export async function getOpenAPIForService(
   }
 
   function isFeatureEnum(program: Program, serviceNamespace: Namespace, enumObj: Enum): boolean {
-    if (!getFeatureFileSet(program, serviceNamespace)) {
-      return false;
-    }
-
-    const featureSet = getResourceFeatureSet(program, serviceNamespace);
-    if (featureSet === undefined) {
-      return false;
-    }
-
-    const enumFeatureNames = new Set(
-      [...enumObj.members.values()].map((member) =>
-        getFeatureOptions(program, member).featureName.toLowerCase(),
-      ),
-    );
-    const configuredFeatureNames = new Set(
-      [...featureSet.keys()].map((featureName) => featureName.toLowerCase()),
-    );
-    if (!enumFeatureNames.has("common")) {
-      configuredFeatureNames.delete("common");
-    }
-
-    return (
-      enumFeatureNames.size === configuredFeatureNames.size &&
-      [...enumFeatureNames].every((featureName) => configuredFeatureNames.has(featureName))
-    );
+    return getFeatureFileSet(program, serviceNamespace) === enumObj;
   }
 
   function getSchemaForType(
