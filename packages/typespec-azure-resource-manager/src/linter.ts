@@ -41,6 +41,7 @@ import { retryAfterRule } from "./rules/retry-after.js";
 import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 import { useApiVersionRule } from "./rules/use-api-version.js";
+import { useApplicationJsonContentTypeRule } from "./rules/use-application-json-content-type.js";
 import { useInterfaceRule } from "./rules/use-interface.js";
 import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
@@ -65,6 +66,7 @@ const rules = [
   armResourceNamePatternRule,
   armResourceOperationsRule,
   useApiVersionRule,
+  useApplicationJsonContentTypeRule,
   useOperationDecoratorRule,
   armResourcePathInvalidCharsRule,
   armResourceProvisioningStateRule,
