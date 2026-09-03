@@ -403,7 +403,7 @@
               {
                 "name": "Active",
                 "value": "Active",
-                "description": "Resource's billing is activate."
+                "description": "Resource's billing is active."
               },
               {
                 "name": "Warned",
