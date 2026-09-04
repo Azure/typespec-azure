@@ -483,6 +483,12 @@ const libDef = {
         default: paramMessage`Property name ${"propertyName"} is normalized to ${"normalizedName"}.`,
       },
     },
+    "invalid-exact-name": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Exact ${"nameKind"} name ${"name"} is not a valid TypeScript identifier. Choose a valid TypeScript identifier or remove exact().`,
+      },
+    },
     "un-supported-format-cases": {
       severity: "warning",
       messages: {
