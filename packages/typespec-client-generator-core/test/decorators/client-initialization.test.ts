@@ -1109,4 +1109,57 @@ describe("@clientInitialization scope in ClientInitializationOptions", () => {
       severity: "warning",
     });
   });
+
+  it("resolves inherited parameters and initializedBy through the model inheritance chain", async () => {
+    // Every `ClientInitializationOptions` setting - not just `scope` - is read through the `extends`
+    // chain. Here `parameters` and `initializedBy` are declared on the base options model while the
+    // leaf only adds `scope`, and both base settings are still applied. (`customizeCode` is used
+    // because it is a valid `initializedBy` value for a root client and differs from the default.)
+    const customizationCode = `
+      namespace MyCustomizations;
+
+      model MyClientInitialization {
+        blobName: string;
+      }
+
+      model Base extends Azure.ClientGenerator.Core.ClientInitializationOptions {
+        parameters: MyClientInitialization;
+        initializedBy: InitializedBy.customizeCode;
+      }
+
+      model Final extends Base {
+        scope: "csharp";
+      }
+
+      @@clientInitialization(MyService, MyCustomizations.Final);
+      `;
+
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(mainCode, customizationCode),
+    );
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const csharpClient = csharpContext.sdkPackage.clients[0];
+    strictEqual(
+      csharpClient.clientInitialization.parameters.length,
+      2,
+      "csharp is in scope, so the inherited parameters model is applied",
+    );
+    strictEqual(
+      csharpClient.clientInitialization.initializedBy,
+      InitializedByFlags.CustomizeCode,
+      "the inherited initializedBy flag is applied",
+    );
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(
+      pythonContext.sdkPackage.clients[0].clientInitialization.parameters.length,
+      1,
+      "python is out of scope, so only the default endpoint parameter remains",
+    );
+  });
 });

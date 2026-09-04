@@ -70,6 +70,7 @@ import {
   type ClientInitializationOptions,
   type DecoratorOptions,
   type ExternalTypeInfo,
+  InitializedByFlags,
   type LanguageScopes,
   type SdkClient,
   type TCGCContext,
@@ -166,7 +167,7 @@ function resolveScopeFromOptions(
   legacyScope?: string,
 ): string | undefined {
   const optionsScopeConfig =
-    options?.kind === "Model" ? getEffectiveScopePropertyType(options) : undefined;
+    options?.kind === "Model" ? getInheritedOptionType(options, "scope") : undefined;
   const optionsScope: string | undefined =
     optionsScopeConfig?.kind === "String" ? optionsScopeConfig.value : undefined;
 
@@ -255,14 +256,20 @@ export const $client: ClientDecorator = (
     });
     return;
   }
+  // Every `ClientOptions` setting is read through `getInheritedOptionType` so a user model that
+  // `extends` `ClientOptions` (or an intermediate options model) has its base-declared settings
+  // honored, consistently with how `scope` resolves below.
   const explicitName =
-    options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
+    options?.kind === "Model" ? getInheritedOptionType(options, "name") : undefined;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
   let services: Namespace[];
   const serviceConfig =
-    options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
+    options?.kind === "Model" ? getInheritedOptionType(options, "service") : undefined;
   const autoMergeServiceConfig =
-    options?.kind === "Model" ? options?.properties.get("autoMergeService")?.type : undefined;
+    options?.kind === "Model" ? getInheritedOptionType(options, "autoMergeService") : undefined;
+  // `@client` has no legacy raw-parameters model form (its `options` is always a `ClientOptions`
+  // bag), so - unlike `$clientInitialization` - it does not need to gate on
+  // `isClientInitializationOptionsBag` before resolving the options-bag scope.
   const effectiveScope = resolveScopeFromOptions(context, "client", options, scope);
 
   if (serviceConfig?.kind === "Namespace") {
@@ -1257,18 +1264,22 @@ function derivesFromClientInitializationOptions(model: Model): boolean {
 }
 
 /**
- * Resolve the nearest effective `scope` property of an options bag, walking the `extends`
- * (`baseModel`) inheritance chain so that a `scope` declared on a base model is honored even when the
+ * Resolve the nearest effective option property of an options bag by name, walking the `extends`
+ * (`baseModel`) inheritance chain so that a property declared on a base model is honored even when the
  * leaf model only adds other properties (e.g. `model Final extends Base { parameters: Params }`).
+ *
+ * All scoped options bags (`ClientOptions`, `ClientInitializationOptions`, and any user model that
+ * extends them) are read through this helper so every setting - `scope`, `service`, `parameters`,
+ * etc. - resolves consistently across the inheritance chain rather than only `scope` doing so.
  */
-function getEffectiveScopePropertyType(model: Model): Type | undefined {
+function getInheritedOptionType(model: Model, propertyName: string): Type | undefined {
   const visited = new Set<Model>();
   let current: Model | undefined = model;
   while (current !== undefined && !visited.has(current)) {
     visited.add(current);
-    const scopeProperty = current.properties.get("scope");
-    if (scopeProperty !== undefined) {
-      return scopeProperty.type;
+    const property = current.properties.get(propertyName);
+    if (property !== undefined) {
+      return property.type;
     }
     current = current.baseModel;
   }
@@ -1367,20 +1378,28 @@ export function getClientInitializationOptions(
     };
   }
 
-  let initializedBy = undefined;
+  let initializedBy: InitializedByFlags | undefined = undefined;
 
-  if (options?.properties.get("initializedBy")) {
-    if (options.properties.get("initializedBy").type.kind === "EnumMember") {
-      initializedBy = options.properties.get("initializedBy").type.value;
-    } else if (options.properties.get("initializedBy").type.kind === "Union") {
+  // Read through the inheritance chain so a user model that `extends` `ClientInitializationOptions`
+  // has its base-declared `initializedBy`/`parameters` honored, consistently with `scope`.
+  const optionsModel: Model | undefined = options?.kind === "Model" ? options : undefined;
+  const initializedByType = optionsModel
+    ? getInheritedOptionType(optionsModel, "initializedBy")
+    : undefined;
+  if (initializedByType) {
+    if (initializedByType.kind === "EnumMember") {
+      initializedBy = initializedByType.value as InitializedByFlags;
+    } else if (initializedByType.kind === "Union") {
       initializedBy = 0;
-      for (const variant of options.properties.get("initializedBy").type.variants.values()) {
-        initializedBy |= variant.type.value;
+      for (const variant of initializedByType.variants.values()) {
+        initializedBy |= (variant.type as EnumMember).value as number;
       }
     }
   }
 
-  let parametersModel = options?.properties.get("parameters")?.type;
+  let parametersModel: Model | undefined = optionsModel
+    ? (getInheritedOptionType(optionsModel, "parameters") as Model | undefined)
+    : undefined;
   let currEntity: Namespace | Interface | undefined = entity;
   while (currEntity) {
     const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(

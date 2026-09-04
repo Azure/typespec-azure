@@ -383,6 +383,37 @@ describe("@client scope in ClientOptions", () => {
       severity: "warning",
     });
   });
+
+  it("resolves an inherited ClientOptions.service through the model inheritance chain", async () => {
+    // Every `ClientOptions` setting - not just `scope` - is read through the `extends` chain, so a
+    // `service` declared on a base options model is honored even when the leaf model only adds other
+    // settings. Here `service` lives on `BaseOptions` while the leaf `FinalOptions` only sets
+    // `scope`, and the client is still bound to `MyClient` (generated for csharp only).
+    const { program } = await SimpleTester.compile(t.code`
+        @service
+        @client(Customizations.FinalOptions)
+        namespace ${t.namespace("MyClient")};
+
+        namespace Customizations {
+          model BaseOptions extends Azure.ClientGenerator.Core.ClientOptions {
+            service: MyClient;
+          }
+          model FinalOptions extends BaseOptions {
+            scope: "csharp";
+          }
+        }
+      `);
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(listClients(pythonContext).length, 0);
+  });
 });
 
 describe("listClients without @client", () => {

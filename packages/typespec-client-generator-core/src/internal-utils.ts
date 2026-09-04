@@ -208,12 +208,18 @@ export function normalizeScope(scope?: LanguageScopes | DecoratorOptions): strin
  * {@link normalizeScope}: a legacy plain string, or a `valueof DecoratorOptions` value (a plain
  * JavaScript object). Compiler entities - a string-literal type from a custom decorator that
  * declares a type-level `scope` parameter, or any other `Type`/`Value` - carry a `kind`/`entityKind`
- * discriminator and are excluded so they keep their normal `getDecoratorArgValue` conversion.
+ * discriminator and are excluded so they keep their normal `getDecoratorArgValue` conversion. Arrays
+ * are excluded as well: no scoped decorator declares an array-valued `scope`, and treating one as a
+ * marshalled bag would silently drop it to `undefined`.
  */
 function isMarshalledScopeArg(value: unknown): value is LanguageScopes | DecoratorOptions {
   if (typeof value === "string") return true;
   return (
-    typeof value === "object" && value !== null && !("kind" in value) && !("entityKind" in value)
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    !("kind" in value) &&
+    !("entityKind" in value)
   );
 }
 
