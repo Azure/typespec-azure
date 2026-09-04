@@ -7,12 +7,7 @@
   {
     "code": "tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources",
     "severity": "warning",
-    "message": "Proxy resource 'Gadget' must not declare top-level `tags` in its properties bag. Use a tracked resource if tags are required."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/unsupported-patch-properties",
-    "severity": "warning",
-    "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    "message": "Proxy resource 'Gadget' must not declare `tags` on its resource envelope or in its properties bag. Use a tracked resource if tags are required."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
@@ -48,11 +43,6 @@
     "code": "tsp-lintdiff-local-linter/path-parameter-schema",
     "severity": "warning",
     "message": "Path parameter should specify a maximum length (maxLength)."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
-    "severity": "warning",
-    "message": "Properties of a PATCH request body must not be required, property:name."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",

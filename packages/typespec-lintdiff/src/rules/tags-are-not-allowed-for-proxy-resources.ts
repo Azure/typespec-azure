@@ -1,14 +1,13 @@
-import { createRule, paramMessage, type Model, type ModelProperty } from "@typespec/compiler";
 import { getArmResources } from "@azure-tools/typespec-azure-resource-manager";
+import { createRule, paramMessage, type Model, type ModelProperty } from "@typespec/compiler";
 
 export const tagsAreNotAllowedForProxyResourcesRule = createRule({
   name: "tags-are-not-allowed-for-proxy-resources",
   description:
-    "Proxy ARM resources must not declare a top-level tags property in their properties bag.",
+    "Proxy ARM resources must not declare a tags property on the resource envelope or in their properties bag.",
   severity: "warning",
   messages: {
-    default:
-      paramMessage`Proxy resource '${"resourceName"}' must not declare top-level \`tags\` in its properties bag. Use a tracked resource if tags are required.`,
+    default: paramMessage`Proxy resource '${"resourceName"}' must not declare \`tags\` on its resource envelope or in its properties bag. Use a tracked resource if tags are required.`,
   },
   create(context) {
     return {
@@ -18,18 +17,20 @@ export const tagsAreNotAllowedForProxyResourcesRule = createRule({
             continue;
           }
 
+          const resourceTags = getPropertyInHierarchy(armResource.typespecType, "tags");
           const propertiesModel = getResourcePropertiesModel(armResource.typespecType);
-          const tagsProperty = propertiesModel && getPropertyInHierarchy(propertiesModel, "tags");
-          if (!tagsProperty) {
-            continue;
-          }
+          const propertiesTags = propertiesModel && getPropertyInHierarchy(propertiesModel, "tags");
 
-          context.reportDiagnostic({
-            target: tagsProperty,
-            format: {
-              resourceName: armResource.name,
-            },
-          });
+          for (const tagsProperty of [resourceTags, propertiesTags]) {
+            if (tagsProperty) {
+              context.reportDiagnostic({
+                target: tagsProperty,
+                format: {
+                  resourceName: armResource.name,
+                },
+              });
+            }
+          }
         }
       },
     };
