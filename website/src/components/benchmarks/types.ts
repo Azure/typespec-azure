@@ -57,7 +57,7 @@ export interface MetricView {
   values: Record<string, (number | null)[]>;
 }
 
-/** A metric summarised for the table, cards and change panel. */
+/** A metric summarized for the table, cards and change panel. */
 export interface MetricRow {
   /** Raw metric label. */
   key: string;

@@ -199,7 +199,7 @@ export function latestValue(values: (number | null)[]): number | null {
 }
 
 /**
- * Summarise metrics for the table, cards and change panel.
+ * Summarize metrics for the table, cards and change panel.
  *
  * `parentKey` turns on the share column, expressing each row as a fraction of
  * its aggregate (for example each linter rule as a share of total lint time).
