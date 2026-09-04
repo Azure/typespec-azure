@@ -17,6 +17,7 @@ import {
   getCustomResourceOptions,
   getExternalTypeRef,
   getFeature,
+  getFeatureFileSet,
   getInlineAzureType,
   getResourceFeatureSet,
   isArmCommonType,
@@ -1608,7 +1609,7 @@ export async function getOpenAPIForService(
       if (
         options.versionEnumStrategy !== "include" &&
         type.kind === "Enum" &&
-        isVersionEnum(program, type)
+        (isVersionEnum(program, type) || isFeatureEnum(program, serviceNamespace, type))
       ) {
         return true;
       }
@@ -1622,6 +1623,10 @@ export async function getOpenAPIForService(
       return true;
     }
     return false;
+  }
+
+  function isFeatureEnum(program: Program, serviceNamespace: Namespace, enumObj: Enum): boolean {
+    return getFeatureFileSet(program, serviceNamespace) === enumObj;
   }
 
   function getSchemaForType(
@@ -3303,6 +3308,9 @@ function createFeatureDocumentProxy(
           featureItem.document.definitions![defName] = defSchema;
         }
         finalizeOpenApi2Document(featureItem.document, featureItem.tags);
+        if (!hasOpenApiContent(featureItem.document)) {
+          continue;
+        }
         docs.push({
           document: featureItem.document,
           operationExamples: featureExamples,
@@ -3359,6 +3367,15 @@ function createFeatureDocumentProxy(
     const ops = operationFeatures.get(featureName)!;
     ops.add(operationId);
   }
+}
+
+function hasOpenApiContent(document: OpenAPI2Document): boolean {
+  return (
+    Object.keys(document.paths).length > 0 ||
+    Object.keys(document["x-ms-paths"] ?? {}).length > 0 ||
+    Object.keys(document.parameters ?? {}).length > 0 ||
+    Object.keys(document.definitions ?? {}).length > 0
+  );
 }
 
 function reportDuplicateOperationIds(

@@ -50,6 +50,7 @@
     "@chronus/chronus": "catalog:",
     "@chronus/github": "catalog:",
     "@chronus/github-pr-commenter": "catalog:",
+    "@octokit/rest": "catalog:",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "cross-env": "catalog:",
