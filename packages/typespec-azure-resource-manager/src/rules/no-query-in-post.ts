@@ -1,6 +1,7 @@
 import { createRule, fileRef, paramMessage } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 import { isArmProviderNamespace } from "../namespace.js";
+import { isApiVersionParameterName } from "./utils.js";
 
 export const noQueryInPostRule = createRule({
   name: "no-query-in-post",
@@ -25,7 +26,7 @@ export const noQueryInPostRule = createRule({
         }
 
         for (const parameter of httpOperation.parameters.properties) {
-          if (parameter.kind !== "query" || isApiVersionParameter(parameter.options.name)) {
+          if (parameter.kind !== "query" || isApiVersionParameterName(parameter.options.name)) {
             continue;
           }
 
@@ -40,7 +41,3 @@ export const noQueryInPostRule = createRule({
     };
   },
 });
-
-function isApiVersionParameter(name: string): boolean {
-  return name === "api-version";
-}

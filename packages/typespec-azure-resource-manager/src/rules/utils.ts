@@ -42,6 +42,10 @@ export function isResourceOperation(program: Program, op: Operation) {
   return !!getResourceOperation(program, op);
 }
 
+export function isApiVersionParameterName(name: string): boolean {
+  return name === "api-version";
+}
+
 export function getProperties(model: Model) {
   let properties: ModelProperty[] = Array.from(model.properties.values());
   while (model.baseModel) {
