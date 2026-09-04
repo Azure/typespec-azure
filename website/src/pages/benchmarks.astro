@@ -4,18 +4,30 @@ import { BenchmarkDashboard } from "../components/benchmarks/benchmark-dashboard
 ---
 
 <BaseLayout>
-  <div style="max-width: 1200px; margin: 0 auto; padding: 2rem 1rem;">
-    <h1 style="margin-bottom: 0.25rem;">Benchmarks</h1>
-    <p style="color: gray; margin-top: 0;">
-      Performance tracking for the TypeSpec Azure compilation pipeline. Data is collected on every
-      push to <code>main</code> and stored on the
-      <a
-        href="https://github.com/Azure/typespec-azure/tree/benchmark-data"
-        target="_blank"
-        rel="noopener noreferrer"><code>benchmark-data</code></a
-      > branch. Use the <strong>Main baseline</strong> / <strong>Azure services</strong> switch to view
-      the consistent in-repo baseline or the real Azure service specs.
+  <div class="page">
+    <h1 class="title">Benchmarks</h1>
+    <p class="subtitle">
+      Compilation performance for the TypeSpec Azure pipeline, recorded on every push to <code
+        >main</code
+      >.
     </p>
-    <BenchmarkDashboard client:load />
+    <BenchmarkDashboard client:only="react" />
   </div>
 </BaseLayout>
+
+<style>
+  .page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .title {
+    margin: 0 0 0.25rem;
+  }
+
+  .subtitle {
+    margin: 0 0 1rem;
+    color: var(--colorNeutralForeground3);
+  }
+</style>

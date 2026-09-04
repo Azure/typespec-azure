@@ -1,0 +1,125 @@
+import { Dropdown, Option } from "@fluentui/react-components";
+import { useMemo } from "react";
+
+import type { Theme } from "@typespec/astro-utils/utils/theme";
+import {
+  BASELINE_DAYS,
+  buildComparisonView,
+  buildRows,
+  formatMs,
+  formatPercent,
+  getEmitterNames,
+  NOISE_FLOOR_RATIO,
+  shortLabel,
+  STAGE_LABELS,
+} from "./data.js";
+import { MetricChart } from "./metric-chart.js";
+import { seriesColor, trendColor } from "./palette.js";
+import type { HistoryData, TimeRange } from "./types.js";
+
+/** Metrics worth tracking per service: the pipeline stages plus each emitter. */
+export function trackableMetrics(data: HistoryData): string[] {
+  const stages = [...STAGE_LABELS, "emit"].filter((label) => data.labels.includes(label));
+  const emitters = getEmitterNames(data.labels).map((name) => `emit/${name}`);
+  return [...stages, ...emitters];
+}
+
+/**
+ * One chart per Azure service.
+ *
+ * Unlike the in-repo baseline, this corpus exists to catch regressions in each
+ * individual service, so the services are shown side by side as small multiples
+ * rather than averaged or overlaid on a single axis: every service keeps its
+ * own y scale, which is what makes a 5% drift visible on a small service that
+ * would otherwise be flattened by a large one.
+ */
+export function ServiceGrid({
+  data,
+  specNames,
+  range,
+  metricKey,
+  onMetricKey,
+  theme,
+}: {
+  data: HistoryData;
+  specNames: string[];
+  range: TimeRange;
+  metricKey: string;
+  onMetricKey: (value: string) => void;
+  theme: Theme;
+}) {
+  const view = useMemo(
+    () => buildComparisonView(data, metricKey, specNames, range),
+    [data, metricKey, specNames, range],
+  );
+
+  const rows = useMemo(() => buildRows(view, specNames), [view, specNames]);
+  const options = useMemo(() => trackableMetrics(data), [data]);
+
+  // Worst regression first, so a service that slowed down leads the grid.
+  const ordered = useMemo(
+    () => [...rows].sort((a, b) => (b.deltaRatio ?? -Infinity) - (a.deltaRatio ?? -Infinity)),
+    [rows],
+  );
+
+  if (view.points.length === 0) return null;
+
+  return (
+    <section className="serviceSection">
+      <header className="chartHeader">
+        <h2 className="sectionTitle">
+          Per-service trend
+          <span className="sectionHint">each service on its own scale</span>
+        </h2>
+        <label className="filterField">
+          <span className="filterLabel">Track</span>
+          <Dropdown
+            size="small"
+            value={shortLabel(metricKey)}
+            selectedOptions={[metricKey]}
+            onOptionSelect={(_, d) => d.optionValue && onMetricKey(d.optionValue)}
+          >
+            {options.map((key) => (
+              <Option key={key} value={key} text={shortLabel(key)}>
+                {shortLabel(key)}
+              </Option>
+            ))}
+          </Dropdown>
+        </label>
+      </header>
+
+      <div className="serviceGrid">
+        {ordered.map((row, index) => {
+          const significant =
+            row.deltaRatio !== null && Math.abs(row.deltaRatio) >= NOISE_FLOOR_RATIO;
+          const color = seriesColor(index, theme);
+
+          return (
+            <article key={row.key} className="serviceCard">
+              <header className="serviceCardHeader">
+                <h3 className="serviceCardTitle">{row.name}</h3>
+                <div className="serviceCardStats">
+                  <span className="serviceCardValue">{formatMs(row.latest)}</span>
+                  <span
+                    className="serviceCardChange"
+                    style={significant ? { color: trendColor(row.delta!, theme) } : undefined}
+                    title={`Compared to the median of the last ${BASELINE_DAYS} days (${formatMs(row.baseline)})`}
+                  >
+                    {formatPercent(row.deltaRatio)}
+                  </span>
+                </div>
+              </header>
+              <MetricChart
+                points={view.points}
+                series={[{ key: row.key, label: row.name, data: row.values, color }]}
+                theme={theme}
+                height={190}
+                yAxisLabel=""
+              />
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
