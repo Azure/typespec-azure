@@ -75,6 +75,7 @@ import {
   getTypeDecorators,
   isNeverOrVoidType,
   isSubscriptionId,
+  responseOverrideKey,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import {
@@ -327,7 +328,10 @@ export function getPropertySegmentsFromModelOrParameters(
   source: SdkModelType | SdkMethodParameter[],
   predicate: (property: SdkMethodParameter | SdkModelPropertyType) => boolean,
 ): (SdkMethodParameter | SdkModelPropertyType)[] | undefined {
-  const queue: { model: SdkModelType; path: (SdkMethodParameter | SdkModelPropertyType)[] }[] = [];
+  const queue: {
+    model: SdkModelType;
+    path: (SdkMethodParameter | SdkModelPropertyType)[];
+  }[] = [];
 
   if (!Array.isArray(source)) {
     if (source.baseModel) {
@@ -609,6 +613,11 @@ function getSdkMethodResponse(
   client: SdkClientType<SdkServiceOperation>,
 ): SdkMethodResponse {
   const responses = sdkOperation.responses;
+  const responseOverride = getOverriddenClientMethod(context, operation);
+  const responseOverrideType =
+    responseOverride && context.program.stateMap(responseOverrideKey).get(responseOverride)
+      ? responseOverride.returnType
+      : undefined;
 
   const allResponseBodies: SdkType[] = [];
   let containsResponseWithoutBody = false;
@@ -622,7 +631,13 @@ function getSdkMethodResponse(
 
   const responseTypes = new Set<string>(allResponseBodies.map((x) => getHashForType(x)));
   let type: SdkType | undefined = undefined;
-  if (getResponseAsBool(context, operation)) {
+  if (responseOverrideType && isNeverOrVoidType(responseOverrideType)) {
+    type = undefined;
+  } else if (responseOverrideType) {
+    type = ignoreDiagnostics(
+      getClientTypeWithDiagnostics(context, responseOverrideType, operation),
+    );
+  } else if (getResponseAsBool(context, operation)) {
     type = getSdkBuiltInType(context, $(context.program).builtin.boolean);
   } else {
     if (responseTypes.size > 1) {
@@ -749,10 +764,14 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
+  const override = getOverriddenClientMethod(context, operation);
+  const responseReplacement =
+    override !== undefined && context.program.stateMap(responseOverrideKey).get(override) === true;
   const lro = getTcgcLroMetadata(context, operation, client);
   // `@disablePageable` disables paging even for operations with @list
   const pagingDisabled = getDisablePageable(context, operation);
   const paging =
+    !responseReplacement &&
     !pagingDisabled &&
     (isList(context.program, operation) || getMarkAsPageable(context, operation));
   if (lro && paging) {
