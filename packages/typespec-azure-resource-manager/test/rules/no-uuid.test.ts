@@ -141,6 +141,19 @@ it("reports a direct UUID response body", async () => {
     .toEmitDiagnostics(diagnostic);
 });
 
+it("reports a UUID response body through an ARM response template", async () => {
+  await tester
+    .expect(
+      inArmService(`
+        @route("/widgets")
+        interface Widgets {
+          @get read(): ArmResponse<Azure.Core.uuid>;
+        }
+      `),
+    )
+    .toEmitDiagnostics(diagnostic);
+});
+
 it("reports a custom scalar derived from UUID", async () => {
   await tester
     .expect(

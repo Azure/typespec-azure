@@ -12,10 +12,8 @@ import {
   fileRef,
   getFormat,
   getLocationContext,
-  getSourceLocation,
   isArrayModelType,
   isRecordModelType,
-  walkPropertiesInherited,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { getAllHttpServices } from "@typespec/http";
@@ -45,84 +43,44 @@ export const noUuidRule = createRule({
 
     return {
       modelProperty: (property) => {
-        const model = property.model;
-        const modelNamespace = model?.namespace;
-        if (
-          !model?.name ||
-          modelNamespace === undefined ||
-          !armServices.some((service) => isWithinNamespace(modelNamespace, service.namespace))
-        ) {
+        if (!isInArmService(property.model?.namespace, armServices)) {
           return;
         }
 
-        const target = getProjectProperty(context.program, property);
-        if (target !== undefined) {
-          reportUuidUsage(
-            context,
-            uuidScalar,
-            property.type,
-            target,
-            reportedTargets,
-            new Set(),
-            true,
-            property,
-          );
+        if (
+          getFormat(context.program, property) === "uuid" ||
+          containsUuid(context.program, uuidScalar, property.type)
+        ) {
+          reportTarget(context, property, reportedTargets);
+        }
+      },
+      operation: (operation) => {
+        const namespace = operation.interface?.namespace ?? operation.namespace;
+        if (
+          isInArmService(namespace, armServices) &&
+          containsUuid(context.program, uuidScalar, operation.returnType)
+        ) {
+          reportTarget(context, operation, reportedTargets);
         }
       },
       root: () => {
         for (const service of armServices) {
           for (const httpOperation of service.operations) {
             const operation = httpOperation.operation;
-            for (const parameter of httpOperation.parameters.parameters) {
-              const target =
-                parameter.param.name === resourceKeyByOperation.get(operation)
-                  ? operation
-                  : getProjectProperty(context.program, parameter.param);
-              if (target !== undefined) {
-                if (getFormat(context.program, parameter.param) === "uuid") {
-                  reportTarget(context, target, reportedTargets);
-                } else {
-                  reportUuidUsage(
-                    context,
-                    uuidScalar,
-                    parameter.param.type,
-                    target,
-                    reportedTargets,
-                  );
-                }
-              }
+            const resourceKey = resourceKeyByOperation.get(operation);
+            if (resourceKey === undefined) {
+              continue;
             }
 
-            const requestBody = httpOperation.parameters.body;
-            if (requestBody !== undefined) {
-              reportUuidUsage(
-                context,
-                uuidScalar,
-                requestBody.type,
-                getPayloadTarget(context.program, requestBody.property, operation),
-                reportedTargets,
-              );
-            }
-
-            for (const response of httpOperation.responses) {
-              for (const content of response.responses) {
-                if (content.body !== undefined) {
-                  reportUuidUsage(
-                    context,
-                    uuidScalar,
-                    content.body.type,
-                    getPayloadTarget(context.program, content.body.property, operation),
-                    reportedTargets,
-                  );
-                }
-
-                for (const header of Object.values(content.headers ?? {})) {
-                  const target = getProjectProperty(context.program, header);
-                  if (target !== undefined) {
-                    reportUuidUsage(context, uuidScalar, header.type, target, reportedTargets);
-                  }
-                }
-              }
+            const parameter = httpOperation.parameters.parameters.find(
+              (parameter) => parameter.param.name === resourceKey,
+            );
+            if (
+              parameter !== undefined &&
+              (getFormat(context.program, parameter.param) === "uuid" ||
+                containsUuid(context.program, uuidScalar, parameter.param.type))
+            ) {
+              reportTarget(context, operation, reportedTargets);
             }
           }
         }
@@ -161,105 +119,58 @@ function isWithinNamespace(namespace: Namespace, ancestor: Namespace): boolean {
   return false;
 }
 
-function reportUuidUsage(
-  context: Parameters<typeof noUuidRule.create>[0],
+function isInArmService(
+  namespace: Namespace | undefined,
+  services: readonly { namespace: Namespace }[],
+): boolean {
+  return (
+    namespace !== undefined &&
+    services.some((service) => isWithinNamespace(namespace, service.namespace))
+  );
+}
+
+function containsUuid(
+  program: Program,
   uuidScalar: Scalar | undefined,
   type: Type,
-  target: ModelProperty | Operation,
-  reportedTargets: Set<ModelProperty | Operation>,
   seen = new Set<Type>(),
-  canReportTarget = true,
-  formatSource?: ModelProperty,
-): void {
-  const formattedProperty = formatSource ?? (target.kind === "ModelProperty" ? target : undefined);
-  if (
-    formattedProperty !== undefined &&
-    getFormat(context.program, formattedProperty) === "uuid" &&
-    canReportTarget &&
-    isProjectDeclaration(context.program, target)
-  ) {
-    reportTarget(context, target, reportedTargets);
-  }
-
+): boolean {
   if (seen.has(type)) {
-    return;
+    return false;
   }
 
   seen.add(type);
 
   switch (type.kind) {
     case "Scalar":
-      if (type === uuidScalar || getFormat(context.program, type) === "uuid") {
-        if (canReportTarget && isProjectDeclaration(context.program, target)) {
-          reportTarget(context, target, reportedTargets);
-        }
-      } else if (type.baseScalar !== undefined) {
-        reportUuidUsage(
-          context,
-          uuidScalar,
-          type.baseScalar,
-          target,
-          reportedTargets,
-          seen,
-          canReportTarget,
-        );
-      }
-      return;
+      return (
+        type === uuidScalar ||
+        getFormat(program, type) === "uuid" ||
+        (type.baseScalar !== undefined && containsUuid(program, uuidScalar, type.baseScalar, seen))
+      );
     case "Model":
       if (isContainerModel(type)) {
-        reportUuidUsage(
-          context,
-          uuidScalar,
-          type.indexer.value,
-          target,
-          reportedTargets,
-          seen,
-          canReportTarget,
-        );
-        return;
+        return containsUuid(program, uuidScalar, type.indexer.value, seen);
       }
-      for (const property of walkPropertiesInherited(type)) {
-        const propertyTarget = getProjectProperty(context.program, property);
-        reportUuidUsage(
-          context,
-          uuidScalar,
-          property.type,
-          propertyTarget ?? target,
-          reportedTargets,
-          new Set(seen),
-          propertyTarget !== undefined,
-          property,
-        );
+      if (getLocationContext(program, type).type === "project") {
+        return false;
       }
-      return;
+      // Project model properties are visited by the linter. Recurse only through library wrappers
+      // such as ArmResponse<T>, whose instantiated payload property cannot be reported directly.
+      return [...type.properties.values()].some(
+        (property) =>
+          getLocationContext(program, property).type !== "project" &&
+          (getFormat(program, property) === "uuid" ||
+            containsUuid(program, uuidScalar, property.type, new Set(seen))),
+      );
     case "Tuple":
-      for (const value of type.values) {
-        reportUuidUsage(
-          context,
-          uuidScalar,
-          value,
-          target,
-          reportedTargets,
-          new Set(seen),
-          canReportTarget,
-        );
-      }
-      return;
+      return type.values.some((value) => containsUuid(program, uuidScalar, value, new Set(seen)));
     case "Union":
-      for (const variant of type.variants.values()) {
-        reportUuidUsage(
-          context,
-          uuidScalar,
-          variant.type,
-          target,
-          reportedTargets,
-          new Set(seen),
-          canReportTarget,
-        );
-      }
-      return;
+      return [...type.variants.values()].some((variant) =>
+        containsUuid(program, uuidScalar, variant.type, new Set(seen)),
+      );
     default:
-      return;
+      return false;
   }
 }
 
@@ -276,37 +187,4 @@ function reportTarget(
 
 function isContainerModel(model: Model): model is ArrayModelType | RecordModelType {
   return isArrayModelType(model) || isRecordModelType(model);
-}
-
-function getPayloadTarget(
-  program: Program,
-  property: ModelProperty | undefined,
-  operation: Operation,
-): ModelProperty | Operation {
-  return property === undefined ? operation : (getProjectProperty(program, property) ?? operation);
-}
-
-function getProjectProperty(program: Program, property: ModelProperty): ModelProperty | undefined {
-  let source = property;
-  while (source.sourceProperty !== undefined) {
-    source = source.sourceProperty;
-  }
-  return isProjectDeclaration(program, source) ? source : undefined;
-}
-
-function isProjectDeclaration(
-  program: Program,
-  declaration: Model | ModelProperty | Operation,
-): boolean {
-  if (getLocationContext(program, declaration).type === "project") {
-    return true;
-  }
-
-  if (declaration.node === undefined) {
-    return false;
-  }
-
-  const path = getSourceLocation(declaration.node).file.path.replaceAll("\\", "/");
-  const projectRoot = program.projectRoot.replaceAll("\\", "/").replace(/\/$/, "");
-  return path === projectRoot || path.startsWith(`${projectRoot}/`);
 }
