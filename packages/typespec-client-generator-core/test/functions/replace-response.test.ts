@@ -110,7 +110,6 @@ it("composes response replacement with other operation transformations", async (
 
         #suppress "experimental-feature" "testing replaceParameter"
         alias WithRequiredName = replaceParameter(TestService.create, "name", CreateResult.id);
-        #suppress "experimental-feature" "testing replaceResponseWithVoid"
         #suppress "@azure-tools/typespec-client-generator-core/override-response-replacement" "intentional response replacement"
         @@override(TestService.create, replaceResponseWithVoid(WithRequiredName));
       `,

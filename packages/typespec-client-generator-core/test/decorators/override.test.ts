@@ -56,7 +56,7 @@ it("basic", async () => {
 });
 
 it("reports an error for an unrelated override response type", async () => {
-  const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+  const diagnostics = await SimpleBaseTester.diagnose(
     createClientCustomizationInput(
       `
     @service
