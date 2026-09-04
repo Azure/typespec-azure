@@ -188,7 +188,9 @@ model Widget is TrackedResource<WidgetProperties>;
 ```json
 {
   "allOf": [
-    { "$ref": "../../common-types/resource-management/v5/types.json#/definitions/TrackedResource" }
+    {
+      "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/TrackedResource"
+    }
   ]
 }
 ```
