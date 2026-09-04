@@ -99,7 +99,14 @@ function getResponseBodyType(
   responses: HttpOperationResponse[] | undefined,
   statusCode: number,
 ): Type | undefined {
-  const response = responses?.find((response) => response.statusCodes === statusCode);
+  const response =
+    responses?.find((response) => response.statusCodes === statusCode) ??
+    responses?.find(
+      (response) =>
+        typeof response.statusCodes === "object" &&
+        statusCode >= response.statusCodes.start &&
+        statusCode <= response.statusCodes.end,
+    );
   const body = response?.responses.find((content) => content.body !== undefined)?.body;
   return body?.type;
 }

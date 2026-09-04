@@ -39,6 +39,7 @@ properties that are missing from the resource model or moved to a different nest
   - PATCH `201` resource response => invalid when the body is inconsistent
   - PATCH without a `200`/`201` response and same-path GET `201` fallback => invalid when the body is inconsistent
   - PATCH `200` non-model response takes precedence over a later model response => invalid because the selected schema has no named properties
+  - a response status range containing `200` or `201` is eligible as the PATCH or GET comparison response, after any exact match for that status
   - different source names with the same emitted JSON name => valid
   - nullable object properties recurse like emitted object schemas => invalid when nested shapes differ, valid when they match
   - matching property names whose array/scalar schemas have no named properties => valid
@@ -69,3 +70,7 @@ properties that are missing from the resource model or moved to a different nest
 | `encoded-discriminator-property` | yes       | An encoded authored property replaces the synthesized discriminator and has a mismatching nested shape |
 | `same-level-subset`              | no        | PATCH updates only `properties.description`, which is a valid subset of the resource model             |
 | `async-get-fallback`             | no        | PATCH has only a `202` response, so the validator falls back to the GET resource model                 |
+
+Focused rule unit tests additionally cover the TypeSpec HTTP representation
+where one response carries a status-code range containing `200`, including the
+precedence of an overlapping exact `200` response.

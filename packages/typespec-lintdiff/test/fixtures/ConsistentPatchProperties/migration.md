@@ -11,9 +11,11 @@ validator-only projects.
 only registered ARM resource lifecycle updates. The Swagger rule inspects every
 ARM PATCH operation, including legacy templates, custom provider operations,
 and PATCH actions. The updated rule traverses ARM HTTP PATCH operations, selects
-the PATCH `200` or `201` response model, falls back to the same-path GET `200`
-or `201` response, recursively compares body properties at the same level, and
-reports the authored property.
+the PATCH response model containing status `200` or `201`, falls back to the
+same-path GET response containing `200` or `201`, recursively compares body
+properties at the same level, and reports the authored property. TypeSpec HTTP
+can represent those statuses either as individual numbers or as members of a
+status-code range.
 
 The five remaining raw TypeSpec-only projects are explained. Nineteen
 diagnostics come from older-version declarations absent from the retained
@@ -28,7 +30,7 @@ reports authored properties.
 | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [External coverage snapshot](../../../docs/coverage_old.md)        | The checked-in snapshot links to its source gist but records no date, spec commit, or generator revision. It reports 450 compiled projects and 210 rules. | `lint`; 303 validator projects; 25 local-lint projects; 0 official projects; 8.3%. Project identities cannot be reconstructed from this aggregate row.                    |
 | [Checked-in observed report](../../../specs/coverage-breakdown.md) | Specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`; 462/468 successfully compiled projects.                                                          | Before this change: `production`; 27 validator projects; 27 TypeSpec projects; 23 overlap; 4 validator-only; 4 TypeSpec-only; 151 validator and 122 TypeSpec diagnostics. |
-| [Final retained evidence](./corpus-evidence.json)                  | Full post-review run generated 2026-09-04 from the same specs commit; 462/468 projects compiled; duration 1,289,461 ms.                                   | 27 validator projects; 32 raw TypeSpec projects; 27 overlap; 0 validator-only; 5 raw TypeSpec-only; 151 validator and 325 raw TypeSpec diagnostics.                       |
+| [Final retained evidence](./corpus-evidence.json)                  | Full review-fix run generated 2026-09-04 from the same specs commit; 462/468 projects compiled; duration 1,261,930 ms.                                    | 27 validator projects; 32 raw TypeSpec projects; 27 overlap; 0 validator-only; 5 raw TypeSpec-only; 151 validator and 325 raw TypeSpec diagnostics.                       |
 
 The external report uses an unidentified older population and aggregate
 migration credit. The observed reports require same-project diagnostics on the
@@ -95,25 +97,27 @@ AutoRest's `getSchemaOrRef` selects inline or referenced schemas,
 emits nested property schemas. The Swagger rule's `diffSchema` recursively
 compares the resulting `properties` maps.
 
-| Authored shape                                                | Emitter branch / selected OpenAPI field                                                   | Swagger result | TypeSpec result | Fixture                                     |
-| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | -------------- | --------------- | ------------------------------------------- |
-| PATCH model has a property at the wrong level                 | `getSchemaForModel` emits it in body schema `properties`; PATCH `200` response selected   | violation      | violation       | `inconsistent-patch`                        |
-| Nested PATCH-only property                                    | `resolveProperty` emits nested model `properties`                                         | violation      | violation       | `nested-extra-property`                     |
-| Custom ARM PATCH outside lifecycle registration               | operation body and response schemas use `getSchemaOrRef`                                  | violation      | violation       | `custom-patch-operation`                    |
-| PATCH has only a `201` resource response                      | response schema for `201` is selected                                                     | violation      | violation       | `patch-201-response`                        |
-| PATCH lacks `200`/`201`; same-path GET has `201`              | PATCH body emitted; GET `201` response is fallback                                        | violation      | violation       | `get-201-fallback`                          |
-| PATCH lacks `200`/`201`; same-path GET has `200`              | GET `200` response is fallback                                                            | clean          | clean           | `async-get-fallback`                        |
-| PATCH has scalar `200` and model `201` responses              | Existing `200` schema wins before its shape is interpreted                                | violation      | violation       | `response-precedence`                       |
-| Different source names encode to the same JSON name           | `resolveProperty` uses the encoded property name                                          | clean          | clean           | `payload-property-shape`                    |
-| Nullable object properties have different nested properties   | nullable single-model unions emit object `properties`                                     | violation      | violation       | `nullable-object-mismatch`                  |
-| Nullable object properties have matching nested properties    | nullable single-model unions emit matching object `properties`                            | clean          | clean           | `nullable-object-match`                     |
-| Same-named array and scalar properties                        | neither property schema emits named `properties`                                          | clean          | clean           | `non-model-property-shape`                  |
-| PATCH-only property scoped to C#                              | AutoRest `isInScope` omits it from the PATCH schema                                       | clean          | clean           | `scoped-property`                           |
-| Same-path GET scoped to C#                                    | AutoRest omits the GET route, so PATCH has no fallback schema                             | clean          | clean           | `scoped-get-fallback`                       |
-| Undeclared PATCH discriminator                                | `getSchemaForModel` synthesizes the discriminator as a required string property           | violation      | violation       | `synthesized-discriminator`                 |
-| Authored property encodes to a synthesized discriminator name | `resolveProperty` overwrites the synthesized property with the authored property's schema | violation      | violation       | `encoded-discriminator-property`            |
-| Same-level PATCH subset                                       | corresponding property exists in response schema                                          | clean          | clean           | `same-level-subset`                         |
-| PATCH has no body or no PATCH/GET `200`/`201` schema          | selected comparison schema is absent                                                      | clean          | clean           | guarded directly by body/response selection |
+| Authored shape                                                | Emitter branch / selected OpenAPI field                                                    | Swagger result | TypeSpec result | Fixture                                     |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | -------------- | --------------- | ------------------------------------------- |
+| PATCH model has a property at the wrong level                 | `getSchemaForModel` emits it in body schema `properties`; PATCH `200` response selected    | violation      | violation       | `inconsistent-patch`                        |
+| Nested PATCH-only property                                    | `resolveProperty` emits nested model `properties`                                          | violation      | violation       | `nested-extra-property`                     |
+| Custom ARM PATCH outside lifecycle registration               | operation body and response schemas use `getSchemaOrRef`                                   | violation      | violation       | `custom-patch-operation`                    |
+| PATCH has only a `201` resource response                      | response schema for `201` is selected                                                      | violation      | violation       | `patch-201-response`                        |
+| PATCH lacks `200`/`201`; same-path GET has `201`              | PATCH body emitted; GET `201` response is fallback                                         | violation      | violation       | `get-201-fallback`                          |
+| PATCH lacks `200`/`201`; same-path GET has `200`              | GET `200` response is fallback                                                             | clean          | clean           | `async-get-fallback`                        |
+| PATCH has scalar `200` and model `201` responses              | Existing `200` schema wins before its shape is interpreted                                 | violation      | violation       | `response-precedence`                       |
+| PATCH response range contains `200`                           | AutoRest emits the full `2XX` range while TypeSpec HTTP retains `{ start: 200, end: 299 }` | validator miss | violation       | focused rule unit tests                     |
+| Exact PATCH `200` overlaps a containing range                 | Explicit `200` response takes precedence over the range regardless of declaration order    | validator miss | violation       | focused rule unit tests                     |
+| Different source names encode to the same JSON name           | `resolveProperty` uses the encoded property name                                           | clean          | clean           | `payload-property-shape`                    |
+| Nullable object properties have different nested properties   | nullable single-model unions emit object `properties`                                      | violation      | violation       | `nullable-object-mismatch`                  |
+| Nullable object properties have matching nested properties    | nullable single-model unions emit matching object `properties`                             | clean          | clean           | `nullable-object-match`                     |
+| Same-named array and scalar properties                        | neither property schema emits named `properties`                                           | clean          | clean           | `non-model-property-shape`                  |
+| PATCH-only property scoped to C#                              | AutoRest `isInScope` omits it from the PATCH schema                                        | clean          | clean           | `scoped-property`                           |
+| Same-path GET scoped to C#                                    | AutoRest omits the GET route, so PATCH has no fallback schema                              | clean          | clean           | `scoped-get-fallback`                       |
+| Undeclared PATCH discriminator                                | `getSchemaForModel` synthesizes the discriminator as a required string property            | violation      | violation       | `synthesized-discriminator`                 |
+| Authored property encodes to a synthesized discriminator name | `resolveProperty` overwrites the synthesized property with the authored property's schema  | violation      | violation       | `encoded-discriminator-property`            |
+| Same-level PATCH subset                                       | corresponding property exists in response schema                                           | clean          | clean           | `same-level-subset`                         |
+| PATCH has no body or no PATCH/GET `200`/`201` schema          | selected comparison schema is absent                                                       | clean          | clean           | guarded directly by body/response selection |
 
 Inherited properties and spreads reach the same model/property emitter
 branches. Arrays, records, scalar leaves, and empty objects have no named
@@ -269,7 +273,9 @@ deduplicate by property name or require count equality.
 
 ## Focused validation
 
-Ten focused cases pass: six violations and four compliant controls. They cover
+Sixteen fixture cases pass: nine violations and seven compliant controls. They cover
 nested and moved properties, custom PATCH traversal, PATCH `201`, GET `200` and
 `201` fallback, encoded JSON names, nullable objects, and a same-level subset.
-The package build and diagnostic-noise audit also pass.
+Focused unit regressions additionally verify that the TypeSpec rule selects a
+response status range containing `200` and prefers an overlapping exact `200`
+response. The package build and diagnostic-noise audit also pass.
