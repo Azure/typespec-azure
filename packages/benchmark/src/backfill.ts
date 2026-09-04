@@ -16,7 +16,15 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { generateHistory } from "./generate-history.js";
-import { DEFAULT_BRANCH, exec, execOk, git, gitSilent, listExistingResults } from "./utils.js";
+import {
+  configureGitIdentity,
+  DEFAULT_BRANCH,
+  exec,
+  execOk,
+  git,
+  gitSilent,
+  listExistingResults,
+} from "./utils.js";
 
 export interface BackfillOptions {
   /** Starting point: a commit SHA, or a number of recent commits to include. Defaults to 100. */
@@ -391,6 +399,8 @@ export function backfill(options: BackfillOptions = {}): void {
 
   console.log(`\nCommitting ${newResults.length} result(s) to ${dataBranch} branch...`);
 
+  configureGitIdentity();
+
   // Switch to benchmark-data branch
   if (gitSilent(`rev-parse --verify origin/${dataBranch}`)) {
     gitSilent(`checkout origin/${dataBranch} --force --quiet`);
@@ -427,7 +437,9 @@ export function backfill(options: BackfillOptions = {}): void {
   const commitMsg = reset
     ? `benchmark: re-measure ${succeeded} commits (${dataDirName})`
     : `benchmark: backfill results for ${succeeded} commits`;
-  gitSilent(`commit -m "${commitMsg}" --quiet`);
+  // Not silent: a failure here leaves the branch unborn, and the push that
+  // follows then fails with an unrelated-looking "src refspec" error.
+  git(`commit -m "${commitMsg}" --quiet`);
   console.log(`Results committed to ${dataBranch} branch.`);
 
   if (shouldPush) {

@@ -2,7 +2,7 @@
 import { copyFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { generateHistory } from "./generate-history.js";
-import { DEFAULT_BRANCH, git, gitSilent } from "./utils.js";
+import { DEFAULT_BRANCH, configureGitIdentity, git, gitSilent } from "./utils.js";
 
 export interface StoreResultsOptions {
   /** Path to the benchmark results JSON file. */
@@ -30,9 +30,7 @@ export function storeResults(options: StoreResultsOptions): void {
     throw new Error(`Results file not found: ${resultsFile}`);
   }
 
-  // Configure git
-  git('config user.name "github-actions[bot]"');
-  git('config user.email "github-actions[bot]@users.noreply.github.com"');
+  configureGitIdentity();
 
   try {
     // Set up worktree for the benchmark-data branch

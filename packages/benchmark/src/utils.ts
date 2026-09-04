@@ -35,6 +35,12 @@ export function execOk(cmd: string, options?: { cwd?: string }): boolean {
   }
 }
 
+/** Give git an identity to commit under, which a CI checkout does not have. */
+export function configureGitIdentity(cwd?: string): void {
+  git('config user.name "github-actions[bot]"', cwd);
+  git('config user.email "github-actions[bot]@users.noreply.github.com"', cwd);
+}
+
 /** List existing result SHAs on the benchmark-data branch. */
 export function listExistingResults(
   branch: string = DEFAULT_BRANCH,
