@@ -1,11 +1,14 @@
 /* eslint-disable no-console */
 import { execSync } from "node:child_process";
 import {
+  closeSync,
   copyFileSync,
   cpSync,
   existsSync,
   mkdirSync,
+  openSync,
   readdirSync,
+  readFileSync,
   rmSync,
   symlinkSync,
   writeFileSync,
@@ -87,6 +90,22 @@ const BUILD_FILTER = [
 ]
   .map((p) => `--filter "${p}"`)
   .join(" ");
+
+/** Last few lines of a log, for explaining a failure without dumping the file. */
+function tail(file: string, lines = 20): string {
+  try {
+    return readFileSync(file, "utf-8").trimEnd().split("\n").slice(-lines).join("\n");
+  } catch {
+    return "(no output captured)";
+  }
+}
+
+function indent(text: string): string {
+  return text
+    .split("\n")
+    .map((line) => `    ${line}`)
+    .join("\n");
+}
 
 /** Restore the saved benchmark package into the repo with symlinks to workspace packages. */
 function restoreBenchmark(repoRoot: string, savedBenchmark: string): void {
@@ -315,17 +334,23 @@ export function backfill(options: BackfillOptions = {}): void {
       // Use --specs-dir from runFlags if provided, otherwise use the saved specs
       const specsFlag = options.specsDir ? "" : `--specs-dir "${defaultSpecsDir}"`;
 
+      // Keep the output: it is the only account of why a commit failed, and
+      // it lives on a runner that is thrown away when the job ends.
+      const logFd = openSync(benchLog, "w");
       try {
         execSync(
           `node "${benchmarkCli}" run ${specsFlag} --output "${resultFile}" ${runFlagsStr}`.trim(),
-          { cwd: repoRoot, stdio: ["ignore", "ignore", "ignore"] },
+          { cwd: repoRoot, stdio: ["ignore", logFd, logFd] },
         );
         console.log("done ✓");
         succeeded++;
       } catch {
-        console.log(`benchmark failed (see ${benchLog})`);
+        console.log("benchmark failed");
+        console.log(indent(tail(benchLog)));
         failed++;
         rmSync(resultFile, { force: true });
+      } finally {
+        closeSync(logFd);
       }
     }
   } finally {
@@ -338,6 +363,12 @@ export function backfill(options: BackfillOptions = {}): void {
   console.log(`Succeeded: ${succeeded}`);
   console.log(`Failed: ${failed}`);
   console.log(`Skipped: ${skipped}`);
+
+  // A run where nothing was measured has produced no data, so let it report as
+  // a failure rather than a green job with an empty result.
+  if (succeeded === 0 && failed > 0) {
+    throw new Error(`Backfill measured nothing: all ${failed} commits failed.`);
+  }
 
   // Step 4: Push results to benchmark-data branch
   const newResults = readdirSync(resultsDir).filter((f) => f.endsWith(".json"));
