@@ -82,9 +82,10 @@ rule's semantics only in the promoted copy.
 - If the fifth round still produces valid findings, finish and push that
   round's valid fixes, then stop and report that the cap prevented another
   verification review.
-- Stop immediately on an unverified review request, review timeout, validation
-  failure, corpus failure, push failure, or finding whose validity cannot be
-  determined safely. Report the blocker instead of silently continuing.
+- Stop immediately on an unverified review request, indeterminate collector
+  failure, validation failure, corpus failure, push failure, or finding whose
+  validity cannot be determined safely. Report the blocker instead of silently
+  continuing.
 
 ## Initialize
 
@@ -141,7 +142,12 @@ rule's semantics only in the promoted copy.
      `already-pending-active`, or `failed-or-unverified`
    - verified request-event ID and timestamp, and the PR head SHA to which the
      active request applies
-   - Copilot review ID and submission timestamp
+   - raw evidence for every review poll and the mandatory final refetch,
+     including UTC poll time, HTTP status or error, useful rate-limit metadata,
+     raw response body or durable hash, and every parsed review candidate's
+     `id`, login, state, `submitted_at`, and `commit_id`
+   - ordinary-poll and final-refetch outcomes, Copilot review ID and submission
+     timestamp, and any reliability classification
    - comment IDs delivered to the fix subagent
    - validity decision for each comment
    - promotion finding category when applicable
@@ -156,8 +162,11 @@ Before requesting the first review, the parent agent owns these steps:
 1. Fetch every unresolved review thread on the pull request, including threads
    from reviews that predate this run. Use GraphQL review-thread resolution
    state rather than treating a comment cursor as backlog state.
-2. Select Copilot threads using their review association and accepted identity
-   variants. GitHub currently represents the review author as
+2. Select Copilot threads using their review association and the exact
+   case-insensitive accepted identities `Copilot`,
+   `copilot-pull-request-reviewer`, and
+   `copilot-pull-request-reviewer[bot]`. GitHub currently represents the review
+   author as
    `copilot-pull-request-reviewer[bot]` in REST and
    `copilot-pull-request-reviewer` in GraphQL, while inline comments may use
    `Copilot`. Do not require one login string to match across APIs.
@@ -210,12 +219,26 @@ ledger. It owns these steps:
    the round unless the result is `new-verified` or
    `already-pending-active`.
 
-5. Wait for a new review submitted by either
-   `copilot-pull-request-reviewer[bot]` or
-   `copilot-pull-request-reviewer` after the active request event. GitHub can
-   expose either login variant depending on the API; treat both as the same
-   Copilot reviewer identity. Poll GitHub at a moderate interval rather than
-   repeatedly requesting reviews. Allow up to 30 minutes.
+5. Poll the paginated REST pull-reviews endpoint,
+   `GET /repos/{owner}/{repo}/pulls/{number}/reviews`, at a moderate interval
+   rather than repeatedly requesting reviews. Treat its raw response as the
+   source of truth for review completion and the numeric review ID. Allow up to
+   30 minutes, using monotonic elapsed time only for deadline accounting.
+   - Across REST, GraphQL, timeline, and comment surfaces, normalize login
+     values case-insensitively and accept exactly `Copilot`,
+     `copilot-pull-request-reviewer`, and
+     `copilot-pull-request-reviewer[bot]`.
+   - A completed review candidate must have a numeric `id`, a `commit_id`
+     exactly matching the active request's head, and a raw ISO-8601 UTC
+     `submitted_at` at or after the active request timestamp. A submitted
+     `COMMENTED` review is complete; do not require `APPROVED`.
+   - For every request, record the raw UTC poll time, current PR head, HTTP
+     status or error, useful rate-limit metadata, raw response body or a durable
+     hash of it, and all parsed Copilot candidates with `id`, login, state,
+     `submitted_at`, and `commit_id`. Do not retain only the newest review.
+   - Treat a non-2xx response, incomplete or failed pagination, parse failure,
+     missing required field, or timestamp-validation failure as a
+     collector/polling failure, never as a successful empty result.
    - Compare submission timestamps without changing their timezone. Prefer
      filtering the raw GitHub JSON with `gh api --jq` and comparing normalized
      UTC instants. If PowerShell parses the response with `ConvertFrom-Json`,
@@ -236,30 +259,39 @@ ledger. It owns these steps:
          [Globalization.CultureInfo]::InvariantCulture
        ).UtcDateTime
      }
-     $isNewReview = $submittedUtc -gt $eventUtc
+     $isNewReview = $submittedUtc -ge $eventUtc
      ```
 
-   - On every poll, record the current head and the newest Copilot review ID and
-     submitted timestamp observed, even when it predates the active request.
-     Treat a missing or unparseable timestamp as a polling failure instead of
-     silently reporting `no new review`.
-   - Once the review-list endpoint includes a matching review, detect it within
-     the current polling interval. If a final or differently implemented
-     refetch finds a review that earlier polls missed, report the poll as
-     unreliable and retain both observations in the ledger; do not attribute
-     the delay to Copilot.
+   - Immediately before the deadline could be reported, perform a mandatory,
+     independent, fully paginated REST pull-reviews refetch. It must discard or
+     bypass collector caches and accumulated state and avoid conditional-cache
+     headers or behavior where practical. Preserve both the ordinary-poll and
+     final-refetch evidence.
+   - If the final refetch finds the completed review, classify ordinary polling
+     as unreliable and continue with that review; do not call the result a
+     Copilot timeout. If the final refetch does not establish a completed
+     review, or the refetch itself fails any request, pagination, parsing,
+     required-field, or timestamp check, report an indeterminate collector
+     failure rather than a Copilot timeout.
+   These are operational evidence requirements. Report observed failures
+   without asserting which internal cache, pagination, parsing, or state bug
+   caused them.
 6. Confirm the completed review applies to the round's head SHA. If the PR head
    changed while review was pending, stop the round as stale.
-7. Fetch all inline comments belonging to the new review by its numeric review
-   ID, using `GET /repos/{owner}/{repo}/pulls/{number}/reviews/{review_id}/comments`
-   with pagination or by filtering all PR review comments on
-   `pull_request_review_id == review_id`. Do not filter these comments by
-   comment-author login. Do not discard a comment because its current line,
-   original line, or diff position is null.
-8. Fetch the pull request's GraphQL review threads with pagination and map every
-   collected REST review comment ID to the GraphQL thread whose comments include
-   that `databaseId`. If any REST comment cannot be mapped to a review-thread ID,
-   return a collection failure and do not hand off a partial list.
+7. Fetch all inline comments from the review-specific numeric REST endpoint,
+   `GET /repos/{owner}/{repo}/pulls/{number}/reviews/{numeric_review_id}/comments`,
+   with complete pagination. This endpoint is the source of truth for the
+   review's comments. Zero comments is a valid completed clean review. Do not
+   filter comments by comment-author login or discard one because its current
+   line, original line, or diff position is null.
+8. Fetch the pull request's GraphQL `reviewThreads` with complete pagination
+   only as a secondary mapping and unresolved-state cross-check. Map each REST
+   comment database ID and its review ID to its thread, and report unmapped REST
+   comments and unresolved threads separately. Missing GraphQL data must never
+   override the REST determination that the review completed; if comments need
+   thread handling but cannot be mapped, return a mapping collection failure
+   without discarding the completed-review evidence or handing off a partial
+   list.
 9. Cross-check the result against available review metadata. If the review body
    reports generated comments but the endpoint returns fewer comments, return a
    collection failure instead of `no-new-comments`.
@@ -374,14 +406,20 @@ PR head SHA matches the returned commit.
 For rounds 1 through 5:
 
 1. Send the current PR head SHA and ledger to the review subagent.
-2. Independently verify the review subagent's result using the numeric
-   review-specific comments endpoint. Also refetch unresolved Copilot review
-   threads and verify that every collected REST comment is mapped to its GraphQL
-   review-thread ID before handoff. A `no-new-comments` result is successful only
-   when the endpoint returns zero comments and no unresolved Copilot threads
-   remain. If either check disagrees or any thread mapping is missing, treat it
-   as a collection failure or deliver the fully mapped discovered comments to
-   the fix subagent; never report success from the subagent result alone.
+2. Independently verify the review subagent's result from a fresh, fully
+   paginated REST pull-reviews refetch and the numeric review-specific REST
+   comments endpoint. Apply the same cache bypass, raw-evidence, identity,
+   candidate-validation, and failure rules as the review subagent. REST reviews
+   are authoritative for completion and review ID; review-specific REST
+   comments are authoritative for comments. Also paginate GraphQL
+   `reviewThreads` as a secondary check, map REST comment database IDs and
+   review ID, and report unresolved threads separately. GraphQL absence does
+   not negate REST completion. A `no-new-comments` result is successful only
+   when the review-specific endpoint returns zero comments and no unresolved
+   Copilot threads remain. If either check disagrees or any required thread
+   mapping is missing, treat it as a collection failure or deliver the fully
+   mapped discovered comments to the fix subagent; never report success from
+   the subagent result alone.
    If the independently verified result is `no-new-comments`, end the loop
    successfully here. The completed review's suppressed-comment section is
    informational and is not a new-comment queue. Do not continue to the fix
