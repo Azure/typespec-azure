@@ -1,0 +1,352 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "host": "management.azure.com",
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "azure_auth": [
+        "user_impersonation"
+      ]
+    }
+  ],
+  "securityDefinitions": {
+    "azure_auth": {
+      "type": "oauth2",
+      "description": "Azure Active Directory OAuth2 Flow.",
+      "flow": "implicit",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/authorize",
+      "scopes": {
+        "user_impersonation": "impersonate your user account"
+      }
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/bytes-content-type": {
+      "put": {
+        "operationId": "CreateOrUpdateBytes",
+        "produces": [
+          "application/octet-stream",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "file"
+            }
+          },
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "schema": {
+              "type": "string",
+              "format": "byte"
+            }
+          }
+        }
+      }
+    },
+    "/bytes-multiple-content-types": {
+      "put": {
+        "operationId": "CreateOrUpdateBytesMultipleContentTypes",
+        "produces": [
+          "application/octet-stream",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "string",
+              "format": "byte"
+            }
+          },
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "schema": {
+              "type": "file"
+            }
+          }
+        }
+      }
+    },
+    "/constrained-array": {
+      "put": {
+        "operationId": "CreateOrUpdateConstrainedArray",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "array",
+              "items": {}
+            }
+          },
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "schema": {
+              "$ref": "#/definitions/ConstrainedUnknownArray"
+            }
+          }
+        }
+      }
+    },
+    "/custom-string": {
+      "put": {
+        "operationId": "CreateOrUpdateCustomString",
+        "produces": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "schema": {
+              "$ref": "#/definitions/Custom.string"
+            }
+          }
+        }
+      }
+    },
+    "/defaults": {
+      "put": {
+        "operationId": "CreateOrUpdateDefaults",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "default": "current"
+                }
+              },
+              "required": [
+                "value"
+              ]
+            }
+          },
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "default": "created"
+                }
+              },
+              "required": [
+                "value"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/metadata": {
+      "put": {
+        "operationId": "CreateOrUpdateMetadata",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "currentValue": {
+                  "type": "string",
+                  "x-ms-client-name": "value"
+                }
+              },
+              "required": [
+                "currentValue"
+              ]
+            }
+          },
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "createdValue": {
+                  "type": "string",
+                  "x-ms-client-name": "value"
+                }
+              },
+              "required": [
+                "createdValue"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/widgets": {
+      "put": {
+        "operationId": "CreateOrUpdate",
+        "produces": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "BinaryCreated": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "BinaryOk": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "ConstrainedUnknownArray": {
+      "type": "array",
+      "minItems": 1,
+      "items": {}
+    },
+    "Custom.string": {
+      "type": "string"
+    },
+    "JsonBytesCreated": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "JsonBytesOk": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "required": [
+        "body"
+      ]
+    }
+  },
+  "parameters": {}
+}
