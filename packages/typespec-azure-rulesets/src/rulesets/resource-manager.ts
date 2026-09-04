@@ -85,7 +85,9 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": true,
     "@azure-tools/typespec-azure-resource-manager/no-reserved-resource-property": true,
     "@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels": true,
+    "@azure-tools/typespec-azure-resource-manager/no-query-in-collection": false,
     "@azure-tools/typespec-azure-resource-manager/use-interface": true,
+    "@azure-tools/typespec-azure-resource-manager/use-application-json-content-type": false,
     "@azure-tools/typespec-azure-resource-manager/use-operation-decorator": true,
     "@azure-tools/typespec-azure-resource-manager/use-api-version": true,
     "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation": true,
@@ -103,6 +105,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/retry-after": false, // Disable https://github.com/Azure/typespec-azure/issues/3351
     "@azure-tools/typespec-azure-resource-manager/secret-prop": true,
     "@azure-tools/typespec-azure-resource-manager/unsupported-type": true,
+    "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op": false,
 
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
