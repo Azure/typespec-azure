@@ -51,7 +51,9 @@ Keep an ordered ledger with one entry per input command:
 - draft PR URL, when one was created
 - development result
 - review-loop result
-- process-improvement suggestions
+- process-improvement suggestions, each with the proposed change, observed
+  evidence, impact, and source task
+- attempt count and any retry reason
 - blocker or failure, when applicable
 
 Update the ledger after every worker result so a later failure does not erase
@@ -76,6 +78,37 @@ long-running development and review workflow. After its completion notification,
 read its result once, update the ledger, and only then launch the next worker.
 Use sync mode only when the complete workflow can realistically finish within
 that invocation.
+
+At worker launch, report the active task, TypeSpec worktree, and `log.txt` path.
+If the user requests status while the worker is running, read the latest
+heartbeat and report its timestamp, phase, active command, elapsed time, and
+last completed milestone. Do not launch another worker or duplicate the active
+command merely to obtain status.
+
+## Bounded orchestration retry
+
+Allow at most one retry for a task, and use a fresh top-level subagent for it.
+Retry only when the first attempt proves an unambiguous defect in this outer
+skill's command parsing, worker prompt, worktree selection, log initialization,
+or skill-invocation mechanics before `/develop-lintdiff-rule` begins repository
+or dependency work.
+
+Before retrying, verify all of the following:
+
+- the TypeSpec and specs worktrees have no task changes
+- no task commit was created or pushed
+- no pull request was created
+- the proposed orchestration-skill correction is narrow and directly addresses
+  the recorded failure
+
+Apply the narrow correction outside the rule worktrees, record the original
+failure and correction in the ledger, then launch one fresh worker with the
+corrected prompt. Never reuse the failed worker.
+
+Do not retry dependency, build, validation, corpus, review, network, credential,
+push, or GitHub failures automatically. Do not retry after development changed
+files, created a commit, pushed a branch, or created a pull request. If the
+retry fails, record the task's terminal result and continue the queue.
 
 ## Top-level worker prompt
 
@@ -108,21 +141,15 @@ Give each top-level subagent all of these instructions:
 > file while the task is running; do not wait until the end to write it. Never
 > write credentials, tokens, authorization headers, or other secrets to the log.
 >
-> Before pulling, perform a read-only Git preflight. Derive the canonical
-> kebab-case rule slug using `/develop-lintdiff-rule`'s branch rules. Verify that
-> the TypeSpec worktree has no staged, tracked, or untracked changes other than
-> the ignored `log.txt`, and that its current branch is the dedicated rule branch
-> with the exact `lintdiff-<canonical-rule-slug>` suffix under its configured
-> branch prefix. It must not be `feature/lintdiff-migration-new` or an unrelated
-> branch. If any preflight check fails, log the evidence, report the task as
-> failed, and stop this worker without pulling.
+> At every phase transition, append a `HEARTBEAT` entry containing the phase,
+> active command, elapsed time, and last completed milestone. During an operation
+> expected to exceed 10 minutes, run it in a form that permits monitoring and
+> append another heartbeat at least every 10 minutes until it ends.
 >
-> Before invoking the development skill, run exactly:
->
-> `git pull origin feature/lintdiff-migration-new`
->
-> If the pull fails, report the task as failed and stop this worker. Do not ask
-> for help, use a destructive recovery command, or continue with stale content.
+> Do not fetch, pull, merge, rebase, or reset the target or rule branch before
+> invoking `/develop-lintdiff-rule`. That delegated skill exclusively owns
+> worktree cleanliness checks, target-branch fetching, remote-base verification,
+> and any safe fast-forward of an untouched rule branch.
 >
 > Next invoke this skill command verbatim as a slash-command/skill invocation,
 > not as a shell command:
@@ -147,8 +174,9 @@ Give each top-level subagent all of these instructions:
 > Do not modify either delegated skill. Do not start another lintdiff rule.
 > Return a structured result containing the rule ID, development outcome, draft
 > PR URL if created, review-loop outcome and completed-round count, final PR head
-> state when available, the absolute `log.txt` path, all process-improvement
-> suggestions, and any blocker.
+> state when available, the absolute `log.txt` path, and any blocker. Return each
+> process-improvement suggestion with four fields: proposed change, concrete
+> observed evidence, impact, and source task.
 
 The outer skill's no-question rule overrides the delegated skills' normal
 post-run request for process-improvement approval. It does not override safety
@@ -208,6 +236,22 @@ After the task sections, add `## Process suggestions` and consolidate the
 workers' suggestions with the outer agent's post-run observations. Never omit
 failed input lines or stop the final report at the first failure.
 
+Format every retained suggestion as:
+
+```markdown
+### <proposed-change>
+
+**Evidence:** <specific event or result observed during the run>
+
+**Impact:** <why the issue matters>
+
+**Source:** Task <number> - <rule-id>, or Outer orchestration
+```
+
+Do not report a suggestion without concrete run evidence. Deduplicate
+suggestions only when they describe the same root cause and proposed change;
+combine their source tasks and evidence rather than discarding either.
+
 ## Post-run process review
 
 After every queue entry is terminal, briefly review the complete run before the
@@ -246,13 +290,13 @@ merely to review the skill update.
 - Never launch the next worker until the previous worker is terminal.
 - Never reuse a completed worker for another command.
 - Never ask the user a question during queue execution.
-- Always sync with `feature/lintdiff-migration-new`.
 - Reject any command whose `--target-branch` is not exactly
   `feature/lintdiff-migration-new`.
 - Reject duplicate or unknown arguments and later queue entries that reuse a
   rule ID, TypeSpec worktree, or specs worktree.
-- Never pull until the TypeSpec worktree is clean and verified as the parsed
-  rule's dedicated branch.
+- Leave target synchronization and worktree verification exclusively to
+  `/develop-lintdiff-rule`; the outer worker must not mutate Git state first.
+- Never retry a task more than once or retry after development work begins.
 - Never run a slash command as a PowerShell or shell executable.
 - Never stage, commit, or push a worker's `log.txt`.
 - Never infer success from subagent prose when the PR or pushed head can be
