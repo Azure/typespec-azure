@@ -26,6 +26,7 @@ export interface EmitterOptions {
 
   "generate-samples"?: boolean;
   "generate-tests"?: boolean;
+  "max-overload"?: "model";
 
   "partial-update"?: boolean;
   "models-subpackage"?: string;
@@ -70,6 +71,13 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
         "When set to `true`, the emitter will generate Java test code (mock test for management-plane SDK, disabled live test for data-plane SDK). Default value is `true`.",
       nullable: true,
       default: true,
+    },
+    "max-overload": {
+      type: "string",
+      description:
+        "When set to `model`, generate the maximum set of model-based convenience method overloads for Azure clients.",
+      nullable: true,
+      enum: ["model"],
     },
 
     "enable-sync-stack": {
