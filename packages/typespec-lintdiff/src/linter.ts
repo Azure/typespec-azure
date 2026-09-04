@@ -50,6 +50,7 @@ import { repeatedPathInfoRule } from "./rules/repeated-path-info.js";
 import { requestBodyOptionalRule } from "./rules/request-body-optional.js";
 import { patchBodyParametersSchemaRule } from "./rules/patch-body-parameters-schema.js";
 import { consistentPatchPropertiesRule } from "./rules/consistent-patch-properties.js";
+import { patchPropertiesCorrespondToPutPropertiesRule } from "./rules/patch-properties-correspond-to-put-properties.js";
 import { subscriptionsAndResourceGroupCasingRule } from "./rules/subscriptions-and-resource-group-casing.js";
 import { tagsAreNotAllowedForProxyResourcesRule } from "./rules/tags-are-not-allowed-for-proxy-resources.js";
 import { tenantLevelAPIsNotAllowedRule } from "./rules/tenant-level-apis-not-allowed.js";
@@ -120,6 +121,7 @@ const rules = [
   requestBodyOptionalRule,
   patchBodyParametersSchemaRule,
   consistentPatchPropertiesRule,
+  patchPropertiesCorrespondToPutPropertiesRule,
   tenantLevelAPIsNotAllowedRule,
   trackedResourcesMustHavePutRule,
   unsupportedPatchPropertiesRule,
@@ -193,6 +195,8 @@ const enabledRules = {
   [`tsp-lintdiff-local-linter/${requestBodyOptionalRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${patchBodyParametersSchemaRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${consistentPatchPropertiesRule.name}`]: true,
+  [`tsp-lintdiff-local-linter/${patchPropertiesCorrespondToPutPropertiesRule.name}`]:
+    true,
   [`tsp-lintdiff-local-linter/${tenantLevelAPIsNotAllowedRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${trackedResourcesMustHavePutRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${unsupportedPatchPropertiesRule.name}`]: true,
