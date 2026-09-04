@@ -45,7 +45,6 @@ interface Widgets {
     Widget,
     ActionRequest,
     ActionResponse,
-    Foundations.DefaultBaseParameters<Widget>,
     Parameters = ActionParameters
   >;
 }
