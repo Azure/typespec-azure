@@ -204,6 +204,20 @@ export function normalizeScope(scope?: LanguageScopes | DecoratorOptions): strin
 }
 
 /**
+ * Whether a decorator's `scope` argument is one of the marshalled forms handled by
+ * {@link normalizeScope}: a legacy plain string, or a `valueof DecoratorOptions` value (a plain
+ * JavaScript object). Compiler entities - a string-literal type from a custom decorator that
+ * declares a type-level `scope` parameter, or any other `Type`/`Value` - carry a `kind`/`entityKind`
+ * discriminator and are excluded so they keep their normal `getDecoratorArgValue` conversion.
+ */
+function isMarshalledScopeArg(value: unknown): value is LanguageScopes | DecoratorOptions {
+  if (typeof value === "string") return true;
+  return (
+    typeof value === "object" && value !== null && !("kind" in value) && !("entityKind" in value)
+  );
+}
+
+/**
  * Parse a scope string to extract negation scopes and positive scopes.
  * Supports two syntax patterns:
  * 1. !(scope1, scope2,...) - Grouped negation
@@ -543,13 +557,18 @@ export function getTypeDecorators(
         };
         for (let i = 0; i < decorator.args.length; i++) {
           const parameterName = decorator.definition.parameters[i].name;
-          // The `scope` argument is emitter-selection metadata, not a client type. It can be
-          // provided either as the legacy plain string or as a typed options bag
-          // (`DecoratorOptions`). Normalize it to its plain-string form before materializing the
+          // The `scope` argument is emitter-selection metadata, not a client type. When it is
+          // provided in one of its marshalled forms - the legacy plain string or a typed options bag
+          // (`DecoratorOptions`) - normalize it to its plain-string form before materializing the
           // remaining decorator arguments, otherwise the options-bag form is run through
           // `getDecoratorArgValue` (which converts it to an SDK model) and later handed to the
           // string-only `isScopeApplicable`, crashing with `scope.match is not a function`.
-          if (parameterName === "scope") {
+          //
+          // A custom decorator may instead declare a *type-level* `scope` parameter (e.g.
+          // `scope: string`), which surfaces here as a compiler string-literal type rather than a
+          // marshalled value. That must go through the normal `getDecoratorArgValue` conversion so
+          // its string value is preserved instead of being lost as `scope: undefined`.
+          if (parameterName === "scope" && isMarshalledScopeArg(decorator.args[i].jsValue)) {
             decoratorInfo.arguments[parameterName] = normalizeScope(
               decorator.args[i].jsValue as LanguageScopes | DecoratorOptions | undefined,
             );

@@ -328,6 +328,61 @@ describe("@client scope in ClientOptions", () => {
       severity: "warning",
     });
   });
+
+  it("resolves an inherited ClientOptions.scope through the model inheritance chain", async () => {
+    // Regression (Josh: resolve scope through the effective options inheritance chain): a `scope`
+    // declared on a base `ClientOptions` model must be honored on `@client` even when the leaf model
+    // only adds other properties. `FinalOptions extends BaseOptions` inherits `scope: "csharp"`, so
+    // the client is generated for csharp only.
+    const { program } = await SimpleTester.compile(t.code`
+        @service
+        @client(Customizations.FinalOptions)
+        namespace ${t.namespace("MyClient")};
+
+        namespace Customizations {
+          model BaseOptions extends Azure.ClientGenerator.Core.ClientOptions {
+            scope: "csharp";
+          }
+          model FinalOptions extends BaseOptions {
+            service: MyClient;
+          }
+        }
+      `);
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(listClients(pythonContext).length, 0);
+  });
+
+  it("reports a conflict for an inherited ClientOptions.scope disagreeing with the legacy positional argument", async () => {
+    // Regression (Josh): an inherited `scope` that conflicts with the legacy positional scope
+    // argument on `@client` must still produce a `conflicting-scope` warning.
+    const [, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+        model BaseOptions extends Azure.ClientGenerator.Core.ClientOptions {
+          scope: "csharp";
+        }
+        model FinalOptions extends BaseOptions {
+          service: MyClient;
+        }
+
+        @service
+        @client(FinalOptions, "python")
+        namespace ${t.namespace("MyClient")} {
+          op download(@path blobName: string): void;
+        }
+      `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflicting-scope",
+      severity: "warning",
+    });
+  });
 });
 
 describe("listClients without @client", () => {

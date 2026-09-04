@@ -166,7 +166,7 @@ function resolveScopeFromOptions(
   legacyScope?: string,
 ): string | undefined {
   const optionsScopeConfig =
-    options?.kind === "Model" ? options.properties.get("scope")?.type : undefined;
+    options?.kind === "Model" ? getEffectiveScopePropertyType(options) : undefined;
   const optionsScope: string | undefined =
     optionsScopeConfig?.kind === "String" ? optionsScopeConfig.value : undefined;
 
@@ -1203,7 +1203,11 @@ const clientInitializationKey = createStateSymbol("clientInitialization");
  *   inheritance chain is an options bag even when it only sets `scope` (e.g. `model Foo extends
  *   ClientInitializationOptions { scope: "csharp"; }`).
  *
- * Anonymous model expressions are intentionally excluded from the ancestry check: the compiler links
+ * The provenance check follows `baseModel` (`extends`) as well as `sourceModel`/`sourceModels`
+ * (`model is`, `PickProperties`/`OmitProperties` and other spread-based transformations), so a named
+ * model derived from `ClientInitializationOptions` through any of those is still recognized.
+ *
+ * Anonymous model expressions are intentionally excluded from the provenance check: the compiler links
  * an inline literal to the expected `ClientInitializationOptions` parameter type, so an anonymous
  * legacy parameters model such as `{ scope: "https://management.azure.com/.default" }` would
  * otherwise look like an options bag. Treating the anonymous scope-only shape as a legacy raw
@@ -1220,11 +1224,23 @@ function isClientInitializationOptionsBag(options: Type): boolean {
   if (options.name === "") {
     return false;
   }
-  for (
-    let current: Model | undefined = options.baseModel;
-    current !== undefined;
-    current = current.baseModel
-  ) {
+  return derivesFromClientInitializationOptions(options);
+}
+
+/**
+ * Whether a model is `ClientInitializationOptions` (from `Azure.ClientGenerator.Core`) or derives
+ * from it through any combination of `extends` (`baseModel`) and `model is` / spread provenance
+ * (`sourceModel`/`sourceModels`).
+ */
+function derivesFromClientInitializationOptions(model: Model): boolean {
+  const visited = new Set<Model>();
+  const stack: (Model | undefined)[] = [model];
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (current === undefined || visited.has(current)) {
+      continue;
+    }
+    visited.add(current);
     if (
       current.name === "ClientInitializationOptions" &&
       current.namespace !== undefined &&
@@ -1232,8 +1248,31 @@ function isClientInitializationOptionsBag(options: Type): boolean {
     ) {
       return true;
     }
+    stack.push(current.baseModel, current.sourceModel);
+    for (const source of current.sourceModels) {
+      stack.push(source.model);
+    }
   }
   return false;
+}
+
+/**
+ * Resolve the nearest effective `scope` property of an options bag, walking the `extends`
+ * (`baseModel`) inheritance chain so that a `scope` declared on a base model is honored even when the
+ * leaf model only adds other properties (e.g. `model Final extends Base { parameters: Params }`).
+ */
+function getEffectiveScopePropertyType(model: Model): Type | undefined {
+  const visited = new Set<Model>();
+  let current: Model | undefined = model;
+  while (current !== undefined && !visited.has(current)) {
+    visited.add(current);
+    const scopeProperty = current.properties.get("scope");
+    if (scopeProperty !== undefined) {
+      return scopeProperty.type;
+    }
+    current = current.baseModel;
+  }
+  return undefined;
 }
 
 export const $clientInitialization: ClientInitializationDecorator = (

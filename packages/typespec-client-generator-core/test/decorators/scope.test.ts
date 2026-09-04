@@ -1,5 +1,6 @@
-import { expectDiagnostics, t } from "@typespec/compiler/testing";
-import { ok, strictEqual } from "assert";
+import { setTypeSpecNamespace } from "@typespec/compiler";
+import { expectDiagnostics, mockFile, t } from "@typespec/compiler/testing";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { getAccess, getClientNameOverride, getClientOptionValue } from "../../src/decorators.js";
 import { getSdkModel } from "../../src/types.js";
@@ -181,6 +182,60 @@ describe("@clientOption scope requirement", () => {
       emitterName: "@azure-tools/typespec-csharp",
     });
     ok(csharpContext.sdkPackage.models.find((x) => x.name === "Payload"));
+  });
+
+  it("preserves a custom decorator's type-level string scope argument", async () => {
+    // Regression: the `scope` argument special-casing must only fire for the marshalled forms of
+    // the built-in scope argument (a legacy plain string or a `DecoratorOptions` bag). A custom,
+    // allowlisted decorator that declares a *type-level* `scope: string` parameter surfaces its
+    // argument here as a compiler string-literal type. That must flow through the normal
+    // `getDecoratorArgValue` conversion so its value ("python") is preserved. If it were forced
+    // through `normalizeScope` instead it would become `scope: undefined`, which both loses the
+    // value and defeats emitter-scope filtering (the decorator would then be emitted for every
+    // emitter rather than just the matching one).
+    function $scopedMarker(): void {}
+    setTypeSpecNamespace("Custom", $scopedMarker);
+
+    const { program } = await SimpleTester.files({
+      "scoped-marker.js": mockFile.js({ $scopedMarker }),
+    }).import("./scoped-marker.js").compile(`
+        namespace Custom {
+          extern dec scopedMarker(target: unknown, scope: string);
+        }
+
+        @service(#{ title: "Test Service" })
+        namespace TestService {
+          @Custom.scopedMarker("python")
+          model Widget {
+            id: string;
+          }
+
+          op get(): Widget;
+        }
+      `);
+
+    const allowList = ["Custom\\.@scopedMarker"];
+
+    const pythonContext = await createSdkContextForTester(
+      program,
+      { emitterName: "@azure-tools/typespec-python" },
+      { additionalDecorators: allowList },
+    );
+    const pythonWidget = pythonContext.sdkPackage.models.find((x) => x.name === "Widget");
+    ok(pythonWidget);
+    deepStrictEqual(pythonWidget.decorators, [
+      { name: "Custom.@scopedMarker", arguments: { scope: "python" } },
+    ]);
+
+    const csharpContext = await createSdkContextForTester(
+      program,
+      { emitterName: "@azure-tools/typespec-csharp" },
+      { additionalDecorators: allowList },
+    );
+    const csharpWidget = csharpContext.sdkPackage.models.find((x) => x.name === "Widget");
+    ok(csharpWidget);
+    // `scope: "python"` does not apply to the C# emitter, so the decorator is filtered out.
+    deepStrictEqual(csharpWidget.decorators, []);
   });
 });
 

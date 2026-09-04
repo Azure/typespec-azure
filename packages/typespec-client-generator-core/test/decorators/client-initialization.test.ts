@@ -997,4 +997,116 @@ describe("@clientInitialization scope in ClientInitializationOptions", () => {
       ok(scopeParam, `scope must remain a client parameter for ${emitterName}`);
     }
   });
+
+  it("identifies a scope-only model via sourceModel provenance (model is PickProperties)", async () => {
+    // Regression (Josh: traverse source-model provenance): a named model produced by a spread-based
+    // transformation such as `model Copy is PickProperties<Base, "scope">` has no `baseModel`, but it
+    // still derives from ClientInitializationOptions through `sourceModel`/`sourceModels`. It must be
+    // recognized as an options bag so `scope` selects the emitter instead of leaking as a parameter.
+    const customizationCode = `
+      namespace MyCustomizations;
+
+      model Base extends Azure.ClientGenerator.Core.ClientInitializationOptions {
+        scope: "csharp";
+      }
+
+      model Copy is TypeSpec.PickProperties<Base, "scope">;
+
+      @@clientInitialization(MyService, MyCustomizations.Copy);
+      `;
+
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(mainCode, customizationCode),
+    );
+
+    for (const emitterName of ["@azure-tools/typespec-csharp", "@azure-tools/typespec-python"]) {
+      const init = (await createSdkContextForTester(program, { emitterName })).sdkPackage.clients[0]
+        .clientInitialization;
+      ok(
+        !init.parameters.find((x) => x.name === "scope"),
+        `scope must not become a client parameter for ${emitterName}`,
+      );
+    }
+  });
+
+  it("resolves an inherited scope through the model inheritance chain", async () => {
+    // Regression (Josh: resolve scope through the effective options inheritance chain): a `scope`
+    // declared on a base options model must be honored even when the leaf model only adds other
+    // properties. `Final extends Base` inherits `scope: "csharp"`, so the customization applies to
+    // csharp only, and scope is never surfaced as a client parameter.
+    const customizationCode = `
+      namespace MyCustomizations;
+
+      model MyClientInitialization {
+        blobName: string;
+      }
+
+      model Base extends Azure.ClientGenerator.Core.ClientInitializationOptions {
+        scope: "csharp";
+      }
+
+      model Final extends Base {
+        parameters: MyClientInitialization;
+      }
+
+      @@clientInitialization(MyService, MyCustomizations.Final);
+      `;
+
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(mainCode, customizationCode),
+    );
+
+    const csharpInit = (
+      await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-csharp" })
+    ).sdkPackage.clients[0].clientInitialization;
+    strictEqual(
+      csharpInit.parameters.length,
+      2,
+      "csharp is in scope (inherited), so blobName is elevated",
+    );
+    ok(
+      !csharpInit.parameters.find((x) => x.name === "scope"),
+      "scope must not become a client parameter",
+    );
+
+    const pythonInit = (
+      await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" })
+    ).sdkPackage.clients[0].clientInitialization;
+    strictEqual(
+      pythonInit.parameters.length,
+      1,
+      "python is out of scope (inherited scope selects csharp), so only endpoint remains",
+    );
+  });
+
+  it("reports a conflict for an inherited scope that disagrees with the legacy positional argument", async () => {
+    // Regression (Josh: inherited scope must still be compared): an inherited `scope` that conflicts
+    // with the legacy positional scope argument must still produce a `conflicting-scope` warning.
+    const customizationCode = `
+      namespace MyCustomizations;
+
+      model MyClientInitialization {
+        blobName: string;
+      }
+
+      model Base extends Azure.ClientGenerator.Core.ClientInitializationOptions {
+        scope: "csharp";
+      }
+
+      model Final extends Base {
+        parameters: MyClientInitialization;
+      }
+
+      @@clientInitialization(MyService, MyCustomizations.Final, "python");
+      `;
+
+    const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(mainCode, customizationCode),
+    );
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflicting-scope",
+      severity: "warning",
+    });
+  });
 });
