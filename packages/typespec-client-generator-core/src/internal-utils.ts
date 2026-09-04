@@ -73,7 +73,9 @@ import type {
   ApiVersionConfig,
   ApiVersionServiceMap,
   DecoratorInfo,
+  DecoratorOptions,
   ExternalTypeInfo,
+  LanguageScopes,
   SdkBuiltInType,
   SdkClient,
   SdkClientType,
@@ -183,6 +185,42 @@ export function getScopedDecoratorData(
     }
   }
   return retval[AllScopes]; // in this case it applies to all languages
+}
+
+/**
+ * Centralizes normalization of the `scope` argument accepted by scoped TCGC decorators. Decorator
+ * implementations should call this instead of independently handling both the legacy plain-string
+ * form and the typed `DecoratorOptions` bag form, so any future evolution of the accepted shapes only
+ * needs to be implemented in one place.
+ *
+ * @param scope Either the legacy plain-string scope value, or a typed options bag (whose own
+ * decorator-specific model may extend `DecoratorOptions`) containing a `scope` property.
+ * @returns The plain-string scope value, or `undefined` if none was specified.
+ */
+export function normalizeScope(scope?: LanguageScopes | DecoratorOptions): string | undefined {
+  if (scope === undefined) return undefined;
+  if (typeof scope === "string") return scope;
+  return scope.scope;
+}
+
+/**
+ * Whether a decorator's `scope` argument is one of the marshalled forms handled by
+ * {@link normalizeScope}: a legacy plain string, or a `valueof DecoratorOptions` value (a plain
+ * JavaScript object). Compiler entities - a string-literal type from a custom decorator that
+ * declares a type-level `scope` parameter, or any other `Type`/`Value` - carry a `kind`/`entityKind`
+ * discriminator and are excluded so they keep their normal `getDecoratorArgValue` conversion. Arrays
+ * are excluded as well: no scoped decorator declares an array-valued `scope`, and treating one as a
+ * marshalled bag would silently drop it to `undefined`.
+ */
+function isMarshalledScopeArg(value: unknown): value is LanguageScopes | DecoratorOptions {
+  if (typeof value === "string") return true;
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    !("kind" in value) &&
+    !("entityKind" in value)
+  );
 }
 
 /**
@@ -524,13 +562,35 @@ export function getTypeDecorators(
           arguments: {},
         };
         for (let i = 0; i < decorator.args.length; i++) {
-          decoratorInfo.arguments[decorator.definition.parameters[i].name] = diagnostics.pipe(
+          const parameterName = decorator.definition.parameters[i].name;
+          // The `scope` argument is emitter-selection metadata, not a client type. When it is
+          // provided in one of its marshalled forms - the legacy plain string or a typed options bag
+          // (`DecoratorOptions`) - store it as-is instead of running it through `getDecoratorArgValue`
+          // (which converts a bag to an SDK model and later crashes the string-only
+          // `isScopeApplicable` with `scope.match is not a function`). Keeping the raw value also
+          // preserves any additional `DecoratorOptions` fields the bag may carry in the future rather
+          // than collapsing it to just the scope string; the applicability filter below normalizes to
+          // the scope string only where a string is actually required.
+          //
+          // A custom decorator may instead declare a *type-level* `scope` parameter (e.g.
+          // `scope: string`), which surfaces here as a compiler string-literal type rather than a
+          // marshalled value. That must go through the normal `getDecoratorArgValue` conversion so
+          // its string value is preserved instead of being lost as `scope: undefined`.
+          if (parameterName === "scope" && isMarshalledScopeArg(decorator.args[i].jsValue)) {
+            decoratorInfo.arguments[parameterName] = decorator.args[i].jsValue;
+            continue;
+          }
+          decoratorInfo.arguments[parameterName] = diagnostics.pipe(
             getDecoratorArgValue(context, decorator.args[i].jsValue, type, decoratorName),
           );
         }
 
-        // Filter by scope - only include decorators that match the current emitter or have no scope
-        const scopeArg = decoratorInfo.arguments["scope"];
+        // Filter by scope - only include decorators that match the current emitter or have no scope.
+        // Normalize here so both the legacy string and the options-bag form resolve to the scope
+        // string that `isScopeApplicable` expects, without disturbing the full value stored above.
+        const scopeArg = normalizeScope(
+          decoratorInfo.arguments["scope"] as LanguageScopes | DecoratorOptions | undefined,
+        );
         if (scopeArg !== undefined && !isScopeApplicable(scopeArg, context.emitterName)) {
           // Skip this decorator if its scope is not applicable to the current emitter
           continue;

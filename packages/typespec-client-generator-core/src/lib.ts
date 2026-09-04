@@ -552,6 +552,13 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`@${"decoratorName"} should be applied with a language scope of ${"allowedScopes"}.`,
       },
     },
+    "conflicting-scope": {
+      ...doc("conflicting-scope"),
+      severity: "warning",
+      messages: {
+        default: paramMessage`@${"decoratorName"} received conflicting scope values: the options bag specifies "${"optionsScope"}" while the legacy positional argument specifies "${"legacyScope"}". The options bag value will be used; the legacy positional argument is ignored.`,
+      },
+    },
     "unnecessary-emitter-option": {
       severity: "warning",
       messages: {

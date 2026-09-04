@@ -183,6 +183,239 @@ describe("@client", () => {
   });
 });
 
+describe("@client scope in ClientOptions", () => {
+  it("accepts scope through ClientOptions.scope instead of the legacy positional argument", async () => {
+    const { program } = await SimpleTester.compile(t.code`
+        @client({service: MyClient, scope: "csharp"})
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(listClients(pythonContext).length, 0);
+  });
+
+  it("accepts matching scope from both ClientOptions.scope and the legacy positional argument", async () => {
+    const { program } = await SimpleTester.compile(t.code`
+        @client({service: MyClient, scope: "csharp"}, "csharp")
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+  });
+
+  it("reports a warning and prefers the options bag scope when ClientOptions.scope conflicts with the legacy positional argument", async () => {
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+        @client({service: MyClient, scope: "csharp"}, "python")
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflicting-scope",
+      severity: "warning",
+    });
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(listClients(pythonContext).length, 0);
+  });
+
+  it("does not report a warning when ClientOptions.scope and the legacy positional scope are semantically equivalent", async () => {
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+        @client({service: MyClient, scope: "csharp, python"}, "python,csharp")
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    expectDiagnosticEmpty(diagnostics);
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(listClients(pythonContext).length, 1);
+  });
+
+  it("does not report a warning when mixed scopes select the same emitters", async () => {
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+        @client({service: MyClient, scope: "!java"}, "csharp, !java")
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    expectDiagnosticEmpty(diagnostics);
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(listClients(pythonContext).length, 1);
+
+    const javaContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+    strictEqual(listClients(javaContext).length, 0);
+  });
+
+  it("does not report a warning when grouped and individual negation select the same emitters", async () => {
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+        @client({service: MyClient, scope: "!(java, python)"}, "!python, !java")
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    expectDiagnosticEmpty(diagnostics);
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(listClients(pythonContext).length, 0);
+  });
+
+  it("reports a warning when mixed scopes select different emitters", async () => {
+    const [, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+        @client({service: MyClient, scope: "!java"}, "csharp, !python")
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflicting-scope",
+      severity: "warning",
+    });
+  });
+
+  it("reports a warning when a negation scope conflicts with a positive-only scope", async () => {
+    const [, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+        @client({service: MyClient, scope: "!java"}, "csharp")
+        @service
+        namespace ${t.namespace("MyClient")};
+      `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflicting-scope",
+      severity: "warning",
+    });
+  });
+
+  it("resolves an inherited ClientOptions.scope through the model inheritance chain", async () => {
+    // Regression (Josh: resolve scope through the effective options inheritance chain): a `scope`
+    // declared on a base `ClientOptions` model must be honored on `@client` even when the leaf model
+    // only adds other properties. `FinalOptions extends BaseOptions` inherits `scope: "csharp"`, so
+    // the client is generated for csharp only.
+    const { program } = await SimpleTester.compile(t.code`
+        @service
+        @client(Customizations.FinalOptions)
+        namespace ${t.namespace("MyClient")};
+
+        namespace Customizations {
+          model BaseOptions extends Azure.ClientGenerator.Core.ClientOptions {
+            scope: "csharp";
+          }
+          model FinalOptions extends BaseOptions {
+            service: MyClient;
+          }
+        }
+      `);
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(listClients(pythonContext).length, 0);
+  });
+
+  it("reports a conflict for an inherited ClientOptions.scope disagreeing with the legacy positional argument", async () => {
+    // Regression (Josh): an inherited `scope` that conflicts with the legacy positional scope
+    // argument on `@client` must still produce a `conflicting-scope` warning.
+    const [, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+        model BaseOptions extends Azure.ClientGenerator.Core.ClientOptions {
+          scope: "csharp";
+        }
+        model FinalOptions extends BaseOptions {
+          service: MyClient;
+        }
+
+        @service
+        @client(FinalOptions, "python")
+        namespace ${t.namespace("MyClient")} {
+          op download(@path blobName: string): void;
+        }
+      `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/conflicting-scope",
+      severity: "warning",
+    });
+  });
+
+  it("resolves an inherited ClientOptions.service through the model inheritance chain", async () => {
+    // Every `ClientOptions` setting - not just `scope` - is read through the `extends` chain, so a
+    // `service` declared on a base options model is honored even when the leaf model only adds other
+    // settings. Here `service` lives on `BaseOptions` while the leaf `FinalOptions` only sets
+    // `scope`, and the client is still bound to `MyClient` (generated for csharp only).
+    const { program } = await SimpleTester.compile(t.code`
+        @service
+        @client(Customizations.FinalOptions)
+        namespace ${t.namespace("MyClient")};
+
+        namespace Customizations {
+          model BaseOptions extends Azure.ClientGenerator.Core.ClientOptions {
+            service: MyClient;
+          }
+          model FinalOptions extends BaseOptions {
+            scope: "csharp";
+          }
+        }
+      `);
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(listClients(csharpContext).length, 1);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(listClients(pythonContext).length, 0);
+  });
+});
+
 describe("listClients without @client", () => {
   it("use service namespace if there is not clients and append Client to service name", async () => {
     const { program, MyService } = await SimpleTester.compile(t.code`
@@ -552,6 +785,52 @@ describe("@operationGroup", () => {
       });
       const client = listClients(context);
       strictEqual(client.length, 0);
+    }
+  });
+
+  it("@operationGroup accepts a DecoratorOptions bag scope", async () => {
+    // Regression: @operationGroup must accept the typed options-bag scope form
+    // (`#{ scope: "python" }`) and normalize it before delegating to @client, otherwise it fails
+    // with invalid-argument.
+    const mainCode = `
+        @service(#{
+          title: "DeviceUpdateClient",
+        })
+        namespace Azure.IoT.DeviceUpdate;
+      `;
+    const clientCode = `
+        @client({name: "DeviceUpdateClient", service: Azure.IoT.DeviceUpdate}, "python, java")
+        namespace Customizations;
+
+        @operationGroup(#{ scope: "python" })
+        interface SubClientOnlyForPython {
+        }
+      `;
+
+    // python should have one sub client
+    {
+      const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+        createClientCustomizationInput(mainCode, clientCode),
+      );
+      expectDiagnosticEmpty(diagnostics);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const client = listClients(context)[0];
+      strictEqual(listSubClients(context, client).length, 1);
+    }
+
+    // java should have no sub client
+    {
+      const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+        createClientCustomizationInput(mainCode, clientCode),
+      );
+      expectDiagnosticEmpty(diagnostics);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-java",
+      });
+      const client = listClients(context)[0];
+      strictEqual(listSubClients(context, client).length, 0);
     }
   });
 });
