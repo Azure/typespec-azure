@@ -1,7 +1,6 @@
 import {
-  getResourceOperation,
-  isAzureResource,
-  resolveProviderNamespace,
+  getArmProviderNamespace,
+  getArmResource,
 } from "@azure-tools/typespec-azure-resource-manager";
 import { createRule, type Model, type ModelProperty } from "@typespec/compiler";
 import { getHttpOperation, type HttpOperationResponse } from "@typespec/http";
@@ -20,16 +19,15 @@ export const xmsResourceInPutResponseRule = createRule({
     return {
       operation: (operation) => {
         const namespace = operation.interface?.namespace ?? operation.namespace;
-        if (resolveProviderNamespace(context.program, namespace) === undefined) {
+        if (
+          namespace === undefined ||
+          getArmProviderNamespace(context.program, namespace) === undefined
+        ) {
           return;
         }
 
         const [httpOperation] = getHttpOperation(context.program, operation);
         if (httpOperation.verb !== "put") {
-          return;
-        }
-
-        if (getResourceOperation(context.program, operation) !== undefined) {
           return;
         }
 
@@ -43,7 +41,7 @@ export const xmsResourceInPutResponseRule = createRule({
         }
 
         if (
-          isAzureResource(context.program, responseModel) ||
+          getArmResource(context.program, responseModel) !== undefined ||
           hasExplicitAzureResourceExtension(context.program, responseModel)
         ) {
           return;
