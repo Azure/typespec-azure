@@ -1023,6 +1023,31 @@ export const $override = (
       },
     });
   }
+
+  const returnTypesMatch =
+    original.returnType === override.returnType ||
+    $(context.program).type.isAssignableTo(override.returnType, original.returnType) ||
+    (original.returnType.kind === "Model" &&
+      override.returnType.kind === "Model" &&
+      original.returnType.name === override.returnType.name &&
+      original.returnType.namespace !== undefined &&
+      override.returnType.namespace !== undefined &&
+      getNamespaceFullName(original.returnType.namespace) ===
+        getNamespaceFullName(override.returnType.namespace));
+  if (!returnTypesMatch) {
+    const isIntentionalResponseReplacement =
+      override.returnType === $(context.program).intrinsic.void ||
+      override.returnType === $(context.program).builtin.bytes;
+    reportDiagnostic(context.program, {
+      code: isIntentionalResponseReplacement
+        ? "override-response-replacement"
+        : "override-response-mismatch",
+      target: context.decoratorTarget,
+      format: {
+        methodName: original.name,
+      },
+    });
+  }
   setScopedDecoratorData(context, $override, overrideKey, original, override, scope);
 };
 
