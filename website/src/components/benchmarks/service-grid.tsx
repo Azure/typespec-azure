@@ -1,6 +1,7 @@
 import {
   Caption1,
   Card,
+  CardHeader,
   Dropdown,
   Field,
   makeStyles,
@@ -37,20 +38,6 @@ const useStyles = makeStyles({
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
     gap: tokens.spacingHorizontalS,
-  },
-  card: {
-    gap: tokens.spacingVerticalXS,
-  },
-  header: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    gap: tokens.spacingHorizontalS,
-  },
-  title: {
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
   },
   stats: {
     display: "flex",
@@ -142,24 +129,28 @@ export function ServiceGrid({
           const color = seriesColor(index, theme);
 
           return (
-            <Card key={row.key} className={styles.card} size="small" appearance="outline">
-              <div className={styles.header}>
-                <Text as="h3" weight="semibold" className={styles.title}>
-                  {row.name}
-                </Text>
-                <div className={styles.stats}>
-                  <Text weight="semibold" className={styles.value}>
-                    {formatMs(row.latest)}
+            <Card key={row.key} size="small" appearance="outline">
+              <CardHeader
+                header={
+                  <Text as="h3" weight="semibold" truncate wrap={false}>
+                    {row.name}
                   </Text>
-                  <Caption1
-                    className={styles.change}
-                    style={significant ? { color: trendColor(row.delta!, theme) } : undefined}
-                    title={`Compared to the median of the last ${BASELINE_DAYS} days (${formatMs(row.baseline)})`}
-                  >
-                    {formatPercent(row.deltaRatio)}
-                  </Caption1>
-                </div>
-              </div>
+                }
+                action={
+                  <div className={styles.stats}>
+                    <Text weight="semibold" className={styles.value}>
+                      {formatMs(row.latest)}
+                    </Text>
+                    <Caption1
+                      className={styles.change}
+                      style={significant ? { color: trendColor(row.delta!, theme) } : undefined}
+                      title={`Compared to the median of the last ${BASELINE_DAYS} days (${formatMs(row.baseline)})`}
+                    >
+                      {formatPercent(row.deltaRatio)}
+                    </Caption1>
+                  </div>
+                }
+              />
               <MetricChart
                 points={view.points}
                 series={[{ key: row.key, label: row.name, data: row.values, color }]}

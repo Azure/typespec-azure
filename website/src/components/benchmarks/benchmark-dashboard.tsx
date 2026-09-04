@@ -1,13 +1,7 @@
 import {
-  Accordion,
-  AccordionHeader,
-  AccordionItem,
-  AccordionPanel,
-  Body1,
   Button,
   Dropdown,
   Field,
-  Link,
   makeStyles,
   mergeClasses,
   MessageBar,
@@ -82,14 +76,6 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     gap: tokens.spacingVerticalS,
-  },
-  about: {
-    maxWidth: "78ch",
-  },
-  aboutParagraph: {
-    display: "block",
-    marginTop: tokens.spacingVerticalS,
-    color: tokens.colorNeutralForeground2,
   },
   loading: {
     display: "flex",
@@ -169,42 +155,6 @@ function LoadingState() {
         <SkeletonItem shape="rectangle" size={128} />
       </div>
     </Skeleton>
-  );
-}
-
-function About() {
-  const styles = useStyles();
-  return (
-    <Accordion collapsible className={styles.about}>
-      <AccordionItem value="about">
-        <AccordionHeader size="small">About this data</AccordionHeader>
-        <AccordionPanel>
-          <Body1 className={styles.aboutParagraph}>
-            Every push to <code>main</code> compiles a fixed set of specs and records how long each
-            compilation stage, linter rule, validator and emitter takes. Results are stored on the{" "}
-            <Link
-              href="https://github.com/Azure/typespec-azure/tree/benchmark-data"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <code>benchmark-data</code>
-            </Link>{" "}
-            branch.
-          </Body1>
-          <Body1 className={styles.aboutParagraph}>
-            <strong>Main baseline</strong> runs the small, consistent specs checked into this
-            repository, which makes it the better signal for spotting compiler regressions.{" "}
-            <strong>Azure services</strong> runs real Azure service specs, which are larger and
-            change independently of this repository.
-          </Body1>
-          <Body1 className={styles.aboutParagraph}>
-            Changes are measured against the median of the previous 7 days rather than the previous
-            run, because individual runs vary by a few percent. Click any point on a chart to open
-            the commit that produced it.
-          </Body1>
-        </AccordionPanel>
-      </AccordionItem>
-    </Accordion>
   );
 }
 
@@ -463,8 +413,6 @@ function Dashboard() {
   return (
     <div className={mergeClasses(styles.root, loading && styles.stale)}>
       {header}
-      <About />
-
       <SummaryCards rows={summaryRows} theme={theme} />
 
       {dataset === "external" && data && (

@@ -1,11 +1,4 @@
-import {
-  Button,
-  Caption1,
-  Card,
-  makeStyles,
-  mergeClasses,
-  tokens,
-} from "@fluentui/react-components";
+import { Badge, Button, Card, makeStyles, Text, tokens } from "@fluentui/react-components";
 
 import type { Theme } from "@typespec/astro-utils/utils/theme";
 import { BASELINE_DAYS, formatMs, formatPercent, type Changes } from "./data.js";
@@ -14,41 +7,27 @@ import { EmptyNote, SectionHeader } from "./section.js";
 import type { MetricRow } from "./types.js";
 
 const useStyles = makeStyles({
-  card: {
-    gap: tokens.spacingVerticalM,
-  },
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
     gap: `${tokens.spacingVerticalM} ${tokens.spacingHorizontalXXXL}`,
   },
-  heading: {
-    display: "block",
-    marginBottom: tokens.spacingVerticalXS,
-    textTransform: "uppercase",
-    letterSpacing: "0.04em",
-    fontWeight: tokens.fontWeightSemibold,
-  },
-  slower: {
-    color: tokens.colorPaletteRedForeground1,
-  },
-  faster: {
-    color: tokens.colorPaletteGreenForeground1,
+  column: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: tokens.spacingVerticalXS,
   },
   list: {
     listStyle: "none",
     margin: 0,
     padding: 0,
+    alignSelf: "stretch",
   },
   item: {
     width: "100%",
     justifyContent: "space-between",
     fontWeight: tokens.fontWeightRegular,
-  },
-  name: {
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
   },
   values: {
     display: "flex",
@@ -86,7 +65,9 @@ function ChangeList({
             title={row.key}
             onClick={() => onSelect(row)}
           >
-            <span className={styles.name}>{row.name}</span>
+            <Text truncate wrap={false}>
+              {row.name}
+            </Text>
             <span className={styles.values} style={{ color: trendColor(row.delta!, theme) }}>
               {formatPercent(row.deltaRatio)}
               <span className={styles.absolute}>
@@ -122,7 +103,7 @@ export function ChangesPanel({
 
   if (regressions.length === 0 && improvements.length === 0) {
     return (
-      <Card className={styles.card} appearance="outline">
+      <Card appearance="outline">
         <SectionHeader title="What changed" />
         <EmptyNote>No metric moved meaningfully against its {BASELINE_DAYS}-day median.</EmptyNote>
       </Card>
@@ -130,13 +111,13 @@ export function ChangesPanel({
   }
 
   return (
-    <Card className={styles.card} appearance="outline">
+    <Card appearance="outline">
       <SectionHeader title="What changed" hint={`latest run vs ${BASELINE_DAYS}-day median`} />
       <div className={styles.grid}>
-        <div>
-          <Caption1 as="h3" className={mergeClasses(styles.heading, styles.slower)}>
+        <div className={styles.column}>
+          <Badge appearance="tint" color="danger">
             Slower
-          </Caption1>
+          </Badge>
           <ChangeList
             rows={regressions}
             emptyText="Nothing regressed."
@@ -144,10 +125,10 @@ export function ChangesPanel({
             onSelect={onSelect}
           />
         </div>
-        <div>
-          <Caption1 as="h3" className={mergeClasses(styles.heading, styles.faster)}>
+        <div className={styles.column}>
+          <Badge appearance="tint" color="success">
             Faster
-          </Caption1>
+          </Badge>
           <ChangeList
             rows={improvements}
             emptyText="Nothing improved."

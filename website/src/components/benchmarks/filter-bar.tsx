@@ -1,4 +1,12 @@
-import { Dropdown, Field, makeStyles, Option, Switch, tokens } from "@fluentui/react-components";
+import {
+  Caption1,
+  Dropdown,
+  Field,
+  makeStyles,
+  Option,
+  Switch,
+  tokens,
+} from "@fluentui/react-components";
 
 import { formatDate } from "./data.js";
 import type { TimeRange } from "./types.js";
@@ -28,7 +36,6 @@ const useStyles = makeStyles({
   meta: {
     marginLeft: "auto",
     color: tokens.colorNeutralForeground3,
-    fontSize: tokens.fontSizeBase200,
     whiteSpace: "nowrap",
     "@media (max-width: 640px)": {
       marginLeft: 0,
@@ -141,9 +148,9 @@ export function FilterBar({
           label={`Compare across ${specNoun}s`}
         />
       )}
-      <span className={styles.meta}>
+      <Caption1 className={styles.meta}>
         {pointCount.toLocaleString()} runs · updated {formatDate(generated)}
-      </span>
+      </Caption1>
     </div>
   );
 }

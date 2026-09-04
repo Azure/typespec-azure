@@ -1,18 +1,21 @@
 import {
   Caption1,
-  Checkbox,
+  createTableColumn,
+  DataGrid,
+  DataGridBody,
+  DataGridCell,
+  DataGridHeader,
+  DataGridHeaderCell,
+  DataGridRow,
   makeStyles,
-  mergeClasses,
   SearchBox,
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableHeaderCell,
-  TableRow,
+  TableCellLayout,
   tokens,
+  type DataGridProps,
+  type TableColumnDefinition,
+  type TableColumnSizingOptions,
 } from "@fluentui/react-components";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 
 import type { Theme } from "@typespec/astro-utils/utils/theme";
 import { formatMs, formatPercent, formatShare } from "./data.js";
@@ -21,8 +24,7 @@ import { EmptyNote, SectionHeader } from "./section.js";
 import { Sparkline } from "./sparkline.js";
 import type { MetricRow } from "./types.js";
 
-type SortKey = "name" | "latest" | "delta" | "share";
-type SortDirection = "ascending" | "descending";
+type SortState = Parameters<NonNullable<DataGridProps["onSortChange"]>>[1];
 
 const useStyles = makeStyles({
   root: {
@@ -46,61 +48,26 @@ const useStyles = makeStyles({
     border: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
     borderRadius: tokens.borderRadiusMedium,
   },
-  table: {
-    // Columns have fixed widths, so scroll sideways rather than letting them
-    // collide once the viewport gets narrower than the table.
-    minWidth: "44rem",
-  },
-  stickyHead: {
+  head: {
     position: "sticky",
     top: 0,
     zIndex: 1,
     backgroundColor: tokens.colorNeutralBackground1,
   },
-  // Fluent lays table cells out with flex, so columns need explicit sizing and
-  // `minWidth: 0` for long rule names to ellipsize instead of overrunning.
-  toggleCell: {
-    flex: "0 0 3.5rem",
-  },
-  nameCell: {
-    flex: "1 1 auto",
-    minWidth: 0,
-  },
-  numericCell: {
-    flex: "0 0 6.5rem",
+  numeric: {
     fontVariantNumeric: "tabular-nums",
-    whiteSpace: "nowrap",
-  },
-  deltaCell: {
-    flexBasis: "11rem",
-  },
-  shareCell: {
-    flexBasis: "5.5rem",
-  },
-  trendCell: {
-    flex: "0 0 6rem",
-  },
-  name: {
-    display: "block",
-    minWidth: 0,
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
   },
 });
 
-function compare(a: MetricRow, b: MetricRow, key: SortKey): number {
-  switch (key) {
-    case "name":
-      return a.name.localeCompare(b.name);
-    case "latest":
-      return (a.latest ?? -Infinity) - (b.latest ?? -Infinity);
-    case "delta":
-      return (a.delta ?? -Infinity) - (b.delta ?? -Infinity);
-    case "share":
-      return (a.share ?? -Infinity) - (b.share ?? -Infinity);
-  }
-}
+const COLUMN_SIZING: TableColumnSizingOptions = {
+  name: { minWidth: 140, idealWidth: 260 },
+  latest: { minWidth: 80, idealWidth: 90 },
+  delta: { minWidth: 150, idealWidth: 180 },
+  share: { minWidth: 70, idealWidth: 80 },
+  trend: { minWidth: 90, idealWidth: 100 },
+};
+
+const numberOf = (value: number | null) => value ?? -Infinity;
 
 /**
  * The full metric list, ranked and searchable.
@@ -130,100 +97,125 @@ export function MetricTable({
 }) {
   const styles = useStyles();
   const [query, setQuery] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("latest");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("descending");
+  const [sortState, setSortState] = useState<SortState>({
+    sortColumn: "latest",
+    sortDirection: "descending",
+  });
 
   /** Anchor for shift-click range selection, as an index into `visible`. */
   const anchorRef = useRef<number | null>(null);
-  /** Whether shift was held for the click that produced the next change event. */
-  const shiftRef = useRef(false);
+
+  const columns = useMemo(() => {
+    const numeric = (node: ReactNode) => (
+      <TableCellLayout className={styles.numeric}>{node}</TableCellLayout>
+    );
+    const all: TableColumnDefinition<MetricRow>[] = [
+      createTableColumn<MetricRow>({
+        columnId: "name",
+        compare: (a, b) => a.name.localeCompare(b.name),
+        renderHeaderCell: () => "Metric",
+        renderCell: (row) => (
+          <TableCellLayout truncate title={row.key}>
+            {row.name}
+          </TableCellLayout>
+        ),
+      }),
+      createTableColumn<MetricRow>({
+        columnId: "latest",
+        compare: (a, b) => numberOf(a.latest) - numberOf(b.latest),
+        renderHeaderCell: () => "Latest",
+        renderCell: (row) => numeric(formatMs(row.latest)),
+      }),
+      createTableColumn<MetricRow>({
+        columnId: "delta",
+        compare: (a, b) => numberOf(a.delta) - numberOf(b.delta),
+        renderHeaderCell: () => "vs 7-day median",
+        renderCell: (row) =>
+          numeric(
+            row.delta === null ? (
+              "—"
+            ) : (
+              <span style={{ color: trendColor(row.delta, theme) }}>
+                {row.delta > 0 ? "+" : "−"}
+                {formatMs(Math.abs(row.delta))} ({formatPercent(row.deltaRatio)})
+              </span>
+            ),
+          ),
+      }),
+      createTableColumn<MetricRow>({
+        columnId: "share",
+        compare: (a, b) => numberOf(a.share) - numberOf(b.share),
+        renderHeaderCell: () => "Share",
+        renderCell: (row) => numeric(formatShare(row.share)),
+      }),
+      createTableColumn<MetricRow>({
+        columnId: "trend",
+        renderHeaderCell: () => "Trend",
+        renderCell: (row) => (
+          <Sparkline
+            values={row.values}
+            color={trendColor(row.delta ?? 0, theme)}
+            ariaLabel={`${row.name} trend`}
+          />
+        ),
+      }),
+    ];
+    return showShare ? all : all.filter((column) => column.columnId !== "share");
+  }, [theme, showShare, styles.numeric]);
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
     const filtered = needle
       ? rows.filter((row) => row.name.toLowerCase().includes(needle))
       : [...rows];
-    filtered.sort((a, b) => {
-      const result = compare(a, b, sortKey);
-      return sortDirection === "ascending" ? result : -result;
-    });
+    // Sorted here as well as in the grid so that shift-selected ranges follow
+    // the order rows are actually displayed in.
+    const compare = columns.find((column) => column.columnId === sortState.sortColumn)?.compare;
+    if (compare) {
+      filtered.sort((a, b) =>
+        sortState.sortDirection === "ascending" ? compare(a, b) : compare(b, a),
+      );
+    }
     return filtered;
-  }, [rows, query, sortKey, sortDirection]);
+  }, [rows, query, columns, sortState]);
 
+  const visibleKeys = useMemo(() => visible.map((row) => row.key), [visible]);
   const selectedSet = useMemo(() => new Set(selected), [selected]);
-
-  const visibleSelectedCount = useMemo(
-    () => visible.reduce((count, row) => count + (selectedSet.has(row.key) ? 1 : 0), 0),
-    [visible, selectedSet],
+  const visibleSelected = useMemo(
+    () => visibleKeys.filter((key) => selectedSet.has(key)),
+    [visibleKeys, selectedSet],
   );
 
-  const sort = (key: SortKey) => {
-    if (key === sortKey) {
-      setSortDirection((d) => (d === "ascending" ? "descending" : "ascending"));
-    } else {
-      setSortKey(key);
-      setSortDirection(key === "name" ? "ascending" : "descending");
+  const onGridSelectionChange: DataGridProps["onSelectionChange"] = (event, data) => {
+    const next = new Set(Array.from(data.selectedItems, String));
+    if (singleSelect) {
+      onSelectionChange([...next]);
+      return;
     }
-    anchorRef.current = null;
-  };
 
-  const headerProps = (key: SortKey) => ({
-    sortable: true,
-    sortDirection: sortKey === key ? sortDirection : undefined,
-    onClick: () => sort(key),
-  });
-
-  const onRowChange = useCallback(
-    (index: number) => {
-      const row = visible[index];
-      if (singleSelect) {
-        onSelectionChange([row.key]);
-        anchorRef.current = index;
-        return;
-      }
-
+    const before = new Set(visibleSelected);
+    const changed = visibleKeys.filter((key) => next.has(key) !== before.has(key));
+    if (changed.length === 1) {
+      const index = visibleKeys.indexOf(changed[0]);
+      const anchor = anchorRef.current;
       // Shift-click applies the new state across the whole range from the
       // anchor, which is how a group of related rules gets selected at once.
-      const anchor = anchorRef.current;
-      if (shiftRef.current && anchor !== null && anchor !== index) {
+      if ("shiftKey" in event && event.shiftKey && anchor !== null && anchor !== index) {
+        const selecting = next.has(changed[0]);
         const [from, to] = anchor < index ? [anchor, index] : [index, anchor];
-        const selecting = !selectedSet.has(row.key);
-        const next = new Set(selected);
-        for (const ranged of visible.slice(from, to + 1)) {
-          if (selecting) next.add(ranged.key);
-          else next.delete(ranged.key);
+        for (const key of visibleKeys.slice(from, to + 1)) {
+          if (selecting) next.add(key);
+          else next.delete(key);
         }
-        onSelectionChange([...next]);
-        return;
       }
-
       anchorRef.current = index;
-      onSelectionChange(
-        selectedSet.has(row.key)
-          ? selected.filter((key) => key !== row.key)
-          : [...selected, row.key],
-      );
-    },
-    [visible, selected, selectedSet, onSelectionChange, singleSelect],
-  );
-
-  const toggleAllVisible = useCallback(() => {
-    const next = new Set(selected);
-    if (visibleSelectedCount === visible.length) {
-      for (const row of visible) next.delete(row.key);
     } else {
-      for (const row of visible) next.add(row.key);
+      anchorRef.current = null;
     }
-    anchorRef.current = null;
-    onSelectionChange([...next]);
-  }, [selected, visible, visibleSelectedCount, onSelectionChange]);
 
-  const allChecked =
-    visible.length > 0 && visibleSelectedCount === visible.length
-      ? true
-      : visibleSelectedCount > 0
-        ? "mixed"
-        : false;
+    const hidden = selected.filter((key) => !visibleKeys.includes(key));
+    onSelectionChange([...hidden, ...visibleKeys.filter((key) => next.has(key))]);
+  };
 
   return (
     <section className={styles.root}>
@@ -239,103 +231,54 @@ export function MetricTable({
             {visible.length === rows.length
               ? `${rows.length} metrics`
               : `${visible.length} of ${rows.length} metrics`}
-            {!singleSelect && visibleSelectedCount > 0 && ` · ${visibleSelectedCount} charted`}
+            {!singleSelect && visibleSelected.length > 0 && ` · ${visibleSelected.length} charted`}
           </Caption1>
         </div>
       </SectionHeader>
 
       <div className={styles.scroll}>
-        <Table size="small" aria-label={caption} className={styles.table}>
-          <TableHeader className={styles.stickyHead}>
-            <TableRow>
-              <TableHeaderCell className={styles.toggleCell}>
-                {singleSelect ? (
-                  "Chart"
-                ) : (
-                  <Checkbox
-                    checked={allChecked}
-                    onChange={toggleAllVisible}
-                    aria-label={
-                      allChecked === true ? "Remove all from the chart" : "Plot all listed metrics"
-                    }
-                    title="Select every listed metric. Shift-click a row to select a range."
-                  />
-                )}
-              </TableHeaderCell>
-              <TableHeaderCell className={styles.nameCell} {...headerProps("name")}>
-                Metric
-              </TableHeaderCell>
-              <TableHeaderCell className={styles.numericCell} {...headerProps("latest")}>
-                Latest
-              </TableHeaderCell>
-              <TableHeaderCell
-                className={mergeClasses(styles.numericCell, styles.deltaCell)}
-                {...headerProps("delta")}
-              >
-                vs 7-day median
-              </TableHeaderCell>
-              {showShare && (
-                <TableHeaderCell
-                  className={mergeClasses(styles.numericCell, styles.shareCell)}
-                  {...headerProps("share")}
-                >
-                  Share
-                </TableHeaderCell>
+        <DataGrid
+          items={visible}
+          columns={columns}
+          getRowId={(row: MetricRow) => row.key}
+          size="small"
+          aria-label={caption}
+          sortable
+          sortState={sortState}
+          onSortChange={(_, next) => {
+            anchorRef.current = null;
+            setSortState(next);
+          }}
+          selectionMode={singleSelect ? "single" : "multiselect"}
+          selectedItems={visibleSelected}
+          onSelectionChange={onGridSelectionChange}
+          resizableColumns
+          columnSizingOptions={COLUMN_SIZING}
+          resizableColumnsOptions={{ autoFitColumns: false }}
+        >
+          <DataGridHeader className={styles.head}>
+            <DataGridRow
+              selectionCell={{
+                checkboxIndicator: { "aria-label": "Plot every listed metric" },
+                title: "Select every listed metric. Shift-click a row to select a range.",
+              }}
+            >
+              {({ renderHeaderCell }) => (
+                <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
               )}
-              <TableHeaderCell className={styles.trendCell}>Trend</TableHeaderCell>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {visible.map((row, index) => {
-              const isSelected = selectedSet.has(row.key);
-              const delta = row.delta;
-              return (
-                <TableRow key={row.key} appearance={isSelected ? "brand" : "none"}>
-                  <TableCell
-                    className={styles.toggleCell}
-                    onClickCapture={(event) => {
-                      shiftRef.current = event.shiftKey;
-                    }}
-                  >
-                    <Checkbox
-                      checked={isSelected}
-                      onChange={() => onRowChange(index)}
-                      aria-label={`Plot ${row.name}`}
-                    />
-                  </TableCell>
-                  <TableCell className={styles.nameCell}>
-                    <span className={styles.name} title={row.key}>
-                      {row.name}
-                    </span>
-                  </TableCell>
-                  <TableCell className={styles.numericCell}>{formatMs(row.latest)}</TableCell>
-                  <TableCell className={mergeClasses(styles.numericCell, styles.deltaCell)}>
-                    {delta === null ? (
-                      "—"
-                    ) : (
-                      <span style={{ color: trendColor(delta, theme) }}>
-                        {delta > 0 ? "+" : "−"}
-                        {formatMs(Math.abs(delta))} ({formatPercent(row.deltaRatio)})
-                      </span>
-                    )}
-                  </TableCell>
-                  {showShare && (
-                    <TableCell className={mergeClasses(styles.numericCell, styles.shareCell)}>
-                      {formatShare(row.share)}
-                    </TableCell>
-                  )}
-                  <TableCell className={styles.trendCell}>
-                    <Sparkline
-                      values={row.values}
-                      color={trendColor(delta ?? 0, theme)}
-                      ariaLabel={`${row.name} trend`}
-                    />
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+            </DataGridRow>
+          </DataGridHeader>
+          <DataGridBody<MetricRow>>
+            {({ item, rowId }) => (
+              <DataGridRow<MetricRow>
+                key={rowId}
+                selectionCell={{ checkboxIndicator: { "aria-label": `Plot ${item.name}` } }}
+              >
+                {({ renderCell }) => <DataGridCell>{renderCell(item)}</DataGridCell>}
+              </DataGridRow>
+            )}
+          </DataGridBody>
+        </DataGrid>
         {visible.length === 0 && <EmptyNote>No metrics match “{query}”.</EmptyNote>}
       </div>
     </section>

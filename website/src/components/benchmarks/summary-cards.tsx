@@ -1,4 +1,12 @@
-import { Caption1, Card, makeStyles, Text, tokens } from "@fluentui/react-components";
+import {
+  Caption1,
+  Card,
+  CardFooter,
+  CardHeader,
+  makeStyles,
+  Text,
+  tokens,
+} from "@fluentui/react-components";
 
 import type { Theme } from "@typespec/astro-utils/utils/theme";
 import { BASELINE_DAYS, formatMs, formatPercent, NOISE_FLOOR_RATIO } from "./data.js";
@@ -12,9 +20,6 @@ const useStyles = makeStyles({
     gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
     gap: tokens.spacingHorizontalS,
   },
-  card: {
-    gap: tokens.spacingVerticalXXS,
-  },
   label: {
     color: tokens.colorNeutralForeground3,
     textTransform: "capitalize",
@@ -23,16 +28,10 @@ const useStyles = makeStyles({
     fontVariantNumeric: "tabular-nums",
     lineHeight: tokens.lineHeightBase500,
   },
-  footer: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: tokens.spacingHorizontalS,
-    color: tokens.colorNeutralForeground3,
-  },
   change: {
     fontVariantNumeric: "tabular-nums",
     whiteSpace: "nowrap",
+    color: tokens.colorNeutralForeground3,
   },
 });
 
@@ -55,14 +54,26 @@ export function SummaryCards({ rows, theme }: { rows: MetricRow[]; theme: Theme 
         const color = isSignificant ? trendColor(row.delta!, theme) : undefined;
 
         return (
-          <Card key={row.key} className={styles.card} size="small" appearance="outline">
-            <Caption1 className={styles.label} as="h3">
-              {row.name}
-            </Caption1>
+          <Card key={row.key} size="small" appearance="outline">
+            <CardHeader
+              header={
+                <Caption1 className={styles.label} as="h3">
+                  {row.name}
+                </Caption1>
+              }
+            />
             <Text size={600} weight="semibold" className={styles.value}>
               {formatMs(row.latest)}
             </Text>
-            <div className={styles.footer}>
+            <CardFooter
+              action={
+                <Sparkline
+                  values={row.values}
+                  color={color ?? "currentColor"}
+                  ariaLabel={`${row.name} trend`}
+                />
+              }
+            >
               <Caption1
                 className={styles.change}
                 style={color ? { color } : undefined}
@@ -70,12 +81,7 @@ export function SummaryCards({ rows, theme }: { rows: MetricRow[]; theme: Theme 
               >
                 {row.deltaRatio === null ? "no baseline" : formatPercent(row.deltaRatio)}
               </Caption1>
-              <Sparkline
-                values={row.values}
-                color={color ?? "currentColor"}
-                ariaLabel={`${row.name} trend`}
-              />
-            </div>
+            </CardFooter>
           </Card>
         );
       })}
