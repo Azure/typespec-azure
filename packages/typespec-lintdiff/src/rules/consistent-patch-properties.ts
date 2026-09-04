@@ -1,14 +1,21 @@
+import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
+import {
+  createTCGCContext,
+  isInScope,
+  type TCGCContext,
+} from "@azure-tools/typespec-client-generator-core";
 import {
   createRule,
-  getProperty,
+  getDiscriminator,
+  isNeverType,
+  isNullType,
   paramMessage,
+  resolveEncodedName,
   type Model,
   type ModelProperty,
+  type Type,
 } from "@typespec/compiler";
-import {
-  getArmResources,
-  type ArmResourceDetails,
-} from "@azure-tools/typespec-azure-resource-manager";
+import { getAllHttpServices, type HttpOperation, type HttpOperationResponse } from "@typespec/http";
 
 export const consistentPatchPropertiesRule = createRule({
   name: "consistent-patch-properties",
@@ -16,29 +23,51 @@ export const consistentPatchPropertiesRule = createRule({
     "ARM PATCH body properties must exist in the resource model at the same nesting level.",
   severity: "warning",
   messages: {
-    default:
-      paramMessage`The property '${"propertyName"}' in the request body either does not appear in the resource model or is nested at the wrong level.`,
+    default: paramMessage`The property '${"propertyName"}' in the request body either does not appear in the resource model or is nested at the wrong level.`,
   },
   create(context) {
     return {
-      root: (program) => {
-        for (const armResource of getArmResources(program)) {
-          const patchBody = armResource.operations.lifecycle.update?.httpOperation.parameters.body
-            ?.type;
-          if (patchBody?.kind !== "Model") {
+      root: () => {
+        const emitterContext = createTCGCContext(context.program, "@azure-tools/typespec-autorest");
+        const [services] = getAllHttpServices(context.program);
+        for (const service of services) {
+          if (resolveProviderNamespace(context.program, service.namespace) === undefined) {
             continue;
           }
 
-          for (const invalidProperty of findInvalidPatchProperties(
-            patchBody,
-            armResource.typespecType,
-          )) {
-            context.reportDiagnostic({
-              target: invalidProperty.property,
-              format: {
-                propertyName: invalidProperty.path.join("."),
-              },
-            });
+          for (const httpOperation of service.operations) {
+            if (
+              httpOperation.verb !== "patch" ||
+              !isInScope(emitterContext, httpOperation.operation)
+            ) {
+              continue;
+            }
+
+            const patchBody = getObjectModel(httpOperation.parameters.body?.type);
+            const resourceType = getResourceType(emitterContext, httpOperation, service.operations);
+            if (patchBody === undefined) {
+              continue;
+            }
+            if (resourceType === undefined) {
+              continue;
+            }
+
+            const resourceModel = getObjectModel(resourceType);
+            const invalidProperties =
+              resourceModel === undefined
+                ? [...getPayloadProperties(emitterContext, patchBody)].map(
+                    ([jsonName, property]) => ({ path: [jsonName], target: property.target }),
+                  )
+                : findInvalidPatchProperties(emitterContext, patchBody, resourceModel);
+
+            for (const invalidProperty of invalidProperties) {
+              context.reportDiagnostic({
+                target: invalidProperty.target,
+                format: {
+                  propertyName: invalidProperty.path.join("."),
+                },
+              });
+            }
           }
         }
       },
@@ -46,80 +75,185 @@ export const consistentPatchPropertiesRule = createRule({
   },
 });
 
-function findInvalidPatchProperties(
-  patchModel: Model,
-  resourceModel: Model,
-  path: string[] = [],
-  visited: Set<Model> = new Set(),
-): Array<{ path: string[]; property: ModelProperty }> {
-  if (visited.has(patchModel)) {
-    return [];
-  }
-  visited.add(patchModel);
+function getResourceType(
+  emitterContext: TCGCContext,
+  patchOperation: HttpOperation,
+  operations: HttpOperation[],
+): Type | undefined {
+  const getOperation = operations.find(
+    (operation) =>
+      operation.verb === "get" &&
+      operation.path === patchOperation.path &&
+      isInScope(emitterContext, operation.operation),
+  );
 
-  const invalidProperties: Array<{ path: string[]; property: ModelProperty }> = [];
-
-  for (const patchProperty of getModelProperties(patchModel)) {
-    const currentPath = [...path, patchProperty.name];
-    const resourceProperty = getProperty(resourceModel, patchProperty.name);
-
-    if (resourceProperty === undefined) {
-      invalidProperties.push(...collectPropertyPaths(patchProperty, currentPath, visited));
-      continue;
-    }
-
-    if (
-      patchProperty.type.kind === "Model" &&
-      resourceProperty.type.kind === "Model"
-    ) {
-      invalidProperties.push(
-        ...findInvalidPatchProperties(
-          patchProperty.type,
-          resourceProperty.type,
-          currentPath,
-          visited,
-        ),
-      );
-    }
-  }
-
-  return invalidProperties;
-}
-
-function collectPropertyPaths(
-  property: ModelProperty,
-  path: string[],
-  visited: Set<Model>,
-): Array<{ path: string[]; property: ModelProperty }> {
-  if (property.type.kind !== "Model") {
-    return [{ path, property }];
-  }
-
-  if (visited.has(property.type)) {
-    return [{ path, property }];
-  }
-  visited.add(property.type);
-
-  const nestedProperties = getModelProperties(property.type);
-  if (nestedProperties.length === 0) {
-    return [{ path, property }];
-  }
-
-  return nestedProperties.flatMap((nestedProperty) =>
-    collectPropertyPaths(nestedProperty, [...path, nestedProperty.name], visited)
+  return (
+    getResponseBodyType(patchOperation.responses, 200) ??
+    getResponseBodyType(patchOperation.responses, 201) ??
+    getResponseBodyType(getOperation?.responses, 200) ??
+    getResponseBodyType(getOperation?.responses, 201)
   );
 }
 
-function getModelProperties(model: Model): ModelProperty[] {
-  const properties = new Map<string, ModelProperty>();
+function getResponseBodyType(
+  responses: HttpOperationResponse[] | undefined,
+  statusCode: number,
+): Type | undefined {
+  const response =
+    responses?.find((response) => response.statusCodes === statusCode) ??
+    responses?.find(
+      (response) =>
+        typeof response.statusCodes === "object" &&
+        statusCode >= response.statusCodes.start &&
+        statusCode <= response.statusCodes.end,
+    );
+  const body = response?.responses.find((content) => content.body !== undefined)?.body;
+  return body?.type;
+}
 
-  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
-    for (const property of current.properties.values()) {
-      if (!properties.has(property.name)) {
-        properties.set(property.name, property);
+function findInvalidPatchProperties(
+  emitterContext: TCGCContext,
+  patchModel: Model,
+  resourceModel: Model,
+  path: string[] = [],
+  activePairs: Map<Model, Set<Model>> = new Map(),
+): Array<{ path: string[]; target: Model | ModelProperty }> {
+  const activeResources = activePairs.get(patchModel);
+  if (activeResources?.has(resourceModel)) {
+    return [];
+  }
+  if (activeResources === undefined) {
+    activePairs.set(patchModel, new Set([resourceModel]));
+  } else {
+    activeResources.add(resourceModel);
+  }
+
+  const invalidProperties: Array<{ path: string[]; target: Model | ModelProperty }> = [];
+  const resourceProperties = getPayloadProperties(emitterContext, resourceModel);
+
+  for (const [jsonName, patchProperty] of getPayloadProperties(emitterContext, patchModel)) {
+    const currentPath = [...path, jsonName];
+    const resourceProperty = resourceProperties.get(jsonName);
+
+    if (resourceProperty === undefined) {
+      invalidProperties.push(
+        ...collectPropertyPaths(emitterContext, patchProperty, currentPath, new Set()),
+      );
+      continue;
+    }
+
+    const patchPropertyModel = getObjectModel(patchProperty.type);
+    if (patchPropertyModel !== undefined) {
+      const resourcePropertyModel = getObjectModel(resourceProperty.type);
+      if (resourcePropertyModel !== undefined) {
+        invalidProperties.push(
+          ...findInvalidPatchProperties(
+            emitterContext,
+            patchPropertyModel,
+            resourcePropertyModel,
+            currentPath,
+            activePairs,
+          ),
+        );
+      } else {
+        invalidProperties.push(
+          ...collectNestedPropertyPaths(emitterContext, patchPropertyModel, currentPath),
+        );
       }
     }
   }
 
-  return [...properties.values()];
+  activePairs.get(patchModel)?.delete(resourceModel);
+  return invalidProperties;
+}
+
+function collectNestedPropertyPaths(
+  emitterContext: TCGCContext,
+  model: Model,
+  path: string[],
+): Array<{ path: string[]; target: Model | ModelProperty }> {
+  const visited = new Set([model]);
+  return [...getPayloadProperties(emitterContext, model)].flatMap(([jsonName, property]) =>
+    collectPropertyPaths(emitterContext, property, [...path, jsonName], visited),
+  );
+}
+
+function collectPropertyPaths(
+  emitterContext: TCGCContext,
+  property: PayloadProperty,
+  path: string[],
+  visited: Set<Model>,
+): Array<{ path: string[]; target: Model | ModelProperty }> {
+  const propertyModel = getObjectModel(property.type);
+  if (propertyModel === undefined) {
+    return [{ path, target: property.target }];
+  }
+
+  if (visited.has(propertyModel)) {
+    return [{ path, target: property.target }];
+  }
+  visited.add(propertyModel);
+
+  const nestedProperties = getPayloadProperties(emitterContext, propertyModel);
+  if (nestedProperties.size === 0) {
+    return [{ path, target: property.target }];
+  }
+
+  const invalidProperties = [...nestedProperties].flatMap(([jsonName, nestedProperty]) =>
+    collectPropertyPaths(emitterContext, nestedProperty, [...path, jsonName], visited),
+  );
+  visited.delete(propertyModel);
+  return invalidProperties;
+}
+
+interface PayloadProperty {
+  target: Model | ModelProperty;
+  type?: Type;
+}
+
+function getPayloadProperties(
+  emitterContext: TCGCContext,
+  model: Model,
+): Map<string, PayloadProperty> {
+  const properties = new Map<string, PayloadProperty>();
+
+  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
+    for (const property of current.properties.values()) {
+      const jsonName = resolveEncodedName(emitterContext.program, property, "application/json");
+      if (
+        !properties.has(jsonName) &&
+        !isNeverType(property.type) &&
+        isInScope(emitterContext, property)
+      ) {
+        properties.set(jsonName, { target: property, type: property.type });
+      }
+    }
+
+    const discriminator = getDiscriminator(emitterContext.program, current);
+    if (
+      discriminator !== undefined &&
+      !current.properties.has(discriminator.propertyName) &&
+      !properties.has(discriminator.propertyName)
+    ) {
+      properties.set(discriminator.propertyName, { target: current });
+    }
+  }
+
+  return properties;
+}
+
+function getObjectModel(type: Type | undefined): Model | undefined {
+  if (type?.kind === "Model") {
+    return type;
+  }
+  if (type?.kind !== "Union") {
+    return undefined;
+  }
+
+  const nonNullVariants = [...type.variants.values()]
+    .map((variant) => variant.type)
+    .filter((variant) => !isNullType(variant));
+  return nonNullVariants.length === 1 && nonNullVariants[0].kind === "Model"
+    ? nonNullVariants[0]
+    : undefined;
 }
