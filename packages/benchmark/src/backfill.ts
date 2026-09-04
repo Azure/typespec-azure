@@ -1,11 +1,14 @@
 /* eslint-disable no-console */
 import { execSync } from "node:child_process";
 import {
+  closeSync,
   copyFileSync,
   cpSync,
   existsSync,
   mkdirSync,
+  openSync,
   readdirSync,
+  readFileSync,
   rmSync,
   symlinkSync,
   writeFileSync,
@@ -13,7 +16,15 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { generateHistory } from "./generate-history.js";
-import { DEFAULT_BRANCH, exec, execOk, git, gitSilent, listExistingResults } from "./utils.js";
+import {
+  configureGitIdentity,
+  DEFAULT_BRANCH,
+  exec,
+  execOk,
+  git,
+  gitSilent,
+  listExistingResults,
+} from "./utils.js";
 
 export interface BackfillOptions {
   /** Starting point: a commit SHA, or a number of recent commits to include. Defaults to 100. */
@@ -34,6 +45,22 @@ export interface BackfillOptions {
   specs?: string;
   /** Directory containing benchmark specs. Forwarded to the run command. */
   specsDir?: string;
+  /** Coefficient of variation above which a spec is re-run. Forwarded to the run command. */
+  noiseCvThreshold?: number;
+  /** Maximum re-runs of a noisy spec. Forwarded to the run command. */
+  maxReruns?: number;
+  /** Iterations per re-run of a noisy spec. Forwarded to the run command. */
+  rerunIterations?: number;
+  /** Directory on the data branch holding results. Defaults to `results`. */
+  resultsDir?: string;
+  /**
+   * Re-measure every commit in range, discarding the results already stored.
+   *
+   * Measurement settings have changed over the life of the series, so the only
+   * way to get points that can be compared with each other is to throw the old
+   * ones away and measure the whole range the same way.
+   */
+  reset?: boolean;
 }
 
 const DEFAULT_FROM = "100";
@@ -50,6 +77,7 @@ const TYPESPEC_PACKAGES = [
   "events",
   "streams",
   "sse",
+  "http-client-js",
 ];
 
 const AZURE_PACKAGES = [
@@ -58,8 +86,19 @@ const AZURE_PACKAGES = [
   "typespec-autorest",
   "typespec-client-generator-core",
   "typespec-azure-rulesets",
+  "typespec-python",
+  "typespec-ts",
+  "typespec-java",
 ];
 
+// Every emitter the specs `emit:`, plus what they depend on. A spec that names
+// an emitter this list forgets fails to compile outright, so it has to track
+// packages/benchmark/specs/*/tspconfig.yaml. Filters that match nothing at an
+// older commit are ignored by pnpm.
+//
+// The "..." suffix is load-bearing: it pulls in each package's workspace
+// dependencies. Without it the compiler builds against a tmlanguage-generator
+// that was never built and every commit dies in tsc.
 const BUILD_FILTER = [
   "@typespec/compiler",
   "@azure-tools/typespec-azure-core",
@@ -68,9 +107,46 @@ const BUILD_FILTER = [
   "@typespec/openapi3",
   "@azure-tools/typespec-client-generator-core",
   "@azure-tools/typespec-azure-rulesets",
+  "@azure-tools/typespec-python",
+  "@typespec/http-client-js",
+  "@azure-tools/typespec-ts",
+  "@azure-tools/typespec-java",
 ]
-  .map((p) => `--filter "${p}"`)
+  .map((p) => `--filter "${p}..."`)
   .join(" ");
+
+/** Last few lines of a log, for explaining a failure without dumping the file. */
+function tail(file: string, lines = 20): string {
+  try {
+    return readFileSync(file, "utf-8").trimEnd().split("\n").slice(-lines).join("\n");
+  } catch {
+    return "(no output captured)";
+  }
+}
+
+function indent(text: string): string {
+  return text
+    .split("\n")
+    .map((line) => `    ${line}`)
+    .join("\n");
+}
+
+/**
+ * Run a preparation step, keeping its output. `execOk` throws it away, which
+ * turns any install or build failure into a bare "build failed" that cannot be
+ * diagnosed once the runner is gone.
+ */
+function execLogged(cmd: string, cwd: string, log: string): boolean {
+  const fd = openSync(log, "w");
+  try {
+    execSync(cmd, { cwd, stdio: ["ignore", fd, fd] });
+    return true;
+  } catch {
+    return false;
+  } finally {
+    closeSync(fd);
+  }
+}
 
 /** Restore the saved benchmark package into the repo with symlinks to workspace packages. */
 function restoreBenchmark(repoRoot: string, savedBenchmark: string): void {
@@ -104,7 +180,31 @@ function restoreBenchmark(repoRoot: string, savedBenchmark: string): void {
 }
 
 /** Resolve a commit range from the from/to options. Returns commits oldest-first. */
-function resolveCommitRange(from: string, to: string | undefined, sourceBranch: string): string[] {
+/**
+ * Resolve the branch to read commits from.
+ *
+ * A CI checkout only creates the branch it was asked for, so `main` is not a
+ * local ref on any other branch -- including whichever branch a change to the
+ * backfill itself is being tested on. Fall back to the remote copy, fetching
+ * it if the checkout was shallow enough to have left it out.
+ */
+function resolveSourceBranch(sourceBranch: string): string {
+  if (execOk(`git rev-parse --verify --quiet ${sourceBranch}^{commit}`)) return sourceBranch;
+
+  const remote = `origin/${sourceBranch}`;
+  if (!execOk(`git rev-parse --verify --quiet ${remote}^{commit}`)) {
+    gitSilent(`fetch origin ${sourceBranch}:refs/remotes/${remote}`);
+  }
+  if (!execOk(`git rev-parse --verify --quiet ${remote}^{commit}`)) {
+    throw new Error(`Cannot resolve source branch '${sourceBranch}' locally or on origin.`);
+  }
+
+  console.log(`Source branch '${sourceBranch}' is not checked out; using ${remote}.`);
+  return remote;
+}
+
+function resolveCommitRange(from: string, to: string | undefined, branch: string): string[] {
+  const sourceBranch = resolveSourceBranch(branch);
   const isNumber = /^\d+$/.test(from);
 
   if (isNumber) {
@@ -128,6 +228,8 @@ export function backfill(options: BackfillOptions = {}): void {
   const sourceBranch = options.sourceBranch ?? "main";
   const dataBranch = options.dataBranch ?? DEFAULT_BRANCH;
   const shouldPush = options.push ?? false;
+  const dataDirName = options.resultsDir ?? "results";
+  const reset = options.reset ?? false;
 
   // Build flags to forward to `cli.js run`
   const runFlags: string[] = [];
@@ -135,6 +237,15 @@ export function backfill(options: BackfillOptions = {}): void {
   if (options.warmup !== undefined) runFlags.push(`--warmup ${options.warmup}`);
   if (options.specs) runFlags.push(`--specs ${options.specs}`);
   if (options.specsDir) runFlags.push(`--specs-dir "${options.specsDir}"`);
+  // The noise gate is part of how a number is produced, so a backfilled point
+  // is only comparable with a live one if it was gated the same way.
+  if (options.noiseCvThreshold !== undefined) {
+    runFlags.push(`--noise-cv-threshold ${options.noiseCvThreshold}`);
+  }
+  if (options.maxReruns !== undefined) runFlags.push(`--max-reruns ${options.maxReruns}`);
+  if (options.rerunIterations !== undefined) {
+    runFlags.push(`--rerun-iterations ${options.rerunIterations}`);
+  }
   const runFlagsStr = runFlags.join(" ");
 
   const repoRoot = git("rev-parse --show-toplevel");
@@ -174,7 +285,7 @@ export function backfill(options: BackfillOptions = {}): void {
   if (gitSilent("fetch origin " + dataBranch)) {
     // fetched successfully
   }
-  const existingResults = listExistingResults(dataBranch);
+  const existingResults = reset ? new Set<string>() : listExistingResults(dataBranch, dataDirName);
 
   // Stash uncommitted changes
   let stashed = false;
@@ -240,16 +351,20 @@ export function backfill(options: BackfillOptions = {}): void {
         continue;
       }
 
-      if (!execOk("pnpm install --frozen-lockfile --quiet", { cwd: repoRoot })) {
-        if (!execOk("pnpm install --quiet", { cwd: repoRoot })) {
+      const setupLog = join(resultsDir, `${sha}.setup.log`);
+
+      if (!execLogged("pnpm install --frozen-lockfile", repoRoot, setupLog)) {
+        if (!execLogged("pnpm install", repoRoot, setupLog)) {
           console.log("install failed, skipping");
+          console.log(indent(tail(setupLog)));
           failed++;
           continue;
         }
       }
 
-      if (!execOk(`pnpm -r ${BUILD_FILTER} build`, { cwd: repoRoot })) {
+      if (!execLogged(`pnpm -r ${BUILD_FILTER} build`, repoRoot, setupLog)) {
         console.log("build failed, skipping");
+        console.log(indent(tail(setupLog)));
         failed++;
         continue;
       }
@@ -264,17 +379,23 @@ export function backfill(options: BackfillOptions = {}): void {
       // Use --specs-dir from runFlags if provided, otherwise use the saved specs
       const specsFlag = options.specsDir ? "" : `--specs-dir "${defaultSpecsDir}"`;
 
+      // Keep the output: it is the only account of why a commit failed, and
+      // it lives on a runner that is thrown away when the job ends.
+      const logFd = openSync(benchLog, "w");
       try {
         execSync(
           `node "${benchmarkCli}" run ${specsFlag} --output "${resultFile}" ${runFlagsStr}`.trim(),
-          { cwd: repoRoot, stdio: ["ignore", "ignore", "ignore"] },
+          { cwd: repoRoot, stdio: ["ignore", logFd, logFd] },
         );
         console.log("done ✓");
         succeeded++;
       } catch {
-        console.log(`benchmark failed (see ${benchLog})`);
+        console.log("benchmark failed");
+        console.log(indent(tail(benchLog)));
         failed++;
         rmSync(resultFile, { force: true });
+      } finally {
+        closeSync(logFd);
       }
     }
   } finally {
@@ -288,6 +409,12 @@ export function backfill(options: BackfillOptions = {}): void {
   console.log(`Failed: ${failed}`);
   console.log(`Skipped: ${skipped}`);
 
+  // A run where nothing was measured has produced no data, so let it report as
+  // a failure rather than a green job with an empty result.
+  if (succeeded === 0 && failed > 0) {
+    throw new Error(`Backfill measured nothing: all ${failed} commits failed.`);
+  }
+
   // Step 4: Push results to benchmark-data branch
   const newResults = readdirSync(resultsDir).filter((f) => f.endsWith(".json"));
   if (newResults.length === 0) {
@@ -296,6 +423,8 @@ export function backfill(options: BackfillOptions = {}): void {
   }
 
   console.log(`\nCommitting ${newResults.length} result(s) to ${dataBranch} branch...`);
+
+  configureGitIdentity();
 
   // Switch to benchmark-data branch
   if (gitSilent(`rev-parse --verify origin/${dataBranch}`)) {
@@ -306,27 +435,36 @@ export function backfill(options: BackfillOptions = {}): void {
     gitSilent("rm -rf . --quiet");
   }
 
-  mkdirSync("results", { recursive: true });
+  if (reset) {
+    console.log(`Clearing ${dataDirName}/ — every commit in range was re-measured.`);
+    rmSync(dataDirName, { recursive: true, force: true });
+  }
+
+  mkdirSync(dataDirName, { recursive: true });
   for (const file of newResults) {
-    copyFileSync(join(resultsDir, file), join("results", file));
+    copyFileSync(join(resultsDir, file), join(dataDirName, file));
   }
 
   // Update latest.json to the most recent result (by commit order, not lexicographic SHA)
   const resultShas = new Set(newResults.map((f) => f.replace(".json", "")));
   const latestSha = [...commits].reverse().find((sha) => resultShas.has(sha));
   if (latestSha) {
-    copyFileSync(join(resultsDir, `${latestSha}.json`), "results/latest.json");
+    copyFileSync(join(resultsDir, `${latestSha}.json`), join(dataDirName, "latest.json"));
   }
 
   // Generate aggregated history.json
-  const resultsPath = join(process.cwd(), "results");
+  const resultsPath = join(process.cwd(), dataDirName);
   const history = generateHistory({ dir: resultsPath });
   writeFileSync(join(resultsPath, "history.json"), JSON.stringify(history, null, 2));
   console.log("Generated history.json");
 
-  git("add results/");
-  const commitMsg = `benchmark: backfill results for ${succeeded} commits`;
-  gitSilent(`commit -m "${commitMsg}" --quiet`);
+  git(`add ${dataDirName}/`);
+  const commitMsg = reset
+    ? `benchmark: re-measure ${succeeded} commits (${dataDirName})`
+    : `benchmark: backfill results for ${succeeded} commits`;
+  // Not silent: a failure here leaves the branch unborn, and the push that
+  // follows then fails with an unrelated-looking "src refspec" error.
+  git(`commit -m "${commitMsg}" --quiet`);
   console.log(`Results committed to ${dataBranch} branch.`);
 
   if (shouldPush) {
