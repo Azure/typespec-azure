@@ -132,12 +132,6 @@ When set to `true`, the emitter will generate Java sample code. Default value is
 
 When set to `true`, the emitter will generate Java test code (mock test for management-plane SDK, disabled live test for data-plane SDK). Default value is `true`.
 
-### `max-overload`
-
-**Type:** `"model"`
-
-When set to `model`, generate the maximum set of model-based convenience method overloads for Azure clients.
-
 ### `enable-sync-stack`
 
 **Type:** `boolean`
@@ -249,6 +243,12 @@ Specify headers that emitter will ignore.
 **Default:** `false`
 
 When set to `true`, the generated SDK uses `getter` method to access child clients. Default value is `false`.
+
+### `max-overload`
+
+**Type:** `"model"`
+
+When set to `model`, generate the maximum set of model-based convenience method overloads for Azure clients.
 
 ### `api-version`
 
