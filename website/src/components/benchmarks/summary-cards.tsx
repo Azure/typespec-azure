@@ -4,6 +4,7 @@ import {
   CardFooter,
   CardHeader,
   makeStyles,
+  SkeletonItem,
   Text,
   tokens,
 } from "@fluentui/react-components";
@@ -85,6 +86,18 @@ export function SummaryCards({ rows, theme }: { rows: MetricRow[]; theme: Theme 
           </Card>
         );
       })}
+    </div>
+  );
+}
+
+/** Placeholder with the same shape as the cards, shown while history loads. */
+export function SummaryCardsSkeleton() {
+  const styles = useStyles();
+  return (
+    <div className={styles.grid}>
+      {Array.from({ length: 6 }, (_, index) => (
+        <SkeletonItem key={index} shape="rectangle" size={72} />
+      ))}
     </div>
   );
 }

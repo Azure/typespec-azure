@@ -47,12 +47,8 @@ export function seriesColor(index: number, theme: Theme): string {
   return theme === "dark" ? entry.dark : entry.light;
 }
 
-/** The number of distinct colors before the palette repeats. */
-export const PALETTE_SIZE = PALETTE.length;
-
 /** Chart chrome colors, so axes and grid lines follow the site theme. */
-export interface ChartTheme {
-  text: string;
+interface ChartTheme {
   mutedText: string;
   grid: string;
   tooltipBackground: string;
@@ -69,7 +65,6 @@ export interface ChartTheme {
 export function chartTheme(theme: Theme): ChartTheme {
   const fluent = fluentTheme(theme);
   return {
-    text: fluent.colorNeutralForeground1,
     mutedText: fluent.colorNeutralForeground3,
     grid: fluent.colorNeutralStroke2,
     tooltipBackground: fluent.colorNeutralBackground1,

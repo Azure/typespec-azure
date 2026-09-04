@@ -141,17 +141,6 @@ export function collectSpecNames(data: HistoryData): string[] {
   return [...names].sort();
 }
 
-/** Union of metric labels across every spec, used to discover emitters. */
-export function collectSpecMetricLabels(data: HistoryData): string[] {
-  const labels = new Set<string>();
-  for (const entry of data.entries) {
-    for (const metrics of Object.values(entry.specMetrics ?? {})) {
-      for (const label of Object.keys(metrics)) labels.add(label);
-    }
-  }
-  return [...labels];
-}
-
 // ─── Statistics ───────────────────────────────────────────────────────────────
 
 /** Median of the given samples, or null when there are none. */

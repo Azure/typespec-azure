@@ -1,13 +1,10 @@
 import {
   Button,
-  Dropdown,
-  Field,
   makeStyles,
   mergeClasses,
   MessageBar,
   MessageBarActions,
   MessageBarBody,
-  Option,
   Skeleton,
   SkeletonItem,
   Tab,
@@ -40,8 +37,9 @@ import { MetricChart, SeriesChips } from "./metric-chart.js";
 import { MetricTable } from "./metric-table.js";
 import { seriesColor } from "./palette.js";
 import { SectionHeader } from "./section.js";
+import { Select } from "./select.js";
 import { ServiceGrid, trackableMetrics } from "./service-grid.js";
-import { SummaryCards } from "./summary-cards.js";
+import { SummaryCards, SummaryCardsSkeleton } from "./summary-cards.js";
 import type {
   Dataset,
   HistoryData,
@@ -82,50 +80,52 @@ const useStyles = makeStyles({
     flexDirection: "column",
     gap: tokens.spacingVerticalL,
   },
-  loadingCards: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-    gap: tokens.spacingHorizontalS,
-  },
 });
 
-const TAB_LIST: { key: TabKey; label: string }[] = [
-  { key: "overview", label: "Overview" },
-  { key: "linter", label: "Linter rules" },
-  { key: "validation", label: "Validators" },
-  { key: "emitters", label: "Emitters" },
-];
-
-/** The aggregate each tab's metrics roll up into. */
-const TAB_PARENT: Record<TabKey, string> = {
-  overview: "total",
-  linter: "linter",
-  validation: "validation",
-  emitters: "emit",
-};
-
-const TAB_CAPTION: Record<TabKey, string> = {
-  overview: "Compilation stages",
-  linter: "Linter rules",
-  validation: "Validators",
-  emitters: "Emitters",
-};
-
-/** Metric keys belonging to a tab, in the order they should be ranked. */
-function tabKeys(view: MetricView, tab: TabKey): string[] {
-  switch (tab) {
-    case "overview":
-      return STAGE_LABELS.filter((label) => view.values[label]);
-    case "linter":
-      return view.labels.filter((l) => l.startsWith("linter/"));
-    case "validation":
-      return view.labels.filter((l) => l.startsWith("validation/"));
-    case "emitters":
-      return getEmitterNames(view.labels)
-        .map((name) => `emit/${name}`)
-        .filter((key) => view.values[key]);
-  }
+interface TabDefinition {
+  key: TabKey;
+  label: string;
+  /** Heading for this tab's chart and table, where "Overview" is too vague. */
+  caption: string;
+  /** The aggregate these metrics roll up into, which the share column uses. */
+  parent: string;
+  /** The metrics this tab covers, in the order they should be ranked. */
+  keys: (view: MetricView) => string[];
 }
+
+const TABS: TabDefinition[] = [
+  {
+    key: "overview",
+    label: "Overview",
+    caption: "Compilation stages",
+    parent: "total",
+    keys: (view) => STAGE_LABELS.filter((label) => view.values[label]),
+  },
+  {
+    key: "linter",
+    label: "Linter rules",
+    caption: "Linter rules",
+    parent: "linter",
+    keys: (view) => view.labels.filter((label) => label.startsWith("linter/")),
+  },
+  {
+    key: "validation",
+    label: "Validators",
+    caption: "Validators",
+    parent: "validation",
+    keys: (view) => view.labels.filter((label) => label.startsWith("validation/")),
+  },
+  {
+    key: "emitters",
+    label: "Emitters",
+    caption: "Emitters",
+    parent: "emit",
+    keys: (view) =>
+      getEmitterNames(view.labels)
+        .map((name) => `emit/${name}`)
+        .filter((key) => view.values[key]),
+  },
+];
 
 function toSeries(
   keys: string[],
@@ -147,11 +147,7 @@ function LoadingState() {
     <Skeleton aria-label="Loading benchmark data">
       <div className={styles.loading}>
         <SkeletonItem shape="rectangle" size={40} />
-        <div className={styles.loadingCards}>
-          {Array.from({ length: 6 }, (_, i) => (
-            <SkeletonItem key={i} shape="rectangle" size={72} />
-          ))}
-        </div>
+        <SummaryCardsSkeleton />
         <SkeletonItem shape="rectangle" size={128} />
       </div>
     </Skeleton>
@@ -219,12 +215,12 @@ function Dashboard() {
     if (data && spec !== "all" && !specNames.includes(spec)) setSpec("all");
   }, [data, spec, specNames]);
 
-  const keys = useMemo(() => (view ? tabKeys(view, tab) : []), [view, tab]);
-  const parentKey = TAB_PARENT[tab];
+  const current = TABS.find((entry) => entry.key === tab)!;
+  const keys = useMemo(() => (view ? current.keys(view) : []), [view, current]);
 
   const rows = useMemo(
-    () => (view ? bySlowest(buildRows(view, keys, parentKey)) : []),
-    [view, keys, parentKey],
+    () => (view ? bySlowest(buildRows(view, keys, current.parent)) : []),
+    [view, keys, current],
   );
 
   const defaultSelection = useMemo(
@@ -259,8 +255,7 @@ function Dashboard() {
   const focusSeries = useCallback(
     (row: MetricRow) => {
       const owningTab =
-        TAB_LIST.find(({ key }) => (view ? tabKeys(view, key).includes(row.key) : false))?.key ??
-        tab;
+        TABS.find((entry) => (view ? entry.keys(view).includes(row.key) : false))?.key ?? tab;
       setTab(owningTab);
       setSelection((current) => ({ ...current, [owningTab]: [row.key] }));
     },
@@ -408,7 +403,7 @@ function Dashboard() {
     );
   }
 
-  const chartTitle = comparing ? `${shortLabel(primaryKey)} across specs` : TAB_CAPTION[tab];
+  const chartTitle = comparing ? `${shortLabel(primaryKey)} across specs` : current.caption;
 
   return (
     <div className={mergeClasses(styles.root, loading && styles.stale)}>
@@ -433,7 +428,7 @@ function Dashboard() {
         onTabSelect={(_, tabData) => setTab(tabData.value as TabKey)}
         className={styles.tabs}
       >
-        {TAB_LIST.map((entry) => (
+        {TABS.map((entry) => (
           <Tab key={entry.key} value={entry.key}>
             {entry.label}
           </Tab>
@@ -465,26 +460,21 @@ function Dashboard() {
         singleSelect={comparing}
         theme={theme}
         showShare={rows.some((row) => row.share !== null)}
-        caption={TAB_CAPTION[tab]}
+        caption={current.caption}
       />
 
       {tab === "emitters" && emittersWithSteps.length > 0 && (
         <section className={styles.chartSection}>
           <SectionHeader title="Step breakdown">
-            <Field label="Emitter" size="small">
-              <Dropdown
-                size="small"
-                value={shortLabel(`emit/${stepEmitter}`)}
-                selectedOptions={[stepEmitter]}
-                onOptionSelect={(_, d) => d.optionValue && setStepEmitter(d.optionValue)}
-              >
-                {emittersWithSteps.map((name) => (
-                  <Option key={name} value={name} text={shortLabel(`emit/${name}`)}>
-                    {shortLabel(`emit/${name}`)}
-                  </Option>
-                ))}
-              </Dropdown>
-            </Field>
+            <Select
+              label="Emitter"
+              value={stepEmitter}
+              options={emittersWithSteps.map((name) => ({
+                value: name,
+                label: shortLabel(`emit/${name}`),
+              }))}
+              onChange={setStepEmitter}
+            />
           </SectionHeader>
           <MetricChart points={view.points} series={stepSeries} theme={theme} height={280} />
           <SeriesChips series={stepSeries} />

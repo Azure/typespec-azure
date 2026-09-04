@@ -1,14 +1,4 @@
-import {
-  Caption1,
-  Card,
-  CardHeader,
-  Dropdown,
-  Field,
-  makeStyles,
-  Option,
-  Text,
-  tokens,
-} from "@fluentui/react-components";
+import { Caption1, Card, CardHeader, makeStyles, Text, tokens } from "@fluentui/react-components";
 import { useMemo } from "react";
 
 import type { Theme } from "@typespec/astro-utils/utils/theme";
@@ -26,6 +16,7 @@ import {
 import { MetricChart } from "./metric-chart.js";
 import { seriesColor, trendColor } from "./palette.js";
 import { SectionHeader } from "./section.js";
+import { Select } from "./select.js";
 import type { HistoryData, TimeRange } from "./types.js";
 
 const useStyles = makeStyles({
@@ -93,7 +84,10 @@ export function ServiceGrid({
   );
 
   const rows = useMemo(() => buildRows(view, specNames), [view, specNames]);
-  const options = useMemo(() => trackableMetrics(data), [data]);
+  const options = useMemo(
+    () => trackableMetrics(data).map((key) => ({ value: key, label: shortLabel(key) })),
+    [data],
+  );
 
   // Worst regression first, so a service that slowed down leads the grid.
   const ordered = useMemo(
@@ -106,20 +100,7 @@ export function ServiceGrid({
   return (
     <section className={styles.section}>
       <SectionHeader title="Per-service trend" hint="each service on its own scale">
-        <Field label="Track" size="small">
-          <Dropdown
-            size="small"
-            value={shortLabel(metricKey)}
-            selectedOptions={[metricKey]}
-            onOptionSelect={(_, d) => d.optionValue && onMetricKey(d.optionValue)}
-          >
-            {options.map((key) => (
-              <Option key={key} value={key} text={shortLabel(key)}>
-                {shortLabel(key)}
-              </Option>
-            ))}
-          </Dropdown>
-        </Field>
+        <Select label="Track" value={metricKey} options={options} onChange={onMetricKey} />
       </SectionHeader>
 
       <div className={styles.grid}>

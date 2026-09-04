@@ -1,20 +1,8 @@
-import {
-  Caption1,
-  Dropdown,
-  Field,
-  makeStyles,
-  Option,
-  Switch,
-  tokens,
-} from "@fluentui/react-components";
+import { Caption1, makeStyles, Switch, tokens } from "@fluentui/react-components";
 
 import { formatDate } from "./data.js";
+import { Select, type SelectOption } from "./select.js";
 import type { TimeRange } from "./types.js";
-
-export interface SelectOption {
-  value: string;
-  label: string;
-}
 
 const useStyles = makeStyles({
   bar: {
@@ -43,42 +31,6 @@ const useStyles = makeStyles({
     },
   },
 });
-
-function Select({
-  label,
-  value,
-  options,
-  onChange,
-  disabled,
-  hint,
-}: {
-  label: string;
-  value: string;
-  options: SelectOption[];
-  onChange: (value: string) => void;
-  disabled?: boolean;
-  hint?: string;
-}) {
-  const selected = options.find((o) => o.value === value);
-  return (
-    <Field label={label} size="small">
-      <Dropdown
-        size="small"
-        disabled={disabled}
-        title={hint}
-        value={disabled && hint ? hint : (selected?.label ?? "")}
-        selectedOptions={[value]}
-        onOptionSelect={(_, data) => data.optionValue && onChange(data.optionValue)}
-      >
-        {options.map((option) => (
-          <Option key={option.value} value={option.value} text={option.label}>
-            {option.label}
-          </Option>
-        ))}
-      </Dropdown>
-    </Field>
-  );
-}
 
 const RANGES: SelectOption[] = [
   { value: "30d", label: "Last 30 days" },
