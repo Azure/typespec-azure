@@ -34,6 +34,22 @@ export interface BackfillOptions {
   specs?: string;
   /** Directory containing benchmark specs. Forwarded to the run command. */
   specsDir?: string;
+  /** Coefficient of variation above which a spec is re-run. Forwarded to the run command. */
+  noiseCvThreshold?: number;
+  /** Maximum re-runs of a noisy spec. Forwarded to the run command. */
+  maxReruns?: number;
+  /** Iterations per re-run of a noisy spec. Forwarded to the run command. */
+  rerunIterations?: number;
+  /** Directory on the data branch holding results. Defaults to `results`. */
+  resultsDir?: string;
+  /**
+   * Re-measure every commit in range, discarding the results already stored.
+   *
+   * Measurement settings have changed over the life of the series, so the only
+   * way to get points that can be compared with each other is to throw the old
+   * ones away and measure the whole range the same way.
+   */
+  reset?: boolean;
 }
 
 const DEFAULT_FROM = "100";
@@ -128,6 +144,8 @@ export function backfill(options: BackfillOptions = {}): void {
   const sourceBranch = options.sourceBranch ?? "main";
   const dataBranch = options.dataBranch ?? DEFAULT_BRANCH;
   const shouldPush = options.push ?? false;
+  const dataDirName = options.resultsDir ?? "results";
+  const reset = options.reset ?? false;
 
   // Build flags to forward to `cli.js run`
   const runFlags: string[] = [];
@@ -135,6 +153,15 @@ export function backfill(options: BackfillOptions = {}): void {
   if (options.warmup !== undefined) runFlags.push(`--warmup ${options.warmup}`);
   if (options.specs) runFlags.push(`--specs ${options.specs}`);
   if (options.specsDir) runFlags.push(`--specs-dir "${options.specsDir}"`);
+  // The noise gate is part of how a number is produced, so a backfilled point
+  // is only comparable with a live one if it was gated the same way.
+  if (options.noiseCvThreshold !== undefined) {
+    runFlags.push(`--noise-cv-threshold ${options.noiseCvThreshold}`);
+  }
+  if (options.maxReruns !== undefined) runFlags.push(`--max-reruns ${options.maxReruns}`);
+  if (options.rerunIterations !== undefined) {
+    runFlags.push(`--rerun-iterations ${options.rerunIterations}`);
+  }
   const runFlagsStr = runFlags.join(" ");
 
   const repoRoot = git("rev-parse --show-toplevel");
@@ -174,7 +201,7 @@ export function backfill(options: BackfillOptions = {}): void {
   if (gitSilent("fetch origin " + dataBranch)) {
     // fetched successfully
   }
-  const existingResults = listExistingResults(dataBranch);
+  const existingResults = reset ? new Set<string>() : listExistingResults(dataBranch, dataDirName);
 
   // Stash uncommitted changes
   let stashed = false;
@@ -306,26 +333,33 @@ export function backfill(options: BackfillOptions = {}): void {
     gitSilent("rm -rf . --quiet");
   }
 
-  mkdirSync("results", { recursive: true });
+  if (reset) {
+    console.log(`Clearing ${dataDirName}/ — every commit in range was re-measured.`);
+    rmSync(dataDirName, { recursive: true, force: true });
+  }
+
+  mkdirSync(dataDirName, { recursive: true });
   for (const file of newResults) {
-    copyFileSync(join(resultsDir, file), join("results", file));
+    copyFileSync(join(resultsDir, file), join(dataDirName, file));
   }
 
   // Update latest.json to the most recent result (by commit order, not lexicographic SHA)
   const resultShas = new Set(newResults.map((f) => f.replace(".json", "")));
   const latestSha = [...commits].reverse().find((sha) => resultShas.has(sha));
   if (latestSha) {
-    copyFileSync(join(resultsDir, `${latestSha}.json`), "results/latest.json");
+    copyFileSync(join(resultsDir, `${latestSha}.json`), join(dataDirName, "latest.json"));
   }
 
   // Generate aggregated history.json
-  const resultsPath = join(process.cwd(), "results");
+  const resultsPath = join(process.cwd(), dataDirName);
   const history = generateHistory({ dir: resultsPath });
   writeFileSync(join(resultsPath, "history.json"), JSON.stringify(history, null, 2));
   console.log("Generated history.json");
 
-  git("add results/");
-  const commitMsg = `benchmark: backfill results for ${succeeded} commits`;
+  git(`add ${dataDirName}/`);
+  const commitMsg = reset
+    ? `benchmark: re-measure ${succeeded} commits (${dataDirName})`
+    : `benchmark: backfill results for ${succeeded} commits`;
   gitSilent(`commit -m "${commitMsg}" --quiet`);
   console.log(`Results committed to ${dataBranch} branch.`);
 

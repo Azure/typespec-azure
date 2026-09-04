@@ -74,6 +74,13 @@ Backfill options:
   --iterations <n>      Number of measured iterations per spec (default: 5)
   --warmup <n>          Number of warmup iterations (default: 1)
   --specs <name,...>    Comma-separated list of specific specs to run
+  --results-dir <dir>   Directory on the data branch to store results/history (default: results)
+  --noise-cv-threshold <n>
+                        Rerun when total-runtime coefficient of variation is above this value
+  --max-reruns <n>      Max rerun cycles when noise gate triggers
+  --rerun-iterations <n>
+                        Extra measured iterations per rerun
+  --reset               Re-measure every commit in range, discarding stored results
 `);
 }
 
@@ -211,6 +218,13 @@ function backfillCommand(args: Record<string, string>): void {
     warmup: args["warmup"] ? parseInt(args["warmup"], 10) : undefined,
     specs: args["specs"],
     specsDir: args["specs-dir"],
+    noiseCvThreshold: args["noise-cv-threshold"]
+      ? parseFloat(args["noise-cv-threshold"])
+      : undefined,
+    maxReruns: args["max-reruns"] ? parseInt(args["max-reruns"], 10) : undefined,
+    rerunIterations: args["rerun-iterations"] ? parseInt(args["rerun-iterations"], 10) : undefined,
+    resultsDir: args["results-dir"],
+    reset: args["reset"] === "true",
   });
 }
 
