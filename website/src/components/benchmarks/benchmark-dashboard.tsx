@@ -1,6 +1,15 @@
 import {
+  Accordion,
+  AccordionHeader,
+  AccordionItem,
+  AccordionPanel,
+  Body1,
   Button,
   Dropdown,
+  Field,
+  Link,
+  makeStyles,
+  mergeClasses,
   MessageBar,
   MessageBarActions,
   MessageBarBody,
@@ -9,13 +18,12 @@ import {
   SkeletonItem,
   Tab,
   TabList,
+  tokens,
 } from "@fluentui/react-components";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { FluentLayout } from "@components/fluent/fluent-layout";
 import { useTheme } from "@typespec/astro-utils/utils/theme-react";
-
-import "./benchmark-dashboard.css";
 
 import { ChangesPanel } from "./changes-panel.js";
 import {
@@ -37,6 +45,7 @@ import { FilterBar } from "./filter-bar.js";
 import { MetricChart, SeriesChips } from "./metric-chart.js";
 import { MetricTable } from "./metric-table.js";
 import { seriesColor } from "./palette.js";
+import { SectionHeader } from "./section.js";
 import { ServiceGrid, trackableMetrics } from "./service-grid.js";
 import { SummaryCards } from "./summary-cards.js";
 import type {
@@ -52,6 +61,47 @@ import { getHistoryUrl, readParams, writeParams } from "./url.js";
 
 /** How many series a dense chart plots before the table takes over. */
 const DEFAULT_SERIES_COUNT = 8;
+
+const useStyles = makeStyles({
+  root: {
+    color: tokens.colorNeutralForeground1,
+    display: "flex",
+    flexDirection: "column",
+    gap: tokens.spacingVerticalXXL,
+  },
+  // A refetch keeps the previous corpus on screen instead of blanking the page.
+  stale: {
+    opacity: 0.55,
+    pointerEvents: "none",
+    transition: "opacity 0.15s ease-in",
+  },
+  tabs: {
+    borderBottom: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
+  },
+  chartSection: {
+    display: "flex",
+    flexDirection: "column",
+    gap: tokens.spacingVerticalS,
+  },
+  about: {
+    maxWidth: "78ch",
+  },
+  aboutParagraph: {
+    display: "block",
+    marginTop: tokens.spacingVerticalS,
+    color: tokens.colorNeutralForeground2,
+  },
+  loading: {
+    display: "flex",
+    flexDirection: "column",
+    gap: tokens.spacingVerticalL,
+  },
+  loadingCards: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+    gap: tokens.spacingHorizontalS,
+  },
+});
 
 const TAB_LIST: { key: TabKey; label: string }[] = [
   { key: "overview", label: "Overview" },
@@ -106,11 +156,12 @@ function toSeries(
 }
 
 function LoadingState() {
+  const styles = useStyles();
   return (
     <Skeleton aria-label="Loading benchmark data">
-      <div className="loadingState">
+      <div className={styles.loading}>
         <SkeletonItem shape="rectangle" size={40} />
-        <div className="loadingCards">
+        <div className={styles.loadingCards}>
           {Array.from({ length: 6 }, (_, i) => (
             <SkeletonItem key={i} shape="rectangle" size={72} />
           ))}
@@ -122,37 +173,43 @@ function LoadingState() {
 }
 
 function About() {
+  const styles = useStyles();
   return (
-    <details className="about">
-      <summary>About this data</summary>
-      <p>
-        Every push to <code>main</code> compiles a fixed set of specs and records how long each
-        compilation stage, linter rule, validator and emitter takes. Results are stored on the{" "}
-        <a
-          href="https://github.com/Azure/typespec-azure/tree/benchmark-data"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <code>benchmark-data</code>
-        </a>{" "}
-        branch.
-      </p>
-      <p>
-        <strong>Main baseline</strong> runs the small, consistent specs checked into this
-        repository, which makes it the better signal for spotting compiler regressions.{" "}
-        <strong>Azure services</strong> runs real Azure service specs, which are larger and change
-        independently of this repository.
-      </p>
-      <p>
-        Changes are measured against the median of the previous 7 days rather than the previous run,
-        because individual runs vary by a few percent. Click any point on a chart to open the commit
-        that produced it.
-      </p>
-    </details>
+    <Accordion collapsible className={styles.about}>
+      <AccordionItem value="about">
+        <AccordionHeader size="small">About this data</AccordionHeader>
+        <AccordionPanel>
+          <Body1 className={styles.aboutParagraph}>
+            Every push to <code>main</code> compiles a fixed set of specs and records how long each
+            compilation stage, linter rule, validator and emitter takes. Results are stored on the{" "}
+            <Link
+              href="https://github.com/Azure/typespec-azure/tree/benchmark-data"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <code>benchmark-data</code>
+            </Link>{" "}
+            branch.
+          </Body1>
+          <Body1 className={styles.aboutParagraph}>
+            <strong>Main baseline</strong> runs the small, consistent specs checked into this
+            repository, which makes it the better signal for spotting compiler regressions.{" "}
+            <strong>Azure services</strong> runs real Azure service specs, which are larger and
+            change independently of this repository.
+          </Body1>
+          <Body1 className={styles.aboutParagraph}>
+            Changes are measured against the median of the previous 7 days rather than the previous
+            run, because individual runs vary by a few percent. Click any point on a chart to open
+            the commit that produced it.
+          </Body1>
+        </AccordionPanel>
+      </AccordionItem>
+    </Accordion>
   );
 }
 
 function Dashboard() {
+  const styles = useStyles();
   const theme = useTheme();
   const initial = useMemo(readParams, []);
 
@@ -362,7 +419,7 @@ function Dashboard() {
 
   if (error) {
     return (
-      <div className="benchmarkDashboard">
+      <div className={styles.root}>
         {header}
         <MessageBar intent="error">
           <MessageBarBody>
@@ -383,7 +440,7 @@ function Dashboard() {
 
   if (!view || !chartView) {
     return (
-      <div className="benchmarkDashboard">
+      <div className={styles.root}>
         {header}
         <LoadingState />
       </div>
@@ -392,7 +449,7 @@ function Dashboard() {
 
   if (view.points.length === 0) {
     return (
-      <div className="benchmarkDashboard">
+      <div className={styles.root}>
         {header}
         <MessageBar intent="info">
           <MessageBarBody>No benchmark runs match the selected filters.</MessageBarBody>
@@ -404,7 +461,7 @@ function Dashboard() {
   const chartTitle = comparing ? `${shortLabel(primaryKey)} across specs` : TAB_CAPTION[tab];
 
   return (
-    <div className={`benchmarkDashboard ${loading ? "benchmarkDashboard--stale" : ""}`}>
+    <div className={mergeClasses(styles.root, loading && styles.stale)}>
       {header}
       <About />
 
@@ -426,7 +483,7 @@ function Dashboard() {
       <TabList
         selectedValue={tab}
         onTabSelect={(_, tabData) => setTab(tabData.value as TabKey)}
-        className="contentTabs"
+        className={styles.tabs}
       >
         {TAB_LIST.map((entry) => (
           <Tab key={entry.key} value={entry.key}>
@@ -435,15 +492,15 @@ function Dashboard() {
         ))}
       </TabList>
 
-      <section className="chartSection">
-        <header className="chartHeader">
-          <h2 className="sectionTitle">{chartTitle}</h2>
-          <span className="sectionHint">
-            {comparing
+      <section className={styles.chartSection}>
+        <SectionHeader
+          title={chartTitle}
+          hint={
+            comparing
               ? "One line per spec. Pick a different metric in the table below."
-              : `Showing ${chartSeries.length} of ${rows.length}. Use the table to add or remove metrics.`}
-          </span>
-        </header>
+              : `Showing ${chartSeries.length} of ${rows.length}. Use the table to add or remove metrics.`
+          }
+        />
         <MetricChart
           points={chartView.points}
           series={chartSeries}
@@ -464,11 +521,9 @@ function Dashboard() {
       />
 
       {tab === "emitters" && emittersWithSteps.length > 0 && (
-        <section className="chartSection">
-          <header className="chartHeader">
-            <h2 className="sectionTitle">Step breakdown</h2>
-            <label className="filterField">
-              <span className="filterLabel">Emitter</span>
+        <section className={styles.chartSection}>
+          <SectionHeader title="Step breakdown">
+            <Field label="Emitter" size="small">
               <Dropdown
                 size="small"
                 value={shortLabel(`emit/${stepEmitter}`)}
@@ -481,8 +536,8 @@ function Dashboard() {
                   </Option>
                 ))}
               </Dropdown>
-            </label>
-          </header>
+            </Field>
+          </SectionHeader>
           <MetricChart points={view.points} series={stepSeries} theme={theme} height={280} />
           <SeriesChips series={stepSeries} />
         </section>

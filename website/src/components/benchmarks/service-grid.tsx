@@ -1,4 +1,13 @@
-import { Dropdown, Option } from "@fluentui/react-components";
+import {
+  Caption1,
+  Card,
+  Dropdown,
+  Field,
+  makeStyles,
+  Option,
+  Text,
+  tokens,
+} from "@fluentui/react-components";
 import { useMemo } from "react";
 
 import type { Theme } from "@typespec/astro-utils/utils/theme";
@@ -15,7 +24,48 @@ import {
 } from "./data.js";
 import { MetricChart } from "./metric-chart.js";
 import { seriesColor, trendColor } from "./palette.js";
+import { SectionHeader } from "./section.js";
 import type { HistoryData, TimeRange } from "./types.js";
+
+const useStyles = makeStyles({
+  section: {
+    display: "flex",
+    flexDirection: "column",
+    gap: tokens.spacingVerticalS,
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+    gap: tokens.spacingHorizontalS,
+  },
+  card: {
+    gap: tokens.spacingVerticalXS,
+  },
+  header: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: tokens.spacingHorizontalS,
+  },
+  title: {
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  stats: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: tokens.spacingHorizontalS,
+    whiteSpace: "nowrap",
+  },
+  value: {
+    fontVariantNumeric: "tabular-nums",
+  },
+  change: {
+    fontVariantNumeric: "tabular-nums",
+    color: tokens.colorNeutralForeground3,
+  },
+});
 
 /** Metrics worth tracking per service: the pipeline stages plus each emitter. */
 export function trackableMetrics(data: HistoryData): string[] {
@@ -48,6 +98,8 @@ export function ServiceGrid({
   onMetricKey: (value: string) => void;
   theme: Theme;
 }) {
+  const styles = useStyles();
+
   const view = useMemo(
     () => buildComparisonView(data, metricKey, specNames, range),
     [data, metricKey, specNames, range],
@@ -65,14 +117,9 @@ export function ServiceGrid({
   if (view.points.length === 0) return null;
 
   return (
-    <section className="serviceSection">
-      <header className="chartHeader">
-        <h2 className="sectionTitle">
-          Per-service trend
-          <span className="sectionHint">each service on its own scale</span>
-        </h2>
-        <label className="filterField">
-          <span className="filterLabel">Track</span>
+    <section className={styles.section}>
+      <SectionHeader title="Per-service trend" hint="each service on its own scale">
+        <Field label="Track" size="small">
           <Dropdown
             size="small"
             value={shortLabel(metricKey)}
@@ -85,30 +132,34 @@ export function ServiceGrid({
               </Option>
             ))}
           </Dropdown>
-        </label>
-      </header>
+        </Field>
+      </SectionHeader>
 
-      <div className="serviceGrid">
+      <div className={styles.grid}>
         {ordered.map((row, index) => {
           const significant =
             row.deltaRatio !== null && Math.abs(row.deltaRatio) >= NOISE_FLOOR_RATIO;
           const color = seriesColor(index, theme);
 
           return (
-            <article key={row.key} className="serviceCard">
-              <header className="serviceCardHeader">
-                <h3 className="serviceCardTitle">{row.name}</h3>
-                <div className="serviceCardStats">
-                  <span className="serviceCardValue">{formatMs(row.latest)}</span>
-                  <span
-                    className="serviceCardChange"
+            <Card key={row.key} className={styles.card} size="small" appearance="outline">
+              <div className={styles.header}>
+                <Text as="h3" weight="semibold" className={styles.title}>
+                  {row.name}
+                </Text>
+                <div className={styles.stats}>
+                  <Text weight="semibold" className={styles.value}>
+                    {formatMs(row.latest)}
+                  </Text>
+                  <Caption1
+                    className={styles.change}
                     style={significant ? { color: trendColor(row.delta!, theme) } : undefined}
                     title={`Compared to the median of the last ${BASELINE_DAYS} days (${formatMs(row.baseline)})`}
                   >
                     {formatPercent(row.deltaRatio)}
-                  </span>
+                  </Caption1>
                 </div>
-              </header>
+              </div>
               <MetricChart
                 points={view.points}
                 series={[{ key: row.key, label: row.name, data: row.values, color }]}
@@ -116,7 +167,7 @@ export function ServiceGrid({
                 height={190}
                 yAxisLabel=""
               />
-            </article>
+            </Card>
           );
         })}
       </div>

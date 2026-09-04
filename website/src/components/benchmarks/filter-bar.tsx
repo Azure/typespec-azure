@@ -1,4 +1,4 @@
-import { Dropdown, Option, Switch } from "@fluentui/react-components";
+import { Dropdown, Field, makeStyles, Option, Switch, tokens } from "@fluentui/react-components";
 
 import { formatDate } from "./data.js";
 import type { TimeRange } from "./types.js";
@@ -7,6 +7,35 @@ export interface SelectOption {
   value: string;
   label: string;
 }
+
+const useStyles = makeStyles({
+  bar: {
+    position: "sticky",
+    top: "var(--header-height, 0)",
+    zIndex: 10,
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "end",
+    gap: tokens.spacingHorizontalL,
+    paddingTop: tokens.spacingVerticalS,
+    paddingBottom: tokens.spacingVerticalS,
+    backgroundColor: tokens.colorNeutralBackground1,
+    borderBottom: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
+    "@media (max-width: 640px)": {
+      position: "static",
+    },
+  },
+  meta: {
+    marginLeft: "auto",
+    color: tokens.colorNeutralForeground3,
+    fontSize: tokens.fontSizeBase200,
+    whiteSpace: "nowrap",
+    "@media (max-width: 640px)": {
+      marginLeft: 0,
+      width: "100%",
+    },
+  },
+});
 
 function Select({
   label,
@@ -25,8 +54,7 @@ function Select({
 }) {
   const selected = options.find((o) => o.value === value);
   return (
-    <label className="filterField">
-      <span className="filterLabel">{label}</span>
+    <Field label={label} size="small">
       <Dropdown
         size="small"
         disabled={disabled}
@@ -41,7 +69,7 @@ function Select({
           </Option>
         ))}
       </Dropdown>
-    </label>
+    </Field>
   );
 }
 
@@ -84,13 +112,14 @@ export function FilterBar({
   pointCount: number;
   generated: string;
 }) {
+  const styles = useStyles();
   const specOptions: SelectOption[] = [
     { value: "all", label: `All ${specNoun}s (average)` },
     ...specNames.map((name) => ({ value: name, label: name })),
   ];
 
   return (
-    <div className="filterBar">
+    <div className={styles.bar}>
       <Select
         label={specNoun === "spec" ? "Spec" : "Service"}
         value={spec}
@@ -112,7 +141,7 @@ export function FilterBar({
           label={`Compare across ${specNoun}s`}
         />
       )}
-      <span className="filterMeta">
+      <span className={styles.meta}>
         {pointCount.toLocaleString()} runs · updated {formatDate(generated)}
       </span>
     </div>

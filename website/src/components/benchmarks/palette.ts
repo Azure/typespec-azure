@@ -7,7 +7,13 @@
  * stays legible on both light and dark backgrounds.
  */
 
+import { webDarkTheme, webLightTheme } from "@fluentui/react-components";
 import type { Theme } from "@typespec/astro-utils/utils/theme";
+
+/** The Fluent theme backing the current site theme. */
+function fluentTheme(theme: Theme) {
+  return theme === "dark" ? webDarkTheme : webLightTheme;
+}
 
 interface PaletteEntry {
   light: string;
@@ -17,6 +23,10 @@ interface PaletteEntry {
 /**
  * Ten hues chosen to stay distinguishable for the most common forms of color
  * vision deficiency, each with a variant tuned for the surface it sits on.
+ *
+ * Fluent's `colorPalette*Foreground1` ramp is not used here: it only offers
+ * seven hues, two of which are greens, and it signals status rather than
+ * telling categories apart.
  */
 const PALETTE: PaletteEntry[] = [
   { light: "#0f6cbd", dark: "#62abf5" }, // blue
@@ -49,26 +59,26 @@ export interface ChartTheme {
   tooltipText: string;
 }
 
+/**
+ * Chart chrome resolved from the Fluent theme.
+ *
+ * Chart.js paints to a canvas and cannot read the CSS custom properties that
+ * `FluentProvider` emits, so token values are read off the theme object rather
+ * than being restated as literals here.
+ */
 export function chartTheme(theme: Theme): ChartTheme {
-  return theme === "dark"
-    ? {
-        text: "#e6e6e6",
-        mutedText: "#a6a6a6",
-        grid: "rgba(255, 255, 255, 0.09)",
-        tooltipBackground: "#292929",
-        tooltipText: "#f5f5f5",
-      }
-    : {
-        text: "#242424",
-        mutedText: "#616161",
-        grid: "rgba(0, 0, 0, 0.08)",
-        tooltipBackground: "#ffffff",
-        tooltipText: "#242424",
-      };
+  const fluent = fluentTheme(theme);
+  return {
+    text: fluent.colorNeutralForeground1,
+    mutedText: fluent.colorNeutralForeground3,
+    grid: fluent.colorNeutralStroke2,
+    tooltipBackground: fluent.colorNeutralBackground1,
+    tooltipText: fluent.colorNeutralForeground1,
+  };
 }
 
 /** Color used to signal a metric got slower / faster. */
 export function trendColor(delta: number, theme: Theme): string {
-  if (delta > 0) return theme === "dark" ? "#f87f8f" : "#c4314b";
-  return theme === "dark" ? "#5ec98a" : "#0e7c42";
+  const fluent = fluentTheme(theme);
+  return delta > 0 ? fluent.colorPaletteRedForeground1 : fluent.colorPaletteGreenForeground1;
 }

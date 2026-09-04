@@ -1,8 +1,18 @@
+import { makeStyles, tokens } from "@fluentui/react-components";
 import { useMemo } from "react";
 
 const WIDTH = 88;
 const HEIGHT = 22;
 const PADDING = 2;
+
+const useStyles = makeStyles({
+  svg: {
+    display: "block",
+  },
+  empty: {
+    color: tokens.colorNeutralForeground3,
+  },
+});
 
 /**
  * A compact trend line for a single metric, so the table and summary cards can
@@ -17,6 +27,7 @@ export function Sparkline({
   color: string;
   ariaLabel?: string;
 }) {
+  const styles = useStyles();
   const path = useMemo(() => {
     const present = values
       .map((value, index) => ({ value, index }))
@@ -38,11 +49,11 @@ export function Sparkline({
       .join(" ");
   }, [values]);
 
-  if (!path) return <span className="sparklineEmpty">—</span>;
+  if (!path) return <span className={styles.empty}>—</span>;
 
   return (
     <svg
-      className="sparkline"
+      className={styles.svg}
       width={WIDTH}
       height={HEIGHT}
       viewBox={`0 0 ${WIDTH} ${HEIGHT}`}

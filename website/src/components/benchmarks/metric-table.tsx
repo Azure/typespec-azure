@@ -1,5 +1,8 @@
 import {
+  Caption1,
   Checkbox,
+  makeStyles,
+  mergeClasses,
   SearchBox,
   Table,
   TableBody,
@@ -7,17 +10,84 @@ import {
   TableHeader,
   TableHeaderCell,
   TableRow,
+  tokens,
 } from "@fluentui/react-components";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import type { Theme } from "@typespec/astro-utils/utils/theme";
 import { formatMs, formatPercent, formatShare } from "./data.js";
 import { trendColor } from "./palette.js";
+import { EmptyNote, SectionHeader } from "./section.js";
 import { Sparkline } from "./sparkline.js";
 import type { MetricRow } from "./types.js";
 
 type SortKey = "name" | "latest" | "delta" | "share";
 type SortDirection = "ascending" | "descending";
+
+const useStyles = makeStyles({
+  root: {
+    display: "flex",
+    flexDirection: "column",
+    gap: tokens.spacingVerticalS,
+  },
+  controls: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: tokens.spacingHorizontalM,
+  },
+  count: {
+    color: tokens.colorNeutralForeground3,
+    whiteSpace: "nowrap",
+  },
+  scroll: {
+    maxHeight: "26rem",
+    overflow: "auto",
+    border: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
+    borderRadius: tokens.borderRadiusMedium,
+  },
+  table: {
+    // Columns have fixed widths, so scroll sideways rather than letting them
+    // collide once the viewport gets narrower than the table.
+    minWidth: "44rem",
+  },
+  stickyHead: {
+    position: "sticky",
+    top: 0,
+    zIndex: 1,
+    backgroundColor: tokens.colorNeutralBackground1,
+  },
+  // Fluent lays table cells out with flex, so columns need explicit sizing and
+  // `minWidth: 0` for long rule names to ellipsize instead of overrunning.
+  toggleCell: {
+    flex: "0 0 3.5rem",
+  },
+  nameCell: {
+    flex: "1 1 auto",
+    minWidth: 0,
+  },
+  numericCell: {
+    flex: "0 0 6.5rem",
+    fontVariantNumeric: "tabular-nums",
+    whiteSpace: "nowrap",
+  },
+  deltaCell: {
+    flexBasis: "11rem",
+  },
+  shareCell: {
+    flexBasis: "5.5rem",
+  },
+  trendCell: {
+    flex: "0 0 6rem",
+  },
+  name: {
+    display: "block",
+    minWidth: 0,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+});
 
 function compare(a: MetricRow, b: MetricRow, key: SortKey): number {
   switch (key) {
@@ -58,6 +128,7 @@ export function MetricTable({
   /** Compare mode plots one metric across specs, so only one row applies. */
   singleSelect?: boolean;
 }) {
+  const styles = useStyles();
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("latest");
   const [sortDirection, setSortDirection] = useState<SortDirection>("descending");
@@ -155,28 +226,29 @@ export function MetricTable({
         : false;
 
   return (
-    <section className="metricTable">
-      <header className="metricTableHeader">
-        <h3 className="metricTableCaption">{caption}</h3>
-        <SearchBox
-          size="small"
-          placeholder="Filter metrics"
-          value={query}
-          onChange={(_, value) => setQuery(value.value)}
-        />
-        <span className="metricTableCount">
-          {visible.length === rows.length
-            ? `${rows.length} metrics`
-            : `${visible.length} of ${rows.length} metrics`}
-          {!singleSelect && visibleSelectedCount > 0 && ` · ${visibleSelectedCount} charted`}
-        </span>
-      </header>
+    <section className={styles.root}>
+      <SectionHeader title={caption}>
+        <div className={styles.controls}>
+          <SearchBox
+            size="small"
+            placeholder="Filter metrics"
+            value={query}
+            onChange={(_, value) => setQuery(value.value)}
+          />
+          <Caption1 className={styles.count}>
+            {visible.length === rows.length
+              ? `${rows.length} metrics`
+              : `${visible.length} of ${rows.length} metrics`}
+            {!singleSelect && visibleSelectedCount > 0 && ` · ${visibleSelectedCount} charted`}
+          </Caption1>
+        </div>
+      </SectionHeader>
 
-      <div className="metricTableScroll">
-        <Table size="small" aria-label={caption}>
-          <TableHeader>
+      <div className={styles.scroll}>
+        <Table size="small" aria-label={caption} className={styles.table}>
+          <TableHeader className={styles.stickyHead}>
             <TableRow>
-              <TableHeaderCell className="metricTableToggleCell">
+              <TableHeaderCell className={styles.toggleCell}>
                 {singleSelect ? (
                   "Chart"
                 ) : (
@@ -190,24 +262,27 @@ export function MetricTable({
                   />
                 )}
               </TableHeaderCell>
-              <TableHeaderCell className="metricNameCell" {...headerProps("name")}>
+              <TableHeaderCell className={styles.nameCell} {...headerProps("name")}>
                 Metric
               </TableHeaderCell>
-              <TableHeaderCell className="numericCell" {...headerProps("latest")}>
+              <TableHeaderCell className={styles.numericCell} {...headerProps("latest")}>
                 Latest
               </TableHeaderCell>
-              <TableHeaderCell className="numericCell numericCell--delta" {...headerProps("delta")}>
+              <TableHeaderCell
+                className={mergeClasses(styles.numericCell, styles.deltaCell)}
+                {...headerProps("delta")}
+              >
                 vs 7-day median
               </TableHeaderCell>
               {showShare && (
                 <TableHeaderCell
-                  className="numericCell numericCell--share"
+                  className={mergeClasses(styles.numericCell, styles.shareCell)}
                   {...headerProps("share")}
                 >
                   Share
                 </TableHeaderCell>
               )}
-              <TableHeaderCell className="trendCell">Trend</TableHeaderCell>
+              <TableHeaderCell className={styles.trendCell}>Trend</TableHeaderCell>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -217,7 +292,7 @@ export function MetricTable({
               return (
                 <TableRow key={row.key} appearance={isSelected ? "brand" : "none"}>
                   <TableCell
-                    className="metricTableToggleCell"
+                    className={styles.toggleCell}
                     onClickCapture={(event) => {
                       shiftRef.current = event.shiftKey;
                     }}
@@ -228,13 +303,13 @@ export function MetricTable({
                       aria-label={`Plot ${row.name}`}
                     />
                   </TableCell>
-                  <TableCell className="metricNameCell">
-                    <span className="metricName" title={row.key}>
+                  <TableCell className={styles.nameCell}>
+                    <span className={styles.name} title={row.key}>
                       {row.name}
                     </span>
                   </TableCell>
-                  <TableCell className="numericCell">{formatMs(row.latest)}</TableCell>
-                  <TableCell className="numericCell numericCell--delta">
+                  <TableCell className={styles.numericCell}>{formatMs(row.latest)}</TableCell>
+                  <TableCell className={mergeClasses(styles.numericCell, styles.deltaCell)}>
                     {delta === null ? (
                       "—"
                     ) : (
@@ -245,11 +320,11 @@ export function MetricTable({
                     )}
                   </TableCell>
                   {showShare && (
-                    <TableCell className="numericCell numericCell--share">
+                    <TableCell className={mergeClasses(styles.numericCell, styles.shareCell)}>
                       {formatShare(row.share)}
                     </TableCell>
                   )}
-                  <TableCell className="trendCell">
+                  <TableCell className={styles.trendCell}>
                     <Sparkline
                       values={row.values}
                       color={trendColor(delta ?? 0, theme)}
@@ -261,7 +336,7 @@ export function MetricTable({
             })}
           </TableBody>
         </Table>
-        {visible.length === 0 && <p className="emptyNote">No metrics match “{query}”.</p>}
+        {visible.length === 0 && <EmptyNote>No metrics match “{query}”.</EmptyNote>}
       </div>
     </section>
   );

@@ -1,3 +1,4 @@
+import { makeStyles, Tag, TagGroup, tokens } from "@fluentui/react-components";
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -15,6 +16,7 @@ import { Line } from "react-chartjs-2";
 import type { Theme } from "@typespec/astro-utils/utils/theme";
 import { formatMs } from "./data.js";
 import { chartTheme } from "./palette.js";
+import { EmptyNote } from "./section.js";
 import type { ChartPoint, Series } from "./types.js";
 import { getCommitUrl } from "./url.js";
 
@@ -22,6 +24,26 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 /** Minimum horizontal room a dated tick needs before labels start colliding. */
 const TICK_SPACING_PX = 90;
+
+const useStyles = makeStyles({
+  container: {
+    position: "relative",
+    width: "100%",
+  },
+  chips: {
+    flexWrap: "wrap",
+    rowGap: tokens.spacingVerticalXS,
+    // Selecting every linter rule adds ~90 tags; cap the height so the key
+    // never pushes the table off screen.
+    maxHeight: "7rem",
+    overflowY: "auto",
+  },
+  swatch: {
+    width: "10px",
+    height: "10px",
+    borderRadius: tokens.borderRadiusSmall,
+  },
+});
 
 /**
  * Choose which x positions get a visible date label.
@@ -93,6 +115,7 @@ export function MetricChart({
   beginAtZero?: boolean;
   height?: number;
 }) {
+  const styles = useStyles();
   const colors = chartTheme(theme);
   const pointsRef = useRef(points);
   pointsRef.current = points;
@@ -136,7 +159,7 @@ export function MetricChart({
         if (target) target.style.cursor = elements.length > 0 ? "pointer" : "default";
       },
       plugins: {
-        // Series are listed as interactive chips below the chart instead, which
+        // Series are listed as interactive tags below the chart instead, which
         // wrap properly and can be removed from the selection.
         legend: { display: false },
         tooltip: {
@@ -195,19 +218,19 @@ export function MetricChart({
   );
 
   if (series.length === 0) {
-    return <p className="emptyNote">Select a metric below to plot it.</p>;
+    return <EmptyNote>Select a metric below to plot it.</EmptyNote>;
   }
 
   return (
-    <div className="chartContainer" style={{ height }} ref={containerRef}>
+    <div className={styles.container} style={{ height }} ref={containerRef}>
       <Line data={chartData} options={options} />
     </div>
   );
 }
 
 /**
- * The chart's key, rendered as HTML rather than a Chart.js legend so it wraps
- * cleanly and each entry can be removed from the selection.
+ * The chart's key, rendered as tags rather than a Chart.js legend so it wraps
+ * cleanly and each entry can be dismissed to drop that series.
  */
 export function SeriesChips({
   series,
@@ -216,33 +239,27 @@ export function SeriesChips({
   series: Series[];
   onRemove?: (key: string) => void;
 }) {
+  const styles = useStyles();
   if (series.length === 0) return null;
 
   return (
-    <ul className="seriesChips">
+    <TagGroup
+      className={styles.chips}
+      size="small"
+      aria-label="Charted metrics"
+      dismissible={onRemove !== undefined}
+      onDismiss={(_, data) => onRemove?.(String(data.value))}
+    >
       {series.map((s) => (
-        <li key={s.key}>
-          {onRemove ? (
-            <button
-              type="button"
-              className="seriesChip seriesChip--removable"
-              onClick={() => onRemove(s.key)}
-              title={`Remove ${s.label} from the chart`}
-            >
-              <span className="seriesChipSwatch" style={{ background: s.color }} />
-              <span className="seriesChipLabel">{s.label}</span>
-              <span aria-hidden className="seriesChipRemove">
-                ✕
-              </span>
-            </button>
-          ) : (
-            <span className="seriesChip">
-              <span className="seriesChipSwatch" style={{ background: s.color }} />
-              <span className="seriesChipLabel">{s.label}</span>
-            </span>
-          )}
-        </li>
+        <Tag
+          key={s.key}
+          value={s.key}
+          title={onRemove ? `Remove ${s.label} from the chart` : s.label}
+          media={<span className={styles.swatch} style={{ background: s.color }} />}
+        >
+          {s.label}
+        </Tag>
       ))}
-    </ul>
+    </TagGroup>
   );
 }
