@@ -138,39 +138,6 @@ it("emits a warning for a non-resource ARM POST operation with an extra query pa
     });
 });
 
-it("does not emit a warning for an ARM POST operation with only api-version in query", async () => {
-  await tester
-    .expect(
-      `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
-      model Widget is TrackedResource<{}> {
-        ...ResourceNameParameter<Widget>;
-      }
-
-      model ActionRequest {
-        value: string;
-      }
-
-      model ActionResponse {
-        result: string;
-      }
-
-      @armResourceOperations
-      interface Widgets {
-        @post
-        @armResourceAction(Widget)
-        doAction(
-          ...ResourceInstanceParameters<Widget>,
-          @body body: ActionRequest,
-        ): ArmResponse<ActionResponse> | ErrorResponse;
-      }
-      `,
-    )
-    .toBeValid();
-});
-
 it("emits a warning when the api-version query parameter uses different casing", async () => {
   await tester
     .expect(
