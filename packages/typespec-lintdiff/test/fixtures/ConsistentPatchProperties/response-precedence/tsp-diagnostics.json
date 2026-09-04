@@ -1,0 +1,82 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern",
+    "severity": "warning",
+    "message": "The resource name parameter should be defined with a 'pattern' restriction.  Please use 'ResourceNameParameter' to specify the name parameter with options to override default pattern RegEx expression."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/consistent-patch-properties",
+    "severity": "warning",
+    "message": "The property 'properties' in the request body either does not appear in the resource model or is nested at the wrong level."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
+    "severity": "warning",
+    "message": "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum or a union of string values, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Model named 'ScalarOkResponse' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'statusCode' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'body' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Model named 'CreatedWidgetResponse' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'statusCode' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'body' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator",
+    "severity": "warning",
+    "message": "Each resource interface must have an @armResourceOperations decorator."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'update' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'body' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/response-schema-problem",
+    "severity": "warning",
+    "message": "Operation 'update' has multiple non-error response schemas. Did you forget to add '@error' to one of them?"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "Resource PATCH operation must be decorated with @armResourceUpdate."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  }
+]

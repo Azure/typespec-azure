@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "rule": "ConsistentPatchProperties",
+  "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
+  "generatedAt": "2026-09-04T13:19:57.931Z",
+  "command": "pnpm --dir packages/typespec-lintdiff specs:typespec --specs-repo C:\\dev\\worktrees\\azure-rest-api-specs-lintdiff-consistent-patch-properties --concurrency 6",
+  "fullRun": true,
+  "durationMs": 1289461,
+  "sourceProjectCount": 468,
+  "successfulProjectCount": 462,
+  "failedProjectCount": 6,
+  "validator": {
+    "diagnostics": 151,
+    "projects": 27,
+    "fileIndependentIdentities": 48
+  },
+  "typespec": {
+    "diagnostics": 325,
+    "sourceIdentities": 188,
+    "projects": 32,
+    "selectedVersionDiagnostics": 306,
+    "selectedVersionProjects": 28
+  },
+  "overlapProjects": [
+    "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+    "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentAPIs",
+    "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview",
+    "specification/automation/Automation.Management",
+    "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI",
+    "specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits",
+    "specification/billingtrust/resource-manager/Microsoft.BillingTrust/BillingTrust",
+    "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry",
+    "specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks",
+    "specification/databox/resource-manager/Microsoft.DataBox/DataBox",
+    "specification/datadog/resource-manager/Microsoft.Datadog/Datadog",
+    "specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory",
+    "specification/dnsresolver/resource-manager/Microsoft.Network/DnsResolver",
+    "specification/domainservices/resource-manager/Microsoft.AAD/DomainServices",
+    "specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder",
+    "specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid",
+    "specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime",
+    "specification/machinelearningservices/MachineLearningServices.Management",
+    "specification/management/resource-manager/Microsoft.Management/ManagementGroups",
+    "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+    "specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery",
+    "specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations",
+    "specification/resources/resource-manager/Microsoft.Resources/resources",
+    "specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere",
+    "specification/sql/resource-manager/Microsoft.Sql/SQL",
+    "specification/support/resource-manager/Microsoft.Support/Support",
+    "specification/vmware/resource-manager/Microsoft.AVS/AVS"
+  ],
+  "validatorOnlyProjects": [],
+  "typespecOnlyProjects": {
+    "selectedVersionIntentional": [
+      "specification/informatica/resource-manager/Informatica.DataManagement/Informatica"
+    ],
+    "olderVersionOnly": [
+      "specification/batch/resource-manager/Microsoft.Batch/Batch",
+      "specification/cdn/resource-manager/Microsoft.Cdn/Cdn",
+      "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
+      "specification/netapp/resource-manager/Microsoft.NetApp/NetApp"
+    ]
+  },
+  "failedProjects": [
+    "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
+    "specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups",
+    "specification/network/resource-manager/Microsoft.Network/Network/Network",
+    "specification/quota/resource-manager/Microsoft.Quota/Quota",
+    "specification/resources/resource-manager/Microsoft.Resources/deployments",
+    "specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker"
+  ]
+}
