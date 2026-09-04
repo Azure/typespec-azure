@@ -95,6 +95,10 @@ const AZURE_PACKAGES = [
 // an emitter this list forgets fails to compile outright, so it has to track
 // packages/benchmark/specs/*/tspconfig.yaml. Filters that match nothing at an
 // older commit are ignored by pnpm.
+//
+// The "..." suffix is load-bearing: it pulls in each package's workspace
+// dependencies. Without it the compiler builds against a tmlanguage-generator
+// that was never built and every commit dies in tsc.
 const BUILD_FILTER = [
   "@typespec/compiler",
   "@azure-tools/typespec-azure-core",
@@ -108,7 +112,7 @@ const BUILD_FILTER = [
   "@azure-tools/typespec-ts",
   "@azure-tools/typespec-java",
 ]
-  .map((p) => `--filter "${p}"`)
+  .map((p) => `--filter "${p}..."`)
   .join(" ");
 
 /** Last few lines of a log, for explaining a failure without dumping the file. */
@@ -125,6 +129,23 @@ function indent(text: string): string {
     .split("\n")
     .map((line) => `    ${line}`)
     .join("\n");
+}
+
+/**
+ * Run a preparation step, keeping its output. `execOk` throws it away, which
+ * turns any install or build failure into a bare "build failed" that cannot be
+ * diagnosed once the runner is gone.
+ */
+function execLogged(cmd: string, cwd: string, log: string): boolean {
+  const fd = openSync(log, "w");
+  try {
+    execSync(cmd, { cwd, stdio: ["ignore", fd, fd] });
+    return true;
+  } catch {
+    return false;
+  } finally {
+    closeSync(fd);
+  }
 }
 
 /** Restore the saved benchmark package into the repo with symlinks to workspace packages. */
@@ -330,16 +351,20 @@ export function backfill(options: BackfillOptions = {}): void {
         continue;
       }
 
-      if (!execOk("pnpm install --frozen-lockfile --quiet", { cwd: repoRoot })) {
-        if (!execOk("pnpm install --quiet", { cwd: repoRoot })) {
+      const setupLog = join(resultsDir, `${sha}.setup.log`);
+
+      if (!execLogged("pnpm install --frozen-lockfile", repoRoot, setupLog)) {
+        if (!execLogged("pnpm install", repoRoot, setupLog)) {
           console.log("install failed, skipping");
+          console.log(indent(tail(setupLog)));
           failed++;
           continue;
         }
       }
 
-      if (!execOk(`pnpm -r ${BUILD_FILTER} build`, { cwd: repoRoot })) {
+      if (!execLogged(`pnpm -r ${BUILD_FILTER} build`, repoRoot, setupLog)) {
         console.log("build failed, skipping");
+        console.log(indent(tail(setupLog)));
         failed++;
         continue;
       }
