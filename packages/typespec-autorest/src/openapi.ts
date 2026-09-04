@@ -107,6 +107,7 @@ import {
   reportDeprecated,
   resolveEncodedName,
   resolvePath,
+  sanitizePathSegment,
   serializeValueAsJson,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
@@ -2873,16 +2874,17 @@ function resolveExampleDir(
 ): string {
   const rawDir = examplesDirectory ?? resolvePath(projectRoot, "examples");
   const hasVersionInterpolation = rawDir.includes("{version}");
+  const sanitizedVersion = version && sanitizePathSegment(version);
 
   if (hasVersionInterpolation) {
     const versionStatus = version && (version.includes("preview") ? "preview" : "stable");
     return interpolatePath(rawDir, {
       "version-status": versionStatus,
-      version: version,
+      version: sanitizedVersion,
     });
   }
 
-  return version ? resolvePath(rawDir, version) : rawDir;
+  return sanitizedVersion ? resolvePath(rawDir, sanitizedVersion) : rawDir;
 }
 
 async function checkExamplesDirExists(host: CompilerHost, dir: string) {

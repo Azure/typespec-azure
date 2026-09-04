@@ -132,9 +132,9 @@ export function isTypePassedByValue(type: tcgc.SdkType): boolean {
 
 /** contains the set of client options */
 const clientOptionKinds = [
+  "emitContentTypeHeader",
   "monomorphicResponseFieldName",
   "omitSerdeMethods",
-  "preserveContentTypeHeader",
   "responseEnvelopeName",
 ] as const;
 export type ClientOptionKind = (typeof clientOptionKinds)[number];
@@ -177,8 +177,8 @@ export function getClientOption<T extends boolean | string>(
       default:
         // this branch is currently all method types
         valid =
+          optionName === "emitContentTypeHeader" ||
           optionName === "monomorphicResponseFieldName" ||
-          optionName === "preserveContentTypeHeader" ||
           optionName === "responseEnvelopeName";
     }
 
@@ -204,7 +204,7 @@ export function getClientOption<T extends boolean | string>(
  * returns true if the response header should be omitted from the response envelope.
  *
  * currently, this is the case for `Content-Type` response headers whose value is
- * a literal/constant, unless the method opts in via the `preserveContentTypeHeader`
+ * a literal/constant, unless the method opts in via the `emitContentTypeHeader`
  * client option. callers (response envelope construction and example mapping)
  * must keep the two sites in sync; use this helper from both.
  *
@@ -216,8 +216,9 @@ export function isOmittedResponseHeader(
   httpHeader: tcgc.SdkServiceResponseHeader,
   sdkMethod: tcgc.SdkServiceMethod<tcgc.SdkHttpOperation>,
   program: tsp.Program,
+  options: go.Options,
 ): boolean {
-  if (!httpHeader.serializedName.match(/^content-type$/i)) {
+  if (!httpHeader.serializedName.match(/^content-type$/i) || options["emit-content-type-header"]) {
     return false;
   }
   // literal/constant header values are folded into the request/response shape and
@@ -225,7 +226,7 @@ export function isOmittedResponseHeader(
   if (httpHeader.type.kind !== "constant" && httpHeader.type.kind !== "enumvalue") {
     return false;
   }
-  const preserveHeader = getClientOption<boolean>("preserveContentTypeHeader", sdkMethod, program);
+  const preserveHeader = getClientOption<boolean>("emitContentTypeHeader", sdkMethod, program);
   return preserveHeader !== true;
 }
 

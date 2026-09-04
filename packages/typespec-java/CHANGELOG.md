@@ -8,7 +8,6 @@
   map-valued response headers and document the Java emitter and client options (core,
   [microsoft/typespec#11860](https://github.com/microsoft/typespec/pull/11860)).
 
-
 ## 0.46.2
 
 ### Bug Fixes

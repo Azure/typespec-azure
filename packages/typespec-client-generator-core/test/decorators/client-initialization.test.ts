@@ -142,18 +142,20 @@ it("client accessor", async () => {
           @route("/op1")
           
           @post
-          @convenientAPI(true)
+          @convenientAPI(true, "java")
           op op1(@path p1: string, @query q1: string): void;
 
           @route("/op2")
           
           @post
-          @convenientAPI(true)
+          @convenientAPI(true, "java")
           op op2(@path p1: string): void;
       }
       `,
   );
-  const context = await createSdkContextForTester(program);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
 
@@ -698,18 +700,20 @@ it("sub client initialized individually", async () => {
         @route("/op1")
         
         @post
-        @convenientAPI(true)
+        @convenientAPI(true, "java")
         op op1(@path p1: string, @query q1: string): void;
 
         @route("/op2")
         
         @post
-        @convenientAPI(true)
+        @convenientAPI(true, "java")
         op op2(@path p1: string): void;
     }
     `,
   );
-  const context = await createSdkContextForTester(program);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
 

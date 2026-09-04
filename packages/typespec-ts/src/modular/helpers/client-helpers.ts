@@ -16,7 +16,7 @@ import type { ModularEmitterOptions } from "../interfaces.js";
 
 import { resolveReference } from "../../framework/reference.js";
 import type { SdkContext } from "../../utils/interfaces.js";
-import { NameType, normalizeName } from "../../utils/name-utils.js";
+import { NameType, normalizeSdkName } from "../../utils/name-utils.js";
 import { CloudSettingHelpers } from "../static-helpers-metadata.js";
 import { getTypeExpression } from "../type-expressions/get-type-expression.js";
 import { getClassicalClientName } from "./naming-helpers.js";
@@ -154,15 +154,16 @@ function getClientParameterTypeExpression(context: SdkContext, parameter: SdkPar
 export function getClientParameterName(parameter: SdkParameter) {
   // We have been calling this endpointParam, so special handling this here to make sure there are no unexpected side effects
   if (
-    (parameter.type.kind === "union" &&
+    !parameter.isExactName &&
+    ((parameter.type.kind === "union" &&
       parameter.type.variantTypes.some((v) => v.kind === "endpoint")) ||
-    ((parameter.kind === "endpoint" || parameter.kind === "path") &&
-      parameter.name.toLowerCase() === "endpoint")
+      ((parameter.kind === "endpoint" || parameter.kind === "path") &&
+        parameter.name.toLowerCase() === "endpoint"))
   ) {
     return "endpointParam";
   }
 
-  return normalizeName(parameter.name, NameType.Parameter, true);
+  return normalizeSdkName(parameter, NameType.Parameter, { shouldGuard: true });
 }
 
 export function buildGetClientEndpointParam(
