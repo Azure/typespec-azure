@@ -41,6 +41,8 @@ model VmSizeCollection is Page<VmSize>;
 /** LogAnalytics collection of operation status response */
 model LogAnalyticsCollection is Page<LogAnalyticsOperationResult>;
 
+@@identifiers(LogAnalyticsCollection.value, #[]);
+
 @armResourceOperations
 interface ProviderOperations {
   /** Operation to get virtual machines for subscription (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/getVmSizes) */

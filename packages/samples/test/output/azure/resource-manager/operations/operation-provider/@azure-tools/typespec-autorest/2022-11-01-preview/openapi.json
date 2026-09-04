@@ -761,7 +761,8 @@
           "description": "The LogAnalyticsOperationResult items on this page",
           "items": {
             "$ref": "#/definitions/LogAnalyticsOperationResult"
-          }
+          },
+          "x-ms-identifiers": []
         },
         "nextLink": {
           "type": "string",
