@@ -28,3 +28,4 @@ Available ruleSets:
 | [`@azure-tools/typespec-client-generator-core/csharp-no-url-suffix`](../rules/csharp-no-url-suffix.md)                 | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions. |
 | [`@azure-tools/typespec-client-generator-core/csharp-model-suffix`](../rules/csharp-model-suffix.md)                   | Model names should use recommended suffixes for C# SDKs.                                        |
 | [`@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms`](../rules/csharp-use-standard-acronyms.md) | C# SDK names should use standard acronym casing.                                                |
+| [`@azure-tools/typespec-client-generator-core/get-operation-name`](../rules/get-operation-name.md)                     | GET SDK method names should use 'Get' or 'List' as the verb prefix.                             |
