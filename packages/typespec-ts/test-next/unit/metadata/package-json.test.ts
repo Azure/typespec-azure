@@ -213,6 +213,23 @@ describe("Package file generation", () => {
       );
     });
 
+    it.each([
+      { packageType: "data-plane", azureArm: false },
+      { packageType: "ARM", azureArm: true },
+    ])(
+      "should include the default customize script in new $packageType packages",
+      ({ azureArm }) => {
+        const model = createMockModel({
+          ...baseConfig,
+          azureArm,
+        });
+        const packageFileContent = buildPackageFile(model);
+        const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
+
+        expect(packageFile.scripts).to.have.property("customize", "echo skipped");
+      },
+    );
+
     it("should skip lint scripts with arm packages for modular", () => {
       const model = createMockModel({
         ...baseConfig,
@@ -308,6 +325,40 @@ describe("Package file generation", () => {
   });
 
   describe("updatePackageFile", () => {
+    it("should add the default customize script when scripts are missing", () => {
+      const model = createMockModel();
+      const initialPackageInfo = {
+        name: "@azure/test-package",
+        version: "1.0.0",
+      };
+
+      const packageFileContent = updatePackageFile(model, initialPackageInfo);
+      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
+
+      expect(packageFile.scripts).toEqual({
+        customize: "echo skipped",
+      });
+    });
+
+    it("should preserve an existing customize script", () => {
+      const model = createMockModel();
+      const initialPackageInfo = {
+        name: "@azure/test-package",
+        version: "1.0.0",
+        scripts: {
+          customize: "npm run format && dev-tool customization apply",
+        },
+      };
+
+      const packageFileContent = updatePackageFile(model, initialPackageInfo);
+      const packageFile = JSON.parse(packageFileContent?.content ?? "{}");
+
+      expect(packageFile.scripts).to.have.property(
+        "customize",
+        "npm run format && dev-tool customization apply",
+      );
+    });
+
     it("should use standard version for LRO dependencies", () => {
       const model = createMockModel({
         hasLro: true,
