@@ -3,9 +3,10 @@
 ## Conclusion
 
 No production TypeSpec rule change is required. The mapped
-`valid-query-parameters-for-point-operations` rule reports every assessable
-project reported by Swagger `ParametersInPointGet`, and the focused fixture
-confirms that both engines reject an authorable point GET query parameter.
+`tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations` rule
+reports every assessable project reported by Swagger `ParametersInPointGet`,
+and the focused fixture confirms that both engines reject an authorable point
+GET query parameter.
 
 The current full-corpus result is 40 Swagger projects, 62 TypeSpec projects,
 40 overlapping projects, no Swagger-only projects, no unassessed projects, and
@@ -23,6 +24,13 @@ Required production rule and fixture/test changes: none. The only rule-specific
 change is this migration note and the fixture `rule.md` link that explain why
 the existing broader TypeSpec rule is the correct mapping for this GET-only
 Swagger rule.
+
+## Reports reconciled
+
+- External aggregate migration report:
+  `packages/typespec-lintdiff/docs/coverage_old.md`
+- Checked-in lint-diff observed coverage report:
+  `packages/typespec-lintdiff/specs/coverage-breakdown.md`
 
 ## Report reconciliation
 
@@ -49,7 +57,8 @@ pinned population; it is not evidence that raw diagnostic counts should be
 equal.
 
 The comparable TypeSpec population is the selected-latest-version population
-produced by the existing `valid-query-parameters-for-point-operations`
+produced by the existing
+`tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations`
 projection filter, shared with the staging
 `ValidQueryParametersForPointOperations` analysis. No remaining
 `ParametersInPointGet` validator project is hidden by an older-version-only
@@ -175,7 +184,8 @@ Swagger projects is the behavioral equivalence criterion.
 The `extra-query-param` fixture emits a point GET with a `filter` query
 parameter. Swagger reports `ParametersInPointGet` on the GET parameter array,
 and TypeSpec reports
-`valid-query-parameters-for-point-operations` on the authored `filter`
-parameter. The shared rule's broader fixture suite separately covers compliant
-api-version-only operations, collection GETs, providerless paths, nested point
-resources, multiple query parameters, and legacy routed point GETs.
+`tsp-lintdiff-local-linter/valid-query-parameters-for-point-operations` on the
+authored `filter` parameter. The shared rule's broader fixture suite separately
+covers compliant api-version-only operations, collection GETs, providerless
+paths, nested point resources, multiple query parameters, and legacy routed
+point GETs.
