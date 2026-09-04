@@ -120,7 +120,31 @@ function restoreBenchmark(repoRoot: string, savedBenchmark: string): void {
 }
 
 /** Resolve a commit range from the from/to options. Returns commits oldest-first. */
-function resolveCommitRange(from: string, to: string | undefined, sourceBranch: string): string[] {
+/**
+ * Resolve the branch to read commits from.
+ *
+ * A CI checkout only creates the branch it was asked for, so `main` is not a
+ * local ref on any other branch -- including whichever branch a change to the
+ * backfill itself is being tested on. Fall back to the remote copy, fetching
+ * it if the checkout was shallow enough to have left it out.
+ */
+function resolveSourceBranch(sourceBranch: string): string {
+  if (execOk(`git rev-parse --verify --quiet ${sourceBranch}^{commit}`)) return sourceBranch;
+
+  const remote = `origin/${sourceBranch}`;
+  if (!execOk(`git rev-parse --verify --quiet ${remote}^{commit}`)) {
+    gitSilent(`fetch origin ${sourceBranch}:refs/remotes/${remote}`);
+  }
+  if (!execOk(`git rev-parse --verify --quiet ${remote}^{commit}`)) {
+    throw new Error(`Cannot resolve source branch '${sourceBranch}' locally or on origin.`);
+  }
+
+  console.log(`Source branch '${sourceBranch}' is not checked out; using ${remote}.`);
+  return remote;
+}
+
+function resolveCommitRange(from: string, to: string | undefined, branch: string): string[] {
+  const sourceBranch = resolveSourceBranch(branch);
   const isNumber = /^\d+$/.test(from);
 
   if (isNumber) {
