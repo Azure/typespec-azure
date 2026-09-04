@@ -237,6 +237,61 @@ describe("@clientOption scope requirement", () => {
     // `scope: "python"` does not apply to the C# emitter, so the decorator is filtered out.
     deepStrictEqual(csharpWidget.decorators, []);
   });
+
+  it("preserves the full options bag on a custom decorator's marshalled scope argument", async () => {
+    // Regression: when a custom, allowlisted decorator declares a `valueof` options bag as its
+    // `scope` argument, the marshalled value must be exposed in full instead of being collapsed to
+    // just the scope string. This proves additional (future) `DecoratorOptions`-style fields are not
+    // dropped, while the scope string is still used to filter by emitter.
+    function $scopedMarker(): void {}
+    setTypeSpecNamespace("Custom", $scopedMarker);
+
+    const { program } = await SimpleTester.files({
+      "scoped-marker.js": mockFile.js({ $scopedMarker }),
+    }).import("./scoped-marker.js").compile(`
+        namespace Custom {
+          model MarkerScope {
+            scope: string;
+            label: string;
+          }
+          extern dec scopedMarker(target: unknown, scope: valueof MarkerScope);
+        }
+
+        @service(#{ title: "Test Service" })
+        namespace TestService {
+          @Custom.scopedMarker(#{ scope: "python", label: "hello" })
+          model Widget {
+            id: string;
+          }
+
+          op get(): Widget;
+        }
+      `);
+
+    const allowList = ["Custom\\.@scopedMarker"];
+
+    const pythonContext = await createSdkContextForTester(
+      program,
+      { emitterName: "@azure-tools/typespec-python" },
+      { additionalDecorators: allowList },
+    );
+    const pythonWidget = pythonContext.sdkPackage.models.find((x) => x.name === "Widget");
+    ok(pythonWidget);
+    // The whole bag is preserved (including `label`), not collapsed to `scope: "python"`.
+    deepStrictEqual(pythonWidget.decorators, [
+      { name: "Custom.@scopedMarker", arguments: { scope: { scope: "python", label: "hello" } } },
+    ]);
+
+    const csharpContext = await createSdkContextForTester(
+      program,
+      { emitterName: "@azure-tools/typespec-csharp" },
+      { additionalDecorators: allowList },
+    );
+    const csharpWidget = csharpContext.sdkPackage.models.find((x) => x.name === "Widget");
+    ok(csharpWidget);
+    // `scope: "python"` still filters the decorator out for the C# emitter.
+    deepStrictEqual(csharpWidget.decorators, []);
+  });
 });
 
 it("emitter with same scope as decorator", async () => {
