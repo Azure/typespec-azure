@@ -39,15 +39,18 @@ it("emits a warning for an ARM POST resource action with an extra query paramete
         result: string;
       }
 
+      model ActionParameters {
+        @query mode?: string;
+      }
+
       @armResourceOperations
       interface Widgets {
-        @post
-        @armResourceAction(Widget)
-        doAction(
-          ...ResourceInstanceParameters<Widget>,
-          @query mode?: string,
-          @body body: ActionRequest,
-        ): ArmResponse<ActionResponse> | ErrorResponse;
+        doAction is ArmResourceActionSync<
+          Widget,
+          ActionRequest,
+          ActionResponse,
+          Parameters = ActionParameters
+        >;
       }
       `,
     )
