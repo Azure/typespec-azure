@@ -33,7 +33,7 @@ describe("get-operation-name", () => {
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-client-generator-core/get-operation-name",
         message:
-          "GET operation ID 'FetchWidget' should use 'Get' or 'List' as the verb prefix. Changing an operation ID after an SDK has shipped may be a breaking change.",
+          "GET SDK method name 'fetchWidget' should use 'Get' or 'List' as the verb prefix. Changing a method name after an SDK has shipped may be a breaking change.",
       });
   });
 
@@ -55,7 +55,7 @@ describe("get-operation-name", () => {
       .toBeValid();
   });
 
-  it("reports a lowercase explicit List operation ID", async () => {
+  it("uses the SDK method name instead of an explicit operation ID", async () => {
     await tester
       .expect(
         `
@@ -67,12 +67,10 @@ describe("get-operation-name", () => {
         op listMigrations(): string[];
       `,
       )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-client-generator-core/get-operation-name",
-      });
+      .toBeValid();
   });
 
-  it("accepts a compliant explicit operation ID", async () => {
+  it("reports an invalid SDK method name despite a compliant operation ID", async () => {
     await tester
       .expect(
         `
@@ -84,7 +82,11 @@ describe("get-operation-name", () => {
         op fetchDetails(@path name: string): string;
       `,
       )
-      .toBeValid();
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-client-generator-core/get-operation-name",
+        message:
+          "GET SDK method name 'fetchDetails' should use 'Get' or 'List' as the verb prefix. Changing a method name after an SDK has shipped may be a breaking change.",
+      });
   });
 
   it("reports concrete operations created from templates without reporting template artifacts", async () => {
@@ -121,197 +123,53 @@ describe("get-operation-name", () => {
       .toBeValid();
   });
 
-  it("accepts the AutoRest operation ID resolved from client name and location", async () => {
+  it("uses an unscoped client name override", async () => {
     await tester
       .expect(
         `
         @service namespace TestService;
 
-        interface ScopeAccessReviewHistoryDefinitionInstances {
-          @route("/accessReviewHistoryDefinitions")
-          @get
-          fetchByScope(): string[];
-        }
-
-        @@clientLocation(
-          ScopeAccessReviewHistoryDefinitionInstances.fetchByScope,
-          "ScopeAccessReviewHistoryDefinitions"
-        );
-        @@clientName(ScopeAccessReviewHistoryDefinitionInstances.fetchByScope, "List");
+        @route("/widgets")
+        @get
+        @clientName("listWidgets")
+        op fetchWidgets(): string[];
       `,
       )
       .toBeValid();
   });
 
-  it("resolves an interface client location", async () => {
+  it("ignores emitter-scoped client name overrides", async () => {
+    await tester
+      .expect(
+        `
+        @service namespace TestService;
+
+        @route("/widgets")
+        @get
+        @clientName("getWidgets", "python")
+        op fetchWidgets(): string[];
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-client-generator-core/get-operation-name",
+        message:
+          "GET SDK method name 'fetchWidgets' should use 'Get' or 'List' as the verb prefix. Changing a method name after an SDK has shipped may be a breaking change.",
+      });
+  });
+
+  it("does not include the client location in the SDK method name", async () => {
     await tester
       .expect(
         `
         @service namespace TestService;
 
         interface Source {
-          @route("/widgets")
-          @get
-          fetchWidgets(): string[];
-        }
-
-        interface Destination {}
-
-        @@clientLocation(Source.fetchWidgets, Destination);
-        @@clientName(Destination, "Widgets");
-      `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-client-generator-core/get-operation-name",
-        message:
-          "GET operation ID 'Widgets_FetchWidgets' should use 'Get' or 'List' as the verb prefix. Changing an operation ID after an SDK has shipped may be a breaking change.",
-      });
-  });
-
-  it("resolves a namespace client location", async () => {
-    await tester
-      .expect(
-        `
-        @service namespace TestService;
-
-        namespace Source {
-          @route("/widgets")
-          @get
-          op fetchWidgets(): string[];
-        }
-
-        namespace Destination {}
-
-        @@clientLocation(Source.fetchWidgets, Destination);
-        @@clientName(Destination, "Widgets");
-      `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-client-generator-core/get-operation-name",
-        message:
-          "GET operation ID 'Widgets_FetchWidgets' should use 'Get' or 'List' as the verb prefix. Changing an operation ID after an SDK has shipped may be a breaking change.",
-      });
-  });
-
-  it("omits a service client location from the operation ID", async () => {
-    await tester
-      .expect(
-        `
-        @service namespace TestService {
-          namespace Source {
-            @route("/widgets")
-            @get
-            op fetchWidgets(): string[];
-          }
-        }
-
-        @@clientLocation(TestService.Source.fetchWidgets, TestService);
-      `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-client-generator-core/get-operation-name",
-        message:
-          "GET operation ID 'FetchWidgets' should use 'Get' or 'List' as the verb prefix. Changing an operation ID after an SDK has shipped may be a breaking change.",
-      });
-  });
-
-  it("uses the direct interface as the operation group", async () => {
-    await tester
-      .expect(
-        `
-        @service namespace TestService;
-
-        @clientName("Widgets")
-        interface Source {
-          @route("/widgets")
-          @get
-          fetchWidgets(): string[];
-        }
-      `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-client-generator-core/get-operation-name",
-        message:
-          "GET operation ID 'Widgets_FetchWidgets' should use 'Get' or 'List' as the verb prefix. Changing an operation ID after an SDK has shipped may be a breaking change.",
-      });
-  });
-
-  it("uses the direct namespace as the operation group", async () => {
-    await tester
-      .expect(
-        `
-        @service namespace TestService;
-
-        @clientName("Widgets")
-        namespace Source {
-          @route("/widgets")
-          @get
-          op fetchWidgets(): string[];
-        }
-      `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-client-generator-core/get-operation-name",
-        message:
-          "GET operation ID 'Widgets_FetchWidgets' should use 'Get' or 'List' as the verb prefix. Changing an operation ID after an SDK has shipped may be a breaking change.",
-      });
-  });
-
-  it("uses AutoRest-scoped client customizations instead of other language scopes", async () => {
-    await tester
-      .expect(
-        `
-        @service namespace TestService;
-
-        interface Source {
-          @route("/widgets")
-          @get
-          fetchWidgets(): string[];
-        }
-
-        @@clientLocation(Source.fetchWidgets, "Widgets", "autorest");
-        @@clientLocation(Source.fetchWidgets, "PythonWidgets", "python");
-        @@clientName(Source.fetchWidgets, "Fetch", "autorest");
-        @@clientName(Source.fetchWidgets, "Get", "python");
-      `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-client-generator-core/get-operation-name",
-        message:
-          "GET operation ID 'Widgets_Fetch' should use 'Get' or 'List' as the verb prefix. Changing an operation ID after an SDK has shipped may be a breaking change.",
-      });
-  });
-
-  it("ignores client customizations scoped only to another language", async () => {
-    await tester
-      .expect(
-        `
-        @service namespace TestService;
-
-        interface Widgets {
           @route("/widgets/{name}")
           @get
           getWidget(@path name: string): string;
         }
 
-        @@clientLocation(Widgets.getWidget, "PythonWidgets", "python");
-        @@clientName(Widgets.getWidget, "FetchWidget", "python");
-      `,
-      )
-      .toBeValid();
-  });
-
-  it("ignores an empty client location when resolving the AutoRest operation ID", async () => {
-    await tester
-      .expect(
-        `
-        @service namespace TestService;
-
-        @route("/widgets/details")
-        @get
-        op getWidget(): string;
-
-        @@clientLocation(getWidget, "");
+        @@clientLocation(Source.getWidget, "Widgets");
       `,
       )
       .toBeValid();

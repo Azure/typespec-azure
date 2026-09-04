@@ -125,7 +125,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-client-generator-core/csharp-no-url-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-no-url-suffix)                 | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions. |
 | [`@azure-tools/typespec-client-generator-core/csharp-model-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-model-suffix)                   | Model names should use recommended suffixes for C# SDKs.                                        |
 | [`@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-use-standard-acronyms) | C# SDK names should use standard acronym casing.                                                |
-| [`@azure-tools/typespec-client-generator-core/get-operation-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/get-operation-name)                     | GET operation IDs should use 'Get' or 'List' as the verb prefix.                                |
+| [`@azure-tools/typespec-client-generator-core/get-operation-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/get-operation-name)                     | GET SDK method names should use 'Get' or 'List' as the verb prefix.                             |
 
 ## Decorators
 

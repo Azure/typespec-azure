@@ -1,16 +1,15 @@
 GET operations generate SDK methods whose names should clearly communicate whether they retrieve one
-resource or list several resources. Use `get` or `list` in TypeSpec so the emitted operation ID starts
-with `Get` or `List`, either directly or after an operation-group prefix.
+resource or list several resources. Use `get` or `list` in TypeSpec so the generated SDK method name
+starts with `Get` or `List`.
 
-Changing an operation ID after publishing an SDK can be a breaking change.
+Changing a method name after publishing an SDK can be a breaking change.
 
 ## Impact
 
-- **Area:** SDK generation. The operation ID determines the generated method name, so a GET
-  operation without `Get` or `List` is less discoverable and does not clearly communicate whether
-  it returns one resource or a collection.
-- **Compatibility:** Renaming an operation ID after an SDK has shipped can rename generated methods
-  and break existing client code.
+- **Area:** SDK generation. A GET operation without `Get` or `List` is less discoverable and does
+  not clearly communicate whether it returns one resource or a collection.
+- **Compatibility:** Renaming a generated method after an SDK has shipped can break existing client
+  code.
 
 ## Examples
 
@@ -40,8 +39,8 @@ op listWidgets(): Widget[];
 
 ## Suppression
 
-Suppress this warning only when the operation ID has already shipped and renaming the generated SDK
-method would be a breaking change. Document the compatibility reason in the suppression:
+Suppress this warning only when the SDK method has already shipped and renaming it would be a
+breaking change. Document the compatibility reason in the suppression:
 
 ```tsp
 #suppress "@azure-tools/typespec-client-generator-core/get-operation-name" "Preserve the shipped SDK method name."
