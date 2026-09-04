@@ -1,0 +1,447 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-core/require-versioned",
+    "severity": "warning",
+    "message": "Azure services should use the versioning library to define versions for their services. Add the '@versioned' decorator to the service namespace."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-common-types-version",
+    "severity": "warning",
+    "message": "Specify the ARM common-types version using the @armCommonTypesVersion decorator on the service namespace or on each version of the service version enum."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+    "severity": "warning",
+    "message": "Use the latest ARM common-types version 'v6' instead of 'v3'."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
+    "severity": "warning",
+    "message": "Arm namespace TestService is missing the Operations interface. Add \"interface Operations extends Azure.ResourceManager.Operations {}\"."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'anonymousModelBody' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'apiVersion' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/response-schema-problem",
+    "severity": "warning",
+    "message": "Operation 'anonymousModelBody' has multiple non-error response schemas. Did you forget to add '@error' to one of them?"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/avoid-anonymous-types",
+    "severity": "warning",
+    "message": "Operation response body should use a named model instead of an anonymous inline model expression."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/avoid-anonymous-types",
+    "severity": "warning",
+    "message": "Operation response body should use a named model instead of an anonymous inline model expression."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+    "severity": "warning",
+    "message": "ARM PUT path '/anonymous-model' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/put-in-operation-name",
+    "severity": "warning",
+    "message": "'PUT' operation 'anonymousModelBody' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'stringBody' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'apiVersion' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+    "severity": "warning",
+    "message": "ARM PUT path '/string' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/put-in-operation-name",
+    "severity": "warning",
+    "message": "'PUT' operation 'stringBody' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'literalBody' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'apiVersion' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+    "severity": "warning",
+    "message": "ARM PUT path '/literal' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/put-in-operation-name",
+    "severity": "warning",
+    "message": "'PUT' operation 'literalBody' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'scalarBody' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'apiVersion' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+    "severity": "warning",
+    "message": "ARM PUT path '/scalar' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/put-in-operation-name",
+    "severity": "warning",
+    "message": "'PUT' operation 'scalarBody' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'enumBody' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'apiVersion' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+    "severity": "warning",
+    "message": "ARM PUT path '/enum' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/put-in-operation-name",
+    "severity": "warning",
+    "message": "'PUT' operation 'enumBody' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-enum",
+    "severity": "warning",
+    "message": "Azure services should not use the enum keyword. Extensible enums should be defined as unions with \"string\" as an accepted variant (ex: `union Choice { Yes: \"yes\", No: \"no\", string };`)."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Enum named 'State' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The EnumMember named 'ready' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The EnumMember named 'done' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'unionBody' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'apiVersion' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+    "severity": "warning",
+    "message": "ARM PUT path '/union' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/non-application-json-type",
+    "severity": "warning",
+    "message": "Only content-type 'application/json' is supported by ARM"
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/put-in-operation-name",
+    "severity": "warning",
+    "message": "'PUT' operation 'unionBody' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Union named 'Choice' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The UnionVariant named 'text' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The UnionVariant named 'count' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'arrayBody' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'apiVersion' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+    "severity": "warning",
+    "message": "ARM PUT path '/array' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/put-in-operation-name",
+    "severity": "warning",
+    "message": "'PUT' operation 'arrayBody' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'tupleBody' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'apiVersion' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/response-schema-problem",
+    "severity": "warning",
+    "message": "Operation 'tupleBody' has multiple non-error response schemas. Did you forget to add '@error' to one of them?"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+    "severity": "warning",
+    "message": "ARM PUT path '/tuple' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/put-in-operation-name",
+    "severity": "warning",
+    "message": "'PUT' operation 'tupleBody' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'unknownBody' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'apiVersion' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+    "severity": "warning",
+    "message": "ARM PUT path '/unknown' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/put-in-operation-name",
+    "severity": "warning",
+    "message": "'PUT' operation 'unknownBody' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-unknown",
+    "severity": "warning",
+    "message": "Azure services must not have properties of type `unknown`."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-unknown",
+    "severity": "warning",
+    "message": "Azure services must not have properties of type `unknown`."
+  },
+  {
+    "code": "@azure-tools/typespec-autorest/union-unsupported",
+    "severity": "warning",
+    "message": "Unions cannot be emitted to OpenAPI v2 unless all options are literals of the same type."
+  }
+]

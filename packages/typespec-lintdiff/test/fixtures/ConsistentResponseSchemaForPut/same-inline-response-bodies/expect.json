@@ -1,0 +1,53 @@
+{
+  "violation": false,
+  "ambientDiagnostics": [
+    "@azure-tools/typespec-autorest/union-unsupported",
+    {
+      "code": "@azure-tools/typespec-azure-core/documentation-required",
+      "count": 24
+    },
+    "@azure-tools/typespec-azure-core/no-enum",
+    {
+      "code": "@azure-tools/typespec-azure-core/no-unknown",
+      "count": 2
+    },
+    "@azure-tools/typespec-azure-core/require-versioned",
+    {
+      "code": "@azure-tools/typespec-azure-core/response-schema-problem",
+      "count": 2
+    },
+    "@azure-tools/typespec-azure-resource-manager/arm-common-types-version",
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+      "count": 18
+    },
+    "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
+    {
+      "code": "tsp-lintdiff-local-linter/avoid-anonymous-types",
+      "count": 2
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "count": 9
+    },
+    "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+    {
+      "code": "tsp-lintdiff-local-linter/non-application-json-type",
+      "count": 8
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "count": 9
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/xms-examples-required",
+      "count": 9
+    }
+  ],
+  "validatorDiagnostics": [
+    {
+      "code": "ConsistentResponseSchemaForPut",
+      "count": 6
+    }
+  ]
+}
