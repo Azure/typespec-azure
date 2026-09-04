@@ -43,6 +43,12 @@ settings without introducing more positional parameters or a breaking signature 
 - Scope normalization (turning either shape into the internal string representation) is
   centralized in `internal-utils.ts` (`normalizeScope`), so decorator implementations do not need
   to special-case both forms themselves.
+- Options bags are resolved through their `extends` inheritance chain: for `@client` and
+  `@clientInitialization`, every setting (`scope`, `service`, `name`, `parameters`, `initializedBy`,
+  etc.) is read via a single `getInheritedOptionType` helper that walks `baseModel`. A user model
+  that `extends ClientOptions`/`ClientInitializationOptions` therefore has its base-declared settings
+  honored even when the leaf model only adds others, and all settings behave consistently rather than
+  only `scope` supporting inheritance.
 
 ## Compatibility guarantees
 
