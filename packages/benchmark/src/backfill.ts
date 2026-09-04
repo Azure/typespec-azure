@@ -69,6 +69,7 @@ const TYPESPEC_PACKAGES = [
   "events",
   "streams",
   "sse",
+  "http-client-js",
 ];
 
 const AZURE_PACKAGES = [
@@ -77,8 +78,15 @@ const AZURE_PACKAGES = [
   "typespec-autorest",
   "typespec-client-generator-core",
   "typespec-azure-rulesets",
+  "typespec-python",
+  "typespec-ts",
+  "typespec-java",
 ];
 
+// Every emitter the specs `emit:`, plus what they depend on. A spec that names
+// an emitter this list forgets fails to compile outright, so it has to track
+// packages/benchmark/specs/*/tspconfig.yaml. Filters that match nothing at an
+// older commit are ignored by pnpm.
 const BUILD_FILTER = [
   "@typespec/compiler",
   "@azure-tools/typespec-azure-core",
@@ -87,6 +95,10 @@ const BUILD_FILTER = [
   "@typespec/openapi3",
   "@azure-tools/typespec-client-generator-core",
   "@azure-tools/typespec-azure-rulesets",
+  "@azure-tools/typespec-python",
+  "@typespec/http-client-js",
+  "@azure-tools/typespec-ts",
+  "@azure-tools/typespec-java",
 ]
   .map((p) => `--filter "${p}"`)
   .join(" ");
