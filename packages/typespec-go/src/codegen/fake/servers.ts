@@ -1249,11 +1249,7 @@ function parseHeaderPathQueryParams(
     // skips url.PathEscape for them), so they're passed through verbatim.
     if (go.isPathParameter(param)) {
       let paramVar = createLocalVariableName(param, "Unescaped");
-      if (
-        go.isRequiredParameter(param.style) &&
-        param.type.kind === "constant" &&
-        param.type.type === "string"
-      ) {
+      if (go.isRequiredParameter(param.style) && go.isConstant(param.type, "string")) {
         // for string-based enums, we perform the conversion as part of unescaping
         paramVar = createLocalVariableName(param, "Param");
         if (param.isEncoded) {
@@ -1271,8 +1267,7 @@ function parseHeaderPathQueryParams(
       } else {
         const isStringParam =
           go.isRequiredParameter(param.style) &&
-          (param.type.kind === "string" ||
-            (param.type.kind === "slice" && param.type.elementType.kind === "string"));
+          (param.type.kind === "string" || go.isSlice(param.type, "string"));
         if (isStringParam) {
           // by convention, if the value is in its "final form" (i.e. no parsing required)
           // then its var is to have the "Param" suffix. the only case is string, everything
@@ -1392,7 +1387,7 @@ function parseHeaderPathQueryParams(
         requiredHelpers.splitHelper = true;
         content += `${indent.get()}${createLocalVariableName(param, "Param")} := splitHelper(${paramValue}, "${helpers.getDelimiterForCollectionFormat(param.collectionFormat)}")\n`;
       }
-    } else if (param.type.kind === "scalar" && param.type.type === "bool") {
+    } else if (go.isScalar(param.type, "bool")) {
       imports.add("strconv");
       let from = `strconv.ParseBool(${paramValue})`;
       if (!go.isRequiredParameter(param.style)) {
@@ -1440,13 +1435,7 @@ function parseHeaderPathQueryParams(
         content += `${indent.get()}return time.Unix(p, 0), nil\n${indent.pop().get()}})\n`;
         content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
       }
-    } else if (
-      param.type.kind === "scalar" &&
-      (param.type.type === "float32" ||
-        param.type.type === "float64" ||
-        param.type.type === "int32" ||
-        param.type.type === "int64")
-    ) {
+    } else if (go.isScalar(param.type, "float32", "float64", "int32", "int64")) {
       let parser: string;
       if (!go.isRequiredParameter(param.style)) {
         requiredHelpers.parseOptional = true;
@@ -1484,7 +1473,7 @@ function parseHeaderPathQueryParams(
       content += `${indent.push().get()}if ${localVar} == nil {\n${indent.push().get()}${localVar} = map[string]*string{}\n${indent.pop().get()}}\n`;
       content += `${indent.get()}${localVar}[hh[len("${headerPrefix}"):]] = to.Ptr(getHeaderValue(req.Header, hh))\n`;
       content += `${indent.pop().get()}}\n${indent.pop().get()}}\n`;
-    } else if (param.type.kind === "constant" && param.type.type !== "string") {
+    } else if (go.isConstant(param.type, "bool", "float32", "float64", "int32", "int64")) {
       let parseHelper: string;
       if (!go.isRequiredParameter(param.style)) {
         requiredHelpers.parseOptional = true;
@@ -1731,8 +1720,7 @@ function getFinalParamValue(
       }
     } else if (
       (go.isHeaderParameter(param) || go.isQueryParameter(param)) &&
-      param.type.kind === "constant" &&
-      param.type.type === "string"
+      go.isConstant(param.type, "string")
     ) {
       // query params from req.URL.Query() are already decoded, so like headers we cast required, string-based enums inline
       return `${go.getTypeDeclaration(param.type, pkg)}(${paramValue})`;

@@ -291,7 +291,7 @@ export async function emitModularClientFromTypeSpec(
   const context = await rlcEmitterFor(tspContent, {
     needNamespaces: options.needNamespaces ?? true,
     needAzureCore: false,
-    needTCGC: false,
+    needTCGC: options.needTCGC,
     withRawContent: options.withRawContent ? true : false,
     withVersionedApiVersion: options.withVersionedApiVersion ? true : false,
     needArmTemplate: options.needArmTemplate === true,
