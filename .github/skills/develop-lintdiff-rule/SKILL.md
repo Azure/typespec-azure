@@ -467,8 +467,11 @@ Do not change Swagger validator code, emitters, or unrelated TypeSpec rules.
 
 ### 3. Run focused validation
 
-Run the narrowest existing fixture tests, package build, and package lint
-commands that cover the changed rule. Fix failures before running the corpus.
+Build the lintdiff package before any fixture validation or snapshot update
+because those commands can load compiled package output. Rebuild after changing
+production TypeScript or diagnostic messages before rerunning validation. Then
+run the narrowest existing fixture tests and package lint commands that cover
+the changed rule. Fix failures before running the corpus.
 
 ### 4. Run the existing corpus analysis
 

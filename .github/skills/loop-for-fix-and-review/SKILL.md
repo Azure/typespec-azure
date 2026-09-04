@@ -210,10 +210,12 @@ ledger. It owns these steps:
    the round unless the result is `new-verified` or
    `already-pending-active`.
 
-5. Wait for a new review submitted by
-   `copilot-pull-request-reviewer[bot]` after the active request event. Poll
-   GitHub at a moderate interval rather than repeatedly requesting reviews.
-   Allow up to 30 minutes.
+5. Wait for a new review submitted by either
+   `copilot-pull-request-reviewer[bot]` or
+   `copilot-pull-request-reviewer` after the active request event. GitHub can
+   expose either login variant depending on the API; treat both as the same
+   Copilot reviewer identity. Poll GitHub at a moderate interval rather than
+   repeatedly requesting reviews. Allow up to 30 minutes.
    - Compare submission timestamps without changing their timezone. Prefer
      filtering the raw GitHub JSON with `gh api --jq` and comparing normalized
      UTC instants. If PowerShell parses the response with `ConvertFrom-Json`,
