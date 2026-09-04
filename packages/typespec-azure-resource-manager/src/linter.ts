@@ -43,6 +43,7 @@ import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 import { useApiVersionRule } from "./rules/use-api-version.js";
 import { useApplicationJsonContentTypeRule } from "./rules/use-application-json-content-type.js";
 import { useInterfaceRule } from "./rules/use-interface.js";
+import { useLatestVersionOfCommonTypesRule } from "./rules/use-latest-version-of-common-types.js";
 import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
@@ -83,6 +84,7 @@ const rules = [
   armResourceInvalidActionVerbRule,
   improperSubscriptionListOperationRule,
   lroLocationHeaderRule,
+  useLatestVersionOfCommonTypesRule,
   missingXmsIdentifiersRule,
   noResponseBodyRule,
   operationsInterfaceMissingRule,
