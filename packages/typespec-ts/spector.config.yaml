@@ -124,13 +124,12 @@ specs:
   parameters/query: true
   azure/client-generator-core/client-doc: true
   azure/client-generator-core/response-as-bool: true
+  azure/client-generator-core/exact-name: true
   documentation: true
 
   type/model/visibility: true
   # Disabled: Http.File generates unresolved __PLACEHOLDER types and identifiers.
   type/file: false
-  # Disabled: exact model and property names are normalized by the emitter.
-  azure/client-generator-core/exact-name: false
   # Disabled: generated patch model properties do not allow JSON merge-patch null values.
   payload/json-merge-patch: false
 
