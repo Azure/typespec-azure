@@ -32,6 +32,7 @@ import { noEmptyModel } from "./rules/no-empty-model.js";
 import { noOverridePropsRule } from "./rules/no-override-props.js";
 import { noQueryInCollectionRule } from "./rules/no-query-in-collection.js";
 import { noQueryInPointOpRule } from "./rules/no-query-in-point-op.js";
+import { noQueryInPostRule } from "./rules/no-query-in-post.js";
 import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
@@ -87,6 +88,7 @@ const rules = [
   lroLocationHeaderRule,
   missingXmsIdentifiersRule,
   noResponseBodyRule,
+  noQueryInPostRule,
   operationsInterfaceMissingRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
