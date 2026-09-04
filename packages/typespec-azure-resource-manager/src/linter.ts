@@ -35,6 +35,7 @@ import { noQueryInPointOpRule } from "./rules/no-query-in-point-op.js";
 import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
+import { noUuidRule } from "./rules/no-uuid.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { resourceNameRule } from "./rules/resource-name.js";
@@ -87,6 +88,7 @@ const rules = [
   lroLocationHeaderRule,
   missingXmsIdentifiersRule,
   noResponseBodyRule,
+  noUuidRule,
   operationsInterfaceMissingRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
