@@ -4,7 +4,7 @@ to add continuation links.
 
 Use the standard ARM list operation templates when possible. Custom list operations can use
 `@list`, identify the returned items with `@pageItems`, and identify the continuation link with
-`@nextLink`. Alternatively, they can explicitly author a truthy `x-ms-pageable` OpenAPI extension.
+`@nextLink`.
 
 ## ❌ Incorrect
 

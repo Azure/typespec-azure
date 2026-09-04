@@ -85,51 +85,6 @@ it("reports an ARM collection GET in a child provider namespace", async () => {
     });
 });
 
-it("allows an explicit truthy x-ms-pageable extension", async () => {
-  await tester
-    .expect(
-      `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
-      model Widget is ProxyResource<{}> {
-        ...ResourceNameParameter<Widget>;
-      }
-
-      @route("/providers/Microsoft.Contoso/widgets")
-      @get
-      @armResourceList(Widget)
-      @TypeSpec.OpenAPI.extension("x-ms-pageable", #{ nextLinkName: null })
-      op listWidgets(): Widget[];
-      `,
-    )
-    .toBeValid();
-});
-
-it("reports a falsy x-ms-pageable extension", async () => {
-  await tester
-    .expect(
-      `
-      @armProviderNamespace
-      namespace Microsoft.Contoso;
-
-      model Widget is ProxyResource<{}> {
-        ...ResourceNameParameter<Widget>;
-      }
-
-      @route("/providers/Microsoft.Contoso/widgets")
-      @get
-      @armResourceList(Widget)
-      @TypeSpec.OpenAPI.extension("x-ms-pageable", null)
-      op listWidgets(): Widget[];
-      `,
-    )
-    .toEmitDiagnostics({
-      code: diagnosticCode,
-      target: "listWidgets",
-    });
-});
-
 it("reports a list operation with page items but no next link", async () => {
   await tester
     .expect(

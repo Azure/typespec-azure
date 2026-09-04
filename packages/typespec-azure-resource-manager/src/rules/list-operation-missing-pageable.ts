@@ -6,19 +6,18 @@ import {
   isTemplateDeclaration,
 } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
-import { getExtensions } from "@typespec/openapi";
 import { getArmProviderNamespace } from "../namespace.js";
 import { isCollectionPath } from "./utils.js";
 
 export const listOperationMissingPageableRule = createRule({
   name: "list-operation-missing-pageable",
   docs: fileRef.fromPackageRoot("src/rules/list-operation-missing-pageable.md"),
-  description: "ARM GET operations on list paths must emit x-ms-pageable metadata.",
+  description: "ARM GET operations on list paths must define TypeSpec paging metadata.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/list-operation-missing-pageable",
   messages: {
     default:
-      "This GET operation uses a collection route but does not emit `x-ms-pageable`. Use an ARM list operation template, add `@list` with `@pageItems` and `@nextLink`, or explicitly author a truthy `x-ms-pageable` extension.",
+      "This GET operation uses a collection route but does not define TypeSpec paging metadata. Use an ARM list operation template or add `@list` with `@pageItems` and `@nextLink`.",
   },
   create(context) {
     return {
@@ -46,11 +45,6 @@ export const listOperationMissingPageableRule = createRule({
             excludeDefaultSegment: true,
           })
         ) {
-          return;
-        }
-
-        const pageableExtension = getExtensions(context.program, operation).get("x-ms-pageable");
-        if (pageableExtension) {
           return;
         }
 
