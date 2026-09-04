@@ -911,6 +911,56 @@ In `typespec-client-generator-core` tests:
 - verify ARM remains absent from TCGC's runtime dependency direction unless the test already uses
   the ARM package as a development dependency.
 
+### Test coverage requirements
+
+The implementation is not complete until automated tests cover every new behavior and failure
+path introduced by the versioned and customizable views.
+
+Required coverage:
+
+- Every branch of version selection:
+  - no version option;
+  - matching versioned snapshot;
+  - unknown version;
+  - unversioned service with a requested version;
+  - transient versioning with a requested root version;
+  - multiple matching snapshots or another internal consistency failure; and
+  - a snapshot mutation that unexpectedly returns no realm.
+- Snapshot cache hit and miss behavior, including proof that two requests for the same service and
+  version reuse the same projected namespace and realm.
+- Legacy enumeration before and after one or more mutations, including a projected type renamed to
+  a qualified name different from its original declaration.
+- Realm filtering for resource models, operations, operation interfaces, provider operations, and
+  embedded references in decorator-created state.
+- Derived cache invalidation and isolation for every cache key touched by the implementation.
+- Every naming kind: resource, operation, and operation group.
+- Every naming callback outcome: replacement name, `undefined`, empty string, and thrown
+  exception.
+- Consistent renaming of all aliases and logical fields for one operation, including
+  `resourceName` and `resourceModelName` where applicable.
+- Declared resources, synthetic parents, resource-valued scopes, and provider operations.
+- Multiple resolved resource occurrences backed by the same TypeSpec model.
+- All call-order permutations listed in the state isolation section.
+- TCGC integration for unscoped and language-scoped names at the selected API version.
+
+Coverage gates:
+
+1. New version-selection, snapshot-cache, realm-filtering, cache-invalidation, graph-copy, and
+   naming helpers should have 100% branch coverage.
+2. If a branch cannot be exercised because it is a defensive compiler invariant, cover the
+   nearest observable failure path and document the exception in the test with the relevant
+   compiler invariant.
+3. The ARM package's aggregate line, function, statement, and branch coverage must not decrease
+   from the merge-base report.
+4. TCGC integration changes must not decrease the TCGC package's aggregate coverage.
+5. Tests must assert behavior, returned TypeSpec object ownership, and cache isolation; executing a
+   line without checking its result does not satisfy this requirement.
+6. Do not exclude the new resolver code from coverage configuration.
+
+During implementation, compare package coverage against the merge base rather than introducing a
+new repository-wide numeric threshold. The package currently runs Vitest coverage without a
+package-specific threshold in `package.json`.
+
 ## Validation commands
 
 Use the repository's mise-managed tools:
@@ -918,7 +968,9 @@ Use the repository's mise-managed tools:
 ```powershell
 mise exec -- pnpm -r --filter "@azure-tools/typespec-azure-resource-manager..." build
 mise exec -- pnpm --filter "@azure-tools/typespec-azure-resource-manager" test
+mise exec -- pnpm --filter "@azure-tools/typespec-azure-resource-manager" test:ci
 mise exec -- pnpm --filter "@azure-tools/typespec-client-generator-core" test
+mise exec -- pnpm --filter "@azure-tools/typespec-client-generator-core" test:ci
 mise exec -- pnpm format
 mise exec -- pnpm lint
 ```
