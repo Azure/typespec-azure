@@ -10,6 +10,10 @@ llmstxt: true
 
 Client initialization customization options.
 
+In addition to the properties below, this inherits `scope` from `DecoratorOptions`, so
+`options.scope` can select which language emitters the `@clientInitialization` customization
+applies to.
+
 ```typespec
 model Azure.ClientGenerator.Core.ClientInitializationOptions
 ```
@@ -24,6 +28,9 @@ model Azure.ClientGenerator.Core.ClientInitializationOptions
 ### `ClientOptions` {#Azure.ClientGenerator.Core.ClientOptions}
 
 Client customization options.
+
+In addition to the properties below, this inherits `scope` from `DecoratorOptions`, so
+`options.scope` can select which language emitters the `@client` customization applies to.
 
 ```typespec
 model Azure.ClientGenerator.Core.ClientOptions

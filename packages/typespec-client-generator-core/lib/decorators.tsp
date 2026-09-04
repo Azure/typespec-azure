@@ -213,6 +213,9 @@ extern dec client(target: Namespace | Interface, options?: ClientOptions, scope?
 
 /**
  * Client customization options.
+ *
+ * In addition to the properties below, this inherits `scope` from `DecoratorOptions`, so
+ * `options.scope` can select which language emitters the `@client` customization applies to.
  */
 model ClientOptions extends DecoratorOptions {
   /**
@@ -680,6 +683,10 @@ extern dec clientInitialization(
 
 /**
  * Client initialization customization options.
+ *
+ * In addition to the properties below, this inherits `scope` from `DecoratorOptions`, so
+ * `options.scope` can select which language emitters the `@clientInitialization` customization
+ * applies to.
  */
 model ClientInitializationOptions extends DecoratorOptions {
   /**
