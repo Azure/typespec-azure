@@ -32,16 +32,16 @@ and provides only aggregate counts, so the historical one-project difference
 cannot be reconstructed from that report.
 
 The checked-in lint-diff report uses azure-rest-api-specs commit
-`f6b53f105b95da05276530a0754a1c71b4f16397`. Its full TypeSpec analysis was
-refreshed on 2026-08-12 over all 468 discovered ARM projects, with 462
-successfully compiled projects included in comparison counts. It records:
+`f6b53f105b95da05276530a0754a1c71b4f16397`. A full TypeSpec analysis was
+rerun on 2026-09-04 over all 468 discovered ARM projects, with 462 successfully
+compiled projects included in comparison counts. It records:
 
-| Measure | Swagger | TypeSpec |
-| --- | ---: | ---: |
-| Projects | 40 | 62 |
-| Diagnostics | 189 | 724 |
-| Same-project overlap | 40 | 40 |
-| One-sided projects | 0 | 22 |
+| Measure              | Swagger | TypeSpec |
+| -------------------- | ------: | -------: |
+| Projects             |      40 |       62 |
+| Diagnostics          |     189 |      724 |
+| Same-project overlap |      40 |       40 |
+| One-sided projects   |       0 |       22 |
 
 All 40 Swagger projects are assessable and overlap the TypeSpec result. The
 newer 40/40 observation supersedes the older aggregate 38/37 result for this
@@ -91,6 +91,54 @@ production rule. The broader staging-rule comparison proves that the same
 and DELETE operations at the selected latest Swagger API versions. They are not
 older-version-only diagnostics and they are not TypeSpec false positives for the
 broader migrated rule.
+
+### Gap example: broader point-operation verb coverage
+
+- **Classification:** TypeSpec-only
+- **Status:** intentional
+- **Project/API version:**
+  `specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache` /
+  selected latest corpus version
+- **Source:** `StorageTarget.tsp`, `delete` operation `force` query parameter
+
+**TypeSpec source**
+
+```typespec
+delete is ArmResourceDeleteWithoutOkAsync<
+  StorageTarget,
+  Parameters = {
+    @query("force")
+    force?: string;
+  },
+  Response =
+    | ArmDeletedResponse
+    | ArmDeleteAcceptedLroResponse<LroHeaders = ArmCombinedLroHeaders &
+        Azure.Core.Foundations.RetryAfterHeader>
+    | ArmDeletedNoContentResponse,
+  Error = CloudError
+>;
+```
+
+**Emitted OpenAPI or validator behavior**
+
+No `ParametersInPointGet` diagnostic is expected for this operation because it
+is a point `delete`, not a point `get`. The same condition belongs to the
+broader staging-only Swagger
+`ValidQueryParametersForPointOperations` comparison.
+
+| Engine            | Observed result                                                                                                                                                  |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Swagger validator | No `ParametersInPointGet` diagnostic because the operation verb is `delete`.                                                                                     |
+| TypeSpec lint     | `valid-query-parameters-for-point-operations` reports `force` because the migrated TypeSpec rule intentionally covers point `get`, `put`, `patch`, and `delete`. |
+
+**Explanation:** The production Swagger rule is GET-only, while the migrated
+TypeSpec rule intentionally maps both this GET-only rule and the staging-only
+all-verbs point-operation rule. The staging comparison has 62 Swagger projects,
+62 TypeSpec projects, and no one-sided projects, so this TypeSpec-only project
+is expected broader-rule coverage rather than a false positive.
+
+**Disposition:** Intentional extra coverage from the shared broader migrated
+rule; no production rule change is required.
 
 ## Compile failures
 
