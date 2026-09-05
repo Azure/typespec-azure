@@ -35,6 +35,7 @@ export interface EmitterOptions {
 
   "skip-special-headers"?: string[];
   "enable-subclient"?: boolean;
+  "max-overload"?: "model";
 
   "advanced-versioning"?: boolean;
   "api-version"?: string;
@@ -71,7 +72,6 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
       nullable: true,
       default: true,
     },
-
     "enable-sync-stack": {
       type: "boolean",
       description:
@@ -233,6 +233,13 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
         "When set to `true`, the generated SDK uses `getter` method to access child clients. Default value is `false`.",
       nullable: true,
       default: false,
+    },
+    "max-overload": {
+      type: "string",
+      description:
+        "When set to `model`, generate the maximum set of model-based convenience method overloads for Azure clients.",
+      nullable: true,
+      enum: ["model"],
     },
 
     // versioning
