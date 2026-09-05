@@ -135,6 +135,17 @@ export function buildClientContext(
         docs: getDocsWithKnownVersion(dpgContext, p),
       };
     });
+  if (
+    emitterOptions.options.addCredentials &&
+    emitterOptions.options.credentialScopes !== undefined
+  ) {
+    propertiesInOptions.push({
+      name: "credentialScopes",
+      type: "string | string[]",
+      hasQuestionToken: true,
+      docs: ["@deprecated Use `credentials.scopes` instead."],
+    });
+  }
   if (dpgContext.arm) {
     propertiesInOptions.push({
       name: "cloudSetting",

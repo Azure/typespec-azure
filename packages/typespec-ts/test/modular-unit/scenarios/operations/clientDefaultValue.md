@@ -74,10 +74,11 @@ export function _createSend(
   context: Client,
   options: CreateOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/api/create").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "text/plain",
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    headers: { accept: "text/plain", ...requestParameters.headers },
     body: options?.body ?? "default-body",
   });
 }
@@ -115,12 +116,13 @@ export function _testQuerySend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     headers: {
       "custom-header": options?.customHeader ?? "application/json",
       accept: "application/json",
-      ...options.requestOptions?.headers,
+      ...requestParameters.headers,
     },
   });
 }
@@ -201,10 +203,11 @@ export function _createRequiredSend(
   body: string,
   options: CreateRequiredOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/api/createRequired").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "text/plain",
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    headers: { accept: "text/plain", ...requestParameters.headers },
     body: body,
   });
 }
@@ -243,12 +246,13 @@ export function _testRequiredSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     headers: {
       "custom-header": customHeader,
       accept: "application/json",
-      ...options.requestOptions?.headers,
+      ...requestParameters.headers,
     },
   });
 }
