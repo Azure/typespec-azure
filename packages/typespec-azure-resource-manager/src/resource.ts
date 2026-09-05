@@ -75,7 +75,13 @@ import { getArmResource, listArmResources, registerArmResource } from "./private
 import { ArmStateKeys } from "./state.js";
 
 export type ArmResourceKind =
-  "Tracked" | "Proxy" | "Extension" | "Virtual" | "Custom" | "BuiltIn" | "Generic";
+  | "Tracked"
+  | "Proxy"
+  | "Extension"
+  | "Virtual"
+  | "Custom"
+  | "BuiltIn"
+  | "Generic";
 
 /**
  * The base details for all kinds of resources
@@ -1215,7 +1221,10 @@ export function resolveArmResourceOperations(
     }
   }
 
-  return [...resolvedOperations.values()].toSorted((a, b) => {
+  const resolved = [...resolvedOperations.values()];
+  disambiguateImplicitResourceNameCollisions(resolved);
+
+  return resolved.toSorted((a, b) => {
     // Sort by provider, type, then instance path
     if (a.resourceType.types.length < b.resourceType.types.length) return -1;
     if (a.resourceType.types.length > b.resourceType.types.length) return 1;
@@ -1227,6 +1236,114 @@ export function resolveArmResourceOperations(
     if (a.resourceInstancePath.toLowerCase() > b.resourceInstancePath.toLowerCase()) return 1;
     return 0;
   });
+}
+
+function disambiguateImplicitResourceNameCollisions(resources: ResolvedResourceOperations[]): void {
+  const resourcesByName = new Map<string, ResolvedResourceOperations[]>();
+  for (const resource of resources) {
+    const key = resource.resourceName.toLowerCase();
+    const group = resourcesByName.get(key);
+    if (group) {
+      group.push(resource);
+    } else {
+      resourcesByName.set(key, [resource]);
+    }
+  }
+
+  for (const group of resourcesByName.values()) {
+    if (group.length < 2) continue;
+
+    const usedNames = new Set(
+      group
+        .filter((resource) => resource.resourceNameIsExplicit)
+        .map((resource) => resource.resourceName.toLowerCase()),
+    );
+    const implicitResources = group.filter((resource) => !resource.resourceNameIsExplicit);
+    const implicitResourcesByFullName = new Map<string, ResolvedResourceOperations[]>();
+
+    for (const resource of implicitResources) {
+      const fullName = getFullResourceTypeName(resource);
+      const fullNameKey = fullName.toLowerCase();
+      const fullNameGroup = implicitResourcesByFullName.get(fullNameKey);
+      if (fullNameGroup) {
+        fullNameGroup.push(resource);
+      } else {
+        implicitResourcesByFullName.set(fullNameKey, [resource]);
+      }
+    }
+
+    for (const sameFullNameResources of implicitResourcesByFullName.values()) {
+      if (sameFullNameResources.length === 1) {
+        const resource = sameFullNameResources[0];
+        setResolvedResourceName(
+          resource,
+          getUniqueResourceName(getFullResourceTypeName(resource), usedNames),
+        );
+      } else {
+        for (const resource of sameFullNameResources) {
+          setResolvedResourceName(
+            resource,
+            getUniqueResourceName(getScopedResourceTypeName(resource), usedNames),
+          );
+        }
+      }
+    }
+  }
+}
+
+function getFullResourceTypeName(resource: ResolvedResourceOperations): string {
+  return resource.resourceType.types.map((type) => pascalCase(type)).join("");
+}
+
+function getScopedResourceTypeName(resource: ResolvedResourceOperations): string {
+  const fullName = getFullResourceTypeName(resource);
+  const scopeName = getScopeName(resource.resourceInstancePath);
+  return `${scopeName}${fullName}`;
+}
+
+function getScopeName(path: string): string {
+  if (path.startsWith("/providers/")) return "Tenant";
+  if (path.startsWith("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/")) {
+    return "ResourceGroup";
+  }
+  if (path.startsWith("/subscriptions/{subscriptionId}/providers/")) return "Subscription";
+  if (path.startsWith("/providers/Microsoft.Management/managementGroups/{managementGroupName}/")) {
+    return "ManagementGroup";
+  }
+  return "Scoped";
+}
+
+function getUniqueResourceName(name: string, usedNames: Set<string>): string {
+  let candidate = name;
+  let suffix = 2;
+  while (usedNames.has(candidate.toLowerCase())) {
+    candidate = `${name}${suffix}`;
+    suffix++;
+  }
+  usedNames.add(candidate.toLowerCase());
+  return candidate;
+}
+
+function setResolvedResourceName(resource: ResolvedResourceOperations, name: string): void {
+  resource.resourceName = name;
+  for (const operation of getResolvedResourceOperations(resource)) {
+    operation.resourceName = name;
+  }
+}
+
+function getResolvedResourceOperations(
+  resource: ResolvedResourceOperations,
+): ArmResourceOperation[] {
+  return [
+    ...(resource.operations.lifecycle.read ?? []),
+    ...(resource.operations.lifecycle.createOrUpdate ?? []),
+    ...(resource.operations.lifecycle.update ?? []),
+    ...(resource.operations.lifecycle.delete ?? []),
+    ...(resource.operations.lifecycle.checkExistence ?? []),
+    ...(resource.operations.lists ?? []),
+    ...(resource.operations.actions ?? []),
+    ...(resource.associatedOperations ?? []),
+  ];
 }
 
 interface ArmResourceOperationCandidate {
