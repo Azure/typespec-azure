@@ -1394,6 +1394,14 @@ All models within the namespace (including nested sub-namespaces) inherit the us
 because their parent namespace has @usage(Usage.input | Usage.json) applied.
 The 'namespaceModelSerializable' operation verifies that models from the namespace can be serialized.
 
+### Azure_Core_ApiVersionOverride_LegacyClient_get
+
+- Endpoint: `get /azure/core/api-version-override/legacy`
+
+Verifies that an API-version override on a child client replaces the default service API version.
+The client call takes no API-version argument and must send the overridden query parameter
+`api-version=2022-10-01` instead of the service version `2025-01-01`.
+
 ### Azure_Core_Basic_createOrReplace
 
 - Endpoint: `get /azure/core/basic`

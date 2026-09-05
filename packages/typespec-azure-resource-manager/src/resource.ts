@@ -29,6 +29,7 @@ import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
 
 import { camelCase, pascalCase } from "change-case";
 import type {
+  ArmFeatureFileOptions,
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
   ArmVirtualResourceDecorator,
@@ -1691,7 +1692,7 @@ export const [getResourceFeature, setResourceFeature] = useStateMap<
 
 export const [getResourceFeatureSet, setResourceFeatureSet] = useStateMap<
   Namespace,
-  Map<string, ArmFeatureOptions>
+  Map<string, ArmFeatureFileOptions>
 >(ArmStateKeys.armFeatureSet);
 
 /**
@@ -1703,17 +1704,17 @@ export const [getFeatureFileSet, setFeatureFileSet] = useStateMap<Namespace, Enu
 
 export const [getResourceFeatureOptions, setResourceFeatureOptions] = useStateMap<
   EnumMember,
-  ArmFeatureOptions
+  ArmFeatureFileOptions
 >(ArmStateKeys.armFeatureOptions);
 
-const commonFeatureOptions: ArmFeatureOptions = {
+const commonFeatureOptions: ArmFeatureFileOptions = {
   featureName: "Common",
   fileName: "common",
   description: "",
 };
-export function getFeatureOptions(program: Program, feature: EnumMember): ArmFeatureOptions {
+export function getFeatureOptions(program: Program, feature: EnumMember): ArmFeatureFileOptions {
   const defaultFeatureName: string = (feature.value ?? feature.name) as string;
-  const defaultOptions: ArmFeatureOptions = {
+  const defaultOptions: ArmFeatureFileOptions = {
     featureName: defaultFeatureName,
     fileName: camelCase(defaultFeatureName),
     description: "",
@@ -1725,9 +1726,9 @@ export function getFeatureOptions(program: Program, feature: EnumMember): ArmFea
  * Get the FeatureOptions for a given type, these could be inherited from the namespace or parent type
  * @param program - The program to process.
  * @param entity - The type entity to get feature options for.
- * @returns The ArmFeatureOptions if found, otherwise undefined.
+ * @returns The feature file options if found, otherwise the common feature options.
  */
-export function getFeature(program: Program, entity: Type): ArmFeatureOptions {
+export function getFeature(program: Program, entity: Type): ArmFeatureFileOptions {
   switch (entity.kind) {
     case "Namespace": {
       const feature = getResourceFeature(program, entity);
@@ -1814,14 +1815,14 @@ export const $features: FeaturesDecorator = (
   features: Enum,
 ) => {
   const { program } = context;
-  let featureMap: Map<string, ArmFeatureOptions> | undefined = getResourceFeatureSet(
+  let featureMap: Map<string, ArmFeatureFileOptions> | undefined = getResourceFeatureSet(
     program,
     entity,
   );
   if (featureMap !== undefined) {
     return;
   }
-  featureMap = new Map<string, ArmFeatureOptions>();
+  featureMap = new Map<string, ArmFeatureFileOptions>();
 
   for (const member of features.members.values()) {
     const options = getFeatureOptions(program, member); // Ensure defaults are created
@@ -1843,7 +1844,13 @@ export const $featureOptions: FeatureOptionsDecorator = (
 };
 
 // New Azure.ResourceManager namespace decorators
-export const $featureFile: FeatureFileDecorator = $feature as unknown as FeatureFileDecorator;
+export const $featureFile: FeatureFileDecorator = (
+  context: DecoratorContext,
+  entity: Model | Operation | Interface | Namespace,
+  featureName: EnumMember,
+) => {
+  setResourceFeature(context.program, entity, featureName);
+};
 export const $featureFiles: FeatureFilesDecorator = (
   context: DecoratorContext,
   entity: Namespace,
@@ -1852,5 +1859,17 @@ export const $featureFiles: FeatureFilesDecorator = (
   setFeatureFileSet(context.program, entity, features);
   $features(context, entity, features);
 };
-export const $featureFileOptions: FeatureFileOptionsDecorator =
-  $featureOptions as unknown as FeatureFileOptionsDecorator;
+export const $featureFileOptions: FeatureFileOptionsDecorator = (
+  context: DecoratorContext,
+  entity: EnumMember,
+  options: ArmFeatureFileOptions,
+) => {
+  if (options.version !== undefined && options.version.trim().length === 0) {
+    reportDiagnostic(context.program, {
+      code: "invalid-feature-file-version",
+      target: entity,
+    });
+    return;
+  }
+  setResourceFeatureOptions(context.program, entity, options);
+};
