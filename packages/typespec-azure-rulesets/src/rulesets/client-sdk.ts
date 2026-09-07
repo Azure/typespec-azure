@@ -8,6 +8,8 @@ export default {
     "@azure-tools/typespec-client-generator-core/csharp-model-suffix": true,
   },
   disable: {
+    "@azure-tools/typespec-client-generator-core/get-operation-name":
+      "Disabled to avoid introducing diagnostics into existing SDK specs during migration.",
     "@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms":
       "Disabled until the C# emitter handles standard acronym casing.",
   },

@@ -18,7 +18,7 @@ export const getOperationNameRule = createRule({
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/get-operation-name",
   messages: {
-    default: paramMessage`GET SDK method name '${"operationName"}' should use 'Get' or 'List' as the verb prefix. Changing a method name after an SDK has shipped may be a breaking change.`,
+    default: paramMessage`GET SDK method name '${"operationName"}' should start with 'get' or 'list'.`,
   },
   create(context) {
     const tcgcContext = createTCGCContext(
@@ -38,6 +38,7 @@ export const getOperationNameRule = createRule({
           return;
         }
 
+        // Validate the common SDK name while leaving emitter-specific overrides to emitter rules.
         const operationName = getLibraryName(tcgcContext, operation, AllScopes);
         if (operationName.length === 0 || validGetOperationName.test(operationName)) {
           return;

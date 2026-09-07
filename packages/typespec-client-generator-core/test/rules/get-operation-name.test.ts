@@ -32,8 +32,7 @@ describe("get-operation-name", () => {
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-client-generator-core/get-operation-name",
-        message:
-          "GET SDK method name 'fetchWidget' should use 'Get' or 'List' as the verb prefix. Changing a method name after an SDK has shipped may be a breaking change.",
+        message: "GET SDK method name 'fetchWidget' should start with 'get' or 'list'.",
       });
   });
 
@@ -84,8 +83,7 @@ describe("get-operation-name", () => {
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-client-generator-core/get-operation-name",
-        message:
-          "GET SDK method name 'fetchDetails' should use 'Get' or 'List' as the verb prefix. Changing a method name after an SDK has shipped may be a breaking change.",
+        message: "GET SDK method name 'fetchDetails' should start with 'get' or 'list'.",
       });
   });
 
@@ -152,8 +150,7 @@ describe("get-operation-name", () => {
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-client-generator-core/get-operation-name",
-        message:
-          "GET SDK method name 'fetchWidgets' should use 'Get' or 'List' as the verb prefix. Changing a method name after an SDK has shipped may be a breaking change.",
+        message: "GET SDK method name 'fetchWidgets' should start with 'get' or 'list'.",
       });
   });
 
