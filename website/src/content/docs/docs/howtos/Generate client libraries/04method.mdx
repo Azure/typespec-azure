@@ -2225,6 +2225,36 @@ func (client *MyServiceClient) MyOp(ctx context.Context, c bool, a string, b int
 </ClientTabItem>
 </ClientTabs>
 
+#### `replaceResponseWithVoid`
+
+Replace only the generated client method response with `void` while preserving the original HTTP
+responses, including their status codes, response bodies, and error metadata:
+
+```typespec
+#suppress "@azure-tools/typespec-client-generator-core/override-response-replacement" "The client intentionally ignores the response body."
+@@override(MyService.create, replaceResponseWithVoid(MyService.create));
+```
+
+#### `replaceResponseWithBytes`
+
+Replace only the generated client method response with the raw HTTP response bytes while preserving
+the original HTTP response metadata:
+
+```typespec
+#suppress "@azure-tools/typespec-client-generator-core/override-response-replacement" "The client intentionally exposes the raw response bytes."
+@@override(MyService.download, replaceResponseWithBytes(MyService.download));
+```
+
+Both response transformations can be chained with parameter transformations and scoped through
+`@override`. Replacing a pageable operation's response with either `void` or `bytes` also makes the
+generated method non-pageable.
+
+An intentional `void` or `bytes` replacement reports the `override-response-replacement` warning;
+suppress it at the customization site after confirming the replacement is expected. An override
+operation with any other response incompatible with the original reports the
+`override-response-mismatch` error. Use these functions instead of declaring an arbitrary
+incompatible return type.
+
 ### Chaining transformations
 
 Transformation functions can be chained together. Each function returns a new operation that can be passed to the next transformation:

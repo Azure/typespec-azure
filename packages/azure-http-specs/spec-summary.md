@@ -999,6 +999,17 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_FileContentType_uploadDefault
+
+- Endpoint: `post /azure/client-generator-core/file-content-type/default`
+
+Upload a File request body without an explicit content type.
+Expected request:
+
+- Content-Type: application/octet-stream
+- Body: test file content
+  Expected response: 204 No Content
+
 ### Azure_ClientGenerator_Core_FlattenProperty_putFlattenModel
 
 - Endpoint: `put /azure/client-generator-core/flatten-property/flattenModel`
@@ -1339,6 +1350,29 @@ param1: param1
 param2: param2
 
 Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_Override_ReplaceResponse_bytesResponse
+
+- Endpoint: `get /azure/client-generator-core/override/response/bytes`
+
+Verify that `replaceResponseWithBytes` exposes the raw response bytes from the generated method
+while preserving the JSON service response on the wire.
+Expected response:
+
+- Status: 200
+- Content-Type: application/json
+- Body: {"name":"widget"}
+
+### Azure_ClientGenerator_Core_Override_ReplaceResponse_voidResponse
+
+- Endpoint: `post /azure/client-generator-core/override/response/void`
+
+Verify that `replaceResponseWithVoid` removes the generated method response while preserving the
+service response on the wire.
+Expected response:
+
+- Status: 200
+- Body: {"name":"widget"}
 
 ### Azure_ClientGenerator_Core_Override_RequireOptionalParameter_requireOptional
 

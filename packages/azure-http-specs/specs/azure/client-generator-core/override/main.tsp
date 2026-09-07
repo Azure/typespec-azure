@@ -79,3 +79,34 @@ interface RemoveOptionalParameter {
     @header param4?: string,
   ): void;
 }
+
+model Widget {
+  name: string;
+}
+
+interface ReplaceResponse {
+  @scenario
+  @scenarioDoc("""
+    Verify that `replaceResponseWithVoid` removes the generated method response while preserving the
+    service response on the wire.
+    Expected response:
+    - Status: 200
+    - Body: {"name":"widget"}
+    """)
+  @route("/response/void")
+  @post
+  voidResponse(): Widget;
+
+  @scenario
+  @scenarioDoc("""
+    Verify that `replaceResponseWithBytes` exposes the raw response bytes from the generated method
+    while preserving the JSON service response on the wire.
+    Expected response:
+    - Status: 200
+    - Content-Type: application/json
+    - Body: {"name":"widget"}
+    """)
+  @route("/response/bytes")
+  @get
+  bytesResponse(): Widget;
+}

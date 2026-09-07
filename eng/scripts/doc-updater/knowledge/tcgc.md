@@ -44,13 +44,15 @@
 27. `@nextLinkVerb(target, verb, scope?)` — set HTTP verb for next link (GET or POST)
 28. `@clientDefaultValue(target, value, scope?)` — set client-level defaults
 
-### Functions (lib/functions.tsp) — 5 functions
+### Functions (lib/functions.tsp) — 7 functions
 
 29. `replaceParameter(operation, selector, replacement)` — replace operation parameter
 30. `removeParameter(operation, selector)` — remove optional parameter
 31. `addParameter(operation, parameter)` — add new parameter
 32. `reorderParameters(operation, order)` — reorder parameters by name list
-33. `exact(name)` — mark a client name as exact, preventing casing transformations; used with @clientName; sets `isExactName: true` on the type graph
+33. `replaceResponseWithVoid(operation)` — replace only the client method response with `void`
+34. `replaceResponseWithBytes(operation)` — replace only the client method response with raw bytes
+35. `exact(name)` — mark a client name as exact, preventing casing transformations; used with @clientName; sets `isExactName: true` on the type graph
 
 ## TSP Doc Comment Issues Found
 
@@ -88,18 +90,18 @@
 
 ### Covered in azure/client-generator-core/
 
-access, alternate-type, api-version, client-control, client-default-value, client-doc, client-initialization, client-location, deserialize-empty-string-as-null, exact-name, flatten-property, hierarchy-building, next-link-verb, override, response-as-bool, usage
+access, alternate-type, api-version, client-default-value, client-doc, client-initialization, client-location, deserialize-empty-string-as-null, exact-name, file-content-type, flatten-property, hierarchy-building, next-link-verb, override, response-as-bool, usage
 
 ### Covered in client/
 
 namespace (@clientNamespace), naming (@clientName), overload, structure (@client)
 
-### Carrier Coverage for Client-Generation Controls
+### Coverage Boundaries for Client-Generation Controls
 
-- `client-control` provides mocked carrier operations for `@protocolAPI`, `@scope`, `@useSystemTextJsonConverter`, model-valued `@clientOption`, and `@disablePageable`.
-- `override` exercises `replaceParameter`, `removeParameter`, `addParameter`, and `reorderParameters` while preserving each operation's wire contract.
+- Do not add `client-control`-style carrier scenarios that only expose emitter metadata without distinct shared wire behavior. Human review removed those scenarios.
+- `override` exercises `replaceParameter`, `removeParameter`, and `reorderParameters`, plus the wire-preserving `replaceResponseWithVoid` and `replaceResponseWithBytes` transformations. Do not add `addParameter` unless the added parameter has a valid, meaningful wire representation.
 - `@convenientAPI` has carrier coverage in `azure/core/basic`; `@markAsLro` and `@markAsPageable` are exercised by resource-manager operation-template scenarios.
-- These scenarios give emitters a shared generation target. Unit tests remain responsible for detailed language-specific type-graph assertions when the decorator has no distinct wire behavior.
+- Unit tests remain responsible for detailed language-specific type-graph assertions when a decorator has no distinct wire behavior.
 
 ## Guideline.md (Emitter Developer Docs) Notes
 
@@ -136,8 +138,8 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - In mockapi.ts files, query parameters use `query:` not `params:` in the request object.
 - The guideline.md previously said `encode` is set only when `@encode` exists — this was inaccurate since encode can also be set contextually (e.g., multipart).
 - Use `// NOT_SUPPORTED` for language examples where an emitter doesn't support a feature. Do NOT use `// TODO: fill in X example manually`.
-- Separate changesets: TCGC documentation updates use "internal" changeKind. Spector spec additions use "feature" changeKind with a separate changeset file.
-- Code-generation controls still need Spector carrier scenarios: use a normal HTTP operation and mock to provide emitters a shared generation target, while keeping detailed language-specific metadata assertions in unit tests.
+- Documentation-only updates do not need changesets. When a task explicitly requires a patch bump for Spector additions, use the repository's `fix` change kind (`versionType: patch`) for `@azure-tools/azure-http-specs`.
+- Add Spector scenarios only when they exercise meaningful shared wire behavior. Do not create carrier operations solely to expose language-specific emitter metadata.
 - `@convenientAPI` and `@protocolAPI` only apply to Java and C#; an omitted scope or a scope that leaves neither supported language enabled warns. Negated scopes are valid when Java or C# remains enabled (for example, excluding only Python). Likewise, their global emitter options warn when explicitly set for another language.
 - `@clientOption` requires an explicit language scope and accepts arbitrary values, including arrays, objects, and nested combinations. `getClientOptions(type, key)` returns one value as `unknown`.
 - The `@deserializeEmptyStringAsNull` section was removed from 08types.mdx in feedback PR #4268. Don't re-add it unless specifically requested.
