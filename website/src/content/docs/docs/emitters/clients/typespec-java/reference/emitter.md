@@ -182,6 +182,12 @@ Specify headers that emitter will ignore.
 
 When set to `true`, the generated SDK uses `getter` method to access child clients. Default value is `false`.
 
+### `max-overload`
+
+**Type:** `"model"`
+
+When set to `model`, generate the maximum set of model-based convenience method overloads for Azure clients.
+
 ### `api-version`
 
 **Type:** `string | object`
