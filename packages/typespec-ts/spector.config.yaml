@@ -54,8 +54,10 @@ specs:
   type/model/inheritance/recursive: true
   type/union: true
   payload/media-type: true
+  payload/multipart: true
   payload/xml: true
   payload/head: true
+  response/body-or-no-content: true
   response/status-code-range: true
   server/versions/versioned: true
   server/versions/not-versioned: true
@@ -136,5 +138,3 @@ specs:
   client/structure/renamed-operation: true
   client/structure/two-operation-group: true
   client/structure/client-operation-group: true
-  # Disabled: multipart not yet supported
-  payload/multipart: false
