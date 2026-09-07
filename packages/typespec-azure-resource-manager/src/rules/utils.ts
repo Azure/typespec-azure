@@ -42,6 +42,29 @@ export function isResourceOperation(program: Program, op: Operation) {
   return !!getResourceOperation(program, op);
 }
 
+export function isCollectionPath(
+  path: string,
+  options: {
+    excludeTerminalPathParameter?: boolean;
+    excludeDefaultSegment?: boolean;
+  } = {},
+): boolean {
+  if (
+    !path.includes(".") ||
+    (options.excludeTerminalPathParameter && path.endsWith("}")) ||
+    (options.excludeDefaultSegment && path.endsWith("/default"))
+  ) {
+    return false;
+  }
+
+  const providerTail = path.split(".").at(-1);
+  return (
+    providerTail !== undefined &&
+    providerTail.includes("/") &&
+    providerTail.split("/").length % 2 === 0
+  );
+}
+
 export function getProperties(model: Model) {
   let properties: ModelProperty[] = Array.from(model.properties.values());
   while (model.baseModel) {
