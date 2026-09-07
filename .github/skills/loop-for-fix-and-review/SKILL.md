@@ -219,6 +219,12 @@ ledger. It owns these steps:
    the round unless the result is `new-verified` or
    `already-pending-active`.
 
+   Before polling, define one reusable collector for the whole round that
+   always normalizes API results to arrays with `@(...)`, handles zero and one
+   candidate without null/scalar ambiguity, parses timestamps in one place,
+   and returns structured evidence. Reuse it for ordinary polls and the final
+   refetch instead of rebuilding inline PowerShell expressions in each loop.
+
 5. Poll the paginated REST pull-reviews endpoint,
    `GET /repos/{owner}/{repo}/pulls/{number}/reviews`, at a moderate interval
    rather than repeatedly requesting reviews. Treat its raw response as the
@@ -273,9 +279,9 @@ ledger. It owns these steps:
      review, or the refetch itself fails any request, pagination, parsing,
      required-field, or timestamp check, report an indeterminate collector
      failure rather than a Copilot timeout.
-   These are operational evidence requirements. Report observed failures
-   without asserting which internal cache, pagination, parsing, or state bug
-   caused them.
+     These are operational evidence requirements. Report observed failures
+     without asserting which internal cache, pagination, parsing, or state bug
+     caused them.
 6. Confirm the completed review applies to the round's head SHA. If the PR head
    changed while review was pending, stop the round as stale.
 7. Fetch all inline comments from the review-specific numeric REST endpoint,
