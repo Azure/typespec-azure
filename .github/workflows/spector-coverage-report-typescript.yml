@@ -1,0 +1,96 @@
+name: "typespec-ts / Spector Coverage Report"
+
+on:
+  schedule:
+    # Every Monday at 09:00 UTC+8.
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+    inputs:
+      report_only:
+        description: "Only update the coverage report; do not create an implementation task"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: typespec-ts-spector-coverage-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    name: Generate Spector coverage report
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    outputs:
+      issue_number: ${{ steps.update-issue.outputs.issue_number }}
+      not_implemented: ${{ steps.update-issue.outputs.not_implemented }}
+    env:
+      PUPPETEER_SKIP_DOWNLOAD: "true"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - name: Install dependencies
+        run: pnpm install --filter "@azure-tools/typespec-ts..." --filter "@typespec/monorepo"
+        timeout-minutes: 15
+
+      - name: Build typespec-ts package
+        run: pnpm turbo run --filter "@azure-tools/typespec-ts..." build
+        timeout-minutes: 20
+
+      - name: Copy TypeSpec files
+        working-directory: packages/typespec-ts
+        run: pnpm copy:typespec
+
+      - name: Run Spector tests
+        working-directory: packages/typespec-ts
+        run: pnpm spector-test
+        timeout-minutes: 60
+
+      - name: Create or update coverage report issue
+        id: update-issue
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { updateCoverageReport } = await import(
+              "${{ github.workspace }}/.github/scripts/spector-coverage-report-typescript.ts"
+            );
+            await updateCoverageReport({ github, context, core });
+
+  create-implementation-task:
+    name: Create or update Spector implementation task
+    needs: report
+    if: >-
+      needs.report.outputs.not_implemented != '{}' &&
+      !(github.event_name == 'workflow_dispatch' && inputs.report_only)
+    permissions:
+      issues: write
+      pull-requests: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/scripts
+
+      - name: Create or update task issue
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          COVERAGE_ISSUE_NUMBER: ${{ needs.report.outputs.issue_number }}
+          NOT_IMPLEMENTED: ${{ needs.report.outputs.not_implemented }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { createOrUpdateImplementationTask } = await import(
+              "${{ github.workspace }}/.github/scripts/spector-coverage-report-typescript.ts"
+            );
+            await createOrUpdateImplementationTask({ github, context, core });
