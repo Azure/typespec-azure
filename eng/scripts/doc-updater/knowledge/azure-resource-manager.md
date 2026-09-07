@@ -155,3 +155,23 @@ The former multi-purpose `arm-resource-operation` checks are represented by thre
 ## Resource Identity Resolution
 
 Concrete ARM resource identities are seeded only by registered read or createOrUpdate operations with valid ARM resource instance paths. List, action, update, delete, and check-existence operations can attach to an existing resolved resource but do not create resource identities by themselves.
+
+Identity paths are matched case-insensitively for literal segments and by position for variable segments. A createOrUpdate operation can establish a resource without a read operation; list-only and action-only operation sets cannot.
+
+## ARM Collection and Content-Type Rules
+
+- `no-query-in-collection` allows only the case-sensitive `api-version` and `$filter` query parameter names on collection GET operations.
+- `no-query-in-point-op` allows only `api-version` (case-insensitively) on GET, PUT, PATCH, and DELETE resource-instance paths.
+- `list-response-envelope` requires model response envelopes for collection GET operations to declare exactly `value` and `nextLink`.
+- `list-operation-missing-pageable` requires collection GET operations to have TypeSpec list metadata, page items, and a next-link property. Standard ARM list operation templates supply this metadata.
+- `use-application-json-content-type` checks resolved request and response body content types for operations in ARM provider namespaces.
+
+When these rules are added or promoted, update both the generated linter reference and the manually maintained rule evaluation and RPC coverage guides.
+
+## Feature Files
+
+The internal `getFeatureFileSet` accessor returns the enum configured by `@featureFiles`, or `undefined` when the decorator is absent. The `arm-feature-file-usage-discourage` rule tests for `undefined`; an empty or otherwise falsey-looking enum state still represents configured feature files.
+
+## Documentation Feedback
+
+Use rendered documentation URLs for canonical sample links. In examples, omit every template argument that is equal to its declared default, including inferred `ResourceNameParameter` key, segment, and name-pattern values.
