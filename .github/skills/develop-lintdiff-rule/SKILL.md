@@ -26,6 +26,9 @@ Before dispatcher mode creates branches or worktrees, and before worker mode
 prepares dependencies or starts the Development workflow, check every requested
 Swagger validator rule ID against
 `packages/typespec-lintdiff/catalog/validator-rule-metadata.json`.
+Parse this file as a JSON array and select the entry whose rule-ID field matches
+the requested ID case-insensitively. Do not use object-property lookup by rule
+name; that can falsely report an existing rule as missing.
 
 Continue only when the rule exists and its catalog `applicability` is `ARM` or
 `Both`. If any requested rule is missing or `DataPlane`, stop immediately and
@@ -52,7 +55,11 @@ mandatory semantic check, not an exact-name search.
 Fetch the user-supplied target branch from `origin` and use
 `refs/remotes/origin/<target-branch>` as the source of truth. Do not use or
 update a same-named local branch; it may be stale or checked out in another
-worktree. Inspect all of the following:
+worktree. Before deeper investigation, use GitHub's exact head/base and PR-title
+evidence to detect whether this rule's migration PR already merged. Also compare
+the rule branch with the remote target. If a merged PR already supplied the
+migration or the diff is empty, stop before dependency setup and report the
+existing PR or empty-diff evidence. Inspect all of the following:
 
 1. Search the rule documentation under
    `packages/typespec-azure-core/src/rules` and
@@ -363,11 +370,13 @@ its supplied worktrees:
 <isolated-specs-worktree>` to build the linter and create the direct link in the
      specs worktree
    - separately provide the focused fixture source inputs immediately before
-     focused validation: either set and verify `LINTDIFF_VALIDATOR_ROOT` and
-     `LINTDIFF_COMMON_TYPES` against existing local sources, or create the two
-     documented temporary links. `compare:setup` does not populate these
-     sources. Do not assume a fresh rule worktree already contains
-     `test/azure-openapi-validator` or `test/common-types`
+     focused validation. On Windows, prefer the two documented temporary
+     junctions because they preserve stable snapshot references. Use
+     `LINTDIFF_VALIDATOR_ROOT` and `LINTDIFF_COMMON_TYPES` only when both paths
+     are verified and the resulting snapshots remain repository-relative.
+     `compare:setup` does not populate these sources. Do not assume a fresh rule
+     worktree already contains `test/azure-openapi-validator` or
+     `test/common-types`
 6. Verify that the specs worktree's local
    `node_modules/tsp-lintdiff-local-linter` resolves directly to the supplied
    typespec-azure worktree. `compare:setup` creates a direct per-worktree link
@@ -451,6 +460,12 @@ for shapes present in the selected projects and versions. Even complete
 same-project overlap cannot replace the emission matrix or establish universal
 semantic coverage.
 
+When the validator resolves external example files or another configured
+artifact directory, mirror its documented path, API-version, and
+`examples-directory` resolution exactly. Do not recursively scan a guessed
+project-root directory as a fallback. If TypeSpec cannot safely observe the
+same external files, document that limit instead of adding a broader heuristic.
+
 ### 2. Implement the focused rule change
 
 When evidence requires a rule update:
@@ -482,6 +497,10 @@ pnpm --dir packages/typespec-lintdiff specs:typespec `
   --specs-repo <isolated-azure-rest-api-specs-worktree> `
   --concurrency 6
 ```
+
+Pass the runner options directly as shown. Do not insert an additional `--`
+after `specs:typespec`; in this repository that separator is forwarded to the
+runner and rejected as an unknown argument.
 
 The command runs all local rules and rewrites canonical TypeSpec results and
 coverage files in this development worktree. Use the refreshed rule row and
@@ -662,6 +681,11 @@ creating a draft PR.
    rule branch as head and the user-supplied target branch as base. Do not mark
    it ready for review; the user decides when the migration evidence and rule
    behavior are ready for formal review.
+   If the preferred PR-creation tool returns an ambiguous transport error or
+   claims a conflicting PR, query GitHub for the exact head/base first. When no
+   PR exists, retry once with an explicit `gh pr create` command that supplies
+   `--head <rule-branch>`, `--base <target-branch>`, and `--draft`; when one
+   exists, return its canonical URL instead of creating a duplicate.
 6. Set the PR title to the exact stable pattern
    `[Swagger Linter Migration] <ValidatorRuleId> (origin)`, replacing
    `<ValidatorRuleId>` with the original Swagger validator rule ID.

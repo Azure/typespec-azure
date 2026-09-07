@@ -38,6 +38,14 @@ rule ID, TypeSpec worktree, or specs worktree may remain valid; mark every later
 queue entry that reuses any of them as failed. Do not ask the user to repair
 malformed input during the run.
 
+As part of complete-queue validation, read
+`packages/typespec-lintdiff/catalog/validator-rule-metadata.json` as a JSON array
+and match each rule by its rule-ID field case-insensitively. Mark a missing or
+`DataPlane`-only rule as failed before launching a worker; only `ARM` and `Both`
+are eligible for `/develop-lintdiff-rule`. Record the observed applicability as
+the blocker. This is a read-only eligibility check, not target synchronization
+or worktree verification.
+
 ## Queue state
 
 Keep an ordered ledger with one entry per input command:
