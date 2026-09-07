@@ -131,6 +131,43 @@ extern fn reorderParameters(
 ): Reflection.Operation;
 
 /**
+ * Replace the method response type of an operation with `void`, discarding the client method
+ * return value while preserving the HTTP response metadata used for the wire protocol.
+ * Use this with `@@override` when the runtime response body should no longer be surfaced
+ * to callers of the generated client method, for example when a "delete" operation returns
+ * a body today but should return nothing to the SDK consumer.
+ *
+ * @param operation The operation to transform.
+ * @returns A new operation whose method response type is `void`.
+ *
+ * @example Replace a response with void
+ * ```typespec
+ * alias DeleteResponse = replaceResponseWithVoid(MyService.delete);
+ * @@override(MyService.delete, DeleteResponse);
+ * ```
+ */
+#suppress "experimental-feature" "replaceResponseWithVoid uses extern fn which is experimental but provides essential response transformation functionality"
+extern fn replaceResponseWithVoid(operation: Reflection.Operation): Reflection.Operation;
+
+/**
+ * Replace the method response type of an operation with the raw bytes of the HTTP response body,
+ * preserving the HTTP response metadata used for the wire protocol. Use this with `@@override`
+ * when callers of the generated client method should receive the unparsed response body instead
+ * of the modeled response type.
+ *
+ * @param operation The operation to transform.
+ * @returns A new operation whose method response type is `bytes`.
+ *
+ * @example Replace a response with the raw response bytes
+ * ```typespec
+ * alias DownloadResponse = replaceResponseWithBytes(MyService.download);
+ * @@override(MyService.download, DownloadResponse);
+ * ```
+ */
+#suppress "experimental-feature" "replaceResponseWithBytes uses extern fn which is experimental but provides essential response transformation functionality"
+extern fn replaceResponseWithBytes(operation: Reflection.Operation): Reflection.Operation;
+
+/**
  * Mark a client name as exact, preventing language emitters from applying
  * their usual casing transformations (e.g., snake_case for Python, camelCase for JavaScript).
  *
