@@ -1427,6 +1427,14 @@ export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
 
 export type LanguageScopes = "dotnet" | "java" | "python" | "javascript" | "go" | string;
 
+/**
+ * A typed options bag accepted by scoped TCGC decorators, mirroring the `.tsp` `DecoratorOptions`
+ * model. Decorator-specific options bags can extend this to add their own settings.
+ */
+export interface DecoratorOptions {
+  scope?: LanguageScopes;
+}
+
 interface SdkExampleBase {
   kind: string;
   name: string;

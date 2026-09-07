@@ -85,6 +85,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": true,
     "@azure-tools/typespec-azure-resource-manager/no-reserved-resource-property": true,
     "@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels": true,
+    "@azure-tools/typespec-azure-resource-manager/list-response-envelope": false,
     "@azure-tools/typespec-azure-resource-manager/no-query-in-collection": false,
     "@azure-tools/typespec-azure-resource-manager/use-interface": true,
     "@azure-tools/typespec-azure-resource-manager/use-application-json-content-type": false,
