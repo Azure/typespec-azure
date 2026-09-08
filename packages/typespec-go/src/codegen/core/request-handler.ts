@@ -482,7 +482,7 @@ function emitBody(
         }
         text += `${indent.get()}XMLName xml.Name \`xml:"${tagName}"\`\n`;
         const fieldName = naming.capitalize(bodyParam.name);
-        let tag = go.getTypeDeclaration(bodyParam.type.elementType, method.receiver.type.pkg);
+        let tag = go.getTypeDeclaration(go.unwrapPtr(bodyParam.type.elementType), method.receiver.type.pkg);
         if (bodyParam.type.elementType.kind === "model" && bodyParam.type.elementType.xml?.name) {
           tag = bodyParam.type.elementType.xml.name;
         }
