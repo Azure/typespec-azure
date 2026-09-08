@@ -9,9 +9,10 @@ Performance benchmarking tool for TypeSpec Azure compilation. Tracks compilation
 3. Runtime metrics are aggregated with an outlier-resistant estimator (trimmed mean for 5+ samples, median for smaller sample sizes)
 4. Per-spec variability (standard deviation and coefficient of variation) is captured from raw iterations
 5. Optional noise-gating can auto-run extra iterations when variance is high
-6. PR baseline can be built from a rolling window of recent `main` results instead of only `latest.json`
-7. Results are stored as JSON — on CI, they're saved to the `benchmark-data` branch
-8. PR comments show a comparison table highlighting performance changes
+6. A frozen reference workload is measured in the same job so results from different CI runners can be compared (see [Machine calibration](#machine-calibration))
+7. PR baseline can be built from a rolling window of recent `main` results instead of only `latest.json`
+8. Results are stored as JSON — on CI, they're saved to the `benchmark-data` branch
+9. PR comments show a comparison table highlighting performance changes
 
 ## Local usage
 
@@ -114,6 +115,37 @@ The backfill command:
 2. Checks out each historical commit, builds its dependencies, and runs benchmarks using the saved CLI
 3. Skips commits that already have results on the `benchmark-data` branch
 4. Commits all new results to the `benchmark-data` branch
+
+## Machine calibration
+
+CI hands out whichever runner is free, and those machines are not equally fast.
+Measured across 100 commits of `main`, the same work varied by 63% depending on
+the machine: spread between machines was 13.7% against 0.9% on a single machine,
+so hardware outweighed code changes roughly 16 to 1. Every commit gets its own
+job, so that noise lands directly between neighboring points and shows up as
+jumps no code change explains.
+
+Machine speed scales TypeSpec workloads more or less uniformly, so it can be
+divided out. Each run therefore also compiles a **frozen reference workload** —
+a fixed spec built with a pinned `@typespec/compiler` release from npm — on the
+same machine, in the same job. Dividing by it drops between-machine spread to
+under 1%, taking the smallest reliably detectable regression from ~41% to ~3.5%.
+
+The reference is deliberately _not_ the compiler being benchmarked. If it moved
+with the repo, a genuine compiler regression would slow the reference by the
+same amount and cancel itself out. It is materialized from constants in
+`src/calibration.ts`, so it is identical for every commit ever measured,
+including commits that predate the file. Changing `REFERENCE_COMPILER_VERSION`
+or the reference spec breaks comparability with existing points, so both are
+versioned by `WORKLOAD_ID` and only entries sharing the dominant workload are
+corrected.
+
+Calibration costs ~15s per job and never fails a run: if the pinned compiler
+cannot be installed, the run proceeds and the point is flagged `uncalibrated`.
+
+Raw measurements are never rewritten. `history.json` stores the calibration
+alongside them and exposes a per-entry `normalization` factor to multiply by, so
+the correction stays visible and reversible.
 
 ## What gets measured
 

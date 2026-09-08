@@ -6,6 +6,7 @@ import os from "os";
 import { join, resolve } from "path";
 import { fileURLToPath } from "url";
 import { aggregateDurations } from "./aggregate.js";
+import { measureCalibration } from "./calibration.js";
 import {
   EXTERNAL_SPEC_CONFIG,
   loadExternalSpecConfig,
@@ -211,10 +212,13 @@ function averageRuntimeStats(runtimes: RuntimeStats[]): RuntimeStats {
 }
 
 function getRunnerInfo(): RunnerInfo {
+  const cpus = os.cpus();
   return {
     os: `${os.platform()}-${os.release()}`,
     nodeVersion: process.version,
     arch: os.arch(),
+    cpu: cpus[0]?.model,
+    cores: cpus.length,
   };
 }
 
@@ -241,6 +245,15 @@ export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResul
   console.log(
     `Running benchmarks: ${specSources.length} spec(s), ${warmup} warmup + ${iterations} iterations each`,
   );
+
+  console.log(`\n  Calibrating machine speed against the frozen reference workload...`);
+  const calibration = await measureCalibration();
+  if (calibration) {
+    console.log(
+      `    Reference (@typespec/compiler@${calibration.compilerVersion}, workload ${calibration.workload}): ` +
+        `${calibration.total.toFixed(1)}ms, CV ${(calibration.cv * 100).toFixed(1)}%`,
+    );
+  }
 
   const specs: Record<string, SpecBenchmarkResult> = {};
   const noiseCvThreshold = options.noiseCvThreshold;
@@ -320,6 +333,7 @@ export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResul
     commit,
     timestamp: new Date().toISOString(),
     runner: getRunnerInfo(),
+    calibration,
     specs,
   };
 }

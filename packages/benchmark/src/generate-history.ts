@@ -3,7 +3,13 @@ import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { median } from "./statistics.js";
-import type { BenchmarkResult, RunnerInfo, RuntimeStats, SpecBenchmarkResult } from "./types.js";
+import type {
+  BenchmarkResult,
+  CalibrationInfo,
+  RunnerInfo,
+  RuntimeStats,
+  SpecBenchmarkResult,
+} from "./types.js";
 import { DEFAULT_BRANCH, listResultBlobs, readBlobs } from "./utils.js";
 
 /**
@@ -14,8 +20,9 @@ import { DEFAULT_BRANCH, listResultBlobs, readBlobs } from "./utils.js";
  *
  * 1. Metrics only.
  * 2. Adds `runner` and `quality` to every entry.
+ * 3. Adds `calibration` and a `normalization` factor per entry.
  */
-export const HISTORY_VERSION = 2;
+export const HISTORY_VERSION = 3;
 
 /** Why a point may not be comparable with the ones around it. */
 export type EntryFlag =
@@ -24,7 +31,9 @@ export type EntryFlag =
   /** Averaged over too few iterations to separate signal from noise. */
   | "low-iterations"
   /** Measured on a different platform than the rest of the series. */
-  | "foreign-runner";
+  | "foreign-runner"
+  /** No machine-speed measurement, so its value still carries the runner's speed. */
+  | "uncalibrated";
 
 /** How much weight a single point deserves. */
 export interface EntryQuality {
@@ -51,7 +60,31 @@ export interface HistoryEntry {
    * regressions do, so a point is only meaningful alongside its environment.
    */
   runner?: RunnerInfo;
+  /** Speed of the machine this point was measured on, against a frozen reference. */
+  calibration?: CalibrationInfo;
+  /**
+   * Multiply any raw metric by this to compare it across machines.
+   *
+   * CI hands out runners that differ by more than 60% in speed, which swamps
+   * real changes. Machine speed scales TypeSpec workloads more or less
+   * uniformly, so dividing by a frozen reference measured in the same job
+   * removes it. Absent when the point has no usable calibration; raw values are
+   * never rewritten, so the correction stays auditable.
+   */
+  normalization?: number;
   quality: EntryQuality;
+}
+
+/** How raw values were made comparable across machines. */
+export interface NormalizationInfo {
+  /** Frozen workload the factors are anchored to. */
+  workload: string;
+  /** Pinned compiler the reference was measured with. */
+  compilerVersion: string;
+  /** Reference time factors are relative to; the median across calibrated entries. */
+  baseline: number;
+  /** How many entries carry a usable calibration. */
+  calibratedEntries: number;
 }
 
 /** The full history.json structure. */
@@ -62,6 +95,8 @@ export interface HistoryData {
   labels: string[];
   /** All spec names found across all entries */
   specNames: string[];
+  /** Absent when no entry carries a calibration. */
+  normalization?: NormalizationInfo;
   entries: HistoryEntry[];
 }
 
@@ -166,6 +201,50 @@ function dominantPlatform(entries: HistoryEntry[]): string | null {
 }
 
 /**
+ * Work out how much of each measurement was the machine rather than the code.
+ *
+ * Calibration is only meaningful against the same frozen workload, so a change
+ * to the reference splits the series: the yardstick most of the history was
+ * measured against wins, and points measured against any other are left
+ * uncorrected rather than silently rescaled against a different reference.
+ *
+ * Factors are expressed relative to the median calibrated machine, so
+ * normalized values stay in familiar milliseconds instead of a unitless ratio.
+ */
+function applyNormalization(entries: HistoryEntry[]): NormalizationInfo | undefined {
+  const byWorkload = new Map<string, HistoryEntry[]>();
+  for (const entry of entries) {
+    const calibration = entry.calibration;
+    if (!calibration || !(calibration.total > 0)) continue;
+    const key = `${calibration.compilerVersion}@${calibration.workload}`;
+    const group = byWorkload.get(key);
+    if (group) group.push(entry);
+    else byWorkload.set(key, [entry]);
+  }
+
+  let dominant: HistoryEntry[] | undefined;
+  for (const group of byWorkload.values()) {
+    if (!dominant || group.length > dominant.length) dominant = group;
+  }
+  if (!dominant || dominant.length === 0) return undefined;
+
+  const baseline = median(dominant.map((entry) => entry.calibration!.total));
+  if (!(baseline > 0)) return undefined;
+
+  for (const entry of dominant) {
+    entry.normalization = baseline / entry.calibration!.total;
+  }
+
+  const reference = dominant[0].calibration!;
+  return {
+    workload: reference.workload,
+    compilerVersion: reference.compilerVersion,
+    baseline,
+    calibratedEntries: dominant.length,
+  };
+}
+
+/**
  * Mark points that cannot be read as part of the same series.
  *
  * A chart line implies every point was measured the same way. This history
@@ -175,7 +254,14 @@ function dominantPlatform(entries: HistoryEntry[]): string | null {
  */
 function flagEntries(entries: HistoryEntry[]): void {
   const expectedPlatform = dominantPlatform(entries);
-  const totals = entries.map((entry) => entry.metrics["total"] ?? null);
+  const anyCalibrated = entries.some((entry) => entry.normalization !== undefined);
+  // Spike detection reads the same values a chart would, so that a fast or slow
+  // runner is not mistaken for a spike once it has been corrected for.
+  const totals = entries.map((entry) => {
+    const total = entry.metrics["total"];
+    if (total === undefined) return null;
+    return total * (entry.normalization ?? 1);
+  });
   const reach = (OUTLIER_WINDOW - 1) / 2;
 
   entries.forEach((entry, index) => {
@@ -188,6 +274,12 @@ function flagEntries(entries: HistoryEntry[]): void {
     const platform = platformOf(entry.runner);
     if (platform && expectedPlatform && platform !== expectedPlatform) {
       flags.push("foreign-runner");
+    }
+
+    // Only worth pointing out once some of the series is corrected; a history
+    // with no calibration at all is uniformly uncorrected, not inconsistent.
+    if (anyCalibrated && entry.normalization === undefined) {
+      flags.push("uncalibrated");
     }
 
     const value = totals[index];
@@ -264,6 +356,7 @@ export function buildHistory(resultFiles: Iterable<ResultFile>): HistoryData {
         metrics,
         specMetrics,
         runner: result.runner,
+        calibration: result.calibration,
         quality: measureQuality(result.specs),
       });
     } catch (e: any) {
@@ -272,6 +365,7 @@ export function buildHistory(resultFiles: Iterable<ResultFile>): HistoryData {
   }
 
   entries.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  const normalization = applyNormalization(entries);
   flagEntries(entries);
 
   const allLabels = new Set<string>();
@@ -286,6 +380,7 @@ export function buildHistory(resultFiles: Iterable<ResultFile>): HistoryData {
     generated: new Date().toISOString(),
     labels: [...allLabels].sort(),
     specNames: [...allSpecNames].sort(),
+    normalization,
     entries,
   };
 }
