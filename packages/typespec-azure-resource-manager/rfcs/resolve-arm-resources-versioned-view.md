@@ -114,24 +114,24 @@ Its high-level sequence is:
 
 ARM decorators register metadata while the TypeSpec program is checked. Important state includes:
 
-| State key | Key type | Purpose |
-| --- | --- | --- |
-| `armResources` | `Model` | Registered ARM resource details and the resource TypeSpec model |
-| `armResourceOperations` | `Model` | Lifecycle, list, and action operation metadata |
-| `resourceOperationList` | `Model` | Operation identifiers associated with a resource |
-| `armResourceOperationData` | `Operation` | Identifies operations marked as ARM resource operations |
-| `armProviderNamespaces` | `Namespace` | ARM provider namespace metadata |
-| `armSingletonResources` | `Model` | Singleton resource metadata |
-| `resourceBaseType` | `Model` | Resolved ARM resource base kind |
-| `armBuiltInResource` | `Model` | Virtual or built-in resource metadata |
-| `customAzureResource` | `Model` | Custom resource metadata |
+| State key                  | Key type    | Purpose                                                         |
+| -------------------------- | ----------- | --------------------------------------------------------------- |
+| `armResources`             | `Model`     | Registered ARM resource details and the resource TypeSpec model |
+| `armResourceOperations`    | `Model`     | Lifecycle, list, and action operation metadata                  |
+| `resourceOperationList`    | `Model`     | Operation identifiers associated with a resource                |
+| `armResourceOperationData` | `Operation` | Identifies operations marked as ARM resource operations         |
+| `armProviderNamespaces`    | `Namespace` | ARM provider namespace metadata                                 |
+| `armSingletonResources`    | `Model`     | Singleton resource metadata                                     |
+| `resourceBaseType`         | `Model`     | Resolved ARM resource base kind                                 |
+| `armBuiltInResource`       | `Model`     | Virtual or built-in resource metadata                           |
+| `customAzureResource`      | `Model`     | Custom resource metadata                                        |
 
 Derived caches include:
 
-| State key | Key type | Purpose |
-| --- | --- | --- |
-| `armResolvedResources` | `Namespace` | Fully resolved `Provider` result |
-| `armResourcesCached` | `Model` | Fully resolved legacy `ArmResourceDetails` |
+| State key              | Key type    | Purpose                                    |
+| ---------------------- | ----------- | ------------------------------------------ |
+| `armResolvedResources` | `Namespace` | Fully resolved `Provider` result           |
+| `armResourcesCached`   | `Model`     | Fully resolved legacy `ArmResourceDetails` |
 
 `registerArmResource` stores the concrete model in `typespecType`. Operation decorators similarly
 store concrete `Model` and `Operation` references. These references are correct for the graph in
@@ -299,9 +299,7 @@ export interface ArmMetadataNameRequest {
   isExplicit?: boolean;
 }
 
-export type ArmMetadataNameResolver = (
-  request: ArmMetadataNameRequest,
-) => string | undefined;
+export type ArmMetadataNameResolver = (request: ArmMetadataNameRequest) => string | undefined;
 ```
 
 Reasons for this shape:
@@ -468,10 +466,7 @@ interface ArmResourceResolutionContext {
 The context provides these predicates:
 
 ```ts
-function isTypeInResolution(
-  context: ArmResourceResolutionContext,
-  type: Type,
-): boolean;
+function isTypeInResolution(context: ArmResourceResolutionContext, type: Type): boolean;
 
 function isContainerInResolution(
   context: ArmResourceResolutionContext,
@@ -502,9 +497,7 @@ returning an incomplete provider.
 Introduce an internal overload or helper:
 
 ```ts
-function listArmResourcesForResolution(
-  context: ArmResourceResolutionContext,
-): ArmResourceDetails[];
+function listArmResourcesForResolution(context: ArmResourceResolutionContext): ArmResourceDetails[];
 ```
 
 For the legacy context it delegates to `listArmResources(program)` after that helper is strengthened
@@ -614,12 +607,12 @@ legacy multi-version view and other emitters sharing the program.
 
 Use this policy:
 
-| Call shape | Provider cache |
-| --- | --- |
-| No options | Existing `armResolvedResources` cache |
-| Name resolver only | Resolve or clone from the raw legacy result, then transform names; never cache customized output |
-| Selected version | Cache the projected snapshot; optionally cache its structural `Provider` by projected namespace |
-| Selected version plus name resolver | Reuse the snapshot or structural provider; never cache customized output |
+| Call shape                          | Provider cache                                                                                   |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------ |
+| No options                          | Existing `armResolvedResources` cache                                                            |
+| Name resolver only                  | Resolve or clone from the raw legacy result, then transform names; never cache customized output |
+| Selected version                    | Cache the projected snapshot; optionally cache its structural `Provider` by projected namespace  |
+| Selected version plus name resolver | Reuse the snapshot or structural provider; never cache customized output                         |
 
 Add an ARM-owned snapshot cache:
 
@@ -629,7 +622,7 @@ interface ArmVersionSnapshot {
   realm: unsafe_Realm;
 }
 
-WeakMap<Program, Map<Namespace, Map<string, ArmVersionSnapshot>>>
+WeakMap<Program, Map<Namespace, Map<string, ArmVersionSnapshot>>>;
 ```
 
 This cache is required for correctness and memory stability, not only performance.
