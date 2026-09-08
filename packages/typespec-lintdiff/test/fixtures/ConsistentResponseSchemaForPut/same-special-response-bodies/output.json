@@ -1,0 +1,315 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "host": "management.azure.com",
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "azure_auth": [
+        "user_impersonation"
+      ]
+    }
+  ],
+  "securityDefinitions": {
+    "azure_auth": {
+      "type": "oauth2",
+      "description": "Azure Active Directory OAuth2 Flow.",
+      "flow": "implicit",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/authorize",
+      "scopes": {
+        "user_impersonation": "impersonate your user account"
+      }
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/binary": {
+      "put": {
+        "operationId": "BinaryBody",
+        "produces": [
+          "application/octet-stream"
+        ],
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "file"
+            }
+          },
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "schema": {
+              "type": "file"
+            }
+          }
+        }
+      }
+    },
+    "/multipart": {
+      "put": {
+        "operationId": "MultipartBody",
+        "produces": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/multipart-string": {
+      "put": {
+        "operationId": "MultipartAndString",
+        "produces": [
+          "multipart/form-data",
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/tuple": {
+      "put": {
+        "operationId": "TupleBody",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "array",
+              "items": {}
+            }
+          },
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "schema": {
+              "type": "array",
+              "items": {}
+            }
+          }
+        }
+      }
+    },
+    "/tuple-unknown-array": {
+      "put": {
+        "operationId": "TupleAndUnknownArray",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "array",
+              "items": {}
+            }
+          },
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "schema": {
+              "type": "array",
+              "items": {}
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "BinaryCreated": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "BinaryOk": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "FormData": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "MultipartCreated": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/OtherFormData"
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "MultipartOk": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/FormData"
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "OtherFormData": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "count"
+      ]
+    },
+    "StringCreated": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "TupleCreated": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "TupleOk": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "UnknownArrayCreated": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": [
+        "body"
+      ]
+    }
+  },
+  "parameters": {}
+}
