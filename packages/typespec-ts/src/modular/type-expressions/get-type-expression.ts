@@ -5,7 +5,7 @@ import type {
   SdkType,
 } from "@azure-tools/typespec-client-generator-core";
 import type { SdkContext } from "../../utils/interfaces.js";
-import { NameType, normalizeName } from "../../utils/name-utils.js";
+import { normalizeSdkPropertyName } from "../../utils/name-utils.js";
 import { getCredentialExpression } from "./get-credential-expression.js";
 import { getEnumExpression } from "./get-enum-expression.js";
 import { getModelExpression } from "./get-model-expression.js";
@@ -21,10 +21,16 @@ export function normalizeModelPropertyName(
   context: SdkContext,
   property: SdkModelPropertyType | SdkHttpParameter | SdkServiceResponseHeader,
 ): string {
-  const normalizedPropName = normalizeName(property.name, NameType.Property);
+  return JSON.stringify(getModelPropertyName(context, property));
+}
+
+export function getModelPropertyName(
+  context: SdkContext,
+  property: SdkModelPropertyType | SdkHttpParameter | SdkServiceResponseHeader,
+): string {
   return context.emitterOptions?.ignorePropertyNameNormalize
-    ? `"${property.name}"`
-    : `"${normalizedPropName}"`;
+    ? property.name
+    : normalizeSdkPropertyName(property);
 }
 
 export function getTypeExpression(

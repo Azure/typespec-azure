@@ -1,11 +1,23 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import { NoTarget, type DiagnosticTarget, type Program } from "@typespec/compiler";
+import { reportDiagnostic } from "../lib.js";
+
 export interface NormalizeNameOption {
   shouldGuard?: boolean;
   customReservedNames?: ReservedName[];
   casingOverride?: CasingConvention;
   numberPrefixOverride?: string;
+}
+
+export interface NormalizeSdkNameOption extends NormalizeNameOption {
+  nameOverride?: string;
+}
+
+export interface SdkName {
+  name: string;
+  isExactName?: boolean;
 }
 
 export interface ReservedName {
@@ -206,6 +218,88 @@ export function normalizeName(
     ? guardReservedNames(normalized, nameType, customReservedNames)
     : normalized;
   return fixLeadingNumber(result, nameType, numberPrefixOverride);
+}
+
+export function normalizeSdkName(
+  sdkName: SdkName,
+  nameType: NameType,
+  options: NormalizeSdkNameOption = {},
+): string {
+  const { nameOverride, ...normalizeOptions } = options;
+  const name = nameOverride ?? sdkName.name;
+  if (!sdkName.isExactName) {
+    return normalizeName(name, nameType, normalizeOptions);
+  }
+  return normalizeOptions.shouldGuard && nameType === NameType.Method
+    ? guardReservedNames(name, nameType, normalizeOptions.customReservedNames)
+    : name;
+}
+
+export function normalizeSdkPropertyName(sdkName: SdkName): string {
+  return normalizeSdkName(sdkName, NameType.Property);
+}
+
+export function isValidTypeScriptIdentifierName(name: string): boolean {
+  return /^[$_\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/u.test(name);
+}
+
+const reportedInvalidExactNames = new WeakMap<Program, WeakSet<object>>();
+
+export function reportInvalidExactName(
+  program: Program,
+  item: SdkName & object,
+  nameType: NameType,
+  nameKind: string,
+  target: DiagnosticTarget | typeof NoTarget = NoTarget,
+): void {
+  if (
+    !item.isExactName ||
+    nameType === NameType.Property ||
+    nameType === NameType.EnumMemberName ||
+    nameType === NameType.File
+  ) {
+    return;
+  }
+
+  const requiresMethodGuard = guardReservedNames(item.name, NameType.Method) !== item.name;
+  const isValid =
+    isValidTypeScriptIdentifierName(item.name) &&
+    (nameType === NameType.Method || !requiresMethodGuard);
+  if (isValid) {
+    return;
+  }
+
+  let reported = reportedInvalidExactNames.get(program);
+  if (!reported) {
+    reported = new WeakSet<object>();
+    reportedInvalidExactNames.set(program, reported);
+  }
+  if (reported.has(item)) {
+    return;
+  }
+  reported.add(item);
+
+  reportDiagnostic(program, {
+    code: "invalid-exact-name",
+    format: { nameKind, name: item.name },
+    target,
+  });
+}
+
+export function formatPropertyName(name: string): string {
+  return isValidTypeScriptIdentifierName(name) ? name : JSON.stringify(name);
+}
+
+export function formatPropertyAccess(base: string, name: string): string {
+  return isValidTypeScriptIdentifierName(name)
+    ? `${base}.${name}`
+    : `${base}[${JSON.stringify(name)}]`;
+}
+
+export function formatOptionalPropertyAccess(base: string, name: string): string {
+  return isValidTypeScriptIdentifierName(name)
+    ? `${base}?.${name}`
+    : `${base}?.[${JSON.stringify(name)}]`;
 }
 
 export function fixLeadingNumber(name: string, nameType: NameType, prefix: string = "_"): string {

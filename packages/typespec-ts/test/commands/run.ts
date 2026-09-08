@@ -1,8 +1,9 @@
 import type { IExtractorConfigPrepareOptions } from "@microsoft/api-extractor";
 import { Extractor, ExtractorConfig, ExtractorLogLevel } from "@microsoft/api-extractor";
-import { existsSync } from "fs";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "fs";
 import * as fs from "fs/promises";
 import { createRequire } from "module";
+import { tmpdir } from "os";
 import { dirname, join as joinPath } from "path";
 import type { CompilerOptions } from "typescript";
 import { createProgram } from "typescript";
@@ -32,23 +33,21 @@ function resolveTspCliPath(): string {
   throw new Error("Could not resolve @typespec/compiler CLI entry (cmd/tsp.js)");
 }
 
-function deepMerge(target: any, source: any): any {
-  const result = { ...target };
-  for (const key of Object.keys(source)) {
-    if (
-      source[key] &&
-      typeof source[key] === "object" &&
-      !Array.isArray(source[key]) &&
-      target[key] &&
-      typeof target[key] === "object" &&
-      !Array.isArray(target[key])
-    ) {
-      result[key] = deepMerge(target[key], source[key]);
-    } else {
-      result[key] = source[key];
-    }
+// api-extractor only merges its default settings when the config is read from disk, and the
+// object holding those defaults is an implementation detail (it used to hang off
+// `ExtractorConfig._defaultConfig`, which was removed in api-extractor 7.58.3). Round-trip the
+// in-memory config through a temp file so the defaults are applied by the public
+// `ExtractorConfig.loadFile` API instead. Paths in the config are absolute or prefixed with the
+// `<projectFolder>` token, so the temp location of the file does not affect how they resolve.
+function withExtractorDefaults(configObject: Record<string, unknown>): any {
+  const tempDir = mkdtempSync(joinPath(tmpdir(), "typespec-ts-api-extractor-"));
+  try {
+    const configFilePath = joinPath(tempDir, "api-extractor.json");
+    writeFileSync(configFilePath, JSON.stringify(configObject));
+    return ExtractorConfig.loadFile(configFilePath);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
   }
-  return result;
 }
 
 // Which generation steps to run for a spec.
@@ -261,14 +260,8 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
       projectFolder,
     };
 
-    // Defaults are merged in api-extractor when the config file is read from disk with
-    // `ExtractorConfig.loadFile`. This is derived from that method.
-    // https://github.com/microsoft/rushstack/blob/1a92f17fa537b55529adbec80203bd99afd8cd24/apps/api-extractor/src/api/ExtractorConfig.ts#L624-L627
-    const configObject = deepMerge(
-      structuredClone((ExtractorConfig as any)._defaultConfig),
-      baseConfigObject,
-    );
-    ExtractorConfig.jsonSchema.validateObject(configObject, "api extractor config object");
+    // Defaults are merged in api-extractor when the config file is read from disk.
+    const configObject = withExtractorDefaults(baseConfigObject);
 
     const config: IExtractorConfigPrepareOptions = {
       configObject,

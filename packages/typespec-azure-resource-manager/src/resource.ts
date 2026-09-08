@@ -1694,7 +1694,10 @@ export const [getResourceFeatureSet, setResourceFeatureSet] = useStateMap<
   Map<string, ArmFeatureOptions>
 >(ArmStateKeys.armFeatureSet);
 
-export const [getFeatureFileSet, setFeatureFileSet] = useStateMap<Namespace, boolean>(
+/**
+ * Gets the enum configured by `@featureFiles`, or `undefined` when feature files are not configured.
+ */
+export const [getFeatureFileSet, setFeatureFileSet] = useStateMap<Namespace, Enum>(
   ArmStateKeys.armFeatureFileSet,
 );
 
@@ -1846,7 +1849,7 @@ export const $featureFiles: FeatureFilesDecorator = (
   entity: Namespace,
   features: Enum,
 ) => {
-  setFeatureFileSet(context.program, entity, true);
+  setFeatureFileSet(context.program, entity, features);
   $features(context, entity, features);
 };
 export const $featureFileOptions: FeatureFileOptionsDecorator =

@@ -85,8 +85,10 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": true,
     "@azure-tools/typespec-azure-resource-manager/no-reserved-resource-property": true,
     "@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels": true,
+    "@azure-tools/typespec-azure-resource-manager/list-response-envelope": false,
     "@azure-tools/typespec-azure-resource-manager/no-query-in-collection": false,
     "@azure-tools/typespec-azure-resource-manager/use-interface": true,
+    "@azure-tools/typespec-azure-resource-manager/use-application-json-content-type": false,
     "@azure-tools/typespec-azure-resource-manager/use-operation-decorator": true,
     "@azure-tools/typespec-azure-resource-manager/use-api-version": true,
     "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation": true,
@@ -95,6 +97,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb": true,
     "@azure-tools/typespec-azure-resource-manager/improper-subscription-list-operation": true,
     "@azure-tools/typespec-azure-resource-manager/no-tenant-level-apis": false,
+    "@azure-tools/typespec-azure-resource-manager/list-operation-missing-pageable": false,
     "@azure-tools/typespec-azure-resource-manager/lro-location-header": true,
     "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers": true,
     "@azure-tools/typespec-azure-resource-manager/no-response-body": true,
@@ -105,6 +108,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/retry-after": false, // Disable https://github.com/Azure/typespec-azure/issues/3351
     "@azure-tools/typespec-azure-resource-manager/secret-prop": true,
     "@azure-tools/typespec-azure-resource-manager/unsupported-type": true,
+    "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op": false,
 
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,

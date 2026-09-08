@@ -136,6 +136,7 @@ function getAzureMonorepoScripts(config: AzureMonorepoInfoConfig) {
       config.withSamples ? '"samples-dev/*.ts"' : ""
     }`,
     clean: "rimraf --glob dist dist-browser dist-esm test-dist temp types *.tgz *.log",
+    customize: "echo skipped",
     "execute:samples": config.withSamples ? "dev-tool samples run samples-dev" : "echo skipped",
     "extract-api": "rimraf review && dev-tool run extract-api",
     format: `prettier --write --config ../../../.prettierrc.json --ignore-path ../../../.prettierignore "src/**/*.{ts,cts,mts}" "test/**/*.{ts,cts,mts}" "*.{js,cjs,mjs,json}" ${

@@ -55,6 +55,72 @@ it("basic", async () => {
   strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsParam);
 });
 
+it("reports an error for an unrelated override response type", async () => {
+  const diagnostics = await SimpleBaseTester.diagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+    @post op func(): string;
+    `,
+      `
+    namespace MyCustomizations;
+    op func(): int32;
+    @@override(MyService.func, MyCustomizations.func);
+    `,
+    ),
+  );
+
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/override-response-mismatch",
+    severity: "error",
+  });
+});
+
+it("reports a warning for an intentional void response replacement", async () => {
+  const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+    @post op func(): string;
+    `,
+      `
+    namespace MyCustomizations;
+    op func(): void;
+    @@override(MyService.func, MyCustomizations.func);
+    `,
+    ),
+  );
+
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/override-response-replacement",
+    severity: "warning",
+  });
+});
+
+it("reports a warning for an intentional bytes response replacement", async () => {
+  const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+    @post op func(): string;
+    `,
+      `
+    namespace MyCustomizations;
+    op func(): bytes;
+    @@override(MyService.func, MyCustomizations.func);
+    `,
+    ),
+  );
+
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/override-response-replacement",
+    severity: "warning",
+  });
+});
+
 it("basic with scope", async () => {
   const mainCode = `
     @service

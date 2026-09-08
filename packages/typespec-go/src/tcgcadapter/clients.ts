@@ -1527,7 +1527,7 @@ export class ClientAdapter {
             byVal,
           );
           if (contentType === "XML" && methodParam.type.kind === "array") {
-            // this is for compat with autorest.go
+            // this is for compat with legacy behavior
             adaptedParam.xml = new go.XMLInfo();
             adaptedParam.xml.wrapper = methodParam.type.name;
           }
@@ -1998,7 +1998,7 @@ export class ClientAdapter {
         let fieldName: string | undefined;
         let xmlInfo: go.XMLInfo | undefined;
         if (contentType === "XML" && sdkResponseType.kind === "array") {
-          // this is for compat with autorest.go
+          // this is for compat with legacy behavior
           xmlInfo = new go.XMLInfo();
           fieldName = sdkResponseType.name;
           const elementType = (<go.Slice>resultType).elementType;
