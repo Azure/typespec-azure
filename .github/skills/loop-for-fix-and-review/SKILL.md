@@ -449,8 +449,9 @@ Do not create replacement subagents between rounds.
 ## Post-run process review
 
 After the loop reaches a termination condition and the deliverable is complete,
-briefly review the run before the final user response. Capture concrete
-suggestions for the next review-and-fix loop, especially:
+briefly review the run before the final user response. Read and follow the
+[shared post-run process review](../shared/post-run-process-review.md), including
+its confidence gate, ownership, independent PR, and reporting rules. Focus on:
 
 - review-request or completion checks that were slow, stale, or unreliable, and
   better cursor or polling evidence to use next time
@@ -466,16 +467,6 @@ suggestions for the next review-and-fix loop, especially:
   or generated corpus data from entering the pull request
 - loop limits, stop conditions, or skill instructions that should be updated
   based on the observed run
-
-Print the consolidated suggestions in the final handoff and ask the user
-whether any should be adopted into this skill. Do not update the skill
-automatically from the post-run review; only make skill changes after the user
-explicitly approves the specific suggestion(s).
-
-Apply approved skill improvements once, after the loop has ended. Keep that
-change separate from target-rule fixes: use a dedicated commit and do not add it
-to the target pull request unless the user explicitly requests that placement.
-Do not restart the completed review loop merely to review the skill update.
 
 ## Result
 

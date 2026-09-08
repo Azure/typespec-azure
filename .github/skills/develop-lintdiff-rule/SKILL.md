@@ -771,8 +771,9 @@ Worker mode returns:
 ## Post-run process review
 
 After the draft PR is created and the deliverable is complete, briefly review
-the run before the final user response. Capture concrete suggestions for the
-next lintdiff rule, especially:
+the run before the final user response. Read and follow the
+[shared post-run process review](../shared/post-run-process-review.md), including
+its confidence gate, ownership, independent PR, and reporting rules. Focus on:
 
 - steps that cost unexpected time and how to avoid or parallelize them next time
 - status reporting that was missing, stale, or too noisy, and the progress or
@@ -785,8 +786,3 @@ next lintdiff rule, especially:
 - corpus, fixture, and migration evidence that made the equivalence conclusion
   clearer or more reliable
 - skill instructions that should be updated based on the observed run
-
-Print the suggestions in the final handoff and ask the user whether any should
-be adopted into this skill. Do not update the skill automatically from the
-post-run review; only make skill changes after the user explicitly approves the
-specific suggestion(s).

@@ -611,8 +611,9 @@ Produce:
 ## Post-run process review
 
 After the promotion PR is created and the deliverable is complete, briefly
-review the run before the final user response. Capture concrete suggestions for
-the next promotion, especially:
+review the run before the final user response. Read and follow the
+[shared post-run process review](../shared/post-run-process-review.md), including
+its confidence gate, ownership, independent PR, and reporting rules. Focus on:
 
 - steps that cost unexpected time and how to avoid or parallelize them next time
 - commands that were too broad, stalled, or failed for environmental reasons
@@ -623,8 +624,3 @@ the next promotion, especially:
   closures
 - test-conversion patterns that made fixture coverage easier or more reliable
 - skill instructions that should be updated based on the observed run
-
-Print the suggestions in the final handoff and ask the user whether any should
-be adopted into this skill. Do not update the skill automatically from the
-post-run review; only make skill changes after the user explicitly approves the
-specific suggestion(s).
