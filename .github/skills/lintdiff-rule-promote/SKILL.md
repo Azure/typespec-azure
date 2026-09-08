@@ -371,8 +371,20 @@ Add a change entry for every touched official package:
   `@azure-tools/typespec-azure-resource-manager`
 - `@azure-tools/typespec-azure-rulesets` when its rulesets changed
 
-Use `feature` for a new official rule and `fix` when folding the behavior into
-an existing official rule.
+Choose the change kind separately for each package:
+
+- For the rule's destination package, use `feature` for a new official rule and
+  `fix` when folding the behavior into an existing official rule.
+- For `@azure-tools/typespec-azure-rulesets`, use a separate `internal` change
+  entry when only registering the rule as `false`. Do not include this package
+  in the rule package's `feature` entry: disabled registration does not enable
+  new diagnostics.
+- Describe the actual behavior using the official TypeSpec rule name. For
+  example: "Register the ARM `no-query-in-post` lint rule as disabled in the
+  resource manager ruleset." Do not say "Enable" when the entry is `false`.
+  If the user explicitly approved immediate enablement, classify and describe
+  that user-facing ruleset change accordingly instead of using this
+  internal-only guidance.
 
 Chronus change files must use LF line endings. Do not run Prettier directly on a
 new change file when the Windows checkout would rewrite it with CRLF. After
@@ -507,6 +519,9 @@ promotion diff. The review should inspect:
   Prettier
 - ruleset registration, including that every newly promoted rule is `false`
   unless the user explicitly approved immediate enablement
+- changelog classification and wording match the actual ruleset enablement:
+  disabled-only registration has a separate `internal` rulesets entry, uses the
+  official TypeSpec rule name, and says "Register ... as disabled," not "Enable"
 - absence of generated lintdiff corpus artifacts
 
 Commit only the promotion-worktree changes needed for the native-library PR.
@@ -596,8 +611,9 @@ Produce:
 ## Post-run process review
 
 After the promotion PR is created and the deliverable is complete, briefly
-review the run before the final user response. Capture concrete suggestions for
-the next promotion, especially:
+review the run before the final user response. Read and follow the
+[shared post-run process review](../shared/post-run-process-review.md), including
+its confidence gate, ownership, independent PR, and reporting rules. Focus on:
 
 - steps that cost unexpected time and how to avoid or parallelize them next time
 - commands that were too broad, stalled, or failed for environmental reasons
@@ -608,8 +624,3 @@ the next promotion, especially:
   closures
 - test-conversion patterns that made fixture coverage easier or more reliable
 - skill instructions that should be updated based on the observed run
-
-Print the suggestions in the final handoff and ask the user whether any should
-be adopted into this skill. Do not update the skill automatically from the
-post-run review; only make skill changes after the user explicitly approves the
-specific suggestion(s).
