@@ -78,6 +78,14 @@ export interface BenchmarkResult {
   commit: string;
   /** ISO 8601 timestamp of when the benchmark was run. */
   timestamp: string;
+  /**
+   * ISO 8601 date the benchmarked commit landed.
+   *
+   * Distinct from `timestamp`: a backfill measures months of history in an
+   * afternoon, so measurement time says nothing about where a point belongs on
+   * a timeline. Absent when the commit could not be resolved.
+   */
+  commitDate?: string;
   /** Runner environment info. */
   runner: RunnerInfo;
   /**

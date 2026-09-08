@@ -49,6 +49,14 @@ export interface EntryQuality {
 export interface HistoryEntry {
   commit: string;
   timestamp: string;
+  /**
+   * When the commit landed, when known.
+   *
+   * Points are placed and ordered by this rather than by `timestamp`, so that a
+   * backfill measuring a year of history in an afternoon still lands each point
+   * where it belongs.
+   */
+  commitDate?: string;
   /** Averaged metrics across all specs */
   metrics: Record<string, number>;
   /** Per-spec metrics (spec name → flat metrics) */
@@ -244,6 +252,11 @@ function applyNormalization(entries: HistoryEntry[]): NormalizationInfo | undefi
   };
 }
 
+/** Where a point sits in history, preferring when the commit landed. */
+function orderOf(entry: HistoryEntry): number {
+  return new Date(entry.commitDate ?? entry.timestamp).getTime();
+}
+
 /**
  * Mark points that cannot be read as part of the same series.
  *
@@ -353,6 +366,7 @@ export function buildHistory(resultFiles: Iterable<ResultFile>): HistoryData {
       entries.push({
         commit: result.commit,
         timestamp: result.timestamp,
+        commitDate: result.commitDate,
         metrics,
         specMetrics,
         runner: result.runner,
@@ -364,7 +378,11 @@ export function buildHistory(resultFiles: Iterable<ResultFile>): HistoryData {
     }
   }
 
-  entries.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  // Ordered by when each commit landed, falling back to measurement time for
+  // points recorded before the commit date was captured. Sorting by
+  // measurement time would put a re-measured commit at the end of the series
+  // rather than back in its place in history.
+  entries.sort((a, b) => orderOf(a) - orderOf(b));
   const normalization = applyNormalization(entries);
   flagEntries(entries);
 

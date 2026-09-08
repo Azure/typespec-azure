@@ -58,15 +58,25 @@ interface RunOptions extends SpecOptions {
   day: number;
   runner?: RunnerInfo;
   calibration?: CalibrationInfo;
+  commitDate?: string;
+  measuredAt?: string;
 }
 
-function run({ day, runner = LINUX, calibration, ...specOptions }: RunOptions): {
+function run({
+  day,
+  runner = LINUX,
+  calibration,
+  commitDate,
+  measuredAt,
+  ...specOptions
+}: RunOptions): {
   name: string;
   content: string;
 } {
   const result: BenchmarkResult = {
     commit: `commit-${day}`,
-    timestamp: new Date(Date.UTC(2026, 0, day)).toISOString(),
+    timestamp: measuredAt ?? new Date(Date.UTC(2026, 0, day)).toISOString(),
+    ...(commitDate ? { commitDate } : {}),
     runner,
     ...(calibration ? { calibration } : {}),
     specs: { sample: spec(specOptions) },
@@ -273,4 +283,31 @@ it("buildHistory ignores a calibration that measured nothing", () => {
 
   expect(history.entries[0].normalization).toBeUndefined();
   expect(history.normalization?.calibratedEntries).toBe(1);
+});
+
+it("buildHistory places a point where its commit landed, not where it was measured", () => {
+  // A backfill measures old commits today, so measurement time would order the
+  // series backwards.
+  const history = buildHistory([
+    run({
+      day: 1,
+      total: 100,
+      commitDate: "2025-03-01T00:00:00.000Z",
+      measuredAt: "2026-09-07T00:00:00.000Z",
+    }),
+    run({
+      day: 2,
+      total: 100,
+      commitDate: "2025-01-01T00:00:00.000Z",
+      measuredAt: "2026-09-08T00:00:00.000Z",
+    }),
+  ]);
+
+  expect(history.entries.map((entry) => entry.commit)).toEqual(["commit-2", "commit-1"]);
+  expect(history.entries[0].commitDate).toBe("2025-01-01T00:00:00.000Z");
+});
+
+it("buildHistory falls back to measurement time for points with no commit date", () => {
+  const history = buildHistory([run({ day: 3, total: 100 }), run({ day: 1, total: 100 })]);
+  expect(history.entries.map((entry) => entry.commit)).toEqual(["commit-1", "commit-3"]);
 });

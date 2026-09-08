@@ -231,6 +231,25 @@ function getGitCommit(providedCommit?: string): string {
   }
 }
 
+/**
+ * When the commit landed, as opposed to when it was measured.
+ *
+ * Uses the committer date rather than the author date, because that is the
+ * order the commits reached the branch; an author date can predate its own
+ * parent after a rebase.
+ */
+function getCommitDate(commit: string): string | undefined {
+  if (commit === "unknown") return undefined;
+  try {
+    return execSync(`git show -s --format=%cI ${commit}`, {
+      encoding: "utf-8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    return undefined;
+  }
+}
+
 /** Run benchmarks for all discovered specs. */
 export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResult> {
   const specsDir = resolve(options.specsDir);
@@ -332,6 +351,7 @@ export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResul
   return {
     commit,
     timestamp: new Date().toISOString(),
+    commitDate: getCommitDate(commit),
     runner: getRunnerInfo(),
     calibration,
     specs,
