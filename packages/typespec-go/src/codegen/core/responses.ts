@@ -187,27 +187,18 @@ function emit(
           }
         }
 
-        let byValue = true;
-        if (respEnv.result.kind === "monomorphicResult") {
-          byValue = respEnv.result.byValue;
-        }
-
         fields.push({
           docs: respEnv.result.docs,
-          field: `${indent.get()}${respEnv.result.fieldName} ${helpers.star(byValue)}${go.getTypeDeclaration(respType, respEnv.method.receiver.type.pkg)}${tag}\n`,
+          field: `${indent.get()}${respEnv.result.fieldName} ${go.getTypeDeclaration(respType, respEnv.method.receiver.type.pkg)}${tag}\n`,
         });
       }
     }
 
     for (const header of respEnv.headers) {
       imports.addForType(header.type);
-      let byValue = true;
-      if (header.kind === "headerScalarResponse") {
-        byValue = header.byValue;
-      }
       fields.push({
         docs: header.docs,
-        field: `${indent.get()}${header.fieldName} ${helpers.star(byValue)}${go.getTypeDeclaration(header.type, respEnv.method.receiver.type.pkg)}\n`,
+        field: `${indent.get()}${header.fieldName} ${go.getTypeDeclaration(header.type, respEnv.method.receiver.type.pkg)}\n`,
       });
     }
 

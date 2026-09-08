@@ -385,29 +385,30 @@ function generateModelDefs(
   const modelDefs = new Array<ModelDef>();
   for (const model of models) {
     for (const field of model.fields) {
+      const fieldType = go.unwrapPtr(field.type);
       const descriptionMods = new Array<string>();
       if (field.annotations.readOnly) {
         descriptionMods.push("READ-ONLY");
       } else if (
         field.annotations.required &&
-        (field.type.kind !== "literal" || model.usage === go.UsageFlags.Output)
+        (fieldType.kind !== "literal" || model.usage === go.UsageFlags.Output)
       ) {
         descriptionMods.push("REQUIRED");
-      } else if (field.type.kind === "literal") {
+      } else if (fieldType.kind === "literal") {
         if (!field.annotations.required) {
           descriptionMods.push("FLAG");
         }
         descriptionMods.push("CONSTANT");
       }
-      if (field.type.kind === "literal" && model.usage !== go.UsageFlags.Output) {
+      if (fieldType.kind === "literal" && model.usage !== go.UsageFlags.Output) {
         // add a comment with the const value for const properties that are sent over the wire
         if (field.docs.description) {
           field.docs.description += "\n";
         } else {
           field.docs.description = "";
         }
-        field.docs.description += `Field has constant value ${helpers.formatLiteralValue(field.type, false)}, any specified value is ignored.`;
-      } else if (field.type.kind === "rawJSON") {
+        field.docs.description += `Field has constant value ${helpers.formatLiteralValue(fieldType, false)}, any specified value is ignored.`;
+      } else if (fieldType.kind === "rawJSON") {
         // raw JSON is emitted as []byte, so document that the field contains raw
         // JSON and that the caller is responsible for marshaling their data structure.
         if (field.docs.description) {
@@ -444,14 +445,15 @@ function generateModelDefs(
       let needsDateTimeMarshalling = false;
       let byteArrayFormat = false;
       for (const field of model.fields) {
-        if (field.type.kind !== "etag") {
+        const fieldType = go.unwrapPtr(field.type);
+        if (fieldType.kind !== "etag") {
           // azcore.ETag un/marshals on its own so no need to
           // import azcore as we don't explicitly reference the type
-          serdeImports.addForType(field.type);
+          serdeImports.addForType(fieldType);
         }
-        if (field.type.kind === "time") {
+        if (fieldType.kind === "time") {
           needsDateTimeMarshalling = true;
-        } else if (field.type.kind === "encodedBytes") {
+        } else if (fieldType.kind === "encodedBytes") {
           byteArrayFormat = true;
         }
       }
@@ -555,15 +557,12 @@ function generateToMultipartForm(modelDef: ModelDef, indent: helpers.Indentation
   let method = `func (${receiver} ${modelDef.Model.name}) toMultipartFormData() (map[string]any, error) {\n`;
   method += `${indent.get()}objectMap := make(map[string]any)\n`;
   for (const field of modelDef.Model.fields) {
-    const fieldType = helpers.recursiveUnwrapMapSlice(field.type);
-    let star = "";
-    if (!field.byValue) {
-      star = "*";
-    }
-    if (!field.byValue) {
+    const star = helpers.deref(field.type);
+    if (field.type.kind === "ptr") {
       method += `${indent.get()}if ${receiver}.${field.name} != nil {\n`;
       indent.push();
     }
+    const fieldType = helpers.recursiveUnwrapMapSlice(field.type);
     if (fieldType.kind === "model" && !fieldType.annotations.multipartFormData) {
       method += `${indent.get()}if err := populateMultipartJSON(objectMap, "${field.serializedName}", ${star}${receiver}.${field.name}); err != nil {\n`;
       method += `${indent.push().get()}return nil, err\n`;
@@ -571,7 +570,7 @@ function generateToMultipartForm(modelDef: ModelDef, indent: helpers.Indentation
     } else {
       method += `${indent.get()}objectMap["${field.serializedName}"] = ${star}${receiver}.${field.name}\n`;
     }
-    if (!field.byValue) {
+    if (field.type.kind === "ptr") {
       indent.pop();
       method += `${indent.get()}}\n`;
     }
@@ -639,6 +638,10 @@ function generateJSONMarshallerBody(
       addlProps = field.type;
       continue;
     }
+    // pointer-ness is captured in the code model, so dispatch on the unwrapped
+    // type and read isPtr to decide pointer-to-type emission.
+    const fieldType = go.unwrapPtr(field.type);
+    const deref = helpers.deref(field.type);
     if (field.annotations.isDiscriminator) {
       if (field.defaultValue) {
         marshaller += `${indent.get()}objectMap["${field.serializedName}"] = ${helpers.formatLiteralValue(field.defaultValue, true)}\n`;
@@ -647,29 +650,26 @@ function generateJSONMarshallerBody(
         // this will enable support for custom types that aren't (yet) described in the swagger.
         marshaller += `${indent.get()}objectMap["${field.serializedName}"] = ${receiver}.${field.name}\n`;
       }
-    } else if (field.type.kind === "encodedBytes") {
+    } else if (fieldType.kind === "encodedBytes") {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
       marshaller += `${indent.get()}populateByteArray(objectMap, "${field.serializedName}", ${receiver}.${field.name}, func() any {\n`;
-      marshaller += `${indent.push().get()}return runtime.EncodeByteArray(${receiver}.${field.name}, runtime.Base64${field.type.encoding}Format)\n`;
+      marshaller += `${indent.push().get()}return runtime.EncodeByteArray(${receiver}.${field.name}, runtime.Base64${fieldType.encoding}Format)\n`;
       marshaller += `${indent.pop().get()}})\n`;
       modelDef.SerDe.needsJSONPopulateByteArray = true;
-    } else if (go.isSlice(field.type, "encodedBytes")) {
+    } else if (go.isSlice(fieldType, "encodedBytes")) {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
       marshaller += `${indent.get()}populateByteArray(objectMap, "${field.serializedName}", ${receiver}.${field.name}, func() any {\n`;
       marshaller += `${indent.push().get()}encodedValue := make([]string, len(${receiver}.${field.name}))\n`;
       marshaller += `${indent.get()}for i := 0; i < len(${receiver}.${field.name}); i++ {\n`;
-      marshaller += `${indent.push().get()}encodedValue[i] = runtime.EncodeByteArray(${receiver}.${field.name}[i], runtime.Base64${field.type.elementType.encoding}Format)\n`;
+      marshaller += `${indent.push().get()}encodedValue[i] = runtime.EncodeByteArray(${receiver}.${field.name}[i], runtime.Base64${fieldType.elementType.encoding}Format)\n`;
       marshaller += `${indent.pop().get()}}\n`;
       marshaller += `${indent.get()}return encodedValue\n`;
       marshaller += `${indent.pop().get()}})\n`;
       modelDef.SerDe.needsJSONPopulateByteArray = true;
-    } else if (go.isSlice(field.type, "time")) {
+    } else if (go.isSlice(fieldType, "time")) {
       const source = `${receiver}.${field.name}`;
-      const elementType = field.type.elementType;
-      let elementPtr = "*";
-      if (field.type.elementTypeByValue) {
-        elementPtr = "";
-      }
+      const elementType = go.unwrapPtr(fieldType.elementType);
+      const elementPtr = helpers.deref(fieldType.elementType);
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
       marshaller += `${indent.get()}aux := make([]${elementPtr}datetime.${elementType.format}, len(${source}), len(${source}))\n`;
       marshaller += `${indent.get()}for i := 0; i < len(${source}); i++ {\n`;
@@ -688,8 +688,8 @@ function generateJSONMarshallerBody(
       marshaller += `${indent.get()}}\n`;
       marshaller += `${indent.get()}populate(objectMap, "${field.serializedName}", aux)\n`;
       modelDef.SerDe.needsJSONPopulate = true;
-    } else if (field.type.kind === "literal") {
-      const setter = `objectMap["${field.serializedName}"] = ${helpers.formatLiteralValue(field.type, true)}`;
+    } else if (fieldType.kind === "literal") {
+      const setter = `objectMap["${field.serializedName}"] = ${helpers.formatLiteralValue(fieldType, true)}`;
       if (!field.annotations.required) {
         marshaller += `${indent.get()}if ${receiver}.${field.name} != nil {\n`;
         marshaller += `${indent.push().get()}${setter}\n`;
@@ -697,7 +697,7 @@ function generateJSONMarshallerBody(
       } else {
         marshaller += `${indent.get()}${setter}\n`;
       }
-    } else if (field.type.kind === "rawJSON") {
+    } else if (fieldType.kind === "rawJSON") {
       marshaller += `${indent.get()}populate(objectMap, "${field.serializedName}", json.RawMessage(${receiver}.${field.name}))\n`;
       modelDef.SerDe.needsJSONPopulate = true;
     } else {
@@ -709,7 +709,7 @@ function generateJSONMarshallerBody(
       }
       if (
         go.isScalar(
-          field.type,
+          fieldType,
           "uint8",
           "uint16",
           "uint32",
@@ -719,42 +719,42 @@ function generateJSONMarshallerBody(
           "int32",
           "int64",
         ) &&
-        field.type.encodeAsString
+        fieldType.encodeAsString
       ) {
         imports.add("strconv");
         marshaller += `${indent.get()}populateAsString(objectMap, "${field.serializedName}", ${receiver}.${field.name}, func() string {\n`;
-        const isSigned = field.type.type.startsWith("int");
-        let fieldExpr = `*${receiver}.${field.name}`;
+        const isSigned = fieldType.type.startsWith("int");
+        let fieldExpr = `${deref}${receiver}.${field.name}`;
         if (
-          (field.type.type.startsWith("uint") && field.type.type !== "uint64") ||
-          (field.type.type.startsWith("int") && field.type.type !== "int64")
+          (fieldType.type.startsWith("uint") && fieldType.type !== "uint64") ||
+          (fieldType.type.startsWith("int") && fieldType.type !== "int64")
         ) {
           fieldExpr = `${isSigned ? "int64" : "uint64"}(${fieldExpr})`;
         }
         marshaller += `${indent.push().get()}return strconv.${isSigned ? "FormatInt" : "FormatUint"}(${fieldExpr}, 10)\n`;
         marshaller += `${indent.pop().get()}})\n`;
         modelDef.SerDe.needsJSONPopulateAsString = true;
-      } else if (go.isScalar(field.type, "bool") && field.type.encodeAsString) {
+      } else if (go.isScalar(fieldType, "bool") && fieldType.encodeAsString) {
         imports.add("strconv");
         marshaller += `${indent.get()}populateAsString(objectMap, "${field.serializedName}", ${receiver}.${field.name}, func() string {\n`;
-        marshaller += `${indent.push().get()}return strconv.FormatBool(*${receiver}.${field.name})\n`;
+        marshaller += `${indent.push().get()}return strconv.FormatBool(${deref}${receiver}.${field.name})\n`;
         marshaller += `${indent.pop().get()}})\n`;
         modelDef.SerDe.needsJSONPopulateAsString = true;
       } else {
         let populate: string;
         // some helpers require extra args after the common ones
         let populateArgs = "";
-        if (field.type.kind === "time") {
+        if (fieldType.kind === "time") {
           imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-          populate = `populateTime[datetime.${field.type.format}]`;
-          populateArgs = `, ${field.type.utc}`;
+          populate = `populateTime[datetime.${fieldType.format}]`;
+          populateArgs = `, ${fieldType.utc}`;
           modelDef.SerDe.needsJSONPopulateTime = true;
-        } else if (field.type.kind === "any") {
+        } else if (fieldType.kind === "any") {
           populate = "populateAny";
           modelDef.SerDe.needsJSONPopulateAny = true;
-        } else if (field.type.kind === "sliceArray") {
+        } else if (fieldType.kind === "sliceArray") {
           populate = "populateStringArray";
-          populateArgs = `, "${getSliceArrayDelimiter(field.type.delimiter)}"`;
+          populateArgs = `, "${getSliceArrayDelimiter(fieldType.delimiter)}"`;
           modelDef.SerDe.needsJSONPopulateStringArray = true;
         } else {
           populate = "populate";
@@ -767,19 +767,19 @@ function generateJSONMarshallerBody(
   if (addlProps) {
     marshaller += `${indent.get()}if ${receiver}.AdditionalProperties != nil {\n`;
     marshaller += `${indent.push().get()}for key, val := range ${receiver}.AdditionalProperties {\n`;
-    if (addlProps.valueType.kind === "time" && addlProps.valueType.utc) {
+    if (go.isPtr(addlProps.valueType, "time") && addlProps.valueType.ptrType.utc) {
       // normalize utc datetimes before casting the (pointer) map value
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
       marshaller += `${indent.push().get()}if val != nil {\n`;
       marshaller += `${indent.push().get()}utcTime := val.UTC()\n`;
-      marshaller += `${indent.get()}objectMap[key] = (*datetime.${addlProps.valueType.format})(&utcTime)\n`;
+      marshaller += `${indent.get()}objectMap[key] = (*datetime.${addlProps.valueType.ptrType.format})(&utcTime)\n`;
       marshaller += `${indent.pop().get()}} else {\n`;
       marshaller += `${indent.push().get()}objectMap[key] = nil\n`;
       marshaller += `${indent.pop().get()}}\n`;
     } else {
       let assignment = "val";
-      if (addlProps.valueType.kind === "time") {
-        assignment = `(*${addlProps.valueType.format})(val)`;
+      if (go.isPtr(addlProps.valueType, "time")) {
+        assignment = `(*${addlProps.valueType.ptrType.format})(val)`;
       }
       marshaller += `${indent.push().get()}objectMap[key] = ${assignment}\n`;
     }
@@ -853,18 +853,15 @@ function generateJSONUnmarshallerBody(
   const emitAddlProps = function (addlProps: go.Map): string {
     // indent is at the case body level when called
     let addlPropsText = `${indent.get()}if ${receiver}.AdditionalProperties == nil {\n`;
-    let ref = "";
-    if (!addlProps.valueTypeByValue) {
-      ref = "&";
-    }
+    const ref = addlProps.valueType.kind === "ptr" ? "&" : "";
     addlPropsText += `${indent.push().get()}${receiver}.AdditionalProperties = ${go.getTypeDeclaration(addlProps, modelDef.Model.pkg)}{}\n`;
     addlPropsText += `${indent.pop().get()}}\n`;
     addlPropsText += `${indent.get()}if val != nil {\n`;
-    let auxType = go.getTypeDeclaration(addlProps.valueType, modelDef.Model.pkg);
+    let auxType = go.getTypeDeclaration(go.unwrapPtr(addlProps.valueType), modelDef.Model.pkg);
     let assignment = `${ref}aux`;
-    if (addlProps.valueType.kind === "time") {
+    if (go.isPtr(addlProps.valueType, "time")) {
       imports.add("time");
-      auxType = addlProps.valueType.format;
+      auxType = addlProps.valueType.ptrType.format;
       assignment = `(*time.Time)(${assignment})`;
     }
     addlPropsText += `${indent.push().get()}var aux ${auxType}\n`;
@@ -886,40 +883,40 @@ function generateJSONUnmarshallerBody(
         addlProps = field.type;
         continue;
       }
+      // dispatch on the unwrapped type; pointer-ness is captured in the code model.
+      const fieldType = go.unwrapPtr(field.type);
       unmarshalBody += `${indent.get()}case "${field.serializedName}":\n`;
       indent.push(); // case body level
-      if (hasDiscriminatorInterface(field.type)) {
+      if (hasDiscriminatorInterface(fieldType)) {
         unmarshalBody += generateDiscriminatorUnmarshaller(modelDef.Model, field, receiver, indent);
         needsErrCheck = true;
-      } else if (field.type.kind === "sliceArray") {
-        unmarshalBody += `${indent.get()}err = unpopulateStringArray(val, "${field.name}", &${receiver}.${field.name}, "${getSliceArrayDelimiter(field.type.delimiter)}")\n`;
+      } else if (fieldType.kind === "sliceArray") {
+        unmarshalBody += `${indent.get()}err = unpopulateStringArray(val, "${field.name}", &${receiver}.${field.name}, "${getSliceArrayDelimiter(fieldType.delimiter)}")\n`;
         modelDef.SerDe.needsJSONUnpopulateStringArray = true;
         needsErrCheck = true;
-      } else if (field.type.kind === "time") {
-        unmarshalBody += `${indent.get()}err = unpopulateTime[datetime.${field.type.format}](val, "${field.name}", &${receiver}.${field.name})\n`;
+      } else if (fieldType.kind === "time") {
+        unmarshalBody += `${indent.get()}err = unpopulateTime[datetime.${fieldType.format}](val, "${field.name}", &${receiver}.${field.name})\n`;
         modelDef.SerDe.needsJSONUnpopulateTime = true;
         needsErrCheck = true;
-      } else if (go.isSlice(field.type, "time")) {
+      } else if (go.isSlice(fieldType, "time")) {
         imports.add("time");
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-        let elementPtr = "*";
-        if (field.type.elementTypeByValue) {
-          elementPtr = "";
-        }
-        unmarshalBody += `${indent.get()}var aux []${elementPtr}datetime.${field.type.elementType.format}\n`;
+        const elementType = go.unwrapPtr(fieldType.elementType);
+        const elementPtr = helpers.deref(fieldType.elementType);
+        unmarshalBody += `${indent.get()}var aux []${elementPtr}datetime.${elementType.format}\n`;
         unmarshalBody += `${indent.get()}err = unpopulate(val, "${field.name}", &aux)\n`;
         unmarshalBody += `${indent.get()}for _, au := range aux {\n`;
         unmarshalBody += `${indent.push().get()}${receiver}.${field.name} = append(${receiver}.${field.name}, (${elementPtr}time.Time)(au))\n`;
         unmarshalBody += `${indent.pop().get()}}\n`;
         modelDef.SerDe.needsJSONUnpopulate = true;
         needsErrCheck = true;
-      } else if (field.type.kind === "encodedBytes") {
+      } else if (fieldType.kind === "encodedBytes") {
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
         unmarshalBody += `${indent.get()}if val != nil && string(val) != "null" {\n`;
-        unmarshalBody += `${indent.push().get()}err = runtime.DecodeByteArray(string(val), &${receiver}.${field.name}, runtime.Base64${field.type.encoding}Format)\n`;
+        unmarshalBody += `${indent.push().get()}err = runtime.DecodeByteArray(string(val), &${receiver}.${field.name}, runtime.Base64${fieldType.encoding}Format)\n`;
         unmarshalBody += `${indent.pop().get()}}\n`;
         needsErrCheck = true;
-      } else if (go.isSlice(field.type, "encodedBytes")) {
+      } else if (go.isSlice(fieldType, "encodedBytes")) {
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
         unmarshalBody += `${indent.get()}var encodedValue []string\n`;
         unmarshalBody += `${indent.get()}err = unpopulate(val, "${field.name}", &encodedValue)\n`;
@@ -927,17 +924,17 @@ function generateJSONUnmarshallerBody(
         indent.push();
         unmarshalBody += `${indent.get()}${receiver}.${field.name} = make([][]byte, len(encodedValue))\n`;
         unmarshalBody += `${indent.get()}for i := 0; i < len(encodedValue) && err == nil; i++ {\n`;
-        unmarshalBody += `${indent.push().get()}err = runtime.DecodeByteArray(encodedValue[i], &${receiver}.${field.name}[i], runtime.Base64${field.type.elementType.encoding}Format)\n`;
+        unmarshalBody += `${indent.push().get()}err = runtime.DecodeByteArray(encodedValue[i], &${receiver}.${field.name}[i], runtime.Base64${fieldType.elementType.encoding}Format)\n`;
         unmarshalBody += `${indent.pop().get()}}\n`;
         indent.pop();
         unmarshalBody += `${indent.get()}}\n`;
         modelDef.SerDe.needsJSONUnpopulate = true;
         needsErrCheck = true;
-      } else if (field.type.kind === "rawJSON") {
+      } else if (fieldType.kind === "rawJSON") {
         unmarshalBody += `${indent.get()}if string(val) != "null" {\n`;
         unmarshalBody += `${indent.push().get()}${receiver}.${field.name} = val\n`;
         unmarshalBody += `${indent.pop().get()}}\n`;
-      } else if (go.isScalar(field.type, "bool") && field.type.encodeAsString) {
+      } else if (go.isScalar(fieldType, "bool") && fieldType.encodeAsString) {
         imports.add("strconv");
         imports.add("strings");
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
@@ -953,7 +950,7 @@ function generateJSONUnmarshallerBody(
         needsErrCheck = true;
       } else if (
         go.isScalar(
-          field.type,
+          fieldType,
           "uint8",
           "uint16",
           "uint32",
@@ -963,13 +960,13 @@ function generateJSONUnmarshallerBody(
           "int32",
           "int64",
         ) &&
-        field.type.encodeAsString
+        fieldType.encodeAsString
       ) {
-        const scalarType = field.type.type;
+        const scalarType = fieldType.type;
         imports.add("strconv");
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
         unmarshalBody += `${indent.get()}err = unpopulateFromString(val, "${field.name}", func(encodedValue string) error {\n`;
-        unmarshalBody += `${indent.push().get()}v, parseErr := strconv.${field.type.type.startsWith("int") ? "ParseInt" : "ParseUint"}(encodedValue, 10, 0)\n`;
+        unmarshalBody += `${indent.push().get()}v, parseErr := strconv.${fieldType.type.startsWith("int") ? "ParseInt" : "ParseUint"}(encodedValue, 10, 0)\n`;
         unmarshalBody += `${indent.get()}${helpers.buildIfBlock(indent, {
           condition: "parseErr == nil",
           body: (indent) => {
@@ -989,7 +986,7 @@ function generateJSONUnmarshallerBody(
         needsErrCheck = true;
       } else {
         const unpopulateField = `err = unpopulate(val, "${field.name}", &${receiver}.${field.name})\n`;
-        if (field.type.kind === "string" && field.annotations.unmarshalEmptyStringAsNil) {
+        if (fieldType.kind === "string" && field.annotations.unmarshalEmptyStringAsNil) {
           unmarshalBody += `${indent.get()}${helpers.buildIfBlock(indent, {
             condition: `string(val) != \`""\``,
             body: (indent) => `${indent.get()}${unpopulateField}`,
@@ -1262,17 +1259,18 @@ function generateXMLMarshaller(
   }
   text += generateAliasType(modelDef.Model, receiver, true, imports, indent);
   for (const field of modelDef.Model.fields) {
-    if (field.type.kind === "slice") {
+    const fieldType = go.unwrapPtr(field.type);
+    if (fieldType.kind === "slice") {
       text += `${indent.get()}if ${receiver}.${field.name} != nil {\n`;
       text += `${indent.push().get()}aux.${field.name} = &${receiver}.${field.name}\n`;
       text += `${indent.pop().get()}}\n`;
-    } else if (go.isAdditionalProperties(field) || field.type.kind === "map") {
+    } else if (go.isAdditionalProperties(field) || fieldType.kind === "map") {
       text += `${indent.get()}aux.${field.name} = (additionalProperties)(${receiver}.${field.name})\n`;
-    } else if (field.type.kind === "encodedBytes") {
+    } else if (fieldType.kind === "encodedBytes") {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
       text += `${indent.get()}if ${receiver}.${field.name} != nil {\n`;
       indent.push();
-      text += `${indent.get()}encoded${field.name} := runtime.EncodeByteArray(${receiver}.${field.name}, runtime.Base64${field.type.encoding}Format)\n`;
+      text += `${indent.get()}encoded${field.name} := runtime.EncodeByteArray(${receiver}.${field.name}, runtime.Base64${fieldType.encoding}Format)\n`;
       text += `${indent.get()}aux.${field.name} = &encoded${field.name}\n`;
       indent.pop();
       text += `${indent.get()}}\n`;
@@ -1304,17 +1302,18 @@ function generateXMLUnmarshaller(
   text += `${indent.push().get()}return err\n`;
   text += `${indent.pop().get()}}\n`;
   for (const field of modelDef.Model.fields) {
-    if (field.type.kind === "time") {
+    const fieldType = go.unwrapPtr(field.type);
+    if (fieldType.kind === "time") {
       text += `${indent.get()}if aux.${field.name} != nil && !(*time.Time)(aux.${field.name}).IsZero() {\n`;
       text += `${indent.push().get()}${receiver}.${field.name} = (*time.Time)(aux.${field.name})\n`;
       text += `${indent.pop().get()}}\n`;
-    } else if (go.isAdditionalProperties(field) || field.type.kind === "map") {
+    } else if (go.isAdditionalProperties(field) || fieldType.kind === "map") {
       text += `${indent.get()}${receiver}.${field.name} = (map[string]*string)(aux.${field.name})\n`;
-    } else if (field.type.kind === "encodedBytes") {
+    } else if (fieldType.kind === "encodedBytes") {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
       text += `${indent.get()}if aux.${field.name} != nil {\n`;
       indent.push();
-      text += `${indent.get()}if err := runtime.DecodeByteArray(*aux.${field.name}, &${receiver}.${field.name}, runtime.Base64${field.type.encoding}Format); err != nil {\n`;
+      text += `${indent.get()}if err := runtime.DecodeByteArray(*aux.${field.name}, &${receiver}.${field.name}, runtime.Base64${fieldType.encoding}Format); err != nil {\n`;
       text += `${indent.push().get()}return err\n`;
       text += `${indent.pop().get()}}\n`;
       indent.pop();
@@ -1345,15 +1344,16 @@ function generateAliasType(
   text += `${indent.get()}aux := &struct {\n`;
   text += `${indent.push().get()}*alias\n`;
   for (const field of modelType.fields) {
+    const fieldType = go.unwrapPtr(field.type);
     const sn = getXMLSerialization(field);
-    if (field.type.kind === "time") {
+    if (fieldType.kind === "time") {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-      text += `${indent.get()}${field.name} *datetime.${field.type.format} \`xml:"${sn}"\`\n`;
-    } else if (go.isAdditionalProperties(field) || field.type.kind === "map") {
+      text += `${indent.get()}${field.name} *datetime.${fieldType.format} \`xml:"${sn}"\`\n`;
+    } else if (go.isAdditionalProperties(field) || fieldType.kind === "map") {
       text += `${indent.get()}${field.name} additionalProperties \`xml:"${sn}"\`\n`;
-    } else if (field.type.kind === "slice") {
-      text += `${indent.get()}${field.name} *${go.getTypeDeclaration(field.type, modelType.pkg)} \`xml:"${sn}"\`\n`;
-    } else if (field.type.kind === "encodedBytes") {
+    } else if (fieldType.kind === "slice") {
+      text += `${indent.get()}${field.name} *${go.getTypeDeclaration(fieldType, modelType.pkg)} \`xml:"${sn}"\`\n`;
+    } else if (fieldType.kind === "encodedBytes") {
       text += `${indent.get()}${field.name} *string \`xml:"${sn}"\`\n`;
     }
   }
@@ -1366,11 +1366,12 @@ function generateAliasType(
   if (forMarshal) {
     // emit code to initialize time fields
     for (const field of modelType.fields) {
-      if (field.type.kind !== "time") {
+      const fieldType = go.unwrapPtr(field.type);
+      if (fieldType.kind !== "time") {
         continue;
       }
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-      text += `${indent.get()}${field.name}: (*datetime.${field.type.format})(${receiver}.${field.name}),\n`;
+      text += `${indent.get()}${field.name}: (*datetime.${fieldType.format})(${receiver}.${field.name}),\n`;
     }
   }
   text += `${indent.pop().get()}}\n`;
@@ -1464,9 +1465,10 @@ class ModelDef {
         text += helpers.formatDocComment(field.docs);
       }
       let typeName = go.getTypeDeclaration(field.type, this.Model.pkg);
-      if (field.type.kind === "literal") {
-        // for constants we use the underlying type name
-        typeName = go.getLiteralTypeDeclaration(field.type.type);
+      const fieldType = go.unwrapPtr(field.type);
+      if (fieldType.kind === "literal") {
+        // for constants we use the underlying type name; getTypeDeclaration above emits the pointer.
+        typeName = `${helpers.deref(field.type)}${go.getLiteralTypeDeclaration(fieldType.type)}`;
       }
       let serialization = field.serializedName;
       if (this.Format === "JSON") {
@@ -1479,7 +1481,7 @@ class ModelDef {
       if (this.Format === "XML" && !go.isAdditionalProperties(field)) {
         tag = ` \`xml:"${serialization}"\``;
       }
-      text += `${indent.get()}${field.name} ${helpers.star(field.byValue)}${typeName}${tag}\n`;
+      text += `${indent.get()}${field.name} ${typeName}${tag}\n`;
       first = false;
     }
 

@@ -46,8 +46,10 @@ export function adaptXMLInfo(src: XMLSourceInfo): go.XMLInfo | undefined {
     xmlInfo.attribute = true;
     returnXMLInfo = true;
   }
-  if (src.type.kind === "slice") {
-    const elementXMLInfo = hasXMLInfo(src.type.elementType);
+
+  const srcType = go.unwrapPtr(src.type);
+  if (srcType.kind === "slice") {
+    const elementXMLInfo = hasXMLInfo(srcType.elementType);
     if (src.xml?.unwrapped === false) {
       if (src.xml.itemsName) {
         xmlInfo.wraps = src.xml.itemsName;
@@ -67,7 +69,7 @@ export function adaptXMLInfo(src: XMLSourceInfo): go.XMLInfo | undefined {
       xmlInfo.name = src.orTypeName;
       returnXMLInfo = true;
     }
-  } else if (src.xml?.unwrapped && src.type.kind === "string") {
+  } else if (src.xml?.unwrapped && srcType.kind === "string") {
     // an unwrapped string means it's text
     xmlInfo.text = true;
     // the ",chardata" tag is mutually exclusive
@@ -110,24 +112,25 @@ export function isPolymorphicRoot(model: tcgc.SdkModelType): boolean {
   }
 }
 
-/**
- * returns true if the specified type doesn't need to be pointer-to-type
- * because it's implicitly nil-able.
- *
- * @param type the type to inspect
- * @returns true if the type is implicitly nil-able
- */
-export function isTypePassedByValue(type: tcgc.SdkType): boolean {
-  if (type.kind === "nullable") {
-    type = type.type;
+/** narrows type to a PtrType within the conditional block */
+export function isPtrType<T extends Exclude<go.WireType, go.Ptr>>(
+  type: T,
+): type is Extract<T, go.PtrType> {
+  switch (type.kind) {
+    case "constant":
+    case "etag":
+    case "literal":
+    case "model":
+    case "multipartContent":
+    case "polymorphicModel":
+    case "scalar":
+    case "string":
+    case "time":
+    case "unionStruct":
+      return true;
+    default:
+      return false;
   }
-  return (
-    type.kind === "unknown" ||
-    type.kind === "array" ||
-    type.kind === "bytes" ||
-    type.kind === "dict" ||
-    (type.kind === "model" && isPolymorphicRoot(type))
-  );
 }
 
 /** contains the set of client options */

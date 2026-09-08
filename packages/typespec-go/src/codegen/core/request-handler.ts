@@ -160,7 +160,10 @@ export function createRequestHandler(
         text += emitParamGroupCheck(pp, indent);
         text += `${indent.push().get()}${defaultValue} = ${helpers.getParamName(pp)}\n`;
         text += `${indent.pop().get()}}\n`;
-        paramValue = helpers.formatValue(defaultValue, pp.type, imports);
+        // we've created a local var with the underlying type of the
+        // optional param, so we must unwrap before assigning the value
+        // to prevent attempting to dereference it.
+        paramValue = helpers.formatValue(defaultValue, go.unwrapPtr(pp.type), imports);
       } else {
         // param isn't required, so emit a local var with
         // the correct default value, then populate it with
@@ -485,11 +488,7 @@ function emitBody(
         }
         text += `${indent.get()}${fieldName} *${go.getTypeDeclaration(bodyParam.type, method.receiver.type.pkg)} \`xml:"${tag}"\`\n`;
         text += `${indent.pop().get()}}\n`;
-        let addr = "&";
-        if (!go.isRequiredParameter(bodyParam.style) && !bodyParam.byValue) {
-          addr = "";
-        }
-        body = `wrapper{${fieldName}: ${addr}${body}}`;
+        body = `wrapper{${fieldName}: &${body}}`;
       } else if (bodyParam.type.kind === "time") {
         // utc datetimes are normalized to UTC before serialization. non-RFC3339
         // formats are wrapped in the internal time type; RFC3339 relies on the
@@ -505,8 +504,8 @@ function emitBody(
         go.isSlice(bodyParam.type, "time") &&
         isSliceOfTimeForMarshalling(bodyParam.type)
       ) {
-        const timeType = bodyParam.type.elementType;
-        const elementPtr = bodyParam.type.elementTypeByValue ? "" : "*";
+        const timeType = go.unwrapPtr(bodyParam.type.elementType);
+        const elementPtr = bodyParam.type.elementType.kind === "ptr" ? "*" : "";
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
         text += `${indent.get()}aux := make([]${elementPtr}datetime.${timeType.format}, len(${body}))\n`;
         text += `${indent.get()}for i := 0; i < len(${body}); i++ {\n`;
@@ -524,7 +523,7 @@ function emitBody(
         text += `${indent.get()}}\n`;
         body = "aux";
       } else if (go.isMap(bodyParam.type, "time")) {
-        const timeType = bodyParam.type.valueType;
+        const timeType = bodyParam.type.valueType.ptrType;
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
         text += `${indent.get()}aux := map[string]*datetime.${timeType.format}{}\n`;
         text += `${indent.get()}for k, v := range ${body} {\n`;
@@ -582,7 +581,7 @@ function emitBody(
     } else if (bodyParam.bodyFormat === "Text") {
       imports.add("strings");
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming");
-      const body = helpers.formatValue(helpers.getParamName(bodyParam), bodyParam.type, imports);
+      const body = helpers.formatParamValue(bodyParam, imports, indent);
       if (go.isRequiredParameter(bodyParam.style)) {
         text += `${indent.get()}body := streaming.NopCloser(strings.NewReader(${body}))\n`;
         text += emitSetBodyWithErrCheck(
@@ -611,7 +610,7 @@ function emitBody(
     text += `${indent.get()}body := struct {\n`;
     indent.push();
     for (const partialBodyParam of partialBodyParams) {
-      text += `${indent.get()}${naming.capitalize(partialBodyParam.serializedName)} ${helpers.star(partialBodyParam.byValue)}${go.getTypeDeclaration(partialBodyParam.type, method.receiver.type.pkg)} \`${partialBodyParam.format.toLowerCase()}:"${partialBodyParam.serializedName}"\`\n`;
+      text += `${indent.get()}${naming.capitalize(partialBodyParam.serializedName)} ${go.getTypeDeclaration(partialBodyParam.type, method.receiver.type.pkg)} \`${partialBodyParam.format.toLowerCase()}:"${partialBodyParam.serializedName}"\`\n`;
     }
     indent.pop();
     text += `${indent.get()}}{\n`;
@@ -748,9 +747,12 @@ function emitClientSideDefault(
       break;
   }
 
+  // we've created a local var with the underlying type of the
+  // optional param, so we must unwrap before assigning the value
+  // to prevent attempting to dereference it.
   const setterFormatText = setterFormat(
     `"${serializedName}"`,
-    helpers.formatValue(defaultVar, param.type, imports),
+    helpers.formatValue(defaultVar, go.unwrapPtr(param.type), imports),
   );
   text += setterFormatText;
   // setterFormat can return the empty string in some cases.
@@ -994,8 +996,9 @@ function getContentTypeValue(
  * @param type the slice of time.Time to inspect
  * @returns true if the slice needs custom marshalling
  */
-function isSliceOfTimeForMarshalling(type: go.Slice<go.Time>): boolean {
-  switch (type.elementType.format) {
+function isSliceOfTimeForMarshalling(type: go.Slice<go.Ptr<go.Time> | go.Time>): boolean {
+  const elementType = go.unwrapPtr(type.elementType);
+  switch (elementType.format) {
     case "PlainDate":
     case "RFC1123":
     case "RFC7231":
@@ -1005,8 +1008,9 @@ function isSliceOfTimeForMarshalling(type: go.Slice<go.Time>): boolean {
     case "RFC3339":
       // RFC3339 normally uses the default time.Time marshaller, but utc slices
       // must be normalized to UTC, which requires building the wrapper slice.
-      return type.elementType.utc;
+      return elementType.utc;
     default:
       return false;
   }
+  return false;
 }

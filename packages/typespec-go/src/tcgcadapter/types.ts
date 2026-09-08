@@ -146,17 +146,8 @@ export class TypeAdapter {
       }
       if (content.addlProps) {
         const annotations = new go.ModelFieldAnnotations(false, false, true, false);
-        const addlPropsType = new go.Map(
-          this.getMapValueType(content.addlProps, false, false),
-          helpers.isTypePassedByValue(content.addlProps),
-        );
-        const addlProps = new go.ModelField(
-          "AdditionalProperties",
-          addlPropsType,
-          true,
-          "",
-          annotations,
-        );
+        const addlPropsType = new go.Map(this.getMapValueType(content.addlProps, false, false));
+        const addlProps = new go.ModelField("AdditionalProperties", addlPropsType, "", annotations);
         modelType.go.fields.push(addlProps);
       }
       this.getPkg().models.push(modelType.go);
@@ -206,7 +197,7 @@ export class TypeAdapter {
     type: tcgc.SdkType,
     elementTypeByValue: boolean,
     substituteDiscriminator: boolean,
-  ): go.WireType {
+  ): Exclude<go.WireType, go.Ptr> {
     switch (type.kind) {
       case "boolean":
       case "bytes":
@@ -231,11 +222,11 @@ export class TypeAdapter {
       case "url":
         return this.getBuiltInType(type);
       case "array": {
-        let elementType = type.valueType;
+        let valueType = type.valueType;
         let nullable = false;
-        if (elementType.kind === "nullable") {
+        if (valueType.kind === "nullable") {
           // unwrap the nullable type
-          elementType = elementType.type;
+          valueType = valueType.type;
           nullable = true;
         }
         // prefer elementTypeByValue. if false, then if the array elements have been explicitly marked as nullable then prefer that, else fall back to our usual algorithm
@@ -243,34 +234,41 @@ export class TypeAdapter {
           ? true
           : nullable
             ? false
-            : this.codeModel.options["slice-elements-byval"] ||
-              helpers.isTypePassedByValue(elementType);
+            : this.codeModel.options["slice-elements-byval"] === true;
+
         const keyName = recursiveKeyName(
           `array-${myElementTypeByValue}`,
-          elementType,
+          valueType,
           substituteDiscriminator,
         );
+
         let arrayType = this.types.get(keyName);
         if (arrayType) {
-          return arrayType;
+          return <go.Slice>arrayType;
         }
-        const goElementType = this.getWireType(
-          type.valueType,
+
+        const elementType = this.getWireType(
+          valueType,
           elementTypeByValue,
           substituteDiscriminator,
         );
-        switch (goElementType.kind) {
+        switch (elementType.kind) {
           case "constantDef":
           case "constantValue":
           case "etag":
           case "literal":
             throw new AdapterError(
               "UnsupportedTsp",
-              `unsupported kind ${goElementType.kind} for slice element type`,
+              `unsupported kind ${elementType.kind} for slice element type`,
               type.valueType.__raw?.node,
             );
         }
-        arrayType = new go.Slice(goElementType, myElementTypeByValue);
+
+        arrayType = new go.Slice(
+          !myElementTypeByValue && helpers.isPtrType(elementType)
+            ? this.getPtrType(elementType)
+            : elementType,
+        );
         this.types.set(keyName, arrayType);
         return arrayType;
       }
@@ -290,20 +288,21 @@ export class TypeAdapter {
         // forces GMT and Unix is absolute), so restrict it to that encoding.
         return this.getTimeType(type.encode, getDateTimeEncoding(type.encode) === "RFC3339");
       case "dict": {
-        const valueTypeByValue = helpers.isTypePassedByValue(type.valueType);
+        const valueType = this.getMapValueType(
+          type.valueType,
+          elementTypeByValue,
+          substituteDiscriminator,
+        );
         const keyName = recursiveKeyName(
-          `dict-${valueTypeByValue}`,
+          `dict${valueType.kind === "ptr" ? "-ptr" : ""}`,
           type.valueType,
           substituteDiscriminator,
         );
         let mapType = this.types.get(keyName);
         if (mapType) {
-          return mapType;
+          return <go.Map>mapType;
         }
-        mapType = new go.Map(
-          this.getMapValueType(type.valueType, elementTypeByValue, substituteDiscriminator),
-          valueTypeByValue,
-        );
+        mapType = new go.Map(valueType);
         this.types.set(keyName, mapType);
         return mapType;
       }
@@ -369,7 +368,7 @@ export class TypeAdapter {
   }
 
   // returns the Go code model type for an io.ReadSeekCloser
-  getReadSeekCloser(sliceOf: boolean): go.WireType {
+  getReadSeekCloser(sliceOf: boolean): go.ReadSeekCloser | go.Slice<go.ReadSeekCloser> {
     let keyName = "io-readseekcloser";
     if (sliceOf) {
       keyName = "sliceof-" + keyName;
@@ -378,11 +377,11 @@ export class TypeAdapter {
     if (!rsc) {
       rsc = new go.ReadSeekCloser();
       if (sliceOf) {
-        rsc = new go.Slice(rsc, true);
+        rsc = new go.Slice(rsc);
       }
       this.types.set(keyName, rsc);
     }
-    return rsc;
+    return <go.ReadSeekCloser | go.Slice<go.ReadSeekCloser>>rsc;
   }
 
   /**
@@ -395,7 +394,10 @@ export class TypeAdapter {
    * @param contentType set when the request uses a fixed content type
    * @returns the go.MultipartContent instance
    */
-  getMultipartContent(sliceOf: boolean, contentType?: string): go.WireType {
+  getMultipartContent(
+    sliceOf: boolean,
+    contentType?: string,
+  ): go.MultipartContent | go.Slice<go.MultipartContent> {
     let keyName = "streaming-multipartcontent";
     if (contentType) {
       keyName += `-${contentType}`;
@@ -408,21 +410,21 @@ export class TypeAdapter {
       const ct = contentType ? new go.Literal(this.getStringType(), `"${contentType}"`) : undefined;
       mpc = new go.MultipartContent(ct);
       if (sliceOf) {
-        mpc = new go.Slice(mpc, true);
+        mpc = new go.Slice(mpc);
       }
       this.types.set(keyName, mpc);
     }
-    return mpc;
+    return <go.MultipartContent | go.Slice<go.MultipartContent>>mpc;
   }
 
-  private getBuiltInType(type: tcgc.SdkBuiltInType): go.WireType {
+  private getBuiltInType(type: tcgc.SdkBuiltInType): Exclude<go.WireType, go.Ptr> {
     switch (type.kind) {
       case "unknown": {
         if (this.codeModel.options["rawjson-as-bytes"]) {
           const anyRawJSONKey = "any-raw-json";
           let anyRawJSON = this.types.get(anyRawJSONKey);
           if (anyRawJSON) {
-            return anyRawJSON;
+            return <go.RawJSON>anyRawJSON;
           }
           anyRawJSON = new go.RawJSON();
           this.types.set(anyRawJSONKey, anyRawJSON);
@@ -430,7 +432,7 @@ export class TypeAdapter {
         }
         let anyType = this.types.get("any");
         if (anyType) {
-          return anyType;
+          return <go.Any>anyType;
         }
         anyType = new go.Any();
         this.types.set("any", anyType);
@@ -440,7 +442,7 @@ export class TypeAdapter {
         const boolKey = type.encode === "string" ? "boolean-string" : "boolean";
         let primitiveBool = this.types.get(boolKey);
         if (primitiveBool) {
-          return primitiveBool;
+          return <go.Scalar<"bool">>primitiveBool;
         }
         primitiveBool = new go.Scalar("bool", type.encode === "string");
         this.types.set(boolKey, primitiveBool);
@@ -452,7 +454,7 @@ export class TypeAdapter {
         const dateKey = "plainDate";
         let date = this.types.get(dateKey);
         if (date) {
-          return date;
+          return <go.Time>date;
         }
         date = new go.Time("PlainDate", false);
         this.types.set(dateKey, date);
@@ -463,7 +465,7 @@ export class TypeAdapter {
         const decimalKey = "float64";
         let decimalType = this.types.get(decimalKey);
         if (decimalType) {
-          return decimalType;
+          return <go.Scalar<"float64">>decimalType;
         }
         decimalType = new go.Scalar(decimalKey, type.encode === "string");
         this.types.set(decimalKey, decimalType);
@@ -474,7 +476,7 @@ export class TypeAdapter {
         const float32Key = "float32";
         let float32 = this.types.get(float32Key);
         if (float32) {
-          return float32;
+          return <go.Scalar<"float32">>float32;
         }
         float32 = new go.Scalar(float32Key, type.encode === "string");
         this.types.set(float32Key, float32);
@@ -484,7 +486,7 @@ export class TypeAdapter {
         const float64Key = "float64";
         let float64 = this.types.get(float64Key);
         if (float64) {
-          return float64;
+          return <go.Scalar<"float64">>float64;
         }
         float64 = new go.Scalar(float64Key, type.encode === "string");
         this.types.set(float64Key, float64);
@@ -501,7 +503,7 @@ export class TypeAdapter {
         const keyName = type.encode === "string" ? `${type.kind}-string` : type.kind;
         let intType = this.types.get(keyName);
         if (intType) {
-          return intType;
+          return <go.Scalar>intType;
         }
         intType = new go.Scalar(type.kind, type.encode === "string");
         this.types.set(keyName, intType);
@@ -511,7 +513,7 @@ export class TypeAdapter {
         const safeintkey = type.encode === "string" ? "int64-string" : "int64";
         let int64 = this.types.get(safeintkey);
         if (int64) {
-          return int64;
+          return <go.Scalar<"int64">>int64;
         }
         int64 = new go.Scalar("int64", type.encode === "string");
         this.types.set(safeintkey, int64);
@@ -528,7 +530,7 @@ export class TypeAdapter {
         const encoding = "PlainTime";
         let time = this.types.get(encoding);
         if (time) {
-          return time;
+          return <go.Time>time;
         }
         time = new go.Time(encoding, false);
         this.types.set(encoding, time);
@@ -626,6 +628,48 @@ export class TypeAdapter {
       this.types.set(literalKey, literalType);
     }
     return <go.Literal<T>>literalType;
+  }
+
+  /** returns a pointer to the specified type */
+  getPtrType<T extends go.PtrType>(goType: T): go.Ptr<T> {
+    let ptrKey = "ptr-";
+    switch (goType.kind) {
+      case "constant":
+      case "etag":
+      case "model":
+      case "multipartContent":
+      case "polymorphicModel":
+      case "unionStruct":
+        ptrKey += goType.name;
+        break;
+      case "literal": {
+        // enum-value literals hold a ConstantValue object; key by its unique name.
+        const literal = goType.literal;
+        ptrKey +=
+          goType.type.kind === "constant"
+            ? `${goType.kind}-${(<go.ConstantValue>literal).name}`
+            : `${goType.kind}-${goType.type.kind}-${literal}`;
+        break;
+      }
+      case "scalar":
+        ptrKey += `${goType.kind}-${goType.type}-${goType.encodeAsString}`;
+        break;
+      case "string":
+        ptrKey += `${goType.kind}`;
+        break;
+      case "time":
+        ptrKey += `${goType.kind}-${goType.format}-${goType.utc}`;
+        break;
+      default:
+        goType satisfies never;
+    }
+
+    let ptrType = this.types.get(ptrKey);
+    if (!ptrType) {
+      ptrType = new go.Ptr(goType);
+      this.types.set(ptrKey, ptrType);
+    }
+    return <go.Ptr<T>>ptrType;
   }
 
   /** returns a Go string type */
@@ -851,10 +895,16 @@ export class TypeAdapter {
       access: prop.access,
     });
 
-    const fieldByValue = isMultipartFormData
-      ? !prop.optional
-      : helpers.isTypePassedByValue(prop.type);
-    const field = new go.ModelField(fieldName, type, fieldByValue, serializedName, annotations);
+    // pointer-capable types are wrapped in a pointer. the exception is multipart/form
+    // data fields, which default to by-value with only the optional ones being
+    // pointer-to-type (see the isMultipartFormData comment above).
+    const usePtr = isMultipartFormData ? prop.optional : true;
+    const field = new go.ModelField(
+      fieldName,
+      usePtr && helpers.isPtrType(type) ? this.getPtrType(type) : type,
+      serializedName,
+      annotations,
+    );
     field.docs.summary = prop.summary;
     field.docs.description = prop.doc;
 
@@ -864,16 +914,17 @@ export class TypeAdapter {
       annotations.isDiscriminator = true;
       field.defaultValue = this.getDiscriminatorLiteral(prop);
     } else if (prop.clientDefaultValue) {
-      if (!go.isLiteralValueType(type)) {
+      const unwrappedPtr = go.unwrapPtr(type);
+      if (!go.isLiteralValueType(unwrappedPtr)) {
         throw new AdapterError(
           "InternalError",
-          `unexpected client side default kind ${type.kind} for field ${field.name}`,
+          `unexpected client side default kind ${unwrappedPtr.kind} for field ${field.name}`,
           prop.__raw?.node,
         );
       }
 
       field.defaultValue = this.getLiteral(
-        type,
+        unwrappedPtr,
         prop.clientDefaultValue,
         helpers.isExtensibleEnum(prop.type),
       );
@@ -1115,7 +1166,7 @@ export class TypeAdapter {
           sdkType.__raw?.node,
         );
       default:
-        return valueType;
+        return helpers.isPtrType(valueType) ? this.getPtrType(valueType) : valueType;
     }
   }
 
@@ -1166,8 +1217,7 @@ export class TypeAdapter {
     }
 
     sliceArray = new go.SliceArray(
-      elementType,
-      this.codeModel.options["slice-elements-byval"] ?? false,
+      this.codeModel.options["slice-elements-byval"] ? elementType : this.getPtrType(elementType),
       getSliceArrayDelimiter(encoding),
     );
 
@@ -1196,13 +1246,9 @@ export class TypeAdapter {
           variant.__raw?.node,
         );
       }
-      goUnion.fields.push(
-        new go.UnionField(
-          recursiveVariantFieldName(type),
-          type,
-          helpers.isTypePassedByValue(variant),
-        ),
-      );
+
+      const fieldType = helpers.isPtrType(type) ? this.getPtrType(type) : type;
+      goUnion.fields.push(new go.UnionField(recursiveVariantFieldName(fieldType), fieldType));
     }
 
     goUnion.docs.summary = sdkUnion.summary;
@@ -1323,6 +1369,8 @@ function recursiveVariantFieldName(type: go.WireType): string {
       return `Literal${recursiveVariantFieldName(type.type)}`;
     case "map":
       return `MapOf${recursiveVariantFieldName(type.valueType)}`;
+    case "ptr":
+      return recursiveVariantFieldName(type.ptrType);
     case "slice":
       return `SliceOf${recursiveVariantFieldName(type.elementType)}`;
     case "scalar":
