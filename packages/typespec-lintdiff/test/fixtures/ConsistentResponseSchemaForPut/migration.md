@@ -96,8 +96,8 @@ array normalization cases. The eleven-fixture harness also passes: two covered
 violation fixtures, six validator-clean fixtures with reviewed ambient warnings,
 and three reviewed validator discrepancies. All 33 selected snapshots were
 regenerated; only the erroneous local tuple/unknown-array warning changed.
-The focused report is [validate-report.md](./validate-report.md). The repaired
-implementation was then run over the full corpus; the results below supersede the
+The fixture snapshots retain the focused results. The repaired implementation
+was then run over the full corpus; the results below supersede the
 earlier historical counts. An independent source-diff review found no significant
 issues in the repairs.
 
@@ -123,7 +123,7 @@ upstream checkout at the validator commit above):
 ```powershell
 mise exec -- pnpm --filter tsp-lintdiff-local-linter test test\rules\consistent-response-schema-for-put.test.ts
 mise exec -- pnpm --filter tsp-lintdiff-local-linter build
-mise exec -- pnpm --filter tsp-lintdiff-local-linter validate ConsistentResponseSchemaForPut --update-snapshots '--report-md=fixtures\ConsistentResponseSchemaForPut\validate-report.md' --parallelism=2
+mise exec -- pnpm --filter tsp-lintdiff-local-linter validate ConsistentResponseSchemaForPut --update-snapshots --parallelism=2
 mise exec -- pnpm --filter tsp-lintdiff-local-linter validate ConsistentResponseSchemaForPut --parallelism=2
 mise exec -- pnpm --filter tsp-lintdiff-local-linter exec oxlint src\rules\consistent-response-schema-for-put.ts test\rules\consistent-response-schema-for-put.test.ts --deny-warnings
 mise exec -- pnpm --dir packages\typespec-lintdiff specs:staging specs ConsistentResponseSchemaForPut
