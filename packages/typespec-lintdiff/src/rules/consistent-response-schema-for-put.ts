@@ -3,11 +3,13 @@ import {
   createRule,
   getFriendlyName,
   isArrayModelType,
+  isTemplateDeclarationOrInstance,
   isTemplateInstance,
   type Model,
   type Program,
   type Type,
 } from "@typespec/compiler";
+import { SyntaxKind } from "@typespec/compiler/ast";
 import { getHttpOperation, type HttpOperationResponse, type HttpPayloadBody } from "@typespec/http";
 
 export const consistentResponseSchemaForPutRule = createRule({
@@ -21,6 +23,15 @@ export const consistentResponseSchemaForPutRule = createRule({
   create(context) {
     return {
       operation: (operation) => {
+        // The walker also visits sourceOperation templates, which are not endpoints.
+        if (
+          isTemplateDeclarationOrInstance(operation) ||
+          (operation.interface !== undefined &&
+            isTemplateDeclarationOrInstance(operation.interface))
+        ) {
+          return;
+        }
+
         const namespace = operation.interface?.namespace ?? operation.namespace;
         if (resolveProviderNamespace(context.program, namespace) === undefined) {
           return;
@@ -116,7 +127,7 @@ function getConstantSchemaCategory(
     body.type.kind === "Tuple" ||
     (body.type.kind === "Model" &&
       isArrayModelType(body.type) &&
-      body.type.decorators.length === 0 &&
+      hasOnlyIntrinsicIndexer(program, body.type) &&
       getFriendlyName(program, body.type) === undefined &&
       (!body.type.name || isTemplateInstance(body.type)) &&
       body.type.indexer.value.kind === "Intrinsic" &&
@@ -126,6 +137,19 @@ function getConstantSchemaCategory(
   }
 
   return undefined;
+}
+
+function hasOnlyIntrinsicIndexer(program: Program, model: Model): boolean {
+  // The intrinsic is not a public decorator; obtain its identity from the standard Array.
+  const array = program.checker.getStdType("Array");
+  const indexer = array.decorators.find(
+    ({ node }) =>
+      node?.parent === array.node &&
+      node?.kind === SyntaxKind.DecoratorExpression &&
+      node.target.kind === SyntaxKind.Identifier &&
+      node.target.sv === "indexer",
+  )?.decorator;
+  return model.decorators.every(({ decorator }) => decorator === indexer);
 }
 
 function emitsFileSchema({ body, contentTypes }: ResponseBody): boolean {
