@@ -1026,14 +1026,7 @@ export const $override = (
 
   const returnTypesMatch =
     original.returnType === override.returnType ||
-    $(context.program).type.isAssignableTo(override.returnType, original.returnType) ||
-    (original.returnType.kind === "Model" &&
-      override.returnType.kind === "Model" &&
-      original.returnType.name === override.returnType.name &&
-      original.returnType.namespace !== undefined &&
-      override.returnType.namespace !== undefined &&
-      getNamespaceFullName(original.returnType.namespace) ===
-        getNamespaceFullName(override.returnType.namespace));
+    $(context.program).type.isAssignableTo(override.returnType, original.returnType);
   if (!returnTypesMatch) {
     const isIntentionalResponseReplacement =
       override.returnType === $(context.program).intrinsic.void ||
