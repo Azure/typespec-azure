@@ -38,6 +38,7 @@ import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
+import { putResponseSchemaConsistencyRule } from "./rules/put-response-schema-consistency.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { secretProprule } from "./rules/secret-prop.js";
@@ -99,6 +100,7 @@ const rules = [
   noEmptyModel,
   noReservedResourcePropertyRule,
   noQueryInPointOpRule,
+  putResponseSchemaConsistencyRule,
 ];
 
 export const $linter = defineLinter({
