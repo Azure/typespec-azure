@@ -151,8 +151,9 @@ Expose or use a dependency-neutral callback that receives:
 - projected TypeSpec declaration;
 - current ARM logical name;
 - selected version;
-- associated resource model when relevant; and
-- whether a resource name was explicit ARM metadata.
+- associated resource model when relevant;
+- ARM resource type string when relevant; and
+- resource instance path when the callback needs to distinguish multiple occurrences.
 
 Apply naming only after structural resolution. All supported names are non-wire logical metadata:
 
@@ -173,9 +174,16 @@ Never change:
 Do not describe resource names, operation names, or operation-group names as wire API. Only their
 current use as internal resolver grouping data requires the post-resolution ordering.
 
+Use `resourceModel` for the TypeSpec `Model` associated with an operation. Use `resourceType` for
+the ARM resource type string formatted as `${provider}/${types.join("/")}`. Do not use
+`resourceType` to refer to a TypeSpec model.
+
 Keep `ArmResourceOperation.resourceName` and `resourceModelName` consistent with resource naming.
-Include resource type and instance path in resource naming requests because one model can produce
-several resolved resource occurrences.
+Include both the ARM resource type string and instance path in resource naming requests because
+one model and one resource type can produce several resolved resource occurrences. For example,
+subscription-scoped and tenant-scoped resources can share the same resource type string while
+having different instance paths. Resource type alone does not encode scope, parent identifiers, or
+extension-resource targets.
 
 Track synthetic parents internally and do not invoke model-based naming for them. Current synthetic
 parents reuse the child model in their `type` field, so model identity alone cannot distinguish
