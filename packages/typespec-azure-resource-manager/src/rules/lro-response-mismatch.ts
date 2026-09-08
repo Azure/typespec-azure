@@ -18,7 +18,7 @@ import {
   isStatusCode,
 } from "@typespec/http";
 import type { ArmResourceOperation } from "../operations.js";
-import { resolveArmResources, type ResolvedResource } from "../resource.js";
+import { getArmResources, resolveArmResources } from "../resource.js";
 
 /**
  * Get the Response type from an operation's template parameter.
@@ -240,7 +240,7 @@ export const lroResponseMismatchRule = createRule({
 
     function validatePutOrPatchOperation(
       op: ArmResourceOperation,
-      resource: ResolvedResource,
+      resourceType: Model,
       verb: "put" | "patch",
     ) {
       const lroMetadata = getLroMetadata(context.program, op.operation);
@@ -253,7 +253,6 @@ export const lroResponseMismatchRule = createRule({
         return;
       }
 
-      const resourceType: Model = resource.type;
       if (!doesFinalResultMatch(finalResult, resourceType)) {
         const messageId = verb === "put" ? "mismatchedPutOperation" : "mismatchedPatchOperation";
         context.reportDiagnostic({
@@ -286,43 +285,34 @@ export const lroResponseMismatchRule = createRule({
 
     return {
       root: (program: Program) => {
-        const provider = resolveArmResources(program);
+        for (const resource of getArmResources(program)) {
+          const lifecycle = resource.operations.lifecycle;
 
-        for (const resource of provider.resources ?? []) {
           // Check resource-level POST actions
-          for (const op of resource.operations.actions) {
+          for (const op of Object.values(resource.operations.actions)) {
             if (op.httpOperation.verb === "post") {
               validatePostOperation(op);
             }
           }
 
-          // Check PUT (createOrUpdate) lifecycle operations
-          const createOrUpdateOps = resource.operations.lifecycle.createOrUpdate;
-          if (createOrUpdateOps) {
-            for (const op of createOrUpdateOps) {
-              validatePutOrPatchOperation(op, resource, "put");
-            }
+          // Check PUT (createOrUpdate) lifecycle operation
+          if (lifecycle.createOrUpdate) {
+            validatePutOrPatchOperation(lifecycle.createOrUpdate, resource.typespecType, "put");
           }
 
-          // Check PATCH (update) lifecycle operations
-          const updateOps = resource.operations.lifecycle.update;
-          if (updateOps) {
-            for (const op of updateOps) {
-              validatePutOrPatchOperation(op, resource, "patch");
-            }
+          // Check PATCH (update) lifecycle operation
+          if (lifecycle.update) {
+            validatePutOrPatchOperation(lifecycle.update, resource.typespecType, "patch");
           }
 
-          // Check DELETE lifecycle operations
-          const deleteOps = resource.operations.lifecycle.delete;
-          if (deleteOps) {
-            for (const op of deleteOps) {
-              validateDeleteOperation(op);
-            }
+          // Check DELETE lifecycle operation
+          if (lifecycle.delete) {
+            validateDeleteOperation(lifecycle.delete);
           }
         }
 
         // Check provider-level actions
-        for (const op of provider.providerOperations ?? []) {
+        for (const op of resolveArmResources(program).providerOperations ?? []) {
           if (op.httpOperation.verb === "post") {
             validatePostOperation(op);
           }

@@ -118,6 +118,31 @@ describe("emits warning when 200 response body does not match finalResult", () =
         message: `The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
       });
   });
+
+  it("when a low-level LRO POST has a 200 response with a body and ArmAcceptedLroResponse (void finalResult)", async () => {
+    await tester
+      .expect(
+        `
+      ${preamble}
+
+      model GenerateResponse {
+        message: string;
+      }
+
+      @armResourceOperations
+      interface Employees {
+        get is ArmResourceRead<Employee>;
+        @post
+        @armResourceAction(Employee)
+        generate(...ApiVersionParameter): GenerateResponse | ArmAcceptedLroResponse | ErrorResponse;
+      }
+      `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/lro-response-mismatch",
+        message: `The final result type of a long-running POST operation does not match the response. Specify the FinalResult in the LroHeaders parameter to match the response type. For example: 'LroHeaders = ArmLroLocationHeader<FinalResult = ResponseType>'.`,
+      });
+  });
 });
 
 describe("emits warning when 204 response has non-void finalResult", () => {
@@ -359,30 +384,6 @@ describe("does not emit warning", () => {
           ArmAcceptedLroResponse,
           Azure.ResourceManager.Foundations.DefaultBaseParameters<Employee>
         >;
-      }
-      `,
-      )
-      .toBeValid();
-  });
-
-  it("when a low-level LRO POST has a 200 response with a body and ArmAcceptedLroResponse", async () => {
-    // Raw @armResourceAction operations are not discovered by resolveArmResources,
-    // so no diagnostic is emitted for low-level non-template LRO operations
-    await tester
-      .expect(
-        `
-      ${preamble}
-
-      model GenerateResponse {
-        message: string;
-      }
-
-      @armResourceOperations
-      interface Employees {
-        get is ArmResourceRead<Employee>;
-        @post
-        @armResourceAction(Employee)
-        generate(...ApiVersionParameter): GenerateResponse | ArmAcceptedLroResponse | ErrorResponse;
       }
       `,
       )
