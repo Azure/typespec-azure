@@ -95,6 +95,7 @@ import {
   omitOperation,
   overrideKey,
   parseScopes,
+  responseOverrideKey,
   scopeKey,
   usageKey,
 } from "./internal-utils.js";
@@ -1024,24 +1025,18 @@ export const $override = (
     });
   }
 
-  const returnTypesMatch =
-    original.returnType === override.returnType ||
-    $(context.program).type.isAssignableTo(override.returnType, original.returnType) ||
-    (original.returnType.kind === "Model" &&
-      override.returnType.kind === "Model" &&
-      original.returnType.name === override.returnType.name &&
-      original.returnType.namespace !== undefined &&
-      override.returnType.namespace !== undefined &&
-      getNamespaceFullName(original.returnType.namespace) ===
-        getNamespaceFullName(override.returnType.namespace));
-  if (!returnTypesMatch) {
-    const isIntentionalResponseReplacement =
-      override.returnType === $(context.program).intrinsic.void ||
-      override.returnType === $(context.program).builtin.bytes;
+  // `@override` is primarily used to customize a method's parameters, and the override
+  // operation's declared return type is otherwise ignored (a customization operation
+  // commonly declares `void` just to satisfy the signature). Only operations produced by
+  // `replaceResponseWithVoid` / `replaceResponseWithBytes`, which mark themselves in
+  // `responseOverrideKey`, intentionally replace the client method response, so only those
+  // emit the response-replacement warning. Inferring intent from the return type instead
+  // would flag ordinary parameter-only overrides as accidental response changes.
+  const isIntentionalResponseReplacement =
+    context.program.stateMap(responseOverrideKey).get(override) === true;
+  if (isIntentionalResponseReplacement) {
     reportDiagnostic(context.program, {
-      code: isIntentionalResponseReplacement
-        ? "override-response-replacement"
-        : "override-response-mismatch",
+      code: "override-response-replacement",
       target: context.decoratorTarget,
       format: {
         methodName: original.name,

@@ -1,1 +1,0 @@
-This diagnostic is issued when an override operation declares a response type that is not compatible with the original operation. Use `replaceResponseWithVoid` or `replaceResponseWithBytes` for an intentional response replacement.
