@@ -47,7 +47,7 @@ Preserve all of these invariants:
 8. Parent and resource-valued scope references point into the same returned resource graph.
 9. Provider operations are selected from the same namespace graph as resources.
 10. Decorator state keyed by a projected type is not trusted until embedded type references are
-   checked.
+    checked.
 11. Program-wide ARM registration state is never cleared to prepare one selected version.
 12. Repeated resolution of the same version reuses the same projected namespace and realm.
 
@@ -55,20 +55,20 @@ Preserve all of these invariants:
 
 Read these files together before editing:
 
-| File | Responsibility |
-| --- | --- |
-| `packages/typespec-azure-resource-manager/src/resource.ts` | Public result types, main resolver, identity parsing, parent and scope resolution, provider operation traversal |
-| `packages/typespec-azure-resource-manager/src/private.decorators.ts` | Resource registration and `listArmResources` |
-| `packages/typespec-azure-resource-manager/src/operations.ts` | Resource operation registration and operation state |
-| `packages/typespec-azure-resource-manager/src/namespace.ts` | Provider namespace registration and lookup |
-| `packages/typespec-azure-resource-manager/src/state.ts` | ARM state keys |
-| `packages/typespec-azure-resource-manager/test/resource-resolution.test.ts` | Resolver behavior and regression tests |
-| `packages/typespec-client-generator-core/src/public-utils.ts` | TCGC `getLibraryName` policy |
-| `packages/typespec-client-generator-core/src/decorators.ts` | TCGC `@clientName` lookup |
-| `packages/typespec-client-generator-core/src/internal-utils.ts` | Existing version mutation usage |
-| `core/packages/versioning/src/mutator.ts` | Snapshot mutator creation |
-| `core/packages/compiler/src/experimental/mutators.ts` | Mutation and realm creation |
-| `core/packages/compiler/src/experimental/realm.ts` | Realm ownership and state-map behavior |
+| File                                                                        | Responsibility                                                                                                  |
+| --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `packages/typespec-azure-resource-manager/src/resource.ts`                  | Public result types, main resolver, identity parsing, parent and scope resolution, provider operation traversal |
+| `packages/typespec-azure-resource-manager/src/private.decorators.ts`        | Resource registration and `listArmResources`                                                                    |
+| `packages/typespec-azure-resource-manager/src/operations.ts`                | Resource operation registration and operation state                                                             |
+| `packages/typespec-azure-resource-manager/src/namespace.ts`                 | Provider namespace registration and lookup                                                                      |
+| `packages/typespec-azure-resource-manager/src/state.ts`                     | ARM state keys                                                                                                  |
+| `packages/typespec-azure-resource-manager/test/resource-resolution.test.ts` | Resolver behavior and regression tests                                                                          |
+| `packages/typespec-client-generator-core/src/public-utils.ts`               | TCGC `getLibraryName` policy                                                                                    |
+| `packages/typespec-client-generator-core/src/decorators.ts`                 | TCGC `@clientName` lookup                                                                                       |
+| `packages/typespec-client-generator-core/src/internal-utils.ts`             | Existing version mutation usage                                                                                 |
+| `core/packages/versioning/src/mutator.ts`                                   | Snapshot mutator creation                                                                                       |
+| `core/packages/compiler/src/experimental/mutators.ts`                       | Mutation and realm creation                                                                                     |
+| `core/packages/compiler/src/experimental/realm.ts`                          | Realm ownership and state-map behavior                                                                          |
 
 ## Resolution flow
 
