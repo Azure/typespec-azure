@@ -473,6 +473,129 @@ describe("unit tests for resource manager helpers", () => {
   });
 });
 describe("end-to-end tests for resource manager helpers", () => {
+  it("preserves the complete legacy provider view when returning the cached result", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model Parent is TrackedResource<{}> {
+  ...ResourceNameParameter<Parent>;
+}
+
+@parentResource(Parent)
+model Child is ProxyResource<{}> {
+  ...ResourceNameParameter<Child>;
+}
+
+@armResourceOperations
+interface Parents {
+  get is ArmResourceRead<Parent>;
+}
+
+@armResourceOperations
+interface Children {
+  get is ArmResourceRead<Child>;
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Child>;
+}
+`);
+
+    const first = resolveArmResources(program);
+    const second = resolveArmResources(program);
+
+    expect(second).toBe(first);
+    expect(
+      first.resources?.map((resource) => ({
+        name: resource.resourceName,
+        type: resource.type.name,
+        resourceType: resource.resourceType,
+        path: resource.resourceInstancePath,
+        parent: resource.parent?.resourceName,
+        scope: typeof resource.scope === "string" ? resource.scope : resource.scope?.resourceName,
+        lifecycle: Object.fromEntries(
+          Object.entries(resource.operations.lifecycle).map(([kind, operations]) => [
+            kind,
+            operations?.map((operation) => ({
+              group: operation.operationGroup,
+              name: operation.name,
+              path: operation.path,
+            })),
+          ]),
+        ),
+      })),
+    ).toEqual([
+      {
+        name: "Parent",
+        type: "Parent",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["parents"],
+        },
+        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}",
+        parent: undefined,
+        scope: "ResourceGroup",
+        lifecycle: {
+          read: [
+            {
+              group: "Parents",
+              name: "get",
+              path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}",
+            },
+          ],
+          createOrUpdate: undefined,
+          update: undefined,
+          delete: undefined,
+          checkExistence: undefined,
+        },
+      },
+      {
+        name: "Child",
+        type: "Child",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["parents", "children"],
+        },
+        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}/children/{childName}",
+        parent: "Parent",
+        scope: "ResourceGroup",
+        lifecycle: {
+          read: [
+            {
+              group: "Children",
+              name: "get",
+              path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}/children/{childName}",
+            },
+          ],
+          createOrUpdate: [
+            {
+              group: "Children",
+              name: "createOrUpdate",
+              path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}/children/{childName}",
+            },
+          ],
+          update: undefined,
+          delete: undefined,
+          checkExistence: undefined,
+        },
+      },
+    ]);
+    expect(
+      first.providerOperations?.map((operation) => ({
+        group: operation.operationGroup,
+        name: operation.name,
+        path: operation.path,
+      })),
+    ).toEqual([
+      {
+        group: "Operations",
+        name: "list",
+        path: "/providers/Microsoft.ContosoProviderHub/operations",
+      },
+    ]);
+  }, 30_000);
   it("collects operation information for tracked resources", async () => {
     const { program } = await Tester.compile(`
 using Azure.Core;

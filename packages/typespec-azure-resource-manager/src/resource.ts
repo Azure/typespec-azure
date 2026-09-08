@@ -498,10 +498,20 @@ function mapResourceKind(
   }
 }
 
+interface ArmResourceResolutionContext {
+  program: Program;
+  providerNamespace: Namespace;
+}
+
 export function resolveArmResources(program: Program): Provider {
-  const provider = resolveProviderNamespace(program);
-  if (provider === undefined) return {};
-  const resolvedResources = getResolvedResources(program, provider);
+  const providerNamespace = resolveProviderNamespace(program);
+  if (providerNamespace === undefined) return {};
+  return resolveArmResourcesForContext({ program, providerNamespace });
+}
+
+function resolveArmResourcesForContext(context: ArmResourceResolutionContext): Provider {
+  const { program, providerNamespace } = context;
+  const resolvedResources = getResolvedResources(program, providerNamespace);
   if (resolvedResources?.resources !== undefined && resolvedResources.resources.length > 0) {
     // Return the cached resource details
     return resolvedResources;
@@ -537,12 +547,12 @@ export function resolveArmResources(program: Program): Provider {
   // Add the unmarked operations
   const resolved: Provider = {
     resources: resources,
-    providerOperations: getUnassociatedOperations(program).filter(
+    providerOperations: getUnassociatedOperationsForContainer(program, providerNamespace).filter(
       (op) => !isArmResourceOperation(program, op.operation),
     ),
   };
 
-  setResolvedResources(program, provider, resolved);
+  setResolvedResources(program, providerNamespace, resolved);
   return resolved;
 }
 
@@ -1098,7 +1108,16 @@ function isResourceIdentityMatch(
 }
 
 export function getUnassociatedOperations(program: Program): ArmResourceOperation[] {
-  return getAllOperations(program)
+  const providerNamespace = resolveProviderNamespace(program);
+  if (providerNamespace === undefined) return [];
+  return getUnassociatedOperationsForContainer(program, providerNamespace);
+}
+
+function getUnassociatedOperationsForContainer(
+  program: Program,
+  container: Namespace | Interface,
+): ArmResourceOperation[] {
+  return getAllOperations(program, container)
     .map((op) => getResourceOperation(program, op))
     .filter((op) => op !== undefined) as ArmResourceOperation[];
 }
@@ -1131,14 +1150,7 @@ function isArmResourceOperation(program: Program, operation: Operation): boolean
   return getArmResourceOperationData(program, operation) !== undefined;
 }
 
-function getAllOperations(
-  program: Program,
-  container?: Namespace | Interface | undefined,
-): Operation[] {
-  container = container || resolveProviderNamespace(program);
-  if (!container) {
-    return [];
-  }
+function getAllOperations(program: Program, container: Namespace | Interface): Operation[] {
   const operations: Operation[] = [];
   for (const op of container.operations.values()) {
     if (
