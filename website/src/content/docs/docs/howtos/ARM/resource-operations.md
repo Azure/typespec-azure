@@ -416,6 +416,10 @@ ARM long-running operations (LROs) use operation status endpoints to allow clien
 status of an async operation. The `GetResourceOperationStatus` operation template provides a
 standard way to expose these endpoints, and `ArmOperationStatus` provides the response model.
 
+> **Note:** The `operationStatuses` and `Azure-AsyncOperation` patterns document an existing ARM wire
+> contract. Use these templates when you need to preserve that contract (for example, brownfield
+> compatibility). Do not read this section as blanket guidance for every new ARM API design.
+
 ### ArmOperationStatus
 
 `ArmOperationStatus` is a response model that represents the status of an async operation. The `id`
@@ -470,6 +474,11 @@ interface OperationStatuses {
 ### Custom response properties
 
 To add custom properties to the operation status response, use the `ArmOperationStatus` template:
+
+> **Warning:** `ArmOperationStatus<Properties>` is not a literal drop-in for every converted custom
+> model. If your existing operation-status payload has extra top-level members (for example
+> `operations` or `resourceId`) or different wire semantics, keep or author an explicit status model
+> that matches the existing contract.
 
 ```typespec
 model WidgetOperationStatus is ArmOperationStatus<WidgetOperationStatusProperties>;
