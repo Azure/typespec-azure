@@ -58,8 +58,14 @@ update a same-named local branch; it may be stale or checked out in another
 worktree. Before deeper investigation, use GitHub's exact head/base and PR-title
 evidence to detect whether this rule's migration PR already merged. Also compare
 the rule branch with the remote target. If a merged PR already supplied the
-migration or the diff is empty, stop before dependency setup and report the
-existing PR or empty-diff evidence. Inspect all of the following:
+migration, stop before dependency setup and report the existing PR evidence.
+An empty diff alone is not a stop condition: a freshly prepared rule branch
+normally has no changes, and an existing implementation may still need migration
+evidence. Continue the semantic coverage check below and, when its classification
+permits development, complete the remaining workflow, including creating or
+refreshing `migration.md`, even if no production rule change is needed. Preserve
+the coverage-based stop conditions below; an empty diff proves neither coverage
+nor completion. Inspect all of the following:
 
 1. Search the rule documentation under
    `packages/typespec-azure-core/src/rules` and
@@ -416,13 +422,18 @@ The top-level worker works only in the supplied typespec-azure worktree.
 ### 1. Establish evidence
 
 - Read the fixture `rule.md`, production TypeSpec rule, fixtures, snapshots,
-  and `migration.md`.
+  and `migration.md` when present. A missing `migration.md` is a deliverable to
+  create from the investigation and validation evidence, not a reason to stop.
 - Read both coverage reports:
   - `packages/typespec-lintdiff/docs/coverage_old.md`
   - `packages/typespec-lintdiff/specs/coverage-breakdown.md`
 - Follow `/analyze-swagger-typespec-lint-gap` to align populations and identify
   real semantic misses.
 - Decide whether the production TypeSpec rule actually requires a change.
+- If no production change is needed, continue focused validation, corpus
+  analysis, and migration documentation. Do not invent a code change merely to
+  produce a diff; evidence-only changes still follow the review and draft PR
+  workflow.
 - Do not require equal raw Swagger and TypeSpec diagnostic counts.
 
 #### Emission-dependent semantic completeness gate
@@ -479,6 +490,31 @@ When evidence requires a rule update:
 - update the rule's `migration.md`
 
 Do not change Swagger validator code, emitters, or unrelated TypeSpec rules.
+
+#### ARM applicability without redundant namespace guards
+
+ARM-only catalog eligibility selects the rule's audience; it does not imply that
+every visited operation must carry provider namespace metadata. Before adding an
+ARM applicability check, inspect the actual ruleset/runner selection and
+neighboring rules in the intended official destination.
+
+- When an ARM-only execution context already supplies the applicability boundary,
+  do not add a provider-namespace presence check merely because the rule is ARM
+  specific. Keep checks for provider metadata only when that metadata is part of
+  the rule's contract.
+- Lintdiff can enable ARM and data-plane rules together. Do not assume that the
+  compiler filters declarations by package or catalog applicability. If the mixed
+  runner requires an isolation guard, record it as lintdiff-only infrastructure,
+  keep it separate from the rule's semantic checks, and cover applicable nested
+  namespaces and inapplicable services.
+- Verify helper traversal direction before using a namespace resolver as an
+  applicability predicate. `resolveProviderNamespace(program, namespace)` searches
+  that namespace and its descendants, not its ancestors; it does not establish
+  whether an operation is inside an ARM provider.
+- Document the intended promotion adaptation in `rule.md`. Native ARM tests should
+  cover ordinary and nested namespaces without an unnecessary provider decorator
+  when the selected official ruleset is the applicability boundary. Filtering
+  library declarations and non-endpoint templates is a separate concern.
 
 ### 3. Run focused validation
 
@@ -556,9 +592,10 @@ corpus when practical.
 
 ### 5. Refresh the rule migration note
 
-After the final corpus run, update the rule's `migration.md` from the newly
-generated results. This update is required whenever the production rule
-changes.
+After the final corpus run, create or refresh the rule's `migration.md` from
+the newly generated results. This step is required for every rule that proceeds
+through the Development workflow, including runs that started with an empty
+diff or required no production rule change.
 
 Record:
 
