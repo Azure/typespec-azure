@@ -283,20 +283,22 @@ export interface ArmMetadataNameRequest {
   /**
    * Resource model associated with operation metadata, when available.
    */
-  resourceType?: Model;
+  resourceModel?: Model;
 
   /**
-   * ARM identity of the resolved resource occurrence, when available.
+   * ARM resource type string, when available.
    *
-   * These values are context for choosing a logical name and cannot be changed.
+   * Formatted as `${provider}/${types.join("/")}`.
    */
-  resolvedResourceType?: ResourceType;
-  resourceInstancePath?: string;
+  resourceType?: string;
 
   /**
-   * True when ARM metadata explicitly supplied the logical resource name.
+   * Instance path of the resolved resource occurrence, when available.
+   *
+   * Resource type does not uniquely identify an occurrence because the same
+   * type can be exposed at multiple scopes or beneath different parents.
    */
-  isExplicit?: boolean;
+  resourceInstancePath?: string;
 }
 
 export type ArmMetadataNameResolver = (request: ArmMetadataNameRequest) => string | undefined;
@@ -365,8 +367,20 @@ The implementation must update all aliases of an operation consistently. A singl
 appear under lifecycle metadata, actions, lists, associated operations, or provider operations.
 
 One model can produce several resolved resource occurrences at different paths. Resource naming
-requests therefore include `resolvedResourceType` and `resourceInstancePath`; consumers must not
-assume that the TypeSpec model alone uniquely identifies a returned resource.
+requests therefore include `resourceType` and `resourceInstancePath`; consumers must not assume
+that the TypeSpec model or ARM resource type string alone uniquely identifies a returned resource.
+
+For example, the resolver can return both subscription-scoped and tenant-scoped occurrences of
+`Microsoft.ContosoProviderHub/supportTickets`. Both have the same resource type string, but their
+instance paths differ:
+
+```text
+/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}
+/providers/Microsoft.ContosoProviderHub/supportTickets/{supportTicketName}
+```
+
+The instance path is not derivable from the resource type string because scope, parent resource
+identifiers, and extension-resource targets are not encoded in the resource type.
 
 The resolver does not enforce uniqueness after logical naming. A consumer can intentionally assign
 the same logical name to multiple resources or operations. Structural association and
@@ -664,14 +678,10 @@ nameResolver({
   version,
   defaultName: resource.resourceName,
   type: resource.type,
-  resolvedResourceType: resource.resourceType,
+  resourceType: `${resource.resourceType.provider}/${resource.resourceType.types.join("/")}`,
   resourceInstancePath: resource.resourceInstancePath,
-  isExplicit: /* retained from structural resolution */,
 });
 ```
-
-The current private `resourceNameIsExplicit` value should be retained long enough to populate the
-request. It need not become a public `ResolvedResource` property unless another consumer needs it.
 
 A non-empty callback result replaces only `ResolvedResource.resourceName` and corresponding
 logical operation metadata. It does not replace resource type segments.
@@ -687,7 +697,7 @@ nameResolver({
   version,
   defaultName: armOperation.name,
   type: armOperation.operation,
-  resourceType,
+  resourceModel,
 });
 ```
 
@@ -705,7 +715,7 @@ nameResolver({
   version,
   defaultName: armOperation.operationGroup,
   type: armOperation.operation.interface,
-  resourceType,
+  resourceModel,
 });
 ```
 
@@ -722,13 +732,6 @@ The ARM package defines only this precedence:
 TCGC-specific precedence remains in TCGC. For example, `getLibraryName` currently incorporates
 language-scoped `@clientName`, unscoped `@clientName`, `@friendlyName`, generated template names,
 and the TypeSpec declaration name.
-
-### Explicit logical ARM resource names
-
-An explicitly supplied logical ARM resource name is included as `defaultName` with
-`isExplicit: true`. It is still not wire metadata. The callback is allowed to override it because
-the callback is an explicitly requested consumer view. Structural resolution has already
-completed, so the override cannot alter resource association.
 
 ## Alternatives considered
 
@@ -803,7 +806,7 @@ expresses the supported customization and preserves invariants.
 ### Phase 3: Name resolver
 
 1. Add public callback types.
-2. Preserve structural name origin and explicitness until post-processing.
+2. Preserve the structural logical names until post-processing.
 3. Mark synthetic resources so they are excluded from model-based naming.
 4. Add graph-preserving copy and name transformation.
 5. Test resource, operation, and operation-group names.
@@ -884,7 +887,6 @@ Verify:
 - resource names can change;
 - operation names can change;
 - operation-group names can change;
-- explicit ARM resource names are passed with `isExplicit: true`;
 - `undefined` preserves defaults;
 - empty names report a diagnostic and preserve defaults;
 - one operation receives a consistent name everywhere it appears;
