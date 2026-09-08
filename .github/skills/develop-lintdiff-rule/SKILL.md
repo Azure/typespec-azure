@@ -480,6 +480,31 @@ When evidence requires a rule update:
 
 Do not change Swagger validator code, emitters, or unrelated TypeSpec rules.
 
+#### ARM applicability without redundant namespace guards
+
+ARM-only catalog eligibility selects the rule's audience; it does not imply that
+every visited operation must carry provider namespace metadata. Before adding an
+ARM applicability check, inspect the actual ruleset/runner selection and
+neighboring rules in the intended official destination.
+
+- When an ARM-only execution context already supplies the applicability boundary,
+  do not add a provider-namespace presence check merely because the rule is ARM
+  specific. Keep checks for provider metadata only when that metadata is part of
+  the rule's contract.
+- Lintdiff can enable ARM and data-plane rules together. Do not assume that the
+  compiler filters declarations by package or catalog applicability. If the mixed
+  runner requires an isolation guard, record it as lintdiff-only infrastructure,
+  keep it separate from the rule's semantic checks, and cover applicable nested
+  namespaces and inapplicable services.
+- Verify helper traversal direction before using a namespace resolver as an
+  applicability predicate. `resolveProviderNamespace(program, namespace)` searches
+  that namespace and its descendants, not its ancestors; it does not establish
+  whether an operation is inside an ARM provider.
+- Document the intended promotion adaptation in `rule.md`. Native ARM tests should
+  cover ordinary and nested namespaces without an unnecessary provider decorator
+  when the selected official ruleset is the applicability boundary. Filtering
+  library declarations and non-endpoint templates is a separate concern.
+
 ### 3. Run focused validation
 
 Build the lintdiff package before any fixture validation or snapshot update

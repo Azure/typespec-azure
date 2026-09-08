@@ -173,6 +173,11 @@ Use these signals:
   package and official ruleset already provide the same applicability boundary,
   and compare neighboring destination rules before deciding whether the guard
   belongs in the promoted implementation.
+- Do not require provider namespace metadata merely because a rule is ARM-only.
+  Separate the selected ruleset's audience from semantic requirements on each
+  declaration. Package ownership alone does not make the compiler filter
+  namespaces; establish the intended boundary from the actual execution context
+  and neighboring rules.
 
 The recommendation should include:
 
@@ -244,13 +249,24 @@ Then adapt it to the destination package:
   - remove a guard when it exists only to isolate an ARM-only rule from
     data-plane programs (or the reverse) in lintdiff's combined rulesets, and
     the selected official package and ruleset already guarantee that boundary
+  - for an ARM-only destination, do not retain a provider-namespace presence
+    check unless provider metadata or per-service filtering is genuinely part
+    of the rule's contract. Removing redundant lintdiff isolation is a promotion
+    adaptation, not a source-semantic repair; it does not require changing the
+    immutable source rule
   - preserve a guard when the rule must still distinguish applicable and
     inapplicable services, namespaces, or declarations within the destination
     ruleset, or when provider metadata is part of the rule's semantics
   - use neighboring destination rules and ruleset registration as evidence,
     document the deliberate adaptation in the PR, and add a native test that
     would fail if the destination unnecessarily retained the lintdiff-only
-    guard
+    guard. Cover both ordinary and nested namespaces without a provider
+    decorator when the official ruleset supplies the applicability boundary;
+    keep library-declaration and template filtering as separate concerns
+  - do not use `resolveProviderNamespace(program, operationNamespace)` as an
+    ancestor-membership check: it searches the supplied namespace and its
+    descendants. If a semantic membership check is required, verify the helper's
+    traversal direction and test nested providers and unrelated services
   - do not remove a guard when destination ownership is ambiguous; return to
     destination analysis rather than broadening the rule speculatively
 - update exported rule variable names to match neighboring rules
