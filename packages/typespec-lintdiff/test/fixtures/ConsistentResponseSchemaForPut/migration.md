@@ -1,5 +1,24 @@
 # ConsistentResponseSchemaForPut migration evidence
 
+## Result and gap summary
+
+- **Results:** In the recorded staging/latest-version comparison, Swagger reports
+  **13 diagnostics across 8 projects**; TypeSpec reports **1 in 1 project**.
+  The assessed population is 462 of 468 projects; six compile failures are excluded.
+- **Why 13 versus 1:** Both catch the same genuine Reservations/Quota mismatch.
+  The other **12 findings across 7 projects** have identical `200`/`201` schema
+  references. The validator compares JavaScript object identity (`!==`), so
+  separate objects representing the same schema trigger false positives.
+  TypeSpec compares schema types instead and intentionally avoids these findings.
+  See the [reference-pair evidence](#gap-example-resolved-external-reference-identity).
+- **Decision:** No further rule change is needed for this gap. The repaired rule
+  matches the tested PUT schema-consistency contract, not the validator's defects;
+  raw counts need not match.
+- **Limits:** External-reference resolution was not independently verified, and
+  the source's nested-namespace limitation remains. See the
+  [evidence limitations](#repair-findings-and-regression-evidence) and
+  [qualified conclusion](#official-coverage-and-conclusion).
+
 ## Sources and scope
 
 - azure-rest-api-specs commit:
