@@ -17,6 +17,7 @@ import { readdirSync, readFileSync, statSync, writeFileSync } from "fs";
 import path from "path";
 import { assert, describe, it } from "vitest";
 import * as codegen from "../../src/codegen/index.js";
+import { getContainingModuleRelativePackagePath } from "../../src/containing-module.js";
 import type { GoEmitterOptions } from "../../src/lib.js";
 import { Adapter } from "../../src/tcgcadapter/adapter.js";
 
@@ -141,8 +142,7 @@ export async function emitGoFor(
 
   // `emitter-output-dir` is a standard emitter option that the compiler normally
   // resolves into EmitContext.emitterOutputDir; resolve it here (including the
-  // `{output-dir}` template) since this helper drives the emitter directly. The
-  // last path segment becomes the package name when a containing-module is used.
+  // `{output-dir}` template) since this helper drives the emitter directly.
   const baseOutputDir = "tsp-output";
   let outputDir = baseOutputDir;
   if (emitterOptions["emitter-output-dir"]) {
@@ -173,6 +173,13 @@ export async function emitGoFor(
 
   const adapter = await Adapter.create(context);
   const codeModel = adapter.tcgcToGoCodeModel();
+  let containingModuleRelativePackagePath: string | undefined;
+  if (codeModel.root.kind === "containingModule") {
+    containingModuleRelativePackagePath = getContainingModuleRelativePackagePath(
+      resolveVirtualPath(baseOutputDir),
+      context.emitterOutputDir,
+    );
+  }
 
   let filePrefix = (emitterOptions["file-prefix"] as string | undefined) ?? "zz_";
   if (filePrefix.length > 0 && !filePrefix.endsWith("_")) {
@@ -196,6 +203,7 @@ export async function emitGoFor(
   if (codeModel.options["generate-samples"]) {
     await emitter.emitExamples();
   }
+  await emitter.emitApiViewPropertiesFile(containingModuleRelativePackagePath);
 
   return files;
 }
@@ -289,6 +297,19 @@ const OUTPUT_CODE_BLOCK_TYPES: Record<string, EmitterFunction> = {
     const resolved = resolveGoFile(files, name ?? "");
     // Format real generated Go like the emitter does; leave the sentinel as-is.
     return resolved === NOT_GENERATED ? resolved : gofmt(resolved);
+  },
+
+  // Snapshot of the APIView cross-language definition ID file. Emitted paths are
+  // relative to emitterOutputDir, so a containing-module scenario nests it under
+  // the package subdirectory; match on the suffix to cover both layouts.
+  "json apiview-properties": async (tsp, _args, configs, inputFiles) => {
+    const files = await emitGoFor(tsp, emitterOptionsFrom(configs), inputFiles);
+    for (const [fileName, content] of files) {
+      if (fileName.endsWith("testdata/apiview-properties.json")) {
+        return content;
+      }
+    }
+    return NOT_GENERATED;
   },
 };
 

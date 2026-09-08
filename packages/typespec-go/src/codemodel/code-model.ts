@@ -32,6 +32,9 @@ export type CodeModelType = "azure-arm" | "data-plane";
 /** contains top-level info about the input source */
 export interface Info {
   title: string;
+
+  /** the TCGC cross-language version of the service definition */
+  crossLanguageVersion: string;
 }
 
 /**
@@ -70,7 +73,8 @@ export class CodeModel implements CodeModel {
 }
 
 export class Info implements Info {
-  constructor(title: string) {
+  constructor(title: string, crossLanguageVersion: string) {
     this.title = title;
+    this.crossLanguageVersion = crossLanguageVersion;
   }
 }

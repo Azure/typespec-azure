@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+export { generateApiViewProperties } from "./apiview-properties.js";
 export { generateClientFactory } from "./client-factory.js";
 export { generateCloudConfig } from "./cloud-config.js";
 export { generateConstants } from "./constants.js";

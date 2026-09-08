@@ -1,0 +1,228 @@
+# The APIView cross-language definition ID file maps generated Go symbols to their tsp definitions
+
+## TypeSpec
+
+```tsp
+@service(#{ title: "Widgets" })
+namespace Widgets;
+
+enum WidgetKind {
+  standard,
+  deluxe,
+}
+
+model Widget {
+  id: string;
+  kind: WidgetKind;
+}
+
+@route("/widgets")
+interface WidgetOps {
+  @get get(@path id: string): Widget;
+
+  @get
+  @list
+  list(): {
+    @pageItems items: Widget[];
+    @nextLink next?: url;
+  };
+}
+```
+
+## The generated apiview-properties.json
+
+```json apiview-properties
+{
+  "CrossLanguagePackageId": "Widgets",
+  "CrossLanguageDefinitionId": {
+    "testmodule-(client *WidgetsWidgetOpsClient) Get": "Widgets.WidgetOps.get",
+    "testmodule-(client *WidgetsWidgetOpsClient) NewListPager": "Widgets.WidgetOps.list",
+    "testmodule-NewWidgetsClientWithNoCredential": "Widgets",
+    "testmodule.ListResponse": "Widgets.list.Response.anonymous",
+    "testmodule.Widget": "Widgets.Widget",
+    "testmodule.WidgetKind": "Widgets.WidgetKind",
+    "testmodule.WidgetKindDeluxe": "Widgets.WidgetKind.deluxe",
+    "testmodule.WidgetKindStandard": "Widgets.WidgetKind.standard",
+    "testmodule.WidgetsClient": "Widgets",
+    "testmodule.WidgetsWidgetOpsClient": "Widgets.WidgetOps"
+  },
+  "CrossLanguageVersion": "4f1096576cb9"
+}
+```
+
+# The APIView cross-language definition ID file is emitted for a containing module
+
+## TypeSpec
+
+```tsp
+@service(#{ title: "Widgets" })
+namespace Widgets;
+
+model Widget {
+  id: string;
+}
+
+@route("/widgets")
+interface WidgetOps {
+  @get get(@path id: string): Widget;
+}
+```
+
+```yaml
+containing-module: github.com/contoso/widget/v2
+emitter-output-dir: {output-dir}/generated/subpkg
+```
+
+```json apiview-properties
+{
+  "CrossLanguagePackageId": "Widgets",
+  "CrossLanguageDefinitionId": {
+    "widget/generated/subpkg-(client *WidgetsWidgetOpsClient) Get": "Widgets.WidgetOps.get",
+    "widget/generated/subpkg.Widget": "Widgets.Widget",
+    "widget/generated/subpkg.WidgetsClient": "Widgets",
+    "widget/generated/subpkg.WidgetsWidgetOpsClient": "Widgets.WidgetOps"
+  },
+  "CrossLanguageVersion": "d80dc19078a8"
+}
+```
+
+# The APIView cross-language definition ID file uses the module name at its root
+
+## TypeSpec
+
+```tsp
+@service(#{ title: "Widgets" })
+namespace Widgets;
+
+model Widget {
+  id: string;
+}
+
+@route("/widgets")
+interface WidgetOps {
+  @get get(@path id: string): Widget;
+}
+```
+
+```yaml
+containing-module: github.com/contoso/widget/v2
+```
+
+```json apiview-properties
+{
+  "CrossLanguagePackageId": "Widgets",
+  "CrossLanguageDefinitionId": {
+    "widget-(client *WidgetsWidgetOpsClient) Get": "Widgets.WidgetOps.get",
+    "widget.Widget": "Widgets.Widget",
+    "widget.WidgetsClient": "Widgets",
+    "widget.WidgetsWidgetOpsClient": "Widgets.WidgetOps"
+  },
+  "CrossLanguageVersion": "d80dc19078a8"
+}
+```
+
+# The APIView package path falls back when the module root isn't known
+
+## TypeSpec
+
+```tsp
+@service(#{ title: "Widgets" })
+namespace Widgets;
+
+model Widget {
+  id: string;
+}
+
+@route("/widgets")
+interface WidgetOps {
+  @get get(@path id: string): Widget;
+}
+```
+
+```yaml
+containing-module: github.com/contoso/widget/v2
+emitter-output-dir: unrelated-output/generated/subpkg
+```
+
+```json apiview-properties
+{
+  "CrossLanguagePackageId": "Widgets",
+  "CrossLanguageDefinitionId": {
+    "widget/subpkg-(client *WidgetsWidgetOpsClient) Get": "Widgets.WidgetOps.get",
+    "widget/subpkg.Widget": "Widgets.Widget",
+    "widget/subpkg.WidgetsClient": "Widgets",
+    "widget/subpkg.WidgetsWidgetOpsClient": "Widgets.WidgetOps"
+  },
+  "CrossLanguageVersion": "d80dc19078a8"
+}
+```
+
+# The APIView cross-language definition ID file includes the ARM ClientFactory accessors
+
+## TypeSpec
+
+```tsp
+@armProviderNamespace
+namespace Microsoft.Test;
+
+model WidgetProperties {
+  description?: string;
+}
+
+model Widget is TrackedResource<WidgetProperties> {
+  @path
+  @key("widgetName")
+  @segment("widgets")
+  name: string;
+}
+
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<Widget>;
+}
+
+model GadgetProperties {
+  description?: string;
+}
+
+model Gadget is TrackedResource<GadgetProperties> {
+  @path
+  @key("gadgetName")
+  @segment("gadgets")
+  name: string;
+}
+
+@armResourceOperations
+interface Gadgets {
+  get is ArmResourceRead<Gadget>;
+}
+```
+
+```json apiview-properties
+{
+  "CrossLanguagePackageId": "Microsoft.Test",
+  "CrossLanguageDefinitionId": {
+    "testmodule-(c *ClientFactory) NewGadgetsClient": "Microsoft.Test.Gadgets",
+    "testmodule-(c *ClientFactory) NewWidgetsClient": "Microsoft.Test.Widgets",
+    "testmodule-(client *GadgetsClient) Get": "Microsoft.Test.Gadgets.get",
+    "testmodule-(client *WidgetsClient) Get": "Microsoft.Test.Widgets.get",
+    "testmodule-NewClientFactory": "Microsoft.Test",
+    "testmodule-NewGadgetsClient": "Microsoft.Test.Gadgets",
+    "testmodule-NewWidgetsClient": "Microsoft.Test.Widgets",
+    "testmodule.ClientFactory": "Microsoft.Test",
+    "testmodule.CreatedByType": "Azure.ResourceManager.CommonTypes.createdByType",
+    "testmodule.CreatedByTypeApplication": "Azure.ResourceManager.CommonTypes.createdByType.Application",
+    "testmodule.CreatedByTypeKey": "Azure.ResourceManager.CommonTypes.createdByType.Key",
+    "testmodule.CreatedByTypeManagedIdentity": "Azure.ResourceManager.CommonTypes.createdByType.ManagedIdentity",
+    "testmodule.CreatedByTypeUser": "Azure.ResourceManager.CommonTypes.createdByType.User",
+    "testmodule.Gadget": "Microsoft.Test.Gadget",
+    "testmodule.GadgetProperties": "Microsoft.Test.GadgetProperties",
+    "testmodule.GadgetsClient": "Microsoft.Test.Gadgets",
+    "testmodule.SystemData": "Azure.ResourceManager.CommonTypes.SystemData",
+    "testmodule.Widget": "Microsoft.Test.Widget",
+    "testmodule.WidgetProperties": "Microsoft.Test.WidgetProperties",
+    "testmodule.WidgetsClient": "Microsoft.Test.Widgets"
+  },
+  "CrossLanguageVersion": "21ca920b5054"
+}
+```
