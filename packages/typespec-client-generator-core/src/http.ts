@@ -335,6 +335,7 @@ function getSdkHttpParameters(
         apiVersions: getAvailableApiVersions(context, tspBody.type, httpOperation.operation),
         type,
         optional: isHttpBodySpread(tspBody) ? false : (tspBody.property?.optional ?? false), // optional is always false for spread body
+        // eslint-disable-next-line @typescript-eslint/no-deprecated -- kept for backward compatibility alongside methodParameterSegments
         correspondingMethodParams: [],
         methodParameterSegments: [],
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,

@@ -141,15 +141,12 @@ function generateResponseUnmarshaller(
     unmarshallerText += `${indent.pop().get()}}\n`;
     unmarshallerText += `${indent.get()}${unmarshalTarget} = (*time.Time)(aux)\n`;
     return unmarshallerText;
-  } else if (isArrayOfDateTime(type)) {
+  } else if (go.isSlice(type, "time")) {
     // unmarshalling arrays of date/time is a little more involved
-    const timeInfo = isArrayOfDateTime(type);
-    let elementPtr = "*";
-    if (timeInfo?.elemByVal) {
-      elementPtr = "";
-    }
+    const timeType = type.elementType;
+    const elementPtr = type.elementTypeByValue ? "" : "*";
     imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-    unmarshallerText += `${indent.get()}var aux []${elementPtr}datetime.${timeInfo?.format}\n`;
+    unmarshallerText += `${indent.get()}var aux []${elementPtr}datetime.${timeType.format}\n`;
     unmarshallerText += `${indent.get()}if err := runtime.UnmarshalAs${format}(resp, &aux); err != nil {\n`;
     unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
     unmarshallerText += `${indent.pop().get()}}\n`;
@@ -159,10 +156,10 @@ function generateResponseUnmarshaller(
     unmarshallerText += `${indent.pop().get()}}\n`;
     unmarshallerText += `${indent.get()}${unmarshalTarget} = cp\n`;
     return unmarshallerText;
-  } else if (helpers.isMapOfDateTime(type)) {
-    const timeInfo = helpers.isMapOfDateTime(type);
+  } else if (go.isMap(type, "time")) {
+    const timeType = type.valueType;
     imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-    unmarshallerText += `${indent.get()}aux := map[string]*datetime.${timeInfo?.format}{}\n`;
+    unmarshallerText += `${indent.get()}aux := map[string]*datetime.${timeType.format}{}\n`;
     unmarshallerText += `${indent.get()}if err := runtime.UnmarshalAs${format}(resp, &aux); err != nil {\n`;
     unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
     unmarshallerText += `${indent.pop().get()}}\n`;
@@ -296,19 +293,4 @@ function formatHeaderResponseValue(
   text += `${indent.get()}${respObj}.${headerResp.fieldName} = ${byRef}${name}\n`;
   text += `${indent.pop().get()}}\n`;
   return text;
-}
-
-function isArrayOfDateTime(
-  paramType: go.WireType,
-): { format: go.TimeFormat; elemByVal: boolean } | undefined {
-  if (paramType.kind !== "slice") {
-    return undefined;
-  }
-  if (paramType.elementType.kind !== "time") {
-    return undefined;
-  }
-  return {
-    format: paramType.elementType.format,
-    elemByVal: paramType.elementTypeByValue,
-  };
 }

@@ -17,6 +17,7 @@ import {
   getCustomResourceOptions,
   getExternalTypeRef,
   getFeature,
+  getFeatureFileSet,
   getInlineAzureType,
   getResourceFeatureSet,
   isArmCommonType,
@@ -107,6 +108,7 @@ import {
   reportDeprecated,
   resolveEncodedName,
   resolvePath,
+  sanitizePathSegment,
   serializeValueAsJson,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
@@ -1607,7 +1609,7 @@ export async function getOpenAPIForService(
       if (
         options.versionEnumStrategy !== "include" &&
         type.kind === "Enum" &&
-        isVersionEnum(program, type)
+        (isVersionEnum(program, type) || isFeatureEnum(program, serviceNamespace, type))
       ) {
         return true;
       }
@@ -1621,6 +1623,10 @@ export async function getOpenAPIForService(
       return true;
     }
     return false;
+  }
+
+  function isFeatureEnum(program: Program, serviceNamespace: Namespace, enumObj: Enum): boolean {
+    return getFeatureFileSet(program, serviceNamespace) === enumObj;
   }
 
   function getSchemaForType(
@@ -2873,16 +2879,17 @@ function resolveExampleDir(
 ): string {
   const rawDir = examplesDirectory ?? resolvePath(projectRoot, "examples");
   const hasVersionInterpolation = rawDir.includes("{version}");
+  const sanitizedVersion = version && sanitizePathSegment(version);
 
   if (hasVersionInterpolation) {
     const versionStatus = version && (version.includes("preview") ? "preview" : "stable");
     return interpolatePath(rawDir, {
       "version-status": versionStatus,
-      version: version,
+      version: sanitizedVersion,
     });
   }
 
-  return version ? resolvePath(rawDir, version) : rawDir;
+  return sanitizedVersion ? resolvePath(rawDir, sanitizedVersion) : rawDir;
 }
 
 async function checkExamplesDirExists(host: CompilerHost, dir: string) {
@@ -3301,6 +3308,9 @@ function createFeatureDocumentProxy(
           featureItem.document.definitions![defName] = defSchema;
         }
         finalizeOpenApi2Document(featureItem.document, featureItem.tags);
+        if (!hasOpenApiContent(featureItem.document)) {
+          continue;
+        }
         docs.push({
           document: featureItem.document,
           operationExamples: featureExamples,
@@ -3357,6 +3367,15 @@ function createFeatureDocumentProxy(
     const ops = operationFeatures.get(featureName)!;
     ops.add(operationId);
   }
+}
+
+function hasOpenApiContent(document: OpenAPI2Document): boolean {
+  return (
+    Object.keys(document.paths).length > 0 ||
+    Object.keys(document["x-ms-paths"] ?? {}).length > 0 ||
+    Object.keys(document.parameters ?? {}).length > 0 ||
+    Object.keys(document.definitions ?? {}).length > 0
+  );
 }
 
 function reportDuplicateOperationIds(

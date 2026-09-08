@@ -478,18 +478,6 @@ export function getMediaFormat(
   return `${marshaller}(${param}${format})`;
 }
 
-export function isMapOfDateTime(
-  paramType: go.WireType,
-): { format: go.TimeFormat; utc: boolean } | undefined {
-  if (paramType.kind !== "map") {
-    return undefined;
-  }
-  if (paramType.valueType.kind !== "time") {
-    return undefined;
-  }
-  return { format: paramType.valueType.format, utc: paramType.valueType.utc };
-}
-
 /**
  * Emits the code for parsing scalar types from a string.
  * The parsing error result is placed into a local var named "err".

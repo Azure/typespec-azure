@@ -184,7 +184,6 @@ function buildPolymorphicDeserializer(
     ) {
       return;
     }
-    const union = subType?.discriminatedSubtypes ? "_Union" : "";
     if (!subType || !subType?.name) {
       reportDiagnostic(context.program, {
         code: "anonymous-type-deserialization",
@@ -192,14 +191,12 @@ function buildPolymorphicDeserializer(
       });
       return; // Skip this subtype
     }
-
-    const rawSubTypeName = `${subType.name}${union}`;
-    const subTypeName = `${normalizeName(rawSubTypeName, NameType.Interface, true)}`;
-    const subtypeDeserializerName = normalizeName(
-      `${subTypeName}Deserializer`,
-      NameType.Operation,
-      true,
-    );
+    const union = subType.discriminatedSubtypes ? "Union" : "";
+    const subTypeName = normalizeModelName(context, subType, NameType.Interface, !union);
+    const subtypeDeserializerName = buildModelDeserializer(context, subType, {
+      nameOnly: true,
+      skipDiscriminatedUnionSuffix: false,
+    }) as string;
 
     cases.push(`
         case "${discriminatedValue}":

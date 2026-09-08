@@ -21,7 +21,7 @@ import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
 import { getClientModuleInfo } from "../utils/client-utils.js";
 import type { SdkContext } from "../utils/interfaces.js";
-import { NameType, normalizeName } from "../utils/name-utils.js";
+import { NameType, normalizeName, normalizeSdkName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap, isTenantLevelOperation } from "../utils/operation-util.js";
 import { AzurePollingDependencies } from "./external-dependencies.js";
 import { getPagingLROMethodName } from "./helpers/classical-operation-helpers.js";
@@ -137,9 +137,14 @@ export function buildClassicalClient(
       `this._clientParams = {${classicalParams.map((p) => p.name).join(",")}};`,
     );
     for (const childClient of client.children) {
-      const subfolder = normalizeName(childClient.name.replace("Client", ""), NameType.File);
+      const subfolder = normalizeSdkName(childClient, NameType.File, {
+        nameOverride: childClient.name.replace(/Client$/, ""),
+      });
       clientFile.addImportDeclaration({
-        moduleSpecifier: `./${subfolder}/${normalizeName(childClient.name, NameType.File)}.js`,
+        moduleSpecifier: `./${subfolder}/${normalizeName(
+          getClassicalClientName(childClient),
+          NameType.File,
+        )}.js`,
         namedImports: [
           `${getClassicalClientName(childClient)}`,
           `${getClassicalClientName(childClient)}OptionalParams`,
@@ -275,11 +280,9 @@ function buildClientOperationGroups(
       const operationName = `_get${rawGroupName}Operations`;
       const propertyType = `${rawGroupName}Operations`;
       // The `groupName` is used to any places where we don't need normalized name again
-      const groupName = normalizeName(rawGroupName, NameType.Property);
-      const existProperty = clientClass.getProperties().filter((p) => {
-        return p.getName() === normalizeName(groupName, NameType.Property);
-      });
-      if (!existProperty || existProperty.length === 0) {
+      const groupName = normalizeName(prefixes[0] ?? "", NameType.Property);
+      const existingProperty = clientClass.getProperty(groupName);
+      if (!existingProperty) {
         clientClass.addProperty({
           name: groupName,
           type: resolveReference(refkey(client, propertyType, layer, "classicOperations")),

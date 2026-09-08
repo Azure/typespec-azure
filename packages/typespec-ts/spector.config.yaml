@@ -54,8 +54,10 @@ specs:
   type/model/inheritance/recursive: true
   type/union: true
   payload/media-type: true
+  payload/multipart: true
   payload/xml: true
   payload/head: true
+  response/body-or-no-content: true
   response/status-code-range: true
   server/versions/versioned: true
   server/versions/not-versioned: true
@@ -124,18 +126,15 @@ specs:
   parameters/query: true
   azure/client-generator-core/client-doc: true
   azure/client-generator-core/response-as-bool: true
+  azure/client-generator-core/exact-name: true
   documentation: true
 
   type/model/visibility: true
   # Disabled: Http.File generates unresolved __PLACEHOLDER types and identifiers.
   type/file: false
-  # Disabled: exact model and property names are normalized by the emitter.
-  azure/client-generator-core/exact-name: false
   # Disabled: generated patch model properties do not allow JSON merge-patch null values.
   payload/json-merge-patch: false
 
   client/structure/renamed-operation: true
   client/structure/two-operation-group: true
   client/structure/client-operation-group: true
-  # Disabled: multipart not yet supported
-  payload/multipart: false

@@ -62,7 +62,7 @@ export interface ArmClientOptions extends QualifiedType {
 }
 
 /** a const type definition used for enums */
-export interface Constant {
+export interface Constant<T extends ConstantType = ConstantType> {
   kind: "constant";
 
   /** the const type name */
@@ -75,7 +75,7 @@ export interface Constant {
   pkg: PackageContent;
 
   /** the underlying type of the const */
-  type: ConstantType;
+  type: T;
 
   /** the possible values for this const */
   values: Array<ConstantValue>;
@@ -183,18 +183,35 @@ export interface Literal<T extends LiteralType = LiteralType> {
 export type LiteralType = Constant | ConstantDef | EncodedBytes | Scalar | String | Time;
 
 /** a Go map type. note that the key is always a string */
-export interface Map {
+export interface Map<T extends MapValueType = MapValueType> {
   kind: "map";
 
   /** the type of values in the map */
-  valueType: MapValueType;
+  valueType: T;
 
   /** indicates if the map's value type is pointer-to-type or not */
   valueTypeByValue: boolean;
 }
 
 /** the set of map value types */
-export type MapValueType = WireType;
+export type MapValueType =
+  | Any
+  | Constant
+  | EncodedBytes
+  | Interface
+  | Map
+  | Model
+  | MultipartContent
+  | PolymorphicModel
+  | RawJSON
+  | ReadCloser
+  | ReadSeekCloser
+  | Scalar
+  | Slice
+  | SliceArray
+  | String
+  | Time
+  | UnionStruct;
 
 /** a field within a model */
 export interface ModelField extends StructField {
@@ -275,11 +292,11 @@ export interface RawJSON {
 }
 
 /** a Go scalar type */
-export interface Scalar {
+export interface Scalar<T extends ScalarType = ScalarType> {
   kind: "scalar";
 
   /** the type of scalar */
-  type: ScalarType;
+  type: T;
 
   /** indicates the value is sent/received as a string */
   encodeAsString: boolean;
@@ -312,11 +329,11 @@ export type ScalarType =
   | "uint64";
 
 /** a Go slice */
-export interface Slice {
+export interface Slice<T extends SliceElementType = SliceElementType> {
   kind: "slice";
 
   /** the element type for this slice */
-  elementType: SliceElementType;
+  elementType: T;
 
   /** indicates if the slice's element type is pointer-to-type or not */
   elementTypeByValue: boolean;
@@ -337,13 +354,30 @@ export interface SliceArray {
 }
 
 /** the set of slice array delimiters */
-export type SliceArrayDelimiter = "comma" | "space" | "pipe" | "newline";
+export type SliceArrayDelimiter = "comma" | "newline" | "pipe" | "space";
 
 /** the supported element types for arrays represented as delimited strings */
-export type SliceArrayElementType = String | Constant;
+export type SliceArrayElementType = Constant | String;
 
 /** the set of slice element types */
-export type SliceElementType = WireType;
+export type SliceElementType =
+  | Any
+  | Constant
+  | EncodedBytes
+  | Interface
+  | Map
+  | Model
+  | MultipartContent
+  | PolymorphicModel
+  | RawJSON
+  | ReadCloser
+  | ReadSeekCloser
+  | Scalar
+  | Slice
+  | SliceArray
+  | String
+  | Time
+  | UnionStruct;
 
 /** a Go string */
 export interface String {
@@ -552,6 +586,22 @@ export function getTypeDeclaration(type: Client | Type, scope: PackageType): str
   }
 }
 
+/** narrows the field to the model's JSON additional properties bucket, whose type is always a map */
+export function isAdditionalProperties(field: ModelField): field is ModelField & { type: Map } {
+  return field.annotations.isAdditionalProperties;
+}
+
+/** narrows type to a constant with one of the specified underlying types (any constant when no types are given) */
+export function isConstant<T extends ConstantType = ConstantType>(
+  type: WireType,
+  ...kinds: Array<T>
+): type is Constant<T> {
+  if (type.kind !== "constant") {
+    return false;
+  }
+  return kinds.length === 0 || (kinds as Array<ConstantType>).includes(type.type);
+}
+
 /** narrows type to a LiteralType within the conditional block */
 export function isLiteralValueType(type: WireType): type is LiteralType {
   switch (type.kind) {
@@ -564,6 +614,39 @@ export function isLiteralValueType(type: WireType): type is LiteralType {
     default:
       return false;
   }
+}
+
+/** narrows type to a map with one of the specified value type kinds (any map when no kinds are given) */
+export function isMap<T extends MapValueType["kind"] = MapValueType["kind"]>(
+  type: WireType,
+  ...kinds: Array<T>
+): type is Map<Extract<MapValueType, { kind: T }>> {
+  if (type.kind !== "map") {
+    return false;
+  }
+  return kinds.length === 0 || (kinds as Array<string>).includes(type.valueType.kind);
+}
+
+/** narrows type to a scalar with one of the specified underlying types (any scalar when no types are given) */
+export function isScalar<T extends ScalarType = ScalarType>(
+  type: WireType,
+  ...kinds: Array<T>
+): type is Scalar<T> {
+  if (type.kind !== "scalar") {
+    return false;
+  }
+  return kinds.length === 0 || (kinds as Array<ScalarType>).includes(type.type);
+}
+
+/** narrows type to a slice with one of the specified element type kinds (any slice when no kinds are given) */
+export function isSlice<T extends SliceElementType["kind"] = SliceElementType["kind"]>(
+  type: WireType,
+  ...kinds: Array<T>
+): type is Slice<Extract<SliceElementType, { kind: T }>> {
+  if (type.kind !== "slice") {
+    return false;
+  }
+  return kinds.length === 0 || (kinds as Array<string>).includes(type.elementType.kind);
 }
 
 /** narrows type to a UnionVariantType within the conditional block */
@@ -677,8 +760,8 @@ export class ArmClientOptions extends QualifiedType implements ArmClientOptions 
   }
 }
 
-export class Constant implements Constant {
-  constructor(pkg: PackageContent, name: string, type: ConstantType, valuesFuncName: string) {
+export class Constant<T extends ConstantType = ConstantType> implements Constant<T> {
+  constructor(pkg: PackageContent, name: string, type: T, valuesFuncName: string) {
     this.kind = "constant";
     this.name = name;
     this.pkg = pkg;
@@ -743,8 +826,8 @@ export class Literal<T> implements Literal<T> {
   }
 }
 
-export class Map implements Map {
-  constructor(valueType: MapValueType, valueTypeByValue: boolean) {
+export class Map<T extends MapValueType = MapValueType> implements Map<T> {
+  constructor(valueType: T, valueTypeByValue: boolean) {
     this.kind = "map";
     this.valueType = valueType;
     this.valueTypeByValue = valueTypeByValue;
@@ -837,16 +920,16 @@ export class ReadSeekCloser extends QualifiedType implements ReadSeekCloser {
   }
 }
 
-export class Scalar implements Scalar {
-  constructor(type: ScalarType, encodeAsString: boolean) {
+export class Scalar<T extends ScalarType = ScalarType> implements Scalar<T> {
+  constructor(type: T, encodeAsString: boolean) {
     this.kind = "scalar";
     this.type = type;
     this.encodeAsString = encodeAsString;
   }
 }
 
-export class Slice implements Slice {
-  constructor(elementType: SliceElementType, elementTypeByValue: boolean) {
+export class Slice<T extends SliceElementType = SliceElementType> implements Slice<T> {
+  constructor(elementType: T, elementTypeByValue: boolean) {
     this.kind = "slice";
     this.elementType = elementType;
     this.elementTypeByValue = elementTypeByValue;

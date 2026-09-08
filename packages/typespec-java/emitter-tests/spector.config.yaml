@@ -34,7 +34,7 @@ specs:
   azure/client-generator-core/override: true
   azure/client-generator-core/response-as-bool: true
   azure/client-generator-core/usage: true
-  azure/core/basic: true
+  azure/core/basic: { options: { max-overload: model } }
   azure/core/lro/rpc: true
   azure/core/lro/standard: true
   azure/core/model: true
@@ -74,7 +74,7 @@ specs:
   encode/datetime: true
   encode/duration: true
   encode/numeric: true
-  parameters/basic: true
+  parameters/basic: { options: { max-overload: model } }
   parameters/body-optionality: true
   parameters/body-root: true
   parameters/collection-format: true
@@ -82,10 +82,10 @@ specs:
   parameters/query: true
   parameters/spread: true
   payload/content-negotiation: true
-  payload/head: true
+  payload/head: { options: { max-overload: model } }
   payload/json-merge-patch: true
   payload/media-type: true
-  payload/multipart: true
+  payload/multipart: { options: { max-overload: model } }
   payload/pageable: true
   payload/xml: true
   resiliency/srv-driven/main.tsp: { options: { advanced-versioning: true } }
@@ -125,7 +125,7 @@ specs:
   type/scalar: true
   type/union: true
   type/union/discriminated: true
-  versioning/added: true
+  versioning/added: { options: { max-overload: model } }
   versioning/madeOptional: true
   versioning/removed: true
   versioning/renamedFrom: true

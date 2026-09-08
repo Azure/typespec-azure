@@ -332,7 +332,7 @@ function getExampleValue(
       } else if (example.type.kind === "etag") {
         imports?.add(example.type.module);
         exampleText = `${go.getTypeDeclaration(example.type, pkg)}("${escapeString(example.value)}")`;
-      } else if (example.type.kind === "scalar" && example.type.type === "byte") {
+      } else if (go.isScalar(example.type, "byte")) {
         exampleText = `io.NopCloser(bytes.NewReader([]byte("${escapeString(example.value)}")))`;
       } else if (example.type.kind === "readSeekCloser") {
         imports?.add("bytes");
@@ -398,15 +398,9 @@ function getExampleValue(
         exampleText += `${indent}\t${field}: ${getExampleValue(pkg, example.value[field], indent + "\t", imports, isFieldByValue && !isFieldPolymorphic).slice(indent.length + 1)},\n`;
       }
       if (example.additionalProperties) {
-        const additionalPropertiesField = example.type.fields.find(
-          (f) => f.annotations.isAdditionalProperties,
+        const additionalPropertiesField = example.type.fields.find((f) =>
+          go.isAdditionalProperties(f),
         )!;
-        if (additionalPropertiesField.type.kind !== "map") {
-          throw new CodegenError(
-            "InternalError",
-            `additional properties field type should be map type`,
-          );
-        }
         const isAdditionalPropertiesFieldByValue =
           additionalPropertiesField.type.valueTypeByValue ?? false;
         const isAdditionalPropertiesPolymorphic =

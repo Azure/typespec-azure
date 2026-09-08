@@ -49,6 +49,23 @@ describe("addStorageCompatResponse", () => {
     expect(result._response.parsedHeaders).toBe(parsedHeaders);
   });
 
+  it("should preserve parsedBody while flattening response headers", () => {
+    const rawResponse = createMockFullOperationResponse(200);
+    const parsedBody = { etag: "body-etag", value: "body-value" };
+    const parsedHeaders = { etag: "header-etag", requestId: "request-id" };
+
+    const result = addStorageCompatResponse(rawResponse, parsedBody, parsedHeaders);
+
+    expect(result.etag).toBe("header-etag");
+    expect(result.requestId).toBe("request-id");
+    expect(result._response.parsedBody).toBe(parsedBody);
+    expect(result._response.parsedBody).toEqual({
+      etag: "body-etag",
+      value: "body-value",
+    });
+    expect(result._response.parsedBody).not.toBe(result);
+  });
+
   it("should handle void (undefined) body with headers at top level", () => {
     const rawResponse = createMockFullOperationResponse(204);
     const parsedHeaders = { requestId: "req-1", version: "2024-01-01" };
