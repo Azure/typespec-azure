@@ -1,0 +1,30 @@
+{
+  "violation": false,
+  "ambientDiagnostics": [
+    { "code": "@azure-tools/typespec-azure-core/documentation-required", "count": 83 },
+    { "code": "@azure-tools/typespec-azure-core/no-closed-literal-union", "count": 1 },
+    { "code": "@azure-tools/typespec-azure-core/no-enum", "count": 1 },
+    { "code": "@azure-tools/typespec-azure-core/no-nullable", "count": 1 },
+    { "code": "@azure-tools/typespec-azure-core/no-openapi", "count": 42 },
+    { "code": "@azure-tools/typespec-azure-core/no-unknown", "count": 1 },
+    { "code": "@azure-tools/typespec-azure-core/no-unnamed-types", "count": 1 },
+    { "code": "@azure-tools/typespec-azure-core/require-versioned", "count": 1 },
+    { "code": "@azure-tools/typespec-azure-resource-manager/arm-no-record", "count": 1 },
+    { "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation", "count": 53 },
+    { "code": "@azure-tools/typespec-azure-resource-manager/lro-location-header", "count": 41 },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
+      "count": 1
+    },
+    { "code": "@azure-tools/typespec-azure-resource-manager/no-response-body", "count": 1 },
+    { "code": "tsp-lintdiff-local-linter/avoid-anonymous-types", "count": 2 },
+    { "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used", "count": 1 },
+    { "code": "tsp-lintdiff-local-linter/long-running-operations-options-validator", "count": 1 },
+    { "code": "tsp-lintdiff-local-linter/lro-extension", "count": 1 },
+    { "code": "tsp-lintdiff-local-linter/missing-xms-error-response", "count": 41 },
+    { "code": "tsp-lintdiff-local-linter/no-error-code-responses", "count": 41 },
+    { "code": "tsp-lintdiff-local-linter/non-application-json-type", "count": 17 },
+    { "code": "tsp-lintdiff-local-linter/post-operation-id-contains-url-verb", "count": 3 },
+    { "code": "tsp-lintdiff-local-linter/xms-examples-required", "count": 42 }
+  ]
+}
