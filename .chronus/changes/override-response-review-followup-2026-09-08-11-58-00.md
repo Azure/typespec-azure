@@ -1,7 +1,7 @@
 ---
-changeKind: internal
+changeKind: fix
 packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Simplify the `@override` response type compatibility check to rely on direct/assignable type comparison and expand the `override-response-mismatch` and `override-response-replacement` diagnostic docs to follow the standard diagnostic documentation pattern.
+Fix `@override` incorrectly reporting response diagnostics for ordinary parameter-only overrides. The override operation's declared return type is ignored again; only operations produced by `replaceResponseWithVoid` / `replaceResponseWithBytes` emit the `override-response-replacement` warning. Removed the `override-response-mismatch` diagnostic, which could not be reported without breaking existing customizations.
