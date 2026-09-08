@@ -1,6 +1,5 @@
 {
-  "version": 2,
-  "generated": "2026-09-07T01:09:27.381Z",
+  "generated": "2026-09-08T14:15:48.526Z",
   "labels": [
     "checker",
     "emit",
@@ -458,16 +457,6 @@
           "emit/@azure-tools/typespec-ts": 2049.8053000000004,
           "emit/@azure-tools/typespec-java": 7131.294534173914
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.016649854060561395,
-        "flags": []
       }
     },
     {
@@ -813,16 +802,6 @@
           "emit/@azure-tools/typespec-ts": 2046.9454055217388,
           "emit/@azure-tools/typespec-java": 7278.290356434783
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.011651888196499547,
-        "flags": []
       }
     },
     {
@@ -1168,16 +1147,6 @@
           "emit/@azure-tools/typespec-ts": 2022.9157265652177,
           "emit/@azure-tools/typespec-java": 7126.806125217391
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.010256320793960088,
-        "flags": []
       }
     },
     {
@@ -1523,16 +1492,6 @@
           "emit/@azure-tools/typespec-ts": 2048.5340124347827,
           "emit/@azure-tools/typespec-java": 7357.216002739131
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.012142890964794812,
-        "flags": []
       }
     },
     {
@@ -1878,16 +1837,6 @@
           "emit/@azure-tools/typespec-ts": 2018.4196119565227,
           "emit/@azure-tools/typespec-java": 7306.479546434783
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.012786821986126464,
-        "flags": []
       }
     },
     {
@@ -2233,16 +2182,6 @@
           "emit/@azure-tools/typespec-ts": 2052.3989837391305,
           "emit/@azure-tools/typespec-java": 7115.295742695653
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.011766758747103513,
-        "flags": []
       }
     },
     {
@@ -2588,16 +2527,6 @@
           "emit/@azure-tools/typespec-ts": 2052.587230521739,
           "emit/@azure-tools/typespec-java": 7359.990330173913
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.015423906206206775,
-        "flags": []
       }
     },
     {
@@ -2943,16 +2872,6 @@
           "emit/@azure-tools/typespec-ts": 2053.235554695652,
           "emit/@azure-tools/typespec-java": 7446.3703907826075
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.013443792238430877,
-        "flags": []
       }
     },
     {
@@ -3298,16 +3217,6 @@
           "emit/@azure-tools/typespec-ts": 2036.414132608696,
           "emit/@azure-tools/typespec-java": 7385.018279521739
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.011925114004390298,
-        "flags": []
       }
     },
     {
@@ -3653,16 +3562,6 @@
           "emit/@azure-tools/typespec-ts": 2081.0193999999997,
           "emit/@azure-tools/typespec-java": 7304.973498391304
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.013869476366934749,
-        "flags": []
       }
     },
     {
@@ -4008,16 +3907,6 @@
           "emit/@azure-tools/typespec-ts": 2142.5247563043476,
           "emit/@azure-tools/typespec-java": 7917.042793347824
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.016790041631727714,
-        "flags": []
       }
     },
     {
@@ -4363,16 +4252,6 @@
           "emit/@azure-tools/typespec-ts": 2166.0357546521736,
           "emit/@azure-tools/typespec-java": 8006.319929043478
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.013658841885547971,
-        "flags": []
       }
     },
     {
@@ -4718,16 +4597,6 @@
           "emit/@azure-tools/typespec-ts": 2157.465888782609,
           "emit/@azure-tools/typespec-java": 7800.941461565218
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.013072721195361344,
-        "flags": []
       }
     },
     {
@@ -5073,16 +4942,6 @@
           "emit/@azure-tools/typespec-ts": 2157.318929565217,
           "emit/@azure-tools/typespec-java": 7696.124954869564
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.012449352519229791,
-        "flags": []
       }
     },
     {
@@ -5428,16 +5287,6 @@
           "emit/@azure-tools/typespec-ts": 2198.1202783043477,
           "emit/@azure-tools/typespec-java": 7957.296089043478
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.010599759748289247,
-        "flags": []
       }
     },
     {
@@ -5783,16 +5632,6 @@
           "emit/@azure-tools/typespec-ts": 2182.6885106956515,
           "emit/@azure-tools/typespec-java": 7912.467675173913
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.013831573755453123,
-        "flags": []
       }
     },
     {
@@ -6138,16 +5977,6 @@
           "emit/@azure-tools/typespec-ts": 2215.44090873913,
           "emit/@azure-tools/typespec-java": 8046.93604321739
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.016718168035050326,
-        "flags": []
       }
     },
     {
@@ -6493,16 +6322,6 @@
           "emit/@azure-tools/typespec-ts": 2218.381602,
           "emit/@azure-tools/typespec-java": 8030.91397847826
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.015298100750594198,
-        "flags": []
       }
     },
     {
@@ -6848,16 +6667,6 @@
           "emit/@azure-tools/typespec-ts": 2138.4603529999995,
           "emit/@azure-tools/typespec-java": 8085.212120260869
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.014594749791891496,
-        "flags": []
       }
     },
     {
@@ -7203,16 +7012,6 @@
           "emit/@azure-tools/typespec-ts": 2125.3931234347824,
           "emit/@azure-tools/typespec-java": 7913.813237130435
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.01292617338727631,
-        "flags": []
       }
     },
     {
@@ -7558,16 +7357,6 @@
           "emit/@azure-tools/typespec-ts": 1982.6205649565218,
           "emit/@azure-tools/typespec-java": 7770.064909304347
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.015287696763984587,
-        "flags": []
       }
     },
     {
@@ -7913,16 +7702,6 @@
           "emit/@azure-tools/typespec-ts": 1987.7917966086957,
           "emit/@azure-tools/typespec-java": 7674.839772391304
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.015511241072368441,
-        "flags": []
       }
     },
     {
@@ -8268,16 +8047,6 @@
           "emit/@azure-tools/typespec-ts": 1992.8447343043476,
           "emit/@azure-tools/typespec-java": 7696.814832347827
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.017107775005814688,
-        "flags": []
       }
     },
     {
@@ -8623,16 +8392,6 @@
           "emit/@azure-tools/typespec-ts": 1969.9580899999999,
           "emit/@azure-tools/typespec-java": 7822.064845304349
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.018895921366676335,
-        "flags": []
       }
     },
     {
@@ -8978,16 +8737,6 @@
           "emit/@azure-tools/typespec-ts": 1970.379758260869,
           "emit/@azure-tools/typespec-java": 7671.360743521738
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.01339105397693492,
-        "flags": []
       }
     },
     {
@@ -9333,16 +9082,6 @@
           "emit/@azure-tools/typespec-ts": 1994.8499556956522,
           "emit/@azure-tools/typespec-java": 7729.399508000002
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.013407422692697533,
-        "flags": []
       }
     },
     {
@@ -9688,16 +9427,6 @@
           "emit/@azure-tools/typespec-ts": 1991.631129565217,
           "emit/@azure-tools/typespec-java": 7777.985531086956
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.013277900646697734,
-        "flags": []
       }
     },
     {
@@ -10043,16 +9772,6 @@
           "emit/@azure-tools/typespec-ts": 2001.310942521739,
           "emit/@azure-tools/typespec-java": 7711.564198869565
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.01100305886598404,
-        "flags": []
       }
     },
     {
@@ -10398,16 +10117,6 @@
           "emit/@azure-tools/typespec-ts": 1962.3708469130431,
           "emit/@azure-tools/typespec-java": 7530.697581913044
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.012572274039322769,
-        "flags": []
       }
     },
     {
@@ -10753,16 +10462,6 @@
           "emit/@azure-tools/typespec-ts": 1990.3412185652173,
           "emit/@azure-tools/typespec-java": 7808.049680391304
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.04116034816495253,
-        "flags": []
       }
     },
     {
@@ -11108,16 +10807,6 @@
           "emit/@azure-tools/typespec-ts": 2068.3173196521734,
           "emit/@azure-tools/typespec-java": 7860.81047121739
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.023774099289405822,
-        "flags": []
       }
     },
     {
@@ -11463,16 +11152,6 @@
           "emit/@azure-tools/typespec-ts": 2035.0813001304348,
           "emit/@azure-tools/typespec-java": 7865.267876652176
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.023822811645706914,
-        "flags": []
       }
     },
     {
@@ -11818,16 +11497,6 @@
           "emit/@azure-tools/typespec-ts": 2008.0771935217394,
           "emit/@azure-tools/typespec-java": 7663.563282217394
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.022255553628092468,
-        "flags": []
       }
     },
     {
@@ -12173,16 +11842,6 @@
           "emit/@azure-tools/typespec-ts": 2015.4911356956525,
           "emit/@azure-tools/typespec-java": 7642.989410173914
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.022626922736851435,
-        "flags": []
       }
     },
     {
@@ -12528,16 +12187,6 @@
           "emit/@azure-tools/typespec-ts": 2114.896913695652,
           "emit/@azure-tools/typespec-java": 7808.4958907826085
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.019326080779062883,
-        "flags": []
       }
     },
     {
@@ -12883,16 +12532,6 @@
           "emit/@azure-tools/typespec-ts": 1977.8963457391308,
           "emit/@azure-tools/typespec-java": 7784.028493304349
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.015106907523601214,
-        "flags": []
       }
     },
     {
@@ -13238,16 +12877,6 @@
           "emit/@azure-tools/typespec-ts": 2003.5031753043475,
           "emit/@azure-tools/typespec-java": 7803.982333434782
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.020425290751695437,
-        "flags": []
       }
     },
     {
@@ -13593,16 +13222,6 @@
           "emit/@azure-tools/typespec-ts": 2019.4763628260873,
           "emit/@azure-tools/typespec-java": 7651.156225782608
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.015781604185805292,
-        "flags": []
       }
     },
     {
@@ -13948,16 +13567,6 @@
           "emit/@azure-tools/typespec-ts": 2000.0853996956516,
           "emit/@azure-tools/typespec-java": 7545.321931956522
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.014447970736470214,
-        "flags": []
       }
     },
     {
@@ -14303,16 +13912,6 @@
           "emit/@azure-tools/typespec-ts": 2001.9905941739132,
           "emit/@azure-tools/typespec-java": 7649.776551043478
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.012367285766480735,
-        "flags": []
       }
     },
     {
@@ -14658,16 +14257,6 @@
           "emit/@azure-tools/typespec-ts": 1703.0443432608697,
           "emit/@azure-tools/typespec-java": 5688.698556826087
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.018869209538590517,
-        "flags": []
       }
     },
     {
@@ -15013,16 +14602,6 @@
           "emit/@azure-tools/typespec-ts": 1724.7516856956522,
           "emit/@azure-tools/typespec-java": 5825.641677913045
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.019778885326281633,
-        "flags": []
       }
     },
     {
@@ -15368,16 +14947,6 @@
           "emit/@azure-tools/typespec-ts": 1748.4634573478259,
           "emit/@azure-tools/typespec-java": 5836.990267869564
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.03867462695737874,
-        "flags": []
       }
     },
     {
@@ -15723,16 +15292,6 @@
           "emit/@azure-tools/typespec-ts": 1696.145709869565,
           "emit/@azure-tools/typespec-java": 5772.72027026087
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.04241491948302384,
-        "flags": []
       }
     },
     {
@@ -16078,16 +15637,6 @@
           "emit/@azure-tools/typespec-ts": 1721.8227154347824,
           "emit/@azure-tools/typespec-java": 5779.877337956524
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.026762132454492073,
-        "flags": []
       }
     },
     {
@@ -16433,16 +15982,6 @@
           "emit/@azure-tools/typespec-ts": 1783.5920669565214,
           "emit/@azure-tools/typespec-java": 5932.433999434782
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.027197952103823073,
-        "flags": []
       }
     },
     {
@@ -16788,16 +16327,6 @@
           "emit/@azure-tools/typespec-ts": 1750.5845176956518,
           "emit/@azure-tools/typespec-java": 5732.6988646956515
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.023541159037227918,
-        "flags": []
       }
     },
     {
@@ -17143,16 +16672,6 @@
           "emit/@azure-tools/typespec-ts": 1696.9937999999997,
           "emit/@azure-tools/typespec-java": 5534.168588608695
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.02111712702005465,
-        "flags": []
       }
     },
     {
@@ -17498,16 +17017,6 @@
           "emit/@azure-tools/typespec-ts": 1708.562944130435,
           "emit/@azure-tools/typespec-java": 5576.702153608697
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.022860529263401902,
-        "flags": []
       }
     },
     {
@@ -17853,16 +17362,6 @@
           "emit/@azure-tools/typespec-ts": 1700.9462449130435,
           "emit/@azure-tools/typespec-java": 5520.762628913043
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.020460771123227525,
-        "flags": []
       }
     },
     {
@@ -18208,16 +17707,6 @@
           "emit/@azure-tools/typespec-ts": 1450.6701501304344,
           "emit/@azure-tools/typespec-java": 4632.794829391305
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.026527802781512184,
-        "flags": []
       }
     },
     {
@@ -18563,16 +18052,6 @@
           "emit/@azure-tools/typespec-ts": 1431.1241092173912,
           "emit/@azure-tools/typespec-java": 4690.081744304348
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.018275165497679824,
-        "flags": []
       }
     },
     {
@@ -18918,16 +18397,6 @@
           "emit/@azure-tools/typespec-ts": 1424.1972088260873,
           "emit/@azure-tools/typespec-java": 4611.292481956522
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.022931836792425248,
-        "flags": []
       }
     },
     {
@@ -19273,16 +18742,6 @@
           "emit/@azure-tools/typespec-ts": 1440.8047883478262,
           "emit/@azure-tools/typespec-java": 4553.451193782608
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.02241628020438964,
-        "flags": []
       }
     },
     {
@@ -19628,16 +19087,6 @@
           "emit/@azure-tools/typespec-ts": 1440.495798347826,
           "emit/@azure-tools/typespec-java": 4653.677756304347
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.03681407668486079,
-        "flags": []
       }
     },
     {
@@ -19983,16 +19432,6 @@
           "emit/@azure-tools/typespec-ts": 1406.7556398695651,
           "emit/@azure-tools/typespec-java": 4706.538204130435
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.023375297202613957,
-        "flags": []
       }
     },
     {
@@ -20338,16 +19777,6 @@
           "emit/@azure-tools/typespec-ts": 1437.6973865217387,
           "emit/@azure-tools/typespec-java": 4606.541982608695
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.022168892406477066,
-        "flags": []
       }
     },
     {
@@ -20693,16 +20122,6 @@
           "emit/@azure-tools/typespec-ts": 1447.978720347826,
           "emit/@azure-tools/typespec-java": 4633.015435478261
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.020187606841910233,
-        "flags": []
       }
     },
     {
@@ -21048,16 +20467,6 @@
           "emit/@azure-tools/typespec-ts": 1421.2073803913042,
           "emit/@azure-tools/typespec-java": 4701.994536391304
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.026575975572300483,
-        "flags": []
       }
     },
     {
@@ -21403,16 +20812,6 @@
           "emit/@azure-tools/typespec-ts": 1437.8435550434783,
           "emit/@azure-tools/typespec-java": 4564.814876521739
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.027306397098496096,
-        "flags": []
       }
     },
     {
@@ -21758,16 +21157,6 @@
           "emit/@azure-tools/typespec-ts": 2025.8731463478262,
           "emit/@azure-tools/typespec-java": 7958.572666217391
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.016273253767665665,
-        "flags": []
       }
     },
     {
@@ -22113,16 +21502,6 @@
           "emit/@azure-tools/typespec-ts": 2007.0302769130433,
           "emit/@azure-tools/typespec-java": 7664.95282621739
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.010946512908170785,
-        "flags": []
       }
     },
     {
@@ -22468,16 +21847,6 @@
           "emit/@azure-tools/typespec-ts": 1984.5675515217386,
           "emit/@azure-tools/typespec-java": 7611.906801695652
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.01072902631830704,
-        "flags": []
       }
     },
     {
@@ -22823,16 +22192,6 @@
           "emit/@azure-tools/typespec-ts": 1994.7215494347822,
           "emit/@azure-tools/typespec-java": 7779.1532661304345
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.011388935928984562,
-        "flags": []
       }
     },
     {
@@ -23178,16 +22537,6 @@
           "emit/@azure-tools/typespec-ts": 1991.7806845652174,
           "emit/@azure-tools/typespec-java": 7771.256615826086
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.009910425083022256,
-        "flags": []
       }
     },
     {
@@ -23533,16 +22882,6 @@
           "emit/@azure-tools/typespec-ts": 1994.4864916956526,
           "emit/@azure-tools/typespec-java": 7717.737453043478
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.012409881827498848,
-        "flags": []
       }
     },
     {
@@ -23888,16 +23227,6 @@
           "emit/@azure-tools/typespec-ts": 2047.3746676521744,
           "emit/@azure-tools/typespec-java": 7866.678798217391
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.0203565925767206,
-        "flags": []
       }
     },
     {
@@ -24243,16 +23572,6 @@
           "emit/@azure-tools/typespec-ts": 2011.4185496956522,
           "emit/@azure-tools/typespec-java": 7798.745039347827
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.018266893987995015,
-        "flags": []
       }
     },
     {
@@ -24598,16 +23917,6 @@
           "emit/@azure-tools/typespec-ts": 1995.361733391304,
           "emit/@azure-tools/typespec-java": 7709.273022043478
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.011845039005018038,
-        "flags": []
       }
     },
     {
@@ -24953,16 +24262,6 @@
           "emit/@azure-tools/typespec-ts": 2004.3884732608694,
           "emit/@azure-tools/typespec-java": 7763.030126826087
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.017171125276546476,
-        "flags": []
       }
     },
     {
@@ -25308,16 +24607,6 @@
           "emit/@azure-tools/typespec-ts": 2073.247917695652,
           "emit/@azure-tools/typespec-java": 7939.810284913045
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.021967745271855132,
-        "flags": []
       }
     },
     {
@@ -25663,16 +24952,6 @@
           "emit/@azure-tools/typespec-ts": 2014.8899364347826,
           "emit/@azure-tools/typespec-java": 7652.108841304347
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.01616849722294455,
-        "flags": []
       }
     },
     {
@@ -26018,16 +25297,6 @@
           "emit/@azure-tools/typespec-ts": 2040.3899527826093,
           "emit/@azure-tools/typespec-java": 7605.787874347825
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.01809892712454464,
-        "flags": []
       }
     },
     {
@@ -26373,16 +25642,6 @@
           "emit/@azure-tools/typespec-ts": 2047.1608595652174,
           "emit/@azure-tools/typespec-java": 7638.228230826086
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.013232159816499243,
-        "flags": []
       }
     },
     {
@@ -26728,16 +25987,6 @@
           "emit/@azure-tools/typespec-ts": 2052.8509803043476,
           "emit/@azure-tools/typespec-java": 7976.327972739127
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.018474090853814445,
-        "flags": []
       }
     },
     {
@@ -27083,16 +26332,6 @@
           "emit/@azure-tools/typespec-ts": 2060.513906347826,
           "emit/@azure-tools/typespec-java": 7761.158623391304
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.025784664963674923,
-        "flags": []
       }
     },
     {
@@ -27438,16 +26677,6 @@
           "emit/@azure-tools/typespec-ts": 2033.8702673043483,
           "emit/@azure-tools/typespec-java": 7865.661782347825
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.018862433011796003,
-        "flags": []
       }
     },
     {
@@ -27793,16 +27022,6 @@
           "emit/@azure-tools/typespec-ts": 2049.8663496521735,
           "emit/@azure-tools/typespec-java": 7659.6352694347825
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.016784075568326735,
-        "flags": []
       }
     },
     {
@@ -28148,16 +27367,6 @@
           "emit/@azure-tools/typespec-ts": 2011.1782252173912,
           "emit/@azure-tools/typespec-java": 7606.9048290434785
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.015905457566828804,
-        "flags": []
       }
     },
     {
@@ -28503,16 +27712,6 @@
           "emit/@azure-tools/typespec-ts": 2082.472761695652,
           "emit/@azure-tools/typespec-java": 7890.836092608695
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.021170176686270407,
-        "flags": []
       }
     },
     {
@@ -28858,16 +28057,6 @@
           "emit/@azure-tools/typespec-ts": 2061.5206573043474,
           "emit/@azure-tools/typespec-java": 7209.279174695652
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.009471048755412378,
-        "flags": []
       }
     },
     {
@@ -29213,16 +28402,6 @@
           "emit/@azure-tools/typespec-ts": 2065.2035264782603,
           "emit/@azure-tools/typespec-java": 7255.785070304346
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.0121300998043594,
-        "flags": []
       }
     },
     {
@@ -29568,16 +28747,6 @@
           "emit/@azure-tools/typespec-ts": 2085.463730913043,
           "emit/@azure-tools/typespec-java": 7229.364973173913
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.0183540350058057,
-        "flags": []
       }
     },
     {
@@ -29923,16 +29092,6 @@
           "emit/@azure-tools/typespec-ts": 2087.726764,
           "emit/@azure-tools/typespec-java": 7120.002413304348
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.015004185892873821,
-        "flags": []
       }
     },
     {
@@ -30278,16 +29437,6 @@
           "emit/@azure-tools/typespec-ts": 2075.4531554782616,
           "emit/@azure-tools/typespec-java": 7197.530991260871
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.022700797793212213,
-        "flags": []
       }
     },
     {
@@ -30633,16 +29782,6 @@
           "emit/@azure-tools/typespec-ts": 2070.4718474347824,
           "emit/@azure-tools/typespec-java": 7282.455950043479
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.015216030550149993,
-        "flags": []
       }
     },
     {
@@ -30988,16 +30127,6 @@
           "emit/@azure-tools/typespec-ts": 2072.361336130434,
           "emit/@azure-tools/typespec-java": 7269.009341086957
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.014231905017023315,
-        "flags": []
       }
     },
     {
@@ -31343,16 +30472,6 @@
           "emit/@azure-tools/typespec-ts": 2073.6843493913047,
           "emit/@azure-tools/typespec-java": 7166.12983952174
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.017316285410997327,
-        "flags": []
       }
     },
     {
@@ -31698,16 +30817,6 @@
           "emit/@azure-tools/typespec-ts": 2079.531387869565,
           "emit/@azure-tools/typespec-java": 7155.492021608696
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.022291255378687334,
-        "flags": []
       }
     },
     {
@@ -32053,16 +31162,6 @@
           "emit/@azure-tools/typespec-ts": 2265.7010108695654,
           "emit/@azure-tools/typespec-java": 7221.503612565217
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.011347277661262522,
-        "flags": []
       }
     },
     {
@@ -32408,16 +31507,6 @@
           "emit/@azure-tools/typespec-ts": 2306.1950449130436,
           "emit/@azure-tools/typespec-java": 7234.704716913043
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.01141055002988449,
-        "flags": []
       }
     },
     {
@@ -32763,16 +31852,6 @@
           "emit/@azure-tools/typespec-ts": 2288.2718503913043,
           "emit/@azure-tools/typespec-java": 7218.5567541304345
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.010633870261127802,
-        "flags": []
       }
     },
     {
@@ -33118,16 +32197,6 @@
           "emit/@azure-tools/typespec-ts": 2361.451520521739,
           "emit/@azure-tools/typespec-java": 7541.546559304348
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.030220305348744876,
-        "flags": []
       }
     },
     {
@@ -33473,16 +32542,6 @@
           "emit/@azure-tools/typespec-ts": 2456.5044323913044,
           "emit/@azure-tools/typespec-java": 7921.2766210434775
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.037370209988786963,
-        "flags": []
       }
     },
     {
@@ -33828,16 +32887,6 @@
           "emit/@azure-tools/typespec-ts": 2299.6686090434787,
           "emit/@azure-tools/typespec-java": 7231.083266695653
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.02999949497569984,
-        "flags": []
       }
     },
     {
@@ -34183,16 +33232,6 @@
           "emit/@azure-tools/typespec-ts": 2295.2357875652174,
           "emit/@azure-tools/typespec-java": 7271.125430565217
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.014782155548728812,
-        "flags": []
       }
     },
     {
@@ -34538,16 +33577,6 @@
           "emit/@azure-tools/typespec-ts": 2281.253503565217,
           "emit/@azure-tools/typespec-java": 7147.951550000001
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.014670654023417187,
-        "flags": []
       }
     },
     {
@@ -34893,16 +33922,6 @@
           "emit/@azure-tools/typespec-ts": 2496.6146841739132,
           "emit/@azure-tools/typespec-java": 8083.764168521739
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.055399692554187294,
-        "flags": []
       }
     },
     {
@@ -35248,16 +34267,6 @@
           "emit/@azure-tools/typespec-ts": 2313.623693478261,
           "emit/@azure-tools/typespec-java": 7350.840775173914
         }
-      },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.03288419384804418,
-        "flags": []
       }
     },
     {
@@ -35603,16 +34612,351 @@
           "emit/@azure-tools/typespec-ts": 2324.0173750869562,
           "emit/@azure-tools/typespec-java": 7355.379884956524
         }
+      }
+    },
+    {
+      "commit": "b75310f3f72832044d6e8512a1bb67b0b8973069",
+      "timestamp": "2026-09-08T14:15:47.068Z",
+      "metrics": {
+        "total": 892.9317082463768,
+        "loader": 301.16041578260865,
+        "resolver": 36.48389233333333,
+        "checker": 371.240564289855,
+        "validation": 81.54554836231883,
+        "validation/compiler": 4.672709811594207,
+        "validation/@typespec/http": 17.013050811594194,
+        "validation/@typespec/rest": 1.929407492753629,
+        "validation/@typespec/versioning": 46.00835697101446,
+        "validation/@azure-tools/typespec-azure-core": 11.8944747101449,
+        "linter": 102.4039941594203,
+        "linter/@azure-tools/typespec-azure-core/operation-missing-api-version": 0.3475804492754338,
+        "linter/@azure-tools/typespec-azure-core/auth-required": 0.06704446376819549,
+        "linter/@azure-tools/typespec-azure-core/request-body-problem": 0.4432864492753263,
+        "linter/@azure-tools/typespec-azure-core/byos": 1.2114848550723742,
+        "linter/@azure-tools/typespec-azure-core/casing-style": 1.367307536231208,
+        "linter/@azure-tools/typespec-azure-core/composition-over-inheritance": 0.17162214492727998,
+        "linter/@azure-tools/typespec-azure-core/known-encoding": 0.4292643623187597,
+        "linter/@azure-tools/typespec-azure-core/long-running-polling-operation-required": 0.7982244202900993,
+        "linter/@azure-tools/typespec-azure-core/no-case-mismatch": 0.6787992173910649,
+        "linter/@azure-tools/typespec-azure-core/no-closed-literal-union": 0.9180135797101369,
+        "linter/@azure-tools/typespec-azure-core/no-enum": 0.27033940579708476,
+        "linter/@azure-tools/typespec-azure-core/no-error-status-codes": 0.2699389565217828,
+        "linter/@azure-tools/typespec-azure-core/no-explicit-routes-resource-ops": 0.17309205797103433,
+        "linter/@azure-tools/typespec-azure-core/no-generic-numeric": 0.8415941304348923,
+        "linter/@azure-tools/typespec-azure-core/no-nullable": 0.43214379710037437,
+        "linter/@azure-tools/typespec-azure-core/no-offsetdatetime": 1.8834781449267002,
+        "linter/@azure-tools/typespec-azure-core/no-rpc-path-params": 0.37795284057963957,
+        "linter/@azure-tools/typespec-azure-core/no-openapi": 2.3704438840580595,
+        "linter/@azure-tools/typespec-azure-core/no-openapi-client-extensions": 0.5761944057976013,
+        "linter/@azure-tools/typespec-azure-core/no-format": 0.7386765942032651,
+        "linter/@azure-tools/typespec-azure-core/no-multiple-discriminator": 0.21093455072449271,
+        "linter/@azure-tools/typespec-azure-core/no-rest-library-interfaces": 0.1040956666666894,
+        "linter/@azure-tools/typespec-azure-core/no-unknown": 0.3084370000009506,
+        "linter/@azure-tools/typespec-azure-core/no-unnamed-types": 0.8590269420293337,
+        "linter/@azure-tools/typespec-azure-core/documentation-required": 1.9513303913042883,
+        "linter/@azure-tools/typespec-azure-core/key-visibility-required": 0.3261634492753142,
+        "linter/@azure-tools/typespec-azure-core/response-schema-problem": 21.73480702898544,
+        "linter/@azure-tools/typespec-azure-core/rpc-operation-request-body": 0.1628736086957367,
+        "linter/@azure-tools/typespec-azure-core/spread-discriminated-model": 0.4045002318843797,
+        "linter/@azure-tools/typespec-azure-core/no-string-discriminator": 0.12766085507205785,
+        "linter/@azure-tools/typespec-azure-core/require-versioned": 0.05777389855070989,
+        "linter/@azure-tools/typespec-azure-core/no-private-usage": 2.961622695652028,
+        "linter/@azure-tools/typespec-azure-core/no-legacy-usage": 1.8786507536229309,
+        "linter/@azure-tools/typespec-azure-core/friendly-name": 1.2435388695654197,
+        "linter/@azure-tools/typespec-azure-core/no-query-explode": 0.3125297101450964,
+        "linter/@azure-tools/typespec-azure-core/no-header-explode": 0.21837607246380764,
+        "linter/@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch": 1.135717101449479,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-no-record": 0.5243450869571739,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts": 9.226578217391346,
+        "linter/@azure-tools/typespec-azure-resource-manager/no-override-props": 0.29551517391355053,
+        "linter/@azure-tools/typespec-azure-resource-manager/no-empty-model": 0.21581882608734304,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-common-types-version": 6.6901008260870585,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-child-resources": 7.977146608695658,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-lifecycle-operations": 0.19257565217385095,
+        "linter/@azure-tools/typespec-azure-resource-manager/use-relationship-required-properties": 0.22866139130446358,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes": 1.7171880434781956,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes": 0.1807256086955694,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes": 0.34061486956518466,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-action-no-segment": 0.366545565217324,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property": 0.3203590869564362,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property": 0.2184116086947419,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-version-format": 0.20654534782624978,
+        "linter/@azure-tools/typespec-azure-resource-manager/version-progression": 0.33200643478235375,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-key-invalid-chars": 0.4250126521747204,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern": 0.11498591304337463,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-custom-resource-no-key": 0.18527869565207805,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage": 0.11169186956531911,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-feature-file-usage-discourage": 0.04383826086930877,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response": 0.7439733478258463,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars": 0.3090295217379326,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": 0.3565867391301491,
+        "linter/@azure-tools/typespec-azure-resource-manager/no-reserved-resource-property": 0.1739503913035467,
+        "linter/@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels": 0.18824443478269645,
+        "linter/@azure-tools/typespec-azure-resource-manager/use-interface": 0.1599599130429891,
+        "linter/@azure-tools/typespec-azure-resource-manager/use-operation-decorator": 0.3260877391304427,
+        "linter/@azure-tools/typespec-azure-resource-manager/use-api-version": 0.44349304347827495,
+        "linter/@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation": 0.37764978260923704,
+        "linter/@azure-tools/typespec-azure-resource-manager/empty-updateable-properties": 0.3264698695653035,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator": 0.10431408695643293,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb": 0.12459973913048641,
+        "linter/@azure-tools/typespec-azure-resource-manager/improper-subscription-list-operation": 0.08403626086951392,
+        "linter/@azure-tools/typespec-azure-resource-manager/lro-location-header": 0.31988121739079917,
+        "linter/@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers": 1.0110608260877243,
+        "linter/@azure-tools/typespec-azure-resource-manager/no-response-body": 12.129284782608426,
+        "linter/@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint": 0.1361711304347528,
+        "linter/@azure-tools/typespec-azure-resource-manager/patch-envelope": 0.31091491304351104,
+        "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-patch": 0.6403483478262268,
+        "linter/@azure-tools/typespec-azure-resource-manager/resource-name": 0.3937862608685978,
+        "linter/@azure-tools/typespec-azure-resource-manager/secret-prop": 3.8911556521739326,
+        "linter/@azure-tools/typespec-azure-resource-manager/unsupported-type": 0.5640274782604928,
+        "linter/@azure-tools/typespec-client-generator-core/require-client-suffix": 1.6492454492755393,
+        "linter/@azure-tools/typespec-client-generator-core/property-name-conflict": 2.0373884927539687,
+        "emit": 15296.239607347825,
+        "emit/@azure-tools/typespec-autorest": 224.90319462318837,
+        "emit/@azure-tools/typespec-python": 4705.875023898551,
+        "emit/@typespec/http-client-js": 1152.9196968840579,
+        "emit/@azure-tools/typespec-ts": 2325.045898869565,
+        "emit/@azure-tools/typespec-java": 6745.6734179855075,
+        "linter/@azure-tools/typespec-azure-core/no-response-body": 31.53066465217374,
+        "linter/@azure-tools/typespec-azure-core/bad-record-type": 0.592512413043778,
+        "linter/@azure-tools/typespec-azure-core/use-standard-names": 0.40817143478265594,
+        "linter/@azure-tools/typespec-azure-core/use-standard-operations": 0.18236932608680412,
+        "emit/@typespec/openapi3": 212.6072250434783,
+        "emit/@typespec/openapi3/compute": 184.17475871739128,
+        "emit/@typespec/openapi3/write": 27.76038269565222
       },
-      "runner": {
-        "os": "linux-6.17.0-1022-azure",
-        "nodeVersion": "v24.15.0",
-        "arch": "x64"
-      },
-      "quality": {
-        "iterations": 25,
-        "cv": 0.02078614313507086,
-        "flags": []
+      "specMetrics": {
+        "azure-arm-resource-manager": {
+          "total": 1243.6029029565218,
+          "loader": 462.0600624347824,
+          "resolver": 62.49410869565217,
+          "checker": 560.3852904347825,
+          "validation": 39.969506565217394,
+          "validation/compiler": 4.222792956521773,
+          "validation/@typespec/http": 9.42340278260868,
+          "validation/@typespec/rest": 1.4550991739130317,
+          "validation/@typespec/versioning": 24.611678304347784,
+          "validation/@azure-tools/typespec-azure-core": 0.20797156521729962,
+          "linter": 118.68506286956526,
+          "linter/@azure-tools/typespec-azure-core/operation-missing-api-version": 0.29786160869581063,
+          "linter/@azure-tools/typespec-azure-core/auth-required": 0.07739373913049664,
+          "linter/@azure-tools/typespec-azure-core/request-body-problem": 0.32768486956466286,
+          "linter/@azure-tools/typespec-azure-core/byos": 0.7661865217392796,
+          "linter/@azure-tools/typespec-azure-core/casing-style": 1.471982260868196,
+          "linter/@azure-tools/typespec-azure-core/composition-over-inheritance": 0.21439273912959755,
+          "linter/@azure-tools/typespec-azure-core/known-encoding": 0.39580873912963516,
+          "linter/@azure-tools/typespec-azure-core/long-running-polling-operation-required": 0.6801991304351838,
+          "linter/@azure-tools/typespec-azure-core/no-case-mismatch": 0.8450739565209322,
+          "linter/@azure-tools/typespec-azure-core/no-closed-literal-union": 0.9306027391304547,
+          "linter/@azure-tools/typespec-azure-core/no-enum": 0.29652613043467485,
+          "linter/@azure-tools/typespec-azure-core/no-error-status-codes": 0.24103769565220753,
+          "linter/@azure-tools/typespec-azure-core/no-explicit-routes-resource-ops": 0.13150960869558295,
+          "linter/@azure-tools/typespec-azure-core/no-generic-numeric": 1.0663039130436711,
+          "linter/@azure-tools/typespec-azure-core/no-nullable": 0.42803439130199444,
+          "linter/@azure-tools/typespec-azure-core/no-offsetdatetime": 1.9601523478236034,
+          "linter/@azure-tools/typespec-azure-core/no-rpc-path-params": 0.25279452173890604,
+          "linter/@azure-tools/typespec-azure-core/no-openapi": 2.955517999999875,
+          "linter/@azure-tools/typespec-azure-core/no-openapi-client-extensions": 0.6112476086960748,
+          "linter/@azure-tools/typespec-azure-core/no-format": 0.7807101304369612,
+          "linter/@azure-tools/typespec-azure-core/no-multiple-discriminator": 0.2451724782605474,
+          "linter/@azure-tools/typespec-azure-core/no-rest-library-interfaces": 0.14659365217395412,
+          "linter/@azure-tools/typespec-azure-core/no-unknown": 0.3253236521762554,
+          "linter/@azure-tools/typespec-azure-core/no-unnamed-types": 0.76501886956525,
+          "linter/@azure-tools/typespec-azure-core/documentation-required": 1.987445608695314,
+          "linter/@azure-tools/typespec-azure-core/key-visibility-required": 0.3995753478252284,
+          "linter/@azure-tools/typespec-azure-core/response-schema-problem": 21.671104869565387,
+          "linter/@azure-tools/typespec-azure-core/rpc-operation-request-body": 0.12543478260896218,
+          "linter/@azure-tools/typespec-azure-core/spread-discriminated-model": 0.4373467826080346,
+          "linter/@azure-tools/typespec-azure-core/no-string-discriminator": 0.16098730434674982,
+          "linter/@azure-tools/typespec-azure-core/require-versioned": 0.058800478260843156,
+          "linter/@azure-tools/typespec-azure-core/no-private-usage": 3.2253852173914668,
+          "linter/@azure-tools/typespec-azure-core/no-legacy-usage": 1.9608062608689303,
+          "linter/@azure-tools/typespec-azure-core/friendly-name": 1.3490883043476298,
+          "linter/@azure-tools/typespec-azure-core/no-query-explode": 0.26221317391333365,
+          "linter/@azure-tools/typespec-azure-core/no-header-explode": 0.1849672608698355,
+          "linter/@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch": 1.0657884347830155,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-no-record": 0.5243450869571739,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts": 9.226578217391346,
+          "linter/@azure-tools/typespec-azure-resource-manager/no-override-props": 0.29551517391355053,
+          "linter/@azure-tools/typespec-azure-resource-manager/no-empty-model": 0.21581882608734304,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-common-types-version": 6.6901008260870585,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-child-resources": 7.977146608695658,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-agent-base-type-lifecycle-operations": 0.19257565217385095,
+          "linter/@azure-tools/typespec-azure-resource-manager/use-relationship-required-properties": 0.22866139130446358,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes": 1.7171880434781956,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes": 0.1807256086955694,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes": 0.34061486956518466,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-action-no-segment": 0.366545565217324,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property": 0.3203590869564362,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property": 0.2184116086947419,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-version-format": 0.20654534782624978,
+          "linter/@azure-tools/typespec-azure-resource-manager/version-progression": 0.33200643478235375,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-key-invalid-chars": 0.4250126521747204,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern": 0.11498591304337463,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-custom-resource-no-key": 0.18527869565207805,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage": 0.11169186956531911,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-feature-file-usage-discourage": 0.04383826086930877,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response": 0.7439733478258463,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars": 0.3090295217379326,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": 0.3565867391301491,
+          "linter/@azure-tools/typespec-azure-resource-manager/no-reserved-resource-property": 0.1739503913035467,
+          "linter/@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels": 0.18824443478269645,
+          "linter/@azure-tools/typespec-azure-resource-manager/use-interface": 0.1599599130429891,
+          "linter/@azure-tools/typespec-azure-resource-manager/use-operation-decorator": 0.3260877391304427,
+          "linter/@azure-tools/typespec-azure-resource-manager/use-api-version": 0.44349304347827495,
+          "linter/@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation": 0.37764978260923704,
+          "linter/@azure-tools/typespec-azure-resource-manager/empty-updateable-properties": 0.3264698695653035,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator": 0.10431408695643293,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb": 0.12459973913048641,
+          "linter/@azure-tools/typespec-azure-resource-manager/improper-subscription-list-operation": 0.08403626086951392,
+          "linter/@azure-tools/typespec-azure-resource-manager/lro-location-header": 0.31988121739079917,
+          "linter/@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers": 1.0110608260877243,
+          "linter/@azure-tools/typespec-azure-resource-manager/no-response-body": 12.129284782608426,
+          "linter/@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint": 0.1361711304347528,
+          "linter/@azure-tools/typespec-azure-resource-manager/patch-envelope": 0.31091491304351104,
+          "linter/@azure-tools/typespec-azure-resource-manager/arm-resource-patch": 0.6403483478262268,
+          "linter/@azure-tools/typespec-azure-resource-manager/resource-name": 0.3937862608685978,
+          "linter/@azure-tools/typespec-azure-resource-manager/secret-prop": 3.8911556521739326,
+          "linter/@azure-tools/typespec-azure-resource-manager/unsupported-type": 0.5640274782604928,
+          "linter/@azure-tools/typespec-client-generator-core/require-client-suffix": 1.5566793913044816,
+          "linter/@azure-tools/typespec-client-generator-core/property-name-conflict": 2.073129739130546,
+          "emit": 13505.489745521738,
+          "emit/@azure-tools/typespec-autorest": 287.4147292608695,
+          "emit/@azure-tools/typespec-python": 4801.141191608697,
+          "emit/@typespec/http-client-js": 1373.2743529130435,
+          "emit/@azure-tools/typespec-ts": 2338.499954913044,
+          "emit/@azure-tools/typespec-java": 4699.427264391305
+        },
+        "azure-core-dataplane": {
+          "total": 725.7405895652174,
+          "loader": 221.84889508695656,
+          "resolver": 23.600140956521727,
+          "checker": 286.18322726086944,
+          "validation": 97.60980339130433,
+          "validation/compiler": 4.674971434782581,
+          "validation/@typespec/http": 16.913068956521744,
+          "validation/@typespec/rest": 1.9618507391304596,
+          "validation/@typespec/versioning": 56.749490478260846,
+          "validation/@azure-tools/typespec-azure-core": 17.245542826086954,
+          "linter": 96.17991039130436,
+          "linter/@azure-tools/typespec-azure-core/operation-missing-api-version": 0.3849627391304456,
+          "linter/@azure-tools/typespec-azure-core/auth-required": 0.06261821739140626,
+          "linter/@azure-tools/typespec-azure-core/request-body-problem": 0.47105391304360283,
+          "linter/@azure-tools/typespec-azure-core/byos": 1.4869077826085093,
+          "linter/@azure-tools/typespec-azure-core/casing-style": 1.3074302173904966,
+          "linter/@azure-tools/typespec-azure-core/composition-over-inheritance": 0.1463408260867116,
+          "linter/@azure-tools/typespec-azure-core/known-encoding": 0.4318190434786155,
+          "linter/@azure-tools/typespec-azure-core/long-running-polling-operation-required": 0.8788503913043592,
+          "linter/@azure-tools/typespec-azure-core/no-case-mismatch": 0.5770655217390176,
+          "linter/@azure-tools/typespec-azure-core/no-closed-literal-union": 0.915944086956504,
+          "linter/@azure-tools/typespec-azure-core/no-enum": 0.2676228260868554,
+          "linter/@azure-tools/typespec-azure-core/no-error-status-codes": 0.27919721739141573,
+          "linter/@azure-tools/typespec-azure-core/no-explicit-routes-resource-ops": 0.1967546956520496,
+          "linter/@azure-tools/typespec-azure-core/no-generic-numeric": 0.7355098260870917,
+          "linter/@azure-tools/typespec-azure-core/no-nullable": 0.45742086956487504,
+          "linter/@azure-tools/typespec-azure-core/no-offsetdatetime": 1.792049086956319,
+          "linter/@azure-tools/typespec-azure-core/no-unnamed-types": 0.8908300000003969,
+          "linter/@azure-tools/typespec-azure-core/no-response-body": 33.20661634782606,
+          "linter/@azure-tools/typespec-azure-core/no-rpc-path-params": 0.4382720434780861,
+          "linter/@azure-tools/typespec-azure-core/no-openapi": 2.01131495652187,
+          "linter/@azure-tools/typespec-azure-core/no-openapi-client-extensions": 0.5332328695651936,
+          "linter/@azure-tools/typespec-azure-core/no-format": 0.6934465217385898,
+          "linter/@azure-tools/typespec-azure-core/no-multiple-discriminator": 0.20304178260898484,
+          "linter/@azure-tools/typespec-azure-core/no-rest-library-interfaces": 0.0802278695651674,
+          "linter/@azure-tools/typespec-azure-core/no-unknown": 0.29844186956575947,
+          "linter/@azure-tools/typespec-azure-core/bad-record-type": 0.576284130434962,
+          "linter/@azure-tools/typespec-azure-core/documentation-required": 1.8832954347827067,
+          "linter/@azure-tools/typespec-azure-core/key-visibility-required": 0.26079813043491845,
+          "linter/@azure-tools/typespec-azure-core/response-schema-problem": 21.96470578260853,
+          "linter/@azure-tools/typespec-azure-core/rpc-operation-request-body": 0.18818982608697454,
+          "linter/@azure-tools/typespec-azure-core/spread-discriminated-model": 0.37999747826236907,
+          "linter/@azure-tools/typespec-azure-core/use-standard-names": 0.4537807826085772,
+          "linter/@azure-tools/typespec-azure-core/use-standard-operations": 0.19412534782599244,
+          "linter/@azure-tools/typespec-azure-core/no-string-discriminator": 0.10907013043472193,
+          "linter/@azure-tools/typespec-azure-core/require-versioned": 0.057579434782630175,
+          "linter/@azure-tools/typespec-azure-core/no-private-usage": 2.776316608696037,
+          "linter/@azure-tools/typespec-azure-core/no-legacy-usage": 1.776968913043477,
+          "linter/@azure-tools/typespec-azure-core/friendly-name": 1.202892826086663,
+          "linter/@azure-tools/typespec-azure-core/no-query-explode": 0.3216461739131833,
+          "linter/@azure-tools/typespec-azure-core/no-header-explode": 0.23799252173909696,
+          "linter/@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch": 1.1928460869566369,
+          "linter/@azure-tools/typespec-client-generator-core/require-client-suffix": 1.7199718695654689,
+          "linter/@azure-tools/typespec-client-generator-core/property-name-conflict": 2.532750782609256,
+          "emit": 15988.645537695647,
+          "emit/@azure-tools/typespec-autorest": 195.85530621739125,
+          "emit/@typespec/openapi3": 214.65622808695653,
+          "emit/@typespec/openapi3/compute": 186.54242882608693,
+          "emit/@typespec/openapi3/write": 27.427828086956573,
+          "emit/@azure-tools/typespec-python": 4708.341656347826,
+          "emit/@typespec/http-client-js": 995.5633311304344,
+          "emit/@azure-tools/typespec-ts": 2218.424253043478,
+          "emit/@azure-tools/typespec-java": 7660.955724695653
+        },
+        "azure-full": {
+          "total": 709.4516322173913,
+          "loader": 219.572289826087,
+          "resolver": 23.357427347826082,
+          "checker": 267.15317517391304,
+          "validation": 107.05733513043478,
+          "validation/compiler": 5.120365043478268,
+          "validation/@typespec/http": 24.702680695652155,
+          "validation/@typespec/rest": 2.371272565217396,
+          "validation/@typespec/versioning": 56.66390213043476,
+          "validation/@azure-tools/typespec-azure-core": 18.229909739130445,
+          "linter": 92.34700921739129,
+          "linter/@azure-tools/typespec-azure-core/operation-missing-api-version": 0.35991700000004523,
+          "linter/@azure-tools/typespec-azure-core/auth-required": 0.06112143478268357,
+          "linter/@azure-tools/typespec-azure-core/request-body-problem": 0.5311205652177131,
+          "linter/@azure-tools/typespec-azure-core/byos": 1.3813602608693343,
+          "linter/@azure-tools/typespec-azure-core/casing-style": 1.322510130434931,
+          "linter/@azure-tools/typespec-azure-core/composition-over-inheritance": 0.15413286956553077,
+          "linter/@azure-tools/typespec-azure-core/known-encoding": 0.4601653043480284,
+          "linter/@azure-tools/typespec-azure-core/long-running-polling-operation-required": 0.8356237391307549,
+          "linter/@azure-tools/typespec-azure-core/no-case-mismatch": 0.6142581739132449,
+          "linter/@azure-tools/typespec-azure-core/no-closed-literal-union": 0.9074939130434517,
+          "linter/@azure-tools/typespec-azure-core/no-enum": 0.24686926086972405,
+          "linter/@azure-tools/typespec-azure-core/no-error-status-codes": 0.28958195652172514,
+          "linter/@azure-tools/typespec-azure-core/no-explicit-routes-resource-ops": 0.19101186956547042,
+          "linter/@azure-tools/typespec-azure-core/no-generic-numeric": 0.7229686521739139,
+          "linter/@azure-tools/typespec-azure-core/no-nullable": 0.4109761304342536,
+          "linter/@azure-tools/typespec-azure-core/no-offsetdatetime": 1.8982330000001777,
+          "linter/@azure-tools/typespec-azure-core/no-unnamed-types": 0.9212319565223543,
+          "linter/@azure-tools/typespec-azure-core/no-response-body": 29.854712956521414,
+          "linter/@azure-tools/typespec-azure-core/no-rpc-path-params": 0.4427919565219267,
+          "linter/@azure-tools/typespec-azure-core/no-openapi": 2.144498695652433,
+          "linter/@azure-tools/typespec-azure-core/no-openapi-client-extensions": 0.5841027391315354,
+          "linter/@azure-tools/typespec-azure-core/no-format": 0.7418731304342442,
+          "linter/@azure-tools/typespec-azure-core/no-multiple-discriminator": 0.18458939130394594,
+          "linter/@azure-tools/typespec-azure-core/no-rest-library-interfaces": 0.08546547826094668,
+          "linter/@azure-tools/typespec-azure-core/no-unknown": 0.30154547826083694,
+          "linter/@azure-tools/typespec-azure-core/bad-record-type": 0.608740695652594,
+          "linter/@azure-tools/typespec-azure-core/documentation-required": 1.9832501304348447,
+          "linter/@azure-tools/typespec-azure-core/key-visibility-required": 0.31811686956579566,
+          "linter/@azure-tools/typespec-azure-core/response-schema-problem": 21.568610434782396,
+          "linter/@azure-tools/typespec-azure-core/rpc-operation-request-body": 0.17499621739127336,
+          "linter/@azure-tools/typespec-azure-core/spread-discriminated-model": 0.3961564347827354,
+          "linter/@azure-tools/typespec-azure-core/use-standard-names": 0.3625620869567347,
+          "linter/@azure-tools/typespec-azure-core/use-standard-operations": 0.1706133043476158,
+          "linter/@azure-tools/typespec-azure-core/no-string-discriminator": 0.11292513043470179,
+          "linter/@azure-tools/typespec-azure-core/require-versioned": 0.05694178260865635,
+          "linter/@azure-tools/typespec-azure-core/no-private-usage": 2.8831662608685806,
+          "linter/@azure-tools/typespec-azure-core/no-legacy-usage": 1.8981770869563859,
+          "linter/@azure-tools/typespec-azure-core/friendly-name": 1.1786354782619661,
+          "linter/@azure-tools/typespec-azure-core/no-query-explode": 0.3537297826087722,
+          "linter/@azure-tools/typespec-azure-core/no-header-explode": 0.23216843478249044,
+          "linter/@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch": 1.1485167826087845,
+          "linter/@azure-tools/typespec-client-generator-core/require-client-suffix": 1.6710850869566674,
+          "linter/@azure-tools/typespec-client-generator-core/property-name-conflict": 1.5062849565221037,
+          "emit": 16394.583538826086,
+          "emit/@azure-tools/typespec-autorest": 191.43954839130433,
+          "emit/@typespec/openapi3": 210.55822200000006,
+          "emit/@typespec/openapi3/compute": 181.80708860869566,
+          "emit/@typespec/openapi3/write": 28.09293730434786,
+          "emit/@azure-tools/typespec-python": 4608.142223739131,
+          "emit/@typespec/http-client-js": 1089.9214066086956,
+          "emit/@azure-tools/typespec-ts": 2418.213488652174,
+          "emit/@azure-tools/typespec-java": 7876.637264869567
+        }
       }
     }
   ]
