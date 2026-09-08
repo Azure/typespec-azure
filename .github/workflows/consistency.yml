@@ -137,7 +137,7 @@ jobs:
         with:
           args: -color -verbose
 
-  # Check catalog is in sync with core
+  # Check dependency and CI tool versions are in sync
   version-consistency:
     name: Versions consistency
     runs-on: ubuntu-latest
@@ -152,7 +152,7 @@ jobs:
         name: Install dependencies
 
       - run: pnpm deps check
-        name: Check catalog is in sync
+        name: Check dependency and CI tool versions are in sync
 
       - run: pnpm run check-lockfile
         name: Check lockfile has no tarball URLs
