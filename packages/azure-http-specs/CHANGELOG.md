@@ -1,5 +1,12 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.45
+
+### Bug Fixes
+
+- [#5214](https://github.com/Azure/typespec-azure/pull/5214) Add the missing nextLink decorator to the ARM operation template paging scenario.
+
+
 ## 0.1.0-alpha.44
 
 ### Features

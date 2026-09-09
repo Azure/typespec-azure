@@ -1,5 +1,18 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.72.0
+
+### Features
+
+- [#5265](https://github.com/Azure/typespec-azure/pull/5265) Add the `no-boolean` lint rule that recommends descriptive extensible enums instead of boolean API shapes when semantic values matter.
+- [#4145](https://github.com/Azure/typespec-azure/pull/4145) Add linter rule `lro-response-mismatch` to warn when a long-running operation's final result type does not match the expected response
+- [#5358](https://github.com/Azure/typespec-azure/pull/5358) Register the ARM collection response envelope rule as disabled by default.
+- [#5302](https://github.com/Azure/typespec-azure/pull/5302) Add the `use-application-json-content-type` rule to require JSON request and response bodies for ARM operations.
+- [#5318](https://github.com/Azure/typespec-azure/pull/5318) Add the `no-query-in-collection` ARM lint rule, disabled by default in the resource-manager ruleset.
+- [#5273](https://github.com/Azure/typespec-azure/pull/5273) Add an ARM lint rule that warns when point GET, PUT, PATCH, or DELETE operations declare query parameters other than `api-version`.
+- [#5379](https://github.com/Azure/typespec-azure/pull/5379) Add the `list-operation-missing-pageable` lint rule for ARM collection GET operations that do not define TypeSpec paging metadata.
+
+
 ## 0.71.0
 
 ### Features
