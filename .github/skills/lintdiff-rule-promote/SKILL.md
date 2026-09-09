@@ -1,7 +1,7 @@
 ---
 name: lintdiff-rule-promote
-description: Promote a user-marked done LintDiff rule from packages/typespec-lintdiff into the correct official TypeSpec Azure library, with a clean worktree, user-confirmed destination (or agent-recommended destination when the user says "do not ask"), native tests/docs/ruleset wiring, validation, and a draft PR. Use when the user names a migrated lintdiff rule as done and asks to move or promote it to typespec-azure-core or typespec-azure-resource-manager.
-argument-hint: "[validator rule id or local rule name marked done] [do not ask]"
+description: Promote a named LintDiff rule from packages/typespec-lintdiff into the correct official TypeSpec Azure library, assuming it is done, with a clean worktree, user-confirmed destination (or agent-recommended destination when the user says "do not ask"), native tests/docs/ruleset wiring, validation, and a draft PR. Use when the user names a migrated lintdiff rule and asks to move or promote it to typespec-azure-core or typespec-azure-resource-manager.
+argument-hint: "[validator rule id or local rule name] [do not ask]"
 user-invocable: true
 ---
 
@@ -16,13 +16,12 @@ official-library PR is prepared in a clean worktree.
 
 ## Preconditions
 
-- The user must explicitly name the rule and mark it as done for this run.
-  Do not infer "done" from catalog status, `coverageKind`, fixture counts, or
-  local linter registration alone.
-- In an active promotion conversation, wording like "start with
-  `<RuleName>`" or "promote `<RuleName>`" is sufficient only when the user has
-  already established that this workflow is for done rules. Record that as a
-  per-run eligibility decision; do not write it back as persistent metadata.
+- The user must name the rule. Assume a rule named for promotion is done for
+  this run; do not ask the user to mark it done or verify a separate done-status
+  flag in catalog metadata, fixtures, or linter registration.
+- Wording like "start with `<RuleName>`" or "promote `<RuleName>`" is sufficient
+  in a promotion conversation. This is a per-run assumption, not a persistent
+  metadata change or a claim that the user explicitly marked the rule done.
 - If the rule semantics are still under review, stop and send the user to the
   lintdiff development or repair flow first.
 - Do not edit or clean up the current lintdiff worktree as part of promotion.
@@ -32,7 +31,7 @@ official-library PR is prepared in a clean worktree.
   personal fork. Verify that `origin` points to `Azure/typespec-azure` before
   creating the worktree. If `origin` is not writable, stop and report the
   permission blocker; do not silently fall back to a fork.
-- Treat the user-marked done lintdiff rule as immutable during promotion. Do not
+- Treat the source lintdiff rule as immutable during promotion. Do not
   change `packages/typespec-lintdiff` source, fixtures, snapshots, package
   manifests, or docs unless the user explicitly redirects from promotion back to
   rule repair.
@@ -73,11 +72,12 @@ of pausing for user confirmation.
   enablement. "Do not ask" alone is not approval to enable new diagnostics.
 - Apply the `int:azure-specs` label directly when appropriate and permitted; if
   labeling is blocked, report that limitation without asking.
-- This mode does not waive the named, user-marked done rule precondition, source
+- This mode does not waive the named rule precondition, source
   immutability, required validation, or repository permission requirements. If
   prerequisites are missing, evidence cannot support a safe recommendation, or
   a source-semantic gap requires reopening repair, stop and report the blocker
-  without asking. Do not infer done status or reopen source repair automatically.
+  without asking. The done-status assumption applies in both modes; do not
+  reopen source repair automatically.
 
 ## Fast path for repeat promotions
 
@@ -99,7 +99,7 @@ needs special investigation:
    package lifecycle scripts first: `pnpm install --ignore-scripts`. Run a full
    `pnpm install` only when the target validation actually needs lifecycle
    outputs.
-5. Do not run the lintdiff harness during promotion. The done rule's
+5. Do not run the lintdiff harness during promotion. The source rule's
    `migration.md` is the source of migration evidence; use source package build
    plus native target tests for promotion validation.
 6. Convert fixture coverage with the standard mapping in step 5 instead of
@@ -150,7 +150,7 @@ validation commands below and only use bounded `validate:pr` with
    - `packages/typespec-lintdiff/catalog/catalog.json` and
      `catalog/validator-rule-metadata.json` when present
 3. Do not run lintdiff harness validation as part of promotion; rely on the
-   done rule's checked-in migration evidence.
+   source rule's checked-in migration evidence.
 4. Record the lintdiff source branch, commit, and source location in your notes.
    Prefer one of these source-location forms:
    - existing worktree path, when a matching local worktree is already present
@@ -256,7 +256,7 @@ proceeding directly with the agent's recommendation.
 Keep both PRs aligned:
 
 - The lintdiff PR remains the source of truth for rule behavior.
-- If review on the native-library PR reveals that the done lintdiff rule has a
+- If review on the native-library PR reveals that the source lintdiff rule has a
   semantic gap, stop promotion and report the blocker. The user must explicitly
   choose to reopen lintdiff rule repair before any source changes are made.
 - Do not let the promoted rule diverge from the lintdiff source without
@@ -544,8 +544,7 @@ promotion. For every review or validation finding, classify it before editing:
   unrelated code
 
 Do not run the lintdiff migration harness during promotion. Harness validation
-belongs to the lintdiff development or repair workflow before the user marks the
-rule done.
+belongs to the lintdiff development or repair workflow before promotion.
 
 ### 10. Review, commit, push, and create a draft PR
 
@@ -601,8 +600,9 @@ It must include:
   rule name, canonical validator rule slug, source branch, source worktree path,
   and whether the source worktree had uncommitted rule changes. Link only to the
   original lintdiff source rule file. Use a branch-based GitHub URL, not a
-  commit-SHA URL. State that the user-marked done source rule was not modified
-  during promotion.
+  commit-SHA URL. State that the source rule was assumed done for this run and
+  was not modified during promotion; do not claim explicit user confirmation
+  of done status unless it was actually given.
 - **Destination analysis:** explain the selected official package, plausible
   alternatives, and the evidence from imports, rule semantics, fixture metadata,
   catalog/report data, and target-library dependency direction.
