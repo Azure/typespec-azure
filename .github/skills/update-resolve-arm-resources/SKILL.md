@@ -100,9 +100,8 @@ For a selected API version:
    version.
 6. Resolve from the cached namespace and realm, not by looking up the provider again.
 7. Filter enumerated ARM state to exact realm-owned keys.
-8. Validate embedded `Model`, `Operation`, `Interface`, and property references.
-9. Clear only derived cache entries for the selected graph.
-10. Compute HTTP metadata from projected operations.
+8. Use the projected provider namespace as the derived provider-cache key.
+9. Compute HTTP metadata from projected operations.
 
 `getVersioningMutators` creates new mutator objects each time, and the compiler mutation cache keys
 on mutator identity. Never recreate a snapshot on every resolver call, and never cache only the
@@ -134,8 +133,9 @@ Treat these as derived caches:
 - `armResolvedResources`
 - `armResourcesCached`
 
-When adding a state key, document which class it belongs to. Add every new derived cache to the
-central invalidation helper.
+When adding a state key, document which class it belongs to. Selected snapshots do not clear these
+maps: realm-owned keys and the projected provider namespace isolate their derived entries from the
+declaration view.
 
 Realm state maps can fall back to parent program state for original types. An entry visible from a
 realm is not necessarily owned by that realm. Check
@@ -191,6 +191,15 @@ them.
 
 For a TCGC integration test, let the consumer call `getLibraryName` or
 `getClientNameOverride`. Do not duplicate TCGC precedence in ARM.
+
+The implemented consumer adapter is:
+
+```ts
+resolveArmResources(program, {
+  version,
+  nameResolver: ({ type }) => getLibraryName(tcgcContext, type),
+});
+```
 
 ## Required tests
 
