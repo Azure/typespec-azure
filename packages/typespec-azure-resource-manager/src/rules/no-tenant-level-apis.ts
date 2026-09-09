@@ -22,7 +22,7 @@ export const noTenantLevelApisRule = createRule({
           }
 
           for (const httpOperation of service.operations) {
-            if (httpOperation.verb === "put" && isTenantLevelPutPath(httpOperation.path)) {
+            if (httpOperation.verb === "put" && isTenantLevelPath(httpOperation.path)) {
               context.reportDiagnostic({
                 target: httpOperation.operation,
                 format: { name: httpOperation.operation.name },
@@ -35,6 +35,6 @@ export const noTenantLevelApisRule = createRule({
   },
 });
 
-function isTenantLevelPutPath(path: string): boolean {
+function isTenantLevelPath(path: string): boolean {
   return path.startsWith("/providers") && !path.endsWith("/operations");
 }
