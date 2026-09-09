@@ -1,0 +1,15 @@
+[
+  {
+    "code": "ConsistentPatchProperties",
+    "message": "The property 'properties.child.displayName' in the request body either not apppear in the resource model or has the wrong level.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "parameters",
+      "4",
+      "schema"
+    ],
+    "severity": 0
+  }
+]

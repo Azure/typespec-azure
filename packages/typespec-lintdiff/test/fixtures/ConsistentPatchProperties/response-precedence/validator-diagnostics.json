@@ -1,0 +1,15 @@
+[
+  {
+    "code": "ConsistentPatchProperties",
+    "message": "The property 'properties' in the request body either not apppear in the resource model or has the wrong level.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/{provider}",
+      "patch",
+      "parameters",
+      "5",
+      "schema"
+    ],
+    "severity": 0
+  }
+]

@@ -1,9 +1,10 @@
 import "../../lib/imports.tsp";
+import "@azure-tools/typespec-client-generator-core";
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.Versioning;
-using TypeSpec.OpenAPI;
+using Azure.ClientGenerator.Core;
 using Azure.ResourceManager;
 
 @armProviderNamespace
@@ -22,48 +23,26 @@ model Widget is ProxyResource<WidgetProperties> {
   @segment("widgets")
   @doc("The name of the widget")
   @path
-  @pattern("^[a-zA-Z0-9_-]+$")
   name: string;
 }
 
 @doc("Widget resource properties.")
 model WidgetProperties {
-  @doc("Description")
-  description?: string;
-
   @doc("Display name")
   displayName?: string;
-
-  @doc("Resource provisioning state")
-  @visibility(Lifecycle.Read)
-  provisioningState?: ResourceProvisioningState;
 }
 
-@doc("PATCH body for the Widget resource.")
+@doc("PATCH properties.")
+model WidgetPatchProperties {
+  @doc("A property emitted only for C#")
+  @scope("csharp")
+  clientOnly?: string;
+}
+
+@doc("PATCH body.")
 model WidgetPatchBody {
   @doc("Resource properties to update")
   properties?: WidgetPatchProperties;
-}
-
-@doc("PATCH properties that match the resource model.")
-model WidgetPatchProperties {
-  @doc("Display name")
-  displayName?: string;
-}
-
-@doc("Accepted LRO polling response.")
-model Accepted202WithLocation {
-  @doc("Status code")
-  @statusCode
-  statusCode: 202;
-
-  @doc("Polling location")
-  @header("Location")
-  location?: string;
-
-  @doc("Retry-after value")
-  @header("Retry-After")
-  retryAfter?: int32;
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}
@@ -76,14 +55,9 @@ interface Widgets {
   listByResourceGroup is ArmResourceListByParent<Widget>;
   listBySubscription is ArmListBySubscription<Widget>;
 
-  #suppress "@azure-tools/typespec-azure-core/no-openapi" "Need explicit LRO extensions for async PATCH."
-  @extension("x-ms-long-running-operation", true)
-  @extension("x-ms-long-running-operation-options", #{ `final-state-via`: "location" })
-  @doc("Update a Widget with an async PATCH body that matches the GET resource model.")
   @patch
   @armResourceUpdate(Widget)
-  update(
-    ...ResourceInstanceParameters<Widget>,
-    @doc("The request body") @body body: WidgetPatchBody,
-  ): Accepted202WithLocation | ErrorResponse;
+  update(...ResourceInstanceParameters<Widget>, @body body: WidgetPatchBody):
+    | ArmResponse<Widget>
+    | ErrorResponse;
 }
