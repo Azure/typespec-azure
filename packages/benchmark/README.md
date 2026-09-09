@@ -126,21 +126,32 @@ job, so that noise lands directly between neighboring points and shows up as
 jumps no code change explains.
 
 Machine speed scales TypeSpec workloads more or less uniformly, so it can be
-divided out. Each run therefore also compiles a **frozen reference workload** —
-a fixed spec built with a pinned `@typespec/compiler` release from npm — on the
-same machine, in the same job. Dividing by it drops between-machine spread to
-under 1%, taking the smallest reliably detectable regression from ~41% to ~3.5%.
+divided out. Each run therefore also compiles a **frozen reference workload** on
+the same machine, in the same job. Dividing by it removes the machine factor
+from the comparison.
 
-The reference is deliberately _not_ the compiler being benchmarked. If it moved
-with the repo, a genuine compiler regression would slow the reference by the
-same amount and cancel itself out. It is materialized from constants in
-`src/calibration.ts`, so it is identical for every commit ever measured,
-including commits that predate the file. Changing `REFERENCE_COMPILER_VERSION`
-or the reference spec breaks comparability with existing points, so both are
-versioned by `WORKLOAD_ID` and only entries sharing the dominant workload are
-corrected.
+The reference has to satisfy two competing requirements.
 
-Calibration costs ~15s per job and never fails a run: if the pinned compiler
+It must be **frozen**, and deliberately does not use the packages being
+benchmarked. If it moved with the repo, a genuine regression would slow the
+reference by the same amount and cancel itself out. It lives in `calibration/`
+and installs exactly pinned releases from npm.
+
+It must also be **representative**. A first attempt imported only
+`@typespec/compiler` and compiled synthetic models; between two CI machines it
+slowed 16% while the real specs slowed 34%, removing only half the machine
+effect. Hardware sensitivity depends on the kind of work being done — `loader`
+is a third of the real measurement and proved the most sensitive phase of all,
+and a spec with no libraries to load barely exercises it. The reference is
+therefore a frozen copy of the `azure-full` spec compiled against the same
+pinned library stack and linter ruleset, which brings its phase mix in line with
+what is actually being measured.
+
+Changing the reference spec or any pinned version breaks comparability with
+existing points, so both are versioned by `WORKLOAD_ID` in `src/calibration.ts`
+and only entries sharing the dominant workload are corrected.
+
+Calibration costs ~20s per commit and never fails a run: if the pinned stack
 cannot be installed, the run proceeds and the point is flagged `uncalibrated`.
 
 Raw measurements are never rewritten. `history.json` stores the calibration

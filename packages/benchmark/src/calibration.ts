@@ -7,105 +7,64 @@
  * code varied by 63% depending on the machine: between-machine spread was 13.7%
  * against 0.9% within a machine, so hardware outweighed code changes 16 to 1.
  *
- * Machine speed acts as a multiplicative constant, which is why dividing one
- * TypeSpec workload by another collapsed that 13.7% to 0.7%. This module
- * measures the denominator: a reference workload that never changes, compiled
- * on the same machine, in the same job, as the real benchmark.
+ * This module measures the denominator needed to divide that out: a reference
+ * workload that never changes, compiled on the same machine, in the same job,
+ * as the real benchmark.
  *
- * The reference must stay frozen. It deliberately does not use the compiler
- * being benchmarked -- it installs a pinned release from npm -- because a
- * reference that moved with the repo would cancel out the very regressions this
- * is meant to expose. Everything it needs is materialized from the constants
- * below, so it is identical for every commit ever measured, including commits
- * predating this file.
+ * Two properties matter, and they pull in opposite directions.
+ *
+ * The reference must be **frozen**. It deliberately does not use the packages
+ * being benchmarked -- it installs pinned releases from npm -- because a
+ * reference that moved with the repo would slow down alongside a real
+ * regression and cancel it out.
+ *
+ * The reference must also be **representative**. A first attempt used a
+ * synthetic spec importing only the compiler; between two CI machines it slowed
+ * 16% while the real specs slowed 34%, so it removed only half the machine
+ * effect. Hardware sensitivity varies with the kind of work: `loader` is a
+ * third of the real measurement and was the most sensitive phase of all, and a
+ * spec with no libraries to load barely exercises it. The reference is
+ * therefore a frozen copy of the azure-full benchmark spec, compiled against
+ * the same pinned library stack and the same linter ruleset, so that it does
+ * the same mix of work.
  */
 import { execFile, execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { median, summarize } from "./statistics.js";
 import type { CalibrationInfo } from "./types.js";
 
 /**
- * Pinned reference compiler. Changing this invalidates comparability with every
- * point measured before the change, so it should move rarely and deliberately,
- * together with WORKLOAD_ID.
+ * Identifies the frozen workload. Bump whenever the reference spec or any
+ * pinned version in calibration/package.json changes, so that points measured
+ * against different yardsticks are never compared with each other.
+ *
+ * v1: synthetic compiler-only spec. Withdrawn, it under-corrected by half.
+ * v2: frozen copy of the azure-full spec against the pinned library stack.
  */
-const REFERENCE_COMPILER_VERSION = "1.14.0";
+const WORKLOAD_ID = "v2";
 
-/**
- * Identifies the frozen workload. Bump whenever REFERENCE_SPEC or the pinned
- * compiler changes, so old points are never silently compared against a
- * different yardstick.
- */
-const WORKLOAD_ID = "v1";
+/** Reported alongside results so the reference in use is always identifiable. */
+const REFERENCE_COMPILER_VERSION = "1.15.0";
 
 /**
  * Sized so the machine-speed estimate is far more precise than the regressions
- * it needs to expose: measured across-run spread is ~0.5%, against a ~3.5%
- * detection target, for ~15s of job time.
+ * it needs to expose, without adding meaningfully to a ~25 minute job.
  */
-const CALIBRATION_WARMUP = 5;
+const CALIBRATION_WARMUP = 3;
 const CALIBRATION_ITERATIONS = 25;
 
-/** Size of the frozen workload. Tuned so the reference takes long enough to average out scheduler noise. */
-const ENTITY_COUNT = 400;
-const FIELDS_PER_ENTITY = 20;
-const OPERATION_COUNT = 200;
+/** The frozen workload, shipped in the package rather than generated. */
+const sourceDir = join(dirname(fileURLToPath(import.meta.url)), "../../calibration");
 
 /**
- * The frozen workload. Uses only compiler built-ins so calibration needs a
- * single pinned package, and is sized to run long enough to average out
- * scheduler noise without materially adding to job time.
- */
-const REFERENCE_SPEC = `
-import "@typespec/compiler";
-
-@service(#{ title: "Calibration" })
-namespace Calibration;
-
-model Base {
-  id: string;
-  createdAt: utcDateTime;
-  updatedAt: utcDateTime;
-  tags: string[];
-}
-
-model Item<T> is Base {
-  value: T;
-  nested: Record<T>;
-  maybe?: T | null;
-}
-
-union Status {
-  active: "active",
-  inactive: "inactive",
-  pending: "pending",
-}
-
-${Array.from({ length: ENTITY_COUNT }, (_, i) => {
-  const props = Array.from(
-    { length: FIELDS_PER_ENTITY },
-    (_, p) => `  field${p}: string | int32 | boolean;`,
-  ).join("\n");
-  return `model Entity${i} is Item<string> {
-${props}
-  status: Status;
-  peer?: Entity${(i + 1) % ENTITY_COUNT};
-}`;
-}).join("\n\n")}
-
-${Array.from(
-  { length: OPERATION_COUNT },
-  (_, i) =>
-    `op operation${i}(input: Entity${i % ENTITY_COUNT}, status: Status): Entity${(i + 7) % ENTITY_COUNT};`,
-).join("\n")}
-`;
-
-/**
- * Loader executed inside the calibration directory so that a bare
- * "@typespec/compiler" import resolves to the pinned copy through normal Node
- * resolution rather than to the workspace being benchmarked.
+ * Loader executed from inside the calibration directory so that bare imports
+ * resolve to the pinned copies through normal Node resolution rather than to
+ * the workspace being benchmarked.
+ *
+ * Measures what `total` measures for real specs: every phase except emit.
  */
 const REFERENCE_RUNNER = `
 import { compile, NodeHost, resolveCompilerOptions } from "@typespec/compiler";
@@ -138,54 +97,38 @@ process.stdout.write(JSON.stringify({ total }));
 
 /** Where the frozen environment is materialized. Reused across commits in a backfill job. */
 function calibrationDir(): string {
-  return join(
-    tmpdir(),
-    `typespec-benchmark-calibration-${REFERENCE_COMPILER_VERSION}-${WORKLOAD_ID}`,
-  );
+  return join(tmpdir(), `typespec-benchmark-calibration-${WORKLOAD_ID}`);
 }
 
 /**
- * Materialize the pinned compiler and frozen spec. Installs only when missing,
- * so a backfill measuring many commits pays for it once.
+ * Materialize the pinned stack and frozen spec. Installs only when missing, so
+ * a backfill measuring many commits pays for it once.
  */
 function prepare(dir: string): void {
-  const specDir = join(dir, "spec");
-  const marker = join(dir, "node_modules", "@typespec", "compiler", "package.json");
-
-  mkdirSync(specDir, { recursive: true });
-  writeFileSync(join(specDir, "main.tsp"), REFERENCE_SPEC);
-  writeFileSync(join(specDir, "tspconfig.yaml"), "emit: []\n");
-  writeFileSync(join(dir, "run.mjs"), REFERENCE_RUNNER);
-  writeFileSync(
-    join(dir, "package.json"),
-    JSON.stringify(
-      { name: "typespec-benchmark-calibration", private: true, type: "module" },
-      null,
-      2,
-    ),
+  const marker = join(
+    dir,
+    "node_modules",
+    "@azure-tools",
+    "typespec-azure-rulesets",
+    "package.json",
   );
+
+  mkdirSync(dir, { recursive: true });
+  cpSync(sourceDir, dir, { recursive: true });
+  writeFileSync(join(dir, "run.mjs"), REFERENCE_RUNNER);
 
   if (existsSync(marker)) return;
 
   try {
     execFileSync(
       "npm",
-      [
-        "install",
-        `@typespec/compiler@${REFERENCE_COMPILER_VERSION}`,
-        "--no-package-lock",
-        "--no-audit",
-        "--no-fund",
-        "--prefer-offline",
-        "--loglevel",
-        "error",
-      ],
+      ["install", "--no-package-lock", "--no-audit", "--no-fund", "--loglevel", "error"],
       { cwd: dir, stdio: ["ignore", "ignore", "pipe"], encoding: "utf-8" },
     );
   } catch (error: any) {
     const details = String(error?.stderr ?? "").trim();
     throw new Error(
-      `failed to install the reference compiler${details ? `: ${details.split("\n")[0]}` : ""}`,
+      `failed to install the reference stack${details ? `: ${details.split("\n")[0]}` : ""}`,
       { cause: error },
     );
   }
@@ -216,7 +159,7 @@ async function compileReference(dir: string): Promise<number> {
  * Measure this machine against the frozen reference.
  *
  * Returns undefined rather than throwing: a machine-speed estimate is valuable
- * but not worth losing a 20 minute benchmark run over, and consumers already
+ * but not worth losing a 25 minute benchmark run over, and consumers already
  * treat calibration as optional so that points measured before it existed stay
  * readable.
  */

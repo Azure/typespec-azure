@@ -156,6 +156,9 @@ function restoreBenchmark(repoRoot: string, savedBenchmark: string): void {
 
   cpSync(join(savedBenchmark, "dist"), join(benchDir, "dist"), { recursive: true });
   cpSync(join(savedBenchmark, "specs"), join(benchDir, "specs"), { recursive: true });
+  // The frozen calibration workload has to travel with it, or old commits would
+  // be measured against no reference at all.
+  cpSync(join(savedBenchmark, "calibration"), join(benchDir, "calibration"), { recursive: true });
   copyFileSync(join(savedBenchmark, "package.json"), join(benchDir, "package.json"));
 
   // Create node_modules with symlinks to workspace packages
@@ -269,6 +272,9 @@ export function backfill(options: BackfillOptions = {}): void {
     recursive: true,
   });
   cpSync(join(repoRoot, "packages/benchmark/specs"), join(savedBenchmark, "specs"), {
+    recursive: true,
+  });
+  cpSync(join(repoRoot, "packages/benchmark/calibration"), join(savedBenchmark, "calibration"), {
     recursive: true,
   });
   copyFileSync(
