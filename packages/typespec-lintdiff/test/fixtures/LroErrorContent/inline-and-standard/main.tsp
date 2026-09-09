@@ -16,9 +16,15 @@ model Failure<T> {
   @statusCode statusCode: 500;
   @body body: T;
 }
-@extension("x-ms-long-running-operation", true)
+@route("/status")
+op poll is Azure.Core.Foundations.GetOperationStatus;
+model Accepted {
+  @statusCode statusCode: 202;
+  @header("Operation-Location") operationLocation: string;
+}
+@Azure.Core.pollingOperation(poll)
 @post
-op Lro<T>(@path name: string): AcceptedResponse | Failure<T>;
+op Lro<T>(@path name: string): Accepted | Failure<T>;
 
 @route("/standard/{name}")
 op standard is Lro<CommonTypes.ErrorResponse>;
@@ -60,18 +66,18 @@ op unknownBody is Lro<unknown>;
 @route("/bytes/{name}")
 op bytesBody is Lro<bytes>;
 @route("/no-body")
-@extension("x-ms-long-running-operation", true)
+@Azure.Core.pollingOperation(poll)
 @post
 op noBody():
-  | AcceptedResponse
+  | Accepted
   | {
       @statusCode statusCode: 400;
     };
 @route("/binary")
-@extension("x-ms-long-running-operation", true)
+@Azure.Core.pollingOperation(poll)
 @post
 op binary():
-  | AcceptedResponse
+  | Accepted
   | {
       @statusCode statusCode: 500;
       @header contentType: "application/octet-stream";
@@ -91,19 +97,19 @@ model GenericError {
 }
 
 @route("/file")
-@extension("x-ms-long-running-operation", true)
+@Azure.Core.pollingOperation(poll)
 @post
 op fileBody():
-  | AcceptedResponse
+  | Accepted
   | {
       @statusCode statusCode: 500;
       @body body: File;
     };
 @route("/multipart")
-@extension("x-ms-long-running-operation", true)
+@Azure.Core.pollingOperation(poll)
 @post
 op multipartBody():
-  | AcceptedResponse
+  | Accepted
   | {
       @statusCode statusCode: 500;
       @multipartBody body: {
@@ -112,11 +118,11 @@ op multipartBody():
     };
 
 @route("/success/{name}")
-@extension("x-ms-long-running-operation", true)
+@Azure.Core.pollingOperation(poll)
 @post
 op success(@path name: string):
   | {
       @statusCode statusCode: 200;
       @body body: GenericError;
     }
-  | AcceptedResponse;
+  | Accepted;

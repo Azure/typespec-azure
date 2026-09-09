@@ -1,104 +1,189 @@
 # LroErrorContent migration evidence
 
-## Conclusion
+## Result and gap summary
 
-**TypeSpec rule update required.** The previous implementation checked model
-ancestry rather than the emitted top-level error reference. It missed named
-scalar/enum/union references and nested namespaces, accepted locally defined
-derived error schemas, reported inline models that Swagger never selects, and
-treated GET polling metadata as an emitted LRO flag.
+**Native-rule repair completed; partial coverage, not functional equivalence.**
+The full production comparison compiled **462/468 ARM projects**: Swagger
+reported **639** diagnostics and native TypeSpec **637**, both in the same
+**54 projects**, with no one-sided projects. Native output includes five
+older-version declarations; excluding those leaves **632** selected-version
+source findings. Four Swagger findings are legacy-marked GETs outside the
+native selector. Three additional Swagger occurrences come from multiple
+error statuses and scope expansions of single authored operations.
+Focused fixtures record **20/39** diagnostics because native checking also
+rejects inline errors and does not honor emitter overrides or SDK scope.
+The required repair removes TCGC, `@typespec/openapi`, and unsafe mutation
+while enforcing the explicitly selected standard-payload contract.
+Historical return types and emitter-only LROs remain outside its scope.
+Six compile failures are excluded from both populations, not treated as clean.
 
-Official coverage is a **gap**, not template enforcement. The standard ARM
-operation templates permit custom `Error` arguments; registered official rules
-do not validate the error reference. See [rule.md](rule.md) for the code-backed
-coverage check, full emission matrix, upstream links, and promotion boundary.
+## Decision and scope
 
-The repaired rule follows semantic HTTP endpoints and every version snapshot,
-reads native ARM reference/common-type metadata, and uses shared payload and
-inline-type APIs. It reports once per authored operation. The native-only
-revision removes the `Autorest.getRef` dependency; it does not replace it with
-an adapter, private state access, decorator inspection, or Swagger emission.
-No emitter, validator, unrelated lint rule, or harness dependency was changed.
+This is an explicitly authorized follow-up to merged [PR #5425](https://github.com/Azure/typespec-azure/pull/5425),
+based on `origin/feature/lintdiff-migration-new` at
+`29c4a87b0`. The source implementation required repair because its intended ARM
+destination must not depend on TCGC, OpenAPI helpers, or unsafe graph mutation.
+The requested development-skill restrictions are isolated in
+[PR #5438](https://github.com/Azure/typespec-azure/pull/5438).
+No official-library promotion is included.
 
-**Partial equivalence to the full Swagger rule.** Emitter-only `@Autorest.useRef`
-overrides are deliberately outside the native contract. The native type remains
-subject to lint regardless of how that override changes emitted Swagger. The
-comparison fixture below proves divergences in both directions.
+The native contract was deliberately selected rather than claiming that
+removing three imports preserves behavior. It checks the unprojected authored
+HTTP program, recognizes non-GET LROs through Azure Core metadata, and requires
+every existing default/4xx/5xx payload to use native ARM v2-or-later
+`ErrorResponse` metadata. It accepts native common types, model-is copies,
+standard native legacy references, and nullable standard errors. It does not
+require bodies, inspect success payloads, or lint synchronous operations.
+All response variants are checked, with one diagnostic per authored operation
+node across statuses, nested services, and shared template instantiations.
 
-The completed native-only full run identifies the same 54 affected projects on
-both sides, with five older-version source findings and three additional emitted
-occurrences explaining the raw count difference. All 641 native source targets
-are unchanged from the previous implementation's corpus result. Neither project
-overlap nor matching totals close the emitter-only limitation demonstrated by
-the fixtures. Compile-failed projects, arbitrary emitter directory overrides,
-and invalid schemas that fail emission also remain outside the equivalence claim.
+No TCGC, OpenAPI helper, emitter, private-state adapter, or unsafe mutation is
+used to make rule decisions. ARM's native reference APIs remain permitted.
+Native tests throw on TCGC/AutoRest imports and exercise the rule without their
+TypeSpec libraries or OpenAPI decorators. The tester registers OpenAPI solely
+to satisfy the existing ARM library's transitive import.
 
-## Sources and comparable populations
+## Source of truth and prior coverage
 
-| Evidence                                                         | Revision / population                                                                                                                                                                                                                                         |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [External coverage snapshot](../../../docs/coverage_old.md)      | 450 compiled projects, 210 validator rules; imported by repository commit `6a418911dbe5d35992fb5845cf4460d45643fec8` on 2026-08-11. The snapshot does not identify its original specs commit, generation timestamp, generator commit, or per-project results. |
-| [Retained observed report](../../../specs/coverage-breakdown.md) | Before this repair: generated 2026-08-10T09:38:18.108Z, 462 successful / 468 selected projects, 215 known validator rules.                                                                                                                                    |
-| Specs checkout and corpus dataset                                | `f6b53f105b95da05276530a0754a1c71b4f16397`                                                                                                                                                                                                                    |
-| Validator source inspection                                      | `Azure/azure-openapi-validator` commit `a970d991d2785184d2786b85e0a345dc3f37bc25`; installed fixture ruleset supplies the same selector and pattern.                                                                                                          |
-| Retained Swagger rule shard                                      | Generated 2026-08-06T08:03:27.940Z; 3,906 occurrences before successful-project population filtering.                                                                                                                                                         |
-| TypeSpec comparison                                              | Local `all` ruleset; ARM service isolation inside this rule; normal production validator mode, not staging.                                                                                                                                                   |
+See [rule.md](rule.md) for direct upstream code, documentation, and test links,
+the complete emission matrix, applicability boundaries, and official-rule
+coverage analysis. The upstream revision is
+`a970d991d2785184d2786b85e0a345dc3f37bc25`.
+Its non-resolving selector checks only existing top-level error `schema.$ref`
+values for operations explicitly emitted as LROs. It ignores inline schemas
+and absent bodies. Its reference pattern accepts common-types v2 and later;
+the unanchored regex and unescaped dot are preserved for native reference
+metadata.
 
-Swagger retains each project's dataset-selected API version. TypeSpec source
-analysis examines all declared version snapshots, with operation-node
-deduplication. Compiler/emitter errors and failed projects are not evidence of
-compliance. Both sides of the behavioral comparison exclude TypeSpec failures.
-Existing service suppressions remain in effect; fixture ambient warnings are
-reviewed separately from the target diagnostic.
+Official coverage remains a gap: status-selection rules do not check payload
+identity, and native ARM async templates accept custom `Error` arguments.
+The unsuppressed native-template fixture demonstrates authorability.
+The raw-extension `restart` fixture's two suppressions are retained only to
+demonstrate an emitter-only discrepancy, not to prove an actionable native gap.
+No unrelated compiler or lint diagnostic is counted as target coverage.
 
-## Report reconciliation
+## Comparable populations and historical reports
 
-| Report                                         | Validator projects | Local TypeSpec projects | Official credit    | Same-project overlap                   | Validator only | TypeSpec only | Raw Swagger / TypeSpec |
-| ---------------------------------------------- | ------------------ | ----------------------- | ------------------ | -------------------------------------- | -------------- | ------------- | ---------------------- |
-| External snapshot (`lint`, 100%)               | 55                 | 55                      | 0                  | Not reconstructable from aggregate row | Not available  | Not available | Not available          |
-| Retained observed production row before repair | 54                 | 55                      | No coverage credit | 54                                     | 0              | 1             | 639 / 644              |
-| Full run before native-only revision           | 54                 | 54                      | No coverage credit | 54                                     | 0              | 0             | 639 / 641              |
-| Final native-only full run (partial semantics) | 54                 | 54                      | No coverage credit | 54                                     | 0              | 0             | 639 / 641              |
+Pinned specs checkout: `f6b53f105b95da05276530a0754a1c71b4f16397`.
+The runner uses the isolated
+`C:\dev\worktrees\azure-rest-api-specs-lintdiff-lro-error-content` checkout.
+The corpus selects 468 ARM projects, production validator mode, and each
+project's dataset-selected API version. The local `all` ruleset runs over
+unprojected source, with this rule's ARM service isolation. Existing source
+suppressions remain effective.
 
-The external report credits migration disposition; the observed report requires
-same-project diagnostics. For this row both name the local lint, so the 55 vs 54
-validator-project difference cannot be explained by official/template credit.
-The report denominators and snapshot metadata differ. Without the external
-report's individual projects/revisions, identifying its extra project would be
-speculation. The observed report's one-sided project is independently
-identifiable: `specification/botservice/resource-manager/Microsoft.BotService/BotService`.
+The retained Swagger rule shard was generated at
+`2026-08-06T08:03:27.940Z`; its 3,906 occurrences span more projects than the
+selected TypeSpec population. Comparisons first restrict both sides to selected,
+successfully compiled projects. Failed projects are not treated as compliant.
+The [external report](../../../docs/coverage_old.md) has only aggregates:
+its extra affected project cannot be reconstructed from that snapshot.
 
-## Focused behavior
+| Historical evidence                           | Population                                                                               | Swagger projects | Native projects | Overlap             | Raw Swagger/native |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------- | --------------- | ------------------- | ------------------ |
+| External coverage snapshot                    | 450 compiled projects; 210 rules; imported at `6a418911dbe5d35992fb5845cf4460d45643fec8` | 55               | 55              | Not reconstructable | Not available      |
+| Checked-in observed report before this repair | Generated `2026-08-10T09:38:18.108Z`; 462/468 successful; 215 known rules                | 54               | 55              | 54                  | 639/644            |
+| Prior implementation's migration evidence     | Generated `2026-09-09T06:42:49.568Z`; 462/468 successful                                 | 54               | 54              | 54                  | 639/641            |
 
-Four violation fixtures and one compliance fixture compile; the violation
-fixtures are classified as partial coverage because of the documented emitter
-override limitation. The template/version fixture intentionally includes an
-old-only operation: latest Swagger has two violations, while the all-version
-native lint has three source diagnostics. The native tests additionally cover
-data-plane isolation, unused templates, nested namespaces and multi-status /
-multi-version deduplication. Seven native tests pass without importing the
-AutoRest TypeSpec library, and a throwing module mock prevents accidental
-runtime imports of the emitter from the rule or its helpers. Native standard
-errors, `model is` copies, and legacy ARM references are covered directly.
-AutoRest scope exclusion is
-covered by an additional SDK-only operation in `reference-shapes` and a native
-negative test; it adds no target diagnostic.
+These are different report revisions, not current repair results. The external
+report credits migration disposition; the
+[observed report](../../../specs/coverage-breakdown.md) counts same-project
+diagnostics. Neither matching project sets nor raw totals proves equivalence.
+The previous migration evidence is preserved in
+[the pre-repair source](https://github.com/Azure/typespec-azure/blob/feature/lintdiff-lro-error-content/packages/typespec-lintdiff/test/fixtures/LroErrorContent/migration.md).
 
-The emission matrix is shape-specific, not just response-surface coverage.
-Inline array, tuple, record, model, literal, intrinsic, file, multipart and binary
-fallthroughs are represented alongside named model/scalar/enum/union references
-and authorable external overrides. Nonserializable types and emitter-error
-unions are not counted as successful Swagger emission.
+## Focused results
+
+All six fixtures compile and their refreshed snapshots are stable. The harness
+classifies four as partial shared coverage, one as a native violation without
+a Swagger violation, and one as a clean control with reviewed ambient
+diagnostics. Those classifications are not per-operation parity claims.
+
+| Fixture                 | Swagger diagnostics | Native diagnostics | Explanation                                                                                                 |
+| ----------------------- | ------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `non-standard-error`    | 2                   | 1                  | Both flag `restartNative`; only Swagger flags raw-extension `restart`.                                      |
+| `reference-shapes`      | 12                  | 13                 | Both flag twelve custom payload endpoints; native also flags SDK-scoped `sdkOnly`.                          |
+| `external-references`   | 4                   | 4                  | Three shared violations; `standard` and `overriddenStandard` diverge in opposite directions.                |
+| `inline-and-standard`   | 0                   | 18                 | Native rejects inline/primitive/collection/binary payloads and the false-overridden native LRO.             |
+| `template-and-versions` | 2                   | 3                  | Shared `createOrUpdate`; native adds `disabled` and removed `oldAction`; Swagger adds legacy-only `marked`. |
+| `standard-error`        | 0                   | 0                  | Native ARM templates and an error model-is copy, with unrelated diagnostics reviewed explicitly.            |
+
+The 27 native tests cover type families, standard references including v1/wrong
+definition/v10 cases, multiple error statuses, success/no-body/sync exclusions,
+binary/multipart payloads, GET exclusion, unrelated services, unused templates,
+nested services, shared operation instantiations, and the authored/historical
+return-type boundary. The independent reviewer found duplicate diagnostics
+through nested services; the repair restores authored-node deduplication and
+adds both nested-service and template-instantiation regression tests.
 
 ## Code-backed gap examples
 
-### Emitter overrides do not change the native lint contract
+### Inline errors: deliberately stronger native payload policy
 
-- **Classification:** emitter-only limitation; both TypeSpec-only and validator-only targets
-- **Status:** intentional partial coverage
-- **Fixture:** `external-references`, operations `standard` and `overriddenStandard`.
+- **Classification:** TypeSpec-only.
+- **Status:** intentional, explicitly selected native behavior.
+- **Source:** `inline-and-standard/main.tsp`, `anonymous`.
 
-**TypeSpec source**
+```typespec
+@route("/anonymous/{name}")
+op anonymous is Lro<{
+  anonymousCode: string;
+}>;
+```
+
+The fixture's `Lro` template has native polling-operation metadata. Its emitted
+500 schema is an inline object with `anonymousCode`, not a `$ref`.
+Swagger therefore produces no diagnostic; the native lint reports the custom
+payload. This difference extends to the primitive/collection/file/multipart
+fallthroughs recorded in the emission matrix. Inlining is not reproduced or
+guessed by production rule code.
+
+### LRO selection and overrides
+
+- **Classification:** both one-sided directions.
+- **Status:** intentional native boundary.
+- **Source:** `template-and-versions/main.tsp`, `disabled` and `marked`.
+
+```typespec
+@TypeSpec.OpenAPI.extension("x-ms-long-running-operation", false)
+disabled is ArmResourceActionAsync<Widget, void, void, Error = CustomError>;
+
+@route("/marked") @post
+@Azure.ClientGenerator.Core.Legacy.markAsLro
+op marked(): AcceptedResponse | CustomError;
+```
+
+| Target     | Swagger result                                                | Native result                                         |
+| ---------- | ------------------------------------------------------------- | ----------------------------------------------------- |
+| `disabled` | Clean: emitted LRO flag is false.                             | Violation: ARM template supplies native LRO metadata. |
+| `marked`   | Violation: legacy marker emits true with custom error `$ref`. | Clean: no native LRO metadata.                        |
+
+The raw-extension-only `non-standard-error/restart` similarly remains
+Swagger-only; its new unsuppressed `restartNative` is independently detected.
+These differences cannot be repaired by importing TCGC or inspecting OpenAPI
+state without violating the requested production boundary.
+
+### SDK scope is not an ARM lint applicability filter
+
+- **Classification:** TypeSpec-only.
+- **Status:** intentional.
+- **Source:** `reference-shapes/main.tsp`, `sdkOnly`.
+
+```typespec
+@Azure.ClientGenerator.Core.scope("csharp")
+@route("/sdk-only/{name}")
+op sdkOnly is Lro<ErrorBody>;
+```
+
+The native HTTP endpoint has polling metadata and a custom error body, so it
+violates the rule. AutoRest omits the operation from Swagger; there is no
+emitted node to compare. SDK-scoping decisions are no longer rule inputs.
+
+### Emitter reference overrides do not change the native payload
+
+- **Classification:** both one-sided directions.
+- **Status:** intentional partial coverage.
+- **Source:** `external-references/main.tsp`.
 
 ```typespec
 @Autorest.useRef("../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse")
@@ -107,363 +192,197 @@ model StandardReference {
 }
 
 @Autorest.useRef("#/definitions/LocalError")
-model OverriddenStandard is Azure.ResourceManager.CommonTypes.ErrorResponse;
+model OverriddenStandard is CommonTypes.ErrorResponse;
 ```
 
-Each model is the explicit 400 body of an LRO in the comparison fixture.
+| Target               | Emitted 400 reference  | Swagger / native                                |
+| -------------------- | ---------------------- | ----------------------------------------------- |
+| `standard`           | ARM v5 `ErrorResponse` | Clean / violation of the native custom payload. |
+| `overriddenStandard` | Local `LocalError`     | Violation / native standard error is clean.     |
 
-| Target               | Swagger response reference / validator  | Native TypeSpec result                   |
-| -------------------- | --------------------------------------- | ---------------------------------------- |
-| `standard`           | Common-types v5 `ErrorResponse` / clean | Custom named model / violation           |
-| `overriddenStandard` | `#/definitions/LocalError` / violation  | Native standard common-type copy / clean |
+The equal fixture totals conceal these different targets. No emitter adapter
+is used to force them to match.
 
-**Explanation:** `@useRef` is emitter-owned state, with no supported native
-accessor. Calling `Autorest.getRef`, hiding it in a helper, or scraping its
-decorator/state would retain the prohibited dependency. Native
-`getExternalTypeRef` and `getArmCommonTypeOpenAPIRef` remain supported: both read
-authored ARM library metadata without loading AutoRest or emitted documents.
+### Authored program versus historical versions
 
-**Disposition:** Keep the native result and mark coverage partial. The
-comparison fixture has four findings on each side but only three shared
-operation targets; equal counts must not be presented as equivalent behavior.
-The standard fix for native authors is `CommonTypes.ErrorResponse`, not an
-emitter override on a custom error. Swagger generation remains comparison-only.
-
-### GET polling metadata is not an emitted LRO
-
-- **Classification:** TypeSpec-only
-- **Status:** fixed
-- **Project/API version:** `specification/botservice/resource-manager/Microsoft.BotService/BotService` / `2023-09-15-preview`
-- **Source:** `routes.tsp`, `OperationResultsOperationGroup.get`, original diagnostic at line 91.
-
-**TypeSpec source**
-
-```typespec
-@get
-get(
-  ...ApiVersionParameter,
-  ...SubscriptionIdParameter,
-  @path operationResultId: string,
-):
-  | ArmResponse<OperationResultsDescription>
-  | ArmAcceptedLroResponse<LroHeaders = ArmLroLocationHeader<FinalResult = OperationResultsDescription> &
-      Azure.Core.Foundations.RetryAfterHeader>
-  | Error;
-```
-
-**Emitted OpenAPI or validator behavior**
-
-The retained `botservice.json` operation `OperationResults_Get` has no
-`x-ms-long-running-operation` field, even though its error has a local reference:
-
-```json
-{
-  "operationId": "OperationResults_Get",
-  "responses": {
-    "default": {
-      "description": "An unexpected error response.",
-      "schema": { "$ref": "#/definitions/Error" }
-    }
-  }
-}
-```
-
-| Engine                 | Observed result                                   |
-| ---------------------- | ------------------------------------------------- |
-| Swagger validator      | No diagnostic: the operation is not selected.     |
-| Previous TypeSpec lint | One diagnostic: `getLroMetadata` was sufficient.  |
-| Repaired TypeSpec lint | GET metadata alone does not select the operation. |
-
-**Explanation:** AutoRest deliberately omits its inferred LRO flag for GET
-polling endpoints. This service declares only the selected API version, so this
-is not an older-version population mismatch.
-
-**Disposition:** Match emitter LRO selection, preserving explicit extension and
-legacy LRO-marker behavior.
-
-### Native templates permit a custom error reference
-
-- **Classification:** count-only / semantic miss in derived-shape cases
-- **Status:** fixed
-- **Project/API version:** focused `template-and-versions` / `2025-01-01`
-- **Source:** `Widgets.createOrUpdate`.
-
-**TypeSpec source**
-
-```typespec
-@error
-model CustomError {
-  code: string;
-}
-createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget, Error = CustomError>;
-```
-
-**Emitted OpenAPI or validator behavior**
-
-```json
-{
-  "schema": { "$ref": "#/definitions/CustomError" }
-}
-```
-
-| Engine            | Observed result                              |
-| ----------------- | -------------------------------------------- |
-| Swagger validator | Violation on the default response reference. |
-| TypeSpec lint     | Violation on the authored operation.         |
-
-**Explanation:** The `Error` template parameter is unconstrained beyond an
-object type. A native template is not proof of standard-reference enforcement.
-The related `reference-shapes/derived` fixture uses a model extending the
-standard error; its top-level reference is still local, despite the common-type
-reference inside its definition's `allOf`.
-
-**Disposition:** Replace ancestry/name heuristics with reference classification.
-
-### Removed operation belongs only to the old version
-
-- **Classification:** count-only
-- **Status:** population mismatch
-- **Project/API version:** focused `template-and-versions` / selected `2025-01-01`
-- **Source:** `Widgets.oldAction`.
-
-**TypeSpec source**
+- **Classification:** version/population difference and explicit coverage limit.
+- **Status:** intentional boundary, not all-version equivalence.
+- **Source:** `template-and-versions/oldAction` and the native historical-return test.
 
 ```typespec
 @removed(Versions.current)
 oldAction is ArmResourceActionAsync<Widget, void, void, Error = CustomError>;
 ```
 
-The service version enum declares `old: "2024-01-01"` and
-`current: "2025-01-01"`. The latest Swagger snapshot omits `oldAction`; therefore
-there is no selected-version Swagger operation to compare.
+The authored operation is still visible to native HTTP traversal and is
+diagnosed; latest Swagger contains no `oldAction`. Conversely, the native test
+uses `@returnTypeChangedFrom` to record a historical custom response on an
+operation whose authored response is standard. It remains native-clean:
+the rule no longer reconstructs that historical response. Removed declarations
+being checked does not imply that all historical shapes are checked.
 
-| Engine            | Observed result                                                 |
-| ----------------- | --------------------------------------------------------------- |
-| Swagger validator | Two latest-version operation violations.                        |
-| TypeSpec lint     | Three all-version operation diagnostics, including `oldAction`. |
+## Corpus execution
 
-**Explanation:** This is valid older-version coverage, not a false positive.
+### Final full-run results
 
-**Disposition:** Preserve the raw TypeSpec count and compare only diagnostics
-attributable to the selected API version.
+The replacement run completed with exit code zero at
+`2026-09-09T18:09:23.3464107+08:00`. The result index records
+`generatedAt: 2026-09-09T10:06:21.607Z`, `durationMs: 2199107`, and
+`partial: false`. It selected all 468 projects and compiled 462 successfully.
+The runner and library baseline is `29c4a87b0`, with this repair's rule changes;
+specs and validator revisions are pinned above.
 
-The same cause is observable in these pinned real-service declarations:
+| Measure                                 |        Swagger | Native TypeSpec |
+| --------------------------------------- | -------------: | --------------: |
+| Affected successfully compiled projects |             54 |              54 |
+| Raw diagnostics                         |            639 |             637 |
+| Project + Swagger file + JSON path      |            639 |  Not applicable |
+| Project + JSON path                     |            639 |  Not applicable |
+| Project + source file + line + column   | Not applicable |             637 |
+| Selected-version source attribution     |            639 |             632 |
 
-| Project suffix                                  | Selected API version | Old-only source targets                                              | Evidence                                                                                                                                    |
-| ----------------------------------------------- | -------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Microsoft.Batch/Batch`                         | `2025-06-01`         | `Certificate.tsp:130`, certificate delete                            | `@removed(Versions.v2025_06_01)` on the operation at line 129                                                                               |
-| `Microsoft.ContainerInstance/ContainerInstance` | `2026-08-01-preview` | `SandboxGroup.tsp:175`, `:187`, `:197`, sandbox create/update/delete | `SandboxGroups` interface has `@removed(Versions.v2026_08_01_preview)` at line 148; the latest endpoints instead belong to `AiAgentsGroups` |
-| `Microsoft.DataProtection/DataProtection`       | `2026-04-01-preview` | `BackupInstanceResource.tsp:192`, `resumeProtectionLegacy`           | `@removed(Versions.v2026_04_01_preview)` at line 190; the replacement `resumeProtection` at line 206 is added in that version               |
+The complete validator-only and TypeSpec-only project lists are both **empty**;
+all 54 affected projects overlap. Among those projects, 47 have equal raw
+counts, three have higher native counts, and four have higher Swagger counts.
+The positive native-minus-Swagger contributions total **+5**, and negative
+contributions total **-7**, producing the net **-2**. These conservative
+identities remove no occurrences and do not assert a cross-engine bijection.
+The counts were independently grouped from the two rule shards and matched
+against the comparison report.
 
-For example, the actual Batch declaration is:
+| Project (suffix of `specification/`)                                               | Selected API version | Swagger | Native raw | Native selected-version |
+| ---------------------------------------------------------------------------------- | -------------------- | ------: | ---------: | ----------------------: |
+| `batch/resource-manager/Microsoft.Batch/Batch`                                     | `2025-06-01`         |       5 |          6 |                       5 |
+| `containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance` | `2026-08-01-preview` |       8 |         11 |                       8 |
+| `cost-management/resource-manager/Microsoft.CostManagement/CostManagement`         | `2025-03-01`         |       8 |          6 |                       6 |
+| `dataprotection/resource-manager/Microsoft.DataProtection/DataProtection`          | `2026-04-01-preview` |      17 |         18 |                      17 |
+| `iothub/resource-manager/Microsoft.Devices/IoTHub`                                 | `2026-05-01-preview` |       6 |          5 |                       5 |
+| `resources/resource-manager/Microsoft.Resources/deploymentStacks`                  | `2025-07-01`         |       3 |          1 |                       1 |
+| `web/resource-manager/Microsoft.Web/AppService`                                    | `2026-07-15`         |      68 |         66 |                      66 |
+
+Selected-version attribution removes exactly the five source targets proved
+below; it is not a new projection run or a claim that historical return types
+were reconstructed. Raw output remains 637. The prior implementation's 641
+raw findings included the four legacy GETs now excluded; its 639/641 result is
+superseded, not silently reused.
+
+### Compile failures
+
+These six projects failed HTTP compilation and were excluded from both sides.
+Their diagnostic codes are compiler errors, not this lint's warnings.
+
+| Project (suffix of `specification/`)                                                       | Error                              |
+| ------------------------------------------------------------------------------------------ | ---------------------------------- |
+| `deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices` | `@typespec/http/duplicate-body`    |
+| `monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups`                  | `@typespec/http/missing-uri-param` |
+| `network/resource-manager/Microsoft.Network/Network/Network`                               | `@typespec/http/missing-uri-param` |
+| `quota/resource-manager/Microsoft.Quota/Quota`                                             | `@typespec/http/missing-uri-param` |
+| `resources/resource-manager/Microsoft.Resources/deployments`                               | `@typespec/http/duplicate-body`    |
+| `servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker`                     | `@typespec/http/duplicate-body`    |
+
+For example, DeviceProvisioningServices reports `duplicate-body` at
+`client.tsp:469:57`; Network reports `missing-uri-param` for
+`applicationGatewayAvailableSslOption`. The full failure records and raw
+stdout/stderr are retained with the session's machine-readable evidence.
+The successful runner exit indicates completion of its analysis, not that
+these six services compiled.
+
+### Pinned real-service selector differences
+
+CostManagement (`2025-03-01`) has eight retained Swagger findings, including two
+GET operations marked only through legacy SDK/emitter authoring:
+`GenerateCostDetailsReport_GetOperationResults` at `routes.tsp:1167-1191` and
+`GenerateDetailedCostReportOperationResults_Get` at
+`GenerateDetailedCostReportOperationResult.tsp:31-40`.
+The former returns
+`ArmResponse<CostDetailsOperationResults> | ArmAcceptedResponse | ErrorResponse`
+under `@Azure.ClientGenerator.Core.Legacy.markAsLro`.
+Its selected Swagger path ends in
+`costDetailsOperationResults/{operationId}.get.responses.default.schema.$ref`.
+The latter is the same selector difference at
+`operationResults/{operationId}.get.responses.default.schema.$ref`.
+Both emitted operations have `x-ms-long-running-operation: true`.
+
+The relevant authored return at `routes.tsp:1188-1191` is:
 
 ```typespec
-@removed(Versions.v2025_06_01)
-delete is ArmResourceDeleteWithoutOkAsync<
-  Certificate,
-  Response =
-    | ArmDeletedResponse
-    | ArmDeleteAcceptedLroResponse
-    | ArmDeletedNoContentResponse,
-  Error = CloudError
->;
+    | ArmResponse<CostDetailsOperationResults>
+    | ArmAcceptedResponse
+    | ErrorResponse;
 ```
 
-The retained `2025-06-01` Swagger has no certificate-delete endpoint. Five raw
-native source diagnostics across these three projects therefore belong only to
-older versions and must be excluded from selected-version cardinality comparisons.
-Their source-level version decorators establish the exclusion without guessing
-from filenames or suppressing valid older-version diagnostics.
-
-### Legacy LRO markers select GET operations explicitly
-
-- **Classification:** count-only
-- **Status:** fixed
-- **Project/API version:** `specification/cost-management/resource-manager/Microsoft.CostManagement/CostManagement` / `2025-03-01`
-- **Source:** `routes.tsp:1170`, `GenerateCostDetailsReport.getOperationResults`; the same cause applies to `GenerateDetailedCostReportOperationResult.tsp:33`.
-
-**TypeSpec source**
-
-```typespec
-@Azure.ClientGenerator.Core.Legacy.markAsLro
-getOperationResults(
-  ...ApiVersionParameter,
-  @path(#{ allowReserved: true }) scope: string,
-  ...Azure.ResourceManager.Legacy.Provider,
-  @path @segment("costDetailsOperationResults") operationId: string,
-):
-  | ArmResponse<CostDetailsOperationResults>
-  | ArmAcceptedResponse
-  | ErrorResponse;
-```
-
-**Emitted OpenAPI or validator behavior**
+The selected emitted GET has these fields:
 
 ```json
 {
-  "operationId": "GenerateCostDetailsReport_GetOperationResults",
   "x-ms-long-running-operation": true,
   "responses": {
-    "default": {
-      "description": "An unexpected error response.",
-      "schema": { "$ref": "#/definitions/ErrorResponse" }
-    }
+    "default": { "schema": { "$ref": "#/definitions/ErrorResponse" } }
   }
 }
 ```
 
-| Engine                 | Observed result                                                        |
-| ---------------------- | ---------------------------------------------------------------------- |
-| Swagger validator      | Eight violations in the retained project, including both marked GETs.  |
-| Previous TypeSpec lint | Six diagnostics; it did not inspect the legacy marker.                 |
-| Repaired TypeSpec lint | Uses `getMarkAsLro` in AutoRest scope, including explicit GET markers. |
+Swagger reports the local error reference; native checking excludes the GET.
+This is an intentional selector difference, not emitted duplication.
 
-**Explanation:** Ignoring all GETs would fix BotService but incorrectly lose
-explicitly marked operations. The emitter treats a legacy marker separately
-from inferred LRO metadata.
+AppService (`2026-07-15`) has 68 retained Swagger findings, including
+`WebApps_GetProductionSiteDeploymentStatus` (`CsmDeploymentStatus.tsp:65-79`)
+and `WebApps_GetSlotSiteDeploymentStatusSlot` (`CsmDeploymentStatus.tsp:128-142`).
+Both are legacy-marked GETs with `DefaultErrorResponse`. The selected paths end
+in `sites/{name}/deploymentStatus/{deploymentStatusId}` and
+`sites/{name}/slots/{slot}/deploymentStatus/{deploymentStatusId}`, respectively;
+both diagnostics target `get.responses.default.schema.$ref`.
 
-**Disposition:** Preserve the marker and extension precedence rather than using
-an unconditional verb exclusion.
+These four occurrences remain Swagger violations but are outside the repaired
+non-GET native selector. This is an explicit partial-coverage boundary, not a
+validator false positive. AppService's unmarked
+`StaticSitesAsyncOperations.getOperationResult` also stays native-excluded; it
+has no emitted LRO flag and no retained target Swagger diagnostic.
 
-### A shared template produces three scoped Swagger operations
+### Older-version declarations in the authored program
 
-- **Classification:** count-only
-- **Status:** intentional
-- **Project/API version:** `specification/resources/resource-manager/Microsoft.Resources/deploymentStacks` / `2025-07-01`
-- **Source:** `routes.tsp:41`, `DeploymentStackCommonOps.validateStack`.
+The five older-version findings match these exact current diagnostic targets:
 
-**TypeSpec source**
+| Project           | Source target (line:column)                | Exclusion evidence                                                |
+| ----------------- | ------------------------------------------ | ----------------------------------------------------------------- |
+| Batch             | `Certificate.tsp:130:3`                    | `delete` removed in selected `2025-06-01`                         |
+| ContainerInstance | `SandboxGroup.tsp:175:3`, `187:3`, `197:3` | `SandboxGroups` removed in selected `2026-08-01-preview`          |
+| DataProtection    | `BackupInstanceResource.tsp:192:3`         | `resumeProtectionLegacy` removed in selected `2026-04-01-preview` |
 
-```typespec
-@added(Versions.v2024_03_01)
-@action("validate")
-validateStack is Extension.ActionAsync<
-  Scope,
-  DeploymentStack,
-  DeploymentStack,
-  DeploymentStackValidateResult,
-  OverrideResourceName = ResourceName,
-  Error =
-    | ErrorResponse
-    | ValidationBadRequestResponse<DeploymentStackValidateResult>
->;
-```
-
-`DeploymentStacksAtResourceGroup`, `DeploymentStacksAtSubscription` and
-`DeploymentStacksAtManagementGroup` inherit this operation from a shared
-template. The retained Swagger contains a violating `responses.400.schema.$ref`
-under each of those three scope routes.
-
-| Engine                 | Observed result                                                                                                      |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Swagger validator      | Three distinct JSON paths, one per scope.                                                                            |
-| Previous TypeSpec lint | Four diagnostics at the identical `routes.tsp:41:3` source location, including a client customization instantiation. |
-| Repaired TypeSpec lint | Deduplicates by the authored operation node.                                                                         |
-
-**Explanation:** File-independent Swagger paths still differ by scope; source
-identity is shared. Equal raw totals would be an inappropriate requirement.
-
-**Disposition:** Keep source-level reporting and retain separate occurrence
-counts. A single actionable source fix addresses the emitted scope variants.
-
-## New corpus run
-
-The first representative ContainerApps run completed at
-2026-09-08T08:19:13Z: one successful project, ten Swagger and ten native target
-diagnostics. The first full run was intentionally interrupted after 172/468
-projects to adopt the independent review's AutoRest endpoint-scope fix. That
-partial run is not final evidence. Known generated corpus files and four
-runner-owned temporary specs configs were removed before retrying.
-
-The post-review DataBoxEdge check completed at 2026-09-08T08:37:51Z: one
-successful project, 33 Swagger and 33 native target diagnostics. The pre-native-only full
-run completed successfully at **2026-09-08T09:07:31Z**, with aggregate generation
-timestamp `2026-09-08T09:04:42.926Z` and duration `1,754,113 ms` (about 29 minutes).
-It used the existing `specs:typespec --concurrency 6` runner against the isolated
-pinned specs checkout, not a new per-rule runner.
-
-For the native-only revision, the representative ContainerApps run completed at
-`2026-09-09T03:39:23Z`, again with 10 Swagger and 10 native findings. A subsequent
-terminal-owned full run was interrupted after 301/468 projects; it is not final
-evidence. Its four temporary specs configs and generated data were cleaned before
-the detached retry, which used a session-local npm prefix for the runner's linking
-step.
-
-The **final native-only full run** completed successfully at
-**2026-09-09T06:46:03Z**, with aggregate generation timestamp
-`2026-09-09T06:42:49.568Z` and duration `6,735,361 ms` (about 112 minutes).
-It used the same pinned specs commit and existing full runner with concurrency
-six. The following table describes this latest run. Its failed-project set,
-raw totals, and complete native source-target set match the pre-native-only
-run; this is observational regression evidence, not proof that emitter overrides
-are natively observable.
-
-| Population / identity                                       | Result                         |
-| ----------------------------------------------------------- | ------------------------------ |
-| Selected projects                                           | 468                            |
-| Successful / failed                                         | 462 / 6                        |
-| Validator projects / native projects / overlap              | 54 / 54 / 54                   |
-| Complete validator-only project list                        | `[]`                           |
-| Complete TypeSpec-only project list                         | `[]`                           |
-| Raw Swagger / native diagnostics on successful projects     | 639 / 641                      |
-| Swagger unique `(project, file, JSON path)`                 | 639                            |
-| Swagger unique `(project, JSON path)`                       | 639                            |
-| Native unique `(project, source file, line, column)`        | 641                            |
-| Native older-version-only exclusions                        | 5                              |
-| Native selected-latest-version source population            | 636 diagnostics in 54 projects |
-| Raw equal-count / native-higher / validator-higher projects | 49 / 3 / 2                     |
-| Sum of native-higher / validator-higher raw differences     | 5 / 3                          |
-
-The complete set of unequal-count projects is:
-
-| Project                                                                                          | Selected API version | Swagger raw | Native raw | Native selected-version | Cause                                                    |
-| ------------------------------------------------------------------------------------------------ | -------------------- | ----------- | ---------- | ----------------------- | -------------------------------------------------------- |
-| `specification/batch/resource-manager/Microsoft.Batch/Batch`                                     | `2025-06-01`         | 5           | 6          | 5                       | Removed certificate delete                               |
-| `specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance` | `2026-08-01-preview` | 8           | 11         | 8                       | Removed SandboxGroups interface's three LROs             |
-| `specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection`          | `2026-04-01-preview` | 17          | 18         | 17                      | Removed `resumeProtectionLegacy`                         |
-| `specification/iothub/resource-manager/Microsoft.Devices/IoTHub`                                 | `2026-05-01-preview` | 6           | 5          | 5                       | One delete emits both 404 and default error references   |
-| `specification/resources/resource-manager/Microsoft.Resources/deploymentStacks`                  | `2025-07-01`         | 3           | 1          | 1                       | One authored template operation emits three scope routes |
-
-All other 49 overlapping projects have equal raw counts. The largest equal-count
-projects include Compute (86), AppService (68), and DocumentDB (56). CostManagement
-now covers all eight emitted violations, including the two legacy-marked GETs.
-BotService is clean on both sides. AppService's two legacy-marked
-`CsmDeploymentStatus.tsp` operations are now included, while its unmarked
-`StaticSitesAsyncOperations.getOperationResult` GET is excluded.
-
-No latest-version diagnostic is discarded by a filename heuristic. The five
-older-version exclusions are proven by the source decorators recorded above.
-After this attribution, the remaining `639 - 636 = 3` difference is exactly the
-two extra deploymentStacks scope occurrences plus IoTHub's second error status.
-No stronger cross-domain canonical identity or count-equalizing rule change is
-needed.
-
-### Two error statuses share one authored operation
-
-- **Classification:** count-only
-- **Status:** intentional
-- **Project/API version:** `specification/iothub/resource-manager/Microsoft.Devices/IoTHub` / `2026-05-01-preview`
-- **Source:** `IotHubDescription.tsp:115`, `delete`.
-
-**TypeSpec source**
+For example, ContainerInstance declares:
 
 ```typespec
-delete is ArmResourceDeleteWithoutOkAsync<
-  IotHubDescription,
-  Response =
-    | ArmResponse<IotHubDescription>
-    | (ArmAcceptedLroResponse<LroHeaders = ArmCombinedLroHeaders<FinalResult = IotHubDescription> &
-        Azure.Core.Foundations.RetryAfterHeader> &
-        Body<IotHubDescription>)
-    | ArmDeletedNoContentResponse
-    | (NotFoundResponse & Body<ErrorDetails>),
-  Error = ErrorDetails
->;
+@armResourceOperations
+@added(Versions.v2026_06_01_preview)
+@removed(Versions.v2026_08_01_preview)
+interface SandboxGroups {}
 ```
 
-**Emitted OpenAPI or validator behavior**
+Its create/update/delete operations use `Error = CloudError`. The same file's
+new `AiAgentsGroups` interface is added in `2026-08-01-preview`; its diagnostics
+at lines 375, 387, and 397 remain in the selected-version population. This is
+declaration-level version evidence, not a filename-based filter. Similarly,
+DataProtection's replacement `resumeProtection` at line 206 remains included.
+The removed targets have no selected-version Swagger operation to compare.
+Their five native findings are a population mismatch, not false positives or
+a reason to mutate the compiler program.
 
-The retained delete response set contains:
+### Multiple error statuses on one authored operation
+
+- **Classification:** count-only, Swagger higher by one.
+- **Status:** explained source-to-emission multiplicity; no rule update required.
+- **Project/API version:** IoTHub / `2026-05-01-preview`.
+- **Source:** `IotHubDescription.tsp:115-125`, `IotHubResource_Delete`.
+
+The delete operation's `Response` includes this branch in addition to its
+default `Error = ErrorDetails`:
+
+```typespec
+      | (NotFoundResponse & Body<ErrorDetails>),
+    Error = ErrorDetails
+```
+
+The emitted LRO contains:
 
 ```json
 {
@@ -472,50 +391,87 @@ The retained delete response set contains:
 }
 ```
 
-| Engine            | Observed result                                                                                |
-| ----------------- | ---------------------------------------------------------------------------------------------- |
-| Swagger validator | Two findings for this delete: `responses.404.schema.$ref` and `responses.default.schema.$ref`. |
-| TypeSpec lint     | One finding at `IotHubDescription.tsp:115:3`.                                                  |
+Swagger diagnoses both `delete.responses.404.schema.$ref` and
+`delete.responses.default.schema.$ref`. Native diagnoses the authored delete
+once at `IotHubDescription.tsp:115:3`. The other four operation findings
+correspond to create/update, manual failover, and private-endpoint
+update/delete. This accounts for all six Swagger versus five native findings,
+without discarding either error status from validation.
 
-**Explanation:** The author fixes one operation's response contract; separate
-Swagger status paths are not separate authored operations.
+### Scoped template expansion from one authored operation
 
-**Disposition:** Keep once-per-operation reporting, covered by the multi-status
-native regression test. Do not force equality by duplicating diagnostics.
+- **Classification:** count-only, Swagger higher by two.
+- **Status:** explained source-to-emission multiplicity; no rule update required.
+- **Project/API version:** deploymentStacks / `2025-07-01`.
+- **Source:** `routes.tsp:41-50`, `DeploymentStackCommonOps.validateStack`.
 
-### Compile failures and uncertainty
+```typespec
+  validateStack is Extension.ActionAsync<
+    Scope,
+    DeploymentStack,
+    DeploymentStack,
+    DeploymentStackValidateResult,
+    OverrideResourceName = ResourceName,
+    Error =
+      | ErrorResponse
+      | ValidationBadRequestResponse<DeploymentStackValidateResult>
+  >;
+```
 
-The full run has exactly the same six failed projects as the retained baseline:
+The template is instantiated for resource group, subscription, and management
+group scopes at lines 84-96. Each emitted LRO has:
 
-| Excluded project                                                                                         | Compiler error                                                         |
-| -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices` | `@typespec/http/duplicate-body`, including `client.tsp:469` and `:534` |
-| `specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups`                  | `@typespec/http/missing-uri-param`                                     |
-| `specification/network/resource-manager/Microsoft.Network/Network/Network`                               | `@typespec/http/missing-uri-param`                                     |
-| `specification/quota/resource-manager/Microsoft.Quota/Quota`                                             | `@typespec/http/missing-uri-param`                                     |
-| `specification/resources/resource-manager/Microsoft.Resources/deployments`                               | `@typespec/http/duplicate-body`                                        |
-| `specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker`                     | `@typespec/http/duplicate-body`                                        |
+```json
+{
+  "400": {
+    "schema": { "$ref": "#/definitions/DeploymentStackValidateResult" }
+  }
+}
+```
 
-Their errors and source targets are retained in the runner's per-project
-`raw/typespec.stdout.txt` / `raw/typespec.stderr.txt` artifacts during analysis.
-They are excluded from both sides of the behavioral population; no equivalence
-claim is made for them. The external coverage snapshot's unrecorded original
-revision remains a report-provenance limit, not evidence of a new semantic gap.
+Swagger flags `DeploymentStacks_ValidateStackAtResourceGroup`,
+`DeploymentStacks_ValidateStackAtSubscription`, and
+`DeploymentStacks_ValidateStackAtManagementGroup` at their
+`post.responses.400.schema.$ref` paths. Native examines every instance but
+reports the shared authored operation once at `routes.tsp:41:3`.
+Project/path deduplication correctly retains the three distinct Swagger paths;
+it cannot turn them into a single source identity.
 
-Generated corpus and coverage data are validation artifacts and are not part of
-this PR. Reproduce with the command above and the pinned specs commit; the
-retained comparison declaration and code-backed excerpts here remain reviewable
-after generated files are restored.
+### Conclusion and remaining limits
 
-## Independent review
+All seven unequal-project totals are explained: five native older-version
+targets, four Swagger legacy GETs, and three additional Swagger occurrences
+from status/scope expansion. No unexplained residual remains in these count
+outliers, and no additional production rule update is required for them.
+This does not establish per-target parity in every equal-count project.
+The focused counterexamples prove that the repaired native rule is **not
+functionally equal** to Swagger: it intentionally checks inline payloads and
+does not read emitter-only state or reconstruct historical return types.
+Six failed projects remain unassessed. The requested native repair is complete;
+official ARM promotion is separate work.
 
-The reviewer identified one valid actionable finding: exclude operations outside
-the AutoRest emitter's TCGC scope before checking LRO error references. Adopted
-with `isInScope` and both native and emitted-fixture regression coverage.
-No findings were rejected. The reviewer found no further implementation issues
-on follow-up. The final complete-diff and migration-evidence review also reported
-no significant issues before committing.
+### Run history
 
-The native-only revision received a separate code review and a follow-up review
-of the completed corpus evidence and full diff. Both reported no significant
-issues; no additional findings were adopted or rejected.
+The representative BotService run completed successfully at
+`2026-09-09T17:19:15.0734624+08:00` on the pinned checkout.
+The first full attempt was intentionally interrupted after 30/468 completions
+to preserve authored-node deduplication across template instances. Its output
+is not final evidence. Its 24 newly generated graph files and four runner-owned
+temporary configs were identified and removed; tracked generated corpus paths
+were restored before restarting.
+
+The replacement full run used the existing `specs:typespec` runner with
+concurrency six:
+
+```powershell
+mise exec -- pnpm --dir packages\typespec-lintdiff specs:typespec `
+  --specs-repo C:\dev\worktrees\azure-rest-api-specs-lintdiff-lro-error-content `
+  --concurrency 6
+```
+
+The final index, comparison report, both raw rule shards, selected outlier
+Swagger files, six failure logs, deterministic aggregation output, and run log
+are retained in this session's `files/lro-final-evidence` and adjacent artifacts.
+Generated corpus files are validation-only and are not included in the repair
+PR. Re-running the command at the pinned revisions regenerates the evidence;
+the checked-in corpus report remains the historical snapshot described above.

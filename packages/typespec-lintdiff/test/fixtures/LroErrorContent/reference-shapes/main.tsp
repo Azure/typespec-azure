@@ -42,9 +42,15 @@ model Failure<T> {
   @statusCode statusCode: 400;
   @body body: T;
 }
-@extension("x-ms-long-running-operation", true)
+@route("/status")
+op poll is Azure.Core.Foundations.GetOperationStatus;
+model Accepted {
+  @statusCode statusCode: 202;
+  @header("Operation-Location") operationLocation: string;
+}
+@Azure.Core.pollingOperation(poll)
 @post
-op Lro<T>(@path name: string): AcceptedResponse | Failure<T>;
+op Lro<T>(@path name: string): Accepted | Failure<T>;
 
 @route("/models/{name}")
 op models is Lro<ErrorBody>;
