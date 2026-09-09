@@ -1,7 +1,7 @@
 ---
-changeKind: internal
+changeKind: feature
 packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Refactor `resolveArmResources` around an explicit provider resolution context without changing its public behavior.
+Add selected-version views and dependency-neutral logical name customization to `resolveArmResources`. The existing no-options call continues to return the multi-version declaration view.

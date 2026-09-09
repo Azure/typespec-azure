@@ -5,6 +5,7 @@ import { it } from "vitest";
 import { parse } from "yaml";
 import { createSdkContext } from "../src/context.js";
 import { listClients } from "../src/decorators.js";
+import { getLibraryName } from "../src/public-utils.js";
 import { SdkTestLibrary } from "../src/testing/index.js";
 import { ArmTester, createSdkContextForTester, SimpleTester } from "./tester.js";
 
@@ -262,4 +263,41 @@ it("calling createSdkContext does not cause resolveArmResources to return duplic
   const resourceNames = provider.resources.map((r) => r.resourceName);
   ok(resourceNames.includes("EmployeeParent"));
   ok(resourceNames.includes("Employee"));
+});
+
+it("uses TCGC library names when supplied to resolveArmResources", async () => {
+  const { program } = await ArmTester.compile(`
+    @armProviderNamespace
+    @service(#{ title: "Azure Management emitter Testing" })
+    namespace Microsoft.ContosoProviderHub;
+
+    @clientName("ClientWidget")
+    model Widget is TrackedResource<{}> {
+      ...ResourceNameParameter<Widget>;
+    }
+
+    interface Operations extends Azure.ResourceManager.Operations {}
+
+    @clientName("ClientWidgets", "csharp")
+    @armResourceOperations
+    interface Widgets {
+      @clientName("fetchWidget", "csharp")
+      get is ArmResourceRead<Widget>;
+    }
+  `);
+
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+  const provider = resolveArmResources(program, {
+    nameResolver: ({ type }) => getLibraryName(context, type),
+  });
+
+  const widget = provider.resources?.find((x) => x.type.name === "Widget");
+  ok(widget);
+  strictEqual(widget.resourceName, "ClientWidget");
+  strictEqual(widget.operations.lifecycle.read?.[0].name, "fetchWidget");
+  strictEqual(widget.operations.lifecycle.read?.[0].operationGroup, "ClientWidgets");
+  strictEqual(widget.operations.lifecycle.read?.[0].resourceName, "ClientWidget");
+  strictEqual(widget.operations.lifecycle.read?.[0].resourceModelName, "ClientWidget");
 });

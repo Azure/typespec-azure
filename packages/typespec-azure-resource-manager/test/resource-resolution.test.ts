@@ -1,3 +1,5 @@
+import { unsafe_Realm } from "@typespec/compiler/experimental";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok } from "assert";
 import { describe, expect, it } from "vitest";
 import type { ArmOperationKind, ArmResourceOperation } from "../src/operations.js";
@@ -596,6 +598,395 @@ interface Children {
       },
     ]);
   }, 30_000);
+
+  it("resolves resources and operations for a selected API version", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+@versioned(Versions)
+namespace Microsoft.ContosoProviderHub;
+
+enum Versions {
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v1: "2024-01-01",
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2: "2025-01-01",
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v3: "2026-01-01",
+}
+
+@renamedFrom(Versions.v2, "OldWidget")
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
+}
+
+model WidgetProperties {
+  @typeChangedFrom(Versions.v2, string)
+  value: int32;
+
+  @added(Versions.v2)
+  currentOnly?: string;
+
+  @madeOptional(Versions.v3)
+  flexible?: string;
+}
+
+@added(Versions.v2)
+model Gadget is ProxyResource<{}> {
+  ...ResourceNameParameter<Gadget>;
+}
+
+@added(Versions.v2)
+@removed(Versions.v3)
+model Temporary is ProxyResource<{}> {
+  ...ResourceNameParameter<Temporary>;
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@added(Versions.v2)
+@route("/providers/Microsoft.ContosoProviderHub/status")
+interface ProviderStatus {
+  @returnTypeChangedFrom(Versions.v3, string)
+  @get status(): int32;
+}
+
+@renamedFrom(Versions.v2, "OldWidgets")
+@armResourceOperations
+interface Widgets {
+  @renamedFrom(Versions.v2, "fetch")
+  get is ArmResourceRead<Widget>;
+
+  @added(Versions.v2)
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+
+  @added(Versions.v2)
+  @removed(Versions.v3)
+  update is ArmResourcePatchSync<Widget, WidgetProperties>;
+}
+
+@added(Versions.v2)
+@armResourceOperations
+interface Gadgets {
+  get is ArmResourceRead<Gadget>;
+}
+
+@added(Versions.v2)
+@removed(Versions.v3)
+@armResourceOperations
+interface Temporaries {
+  get is ArmResourceRead<Temporary>;
+}
+`);
+
+    const legacyBeforeProjection = resolveArmResources(program);
+    const v1 = resolveArmResources(program, { version: "2024-01-01" });
+    const repeatedV1 = resolveArmResources(program, { version: "2024-01-01" });
+    const namedV1 = resolveArmResources(program, {
+      version: "2024-01-01",
+      nameResolver: ({ kind, defaultName }) =>
+        kind === "operation" ? `client${defaultName}` : `Client${defaultName}`,
+    });
+    const differentlyNamedV1 = resolveArmResources(program, {
+      version: "2024-01-01",
+      nameResolver: ({ defaultName }) => `Other${defaultName}`,
+    });
+    const v2 = resolveArmResources(program, { version: "2025-01-01" });
+    const v3 = resolveArmResources(program, { version: "2026-01-01" });
+
+    expect(repeatedV1).toBe(v1);
+    expect(namedV1).not.toBe(v1);
+    expect(namedV1.resources?.[0].resourceName).toBe("ClientOldWidget");
+    expect(namedV1.resources?.[0].operations.lifecycle.read?.[0]).toMatchObject({
+      name: "clientfetch",
+      operationGroup: "ClientOldWidgets",
+      resourceName: "ClientOldWidget",
+    });
+    expect(differentlyNamedV1.resources?.[0].resourceName).toBe("OtherOldWidget");
+    expect(v1.resources).toHaveLength(1);
+    const oldWidget = v1.resources![0];
+    expect(oldWidget.type.name).toBe("OldWidget");
+    expect(oldWidget.resourceName).toBe("OldWidget");
+    expect(oldWidget.operations.lifecycle.read?.[0]).toMatchObject({
+      name: "fetch",
+      operationGroup: "OldWidgets",
+    });
+    expect(oldWidget.operations.lifecycle.createOrUpdate).toBeUndefined();
+    expect(v1.providerOperations?.map((x) => x.name)).not.toContain("status");
+
+    const oldWidgetRealm = unsafe_Realm.realmForType.get(oldWidget.type);
+    expect(oldWidgetRealm).toBeDefined();
+    expect(unsafe_Realm.realmForType.get(repeatedV1.resources![0].type)).toBe(oldWidgetRealm);
+
+    const oldProperties = oldWidget.type.properties.get("properties")?.type;
+    ok(oldProperties?.kind === "Model");
+    expect(oldProperties.properties.has("currentOnly")).toBe(false);
+    expect(oldProperties.properties.get("value")?.type).toMatchObject({
+      kind: "Scalar",
+      name: "string",
+    });
+
+    expect(v2.resources?.map((x) => x.type.name).sort()).toEqual(["Gadget", "Temporary", "Widget"]);
+    const widget = v2.resources!.find((x) => x.type.name === "Widget");
+    ok(widget);
+    expect(widget.operations.lifecycle.read?.[0]).toMatchObject({
+      name: "get",
+      operationGroup: "Widgets",
+    });
+    expect(widget.operations.lifecycle.createOrUpdate).toHaveLength(1);
+    expect(widget.operations.lifecycle.update).toHaveLength(1);
+    expect(v2.providerOperations?.map((x) => x.name)).toContain("status");
+    expect(
+      v2.providerOperations?.find((x) => x.name === "status")?.operation.returnType,
+    ).toMatchObject({
+      kind: "Scalar",
+      name: "string",
+    });
+
+    const currentProperties = widget.type.properties.get("properties")?.type;
+    ok(currentProperties?.kind === "Model");
+    expect(currentProperties.properties.has("currentOnly")).toBe(true);
+    expect(currentProperties.properties.get("value")?.type).toMatchObject({
+      kind: "Scalar",
+      name: "int32",
+    });
+    expect(currentProperties.properties.get("flexible")?.optional).toBe(false);
+
+    expect(v3.resources?.map((x) => x.type.name).sort()).toEqual(["Gadget", "Widget"]);
+    const latestWidget = v3.resources!.find((x) => x.type.name === "Widget");
+    ok(latestWidget);
+    expect(latestWidget.operations.lifecycle.update).toBeUndefined();
+    const latestProperties = latestWidget.type.properties.get("properties")?.type;
+    ok(latestProperties?.kind === "Model");
+    expect(latestProperties.properties.get("flexible")?.optional).toBe(true);
+    expect(
+      v3.providerOperations?.find((x) => x.name === "status")?.operation.returnType,
+    ).toMatchObject({
+      kind: "Scalar",
+      name: "int32",
+    });
+
+    const legacy = resolveArmResources(program);
+    expect(legacy).toBe(legacyBeforeProjection);
+    expect(legacy.resources?.map((x) => x.type.name).sort()).toEqual([
+      "Gadget",
+      "Temporary",
+      "Widget",
+    ]);
+    expect(legacy.resources?.some((x) => unsafe_Realm.realmForType.has(x.type))).toBe(false);
+  }, 30_000);
+
+  it("reports invalid selected API versions", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+@versioned(Versions)
+namespace Microsoft.ContosoProviderHub;
+
+enum Versions {
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v1: "2024-01-01",
+}
+
+model Widget is TrackedResource<{}> {
+  ...ResourceNameParameter<Widget>;
+}
+
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<Widget>;
+}
+`);
+
+    expect(resolveArmResources(program, { version: "2099-01-01" })).toEqual({});
+    expectDiagnostics(program.diagnostics, {
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-version-not-found",
+      message: "API version '2099-01-01' was not found. Available versions: 2024-01-01.",
+    });
+  });
+
+  it("reports a selected API version for a transiently versioned service", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+model Widget is TrackedResource<{}> {
+  ...ResourceNameParameter<Widget>;
+}
+
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<Widget>;
+}
+`);
+
+    expect(resolveArmResources(program, { version: "2024-01-01" })).toEqual({});
+    expectDiagnostics(program.diagnostics, {
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-version-transient",
+      message:
+        "API version '2024-01-01' cannot be selected because the ARM service uses transient versioning.",
+    });
+  });
+
+  it("customizes logical names without mutating the cached provider", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model Parent is TrackedResource<{}> {
+  ...ResourceNameParameter<Parent>;
+}
+
+@parentResource(Parent)
+model Child is ProxyResource<{}> {
+  ...ResourceNameParameter<Child>;
+}
+
+@armResourceOperations
+interface Children {
+  get is ArmResourceRead<Child>;
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Child>;
+}
+`);
+
+    const original = resolveArmResources(program);
+    const requests: Array<{
+      kind: string;
+      defaultName: string;
+      typeName: string;
+      resourceModel?: string;
+      resourceType?: string;
+      resourceInstancePath?: string;
+    }> = [];
+    const named = resolveArmResources(program, {
+      nameResolver: (request) => {
+        requests.push({
+          kind: request.kind,
+          defaultName: request.defaultName,
+          typeName: String(request.type.name),
+          resourceModel: request.resourceModel?.name,
+          resourceType: request.resourceType,
+          resourceInstancePath: request.resourceInstancePath,
+        });
+        switch (request.kind) {
+          case "resource":
+            return `Client${request.defaultName}`;
+          case "operation":
+            return `client${request.defaultName}`;
+          case "operation-group":
+            return `Client${request.defaultName}`;
+        }
+      },
+    });
+
+    expect(named).not.toBe(original);
+    const child = named.resources?.find((x) => x.type.name === "Child");
+    ok(child);
+    expect(child.resourceName).toBe("ClientChild");
+    expect(child.operations.lifecycle.read?.[0]).toMatchObject({
+      name: "clientget",
+      operationGroup: "ClientChildren",
+      resourceName: "ClientChild",
+      resourceModelName: "ClientChild",
+    });
+
+    const syntheticParent = named.resources?.find(
+      (x) => x.resourceType.types.join("/") === "parents",
+    );
+    ok(syntheticParent);
+    expect(syntheticParent.resourceName).toBe("Parent");
+
+    expect(requests).toContainEqual({
+      kind: "resource",
+      defaultName: "Child",
+      typeName: "Child",
+      resourceModel: undefined,
+      resourceType: "Microsoft.ContosoProviderHub/parents/children",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}/children/{childName}",
+    });
+    expect(requests).toContainEqual({
+      kind: "operation",
+      defaultName: "get",
+      typeName: "get",
+      resourceModel: "Child",
+      resourceType: "Microsoft.ContosoProviderHub/parents/children",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}/children/{childName}",
+    });
+    expect(requests).toContainEqual({
+      kind: "operation-group",
+      defaultName: "Children",
+      typeName: "Children",
+      resourceModel: "Child",
+      resourceType: "Microsoft.ContosoProviderHub/parents/children",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}/children/{childName}",
+    });
+
+    expect(resolveArmResources(program)).toBe(original);
+    expect(original.resources?.find((x) => x.type.name === "Child")?.resourceName).toBe("Child");
+    expect(
+      original.resources?.find((x) => x.type.name === "Child")?.operations.lifecycle.read?.[0],
+    ).toMatchObject({
+      name: "get",
+      operationGroup: "Children",
+      resourceName: "Child",
+      resourceModelName: "Child",
+    });
+  }, 30_000);
+
+  it("handles metadata name resolver fallback, empty names, and errors", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+model Widget is TrackedResource<{}> {
+  ...ResourceNameParameter<Widget>;
+}
+
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<Widget>;
+}
+`);
+
+    const original = resolveArmResources(program);
+    const fallback = resolveArmResources(program, {
+      nameResolver: () => undefined,
+    });
+    expect(fallback).not.toBe(original);
+    expect(fallback.resources?.[0].resourceName).toBe("Widget");
+
+    const empty = resolveArmResources(program, {
+      nameResolver: ({ kind }) => (kind === "resource" ? "" : undefined),
+    });
+    expect(empty.resources?.[0].resourceName).toBe("Widget");
+    expectDiagnostics(program.diagnostics, {
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-metadata-name",
+      message: "The metadata name resolver returned an empty resource name for 'Widget'.",
+    });
+
+    expect(() =>
+      resolveArmResources(program, {
+        nameResolver: () => {
+          throw new Error("consumer naming failed");
+        },
+      }),
+    ).toThrow("consumer naming failed");
+    expect(resolveArmResources(program)).toBe(original);
+  });
+
   it("collects operation information for tracked resources", async () => {
     const { program } = await Tester.compile(`
 using Azure.Core;
