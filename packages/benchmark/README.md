@@ -9,9 +9,10 @@ Performance benchmarking tool for TypeSpec Azure compilation. Tracks compilation
 3. Runtime metrics are aggregated with an outlier-resistant estimator (trimmed mean for 5+ samples, median for smaller sample sizes)
 4. Per-spec variability (standard deviation and coefficient of variation) is captured from raw iterations
 5. Optional noise-gating can auto-run extra iterations when variance is high
-6. PR baseline can be built from a rolling window of recent `main` results instead of only `latest.json`
-7. Results are stored as JSON — on CI, they're saved to the `benchmark-data` branch
-8. PR comments show a comparison table highlighting performance changes
+6. A frozen reference workload is measured in the same job so results from different CI runners can be compared (see [Machine calibration](#machine-calibration))
+7. PR baseline can be built from a rolling window of recent `main` results instead of only `latest.json`
+8. Results are stored as JSON — on CI, they're saved to the `benchmark-data` branch
+9. PR comments show a comparison table highlighting performance changes
 
 ## Local usage
 
@@ -114,6 +115,48 @@ The backfill command:
 2. Checks out each historical commit, builds its dependencies, and runs benchmarks using the saved CLI
 3. Skips commits that already have results on the `benchmark-data` branch
 4. Commits all new results to the `benchmark-data` branch
+
+## Machine calibration
+
+CI hands out whichever runner is free, and those machines are not equally fast.
+Measured across 100 commits of `main`, the same work varied by 63% depending on
+the machine: spread between machines was 13.7% against 0.9% on a single machine,
+so hardware outweighed code changes roughly 16 to 1. Every commit gets its own
+job, so that noise lands directly between neighboring points and shows up as
+jumps no code change explains.
+
+Machine speed scales TypeSpec workloads more or less uniformly, so it can be
+divided out. Each run therefore also compiles a **frozen reference workload** on
+the same machine, in the same job. Dividing by it removes the machine factor
+from the comparison.
+
+The reference has to satisfy two competing requirements.
+
+It must be **frozen**, and deliberately does not use the packages being
+benchmarked. If it moved with the repo, a genuine regression would slow the
+reference by the same amount and cancel itself out. It lives in `calibration/`
+and installs exactly pinned releases from npm.
+
+It must also be **representative**. A first attempt imported only
+`@typespec/compiler` and compiled synthetic models; between two CI machines it
+slowed 16% while the real specs slowed 34%, removing only half the machine
+effect. Hardware sensitivity depends on the kind of work being done — `loader`
+is a third of the real measurement and proved the most sensitive phase of all,
+and a spec with no libraries to load barely exercises it. The reference is
+therefore a frozen copy of the `azure-full` spec compiled against the same
+pinned library stack and linter ruleset, which brings its phase mix in line with
+what is actually being measured.
+
+Changing the reference spec or any pinned version breaks comparability with
+existing points, so both are versioned by `WORKLOAD_ID` in `src/calibration.ts`
+and only entries sharing the dominant workload are corrected.
+
+Calibration costs ~20s per commit and never fails a run: if the pinned stack
+cannot be installed, the run proceeds and the point is flagged `uncalibrated`.
+
+Raw measurements are never rewritten. `history.json` stores the calibration
+alongside them and exposes a per-entry `normalization` factor to multiply by, so
+the correction stays visible and reversible.
 
 ## What gets measured
 
