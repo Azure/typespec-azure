@@ -5,6 +5,11 @@
     "message": "The resource name parameter should be defined with a 'pattern' restriction.  Please use 'ResourceNameParameter' to specify the name parameter with options to override default pattern RegEx expression."
   },
   {
+    "code": "tsp-lintdiff-local-linter/consistent-patch-properties",
+    "severity": "warning",
+    "message": "The property 'displayName' in the request body either does not appear in the resource model or is nested at the wrong level."
+  },
+  {
     "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
     "severity": "warning",
     "message": "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum or a union of string values, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'."

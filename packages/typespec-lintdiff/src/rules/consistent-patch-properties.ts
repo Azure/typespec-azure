@@ -1,10 +1,5 @@
 import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 import {
-  createTCGCContext,
-  isInScope,
-  type TCGCContext,
-} from "@azure-tools/typespec-client-generator-core";
-import {
   createRule,
   getDiscriminator,
   isNeverType,
@@ -13,6 +8,7 @@ import {
   resolveEncodedName,
   type Model,
   type ModelProperty,
+  type Program,
   type Type,
 } from "@typespec/compiler";
 import { getAllHttpServices, type HttpOperation, type HttpOperationResponse } from "@typespec/http";
@@ -28,7 +24,6 @@ export const consistentPatchPropertiesRule = createRule({
   create(context) {
     return {
       root: () => {
-        const emitterContext = createTCGCContext(context.program, "@azure-tools/typespec-autorest");
         const [services] = getAllHttpServices(context.program);
         for (const service of services) {
           if (resolveProviderNamespace(context.program, service.namespace) === undefined) {
@@ -36,15 +31,12 @@ export const consistentPatchPropertiesRule = createRule({
           }
 
           for (const httpOperation of service.operations) {
-            if (
-              httpOperation.verb !== "patch" ||
-              !isInScope(emitterContext, httpOperation.operation)
-            ) {
+            if (httpOperation.verb !== "patch") {
               continue;
             }
 
             const patchBody = getObjectModel(httpOperation.parameters.body?.type);
-            const resourceType = getResourceType(emitterContext, httpOperation, service.operations);
+            const resourceType = getResourceType(httpOperation, service.operations);
             if (patchBody === undefined) {
               continue;
             }
@@ -55,10 +47,10 @@ export const consistentPatchPropertiesRule = createRule({
             const resourceModel = getObjectModel(resourceType);
             const invalidProperties =
               resourceModel === undefined
-                ? [...getPayloadProperties(emitterContext, patchBody)].map(
+                ? [...getPayloadProperties(context.program, patchBody)].map(
                     ([jsonName, property]) => ({ path: [jsonName], target: property.target }),
                   )
-                : findInvalidPatchProperties(emitterContext, patchBody, resourceModel);
+                : findInvalidPatchProperties(context.program, patchBody, resourceModel);
 
             for (const invalidProperty of invalidProperties) {
               context.reportDiagnostic({
@@ -76,15 +68,11 @@ export const consistentPatchPropertiesRule = createRule({
 });
 
 function getResourceType(
-  emitterContext: TCGCContext,
   patchOperation: HttpOperation,
   operations: HttpOperation[],
 ): Type | undefined {
   const getOperation = operations.find(
-    (operation) =>
-      operation.verb === "get" &&
-      operation.path === patchOperation.path &&
-      isInScope(emitterContext, operation.operation),
+    (operation) => operation.verb === "get" && operation.path === patchOperation.path,
   );
 
   return (
@@ -112,7 +100,7 @@ function getResponseBodyType(
 }
 
 function findInvalidPatchProperties(
-  emitterContext: TCGCContext,
+  program: Program,
   patchModel: Model,
   resourceModel: Model,
   path: string[] = [],
@@ -129,15 +117,15 @@ function findInvalidPatchProperties(
   }
 
   const invalidProperties: Array<{ path: string[]; target: Model | ModelProperty }> = [];
-  const resourceProperties = getPayloadProperties(emitterContext, resourceModel);
+  const resourceProperties = getPayloadProperties(program, resourceModel);
 
-  for (const [jsonName, patchProperty] of getPayloadProperties(emitterContext, patchModel)) {
+  for (const [jsonName, patchProperty] of getPayloadProperties(program, patchModel)) {
     const currentPath = [...path, jsonName];
     const resourceProperty = resourceProperties.get(jsonName);
 
     if (resourceProperty === undefined) {
       invalidProperties.push(
-        ...collectPropertyPaths(emitterContext, patchProperty, currentPath, new Set()),
+        ...collectPropertyPaths(program, patchProperty, currentPath, new Set()),
       );
       continue;
     }
@@ -148,7 +136,7 @@ function findInvalidPatchProperties(
       if (resourcePropertyModel !== undefined) {
         invalidProperties.push(
           ...findInvalidPatchProperties(
-            emitterContext,
+            program,
             patchPropertyModel,
             resourcePropertyModel,
             currentPath,
@@ -157,7 +145,7 @@ function findInvalidPatchProperties(
         );
       } else {
         invalidProperties.push(
-          ...collectNestedPropertyPaths(emitterContext, patchPropertyModel, currentPath),
+          ...collectNestedPropertyPaths(program, patchPropertyModel, currentPath),
         );
       }
     }
@@ -168,18 +156,18 @@ function findInvalidPatchProperties(
 }
 
 function collectNestedPropertyPaths(
-  emitterContext: TCGCContext,
+  program: Program,
   model: Model,
   path: string[],
 ): Array<{ path: string[]; target: Model | ModelProperty }> {
   const visited = new Set([model]);
-  return [...getPayloadProperties(emitterContext, model)].flatMap(([jsonName, property]) =>
-    collectPropertyPaths(emitterContext, property, [...path, jsonName], visited),
+  return [...getPayloadProperties(program, model)].flatMap(([jsonName, property]) =>
+    collectPropertyPaths(program, property, [...path, jsonName], visited),
   );
 }
 
 function collectPropertyPaths(
-  emitterContext: TCGCContext,
+  program: Program,
   property: PayloadProperty,
   path: string[],
   visited: Set<Model>,
@@ -194,13 +182,13 @@ function collectPropertyPaths(
   }
   visited.add(propertyModel);
 
-  const nestedProperties = getPayloadProperties(emitterContext, propertyModel);
+  const nestedProperties = getPayloadProperties(program, propertyModel);
   if (nestedProperties.size === 0) {
     return [{ path, target: property.target }];
   }
 
   const invalidProperties = [...nestedProperties].flatMap(([jsonName, nestedProperty]) =>
-    collectPropertyPaths(emitterContext, nestedProperty, [...path, jsonName], visited),
+    collectPropertyPaths(program, nestedProperty, [...path, jsonName], visited),
   );
   visited.delete(propertyModel);
   return invalidProperties;
@@ -211,25 +199,18 @@ interface PayloadProperty {
   type?: Type;
 }
 
-function getPayloadProperties(
-  emitterContext: TCGCContext,
-  model: Model,
-): Map<string, PayloadProperty> {
+function getPayloadProperties(program: Program, model: Model): Map<string, PayloadProperty> {
   const properties = new Map<string, PayloadProperty>();
 
   for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
     for (const property of current.properties.values()) {
-      const jsonName = resolveEncodedName(emitterContext.program, property, "application/json");
-      if (
-        !properties.has(jsonName) &&
-        !isNeverType(property.type) &&
-        isInScope(emitterContext, property)
-      ) {
+      const jsonName = resolveEncodedName(program, property, "application/json");
+      if (!properties.has(jsonName) && !isNeverType(property.type)) {
         properties.set(jsonName, { target: property, type: property.type });
       }
     }
 
-    const discriminator = getDiscriminator(emitterContext.program, current);
+    const discriminator = getDiscriminator(program, current);
     if (
       discriminator !== undefined &&
       !current.properties.has(discriminator.propertyName) &&

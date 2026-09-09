@@ -1,42 +1,87 @@
 # ConsistentPatchProperties migration evidence
 
-## Conclusion
+## Result and gap summary
 
-The migrated TypeSpec rule is functionally equivalent to the intended Swagger
-`ConsistentPatchProperties` behavior over the aligned, successfully compiled
-corpus. The final full run covers all 27 validator projects. There are no
-validator-only projects.
+The September 9 full production run has **151 Swagger diagnostics in 27
+projects versus 325 TypeSpec diagnostics in 32 projects**, over 462 successfully
+compiled projects; six failures are excluded from both sides. All 27 validator
+projects overlap. Counts are unchanged from September 4.
 
-**TypeSpec rule update required:** yes. The previous implementation inspected
-only registered ARM resource lifecycle updates. The Swagger rule inspects every
-ARM PATCH operation, including legacy templates, custom provider operations,
-and PATCH actions. The updated rule traverses ARM HTTP PATCH operations, selects
-the PATCH response model containing status `200` or `201`, falls back to the
-same-path GET response containing `200` or `201`, recursively compares body
-properties at the same level, and reports the authored property. TypeSpec HTTP
-can represent those statuses either as individual numbers or as members of a
-status-code range.
+The five TypeSpec-only projects contribute 19 removed/renamed-declaration
+findings and 22 Informatica findings on selected-version schema mismatches.
+The other 133 extra raw findings occur in overlapping projects, where reporting
+granularity and repeated source targets differ.
 
-The five remaining raw TypeSpec-only projects are explained. Nineteen
-diagnostics come from older-version declarations absent from the retained
-latest Swagger. Informatica also contains genuine selected-version violations
-missed by the Swagger validator. Raw diagnostic equality is not required
-because Swagger reports emitted operation/schema occurrences while TypeSpec
-reports authored properties.
+**Decision: native-boundary repair completed; Swagger equivalence is partial.**
+Four scope fixtures prove three TypeSpec-only cases and one validator-only case:
+native declarations remain visible when AutoRest omits them. The unchanged
+corpus does not exercise away this contract difference.
+
+**Limits:** Informatica's validator-side omission mechanism remains unisolated.
+Version exclusions establish the four one-sided-project exclusions, not a
+globally latest-version-projected diagnostic total.
+
+## Required changes and native contract
+
+The repair replaces `TCGCContext` with compiler `Program`, removes
+`createTCGCContext` and all `isInScope` calls, and preserves the native PATCH
+body/response comparison. No emitter, generator context, private decorator
+state, or generated OpenAPI is used to decide diagnostics. Compiler APIs still
+provide JSON encoded names, inheritance, nullability, and discriminator metadata.
+
+PATCH `200`, then `201`, then same-path GET `200`/`201` selects the comparison
+body. Exact response codes take precedence over a containing range. The lint
+recursively compares same-level properties and reports authored targets; this
+repair does not change diagnostic granularity, cycle handling, or API-version
+policy.
+
+Directly related changes are the native regression tests, four scope-comparison
+fixtures and snapshots (two existing, two new), and partial-coverage metadata.
+The ARM provider check remains lintdiff-only isolation in a mixed runner; its
+official-library adaptation is separate from this repair.
+
+The existing official `arm-resource-patch` rule remains only partial coverage:
+it checks registered resource PATCH bodies without this recursive same-level
+comparison or the complete custom-operation response/fallback selection.
+The merged source PR #5399 is historical; this is an explicitly approved
+follow-up repair, not a duplicate migration.
 
 ## Evidence revisions and populations
 
-| Evidence                                                           | Revision and population                                                                                                                                   | `ConsistentPatchProperties` row                                                                                                                                           |
-| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [External coverage snapshot](../../../docs/coverage_old.md)        | The checked-in snapshot links to its source gist but records no date, spec commit, or generator revision. It reports 450 compiled projects and 210 rules. | `lint`; 303 validator projects; 25 local-lint projects; 0 official projects; 8.3%. Project identities cannot be reconstructed from this aggregate row.                    |
-| [Checked-in observed report](../../../specs/coverage-breakdown.md) | Specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`; 462/468 successfully compiled projects.                                                          | Before this change: `production`; 27 validator projects; 27 TypeSpec projects; 23 overlap; 4 validator-only; 4 TypeSpec-only; 151 validator and 122 TypeSpec diagnostics. |
-| [Final retained evidence](./corpus-evidence.json)                  | Full review-fix run generated 2026-09-04 from the same specs commit; 462/468 projects compiled; duration 1,261,930 ms.                                    | 27 validator projects; 32 raw TypeSpec projects; 27 overlap; 0 validator-only; 5 raw TypeSpec-only; 151 validator and 325 raw TypeSpec diagnostics.                       |
+Upstream research uses `azure-openapi-validator` commit
+`6243cb01c16c7535cd3b8df6f45fbeb3c095ed7f`:
+[implementation](https://github.com/Azure/azure-openapi-validator/blob/6243cb01c16c7535cd3b8df6f45fbeb3c095ed7f/packages/rulesets/src/spectral/functions/consistent-patch-properties.ts),
+[`diffSchema` and GET lookup](https://github.com/Azure/azure-openapi-validator/blob/6243cb01c16c7535cd3b8df6f45fbeb3c095ed7f/packages/rulesets/src/spectral/functions/utils.ts),
+[tests](https://github.com/Azure/azure-openapi-validator/blob/6243cb01c16c7535cd3b8df6f45fbeb3c095ed7f/packages/rulesets/src/spectral/test/consistent-patch-properties.test.ts),
+and [documentation](https://github.com/Azure/azure-openapi-validator/blob/6243cb01c16c7535cd3b8df6f45fbeb3c095ed7f/docs/consistent-patch-properties.md).
+The installed comparison engine is `@microsoft.azure/openapi-validator-rulesets`
+2.2.6. Its resolved ARM selector is `$.paths.*.patch`, using the first body
+parameter schema and the response precedence described above. Upstream tests
+cover inherited missing properties, a matching subset, and asynchronous GET
+fallback. The scope limitations occur before this validator, during emission.
+
+| Evidence                                                           | Revision and population                                                                                                                                   | `ConsistentPatchProperties` row                                                                                                                                                                |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [External coverage snapshot](../../../docs/coverage_old.md)        | The checked-in snapshot links to its source gist but records no date, spec commit, or generator revision. It reports 450 compiled projects and 210 rules. | `lint`; 303 validator projects; 25 local-lint projects; 0 official projects; 8.3%. Project identities cannot be reconstructed from this aggregate row.                                         |
+| [Checked-in observed report](../../../specs/coverage-breakdown.md) | Specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`; 462/468 successfully compiled projects.                                                          | Before this change: `production`; 27 validator projects; 27 TypeSpec projects; 23 overlap; 4 validator-only; 4 TypeSpec-only; 151 validator and 122 TypeSpec diagnostics.                      |
+| September 4 source evidence (historical)                           | Full review-fix run from the same specs commit; 462/468 projects compiled; duration 1,261,930 ms.                                                         | 27 validator projects; 32 TypeSpec projects; 27 overlap; 0 validator-only; 5 TypeSpec-only; 151 validator and 325 TypeSpec diagnostics.                                                        |
+| [Final retained repair evidence](./corpus-evidence.json)           | Full run generated 2026-09-09T09:24:28.545Z; completed 2026-09-09T17:28:59+08:00; same specs commit; 462/468 compiled; duration 4,678,050 ms.             | `production`; `partial` semantic coverage; 27 validator projects; 32 raw TypeSpec projects; 27 overlap; 0 validator-only; 5 raw TypeSpec-only; 151 validator and 325 raw TypeSpec diagnostics. |
 
 The external report uses an unidentified older population and aggregate
 migration credit. The observed reports require same-project diagnostics on the
 pinned successful-project population. The final TypeSpec diagnostic count also
 includes every declared API version; the validator dataset retains one selected
 version per project.
+
+The repair ran on `feature/lintdiff-consistent-patch-properties-native` from
+target commit `29c4a87b0799092be0ede854ffdf23a0a9648795`, with the uncommitted
+source repair included. The runner's source fingerprint is retained in
+`corpus-evidence.json`. The scope is ARM, production validator execution,
+successfully compiled projects only, no readme suppressions on retained
+Swagger, and normal source-program TypeSpec diagnostics (including source
+suppressions). No new global API-version projection or normalization was added.
+The checked-in coverage report is deliberately historical: refreshed canonical
+corpus artifacts are not included in this rule-repair PR.
 
 Six compile failures were excluded from both sides:
 
@@ -70,18 +115,30 @@ The raw TypeSpec-only projects are:
   These diagnostics are intentional; the Swagger validator silently misses the
   emitted violations.
 
-The selected-version TypeSpec population therefore contains 306 diagnostics
-across 28 projects: all 27 overlap projects plus one intentional TypeSpec-only
-project.
+The version attribution was rechecked against the pinned source:
+
+| Project              | Selected API version | Raw findings excluded | Source evidence                                                                                                                            |
+| -------------------- | -------------------- | --------------------: | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Batch                | `2025-06-01`         |                     2 | `models.tsp:1981-1995`: certificate model removed in `v2025_06_01`.                                                                        |
+| Cdn                  | `2026-04-01-preview` |                     1 | `KeyGroup.tsp:46-81`: PATCH interface removed in `v2025_12_01`; diagnostic on `models.tsp:3593`.                                           |
+| ManagedNetworkFabric | `2025-07-15`         |                    15 | Deprecated PATCH properties or their containing property are removed/renamed in `v2024_06_15_preview` or `v2025_07_15`; see example below. |
+| NetApp               | `2026-05-15-preview` |                     1 | `Volume.tsp:1330-1346`: `usageThreshold20250901` removed/renamed at the selected preview version.                                          |
+
+Excluding these 19 findings leaves 306 diagnostics across 28 projects: all
+27 overlap projects plus Informatica. This is a **one-sided version-filtered
+population**, not a globally projected latest-version run. Versioning can also
+rename properties, so the unprojected deprecated names do not prove violations
+in the older emitted API versions either.
 
 ## Diagnostic cardinality
 
-| Identity                                         | Validator | TypeSpec |
-| ------------------------------------------------ | --------: | -------: |
-| Raw full-run diagnostics                         |       151 |      325 |
-| Validator `project + JSON path`                  |        48 |      N/A |
-| TypeSpec `project + source file + line + column` |       N/A |      188 |
-| Selected-version diagnostics                     |       151 |      306 |
+| Identity                                          | Validator | TypeSpec |
+| ------------------------------------------------- | --------: | -------: |
+| Raw full-run diagnostics                          |       151 |      325 |
+| Validator `project + Swagger file + JSON path`    |        48 |      N/A |
+| Validator `project + JSON path`                   |        48 |      N/A |
+| TypeSpec `project + source file + line + column`  |       N/A |      188 |
+| After the documented one-sided version exclusions |       151 |      306 |
 
 Eighteen overlap projects have equal raw counts. Across the other nine,
 TypeSpec has 133 additional raw diagnostics and Swagger has none. The largest
@@ -89,6 +146,15 @@ differences come from multiple versions and operations sharing source models,
 plus diagnostic granularity: Swagger can report one parent property at an
 operation body path while TypeSpec reports its individual missing leaves. The
 two identity domains cannot be safely collapsed into a one-to-one key.
+
+Across all 32 affected projects, raw positive differences sum to 174 and
+negative differences to zero. After the separate identity-based deduplications,
+nine projects have equal counts, 22 are TypeSpec-higher, and SQL is
+validator-higher; positive differences sum to 142 and negative differences to
+2, giving 188 versus 48. SQL has four operation paths but only two reused
+authored `operations` properties. EdgeOrder is the largest deduplicated
+TypeSpec-higher outlier: three parent-property messages share one Swagger path,
+while TypeSpec reports 25 authored leaves.
 
 ## Emission matrix
 
@@ -107,13 +173,15 @@ compares the resulting `properties` maps.
 | PATCH lacks `200`/`201`; same-path GET has `200`              | GET `200` response is fallback                                                             | clean          | clean           | `async-get-fallback`                        |
 | PATCH has scalar `200` and model `201` responses              | Existing `200` schema wins before its shape is interpreted                                 | violation      | violation       | `response-precedence`                       |
 | PATCH response range contains `200`                           | AutoRest emits the full `2XX` range while TypeSpec HTTP retains `{ start: 200, end: 299 }` | validator miss | violation       | focused rule unit tests                     |
-| Exact PATCH `200` overlaps a containing range                 | Explicit `200` response takes precedence over the range regardless of declaration order    | validator miss | violation       | focused rule unit tests                     |
+| Exact PATCH `200` overlaps a containing range                 | Explicit `200` response takes precedence over the range regardless of declaration order    | violation      | violation       | focused rule unit tests                     |
 | Different source names encode to the same JSON name           | `resolveProperty` uses the encoded property name                                           | clean          | clean           | `payload-property-shape`                    |
 | Nullable object properties have different nested properties   | nullable single-model unions emit object `properties`                                      | violation      | violation       | `nullable-object-mismatch`                  |
 | Nullable object properties have matching nested properties    | nullable single-model unions emit matching object `properties`                             | clean          | clean           | `nullable-object-match`                     |
 | Same-named array and scalar properties                        | neither property schema emits named `properties`                                           | clean          | clean           | `non-model-property-shape`                  |
-| PATCH-only property scoped to C#                              | AutoRest `isInScope` omits it from the PATCH schema                                        | clean          | clean           | `scoped-property`                           |
-| Same-path GET scoped to C#                                    | AutoRest omits the GET route, so PATCH has no fallback schema                              | clean          | clean           | `scoped-get-fallback`                       |
+| PATCH-only property scoped to C#                              | AutoRest `isInScope` omits it from the PATCH schema                                        | clean          | violation       | `scoped-property`                           |
+| Same-path GET scoped to C#                                    | AutoRest omits the GET route, so PATCH has no fallback schema                              | clean          | violation       | `scoped-get-fallback`                       |
+| PATCH operation scoped to C#                                  | AutoRest filters the route; no PATCH operation reaches the validator                       | clean          | violation       | `scoped-patch-operation`                    |
+| Matching response property scoped to C#                       | AutoRest omits the response property but retains the PATCH property                        | violation      | clean           | `scoped-response-property`                  |
 | Undeclared PATCH discriminator                                | `getSchemaForModel` synthesizes the discriminator as a required string property            | violation      | violation       | `synthesized-discriminator`                 |
 | Authored property encodes to a synthesized discriminator name | `resolveProperty` overwrites the synthesized property with the authored property's schema  | violation      | violation       | `encoded-discriminator-property`            |
 | Same-level PATCH subset                                       | corresponding property exists in response schema                                           | clean          | clean           | `same-level-subset`                         |
@@ -123,10 +191,134 @@ Inherited properties and spreads reach the same model/property emitter
 branches. Arrays, records, scalar leaves, and empty objects have no named
 `properties` at that point in the recursive comparison; neither rule treats
 their elements, arbitrary record keys, or scalar values as named PATCH
-properties. Operation and property scope use AutoRest's TCGC emitter identity,
-and undeclared discriminators are represented by the model that causes AutoRest
+properties. Operation and property scope are deliberately not projected to an
+emitter-specific contract. Undeclared discriminators use compiler metadata and
+are represented by the model that causes AutoRest
 to synthesize them. Cycles are guarded by active model-pair traversal without
 suppressing repeated authored occurrences on sibling paths.
+
+## Gap examples: emitter scope is outside the native contract
+
+The following examples are from the checked-in comparison fixtures at API
+version `2024-01-01` for the two existing fixtures and `0000-00-00` for the two
+new unversioned fixtures. Schema excerpts omit descriptions only. Each native
+outcome also has a direct unit assertion; comparison snapshots alone are not
+the acceptance criterion.
+
+### PATCH request property omitted by AutoRest
+
+- **Classification:** TypeSpec-only
+- **Status:** intentional
+- **Project/API version:** fixture `scoped-property` / `2024-01-01`
+- **Source:** `scoped-property/main.tsp`, `WidgetPatchProperties.clientOnly`
+
+```typespec
+model WidgetPatchProperties {
+  @scope("csharp")
+  clientOnly?: string;
+}
+```
+
+AutoRest emits `"WidgetPatchProperties": { "type": "object" }`, with no
+`properties` map. The native model still contains `clientOnly`.
+
+| Engine            | Observed result                                                          |
+| ----------------- | ------------------------------------------------------------------------ |
+| Swagger validator | No finding: the property is absent from the PATCH schema.                |
+| TypeSpec lint     | One finding for `properties.clientOnly`, absent from the response model. |
+
+**Disposition:** retain the native finding and partial-coverage classification;
+do not import downstream scope helpers into an ARM lint.
+
+### GET fallback omitted by AutoRest
+
+- **Classification:** TypeSpec-only
+- **Status:** intentional
+- **Project/API version:** fixture `scoped-get-fallback` / `2024-01-01`
+- **Source:** `scoped-get-fallback/main.tsp`, `CustomWidgetOperations.read`
+
+```typespec
+@get
+@scope("csharp")
+read(...ResourceInstanceParameters<Widget>): WidgetResponse | ErrorResponse;
+
+@patch
+update(...ResourceInstanceParameters<Widget>, @body body: WidgetPatchBody):
+  | AcceptedResponse
+  | ErrorResponse;
+```
+
+The emitted widget-item path has only `patch`; its responses are `202` and
+`default`, with no eligible resource schema. The same-path GET exists in the
+native HTTP graph and returns the resource whose `displayName` is nested under
+`properties`, unlike the PATCH body.
+
+| Engine            | Observed result                                                                  |
+| ----------------- | -------------------------------------------------------------------------------- |
+| Swagger validator | No finding: neither PATCH nor an emitted GET supplies a `200`/`201` schema.      |
+| TypeSpec lint     | One finding for the wrongly nested `displayName`, using the native GET fallback. |
+
+**Disposition:** retain native GET selection; emitted route visibility is not a
+native semantic condition.
+
+### PATCH endpoint omitted by AutoRest
+
+- **Classification:** TypeSpec-only
+- **Status:** intentional
+- **Project/API version:** fixture `scoped-patch-operation` / `0000-00-00`
+- **Source:** `scoped-patch-operation/main.tsp`, `update`
+
+```typespec
+@route("/widgets")
+@patch
+@scope("csharp")
+op update(@body body: WidgetUpdate): Widget;
+```
+
+`WidgetUpdate` has `extra`; `Widget` has only `name`. The emitted `/widgets`
+path has only `get`, so there is no PATCH object for the validator selector.
+
+| Engine            | Observed result                                       |
+| ----------------- | ----------------------------------------------------- |
+| Swagger validator | No finding: the PATCH operation was not emitted.      |
+| TypeSpec lint     | One finding for `extra` on the native PATCH endpoint. |
+
+**Disposition:** retain endpoint checking independent of client scope.
+
+### Matching response property omitted by AutoRest
+
+- **Classification:** validator-only
+- **Status:** intentional
+- **Project/API version:** fixture `scoped-response-property` / `0000-00-00`
+- **Source:** `scoped-response-property/main.tsp`, `Widget.description`
+
+```typespec
+model Widget {
+  name?: string;
+
+  @scope("csharp")
+  description?: string;
+}
+model WidgetUpdate {
+  description?: string;
+}
+```
+
+```json
+{
+  "Widget": { "type": "object", "properties": { "name": { "type": "string" } } },
+  "WidgetUpdate": { "type": "object", "properties": { "description": { "type": "string" } } }
+}
+```
+
+| Engine            | Observed result                                                           |
+| ----------------- | ------------------------------------------------------------------------- |
+| Swagger validator | One finding for `description`, absent from the emitted response schema.   |
+| TypeSpec lint     | No finding: `description` exists at the same level in both native models. |
+
+**Disposition:** retain native compliance and the explicit reviewed validator
+expectation. The validator is correct for the emitted schema; this is not a
+validator false positive or proof of complete Swagger equivalence.
 
 ## Gap example: custom PATCH traversal
 
@@ -172,14 +364,14 @@ resource lifecycle update, so `getArmResources()` did not expose it.
 
 - **Classification:** TypeSpec-only
 - **Status:** population mismatch
-- **Project/API version:** `Batch` / selected latest version after `2025-06-01`
+- **Project/API version:** `Batch` / `2025-06-01`
 - **Source:** `models.tsp`, `CertificateCreateOrUpdateProperties`
 
 **TypeSpec source**
 
 ```typespec
 @removed(Versions.v2025_06_01)
-model CertificateCreateOrUpdateProperties {
+model CertificateCreateOrUpdateProperties extends CertificateBaseProperties {
   @visibility(Lifecycle.Read, Lifecycle.Update)
   data: string;
 
@@ -200,6 +392,36 @@ from the retained latest Swagger.
 
 **Disposition:** exclude these diagnostics from selected-version comparison;
 do not weaken the production lint.
+
+### Versioning subcase: removed and renamed PATCH properties
+
+- **Classification:** TypeSpec-only
+- **Status:** population mismatch
+- **Project/API version:** `ManagedNetworkFabric` / `2025-07-15`
+- **Source:** `models/NetworkToNetworkInterconnect.tsp:260-262`
+
+```typespec
+@removed(Versions.v2025_07_15)
+@renamedFrom(Versions.v2025_07_15, "prefixLimits")
+prefixLimitsDeprecated?: OptionBLayer3PrefixLimitPatchProperties[];
+```
+
+The raw program reports
+`properties.optionBLayer3Configuration.prefixLimitsDeprecated`. The selected
+version removes this declaration and uses the separately added `prefixLimits`
+property. The same pattern accounts for the deprecated properties in
+`InternalNetwork.tsp`, `common.tsp`, `NetworkTapRule.tsp`, and
+`L3IsolationDomain.tsp`; two findings under `aggregateRouteConfigurationDeprecated`
+are removed with their containing property in `v2024_06_15_preview`.
+
+| Engine            | Observed result                                                   |
+| ----------------- | ----------------------------------------------------------------- |
+| Swagger validator | No corresponding deprecated property in the selected emitted API. |
+| TypeSpec lint     | Fifteen raw findings across removed/renamed PATCH declarations.   |
+
+**Disposition:** exclude these source-program findings from the selected-version
+project comparison. A renamed source property is not evidence of an invalid
+older emitted property name.
 
 ## Gap example: validator misses an emitted violation
 
@@ -246,6 +468,16 @@ model OrganizationPropertiesCustomUpdate {
 **Disposition:** retain the TypeSpec findings; they enforce the documented
 same-level subset contract and expose a validator false negative.
 
+The selected Swagger was rechecked in this repair: `Organizations_Update`
+uses `InformaticaOrganizationResourceUpdate` as its body and
+`InformaticaOrganizationResource` as its `200` response. The former references
+`OrganizationPropertiesCustomUpdate`; the latter references
+`OrganizationProperties`, which has `informaticaProperties` rather than
+`informaticaOrganizationProperties` and no `existingResourceId`. Retained
+validator output contains no execution error and no rule finding. This proves
+the observed omission and schema mismatch, but not the internal reason the
+validator omitted the findings; that mechanism remains unisolated.
+
 ## Gap example: emitted occurrence versus source target
 
 - **Classification:** count-only
@@ -271,11 +503,75 @@ same-level subset contract and expose a validator false negative.
 **Disposition:** preserve raw counts and source identities separately. Do not
 deduplicate by property name or require count equality.
 
+### Count-only outlier: SQL shares two properties across four routes
+
+- **Classification:** count-only
+- **Status:** intentional
+- **Project/API version:** `SQL` / `2025-02-01-preview`
+- **Source:** `models.tsp:11883-11885` and `11930-11932`
+
+```typespec
+model SensitivityLabelUpdateList {
+  operations?: SensitivityLabelUpdate[];
+}
+model RecommendedSensitivityLabelUpdateList {
+  operations?: RecommendedSensitivityLabelUpdate[];
+}
+```
+
+The validator reports `operations` at four distinct PATCH body schema paths:
+`currentSensitivityLabels` and `recommendedSensitivityLabels`, each under both
+`managedInstances/.../databases` and `servers/.../databases`. TypeSpec also
+reports four raw findings, but repeats the two source locations above.
+
+| Engine            | Observed result                                         |
+| ----------------- | ------------------------------------------------------- |
+| Swagger validator | Four raw findings and four file-independent JSON paths. |
+| TypeSpec lint     | Four raw findings and two source identities.            |
+
+**Disposition:** do not mistake source reuse for two missed operations.
+
+### Count-only outlier: EdgeOrder reports parents versus leaves
+
+- **Classification:** count-only
+- **Status:** intentional
+- **Project/API version:** `EdgeOrder` / `2024-02-01`
+- **Source:** `models.tsp:2471-2485`, `OrderItemUpdateProperties`
+
+```typespec
+model OrderItemUpdateProperties {
+  forwardAddress?: AddressProperties;
+  preferences?: Preferences;
+  notificationEmailList?: string[];
+}
+```
+
+The validator reports `properties.forwardAddress`, `properties.preferences`,
+and `properties.notificationEmailList`, all at the same order-item PATCH body
+schema path. Native lint expands the missing object properties to authored
+leaves such as `properties.forwardAddress.shippingAddress.streetAddress1`;
+the array `notificationEmailList` remains a single target.
+
+| Engine            | Observed result                                                |
+| ----------------- | -------------------------------------------------------------- |
+| Swagger validator | Three parent-property messages, sharing one JSON path.         |
+| TypeSpec lint     | Twenty-five authored-property messages at 25 source locations. |
+
+**Disposition:** preserve this existing diagnostic granularity, not a fabricated
+one-to-one identity between operation schema paths and source properties.
+
 ## Focused validation
 
-Sixteen fixture cases pass: nine violations and seven compliant controls. They cover
-nested and moved properties, custom PATCH traversal, PATCH `201`, GET `200` and
-`201` fallback, encoded JSON names, nullable objects, and a same-level subset.
-Focused unit regressions additionally verify that the TypeSpec rule selects a
-response status range containing `200` and prefers an overlapping exact `200`
-response. The package build and diagnostic-noise audit also pass.
+The repair's 18 fixture snapshots were refreshed and then checked without
+snapshot updates. There are nine matching violation cases, five matching
+rule-compliant controls, three intentional TypeSpec-only scope cases, and one
+reviewed validator-only scope case. The harness labels the TypeSpec-only cases
+as mapped diagnostics in validator-clean fixtures; that warning is explained,
+not suppressed or reclassified as equivalence. One pre-existing non-model
+control still has unreviewed ambient diagnostics, unrelated to this rule.
+
+Nine native unit cases pass: the two existing response-range regressions,
+three emitter/client-generator-free model-comparison cases, and four client
+scope regressions. Package build and changed-file lint pass. The full corpus
+completed with exit code zero; the six project compile failures above are
+retained and excluded, not counted as successful comparisons.
