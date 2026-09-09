@@ -55,7 +55,6 @@ model StandAloneUnion {
 }
 
 // Color and ColorModel will be generated in implementation.models package
-#suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
 @access(Access.internal)
 @usage(Usage.input | Usage.output)
 enum Color {
