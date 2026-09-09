@@ -47,9 +47,9 @@ import { isArmLibraryNamespace } from "./namespace.js";
 import {
   getArmResourceInfo,
   getResourceBaseType,
-  getResourcePathElements,
   isArmVirtualResource,
   isCustomAzureResource,
+  parseArmResourceInstancePath,
   ResourceBaseType,
 } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
@@ -686,16 +686,12 @@ function createParamMutator(sourceParameterName: string, targetParameterName: st
   };
 }
 
-export function getDefaultLegacyExtensionResourceName(
-  path: string,
-  resourceName: string,
-  operationKind: ArmOperationKind,
-): string {
+export function getDefaultLegacyExtensionResourceName(path: string, resourceName: string): string {
   const providerIndex = path.lastIndexOf("/providers");
   if (providerIndex > -1 && providerIndex < path.length - 1) {
     const targetPath = path.slice(0, providerIndex);
     const extensionPath = path.slice(providerIndex);
-    const extensionInfo = getResourcePathElements(extensionPath, operationKind);
+    const extensionInfo = parseArmResourceInstancePath(extensionPath);
     if (!extensionInfo) return resourceName;
     const extensionName = extensionInfo.resourceType.types.flatMap((t) => pascalCase(t)).join("");
     if (targetPath.length === 0) {
@@ -704,7 +700,7 @@ export function getDefaultLegacyExtensionResourceName(
     if (targetPath.length === 1) {
       return `${pascalCase(targetPath[0].replaceAll("{", "").replaceAll("}", ""))}${extensionName}`;
     }
-    const targetInfo = getResourcePathElements(targetPath, "read");
+    const targetInfo = parseArmResourceInstancePath(targetPath);
     if (!targetInfo || targetInfo.resourceType.types.length === 0) return resourceName;
     const types = targetInfo.resourceType.types;
     return `${pascalCase(types[types.length - 1])}${extensionName}`;
@@ -713,7 +709,7 @@ export function getDefaultLegacyExtensionResourceName(
 }
 
 function getDefaultLegacyResourceName(operation: ArmResourceOperationData, httpOp: string): string {
-  const pathInfo = getResourcePathElements(httpOp, operation.kind);
+  const pathInfo = parseArmResourceInstancePath(httpOp);
   if (pathInfo !== undefined) {
     let types: string[] = pathInfo.resourceType.types;
     if (types.length > 1) {
@@ -732,11 +728,7 @@ export function getResourceNameForOperation(
   if (operation.resourceName !== undefined && operation.resourceName.length > 0)
     return operation.resourceName;
   if (operation.resourceKind === "legacy-extension") {
-    return getDefaultLegacyExtensionResourceName(
-      operationPath,
-      operation.resourceModelName,
-      operation.kind,
-    );
+    return getDefaultLegacyExtensionResourceName(operationPath, operation.resourceModelName);
   }
   if (operation.resourceKind === "legacy") {
     return getDefaultLegacyResourceName(operation, operationPath);

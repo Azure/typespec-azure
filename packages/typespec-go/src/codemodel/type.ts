@@ -43,8 +43,10 @@ export type WireType =
   | ReadSeekCloser
   | Scalar
   | Slice
+  | SliceArray
   | String
-  | Time;
+  | Time
+  | UnionStruct;
 
 /** defines a type within the Go type system */
 export type Type = SdkType | WireType;
@@ -60,7 +62,7 @@ export interface ArmClientOptions extends QualifiedType {
 }
 
 /** a const type definition used for enums */
-export interface Constant {
+export interface Constant<T extends ConstantType = ConstantType> {
   kind: "constant";
 
   /** the const type name */
@@ -73,7 +75,7 @@ export interface Constant {
   pkg: PackageContent;
 
   /** the underlying type of the const */
-  type: ConstantType;
+  type: T;
 
   /** the possible values for this const */
   values: Array<ConstantValue>;
@@ -181,18 +183,35 @@ export interface Literal<T extends LiteralType = LiteralType> {
 export type LiteralType = Constant | ConstantDef | EncodedBytes | Scalar | String | Time;
 
 /** a Go map type. note that the key is always a string */
-export interface Map {
+export interface Map<T extends MapValueType = MapValueType> {
   kind: "map";
 
   /** the type of values in the map */
-  valueType: MapValueType;
+  valueType: T;
 
   /** indicates if the map's value type is pointer-to-type or not */
   valueTypeByValue: boolean;
 }
 
 /** the set of map value types */
-export type MapValueType = WireType;
+export type MapValueType =
+  | Any
+  | Constant
+  | EncodedBytes
+  | Interface
+  | Map
+  | Model
+  | MultipartContent
+  | PolymorphicModel
+  | RawJSON
+  | ReadCloser
+  | ReadSeekCloser
+  | Scalar
+  | Slice
+  | SliceArray
+  | String
+  | Time
+  | UnionStruct;
 
 /** a field within a model */
 export interface ModelField extends StructField {
@@ -273,11 +292,11 @@ export interface RawJSON {
 }
 
 /** a Go scalar type */
-export interface Scalar {
+export interface Scalar<T extends ScalarType = ScalarType> {
   kind: "scalar";
 
   /** the type of scalar */
-  type: ScalarType;
+  type: T;
 
   /** indicates the value is sent/received as a string */
   encodeAsString: boolean;
@@ -310,18 +329,55 @@ export type ScalarType =
   | "uint64";
 
 /** a Go slice */
-export interface Slice {
+export interface Slice<T extends SliceElementType = SliceElementType> {
   kind: "slice";
 
   /** the element type for this slice */
-  elementType: SliceElementType;
+  elementType: T;
 
   /** indicates if the slice's element type is pointer-to-type or not */
   elementTypeByValue: boolean;
 }
 
+/** specialized slice type for arrays represented as delimited strings */
+export interface SliceArray {
+  kind: "sliceArray";
+
+  /** the element type for this slice */
+  elementType: SliceArrayElementType;
+
+  /** indicates if the slice's element type is pointer-to-type or not */
+  elementTypeByValue: boolean;
+
+  /** the delimiter used to separate elements */
+  delimiter: SliceArrayDelimiter;
+}
+
+/** the set of slice array delimiters */
+export type SliceArrayDelimiter = "comma" | "newline" | "pipe" | "space";
+
+/** the supported element types for arrays represented as delimited strings */
+export type SliceArrayElementType = Constant | String;
+
 /** the set of slice element types */
-export type SliceElementType = WireType;
+export type SliceElementType =
+  | Any
+  | Constant
+  | EncodedBytes
+  | Interface
+  | Map
+  | Model
+  | MultipartContent
+  | PolymorphicModel
+  | RawJSON
+  | ReadCloser
+  | ReadSeekCloser
+  | Scalar
+  | Slice
+  | SliceArray
+  | String
+  | Time
+  | UnionStruct;
 
 /** a Go string */
 export interface String {
@@ -374,6 +430,25 @@ export interface TokenCredential extends QualifiedType {
   /** the scopes to include for the credential */
   scopes: Array<string>;
 }
+
+/** a single variant within a union */
+export interface UnionField extends StructField {
+  /** the variant's underlying type */
+  type: UnionVariantType;
+}
+
+/** a Go struct modeling a non-discriminated union where exactly one field is set */
+export interface UnionStruct extends StructBase {
+  kind: "unionStruct";
+
+  /** the variant fields of the union. exactly one is populated at runtime */
+  fields: Array<UnionField>;
+}
+
+/**
+ * the subset of WireType kinds that can appear as a variant within a non-discriminated union.
+ */
+export type UnionVariantType = Constant | Literal | Map | Model | Scalar | Slice | String;
 
 /** bit flags indicating how a model/polymorphic type is used */
 export enum UsageFlags {
@@ -459,7 +534,8 @@ export function getTypeDeclaration(type: Client | Type, scope: PackageType): str
     case "model":
     case "paramGroup":
     case "polymorphicModel":
-    case "responseEnvelope": {
+    case "responseEnvelope":
+    case "unionStruct": {
       let pkg: PackageType;
       const typeName = type.kind === "paramGroup" ? type.groupName : type.name;
       switch (type.kind) {
@@ -493,6 +569,7 @@ export function getTypeDeclaration(type: Client | Type, scope: PackageType): str
     case "scalar":
       return type.type;
     case "slice":
+    case "sliceArray":
       return (
         `[]${type.elementTypeByValue ? "" : "*"}` + getTypeDeclaration(type.elementType, scope)
       );
@@ -509,6 +586,22 @@ export function getTypeDeclaration(type: Client | Type, scope: PackageType): str
   }
 }
 
+/** narrows the field to the model's JSON additional properties bucket, whose type is always a map */
+export function isAdditionalProperties(field: ModelField): field is ModelField & { type: Map } {
+  return field.annotations.isAdditionalProperties;
+}
+
+/** narrows type to a constant with one of the specified underlying types (any constant when no types are given) */
+export function isConstant<T extends ConstantType = ConstantType>(
+  type: WireType,
+  ...kinds: Array<T>
+): type is Constant<T> {
+  if (type.kind !== "constant") {
+    return false;
+  }
+  return kinds.length === 0 || (kinds as Array<ConstantType>).includes(type.type);
+}
+
 /** narrows type to a LiteralType within the conditional block */
 export function isLiteralValueType(type: WireType): type is LiteralType {
   switch (type.kind) {
@@ -517,6 +610,55 @@ export function isLiteralValueType(type: WireType): type is LiteralType {
     case "scalar":
     case "string":
     case "time":
+      return true;
+    default:
+      return false;
+  }
+}
+
+/** narrows type to a map with one of the specified value type kinds (any map when no kinds are given) */
+export function isMap<T extends MapValueType["kind"] = MapValueType["kind"]>(
+  type: WireType,
+  ...kinds: Array<T>
+): type is Map<Extract<MapValueType, { kind: T }>> {
+  if (type.kind !== "map") {
+    return false;
+  }
+  return kinds.length === 0 || (kinds as Array<string>).includes(type.valueType.kind);
+}
+
+/** narrows type to a scalar with one of the specified underlying types (any scalar when no types are given) */
+export function isScalar<T extends ScalarType = ScalarType>(
+  type: WireType,
+  ...kinds: Array<T>
+): type is Scalar<T> {
+  if (type.kind !== "scalar") {
+    return false;
+  }
+  return kinds.length === 0 || (kinds as Array<ScalarType>).includes(type.type);
+}
+
+/** narrows type to a slice with one of the specified element type kinds (any slice when no kinds are given) */
+export function isSlice<T extends SliceElementType["kind"] = SliceElementType["kind"]>(
+  type: WireType,
+  ...kinds: Array<T>
+): type is Slice<Extract<SliceElementType, { kind: T }>> {
+  if (type.kind !== "slice") {
+    return false;
+  }
+  return kinds.length === 0 || (kinds as Array<string>).includes(type.elementType.kind);
+}
+
+/** narrows type to a UnionVariantType within the conditional block */
+export function isUnionVariantType(type: WireType): type is UnionVariantType {
+  switch (type.kind) {
+    case "constant":
+    case "literal":
+    case "map":
+    case "model":
+    case "scalar":
+    case "slice":
+    case "string":
       return true;
     default:
       return false;
@@ -618,8 +760,8 @@ export class ArmClientOptions extends QualifiedType implements ArmClientOptions 
   }
 }
 
-export class Constant implements Constant {
-  constructor(pkg: PackageContent, name: string, type: ConstantType, valuesFuncName: string) {
+export class Constant<T extends ConstantType = ConstantType> implements Constant<T> {
+  constructor(pkg: PackageContent, name: string, type: T, valuesFuncName: string) {
     this.kind = "constant";
     this.name = name;
     this.pkg = pkg;
@@ -684,8 +826,8 @@ export class Literal<T> implements Literal<T> {
   }
 }
 
-export class Map implements Map {
-  constructor(valueType: MapValueType, valueTypeByValue: boolean) {
+export class Map<T extends MapValueType = MapValueType> implements Map<T> {
+  constructor(valueType: T, valueTypeByValue: boolean) {
     this.kind = "map";
     this.valueType = valueType;
     this.valueTypeByValue = valueTypeByValue;
@@ -778,19 +920,32 @@ export class ReadSeekCloser extends QualifiedType implements ReadSeekCloser {
   }
 }
 
-export class Scalar implements Scalar {
-  constructor(type: ScalarType, encodeAsString: boolean) {
+export class Scalar<T extends ScalarType = ScalarType> implements Scalar<T> {
+  constructor(type: T, encodeAsString: boolean) {
     this.kind = "scalar";
     this.type = type;
     this.encodeAsString = encodeAsString;
   }
 }
 
-export class Slice implements Slice {
-  constructor(elementType: SliceElementType, elementTypeByValue: boolean) {
+export class Slice<T extends SliceElementType = SliceElementType> implements Slice<T> {
+  constructor(elementType: T, elementTypeByValue: boolean) {
     this.kind = "slice";
     this.elementType = elementType;
     this.elementTypeByValue = elementTypeByValue;
+  }
+}
+
+export class SliceArray implements SliceArray {
+  constructor(
+    elementType: SliceArrayElementType,
+    elementTypeByValue: boolean,
+    delimiter: SliceArrayDelimiter,
+  ) {
+    this.kind = "sliceArray";
+    this.elementType = elementType;
+    this.elementTypeByValue = elementTypeByValue;
+    this.delimiter = delimiter;
   }
 }
 
@@ -804,6 +959,20 @@ export class Struct extends StructBase implements Struct {
   constructor(pkg: PackageContent, name: string) {
     super(pkg, name);
     this.kind = "struct";
+  }
+}
+
+export class UnionField extends StructField implements UnionField {
+  constructor(name: string, type: UnionVariantType, byValue: boolean) {
+    super(name, type, byValue);
+  }
+}
+
+export class UnionStruct extends StructBase implements UnionStruct {
+  constructor(pkg: PackageContent, name: string) {
+    super(pkg, name);
+    this.kind = "unionStruct";
+    this.fields = new Array<UnionField>();
   }
 }
 

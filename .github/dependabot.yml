@@ -23,6 +23,10 @@ updates:
     exclude-paths:
       - ".github/workflows/*.lock.{yaml,yml}"
     labels: [] # conflict with our labels in labels.ts
+    # Give the community time to detect and report compromised action releases
+    # before they are proposed as updates here.
+    cooldown:
+      default-days: 7
     groups:
       actions:
         patterns:

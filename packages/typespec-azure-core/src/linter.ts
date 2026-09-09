@@ -7,6 +7,7 @@ import { compositionOverInheritanceRule } from "./rules/composition-over-inherit
 import { friendlyNameRule } from "./rules/friendly-name.js";
 import { knownEncodingRule } from "./rules/known-encoding.js";
 import { longRunningOperationsRequirePollingOperation } from "./rules/lro-polling-operation.js";
+import { noBooleanRule } from "./rules/no-boolean.js";
 import { noCaseMismatchRule } from "./rules/no-case-mismatch.js";
 import { noClosedLiteralUnionRule } from "./rules/no-closed-literal-union.js";
 import { noEnumRule } from "./rules/no-enum.js";
@@ -49,6 +50,7 @@ const rules = [
   byosRule,
   casingRule,
   compositionOverInheritanceRule,
+  noBooleanRule,
   knownEncodingRule,
   longRunningOperationsRequirePollingOperation,
   noCaseMismatchRule,

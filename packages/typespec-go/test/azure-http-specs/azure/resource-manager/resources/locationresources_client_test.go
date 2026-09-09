@@ -121,3 +121,13 @@ func TestLocationResourcesClient_Update(t *testing.T) {
 		Type: to.Ptr("Azure.ResourceManager.Resources/locationResources"),
 	}, resp.LocationResource)
 }
+
+func TestLocationResourcesClient_CreateOrUpdate_emptySubscriptionID(t *testing.T) {
+	resp, err := clientFactory.NewLocationResourcesClient("").CreateOrUpdate(context.Background(), "eastus", "resource", resources.LocationResource{
+		Properties: &resources.LocationResourceProperties{
+			Description: to.Ptr("valid"),
+		},
+	}, nil)
+	require.ErrorContains(t, err, "parameter subscriptionID cannot be empty")
+	require.Zero(t, resp)
+}

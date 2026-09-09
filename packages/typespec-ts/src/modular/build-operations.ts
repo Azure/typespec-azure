@@ -22,9 +22,9 @@ import { addDeclaration } from "../framework/declaration.js";
 import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
-import { getClientModuleInfo, isMultiEndpointClient } from "../utils/client-utils.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
 import type { SdkContext } from "../utils/interfaces.js";
-import { NameType, normalizeName } from "../utils/name-utils.js";
+import { NameType, normalizeName, normalizeSdkName } from "../utils/name-utils.js";
 import {
   getMethodHierarchiesMap,
   hasDualFormatSupport,
@@ -49,8 +49,7 @@ export function buildOperationFiles(
   const [_, client] = clientMap;
   const operationFiles: Set<SourceFile> = new Set();
   const { subfolder, clientName } = getClientModuleInfo(clientMap);
-  const isMultiEndpoint = isMultiEndpointClient(dpgContext);
-  const clientType = isMultiEndpoint ? `Client.${clientName}` : "Client";
+  const clientType = "Client";
   const methodMap = getMethodHierarchiesMap(dpgContext, client);
   for (const [prefixKey, operations] of methodMap) {
     const prefixes = prefixKey.split("/");
@@ -187,7 +186,7 @@ export function buildOperationOptions(
           docs: getDocsFromDescription(p.doc),
           hasQuestionToken: true,
           type: getTypeExpression(context, p.type, { isOptional: true }),
-          name: normalizeName(p.name, NameType.Parameter),
+          name: normalizeSdkName(p, NameType.Parameter),
         };
       }),
     ),

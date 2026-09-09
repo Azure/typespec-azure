@@ -19,9 +19,9 @@ import { useContext } from "../context-manager.js";
 import { useDependencies } from "../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../framework/reference.js";
 import { refkey } from "../framework/refkey.js";
-import { getClientModuleInfo, isMultiEndpointClient } from "../utils/client-utils.js";
+import { getClientModuleInfo } from "../utils/client-utils.js";
 import type { SdkContext } from "../utils/interfaces.js";
-import { NameType, normalizeName } from "../utils/name-utils.js";
+import { NameType, normalizeName, normalizeSdkName } from "../utils/name-utils.js";
 import { getMethodHierarchiesMap, isTenantLevelOperation } from "../utils/operation-util.js";
 import { AzurePollingDependencies } from "./external-dependencies.js";
 import { getPagingLROMethodName } from "./helpers/classical-operation-helpers.js";
@@ -68,19 +68,11 @@ export function buildClassicalClient(
   });
 
   // Add the private client member. This will be the client context from /api
-  if (isMultiEndpointClient(dpgContext)) {
-    clientClass.addProperty({
-      name: "_client",
-      type: `Client.${clientName}`,
-      scope: Scope.Private,
-    });
-  } else {
-    clientClass.addProperty({
-      name: "_client",
-      type: `${clientName}`,
-      scope: Scope.Private,
-    });
-  }
+  clientClass.addProperty({
+    name: "_client",
+    type: `${clientName}`,
+    scope: Scope.Private,
+  });
   // Add the pipeline member. This will be the pipeline from /api
   clientClass.addProperty({
     name: "pipeline",
@@ -145,9 +137,14 @@ export function buildClassicalClient(
       `this._clientParams = {${classicalParams.map((p) => p.name).join(",")}};`,
     );
     for (const childClient of client.children) {
-      const subfolder = normalizeName(childClient.name.replace("Client", ""), NameType.File);
+      const subfolder = normalizeSdkName(childClient, NameType.File, {
+        nameOverride: childClient.name.replace(/Client$/, ""),
+      });
       clientFile.addImportDeclaration({
-        moduleSpecifier: `./${subfolder}/${normalizeName(childClient.name, NameType.File)}.js`,
+        moduleSpecifier: `./${subfolder}/${normalizeName(
+          getClassicalClientName(childClient),
+          NameType.File,
+        )}.js`,
         namedImports: [
           `${getClassicalClientName(childClient)}`,
           `${getClassicalClientName(childClient)}OptionalParams`,
@@ -190,11 +187,10 @@ function importAllApis(clientFile: SourceFile, srcPath: string, subfolder: strin
 
 function generateMethod(
   context: SdkContext,
-  clientType: string,
   method: [string[], SdkServiceMethod<SdkServiceOperation>],
 ): MethodDeclarationStructure[] {
   const res: MethodDeclarationStructure[] = [];
-  const declaration = getOperationFunction(context, method, clientType);
+  const declaration = getOperationFunction(context, method, "Client");
   const methodName = declaration.propertyName ?? declaration.name ?? "FIXME";
   const methodParams = declaration.parameters?.filter((p) => p.name !== "context") ?? [];
   const declarationRefKey = resolveReference(refkey(method[1], "api"));
@@ -268,19 +264,14 @@ function buildClientOperationGroups(
   dpgContext: SdkContext,
   clientClass: ClassDeclaration,
 ) {
-  let clientType = "Client";
   const [_hierarchy, client] = clientMap;
-  const { subfolder } = getClientModuleInfo(clientMap);
-  if (subfolder && subfolder !== "") {
-    clientType = `Client.${clientClass.getName()}`;
-  }
   const methodMap = getMethodHierarchiesMap(dpgContext, client);
   for (const [prefixKey, operations] of methodMap) {
     const prefixes = prefixKey.split("/");
     const layer = 0;
     if (prefixKey === "") {
       operations.forEach((op) => {
-        const methods = generateMethod(dpgContext, clientType, [prefixes, op]);
+        const methods = generateMethod(dpgContext, [prefixes, op]);
         clientClass.addMethods(methods);
       });
     } else {
@@ -289,14 +280,12 @@ function buildClientOperationGroups(
       const operationName = `_get${rawGroupName}Operations`;
       const propertyType = `${rawGroupName}Operations`;
       // The `groupName` is used to any places where we don't need normalized name again
-      const groupName = normalizeName(rawGroupName, NameType.Property);
-      const existProperty = clientClass.getProperties().filter((p) => {
-        return p.getName() === normalizeName(groupName, NameType.Property);
-      });
-      if (!existProperty || existProperty.length === 0) {
+      const groupName = normalizeName(prefixes[0] ?? "", NameType.Property);
+      const existingProperty = clientClass.getProperty(groupName);
+      if (!existingProperty) {
         clientClass.addProperty({
           name: groupName,
-          type: resolveReference(refkey(propertyType, layer, "classicOperations")),
+          type: resolveReference(refkey(client, propertyType, layer, "classicOperations")),
           scope: Scope.Public,
           isReadonly: true,
           docs: ["The operation groups for " + groupName],
@@ -304,7 +293,7 @@ function buildClientOperationGroups(
         clientClass
           .getConstructors()[0]
           ?.addStatements(
-            `this.${groupName} = ${resolveReference(refkey(operationName, layer, "getClassicOperations"))}(this._client)`,
+            `this.${groupName} = ${resolveReference(refkey(client, operationName, layer, "getClassicOperations"))}(this._client)`,
           );
       }
     }

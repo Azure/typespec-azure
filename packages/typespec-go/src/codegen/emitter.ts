@@ -133,12 +133,18 @@ export class Emitter {
           await write("responses_serde.go", responses.serDe);
         }
 
+        const unions = core.generateUnions(pkg);
+        if (unions) {
+          await write("unions.go", unions.types);
+          await write("unions_serde.go", unions.serde);
+        }
+
         const xmlAddlProps = core.generateXMLAdditionalPropsHelpers(pkg);
         if (xmlAddlProps.length > 0) {
           await write("xml_helper.go", xmlAddlProps);
         }
 
-        if (this.codeModel.options.generateFakes) {
+        if (this.codeModel.options["generate-fakes"]) {
           const fakePkg = new go.FakePackage(pkg);
           const serverContent = fake.generateServers(fakePkg, this.codeModel.type);
           if (serverContent.servers.length > 0) {
@@ -187,7 +193,7 @@ export class Emitter {
 
   /** writes the *_example_test.go files */
   async emitExamples(): Promise<void> {
-    if (!this.codeModel.options.generateExamples) {
+    if (!this.codeModel.options["generate-samples"]) {
       return;
     }
 
@@ -361,6 +367,11 @@ function sortContent(pkg: go.PackageContent): void {
         return sortAscending(a.fieldName, b.fieldName);
       },
     );
+  }
+
+  pkg.unions.sort((a, b) => sortAscending(a.name, b.name));
+  for (const goUnion of pkg.unions) {
+    goUnion.fields.sort((a, b) => sortAscending(a.name, b.name));
   }
 
   pkg.clients.sort((a: go.Client, b: go.Client) => {

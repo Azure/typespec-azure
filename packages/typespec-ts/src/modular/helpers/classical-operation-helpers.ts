@@ -15,7 +15,7 @@ import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
 import { getClientModuleInfo } from "../../utils/client-utils.js";
 import type { SdkContext } from "../../utils/interfaces.js";
-import { NameType, normalizeName } from "../../utils/name-utils.js";
+import { NameType, normalizeName, normalizeSdkName } from "../../utils/name-utils.js";
 import type { ServiceOperation } from "../../utils/operation-util.js";
 import { AzurePollingDependencies } from "../external-dependencies.js";
 import { PagingHelpers, SimplePollerHelpers } from "../static-helpers-metadata.js";
@@ -25,8 +25,7 @@ import { getOperationFunction } from "./operation-helpers.js";
 interface OperationDeclarationInfo {
   // the operation function
   declaration: OptionalKind<FunctionDeclarationStructure>;
-  // the original operation name
-  oriName: string | undefined;
+  operation: ServiceOperation;
   // the refkey of the operation declaration
   declarationRefKey: string | undefined;
   // the default is false
@@ -58,6 +57,7 @@ export function getClassicalOperation(
 ) {
   const prefixes = operationGroup[0];
   const operations = operationGroup[1];
+  const client = clientMap[1];
   const { clientName } = getClientModuleInfo(clientMap);
   const hasClientContextImport = classicFile.getImportDeclarations().filter((i) => {
     return (
@@ -84,7 +84,7 @@ export function getClassicalOperation(
       const declaration = getOperationFunction(dpgContext, [prefixes, operation], clientName);
       operationDeclarationMap.set(declaration, {
         declaration,
-        oriName: operation.oriName,
+        operation,
         declarationRefKey: resolveReference(refkey(operation, "api")),
         isLro: declaration.isLro,
         lroFinalReturnType: declaration.lroFinalReturnType,
@@ -119,7 +119,9 @@ export function getClassicalOperation(
       properties.push({
         kind: StructureKind.PropertySignature,
         name,
-        type: resolveReference(refkey(nextLayerInterfaceName, layer + 1, "classicOperations")),
+        type: resolveReference(
+          refkey(client, nextLayerInterfaceName, layer + 1, "classicOperations"),
+        ),
       });
     }
   } else {
@@ -197,7 +199,7 @@ export function getClassicalOperation(
     addDeclaration(
       classicFile,
       interfaceDeclaration,
-      refkey(interfaceName, layer, "classicOperations"),
+      refkey(client, interfaceName, layer, "classicOperations"),
     );
   }
 
@@ -286,7 +288,7 @@ export function getClassicalOperation(
     addDeclaration(
       classicFile,
       functionDeclaration,
-      refkey(functionName, layer, "getClassicOperation"),
+      refkey(client, functionName, layer, "getClassicOperation"),
     );
   }
 
@@ -319,11 +321,11 @@ export function getClassicalOperation(
           ${normalizeName(
             prefixes[layer + 1] ?? "FIXME",
             NameType.Property,
-          )}: ${resolveReference(refkey(nextLayerOperationFunctionName, layer + 1, "getClassicOperations"))}(context)}`;
+          )}: ${resolveReference(refkey(client, nextLayerOperationFunctionName, layer + 1, "getClassicOperations"))}(context)}`;
         }
       } else {
         statement = `,
-      ...${resolveReference(refkey(nextLayerOperationFunctionName, layer + 1, "getClassicOperations"))}(context)}`;
+      ...${resolveReference(refkey(client, nextLayerOperationFunctionName, layer + 1, "getClassicOperations"))}(context)}`;
       }
 
       if (statement) {
@@ -342,23 +344,23 @@ export function getClassicalOperation(
           type: clientName,
         },
       ],
-      returnType: resolveReference(refkey(interfaceName, layer, "classicOperations")),
+      returnType: resolveReference(refkey(client, interfaceName, layer, "classicOperations")),
       statements:
         layer !== prefixes.length - 1
           ? `return {
             ${normalizeName(
               prefixes[layer + 1] ?? "FIXME",
               NameType.Property,
-            )}: ${resolveReference(refkey(nextLayerOperationFunctionName, layer + 1, "getClassicOperations"))}(context)   
+            )}: ${resolveReference(refkey(client, nextLayerOperationFunctionName, layer + 1, "getClassicOperations"))}(context)
       }`
           : `return {
-        ...${resolveReference(refkey(functionName, layer, "getClassicOperation"))}(context)
+        ...${resolveReference(refkey(client, functionName, layer, "getClassicOperation"))}(context)
       }`,
     };
     addDeclaration(
       classicFile,
       functions,
-      refkey(operationFunctionName, layer, "getClassicOperations"),
+      refkey(client, operationFunctionName, layer, "getClassicOperations"),
     );
   }
 
@@ -367,12 +369,11 @@ export function getClassicalOperation(
       propertyName?: string;
     },
   ) {
-    return normalizeName(
-      operationDeclarationMap.get(declaration)?.oriName ??
-        declaration.propertyName ??
-        declaration.name ??
-        "FIXME",
-      NameType.Method,
-    );
+    const operationInfo = operationDeclarationMap.get(declaration);
+    const name =
+      operationInfo?.operation.oriName ?? declaration.propertyName ?? declaration.name ?? "FIXME";
+    return normalizeSdkName(operationInfo?.operation ?? { name }, NameType.Method, {
+      nameOverride: name,
+    });
   }
 }

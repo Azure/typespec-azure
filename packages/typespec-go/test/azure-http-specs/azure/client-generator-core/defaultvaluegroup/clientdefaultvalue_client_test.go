@@ -37,7 +37,6 @@ func TestClientDefaultValueClient_GetPathParameter(t *testing.T) {
 }
 
 func TestClientDefaultValueClient_PutModelProperty(t *testing.T) {
-	t.Skip("https://github.com/Azure/typespec-azure/issues/4295")
 	client, err := defaultvaluegroup.NewClientDefaultValueClientWithNoCredential("http://localhost:3000", nil)
 	require.NoError(t, err)
 	resp, err := client.PutModelProperty(context.Background(), defaultvaluegroup.ModelWithDefaultValues{

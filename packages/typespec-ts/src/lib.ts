@@ -91,6 +91,7 @@ export interface EmitterOptions {
    * package.json exports). Defaults to `false`.
    */
   "generate-react-native-target"?: boolean;
+  "experimental-split-models-by-visibility"?: boolean;
 }
 
 export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
@@ -312,6 +313,12 @@ export const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
       description:
         "When set to true, generates React Native build targets (tsconfig, warp target, package.json exports). Defaults to `false`.",
     },
+    "experimental-split-models-by-visibility": {
+      type: "boolean",
+      nullable: true,
+      description:
+        "Whether to project request-body models to their write visibility (e.g. WidgetCreate/WidgetCreateOrUpdate) so read-only properties do not leak into input types. Defaults to false",
+    },
   },
   required: [],
 };
@@ -474,6 +481,12 @@ const libDef = {
       severity: "warning",
       messages: {
         default: paramMessage`Property name ${"propertyName"} is normalized to ${"normalizedName"}.`,
+      },
+    },
+    "invalid-exact-name": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Exact ${"nameKind"} name ${"name"} is not a valid TypeScript identifier. Choose a valid TypeScript identifier or remove exact().`,
       },
     },
     "un-supported-format-cases": {

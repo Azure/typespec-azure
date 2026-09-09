@@ -1030,6 +1030,48 @@ it("emit error when operations from multiple services in the same client have th
   ]);
 });
 
+it("emits warnings for operations with the same name for C# overloads", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace ServiceA {
+      @route("/a")
+      op test(): void;
+    }
+
+    @service
+    namespace ServiceB {
+      @route("/b")
+      op test(value: string): void;
+    }
+    `,
+      `
+    @client({service: [ServiceA, ServiceB]})
+    namespace MyClient {}
+    `,
+    ),
+  );
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@typespec/http-client-csharp",
+  });
+  const duplicateDiags = context.diagnostics.filter(
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name" ||
+      d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
+  );
+  expectDiagnostics(duplicateDiags, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
+      message: /test/,
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
+      message: /test/,
+    },
+  ]);
+});
+
 it("no error when operations from multiple services have different names", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(

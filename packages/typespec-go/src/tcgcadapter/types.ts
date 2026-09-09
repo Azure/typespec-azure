@@ -67,6 +67,14 @@ export class TypeAdapter {
       this.getPkg().constants.push(constType);
     }
 
+    for (const sdkUnion of this.ctx.sdkPackage.unions.filter((u) => u.kind === "union")) {
+      const goUnion = this.getUnionStruct(
+        sdkUnion,
+        this.codeModel.options["slice-elements-byval"] ?? false,
+      );
+      this.getPkg().unions.push(goUnion);
+    }
+
     // we must adapt all interface/model types first. this is because models can contain cyclic references
     const modelTypes = new Array<ModelTypeSdkModelType>();
     const ifaceTypes = new Array<InterfaceTypeSdkModelType>();
@@ -139,7 +147,7 @@ export class TypeAdapter {
       if (content.addlProps) {
         const annotations = new go.ModelFieldAnnotations(false, false, true, false);
         const addlPropsType = new go.Map(
-          this.getWireType(content.addlProps, false, false),
+          this.getMapValueType(content.addlProps, false, false),
           helpers.isTypePassedByValue(content.addlProps),
         );
         const addlProps = new go.ModelField(
@@ -235,7 +243,8 @@ export class TypeAdapter {
           ? true
           : nullable
             ? false
-            : this.codeModel.options.sliceElementsByval || helpers.isTypePassedByValue(elementType);
+            : this.codeModel.options["slice-elements-byval"] ||
+              helpers.isTypePassedByValue(elementType);
         const keyName = recursiveKeyName(
           `array-${myElementTypeByValue}`,
           elementType,
@@ -245,10 +254,23 @@ export class TypeAdapter {
         if (arrayType) {
           return arrayType;
         }
-        arrayType = new go.Slice(
-          this.getWireType(elementType, elementTypeByValue, substituteDiscriminator),
-          myElementTypeByValue,
+        const goElementType = this.getWireType(
+          type.valueType,
+          elementTypeByValue,
+          substituteDiscriminator,
         );
+        switch (goElementType.kind) {
+          case "constantDef":
+          case "constantValue":
+          case "etag":
+          case "literal":
+            throw new AdapterError(
+              "UnsupportedTsp",
+              `unsupported kind ${goElementType.kind} for slice element type`,
+              type.valueType.__raw?.node,
+            );
+        }
+        arrayType = new go.Slice(goElementType, myElementTypeByValue);
         this.types.set(keyName, arrayType);
         return arrayType;
       }
@@ -279,7 +301,7 @@ export class TypeAdapter {
           return mapType;
         }
         mapType = new go.Map(
-          this.getWireType(type.valueType, elementTypeByValue, substituteDiscriminator),
+          this.getMapValueType(type.valueType, elementTypeByValue, substituteDiscriminator),
           valueTypeByValue,
         );
         this.types.set(keyName, mapType);
@@ -314,6 +336,15 @@ export class TypeAdapter {
         return this.getModel(type);
       case "nullable":
         return this.getWireType(type.type, elementTypeByValue, substituteDiscriminator);
+      case "union":
+        if (type.discriminatedOptions) {
+          throw new AdapterError(
+            "UnsupportedTsp",
+            `unsupported type kind ${type.kind}`,
+            type.__raw?.node,
+          );
+        }
+        return this.getUnionStruct(type, elementTypeByValue);
       default:
         throw new AdapterError(
           "UnsupportedTsp",
@@ -387,7 +418,7 @@ export class TypeAdapter {
   private getBuiltInType(type: tcgc.SdkBuiltInType): go.WireType {
     switch (type.kind) {
       case "unknown": {
-        if (this.codeModel.options.rawJSONAsBytes) {
+        if (this.codeModel.options["rawjson-as-bytes"]) {
           const anyRawJSONKey = "any-raw-json";
           let anyRawJSON = this.types.get(anyRawJSONKey);
           if (anyRawJSON) {
@@ -406,7 +437,7 @@ export class TypeAdapter {
         return anyType;
       }
       case "boolean": {
-        const boolKey = "boolean";
+        const boolKey = type.encode === "string" ? "boolean-string" : "boolean";
         let primitiveBool = this.types.get(boolKey);
         if (primitiveBool) {
           return primitiveBool;
@@ -610,7 +641,7 @@ export class TypeAdapter {
 
   private getInterfaceType(model: tcgc.SdkModelType): go.Interface {
     if (model.name.length === 0) {
-      throw new AdapterError("InternalError", "unnamed model");
+      throw new AdapterError("InternalError", "unnamed model", model.__raw?.node);
     }
     if (!helpers.isPolymorphicRoot(model)) {
       throw new AdapterError(
@@ -776,30 +807,30 @@ export class TypeAdapter {
     // for multipart/form data containing models, default to fields not being pointer-to-type as we
     // don't have to deal with JSON patch shenanigans. only the optional fields will be pointer-to-type.
     const isMultipartFormData = (modelType.usage & tcgc.UsageFlags.MultipartFormData) !== 0;
-    let fieldByValue = isMultipartFormData ? true : helpers.isTypePassedByValue(prop.type);
-    if (isMultipartFormData && prop.kind === "property" && prop.optional) {
-      fieldByValue = false;
+
+    let type: go.WireType;
+    if (prop.encode && prop.type.kind === "array") {
+      type = this.getSliceArray(prop.type, prop.encode);
+    } else if (prop.serializationOptions.multipart?.isFilePart) {
+      // for file parts, check if the tsp defines a fixed content type
+      // (e.g. HttpPart<File<"image/png">>). if so, bake it into the MultipartContent type.
+      const multipartOpts = prop.serializationOptions.multipart;
+      const fixedContentType =
+        multipartOpts?.contentType?.type.kind === "constant" &&
+        multipartOpts.defaultContentTypes.length === 1
+          ? multipartOpts.defaultContentTypes[0]
+          : undefined;
+      type = this.getMultipartContent(prop.type.kind === "array", fixedContentType);
+    } else {
+      type = this.getWireType(prop.type, isMultipartFormData, true);
     }
-    let type = this.getWireType(prop.type, isMultipartFormData, true);
-    if (prop.kind === "property") {
-      if (prop.serializationOptions.multipart?.isFilePart) {
-        // for file parts, check if the tsp defines a fixed content type
-        // (e.g. HttpPart<File<"image/png">>). if so, bake it into the MultipartContent type.
-        const multipartOpts = prop.serializationOptions.multipart;
-        const fixedContentType =
-          multipartOpts?.contentType?.type.kind === "constant" &&
-          multipartOpts.defaultContentTypes.length === 1
-            ? multipartOpts.defaultContentTypes[0]
-            : undefined;
-        type = this.getMultipartContent(prop.type.kind === "array", fixedContentType);
-      }
-      if (prop.visibility) {
-        // the field is read-only IFF the only visibility attribute present is Read.
-        // a field can have Read & Create set which means it's required on input and
-        // returned on output.
-        if (prop.visibility.length === 1 && prop.visibility[0] === http.Visibility.Read) {
-          annotations.readOnly = true;
-        }
+
+    if (prop.visibility) {
+      // the field is read-only IFF the only visibility attribute present is Read.
+      // a field can have Read & Create set which means it's required on input and
+      // returned on output.
+      if (prop.visibility.length === 1 && prop.visibility[0] === http.Visibility.Read) {
+        annotations.readOnly = true;
       }
     }
 
@@ -819,6 +850,10 @@ export class TypeAdapter {
       isExactName: prop.isExactName,
       access: prop.access,
     });
+
+    const fieldByValue = isMultipartFormData
+      ? !prop.optional
+      : helpers.isTypePassedByValue(prop.type);
     const field = new go.ModelField(fieldName, type, fieldByValue, serializedName, annotations);
     field.docs.summary = prop.summary;
     field.docs.description = prop.doc;
@@ -1060,6 +1095,131 @@ export class TypeAdapter {
 
     // TODO: tcgc doesn't support duration as a literal value
   }
+
+  /** adapts the SDK type to a Go map value type */
+  private getMapValueType(
+    sdkType: tcgc.SdkType,
+    elementTypeByValue: boolean,
+    substituteDiscriminator: boolean,
+  ): go.MapValueType {
+    const valueType = this.getWireType(sdkType, elementTypeByValue, substituteDiscriminator);
+    switch (valueType.kind) {
+      case "constantDef":
+      case "constantValue":
+      case "etag":
+      case "multipartContent":
+      case "literal":
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `unsupported kind ${valueType.kind} for map value type`,
+          sdkType.__raw?.node,
+        );
+      default:
+        return valueType;
+    }
+  }
+
+  /** adapts the SDK type to an encoded string array type */
+  private getSliceArray(
+    sdkType: tcgc.SdkArrayType,
+    encoding: tcgc.ArrayKnownEncoding,
+  ): go.SliceArray {
+    let keySegment: string;
+    switch (sdkType.valueType.kind) {
+      case "enum":
+        keySegment = `enum-${sdkType.valueType.name}`;
+        break;
+      default:
+        keySegment = sdkType.valueType.kind;
+    }
+
+    const keyName = `array-encoded-${keySegment}-${encoding}`;
+    let sliceArray = this.types.get(keyName);
+    if (sliceArray) {
+      return <go.SliceArray>sliceArray;
+    }
+
+    let elementType: go.SliceArrayElementType;
+    switch (sdkType.valueType.kind) {
+      case "enum":
+        switch (sdkType.valueType.valueType.kind) {
+          case "string":
+            elementType = this.getConstantType(sdkType.valueType);
+            break;
+          default:
+            throw new AdapterError(
+              "UnsupportedTsp",
+              `unsupported enum value kind ${sdkType.valueType.valueType.kind} for string encoded array`,
+              sdkType.__raw?.node,
+            );
+        }
+        break;
+      case "string":
+        elementType = this.getStringType();
+        break;
+      default:
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `unsupported kind ${sdkType.valueType.kind} for string encoded array`,
+          sdkType.__raw?.node,
+        );
+    }
+
+    sliceArray = new go.SliceArray(
+      elementType,
+      this.codeModel.options["slice-elements-byval"] ?? false,
+      getSliceArrayDelimiter(encoding),
+    );
+
+    this.types.set(keyName, sliceArray);
+    return sliceArray;
+  }
+
+  private getUnionStruct(sdkUnion: tcgc.SdkUnionType, elementTypeByValue: boolean): go.UnionStruct {
+    if (sdkUnion.name.length === 0) {
+      throw new AdapterError("InternalError", "unnamed union", sdkUnion.__raw?.node);
+    }
+
+    const unionName = helpers.getEffectiveName(sdkUnion);
+    let goUnion = this.types.get(unionName);
+    if (goUnion) {
+      return <go.UnionStruct>goUnion;
+    }
+
+    goUnion = new go.UnionStruct(this.getPkg(), unionName);
+    for (const variant of sdkUnion.variantTypes) {
+      const type = this.getWireType(variant, elementTypeByValue, false);
+      if (!go.isUnionVariantType(type)) {
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `unsupported kind ${variant.kind} for union variant`,
+          variant.__raw?.node,
+        );
+      }
+      goUnion.fields.push(
+        new go.UnionField(
+          recursiveVariantFieldName(type),
+          type,
+          helpers.isTypePassedByValue(variant),
+        ),
+      );
+    }
+
+    goUnion.docs.summary = sdkUnion.summary;
+    goUnion.docs.description = sdkUnion.doc;
+    if (goUnion.docs.summary) {
+      if (!goUnion.docs.summary.startsWith(unionName)) {
+        goUnion.docs.summary = go.prefixDocWithName(unionName, goUnion.docs.summary);
+      }
+    } else if (goUnion.docs.description) {
+      if (!goUnion.docs.description.startsWith(unionName)) {
+        goUnion.docs.description = go.prefixDocWithName(unionName, goUnion.docs.description);
+      }
+    }
+
+    this.types.set(unionName, goUnion);
+    return goUnion;
+  }
 }
 
 function getPrimitiveType(
@@ -1080,6 +1240,21 @@ function getPrimitiveType(
         `unhandled tcgc.SdkBuiltInKinds: ${type.kind}`,
         type.__raw?.node,
       );
+  }
+}
+
+function getSliceArrayDelimiter(encoding: string): go.SliceArrayDelimiter {
+  switch (encoding) {
+    case "commaDelimited":
+      return "comma";
+    case "spaceDelimited":
+      return "space";
+    case "pipeDelimited":
+      return "pipe";
+    case "newlineDelimited":
+      return "newline";
+    default:
+      throw new AdapterError("UnsupportedTsp", `unsupported array encoding ${encoding}`);
   }
 }
 
@@ -1134,6 +1309,26 @@ function recursiveKeyName(
       return `${root}-timeRFC3339`;
     default:
       return `${root}-${obj.kind}`;
+  }
+}
+
+function recursiveVariantFieldName(type: go.WireType): string {
+  switch (type.kind) {
+    case "constant":
+    case "model":
+      return type.name;
+    case "encodedBytes":
+      return "Bytes";
+    case "literal":
+      return `Literal${recursiveVariantFieldName(type.type)}`;
+    case "map":
+      return `MapOf${recursiveVariantFieldName(type.valueType)}`;
+    case "slice":
+      return `SliceOf${recursiveVariantFieldName(type.elementType)}`;
+    case "scalar":
+      return naming.capitalize(type.type);
+    default:
+      return naming.capitalize(type.kind);
   }
 }
 

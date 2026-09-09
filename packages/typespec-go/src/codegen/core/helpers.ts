@@ -88,6 +88,28 @@ export function canonicalizeHeaderName(name: string): string {
 }
 
 /**
+ * emits code to verify that a path parameter is not empty
+ *
+ * @param param the path parameter to check
+ * @param paramIn where the path parameter check is being emitted
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @returns the code to check the path parameter for emptiness
+ */
+export function emitEmptyPathParamCheck(
+  param: go.PathParameter,
+  paramIn: "ctor" | "method",
+  imports: ImportManager,
+  indent: Indentation,
+): string {
+  imports.add("errors");
+  let text = `${indent.get()}if ${paramIn === "ctor" ? param.name : getParamName(param)} == "" {\n`;
+  text += `${indent.push().get()}return nil, errors.New("parameter ${param.name} cannot be empty")\n`;
+  text += `${indent.pop().get()}}\n`;
+  return text;
+}
+
+/**
  * returns the parameter's type definition with a possible '*' prefix
  *
  * @param scope the package into which the type definition is being emitted
@@ -456,16 +478,85 @@ export function getMediaFormat(
   return `${marshaller}(${param}${format})`;
 }
 
-export function isMapOfDateTime(
-  paramType: go.WireType,
-): { format: go.TimeFormat; utc: boolean } | undefined {
-  if (paramType.kind !== "map") {
-    return undefined;
+/**
+ * Emits the code for parsing scalar types from a string.
+ * The parsing error result is placed into a local var named "err".
+ *
+ * @param scalar the type of scalar to parse
+ * @param src the source var that contains the scalar in string format
+ * @param dst the destination var that contains the result
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @returns the scalar parsing code
+ */
+export function emitScalarParsing(
+  scalar: go.Scalar | go.Constant,
+  src: string,
+  dst: string,
+  imports: ImportManager,
+  indent: Indentation,
+): string {
+  imports.add("strconv");
+  switch (scalar.type) {
+    case "bool":
+      return `${indent.get()}${dst}, err := strconv.ParseBool(${src})\n`;
+    case "float32":
+      return (
+        `${indent.get()}${dst}32, err := strconv.ParseFloat(${src}, 32)\n` +
+        `${indent.get()}${dst} := float32(${dst}32)\n`
+      );
+    case "float64":
+      return `${indent.get()}${dst}, err := strconv.ParseFloat(${src}, 64)\n`;
+    case "int32":
+      return (
+        `${indent.get()}${dst}32, err := strconv.ParseInt(${src}, 10, 32)\n` +
+        `${indent.get()}${dst} := int32(${dst}32)\n`
+      );
+    case "int64":
+      return `${indent.get()}${dst}, err := strconv.ParseInt(${src}, 10, 64)\n`;
+    default:
+      throw new CodegenError("InternalError", `unhandled scalar type ${scalar.type}`);
   }
-  if (paramType.valueType.kind !== "time") {
-    return undefined;
+}
+
+/**
+ * emits the code for parsing a time.Time from the specified variable.
+ * note that the emitted code does not include the error check after parsing.
+ *
+ * @param srcVar the name of the variable that contains the value to parse
+ * @param time the modeled time associated with srcVar
+ * @param dstVar the name of the variable to contain the parsed value
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @returns the time parsing code
+ */
+export function emitTimeParsing(
+  srcVar: string,
+  time: go.Time,
+  dstVar: string,
+  imports: ImportManager,
+  indent: Indentation,
+): string {
+  imports.add("time");
+  let text: string;
+  switch (time.format) {
+    case "RFC1123":
+    case "RFC3339":
+    case "RFC7231":
+      text = `${indent.get()}${dstVar}, err := time.Parse(${time.format === "RFC3339" ? RFC3339Format : RFC1123Format}, ${srcVar})\n`;
+      break;
+    case "PlainDate":
+      text = `${indent.get()}${dstVar}, err := time.Parse(${plainDateFormat}, ${srcVar})\n`;
+      break;
+    case "PlainTime":
+      text = `${indent.get()}${dstVar}, err := time.Parse(${plainTimeFormat}, ${srcVar})\n`;
+      break;
+    case "Unix":
+      imports.add("strconv");
+      text = `${indent.get()}${dstVar}, err := strconv.ParseInt(${srcVar}, 10, 64)\n`;
+      break;
   }
-  return { format: paramType.valueType.format, utc: paramType.valueType.utc };
+  return text;
 }
 
 export function formatValue(
@@ -945,16 +1036,19 @@ export function star(byValue: boolean): string {
  * @param param the param for which to create a zero value
  * @returns the zero-value expression
  */
-export function zeroValue(param: go.MethodParameter): string {
+export function zeroValue(param: go.ClientParameter | go.MethodParameter): string {
   // even though API version params typically have a client-side default which makes
   // them optional, the azcore.ClientOptions.APIVersion field isn't pointer-to-type.
-  if (go.isRequiredParameter(param.style) || go.isAPIVersionParameter(param)) {
+  if (go.isRequiredParameter(param.style)) {
     switch (param.type.kind) {
       case "string":
         return `""`;
       default:
         throw new CodegenError("InternalError", `unhandled zero-value kind ${param.type.kind}`);
     }
+  } else if (go.isAPIVersionParameter(param)) {
+    // api version is always a string
+    return `""`;
   }
 
   // optional params are pointer-to-type
@@ -1285,17 +1379,31 @@ export interface elseBlock {
 }
 
 /**
- * constructs an if block (can expand to include else if as necessary)
+ * constructs an if block
  *
  * @param indent the current indentation helper in scope
  * @param ifBlock the if block definition
+ * @param elseIfBlocks optional zero or more "else if" block definitions
  * @param elseBlock optional else block definition
  * @returns the text for the if block
  */
-export function buildIfBlock(indent: Indentation, ifBlock: ifBlock, elseBlock?: elseBlock): string {
+export function buildIfBlock(
+  indent: Indentation,
+  ifBlock: ifBlock,
+  elseIfBlocks?: Array<ifBlock>,
+  elseBlock?: elseBlock,
+): string {
   let body = `if ${ifBlock.condition} {\n`;
   body += ifBlock.body(indent.push());
   body += `${indent.pop().get()}}`;
+
+  if (elseIfBlocks) {
+    for (const elseIfBlock of elseIfBlocks) {
+      body += ` else if ${elseIfBlock.condition} {\n`;
+      body += elseIfBlock.body(indent.push());
+      body += `${indent.pop().get()}}`;
+    }
+  }
 
   if (elseBlock) {
     body += " else {\n";
@@ -1319,6 +1427,70 @@ export function buildErrCheck(indent: Indentation, errVar: string, returns?: str
   body += `${indent.push().get()}return ${returns ? `${returns}, ` : ""}${errVar}\n`;
   body += `${indent.pop().get()}}`;
   return body;
+}
+
+/**
+ * constructs a for block
+ *
+ * @param indent the current indentation helper in scope
+ * @param expression the for expression
+ * @param body the body of the for block
+ * @returns the text for the for block
+ */
+export function buildForBlock(
+  indent: Indentation,
+  expression: string,
+  body: (indent: Indentation) => string,
+): string {
+  let content = `for ${expression} {\n`;
+  content += body(indent.push());
+  content += `${indent.pop().get()}}\n`;
+  return content;
+}
+
+/** a case statement in a switch/case block */
+export interface caseStatement {
+  /** the case's expression */
+  expression: string;
+
+  /** the case's execution clause */
+  clause: (indent: Indentation) => string;
+}
+
+/** the default case in a switch/case block */
+export interface defaultCase {
+  /** the case's execution clause */
+  clause: (indent: Indentation) => string;
+}
+
+/**
+ * constructs a switch/case statement
+ *
+ * @param indent the current indentation helper in scope
+ * @param statement the statement to switch on
+ * @param cases one or more case statements
+ * @param def optional default case statement
+ * @returns the text for the switch/case statement
+ */
+export function buildSwitchCase(
+  indent: Indentation,
+  statement: string,
+  cases: Array<caseStatement>,
+  def?: defaultCase,
+): string {
+  let content = `switch ${statement} {\n`;
+  for (const cse of cases) {
+    content += `case ${cse.expression}:\n`;
+    content += cse.clause(indent.push());
+    indent.pop();
+  }
+  if (def) {
+    content += "default:\n";
+    content += def.clause(indent.push());
+    indent.pop();
+  }
+  content += "}\n";
+  return content;
 }
 
 /**

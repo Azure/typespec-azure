@@ -104,7 +104,8 @@ export interface HeaderCollectionParameter extends HttpParameterBase {
 
 /**
  * parameter map collection that goes in a HTTP header.
- * NOTE: this is a specialized parameter type to support storage.
+ * NOTE: this is a specialized parameter type to support storage
+ * x-ms-meta headers and should _not_ be used for any other cases.
  */
 export interface HeaderMapParameter extends HttpParameterBase {
   kind: "headerMapParam";

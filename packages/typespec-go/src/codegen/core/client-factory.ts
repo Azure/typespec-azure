@@ -31,7 +31,7 @@ export function generateClientFactory(
   const imports = new ImportManager(pkg);
 
   let clientFactoryParams: Array<go.ClientParameter>;
-  if (options.factoryGatherAllParams) {
+  if (options["factory-gather-all-params"]) {
     clientFactoryParams = helpers.getAllClientParameters(pkg, target);
   } else {
     clientFactoryParams = helpers.getCommonClientParameters(pkg, target);

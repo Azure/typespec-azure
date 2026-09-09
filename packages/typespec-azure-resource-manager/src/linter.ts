@@ -25,13 +25,20 @@ import { armResourceProvisioningStateRule } from "./rules/arm-resource-provision
 import { beyondNestingRule } from "./rules/beyond-nesting-levels.js";
 import { envelopePropertiesRules } from "./rules/envelope-properties.js";
 import { improperSubscriptionListOperationRule } from "./rules/improper-subscription-list-operation.js";
+import { listOperationMissingPageableRule } from "./rules/list-operation-missing-pageable.js";
+import { listResponseEnvelopeRule } from "./rules/list-response-envelope.js";
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
+import { lroResponseMismatchRule } from "./rules/lro-response-mismatch.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
 import { noOverridePropsRule } from "./rules/no-override-props.js";
+import { noQueryInCollectionRule } from "./rules/no-query-in-collection.js";
+import { noQueryInPointOpRule } from "./rules/no-query-in-point-op.js";
+import { noQueryInPostRule } from "./rules/no-query-in-post.js";
 import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
+import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { resourceNameRule } from "./rules/resource-name.js";
@@ -39,6 +46,7 @@ import { retryAfterRule } from "./rules/retry-after.js";
 import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 import { useApiVersionRule } from "./rules/use-api-version.js";
+import { useApplicationJsonContentTypeRule } from "./rules/use-application-json-content-type.js";
 import { useInterfaceRule } from "./rules/use-interface.js";
 import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
@@ -55,6 +63,7 @@ const rules = [
   armDeleteResponseCodesRule,
   armPutResponseCodesRule,
   armPostResponseCodesRule,
+  lroResponseMismatchRule,
   armResourceActionNoSegmentRule,
   armResourceDuplicatePropertiesRule,
   armResourceEnvelopeProperties,
@@ -63,6 +72,7 @@ const rules = [
   armResourceNamePatternRule,
   armResourceOperationsRule,
   useApiVersionRule,
+  useApplicationJsonContentTypeRule,
   useOperationDecoratorRule,
   armResourcePathInvalidCharsRule,
   armResourceProvisioningStateRule,
@@ -71,6 +81,8 @@ const rules = [
   armCustomResourceUsageDiscourage,
   armFeatureFileUsageDiscourage,
   beyondNestingRule,
+  listResponseEnvelopeRule,
+  noQueryInCollectionRule,
   useInterfaceRule,
   deleteOperationMissingRule,
   envelopePropertiesRules,
@@ -78,8 +90,10 @@ const rules = [
   armResourceInvalidActionVerbRule,
   improperSubscriptionListOperationRule,
   lroLocationHeaderRule,
+  listOperationMissingPageableRule,
   missingXmsIdentifiersRule,
   noResponseBodyRule,
+  noQueryInPostRule,
   operationsInterfaceMissingRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
@@ -89,6 +103,8 @@ const rules = [
   secretProprule,
   noEmptyModel,
   noReservedResourcePropertyRule,
+  noTenantLevelApisRule,
+  noQueryInPointOpRule,
 ];
 
 export const $linter = defineLinter({

@@ -51,7 +51,14 @@ import { reportDiagnostic } from "../lib.js";
 import { getClientHierarchyMap } from "../utils/client-utils.js";
 import type { SdkContext } from "../utils/interfaces.js";
 import { isAzureCoreErrorType } from "../utils/model-utils.js";
-import { fixLeadingNumber, NameType, normalizeName } from "../utils/name-utils.js";
+import {
+  fixLeadingNumber,
+  formatPropertyName,
+  NameType,
+  normalizeName,
+  normalizeSdkName,
+  reportInvalidExactName,
+} from "../utils/name-utils.js";
 import { getMethodHierarchiesMap } from "../utils/operation-util.js";
 import { getHeaderClientOptions } from "./helpers/client-option-helpers.js";
 import {
@@ -314,6 +321,35 @@ export function getModelsPath(sourceRoot: string, modelNamespace: string[] = [])
   );
 }
 
+/** Finds the namespace prefix shared by every service in the package. */
+function getCommonServiceNamespace(context: SdkContext): string[] {
+  if (context.commonServiceNamespace) {
+    return context.commonServiceNamespace;
+  }
+
+  const serviceNamespaces = context.allServiceNamespaces ?? listAllServiceNamespaces(context);
+  if (serviceNamespaces.length === 0) {
+    context.commonServiceNamespace = [];
+    return context.commonServiceNamespace;
+  }
+
+  // Start with the first namespace and shorten it at the first segment that
+  // differs in each subsequent service namespace.
+  const commonNamespace = getNamespaceFullName(serviceNamespaces[0]!).split(".");
+  for (const serviceNamespace of serviceNamespaces.slice(1)) {
+    const segments = getNamespaceFullName(serviceNamespace).split(".");
+    const commonLength = commonNamespace.findIndex((segment, index) => segment !== segments[index]);
+    if (commonLength !== -1) {
+      commonNamespace.length = commonLength;
+    }
+    if (commonNamespace.length === 0) {
+      break;
+    }
+  }
+  context.commonServiceNamespace = commonNamespace;
+  return context.commonServiceNamespace;
+}
+
 export function getModelNamespaces(context: SdkContext, model: SdkType): string[] {
   if (model.kind === "model" || model.kind === "enum" || model.kind === "union") {
     if (
@@ -325,22 +361,11 @@ export function getModelNamespaces(context: SdkContext, model: SdkType): string[
       return [];
     }
     const segments = model.namespace.split(".");
-    // Keep full namespace segments if multiple services are present because there isn't a root namespace to trim
-    if (context.emitterOptions?.isMultiService) {
-      return segments;
-    }
-
-    const allServiceNamespaces = context.allServiceNamespaces ?? listAllServiceNamespaces(context);
-    const deepestNamespace = getNamespaceFullName(allServiceNamespaces[0]!);
-    const rootNamespace = deepestNamespace.split(".") ?? [];
-    if (segments.length > rootNamespace.length) {
-      while (segments[0] === rootNamespace[0]) {
-        segments.shift();
-        rootNamespace.shift();
-      }
-      return segments;
-    }
-    return [];
+    const commonNamespace = getCommonServiceNamespace(context);
+    const modelUsesCommonNamespace = commonNamespace.every(
+      (segment, index) => segment === segments[index],
+    );
+    return modelUsesCommonNamespace ? segments.slice(commonNamespace.length) : segments;
   } else if (model.kind === "array" || model.kind === "dict") {
     return getModelNamespaces(context, model.valueType);
   } else if (model.kind === "nullable") {
@@ -602,11 +627,15 @@ function emitEnumMember(
   member: SdkEnumValueType,
   reportMemberNameDiagnostic = false, // if reportMemberNameDiagnostic is true, it will report diagnostic for enum member name
 ): EnumMemberStructure {
-  const shouldNormalizeName = !member.name.startsWith("$DO_NOT_NORMALIZE$");
-  const enumTypeName = normalizeName(member.enumType.name, NameType.Interface, true);
-  let normalizedMemberName = context.emitterOptions?.ignoreEnumMemberNameNormalize
-    ? fixLeadingNumber(member.name, NameType.EnumMemberName) // need to fix the leading number also for enum member
-    : normalizeName(member.name, NameType.EnumMemberName, true);
+  const shouldNormalizeName = !member.isExactName && !member.name.startsWith("$DO_NOT_NORMALIZE$");
+  const enumTypeName = normalizeSdkName(member.enumType, NameType.Interface, {
+    shouldGuard: true,
+  });
+  let normalizedMemberName = member.isExactName
+    ? formatPropertyName(member.name)
+    : context.emitterOptions?.ignoreEnumMemberNameNormalize
+      ? fixLeadingNumber(member.name, NameType.EnumMemberName) // need to fix the leading number also for enum member
+      : normalizeSdkName(member, NameType.EnumMemberName, { shouldGuard: true });
   // If the member name starts with _ due to a leading digit (not because the original has _),
   // replace the _ prefix with either "V" (for API version enums) or the enum type name.
   if (
@@ -828,6 +857,8 @@ export function normalizeModelName(
     return getTypeExpression(context, type);
   }
 
+  reportInvalidExactName(context.program, type, nameType, type.kind, type.__raw ?? NoTarget);
+
   const segments = getModelNamespaces(context, type);
   let unionSuffix = "";
   if (!skipPolymorphicUnionSuffix) {
@@ -835,12 +866,15 @@ export function normalizeModelName(
       unionSuffix = "Union";
     }
   }
-  const namespacePrefix = context.emitterOptions?.enableModelNamespace ? segments.join("") : "";
+  const namespacePrefix = context.emitterOptions?.enableModelNamespace
+    ? normalizeName(segments.join(""), nameType)
+    : "";
   const internalModelPrefix =
     (isPagedResultModel(context, type) && !pagedModelsKeptPublic.has(type)) || type.isGeneratedName
       ? "_"
       : "";
-  return `${internalModelPrefix}${normalizeName(namespacePrefix + type.name, nameType, true)}${unionSuffix}`;
+  const modelName = normalizeSdkName(type, nameType, { shouldGuard: true });
+  return `${internalModelPrefix}${namespacePrefix}${modelName}${unionSuffix}`;
 }
 
 function buildModelPolymorphicType(context: SdkContext, type: SdkModelType) {
@@ -880,6 +914,7 @@ function buildModelProperty(
   const normalizedPropName = normalizeModelPropertyName(context, property);
   if (
     !context.emitterOptions?.ignorePropertyNameNormalize &&
+    !property.isExactName &&
     normalizedPropName !== `"${property.name}"`
   ) {
     reportDiagnostic(context.program, {

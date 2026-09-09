@@ -14,11 +14,13 @@ namespace Customization;
   "java"
 );
 
-op reorderCustomized(@path param1: string, @path param2: string): void;
-
+#suppress "experimental-feature" "Testing the reorderParameters function"
 @@override(
   _Specs_.Azure.ClientGenerator.Core.Override.ReorderParameters.reorder,
-  reorderCustomized
+  reorderParameters(
+    _Specs_.Azure.ClientGenerator.Core.Override.ReorderParameters.reorder,
+    #["param1", "param2"]
+  )
 );
 
 model GroupParametersOptions {
@@ -30,16 +32,28 @@ op groupCustomized(options: GroupParametersOptions): void;
 
 @@override(_Specs_.Azure.ClientGenerator.Core.Override.GroupParameters.group, groupCustomized);
 
-op requireOptionalCustomized(@path param1: string, @path param2: string): void;
+model RequiredParameters {
+  @path param2: string;
+}
 
+#suppress "experimental-feature" "Testing the replaceParameter function"
 @@override(
   _Specs_.Azure.ClientGenerator.Core.Override.RequireOptionalParameter.requireOptional,
-  requireOptionalCustomized
+  replaceParameter(
+    _Specs_.Azure.ClientGenerator.Core.Override.RequireOptionalParameter.requireOptional,
+    "param2",
+    RequiredParameters.param2
+  )
 );
 
-op removeOptionalCustomized(@path param1: string, @query param2?: string): void;
-
+#suppress "experimental-feature" "Testing the removeParameter function"
 @@override(
   _Specs_.Azure.ClientGenerator.Core.Override.RemoveOptionalParameter.removeOptional,
-  removeOptionalCustomized
+  removeParameter(
+    removeParameter(
+      _Specs_.Azure.ClientGenerator.Core.Override.RemoveOptionalParameter.removeOptional,
+      "param3"
+    ),
+    "param4"
+  )
 );

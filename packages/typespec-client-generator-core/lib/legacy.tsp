@@ -149,7 +149,11 @@ namespace Azure.ClientGenerator.Core.Legacy;
  * // properties — every field is supplied by the new base chain.
  * ```
  */
-extern dec hierarchyBuilding(target: Model, value: Model, scope?: valueof string);
+extern dec hierarchyBuilding(
+  target: Model,
+  value: Model,
+  scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string
+);
 
 /**
  * Set whether a model property should be flattened or not.
@@ -168,7 +172,10 @@ extern dec hierarchyBuilding(target: Model, value: Model, scope?: valueof string
  * }
  * ```
  */
-extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
+extern dec flattenProperty(
+  target: ModelProperty,
+  scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string
+);
 
 /**
  * Forces an operation to be treated as a Long Running Operation (LRO) by the SDK generators,
@@ -202,7 +209,10 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
  * ```
  *
  */
-extern dec markAsLro(target: Operation, scope?: valueof string);
+extern dec markAsLro(
+  target: Operation,
+  scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string
+);
 
 /**
  * Forces an operation to be treated as a pageable operation by the SDK generators,
@@ -234,7 +244,10 @@ extern dec markAsLro(target: Operation, scope?: valueof string);
  * ```
  *
  */
-extern dec markAsPageable(target: Operation, scope?: valueof string);
+extern dec markAsPageable(
+  target: Operation,
+  scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string
+);
 
 /**
  * Prevents an operation from being treated as a pageable operation by the SDK generators,
@@ -263,7 +276,10 @@ extern dec markAsPageable(target: Operation, scope?: valueof string);
  * ```
  *
  */
-extern dec disablePageable(target: Operation, scope?: valueof string);
+extern dec disablePageable(
+  target: Operation,
+  scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string
+);
 
 /**
  * Specifies the HTTP verb for the next link operation in a paging scenario.
@@ -287,7 +303,11 @@ extern dec disablePageable(target: Operation, scope?: valueof string);
  * op listItems(): PageResult;
  * ```
  */
-extern dec nextLinkVerb(target: Operation, verb: "GET" | "POST", scope?: valueof string);
+extern dec nextLinkVerb(
+  target: Operation,
+  verb: "GET" | "POST",
+  scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string
+);
 
 /**
  * Sets a client-level default value for a model property or operation parameter.
@@ -336,5 +356,5 @@ extern dec nextLinkVerb(target: Operation, verb: "GET" | "POST", scope?: valueof
 extern dec clientDefaultValue(
   target: ModelProperty,
   value: valueof string | boolean | numeric,
-  scope?: valueof string
+  scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string
 );

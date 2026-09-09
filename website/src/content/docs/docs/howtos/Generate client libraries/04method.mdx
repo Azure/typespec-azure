@@ -12,9 +12,9 @@ For advanced paging, long-running, multipart or streaming operations, see the [P
 
 ### Default behaviors
 
-By default, any language code generator will generate both protocol methods and convenient methods for an operation.
+TCGC enables both protocol and convenience methods by default. The Java and C# emitters expose these as separate method layers. Other emitters may represent an operation with a single API surface instead.
 
-> **NOTE:** Python and Typescript don't have a separation of convenient/protocol methods.
+> **NOTE:** Python and TypeScript don't have a separation of convenience and protocol methods.
 
 <ClientTabs>
 
@@ -107,67 +107,89 @@ func (client *PetStoreNamespaceClient) GetModel(ctx context.Context, name string
 
 ### Customizations
 
-The detailed generation configuration of protocol and/or convenient methods that can be done:
-
-As emitters global parameters:
+Java and C# emitters support global generation parameters:
 
 - `generate-protocol-methods`: boolean flag to shift the entire generation for the process (`true` by default)
 - `generate-convenience-methods`: boolean flag to shift the entire generation for the process (`true` by default)
 
-To set global emitters parameters, read the documentation of [emitters configuration](https://microsoft.github.io/typespec/introduction/configuration#configuration-file).
+To set global emitter parameters, read the documentation of [emitter configuration](https://microsoft.github.io/typespec/introduction/configuration#configuration-file).
 
-For fine tuning, the set of decorators `@protocolAPI` and `@convenientAPI` can be used. They take a required boolean as parameter.
+Setting either option for any other language emitter produces an `unnecessary-emitter-option` warning because the option has no effect.
+
+For fine tuning, use `@protocolAPI` and `@convenientAPI`. Each takes a boolean and a language scope. The scope must apply to Java, C#, or both; omitting it or using a scope that excludes both languages produces a `decorator-requires-scope` warning.
 
 #### Shifting the generation of protocol and convenience on and off
 
-This can be achieved with the augment operator and the emitter package
+Use the augment operator in `client.tsp`. This example disables convenience methods for Java and C# while leaving the other language emitters unchanged.
 
 <ClientTabs>
 
-```typespec title=client.tsp
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using TypeSpec.Http;
+
+@service
+namespace PetStore;
+
+model Pet {
+  name: string;
+}
+
+@route("/pets/{name}")
+@get
+op getPet(@path name: string): Pet;
+```
+
+```typespec title="client.tsp"
 import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-@@convenientAPI(PetStoreNamespace.GetModel, false);
+@@convenientAPI(PetStore.getPet, false, "java, csharp");
 ```
 
 ```python
-# Python do not change behavior based on protocolAPI or convenientAPI
+class PetStoreClient:
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+    def get_pet(self, name: str, **kwargs: Any) -> Pet: ...
 ```
 
 ```csharp
-// Model class is not generated.
-// Convenient method is not generated.
-
-namespace PetStoreNamespace
+namespace PetStore
 {
-  public partial class PetStoreNamespaceClient
+  public partial class PetStoreClient
   {
-    // protocol method
-    public virtual async Task<Response> GetModelAsync(string name, RequestContext context) {}
-    public virtual Response GetModel(string name, RequestContext context) {}
+    public virtual Response GetPet(string name, RequestContext context = null) { ... }
+    public virtual async Task<Response> GetPetAsync(string name, RequestContext context = null) { ... }
   }
 }
 ```
 
 ```typescript
-// Typescript do not change behavior based on protocolAPI or convenientAPI
+export class PetStoreClient {
+  constructor(endpointParam: string, options: PetStoreClientOptionalParams = {});
+  getPet(name: string, options: GetPetOptionalParams = { requestOptions: {} }): Promise<Pet>;
+}
 ```
 
 ```java
-// Model class is not generated.
-// Convenient method is not generated.
+public final class PetStoreClient {
+    public Response<BinaryData> getPetWithResponse(String name, RequestOptions requestOptions) { ... }
+}
 
-public final class PetStoreNamespaceClient {
-    // protocol method
-    public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+public final class PetStoreAsyncClient {
+    public Mono<Response<BinaryData>> getPetWithResponse(String name, RequestOptions requestOptions) { ... }
 }
 ```
 
 ```go
-// NOT_SUPPORTED
+type PetStoreClient struct { ... }
+
+func NewPetStoreClientWithNoCredential(endpoint string, options *PetStoreClientOptions) (*PetStoreClient, error)
+
+func (client *PetStoreClient) GetPet(ctx context.Context, name string, options *PetStoreClientGetPetOptions) (PetStoreClientGetPetResponse, error)
 ```
 
 </ClientTabs>

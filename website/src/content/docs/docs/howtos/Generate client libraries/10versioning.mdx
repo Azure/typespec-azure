@@ -130,7 +130,7 @@ func (client *ServiceClient) StableFunctionality(ctx context.Context, stableMode
 
 ## Multiple api versions
 
-The configuration flag `api-version` allows you to toggle the behavior that our emitters will generate. For single-service packages, it accepts a string value. For multi-service packages, it can also be an object mapping each service namespace's full name to a version string (see [Per-service versioning](#per-service-versioning-multi-service-packages)).
+The configuration flag `api-version` allows you to toggle the behavior that our emitters will generate. For single-service packages, it accepts a string value. For multi-service packages, it can also be an object that maps service namespaces to version strings. Represent each segment of a nested namespace as a nested object (see [Per-service versioning](#per-service-versioning-multi-service-packages)).
 
 We will get the versioning information from the `Versions` enum that you pass to the `@versioned` decorator from the `@typespec/versioning` library.
 
@@ -466,7 +466,7 @@ func (client *ServiceClient) StableFunctionality(ctx context.Context, stableMode
 
 ### Per-service versioning (multi-service packages)
 
-When your spec defines multiple services merged into a single client (using `@client({service: [ServiceA, ServiceB]})`), you can specify a different API version for each service by passing an object instead of a string. The keys are the full namespace names of each service, and the values are the desired version strings.
+When your spec defines multiple services merged into a single client (using `@client({service: [Microsoft.Network, Microsoft.Compute]})`), you can specify a different API version for each service by passing an object instead of a string. For nested service namespaces, represent each namespace segment as a nested object in `tspconfig.yaml`.
 
 Services not listed in the object default to their latest version.
 
@@ -474,8 +474,9 @@ Services not listed in the object default to their latest version.
 options:
   "@azure-tools/typespec-python":
     api-version:
-      ServiceA: "2024-01-01"
-      ServiceB: "2024-05-01"
+      Microsoft:
+        Network: "2024-01-01"
+        Compute: "2024-05-01"
 ```
 
 For example, given two versioned services:
@@ -489,7 +490,7 @@ using TypeSpec.Http;
 
 @service
 @versioned(VersionsA)
-namespace ServiceA {
+namespace Microsoft.Network {
   enum VersionsA {
     v2024_01_01: "2024-01-01",
     v2024_06_01: "2024-06-01",
@@ -500,7 +501,7 @@ namespace ServiceA {
 
 @service
 @versioned(VersionsB)
-namespace ServiceB {
+namespace Microsoft.Compute {
   enum VersionsB {
     v2024_05_01: "2024-05-01",
     v2024_09_01: "2024-09-01",
@@ -510,9 +511,9 @@ namespace ServiceB {
 }
 ```
 
-With `api-version: { ServiceA: "2024-01-01", ServiceB: "2024-05-01" }`, the generated client will use version `2024-01-01` for ServiceA operations and `2024-05-01` for ServiceB operations.
+With the configuration above, the generated client uses version `2024-01-01` for `Microsoft.Network` operations and `2024-05-01` for `Microsoft.Compute` operations. TCGC also uses each resolved service version when selecting versioned example files.
 
-With `api-version: { ServiceA: "2024-01-01" }` (ServiceB omitted), ServiceA will use `2024-01-01` while ServiceB will default to its latest version `2024-09-01`.
+If `Compute` is omitted, `Microsoft.Network` uses `2024-01-01` while `Microsoft.Compute` defaults to its latest version, `2024-09-01`.
 
 > NOTE: The special value `"all"` is **not supported** for multi-service packages. If specified (either as a top-level string or as a per-service value), it is ignored and the service falls back to its latest version. The `"latest"` value works as expected and applies to all services.
 

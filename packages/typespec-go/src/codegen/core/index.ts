@@ -17,5 +17,6 @@ export { generateOperations } from "./operations.js";
 export { generateOptions } from "./options.js";
 export { generatePolymorphicHelpers } from "./polymorphics.js";
 export { generateResponses } from "./responses.js";
+export { generateUnions } from "./unions.js";
 export { generateVersionInfo } from "./version.js";
 export { generateXMLAdditionalPropsHelpers } from "./xml-additional-props.js";

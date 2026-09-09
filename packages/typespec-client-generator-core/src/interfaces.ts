@@ -35,6 +35,12 @@ import type { ContextNode } from "./internal-utils.js";
 
 type SourceKind = "RequestParameter" | "RequestBody" | "ResponseBody";
 
+export type ApiVersionConfig = string | ApiVersionServiceMap;
+
+export interface ApiVersionServiceMap {
+  [namespaceSegment: string]: string | ApiVersionServiceMap;
+}
+
 export interface TCGCContext {
   program: Program;
   diagnostics: readonly Diagnostic[];
@@ -1420,6 +1426,14 @@ export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> ext
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
 
 export type LanguageScopes = "dotnet" | "java" | "python" | "javascript" | "go" | string;
+
+/**
+ * A typed options bag accepted by scoped TCGC decorators, mirroring the `.tsp` `DecoratorOptions`
+ * model. Decorator-specific options bags can extend this to add their own settings.
+ */
+export interface DecoratorOptions {
+  scope?: LanguageScopes;
+}
 
 interface SdkExampleBase {
   kind: string;

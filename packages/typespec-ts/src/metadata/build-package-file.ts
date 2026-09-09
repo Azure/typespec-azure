@@ -61,6 +61,7 @@ export function buildPackageFile(
  * - Adds LRO dependencies (`@azure/core-lro`, `@azure/abort-controller`) when the package has
  *   polling operations (for non-monorepo Azure packages).
  * - Updates exports (tshy or warp) when `exports` is provided.
+ * - Adds the default `customize` script when the package does not define one.
  */
 export function updatePackageFile(
   model: ClientModel,
@@ -85,6 +86,9 @@ export function updatePackageFile(
   } else {
     packageInfo = existingFilePathOrContent;
   }
+
+  packageInfo.scripts ??= {};
+  packageInfo.scripts.customize ??= "echo skipped";
 
   // Migrate AutoRest-specific dependency names and versions to their TypeSpec equivalents.
   const deps: Record<string, string> = { ...(packageInfo.dependencies ?? {}) };
