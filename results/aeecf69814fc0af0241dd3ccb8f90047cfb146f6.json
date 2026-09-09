@@ -1,0 +1,577 @@
+{
+  "commit": "aeecf69814fc0af0241dd3ccb8f90047cfb146f6",
+  "timestamp": "2026-04-24T19:27:44.827Z",
+  "runner": {
+    "os": "darwin-25.4.0",
+    "nodeVersion": "v24.11.1",
+    "arch": "arm64"
+  },
+  "specs": {
+    "azure-arm-resource-manager": {
+      "name": "azure-arm-resource-manager",
+      "iterations": 1,
+      "stats": {
+        "complexity": {
+          "createdTypes": 16832,
+          "finishedTypes": 14756
+        },
+        "runtime": {
+          "loader": 132.08808399999987,
+          "resolver": 25.542416999999887,
+          "checker": 186.02300000000014,
+          "validation": {
+            "total": 12.046334000000115,
+            "validators": {
+              "compiler": 1.0747089999999844,
+              "@typespec/http": 2.4730409999999665,
+              "@typespec/rest": 0.2805000000000746,
+              "@typespec/versioning": 8.190250000000106,
+              "@azure-tools/typespec-azure-core": 0.016417000000046755
+            }
+          },
+          "linter": {
+            "total": 94.84166699999992,
+            "rules": {
+              "@azure-tools/typespec-azure-core/operation-missing-api-version": 0.09503499999937048,
+              "@azure-tools/typespec-azure-core/auth-required": 0.01695700000004763,
+              "@azure-tools/typespec-azure-core/request-body-problem": 0.13925400000061927,
+              "@azure-tools/typespec-azure-core/byos": 2.953713000000107,
+              "@azure-tools/typespec-azure-core/casing-style": 0.47345500000233187,
+              "@azure-tools/typespec-azure-core/composition-over-inheritance": 0.06454999999846223,
+              "@azure-tools/typespec-azure-core/known-encoding": 0.19778699999869787,
+              "@azure-tools/typespec-azure-core/long-running-polling-operation-required": 0.21841799999970135,
+              "@azure-tools/typespec-azure-core/no-case-mismatch": 0.3126720000007026,
+              "@azure-tools/typespec-azure-core/no-closed-literal-union": 0.22150000000033288,
+              "@azure-tools/typespec-azure-core/no-enum": 0.036039999999729844,
+              "@azure-tools/typespec-azure-core/no-error-status-codes": 0.07658799999921939,
+              "@azure-tools/typespec-azure-core/no-explicit-routes-resource-ops": 0.05678699999953096,
+              "@azure-tools/typespec-azure-core/no-generic-numeric": 0.3764129999999568,
+              "@azure-tools/typespec-azure-core/no-nullable": 0.1602880000029927,
+              "@azure-tools/typespec-azure-core/no-offsetdatetime": 0.8212090000038188,
+              "@azure-tools/typespec-azure-core/no-rpc-path-params": 0.07470900000089387,
+              "@azure-tools/typespec-azure-core/no-openapi": 1.8741550000008829,
+              "@azure-tools/typespec-azure-core/no-format": 0.4578610000055505,
+              "@azure-tools/typespec-azure-core/no-multiple-discriminator": 0.09738099999935912,
+              "@azure-tools/typespec-azure-core/no-rest-library-interfaces": 0.026624999999739885,
+              "@azure-tools/typespec-azure-core/no-unknown": 0.12200200000052064,
+              "@azure-tools/typespec-azure-core/no-unnamed-union": 0.21760099999937665,
+              "@azure-tools/typespec-azure-core/documentation-required": 0.663533999996389,
+              "@azure-tools/typespec-azure-core/key-visibility-required": 0.16254900000058115,
+              "@azure-tools/typespec-azure-core/response-schema-problem": 8.87128999999959,
+              "@azure-tools/typespec-azure-core/rpc-operation-request-body": 0.02445899999975154,
+              "@azure-tools/typespec-azure-core/spread-discriminated-model": 0.1929170000059912,
+              "@azure-tools/typespec-azure-core/no-string-discriminator": 0.048252000000957196,
+              "@azure-tools/typespec-azure-core/require-versioned": 0.009082999999918684,
+              "@azure-tools/typespec-azure-core/no-private-usage": 1.472844999996596,
+              "@azure-tools/typespec-azure-core/no-legacy-usage": 1.0649500000004082,
+              "@azure-tools/typespec-azure-core/friendly-name": 0.49955499999737185,
+              "@azure-tools/typespec-azure-core/no-query-explode": 19.38253899999995,
+              "@azure-tools/typespec-azure-core/no-header-explode": 7.9157539999989694,
+              "@azure-tools/typespec-azure-resource-manager/arm-no-record": 0.23057199999811928,
+              "@azure-tools/typespec-azure-resource-manager/no-empty-model": 0.07990899999822432,
+              "@azure-tools/typespec-azure-resource-manager/arm-common-types-version": 3.631291999999803,
+              "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes": 4.224624999999833,
+              "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes": 0.030375000000049113,
+              "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes": 0.38504199999988487,
+              "@azure-tools/typespec-azure-resource-manager/arm-resource-action-no-segment": 0.13262699999995675,
+              "@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property": 0.09708700000146564,
+              "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property": 0.07233200000109719,
+              "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-version-format": 0.05924999999933789,
+              "@azure-tools/typespec-azure-resource-manager/arm-resource-key-invalid-chars": 0.12437299999942297,
+              "@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern": 0.006415999999944688,
+              "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-no-key": 0.0768339999995078,
+              "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage": 0.046124000001100285,
+              "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response": 4.296528999998827,
+              "@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars": 0.11515699999768003,
+              "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": 0.11029800000005707,
+              "@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels": 0.07558599999720172,
+              "@azure-tools/typespec-azure-resource-manager/arm-resource-operation": 0.09966599999847858,
+              "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation": 0.12854100000322433,
+              "@azure-tools/typespec-azure-resource-manager/empty-updateable-properties": 0.10013200000094002,
+              "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator": 0.016165999999657288,
+              "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb": 0.049661999999671025,
+              "@azure-tools/typespec-azure-resource-manager/improper-subscription-list-operation": 0.004541999999901236,
+              "@azure-tools/typespec-azure-resource-manager/lro-location-header": 8.409920999999486,
+              "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers": 0.22236000000202694,
+              "@azure-tools/typespec-azure-resource-manager/no-response-body": 12.302916999998615,
+              "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint": 0.017751000000089334,
+              "@azure-tools/typespec-azure-resource-manager/patch-envelope": 0.1092739999976402,
+              "@azure-tools/typespec-azure-resource-manager/arm-resource-patch": 0.19637399999942318,
+              "@azure-tools/typespec-azure-resource-manager/resource-name": 0.11055100000021412,
+              "@azure-tools/typespec-azure-resource-manager/secret-prop": 2.3007819999988897,
+              "@azure-tools/typespec-azure-resource-manager/unsupported-type": 0.26734300000339317,
+              "@azure-tools/typespec-client-generator-core/require-client-suffix": 0.20283399999948415,
+              "@azure-tools/typespec-client-generator-core/property-name-conflict": 0.8950519999966673
+            }
+          },
+          "emit": {
+            "total": 121.54620899999986,
+            "emitters": {
+              "@azure-tools/typespec-autorest": {
+                "total": 121.506167,
+                "steps": {}
+              }
+            }
+          },
+          "total": 572.0877109999998
+        }
+      },
+      "rawIterations": [
+        {
+          "complexity": {
+            "createdTypes": 16832,
+            "finishedTypes": 14756
+          },
+          "runtime": {
+            "loader": 132.08808399999987,
+            "resolver": 25.542416999999887,
+            "checker": 186.02300000000014,
+            "validation": {
+              "total": 12.046334000000115,
+              "validators": {
+                "compiler": 1.0747089999999844,
+                "@typespec/http": 2.4730409999999665,
+                "@typespec/rest": 0.2805000000000746,
+                "@typespec/versioning": 8.190250000000106,
+                "@azure-tools/typespec-azure-core": 0.016417000000046755
+              }
+            },
+            "linter": {
+              "total": 94.84166699999992,
+              "rules": {
+                "@azure-tools/typespec-azure-core/operation-missing-api-version": 0.09503499999937048,
+                "@azure-tools/typespec-azure-core/auth-required": 0.01695700000004763,
+                "@azure-tools/typespec-azure-core/request-body-problem": 0.13925400000061927,
+                "@azure-tools/typespec-azure-core/byos": 2.953713000000107,
+                "@azure-tools/typespec-azure-core/casing-style": 0.47345500000233187,
+                "@azure-tools/typespec-azure-core/composition-over-inheritance": 0.06454999999846223,
+                "@azure-tools/typespec-azure-core/known-encoding": 0.19778699999869787,
+                "@azure-tools/typespec-azure-core/long-running-polling-operation-required": 0.21841799999970135,
+                "@azure-tools/typespec-azure-core/no-case-mismatch": 0.3126720000007026,
+                "@azure-tools/typespec-azure-core/no-closed-literal-union": 0.22150000000033288,
+                "@azure-tools/typespec-azure-core/no-enum": 0.036039999999729844,
+                "@azure-tools/typespec-azure-core/no-error-status-codes": 0.07658799999921939,
+                "@azure-tools/typespec-azure-core/no-explicit-routes-resource-ops": 0.05678699999953096,
+                "@azure-tools/typespec-azure-core/no-generic-numeric": 0.3764129999999568,
+                "@azure-tools/typespec-azure-core/no-nullable": 0.1602880000029927,
+                "@azure-tools/typespec-azure-core/no-offsetdatetime": 0.8212090000038188,
+                "@azure-tools/typespec-azure-core/no-rpc-path-params": 0.07470900000089387,
+                "@azure-tools/typespec-azure-core/no-openapi": 1.8741550000008829,
+                "@azure-tools/typespec-azure-core/no-format": 0.4578610000055505,
+                "@azure-tools/typespec-azure-core/no-multiple-discriminator": 0.09738099999935912,
+                "@azure-tools/typespec-azure-core/no-rest-library-interfaces": 0.026624999999739885,
+                "@azure-tools/typespec-azure-core/no-unknown": 0.12200200000052064,
+                "@azure-tools/typespec-azure-core/no-unnamed-union": 0.21760099999937665,
+                "@azure-tools/typespec-azure-core/documentation-required": 0.663533999996389,
+                "@azure-tools/typespec-azure-core/key-visibility-required": 0.16254900000058115,
+                "@azure-tools/typespec-azure-core/response-schema-problem": 8.87128999999959,
+                "@azure-tools/typespec-azure-core/rpc-operation-request-body": 0.02445899999975154,
+                "@azure-tools/typespec-azure-core/spread-discriminated-model": 0.1929170000059912,
+                "@azure-tools/typespec-azure-core/no-string-discriminator": 0.048252000000957196,
+                "@azure-tools/typespec-azure-core/require-versioned": 0.009082999999918684,
+                "@azure-tools/typespec-azure-core/no-private-usage": 1.472844999996596,
+                "@azure-tools/typespec-azure-core/no-legacy-usage": 1.0649500000004082,
+                "@azure-tools/typespec-azure-core/friendly-name": 0.49955499999737185,
+                "@azure-tools/typespec-azure-core/no-query-explode": 19.38253899999995,
+                "@azure-tools/typespec-azure-core/no-header-explode": 7.9157539999989694,
+                "@azure-tools/typespec-azure-resource-manager/arm-no-record": 0.23057199999811928,
+                "@azure-tools/typespec-azure-resource-manager/no-empty-model": 0.07990899999822432,
+                "@azure-tools/typespec-azure-resource-manager/arm-common-types-version": 3.631291999999803,
+                "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes": 4.224624999999833,
+                "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes": 0.030375000000049113,
+                "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes": 0.38504199999988487,
+                "@azure-tools/typespec-azure-resource-manager/arm-resource-action-no-segment": 0.13262699999995675,
+                "@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property": 0.09708700000146564,
+                "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property": 0.07233200000109719,
+                "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-version-format": 0.05924999999933789,
+                "@azure-tools/typespec-azure-resource-manager/arm-resource-key-invalid-chars": 0.12437299999942297,
+                "@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern": 0.006415999999944688,
+                "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-no-key": 0.0768339999995078,
+                "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage": 0.046124000001100285,
+                "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response": 4.296528999998827,
+                "@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars": 0.11515699999768003,
+                "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": 0.11029800000005707,
+                "@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels": 0.07558599999720172,
+                "@azure-tools/typespec-azure-resource-manager/arm-resource-operation": 0.09966599999847858,
+                "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation": 0.12854100000322433,
+                "@azure-tools/typespec-azure-resource-manager/empty-updateable-properties": 0.10013200000094002,
+                "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator": 0.016165999999657288,
+                "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb": 0.049661999999671025,
+                "@azure-tools/typespec-azure-resource-manager/improper-subscription-list-operation": 0.004541999999901236,
+                "@azure-tools/typespec-azure-resource-manager/lro-location-header": 8.409920999999486,
+                "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers": 0.22236000000202694,
+                "@azure-tools/typespec-azure-resource-manager/no-response-body": 12.302916999998615,
+                "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint": 0.017751000000089334,
+                "@azure-tools/typespec-azure-resource-manager/patch-envelope": 0.1092739999976402,
+                "@azure-tools/typespec-azure-resource-manager/arm-resource-patch": 0.19637399999942318,
+                "@azure-tools/typespec-azure-resource-manager/resource-name": 0.11055100000021412,
+                "@azure-tools/typespec-azure-resource-manager/secret-prop": 2.3007819999988897,
+                "@azure-tools/typespec-azure-resource-manager/unsupported-type": 0.26734300000339317,
+                "@azure-tools/typespec-client-generator-core/require-client-suffix": 0.20283399999948415,
+                "@azure-tools/typespec-client-generator-core/property-name-conflict": 0.8950519999966673
+              }
+            },
+            "emit": {
+              "total": 121.54620899999986,
+              "emitters": {
+                "@azure-tools/typespec-autorest": {
+                  "total": 121.506167,
+                  "steps": {}
+                }
+              }
+            },
+            "total": 572.0877109999998
+          }
+        }
+      ]
+    },
+    "azure-core-dataplane": {
+      "name": "azure-core-dataplane",
+      "iterations": 1,
+      "stats": {
+        "complexity": {
+          "createdTypes": 8984,
+          "finishedTypes": 8523
+        },
+        "runtime": {
+          "loader": 45.00254199999972,
+          "resolver": 4.716249999999945,
+          "checker": 62.575958000000355,
+          "validation": {
+            "total": 31.606166999999914,
+            "validators": {
+              "compiler": 0.9782079999999951,
+              "@typespec/http": 6.006249999999909,
+              "@typespec/rest": 0.3526249999999891,
+              "@typespec/versioning": 20.068916000000172,
+              "@azure-tools/typespec-azure-core": 4.179834000000028
+            }
+          },
+          "linter": {
+            "total": 46.74366700000019,
+            "rules": {
+              "@azure-tools/typespec-azure-core/operation-missing-api-version": 0.07966699999906268,
+              "@azure-tools/typespec-azure-core/auth-required": 0.00574999999935244,
+              "@azure-tools/typespec-azure-core/request-body-problem": 0.17504199999757475,
+              "@azure-tools/typespec-azure-core/byos": 2.5811249999997017,
+              "@azure-tools/typespec-azure-core/casing-style": 0.23320299999932104,
+              "@azure-tools/typespec-azure-core/composition-over-inheritance": 0.020002000002023124,
+              "@azure-tools/typespec-azure-core/known-encoding": 0.10982399998965775,
+              "@azure-tools/typespec-azure-core/long-running-polling-operation-required": 0.17650200000025507,
+              "@azure-tools/typespec-azure-core/no-case-mismatch": 0.09946200000058525,
+              "@azure-tools/typespec-azure-core/no-closed-literal-union": 0.16250100000070233,
+              "@azure-tools/typespec-azure-core/no-enum": 0.02195599999913611,
+              "@azure-tools/typespec-azure-core/no-error-status-codes": 0.04699899999786794,
+              "@azure-tools/typespec-azure-core/no-explicit-routes-resource-ops": 0.0499180000015258,
+              "@azure-tools/typespec-azure-core/no-generic-numeric": 0.15404999999782376,
+              "@azure-tools/typespec-azure-core/no-nullable": 0.1210909999949763,
+              "@azure-tools/typespec-azure-core/no-offsetdatetime": 0.5582699999999932,
+              "@azure-tools/typespec-azure-core/no-unnamed-union": 0.1491130000040357,
+              "@azure-tools/typespec-azure-core/no-response-body": 7.569547000002331,
+              "@azure-tools/typespec-azure-core/no-rpc-path-params": 0.08525199999940014,
+              "@azure-tools/typespec-azure-core/no-openapi": 0.6918319999913365,
+              "@azure-tools/typespec-azure-core/no-format": 0.2779249999998683,
+              "@azure-tools/typespec-azure-core/no-multiple-discriminator": 0.027005999997982144,
+              "@azure-tools/typespec-azure-core/no-rest-library-interfaces": 0.006208000000242464,
+              "@azure-tools/typespec-azure-core/no-unknown": 0.07404899999937697,
+              "@azure-tools/typespec-azure-core/bad-record-type": 0.10807900000236259,
+              "@azure-tools/typespec-azure-core/documentation-required": 0.39049600000316786,
+              "@azure-tools/typespec-azure-core/key-visibility-required": 0.06836900000052992,
+              "@azure-tools/typespec-azure-core/response-schema-problem": 8.922376999997141,
+              "@azure-tools/typespec-azure-core/rpc-operation-request-body": 0.13561800000252333,
+              "@azure-tools/typespec-azure-core/spread-discriminated-model": 0.08686299999681069,
+              "@azure-tools/typespec-azure-core/use-standard-names": 1.9961659999962649,
+              "@azure-tools/typespec-azure-core/use-standard-operations": 0.05516799999986688,
+              "@azure-tools/typespec-azure-core/no-string-discriminator": 0.015165999994223966,
+              "@azure-tools/typespec-azure-core/require-versioned": 0.00912499999958527,
+              "@azure-tools/typespec-azure-core/no-private-usage": 0.7280439999849477,
+              "@azure-tools/typespec-azure-core/no-legacy-usage": 0.5297609999870474,
+              "@azure-tools/typespec-azure-core/friendly-name": 0.24846499999648586,
+              "@azure-tools/typespec-azure-core/no-query-explode": 7.886793000002399,
+              "@azure-tools/typespec-azure-core/no-header-explode": 8.712209999998322,
+              "@azure-tools/typespec-client-generator-core/require-client-suffix": 0.14391500000101587,
+              "@azure-tools/typespec-client-generator-core/property-name-conflict": 0.45942100000274877
+            }
+          },
+          "emit": {
+            "total": 140.39200000000028,
+            "emitters": {
+              "@azure-tools/typespec-autorest": {
+                "total": 67.85691700000007,
+                "steps": {}
+              },
+              "@typespec/openapi3": {
+                "total": 72.46266700000024,
+                "steps": {
+                  "compute": 60.983999999999924,
+                  "write": 11.413915999999972
+                }
+              }
+            }
+          },
+          "total": 331.0365840000004
+        }
+      },
+      "rawIterations": [
+        {
+          "complexity": {
+            "createdTypes": 8984,
+            "finishedTypes": 8523
+          },
+          "runtime": {
+            "loader": 45.00254199999972,
+            "resolver": 4.716249999999945,
+            "checker": 62.575958000000355,
+            "validation": {
+              "total": 31.606166999999914,
+              "validators": {
+                "compiler": 0.9782079999999951,
+                "@typespec/http": 6.006249999999909,
+                "@typespec/rest": 0.3526249999999891,
+                "@typespec/versioning": 20.068916000000172,
+                "@azure-tools/typespec-azure-core": 4.179834000000028
+              }
+            },
+            "linter": {
+              "total": 46.74366700000019,
+              "rules": {
+                "@azure-tools/typespec-azure-core/operation-missing-api-version": 0.07966699999906268,
+                "@azure-tools/typespec-azure-core/auth-required": 0.00574999999935244,
+                "@azure-tools/typespec-azure-core/request-body-problem": 0.17504199999757475,
+                "@azure-tools/typespec-azure-core/byos": 2.5811249999997017,
+                "@azure-tools/typespec-azure-core/casing-style": 0.23320299999932104,
+                "@azure-tools/typespec-azure-core/composition-over-inheritance": 0.020002000002023124,
+                "@azure-tools/typespec-azure-core/known-encoding": 0.10982399998965775,
+                "@azure-tools/typespec-azure-core/long-running-polling-operation-required": 0.17650200000025507,
+                "@azure-tools/typespec-azure-core/no-case-mismatch": 0.09946200000058525,
+                "@azure-tools/typespec-azure-core/no-closed-literal-union": 0.16250100000070233,
+                "@azure-tools/typespec-azure-core/no-enum": 0.02195599999913611,
+                "@azure-tools/typespec-azure-core/no-error-status-codes": 0.04699899999786794,
+                "@azure-tools/typespec-azure-core/no-explicit-routes-resource-ops": 0.0499180000015258,
+                "@azure-tools/typespec-azure-core/no-generic-numeric": 0.15404999999782376,
+                "@azure-tools/typespec-azure-core/no-nullable": 0.1210909999949763,
+                "@azure-tools/typespec-azure-core/no-offsetdatetime": 0.5582699999999932,
+                "@azure-tools/typespec-azure-core/no-unnamed-union": 0.1491130000040357,
+                "@azure-tools/typespec-azure-core/no-response-body": 7.569547000002331,
+                "@azure-tools/typespec-azure-core/no-rpc-path-params": 0.08525199999940014,
+                "@azure-tools/typespec-azure-core/no-openapi": 0.6918319999913365,
+                "@azure-tools/typespec-azure-core/no-format": 0.2779249999998683,
+                "@azure-tools/typespec-azure-core/no-multiple-discriminator": 0.027005999997982144,
+                "@azure-tools/typespec-azure-core/no-rest-library-interfaces": 0.006208000000242464,
+                "@azure-tools/typespec-azure-core/no-unknown": 0.07404899999937697,
+                "@azure-tools/typespec-azure-core/bad-record-type": 0.10807900000236259,
+                "@azure-tools/typespec-azure-core/documentation-required": 0.39049600000316786,
+                "@azure-tools/typespec-azure-core/key-visibility-required": 0.06836900000052992,
+                "@azure-tools/typespec-azure-core/response-schema-problem": 8.922376999997141,
+                "@azure-tools/typespec-azure-core/rpc-operation-request-body": 0.13561800000252333,
+                "@azure-tools/typespec-azure-core/spread-discriminated-model": 0.08686299999681069,
+                "@azure-tools/typespec-azure-core/use-standard-names": 1.9961659999962649,
+                "@azure-tools/typespec-azure-core/use-standard-operations": 0.05516799999986688,
+                "@azure-tools/typespec-azure-core/no-string-discriminator": 0.015165999994223966,
+                "@azure-tools/typespec-azure-core/require-versioned": 0.00912499999958527,
+                "@azure-tools/typespec-azure-core/no-private-usage": 0.7280439999849477,
+                "@azure-tools/typespec-azure-core/no-legacy-usage": 0.5297609999870474,
+                "@azure-tools/typespec-azure-core/friendly-name": 0.24846499999648586,
+                "@azure-tools/typespec-azure-core/no-query-explode": 7.886793000002399,
+                "@azure-tools/typespec-azure-core/no-header-explode": 8.712209999998322,
+                "@azure-tools/typespec-client-generator-core/require-client-suffix": 0.14391500000101587,
+                "@azure-tools/typespec-client-generator-core/property-name-conflict": 0.45942100000274877
+              }
+            },
+            "emit": {
+              "total": 140.39200000000028,
+              "emitters": {
+                "@azure-tools/typespec-autorest": {
+                  "total": 67.85691700000007,
+                  "steps": {}
+                },
+                "@typespec/openapi3": {
+                  "total": 72.46266700000024,
+                  "steps": {
+                    "compute": 60.983999999999924,
+                    "write": 11.413915999999972
+                  }
+                }
+              }
+            },
+            "total": 331.0365840000004
+          }
+        }
+      ]
+    },
+    "azure-full": {
+      "name": "azure-full",
+      "iterations": 1,
+      "stats": {
+        "complexity": {
+          "createdTypes": 9186,
+          "finishedTypes": 8727
+        },
+        "runtime": {
+          "loader": 43.031834000000345,
+          "resolver": 4.548999999999978,
+          "checker": 59.63229199999978,
+          "validation": {
+            "total": 29.497542000000067,
+            "validators": {
+              "compiler": 0.8730000000000473,
+              "@typespec/http": 2.2257080000003953,
+              "@typespec/rest": 0.3247919999998885,
+              "@typespec/versioning": 22.4795409999997,
+              "@azure-tools/typespec-azure-core": 3.5842499999998836
+            }
+          },
+          "linter": {
+            "total": 47.50508400000035,
+            "rules": {
+              "@azure-tools/typespec-azure-core/operation-missing-api-version": 0.09516899999925954,
+              "@azure-tools/typespec-azure-core/auth-required": 0.006205999999110645,
+              "@azure-tools/typespec-azure-core/request-body-problem": 0.1392860000037217,
+              "@azure-tools/typespec-azure-core/byos": 4.420454000000518,
+              "@azure-tools/typespec-azure-core/casing-style": 0.24875199999678443,
+              "@azure-tools/typespec-azure-core/composition-over-inheritance": 0.021874999995816324,
+              "@azure-tools/typespec-azure-core/known-encoding": 0.12304399998811277,
+              "@azure-tools/typespec-azure-core/long-running-polling-operation-required": 0.190328999997746,
+              "@azure-tools/typespec-azure-core/no-case-mismatch": 0.07287499999938518,
+              "@azure-tools/typespec-azure-core/no-closed-literal-union": 0.13624700000173107,
+              "@azure-tools/typespec-azure-core/no-enum": 0.020624999999654392,
+              "@azure-tools/typespec-azure-core/no-error-status-codes": 0.05216800000016519,
+              "@azure-tools/typespec-azure-core/no-explicit-routes-resource-ops": 0.052295000001777225,
+              "@azure-tools/typespec-azure-core/no-generic-numeric": 0.20908499999723063,
+              "@azure-tools/typespec-azure-core/no-nullable": 0.14683900000409267,
+              "@azure-tools/typespec-azure-core/no-offsetdatetime": 0.5990760000090631,
+              "@azure-tools/typespec-azure-core/no-unnamed-union": 0.18323199999940698,
+              "@azure-tools/typespec-azure-core/no-response-body": 6.9834989999990285,
+              "@azure-tools/typespec-azure-core/no-rpc-path-params": 0.12475000000040382,
+              "@azure-tools/typespec-azure-core/no-openapi": 0.7490340000099422,
+              "@azure-tools/typespec-azure-core/no-format": 0.21321399999214918,
+              "@azure-tools/typespec-azure-core/no-multiple-discriminator": 0.03017100000215578,
+              "@azure-tools/typespec-azure-core/no-rest-library-interfaces": 0.008665999999720952,
+              "@azure-tools/typespec-azure-core/no-unknown": 0.08371899999337984,
+              "@azure-tools/typespec-azure-core/bad-record-type": 0.11638700000139579,
+              "@azure-tools/typespec-azure-core/documentation-required": 0.42587600000115344,
+              "@azure-tools/typespec-azure-core/key-visibility-required": 0.07637499999873398,
+              "@azure-tools/typespec-azure-core/response-schema-problem": 8.99775100000079,
+              "@azure-tools/typespec-azure-core/rpc-operation-request-body": 0.2542539999994915,
+              "@azure-tools/typespec-azure-core/spread-discriminated-model": 0.09914600000047358,
+              "@azure-tools/typespec-azure-core/use-standard-names": 1.9055009999992762,
+              "@azure-tools/typespec-azure-core/use-standard-operations": 0.0452909999980875,
+              "@azure-tools/typespec-azure-core/no-string-discriminator": 0.01663300000154777,
+              "@azure-tools/typespec-azure-core/require-versioned": 0.007791999999881227,
+              "@azure-tools/typespec-azure-core/no-private-usage": 0.8218640000059168,
+              "@azure-tools/typespec-azure-core/no-legacy-usage": 0.5998400000030415,
+              "@azure-tools/typespec-azure-core/friendly-name": 0.2789410000023054,
+              "@azure-tools/typespec-azure-core/no-query-explode": 7.747445999999854,
+              "@azure-tools/typespec-azure-core/no-header-explode": 7.582367000000431,
+              "@azure-tools/typespec-client-generator-core/require-client-suffix": 0.13254200000028504,
+              "@azure-tools/typespec-client-generator-core/property-name-conflict": 0.445824000007633
+            }
+          },
+          "emit": {
+            "total": 133.04158300000017,
+            "emitters": {
+              "@azure-tools/typespec-autorest": {
+                "total": 61.24095899999975,
+                "steps": {}
+              },
+              "@typespec/openapi3": {
+                "total": 71.69841699999961,
+                "steps": {
+                  "compute": 63.7717090000001,
+                  "write": 7.867292000000361
+                }
+              }
+            }
+          },
+          "total": 317.2573350000007
+        }
+      },
+      "rawIterations": [
+        {
+          "complexity": {
+            "createdTypes": 9186,
+            "finishedTypes": 8727
+          },
+          "runtime": {
+            "loader": 43.031834000000345,
+            "resolver": 4.548999999999978,
+            "checker": 59.63229199999978,
+            "validation": {
+              "total": 29.497542000000067,
+              "validators": {
+                "compiler": 0.8730000000000473,
+                "@typespec/http": 2.2257080000003953,
+                "@typespec/rest": 0.3247919999998885,
+                "@typespec/versioning": 22.4795409999997,
+                "@azure-tools/typespec-azure-core": 3.5842499999998836
+              }
+            },
+            "linter": {
+              "total": 47.50508400000035,
+              "rules": {
+                "@azure-tools/typespec-azure-core/operation-missing-api-version": 0.09516899999925954,
+                "@azure-tools/typespec-azure-core/auth-required": 0.006205999999110645,
+                "@azure-tools/typespec-azure-core/request-body-problem": 0.1392860000037217,
+                "@azure-tools/typespec-azure-core/byos": 4.420454000000518,
+                "@azure-tools/typespec-azure-core/casing-style": 0.24875199999678443,
+                "@azure-tools/typespec-azure-core/composition-over-inheritance": 0.021874999995816324,
+                "@azure-tools/typespec-azure-core/known-encoding": 0.12304399998811277,
+                "@azure-tools/typespec-azure-core/long-running-polling-operation-required": 0.190328999997746,
+                "@azure-tools/typespec-azure-core/no-case-mismatch": 0.07287499999938518,
+                "@azure-tools/typespec-azure-core/no-closed-literal-union": 0.13624700000173107,
+                "@azure-tools/typespec-azure-core/no-enum": 0.020624999999654392,
+                "@azure-tools/typespec-azure-core/no-error-status-codes": 0.05216800000016519,
+                "@azure-tools/typespec-azure-core/no-explicit-routes-resource-ops": 0.052295000001777225,
+                "@azure-tools/typespec-azure-core/no-generic-numeric": 0.20908499999723063,
+                "@azure-tools/typespec-azure-core/no-nullable": 0.14683900000409267,
+                "@azure-tools/typespec-azure-core/no-offsetdatetime": 0.5990760000090631,
+                "@azure-tools/typespec-azure-core/no-unnamed-union": 0.18323199999940698,
+                "@azure-tools/typespec-azure-core/no-response-body": 6.9834989999990285,
+                "@azure-tools/typespec-azure-core/no-rpc-path-params": 0.12475000000040382,
+                "@azure-tools/typespec-azure-core/no-openapi": 0.7490340000099422,
+                "@azure-tools/typespec-azure-core/no-format": 0.21321399999214918,
+                "@azure-tools/typespec-azure-core/no-multiple-discriminator": 0.03017100000215578,
+                "@azure-tools/typespec-azure-core/no-rest-library-interfaces": 0.008665999999720952,
+                "@azure-tools/typespec-azure-core/no-unknown": 0.08371899999337984,
+                "@azure-tools/typespec-azure-core/bad-record-type": 0.11638700000139579,
+                "@azure-tools/typespec-azure-core/documentation-required": 0.42587600000115344,
+                "@azure-tools/typespec-azure-core/key-visibility-required": 0.07637499999873398,
+                "@azure-tools/typespec-azure-core/response-schema-problem": 8.99775100000079,
+                "@azure-tools/typespec-azure-core/rpc-operation-request-body": 0.2542539999994915,
+                "@azure-tools/typespec-azure-core/spread-discriminated-model": 0.09914600000047358,
+                "@azure-tools/typespec-azure-core/use-standard-names": 1.9055009999992762,
+                "@azure-tools/typespec-azure-core/use-standard-operations": 0.0452909999980875,
+                "@azure-tools/typespec-azure-core/no-string-discriminator": 0.01663300000154777,
+                "@azure-tools/typespec-azure-core/require-versioned": 0.007791999999881227,
+                "@azure-tools/typespec-azure-core/no-private-usage": 0.8218640000059168,
+                "@azure-tools/typespec-azure-core/no-legacy-usage": 0.5998400000030415,
+                "@azure-tools/typespec-azure-core/friendly-name": 0.2789410000023054,
+                "@azure-tools/typespec-azure-core/no-query-explode": 7.747445999999854,
+                "@azure-tools/typespec-azure-core/no-header-explode": 7.582367000000431,
+                "@azure-tools/typespec-client-generator-core/require-client-suffix": 0.13254200000028504,
+                "@azure-tools/typespec-client-generator-core/property-name-conflict": 0.445824000007633
+              }
+            },
+            "emit": {
+              "total": 133.04158300000017,
+              "emitters": {
+                "@azure-tools/typespec-autorest": {
+                  "total": 61.24095899999975,
+                  "steps": {}
+                },
+                "@typespec/openapi3": {
+                  "total": 71.69841699999961,
+                  "steps": {
+                    "compute": 63.7717090000001,
+                    "write": 7.867292000000361
+                  }
+                }
+              }
+            },
+            "total": 317.2573350000007
+          }
+        }
+      ]
+    }
+  }
+}
