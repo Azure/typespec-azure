@@ -416,9 +416,10 @@ ARM long-running operations (LROs) use operation status endpoints to allow clien
 status of an async operation. The `GetResourceOperationStatus` operation template provides a
 standard way to expose these endpoints, and `ArmOperationStatus` provides the response model.
 
-> **Note:** The `operationStatuses` and `Azure-AsyncOperation` patterns document an existing ARM wire
-> contract. Use these templates when you need to preserve that contract (for example, brownfield
-> compatibility). Do not read this section as blanket guidance for every new ARM API design.
+> **Note:** These templates can represent existing ARM operation-status endpoints. Use them when they
+> reproduce the existing wire contract; otherwise, preserve the contract with an explicit status
+> model. ARM's complete LRO polling flow, particularly `Azure-AsyncOperation`, is not yet
+> standardized enough for this to be blanket guidance for new APIs.
 
 ### ArmOperationStatus
 
