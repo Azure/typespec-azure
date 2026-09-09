@@ -446,6 +446,39 @@ An emitter helper that only reads metadata is still an emitter dependency.
 Do not conceal it behind a wrapper, dynamic import, private state-map key,
 decorator-name scraping, or copied emitter implementation.
 
+Design production rules for their intended official destination before choosing
+dependencies. ARM rules must not import or call
+`@azure-tools/typespec-client-generator-core` (TCGC): ARM is a dependency of
+TCGC, so promoting such a rule would introduce the wrong dependency direction.
+Do not add a TCGC dependency to ARM to preserve SDK scope or legacy LRO markers;
+use supported Azure Core and ARM semantic APIs instead.
+
+Production rules must not use `@typespec/openapi`, including `getExtensions`
+and `shouldInline`, even though it is a library rather than an emitter. Define
+the check in terms of TypeSpec authoring semantics instead of OpenAPI extension
+overrides or predicted schema inlining. Do not copy these helpers or inspect
+their private state to evade this boundary.
+
+Do not use unsafe compiler APIs such as
+`unsafe_mutateSubgraphWithNamespace` to construct version snapshots in a
+production rule. Prefer supported, non-mutating versioning metadata APIs.
+If they cannot establish a historical shape, document that limitation rather
+than silently checking only the latest shape while claiming all-version
+coverage.
+
+Apply these restrictions to the rule and helpers introduced or reused to
+implement its decisions. Existing transitive dependencies of supported Azure
+libraries are not permission to call the prohibited APIs indirectly. Research
+and comparison fixtures may still use the prohibited libraries to demonstrate
+Swagger divergence; native rule tests must not depend on TCGC, OpenAPI
+decorators, or unsafe mutation to exercise the rule.
+
+Removing a prohibited dependency can change the diagnostic population. Record
+the native contract and explicit differences for SDK scope, legacy markers,
+OpenAPI overrides, inline shapes, and historical versions when relevant.
+Update regression tests, comparison fixtures, and migration evidence together;
+do not present import removal as behavior-preserving without evidence.
+
 Inspecting emitter source and comparing generated Swagger are permitted only
 for migration research and the test/comparison harness. Shared semantic APIs
 such as HTTP payload metadata and Azure common-type metadata are appropriate
@@ -745,6 +778,10 @@ The reviewer must:
 - verify that production rule imports and reachable helpers respect the native
   implementation boundary, native tests do not require an emitter, and any
   emitter-only divergence is documented rather than hidden by an adapter
+- verify destination-compatible dependency direction and absence of TCGC
+  dependencies in ARM rule logic, `@typespec/openapi` usage, and unsafe compiler
+  mutation; check that their removal did not leave unsupported claims about
+  SDK scope, extension overrides, schema inlining, or historical versions
 - for an emission-dependent rule, independently audit the negative space:
   compare the rule against every reachable emitter type branch, default path,
   and fallthrough in the recorded emission matrix rather than limiting review
