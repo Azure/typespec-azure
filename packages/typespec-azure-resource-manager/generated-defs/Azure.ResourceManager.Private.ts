@@ -239,7 +239,13 @@ export type LegacyResourceOperationDecorator = (
   target: Operation,
   resourceType: Model,
   operationType:
-    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: string,
 ) => DecoratorValidatorCallbacks | void;
 
@@ -258,7 +264,13 @@ export type ExtensionResourceOperationDecorator = (
   targetResourceType: Model,
   extensionResourceType: Model,
   operationType:
-    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: string,
 ) => DecoratorValidatorCallbacks | void;
 
@@ -277,7 +289,13 @@ export type BuiltInResourceOperationDecorator = (
   parentResourceType: Model,
   builtInResourceType: Model,
   operationType:
-    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: string,
 ) => DecoratorValidatorCallbacks | void;
 
@@ -294,7 +312,13 @@ export type LegacyExtensionResourceOperationDecorator = (
   target: Operation,
   resourceType: Model,
   operationType:
-    "read" | "createOrUpdate" | "update" | "delete" | "list" | "action" | "checkExistence",
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: string,
 ) => DecoratorValidatorCallbacks | void;
 

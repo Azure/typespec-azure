@@ -529,7 +529,25 @@ export function registerArmResource(
   type?: string,
   nameParameter?: string,
 ): void {
-  const { program } = context;
+  registerArmResourceCore(context.program, context, resourceType, type, nameParameter);
+}
+
+export function registerArmResourceFromModel(
+  program: Program,
+  resourceType: Model,
+  type?: string,
+  nameParameter?: string,
+): void {
+  registerArmResourceCore(program, undefined, resourceType, type, nameParameter);
+}
+
+function registerArmResourceCore(
+  program: Program,
+  context: DecoratorContext | undefined,
+  resourceType: Model,
+  type?: string,
+  nameParameter?: string,
+): void {
   const namespaceName = resourceType.namespace ? getTypeName(resourceType.namespace) : undefined;
   if (
     namespaceName === undefined ||
@@ -583,7 +601,7 @@ export function registerArmResource(
     }
 
     // Set the name property to be read only
-    if (primaryKeyProperty.name === "name") {
+    if (context && primaryKeyProperty.name === "name") {
       const Lifecycle = getLifecycleVisibilityEnum(program);
       // Decorators may be re-applied to copies of the resource (e.g. by versioning
       // projections or emitters using the mutator framework), and such copies share the
@@ -646,7 +664,7 @@ export function registerArmResource(
     },
   };
 
-  setArmResource(context.program, resourceType, armResourceDetails);
+  setArmResource(program, resourceType, armResourceDetails);
 }
 
 export function listArmResources(program: Program): ArmResourceDetails[] {
