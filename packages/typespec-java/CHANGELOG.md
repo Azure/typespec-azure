@@ -4,7 +4,7 @@
 
 ### Features
 
-- Support collection prefixes for request headers in generated Java clients.
+- [#5436](https://github.com/Azure/typespec-azure/pull/5436) Support collection prefixes for request headers in generated Java clients.
 
 ### Bug Fixes
 
@@ -12,8 +12,6 @@
 
 
 ## 0.46.3
-
-### Bug Fixes
 
 ### Features
 
