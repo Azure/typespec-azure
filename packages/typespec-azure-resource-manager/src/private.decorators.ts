@@ -23,6 +23,7 @@ import {
   type Tuple,
   type Type,
 } from "@typespec/compiler";
+import { unsafe_Realm } from "@typespec/compiler/experimental";
 
 import { $ } from "@typespec/compiler/typekit";
 import { useStateMap } from "@typespec/compiler/utils";
@@ -649,13 +650,15 @@ export function registerArmResource(
   setArmResource(context.program, resourceType, armResourceDetails);
 }
 
-export function listArmResources(program: Program): ArmResourceDetails[] {
+export function listArmResources(program: Program, realm?: unsafe_Realm): ArmResourceDetails[] {
   // Deduplicate by namespace-qualified name. Versioning mutations (from TCGC's
   // createSdkContext or autorest's per-version snapshots) re-apply decorators on
   // realm copies, registering them alongside the originals. By keeping only the
   // first entry per qualified name, we ensure each resource appears exactly once.
   const seen = new Set<string>();
   return [...armResourceStateMap(program).values()].filter((r) => {
+    const owningRealm = unsafe_Realm.realmForType.get(r.typespecType);
+    if (realm === undefined ? owningRealm !== undefined : owningRealm !== realm) return false;
     const name = getTypeName(r.typespecType);
     if (seen.has(name)) return false;
     seen.add(name);

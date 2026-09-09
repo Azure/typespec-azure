@@ -435,9 +435,10 @@ The selected-version path performs these steps:
    consistency error; it must not fall back to legacy enumeration.
 7. Cache the projected namespace and realm by program, provider namespace, and version.
 8. Create a realm-aware resolution context.
-9. Invalidate derived ARM cache entries for that realm.
-10. Resolve resources and operations from the projected namespace and realm-owned metadata.
-11. Apply optional logical naming.
+9. Resolve resources and operations from the projected namespace and realm-owned metadata. The
+   projected provider namespace is itself the derived-cache key, so it cannot collide with the
+   declaration-view cache.
+10. Apply optional logical naming.
 
 Version matching is exact and case-sensitive because API version enum values are wire values.
 There is no implicit `latest` value in this API. Consumers that want latest should select it from
@@ -454,7 +455,9 @@ Add diagnostics for:
   and
 - an empty name returned by a custom name resolver.
 
-The first three diagnostics should include the requested version and available root version values.
+The unknown-version diagnostic should include the requested version and available root version
+values. Unversioned and transient-version diagnostics include the requested version; transient
+versioning has no root service versions to list.
 The resolver should report the diagnostic through the program and return an empty `Provider`,
 matching the existing ability to return an empty provider when no ARM provider namespace exists.
 
@@ -819,6 +822,19 @@ expresses the supported customization and preserves invariants.
 2. Regenerate package API documentation if the public types are included in generated docs.
 3. Add a change description for the ARM package.
 4. Review whether selected-version diagnostics need a result-plus-diagnostics convenience API.
+
+### Implementation status
+
+Phases 1 through 4 are implemented by the draft PR associated with this RFC:
+
+- selected snapshots are cached as projected namespace and realm pairs;
+- resource enumeration accepts an exact realm and excludes all realm-owned resources from the
+  declaration view;
+- projected provider namespaces key their own derived provider cache entries;
+- logical naming runs on a graph-preserving copy and leaves structural and wire metadata intact;
+- synthetic parent resources retain their path-derived names; and
+- TCGC integration is exercised from the consumer package by passing `getLibraryName` as the
+  callback implementation, without an ARM production dependency on TCGC.
 
 ## Test plan
 
