@@ -2,6 +2,10 @@
 
 ## 0.46.4
 
+### Features
+
+- Support collection prefixes for request headers in generated Java clients.
+
 ### Bug Fixes
 
 - [#5381](https://github.com/Azure/typespec-azure/pull/5381) Avoid duplicate inherited discriminator fields in generated Java models.
