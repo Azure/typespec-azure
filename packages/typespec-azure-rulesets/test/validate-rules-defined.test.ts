@@ -4,7 +4,7 @@ import {
   $linter as ResourceManagerLinter,
 } from "@azure-tools/typespec-azure-resource-manager";
 import type { LinterDefinition } from "@typespec/compiler";
-import { fail, ok } from "node:assert";
+import { fail, ok, strictEqual } from "node:assert";
 import { describe, it } from "vitest";
 import { $linter } from "../src/index.js";
 
@@ -56,7 +56,10 @@ describe("expect all rules to be defined", () => {
     ok(ruleset);
     ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-no-url-suffix"]);
     ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-model-suffix"]);
-    ok(ruleset.disable?.["@azure-tools/typespec-client-generator-core/get-operation-name"]);
+    strictEqual(
+      ruleset.enable?.["@azure-tools/typespec-client-generator-core/get-operation-name"],
+      false,
+    );
     ok(
       ruleset.disable?.["@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms"],
     );
