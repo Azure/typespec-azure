@@ -82,6 +82,10 @@ function getResponseBody(response: HttpOperationResponse): ResponseBody | undefi
   const contentTypes: string[] = [];
   for (const content of response.responses) {
     if (content.body !== undefined) {
+      // AutoRest rejects conflicting body types; do not compare an arbitrary last variant.
+      if (body !== undefined && body.type !== content.body.type) {
+        return undefined;
+      }
       body = content.body;
       contentTypes.push(...content.body.contentTypes);
     }

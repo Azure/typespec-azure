@@ -12,6 +12,11 @@ Distinct named types remain distinct schemas, even if their properties match.
 The comparison also accounts for equivalent emitted binary, multipart, and tuple
 response schemas.
 
+If either status declares multiple distinct body types, this rule skips the
+comparison. AutoRest rejects those conflicting bodies with `duplicate-body-types`;
+correct that error before comparing the `200` and `201` schemas. Multiple content
+types sharing one body type remain supported.
+
 #### ❌ Incorrect
 
 ```tsp
@@ -84,7 +89,7 @@ breaking change and the inconsistency has been reviewed. Prefer reusing the same
 response model. Place the directive above the affected operation:
 
 ```tsp
-#suppress "put-response-schema-consistency" "Existing API contract returns different create and replace bodies."
+#suppress "@azure-tools/typespec-azure-resource-manager/put-response-schema-consistency" "Existing API contract returns different create and replace bodies."
 ```
 
 ## LintDiff Equivalent

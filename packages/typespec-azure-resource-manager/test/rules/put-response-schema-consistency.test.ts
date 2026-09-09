@@ -2,6 +2,7 @@ import { Tester } from "#test/tester.js";
 import { $minItems, type DecoratorContext, type Model } from "@typespec/compiler";
 import {
   createLinterRuleTester,
+  expectDiagnostics,
   mockFile,
   type LinterRuleTester,
 } from "@typespec/compiler/testing";
@@ -29,6 +30,15 @@ const diagnostic = {
 const responses = `
   model OkBody<T> { @statusCode statusCode: 200; @body body: T; }
   model CreatedBody<T> { @statusCode statusCode: 201; @body body: T; }
+`;
+
+const contentResponses = `
+  ${responses}
+  model ContentResponse<Status extends int32, Body, ContentType extends string> {
+    @statusCode statusCode: Status;
+    @header contentType: ContentType;
+    @body body: Body;
+  }
 `;
 
 const arm = `
@@ -528,4 +538,131 @@ it("preserves equality for the same constrained array type", async () => {
   `,
     )
     .toBeValid();
+});
+
+it("ignores conflicting body types at either exact status in either order", async () => {
+  for (const [status, otherStatus] of [
+    [200, 201],
+    [201, 200],
+  ]) {
+    for (const variants of ["Json | Xml", "Xml | Json"]) {
+      await tester
+        .expect(
+          `
+          ${contentResponses}
+          model Json is ContentResponse<${status}, string, "application/json">;
+          model Xml is ContentResponse<${status}, int32, "application/xml">;
+          model Other is ContentResponse<${otherStatus}, string, "application/json">;
+          @put op createOrUpdate(): ${variants} | Other;
+        `,
+        )
+        .toBeValid();
+    }
+  }
+});
+
+it("does not merge distinct anonymous body variants with equal properties", async () => {
+  await tester
+    .expect(
+      `
+      ${contentResponses}
+      model Json is ContentResponse<200, { value: string }, "application/json">;
+      model Xml is ContentResponse<200, { value: string }, "application/xml">;
+      @put op createOrUpdate(): Json | Xml | CreatedBody<int32>;
+    `,
+    )
+    .toBeValid();
+});
+
+it("allows shared body types across reordered content variants", async () => {
+  for (const variants of ["Json | Xml", "Xml | Json"]) {
+    await tester
+      .expect(
+        `
+        ${contentResponses}
+        model Payload { value: string; }
+        model Json is ContentResponse<200, Payload, "application/json">;
+        model Xml is ContentResponse<200, Payload, "application/xml">;
+        @put op createOrUpdate(): ${variants} | CreatedBody<Payload>;
+      `,
+      )
+      .toBeValid();
+  }
+});
+
+it("reports schema differences across valid reordered response groups", async () => {
+  for (const variants of ["Json | Xml", "Xml | Json"]) {
+    await tester
+      .expect(
+        `
+        ${contentResponses}
+        model Payload { value: string; }
+        model Other { value: int32; }
+        model Json is ContentResponse<200, Payload, "application/json">;
+        model Xml is ContentResponse<200, Payload, "application/xml">;
+        @put op createOrUpdate(): ${variants} | CreatedBody<Other>;
+      `,
+      )
+      .toEmitDiagnostics([{ ...diagnostic, target: "createOrUpdate" }]);
+  }
+});
+
+it("aggregates JSON and binary variants at either status regardless of order", async () => {
+  for (const [status, otherStatus] of [
+    [200, 201],
+    [201, 200],
+  ]) {
+    for (const variants of ["Json | Binary", "Binary | Json"]) {
+      await tester
+        .expect(
+          `
+          ${contentResponses}
+          model Json is ContentResponse<${status}, bytes, "application/json">;
+          model Binary is ContentResponse<${status}, bytes, "application/octet-stream">;
+          model Other is ContentResponse<${otherStatus}, bytes, "application/octet-stream">;
+          @put op createOrUpdate(): ${variants} | Other;
+        `,
+        )
+        .toEmitDiagnostics([{ ...diagnostic, target: "createOrUpdate" }]);
+    }
+  }
+});
+
+it("does not treat bodyless variants as conflicting body types", async () => {
+  for (const variants of ["Empty | OkBody<string>", "OkBody<string> | Empty"]) {
+    await tester
+      .expect(
+        `
+        ${responses}
+        model Empty { @statusCode statusCode: 200; }
+        @put op createOrUpdate(): ${variants} | CreatedBody<int32>;
+      `,
+      )
+      .toEmitDiagnostics([{ ...diagnostic, target: "createOrUpdate" }]);
+  }
+});
+
+it("supports suppression with the fully qualified diagnostic code", async () => {
+  const options = {
+    compilerOptions: {
+      linterRuleSet: {
+        enable: {
+          "@azure-tools/typespec-azure-resource-manager/put-response-schema-consistency": true,
+        },
+      },
+    },
+  };
+  const code = `
+    ${responses}
+    @put op createOrUpdate(): OkBody<string> | CreatedBody<int32>;
+  `;
+  expectDiagnostics(await Tester.diagnose(code, options), [diagnostic]);
+  await Tester.compile(
+    `
+      ${responses}
+      #suppress "@azure-tools/typespec-azure-resource-manager/put-response-schema-consistency" "Existing API contract."
+      @put op createOrUpdate(): OkBody<string> | CreatedBody<int32>;
+    `,
+    options,
+  );
 });
