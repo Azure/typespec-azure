@@ -1,12 +1,24 @@
 # Change Log - @azure-tools/typespec-java
 
-## 0.46.3
+## 0.46.4
+
+### Features
+
+- Support collection prefixes for request headers in generated Java clients.
 
 ### Bug Fixes
 
-- [#5394](https://github.com/Azure/typespec-azure/pull/5394) Sync core to microsoft/typespec commit `890cad64c`. Support collection header prefixes for
+- Avoid duplicate inherited discriminator fields in generated Java models.
+
+
+## 0.46.3
+
+### Features
+
+- Sync core to microsoft/typespec commit `890cad64c`. Support collection header prefixes for
   map-valued response headers and document the Java emitter and client options (core,
   [microsoft/typespec#11860](https://github.com/microsoft/typespec/pull/11860)).
+
 
 ## 0.46.2
 
