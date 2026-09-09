@@ -2,7 +2,7 @@
 
 ## Result and gap summary
 
-- **Results:** In the recorded staging/latest-version comparison, Swagger reports
+- **Results:** In the 2026-09-09 staging/latest-version comparison, Swagger reports
   **13 diagnostics across 8 projects**; TypeSpec reports **1 in 1 project**.
   The assessed population is 462 of 468 projects; six compile failures are excluded.
 - **Why 13 versus 1:** Both catch the same genuine Reservations/Quota mismatch.
@@ -11,34 +11,42 @@
   separate objects representing the same schema trigger false positives.
   TypeSpec compares schema types instead and intentionally avoids these findings.
   See the [reference-pair evidence](#gap-example-resolved-external-reference-identity).
-- **Decision:** No further rule change is needed for this gap. The repaired rule
-  matches the tested PUT schema-consistency contract, not the validator's defects;
-  raw counts need not match.
+- **Decision:** The source now skips conflicting body types within one status,
+  avoiding order-dependent secondary warnings on inputs AutoRest already rejects.
+  Valid-response behavior and corpus counts are unchanged; the count gap does not
+  require reproducing validator defects.
 - **Limits:** External-reference resolution was not independently verified, and
   the source's nested-namespace limitation remains. See the
-  [evidence limitations](#repair-findings-and-regression-evidence) and
+  [evidence limitations](#earlier-template-and-array-repair-findings) and
   [qualified conclusion](#official-coverage-and-conclusion).
 
 ## Sources and scope
 
 - azure-rest-api-specs commit:
   `f6b53f105b95da05276530a0754a1c71b4f16397`
-- azure-openapi-validator commit:
+- Original recorded azure-openapi-validator source commit:
   `1198225afecbb818c3050d4d2a91da92e14e56ce`
+- Fixture metadata checkout for this run:
+  `6243cb01c16c7535cd3b8df6f45fbeb3c095ed7f`; the target comparator still uses
+  exact status lookup and JavaScript object identity.
 - Validator registration: ARM, `RPC-Put-V1-29`, `stagingOnly: true`,
   `resolved: true`, OpenAPI 2, selector `$.paths.*`.
 - Focused repair harness runtime: installed
   `@microsoft.azure/openapi-validator-rulesets@2.2.6`; its function retains the
   same exact-status and object-identity logic as the pinned upstream source above.
-- Repaired TypeSpec corpus run: full, 468 projects, results generated at
-  `2026-09-08T08:02:49.569Z`, completed successfully in 1,405,217 ms
-  (23 minutes 25 seconds), with 462 successful projects and six compile failures.
-- Repaired source rule Git blob: `29c8bcea0f110784b121b0eacec062bb92158c8c`.
+- Repaired TypeSpec corpus run: full, 468 projects, index `generatedAt`
+  `2026-09-09T05:17:51.600Z`, recorded duration 1,693,363 ms
+  (28 minutes 13 seconds), with 462 successful projects and six compile failures.
+  The process completed with exit code zero at `2026-09-09T05:20:31.6454966Z`;
+  the index timestamp precedes final output writing.
+- Repaired source rule Git blob: `78a6d1857da53097cbbe6e657b951de4ca27f9d8`.
   The run used uncommitted repair changes on source HEAD
-  `770f90840672d31bb36c5e4f8a58edd2f4174a10`; the recorded local-linter
-  fingerprint is
-  `sha256:95501734e179759346e5fa01c3eec31d084f4ce56b7d8b5e444ba1884ac15a63`.
-- One-rule staging scan: `2026-09-08T07:42:02Z`, same pinned Swagger dataset
+  `bc936175f30133b02b1cf6a714afc491701a7365`, with core at
+  `a6137cac43a727ce0c2656364fd72d50c272ee4a`. The fetched migration target was
+  `fbc43e9abaeeeb200a7fbe349a833deb8a8f52ef`.
+  The corpus metadata recorded local-linter fingerprint
+  `sha256:9cae0ee6b15b6f896edc50f62447609d8fbf49b49d07e8ae66d6dca4b6c82b84`.
+- One-rule staging scan: `2026-09-09T04:51:52.035Z`, same pinned Swagger dataset
   and installed validator runtime as the focused repair.
 
 The checked-in production comparison cannot measure this rule: production mode
@@ -71,11 +79,11 @@ and coverage definitions: official-rule credit in the external report is not
 observed local-lint overlap. No unsupported project correspondence is inferred
 from the external aggregate row.
 
-## Focused behavior (revalidated 2026-09-08)
+## Focused behavior (revalidated 2026-09-09)
 
-Eleven focused fixtures cover the exact verb/status gates, absent statuses and
+Twelve focused fixtures cover the exact verb/status gates, absent statuses and
 bodies, named and inline schema families, external references, binary and
-multipart responses, and multiple content variants. Two violation fixtures are
+multipart responses, and multiple content variants. Three violation fixtures are
 covered by the local lint. Six validator-clean compliance fixtures remain clean.
 Three compliance fixtures explicitly record reviewed Swagger false positives:
 
@@ -86,7 +94,76 @@ Three compliance fixtures explicitly record reviewed Swagger false positives:
 These false positives come from comparing resolved JavaScript objects with
 `!==`, not from a difference in emitted schema values.
 
-### Repair findings and regression evidence
+### Mixed-body response repair
+
+Promotion review [comment 3956634943](https://github.com/Azure/typespec-azure/pull/5423#discussion_r3956634943)
+identified order-dependent last-body selection in `getResponseBody`. Source
+inspection showed that AutoRest's `emitResponseObject` performs the same selection,
+but also reports `@azure-tools/typespec-autorest/duplicate-body-types` whenever
+body type identities differ within one status. Thus the finding did not establish
+a missed check on successfully emitted Swagger. The user explicitly selected a
+conservative source repair: omit this secondary lint comparison on emitter-invalid
+mixed-body responses rather than retain the arbitrary last-body warning.
+
+`getResponseBody` now returns no comparable body when two body-bearing variants
+have different `Type` identities. Either exact status can trigger this exemption.
+The emitter error remains; no schema is synthesized, bodies are not structurally
+merged, and valid response groups still aggregate all content types. A bodyless
+variant is not a conflicting body type. This change applies to the source rule;
+the promotion copy must be synchronized separately, not silently changed here.
+
+Twenty-six native tests pass. The three new failing cases before the guard were
+conflicts at `200`, conflicts at `201`, and distinct anonymous body types with equal
+properties. Regression tests cover both variant orders, and separately invoke
+AutoRest to assert its `duplicate-body-types` error at each exact status. Controls
+preserve matching named bodies, genuine `200`/`201` differences, mixed JSON/binary
+classification, and bodyless variants.
+
+The new `different-multiple-content-types` fixture has four genuine violations in
+both engines: two reversed named-body variant orders and two reversed JSON/binary
+orders at `201`. All twelve fixture comparisons and 36 snapshots pass. Existing
+fixtures and their snapshots are unchanged. Invalid mixed-body inputs are covered
+by native/emitter diagnostic tests, not misrepresented as successful Swagger
+fixture compilations.
+
+The intrinsic-indexer review suggestion was not adopted: the compiler's standard
+`Array` declares `@indexer`, and no missing intrinsic identity was demonstrated.
+The promotion's fully qualified suppression-code documentation correction is
+outside this source repair.
+
+### Gap example: secondary warning on invalid response variants
+
+- **Classification:** TypeSpec-only secondary diagnostic on emitter-invalid input
+- **Status:** fixed
+- **Project/API version:** native regression, not a real-service count gap
+- **Source:** `response content variants` in
+  `test/rules/consistent-response-schema-for-put.test.ts`
+
+**TypeSpec source**
+
+```typespec
+model Json is Response<200, string, "application/json">;
+model Xml is Response<200, int32, "application/xml">;
+model Other is Response<201, string, "application/json">;
+@put op put(): Json | Xml | Other;
+```
+
+`Response` supplies `@statusCode`, `@header contentType`, and `@body` through the
+test's generic response wrapper.
+
+**Emitter boundary:** AutoRest rejects the conflicting `200` bodies with
+`duplicate-body-types`; there is no successful Swagger emission to compare.
+
+| Engine                    | Observed result                                                     |
+| ------------------------- | ------------------------------------------------------------------- |
+| AutoRest                  | `duplicate-body-types` error in both variant orders; unchanged      |
+| Source lint before repair | Secondary mismatch warning when the last `200` body is `int32`      |
+| Source lint after repair  | No secondary comparison for the conflicting status, in either order |
+
+**Disposition:** Defer schema comparison until each status has one body type.
+This avoids noisy diagnostics on invalid input, not a validator count mismatch.
+
+### Earlier template and array repair findings
 
 The previous conclusion overstated the evidence: the stored
 `same-special-response-bodies/tsp-diagnostics.json` contained a local lint warning
@@ -129,7 +206,7 @@ rests on inspected emitted reference pairs and the validator's identity-comparis
 implementation, not a claim of independently verified resolution in these runs.
 The repaired template and tuple/array regressions do not use external references.
 
-This repair is limited to template duplication and intrinsic-array normalization.
+The earlier repair was limited to template duplication and intrinsic-array normalization.
 The source's existing provider-namespace guard remains unchanged. Its
 `resolveProviderNamespace` call searches the supplied namespace and descendants,
 not ancestors, so nested operation namespaces remain a known source limitation.
@@ -153,6 +230,15 @@ mise exec -- pnpm --dir packages\typespec-lintdiff specs:typespec --specs-repo C
 Package build and focused lint pass. Package-wide `pnpm --filter
 tsp-lintdiff-local-linter lint` remains blocked by 232 existing warnings in
 unmodified files; none comes from the repaired rule or its tests.
+
+For the 2026-09-09 repair, validation used the explicit source/test paths above,
+not package-wide lint. Temporary `test/common-types` and
+`test/azure-openapi-validator` junctions supplied the focused fixture inputs and
+were removed afterward. Their presence does not establish successful external
+reference resolution: the existing harness still filters `invalid-ref`.
+`audit:noise` has no rule selector and would recompile unrelated rules; the
+focused harness's exact ambient-diagnostic and target-diagnostic assertions
+provide the scoped noise evidence instead.
 
 ## Repaired full-corpus comparison
 
@@ -355,6 +441,15 @@ It compares all non-error response bodies for every HTTP verb and success-status
 combination, producing out-of-scope findings such as POST `200`/`201` and PUT
 `200`/`202`.
 
+The worker coverage classification is **partial**, verified against the fetched
+remote migration target. Core's rule is registered and enabled, but compares all
+non-error bodies by effective type identity rather than this exact emitted-schema
+contract. ARM's registered `arm-resource-operation-response` implements RPC008 for
+tracked-resource lifecycle operations, not arbitrary PUT bodies. The RPC coverage
+inventory's template/lifecycle entries therefore do not eliminate this custom
+operation surface. The existing local rule remains the repair owner; no new
+overlapping rule was added.
+
 Within the applicable namespaces covered by these fixtures, the dedicated rule
 implements the intended
 `ConsistentResponseSchemaForPut` contract: ARM PUT only, exact `200` and `201`
@@ -362,9 +457,11 @@ responses only, both schemas required, and consistent emitted schema identity.
 It deliberately excludes the validator's resolved-object identity defects while
 preserving genuine named-schema and inline-schema differences. The emission
 matrix in `rule.md` and the rerun focused fixtures support the tested contract,
-including the repaired template and intrinsic-array cases. This is not a proof of
+including the repaired template, intrinsic-array, and mixed-body cases. This is not a proof of
 equivalence for all possible decorated or emitter-specific shapes. The new full
 run confirms unchanged real-service behavior and no unexplained one-sided
 projects; the documented nested-namespace source limitation remains. The source
-repairs were required for false-positive and duplicate-diagnostic behavior, not to
-force raw Swagger and TypeSpec counts to match.
+repairs address false-positive, duplicate, and invalid-input secondary diagnostic
+behavior, not raw Swagger/TypeSpec count equality. The mixed-body exemption is an
+intentional boundary for unsuccessful emission, not an assertion that conflicting
+schemas are equal.

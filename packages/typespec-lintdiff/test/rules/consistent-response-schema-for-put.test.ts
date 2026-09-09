@@ -8,6 +8,7 @@ import {
 import {
   createLinterRuleTester,
   createTester,
+  expectDiagnostics,
   mockFile,
   type LinterRuleTester,
 } from "@typespec/compiler/testing";
@@ -22,6 +23,7 @@ const Tester = createTester(resolvePath(import.meta.dirname, "../.."), {
     "@typespec/versioning",
     "@azure-tools/typespec-azure-core",
     "@azure-tools/typespec-azure-resource-manager",
+    "@azure-tools/typespec-autorest",
   ],
 })
   .importLibraries()
@@ -43,6 +45,7 @@ const Tester = createTester(resolvePath(import.meta.dirname, "../.."), {
       namespace Custom {
         extern dec indexer(target: TypeSpec.Reflection.Model);
       }
+      @service
       @armProviderNamespace
       namespace Microsoft.TestService {
         model OkBody<T> {
@@ -217,4 +220,121 @@ describe("constant array schemas", () => {
       )
       .toBeValid();
   });
+});
+
+describe("response content variants", () => {
+  const responses = `
+      model Response<Status extends int32, Body, ContentType extends string> {
+        @statusCode statusCode: Status;
+        @header contentType: ContentType;
+        @body body: Body;
+      }
+    `;
+
+  it.each([
+    [200, 201],
+    [201, 200],
+  ])(
+    "ignores conflicting body types at status %s regardless of their order",
+    async (status, otherStatus) => {
+      for (const bodies of ["Json | Xml", "Xml | Json"]) {
+        const code = `
+            ${responses}
+            model Json is Response<${status}, string, "application/json">;
+            model Xml is Response<${status}, int32, "application/xml">;
+            model Other is Response<${otherStatus}, string, "application/json">;
+            @put op put(): ${bodies} | Other;
+          `;
+        await tester.expect(code).toBeValid();
+        const diagnostics = await Tester.emit("@azure-tools/typespec-autorest").diagnose(code);
+        expectDiagnostics(
+          diagnostics.filter((diagnostic) => diagnostic.severity === "error"),
+          { code: "@azure-tools/typespec-autorest/duplicate-body-types" },
+        );
+      }
+    },
+  );
+
+  it("does not merge distinct inline types merely because their properties agree", async () => {
+    await tester
+      .expect(
+        `
+          ${responses}
+          model Json is Response<200, { value: string }, "application/json">;
+          model Xml is Response<200, { value: string }, "application/xml">;
+          @put op put(): Json | Xml | CreatedBody<int32>;
+        `,
+      )
+      .toBeValid();
+  });
+
+  it.each(["Json | Xml", "Xml | Json"])(
+    "allows shared body types across reordered variants: %s",
+    async (variants) => {
+      await tester
+        .expect(
+          `
+            ${responses}
+            model Payload { value: string; }
+            model Json is Response<200, Payload, "application/json">;
+            model Xml is Response<200, Payload, "application/xml">;
+            @put op put(): ${variants} | CreatedBody<Payload>;
+          `,
+        )
+        .toBeValid();
+    },
+  );
+
+  it.each(["Json | Xml", "Xml | Json"])(
+    "still reports different schemas across valid status groups: %s",
+    async (variants) => {
+      await tester
+        .expect(
+          `
+            ${responses}
+            model Payload { value: string; }
+            model Other { value: int32; }
+            model Json is Response<200, Payload, "application/json">;
+            model Xml is Response<200, Payload, "application/xml">;
+            @put op /*put*/put(): ${variants} | CreatedBody<Other>;
+          `,
+        )
+        .toEmitDiagnostics(({ put }) => ({
+          ...diagnostic,
+          pos: getSourceLocation(put).pos,
+          end: getSourceLocation(put).end,
+        }));
+    },
+  );
+
+  it.each(["Json | Binary", "Binary | Json"])(
+    "aggregates every content type for a shared bytes body: %s",
+    async (variants) => {
+      await tester
+        .expect(
+          `
+            ${responses}
+            model Json is Response<200, bytes, "application/json">;
+            model Binary is Response<200, bytes, "application/octet-stream">;
+            model Created is Response<201, bytes, "application/octet-stream">;
+            @put op put(): ${variants} | Created;
+          `,
+        )
+        .toEmitDiagnostics(diagnostic);
+    },
+  );
+
+  it.each(["Empty | OkBody<string>", "OkBody<string> | Empty"])(
+    "does not treat a bodyless variant as a conflicting body: %s",
+    async (variants) => {
+      await tester
+        .expect(
+          `
+            model Empty { @statusCode statusCode: 200; }
+            @put op put(): ${variants} | CreatedBody<int32>;
+          `,
+        )
+        .toEmitDiagnostics(diagnostic);
+    },
+  );
 });
