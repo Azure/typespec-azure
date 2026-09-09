@@ -436,6 +436,29 @@ The top-level worker works only in the supplied typespec-azure worktree.
   workflow.
 - Do not require equal raw Swagger and TypeSpec diagnostic counts.
 
+#### Native TypeSpec implementation boundary
+
+Production rules must validate the TypeSpec semantic model directly through
+supported compiler, HTTP, versioning, and Azure library APIs. Do not import or
+call functions from `@azure-tools/typespec-autorest` or another emitter, invoke
+emission, or read generated Swagger/OpenAPI to decide TypeSpec diagnostics.
+An emitter helper that only reads metadata is still an emitter dependency.
+Do not conceal it behind a wrapper, dynamic import, private state-map key,
+decorator-name scraping, or copied emitter implementation.
+
+Inspecting emitter source and comparing generated Swagger are permitted only
+for migration research and the test/comparison harness. Shared semantic APIs
+such as HTTP payload metadata and Azure common-type metadata are appropriate
+when they operate on the program without loading or running an emitter.
+
+If an emitter-specific override has no supported native API, describe the
+unobservable behavior and resulting divergence in `rule.md` and `migration.md`.
+Validate the native contract rather than inventing an adapter to force parity.
+Mark coverage partial when material Swagger behavior remains outside that
+contract; do not claim full equivalence from corpus overlap. Include native
+tests that compile without importing the emitter and comparison fixtures for
+the documented divergence.
+
 #### Emission-dependent semantic completeness gate
 
 When the Swagger rule selects, resolves, or compares an emitted OpenAPI field,
@@ -443,8 +466,9 @@ do not treat upstream validator tests, observed corpus overlap, or coverage of
 the containing authorable surface as complete semantic evidence. Before
 implementing or accepting the migrated rule:
 
-1. Trace the emitter path from the relevant TypeSpec semantic target to the
-   OpenAPI node and field inspected by the Swagger rule.
+1. For research only, trace the emitter path from the relevant TypeSpec semantic
+   target to the OpenAPI node and field inspected by the Swagger rule. Implement
+   the native semantic check within the boundary above, not an emitter adapter.
 2. Enumerate every authorable TypeSpec type family and meaningful subtype that
    can reach that emitter path. Include default and fallthrough branches,
    unsupported-but-emitted shapes, transformed or inherited types, and
@@ -463,8 +487,10 @@ implementing or accepting the migrated rule:
    shapes within that surface.
 5. Treat any reachable but unclassified emitter branch as unresolved
    uncertainty. Do not claim functional equivalence or proceed to the PR until
-   the matrix is closed or the branch is proven unauthorable for the rule's
-   scope.
+   the matrix is closed, the branch is proven unauthorable for the rule's scope,
+   or an emitter-only limitation is explicitly classified as partial coverage
+   under the native implementation boundary. A documented limitation does not
+   establish full equivalence.
 
 The full corpus is observational regression evidence: it proves behavior only
 for shapes present in the selected projects and versions. Even complete
@@ -678,6 +704,9 @@ The reviewer must:
   usage, version/projection mistakes, unstable diagnostic targets, ineffective
   deduplication, and misleading diagnostics
 - verify that fixture evidence covers the implementation's important branches
+- verify that production rule imports and reachable helpers respect the native
+  implementation boundary, native tests do not require an emitter, and any
+  emitter-only divergence is documented rather than hidden by an adapter
 - for an emission-dependent rule, independently audit the negative space:
   compare the rule against every reachable emitter type branch, default path,
   and fallthrough in the recorded emission matrix rather than limiting review

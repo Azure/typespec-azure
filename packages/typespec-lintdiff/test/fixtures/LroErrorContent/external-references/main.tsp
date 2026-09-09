@@ -32,6 +32,8 @@ model LocalReference {
 model LocalError {
   code?: string;
 }
+@useRef("#/definitions/LocalError")
+model OverriddenStandard is CommonTypes.ErrorResponse;
 
 model Failure<T> {
   @statusCode statusCode: 400;
@@ -50,3 +52,5 @@ op wrong is Lro<WrongDefinition>;
 op legacy is Lro<LegacyStandard>;
 @route("/local/{name}")
 op localError is Lro<LocalReference>;
+@route("/overridden-standard/{name}")
+op overriddenStandard is Lro<OverriddenStandard>;

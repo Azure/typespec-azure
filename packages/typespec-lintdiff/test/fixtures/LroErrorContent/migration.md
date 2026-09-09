@@ -14,17 +14,24 @@ do not validate the error reference. See [rule.md](rule.md) for the code-backed
 coverage check, full emission matrix, upstream links, and promotion boundary.
 
 The repaired rule follows semantic HTTP endpoints and every version snapshot,
-resolves reference decorators/common-type metadata, and applies the emitter's
-reference-versus-inline decisions. It reports once per authored operation.
+reads native ARM reference/common-type metadata, and uses shared payload and
+inline-type APIs. It reports once per authored operation. The native-only
+revision removes the `Autorest.getRef` dependency; it does not replace it with
+an adapter, private state access, decorator inspection, or Swagger emission.
 No emitter, validator, unrelated lint rule, or harness dependency was changed.
 
-**Functionally equivalent within the documented successful-emission scope.**
-The final full run identifies the same 54 affected projects on both sides, with
-no validator-only or TypeSpec-only projects. Five older-version source findings
-and three additional emitted occurrences explain the raw count difference.
-This conclusion does not claim raw diagnostic equality or coverage of the six
-compile-failed projects, arbitrary emitter directory overrides, or invalid
-schemas that fail emission.
+**Partial equivalence to the full Swagger rule.** Emitter-only `@Autorest.useRef`
+overrides are deliberately outside the native contract. The native type remains
+subject to lint regardless of how that override changes emitted Swagger. The
+comparison fixture below proves divergences in both directions.
+
+The completed native-only full run identifies the same 54 affected projects on
+both sides, with five older-version source findings and three additional emitted
+occurrences explaining the raw count difference. All 641 native source targets
+are unchanged from the previous implementation's corpus result. Neither project
+overlap nor matching totals close the emitter-only limitation demonstrated by
+the fixtures. Compile-failed projects, arbitrary emitter directory overrides,
+and invalid schemas that fail emission also remain outside the equivalence claim.
 
 ## Sources and comparable populations
 
@@ -50,7 +57,8 @@ reviewed separately from the target diagnostic.
 | ---------------------------------------------- | ------------------ | ----------------------- | ------------------ | -------------------------------------- | -------------- | ------------- | ---------------------- |
 | External snapshot (`lint`, 100%)               | 55                 | 55                      | 0                  | Not reconstructable from aggregate row | Not available  | Not available | Not available          |
 | Retained observed production row before repair | 54                 | 55                      | No coverage credit | 54                                     | 0              | 1             | 639 / 644              |
-| Final full production run after repair         | 54                 | 54                      | No coverage credit | 54                                     | 0              | 0             | 639 / 641              |
+| Full run before native-only revision           | 54                 | 54                      | No coverage credit | 54                                     | 0              | 0             | 639 / 641              |
+| Final native-only full run (partial semantics) | 54                 | 54                      | No coverage credit | 54                                     | 0              | 0             | 639 / 641              |
 
 The external report credits migration disposition; the observed report requires
 same-project diagnostics. For this row both name the local lint, so the 55 vs 54
@@ -62,12 +70,17 @@ identifiable: `specification/botservice/resource-manager/Microsoft.BotService/Bo
 
 ## Focused behavior
 
-Four violation fixtures and one compliance fixture compile and match the target
-validator outcomes. The template/version fixture intentionally includes an
+Four violation fixtures and one compliance fixture compile; the violation
+fixtures are classified as partial coverage because of the documented emitter
+override limitation. The template/version fixture intentionally includes an
 old-only operation: latest Swagger has two violations, while the all-version
 native lint has three source diagnostics. The native tests additionally cover
 data-plane isolation, unused templates, nested namespaces and multi-status /
-multi-version deduplication. Five native tests pass. AutoRest scope exclusion is
+multi-version deduplication. Seven native tests pass without importing the
+AutoRest TypeSpec library, and a throwing module mock prevents accidental
+runtime imports of the emitter from the rule or its helpers. Native standard
+errors, `model is` copies, and legacy ARM references are covered directly.
+AutoRest scope exclusion is
 covered by an additional SDK-only operation in `reference-shapes` and a native
 negative test; it adds no target diagnostic.
 
@@ -78,6 +91,43 @@ and authorable external overrides. Nonserializable types and emitter-error
 unions are not counted as successful Swagger emission.
 
 ## Code-backed gap examples
+
+### Emitter overrides do not change the native lint contract
+
+- **Classification:** emitter-only limitation; both TypeSpec-only and validator-only targets
+- **Status:** intentional partial coverage
+- **Fixture:** `external-references`, operations `standard` and `overriddenStandard`.
+
+**TypeSpec source**
+
+```typespec
+@Autorest.useRef("../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse")
+model StandardReference {
+  code?: string;
+}
+
+@Autorest.useRef("#/definitions/LocalError")
+model OverriddenStandard is Azure.ResourceManager.CommonTypes.ErrorResponse;
+```
+
+Each model is the explicit 400 body of an LRO in the comparison fixture.
+
+| Target               | Swagger response reference / validator  | Native TypeSpec result                   |
+| -------------------- | --------------------------------------- | ---------------------------------------- |
+| `standard`           | Common-types v5 `ErrorResponse` / clean | Custom named model / violation           |
+| `overriddenStandard` | `#/definitions/LocalError` / violation  | Native standard common-type copy / clean |
+
+**Explanation:** `@useRef` is emitter-owned state, with no supported native
+accessor. Calling `Autorest.getRef`, hiding it in a helper, or scraping its
+decorator/state would retain the prohibited dependency. Native
+`getExternalTypeRef` and `getArmCommonTypeOpenAPIRef` remain supported: both read
+authored ARM library metadata without loading AutoRest or emitted documents.
+
+**Disposition:** Keep the native result and mark coverage partial. The
+comparison fixture has four findings on each side but only three shared
+operation targets; equal counts must not be presented as equivalent behavior.
+The standard fix for native authors is `CommonTypes.ErrorResponse`, not an
+emitter override on a custom error. Swagger generation remains comparison-only.
 
 ### GET polling metadata is not an emitted LRO
 
@@ -326,11 +376,27 @@ partial run is not final evidence. Known generated corpus files and four
 runner-owned temporary specs configs were removed before retrying.
 
 The post-review DataBoxEdge check completed at 2026-09-08T08:37:51Z: one
-successful project, 33 Swagger and 33 native target diagnostics. The final full
+successful project, 33 Swagger and 33 native target diagnostics. The pre-native-only full
 run completed successfully at **2026-09-08T09:07:31Z**, with aggregate generation
 timestamp `2026-09-08T09:04:42.926Z` and duration `1,754,113 ms` (about 29 minutes).
 It used the existing `specs:typespec --concurrency 6` runner against the isolated
 pinned specs checkout, not a new per-rule runner.
+
+For the native-only revision, the representative ContainerApps run completed at
+`2026-09-09T03:39:23Z`, again with 10 Swagger and 10 native findings. A subsequent
+terminal-owned full run was interrupted after 301/468 projects; it is not final
+evidence. Its four temporary specs configs and generated data were cleaned before
+the detached retry, which used a session-local npm prefix for the runner's linking
+step.
+
+The **final native-only full run** completed successfully at
+**2026-09-09T06:46:03Z**, with aggregate generation timestamp
+`2026-09-09T06:42:49.568Z` and duration `6,735,361 ms` (about 112 minutes).
+It used the same pinned specs commit and existing full runner with concurrency
+six. The following table describes this latest run. Its failed-project set,
+raw totals, and complete native source-target set match the pre-native-only
+run; this is observational regression evidence, not proof that emitter overrides
+are natively observable.
 
 | Population / identity                                       | Result                         |
 | ----------------------------------------------------------- | ------------------------------ |
@@ -449,3 +515,7 @@ with `isInScope` and both native and emitted-fixture regression coverage.
 No findings were rejected. The reviewer found no further implementation issues
 on follow-up. The final complete-diff and migration-evidence review also reported
 no significant issues before committing.
+
+The native-only revision received a separate code review and a follow-up review
+of the completed corpus evidence and full diff. Both reported no significant
+issues; no additional findings were adopted or rejected.

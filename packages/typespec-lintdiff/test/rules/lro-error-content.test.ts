@@ -1,7 +1,11 @@
 import { resolvePath } from "@typespec/compiler";
 import { createLinterRuleTester, createTester } from "@typespec/compiler/testing";
-import { describe, it } from "vitest";
+import { describe, it, vi } from "vitest";
 import { lroErrorContentRule } from "../../src/rules/lro-error-content.js";
+
+vi.mock("@azure-tools/typespec-autorest", () => {
+  throw new Error("Native lint must not load the AutoRest emitter.");
+});
 
 const Tester = createTester(resolvePath(import.meta.dirname, "../.."), {
   libraries: [
@@ -12,7 +16,6 @@ const Tester = createTester(resolvePath(import.meta.dirname, "../.."), {
     "@azure-tools/typespec-azure-core",
     "@azure-tools/typespec-azure-resource-manager",
     "@azure-tools/typespec-client-generator-core",
-    "@azure-tools/typespec-autorest",
   ],
 }).importLibraries();
 
@@ -35,6 +38,43 @@ async function tester() {
 }
 
 describe("lro-error-content", () => {
+  it("accepts native common-type errors and model-is copies without an emitter", async () => {
+    const rule = await tester();
+    await rule
+      .expect(
+        `${header}
+      @armProviderNamespace @service
+      @armCommonTypesVersion(CommonTypes.Versions.v5)
+      namespace Arm;
+      model ErrorCopy is CommonTypes.ErrorResponse;
+      @extension("x-ms-long-running-operation", true)
+      @route("/standard") @post op standard(): AcceptedResponse | CommonTypes.ErrorResponse;
+      @extension("x-ms-long-running-operation", true)
+      @route("/copy") @post op copy(): AcceptedResponse | ErrorCopy;
+    `,
+      )
+      .toBeValid();
+  });
+
+  it("uses native ARM external-reference metadata without an emitter", async () => {
+    const rule = await tester();
+    await rule
+      .expect(
+        `${header}
+      @armProviderNamespace @service namespace Arm;
+      @Legacy.externalTypeRef("../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse")
+      @error model StandardError { code?: string; }
+      @Legacy.externalTypeRef("../../common-types/resource-management/v1/types.json#/definitions/ErrorResponse")
+      @error model OldError { code?: string; }
+      @extension("x-ms-long-running-operation", true)
+      @route("/standard") @post op standard(): AcceptedResponse | StandardError;
+      @extension("x-ms-long-running-operation", true)
+      @route("/old") @post op old(): AcceptedResponse | OldError;
+    `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
   it("ignores operations scoped out of AutoRest", async () => {
     const rule = await tester();
     await rule

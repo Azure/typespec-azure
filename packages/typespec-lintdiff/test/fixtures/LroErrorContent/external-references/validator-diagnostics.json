@@ -32,6 +32,20 @@
     "message": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
     "path": [
       "paths",
+      "/overridden-standard/{name}",
+      "post",
+      "responses",
+      "400",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LroErrorContent",
+    "message": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "path": [
+      "paths",
       "/wrong/{name}",
       "post",
       "responses",

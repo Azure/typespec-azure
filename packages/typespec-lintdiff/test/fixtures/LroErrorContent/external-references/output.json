@@ -114,6 +114,31 @@
         "x-ms-long-running-operation": true
       }
     },
+    "/overridden-standard/{name}": {
+      "post": {
+        "operationId": "OverriddenStandard",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "The request has been accepted for processing, but processing has not yet completed."
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "schema": {
+              "$ref": "#/definitions/LocalError"
+            }
+          }
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
     "/standard/{name}": {
       "post": {
         "operationId": "Standard",

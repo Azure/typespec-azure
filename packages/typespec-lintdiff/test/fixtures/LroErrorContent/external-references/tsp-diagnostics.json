@@ -25,6 +25,11 @@
     "message": "Error response references of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error reference."
   },
   {
+    "code": "tsp-lintdiff-local-linter/lro-error-content",
+    "severity": "warning",
+    "message": "Error response references of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error reference."
+  },
+  {
     "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
     "severity": "warning",
     "message": "Arm namespace ExternalReferences is missing the Operations interface. Add \"interface Operations extends Azure.ResourceManager.Operations {}\"."
@@ -113,6 +118,11 @@
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The ModelProperty named 'code' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-openapi",
+    "severity": "warning",
+    "message": "Using @useRef should never be used in Azure specs."
   },
   {
     "code": "@azure-tools/typespec-azure-core/no-openapi",
@@ -473,6 +483,91 @@
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
     "message": "Operation 'localError' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-openapi",
+    "severity": "warning",
+    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'Lro' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'name' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/lro-location-header",
+    "severity": "warning",
+    "message": "A 202 response should include a Location response header."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/missing-xms-error-response",
+    "severity": "warning",
+    "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
+    "severity": "warning",
+    "message": "Operation 'Lro' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-openapi",
+    "severity": "warning",
+    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The Operation named 'overriddenStandard' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'name' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/lro-location-header",
+    "severity": "warning",
+    "message": "A 202 response should include a Location response header."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/missing-xms-error-response",
+    "severity": "warning",
+    "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
+    "severity": "warning",
+    "message": "Operation 'overriddenStandard' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/post-operation-id-contains-url-verb",
+    "severity": "warning",
+    "message": "POST operation 'overriddenStandard' should contain the action verb 'overridden-standard' from the route path. Consider updating the operation name."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",

@@ -1,4 +1,3 @@
-import { getRef } from "@azure-tools/typespec-autorest";
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   getArmCommonTypeOpenAPIRef,
@@ -52,7 +51,7 @@ export const lroErrorContentRule = createRule({
     const reported = new Set<Operation["node"]>();
 
     function hasInvalidReference(type: Type, service: Service, version?: string): boolean {
-      let reference = getRef(program, type) || getExternalTypeRef(program, type);
+      let reference = getExternalTypeRef(program, type);
       if (
         !reference &&
         isArmCommonType(type) &&
