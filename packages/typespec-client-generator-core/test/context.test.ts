@@ -1,4 +1,5 @@
 import { resolveArmResources } from "@azure-tools/typespec-azure-resource-manager";
+import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { resolveVirtualPath } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
@@ -300,4 +301,122 @@ it("uses TCGC library names when supplied to resolveArmResources", async () => {
   strictEqual(widget.operations.lifecycle.read?.[0].operationGroup, "ClientWidgets");
   strictEqual(widget.operations.lifecycle.read?.[0].resourceName, "ClientWidget");
   strictEqual(widget.operations.lifecycle.read?.[0].resourceModelName, "ClientWidget");
+});
+
+it("uses TCGC library names for selected ARM resource versions", async () => {
+  const { program } = await ArmTester.compile(`
+    @armProviderNamespace
+    @service(#{ title: "Azure Management emitter Testing" })
+    @versioned(Versions)
+    namespace Microsoft.ContosoProviderHub;
+
+    enum Versions {
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+      v1: "2024-01-01",
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+      v2: "2025-01-01",
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+      v3: "2026-01-01",
+    }
+
+    @clientName("ClientWidget")
+    model Widget is TrackedResource<WidgetProperties> {
+      ...ResourceNameParameter<Widget>;
+    }
+
+    model WidgetProperties {
+      value?: string;
+    }
+
+    @added(Versions.v2)
+    @clientName("ClientGadget", "csharp")
+    model Gadget is ProxyResource<{}> {
+      ...ResourceNameParameter<Gadget>;
+    }
+
+    @added(Versions.v2)
+    @removed(Versions.v3)
+    @clientName("ClientTemporary")
+    model Temporary is ProxyResource<{}> {
+      ...ResourceNameParameter<Temporary>;
+    }
+
+    @clientName("ClientWidgets", "csharp")
+    @armResourceOperations
+    interface Widgets {
+      @clientName("fetchWidget", "csharp")
+      get is ArmResourceRead<Widget>;
+
+      @added(Versions.v2)
+      @clientName("createWidget", "csharp")
+      createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+
+      @added(Versions.v2)
+      @removed(Versions.v3)
+      @clientName("updateWidget", "csharp")
+      update is ArmResourcePatchSync<Widget, WidgetProperties>;
+    }
+
+    @added(Versions.v2)
+    @clientName("ClientGadgets", "csharp")
+    @armResourceOperations
+    interface Gadgets {
+      @clientName("fetchGadget", "csharp")
+      get is ArmResourceRead<Gadget>;
+    }
+
+    @added(Versions.v2)
+    @removed(Versions.v3)
+    @clientName("ClientTemporaries")
+    @armResourceOperations
+    interface Temporaries {
+      @clientName("fetchTemporary")
+      get is ArmResourceRead<Temporary>;
+    }
+  `);
+
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+  const resolveVersion = (version: string) =>
+    resolveArmResources(program, {
+      version,
+      nameResolver: ({ type }) => getLibraryName(context, type),
+    });
+
+  const v1 = resolveVersion("2024-01-01");
+  const v2 = resolveVersion("2025-01-01");
+  const v3 = resolveVersion("2026-01-01");
+
+  strictEqual(v1.resources?.length, 1);
+  const v1Widget = v1.resources?.[0];
+  ok(v1Widget);
+  strictEqual(v1Widget.resourceName, "ClientWidget");
+  strictEqual(v1Widget.operations.lifecycle.read?.[0].name, "fetchWidget");
+  strictEqual(v1Widget.operations.lifecycle.read?.[0].operationGroup, "ClientWidgets");
+  strictEqual(v1Widget.operations.lifecycle.createOrUpdate, undefined);
+  ok(unsafe_Realm.realmForType.has(v1Widget.type));
+
+  strictEqual(v2.resources?.length, 3);
+  const v2Widget = v2.resources?.find((x) => x.type.name === "Widget");
+  const v2Gadget = v2.resources?.find((x) => x.type.name === "Gadget");
+  const v2Temporary = v2.resources?.find((x) => x.type.name === "Temporary");
+  ok(v2Widget);
+  ok(v2Gadget);
+  ok(v2Temporary);
+  strictEqual(v2Widget.resourceName, "ClientWidget");
+  strictEqual(v2Widget.operations.lifecycle.createOrUpdate?.[0].name, "createWidget");
+  strictEqual(v2Widget.operations.lifecycle.update?.[0].name, "updateWidget");
+  strictEqual(v2Gadget.resourceName, "ClientGadget");
+  strictEqual(v2Gadget.operations.lifecycle.read?.[0].operationGroup, "ClientGadgets");
+  strictEqual(v2Temporary.resourceName, "ClientTemporary");
+  strictEqual(v2Temporary.operations.lifecycle.read?.[0].name, "fetchTemporary");
+
+  strictEqual(v3.resources?.length, 2);
+  const v3Widget = v3.resources?.find((x) => x.type.name === "Widget");
+  ok(v3Widget);
+  strictEqual(v3Widget.resourceName, "ClientWidget");
+  strictEqual(v3Widget.operations.lifecycle.update, undefined);
+  ok(v3.resources?.some((x) => x.resourceName === "ClientGadget"));
+  ok(!v3.resources?.some((x) => x.resourceName === "ClientTemporary"));
 });
