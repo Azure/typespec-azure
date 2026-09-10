@@ -1,12 +1,12 @@
-Use a model for every Azure Resource Manager request body that has an explicit schema type.
+Use a plain model for every Azure Resource Manager request body.
 
 ## Impact
 
 - **Area:** API, SDK
 
-Model request bodies can evolve by adding optional properties without changing the top-level wire shape. Primitive and array bodies cannot gain new fields without a breaking API and generated-SDK change.
+Plain model request bodies can evolve by adding optional properties without changing the top-level wire shape. Primitive, union, array, and record bodies cannot gain new fields without a breaking API and generated-SDK change.
 
-Schemas without an explicit type, such as `unknown` and unsupported model unions, are outside this rule's scope. Nullable and singleton unions use their effective emitted schema type, while unions emitted as string or number enums are rejected. Operations without a request body are also allowed.
+A plain model is a TypeSpec model without an indexer. This rule evaluates the authored TypeSpec shape rather than reproducing emitter-specific Swagger schema behavior. Operations without a request body and multipart request bodies are allowed.
 
 ## Incorrect
 
@@ -19,13 +19,10 @@ model ItemList is Array<string>;
 @post
 op submitItems(@body body: ItemList): void;
 
-union ActionMode {
-  "fast",
-  "safe",
-}
+model Metadata is Record<string>;
 
 @post
-op runAction(@body body: ActionMode): void;
+op submitMetadata(@body body: Metadata): void;
 ```
 
 ## Correct
@@ -44,15 +41,12 @@ model SubmitItemsRequest {
 
 @post
 op submitItems(@body body: SubmitItemsRequest): void;
-
-@post
-op submitNullable(@body body: SubmitRequest | null): void;
 ```
 
 ## Suppression
 
-Suppress only when required to preserve an existing API; otherwise replace the request body with a model.
+Suppress only when required to preserve an existing API; otherwise replace the request body with a model without an indexer.
 
-## LintDiff Equivalent
+## LintDiff Origin
 
-This rule corresponds to the Swagger validator rule [ParametersSchemaAsTypeObject](https://github.com/Azure/azure-openapi-validator/blob/main/docs/parameters-schema-as-type-object.md).
+This rule is the idiomatic TypeSpec equivalent of the Swagger validator rule [ParametersSchemaAsTypeObject](https://github.com/Azure/azure-openapi-validator/blob/main/docs/parameters-schema-as-type-object.md). It intentionally validates TypeSpec model semantics instead of simulating AutoRest's emitted Swagger schema details.
