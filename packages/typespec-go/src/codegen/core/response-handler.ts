@@ -143,8 +143,8 @@ function generateResponseUnmarshaller(
     return unmarshallerText;
   } else if (go.isSlice(type, "time")) {
     // unmarshalling arrays of date/time is a little more involved
-    const timeType = type.elementType;
-    const elementPtr = type.elementTypeByValue ? "" : "*";
+    const timeType = go.unwrapPtr(type.elementType);
+    const elementPtr = type.elementType.kind === "ptr" ? "*" : "";
     imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
     unmarshallerText += `${indent.get()}var aux []${elementPtr}datetime.${timeType.format}\n`;
     unmarshallerText += `${indent.get()}if err := runtime.UnmarshalAs${format}(resp, &aux); err != nil {\n`;
@@ -157,7 +157,7 @@ function generateResponseUnmarshaller(
     unmarshallerText += `${indent.get()}${unmarshalTarget} = cp\n`;
     return unmarshallerText;
   } else if (go.isMap(type, "time")) {
-    const timeType = type.valueType;
+    const timeType = type.valueType.ptrType;
     imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
     unmarshallerText += `${indent.get()}aux := map[string]*datetime.${timeType.format}{}\n`;
     unmarshallerText += `${indent.get()}if err := runtime.UnmarshalAs${format}(resp, &aux); err != nil {\n`;
@@ -188,6 +188,7 @@ function generateResponseUnmarshaller(
     unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
     unmarshallerText += `${indent.pop().get()}}\n`;
     let resultVar: string;
+    type = go.unwrapPtr(type);
     switch (type.kind) {
       case "scalar":
         resultVar = "parsedBody";
@@ -250,17 +251,18 @@ function formatHeaderResponseValue(
   indent.push();
   let name = naming.uncapitalize(headerResp.fieldName);
   let byRef = "&";
-  switch (headerResp.type.kind) {
+  const headerRespType = go.unwrapPtr(headerResp.type);
+  switch (headerRespType.kind) {
     case "constant":
     case "etag":
-      text += `${indent.get()}${respObj}.${headerResp.fieldName} = (*${go.getTypeDeclaration(headerResp.type, method.receiver.type.pkg)})(&val)\n`;
+      text += `${indent.get()}${respObj}.${headerResp.fieldName} = (${go.getTypeDeclaration(headerResp.type, method.receiver.type.pkg)})(&val)\n`;
       indent.pop();
       text += `${indent.get()}}\n`;
       return text;
     case "encodedBytes":
       // a base-64 encoded value in string format
       imports.add("encoding/base64");
-      text += `${indent.get()}${name}, err := base64.${helpers.formatBytesEncoding(headerResp.type.encoding)}Encoding.DecodeString(val)\n`;
+      text += `${indent.get()}${name}, err := base64.${helpers.formatBytesEncoding(headerRespType.encoding)}Encoding.DecodeString(val)\n`;
       byRef = "";
       break;
     case "literal":
@@ -269,20 +271,20 @@ function formatHeaderResponseValue(
       text += `${indent.get()}}\n`;
       return text;
     case "scalar":
-      text += helpers.emitScalarParsing(headerResp.type, "val", name, imports, indent);
+      text += helpers.emitScalarParsing(headerRespType, "val", name, imports, indent);
       break;
     case "string":
       text += `${indent.get()}${respObj}.${headerResp.fieldName} = &val\n`;
       text += `${indent.pop().get()}}\n`;
       return text;
     case "time":
-      if (headerResp.type.format === "Unix") {
+      if (headerRespType.format === "Unix") {
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
-        text += helpers.emitTimeParsing("val", headerResp.type, "sec", imports, indent);
+        text += helpers.emitTimeParsing("val", headerRespType, "sec", imports, indent);
         name = "to.Ptr(time.Unix(sec, 0))";
         byRef = "";
       } else {
-        text += helpers.emitTimeParsing("val", headerResp.type, name, imports, indent);
+        text += helpers.emitTimeParsing("val", headerRespType, name, imports, indent);
       }
   }
 

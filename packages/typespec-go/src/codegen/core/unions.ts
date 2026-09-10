@@ -64,7 +64,7 @@ function generateUnionTypes(
     for (const field of goUnion.fields) {
       imports.addForType(field.type);
       text += helpers.formatDocCommentWithPrefix(field.name, field.docs);
-      text += `${indent.get()}${field.name} ${helpers.star(field.byValue)}${go.getTypeDeclaration(field.type, goUnion.pkg)}\n`;
+      text += `${indent.get()}${field.name} ${go.getTypeDeclaration(field.type, goUnion.pkg)}\n`;
     }
     text += `${indent.pop().get()}}\n\n`;
   }
@@ -271,13 +271,13 @@ function generateUnmarshalObjects(goUnion: go.UnionStruct, indent: helpers.Inden
     const field = jsonObjects[i];
     if (field.type.kind === "map") {
       break;
-    } else if (field.type.kind !== "model") {
+    } else if (!go.isPtr(field.type, "model")) {
       // we already validated this earlier. however it lets
       // the compiler treat field.type as a model type.
       throw new CodegenError("InternalError", `unexpected union type ${field.type.kind}`);
     }
 
-    const condition = `hasRequiredFields(rawMsg, ${getJsonFieldsForProbe(field.type)})`;
+    const condition = `hasRequiredFields(rawMsg, ${getJsonFieldsForProbe(field.type.ptrType)})`;
     const body = (indent: helpers.Indentation) =>
       `${indent.get()}err = json.Unmarshal(data, &${receiver}.${field.name})\n`;
     if (i === 0) {
@@ -466,7 +466,7 @@ function groupMixedJsonNumbers(goUnion: go.UnionStruct): Array<go.UnionField> {
 function groupJsonObjects(goUnion: go.UnionStruct): Array<go.UnionField> {
   const objectFields = new Array<go.UnionField>();
   for (const field of goUnion.fields) {
-    if (field.type.kind === "map" || field.type.kind === "model") {
+    if (field.type.kind === "map" || go.isPtr(field.type, "model")) {
       objectFields.push(field);
     }
   }
@@ -477,13 +477,13 @@ function groupJsonObjects(goUnion: go.UnionStruct): Array<go.UnionField> {
   // more fields have a better chance of hasRequiredFields() not
   // returning a false positive. maps always appears after models
   objectFields.sort((a, b) => {
-    if (a.type.kind === "model" && b.type.kind === "model") {
-      return b.type.fields.length - a.type.fields.length;
+    if (go.isPtr(a.type, "model") && go.isPtr(b.type, "model")) {
+      return b.type.ptrType.fields.length - a.type.ptrType.fields.length;
     } else if (a.type.kind === "map" && b.type.kind === "map") {
       return 0;
     } else if (a.type.kind === "map") {
       return 1;
-    } else if (a.type.kind === "model") {
+    } else if (go.isPtr(a.type, "model")) {
       return -1;
     }
     throw new CodegenError("InternalError", `unexpected union types ${a.type.kind} ${b.type.kind}`);
@@ -501,6 +501,10 @@ function groupJsonObjects(goUnion: go.UnionStruct): Array<go.UnionField> {
  * @returns the ScalarType or undefined
  */
 function isJsonNumberType(variantType: go.UnionVariantType): go.ScalarType | undefined {
+  if (variantType.kind !== "ptr") {
+    return undefined;
+  }
+
   const isScalarJsonNubmer = function (scalar: go.ScalarType): go.ScalarType | undefined {
     switch (scalar) {
       case "bool":
@@ -512,16 +516,17 @@ function isJsonNumberType(variantType: go.UnionVariantType): go.ScalarType | und
     }
   };
 
-  switch (variantType.kind) {
+  const unwrapped = go.unwrapPtr(variantType);
+  switch (unwrapped.kind) {
     case "literal":
-      switch (variantType.type.kind) {
+      switch (unwrapped.type.kind) {
         case "scalar":
-          return isScalarJsonNubmer(variantType.type.type);
+          return isScalarJsonNubmer(unwrapped.type.type);
         default:
           return undefined;
       }
     case "scalar":
-      return isScalarJsonNubmer(variantType.type);
+      return isScalarJsonNubmer(unwrapped.type);
     default:
       return undefined;
   }
@@ -543,9 +548,10 @@ function getJsonProbeKindForType(variantType: go.UnionVariantType): string {
     }
   };
 
-  switch (variantType.kind) {
+  const unwrapped = go.unwrapPtr(variantType);
+  switch (unwrapped.kind) {
     case "constant":
-      switch (variantType.type) {
+      switch (unwrapped.type) {
         case "bool":
           return "jsonBool";
         case "string":
@@ -554,9 +560,9 @@ function getJsonProbeKindForType(variantType: go.UnionVariantType): string {
           return "jsonNumber";
       }
     case "literal":
-      switch (variantType.type.kind) {
+      switch (unwrapped.type.kind) {
         case "scalar":
-          return getScalarProbe(variantType.type.type);
+          return getScalarProbe(unwrapped.type.type);
         default:
           return "jsonString";
       }
@@ -564,7 +570,7 @@ function getJsonProbeKindForType(variantType: go.UnionVariantType): string {
     case "model":
       return "jsonObject";
     case "scalar":
-      return getScalarProbe(variantType.type);
+      return getScalarProbe(unwrapped.type);
     case "slice":
       return "jsonArray";
     case "string":

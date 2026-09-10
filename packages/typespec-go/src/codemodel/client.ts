@@ -430,7 +430,7 @@ export class ClientCredentialParameter
   implements ClientCredentialParameter
 {
   constructor(name: string, type: type.TokenCredential) {
-    super(name, type, true);
+    super(name, type);
     this.kind = "credentialParam";
     this.style = "required";
   }

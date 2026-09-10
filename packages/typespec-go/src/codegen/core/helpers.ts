@@ -121,25 +121,16 @@ export function formatParameterTypeName(
   param: go.ClientOptionsType | go.ClientParameter | go.ParameterGroup,
 ): string {
   let typeName: string;
-  let required: boolean;
   switch (param.kind) {
     case "armClientOptions":
-      typeName = go.getTypeDeclaration(param, scope);
-      required = false;
-      break;
     case "clientOptions":
-      typeName = go.getTypeDeclaration(param, scope);
-      required = false;
-      break;
     case "paramGroup":
       typeName = go.getTypeDeclaration(param, scope);
-      required = param.required;
       break;
     default:
       typeName = go.getTypeDeclaration(param.type, scope);
-      required = param.byValue;
   }
-  return required ? typeName : `*${typeName}`;
+  return typeName;
 }
 
 // sorts parameters by their required state, ordering required before optional
@@ -333,12 +324,7 @@ export function getParamName(param: go.MethodParameter): string {
   if (param.location === "client") {
     paramName = `client.${paramName}`;
   }
-  // client parameters with default values aren't emitted as pointer-to-type
-  if (
-    !go.isRequiredParameter(param.style) &&
-    !(param.location === "client" && go.isClientSideDefault(param.style)) &&
-    !param.byValue
-  ) {
+  if (param.type.kind === "ptr") {
     paramName = `*${paramName}`;
   }
   return paramName;
@@ -406,13 +392,14 @@ export function formatParamValue(
         return content;
       };
 
-      switch (param.type.elementType.kind) {
+      const unwrappedElement = go.unwrapPtr(param.type.elementType);
+      switch (unwrappedElement.kind) {
         case "encodedBytes":
           imports.add("encoding/base64");
           imports.add("strings");
           return emitConvertOver(
             param.name,
-            `base64.${formatBytesEncoding(param.type.elementType.encoding)}Encoding.EncodeToString(${param.name}[i])`,
+            `base64.${formatBytesEncoding(unwrappedElement.encoding)}Encoding.EncodeToString(${param.name}[i])`,
           );
         case "string":
           imports.add("strings");
@@ -420,12 +407,10 @@ export function formatParamValue(
         case "time": {
           imports.add("strings");
           imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-          const elemVal = param.type.elementType.utc
-            ? `${param.name}[i].UTC()`
-            : `${param.name}[i]`;
+          const elemVal = unwrappedElement.utc ? `${param.name}[i].UTC()` : `${param.name}[i]`;
           return emitConvertOver(
             param.name,
-            `datetime.${param.type.elementType.format}(${elemVal}).String()`,
+            `datetime.${unwrappedElement.format}(${elemVal}).String()`,
           );
         }
         default:
@@ -436,7 +421,9 @@ export function formatParamValue(
     }
   }
 
-  return formatValue(paramName, param.type, imports);
+  // when we called getParamName it includes any dereference for a Ptr
+  // parameter, so we unwrap it here else we end up with a double deref
+  return formatValue(paramName, go.unwrapPtr(param.type), imports);
 }
 
 /**
@@ -559,23 +546,16 @@ export function emitTimeParsing(
   return text;
 }
 
-export function formatValue(
-  paramName: string,
-  type: go.WireType,
-  imports: ImportManager,
-  deref?: boolean,
-): string {
+export function formatValue(paramName: string, type: go.WireType, imports: ImportManager): string {
   // callers don't have enough context to know if paramName needs to be
   // dereferenced so we track that here when specified. note that not all
   // cases will require paramName to be dereferenced.
-  let star = "";
-  if (deref === true) {
-    star = "*";
-  }
+  const star = deref(type);
 
-  switch (type.kind) {
+  const unwrappedType = go.unwrapPtr(type);
+  switch (unwrappedType.kind) {
     case "constant":
-      if (type.type === "string") {
+      if (unwrappedType.type === "string") {
         return `string(${star}${paramName})`;
       }
       imports.add("fmt");
@@ -583,19 +563,19 @@ export function formatValue(
     case "encodedBytes":
       // a base-64 encoded value in string format
       imports.add("encoding/base64");
-      return `base64.${formatBytesEncoding(type.encoding)}Encoding.EncodeToString(${paramName})`;
+      return `base64.${formatBytesEncoding(unwrappedType.encoding)}Encoding.EncodeToString(${paramName})`;
     case "etag":
       return `string(${star}${paramName})`;
     case "literal":
       // cannot use formatLiteralValue() since all values are treated as strings
-      switch (type.type.kind) {
+      switch (unwrappedType.type.kind) {
         case "constantDef":
-          return type.type.name;
+          return unwrappedType.type.name;
         default:
-          return `"${type.literal}"`;
+          return `"${unwrappedType.literal}"`;
       }
     case "scalar":
-      switch (type.type) {
+      switch (unwrappedType.type) {
         case "bool":
           imports.add("strconv");
           return `strconv.FormatBool(${star}${paramName})`;
@@ -612,12 +592,12 @@ export function formatValue(
           imports.add("strconv");
           return `strconv.FormatInt(${star}${paramName}, 10)`;
         default:
-          throw new CodegenError("InternalError", `unhandled scalar type ${type.type}`);
+          throw new CodegenError("InternalError", `unhandled scalar type ${unwrappedType.type}`);
       }
     case "time": {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-      const timeVal = type.utc ? `(${star}${paramName}).UTC()` : `${star}${paramName}`;
-      return `datetime.${type.format}(${timeVal}).String()`;
+      const timeVal = unwrappedType.utc ? `(${star}${paramName}).UTC()` : `${star}${paramName}`;
+      return `datetime.${unwrappedType.format}(${timeVal}).String()`;
     }
     default:
       return `${star}${paramName}`;
@@ -1013,6 +993,8 @@ export function recursiveUnwrapMapSlice(item: go.WireType): go.WireType {
   switch (item.kind) {
     case "map":
       return recursiveUnwrapMapSlice(item.valueType);
+    case "ptr":
+      return recursiveUnwrapMapSlice(item.ptrType);
     case "slice":
       return recursiveUnwrapMapSlice(item.elementType);
     default:
@@ -1020,14 +1002,9 @@ export function recursiveUnwrapMapSlice(item: go.WireType): go.WireType {
   }
 }
 
-/**
- * returns a * character when byValue is false
- *
- * @param byValue indicates if the type is passed by value
- * @returns a * or the empty string
- */
-export function star(byValue: boolean): string {
-  return byValue ? "" : "*";
+/** returns a * character when needing to dereference */
+export function deref(type: go.WireType): "*" | "" {
+  return type.kind === "ptr" ? "*" : "";
 }
 
 /**
