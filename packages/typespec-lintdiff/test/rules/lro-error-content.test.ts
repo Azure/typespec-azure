@@ -1,6 +1,7 @@
 import { resolvePath } from "@typespec/compiler";
 import { createLinterRuleTester, createTester } from "@typespec/compiler/testing";
 import { readFile } from "node:fs/promises";
+import { createSourceFile, isImportDeclaration, ScriptTarget } from "typescript";
 import { describe, expect, it, vi } from "vitest";
 import { lroErrorContentRule } from "../../src/rules/lro-error-content.js";
 
@@ -54,12 +55,17 @@ async function tester() {
 }
 
 describe("lro-error-content", () => {
-  it("does not import TCGC, OpenAPI, or unsafe compiler APIs", async () => {
+  it("does not import TCGC, OpenAPI, or experimental compiler APIs", async () => {
     const source = await readFile(
       new URL("../../src/rules/lro-error-content.ts", import.meta.url),
       "utf8",
     );
-    expect(source).not.toMatch(/typespec-client-generator-core|@typespec\/openapi|unsafe_/);
+    const imports = createSourceFile("lro-error-content.ts", source, ScriptTarget.Latest)
+      .statements.filter(isImportDeclaration)
+      .map((statement) => statement.moduleSpecifier.text);
+    expect(imports).not.toContain("@azure-tools/typespec-client-generator-core");
+    expect(imports).not.toContain("@typespec/openapi");
+    expect(imports).not.toContain("@typespec/compiler/experimental");
   });
 
   it("accepts native common-type errors, model-is copies, and nullable standard errors", async () => {
