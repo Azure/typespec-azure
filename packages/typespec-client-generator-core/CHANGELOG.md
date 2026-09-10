@@ -1,5 +1,20 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.72.0
+
+### Features
+
+- [#5276](https://github.com/Azure/typespec-azure/pull/5276) `@clientOption`'s `value` can now reference a TypeSpec model, in addition to `string`, `boolean`, and `number` literal values. The referenced model (including customizations such as `@alternateType`) is preserved and resolved so scoped emitters can access it via `getClientOptions`.
+- [#5173](https://github.com/Azure/typespec-azure/pull/5173) Allow `@override` to replace a client method response and add the `replaceResponseWithVoid` and `replaceResponseWithBytes` customization functions. Report response type mismatches as errors and intentional `void` or `bytes` replacements as warnings.
+- [#5305](https://github.com/Azure/typespec-azure/pull/5305) Make the `scope` argument accepted by scoped TCGC decorators evolvable via a shared, typed `Azure.ClientGenerator.Core.DecoratorOptions` model. Every scoped decorator now accepts either the legacy plain-string scope (e.g. `"csharp"`) or a typed options bag (e.g. `#{ scope: "csharp" }`), and individual decorators can later grow their own options model that extends `DecoratorOptions` without breaking others.
+  
+  `@client`'s `ClientOptions` and `@clientInitialization`'s `ClientInitializationOptions` now also accept `scope` directly (both extend `DecoratorOptions`). If the options bag scope disagrees with the legacy positional argument, TCGC reports a `conflicting-scope` warning and prefers the options bag value. Decorators that already have an options bag keep a single options bag — the legacy positional `scope` stays a plain string purely for backward compatibility. See `design-docs/decorator-options-migration.md` for migration guidance and deprecation policy.
+
+### Bug Fixes
+
+- [#5306](https://github.com/Azure/typespec-azure/pull/5306) Use an optional string with an `application/octet-stream` client default for file uploads without an explicit content type.
+
+
 ## 0.71.2
 
 ### Bug Fixes
