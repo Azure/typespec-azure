@@ -94,7 +94,10 @@ nor completion. Inspect all of the following:
    not only the validator rule ID. Older TypeSpec rules may use a different name,
    and one TypeSpec rule may cover several validator rules.
 
-Classify each requested rule as:
+Assess material validator behavior against valid supported TypeSpec inputs and
+the native implementation boundary below, not exact executable Swagger behavior.
+Record Swagger-only or already-invalid shapes as intentional parity gaps, not
+missing native checks. Classify each requested rule as:
 
 - `already covered`: an enabled official TypeSpec rule enforces all material
   validator behavior
@@ -439,15 +442,17 @@ The top-level worker works only in the supplied typespec-azure worktree.
 #### Native TypeSpec implementation boundary
 
 Prefer idiomatic TypeSpec validation. Preserve Swagger parity only where it
-naturally maps to TypeSpec semantics. Exact executable Swagger behavior is not
+naturally maps to TypeSpec semantics; exact executable Swagger behavior is not
 the migration contract when reproducing it requires non-idiomatic TypeSpec or
-handling constructs already invalidated by TypeSpec or Azure rules. Do not
-simulate AutoRest/Swagger schema formatting, encoding, or emission merely to
-obtain exact diagnostic parity, even through otherwise supported semantic APIs.
+handling constructs already invalidated by TypeSpec or Azure rules. Do not embed
+AutoRest/Swagger schema formatting, encoding, or emission logic merely to obtain
+exact diagnostic parity, even when it could be recreated using native APIs.
+For example, when the guideline calls for a plain model, check the model and its
+indexer rather than simulate how AutoRest formats or encodes its schema.
 
-This policy follows the [promotion review in PR #5361](https://github.com/Azure/typespec-azure/pull/5361):
-native rules should check TypeSpec semantics, such as a plain model without an
-indexer, rather than reconstruct the emitter's schema classification.
+This priority follows the
+[review discussion on PR #5361](https://github.com/Azure/typespec-azure/pull/5361#discussion_r3974150445):
+native rules check TypeSpec semantics first; Swagger parity is secondary.
 
 Production rules must validate the TypeSpec semantic model directly through
 supported compiler, HTTP, versioning, and Azure library APIs. Do not import or
@@ -462,58 +467,68 @@ for migration research and the test/comparison harness. Shared semantic APIs
 such as HTTP payload metadata and Azure common-type metadata are appropriate
 when they operate on the program without loading or running an emitter.
 
-For intentional parity gaps, including emitter-specific overrides with no
-supported native API, describe the native contract, excluded behavior, and
-resulting divergence in `rule.md` and `migration.md`.
-Validate the native contract rather than inventing an adapter to force parity.
-Mark coverage partial when material Swagger behavior remains outside that
-contract; do not claim full equivalence from corpus overlap. Include native
-tests that compile without importing the emitter and comparison fixtures for
-the documented divergence.
+Before adding special cases or helper complexity, require tests demonstrating
+that the added behavior affects valid supported idiomatic TypeSpec inputs.
+Distinguish those inputs from Swagger-only shapes, emitter-invalid shapes, and
+constructs already rejected by TypeSpec or Azure rules. A fixture that reaches
+emission despite those diagnostics does not prove supported TypeSpec behavior.
+If the complexity affects only such shapes, omit it and document the intentional
+parity gap with the rejecting diagnostic or other code-backed evidence.
 
-#### Emission-dependent evidence and native scope gate
+If parity requires emitter simulation, non-idiomatic TypeSpec, or an
+emitter-specific override with no supported native API, describe the behavior
+and intentional divergence in `rule.md` and `migration.md`.
+Validate the native contract rather than inventing an adapter to force parity.
+Distinguish native contract coverage from exact Swagger equivalence. Mark Swagger
+coverage partial when material Swagger behavior remains outside that contract;
+this does not itself require more native implementation. Do not claim full
+equivalence from corpus overlap. Include native tests that compile without
+importing the emitter and comparison fixtures or rejection evidence for the
+documented divergence.
+
+#### Native semantic completeness and parity evidence gate
 
 When the Swagger rule selects, resolves, or compares an emitted OpenAPI field,
 do not treat upstream validator tests, observed corpus overlap, or coverage of
-the containing authorable surface as complete semantic evidence. Before
-implementing or accepting the migrated rule:
+the containing authorable surface as complete semantic evidence. The native
+contract above governs this investigation; an emission matrix is research
+evidence, not a requirement to reproduce the emitter. Before implementing or
+accepting the migrated rule:
 
-1. For research only, trace the emitter path from the relevant TypeSpec semantic
-   target to the OpenAPI node and field inspected by the Swagger rule. Implement
-   the native semantic check within the boundary above, not an emitter adapter.
-2. Distinguish valid, supported, idiomatic TypeSpec inputs from Swagger-only,
-   emitter-invalid, and already-invalidated shapes. Inspect relevant type
-   families, transformations, and decorator or content-type branches to establish
-   that distinction; an unsupported shape being emitted does not make it part
-   of the native rule's contract.
+1. State the intended guideline as an idiomatic TypeSpec semantic check. For
+   research only, trace relevant emitter paths when needed to explain Swagger
+   behavior or a parity gap; do not turn those paths into an implementation
+   checklist.
+2. Enumerate the valid supported TypeSpec type families and meaningful subtypes
+   relevant to that check, including transformed or inherited types and relevant
+   decorators or content types. Separately classify Swagger-only, emitter-invalid,
+   already-rejected, and unsupported-but-emitted shapes; they do not expand the
+   native contract.
 3. Record a rule-local emission matrix with, at minimum:
    - authored TypeSpec shape
-   - validity and support status, with the compiler, Azure rule, or emitter
-     diagnostic that excludes an invalid shape
-   - emitter function or branch
+   - validity and support status, with any rejecting TypeSpec or Azure diagnostic
+   - native semantic check and any relevant emitter function or branch
    - whether the selected OpenAPI field is present
    - its emitted value or value category when present
    - expected Swagger result
-   - expected TypeSpec lint result
-   - the fixture or code-backed evidence that proves the row
+   - expected TypeSpec lint result and any intentional parity gap
+   - the fixture or code-backed rejection evidence that proves the row
 4. Distinguish **surface coverage** from **shape coverage**. A request-body,
    response-body, parameter, or model fixture proves only the represented
-   shapes within that surface.
-5. Require tests demonstrating that any added classification or compatibility
-   complexity affects valid, supported TypeSpec within the idiomatic native
-   contract. If it only reproduces emitter behavior or handles already-invalid
-   constructs, omit it and document the intentional parity gap instead.
-6. Resolve uncertainty about valid inputs within the native contract before
-   proceeding to the PR. Explicitly classify excluded or emitter-only behavior
-   rather than requiring exhaustive emitter simulation. A documented limitation
-   permits an intentional difference; it does not establish full Swagger
-   equivalence.
+   shapes within that surface. Every added implementation branch must have a
+   test showing its effect on valid supported TypeSpec, not only invalid or
+   emitter-specific shapes.
+5. Resolve unclassified behavior within the native contract before proceeding
+   to the PR. Document out-of-contract rows and intentional parity gaps with
+   evidence rather than requiring exhaustive emitter-branch simulation. Do not
+   call unresolved differences intentional or claim full Swagger equivalence
+   from a documented limitation.
 
 The full corpus is observational regression evidence: it proves behavior only
 for shapes present in the selected projects and versions. Even complete
-same-project overlap cannot replace native-contract evidence or establish
-universal semantic coverage. Document intentional differences rather than
-forcing emitter simulation into the native linter to close corpus gaps.
+same-project overlap cannot replace supported-shape tests or establish universal
+semantic coverage. Corpus/lintdiff discrepancies guide investigation and
+documentation; they do not override the idiomatic native contract.
 
 When the validator resolves external example files or another configured
 artifact directory, mirror its documented path, API-version, and
@@ -527,10 +542,10 @@ When evidence requires a rule update:
 
 - change the production TypeSpec rule
 - add directly related violating, compliant, and regression fixtures
-- for an emission-dependent rule, cover distinct outcomes within the native
-  contract and prove that added complexity affects valid, supported TypeSpec;
-  keep emitter-invalid and Swagger-only cases as comparison evidence, not as
-  requirements for production compatibility logic
+- for an emission-dependent rule, cover each distinct supported native matrix
+  outcome and prove that every added special case affects valid supported
+  TypeSpec; omit complexity justified only by out-of-contract shapes and retain
+  comparison or rejection evidence for the intentional gaps
 - update snapshots and fixture `rule.md`
 - update the rule's `migration.md`
 
@@ -657,10 +672,6 @@ introduction. In roughly 150 words or fewer, answer:
   a real missed check from validator false positives, emitted duplicates,
   version/population differences, or exclusions. Say what each engine checks
   differently; labels such as "different methodologies" are not an explanation.
-- **Intentional parity gaps:** Separate valid, supported TypeSpec behavior from
-  Swagger-only, emitter-invalid, or already-invalidated shapes. Explain why
-  omitted emitter simulation is outside the native contract, not a missing
-  migration requirement.
 - **Decision:** State whether a TypeSpec rule update is required, was completed,
   or is unnecessary for the explained gap, and why. State the functional
   equivalence conclusion separately from raw-count equality.
@@ -691,7 +702,9 @@ the concise opening supplements it, not replaces it. Record:
   comparison, including diagnostics excluded because they belong only to older
   API versions
 - compile failures and their effect on the assessed population
-- explanations for remaining gaps
+- explanations for remaining gaps, distinguishing intentional native-contract
+  differences and Swagger-only or already-invalid shapes from missed checks on
+  valid supported TypeSpec
 - the standard code-backed example from
   `/analyze-swagger-typespec-lint-gap` for every distinct material gap cause
 - the final conclusion on functional equivalence and any uncertainty
@@ -768,10 +781,13 @@ The reviewer must:
 - verify that production rule imports and reachable helpers respect the native
   implementation boundary, native tests do not require an emitter, and any
   emitter-only divergence is documented rather than hidden by an adapter
-- for an emission-dependent rule, independently audit the native contract and
-  recorded matrix: verify valid supported shapes are covered, excluded shapes
-  have code-backed reasons, and added complexity has tests proving its value
-  for idiomatic TypeSpec rather than merely matching emitter branches
+- verify that special cases and helpers have tests proving an effect on valid
+  supported TypeSpec and do not simulate AutoRest schema formatting or encoding
+  solely for diagnostic parity
+- for an emission-dependent rule, independently audit supported native shapes
+  missing from the implementation and the matrix's validity classifications;
+  confirm out-of-contract differences have evidence and are documented rather
+  than requiring emitter simulation or checks for already-rejected constructs
 - confirm that corpus parity is not being used to close an untested matrix row
 - confirm generated corpus and coverage files are absent from the PR diff
 - report only concrete, actionable findings with file and line references
