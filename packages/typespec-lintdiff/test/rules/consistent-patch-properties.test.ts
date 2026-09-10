@@ -30,7 +30,7 @@ beforeEach(async () => {
 });
 
 describe("consistent-patch-properties", () => {
-  it("checks nested PATCH properties without loading an emitter or client generator", async () => {
+  it("checks nested PATCH properties without loading AutoRest or the client generator core", async () => {
     await tester
       .expect(
         `
@@ -52,7 +52,7 @@ describe("consistent-patch-properties", () => {
       });
   });
 
-  it("accepts a same-level subset without loading an emitter or client generator", async () => {
+  it("accepts a same-level subset without loading AutoRest or the client generator core", async () => {
     await tester
       .expect(
         `
@@ -70,7 +70,7 @@ describe("consistent-patch-properties", () => {
       .toBeValid();
   });
 
-  it("uses the same-path GET model without loading an emitter or client generator", async () => {
+  it("uses the same-path GET model without loading AutoRest or the client generator core", async () => {
     await tester
       .expect(
         `
