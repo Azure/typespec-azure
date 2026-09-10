@@ -1,0 +1,14 @@
+{
+  "extends": "../../core/tsconfig.base.json",
+  "composite": true,
+  "references": [
+    { "path": "../../core/packages/compiler/tsconfig.json" },
+    { "path": "../../core/packages/http/tsconfig.json" },
+    { "path": "../../core/packages/versioning/tsconfig.json" }
+  ],
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo"
+  }
+}

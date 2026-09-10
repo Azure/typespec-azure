@@ -1,0 +1,69 @@
+{
+  "name": "@azure-tools/typespec-breaking-change",
+  "version": "0.1.0",
+  "author": "Microsoft Corporation",
+  "description": "TypeSpec breaking change detection tool for Azure HTTP APIs",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/src/index.js",
+  "tspMain": "lib/main.tsp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azure/typespec-azure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/typespec-azure/issues"
+  },
+  "keywords": [
+    "typespec",
+    "breaking-change",
+    "azure"
+  ],
+  "bin": {
+    "typespec-breaking-change": "./dist/src/cli/cli.js"
+  },
+  "exports": {
+    ".": {
+      "typespec": "./lib/main.tsp",
+      "import": "./dist/src/index.js"
+    }
+  },
+  "scripts": {
+    "clean": "rimraf ./dist ./temp",
+    "build": "tsc -p tsconfig.build.json",
+    "watch": "tsc -p tsconfig.build.json --watch",
+    "test": "vitest run",
+    "test:real-specs": "vitest run test/integration-real-spec.test.ts",
+    "test:watch": "vitest -w",
+    "test:ui": "vitest --ui",
+    "test:ci": "vitest run --coverage --reporter=junit --reporter=default",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "yargs": "catalog:"
+  },
+  "peerDependencies": {
+    "@typespec/compiler": "workspace:^",
+    "@typespec/http": "workspace:^",
+    "@typespec/http-canonicalization": "workspace:^",
+    "@typespec/versioning": "workspace:^"
+  },
+  "devDependencies": {
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:^",
+    "@types/node": "catalog:",
+    "@types/yargs": "catalog:",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/http": "workspace:^",
+    "@typespec/http-canonicalization": "workspace:^",
+    "@typespec/openapi": "workspace:^",
+    "@typespec/rest": "workspace:^",
+    "@typespec/versioning": "workspace:^",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
+    "rimraf": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
