@@ -65,8 +65,7 @@ No unrelated compiler or lint diagnostic is counted as target coverage.
 ## Comparable populations and historical reports
 
 Pinned specs checkout: `f6b53f105b95da05276530a0754a1c71b4f16397`.
-The runner uses the isolated
-`C:\dev\worktrees\azure-rest-api-specs-lintdiff-lro-error-content` checkout.
+The runner receives an isolated specs checkout through `--specs-repo`.
 The corpus selects 468 ARM projects, production validator mode, and each
 project's dataset-selected API version. The local `all` ruleset runs over
 unprojected source, with this rule's ARM service isolation. Existing source
@@ -465,9 +464,11 @@ concurrency six:
 
 ```powershell
 mise exec -- pnpm --dir packages\typespec-lintdiff specs:typespec `
-  --specs-repo C:\dev\worktrees\azure-rest-api-specs-lintdiff-lro-error-content `
+  --specs-repo "<isolated-specs-checkout>" `
   --concurrency 6
 ```
+
+Replace `<isolated-specs-checkout>` with the local isolated checkout path.
 
 The final index, comparison report, both raw rule shards, selected outlier
 Swagger files, six failure logs, deterministic aggregation output, and run log
