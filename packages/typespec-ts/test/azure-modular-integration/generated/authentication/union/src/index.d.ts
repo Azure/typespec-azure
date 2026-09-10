@@ -19,6 +19,7 @@ export declare class UnionClient {
 }
 
 export declare interface UnionClientOptionalParams extends ClientOptions {
+    credentialScopes?: string | string[];
 }
 
 export declare interface ValidKeyOptionalParams extends OperationOptions {

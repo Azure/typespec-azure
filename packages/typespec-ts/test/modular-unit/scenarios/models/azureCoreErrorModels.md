@@ -396,10 +396,11 @@ export function _createOrUpdateSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).put({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: avsSummarySerializer(resource),
   });
 }
@@ -450,9 +451,10 @@ export function _listSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 

@@ -36,9 +36,10 @@ export function _testSend(
   context: Client,
   options: TestOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "text/plain", ...requestParameters.headers },
   });
 }
 

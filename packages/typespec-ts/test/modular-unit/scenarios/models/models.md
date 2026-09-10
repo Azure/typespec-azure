@@ -79,10 +79,11 @@ export function _readSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: streamingChatCompletionOptionsSerializer(body),
   });
 }
@@ -145,10 +146,11 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    headers: { accept: "text/plain", ...requestParameters.headers },
     body: { stream: true, messages: "aaaaa", index: 123 },
   });
 }

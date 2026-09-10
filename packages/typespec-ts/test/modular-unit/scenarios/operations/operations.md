@@ -151,8 +151,9 @@ export function _readSend(
   prop2: number,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
     headers: {
       "required-header": requiredHeader,
@@ -195,7 +196,7 @@ export function _readSend(
               : options?.nullableDateHeader.toUTCString(),
           }
         : {}),
-      ...options.requestOptions?.headers,
+      ...requestParameters.headers,
     },
     body: { prop1: prop1, prop2: prop2 },
   });
@@ -266,11 +267,12 @@ export function _readSend(
   nullableRequiredHeader: string | null,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     headers: {
       "nullable-required-header": nullableRequiredHeader,
-      ...options.requestOptions?.headers,
+      ...requestParameters.headers,
     },
   });
 }
@@ -434,9 +436,10 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 
@@ -494,10 +497,11 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: !options?.bars ? options?.bars : barArraySerializer(options?.bars),
   });
 }
@@ -615,9 +619,10 @@ export function _readSend(
   context: Client,
   options: ReadOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 
@@ -685,9 +690,10 @@ export function _testSend(
   context: Client,
   options: TestOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 
@@ -773,9 +779,10 @@ export function _testSend(
   context: Client,
   options: TestOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 
@@ -875,9 +882,10 @@ export function _getSend(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 
@@ -969,9 +977,10 @@ export function _getSend(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 
@@ -1062,10 +1071,11 @@ export function _createOrUpdateEndpointSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: endpointSerializer(endpointParam),
   });
 }
@@ -1196,9 +1206,10 @@ export function _fooSend(
   context: Client,
   options: FooOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/list-post").post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 
@@ -1227,9 +1238,10 @@ export function _barSend(
   context: Client,
   options: BarOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/list-get").post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 

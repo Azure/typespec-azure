@@ -65,11 +65,12 @@ export function _fooSend(
   context: Client,
   options: FooOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").get({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     headers: {
       "api-version": context.apiVersion ?? "2021-10-01-preview",
-      ...options.requestOptions?.headers,
+      ...requestParameters.headers,
     },
   });
 }

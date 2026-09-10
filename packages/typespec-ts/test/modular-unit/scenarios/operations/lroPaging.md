@@ -313,9 +313,10 @@ export function _suspendSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 

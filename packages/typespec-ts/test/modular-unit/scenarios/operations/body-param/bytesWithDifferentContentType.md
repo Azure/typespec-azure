@@ -36,10 +36,11 @@ export function _uploadFileSend(
   body: string,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "text/plain",
-    headers: { accept: "*/*", ...options.requestOptions?.headers },
+    headers: { accept: "*/*", ...requestParameters.headers },
     body: body,
   });
 }
@@ -128,10 +129,11 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/octet-stream",
-    headers: { accept: "application/xml", ...options.requestOptions?.headers },
+    headers: { accept: "application/xml", ...requestParameters.headers },
     body: body,
   });
 }
@@ -221,10 +223,11 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/octet-stream",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: body,
   });
 }
@@ -314,10 +317,11 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/octet-stream",
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    headers: { accept: "text/plain", ...requestParameters.headers },
     body: body,
   });
 }
@@ -403,10 +407,11 @@ export function _uploadFileSend(
   body: Uint8Array,
   options: UploadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/octet-stream",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: body,
   });
 }

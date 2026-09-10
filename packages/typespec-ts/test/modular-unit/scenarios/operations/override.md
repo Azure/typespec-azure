@@ -301,11 +301,12 @@ export function _removeOptionalOriginalSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     headers: {
       ...(options?.param4 !== undefined ? { param4: options?.param4 } : {}),
-      ...options.requestOptions?.headers,
+      ...requestParameters.headers,
     },
   });
 }
@@ -415,13 +416,14 @@ export function _changeOptionalityOriginalSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     headers: {
       ...(options?.requiredHeader !== undefined
         ? { "required-header": options?.requiredHeader }
         : {}),
-      ...options.requestOptions?.headers,
+      ...requestParameters.headers,
     },
   });
 }
