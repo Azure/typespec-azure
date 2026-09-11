@@ -55,6 +55,7 @@ interface Widgets {
   get is ArmResourceRead<Widget>;
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
   delete is ArmResourceDeleteWithoutOkAsync<Widget>;
+  restartNative is ArmResourceActionAsync<Widget, void, void, Error = CustomApiError>;
 
   #suppress "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes" "LRO POST needs 202 response"
   #suppress "@azure-tools/typespec-azure-core/no-openapi" "Need x-ms-long-running-operation to test non-standard error in LRO"
