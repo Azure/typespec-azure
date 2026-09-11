@@ -9,7 +9,7 @@
 export function slugify(value: string): string {
   return value
     .replace(/[^A-Za-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "")
+    .replace(/^_|_$/g, "")
     .slice(0, 120);
 }
 
