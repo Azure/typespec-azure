@@ -1,0 +1,483 @@
+import {
+  getSourceLocation,
+  type EnumMember,
+  type Interface,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type Operation,
+  type SourceLocation,
+  type Type,
+  type UnionVariant,
+} from "@typespec/compiler";
+import type { OriginDeclaration } from "../types.js";
+
+/**
+ * Resolve the origin declaration for a type encountered during diffing.
+ *
+ * The origin is the nearest named TypeSpec declaration that "owns" this type.
+ * Used for:
+ * 1. Deduplication: same {origin, DiffKind} across operations = one finding
+ * 2. Suppression: decorator on origin type suppresses all uses
+ *
+ * Resolution rules:
+ * - ModelProperty with sourceProperty → follow chain to original named declaration
+ * - ModelProperty on a named model → the property itself
+ * - Named Model/Enum/Union/Scalar → the type itself
+ * - EnumMember → the parent Enum
+ * - UnionVariant → the parent Union (if named)
+ * - Anonymous/inline types → climb to nearest named ancestor, or undefined
+ */
+export function resolveOrigin(type?: Type): OriginDeclaration | undefined {
+  if (!type) return undefined;
+
+  switch (type.kind) {
+    case "ModelProperty":
+      return resolveModelPropertyOrigin(type);
+    case "Model":
+      return resolveModelOrigin(type);
+    case "Enum":
+      return resolveNamedTypeOrigin(type, type.name, type.namespace);
+    case "EnumMember":
+      return resolveEnumMemberOrigin(type);
+    case "Union":
+      return type.name ? resolveNamedTypeOrigin(type, type.name, type.namespace) : undefined;
+    case "UnionVariant":
+      return resolveUnionVariantOrigin(type);
+    case "Scalar":
+      return resolveNamedTypeOrigin(type, type.name, type.namespace);
+    case "Operation":
+      return resolveOperationOrigin(type);
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Resolve origin for a ModelProperty.
+ * Follows the sourceProperty chain (from spreads/intersections) to the original declaration.
+ * When sourceProperty is not set (e.g., visibility-filtered ARM models), uses AST node
+ * identity to find the canonical property in the versioned namespace.
+ */
+function resolveModelPropertyOrigin(prop: ModelProperty): OriginDeclaration | undefined {
+  // Follow sourceProperty chain to the original
+  const original = followSourcePropertyChain(prop);
+  const templateSource = traceToTemplateSourceProperty(original);
+
+  // Check if the original property lives on a named model
+  if (templateSource?.model && isNamedDeclaration(templateSource.model)) {
+    return {
+      declarationPath: buildDeclarationPath(templateSource.model, templateSource.name),
+      type: templateSource,
+      sourceLocation: safeGetSourceLocation(templateSource),
+    };
+  }
+
+  if (original.model && isNamedDeclaration(original.model)) {
+    // If the model looks like a visibility-filtered copy (e.g., EmployeePropertiesCreateOrUpdate),
+    // trace back to the canonical model via AST node identity on the property.
+    const canonical = traceToCanonicalProperty(original);
+    const resolved = canonical ?? original;
+    return {
+      declarationPath: buildDeclarationPath(resolved.model!, resolved.name),
+      type: resolved,
+      sourceLocation: safeGetSourceLocation(resolved),
+    };
+  }
+
+  const enclosingOperation = findEnclosingOperation(original);
+  if (enclosingOperation) {
+    return {
+      declarationPath: buildOperationPropertyPath(enclosingOperation, original.name),
+      type: original,
+      sourceLocation: safeGetSourceLocation(original),
+    };
+  }
+
+  const enclosingOperationPath = findEnclosingOperationPathFromNode(original);
+  if (enclosingOperationPath) {
+    return {
+      declarationPath: `${enclosingOperationPath}.${original.name}`,
+      type: original,
+      sourceLocation: safeGetSourceLocation(original),
+    };
+  }
+
+  // Property is on an anonymous model — try climbing to a named ancestor
+  return climbToNamedAncestor(original);
+}
+
+/**
+ * Trace a property back to its canonical declaration using AST node identity.
+ *
+ * HTTP canonicalization creates visibility-filtered model copies (e.g.,
+ * EmployeePropertiesCreateOrUpdate) without setting sourceProperty. However,
+ * the copied properties share the same AST node as the original. We use this
+ * to find the original property on the user-declared model in the namespace.
+ */
+function traceToCanonicalProperty(prop: ModelProperty): ModelProperty | undefined {
+  const node = prop.node;
+  if (!node || !prop.model?.namespace) return undefined;
+
+  // Look for a model in the same namespace whose same-named property shares this node
+  const ns = prop.model.namespace;
+  for (const [, model] of ns.models) {
+    if (model === prop.model) continue;
+    const candidate = model.properties.get(prop.name);
+    if (candidate && candidate.node === node && model.name !== prop.model.name) {
+      // Found the canonical source — prefer the shorter-named model (the original)
+      if (model.name.length < prop.model.name.length) {
+        return candidate;
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Trace a property through template instantiation metadata when sourceProperty
+ * is absent. The compiler attaches templateMapper/sourceModels to instantiated
+ * models, but does not always backfill sourceProperty on copied properties.
+ */
+function traceToTemplateSourceProperty(prop: ModelProperty): ModelProperty | undefined {
+  return (
+    traceToTemplateSourceModel(prop.model, prop.name, new Set<Model>()) ??
+    traceToTemplateArgumentProperty(prop.model, prop.name, new Set<Model>())
+  );
+}
+
+function traceToTemplateSourceModel(
+  model: Model | undefined,
+  propertyName: string,
+  seen: Set<Model>,
+): ModelProperty | undefined {
+  if (!model || seen.has(model)) return undefined;
+  seen.add(model);
+
+  for (const source of model.sourceModels ?? []) {
+    const sourceModel = source.model;
+    if (!sourceModel) continue;
+
+    const direct = sourceModel.properties.get(propertyName);
+    if (direct) {
+      return followSourcePropertyChain(direct);
+    }
+
+    const nested =
+      traceToTemplateSourceModel(sourceModel, propertyName, seen) ??
+      traceToTemplateArgumentProperty(sourceModel, propertyName, seen);
+    if (nested) {
+      return nested;
+    }
+  }
+
+  return undefined;
+}
+
+function traceToTemplateArgumentProperty(
+  model: Model | undefined,
+  propertyName: string,
+  seen: Set<Model>,
+): ModelProperty | undefined {
+  const args = ((model as any)?.templateMapper?.args ?? []) as Type[];
+  if (!args) return undefined;
+
+  for (const arg of args) {
+    if (arg.kind !== "Model" || seen.has(arg)) continue;
+    seen.add(arg);
+
+    const direct = arg.properties.get(propertyName);
+    if (direct) {
+      return followSourcePropertyChain(direct);
+    }
+
+    const nested =
+      traceToTemplateSourceModel(arg, propertyName, seen) ??
+      traceToTemplateArgumentProperty(arg, propertyName, seen);
+    if (nested) {
+      return nested;
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Resolve origin for a Model type.
+ * Named models are their own origin; anonymous models have no origin.
+ */
+function resolveModelOrigin(model: Model): OriginDeclaration | undefined {
+  if (isNamedDeclaration(model)) {
+    return resolveNamedTypeOrigin(model, model.name, model.namespace);
+  }
+  return undefined;
+}
+
+/**
+ * Resolve origin for an EnumMember → parent Enum is the origin.
+ */
+function resolveEnumMemberOrigin(member: EnumMember): OriginDeclaration | undefined {
+  const parent = member.enum;
+  if (parent && parent.name) {
+    return resolveNamedTypeOrigin(parent, parent.name, parent.namespace);
+  }
+  return undefined;
+}
+
+/**
+ * Resolve origin for a UnionVariant → parent Union is the origin (if named).
+ */
+function resolveUnionVariantOrigin(variant: UnionVariant): OriginDeclaration | undefined {
+  const parent = variant.union;
+  if (parent && parent.name) {
+    return resolveNamedTypeOrigin(parent, parent.name, parent.namespace);
+  }
+  // Anonymous union variant — try to find a named property parent
+  return undefined;
+}
+
+function resolveOperationOrigin(operation: Operation): OriginDeclaration | undefined {
+  if (!operation.name) {
+    return undefined;
+  }
+
+  return {
+    declarationPath: buildOperationQualifiedName(operation),
+    type: operation,
+    sourceLocation: safeGetSourceLocation(operation),
+  };
+}
+
+/**
+ * Build an OriginDeclaration for a named type.
+ */
+function resolveNamedTypeOrigin(
+  type: Type,
+  name: string,
+  namespace?: Namespace,
+): OriginDeclaration | undefined {
+  if (!name) return undefined;
+
+  return {
+    declarationPath: buildQualifiedName(namespace, name),
+    type,
+    sourceLocation: safeGetSourceLocation(type),
+  };
+}
+
+/**
+ * Follow the sourceProperty chain to the original declaration.
+ * Spreads and intersections create copies with sourceProperty pointing back.
+ */
+function followSourcePropertyChain(prop: ModelProperty): ModelProperty {
+  let current = prop;
+  while (current.sourceProperty) {
+    current = current.sourceProperty;
+  }
+  return current;
+}
+
+/**
+ * For a property on an anonymous model, climb the type graph to find the
+ * nearest named ancestor (e.g., a named property on a named model).
+ *
+ * This handles cases like:
+ * ```typespec
+ * model Widget { config: { nested: { deep: string } } }
+ * ```
+ * where `deep` lives on an anonymous model, but we want to point at `Widget.config`.
+ */
+function climbToNamedAncestor(prop: ModelProperty): OriginDeclaration | undefined {
+  // Walk up: property → model → (if model is a property type) property → model → ...
+  let currentModel = prop.model;
+
+  while (currentModel) {
+    // Find if this anonymous model is the type of some property
+    const parentProp = findParentProperty(currentModel);
+    if (!parentProp) break;
+
+    // Follow sourceProperty on the parent too
+    const originalParent = followSourcePropertyChain(parentProp);
+
+    if (originalParent.model && isNamedDeclaration(originalParent.model)) {
+      return {
+        declarationPath: buildDeclarationPath(originalParent.model, originalParent.name),
+        type: originalParent,
+        sourceLocation: safeGetSourceLocation(originalParent),
+      };
+    }
+
+    currentModel = originalParent.model;
+  }
+
+  return undefined;
+}
+
+/**
+ * Check if a model type is a named declaration (not anonymous).
+ */
+function isNamedDeclaration(model: Model): boolean {
+  return model.name !== "" && !model.name.startsWith("(anonymous");
+}
+
+/**
+ * Try to find a property whose type is this model.
+ * For anonymous models used as inline property types, we walk the node's
+ * parent chain to find a ModelProperty declaration that uses this model.
+ */
+function findParentProperty(model: Model): ModelProperty | undefined {
+  // For anonymous models created inline, the model's properties may be
+  // sourced from a parent property. We can detect this by checking if
+  // any enclosing model has a property whose type is this anonymous model.
+  // Walk the node parent chain looking for a property declaration.
+  const node = model.node;
+  if (!node) return undefined;
+
+  let current = (node as any).parent;
+  while (current) {
+    // Look for a node that has a symbol pointing to a ModelProperty type
+    const sym = (current as any).symbol;
+    if (sym?.type?.kind === "ModelProperty") {
+      return sym.type as ModelProperty;
+    }
+    current = (current as any).parent;
+  }
+
+  return undefined;
+}
+
+/**
+ * Build a declaration path like "Microsoft.Foo.Widget.name"
+ */
+function buildDeclarationPath(model: Model, propertyName: string): string {
+  const modelPath = buildQualifiedName(model.namespace, model.name);
+  return `${modelPath}.${propertyName}`;
+}
+
+function buildOperationPropertyPath(operation: Operation, propertyName: string): string {
+  const operationPath = buildOperationQualifiedName(operation);
+  return `${operationPath}.${propertyName}`;
+}
+
+/**
+ * Build a qualified name from namespace + name.
+ */
+function buildQualifiedName(namespace: Namespace | undefined, name: string): string {
+  const parts: string[] = [];
+  let current = namespace;
+  while (current && current.name) {
+    parts.unshift(current.name);
+    current = current.namespace;
+  }
+  parts.push(name);
+  return parts.join(".");
+}
+
+function buildOperationQualifiedName(operation: Operation): string {
+  const interfacePath = buildInterfaceQualifiedName(operation.interface);
+  if (interfacePath) {
+    return `${interfacePath}.${operation.name}`;
+  }
+
+  return buildQualifiedName(operation.namespace, operation.name);
+}
+
+function buildInterfaceQualifiedName(iface: Interface | undefined): string | undefined {
+  if (!iface?.name) {
+    return undefined;
+  }
+
+  return buildQualifiedName(iface.namespace, iface.name);
+}
+
+/**
+ * Safely get source location, returning a synthetic one if unavailable.
+ */
+function safeGetSourceLocation(type: Type): SourceLocation {
+  return (
+    getSourceLocation(type, { locateId: true }) ?? getSourceLocation(type) ?? ({} as SourceLocation)
+  );
+}
+
+function findEnclosingOperation(prop: ModelProperty): Operation | undefined {
+  const parametersModel = prop.model;
+  if (!parametersModel) {
+    return undefined;
+  }
+
+  const namespace = parametersModel.namespace;
+  if (namespace) {
+    for (const operation of namespace.operations.values()) {
+      if (operation.parameters === parametersModel) {
+        return operation;
+      }
+    }
+
+    for (const iface of namespace.interfaces.values()) {
+      for (const operation of iface.operations.values()) {
+        if (operation.parameters === parametersModel) {
+          return operation;
+        }
+      }
+    }
+  }
+
+  if (!parametersModel.node) {
+    return undefined;
+  }
+
+  let current = (parametersModel.node as any).parent;
+  while (current) {
+    const operationType = current.symbol?.type;
+    if (operationType?.kind === "Operation") {
+      return operationType as Operation;
+    }
+    current = current.parent;
+  }
+
+  return undefined;
+}
+
+function findEnclosingOperationPathFromNode(prop: ModelProperty): string | undefined {
+  let operationName: string | undefined;
+  let interfaceName: string | undefined;
+  let current: any = prop.node?.parent;
+
+  while (current) {
+    if (!operationName && "signature" in current && typeof current.id?.sv === "string") {
+      operationName = current.id.sv;
+    } else if (
+      operationName &&
+      !interfaceName &&
+      "operations" in current &&
+      typeof current.id?.sv === "string"
+    ) {
+      interfaceName = current.id.sv;
+      break;
+    }
+
+    current = current.parent;
+  }
+
+  if (!operationName) {
+    return undefined;
+  }
+
+  const namespacePath = prop.model?.namespace
+    ? buildNamespaceQualifiedName(prop.model.namespace)
+    : "";
+  const parts = [namespacePath, interfaceName, operationName].filter(
+    (part): part is string => !!part,
+  );
+  return parts.join(".");
+}
+
+function buildNamespaceQualifiedName(namespace: Namespace): string {
+  const parts: string[] = [];
+  let current: Namespace | undefined = namespace;
+  while (current && current.name) {
+    parts.unshift(current.name);
+    current = current.namespace;
+  }
+  return parts.join(".");
+}
