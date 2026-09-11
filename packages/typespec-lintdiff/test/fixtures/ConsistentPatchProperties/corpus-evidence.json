@@ -2,16 +2,18 @@
   "schemaVersion": 2,
   "rule": "ConsistentPatchProperties",
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-09-09T09:24:28.545Z",
-  "completedAt": "2026-09-09T17:28:59.7719922+08:00",
-  "sourceBaseCommit": "29c4a87b0799092be0ede854ffdf23a0a9648795",
+  "generatedAt": "2026-09-11T04:09:06.638Z",
+  "completedAt": "2026-09-11T12:11:44.0169781+08:00",
+  "sourceBaseCommit": "ef60a2bcabafe2f64048730fa4d3dc882fe5470d",
   "sourceBranch": "feature/lintdiff-consistent-patch-properties-native",
-  "sourceState": "Uncommitted native-boundary repair, before final formatting",
-  "localLinterFingerprint": "sha256:33b2527404c4fb88cc32a37f2dd7cb1d58b17789308bdce020e23635019bd6f1",
+  "sourceState": "Uncommitted inherited-property override repair, after source formatting",
+  "localLinterFingerprint": "sha256:69a9478d227d2e07fba5d702c81804826c08c70d6b9d22f3215e950e0cd9edf1",
+  "diagnosticMultisetUnchangedFrom": "2026-09-09T09:24:28.545Z",
+  "diagnosticMultisetIdentity": "project + source file + line + column + message + severity, including multiplicity",
   "coverageKind": "partial",
   "command": "pnpm --dir packages/typespec-lintdiff specs:typespec --specs-repo C:\\dev\\worktrees\\azure-rest-api-specs-lintdiff-consistent-patch-properties --concurrency 6",
   "fullRun": true,
-  "durationMs": 4678050,
+  "durationMs": 1287834,
   "sourceProjectCount": 468,
   "successfulProjectCount": 462,
   "failedProjectCount": 6,
@@ -58,7 +60,7 @@
   "uncertainty": {
     "informatica": "Selected Swagger schema mismatches are verified; the validator-side omission mechanism is not isolated.",
     "versions": "The remaining 306 diagnostics are not a globally latest-version-projected population.",
-    "scope": "Four fixtures prove intentional native/emitter contract differences despite unchanged corpus counts."
+    "scope": "Four scope fixtures and two inherited-never fixtures prove intentional native/emitter contract differences despite unchanged corpus findings."
   },
   "overlapProjects": [
     "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",

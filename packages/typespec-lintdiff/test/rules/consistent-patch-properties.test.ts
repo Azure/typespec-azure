@@ -30,6 +30,100 @@ beforeEach(async () => {
 });
 
 describe("consistent-patch-properties", () => {
+  describe("inherited property overrides", () => {
+    const service = `
+      using TypeSpec.Http;
+      @Azure.ResourceManager.armProviderNamespace
+      @service namespace Microsoft.TestService;
+    `;
+
+    for (const nested of [false, true]) {
+      it(`ignores a never override in a ${nested ? "nested" : "top-level"} PATCH model`, async () => {
+        await tester
+          .expect(
+            `${service}
+            model Base { extra?: string; name?: string; }
+            model WithoutExtra extends Base { extra?: never; }
+            model Update extends WithoutExtra {}
+            model Resource { name?: string; }
+            @route("/widgets") @patch
+            op update(@body body: ${nested ? "{ properties?: Update }" : "Update"}):
+              ${nested ? "{ properties?: Resource }" : "Resource"};
+          `,
+          )
+          .toBeValid();
+      });
+
+      it(`reports a property removed by never in a ${nested ? "nested" : "top-level"} resource model`, async () => {
+        await tester
+          .expect(
+            `${service}
+            model Base { extra?: string; name?: string; }
+            model WithoutExtra extends Base { extra?: never; }
+            model Resource extends WithoutExtra {}
+            model Update { extra?: string; }
+            @route("/widgets") @patch
+            op update(@body body: ${nested ? "{ properties?: Update }" : "Update"}):
+              ${nested ? "{ properties?: Resource }" : "Resource"};
+          `,
+          )
+          .toEmitDiagnostics({
+            code: "tsp-lintdiff-local-linter/consistent-patch-properties",
+            message: `The property '${nested ? "properties.extra" : "extra"}' in the request body either does not appear in the resource model or is nested at the wrong level.`,
+          });
+      });
+    }
+
+    it("shadows an inherited property by source name before resolving its encoded name", async () => {
+      await tester
+        .expect(
+          `${service}
+          model Base { @encodedName("application/json", "oldName") extra?: string; }
+          model Update extends Base {
+            @encodedName("application/json", "newName") extra?: never;
+          }
+          @route("/widgets") @patch
+          op update(@body body: Update): { name?: string };
+        `,
+        )
+        .toBeValid();
+    });
+
+    it("does not let a never property hide a differently named inherited payload property", async () => {
+      await tester
+        .expect(
+          `${service}
+          model Base { @encodedName("application/json", "wireName") present?: string; }
+          model Update extends Base {
+            @encodedName("application/json", "wireName") removed?: never;
+          }
+          @route("/widgets") @patch
+          op update(@body body: Update): { name?: string };
+        `,
+        )
+        .toEmitDiagnostics({
+          code: "tsp-lintdiff-local-linter/consistent-patch-properties",
+          message:
+            "The property 'wireName' in the request body either does not appear in the resource model or is nested at the wrong level.",
+        });
+    });
+
+    it("uses a redeclared property's encoded name rather than its base declaration", async () => {
+      await tester
+        .expect(
+          `${service}
+          model Base { @encodedName("application/json", "oldName") value?: string; }
+          model Update extends Base {
+            @encodedName("application/json", "newName") value?: string;
+          }
+          @route("/widgets") @patch
+          op update(@body body: Update): { newName?: string };
+        `,
+        )
+        .toBeValid();
+    });
+  });
+
   it("checks nested PATCH properties without loading AutoRest or the client generator core", async () => {
     await tester
       .expect(

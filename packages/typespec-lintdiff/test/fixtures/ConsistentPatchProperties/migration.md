@@ -2,26 +2,64 @@
 
 ## Result and gap summary
 
-The September 9 full production run has **151 Swagger diagnostics in 27
+The September 11 full production run has **151 Swagger diagnostics in 27
 projects versus 325 TypeSpec diagnostics in 32 projects**, over 462 successfully
 compiled projects; six failures are excluded from both sides. All 27 validator
-projects overlap. Counts are unchanged from September 4.
+projects overlap. Individual TypeSpec findings, including multiplicity, are
+unchanged from September 9.
 
 The five TypeSpec-only projects contribute 19 removed/renamed-declaration
 findings and 22 Informatica findings on selected-version schema mismatches.
 The other 133 extra raw findings occur in overlapping projects, where reporting
 granularity and repeated source targets differ.
 
-**Decision: native-boundary repair completed; Swagger equivalence is partial.**
-Four scope fixtures prove three TypeSpec-only cases and one validator-only case:
-native declarations remain visible when AutoRest omits them. The unchanged
-corpus does not exercise away this contract difference.
+**Decision: inherited-override repair completed; Swagger equivalence remains
+partial.** Native regressions correct false positives and missed violations
+when derived models override inherited properties with `never`. Two new
+fixtures show opposite Swagger/native outcomes because emitted `allOf`
+retains the base property. Four existing scope cases also differ intentionally.
+Unchanged corpus findings do not establish universal equivalence.
 
 **Limits:** Informatica's validator-side omission mechanism remains unisolated.
 Version exclusions establish the four one-sided-project exclusions, not a
 globally latest-version-projected diagnostic total.
 
 ## Required changes and native contract
+
+### Inherited override repair
+
+The September 11 promotion review found that skipping a derived `never`
+property allowed a later base-model walk to revive it. This caused false
+positives on PATCH bodies and missed violations on response models. The rule
+now uses compiler `getProperty(model, property.name)` to identify the effective
+declaration before resolving JSON names and filtering `never`. This also fixes
+the directly related case where an override changes its encoded name.
+
+Seven native regressions cover request/response shadowing at top-level and
+nested positions, intermediate inheritance, encoded-name overrides, a
+non-`never` redeclaration, and an unrelated property sharing an encoded name.
+Six failed before the repair; the unrelated-name control already passed.
+All snippets compile without suppressions or emitter execution.
+
+Two comparison fixtures show why native correctness does not imply Swagger
+parity. In `never-patch-override`, `Update extends Base` removes `extra` with
+`never`; the native lint correctly accepts it. Its emitted `Update.allOf`
+still references `Base`, whose `properties.extra` produces one validator
+diagnostic at `paths./widgets.patch.parameters.0.schema`.
+In `never-resource-override`, the response similarly removes `extra` natively,
+so PATCH `extra` is invalid. Emitted `Resource.allOf` still exposes the base
+property and the validator accepts it. AutoRest's `getSchemaForModel` skips
+`never` properties but preserves the base reference; the validator's
+`getProperties` merges the referenced `allOf` properties. The validator is
+checking the emitted schema correctly in both cases; it cannot observe the
+TypeSpec override. Snapshots preserve that evidence without changing the
+native contract to reproduce emission.
+
+This is an explicitly authorized source repair following merged PR #5439,
+not another initial migration. The unfinished official-library promotion
+remains separate and unchanged until this source repair is ready.
+
+### Prior native-boundary repair
 
 The repair replaces `TCGCContext` with compiler `Program`, removes
 `createTCGCContext` and all `isInScope` calls, and preserves the native PATCH
@@ -60,12 +98,13 @@ parameter schema and the response precedence described above. Upstream tests
 cover inherited missing properties, a matching subset, and asynchronous GET
 fallback. The scope limitations occur before this validator, during emission.
 
-| Evidence                                                           | Revision and population                                                                                                                                   | `ConsistentPatchProperties` row                                                                                                                                                                |
-| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [External coverage snapshot](../../../docs/coverage_old.md)        | The checked-in snapshot links to its source gist but records no date, spec commit, or generator revision. It reports 450 compiled projects and 210 rules. | `lint`; 303 validator projects; 25 local-lint projects; 0 official projects; 8.3%. Project identities cannot be reconstructed from this aggregate row.                                         |
-| [Checked-in observed report](../../../specs/coverage-breakdown.md) | Specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`; 462/468 successfully compiled projects.                                                          | Before this change: `production`; 27 validator projects; 27 TypeSpec projects; 23 overlap; 4 validator-only; 4 TypeSpec-only; 151 validator and 122 TypeSpec diagnostics.                      |
-| September 4 source evidence (historical)                           | Full review-fix run from the same specs commit; 462/468 projects compiled; duration 1,261,930 ms.                                                         | 27 validator projects; 32 TypeSpec projects; 27 overlap; 0 validator-only; 5 TypeSpec-only; 151 validator and 325 TypeSpec diagnostics.                                                        |
-| [Final retained repair evidence](./corpus-evidence.json)           | Full run generated 2026-09-09T09:24:28.545Z; completed 2026-09-09T17:28:59+08:00; same specs commit; 462/468 compiled; duration 4,678,050 ms.             | `production`; `partial` semantic coverage; 27 validator projects; 32 raw TypeSpec projects; 27 overlap; 0 validator-only; 5 raw TypeSpec-only; 151 validator and 325 raw TypeSpec diagnostics. |
+| Evidence                                                             | Revision and population                                                                                                                                   | `ConsistentPatchProperties` row                                                                                                                                                                |
+| -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [External coverage snapshot](../../../docs/coverage_old.md)          | The checked-in snapshot links to its source gist but records no date, spec commit, or generator revision. It reports 450 compiled projects and 210 rules. | `lint`; 303 validator projects; 25 local-lint projects; 0 official projects; 8.3%. Project identities cannot be reconstructed from this aggregate row.                                         |
+| [Checked-in observed report](../../../specs/coverage-breakdown.md)   | Specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`; 462/468 successfully compiled projects.                                                          | Before this change: `production`; 27 validator projects; 27 TypeSpec projects; 23 overlap; 4 validator-only; 4 TypeSpec-only; 151 validator and 122 TypeSpec diagnostics.                      |
+| September 4 source evidence (historical)                             | Full review-fix run from the same specs commit; 462/468 projects compiled; duration 1,261,930 ms.                                                         | 27 validator projects; 32 TypeSpec projects; 27 overlap; 0 validator-only; 5 TypeSpec-only; 151 validator and 325 TypeSpec diagnostics.                                                        |
+| September 9 native-boundary evidence (historical)                    | Full run generated 2026-09-09T09:24:28.545Z; completed 2026-09-09T17:28:59+08:00; same specs commit; 462/468 compiled; duration 4,678,050 ms.             | 27 validator projects; 32 raw TypeSpec projects; 27 overlap; 0 validator-only; 5 raw TypeSpec-only; 151 validator and 325 raw TypeSpec diagnostics.                                            |
+| [Final retained inheritance-repair evidence](./corpus-evidence.json) | Full run generated 2026-09-11T04:09:06.638Z; completed 2026-09-11T12:11:44+08:00; same specs commit; 462/468 compiled; duration 1,287,834 ms.             | `production`; `partial` semantic coverage; 27 validator projects; 32 raw TypeSpec projects; 27 overlap; 0 validator-only; 5 raw TypeSpec-only; 151 validator and 325 raw TypeSpec diagnostics. |
 
 The external report uses an unidentified older population and aggregate
 migration credit. The observed reports require same-project diagnostics on the
@@ -73,8 +112,8 @@ pinned successful-project population. The final TypeSpec diagnostic count also
 includes every declared API version; the validator dataset retains one selected
 version per project.
 
-The repair ran on `feature/lintdiff-consistent-patch-properties-native` from
-target commit `29c4a87b0799092be0ede854ffdf23a0a9648795`, with the uncommitted
+The inheritance repair ran on `feature/lintdiff-consistent-patch-properties-native`
+at commit `ef60a2bcabafe2f64048730fa4d3dc882fe5470d`, with the uncommitted
 source repair included. The runner's source fingerprint is retained in
 `corpus-evidence.json`. The scope is ARM, production validator execution,
 successfully compiled projects only, no readme suppressions on retained
@@ -82,6 +121,14 @@ Swagger, and normal source-program TypeSpec diagnostics (including source
 suppressions). No new global API-version projection or normalization was added.
 The checked-in coverage report is deliberately historical: refreshed canonical
 corpus artifacts are not included in this rule-repair PR.
+
+An independent comparison of the complete diagnostic multiset
+(`project`, source file, line, column, message, severity) against the retained
+September 9 shard found no differences. The specs revision, successful-project
+set, one-sided project counts, and diagnostic identities are unchanged, so the
+version attribution and detailed examples below still apply to this run.
+This is observational evidence only; the new regressions expose a native shape
+gap that the corpus counts did not reveal.
 
 Six compile failures were excluded from both sides:
 
@@ -163,29 +210,32 @@ AutoRest's `getSchemaOrRef` selects inline or referenced schemas,
 emits nested property schemas. The Swagger rule's `diffSchema` recursively
 compares the resulting `properties` maps.
 
-| Authored shape                                                | Emitter branch / selected OpenAPI field                                                    | Swagger result | TypeSpec result | Fixture                                     |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | -------------- | --------------- | ------------------------------------------- |
-| PATCH model has a property at the wrong level                 | `getSchemaForModel` emits it in body schema `properties`; PATCH `200` response selected    | violation      | violation       | `inconsistent-patch`                        |
-| Nested PATCH-only property                                    | `resolveProperty` emits nested model `properties`                                          | violation      | violation       | `nested-extra-property`                     |
-| Custom ARM PATCH outside lifecycle registration               | operation body and response schemas use `getSchemaOrRef`                                   | violation      | violation       | `custom-patch-operation`                    |
-| PATCH has only a `201` resource response                      | response schema for `201` is selected                                                      | violation      | violation       | `patch-201-response`                        |
-| PATCH lacks `200`/`201`; same-path GET has `201`              | PATCH body emitted; GET `201` response is fallback                                         | violation      | violation       | `get-201-fallback`                          |
-| PATCH lacks `200`/`201`; same-path GET has `200`              | GET `200` response is fallback                                                             | clean          | clean           | `async-get-fallback`                        |
-| PATCH has scalar `200` and model `201` responses              | Existing `200` schema wins before its shape is interpreted                                 | violation      | violation       | `response-precedence`                       |
-| PATCH response range contains `200`                           | AutoRest emits the full `2XX` range while TypeSpec HTTP retains `{ start: 200, end: 299 }` | validator miss | violation       | focused rule unit tests                     |
-| Exact PATCH `200` overlaps a containing range                 | Explicit `200` response takes precedence over the range regardless of declaration order    | violation      | violation       | focused rule unit tests                     |
-| Different source names encode to the same JSON name           | `resolveProperty` uses the encoded property name                                           | clean          | clean           | `payload-property-shape`                    |
-| Nullable object properties have different nested properties   | nullable single-model unions emit object `properties`                                      | violation      | violation       | `nullable-object-mismatch`                  |
-| Nullable object properties have matching nested properties    | nullable single-model unions emit matching object `properties`                             | clean          | clean           | `nullable-object-match`                     |
-| Same-named array and scalar properties                        | neither property schema emits named `properties`                                           | clean          | clean           | `non-model-property-shape`                  |
-| PATCH-only property scoped to C#                              | AutoRest `isInScope` omits it from the PATCH schema                                        | clean          | violation       | `scoped-property`                           |
-| Same-path GET scoped to C#                                    | AutoRest omits the GET route, so PATCH has no fallback schema                              | clean          | violation       | `scoped-get-fallback`                       |
-| PATCH operation scoped to C#                                  | AutoRest filters the route; no PATCH operation reaches the validator                       | clean          | violation       | `scoped-patch-operation`                    |
-| Matching response property scoped to C#                       | AutoRest omits the response property but retains the PATCH property                        | violation      | clean           | `scoped-response-property`                  |
-| Undeclared PATCH discriminator                                | `getSchemaForModel` synthesizes the discriminator as a required string property            | violation      | violation       | `synthesized-discriminator`                 |
-| Authored property encodes to a synthesized discriminator name | `resolveProperty` overwrites the synthesized property with the authored property's schema  | violation      | violation       | `encoded-discriminator-property`            |
-| Same-level PATCH subset                                       | corresponding property exists in response schema                                           | clean          | clean           | `same-level-subset`                         |
-| PATCH has no body or no PATCH/GET `200`/`201` schema          | selected comparison schema is absent                                                       | clean          | clean           | guarded directly by body/response selection |
+| Authored shape                                                    | Emitter branch / selected OpenAPI field                                                             | Swagger result | TypeSpec result                 | Fixture                                     |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | -------------- | ------------------------------- | ------------------------------------------- |
+| PATCH model has a property at the wrong level                     | `getSchemaForModel` emits it in body schema `properties`; PATCH `200` response selected             | violation      | violation                       | `inconsistent-patch`                        |
+| Nested PATCH-only property                                        | `resolveProperty` emits nested model `properties`                                                   | violation      | violation                       | `nested-extra-property`                     |
+| Custom ARM PATCH outside lifecycle registration                   | operation body and response schemas use `getSchemaOrRef`                                            | violation      | violation                       | `custom-patch-operation`                    |
+| PATCH has only a `201` resource response                          | response schema for `201` is selected                                                               | violation      | violation                       | `patch-201-response`                        |
+| PATCH lacks `200`/`201`; same-path GET has `201`                  | PATCH body emitted; GET `201` response is fallback                                                  | violation      | violation                       | `get-201-fallback`                          |
+| PATCH lacks `200`/`201`; same-path GET has `200`                  | GET `200` response is fallback                                                                      | clean          | clean                           | `async-get-fallback`                        |
+| PATCH has scalar `200` and model `201` responses                  | Existing `200` schema wins before its shape is interpreted                                          | violation      | violation                       | `response-precedence`                       |
+| PATCH response range contains `200`                               | AutoRest emits the full `2XX` range while TypeSpec HTTP retains `{ start: 200, end: 299 }`          | validator miss | violation                       | focused rule unit tests                     |
+| Exact PATCH `200` overlaps a containing range                     | Explicit `200` response takes precedence over the range regardless of declaration order             | violation      | violation                       | focused rule unit tests                     |
+| Different source names encode to the same JSON name               | `resolveProperty` uses the encoded property name                                                    | clean          | clean                           | `payload-property-shape`                    |
+| Nullable object properties have different nested properties       | nullable single-model unions emit object `properties`                                               | violation      | violation                       | `nullable-object-mismatch`                  |
+| Nullable object properties have matching nested properties        | nullable single-model unions emit matching object `properties`                                      | clean          | clean                           | `nullable-object-match`                     |
+| Same-named array and scalar properties                            | neither property schema emits named `properties`                                                    | clean          | clean                           | `non-model-property-shape`                  |
+| PATCH-only property scoped to C#                                  | AutoRest `isInScope` omits it from the PATCH schema                                                 | clean          | violation                       | `scoped-property`                           |
+| Same-path GET scoped to C#                                        | AutoRest omits the GET route, so PATCH has no fallback schema                                       | clean          | violation                       | `scoped-get-fallback`                       |
+| PATCH operation scoped to C#                                      | AutoRest filters the route; no PATCH operation reaches the validator                                | clean          | violation                       | `scoped-patch-operation`                    |
+| Matching response property scoped to C#                           | AutoRest omits the response property but retains the PATCH property                                 | violation      | clean                           | `scoped-response-property`                  |
+| Undeclared PATCH discriminator                                    | `getSchemaForModel` synthesizes the discriminator as a required string property                     | violation      | violation                       | `synthesized-discriminator`                 |
+| Authored property encodes to a synthesized discriminator name     | `resolveProperty` overwrites the synthesized property with the authored property's schema           | violation      | violation                       | `encoded-discriminator-property`            |
+| Valid PATCH inheritance overrides a base property with `never`    | `getSchemaForModel` omits the override but retains `allOf` and the base property                    | violation      | clean                           | `never-patch-override`                      |
+| Valid response inheritance overrides a base property with `never` | `getSchemaForModel` omits the override but retains `allOf` and the base property                    | clean          | violation                       | `never-resource-override`                   |
+| Valid redeclaration changes an inherited property's encoded name  | Native source-name lookup selects only the derived declaration; emission is not the native contract | not asserted   | clean when the new name matches | native inherited-override tests             |
+| Same-level PATCH subset                                           | corresponding property exists in response schema                                                    | clean          | clean                           | `same-level-subset`                         |
+| PATCH has no body or no PATCH/GET `200`/`201` schema              | selected comparison schema is absent                                                                | clean          | clean                           | guarded directly by body/response selection |
 
 Inherited properties and spreads reach the same model/property emitter
 branches. Arrays, records, scalar leaves, and empty objects have no named
@@ -562,16 +612,27 @@ one-to-one identity between operation schema paths and source properties.
 
 ## Focused validation
 
-The repair's 18 fixture snapshots were refreshed and then checked without
+The repair's 20 fixture snapshots were refreshed and then checked without
 snapshot updates. There are nine matching violation cases, five matching
-rule-compliant controls, three intentional TypeSpec-only scope cases, and one
-reviewed validator-only scope case. The harness labels the TypeSpec-only cases
+rule-compliant controls, four intentional TypeSpec-only cases, and two
+reviewed validator-only cases. The two new inheritance cases add one discrepancy
+in each direction to the four existing scope cases. The harness labels the TypeSpec-only cases
 as mapped diagnostics in validator-clean fixtures; that warning is explained,
 not suppressed or reclassified as equivalence. One pre-existing non-model
 control still has unreviewed ambient diagnostics, unrelated to this rule.
 
-Nine native unit cases pass: the two existing response-range regressions,
-three emitter/client-generator-free model-comparison cases, and four client
-scope regressions. Package build and changed-file lint pass. The full corpus
+Sixteen native unit cases pass: seven inherited-override regressions, the two
+existing response-range regressions, three model-comparison cases without
+AutoRest or the client generator core, and four existing client-scope
+regressions. Package build and changed-file lint pass. The full corpus
 completed with exit code zero; the six project compile failures above are
 retained and excluded, not counted as successful comparisons.
+
+The first comparison run exposed the two new native/emitted inheritance
+differences; the fixture expectations now record those reviewed outcomes rather
+than claiming parity. A one-project Informatica run succeeded before the full
+run. The legacy corpus runner invokes `npm link`, so both completed runs used
+a session-local `npm_config_prefix` to isolate its link registry; the specs
+package's resolved path was checked against this source worktree. An initial
+setup-only attempt was interrupted before corpus generation and is not counted
+as a completed run. No harness implementation was changed.

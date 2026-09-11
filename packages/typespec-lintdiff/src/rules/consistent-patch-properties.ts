@@ -2,6 +2,7 @@ import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-m
 import {
   createRule,
   getDiscriminator,
+  getProperty,
   isNeverType,
   isNullType,
   paramMessage,
@@ -204,6 +205,10 @@ function getPayloadProperties(program: Program, model: Model): Map<string, Paylo
 
   for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
     for (const property of current.properties.values()) {
+      // A derived declaration shadows its base even when its payload type is never.
+      if (getProperty(model, property.name) !== property) {
+        continue;
+      }
       const jsonName = resolveEncodedName(program, property, "application/json");
       if (!properties.has(jsonName) && !isNeverType(property.type)) {
         properties.set(jsonName, { target: property, type: property.type });

@@ -39,6 +39,19 @@ Swagger-compliant expectations and record a native diagnostic in their snapshots
 discrepancy. Native unit tests assert the intended result for all four cases.
 Do not add an emitter adapter or read TCGC private state to eliminate these gaps.
 
+Inherited properties are resolved by their authored name before JSON names or
+`never` filtering. A derived `extra?: never` hides `Base.extra`, including
+through intermediate models and nested payloads. A redeclaration with a new
+encoded name also replaces the base declaration rather than adding another
+property. Unrelated properties sharing a JSON name are not inheritance overrides.
+
+`never-patch-override` is native-compliant but has a reviewed validator
+diagnostic; `never-resource-override` is validator-compliant but has a native
+diagnostic. AutoRest skips the derived `never` property while emitting an
+`allOf` reference to the base, whose `extra` remains visible to the validator.
+These are native-versus-emitted contract differences, not validator defects.
+Native regression tests assert both outcomes independently of emission.
+
 The provider namespace check isolates this ARM rule in lintdiff's mixed ruleset;
 it is not a requirement that every operation carry provider metadata. Evaluate
 that isolation separately during official ARM promotion, with ordinary and
@@ -94,6 +107,8 @@ nested-namespace coverage. This repair does not change the applicability guard.
 | `encoded-discriminator-property` | yes                      | An encoded authored property replaces the synthesized discriminator and has a mismatching nested shape |
 | `same-level-subset`              | no                       | PATCH updates only `properties.description`, which is a valid subset of the resource model             |
 | `async-get-fallback`             | no                       | PATCH has only a `202` response, so the validator falls back to the GET resource model                 |
+| `never-patch-override`           | yes (Swagger); native no | A native PATCH `never` override hides a base property retained by emitted `allOf`                      |
+| `never-resource-override`        | no (Swagger); native yes | A native response `never` override hides a base property retained by emitted `allOf`                   |
 
 Focused rule unit tests additionally cover the TypeSpec HTTP representation
 where one response carries a status-code range containing `200`, including the
