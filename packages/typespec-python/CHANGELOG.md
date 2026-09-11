@@ -1,5 +1,9 @@
 # Release
 
+## 0.63.7
+
+- Bump @typespec/http-client-python to 0.37.2
+
 ## 0.63.6
 
 ### Bug Fixes
