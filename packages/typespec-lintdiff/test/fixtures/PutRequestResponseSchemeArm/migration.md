@@ -49,7 +49,7 @@ The shared function finds the first body parameter schema, returns no diagnostic
 
 ## Native TypeSpec behavior
 
-The migrated rule visits ARM provider PUT operations, reads HTTP operation metadata, compares the request body type with the primary `200` response body type or fallback `201` response body type, and reports on the operation when both body schemas exist and differ. The helper compares TypeSpec semantic models, scalars, enums, tuples, unions, arrays, indexers, inherited properties, property optionality, and property types. It now treats `void` request bodies as absent schemas, matching the validator's no-request-schema exit and avoiding emitter-specific false positives without changing shared data-plane response handling.
+The migrated rule visits ARM provider PUT operations, reads HTTP operation metadata, compares the request body type with the primary `200` response body type or fallback `201` response body type, and reports on the operation when both body schemas exist and differ. The helper compares TypeSpec semantic models, scalars, enums, tuples, unions, arrays, indexers, inherited properties, property optionality, and property types. It now treats `void` request bodies as absent schemas, matching the validator's no-request-schema exit and avoiding emitter-specific false positives without changing shared data-plane response handling. The shared-helper behavior is also covered by the data-plane `PutRequestResponseScheme/no-request-body` fixture.
 
 ## Native shape matrix
 

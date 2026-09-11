@@ -29,8 +29,9 @@ validator violation.
 
 ## Test Cases
 
-| ID                        | Violation | Description                                                |
-| ------------------------- | --------- | ---------------------------------------------------------- |
-| `put-schema-match`        | false     | PUT request and `200` response use the same schema.        |
-| `put-schema-mismatch`     | true      | PUT request and `200` response use different schemas.      |
-| `put-schema-mismatch-201` | true      | PUT has no `200`; request body differs from the `201` body.|
+| ID                        | Violation | Description                                                   |
+| ------------------------- | --------- | ------------------------------------------------------------- |
+| `put-schema-match`        | false     | PUT request and `200` response use the same schema.           |
+| `no-request-body`         | false     | PUT has no emitted request body for the validator to compare. |
+| `put-schema-mismatch`     | true      | PUT request and `200` response use different schemas.         |
+| `put-schema-mismatch-201` | true      | PUT has no `200`; request body differs from the `201` body.   |
