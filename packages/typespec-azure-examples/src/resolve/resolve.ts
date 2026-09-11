@@ -9,6 +9,8 @@ export interface ResolvedExample {
   readonly operation: string;
   /** The lineage title, when the operation has more than one lineage. */
   readonly title?: string;
+  /** The original legacy `x-ms-examples` file name, when preserved during migration. */
+  readonly legacyFilename?: string;
   readonly request?: unknown;
   readonly responses?: unknown;
 }
@@ -58,6 +60,9 @@ export function resolveExampleFiles(
         examples.push({
           operation,
           ...(title === "" ? {} : { title }),
+          ...(typeof selected.legacyFilename === "string"
+            ? { legacyFilename: selected.legacyFilename }
+            : {}),
           request: substituteApiVersion(selected.request, apiVersion),
           responses: substituteApiVersion(selected.responses, apiVersion),
         });
@@ -76,6 +81,7 @@ export function resolveExampleFiles(
 interface Variant {
   readonly title?: unknown;
   readonly since?: unknown;
+  readonly legacyFilename?: unknown;
   readonly request?: unknown;
   readonly responses?: unknown;
 }
