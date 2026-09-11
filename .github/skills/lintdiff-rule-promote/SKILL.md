@@ -390,7 +390,10 @@ reference entries as a substitute for regeneration. After docs regeneration,
 inspect the generated target-package README and website linter/rule references
 for the official rule name, page path, links, and table entry. Format the changed
 Markdown files and check them with Prettier so generated tables use the expected
-layout.
+layout. Use the scoped empty-ignore override in step 9: ordinary Prettier
+commands silently skip website references covered by `.prettierignore` and
+generated rule pages covered by `.gitignore`. Leave both ignore files untouched
+and do not force-add ignored generated rule pages.
 
 ### 7. Update rulesets
 
@@ -471,7 +474,8 @@ Optimized validation order:
 5. inspect the generated package README and website linter/rule references for
    the official rule name, page path, links, and table entry
 6. format changed Markdown and run a Prettier check over the generated package
-   README, rule documentation, and website linter/rule references
+   README, rule documentation, and website linter/rule references, using an
+   empty-ignore override and explicit filenames as shown below
 7. `@azure-tools/typespec-azure-rulesets` build and test when rulesets changed
 8. affected package test
 9. if broad local validation is warranted, run the repo build or
@@ -484,7 +488,9 @@ dedicated Website job runs without the skip and is the authoritative Astro check
 and build for generated website content.
 
 For ARM rule promotion, use this command set as the default targeted validation
-loop, replacing `<rule-name>` with the promoted rule file stem:
+loop, setting `RULE_NAME` to the exact official TypeSpec rule name/file stem
+(for example, `use-create-for-put`, not the validator slug
+`put-in-operation-name`):
 
 ```bash
 RULE_NAME="replace-with-rule-name"
@@ -493,8 +499,8 @@ pnpm --filter @azure-tools/typespec-azure-resource-manager exec vitest run "test
 pnpm --filter @azure-tools/typespec-azure-resource-manager build
 pnpm --filter @azure-tools/typespec-azure-resource-manager lint
 pnpm --filter @azure-tools/typespec-azure-resource-manager regen-docs
-pnpm exec prettier --write packages/typespec-azure-resource-manager/README.md "packages/typespec-azure-resource-manager/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-resource-manager/reference/linter.md
-pnpm exec prettier --check packages/typespec-azure-resource-manager/README.md "packages/typespec-azure-resource-manager/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-resource-manager/reference/linter.md
+pnpm exec prettier --ignore-path /dev/null --write packages/typespec-azure-resource-manager/README.md "packages/typespec-azure-resource-manager/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-resource-manager/reference/linter.md "website/src/content/docs/docs/libraries/azure-resource-manager/rules/${RULE_NAME}.md"
+pnpm exec prettier --ignore-path /dev/null --check packages/typespec-azure-resource-manager/README.md "packages/typespec-azure-resource-manager/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-resource-manager/reference/linter.md "website/src/content/docs/docs/libraries/azure-resource-manager/rules/${RULE_NAME}.md"
 pnpm --filter @azure-tools/typespec-azure-rulesets build
 pnpm --filter @azure-tools/typespec-azure-rulesets test
 pnpm --filter @azure-tools/typespec-azure-resource-manager test
@@ -511,14 +517,41 @@ pnpm --filter @azure-tools/typespec-azure-core exec vitest run "test/rules/${RUL
 pnpm --filter @azure-tools/typespec-azure-core build
 pnpm --filter @azure-tools/typespec-azure-core lint
 pnpm --filter @azure-tools/typespec-azure-core regen-docs
-pnpm exec prettier --write packages/typespec-azure-core/README.md "packages/typespec-azure-core/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-core/reference/linter.md
-pnpm exec prettier --check packages/typespec-azure-core/README.md "packages/typespec-azure-core/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-core/reference/linter.md
+pnpm exec prettier --ignore-path /dev/null --write packages/typespec-azure-core/README.md "packages/typespec-azure-core/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-core/reference/linter.md "website/src/content/docs/docs/libraries/azure-core/rules/${RULE_NAME}.md"
+pnpm exec prettier --ignore-path /dev/null --check packages/typespec-azure-core/README.md "packages/typespec-azure-core/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-core/reference/linter.md "website/src/content/docs/docs/libraries/azure-core/rules/${RULE_NAME}.md"
 pnpm --filter @azure-tools/typespec-azure-rulesets build
 pnpm --filter @azure-tools/typespec-azure-rulesets test
 pnpm --filter @azure-tools/typespec-azure-core test
 pnpm exec cross-env TYPESPEC_SKIP_WEBSITE_BUILD=true pnpm validate:pr
 git diff --check
 ```
+
+The Bash examples use the POSIX empty ignore path `/dev/null`. In Windows
+PowerShell, use `NUL` instead; the equivalent four-file formatting commands are
+below. Set `$Library` to `azure-resource-manager` or `azure-core` and `$RuleName`
+to the exact official rule name:
+
+```powershell
+$Library = "azure-resource-manager"
+$RuleName = "use-create-for-put"
+$DocFiles = @(
+  "packages\typespec-$Library\README.md"
+  "packages\typespec-$Library\src\rules\$RuleName.md"
+  "website\src\content\docs\docs\libraries\$Library\reference\linter.md"
+  "website\src\content\docs\docs\libraries\$Library\rules\$RuleName.md"
+)
+pnpm exec prettier --ignore-path NUL --write @DocFiles
+pnpm exec prettier --ignore-path NUL --check @DocFiles
+```
+
+An explicit empty ignore file is also valid in place of the platform null path.
+Apply this override only to these explicit filenames, never a directory, glob,
+or repo-wide formatting command. Confirm the `--write` output actually lists all
+four files, including `reference/linter.md` and `rules/<official-rule-name>.md`;
+a successful `--check` summary alone does not prove ignored files were checked.
+If needed, use `prettier --ignore-path <empty-ignore-path> --file-info <filename>`
+for each generated file and confirm `"ignored": false`, then rerun the scoped
+write/check commands.
 
 Run a focused code review after steps 1-2 pass and before steps 3-6 when the
 rule logic is non-trivial. This catches semantic gaps before expensive full
