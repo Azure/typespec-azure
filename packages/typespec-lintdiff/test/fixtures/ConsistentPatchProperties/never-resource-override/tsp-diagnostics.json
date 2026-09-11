@@ -1,0 +1,52 @@
+[
+  {
+    "code": "@azure-tools/typespec-azure-core/require-versioned",
+    "severity": "warning",
+    "message": "Azure services should use the versioning library to define versions for their services. Add the '@versioned' decorator to the service namespace."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-common-types-version",
+    "severity": "warning",
+    "message": "Specify the ARM common-types version using the @armCommonTypesVersion decorator on the service namespace or on each version of the service version enum."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+    "severity": "warning",
+    "message": "Use the latest ARM common-types version 'v6' instead of 'v3'."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/consistent-patch-properties",
+    "severity": "warning",
+    "message": "The property 'extra' in the request body either does not appear in the resource model or is nested at the wrong level."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/composition-over-inheritance",
+    "severity": "warning",
+    "message": "Model 'Resource' is extending 'Microsoft.TestService.Base' that doesn't define a discriminator. If 'Microsoft.TestService.Base' is meant to be used:\n - For composition consider using spread `...` or `model is` instead.\n - As a polymorphic relation, add the `@discriminator` decorator on the base model."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'extra' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/no-override-props",
+    "severity": "warning",
+    "message": "The property 'extra' is also defined in the base model.  Redefining inherited properties can cause problems with OpenAPI tooling and some language representations of the models."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  }
+]

@@ -26,6 +26,9 @@ Before dispatcher mode creates branches or worktrees, and before worker mode
 prepares dependencies or starts the Development workflow, check every requested
 Swagger validator rule ID against
 `packages/typespec-lintdiff/catalog/validator-rule-metadata.json`.
+Parse this file as a JSON array and select the entry whose rule-ID field matches
+the requested ID case-insensitively. Do not use object-property lookup by rule
+name; that can falsely report an existing rule as missing.
 
 Continue only when the rule exists and its catalog `applicability` is `ARM` or
 `Both`. If any requested rule is missing or `DataPlane`, stop immediately and
@@ -52,7 +55,17 @@ mandatory semantic check, not an exact-name search.
 Fetch the user-supplied target branch from `origin` and use
 `refs/remotes/origin/<target-branch>` as the source of truth. Do not use or
 update a same-named local branch; it may be stale or checked out in another
-worktree. Inspect all of the following:
+worktree. Before deeper investigation, use GitHub's exact head/base and PR-title
+evidence to detect whether this rule's migration PR already merged. Also compare
+the rule branch with the remote target. If a merged PR already supplied the
+migration, stop before dependency setup and report the existing PR evidence.
+An empty diff alone is not a stop condition: a freshly prepared rule branch
+normally has no changes, and an existing implementation may still need migration
+evidence. Continue the semantic coverage check below and, when its classification
+permits development, complete the remaining workflow, including creating or
+refreshing `migration.md`, even if no production rule change is needed. Preserve
+the coverage-based stop conditions below; an empty diff proves neither coverage
+nor completion. Inspect all of the following:
 
 1. Search the rule documentation under
    `packages/typespec-azure-core/src/rules` and
@@ -81,7 +94,10 @@ worktree. Inspect all of the following:
    not only the validator rule ID. Older TypeSpec rules may use a different name,
    and one TypeSpec rule may cover several validator rules.
 
-Classify each requested rule as:
+Assess material validator behavior against valid supported TypeSpec inputs and
+the native implementation boundary below, not exact executable Swagger behavior.
+Record Swagger-only or already-invalid shapes as intentional parity gaps, not
+missing native checks. Classify each requested rule as:
 
 - `already covered`: an enabled official TypeSpec rule enforces all material
   validator behavior
@@ -363,11 +379,13 @@ its supplied worktrees:
 <isolated-specs-worktree>` to build the linter and create the direct link in the
      specs worktree
    - separately provide the focused fixture source inputs immediately before
-     focused validation: either set and verify `LINTDIFF_VALIDATOR_ROOT` and
-     `LINTDIFF_COMMON_TYPES` against existing local sources, or create the two
-     documented temporary links. `compare:setup` does not populate these
-     sources. Do not assume a fresh rule worktree already contains
-     `test/azure-openapi-validator` or `test/common-types`
+     focused validation. On Windows, prefer the two documented temporary
+     junctions because they preserve stable snapshot references. Use
+     `LINTDIFF_VALIDATOR_ROOT` and `LINTDIFF_COMMON_TYPES` only when both paths
+     are verified and the resulting snapshots remain repository-relative.
+     `compare:setup` does not populate these sources. Do not assume a fresh rule
+     worktree already contains `test/azure-openapi-validator` or
+     `test/common-types`
 6. Verify that the specs worktree's local
    `node_modules/tsp-lintdiff-local-linter` resolves directly to the supplied
    typespec-azure worktree. `compare:setup` creates a direct per-worktree link
@@ -407,49 +425,154 @@ The top-level worker works only in the supplied typespec-azure worktree.
 ### 1. Establish evidence
 
 - Read the fixture `rule.md`, production TypeSpec rule, fixtures, snapshots,
-  and `migration.md`.
+  and `migration.md` when present. A missing `migration.md` is a deliverable to
+  create from the investigation and validation evidence, not a reason to stop.
 - Read both coverage reports:
   - `packages/typespec-lintdiff/docs/coverage_old.md`
   - `packages/typespec-lintdiff/specs/coverage-breakdown.md`
 - Follow `/analyze-swagger-typespec-lint-gap` to align populations and identify
   real semantic misses.
 - Decide whether the production TypeSpec rule actually requires a change.
+- If no production change is needed, continue focused validation, corpus
+  analysis, and migration documentation. Do not invent a code change merely to
+  produce a diff; evidence-only changes still follow the review and draft PR
+  workflow.
 - Do not require equal raw Swagger and TypeSpec diagnostic counts.
 
-#### Emission-dependent semantic completeness gate
+#### Native TypeSpec implementation boundary
+
+Prefer idiomatic TypeSpec validation. Preserve Swagger parity only where it
+naturally maps to TypeSpec semantics; exact executable Swagger behavior is not
+the migration contract when reproducing it requires non-idiomatic TypeSpec or
+handling constructs already invalidated by TypeSpec or Azure rules. Do not embed
+AutoRest/Swagger schema formatting, encoding, or emission logic merely to obtain
+exact diagnostic parity, even when it could be recreated using native APIs.
+For example, when the guideline calls for a plain model, check the model and its
+indexer rather than simulate how AutoRest formats or encodes its schema.
+
+This priority follows the
+[review discussion on PR #5361](https://github.com/Azure/typespec-azure/pull/5361#discussion_r3974150445):
+native rules check TypeSpec semantics first; Swagger parity is secondary.
+
+Production rules must validate the TypeSpec semantic model directly through
+supported compiler, HTTP, versioning, and Azure library APIs. Do not import or
+call functions from `@azure-tools/typespec-autorest` or another emitter, invoke
+emission, or read generated Swagger/OpenAPI to decide TypeSpec diagnostics.
+An emitter helper that only reads metadata is still an emitter dependency.
+Do not conceal it behind a wrapper, dynamic import, private state-map key,
+decorator-name scraping, or copied emitter implementation.
+
+Design production rules for their intended official destination before choosing
+dependencies. ARM rules must not import or call
+`@azure-tools/typespec-client-generator-core` (TCGC): ARM is a dependency of
+TCGC, so promoting such a rule would introduce the wrong dependency direction.
+Do not add a TCGC dependency to ARM to preserve SDK scope or legacy LRO markers;
+use supported Azure Core and ARM semantic APIs instead.
+
+Production rules must not use `@typespec/openapi`, including `getExtensions`
+and `shouldInline`, even though it is a library rather than an emitter. Define
+the check in terms of TypeSpec authoring semantics instead of OpenAPI extension
+overrides or predicted schema inlining. Do not copy these helpers or inspect
+their private state to evade this boundary.
+
+Do not use unsafe compiler APIs such as
+`unsafe_mutateSubgraphWithNamespace` to construct version snapshots in a
+production rule. Prefer supported, non-mutating versioning metadata APIs.
+If they cannot establish a historical shape, document that limitation rather
+than silently checking only the latest shape while claiming all-version
+coverage.
+
+These restrictions apply to production rule logic and helpers used to implement
+its decisions. Supported Azure semantic APIs remain permitted despite their
+internal transitive dependencies; do not use wrappers or private state to access
+prohibited functionality. Research and comparison fixtures may still use the
+prohibited libraries to demonstrate Swagger divergence. Native tests may
+register transitive libraries required by the test host, but must exercise the
+rule through supported native semantics rather than TCGC, OpenAPI decorators,
+or unsafe mutation.
+
+Removing a prohibited dependency can change the diagnostic population. Record
+the native contract and explicit differences for SDK scope, legacy markers,
+OpenAPI overrides, inline shapes, and historical versions when relevant.
+When behavior changes, update native regression tests for supported TypeSpec
+inputs and document material differences in migration evidence. Use comparison
+fixtures or code-backed rejection evidence as appropriate. These differences
+do not justify restoring prohibited dependencies or reproducing emitter
+behavior. Do not present import removal as behavior-preserving without evidence.
+
+Inspecting emitter source and comparing generated Swagger are permitted only
+for migration research and the test/comparison harness. Shared semantic APIs
+such as HTTP payload metadata and Azure common-type metadata are appropriate
+when they operate on the program without loading or running an emitter.
+
+Before adding special cases or helper complexity, require tests demonstrating
+that the added behavior affects valid supported idiomatic TypeSpec inputs.
+Distinguish those inputs from Swagger-only shapes, emitter-invalid shapes, and
+constructs already rejected by TypeSpec or Azure rules. A fixture that reaches
+emission despite those diagnostics does not prove supported TypeSpec behavior.
+If the complexity affects only such shapes, omit it and document the intentional
+parity gap with the rejecting diagnostic or other code-backed evidence.
+
+If parity requires emitter simulation, non-idiomatic TypeSpec, or an
+emitter-specific override with no supported native API, describe the behavior
+and intentional divergence in `rule.md` and `migration.md`.
+Validate the native contract rather than inventing an adapter to force parity.
+Distinguish native contract coverage from exact Swagger equivalence. Mark Swagger
+coverage partial when material Swagger behavior remains outside that contract;
+this does not itself require more native implementation. Do not claim full
+equivalence from corpus overlap. Include native tests that compile without
+importing the emitter and comparison fixtures or rejection evidence for the
+documented divergence.
+
+#### Native semantic completeness and parity evidence gate
 
 When the Swagger rule selects, resolves, or compares an emitted OpenAPI field,
 do not treat upstream validator tests, observed corpus overlap, or coverage of
-the containing authorable surface as complete semantic evidence. Before
-implementing or accepting the migrated rule:
+the containing authorable surface as complete semantic evidence. The native
+contract above governs this investigation; an emission matrix is research
+evidence, not a requirement to reproduce the emitter. Before implementing or
+accepting the migrated rule:
 
-1. Trace the emitter path from the relevant TypeSpec semantic target to the
-   OpenAPI node and field inspected by the Swagger rule.
-2. Enumerate every authorable TypeSpec type family and meaningful subtype that
-   can reach that emitter path. Include default and fallthrough branches,
-   unsupported-but-emitted shapes, transformed or inherited types, and
-   decorator- or content-type-dependent branches when they affect the selected
-   OpenAPI field.
+1. State the intended guideline as an idiomatic TypeSpec semantic check. For
+   research only, trace relevant emitter paths when needed to explain Swagger
+   behavior or a parity gap; do not turn those paths into an implementation
+   checklist.
+2. Enumerate the valid supported TypeSpec type families and meaningful subtypes
+   relevant to that check, including transformed or inherited types and relevant
+   decorators or content types. Separately classify Swagger-only, emitter-invalid,
+   already-rejected, and unsupported-but-emitted shapes; they do not expand the
+   native contract.
 3. Record a rule-local emission matrix with, at minimum:
    - authored TypeSpec shape
-   - emitter function or branch
+   - validity and support status, with any rejecting TypeSpec or Azure diagnostic
+   - native semantic check and any relevant emitter function or branch
    - whether the selected OpenAPI field is present
    - its emitted value or value category when present
    - expected Swagger result
-   - expected TypeSpec lint result
-   - the fixture that proves the row
+   - expected TypeSpec lint result and any intentional parity gap
+   - the fixture or code-backed rejection evidence that proves the row
 4. Distinguish **surface coverage** from **shape coverage**. A request-body,
    response-body, parameter, or model fixture proves only the represented
-   shapes within that surface.
-5. Treat any reachable but unclassified emitter branch as unresolved
-   uncertainty. Do not claim functional equivalence or proceed to the PR until
-   the matrix is closed or the branch is proven unauthorable for the rule's
-   scope.
+   shapes within that surface. Every added implementation branch must have a
+   test showing its effect on valid supported TypeSpec, not only invalid or
+   emitter-specific shapes.
+5. Resolve unclassified behavior within the native contract before proceeding
+   to the PR. Document out-of-contract rows and intentional parity gaps with
+   evidence rather than requiring exhaustive emitter-branch simulation. Do not
+   call unresolved differences intentional or claim full Swagger equivalence
+   from a documented limitation.
 
 The full corpus is observational regression evidence: it proves behavior only
 for shapes present in the selected projects and versions. Even complete
-same-project overlap cannot replace the emission matrix or establish universal
-semantic coverage.
+same-project overlap cannot replace supported-shape tests or establish universal
+semantic coverage. Corpus/lintdiff discrepancies guide investigation and
+documentation; they do not override the idiomatic native contract.
+
+When the validator resolves external example files or another configured
+artifact directory, mirror its documented path, API-version, and
+`examples-directory` resolution exactly. Do not recursively scan a guessed
+project-root directory as a fallback. If TypeSpec cannot safely observe the
+same external files, document that limit instead of adding a broader heuristic.
 
 ### 2. Implement the focused rule change
 
@@ -457,13 +580,39 @@ When evidence requires a rule update:
 
 - change the production TypeSpec rule
 - add directly related violating, compliant, and regression fixtures
-- for an emission-dependent rule, add fixtures for every distinct matrix
-  outcome and every implementation branch whose fallback behavior can change
-  whether the selected OpenAPI field exists
+- for an emission-dependent rule, cover each distinct supported native matrix
+  outcome and prove that every added special case affects valid supported
+  TypeSpec; omit complexity justified only by out-of-contract shapes and retain
+  comparison or rejection evidence for the intentional gaps
 - update snapshots and fixture `rule.md`
 - update the rule's `migration.md`
 
 Do not change Swagger validator code, emitters, or unrelated TypeSpec rules.
+
+#### ARM applicability without redundant namespace guards
+
+ARM-only catalog eligibility selects the rule's audience; it does not imply that
+every visited operation must carry provider namespace metadata. Before adding an
+ARM applicability check, inspect the actual ruleset/runner selection and
+neighboring rules in the intended official destination.
+
+- When an ARM-only execution context already supplies the applicability boundary,
+  do not add a provider-namespace presence check merely because the rule is ARM
+  specific. Keep checks for provider metadata only when that metadata is part of
+  the rule's contract.
+- Lintdiff can enable ARM and data-plane rules together. Do not assume that the
+  compiler filters declarations by package or catalog applicability. If the mixed
+  runner requires an isolation guard, record it as lintdiff-only infrastructure,
+  keep it separate from the rule's semantic checks, and cover applicable nested
+  namespaces and inapplicable services.
+- Verify helper traversal direction before using a namespace resolver as an
+  applicability predicate. `resolveProviderNamespace(program, namespace)` searches
+  that namespace and its descendants, not its ancestors; it does not establish
+  whether an operation is inside an ARM provider.
+- Document the intended promotion adaptation in `rule.md`. Native ARM tests should
+  cover ordinary and nested namespaces without an unnecessary provider decorator
+  when the selected official ruleset is the applicability boundary. Filtering
+  library declarations and non-endpoint templates is a separate concern.
 
 ### 3. Run focused validation
 
@@ -482,6 +631,10 @@ pnpm --dir packages/typespec-lintdiff specs:typespec `
   --specs-repo <isolated-azure-rest-api-specs-worktree> `
   --concurrency 6
 ```
+
+Pass the runner options directly as shown. Do not insert an additional `--`
+after `specs:typespec`; in this repository that separator is forwarded to the
+runner and rejected as an unknown argument.
 
 The command runs all local rules and rewrites canonical TypeSpec results and
 coverage files in this development worktree. Use the refreshed rule row and
@@ -537,11 +690,47 @@ corpus when practical.
 
 ### 5. Refresh the rule migration note
 
-After the final corpus run, update the rule's `migration.md` from the newly
-generated results. This update is required whenever the production rule
-changes.
+After the final corpus run, create or refresh the rule's `migration.md` from
+the newly generated results. This step is required for every rule that proceeds
+through the Development workflow, including runs that started with an empty
+diff or required no production rule change.
 
-Record:
+#### Lead with the result and gap explanation
+
+Immediately after the document title, start with `## Result and gap summary`.
+This is the migration note's primary reader-facing information, not an audit-log
+introduction. In roughly 150 words or fewer, answer:
+
+- **Results:** What are the latest validator versus migrated TypeSpec diagnostic
+  counts and affected-project counts? Name the compared scope, including staging
+  versus production or selected API version when material. Label partial or
+  non-comparable results explicitly.
+- **Why they differ:** Explain the concrete cause of each material discrepancy
+  in plain language and quantify its contribution when established. Distinguish
+  a real missed check from validator false positives, emitted duplicates,
+  version/population differences, or exclusions. Say what each engine checks
+  differently; labels such as "different methodologies" are not an explanation.
+- **Decision:** State whether a TypeSpec rule update is required, was completed,
+  or is unnecessary for the explained gap, and why. State the functional
+  equivalence conclusion separately from raw-count equality.
+- **Uncertainty:** Surface any unexplained remainder or material evidence
+  limitation here, not only deep in the document. Do not present an unresolved
+  gap as intentional or call findings false positives without supporting evidence.
+
+Use a short paragraph or compact bullets; when several causes contribute, a
+small cause/count/disposition table can follow. Link to the detailed evidence
+sections below rather than repeating their full tables. If counts match, say
+there is no observed count gap without treating equality as proof of equivalence.
+If comparison is blocked, lead with that blocker instead of implying parity.
+
+A reader should understand the mismatch and its migration impact from this
+opening alone. Do not lead with commit hashes, tool versions, commands, report
+reconciliation history, or repair chronology.
+
+#### Keep the supporting evidence below the summary
+
+Retain the complete evidence required by `/analyze-swagger-typespec-lint-gap`;
+the concise opening supplements it, not replaces it. Record:
 
 - the specs commit and whether the run was full or partial
 - latest validator and TypeSpec project and diagnostic counts
@@ -551,7 +740,9 @@ Record:
   comparison, including diagnostics excluded because they belong only to older
   API versions
 - compile failures and their effect on the assessed population
-- explanations for remaining gaps
+- explanations for remaining gaps, distinguishing intentional native-contract
+  differences and Swagger-only or already-invalid shapes from missed checks on
+  valid supported TypeSpec
 - the standard code-backed example from
   `/analyze-swagger-typespec-lint-gap` for every distinct material gap cause
 - the final conclusion on functional equivalence and any uncertainty
@@ -618,14 +809,27 @@ The reviewer must:
   `refs/remotes/origin/<target-branch>`, not a same-named local branch
 - inspect the production rule, fixtures, snapshots, `rule.md`, and
   `migration.md`
+- verify that `migration.md` opens with an accurate result and gap summary:
+  counts, concrete causes, rule-change decision, and material uncertainty must
+  agree with the detailed evidence without requiring readers to reconstruct them
 - check for semantic misses, false positives, incorrect TypeSpec compiler API
   usage, version/projection mistakes, unstable diagnostic targets, ineffective
   deduplication, and misleading diagnostics
 - verify that fixture evidence covers the implementation's important branches
-- for an emission-dependent rule, independently audit the negative space:
-  compare the rule against every reachable emitter type branch, default path,
-  and fallthrough in the recorded emission matrix rather than limiting review
-  to branches made explicit by the TypeSpec rule implementation
+- verify that production rule imports and reachable helpers respect the native
+  implementation boundary, native tests do not require an emitter, and any
+  emitter-only divergence is documented rather than hidden by an adapter
+- verify destination-compatible dependency direction and absence of TCGC
+  dependencies in ARM rule logic, `@typespec/openapi` usage, and unsafe compiler
+  mutation; check that their removal did not leave unsupported claims about
+  SDK scope, extension overrides, schema inlining, or historical versions
+- verify that special cases and helpers have tests proving an effect on valid
+  supported TypeSpec and do not simulate AutoRest schema formatting or encoding
+  solely for diagnostic parity
+- for an emission-dependent rule, independently audit supported native shapes
+  missing from the implementation and the matrix's validity classifications;
+  confirm out-of-contract differences have evidence and are documented rather
+  than requiring emitter simulation or checks for already-rejected constructs
 - confirm that corpus parity is not being used to close an untested matrix row
 - confirm generated corpus and coverage files are absent from the PR diff
 - report only concrete, actionable findings with file and line references
@@ -662,6 +866,11 @@ creating a draft PR.
    rule branch as head and the user-supplied target branch as base. Do not mark
    it ready for review; the user decides when the migration evidence and rule
    behavior are ready for formal review.
+   If the preferred PR-creation tool returns an ambiguous transport error or
+   claims a conflicting PR, query GitHub for the exact head/base first. When no
+   PR exists, retry once with an explicit `gh pr create` command that supplies
+   `--head <rule-branch>`, `--base <target-branch>`, and `--draft`; when one
+   exists, return its canonical URL instead of creating a duplicate.
 6. Set the PR title to the exact stable pattern
    `[Swagger Linter Migration] <ValidatorRuleId> (origin)`, replacing
    `<ValidatorRuleId>` with the original Swagger validator rule ID.
@@ -747,8 +956,9 @@ Worker mode returns:
 ## Post-run process review
 
 After the draft PR is created and the deliverable is complete, briefly review
-the run before the final user response. Capture concrete suggestions for the
-next lintdiff rule, especially:
+the run before the final user response. Read and follow the
+[shared post-run process review](../shared/post-run-process-review.md), including
+its confidence gate, ownership, independent PR, and reporting rules. Focus on:
 
 - steps that cost unexpected time and how to avoid or parallelize them next time
 - status reporting that was missing, stale, or too noisy, and the progress or
@@ -761,8 +971,3 @@ next lintdiff rule, especially:
 - corpus, fixture, and migration evidence that made the equivalence conclusion
   clearer or more reliable
 - skill instructions that should be updated based on the observed run
-
-Print the suggestions in the final handoff and ask the user whether any should
-be adopted into this skill. Do not update the skill automatically from the
-post-run review; only make skill changes after the user explicitly approves the
-specific suggestion(s).

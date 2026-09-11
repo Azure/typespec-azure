@@ -1,7 +1,7 @@
 ---
 name: lintdiff-rule-promote
-description: Promote a user-marked done LintDiff rule from packages/typespec-lintdiff into the correct official TypeSpec Azure library, with a clean worktree, user-confirmed destination, native tests/docs/ruleset wiring, validation, and a draft PR. Use when the user names a migrated lintdiff rule as done and asks to move or promote it to typespec-azure-core or typespec-azure-resource-manager.
-argument-hint: "[validator rule id or local rule name marked done]"
+description: Promote a named LintDiff rule from packages/typespec-lintdiff into the correct official TypeSpec Azure library, assuming it is done, with a clean worktree, agent-recommended destination by default (or user-confirmed destination when requested), native tests/docs/ruleset wiring, validation, and a draft PR. Use when the user names a migrated lintdiff rule and asks to move or promote it to typespec-azure-core or typespec-azure-resource-manager.
+argument-hint: "[validator rule id or local rule name] [ask for confirmation]"
 user-invocable: true
 ---
 
@@ -16,13 +16,12 @@ official-library PR is prepared in a clean worktree.
 
 ## Preconditions
 
-- The user must explicitly name the rule and mark it as done for this run.
-  Do not infer "done" from catalog status, `coverageKind`, fixture counts, or
-  local linter registration alone.
-- In an active promotion conversation, wording like "start with
-  `<RuleName>`" or "promote `<RuleName>`" is sufficient only when the user has
-  already established that this workflow is for done rules. Record that as a
-  per-run eligibility decision; do not write it back as persistent metadata.
+- The user must name the rule. Assume a rule named for promotion is done for
+  this run; do not ask the user to mark it done or verify a separate done-status
+  flag in catalog metadata, fixtures, or linter registration.
+- Wording like "start with `<RuleName>`" or "promote `<RuleName>`" is sufficient
+  in a promotion conversation. This is a per-run assumption, not a persistent
+  metadata change or a claim that the user explicitly marked the rule done.
 - If the rule semantics are still under review, stop and send the user to the
   lintdiff development or repair flow first.
 - Do not edit or clean up the current lintdiff worktree as part of promotion.
@@ -32,7 +31,7 @@ official-library PR is prepared in a clean worktree.
   personal fork. Verify that `origin` points to `Azure/typespec-azure` before
   creating the worktree. If `origin` is not writable, stop and report the
   permission blocker; do not silently fall back to a fork.
-- Treat the user-marked done lintdiff rule as immutable during promotion. Do not
+- Treat the source lintdiff rule as immutable during promotion. Do not
   change `packages/typespec-lintdiff` source, fixtures, snapshots, package
   manifests, or docs unless the user explicitly redirects from promotion back to
   rule repair.
@@ -52,13 +51,43 @@ official-library PR is prepared in a clean worktree.
   `LatestVersionOfCommonTypesMustBeUsed` should be promoted as a concise rule
   name such as `use-latest-version-of-common-types`, not the full validator slug.
 
+## Confirmation policy
+
+Use "do not ask" mode by default: proceed with the agent's evidence-backed
+recommendation instead of pausing for routine confirmation. The user does not
+need to add "do not ask" to the promotion request. If the user explicitly asks
+for confirmation, pause at the applicable confirmation points for that run.
+
+- "Do not ask" skips confirmation pauses only, never blocker stops. All existing
+  blocker classifications and stop conditions remain unchanged and take
+  precedence over this default. When a stop condition is met, stop and
+  report the blocker; do not bypass it or continue on the agent's recommendation.
+- Still perform the destination analysis and state the selected package and
+  reasons, then continue directly. Honor any destination already specified by
+  the user rather than replacing it with the agent's preference.
+- Apply this policy to routine confirmation points throughout the run. Record
+  agent-selected decisions as such in the PR; do not claim the user explicitly
+  selected them. An explicit request for confirmation applies only to that run;
+  subsequent runs retain the "do not ask" default.
+- Keep ruleset entries `false` unless the user separately approves immediate
+  enablement. "Do not ask" alone is not approval to enable new diagnostics.
+- Apply the `int:azure-specs` label directly when appropriate and permitted; if
+  labeling is blocked, report that limitation without asking.
+- This mode does not waive the named rule precondition, source
+  immutability, required validation, or repository permission requirements. If
+  prerequisites are missing, evidence cannot support a safe recommendation, or
+  a source-semantic gap requires reopening repair, stop and report the blocker
+  without asking. The done-status assumption applies in both modes; do not
+  reopen source repair automatically.
+
 ## Fast path for repeat promotions
 
 After the first promotion in a repo, use this optimized order unless the rule
 needs special investigation:
 
-1. Run the destination analysis and user confirmation before creating or
-   preparing a worktree.
+1. Run the destination analysis and proceed with the agent's recommendation by
+   default, or obtain the user's choice when confirmation was requested, before
+   creating or preparing a worktree.
 2. Read checked-in source evidence from the existing source worktree or fetched
    git refs; prefer source branches and worktrees whose names use the canonical
    Swagger validator rule slug. Do not create a source worktree just to inspect
@@ -71,7 +100,7 @@ needs special investigation:
    package lifecycle scripts first: `pnpm install --ignore-scripts`. Run a full
    `pnpm install` only when the target validation actually needs lifecycle
    outputs.
-5. Do not run the lintdiff harness during promotion. The done rule's
+5. Do not run the lintdiff harness during promotion. The source rule's
    `migration.md` is the source of migration evidence; use source package build
    plus native target tests for promotion validation.
 6. Convert fixture coverage with the standard mapping in step 5 instead of
@@ -122,7 +151,7 @@ validation commands below and only use bounded `validate:pr` with
    - `packages/typespec-lintdiff/catalog/catalog.json` and
      `catalog/validator-rule-metadata.json` when present
 3. Do not run lintdiff harness validation as part of promotion; rely on the
-   done rule's checked-in migration evidence.
+   source rule's checked-in migration evidence.
 4. Record the lintdiff source branch, commit, and source location in your notes.
    Prefer one of these source-location forms:
    - existing worktree path, when a matching local worktree is already present
@@ -140,10 +169,12 @@ validation commands below and only use bounded `validate:pr` with
 5. If there are uncommitted source-rule changes, treat the current working tree
    as the source only after making that explicit in the PR description.
 
-### 2. Recommend the destination library, then wait for the user's choice
+### 2. Recommend and select the destination library
 
-Analyze first, then present a recommendation with reasons and ask the user to
-choose the destination before moving files.
+Analyze first, then present a recommendation with reasons. By default, select
+the recommended destination and continue directly under the confirmation policy.
+Honor a user-specified destination. Ask the user to choose before moving files
+only when they explicitly requested confirmation.
 
 Use these signals:
 
@@ -173,6 +204,11 @@ Use these signals:
   package and official ruleset already provide the same applicability boundary,
   and compare neighboring destination rules before deciding whether the guard
   belongs in the promoted implementation.
+- Do not require provider namespace metadata merely because a rule is ARM-only.
+  Separate the selected ruleset's audience from semantic requirements on each
+  declaration. Package ownership alone does not make the compiler filter
+  namespaces; establish the intended boundary from the actual execution context
+  and neighboring rules.
 
 The recommendation should include:
 
@@ -182,7 +218,10 @@ The recommendation should include:
 - any required adaptation, such as removing lintdiff-only helpers or changing
   diagnostic names
 
-Stop until the user selects the destination.
+Proceed with the evidence-backed destination by default. If the user requested
+confirmation, wait for their selection before continuing. If the evidence cannot
+support a safe recommendation, stop and report the blocker under the confirmation
+policy.
 
 ### 3. Create a clean promotion worktree
 
@@ -221,7 +260,7 @@ Stop until the user selects the destination.
 Keep both PRs aligned:
 
 - The lintdiff PR remains the source of truth for rule behavior.
-- If review on the native-library PR reveals that the done lintdiff rule has a
+- If review on the native-library PR reveals that the source lintdiff rule has a
   semantic gap, stop promotion and report the blocker. The user must explicitly
   choose to reopen lintdiff rule repair before any source changes are made.
 - Do not let the promoted rule diverge from the lintdiff source without
@@ -244,13 +283,24 @@ Then adapt it to the destination package:
   - remove a guard when it exists only to isolate an ARM-only rule from
     data-plane programs (or the reverse) in lintdiff's combined rulesets, and
     the selected official package and ruleset already guarantee that boundary
+  - for an ARM-only destination, do not retain a provider-namespace presence
+    check unless provider metadata or per-service filtering is genuinely part
+    of the rule's contract. Removing redundant lintdiff isolation is a promotion
+    adaptation, not a source-semantic repair; it does not require changing the
+    immutable source rule
   - preserve a guard when the rule must still distinguish applicable and
     inapplicable services, namespaces, or declarations within the destination
     ruleset, or when provider metadata is part of the rule's semantics
   - use neighboring destination rules and ruleset registration as evidence,
     document the deliberate adaptation in the PR, and add a native test that
     would fail if the destination unnecessarily retained the lintdiff-only
-    guard
+    guard. Cover both ordinary and nested namespaces without a provider
+    decorator when the official ruleset supplies the applicability boundary;
+    keep library-declaration and template filtering as separate concerns
+  - do not use `resolveProviderNamespace(program, operationNamespace)` as an
+    ancestor-membership check: it searches the supplied namespace and its
+    descendants. If a semantic membership check is required, verify the helper's
+    traversal direction and test nested providers and unrelated services
   - do not remove a guard when destination ownership is ambiguous; return to
     destination analysis rather than broadening the rule speculatively
 - update exported rule variable names to match neighboring rules
@@ -371,8 +421,20 @@ Add a change entry for every touched official package:
   `@azure-tools/typespec-azure-resource-manager`
 - `@azure-tools/typespec-azure-rulesets` when its rulesets changed
 
-Use `feature` for a new official rule and `fix` when folding the behavior into
-an existing official rule.
+Choose the change kind separately for each package:
+
+- For the rule's destination package, use `feature` for a new official rule and
+  `fix` when folding the behavior into an existing official rule.
+- For `@azure-tools/typespec-azure-rulesets`, use a separate `internal` change
+  entry when only registering the rule as `false`. Do not include this package
+  in the rule package's `feature` entry: disabled registration does not enable
+  new diagnostics.
+- Describe the actual behavior using the official TypeSpec rule name. For
+  example: "Register the ARM `no-query-in-post` lint rule as disabled in the
+  resource manager ruleset." Do not say "Enable" when the entry is `false`.
+  If the user explicitly approved immediate enablement, classify and describe
+  that user-facing ruleset change accordingly instead of using this
+  internal-only guidance.
 
 Chronus change files must use LF line endings. Do not run Prettier directly on a
 new change file when the Windows checkout would rewrite it with CRLF. After
@@ -477,16 +539,17 @@ step, elapsed time, and the successful narrower validations.
 If validation reveals a semantic issue, do not edit the lintdiff source during
 promotion. For every review or validation finding, classify it before editing:
 
-- **source semantic issue**: promotion is blocked; report the exact gap and ask
-  the user to reopen lintdiff repair if they want source changes
+- **source semantic issue**: promotion is blocked; by default, report the exact
+  gap without asking or reopening repair. If the user requested confirmation,
+  ask whether they want to reopen lintdiff repair; source changes still require
+  explicit authorization
 - **promotion adaptation issue**: fix only the promotion worktree, and document
   why lintdiff does not need the change
 - **pre-existing or environmental issue**: record the evidence and do not change
   unrelated code
 
 Do not run the lintdiff migration harness during promotion. Harness validation
-belongs to the lintdiff development or repair workflow before the user marks the
-rule done.
+belongs to the lintdiff development or repair workflow before promotion.
 
 ### 10. Review, commit, push, and create a draft PR
 
@@ -507,6 +570,9 @@ promotion diff. The review should inspect:
   Prettier
 - ruleset registration, including that every newly promoted rule is `false`
   unless the user explicitly approved immediate enablement
+- changelog classification and wording match the actual ruleset enablement:
+  disabled-only registration has a separate `internal` rulesets entry, uses the
+  official TypeSpec rule name, and says "Register ... as disabled," not "Enable"
 - absence of generated lintdiff corpus artifacts
 
 Commit only the promotion-worktree changes needed for the native-library PR.
@@ -539,8 +605,9 @@ It must include:
   rule name, canonical validator rule slug, source branch, source worktree path,
   and whether the source worktree had uncommitted rule changes. Link only to the
   original lintdiff source rule file. Use a branch-based GitHub URL, not a
-  commit-SHA URL. State that the user-marked done source rule was not modified
-  during promotion.
+  commit-SHA URL. State that the source rule was assumed done for this run and
+  was not modified during promotion; do not claim explicit user confirmation
+  of done status unless it was actually given.
 - **Destination analysis:** explain the selected official package, plausible
   alternatives, and the evidence from imports, rule semantics, fixture metadata,
   catalog/report data, and target-library dependency direction.
@@ -578,14 +645,17 @@ Prefer concrete examples, project names, and before/after evidence. Avoid a
 generic bullet such as "promote lint rule" without explaining the actual rule
 behavior and why the destination package is correct.
 
-After the draft PR exists, apply or ask for the `int:azure-specs` label when the
-new rule could affect existing Azure service specs.
+After the draft PR exists, apply the `int:azure-specs` label directly by default
+when the new rule could affect existing Azure service specs and permissions allow
+it; otherwise report the labeling limitation. Ask before applying it only when
+the user requested confirmation.
 
 ## Deliverable
 
 Produce:
 
-- the destination analysis and user-selected target package
+- the destination analysis and target package selected by the agent under the
+  default "do not ask" policy or explicitly selected by the user
 - a clean worktree branch, named from the canonical validator rule slug,
   containing only native-library promotion changes
 - source, tests, docs, rulesets, and change entries in the target packages
@@ -596,8 +666,9 @@ Produce:
 ## Post-run process review
 
 After the promotion PR is created and the deliverable is complete, briefly
-review the run before the final user response. Capture concrete suggestions for
-the next promotion, especially:
+review the run before the final user response. Read and follow the
+[shared post-run process review](../shared/post-run-process-review.md), including
+its confidence gate, ownership, independent PR, and reporting rules. Focus on:
 
 - steps that cost unexpected time and how to avoid or parallelize them next time
 - commands that were too broad, stalled, or failed for environmental reasons
@@ -608,8 +679,3 @@ the next promotion, especially:
   closures
 - test-conversion patterns that made fixture coverage easier or more reliable
 - skill instructions that should be updated based on the observed run
-
-Print the suggestions in the final handoff and ask the user whether any should
-be adopted into this skill. Do not update the skill automatically from the
-post-run review; only make skill changes after the user explicitly approves the
-specific suggestion(s).

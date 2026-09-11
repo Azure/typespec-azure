@@ -13,8 +13,8 @@ persistent subagents with separate responsibilities:
 - **Review subagent:** requests Copilot reviews and collects comments from the
   newly completed review by numeric review ID.
 - **Fix subagent:** analyzes every unresolved or newly created comment, adopts
-  only valid findings, validates the changes, commits them, and pushes them to
-  the pull request.
+  only valid findings, and validates the changes. It commits and pushes them
+  only after explicit publication approval from the parent agent.
 
 The parent agent orchestrates handoffs and tracks loop state. It must not treat
 Copilot comments as automatically correct.
@@ -151,7 +151,8 @@ rule's semantics only in the promoted copy.
    - comment IDs delivered to the fix subagent
    - validity decision for each comment
    - promotion finding category when applicable
-   - validation procedure and corpus results when applicable
+   - planned validation scope, command results, and corpus applicability/results
+   - publication handoff identity and the parent's approval or rejection
    - pushed fix commit SHA
    - processed review-thread IDs and their final resolution state
 
@@ -174,9 +175,10 @@ Before requesting the first review, the parent agent owns these steps:
    comments whose current `line` or `originalLine` is null; an outdated
    position does not make an unresolved finding disappear.
 4. Deliver the backlog to the fix subagent before requesting another review.
-   In standard PR mode, if it changes production linter behavior, run the
-   required corpus procedure. In promotion PR mode, use the promotion validation
-   procedure below and never run the lintdiff corpus harness.
+   Apply the validation scope and parent publication gate below, just as for
+   counted rounds. In standard PR mode, production linter changes require the
+   corpus procedure. In promotion PR mode, use promotion validation and never
+   run the lintdiff corpus harness.
 5. After a valid fix is pushed, reply to each processed thread with the fix
    commit or rationale and resolve it. For an invalid or inapplicable finding,
    reply with the technical rationale and resolve it without changing code.
@@ -218,6 +220,12 @@ ledger. It owns these steps:
    Do not poll for a completed review, report a successful request, or continue
    the round unless the result is `new-verified` or
    `already-pending-active`.
+
+   Before polling, define one reusable collector for the whole round that
+   always normalizes API results to arrays with `@(...)`, handles zero and one
+   candidate without null/scalar ambiguity, parses timestamps in one place,
+   and returns structured evidence. Reuse it for ordinary polls and the final
+   refetch instead of rebuilding inline PowerShell expressions in each loop.
 
 5. Poll the paginated REST pull-reviews endpoint,
    `GET /repos/{owner}/{repo}/pulls/{number}/reviews`, at a moderate interval
@@ -273,9 +281,9 @@ ledger. It owns these steps:
      review, or the refetch itself fails any request, pagination, parsing,
      required-field, or timestamp check, report an indeterminate collector
      failure rather than a Copilot timeout.
-   These are operational evidence requirements. Report observed failures
-   without asserting which internal cache, pagination, parsing, or state bug
-   caused them.
+     These are operational evidence requirements. Report observed failures
+     without asserting which internal cache, pagination, parsing, or state bug
+     caused them.
 6. Confirm the completed review applies to the round's head SHA. If the PR head
    changed while review was pending, stop the round as stale.
 7. Fetch all inline comments from the review-specific numeric REST endpoint,
@@ -354,9 +362,39 @@ owns these steps:
    request's scope. In promotion PR mode, every applied finding must also be a
    `promotion-adaptation-issue`. Add or update regression tests where
    appropriate.
-7. Run the narrowest existing tests, build, and lint commands that cover the
-   changed behavior. Follow all repository commit-time formatting and linting
-   requirements before committing.
+7. Select and record the required validation scope below before running
+   commands. Run the narrowest existing commands that satisfy that scope and
+   repository commit-time requirements.
+8. Return the validation evidence and wait for parent publication approval.
+   Do not stage, commit, or push as part of the initial fix handoff.
+
+### Validation scope and evidence
+
+For every **standard lintdiff fix**, including tests-only fixes, follow the
+targeted formatting and linting procedure in
+[`develop-lintdiff-rule`](../develop-lintdiff-rule/SKILL.md). Format explicit
+eligible files and lint only changed TypeScript source/test files; do not use
+package- or repository-wide lint as a proxy when it has unrelated baseline
+warnings. This task-specific exception is independent of the production-source
+corpus requirement below. Documentation-only changes do not require source
+builds or tests unless the repository defines a documentation-specific check.
+
+For other standard PRs, follow the affected repository/package's existing
+targeted validation requirements. Promotion PRs retain the promotion validation
+procedure below; do not substitute lintdiff's narrower procedure for it.
+
+Before execution, record each planned command's working directory, exact
+command, covered files/behavior, and whether it is required or supplemental,
+with the instruction that determines its scope. Record every executed command's
+exit code, outcome, and output or durable log path, including failed attempts.
+Also record whether corpus validation is required, why, and its results when
+applicable.
+
+On a command failure, stop and return the evidence before staging, committing,
+or pushing. A passing narrower command does not erase a failed required check.
+Do not retrospectively relabel a failed command as supplemental or self-waive
+it because its diagnostics appear unrelated. Preserve the failure in the
+ledger and report the blocker.
 
 ### Linter source changes
 
@@ -380,15 +418,34 @@ production rule edit is permitted only when it is a verified
 `promotion-adaptation-issue` that preserves the immutable source semantics.
 Surface any required promotion validation failure and stop the loop.
 
+### Parent publication gate
+
+After all required validation succeeds, return `ready-for-publication` with:
+
+- the local and remote PR head SHA, target worktree, and explicit changed files
+- all finding classifications and the complete proposed diff, including new
+  files, plus a digest or equivalent content identity for the proposed changes
+- the validation scope and complete command/corpus evidence described above
+
+The parent independently inspects the proposed diff and evidence, confirms that
+the required scope is satisfied and no command failure or unresolved blocker
+remains, and records its decision in the ledger. Only then may it send explicit
+publication approval to the same persistent fix subagent, identifying the
+approved head SHA and change-content identity. This is an agent-to-agent gate,
+not an additional user approval prompt. It applies to backlog fixes and every
+counted round, including round five.
+
 ### Commit and push
 
-After all required validation succeeds:
+Only after receiving the parent's explicit publication approval:
 
 1. Reconfirm the target worktree diff contains no unrelated or generated corpus
    data. In promotion PR mode, run this and all remaining git commands from the
-   ledger's absolute target worktree path.
+   ledger's absolute target worktree path. Confirm that the local and remote
+   head, proposed content, and validation evidence still match the approval.
+   Any change invalidates approval: return to the parent without publishing.
 2. Stage only explicit files belonging to the accepted findings. Do not use a
-   broad staging command.
+   broad staging command. Confirm staged content matches the approved changes.
 3. Create a new commit; do not amend an existing commit.
 4. Push the commit to the pull request's remote head branch.
 5. Return the pushed commit SHA, changed files, validation evidence, corpus
@@ -430,10 +487,13 @@ For rounds 1 through 5:
    thread remains unresolved, and then end successfully.
 5. If it returns `uncertain-or-blocked` or any command failure, stop and report
    the blocker.
-6. Verify the fix commit is present on the remote PR head.
-7. Reply to and resolve every processed thread that was fixed or safely
+6. For `ready-for-publication`, apply the parent publication gate, then send
+   approval to the same fix subagent and await its commit/push result. Stop on
+   failed publication or invalidated approval; do not request another review.
+7. Verify the approved fix commit is present on the remote PR head.
+8. Reply to and resolve every processed thread that was fixed or safely
    rejected, then confirm no processed thread remains unresolved.
-8. Record the round in the ledger and hand the pushed SHA plus fix/rejection
+9. Record the round in the ledger and hand the pushed SHA plus fix/rejection
    summary back to the review subagent for the next round.
 
 Never run both subagents on the same round concurrently: the fix subagent
@@ -443,8 +503,9 @@ Do not create replacement subagents between rounds.
 ## Post-run process review
 
 After the loop reaches a termination condition and the deliverable is complete,
-briefly review the run before the final user response. Capture concrete
-suggestions for the next review-and-fix loop, especially:
+briefly review the run before the final user response. Read and follow the
+[shared post-run process review](../shared/post-run-process-review.md), including
+its confidence gate, ownership, independent PR, and reporting rules. Focus on:
 
 - review-request or completion checks that were slow, stale, or unreliable, and
   better cursor or polling evidence to use next time
@@ -460,16 +521,6 @@ suggestions for the next review-and-fix loop, especially:
   or generated corpus data from entering the pull request
 - loop limits, stop conditions, or skill instructions that should be updated
   based on the observed run
-
-Print the consolidated suggestions in the final handoff and ask the user
-whether any should be adopted into this skill. Do not update the skill
-automatically from the post-run review; only make skill changes after the user
-explicitly approves the specific suggestion(s).
-
-Apply approved skill improvements once, after the loop has ended. Keep that
-change separate from target-rule fixes: use a dedicated commit and do not add it
-to the target pull request unless the user explicitly requests that placement.
-Do not restart the completed review loop merely to review the skill update.
 
 ## Result
 

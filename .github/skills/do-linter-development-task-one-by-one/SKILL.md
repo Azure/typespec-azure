@@ -38,6 +38,14 @@ rule ID, TypeSpec worktree, or specs worktree may remain valid; mark every later
 queue entry that reuses any of them as failed. Do not ask the user to repair
 malformed input during the run.
 
+As part of complete-queue validation, read
+`packages/typespec-lintdiff/catalog/validator-rule-metadata.json` as a JSON array
+and match each rule by its rule-ID field case-insensitively. Mark a missing or
+`DataPlane`-only rule as failed before launching a worker; only `ARM` and `Both`
+are eligible for `/develop-lintdiff-rule`. Record the observed applicability as
+the blocker. This is a read-only eligibility check, not target synchronization
+or worktree verification.
+
 ## Queue state
 
 Keep an ordered ledger with one entry per input command:
@@ -51,8 +59,8 @@ Keep an ordered ledger with one entry per input command:
 - draft PR URL, when one was created
 - development result
 - review-loop result
-- process-improvement suggestions, each with the proposed change, observed
-  evidence, impact, and source task
+- high-confidence process-improvement suggestions, each with the proposed
+  change, observed evidence, impact, and source task
 - attempt count and any retry reason
 - blocker or failure, when applicable
 
@@ -158,29 +166,30 @@ Give each top-level subagent all of these instructions:
 >
 > Follow `/develop-lintdiff-rule` through draft pull-request creation. Do not
 > stop after implementation, validation, commit, or push. Capture the canonical
-> draft PR URL from its result. If the skill asks whether to adopt post-run
-> process suggestions, do not ask the user: decline automatic adoption, retain
-> the suggestions for your result, and continue.
+> draft PR URL from its result. Pass the shared post-run policy's queue ownership
+> constraint to that skill: do not modify skills or create a skill-update PR;
+> return only evidence-backed, high-confidence suggestions to the outer agent.
 >
 > After the draft PR exists, invoke:
 >
 > `/loop-for-fix-and-review <canonical-pr-url>`
 >
 > Complete that skill's bounded review-and-fix loop. It may create the two nested
-> persistent subagents required by its own contract. If it asks whether to adopt
-> post-run process suggestions, do not ask the user: decline automatic adoption
-> and retain the suggestions for your result.
+> persistent subagents required by its own contract. Pass the same queue
+> ownership constraint to that skill and its subagents. Retain only
+> evidence-backed, high-confidence process suggestions for your result.
 >
 > Do not modify either delegated skill. Do not start another lintdiff rule.
 > Return a structured result containing the rule ID, development outcome, draft
 > PR URL if created, review-loop outcome and completed-round count, final PR head
 > state when available, the absolute `log.txt` path, and any blocker. Return each
-> process-improvement suggestion with four fields: proposed change, concrete
-> observed evidence, impact, and source task.
+> high-confidence process-improvement suggestion with four fields: proposed
+> change, concrete observed evidence, impact, and source task. Do not ask the
+> user about suggestions or include low-confidence suggestions.
 
-The outer skill's no-question rule overrides the delegated skills' normal
-post-run request for process-improvement approval. It does not override safety
-stops, validation requirements, review-loop limits, or repository guardrails.
+The outer agent exclusively owns the consolidated post-run review and any
+skill-update PR under the shared policy. This does not override safety stops,
+validation requirements, review-loop limits, or repository guardrails.
 
 ## Result classification
 
@@ -232,31 +241,18 @@ copy the folder path directly. Do the same for the execution-log path. Omit the
 `Blocker` line when there is no blocker. For malformed input whose worktree
 cannot be parsed, use `Not available` for both paths.
 
-After the task sections, add `## Process suggestions` and consolidate the
-workers' suggestions with the outer agent's post-run observations. Never omit
-failed input lines or stop the final report at the first failure.
-
-Format every retained suggestion as:
-
-```markdown
-### <proposed-change>
-
-**Evidence:** <specific event or result observed during the run>
-
-**Impact:** <why the issue matters>
-
-**Source:** Task <number> - <rule-id>, or Outer orchestration
-```
-
-Do not report a suggestion without concrete run evidence. Deduplicate
-suggestions only when they describe the same root cause and proposed change;
-combine their source tasks and evidence rather than discarding either.
+Never omit failed input lines or stop the final report at the first failure.
+After the task sections, include the skill-update PR link and brief summary, or
+a publishing blocker, only when required by the shared policy's final handoff.
+Do not print a process-suggestions list or low-confidence observations.
 
 ## Post-run process review
 
 After every queue entry is terminal, briefly review the complete run before the
-final user response. This review belongs to the outer agent; workers must still
-finish without asking the user questions.
+final user response. Read and follow the
+[shared post-run process review](../shared/post-run-process-review.md), including
+its confidence gate, ownership, independent PR, and reporting rules. This review
+belongs to the outer agent; workers only return qualifying evidence.
 
 Capture concrete suggestions for improving future queue runs, especially:
 
@@ -272,17 +268,6 @@ Capture concrete suggestions for improving future queue runs, especially:
 - copyability of TypeSpec worktree and execution-log paths
 - repeated setup or validation work that could be avoided safely on later tasks
 - skill instructions that should be corrected or clarified based on the run
-
-Combine duplicate suggestions from workers and the outer review. In the final
-handoff, print the consolidated list under `## Process suggestions`, then ask
-the user whether any specific suggestions should be adopted into this skill.
-Do not update the skill automatically; apply only suggestions the user
-explicitly approves.
-
-Apply approved improvements only after the queue and all review loops have
-ended. Keep those edits separate from every lintdiff rule branch and pull
-request, and do not restart completed rule-development or review workflows
-merely to review the skill update.
 
 ## Guardrails
 
@@ -301,5 +286,7 @@ merely to review the skill update.
 - Never stage, commit, or push a worker's `log.txt`.
 - Never infer success from subagent prose when the PR or pushed head can be
   verified directly.
-- Never automatically edit either delegated skill based on post-run suggestions.
-- Never automatically edit this skill based on post-run suggestions.
+- Workers must never edit skills or create skill-update PRs based on post-run
+  suggestions.
+- The outer agent may make high-confidence post-run skill updates only through
+  the shared policy's independent skill-only PR after the queue has ended.
