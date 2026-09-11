@@ -3,10 +3,10 @@ validatorRuleId: PutRequestResponseSchemeArm
 engine: spectral
 tspLints:
   - tsp-lintdiff-local-linter/put-request-response-scheme-arm
-  - '@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response'
+  - "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response"
 coverageKind: lint
 officialTspLints:
-  - '@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response'
+  - "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response"
 tspRuleset: resource-manager
 ---
 
@@ -55,10 +55,11 @@ lint retained as corroborating overlap for the response-mismatch subset.
 
 ## Test Cases
 
-| ID          | Violation | Description                                          |
-| ----------- | --------- | ---------------------------------------------------- |
-| `compliant` | false     | Standard ARM resource templates emit matching PUT request/response schemas |
-| `arm-resource-mismatch` | true | Custom ARM createOrUpdate returns a different ARM resource model; both the new local lint and the official ARM response lint fire |
-| `arm-resource-mismatch-201` | true | ARM createOrUpdate only returns `201`, and that fallback schema differs from the PUT request body |
-| `request-body-mismatch-response-match` | true | ARM createOrUpdate keeps the canonical response model but accepts a different request model; this is the authorable gap filled by the new local lint |
-| `empty-arm-id-details` | false | Empty `x-ms-arm-id-details: {}` metadata does not break schema equality |
+| ID                                     | Violation | Description                                                                                                                                          |
+| -------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `compliant`                            | false     | Standard ARM resource templates emit matching PUT request/response schemas                                                                           |
+| `arm-resource-mismatch`                | true      | Custom ARM createOrUpdate returns a different ARM resource model; both the new local lint and the official ARM response lint fire                    |
+| `arm-resource-mismatch-201`            | true      | ARM createOrUpdate only returns `201`, and that fallback schema differs from the PUT request body                                                    |
+| `request-body-mismatch-response-match` | true      | ARM createOrUpdate keeps the canonical response model but accepts a different request model; this is the authorable gap filled by the new local lint |
+| `empty-arm-id-details`                 | false     | Empty `x-ms-arm-id-details: {}` metadata does not break schema equality                                                                              |
+| `no-request-body`                      | false     | PUT operations without an emitted request body are skipped because the Swagger rule has no request schema to compare                                 |

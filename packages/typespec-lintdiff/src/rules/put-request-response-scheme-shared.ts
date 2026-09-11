@@ -1,5 +1,6 @@
 import {
   isArrayModelType,
+  isVoidType,
   walkPropertiesInherited,
   type Enum,
   type Model,
@@ -19,7 +20,7 @@ export function comparePutRequestAndResponse(
   httpOperation: HttpOperation,
 ): PutRequestResponseComparison | undefined {
   const requestBody = httpOperation.parameters.body;
-  if (requestBody === undefined) {
+  if (requestBody === undefined || isVoidType(requestBody.type)) {
     return undefined;
   }
 
@@ -39,20 +40,14 @@ export function comparePutRequestAndResponse(
   };
 }
 
-function getPrimaryResponse(
-  responses: HttpOperationResponse[],
-): HttpOperationResponse | undefined {
+function getPrimaryResponse(responses: HttpOperationResponse[]): HttpOperationResponse | undefined {
   return (
     responses.find((response) => response.statusCodes === 200) ??
     responses.find((response) => response.statusCodes === 201)
   );
 }
 
-function areEquivalentTypes(
-  left: Type,
-  right: Type,
-  seen: Map<Type, Set<Type>>,
-): boolean {
+function areEquivalentTypes(left: Type, right: Type, seen: Map<Type, Set<Type>>): boolean {
   if (left === right) {
     return true;
   }
@@ -93,11 +88,7 @@ function markSeen(seen: Map<Type, Set<Type>>, left: Type, right: Type): void {
   }
 }
 
-function areEquivalentModels(
-  left: Model,
-  right: Model,
-  seen: Map<Type, Set<Type>>,
-): boolean {
+function areEquivalentModels(left: Model, right: Model, seen: Map<Type, Set<Type>>): boolean {
   const leftIsArray = isArrayModelType(left);
   const rightIsArray = isArrayModelType(right);
   if (leftIsArray || rightIsArray) {
@@ -166,22 +157,14 @@ function areEquivalentEnums(left: Enum, right: Enum): boolean {
   return true;
 }
 
-function areEquivalentTuples(
-  left: Tuple,
-  right: Tuple,
-  seen: Map<Type, Set<Type>>,
-): boolean {
+function areEquivalentTuples(left: Tuple, right: Tuple, seen: Map<Type, Set<Type>>): boolean {
   return (
     left.values.length === right.values.length &&
     left.values.every((value, index) => areEquivalentTypes(value, right.values[index], seen))
   );
 }
 
-function areEquivalentUnions(
-  left: Union,
-  right: Union,
-  seen: Map<Type, Set<Type>>,
-): boolean {
+function areEquivalentUnions(left: Union, right: Union, seen: Map<Type, Set<Type>>): boolean {
   if (left.variants.size !== right.variants.size) {
     return false;
   }

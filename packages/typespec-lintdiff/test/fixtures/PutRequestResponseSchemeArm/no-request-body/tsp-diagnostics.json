@@ -15,26 +15,6 @@
     "message": "Description must not match the name of the node it describes. Node name:'description' Description:'Description'"
   },
   {
-    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
-    "severity": "warning",
-    "message": "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
-    "severity": "warning",
-    "message": "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
-    "severity": "warning",
-    "message": "Description must not match the name of the node it describes. Node name:'description' Description:'Description'"
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/tracked-resources-must-have-put",
-    "severity": "warning",
-    "message": "Tracked resource 'WidgetAlternate' must have a put/createOrUpdate operation."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
@@ -50,14 +30,19 @@
     "message": "Path parameter should specify a maximum length (maxLength)."
   },
   {
-    "code": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
-    "severity": "warning",
-    "message": "PUT request body schema should match the 200 response schema."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+    "severity": "warning",
+    "message": "Path parameter should specify a maximum length (maxLength)."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",

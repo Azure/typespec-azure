@@ -2,10 +2,6 @@
   "violation": false,
   "ambientDiagnostics": [
     {
-      "code": "@azure-tools/typespec-azure-core/no-openapi",
-      "count": 1
-    },
-    {
       "code": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
       "count": 1
     },
@@ -15,7 +11,7 @@
     },
     {
       "code": "tsp-lintdiff-local-linter/path-parameter-schema",
-      "count": 10
+      "count": 9
     },
     {
       "code": "tsp-lintdiff-local-linter/security-definition-description",
