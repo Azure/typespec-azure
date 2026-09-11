@@ -85,7 +85,9 @@ rule's semantics only in the promoted copy.
 - Stop immediately on an unverified review request, indeterminate collector
   failure, validation failure, corpus failure, push failure, or finding whose
   validity cannot be determined safely. Report the blocker instead of silently
-  continuing.
+  continuing. The only exception is the bounded, parent-authorized
+  [local collector recovery](#local-collector-recovery) below; it never permits
+  an agent to silently resume or erase a failed attempt.
 
 ## Initialize
 
@@ -155,6 +157,53 @@ rule's semantics only in the promoted copy.
    - publication handoff identity and the parent's approval or rejection
    - pushed fix commit SHA
    - processed review-thread IDs and their final resolution state
+   - any local collector failure, its original evidence, recovery eligibility,
+     the parent's one-time recollection authorization, fresh evidence identity,
+     and final recovery approval or rejection
+
+## Local collector recovery
+
+A visible comment is not by itself permission to resume an unverified request.
+However, a proven local parsing or result-shape bug need not discard an
+otherwise verifiable review. This exception applies only to collection, never
+to finding validity, validation, corpus runs, staging, commits, or pushes.
+
+1. **Pause on failure.** Preserve the original command, exit/error, raw
+   responses and ledger entry. Report to the parent. Do not request another
+   review, send findings to the fix agent, change the head, resolve threads, or
+   label the failed attempt successful.
+2. **Parent eligibility gate.** Permit at most one recovery attempt per round
+   only when preserved raw API evidence conclusively identifies a local
+   timestamp-conversion or result-shape bug. The raw responses must be valid,
+   complete and successful, with trustworthy pre/post request evidence proving
+   a new request-event cursor on the same head (or the already-recorded active
+   pending-request provenance). Missing evidence, genuinely unverified requests,
+   invalid source timestamps, API/auth/rate-limit failures, failed or incomplete
+   pagination, stale heads, and unknown failure causes remain hard stops.
+3. **Authorize read-only recollection.** Record the parent's authorization
+   with the original failure identity, immutable request event/time and head.
+   Use the bundled [collector](collector.md), not a patched copy of an ad-hoc
+   collector. Do not edit skill instructions or helper code during the active
+   loop. If the bundled helper itself needs repair, stop and repair it after
+   termination. The parent performs one independent, fresh, fully paginated,
+   no-cache recollection into a new evidence directory.
+4. **Re-establish all evidence.** Verify the current head, numeric completed
+   review ID, exact review commit and UTC submission/request correlation,
+   review-specific REST comments and review metadata, and complete GraphQL
+   mapping/unresolved state. If the review is not yet complete, the recollection
+   fails; do not restart a polling deadline or use recovery to wait indefinitely.
+   Any disagreement, missing evidence, or second collector failure ends the loop.
+5. **Explicit approval before handoff.** Record `recovered-local-collector`
+   separately from the original failure, including fresh artifact paths/digests
+   and the parent's approval of the exact request/head/review/comment set.
+   Only then may the parent continue the same round. Do not increment the
+   round count or request another review. A verified zero-comment review with
+   no unresolved Copilot threads ends the loop immediately; suppressed comments
+   are not actionable input.
+
+Neither subagent may authorize recovery or replace the failed ledger with a
+success-only ledger. Recovery does not waive the independent review check,
+finding assessment, validation, or publication gate.
 
 ## Drain the unresolved backlog
 
@@ -215,17 +264,18 @@ ledger. It owns these steps:
      unchanged current PR head.
    - `failed-or-unverified` for every other outcome, including a trigger that
      reports success without either form of positive API evidence. Return the
-     evidence and stop the round.
+     evidence and stop the round. If raw evidence proves a local collector bug,
+     only the parent may apply the local collector recovery procedure.
 
    Do not poll for a completed review, report a successful request, or continue
    the round unless the result is `new-verified` or
    `already-pending-active`.
 
-   Before polling, define one reusable collector for the whole round that
-   always normalizes API results to arrays with `@(...)`, handles zero and one
-   candidate without null/scalar ambiguity, parses timestamps in one place,
-   and returns structured evidence. Reuse it for ordinary polls and the final
-   refetch instead of rebuilding inline PowerShell expressions in each loop.
+   Use the bundled [review evidence collector](collector.md) for request
+   snapshots, request verification, ordinary polls, final refetches and thread
+   mapping. Both agents and the parent reuse its raw-UTC parsing and array
+   handling rather than generating inline PowerShell collectors. Each
+   invocation writes a new evidence directory; never overwrite failed evidence.
 
 5. Poll the paginated REST pull-reviews endpoint,
    `GET /repos/{owner}/{repo}/pulls/{number}/reviews`, at a moderate interval
@@ -465,7 +515,8 @@ For rounds 1 through 5:
 1. Send the current PR head SHA and ledger to the review subagent.
 2. Independently verify the review subagent's result from a fresh, fully
    paginated REST pull-reviews refetch and the numeric review-specific REST
-   comments endpoint. Apply the same cache bypass, raw-evidence, identity,
+   comments endpoint using the bundled [collector](collector.md). Apply the
+   same cache bypass, raw-evidence, identity,
    candidate-validation, and failure rules as the review subagent. REST reviews
    are authoritative for completion and review ID; review-specific REST
    comments are authoritative for comments. Also paginate GraphQL
