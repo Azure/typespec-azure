@@ -48,7 +48,7 @@ export interface BodyParameter extends HttpParameterBase {
   contentType: BodyParameterContentTypeKind;
 
   /** optional XML schema metadata */
-  xml?: type.XMLInfo;
+  xmlWrapper?: string;
 }
 
 /** describes how the body param's content type is set */
@@ -199,9 +199,6 @@ export interface PartialBodyParameter extends HttpParameterBase {
 
   /** the wire format of the underlying type */
   format: "JSON" | "XML";
-
-  /** optional XML schema metadata */
-  xml?: type.XMLInfo;
 }
 
 /** a collection of values that go in the HTTP path */

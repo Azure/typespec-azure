@@ -178,13 +178,9 @@ function emit(
         first = false;
       } else {
         let tag = "";
-        if (respEnv.result.kind === "monomorphicResult" && respEnv.result.format === "XML") {
+        if (respEnv.result.kind === "monomorphicResult" && respEnv.result.format === "XML" && respEnv.result.xmlWrapper) {
           // only emit tags for XML; JSON uses custom marshallers/unmarshallers
-          if (respEnv.result.xml?.wraps) {
-            tag = ` \`xml:"${respEnv.result.xml.wraps}"\``;
-          } else if (respEnv.result.xml?.name) {
-            tag = ` \`xml:"${respEnv.result.xml.name}"\``;
-          }
+          tag = ` \`xml:"${respEnv.result.xmlWrapper}"\``;
         }
 
         fields.push({

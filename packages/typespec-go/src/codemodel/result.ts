@@ -146,7 +146,7 @@ export interface MonomorphicResult {
   format: ResultFormat;
 
   /** optional XML schema metadata */
-  xml?: type.XMLInfo;
+  xmlWrapper?: string;
 }
 
 /** the possible monomorphic result types */
