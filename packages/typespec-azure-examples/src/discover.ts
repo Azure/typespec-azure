@@ -60,7 +60,18 @@ export async function validateExamplesDir(dir: string): Promise<ValidateDirResul
   let serviceVersions: string[] | undefined;
   const serviceYamlPath = join(dir, "service.yaml");
   if (await exists(serviceYamlPath)) {
-    serviceVersions = parseServiceVersions(await readFile(serviceYamlPath, "utf-8")).versions;
+    const parsed = parseServiceVersions(await readFile(serviceYamlPath, "utf-8"));
+    if (parsed.versions.length > 0) {
+      serviceVersions = parsed.versions;
+    } else {
+      diagnostics.push({
+        code: "invalid-service-yaml",
+        message:
+          "service.yaml has no readable 'versions' list; skipping the 'since' version-membership check.",
+        severity: "warning",
+        file: relative(dir, serviceYamlPath),
+      });
+    }
   } else if (files.length > 0) {
     diagnostics.push({
       code: "missing-service-yaml",
