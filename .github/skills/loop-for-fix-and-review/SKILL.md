@@ -164,9 +164,11 @@ rule's semantics only in the promoted copy.
 ## Local collector recovery
 
 A visible comment is not by itself permission to resume an unverified request.
-However, a proven local parsing or result-shape bug need not discard an
-otherwise verifiable review. This exception applies only to collection, never
-to finding validity, validation, corpus runs, staging, commits, or pushes.
+However, a proven local parsing, result-shape, or display-encoding bug need not
+discard an otherwise verifiable review. Distinguish failed evidence collection
+from failed display of successfully saved evidence; neither permits automatic
+resumption. This exception applies only to collection and evidence display,
+never to finding validity, validation, corpus runs, staging, commits, or pushes.
 
 1. **Pause on failure.** Preserve the original command, exit/error, raw
    responses and ledger entry. Report to the parent. Do not request another
@@ -174,7 +176,12 @@ to finding validity, validation, corpus runs, staging, commits, or pushes.
    label the failed attempt successful.
 2. **Parent eligibility gate.** Permit at most one recovery attempt per round
    only when preserved raw API evidence conclusively identifies a local
-   timestamp-conversion or result-shape bug. The raw responses must be valid,
+   timestamp-conversion or result-shape bug, or a display-only encoding failure
+   after the bundled collector exited successfully and saved a complete
+   `result.json`. For display-only failures, record the failing output command,
+   its encoding/error, and the successful collector's separate exit status and
+   artifact identity. A decode error while reading API data or a failure to save
+   evidence is not a display-only failure. The raw responses must be valid,
    complete and successful, with trustworthy pre/post request evidence proving
    a new request-event cursor on the same head (or the already-recorded active
    pending-request provenance). Missing evidence, genuinely unverified requests,
@@ -186,7 +193,10 @@ to finding validity, validation, corpus runs, staging, commits, or pushes.
    collector. Do not edit skill instructions or helper code during the active
    loop. If the bundled helper itself needs repair, stop and repair it after
    termination. The parent performs one independent, fresh, fully paginated,
-   no-cache recollection into a new evidence directory.
+   no-cache recollection into a new evidence directory. Use UTF-8 execution and
+   the collector's structured `review_metadata`, not the failed display script.
+   Display-only recovery uses the same one-attempt budget and all remaining
+   checks; it does not request another review.
 4. **Re-establish all evidence.** Verify the current head, numeric completed
    review ID, exact review commit and UTC submission/request correlation,
    review-specific REST comments and review metadata, and complete GraphQL
@@ -276,6 +286,10 @@ ledger. It owns these steps:
    mapping. Both agents and the parent reuse its raw-UTC parsing and array
    handling rather than generating inline PowerShell collectors. Each
    invocation writes a new evidence directory; never overwrite failed evidence.
+   Run all collector and supporting Python commands with `python -X utf8`
+   (prefixed by `mise exec --` when available). Read the collector's structured,
+   ASCII-escaped JSON instead of printing raw Unicode review bodies through
+   ad-hoc scripts.
 
 5. Poll the paginated REST pull-reviews endpoint,
    `GET /repos/{owner}/{repo}/pulls/{number}/reviews`, at a moderate interval
@@ -350,7 +364,10 @@ ledger. It owns these steps:
    thread handling but cannot be mapped, return a mapping collection failure
    without discarding the completed-review evidence or handing off a partial
    list.
-9. Cross-check the result against available review metadata. If the review body
+9. Cross-check the result against the collector's `review_metadata` summary,
+   generated-comment counts, and REST comment count. The summary excludes
+   collapsed details; do not inspect suppressed findings as actionable input.
+   An absent count marker is not a zero-comment declaration. If the review body
    reports generated comments but the endpoint returns fewer comments, return a
    collection failure instead of `no-new-comments`.
 10. Return either:
