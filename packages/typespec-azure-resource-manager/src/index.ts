@@ -1,5 +1,6 @@
 export const namespace = "Azure.ResourceManager";
 
+export type { ArmFeatureFileOptions } from "../generated-defs/Azure.ResourceManager.js";
 export type { ArmFeatureOptions } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 export {
   $armCommonTypesVersion,

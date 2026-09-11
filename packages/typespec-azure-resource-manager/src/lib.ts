@@ -131,6 +131,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`The specified common-types version '${"version"}'  is not valid for ${"resourceName"} resources. Please use version ${"requiredVersion"} or later of common-types.`,
       },
     },
+    "invalid-feature-file-version": {
+      severity: "error",
+      messages: {
+        default: "The version in @featureFileOptions must not be empty or contain only whitespace.",
+      },
+    },
     "basetypes-experimental": {
       severity: "warning",
       messages: {
