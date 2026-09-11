@@ -1,7 +1,8 @@
 # @azure-tools/typespec-azure-examples
 
 Tooling for the Azure **unified examples format** (`examples.yaml`): the published JSON Schema
-and the `tsp-examples` CLI, plus the transitional `tsp-examples-migrate` tool.
+and the `tsp-examples` CLI, plus the transitional `tsp-examples-migrate` and
+`tsp-examples-legacy-expand` tools.
 
 The unified examples format replaces the ~282K per-version `x-ms-examples` JSON files with a
 single version-aware `examples.yaml` per service (or `examples/<Interface>.yaml` for large
@@ -104,6 +105,26 @@ What it does:
 Options: `--out <dir>` (default `.`), `--namespace <ns>`, `--service <path>`,
 `--split-by-interface`, `--dry-run`, `--warn-as-error`.
 
+## `tsp-examples-legacy-expand`
+
+> **Transitional tool.** Expands the unified format back into the classic per-version examples so
+> downstream consumers keep working during rollout; it will be removed once consumers read
+> `examples.yaml` directly.
+
+Expand the unified examples into the concrete example for each operation at a target API version:
+
+```bash
+tsp-examples-legacy-expand <service-dir> --api-version <version>
+```
+
+It reads the linear version order from the adjacent `service.yaml`, discovers `examples.yaml` /
+`examples/*.yaml`, and for each operation lineage selects the entry with the greatest `since` that
+is `<=` the target (the base entry applies from the earliest version). The `{api-version}`
+placeholder is substituted with the target version. Results are printed as JSON (or written with
+`--out <file>`); a lineage with no applicable entry at the target version is omitted.
+
+Options: `--api-version <v>` (required), `--out <file>`.
+
 ## API
 
 ```ts
@@ -112,9 +133,12 @@ import {
   validateExampleFiles,
   loadExampleFile,
   migrate,
+  resolveExamplesDir,
 } from "@azure-tools/typespec-azure-examples";
 
 const { diagnostics } = await validateExamplesDir("path/to/service");
 
 const { files } = await migrate("path/to/specs", { namespace: "Microsoft.EventGrid" });
+
+const { examples } = await resolveExamplesDir("path/to/service", "2024-06-01");
 ```
