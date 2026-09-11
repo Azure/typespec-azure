@@ -222,8 +222,8 @@ export interface ModelField extends StructField {
   /** the value to send over the wire if one isn't specified */
   defaultValue?: Literal;
 
-  /** any XML metadata */
-  xml?: XMLInfo;
+  /** contains XML-specific serde info */
+  xmlKind?: XMLKind;
 }
 
 /** additional settings for a model type */
@@ -350,6 +350,9 @@ export interface Slice<T extends SliceElementType = SliceElementType> {
 
   /** the element type for this slice */
   elementType: T;
+
+  /** the XML name for the elements */
+  xmlName?: string;
 }
 
 /** the set of slice element types */
@@ -480,27 +483,8 @@ export enum UsageFlags {
   Output = 2,
 }
 
-/** metadata used for XML serde */
-export interface XMLInfo {
-  /** element name to use instead of the default name */
-  name?: string;
-
-  /**
-   * name propagated to the generated wrapper type.
-   * this is used solely in method bodies to generate
-   * a "type wrapper struct" with the specified name.
-   */
-  wrapper?: string;
-
-  /** slices only. this is the name of the wrapped type */
-  wraps?: string;
-
-  /** value is an XML attribute */
-  attribute: boolean;
-
-  /** value is raw text */
-  text: boolean;
-}
+/** XMLKind contains info used for generating XML-specific serde */
+export type XMLKind = "attribute" | "text" | "unwrappedList";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // helpers
@@ -615,6 +599,19 @@ export function getTypeDeclaration(
       // strip module to just the leaf package as required
       return `${byRef}${path.basename(type.module)}.${type.name}`;
   }
+}
+
+/**
+ * returns the XML name for the provided type or undefined
+ *
+ * @param type the type to inspect for XMLInfo
+ * @returns the XMLInfo or undefined
+ */
+export function hasXMLName(type: WireType): string | undefined {
+  if ("xmlName" in type) {
+    return type.xmlName;
+  }
+  return undefined;
 }
 
 /** narrows the field to the model's JSON additional properties bucket, whose type is always a map */
@@ -797,8 +794,11 @@ interface ModelBase extends StructBase {
   /** usage flags for this model */
   usage: UsageFlags;
 
-  /** any XML metadata */
-  xml?: XMLInfo;
+  /**
+   * the name of the type over the wire if it's
+   * different from the type's name.
+   */
+  xmlName?: string;
 }
 
 class StructBase implements StructBase {
@@ -1064,12 +1064,5 @@ export class TokenCredential extends QualifiedType implements TokenCredential {
     super("TokenCredential", "github.com/Azure/azure-sdk-for-go/sdk/azcore");
     this.kind = "tokenCredential";
     this.scopes = scopes;
-  }
-}
-
-export class XMLInfo implements XMLInfo {
-  constructor() {
-    this.attribute = false;
-    this.text = false;
   }
 }

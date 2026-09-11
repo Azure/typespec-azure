@@ -4,6 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as go from "../../codemodel/index.js";
+import * as naming from "../../naming/index.js";
 import * as helpers from "./helpers.js";
 import { ImportManager } from "./imports.js";
 
@@ -461,9 +462,10 @@ function generateModelDefs(
       const needsXMLDictionaryUnmarshalling = needsXMLDictionaryHelper(model);
       if (
         needsDateTimeMarshalling ||
-        model.xml?.name ||
+        model.xmlName ||
         needsXMLArrayMarshalling(model) ||
-        byteArrayFormat
+        byteArrayFormat ||
+        needsXMLNestedModelMarshalling(model)
       ) {
         generateXMLMarshaller(modelDef, serdeImports, indent);
         if (needsDateTimeMarshalling || needsXMLDictionaryUnmarshalling || byteArrayFormat) {
@@ -520,6 +522,38 @@ function needsXMLArrayMarshalling(modelType: go.Model): boolean {
     }
   }
   return false;
+}
+
+/**
+ * returns true if the model contains one or more nested models
+ * where the field's serialized name is different from the model's
+ * XML name. the field's serialized name takes precedence.
+ *
+ * @param modelType the model to inspect
+ * @returns true if a custom marshaller is required
+ */
+function needsXMLNestedModelMarshalling(modelType: go.Model): boolean {
+  for (const field of modelType.fields) {
+    if (fieldNeedsXMLNestedModelMarshalling(field)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * narrows field to a Model or Ptr<Model> type that requires custom
+ * marshalling due to the field's serialized name being different from
+ * the model's XML name.
+ *
+ * @param field the field to inspect
+ * @returns a Model or Ptr<Model> that requires custom marshalling
+ */
+function fieldNeedsXMLNestedModelMarshalling(
+  field: go.ModelField,
+): field is go.ModelField & { type: go.Model | go.Ptr<go.Model> } {
+  const fieldType = go.unwrapPtr(field.type);
+  return fieldType.kind === "model" && !!fieldType.xmlName && field.serializedName !== fieldType.xmlName;
 }
 
 // generates discriminator marker method
@@ -1238,6 +1272,12 @@ function recursivePopulateDiscriminator(
   return text;
 }
 
+/** returns the alias type name to use when aliasing a model type */
+function getXMLNestedModelAliasTypeName(type: go.Model | go.Ptr<go.Model>): string {
+  const fieldType = go.unwrapPtr(type);
+  return naming.uncapitalize(fieldType.name);
+}
+
 /**
  * generates an implementation of MarshalXML for the provided type.
  * the method impl is added to modelDef.SerDe.methods.
@@ -1254,8 +1294,16 @@ function generateXMLMarshaller(
   const receiver = modelDef.receiverName();
   const desc = `MarshalXML implements the xml.Marshaller interface for type ${modelDef.Model.name}.`;
   let text = `func (${receiver} ${modelDef.Model.name}) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {\n`;
-  if (modelDef.Model.xml?.name) {
-    text += `${indent.get()}start.Name.Local = "${modelDef.Model.xml.name}"\n`;
+  if (modelDef.Model.xmlName) {
+    text += `${indent.get()}start.Name.Local = "${modelDef.Model.xmlName}"\n`;
+  }
+  // declare the type aliases for custom marshalling first
+  // as the containing type's alias type depends on them
+  for (const field of modelDef.Model.fields) {
+    if (fieldNeedsXMLNestedModelMarshalling(field)) {
+      const fieldType = go.unwrapPtr(field.type);
+      text += `${indent.get()}type ${getXMLNestedModelAliasTypeName(field.type)} ${fieldType.name}\n`;
+    }
   }
   text += generateAliasType(modelDef.Model, receiver, true, imports, indent);
   for (const field of modelDef.Model.fields) {
@@ -1274,6 +1322,11 @@ function generateXMLMarshaller(
       text += `${indent.get()}aux.${field.name} = &encoded${field.name}\n`;
       indent.pop();
       text += `${indent.get()}}\n`;
+    } else if (fieldNeedsXMLNestedModelMarshalling(field)) {
+      text += `${indent.get()}${helpers.buildIfBlock(indent, {
+        condition: `${receiver}.${field.name} != nil`,
+        body: (indent) => `${indent.get()}aux.${field.name} = (*${getXMLNestedModelAliasTypeName(field.type)})(${receiver}.${field.name})\n`,
+      })}\n`;
     }
   }
   text += `${indent.get()}return enc.EncodeElement(aux, start)\n`;
@@ -1345,7 +1398,7 @@ function generateAliasType(
   text += `${indent.push().get()}*alias\n`;
   for (const field of modelType.fields) {
     const fieldType = go.unwrapPtr(field.type);
-    const sn = getXMLSerialization(field);
+    const sn = getXMLSerialization(field, modelType.pkg);
     if (fieldType.kind === "time") {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
       text += `${indent.get()}${field.name} *datetime.${fieldType.format} \`xml:"${sn}"\`\n`;
@@ -1355,6 +1408,8 @@ function generateAliasType(
       text += `${indent.get()}${field.name} *${go.getTypeDeclaration(fieldType, modelType.pkg)} \`xml:"${sn}"\`\n`;
     } else if (fieldType.kind === "encodedBytes") {
       text += `${indent.get()}${field.name} *string \`xml:"${sn}"\`\n`;
+    } else if (fieldNeedsXMLNestedModelMarshalling(field)) {
+      text += `${indent.get()}${field.name} *${getXMLNestedModelAliasTypeName(field.type)} \`xml:"${field.serializedName}"\`\n`;
     }
   }
   text += `${indent.pop().get()}}{\n`;
@@ -1474,7 +1529,7 @@ class ModelDef {
       if (this.Format === "JSON") {
         serialization += ",omitempty";
       } else if (this.Format === "XML") {
-        serialization = getXMLSerialization(field);
+        serialization = getXMLSerialization(field, this.Model.pkg);
       }
       let tag = "";
       // only emit tags for XML; JSON uses custom marshallers/unmarshallers
@@ -1502,26 +1557,18 @@ class ModelDef {
  * @param field the field for which to construct the tag's contents
  * @returns the contents for the XML tag
  */
-function getXMLSerialization(field: go.ModelField): string {
+function getXMLSerialization(field: go.ModelField, pkg: go.PackageContent): string {
   let serialization = field.serializedName;
-  // default to using the serialization name
-  if (field.xml?.name) {
-    // xml can specify its own name, prefer that if available
-    serialization = field.xml.name;
-  } else if (field.xml?.text) {
-    // type has the x-ms-text attribute applied so it should be character data, not a node (https://github.com/Azure/autorest/tree/main/docs/extensions#x-ms-text)
-    // see https://pkg.go.dev/encoding/xml#Unmarshal for what ,chardata actually means
-    serialization = ",chardata";
+  switch (field.xmlKind) {
+    case "attribute":
+      serialization += ",attr";
+      return serialization;
+    case "text":
+      serialization = ",chardata";
+      return serialization;
   }
-  if (field.xml?.attribute) {
-    // value comes from an xml attribute
-    serialization += ",attr";
-  } else if (field.type.kind === "slice") {
-    // start with the serialized name of the element, preferring xml name if available
-    let inner = field.serializedName;
-    if (field.xml?.name) {
-      inner = field.xml.name;
-    }
+
+  if (field.type.kind === "slice") {
     // arrays can be wrapped or unwrapped.  here's a wrapped example
     // note how the array of apple objects is "wrapped" in GoodApples
     // <AppleBarrel>
@@ -1542,12 +1589,12 @@ function getXMLSerialization(field: go.ModelField): string {
     //   </slide>
     // </slideshow>
 
-    // arrays in the response type are handled slightly different as we
-    // unmarshal directly into them so no need to add the unwrapping.
-    if (field.xml?.wraps) {
-      serialization += `>${field.xml.wraps}`;
-    } else {
-      serialization = inner;
+    // for unwrapped lists we use the serialized name on the field
+    if (field.xmlKind !== "unwrappedList") {
+      // start with the serialized name of the element, preferring xml name if available
+      const unwrappedPtrType = go.unwrapPtr(field.type.elementType);
+      const inner = field.type.xmlName ? field.type.xmlName : go.hasXMLName(unwrappedPtrType) ?? go.getTypeDeclaration(unwrappedPtrType, pkg);
+      serialization += `>${inner}`;
     }
   }
   return serialization;
