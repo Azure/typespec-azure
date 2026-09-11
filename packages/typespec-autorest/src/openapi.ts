@@ -60,6 +60,7 @@ import {
   type Value,
   compilerAssert,
   createDiagnosticCollector,
+  createSourceFile,
   explainStringTemplateNotSerializable,
   getAllTags,
   getAnyExtensionFromPath,
@@ -155,6 +156,14 @@ import {
 import { getVersionsForEnum } from "@typespec/versioning";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples as getAutorestExamples, getRef } from "./decorators.js";
+import {
+  type UnifiedExamplesResult,
+  hasUnifiedExamples,
+  legacyExampleFileName,
+  loadUnifiedExamples,
+  operationKeyForId,
+  toLegacyExampleDoc,
+} from "./examples-unified.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
 import { createDiagnostic, reportDiagnostic } from "./lib.js";
 import type {
@@ -274,6 +283,16 @@ export interface AutorestDocumentEmitterOptions {
    * @default "namespaced"
    */
   readonly typeNameStrategy?: "namespaced" | "name-only";
+
+  /**
+   * Controls how the emitter sources `x-ms-examples`.
+   *
+   * - `"auto"`: Use the unified `examples.yaml` format when present, otherwise legacy JSON files.
+   * - `"legacy"`: Only load legacy per-version `x-ms-examples` JSON files.
+   * - `"unified"`: Only read the unified `examples.yaml`, materializing legacy files per version.
+   * @default "auto"
+   */
+  readonly examplesFormat?: "auto" | "legacy" | "unified";
 }
 
 type HttpParameterProperties = Extract<
@@ -349,7 +368,15 @@ export async function getOpenAPIForService(
     context.version,
   );
 
-  const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
+  // Load the unified `examples.yaml` format when enabled. Resolved examples are materialized into
+  // legacy `x-ms-examples` files per operation as each endpoint is emitted (see `emitOperation`).
+  const unified = await resolveUnifiedExamples(program, context, options);
+
+  // Legacy per-version `x-ms-examples` JSON files are only loaded when the unified format is not
+  // in use for this emit.
+  const [exampleMap, diagnostics] = unified.active
+    ? [new Map<string, Record<string, LoadedExample>>(), [] as readonly Diagnostic[]]
+    : await loadExamples(program, options, context.version);
   program.reportDiagnostics(diagnostics);
 
   const routes = httpService.operations;
@@ -402,7 +429,10 @@ export async function getOpenAPIForService(
   proxy.setGlobalProduces([...globalProduces]);
 
   proxy.writeExamples(exampleMap, operationIdsWithExample);
-  return proxy.resolveDocuments(context);
+  const documents = await proxy.resolveDocuments(context);
+  return unified.active
+    ? documents.map((document) => ({ ...document, examplesGenerated: true }))
+    : documents;
 
   function resolveHost(
     program: Program,
@@ -658,8 +688,57 @@ export async function getOpenAPIForService(
       }
     }
 
+    emitUnifiedExamples();
+
     // Attach additional extensions after main fields
     attachExtensions(op, currentEndpoint);
+  }
+
+  /**
+   * Materialize the unified `examples.yaml` examples applicable to the current endpoint into legacy
+   * `x-ms-examples` files. Each resolved example is flattened back into the legacy shape (using the
+   * endpoint's own body parameter name) and registered so the emitter writes it to `examples/`.
+   */
+  function emitUnifiedExamples() {
+    const operationId = currentEndpoint.operationId;
+    if (!unified.active || operationId === undefined) {
+      return;
+    }
+    const resolvedExamples = unified.byOperationKey.get(operationKeyForId(operationId));
+    if (resolvedExamples === undefined || resolvedExamples.length === 0) {
+      return;
+    }
+
+    operationIdsWithExample.add(operationId);
+    currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
+
+    const bodyParameterName = currentEndpoint.parameters.find(
+      (param): param is OpenAPI2BodyParameter => "in" in param && param.in === "body",
+    )?.name;
+
+    const record: Record<string, LoadedExample> = exampleMap.get(operationId) ?? {};
+    const usedFileNames = new Set<string>();
+    for (const resolved of resolvedExamples) {
+      const doc = toLegacyExampleDoc(resolved, {
+        operationId,
+        apiVersion: unified.apiVersion!,
+        bodyParameterName,
+      });
+      const relativePath = legacyExampleFileName(
+        operationId,
+        resolved.title,
+        usedFileNames,
+        resolved.legacyFilename,
+      );
+      const text = JSON.stringify(doc, null, 2);
+      record[doc.title] = {
+        relativePath,
+        file: createSourceFile(text, relativePath),
+        data: doc,
+      };
+      currentEndpoint["x-ms-examples"][doc.title] = { $ref: `./examples/${relativePath}` };
+    }
+    exampleMap.set(operationId, record);
   }
 
   function applyEndpointProduces() {
@@ -2918,6 +2997,52 @@ async function searchExampleJsonFiles(program: Program, exampleDir: string): Pro
 
   await recursiveSearch(exampleDir);
   return exampleFiles;
+}
+
+/** Resolved unified examples for the current emit, grouped by unified operation key. */
+interface ResolvedUnifiedExamples {
+  /** True when the unified `examples.yaml` format is in use for this emit. */
+  readonly active: boolean;
+  /** The concrete API version the examples were resolved/materialized for. */
+  readonly apiVersion?: string;
+  /** Resolved examples grouped by unified operation key (e.g. `CaCertificates.get`). */
+  readonly byOperationKey: UnifiedExamplesResult["byOperationKey"];
+}
+
+/**
+ * Decide whether the unified `examples.yaml` format applies to this emit and, if so, load and
+ * resolve it for the emitted API version. In `"auto"` mode the unified format is used only when a
+ * `examples.yaml` / `examples/*.yaml` file is present at the project root; `"unified"` forces it and
+ * `"legacy"` disables it.
+ */
+async function resolveUnifiedExamples(
+  program: Program,
+  context: AutorestEmitterContext,
+  options: AutorestDocumentEmitterOptions,
+): Promise<ResolvedUnifiedExamples> {
+  const format = options.examplesFormat ?? "auto";
+  const baseDir = program.projectRoot;
+  const useUnified =
+    format === "unified" || (format === "auto" && (await hasUnifiedExamples(program, baseDir)));
+  if (!useUnified) {
+    return { active: false, byOperationKey: new Map() };
+  }
+
+  const apiVersion = context.version ?? resolveInfo(program, context.service.type)?.version;
+  if (apiVersion === undefined) {
+    return { active: true, byOperationKey: new Map() };
+  }
+
+  const order = context.versions ?? [apiVersion];
+  const result = await loadUnifiedExamples(program, baseDir, apiVersion, order);
+  for (const diagnostic of result.diagnostics) {
+    reportDiagnostic(program, {
+      code: "unified-example-loading",
+      format: { message: diagnostic.message },
+      target: NoTarget,
+    });
+  }
+  return { active: true, apiVersion, byOperationKey: result.byOperationKey };
 }
 
 async function loadExamples(
