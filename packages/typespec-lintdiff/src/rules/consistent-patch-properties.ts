@@ -214,11 +214,14 @@ function getPayloadProperties(program: Program, model: Model): Map<string, Paylo
         properties.set(jsonName, { target: property, type: property.type });
       }
     }
+  }
 
+  // Resolve the complete authored shape before filling in discriminator metadata.
+  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
     const discriminator = getDiscriminator(program, current);
     if (
       discriminator !== undefined &&
-      !current.properties.has(discriminator.propertyName) &&
+      getProperty(model, discriminator.propertyName) === undefined &&
       !properties.has(discriminator.propertyName)
     ) {
       properties.set(discriminator.propertyName, { target: current });

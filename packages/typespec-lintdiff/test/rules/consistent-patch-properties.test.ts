@@ -30,6 +30,104 @@ beforeEach(async () => {
 });
 
 describe("consistent-patch-properties", () => {
+  describe("authored properties take precedence over synthesized discriminators", () => {
+    const service = `
+      using TypeSpec.Http;
+      @Azure.ResourceManager.armProviderNamespace
+      @service namespace Microsoft.TestService;
+    `;
+
+    for (const inherited of [false, true]) {
+      const models = inherited
+        ? `
+          model Base {
+            @encodedName("application/json", "kind") payload?: { extra?: string };
+          }
+          model Middle extends Base {}
+          @discriminator("kind") model Details extends Middle {}
+        `
+        : `
+          @discriminator("kind") model Details {
+            @encodedName("application/json", "kind") payload?: { extra?: string };
+          }
+        `;
+
+      it(`checks the nested shape of an ${inherited ? "inherited" : "inline"} encoded PATCH property`, async () => {
+        await tester
+          .expect(
+            `${service}${models}
+            @route("/widgets") @patch
+            op update(@body body: { details?: Details }): { details?: { kind?: string } };
+          `,
+          )
+          .toEmitDiagnostics({
+            code: "tsp-lintdiff-local-linter/consistent-patch-properties",
+            message:
+              "The property 'details.kind.extra' in the request body either does not appear in the resource model or is nested at the wrong level.",
+          });
+      });
+
+      it(`uses the nested shape of an ${inherited ? "inherited" : "inline"} encoded response property`, async () => {
+        await tester
+          .expect(
+            `${service}${models}
+            @route("/widgets") @patch
+            op update(@body body: { details?: { kind?: { extra?: string } } }):
+              { details?: Details };
+          `,
+          )
+          .toBeValid();
+      });
+    }
+
+    it("does not synthesize a second discriminator for an inherited authored name encoded differently", async () => {
+      await tester
+        .expect(
+          `${service}
+          model Base {
+            @encodedName("application/json", "wireKind") kind?: string;
+          }
+          @discriminator("kind") model Details extends Base {}
+          @route("/widgets") @patch
+          op update(@body body: Details): { wireKind?: string };
+        `,
+        )
+        .toBeValid();
+    });
+
+    it("still reports a synthesized discriminator with no authored property", async () => {
+      await tester
+        .expect(
+          `${service}
+          model Base { name?: string; }
+          @discriminator("kind") model Details extends Base {}
+          @route("/widgets") @patch
+          op update(@body body: Details): { name?: string };
+        `,
+        )
+        .toEmitDiagnostics({
+          code: "tsp-lintdiff-local-linter/consistent-patch-properties",
+          message:
+            "The property 'kind' in the request body either does not appear in the resource model or is nested at the wrong level.",
+        });
+    });
+
+    it("preserves a derived never override when synthesizing a discriminator", async () => {
+      await tester
+        .expect(
+          `${service}
+          model Base {
+            @encodedName("application/json", "kind") payload?: { extra?: string };
+          }
+          @discriminator("kind") model Details extends Base { payload?: never; }
+          @route("/widgets") @patch
+          op update(@body body: Details): { kind?: string };
+        `,
+        )
+        .toBeValid();
+    });
+  });
+
   describe("inherited property overrides", () => {
     const service = `
       using TypeSpec.Http;
