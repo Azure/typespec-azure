@@ -170,6 +170,38 @@ Widgets.get:
     expect(file.title).toBe("Get a widget");
   });
 
+  it("disambiguates x-ms-examples keys when two variants derive the same title", async () => {
+    const collidingYaml = `
+$namespace: WidgetService
+Widgets.get:
+  - request:
+      path:
+        id: "1"
+    responses:
+      200:
+        body:
+          name: base
+  - title: Widgets_Get
+    request:
+      path:
+        id: "2"
+    responses:
+      200:
+        body:
+          name: explicit
+`;
+    const { v1 } = await compileVersioned(collidingYaml);
+
+    // Both variants derive the title `Widgets_Get`; neither may be silently dropped.
+    const examples = v1.paths["/widgets/{id}"]?.get?.["x-ms-examples"];
+    expect(Object.keys(examples ?? {}).sort()).toEqual(["Widgets_Get", "Widgets_Get_2"]);
+    for (const entry of Object.values(examples ?? {})) {
+      expect(
+        tester.fs.fs.has(resolveVirtualPath(`./tsp-output/stable/2023-01-01/${entry.$ref}`)),
+      ).toBe(true);
+    }
+  });
+
   it("flattens the request body under the operation's body parameter name", async () => {
     await compileVersioned(versionedExamplesYaml);
 
