@@ -16,9 +16,17 @@ Prepare a release PR for `@azure-tools/typespec-python` from the repository root
 
 ## Workflow
 
-### 1. Create the Branch
+### 1. Clean the Repository and Create the Branch
 
-1. Create the publish branch using the current date:
+1. Clean the repository and update `main` with this exact sequence:
+
+   ```bash
+   git reset HEAD && git checkout . && git clean -fd && git checkout origin/main && git pull origin main
+   ```
+
+   This intentionally discards all uncommitted tracked and untracked files. Run it only when the user has asked to start the release workflow.
+
+2. Create the publish branch from the clean, updated `origin/main` checkout using the current date:
 
    ```bash
    release_date=$(date +%F)
@@ -99,19 +107,13 @@ Prepare a release PR for `@azure-tools/typespec-python` from the repository root
    git push --set-upstream origin "publish/python-${release_date}"
    ```
 
-4. Before creating the pull request, clean the repository and update `main` with this exact sequence:
-
-   ```bash
-   git reset HEAD && git checkout . && git clean -fd && git checkout origin/main && git pull origin main
-   ```
-
-5. Create a pull request targeting `main` from `publish/python-${release_date}` with this exact title and an empty body:
+4. Create a pull request targeting `main` from `publish/python-${release_date}` with this exact title and an empty body:
 
    ```bash
    gh pr create --repo Azure/typespec-azure --base main --head "publish/python-${release_date}" --title "[python] release <version>" --body ""
    ```
 
-6. Verify the created pull request has the expected title and an empty body:
+5. Verify the created pull request has the expected title and an empty body:
 
    ```bash
    gh pr view "publish/python-${release_date}" --repo Azure/typespec-azure --json title,body,url
