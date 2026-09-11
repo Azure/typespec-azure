@@ -25,6 +25,17 @@ describe("normalizeApiVersion", () => {
       "a?api-version={api-version}",
     ]);
   });
+
+  it("does not corrupt ISO timestamps that share the version date", () => {
+    const input = {
+      createdAt: "2024-06-01T09:00:00Z",
+      nextLink: "https://host/things?api-version=2024-06-01",
+    };
+    expect(normalizeApiVersion(input, "2024-06-01")).toEqual({
+      createdAt: "2024-06-01T09:00:00Z",
+      nextLink: "https://host/things?api-version={api-version}",
+    });
+  });
 });
 
 describe("normalizeApiVersions", () => {
