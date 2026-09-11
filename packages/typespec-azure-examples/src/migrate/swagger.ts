@@ -1,5 +1,5 @@
 import { readdir, readFile } from "fs/promises";
-import { dirname, isAbsolute, join, resolve, sep } from "path";
+import { basename, dirname, isAbsolute, join, resolve, sep } from "path";
 import type {
   ParameterLocation,
   SwaggerDocument,
@@ -21,6 +21,8 @@ export interface CrawledExample {
   readonly operationId: string;
   readonly version: string;
   readonly exampleName: string;
+  /** The original `x-ms-examples` file name (basename of the `$ref`), e.g. `Foo_Get.json`. */
+  readonly fileName: string;
   readonly doc: XmsExampleDoc;
   readonly paramLocations: Map<string, ParameterLocation>;
 }
@@ -166,6 +168,7 @@ export async function crawlExamples(root: string): Promise<CrawlResult> {
           operationId: operation.operationId,
           version,
           exampleName,
+          fileName: basename(examplePath),
           doc: exampleDoc,
           paramLocations: operation.paramLocations,
         });

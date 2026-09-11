@@ -54,9 +54,11 @@ export async function migrate(root: string, options: MigrateOptions = {}): Promi
   const allowedVersions = options.versionOrder ? new Set(options.versionOrder) : undefined;
 
   const byOperation = new Map<string, CollectedExample[]>();
+  const operationIds = new Map<string, string>();
   for (const crawled of crawl.examples) {
     if (allowedVersions !== undefined && !allowedVersions.has(crawled.version)) continue;
     const operationKey = deriveOperationKey(crawled.operationId);
+    operationIds.set(operationKey, crawled.operationId);
     const variant = normalizeApiVersions(
       transformExample(crawled.doc, crawled.paramLocations),
       crawl.versions,
@@ -64,6 +66,7 @@ export async function migrate(root: string, options: MigrateOptions = {}): Promi
     const collected: CollectedExample = {
       version: crawled.version,
       exampleName: crawled.exampleName,
+      fileName: crawled.fileName,
       variant,
     };
     const group = byOperation.get(operationKey);
@@ -75,7 +78,11 @@ export async function migrate(root: string, options: MigrateOptions = {}): Promi
   for (const [operationKey, collected] of byOperation) {
     entries.push({
       operationKey,
-      variants: buildLineages(collected, { compareVersions, baselineVersion }),
+      variants: buildLineages(collected, {
+        operationId: operationIds.get(operationKey)!,
+        compareVersions,
+        baselineVersion,
+      }),
     });
   }
 
