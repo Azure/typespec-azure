@@ -3257,6 +3257,9 @@ importers:
 
   packages/typespec-autorest:
     dependencies:
+      '@azure-tools/typespec-azure-examples':
+        specifier: workspace:^
+        version: link:../typespec-azure-examples
       '@typespec/xml':
         specifier: workspace:^
         version: link:../../core/packages/xml
