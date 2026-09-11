@@ -163,6 +163,7 @@ import {
   loadUnifiedExamples,
   operationKeyForId,
   toLegacyExampleDoc,
+  uniqueExampleKey,
 } from "./examples-unified.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
 import { createDiagnostic, reportDiagnostic } from "./lib.js";
@@ -718,6 +719,7 @@ export async function getOpenAPIForService(
 
     const record: Record<string, LoadedExample> = exampleMap.get(operationId) ?? {};
     const usedFileNames = new Set<string>();
+    const usedTitles = new Set<string>();
     for (const resolved of resolvedExamples) {
       const doc = toLegacyExampleDoc(resolved, {
         operationId,
@@ -730,13 +732,14 @@ export async function getOpenAPIForService(
         usedFileNames,
         resolved.legacyFilename,
       );
+      const key = uniqueExampleKey(doc.title, usedTitles);
       const text = JSON.stringify(doc, null, 2);
-      record[doc.title] = {
+      record[key] = {
         relativePath,
         file: createSourceFile(text, relativePath),
         data: doc,
       };
-      currentEndpoint["x-ms-examples"][doc.title] = { $ref: `./examples/${relativePath}` };
+      currentEndpoint["x-ms-examples"][key] = { $ref: `./examples/${relativePath}` };
     }
     exampleMap.set(operationId, record);
   }

@@ -178,3 +178,19 @@ export function legacyExampleFileName(
   used.add(name);
   return `${name}.json`;
 }
+
+/**
+ * Disambiguate an `x-ms-examples` key against the keys already used for the same operation. Two
+ * variants of one operation can derive the same title (e.g. an untitled lineage whose default key
+ * is the `operationId` next to a lineage explicitly titled the same), which would otherwise silently
+ * overwrite each other in the `x-ms-examples` map. Mirrors {@link legacyExampleFileName}.
+ */
+export function uniqueExampleKey(title: string, used: Set<string>): string {
+  let name = title;
+  let index = 2;
+  while (used.has(name)) {
+    name = `${title}_${index++}`;
+  }
+  used.add(name);
+  return name;
+}
