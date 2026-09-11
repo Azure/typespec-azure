@@ -1,8 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Test Service",
-    "version": "2024-01-01",
+    "title": "(title)",
+    "version": "0000-00-00",
     "x-typespec-generated": [
       {
         "emitter": "@azure-tools/typespec-autorest"
@@ -46,7 +46,7 @@
     }
   ],
   "paths": {
-    "/providers/Microsoft.TestService/operations": {
+    "/providers/Microsoft.StandardErrors/operations": {
       "get": {
         "operationId": "Operations_List",
         "tags": [
@@ -77,66 +77,9 @@
         }
       }
     },
-    "/restart/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/restart": {
-      "post": {
-        "operationId": "Widgets_Restart",
-        "tags": [
-          "Widgets"
-        ],
-        "description": "Restart widget",
-        "parameters": [
-          {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ApiVersionParameter"
-          },
-          {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/SubscriptionIdParameter"
-          },
-          {
-            "$ref": "../../../../../common-types/resource-management/v5/types.json#/parameters/ResourceGroupNameParameter"
-          },
-          {
-            "name": "widgetName",
-            "in": "path",
-            "description": "The name of the widget",
-            "required": true,
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9_-]+$"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Azure operation completed successfully.",
-            "schema": {
-              "$ref": "#/definitions/Widget"
-            }
-          },
-          "202": {
-            "description": "Accepted response with location.",
-            "headers": {
-              "Location": {
-                "type": "string",
-                "description": "Operation location"
-              },
-              "Retry-After": {
-                "type": "integer",
-                "format": "int32",
-                "description": "Retry after seconds"
-              }
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/CustomApiError"
-            }
-          }
-        },
-        "x-ms-long-running-operation": true
-      }
-    },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StandardErrors/widgets/{widgetName}": {
       "get": {
-        "operationId": "Widgets_Get",
+        "operationId": "Widgets_Read",
         "tags": [
           "Widgets"
         ],
@@ -154,10 +97,8 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget",
             "required": true,
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9_-]+$"
+            "type": "string"
           }
         ],
         "responses": {
@@ -194,10 +135,8 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget",
             "required": true,
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9_-]+$"
+            "type": "string"
           },
           {
             "name": "resource",
@@ -264,10 +203,8 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget",
             "required": true,
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9_-]+$"
+            "type": "string"
           }
         ],
         "responses": {
@@ -301,9 +238,9 @@
         "x-ms-long-running-operation": true
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/restartNative": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StandardErrors/widgets/{widgetName}/action": {
       "post": {
-        "operationId": "Widgets_RestartNative",
+        "operationId": "Widgets_Action",
         "tags": [
           "Widgets"
         ],
@@ -321,10 +258,8 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget",
             "required": true,
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9_-]+$"
+            "type": "string"
           }
         ],
         "responses": {
@@ -348,7 +283,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/CustomApiError"
+              "$ref": "../../../../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -360,10 +295,6 @@
     }
   },
   "definitions": {
-    "Accepted202WithLocation": {
-      "type": "object",
-      "description": "Accepted response with location."
-    },
     "Azure.ResourceManager.ResourceProvisioningState": {
       "type": "string",
       "description": "The provisioning state of a resource type.",
@@ -394,24 +325,6 @@
         ]
       }
     },
-    "CustomApiError": {
-      "type": "object",
-      "description": "Custom error response.",
-      "properties": {
-        "code": {
-          "type": "string",
-          "description": "Error code"
-        },
-        "message": {
-          "type": "string",
-          "description": "Message"
-        }
-      },
-      "required": [
-        "code",
-        "message"
-      ]
-    },
     "Widget": {
       "type": "object",
       "description": "Concrete tracked resource types can be created by aliasing this type using a specific property type.",
@@ -429,15 +342,9 @@
     },
     "WidgetProperties": {
       "type": "object",
-      "description": "Widget resource properties.",
       "properties": {
-        "description": {
-          "type": "string",
-          "description": "Description"
-        },
         "provisioningState": {
           "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
-          "description": "Resource provisioning state",
           "readOnly": true
         }
       }

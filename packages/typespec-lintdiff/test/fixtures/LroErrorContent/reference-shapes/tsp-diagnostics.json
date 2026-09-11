@@ -12,62 +12,67 @@
   {
     "code": "tsp-lintdiff-local-linter/lro-error-content",
     "severity": "warning",
-    "message": "Error response references of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error reference."
+    "message": "Error payloads of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload."
   },
   {
     "code": "tsp-lintdiff-local-linter/lro-error-content",
     "severity": "warning",
-    "message": "Error response references of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error reference."
+    "message": "Error payloads of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload."
   },
   {
     "code": "tsp-lintdiff-local-linter/lro-error-content",
     "severity": "warning",
-    "message": "Error response references of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error reference."
+    "message": "Error payloads of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload."
   },
   {
     "code": "tsp-lintdiff-local-linter/lro-error-content",
     "severity": "warning",
-    "message": "Error response references of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error reference."
+    "message": "Error payloads of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload."
   },
   {
     "code": "tsp-lintdiff-local-linter/lro-error-content",
     "severity": "warning",
-    "message": "Error response references of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error reference."
+    "message": "Error payloads of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload."
   },
   {
     "code": "tsp-lintdiff-local-linter/lro-error-content",
     "severity": "warning",
-    "message": "Error response references of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error reference."
+    "message": "Error payloads of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload."
   },
   {
     "code": "tsp-lintdiff-local-linter/lro-error-content",
     "severity": "warning",
-    "message": "Error response references of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error reference."
+    "message": "Error payloads of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload."
   },
   {
     "code": "tsp-lintdiff-local-linter/lro-error-content",
     "severity": "warning",
-    "message": "Error response references of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error reference."
+    "message": "Error payloads of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload."
   },
   {
     "code": "tsp-lintdiff-local-linter/lro-error-content",
     "severity": "warning",
-    "message": "Error response references of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error reference."
+    "message": "Error payloads of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload."
   },
   {
     "code": "tsp-lintdiff-local-linter/lro-error-content",
     "severity": "warning",
-    "message": "Error response references of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error reference."
+    "message": "Error payloads of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload."
   },
   {
     "code": "tsp-lintdiff-local-linter/lro-error-content",
     "severity": "warning",
-    "message": "Error response references of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error reference."
+    "message": "Error payloads of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload."
   },
   {
     "code": "tsp-lintdiff-local-linter/lro-error-content",
     "severity": "warning",
-    "message": "Error response references of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error reference."
+    "message": "Error payloads of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/lro-error-content",
+    "severity": "warning",
+    "message": "Error payloads of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload."
   },
   {
     "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
@@ -130,9 +135,39 @@
     "message": "Models should not equate to type Record. ARM requires Resource provider teams to define types explicitly."
   },
   {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
+    "message": "The Model named 'Accepted' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'statusCode' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named 'operationLocation' should have a documentation or description, use doc comment /** */ to provide it."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All operations must be inside an interface declaration."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/get-in-operation-name",
+    "severity": "warning",
+    "message": "'GET' operation 'Poll' should use method name 'Get' or method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
   },
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
@@ -175,11 +210,6 @@
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
   },
   {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
-  },
-  {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The Operation named 'Lro' should have a documentation or description, use doc comment /** */ to provide it."
@@ -208,11 +238,6 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
   },
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
@@ -255,11 +280,6 @@
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
   },
   {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
-  },
-  {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The Operation named 'Lro' should have a documentation or description, use doc comment /** */ to provide it."
@@ -288,11 +308,6 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
   },
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
@@ -335,11 +350,6 @@
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
   },
   {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
-  },
-  {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The Operation named 'Lro' should have a documentation or description, use doc comment /** */ to provide it."
@@ -368,11 +378,6 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
   },
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
@@ -420,11 +425,6 @@
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
   },
   {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
-  },
-  {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The Operation named 'Lro' should have a documentation or description, use doc comment /** */ to provide it."
@@ -458,11 +458,6 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
   },
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
@@ -520,11 +515,6 @@
     "message": "The EnumMember named 'bad' should have a documentation or description, use doc comment /** */ to provide it."
   },
   {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
-  },
-  {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The Operation named 'Lro' should have a documentation or description, use doc comment /** */ to provide it."
@@ -553,11 +543,6 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
   },
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
@@ -625,11 +610,6 @@
     "message": "The UnionVariant named 'worse' should have a documentation or description, use doc comment /** */ to provide it."
   },
   {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
-  },
-  {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The Operation named 'Lro' should have a documentation or description, use doc comment /** */ to provide it."
@@ -663,11 +643,6 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
   },
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
@@ -710,11 +685,6 @@
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
   },
   {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
-  },
-  {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The Operation named 'Lro' should have a documentation or description, use doc comment /** */ to provide it."
@@ -743,11 +713,6 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
   },
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
@@ -790,11 +755,6 @@
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
   },
   {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
-  },
-  {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The Operation named 'Lro' should have a documentation or description, use doc comment /** */ to provide it."
@@ -823,11 +783,6 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
   },
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
@@ -875,11 +830,6 @@
     "message": "@friendlyName should decorate template and use template parameter's properties in friendly name."
   },
   {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
-  },
-  {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The Operation named 'Lro' should have a documentation or description, use doc comment /** */ to provide it."
@@ -908,11 +858,6 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
   },
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
@@ -960,11 +905,6 @@
     "message": "Don't use `| null`. If you meant to have an optional property, use `?`. (e.g. `myProp?: string`)"
   },
   {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
-  },
-  {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The Operation named 'Lro' should have a documentation or description, use doc comment /** */ to provide it."
@@ -993,11 +933,6 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
   },
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
@@ -1050,11 +985,6 @@
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
   },
   {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
-  },
-  {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The Operation named 'Lro' should have a documentation or description, use doc comment /** */ to provide it."
@@ -1083,11 +1013,6 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
   },
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
@@ -1133,11 +1058,6 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/no-openapi",
-    "severity": "warning",
-    "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
   },
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
