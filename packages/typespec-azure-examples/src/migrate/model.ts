@@ -17,6 +17,7 @@ export interface MigratedResponse {
 export interface MigratedVariant {
   title?: string;
   since?: string;
+  legacyFilename?: string;
   request: MigratedRequest;
   responses: Record<string, MigratedResponse>;
 }
