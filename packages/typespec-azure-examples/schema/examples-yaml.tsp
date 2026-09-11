@@ -50,6 +50,14 @@ model Example {
   description?: string;
 
   /**
+   * Legacy `x-ms-examples` file name (e.g. `CaCertificates_Get.json`) this variant was migrated
+   * from. Preserved so an emitter can re-materialize the legacy file under its original name,
+   * keeping the diff minimal during rollout. When omitted, the emitter derives the file name (and
+   * the `x-ms-examples` key) from the operation id and `title`.
+   */
+  legacyFilename?: string;
+
+  /**
    * Quoted version from which this variant applies (must be a version listed in the service's
    * `service.yaml`). Omit to apply from the earliest version.
    */
