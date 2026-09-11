@@ -1,13 +1,8 @@
 [
   {
-    "code": "tsp-lintdiff-local-linter/consistent-patch-properties",
-    "severity": "warning",
-    "message": "The property 'properties.extraPatchOnly' in the request body either does not appear in the resource model or is nested at the wrong level."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/patch-properties-correspond-to-put-properties",
     "severity": "warning",
-    "message": "The property 'extraPatchOnly' in the PATCH body does not correspond to a property in the PUT body."
+    "message": "The PATCH request body must contain at least one property."
   },
   {
     "code": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
@@ -15,9 +10,14 @@
     "message": "Description must not match the name of the node it describes. Node name:'description' Description:'Description'"
   },
   {
-    "code": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+    "code": "@azure-tools/typespec-azure-resource-manager/empty-updateable-properties",
     "severity": "warning",
-    "message": "Description must not match the name of the node it describes. Node name:'description' Description:'Description'"
+    "message": "The RP-specific properties of the Resource (as defined in the 'properties' property) should have at least one updateable property.  Properties are updateable if they do not have a '@visibility' decorator, or if they include 'update' in the '@visibility' decorator arguments."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/no-empty-model",
+    "severity": "warning",
+    "message": "Properties with type:object must have definition of a reference model."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",

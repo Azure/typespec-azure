@@ -272,13 +272,22 @@ def collect(client, head, request_time, review_id=None):
         selected = max(matches, key=lambda r: (utc(r["submitted_at"]), r["id"]))
         comments = client.pages(f"repos/{client.repo}/pulls/{client.pr}/reviews/{selected['id']}/comments")
         body = next(r["body"] for r in reviews if r["id"] == selected["id"])
-        generated = re.findall(r"Comments generated:\*{0,2}\s*(\d+)", body or "", re.IGNORECASE)
-        if generated and max(map(int, generated)) > len(comments):
+        generated = [
+            int(count) for count in re.findall(
+                r"Comments generated:\*{0,2}\s*(\d+)", body or "", re.IGNORECASE
+            )
+        ]
+        if generated and max(generated) > len(comments):
             raise EvidenceError("Review metadata reports more comments than REST returned")
         threads = client.threads()
         result.update(
             status="comments" if comments else "no-new-comments",
             review=selected, comments=map_comments(comments, threads, selected),
+            review_metadata={
+                "summary": re.split(r"<details\b", body or "", maxsplit=1, flags=re.IGNORECASE)[0].strip(),
+                "generated_comment_counts": generated,
+                "rest_comment_count": len(comments),
+            },
             unresolved_copilot_threads=unresolved(threads),
         )
         if not comments and result["unresolved_copilot_threads"]:
@@ -357,8 +366,10 @@ def main():
     except (EvidenceError, KeyError, TypeError, ValueError, OSError) as error:
         result.update(status="failed", error=f"{type(error).__name__}: {error}")
     result["finished_at"] = now()
-    (args.output / "result.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
-    print(json.dumps(result, indent=2))
+    # Escape Unicode for redirected Windows stdout without losing the original text.
+    serialized = json.dumps(result, indent=2, ensure_ascii=True)
+    (args.output / "result.json").write_text(serialized, encoding="utf-8")
+    print(serialized)
     return 1 if result["status"] == "failed" else 0
 
 
