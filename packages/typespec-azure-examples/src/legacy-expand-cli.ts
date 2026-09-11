@@ -51,6 +51,7 @@ async function main(): Promise<void> {
     examples: result.examples.map((e) => ({
       operation: e.operation,
       ...(e.title ? { title: e.title } : {}),
+      ...(e.legacyFilename ? { legacyFilename: e.legacyFilename } : {}),
       request: e.request,
       responses: e.responses,
     })),
