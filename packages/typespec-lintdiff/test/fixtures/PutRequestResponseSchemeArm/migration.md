@@ -7,7 +7,7 @@ The latest full production corpus at specs commit `f6b53f105b95da05276530a0754a1
 ## Conclusion
 
 - **Coverage classification:** partial, with an intentional native-contract boundary for missing success response schemas.
-- **TypeSpec rule update:** required and completed. `comparePutRequestAndResponse` now skips `void` request or response bodies so TypeSpec does not report operations that do not emit a body schema for the Swagger rule to compare.
+- **TypeSpec rule update:** required and completed. `comparePutRequestAndResponse` now skips `void` request bodies so TypeSpec does not report operations that do not emit a request schema for the Swagger rule to compare.
 - **Remaining uncertainty:** none for the supported request-body equality contract. The residual validator-only projects are explained by Swagger's empty-response-schema behavior on already-invalid/suppressed ARM operations.
 
 ## Reports and source revisions
@@ -49,7 +49,7 @@ The shared function finds the first body parameter schema, returns no diagnostic
 
 ## Native TypeSpec behavior
 
-The migrated rule visits ARM provider PUT operations, reads HTTP operation metadata, compares the request body type with the primary `200` response body type or fallback `201` response body type, and reports on the operation when both body schemas exist and differ. The helper compares TypeSpec semantic models, scalars, enums, tuples, unions, arrays, indexers, inherited properties, property optionality, and property types. It now treats `void` request/response bodies as absent schemas, matching the validator's no-request-schema exit and avoiding emitter-specific false positives.
+The migrated rule visits ARM provider PUT operations, reads HTTP operation metadata, compares the request body type with the primary `200` response body type or fallback `201` response body type, and reports on the operation when both body schemas exist and differ. The helper compares TypeSpec semantic models, scalars, enums, tuples, unions, arrays, indexers, inherited properties, property optionality, and property types. It now treats `void` request bodies as absent schemas, matching the validator's no-request-schema exit and avoiding emitter-specific false positives without changing shared data-plane response handling.
 
 ## Native shape matrix
 

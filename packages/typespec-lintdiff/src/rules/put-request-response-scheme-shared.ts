@@ -30,7 +30,7 @@ export function comparePutRequestAndResponse(
   }
 
   const responseBody = response.responses.find((content) => content.body !== undefined)?.body;
-  if (responseBody === undefined || isVoidType(responseBody.type)) {
+  if (responseBody === undefined) {
     return undefined;
   }
 
