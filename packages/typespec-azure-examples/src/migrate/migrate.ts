@@ -1,6 +1,6 @@
 import { buildLineages, type CollectedExample } from "./dedup.js";
 import { planFiles, type EmittedFile, type OperationEntry } from "./emit.js";
-import { normalizeApiVersions } from "./normalize.js";
+import { normalizeApiVersion } from "./normalize.js";
 import { deriveOperationKey } from "./operation-key.js";
 import { crawlExamples } from "./swagger.js";
 import { transformExample } from "./transform.js";
@@ -59,9 +59,9 @@ export async function migrate(root: string, options: MigrateOptions = {}): Promi
     if (allowedVersions !== undefined && !allowedVersions.has(crawled.version)) continue;
     const operationKey = deriveOperationKey(crawled.operationId);
     operationIds.set(operationKey, crawled.operationId);
-    const variant = normalizeApiVersions(
+    const variant = normalizeApiVersion(
       transformExample(crawled.doc, crawled.paramLocations),
-      crawl.versions,
+      crawled.version,
     );
     const collected: CollectedExample = {
       version: crawled.version,
