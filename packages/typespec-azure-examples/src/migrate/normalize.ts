@@ -20,12 +20,19 @@ export function normalizeApiVersions<T>(value: T, versions: readonly string[]): 
     .filter((v) => v.length > 0)
     .sort((a, b) => b.length - a.length);
   if (ordered.length === 0) return value;
-  const matcher = new RegExp(ordered.map(escapeRegExp).join("|"), "g");
+  const matcher = new RegExp(`(?:${ordered.map(escapeRegExp).join("|")})${VERSION_BOUNDARY}`, "g");
   return normalize(value, matcher) as T;
 }
 
+/**
+ * A trailing guard so an api-version string is only matched as a whole token. Azure api-versions are
+ * `YYYY-MM-DD[-suffix]` and are never immediately followed by a digit or the ISO-8601 time
+ * designator `T`, so this prevents corrupting embedded timestamps such as `2023-01-01T09:00:00Z`.
+ */
+const VERSION_BOUNDARY = "(?![T\\d])";
+
 function buildMatcher(version: string): RegExp {
-  return new RegExp(escapeRegExp(version), "g");
+  return new RegExp(escapeRegExp(version) + VERSION_BOUNDARY, "g");
 }
 
 function normalize(value: unknown, matcher: RegExp): unknown {
