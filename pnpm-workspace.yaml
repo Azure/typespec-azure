@@ -72,6 +72,7 @@ catalog:
   "@octokit/core": ^7.0.7
   "@octokit/plugin-paginate-graphql": ^6.0.0
   "@octokit/plugin-rest-endpoint-methods": ^18.0.0
+  "@octokit/rest": ^22.0.1
   "@pinterest/alloy-graphql": ^1.1.1
   "@playwright/test": ^1.62.1
   "@scalar/json-magic": ^0.13.2
@@ -101,7 +102,7 @@ catalog:
   "@types/swagger-ui-express": ^4.1.8
   "@types/which": ^3.0.4
   "@types/yargs": ^17.0.35
-  "@typespec/http-client-python": ">=0.37.0 <1.0.0"
+  "@typespec/http-client-python": ">=0.37.2 <1.0.0"
   "@typespec/ts-http-runtime": "0.3.8"
   "@vitejs/plugin-react": ^6.1.0
   "@vitest/coverage-v8": ^4.1.11

@@ -59,8 +59,10 @@ function packPackages() {
 
   return {
     "@typespec/compiler": resolvePackage("typespec-compiler-"),
+    "@typespec/asset-emitter": resolvePackage("typespec-asset-emitter-"),
     "@typespec/openapi": resolvePackage("typespec-openapi-"),
     "@typespec/openapi3": resolvePackage("typespec-openapi3-"),
+    "@typespec/json-schema": resolvePackage("typespec-json-schema-"),
     "@typespec/http": resolvePackage("typespec-http-"),
     "@typespec/rest": resolvePackage("typespec-rest-"),
     "@typespec/xml": resolvePackage("typespec-xml-"),
@@ -71,6 +73,7 @@ function packPackages() {
     "@typespec/http-specs": resolvePackage("typespec-http-specs-"),
     "@typespec/spector": resolvePackage("typespec-spector-"),
     "@typespec/spec-api": resolvePackage("typespec-spec-api-"),
+    "@typespec/spec-coverage-sdk": resolvePackage("typespec-spec-coverage-sdk-"),
     "@azure-tools/typespec-azure-core": resolvePackage("azure-tools-typespec-azure-core-"),
     "@azure-tools/typespec-azure-resource-manager": resolvePackage(
       "azure-tools-typespec-azure-resource-manager-",
@@ -105,10 +108,12 @@ function testAzureHttpSpecs(packages) {
     ...originalPackageJson,
     dependencies: {
       "@typespec/compiler": packages["@typespec/compiler"],
+      "@typespec/asset-emitter": packages["@typespec/asset-emitter"],
       "@typespec/http": packages["@typespec/http"],
       "@typespec/rest": packages["@typespec/rest"],
       "@typespec/openapi": packages["@typespec/openapi"],
       "@typespec/openapi3": packages["@typespec/openapi3"],
+      "@typespec/json-schema": packages["@typespec/json-schema"],
       "@typespec/xml": packages["@typespec/xml"],
       "@typespec/versioning": packages["@typespec/versioning"],
       "@typespec/events": packages["@typespec/events"],
@@ -117,6 +122,7 @@ function testAzureHttpSpecs(packages) {
       "@typespec/http-specs": packages["@typespec/http-specs"],
       "@typespec/spector": packages["@typespec/spector"],
       "@typespec/spec-api": packages["@typespec/spec-api"],
+      "@typespec/spec-coverage-sdk": packages["@typespec/spec-coverage-sdk"],
       "@azure-tools/typespec-azure-core": packages["@azure-tools/typespec-azure-core"],
       "@azure-tools/typespec-azure-resource-manager":
         packages["@azure-tools/typespec-azure-resource-manager"],
