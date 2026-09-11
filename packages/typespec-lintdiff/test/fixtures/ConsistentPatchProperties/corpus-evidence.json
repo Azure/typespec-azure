@@ -1,25 +1,64 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "rule": "ConsistentPatchProperties",
   "specsCommit": "f6b53f105b95da05276530a0754a1c71b4f16397",
-  "generatedAt": "2026-09-04T14:39:11.685Z",
+  "generatedAt": "2026-09-09T09:24:28.545Z",
+  "completedAt": "2026-09-09T17:28:59.7719922+08:00",
+  "sourceBaseCommit": "29c4a87b0799092be0ede854ffdf23a0a9648795",
+  "sourceBranch": "feature/lintdiff-consistent-patch-properties-native",
+  "sourceState": "Uncommitted native-boundary repair, before final formatting",
+  "localLinterFingerprint": "sha256:33b2527404c4fb88cc32a37f2dd7cb1d58b17789308bdce020e23635019bd6f1",
+  "coverageKind": "partial",
   "command": "pnpm --dir packages/typespec-lintdiff specs:typespec --specs-repo C:\\dev\\worktrees\\azure-rest-api-specs-lintdiff-consistent-patch-properties --concurrency 6",
   "fullRun": true,
-  "durationMs": 1261930,
+  "durationMs": 4678050,
   "sourceProjectCount": 468,
   "successfulProjectCount": 462,
   "failedProjectCount": 6,
   "validator": {
     "diagnostics": 151,
     "projects": 27,
-    "fileIndependentIdentities": 48
+    "fileIndependentIdentities": 48,
+    "fileAndPathIdentities": 48
   },
   "typespec": {
     "diagnostics": 325,
     "sourceIdentities": 188,
-    "projects": 32,
-    "selectedVersionDiagnostics": 306,
-    "selectedVersionProjects": 28
+    "projects": 32
+  },
+  "afterOneSidedVersionExclusions": {
+    "diagnostics": 306,
+    "projects": 28,
+    "excludedDiagnostics": 19,
+    "globallyProjected": false,
+    "scope": "Remove only the documented findings in the four older-version-only projects"
+  },
+  "rawCountComparison": {
+    "equalOverlapProjects": 18,
+    "typeSpecHigherOverlapProjects": 9,
+    "validatorHigherOverlapProjects": 0,
+    "positiveDifferenceAllProjects": 174,
+    "negativeDifferenceAllProjects": 0
+  },
+  "deduplicatedCountComparison": {
+    "equalProjects": 9,
+    "typeSpecHigherProjects": 22,
+    "validatorHigherProjects": 1,
+    "positiveDifference": 142,
+    "negativeDifference": 2,
+    "identities": "Validator project + JSON path; TypeSpec project + source file + line + column"
+  },
+  "oneSidedProjectCounts": {
+    "Batch": 2,
+    "Cdn": 1,
+    "Informatica": 22,
+    "ManagedNetworkFabric": 15,
+    "NetApp": 1
+  },
+  "uncertainty": {
+    "informatica": "Selected Swagger schema mismatches are verified; the validator-side omission mechanism is not isolated.",
+    "versions": "The remaining 306 diagnostics are not a globally latest-version-projected population.",
+    "scope": "Four fixtures prove intentional native/emitter contract differences despite unchanged corpus counts."
   },
   "overlapProjects": [
     "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
@@ -61,6 +100,14 @@
       "specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric",
       "specification/netapp/resource-manager/Microsoft.NetApp/NetApp"
     ]
+  },
+  "compileFailureKinds": {
+    "DeviceProvisioningServices": "@typespec/http/duplicate-body",
+    "TenantActionGroups": "@typespec/http/missing-uri-param",
+    "Network": "@typespec/http/missing-uri-param",
+    "Quota": "@typespec/http/missing-uri-param",
+    "deployments": "@typespec/http/duplicate-body",
+    "ServiceLinker": "@typespec/http/duplicate-body"
   },
   "failedProjects": [
     "specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices",
