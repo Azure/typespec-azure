@@ -1,7 +1,7 @@
 ---
 name: lintdiff-rule-promote
-description: Promote a named LintDiff rule from packages/typespec-lintdiff into the correct official TypeSpec Azure library, assuming it is done, with a clean worktree, user-confirmed destination (or agent-recommended destination when the user says "do not ask"), native tests/docs/ruleset wiring, validation, and a draft PR. Use when the user names a migrated lintdiff rule and asks to move or promote it to typespec-azure-core or typespec-azure-resource-manager.
-argument-hint: "[validator rule id or local rule name] [do not ask]"
+description: Promote a named LintDiff rule from packages/typespec-lintdiff into the correct official TypeSpec Azure library, assuming it is done, with a clean worktree, agent-recommended destination by default (or user-confirmed destination when requested), native tests/docs/ruleset wiring, validation, and a draft PR. Use when the user names a migrated lintdiff rule and asks to move or promote it to typespec-azure-core or typespec-azure-resource-manager.
+argument-hint: "[validator rule id or local rule name] [ask for confirmation]"
 user-invocable: true
 ---
 
@@ -53,21 +53,22 @@ official-library PR is prepared in a clean worktree.
 
 ## Confirmation policy
 
-By default, ask for the destination choice as described in step 2. If the user
-adds a note such as "do not ask" to the promotion request, treat it as per-run
-authorization to proceed with the agent's evidence-backed recommendation instead
-of pausing for user confirmation.
+Use "do not ask" mode by default: proceed with the agent's evidence-backed
+recommendation instead of pausing for routine confirmation. The user does not
+need to add "do not ask" to the promotion request. If the user explicitly asks
+for confirmation, pause at the applicable confirmation points for that run.
 
 - "Do not ask" skips confirmation pauses only, never blocker stops. All existing
   blocker classifications and stop conditions remain unchanged and take
-  precedence over this authorization. When a stop condition is met, stop and
+  precedence over this default. When a stop condition is met, stop and
   report the blocker; do not bypass it or continue on the agent's recommendation.
 - Still perform the destination analysis and state the selected package and
   reasons, then continue directly. Honor any destination already specified by
   the user rather than replacing it with the agent's preference.
 - Apply this policy to routine confirmation points throughout the run. Record
   agent-selected decisions as such in the PR; do not claim the user explicitly
-  selected them. Do not persist this preference for future runs.
+  selected them. An explicit request for confirmation applies only to that run;
+  subsequent runs retain the "do not ask" default.
 - Keep ruleset entries `false` unless the user separately approves immediate
   enablement. "Do not ask" alone is not approval to enable new diagnostics.
 - Apply the `int:azure-specs` label directly when appropriate and permitted; if
@@ -84,9 +85,9 @@ of pausing for user confirmation.
 After the first promotion in a repo, use this optimized order unless the rule
 needs special investigation:
 
-1. Run the destination analysis and obtain the user's choice, or proceed with
-   the agent's recommendation in "do not ask" mode, before creating or preparing
-   a worktree.
+1. Run the destination analysis and proceed with the agent's recommendation by
+   default, or obtain the user's choice when confirmation was requested, before
+   creating or preparing a worktree.
 2. Read checked-in source evidence from the existing source worktree or fetched
    git refs; prefer source branches and worktrees whose names use the canonical
    Swagger validator rule slug. Do not create a source worktree just to inspect
@@ -170,9 +171,10 @@ validation commands below and only use bounded `validate:pr` with
 
 ### 2. Recommend and select the destination library
 
-Analyze first, then present a recommendation with reasons and ask the user to
-choose the destination before moving files. In "do not ask" mode, select the
-recommended destination and continue directly under the confirmation policy.
+Analyze first, then present a recommendation with reasons. By default, select
+the recommended destination and continue directly under the confirmation policy.
+Honor a user-specified destination. Ask the user to choose before moving files
+only when they explicitly requested confirmation.
 
 Use these signals:
 
@@ -216,8 +218,10 @@ The recommendation should include:
 - any required adaptation, such as removing lintdiff-only helpers or changing
   diagnostic names
 
-Stop until the user selects the destination, unless "do not ask" mode authorizes
-proceeding directly with the agent's recommendation.
+Proceed with the evidence-backed destination by default. If the user requested
+confirmation, wait for their selection before continuing. If the evidence cannot
+support a safe recommendation, stop and report the blocker under the confirmation
+policy.
 
 ### 3. Create a clean promotion worktree
 
@@ -535,9 +539,10 @@ step, elapsed time, and the successful narrower validations.
 If validation reveals a semantic issue, do not edit the lintdiff source during
 promotion. For every review or validation finding, classify it before editing:
 
-- **source semantic issue**: promotion is blocked; report the exact gap and ask
-  the user to reopen lintdiff repair if they want source changes. In "do not ask"
-  mode, report the blocker without asking or reopening repair
+- **source semantic issue**: promotion is blocked; by default, report the exact
+  gap without asking or reopening repair. If the user requested confirmation,
+  ask whether they want to reopen lintdiff repair; source changes still require
+  explicit authorization
 - **promotion adaptation issue**: fix only the promotion worktree, and document
   why lintdiff does not need the change
 - **pre-existing or environmental issue**: record the evidence and do not change
@@ -640,16 +645,17 @@ Prefer concrete examples, project names, and before/after evidence. Avoid a
 generic bullet such as "promote lint rule" without explaining the actual rule
 behavior and why the destination package is correct.
 
-After the draft PR exists, apply or ask for the `int:azure-specs` label when the
-new rule could affect existing Azure service specs. In "do not ask" mode, apply
-it directly when permitted; otherwise report the labeling limitation.
+After the draft PR exists, apply the `int:azure-specs` label directly by default
+when the new rule could affect existing Azure service specs and permissions allow
+it; otherwise report the labeling limitation. Ask before applying it only when
+the user requested confirmation.
 
 ## Deliverable
 
 Produce:
 
-- the destination analysis and target package selected by the user or by the
-  agent under "do not ask" authorization
+- the destination analysis and target package selected by the agent under the
+  default "do not ask" policy or explicitly selected by the user
 - a clean worktree branch, named from the canonical validator rule slug,
   containing only native-library promotion changes
 - source, tests, docs, rulesets, and change entries in the target packages
