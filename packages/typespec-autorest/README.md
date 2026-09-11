@@ -212,6 +212,14 @@ Strategy for naming the OpenAPI names derived from TypeSpec types. "namespaced" 
 
 Controls emission of a `service.yaml` manifest at the project root. "auto" (default) emits it only if the file already exists, "always" always emits it, "never" disables it. When an existing file is present it is updated in place, preserving comments and unrelated keys.
 
+### `examples-format`
+
+**Type:** `"auto" | "legacy" | "unified"`
+
+**Default:** `"auto"`
+
+Controls how the emitter sources `x-ms-examples`. "auto" (default) uses the unified `examples.yaml` format when present and otherwise loads legacy per-version JSON files, "legacy" only loads legacy JSON files, and "unified" only reads `examples.yaml`, materializing the applicable legacy `x-ms-examples` files for the emitted API version.
+
 ## Decorators
 
 ### Autorest
