@@ -67,8 +67,12 @@ PUT 200 response models must have `x-ms-azure-resource` in their hierarchy.
 The repaired local suite covers the strongest useful upstream semantic matrix:
 
 - `put` + response schema without `x-ms-azure-resource` => invalid
+- interface `put` + response schema without `x-ms-azure-resource` => invalid
+- nested provider namespace `put` + response schema without `x-ms-azure-resource` => invalid
 - `put` + response schema with explicit `x-ms-azure-resource` => valid
+- standard ARM `put` + registered resource response => valid
 - `patch` + response schema without `x-ms-azure-resource` => ignored by selector
+- global `put` outside the ARM provider namespace => ignored
 
 What remains distinct from the upstream Swagger helper is that the local lint
 uses TypeSpec/ARM resource semantics directly instead of reproducing the
@@ -77,8 +81,12 @@ defense-in-depth check.
 
 ## Test Cases
 
-| ID | Violation | Description |
-| --- | --------- | ----------- |
-| `put-missing-azure-resource` | true | Raw ARM-style PUT returns a custom model without `x-ms-azure-resource` |
-| `put-with-azure-resource` | false | Raw ARM-style PUT returns a model with explicit `x-ms-azure-resource: true` |
-| `patch-ignored` | false | Raw ARM-style PATCH returns a non-resource model but is ignored because the rule only selects PUT |
+| ID                                            | Violation | Description                                                                                                                        |
+| --------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `put-missing-azure-resource`                  | true      | Raw ARM-style PUT returns a custom model without `x-ms-azure-resource`                                                             |
+| `put-interface-missing-azure-resource`        | true      | Raw ARM-style interface PUT returns a custom model without `x-ms-azure-resource`                                                   |
+| `put-nested-namespace-missing-azure-resource` | true      | Raw PUT in a child of the ARM provider namespace returns a custom model without `x-ms-azure-resource`                              |
+| `put-with-azure-resource`                     | false     | Raw ARM-style PUT returns a model with explicit `x-ms-azure-resource: true`                                                        |
+| `put-arm-resource`                            | false     | Standard ARM PUT returns a registered resource; the expected validator-only diagnostic records its external-`$ref` ancestry defect |
+| `patch-ignored`                               | false     | Raw ARM-style PATCH returns a non-resource model but is ignored because the rule only selects PUT                                  |
+| `global-put-ignored`                          | false     | Global PUT is ignored even when an unrelated ARM provider service exists in the program                                            |
