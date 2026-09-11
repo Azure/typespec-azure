@@ -16,6 +16,7 @@ const examplesYaml = `
 $namespace: Microsoft.Test
 Things.get:
   - request: { path: { id: "1" } }
+    legacyFilename: Things_Get.json
     responses:
       200:
         body: { tier: base, nextLink: "https://h/x?api-version={api-version}" }
@@ -42,6 +43,12 @@ describe("resolveExamplesDir (end-to-end)", () => {
     expect(result.diagnostics).toEqual([]);
     expect(result.examples).toHaveLength(1);
     expect((result.examples[0].responses as any)["200"].body.tier).toBe("base");
+  });
+
+  it("threads legacyFilename through to the resolved example", async () => {
+    const dir = await fixture();
+    const result = await resolveExamplesDir(dir, "2023-01-01");
+    expect(result.examples[0].legacyFilename).toBe("Things_Get.json");
   });
 
   it("resolves the since entry for the later version and materializes api-version", async () => {
