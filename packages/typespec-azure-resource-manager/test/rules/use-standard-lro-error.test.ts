@@ -79,6 +79,48 @@ describe("use-standard-lro-error", () => {
       .toBeValid();
   });
 
+  it("accepts the standard error from ARM templates", async () => {
+    await tester
+      .expect(
+        `
+        @armProviderNamespace
+        @armCommonTypesVersion(CommonTypes.Versions.v5)
+        namespace Microsoft.Contoso;
+
+        model Widget is ProxyResource<{}> {
+          ...ResourceNameParameter<Widget>;
+        }
+        @armResourceOperations
+        interface Widgets {
+          action is ArmResourceActionAsync<Widget, void, void>;
+        }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("rejects a custom error supplied to an ARM template", async () => {
+    await tester
+      .expect(
+        `
+        @armProviderNamespace
+        @armCommonTypesVersion(CommonTypes.Versions.v5)
+        namespace Microsoft.Contoso;
+
+        model Widget is ProxyResource<{}> {
+          ...ResourceNameParameter<Widget>;
+        }
+        @error model CustomError { code: string; }
+
+        @armResourceOperations
+        interface Widgets {
+          action is ArmResourceActionAsync<Widget, void, void, Error = CustomError>;
+        }
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
   it("uses native ARM external references and rejects v1, local, and wrong definitions", async () => {
     await tester
       .expect(
@@ -238,6 +280,30 @@ describe("use-standard-lro-error", () => {
       `,
       )
       .toBeValid();
+  });
+
+  it("does not treat a raw OpenAPI extension as native LRO metadata", async () => {
+    await tester
+      .expect(
+        `${header}
+        @TypeSpec.OpenAPI.extension("x-ms-long-running-operation", true)
+        @route("/raw") @post
+        op rawExtension(): Accepted | Failure<string>;
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("does not let a raw OpenAPI extension disable native LRO metadata", async () => {
+    await tester
+      .expect(
+        `${header}
+        @TypeSpec.OpenAPI.extension("x-ms-long-running-operation", false)
+        @route("/disabled")
+        op disabled is Lro<string>;
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
   });
 
   it("checks ordinary and nested namespaces without an ARM provider decorator", async () => {
