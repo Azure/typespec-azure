@@ -28,6 +28,8 @@ export interface ExampleDiagnostic {
 export interface ExampleVariant {
   readonly title?: string;
   readonly description?: string;
+  /** Legacy `x-ms-examples` file name this variant was migrated from, when preserved. */
+  readonly legacyFilename?: string;
   readonly since?: string;
   readonly request?: ExampleRequest;
   readonly responses?: Record<string, ExampleResponse>;
