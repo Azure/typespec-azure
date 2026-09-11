@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-java"
 ---
 
-Update TypeSpec dependencies to their September minor versions and sync Java generation behavior, including responses that return either a model body or no content ([microsoft/typespec#11936](https://github.com/microsoft/typespec/pull/11936)).
+Update TypeSpec dependencies to their September minor versions. Includes behavior changes from upstream libraries such as TCGC ([microsoft/typespec#11936](https://github.com/microsoft/typespec/pull/11936)).
