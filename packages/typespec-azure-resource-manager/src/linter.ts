@@ -23,6 +23,7 @@ import { patchOperationsRule } from "./rules/arm-resource-patch.js";
 import { armResourcePathInvalidCharsRule } from "./rules/arm-resource-path-invalid-chars.js";
 import { armResourceProvisioningStateRule } from "./rules/arm-resource-provisioning-state-rule.js";
 import { beyondNestingRule } from "./rules/beyond-nesting-levels.js";
+import { consistentPatchPropertiesRule } from "./rules/consistent-patch-properties.js";
 import { envelopePropertiesRules } from "./rules/envelope-properties.js";
 import { improperSubscriptionListOperationRule } from "./rules/improper-subscription-list-operation.js";
 import { listOperationMissingPageableRule } from "./rules/list-operation-missing-pageable.js";
@@ -97,6 +98,7 @@ const rules = [
   operationsInterfaceMissingRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
+  consistentPatchPropertiesRule,
   resourceNameRule,
   retryAfterRule,
   unsupportedTypeRule,
