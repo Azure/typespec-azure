@@ -22,7 +22,7 @@ The registered official ARM rule `arm-resource-patch` checks that a PATCH body e
 
 - Added and enabled `tsp-lintdiff-local-linter/patch-properties-correspond-to-put-properties`.
 - Grouped every PUT and PATCH operation in ARM HTTP services by emitted route, matching the Swagger path-item scope.
-- Ignored same-endpoint overload siblings, matching the HTTP layer's emitted-endpoint uniqueness logic before route pairing.
+- Ignored same-endpoint overload siblings before route pairing; a native regression test gives the base and overload operations distinct bodies.
 - Declared `projectionScope: http-reachable` so corpus comparison retains only diagnostics reachable from the dataset-selected API version's HTTP operations.
 - Reported missing, `void`, and property-free PATCH bodies, implementing the documented
   at-least-one-property requirement that the Swagger implementation accidentally checks only at
@@ -47,9 +47,12 @@ The registered official ARM rule `arm-resource-patch` checks that a PATCH body e
 | No PATCH body / `void` body                               | Autorest omits body parameter                      | no PATCH body parameter        | violation                | violation         | `missing-patch-body`                 |
 | Empty PATCH body model                                    | emitted body schema has no leaf properties         | empty property set             | validator false negative | violation         | `empty-patch-model`                  |
 | No PUT body                                               | Autorest omits body parameter                      | no PUT body parameter          | violation                | violation         | `missing-put-body`                   |
+| Same-endpoint PUT/PATCH overloads with distinct bodies    | `isOverloadSameEndpoint` filters overload siblings | unavailable: emission crashed  | unverified               | clean             | native rule test                     |
 | Scalar, array, record, union, nullable model, empty model | scalar/fallthrough and single-model-union branches | corresponding leaf names       | clean                    | clean             | `type-family-compliant`              |
 
 The Autorest path is visible in `packages/typespec-autorest/src/openapi.ts`: `void` bodies are omitted, body models are emitted through request visibility transforms, and property metadata becomes Swagger schema fields. The rule uses the same `resolveRequestVisibility`, `MetadataInfo.isTransformed`, `isPayloadProperty`, and schema-sharing policy used by the adjacent PATCH emission-aware lint.
+
+The [native overload regression test](../../rules/patch-properties-correspond-to-put-properties.test.ts) covers only the linter's selection of base-operation bodies instead of same-endpoint overload bodies. The attempted Swagger-comparison fixture crashed in `@azure-tools/typespec-autorest` with `Duplicate route` before the validator could run and was removed. Native-only coverage is retained for this scenario; Swagger equivalence is unverified, not validator-clean.
 
 ## Report reconciliation
 
