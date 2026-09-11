@@ -87,12 +87,14 @@ describe("migrate (end-to-end)", () => {
     // Get collapses across versions (api-version normalized) into one base entry.
     expect(doc["Things.get"]).toHaveLength(1);
     expect(doc["Things.get"][0].since).toBeUndefined();
+    expect(doc["Things.get"][0].legacyFilename).toBe("Get.json");
     expect(doc["Things.get"][0].responses["200"].body.nextLink).toContain("{api-version}");
     expect(doc["Things.get"][0].request.path).toEqual({ subscriptionId: "sub", id: "1" });
 
     // Create changed content across versions -> base + since variant.
     expect(doc["Things.create"]).toHaveLength(2);
     expect(doc["Things.create"][0].since).toBeUndefined();
+    expect(doc["Things.create"][0].legacyFilename).toBe("Create.json");
     expect(doc["Things.create"][0].request.body).toEqual({ sku: "basic" });
     expect(doc["Things.create"][1].since).toBe("2024-06-01");
     expect(doc["Things.create"][1].request.body).toEqual({ sku: "premium" });
