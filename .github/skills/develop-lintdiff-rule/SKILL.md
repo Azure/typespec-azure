@@ -560,6 +560,37 @@ for migration research and the test/comparison harness. Shared semantic APIs
 such as HTTP payload metadata and Azure common-type metadata are appropriate
 when they operate on the program without loading or running an emitter.
 
+Determine type identity, version, and other semantic properties from TypeSpec
+types and structured metadata, not by matching or parsing generated OpenAPI
+reference strings. This restriction is about how an API result is used, not
+only which package exports it: an allowed Azure library can also expose a
+reference-formatting helper. Do not construct a reference and parse it back
+when a supported API exposes the underlying record. For example, consume
+`findArmCommonTypeRecord(program, usage.type, { service, version: apiVersion })`
+and its record fields instead of parsing `getArmCommonTypeOpenAPIRef(...)`.
+An external reference to a standard type does not establish native type identity.
+Reference-formatting helpers remain appropriate for emitters and comparison
+research, not for inferring native lint semantics.
+
+When replacing reference-based logic, preserve the established version-selection
+and fallback policy, diagnostic population, and diagnostic targets unless an
+intentional semantic change is separately justified and documented. Handle
+diagnostics returned by metadata resolution explicitly using the repository's
+diagnostic conventions; do not discard them or silently treat failed resolution
+as compliance. Add regression coverage for version selection, fallback, and
+targets where relevant, and prove that checking a resolved record does not
+depend on its generated reference matching the old path or regex layout.
+Use supported native inputs or the existing test infrastructure; do not add
+production adapters or unsupported authoring shapes solely for this test.
+If no supported metadata API can establish the required property, document the
+limitation rather than introducing a reference-string heuristic.
+
+This also follows the
+[metadata-over-reference review on PR #5271](https://github.com/Azure/typespec-azure/pull/5271#issuecomment-5661318416).
+Distinguish architectural reference-format coupling from a demonstrated
+false positive or missed diagnostic; do not claim an affected service without
+evidence.
+
 Before adding special cases or helper complexity, require tests demonstrating
 that the added behavior affects valid supported idiomatic TypeSpec inputs.
 Distinguish those inputs from Swagger-only shapes, emitter-invalid shapes, and
@@ -874,6 +905,10 @@ The reviewer must:
 - verify that production rule imports and reachable helpers respect the native
   implementation boundary, native tests do not require an emitter, and any
   emitter-only divergence is documented rather than hidden by an adapter
+- check for reference-string inference even through allowed Azure library APIs;
+  require structured metadata where available, explicit handling of returned
+  resolution diagnostics, and regression evidence for reference-format
+  independence and preserved version-selection, fallback, and diagnostic targets
 - verify destination-compatible dependency direction and absence of TCGC
   dependencies in ARM rule logic, `@typespec/openapi` usage, and unsafe compiler
   mutation; check that their removal did not leave unsupported claims about
