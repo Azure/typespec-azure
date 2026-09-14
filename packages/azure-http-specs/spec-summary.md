@@ -1340,29 +1340,6 @@ param2: param2
 
 Expected response: 204 No Content
 
-### Azure_ClientGenerator_Core_Override_ReplaceResponse_bytesResponse
-
-- Endpoint: `get /azure/client-generator-core/override/response/bytes`
-
-Verify that `replaceResponseWithBytes` exposes the raw response bytes from the generated method
-while preserving the JSON service response on the wire.
-Expected response:
-
-- Status: 200
-- Content-Type: application/json
-- Body: {"name":"widget"}
-
-### Azure_ClientGenerator_Core_Override_ReplaceResponse_voidResponse
-
-- Endpoint: `post /azure/client-generator-core/override/response/void`
-
-Verify that `replaceResponseWithVoid` removes the generated method response while preserving the
-service response on the wire.
-Expected response:
-
-- Status: 200
-- Body: {"name":"widget"}
-
 ### Azure_ClientGenerator_Core_Override_RequireOptionalParameter_requireOptional
 
 - Endpoint: `get /azure/client-generator-core/override/require-optional/{param1}/{param2}`
@@ -1394,6 +1371,29 @@ Test that a HEAD operation decorated with @responseAsBool returns false for a 40
 Expected call:
 
 - HEAD /azure/client-generator-core/response-as-bool/exists/not-exists -> 404 (returns false)
+
+### Azure_ClientGenerator_Core_ResponseReplacement_bytesResponse
+
+- Endpoint: `get /azure/client-generator-core/response-replacement/bytes`
+
+Verify that `replaceResponseWithBytes` exposes the raw response bytes from the generated method
+while preserving the JSON service response on the wire.
+Expected response:
+
+- Status: 200
+- Content-Type: application/json
+- Body: {"name":"widget"}
+
+### Azure_ClientGenerator_Core_ResponseReplacement_voidResponse
+
+- Endpoint: `post /azure/client-generator-core/response-replacement/void`
+
+Verify that `replaceResponseWithVoid` removes the generated method response while preserving the
+service response on the wire.
+Expected response:
+
+- Status: 200
+- Body: {"name":"widget"}
 
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 

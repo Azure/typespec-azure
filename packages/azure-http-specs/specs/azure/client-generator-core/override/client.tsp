@@ -57,17 +57,3 @@ model RequiredParameters {
     "param4"
   )
 );
-
-#suppress "@azure-tools/typespec-client-generator-core/override-response-replacement" "The generated method intentionally ignores the response body."
-@@override(
-  _Specs_.Azure.ClientGenerator.Core.Override.ReplaceResponse.voidResponse,
-  replaceResponseWithVoid(_Specs_.Azure.ClientGenerator.Core.Override.ReplaceResponse.voidResponse)
-);
-
-#suppress "@azure-tools/typespec-client-generator-core/override-response-replacement" "The generated method intentionally exposes the raw response bytes."
-@@override(
-  _Specs_.Azure.ClientGenerator.Core.Override.ReplaceResponse.bytesResponse,
-  replaceResponseWithBytes(
-    _Specs_.Azure.ClientGenerator.Core.Override.ReplaceResponse.bytesResponse
-  )
-);

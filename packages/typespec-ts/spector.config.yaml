@@ -105,6 +105,8 @@ specs:
   azure/client-generator-core/hierarchy-building: true
   client/overload: true
   azure/client-generator-core/override: true
+  # Disabled until all language emitters support response replacement.
+  azure/client-generator-core/response-replacement: false
   azure/client-generator-core/alternate-type: true
   azure/versioning/previewVersion: true
   azure/client-generator-core/next-link-verb: true

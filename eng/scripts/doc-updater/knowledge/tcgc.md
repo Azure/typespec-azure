@@ -90,7 +90,7 @@
 
 ### Covered in azure/client-generator-core/
 
-access, alternate-type, api-version, client-default-value, client-doc, client-initialization, client-location, deserialize-empty-string-as-null, exact-name, flatten-property, hierarchy-building, next-link-verb, override, response-as-bool, usage
+access, alternate-type, api-version, client-default-value, client-doc, client-initialization, client-location, deserialize-empty-string-as-null, exact-name, flatten-property, hierarchy-building, next-link-verb, override, response-as-bool, response-replacement, usage
 
 ### Covered in client/
 
@@ -99,7 +99,7 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 ### Coverage Boundaries for Client-Generation Controls
 
 - Do not add `client-control`-style carrier scenarios that only expose emitter metadata without distinct shared wire behavior. Human review removed those scenarios.
-- `override` exercises `replaceParameter`, `removeParameter`, and `reorderParameters`, plus the wire-preserving `replaceResponseWithVoid` and `replaceResponseWithBytes` transformations. Do not add `addParameter` unless the added parameter has a valid, meaningful wire representation.
+- `override` exercises `replaceParameter`, `removeParameter`, and `reorderParameters`. `response-replacement` exercises the wire-preserving `replaceResponseWithVoid` and `replaceResponseWithBytes` transformations but is disabled in all language emitter suites for now. Do not add `addParameter` unless the added parameter has a valid, meaningful wire representation.
 - `@convenientAPI` has carrier coverage in `azure/core/basic`; `@markAsLro` and `@markAsPageable` are exercised by resource-manager operation-template scenarios.
 - Unit tests remain responsible for detailed language-specific type-graph assertions when a decorator has no distinct wire behavior.
 
