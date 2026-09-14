@@ -36,7 +36,7 @@ import {
   type Version,
 } from "@typespec/versioning";
 import {
-  getArmCommonTypeOpenAPIRef,
+  findArmCommonTypeRecord,
   getArmCommonTypesVersion,
   getArmCommonTypesVersions,
   isArmCommonType,
@@ -495,16 +495,18 @@ function reportOutdatedUsages(
   const reported = new Map<ModelProperty | Operation, Set<string>>();
 
   for (const usage of usages) {
-    const reference = getArmCommonTypeOpenAPIRef(context.program, usage.type, {
+    const [record, diagnostics] = findArmCommonTypeRecord(context.program, usage.type, {
       service,
       version: apiVersion,
     });
-    const parsedReference = parseCommonTypesReference(reference);
-    if (parsedReference === undefined || parsedReference.version === latestVersion) {
+    context.program.reportDiagnostics(diagnostics);
+    if (record === undefined || record.version === latestVersion) {
       continue;
     }
 
-    const identity = `${parsedReference.fileName}\0${parsedReference.version}\0${parsedReference.referenceKind}\0${parsedReference.referenceName}`;
+    const fileName = record.referenceFile ?? record.basePath;
+    const referenceKind = record.kind === "definitions" ? "definition" : "parameter";
+    const identity = `${fileName}\0${record.version}\0${record.kind}\0${record.name}`;
     let targetReferences = reported.get(usage.target);
     if (targetReferences === undefined) {
       targetReferences = new Set();
@@ -519,33 +521,12 @@ function reportOutdatedUsages(
       messageId: "reference",
       target: usage.target,
       format: {
-        currentVersion: parsedReference.version,
+        currentVersion: record.version,
         latestVersion,
-        fileName: parsedReference.fileName,
-        referenceKind: parsedReference.referenceKind,
-        referenceName: parsedReference.referenceName,
+        fileName,
+        referenceKind,
+        referenceName: record.name,
       },
     });
   }
-}
-
-function parseCommonTypesReference(reference: string | undefined):
-  | {
-      version: string;
-      fileName: string;
-      referenceKind: string;
-      referenceName: string;
-    }
-  | undefined {
-  const match = reference?.match(
-    /(?:resource-management\/|\{arm-types-dir\}\/)(v\d+)\/([^/#]+\.json)#\/([^/]+)\/([^/]+)$/i,
-  );
-  return match
-    ? {
-        version: match[1].toLowerCase(),
-        fileName: match[2].toLowerCase(),
-        referenceKind: match[3].replace(/s$/i, "").toLowerCase(),
-        referenceName: decodeURIComponent(match[4]),
-      }
-    : undefined;
 }

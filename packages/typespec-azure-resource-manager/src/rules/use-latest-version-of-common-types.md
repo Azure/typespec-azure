@@ -6,6 +6,8 @@ The rule checks the effective `@armCommonTypesVersion` on each ARM service or
 service version. When the selected version is current, it also checks common
 types reachable from HTTP operation parameters and payloads so older legacy
 symbols are not emitted through an otherwise current API version.
+These checks use resolved ARM common-type metadata, including its version and
+reference file, rather than parsing generated OpenAPI reference paths.
 
 ## Impact
 
