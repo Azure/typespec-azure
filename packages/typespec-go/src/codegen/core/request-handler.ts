@@ -475,16 +475,16 @@ function emitBody(
         text += `${indent.get()}type wrapper struct {\n`;
         indent.push();
         let tagName: string;
-        if (bodyParam.xml?.wrapper) {
-          tagName = bodyParam.xml.wrapper;
+        if (bodyParam.xmlWrapper) {
+          tagName = bodyParam.xmlWrapper;
         } else {
           tagName = go.getTypeDeclaration(bodyParam.type, method.receiver.type.pkg);
         }
         text += `${indent.get()}XMLName xml.Name \`xml:"${tagName}"\`\n`;
         const fieldName = naming.capitalize(bodyParam.name);
         let tag = go.getTypeDeclaration(go.unwrapPtr(bodyParam.type.elementType), method.receiver.type.pkg);
-        if (bodyParam.type.elementType.kind === "model" && bodyParam.type.elementType.xml?.name) {
-          tag = bodyParam.type.elementType.xml.name;
+        if (bodyParam.type.elementType.kind === "model" && bodyParam.type.elementType.xmlName) {
+          tag = bodyParam.type.elementType.xmlName;
         }
         text += `${indent.get()}${fieldName} *${go.getTypeDeclaration(bodyParam.type, method.receiver.type.pkg)} \`xml:"${tag}"\`\n`;
         text += `${indent.pop().get()}}\n`;

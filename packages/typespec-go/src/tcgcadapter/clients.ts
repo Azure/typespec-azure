@@ -1517,8 +1517,7 @@ export class ClientAdapter {
           );
           if (contentType === "XML" && methodParam.type.kind === "array") {
             // this is for compat with legacy behavior
-            adaptedParam.xml = new go.XMLInfo();
-            adaptedParam.xml.wrapper = methodParam.type.name;
+            adaptedParam.xmlWrapper = methodParam.type.name;
           }
         }
         break;
@@ -1986,14 +1985,13 @@ export class ClientAdapter {
 
       if (go.isMonomorphicResultType(resultType)) {
         let fieldName: string | undefined;
-        let xmlInfo: go.XMLInfo | undefined;
+        let xmlWrapper: string | undefined;
         if (contentType === "XML" && sdkResponseType.kind === "array") {
           // this is for compat with legacy behavior
-          xmlInfo = new go.XMLInfo();
           fieldName = sdkResponseType.name;
           const elementType = go.unwrapPtr((<go.Slice>resultType).elementType);
-          const elementTypeXmlName = helpers.hasXMLInfo(elementType)?.name;
-          xmlInfo.wraps =
+          const elementTypeXmlName = go.hasXMLName(elementType);
+          xmlWrapper =
             elementTypeXmlName ?? go.getTypeDeclaration(elementType, method.receiver.type.pkg);
         }
 
@@ -2016,7 +2014,7 @@ export class ClientAdapter {
           contentType,
           helpers.isPtrType(resultType) ? this.ta.getPtrType(resultType) : resultType,
         );
-        respEnv.result.xml = xmlInfo;
+        respEnv.result.xmlWrapper = xmlWrapper;
       } else {
         throw new AdapterError(
           "InternalError",
