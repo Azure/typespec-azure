@@ -71,9 +71,14 @@ describe("use-standard-lro-error", () => {
       .expect(
         `${header}
         model Copy is CommonTypes.ErrorResponse;
+        model CopyAgain is Copy;
+        alias StandardError = CommonTypes.ErrorResponse;
         @route("/standard") op standard is Lro<CommonTypes.ErrorResponse>;
         @route("/copy") op copy is Lro<Copy>;
+        @route("/copy-again") op copyAgain is Lro<CopyAgain>;
+        @route("/alias") op aliasError is Lro<StandardError>;
         @route("/nullable") op nullable is Lro<CommonTypes.ErrorResponse | null>;
+        @route("/nullable-copy") op nullableCopy is Lro<CopyAgain | null>;
       `,
       )
       .toBeValid();
@@ -121,28 +126,59 @@ describe("use-standard-lro-error", () => {
       .toEmitDiagnostics([diagnostic]);
   });
 
-  it("uses native ARM external references and rejects v1, local, and wrong definitions", async () => {
+  it.each([
+    "../../common-types/resource-management/v1/types.json#/definitions/ErrorResponse",
+    "../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse",
+    "../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse",
+    "../../common-types/resource-management/v10/types.json#/definitions/ErrorResponse",
+    "../../common-types/resource-management/v5/types.json#/definitions/ErrorDetail",
+    "#/definitions/ErrorResponse",
+  ])("does not accept a custom model based on the external reference %s", async (reference) => {
     await tester
       .expect(
         `${header}
-        @Legacy.externalTypeRef("../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse")
-        model V2 { code?: string; }
-        @Legacy.externalTypeRef("../../common-types/resource-management/v10/types.json#/definitions/ErrorResponse")
-        model V10 { code?: string; }
-        @Legacy.externalTypeRef("../../common-types/resource-management/v1/types.json#/definitions/ErrorResponse")
-        model V1 { code?: string; }
-        @Legacy.externalTypeRef("../../common-types/resource-management/v5/types.json#/definitions/ErrorDetail")
-        model Wrong { code?: string; }
-        @Legacy.externalTypeRef("#/definitions/ErrorResponse")
-        model Local { code?: string; }
-        @route("/v2") op v2 is Lro<V2>;
-        @route("/v10") op v10 is Lro<V10>;
-        @route("/v1") op v1 is Lro<V1>;
-        @route("/wrong") op wrong is Lro<Wrong>;
-        @route("/local") op localReference is Lro<Local>;
+        @Legacy.externalTypeRef("${reference}")
+        model Custom { code?: string; }
+        @route("/custom") op custom is Lro<Custom>;
       `,
       )
-      .toEmitDiagnostics([diagnostic, diagnostic, diagnostic]);
+      .toEmitDiagnostics([diagnostic]);
+  });
+
+  it("does not let an external reference override the standard TypeSpec model", async () => {
+    await tester
+      .expect(
+        `${header}
+        @Legacy.externalTypeRef("#/definitions/OtherError")
+        model Copy is CommonTypes.ErrorResponse;
+        @route("/copy") op copy is Lro<Copy>;
+      `,
+      )
+      .toBeValid();
+  });
+
+  it.each(["v3", "v4", "v5", "v6"])(
+    "accepts the standard TypeSpec model with common-types %s",
+    async (version) => {
+      await tester
+        .expect(
+          `${header.replace("Versions.v5", `Versions.${version}`)}
+          @route("/standard") op standard is Lro<CommonTypes.ErrorResponse>;
+        `,
+        )
+        .toBeValid();
+    },
+  );
+
+  it("rejects a same-named model with the standard shape in a different namespace", async () => {
+    await tester
+      .expect(
+        `${header}
+        model ErrorResponse { error?: CommonTypes.ErrorDetail; }
+        @route("/custom") op custom is Lro<ErrorResponse>;
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
   });
 
   it("rejects custom model reference shapes", async () => {
@@ -319,6 +355,20 @@ describe("use-standard-lro-error", () => {
       .toEmitDiagnostics([diagnostic, diagnostic]);
   });
 
+  it("checks operations without a service decorator", async () => {
+    await tester
+      .expect(
+        `${header.replace("@service", "")}
+        @route("/custom") op custom is Lro<string>;
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
+  it("does not diagnose imported Azure.Core or Azure.ResourceManager library operations", async () => {
+    await tester.expect("").toBeValid();
+  });
+
   it("reports a nested service operation without an ARM provider decorator", async () => {
     await tester
       .expect(
@@ -339,6 +389,12 @@ describe("use-standard-lro-error", () => {
         `${header}
         @Azure.Core.pollingOperation(poll) @post
         op Unused<T>(): Accepted | Failure<T>;
+        @Azure.Core.pollingOperation(poll) @post
+        op UnusedInvalid<T>(): Accepted | Failure<string>;
+        interface UnusedActions<T> {
+          @Azure.Core.pollingOperation(poll) @post
+          op run(): Accepted | Failure<string>;
+        }
         @route("/valid") op valid is Lro<CommonTypes.ErrorResponse>;
       `,
       )

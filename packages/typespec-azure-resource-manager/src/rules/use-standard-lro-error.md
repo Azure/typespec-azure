@@ -1,5 +1,10 @@
-Long-running ARM operations must return the standard common-types
-`ErrorResponse` for every existing default, 4xx, and 5xx response body.
+Long-running ARM operations must use `Azure.ResourceManager.CommonTypes.ErrorResponse`
+for every existing default, 4xx, and 5xx response body.
+
+The rule checks the TypeSpec model, not an emitted OpenAPI reference. Aliases,
+`model is` copies, and nullable unions with a single non-null standard error type
+are accepted. An external reference to the Swagger common-types `ErrorResponse`
+does not make a custom TypeSpec model compliant.
 
 ## Impact
 
@@ -12,6 +17,7 @@ for `Azure.ResourceManager.CommonTypes.ErrorResponse`.
 
 An error response without a body is not checked. Success responses, synchronous
 operations, and GET operations are also outside this rule.
+Operations are checked even without a `@service` decorator.
 
 ## ❌ Incorrect
 
