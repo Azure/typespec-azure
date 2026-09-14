@@ -115,6 +115,8 @@ Keep an ordered ledger with one entry per input command:
   and source-repair reasons
 - review owner (`worker` or `outer`), observed launch/follow-up capabilities,
   waiting phase, handoff artifact, and review invocation/agent IDs
+- local draft-correction counts, causal evidence and rerun results, separate
+  from worker attempts, review rounds and source-repair cycles
 - blocker or failure, when applicable
 
 Update the ledger after every phase handoff and worker result so a later failure
@@ -237,12 +239,31 @@ Apply the narrow correction outside the rule worktrees, record the original
 failure and correction in the ledger, then launch one fresh worker with the
 corrected prompt. Never reuse the failed worker.
 
-Do not retry dependency, build, validation, corpus, review, network, credential,
-push, or GitHub failures automatically. An orchestration retry is forbidden after
-development changed files, created a commit, pushed a branch, or created a pull
-request. Only a confirmed source defect under the separate source-repair contract
-permits restarting after development work. If the orchestration retry fails,
-record the task's terminal result and continue the queue.
+Do not restart workers automatically for dependency, build, validation, corpus,
+review, network, credential, push or GitHub failures. This does not prohibit an
+eligible in-place draft correction below. An orchestration retry is forbidden
+after development changed files, created a commit, pushed a branch, or created
+a pull request. Only a confirmed source defect under the separate source-repair
+contract permits an automatic cycle restart after development work. If the
+orchestration retry fails, record the task's terminal result and continue the queue.
+
+### Local draft correction is not a worker restart
+
+Apply the review skill's
+[bounded draft-correction policy](../loop-for-fix-and-review/SKILL.md#bounded-draft-correction)
+to agent-introduced errors in unpublished task-owned changes. Review phases use
+that skill's three-attempt budget per backlog pass or round. Development and
+promotion preparation each allow three corrective attempts per phase per cycle
+under the same causal-evidence, scope, rerun and stop requirements. Track these
+budgets separately; returning to a phase does not reset its count.
+
+The active worker or fix agent corrects eligible compiler, lint, test or semantic
+regression failures in place and reruns the original required checks. It must
+not report a terminal blocker merely because its own draft needs a safe,
+understood correction and budget remains. Preserve all failed-attempt evidence;
+do not restart the worker, consume a source-repair cycle, or weaken validation.
+Operational failures, unknown causes, exhausted budgets and confirmed immutable
+promotion-source defects retain their existing stop/handoff behavior.
 
 ## Bounded source-repair loop
 
@@ -388,6 +409,12 @@ Give each top-level subagent all of these instructions:
 > active command, elapsed time, and last completed milestone. During an operation
 > expected to exceed 10 minutes, run it in a form that permits monitoring and
 > append another heartbeat at least every 10 minutes until it ends.
+>
+> For agent-introduced draft errors, apply the local draft-correction policy
+> above. Record the causal evidence and attempt count, correct eligible failures
+> in place, and rerun the failed required command plus affected remaining checks.
+> Do not stop merely on the first build/test failure in your own draft. Do stop
+> on ineligible failures or exhausted budget, and never publish a failing draft.
 >
 > Do not fetch, pull, merge, rebase, or reset the target or rule branch before
 > invoking `/develop-lintdiff-rule`. That delegated skill exclusively owns
@@ -597,6 +624,8 @@ Capture concrete suggestions for improving future queue runs, especially:
 - Never exceed one setup-only orchestration retry or three source-repair cycles.
   Do not apply orchestration retry after development begins or reinterpret
   operational failures as source defects.
+- Never exceed the separate three-attempt draft-correction budget for its
+  phase/backlog/round scope, reset it by relaunching agents, or hide failed checks.
 - Never promote without clean development review, or report success without
   clean promotion review against the final source provenance.
 - Never let promotion or its review mutate the source; return evidence to the
