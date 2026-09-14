@@ -409,6 +409,11 @@ Give each top-level subagent all of these instructions:
 > Reuse this same absolute log through promotion and every repair cycle; do not
 > truncate it or create a new per-cycle log. Include cycle, phase, and working
 > directory in entries, and instruct delegated agents to log their milestones.
+> Keep long-running command output in a separate durable artifact and append
+> shared-log entries with short-lived writes. Do not pipe an entire long-running
+> command through `Tee-Object` to the shared log: it can hold the file open and
+> prevent the parent or heartbeat monitor from appending. Preserve the command's
+> exit status independently of logging and record its raw-output artifact path.
 >
 > At every phase transition, append a `HEARTBEAT` entry containing the phase,
 > active command, elapsed time, and last completed milestone. During an operation
