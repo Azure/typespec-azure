@@ -78,7 +78,58 @@ for confirmation, pause at the applicable confirmation points for that run.
   prerequisites are missing, evidence cannot support a safe recommendation, or
   a source-semantic gap requires reopening repair, stop and report the blocker
   without asking. The done-status assumption applies in both modes; do not
-  reopen source repair automatically.
+  reopen source repair automatically. Queue-controlled runs return the structured
+  handoff below instead of asking; only the outer queue may start source repair.
+
+## Queue-controlled promotion and resumption
+
+When invoked by `/do-linter-development-task-one-by-one` with the
+`lintdiff-development-queue` marker and a
+[cycle handoff](../do-linter-development-task-one-by-one/SKILL.md#cycle-handoff),
+apply this narrowly scoped contract. Standalone promotion behavior is unchanged.
+
+- Require a clean, successfully reviewed development PR head. Verify its
+  canonical PR identity, current pushed SHA, and local source worktree against
+  the handoff. Pin that exact commit as immutable source for this invocation;
+  do not silently consume a newer branch tip or uncommitted source changes.
+- Use the existing destination analysis, same-repository `origin/main` target,
+  disabled-by-default rulesets, and required validation. Do not wait for the
+  development PR to merge. Pass the queue's no-skill-edits/no-skill-update-PR
+  constraint to all delegated agents and append milestones to the shared log.
+- For initial promotion, create/select the separate promotion worktree as usual.
+  Report its absolute path and branch as soon as selected, including on failure
+  before PR creation.
+- On a repair cycle, reuse the recorded promotion worktree, branch, and open
+  draft PR when they exist. Verify repository/base/head identities and the
+  recorded pushed promotion SHA before changes. Do not create replacements,
+  close PRs, reset, rebase, or force-push. If the PR was closed/merged or state
+  changed outside the handoff, stop.
+- The queue's recorded unfinished promotion edits may be resumed only when the
+  worktree state manifest proves their exact content and task ownership. This is
+  the sole exception to clean-worktree preparation/reuse requirements; unrelated,
+  unexplained, or externally changed edits remain blockers. Do not clean, stash,
+  overwrite them, or make speculative checkpoint commits. Promotion PR review
+  still requires a clean worktree at the pushed head.
+- After source repair and a new clean development review, refresh the native
+  implementation from the new pinned source commit. Preserve valid prior
+  promotion adaptations and review fixes; reconcile changes incrementally rather
+  than blindly copying over files or merging/cherry-picking the whole development
+  branch. Update native regression coverage, fixture mappings, docs, and PR
+  provenance, including the previous and new source SHAs and reason for refresh.
+  Re-run required promotion validation before appending and pushing new commits.
+- If a verified source-semantic defect is found during preparation, validation,
+  or review, stop this invocation without modifying the source or implementing
+  divergent semantics only in the official copy. Return
+  `source-repair-required` with the cycle handoff's complete defect evidence,
+  acceptance criteria, both PR/worktree identities when available, and the
+  manifest of any unfinished promotion edits. A failing command or review comment
+  alone is not proof of a source defect.
+- Only the outer queue decides whether its three-repair budget permits a new
+  worker. This queue invocation supplies advance repair authorization, replacing
+  the standalone requirement to ask the user to reopen repair; it does not
+  waive this skill's source-immutability or stop conditions. Uncertain findings,
+  adaptation issues, and operational blockers must not be relabeled
+  `source-repair-required`; record any accompanying operational blocker.
 
 ## Fast path for repeat promotions
 
@@ -262,7 +313,9 @@ Keep both PRs aligned:
 - The lintdiff PR remains the source of truth for rule behavior.
 - If review on the native-library PR reveals that the source lintdiff rule has a
   semantic gap, stop promotion and report the blocker. The user must explicitly
-  choose to reopen lintdiff rule repair before any source changes are made.
+  choose to reopen lintdiff rule repair before any source changes are made,
+  except for the outer queue's advance authorization under the queue-controlled
+  handoff above. In that mode, return evidence and stop; never repair here.
 - Do not let the promoted rule diverge from the lintdiff source without
   explicitly documenting why.
 
@@ -575,7 +628,8 @@ promotion. For every review or validation finding, classify it before editing:
 - **source semantic issue**: promotion is blocked; by default, report the exact
   gap without asking or reopening repair. If the user requested confirmation,
   ask whether they want to reopen lintdiff repair; source changes still require
-  explicit authorization
+  explicit authorization. In queue-controlled mode, return
+  `source-repair-required` to the outer queue under the handoff contract
 - **promotion adaptation issue**: fix only the promotion worktree, and document
   why lintdiff does not need the change
 - **pre-existing or environmental issue**: record the evidence and do not change
@@ -615,6 +669,10 @@ whose head branch and `main` base both belong to `Azure/typespec-azure`. If the
 push is rejected, stop and report the permission blocker; do not push the branch
 to a personal fork instead.
 
+In queue-controlled resumption, update the recorded open draft PR after pushing
+incremental commits; do not create a duplicate. Verify the current remote head
+still matches the handoff before pushing and stop on external changes.
+
 Use this stable PR title pattern:
 
 - `[Swagger Linter Migration] <ValidatorRuleId>`
@@ -635,7 +693,8 @@ It must include:
   and any known validator defects, stale maps, emitted-occurrence duplication, or
   other discrepancies that should not be copied.
 - **Source TypeSpec lintdiff rule:** identify the source lintdiff rule id, local
-  rule name, canonical validator rule slug, source branch, source worktree path,
+  rule name, canonical validator rule slug, source branch, pinned source commit,
+  source worktree path,
   and whether the source worktree had uncommitted rule changes. Link only to the
   original lintdiff source rule file. Use a branch-based GitHub URL, not a
   commit-SHA URL. State that the source rule was assumed done for this run and
@@ -671,8 +730,10 @@ It must include:
   promotion validation is blocked or incomplete. Do not mention skipped lintdiff
   harness validation as a blocker; the harness is not part of promotion.
 - **Promotion sync policy:** semantic gaps found after promotion should block the
-  promotion PR until the user explicitly reopens lintdiff repair; do not describe
-  unapproved source-rule edits as part of the promotion flow.
+  promotion PR until the user explicitly reopens lintdiff repair, or the owning
+  queue starts an authorized source-repair cycle. In queue mode, describe the
+  bounded return-to-development flow and refresh this PR only after clean source
+  review. Never describe source-rule edits as part of promotion itself.
 
 Prefer concrete examples, project names, and before/after evidence. Avoid a
 generic bullet such as "promote lint rule" without explaining the actual rule
@@ -691,10 +752,13 @@ Produce:
   default "do not ask" policy or explicitly selected by the user
 - a clean worktree branch, named from the canonical validator rule slug,
   containing only native-library promotion changes
+- the absolute promotion worktree path, including on an early stop if selected
 - source, tests, docs, rulesets, and change entries in the target packages
 - validation evidence
-- a draft PR link
+- a created or updated draft PR link and verified pushed head SHA
 - any sync notes for the corresponding lintdiff source PR
+- in queue mode, the pinned source SHA, required-validation outcome, and complete
+  cycle handoff for `source-repair-required` or any other blocker
 
 ## Post-run process review
 

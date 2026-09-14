@@ -168,6 +168,39 @@ dependency installation is recoverable worker setup, not a reason to require
 another user invocation. Never accept multiple rule IDs in worker mode and
 never delegate the complete workflow to a development subagent.
 
+### Queue-controlled source repair
+
+When invoked by `/do-linter-development-task-one-by-one` with the
+`lintdiff-development-queue` marker, a source-repair cycle number `1` through `3`,
+and a verified source-defect
+[cycle handoff](../do-linter-development-task-one-by-one/SKILL.md#cycle-handoff),
+the original worker command is unchanged. Repair context is supplied separately;
+do not add public flags or run the slash command as a shell executable. Initial
+cycle `0` uses ordinary worker development and does not require an existing PR.
+
+- Reuse the exact supplied TypeSpec/specs worktrees, rule branch, and development
+  PR. Verify the recorded repository/base/head identities and pushed SHA before
+  editing. A closed/merged PR, changed remote head, or unexplained local changes
+  is a blocker; do not create a replacement PR or overwrite newer work.
+- Re-run worker setup, eligibility and coverage gates, evidence gathering, and
+  the full required development workflow. The existing open development PR is
+  not a reason to skip repair. Existing merged-PR and coverage stop conditions
+  still apply; report them rather than forcing development through.
+- Use the handoff's source-defect evidence and acceptance criteria to scope the
+  repair. Preserve earlier commits, add regression coverage, refresh
+  `migration.md`, and append focused repair commits only after required
+  validation and independent review. Do not reset, rebase, or force-push.
+- Refresh the same development PR's description and return its canonical URL
+  and verified pushed head SHA. Do not close it or attempt duplicate creation.
+  The queue runs a new review loop before promotion can consume the repaired head.
+- Do not edit the promotion worktree or launch promotion from this skill.
+  Append milestones to the queue's shared log and return evidence-backed process
+  suggestions only; the outer queue owns any post-run skill update.
+
+This is an explicitly authorized new repair cycle, not an automatic retry of
+failed validation or publication. Standalone worker and dispatcher behavior is
+unchanged.
+
 ## Orchestration
 
 The dispatcher must isolate each requested rule before handing it back to the
@@ -866,6 +899,8 @@ creating a draft PR.
    rule branch as head and the user-supplied target branch as base. Do not mark
    it ready for review; the user decides when the migration evidence and rule
    behavior are ready for formal review.
+   In queue-controlled source repair, verify and update the recorded open draft
+   PR instead of creating another one; retain its base and head branch.
    If the preferred PR-creation tool returns an ambiguous transport error or
    claims a conflicting PR, query GitHub for the exact head/base first. When no
    PR exists, retry once with an explicit `gh pr create` command that supplies
@@ -909,7 +944,9 @@ creating a draft PR.
   must not launch development subagents.
 - Never develop multiple rule PRs in one worktree.
 - Maintain a one-to-one mapping between each rule, rule branch, typespec-azure
-  worktree, azure-rest-api-specs worktree, and top-level worker session.
+  worktree, and azure-rest-api-specs worktree, with only one active top-level
+  worker for that rule. Queue-controlled repair cycles use fresh sequential
+  workers with that same mapping.
 - Keep each rule's source branch names and worktree directory names tied to the
   canonical Swagger validator rule slug so source branches can be linked and
   prepared worktrees can be found and reused later.
@@ -951,7 +988,7 @@ Worker mode returns:
 - per-rule review findings adopted and rejected, with reasons
 - the explicit rule-related files and any required fixture-harness dependency
   repair ready for each PR
-- each created draft PR URL
+- each created or updated draft PR URL and verified pushed head SHA
 
 ## Post-run process review
 

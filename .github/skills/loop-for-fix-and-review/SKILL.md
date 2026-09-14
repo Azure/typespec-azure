@@ -64,6 +64,41 @@ tests, documentation, generated official-library references, ruleset
 registration, or change metadata. They must not silently change the source
 rule's semantics only in the promoted copy.
 
+### Queue-controlled source-repair handoff
+
+When the caller is `/do-linter-development-task-one-by-one` and provides the
+`lintdiff-development-queue` marker with its
+[cycle handoff](../do-linter-development-task-one-by-one/SKILL.md#cycle-handoff),
+pass that context and the queue's process-review ownership constraint to both
+nested agents. Standalone review behavior is unchanged.
+
+In promotion PR mode, a confirmed `source-semantic-issue` still stops this loop
+without changing the source or making the promoted copy diverge. Return the
+worker outcome `source-repair-required` with the pinned source SHA, exact source
+locations, expected/actual behavior, reproducer or regression case, why it is not
+an adaptation defect, acceptance criteria, review/comment IDs, and PR/worktree
+identities. This applies to unresolved backlog findings as well as new rounds.
+Include any unfinished task-owned state and any accompanying operational blocker
+in the handoff. Do not resolve an unfixed source-defect thread or declare the
+review clean simply because repair was delegated.
+
+Only the outer queue may start a fresh source-repair worker. In promotion PR mode,
+this skill and its fix agent must not invoke development or promotion, edit
+source semantics, refresh promotion from a new source SHA, or resume this loop
+after returning a source defect. Standard development PR reviews may still fix
+valid source findings under their normal scope. `source-repair-required` is a
+specific blocked outcome, not a successful review or an exception to the stop
+conditions. Uncertain findings,
+ordinary adaptation fixes, and operational failures do not authorize repair.
+
+Every new invocation after source repair or promotion refresh uses two new
+persistent agents and its own five-round budget. It still drains unresolved
+threads, verifies the current pushed head, and requires a clean promotion
+worktree. Prior reviews do not count as clean verification of a changed head.
+Before returning to the queue, ensure neither nested agent nor its commands is
+still acting on the PR/worktree. Append milestones and the final result to the
+queue's shared execution log; do not truncate it or create a skill-update PR.
+
 ## Loop limits
 
 - Run at most **five review/fix rounds**.
@@ -405,7 +440,9 @@ owns these steps:
    `uncertain-or-blocked`. In promotion PR mode, always classify a verified
    `source-semantic-issue` as `uncertain-or-blocked` for this loop and stop the
    promotion. Report that the source rule must return to lintdiff repair; do not
-   edit either the immutable source or the promoted copy.
+   edit either the immutable source or the promoted copy. In queue mode, attach
+   the verified defect evidence needed for the parent's
+   `source-repair-required` handoff; no repair is performed in this loop.
 5. If no finding is `valid-actionable`, make no changes and return
    `no-valid-comments`.
 6. Apply all and only the `valid-actionable` findings that are in the pull
@@ -537,7 +574,10 @@ For rounds 1 through 5:
    rationale, resolve the safely rejected threads, verify that no processed
    thread remains unresolved, and then end successfully.
 5. If it returns `uncertain-or-blocked` or any command failure, stop and report
-   the blocker.
+   the blocker. In queue-controlled promotion mode, return
+   `source-repair-required` for a confirmed source defect with the complete
+   evidence contract above; retain any separate operational failure rather than
+   hiding it behind that outcome.
 6. For `ready-for-publication`, apply the parent publication gate, then send
    approval to the same fix subagent and await its commit/push result. Stop on
    failed publication or invalidated approval; do not request another review.
@@ -584,3 +624,6 @@ Report:
 - commits pushed
 - focused validation and corpus outcome when applicable
 - termination reason: no comments, no valid comments, five-round cap, or blocker
+- in queue mode, reviewed and final pushed head SHAs, pinned promotion source
+  SHA when applicable, and the complete evidence handoff for a confirmed
+  `source-repair-required` blocker
