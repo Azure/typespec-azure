@@ -38,7 +38,11 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 Rule documentation is authored beside each rule in `packages/typespec-azure-resource-manager/src/rules/*.md` and associated with the rule through its `docs` field. `pnpm regen-docs` passes `--rules-dir ../rules` and generates the website rule pages under `website/src/content/docs/docs/libraries/azure-resource-manager/rules/`. That website directory is ignored by Git and must not be edited manually.
 
-The `use-relationship-required-properties`, `use-api-version`, `use-operation-decorator`, and `use-interface` rules currently have adjacent Markdown source but no `docs` field in their TypeScript rule definitions. `regen-docs` therefore warns that their documentation is missing and emits description-only rule pages. Fixing those associations requires an edit under `src/`.
+The `use-relationship-required-properties`, `lro-response-mismatch`, `use-api-version`,
+`use-operation-decorator`, and `use-interface` rules currently have adjacent Markdown source but no
+`docs` field in their TypeScript rule definitions. `regen-docs` therefore warns that their
+documentation is missing and emits description-only rule pages. Fixing those associations requires
+an edit under `src/`.
 
 ## Reference Documentation Generation
 
@@ -105,6 +109,13 @@ All standard envelope properties (`EntityTagProperty`, `ExtendedLocationProperty
 
 `ResourceNameParameter` has a `NamePattern` template parameter with default value `"^[a-zA-Z0-9-]{3,24}$"`. In documentation examples, omit `NamePattern` when the value equals the default. Only show it when demonstrating a custom pattern.
 
+More generally, examples should pass template arguments only when they differ from their declared
+defaults. Do not copy custom key names, segment names, or patterns from an older example into a new
+example unless the API requires those wire-level values.
+
+For links to canonical samples in user-facing documentation, prefer the published sample URL under
+`https://azure.github.io/typespec-azure/docs/samples/` over a GitHub source-tree URL.
+
 ## Feedback Corrections Applied
 
 - `step03.md`: Use `...ResourceNameParameter<AddressResource, KeyName = "addressName", SegmentName = "addresses">` instead of manual `@key/@segment name` fields for child resources.
@@ -155,3 +166,26 @@ The former multi-purpose `arm-resource-operation` checks are represented by thre
 ## Resource Identity Resolution
 
 Concrete ARM resource identities are seeded only by registered read or createOrUpdate operations with valid ARM resource instance paths. List, action, update, delete, and check-existence operations can attach to an existing resolved resource but do not create resource identities by themselves.
+
+## ARM Operation Contract Rules
+
+- Collection GET operations may use only `api-version` and the case-sensitive `$filter` query
+  parameter. Point GET, PUT, PATCH, and DELETE operations and all POST operations may use only
+  `api-version`; POST-specific input belongs in the request body.
+- Standard ARM list templates already provide TypeSpec paging metadata and return
+  `ResourceListResult<Resource>`. Custom collection GET operations need `@list`, `@pageItems`, and
+  `@nextLink`, and their response envelope must contain exactly `value` and `nextLink`.
+- ARM request and response bodies must resolve to `application/json`.
+- Tenant-level PUT routes beginning with `/providers` are strongly discouraged. The
+  `/providers/{namespace}/operations` endpoint is exempt.
+- LRO final results must match the operation contract: PUT and PATCH resolve to the resource type,
+  DELETE resolves to `void`, and a POST action result matches its response type. Standard async
+  templates set the appropriate defaults; preserve the intended `FinalResult` when overriding
+  `LroHeaders`.
+- Both `ArmResourceActionAsync` and `ActionAsync` default their LRO header `FinalResult` to the
+  `Response` template argument. Do not describe either default as `void`; only no-response action
+  templates default to `void`.
+
+The corresponding rules are `no-query-in-collection`, `no-query-in-point-op`, `no-query-in-post`,
+`list-operation-missing-pageable`, `list-response-envelope`,
+`use-application-json-content-type`, `no-tenant-level-apis`, and `lro-response-mismatch`.

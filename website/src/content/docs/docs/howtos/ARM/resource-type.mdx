@@ -6,9 +6,8 @@ llmstxt: true
 
 import { ExampleRef } from "@components/sample";
 
-## Introductions
+## Introduction
 
-Introduction
 Resources are the basic building blocks of Azure. When a customer interacts with Azure through the Control Plane (ARM), they generally will be reading (GET), writing (PUT/PATCH), deleting (DELETE) or performing actions upon (POST) one or more resources. Each resource is managed by a particular Resource Provider, so we uniquely identify a resource by its 'fully-qualified type'. Some well-known examples of types are Microsoft.Compute/virtualMachines, or Microsoft.Network/networkSecurityGroups/securityRules. See Resource Ids for a more in-depth breakdown of the id and associated fields.
 
 In order to give customers a consistent API when working with many different Resource Providers, and to allow ARM to understand and manage resources programmatically, ARM requires each RP to follow a set of contracts for resource management, defined in the ARM RPC.
@@ -37,7 +36,7 @@ Resources are modeled in TypeSpec by choosing a _base resource type_, defining _
 
 ### Tracked Resources
 
-Tracked resources use the `TrackedResource<TProperties/>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
+Tracked resources use the `TrackedResource<TProperties>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
 
 ```typespec
 model Employee is TrackedResource<EmployeeProperties> {
@@ -53,11 +52,13 @@ You can find a complete sample of Tracked Resources below.
 
 ### Tenant Resources
 
-Tenant resources use the `ProxyResource<TProperties/>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
+Tenant resources use the `TrackedResource<TProperties>` as their base resource type, where
+`TProperties` is the properties model for the RP-specific properties of the resource. Here is an
+example:
 
 ```typespec
 @tenantResource
-model Employee is ProxyResource<EmployeeProperties> {
+model Employee is TrackedResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
 ```
@@ -65,13 +66,20 @@ model Employee is ProxyResource<EmployeeProperties> {
 `@tenantResource`: designates this resource as being a cross-tenant resource, with scope across all customer subscriptions in the tenant.
 `...ResourceNameParameter<Employee>`: spreads in the standard resource name parameter, which automatically defines the resource type name, parameter name, and path segment based on the resource model.
 
+:::caution
+Tenant-level ARM APIs are strongly discouraged because they operate outside subscription and
+resource-group boundaries and require additional security review. A PUT operation generated for a
+tenant resource triggers the `no-tenant-level-apis` lint rule. Prefer subscription or resource-group
+scope whenever possible.
+:::
+
 You can find a complete sample of Tenant Resources below.
 
 <ExampleRef path="resource-manager/resource-types/tenant" collapsed />
 
 ### Extension Resource
 
-Extension resources use the `ExtensionResource<TProperties/>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Extension resources augment or alter the functionality of other resources, and can be scoped to specific target resource types using the templates in the `Extension` namespace.
+Extension resources use the `ExtensionResource<TProperties>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Extension resources augment or alter the functionality of other resources, and can be scoped to specific target resource types using the templates in the `Extension` namespace.
 
 #### Defining the Resource Model
 
@@ -248,7 +256,7 @@ You can find the complete sample of Extension Resources below.
 
 ### Child Resource
 
-Child resources usually use the `ProxyResource<TProperties/>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
+Child resources usually use the `ProxyResource<TProperties>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
 
 ```typespec
 @parentResource(Employee)
@@ -266,7 +274,7 @@ You can find a complete sample of Child Resources below.
 
 ### Subscription-based Resource
 
-Subscription-based resources use the `ProxyResource<TProperties/>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
+Subscription-based resources use the `ProxyResource<TProperties>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
 
 ```typespec
 @subscriptionResource
@@ -308,7 +316,7 @@ You can find a complete sample of Location Resources below.
 
 ### Singleton Resource
 
-Singleton resources can use any resource base type, but most often use `ProxyResource<TProperties/>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
+Singleton resources can use any resource base type, but most often use `ProxyResource<TProperties>` as their base resource type, where `TProperties` is the properties model for the rp-specific properties of the resource. Here is an example:
 
 ```typespec
 @singleton
@@ -526,7 +534,7 @@ Finally, when your _rp-specific property bag_ contains an array of complex prope
 
 ## Adding Optional Standard Envelope Properties
 
-In addition to the resource-specific property bag, a resource may configure on or more standard ARM features through the use of standard properties in the _ARM Envelope_. Standard features configured in the envelope include:
+In addition to the resource-specific property bag, a resource may configure one or more standard ARM features through the use of standard properties in the _ARM Envelope_. Standard features configured in the envelope include:
 
 - **Managed Identity**: Associating a managed identity with the resource to authorize actions taken by this resource on other resources.
 - **SKU**: A standard mechanism for configuring levels of service for a resource.

@@ -104,12 +104,7 @@ model ProxyResource<Properties extends {}, PropertiesOptional extends valueof bo
  * @example
  * ```typespec
  * model PetInstance is ExtensionResource<PetProperties> {
- *  @key
- *  @path
- *  @segment("petInstances")
- *  @pattern("^[a-zA-Z0-9-]{3,24}$")
- *  @visibility(Lifecycle.Read)
- *  name: string;
+ *   ...ResourceNameParameter<PetInstance>;
  * }
  * ```
  */
@@ -303,7 +298,7 @@ model EntityTagProperty {
 alias ResourceKind = ResourceKindProperty;
 /**
  * Model representing the standard `kind` envelope property for a resource.
- * Spread this model into a resource model if the resource support ARM `kind`.
+ * Spread this model into a resource model if the resource supports ARM `kind`.
  * @template Type The type of the kind property. Default is string. However you can pass a union with string values.
  *
  * @example
