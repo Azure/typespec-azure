@@ -1,16 +1,14 @@
 # PatchPropertiesCorrespondToPutProperties migration evidence
 
-## Conclusion
+## Result and gap summary
 
-A dedicated TypeSpec rule was required. The imported mapping reused `consistent-patch-properties`, which compares PATCH properties with the resource response model and preserves nesting. The Swagger rule instead pairs PUT and PATCH operations by emitted path, requires both request bodies, flattens nested request properties, and compares the resulting leaves. The new `patch-properties-correspond-to-put-properties` rule follows that distinct authoring contract across every same-path PUT/PATCH pair in an ARM HTTP service, uses emitted JSON names, handles `void` bodies, and uses Autorest-compatible visibility/schema-sharing metadata.
-
-The intended property-presence behavior is covered, but this migration remains **partial relative to the staging validator implementation**. Its undocumented `lodash.isEqual` comparison treats the complete emitted property schema as property identity. It therefore reports differences in descriptions, `readOnly`, constraints, and `x-ms-client-name`, and conflates same-named leaves after discarding nesting. The TypeSpec rule intentionally does not reproduce these false positives. The final corpus has no TypeSpec-only projects, but 281 validator-only projects remain, primarily from that staging-only defect; raw diagnostic equality and implementation-level equivalence are not claimed.
+Across 462 successfully compiled projects, the staging validator reports 1,374 diagnostics in 316 projects; selected-version TypeSpec reports 94 in 35, all overlapping, with 281 validator-only projects. The dominant gap is the validator's undocumented whole-schema deep comparison, which reports description, `readOnly`, constraint, and `x-ms-client-name` differences instead of property presence. A dedicated TypeSpec rule was therefore required and now implements the documented PUT/PATCH leaf-presence contract, including direct and inherited AutoRest-synthesized discriminator keys. Functional coverage is complete for the valid supported shapes in the emission matrix, but raw-count and implementation equivalence are intentionally not claimed. Six corpus projects remain unassessed; their project set exactly matches the committed baseline failures, although fresh detailed failure payloads were not retained after corpus cleanup. Swagger comparison for same-endpoint overloads also remains unavailable because AutoRest rejects that fixture shape.
 
 ## Evidence provenance
 
 - External report: `packages/typespec-lintdiff/docs/coverage_old.md` (source gist linked in that file), 450 compiled projects and 210 validator rules. Its row reports 308 fired projects, 20 local-lint projects, 0 official-rule projects, and 6.5% coverage under a different snapshot/methodology.
 - Current dataset: azure-rest-api-specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`, recorded in `packages/typespec-lintdiff/specs/_meta.json`.
-- Final TypeSpec run: `2026-09-04T19:24:35.932Z`, full scope, 462 of 468 projects, 6 compile failures, duration 1334907 ms.
+- Final TypeSpec run: `2026-09-11T10:16:50.087Z`, full scope, 462 of 468 projects, 6 compile failures, approximately 24 minutes.
 - Staging validator source: `packages/rulesets/src/spectral/functions/patch-properties-correspond-to-put-properties.ts` in azure-openapi-validator. The catalog marks this rule `stagingOnly: true`.
 - Generated `packages/typespec-lintdiff/specs` changes are validation evidence only and are excluded from this PR.
 
@@ -28,6 +26,7 @@ The registered official ARM rule `arm-resource-patch` checks that a PATCH body e
   at-least-one-property requirement that the Swagger implementation accidentally checks only at
   the body-parameter-array level.
 - Flattened model-valued properties to leaves while treating scalars, arrays, records, multi-model unions, and empty models as leaf schemas, matching the validator traversal shape.
+- Included missing discriminator properties synthesized by AutoRest, including discriminators inherited from base models.
 - Preserved nested `allOf`-only wrappers as leaves because the validator descends only through a nested schema with direct `properties`.
 - Compared `@encodedName` JSON names rather than authored property identifiers.
 - Used request visibility and Autorest-compatible schema-sharing rules so read-only and `x-ms-mutability` properties reflect emitted Swagger schemas.
@@ -35,20 +34,23 @@ The registered official ARM rule `arm-resource-patch` checks that a PATCH body e
 
 ## Emission matrix
 
-| Authored shape                                            | Emission/traversal branch                          | Selected OpenAPI field         | Expected Swagger         | Expected TypeSpec | Fixture                              |
-| --------------------------------------------------------- | -------------------------------------------------- | ------------------------------ | ------------------------ | ----------------- | ------------------------------------ |
-| PATCH leaf absent from PUT                                | resolved nested `properties` recursion             | PATCH leaf name only           | violation                | violation         | `patch-extra-property`               |
-| Same authored name, different JSON names                  | `resolveEncodedName` / `x-ms-client-name`          | different property keys        | violation                | violation         | `encoded-name-mismatch`              |
-| Differently named inherited-only wrappers                 | nested `allOf` without direct `properties`         | wrapper property keys          | violation                | violation         | `allof-wrapper-name-mismatch`        |
-| PATCH subset of PUT                                       | ordinary model properties                          | matching leaf names            | clean                    | clean             | `compliant-subset`                   |
-| Same leaf at different levels                             | recursive helper discards containers               | matching leaf name             | clean                    | clean             | `different-nesting-compliant`        |
-| Different authored names, same JSON name                  | encoded property plus differing `x-ms-client-name` | same key, unequal full schemas | false positive           | clean             | `encoded-name-compliant`             |
-| Same key/type, different documentation                    | emitted property `description`                     | same key, unequal full schemas | false positive           | clean             | `schema-value-validator-discrepancy` |
-| No PATCH body / `void` body                               | Autorest omits body parameter                      | no PATCH body parameter        | violation                | violation         | `missing-patch-body`                 |
-| Empty PATCH body model                                    | emitted body schema has no leaf properties         | empty property set             | validator false negative | violation         | `empty-patch-model`                  |
-| No PUT body                                               | Autorest omits body parameter                      | no PUT body parameter          | violation                | violation         | `missing-put-body`                   |
-| Same-endpoint PUT/PATCH overloads with distinct bodies    | `isOverloadSameEndpoint` filters overload siblings | unavailable: emission crashed  | unverified               | clean             | native rule test                     |
-| Scalar, array, record, union, nullable model, empty model | scalar/fallthrough and single-model-union branches | corresponding leaf names       | clean                    | clean             | `type-family-compliant`              |
+| Authored shape                                            | Emission/traversal branch                           | Selected OpenAPI field         | Expected Swagger         | Expected TypeSpec | Fixture                               |
+| --------------------------------------------------------- | --------------------------------------------------- | ------------------------------ | ------------------------ | ----------------- | ------------------------------------- |
+| PATCH leaf absent from PUT                                | resolved nested `properties` recursion              | PATCH leaf name only           | violation                | violation         | `patch-extra-property`                |
+| Same authored name, different JSON names                  | `resolveEncodedName` / `x-ms-client-name`           | different property keys        | violation                | violation         | `encoded-name-mismatch`               |
+| Differently named inherited-only wrappers                 | nested `allOf` without direct `properties`          | wrapper property keys          | violation                | violation         | `allof-wrapper-name-mismatch`         |
+| PATCH subset of PUT                                       | ordinary model properties                           | matching leaf names            | clean                    | clean             | `compliant-subset`                    |
+| Same leaf at different levels                             | recursive helper discards containers                | matching leaf name             | clean                    | clean             | `different-nesting-compliant`         |
+| Different authored names, same JSON name                  | encoded property plus differing `x-ms-client-name`  | same key, unequal full schemas | false positive           | clean             | `encoded-name-compliant`              |
+| Same key/type, different documentation                    | emitted property `description`                      | same key, unequal full schemas | false positive           | clean             | `schema-value-validator-discrepancy`  |
+| No PATCH body / `void` body                               | Autorest omits body parameter                       | no PATCH body parameter        | violation                | violation         | `missing-patch-body`                  |
+| Empty PATCH body model                                    | emitted body schema has no leaf properties          | empty property set             | validator false negative | violation         | `empty-patch-model`                   |
+| No PUT body                                               | Autorest omits body parameter                       | no PUT body parameter          | violation                | violation         | `missing-put-body`                    |
+| PATCH declares an unauthored discriminator absent in PUT  | AutoRest synthesizes a direct property              | PATCH discriminator key only   | violation                | violation         | `synthesized-discriminator-mismatch`  |
+| PATCH inherits an unauthored discriminator absent in PUT  | inherited base schema contributes the property      | PATCH discriminator key only   | violation                | violation         | `inherited-synthesized-discriminator` |
+| PUT and PATCH use the same synthesized discriminator      | both bodies reference the same synthesized property | matching discriminator key     | clean                    | clean             | `synthesized-discriminator-compliant` |
+| Same-endpoint PUT/PATCH overloads with distinct bodies    | `isOverloadSameEndpoint` filters overload siblings  | unavailable: emission crashed  | unverified               | clean             | native rule test                      |
+| Scalar, array, record, union, nullable model, empty model | scalar/fallthrough and single-model-union branches  | corresponding leaf names       | clean                    | clean             | `type-family-compliant`               |
 
 The Autorest path is visible in `packages/typespec-autorest/src/openapi.ts`: `void` bodies are omitted, body models are emitted through request visibility transforms, and property metadata becomes Swagger schema fields. The rule uses the same `resolveRequestVisibility`, `MetadataInfo.isTransformed`, `isPayloadProperty`, and schema-sharing policy used by the adjacent PATCH emission-aware lint.
 
@@ -61,7 +63,7 @@ The [native overload regression test](../../rules/patch-properties-correspond-to
 | External `coverage_old.md` | older aggregate snapshot              |                308 |                20 | not reconstructable | not reconstructable |  not reported | not reported                |
 | Final local report         | staging rule, 462 successful projects |                316 |                35 |                  35 |                 281 |             0 | validator 1374; TypeSpec 94 |
 
-The count gap is caused first by snapshot/population differences (450 versus 468 source projects), then by execution mode (the current rule is staging-only), mapping changes (a dedicated lint replaces the shared imported mapping), and aggregation identity. Most importantly, the staging validator compares full leaf-schema objects while the TypeSpec lint implements documented property-name correspondence. Raw Swagger occurrences and semantic TypeSpec targets are not normalized because no collision-resistant one-to-one identity exists. The rule produced 96 raw TypeSpec diagnostics; HTTP-reachable selected-version projection retained 94. The two excluded diagnostics came from the unassessed compile-failure project `specification/quota/resource-manager/Microsoft.Quota/Quota`, not from an older-version-only target. No TypeSpec-only project remains in the aligned population.
+The count gap is caused first by snapshot/population differences (450 versus 468 source projects), then by execution mode (the current rule is staging-only), mapping changes (a dedicated lint replaces the shared imported mapping), and aggregation identity. Most importantly, the staging validator compares full leaf-schema objects while the TypeSpec lint implements documented property-name correspondence. Raw Swagger occurrences and semantic TypeSpec targets are not normalized because no collision-resistant one-to-one identity exists. The rule produced 96 raw TypeSpec diagnostics in 36 projects; HTTP-reachable selected-version projection retained 94 in 35. The two excluded diagnostics came from the unassessed compile-failure project `specification/quota/resource-manager/Microsoft.Quota/Quota` (`name` in `GroupQuotasEntity.tsp` and a missing PATCH body in `GroupQuotaSubscriptionId.tsp`), not from an older-version-only target. The discriminator fix added no corpus diagnostics or projects: both raw and retained counts are unchanged from the preceding run. No TypeSpec-only project remains in the staging-aligned population.
 
 ## Code-backed gap examples
 
@@ -498,11 +500,29 @@ These six projects were excluded symmetrically from behavioral comparison:
 - `specification/resources/resource-manager/Microsoft.Resources/deployments`
 - `specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker`
 
-They do not change the 462-project assessed population, but no claim is made about this rule in those projects.
+The fresh run attempted all 468 projects and reproduced exactly this committed baseline failure
+project set; there were no new failed projects. The committed baseline attributes the failures to
+`@typespec/http/duplicate-body` in DeviceProvisioningServices, deployments, and ServiceLinker, and
+to `@typespec/http/missing-uri-param` in TenantActionGroups, Network, and Quota. Fresh aggregate
+diagnostic counts varied, and the detailed fresh per-project payloads were not retained before
+generated corpus cleanup, so exact cause identity cannot be reconfirmed. These are unchanged known
+exclusions by project identity, not evidence of a discriminator-rule regression. No claim is made
+about this rule in those projects.
 
 ## Focused validation
 
-Eleven focused cases pass: six intended violations, three validator-clean compliance cases with reviewed ambient diagnostics, two reviewed staging-validator false-positive discrepancies, and one documented validator false-negative case for an empty body model. Snapshots preserve the emitted Swagger and both diagnostic sets. The final package build and focused validation were rerun after the HTTP-path, empty/`void`-body, nested `allOf` wrapper, and overload fixes.
+Fourteen focused cases pass: eight intended-violation cases (seven covered and one documented
+validator false negative for an empty body model), four validator-clean compliance cases with
+reviewed ambient diagnostics, and two reviewed staging-validator false-positive discrepancies. The direct and inherited
+discriminator fixtures each emit and report exactly one PATCH-only `kind`; the control emits
+matching `kind` properties and is target-rule clean. Snapshots preserve the emitted Swagger and both
+diagnostic sets. Rebuilding the current dependency closure with TypeSpec compiler 1.14.0 also
+refreshed two ambient
+`consistent-patch-properties` entries: it removed the stale diagnostic from
+`encoded-name-compliant` and added the currently emitted diagnostic to `encoded-name-mismatch`.
+That neighboring rule's source is unchanged; neither snapshot change affects this target rule's
+expected diagnostic. The package build, focused comparison, and native overload regression were
+rerun after the production change.
 
 ## Remaining uncertainty
 

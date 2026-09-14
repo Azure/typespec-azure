@@ -1,6 +1,7 @@
 import { getArmProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 import {
   createRule,
+  getDiscriminator,
   getLifecycleVisibilityEnum,
   getLocationContext,
   getVisibilityForClass,
@@ -194,6 +195,19 @@ function collectTypeLeaves(
       leaves.push(...nested);
     }
   }
+  const leafNames = new Set(leaves.map((leaf) => leaf.jsonName));
+  for (const discriminator of getSynthesizedDiscriminators(program, type)) {
+    if (!leafNames.has(discriminator.jsonName)) {
+      leaves.push({
+        jsonName: discriminator.jsonName,
+        target:
+          getLocationContext(program, discriminator.target).type === "project"
+            ? discriminator.target
+            : diagnosticTarget,
+      });
+      leafNames.add(discriminator.jsonName);
+    }
+  }
   visiting.delete(type);
   return leaves;
 }
@@ -220,10 +234,37 @@ function hasDirectPayloadProperties(
   const schemaVisibility = metadataInfo.isTransformed(type, visibility)
     ? visibility
     : Visibility.Read;
-  return [...type.properties.values()].some(
-    (property) =>
-      metadataInfo.isPayloadProperty(property, schemaVisibility) && !isNeverType(property.type),
+  return (
+    [...type.properties.values()].some(
+      (property) =>
+        metadataInfo.isPayloadProperty(property, schemaVisibility) && !isNeverType(property.type),
+    ) || hasDirectSynthesizedDiscriminator(program, type)
   );
+}
+
+function hasDirectSynthesizedDiscriminator(program: Program, model: Model): boolean {
+  const discriminator = getDiscriminator(program, model);
+  return (
+    discriminator !== undefined && model.properties.get(discriminator.propertyName) === undefined
+  );
+}
+
+function getSynthesizedDiscriminators(
+  program: Program,
+  model: Model,
+): { jsonName: string; target: Model }[] {
+  const discriminators = new Map<string, Model>();
+  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
+    const discriminator = getDiscriminator(program, current);
+    if (
+      discriminator !== undefined &&
+      current.properties.get(discriminator.propertyName) === undefined &&
+      !discriminators.has(discriminator.propertyName)
+    ) {
+      discriminators.set(discriminator.propertyName, current);
+    }
+  }
+  return [...discriminators].map(([jsonName, target]) => ({ jsonName, target }));
 }
 
 function getModelProperties(model: Model): ModelProperty[] {
