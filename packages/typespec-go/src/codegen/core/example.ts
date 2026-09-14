@@ -119,7 +119,7 @@ export function generateExamples(
               });
             }
           }
-          exampleText += `${indent.get()}clientFactory, err := ${go.getPackageName(pkg.src)}.NewClientFactory(${clientFactoryParamsExample.map((p) => getExampleValue(pkg, p.value, "\t", imports, p.parameter.byValue)).join(", ")}, nil)\n`;
+          exampleText += `${indent.get()}clientFactory, err := ${go.getPackageName(pkg.src)}.NewClientFactory(${clientFactoryParamsExample.map((p) => getExampleValue(pkg, p.value, "\t", imports, p.parameter.type.kind !== "ptr")).join(", ")}, nil)\n`;
           exampleText += `${indent.get()}if err != nil {\n`;
           exampleText += `${indent.push().get()}log.Fatalf("failed to create client: %v", err)\n`;
           exampleText += `${indent.pop().get()}}\n`;
@@ -141,11 +141,11 @@ export function generateExamples(
             }
           }
           if (clientPrivateParameters.length > 0) {
-            clientRef += `${clientPrivateParameters.map((p) => getExampleValue(pkg, p.value, "\t", imports, p.parameter.byValue).slice(1)).join(", ")}`;
+            clientRef += `${clientPrivateParameters.map((p) => getExampleValue(pkg, p.value, "\t", imports, p.parameter.type.kind !== "ptr").slice(1)).join(", ")}`;
           }
           clientRef += `)`;
         } else {
-          exampleText += `${indent.get()}client, err := ${go.getPackageName(client.instance.constructors[0].pkg)}.${client.instance.constructors[0].name}(${clientParameters.map((p) => getExampleValue(pkg, p.value, "\t", imports, p.parameter.byValue).slice(1)).join(", ")}, cred, nil)\n`;
+          exampleText += `${indent.get()}client, err := ${go.getPackageName(client.instance.constructors[0].pkg)}.${client.instance.constructors[0].name}(${clientParameters.map((p) => getExampleValue(pkg, p.value, "\t", imports, p.parameter.type.kind !== "ptr").slice(1)).join(", ")}, cred, nil)\n`;
           exampleText += `${indent.get()}if err != nil {\n`;
           exampleText += `${indent.push().get()}log.Fatalf("failed to create client: %v", err)\n`;
           exampleText += `${indent.pop().get()}}\n`;
@@ -281,7 +281,7 @@ export function generateExamples(
               ? fieldName
               : (example.responseEnvelope?.result.type as go.Model).name;
             if (method.returns.result?.kind === "monomorphicResult") {
-              resultByValue = method.returns.result.byValue;
+              resultByValue = method.returns.result.monomorphicType.kind !== "ptr";
             } else if (method.returns.result?.kind === "polymorphicResult") {
               resultFieldName = method.returns.result.interface.name;
               resultByValue = false;
@@ -365,7 +365,7 @@ function getExampleValue(
     case "any":
       return jsonToGo(example.value, indent);
     case "array": {
-      const isElementByValue = example.type.elementTypeByValue;
+      const isElementByValue = example.type.elementType.kind !== "ptr";
       // if polymorphic, need to add type name in array, so inArray will be set to false
       // if other case, no need to add type name in array, so inArray will be set to true
       const isElementPolymorphic = example.type.elementType.kind === "interface";
@@ -378,7 +378,7 @@ function getExampleValue(
     }
     case "dictionary": {
       let exampleText = `${indent}${getRef(byValue)}${go.getTypeDeclaration(example.type, pkg)}{\n`;
-      const isValueByValue = example.type.valueTypeByValue;
+      const isValueByValue = example.type.valueType.kind !== "ptr";
       const isValuePolymorphic = example.type.valueType.kind === "interface";
       for (const key in example.value) {
         exampleText += `${indent}\t"${key}": ${getExampleValue(pkg, example.value[key], indent + "\t", imports, isValueByValue && !isValuePolymorphic).slice(indent.length + 1)},\n`;
@@ -393,7 +393,7 @@ function getExampleValue(
       }
       for (const field in example.value) {
         const goField = example.type.fields.find((f) => f.name === field)!;
-        const isFieldByValue = goField.byValue ?? false;
+        const isFieldByValue = goField.type.kind !== "ptr";
         const isFieldPolymorphic = goField.type.kind === "interface";
         exampleText += `${indent}\t${field}: ${getExampleValue(pkg, example.value[field], indent + "\t", imports, isFieldByValue && !isFieldPolymorphic).slice(indent.length + 1)},\n`;
       }
@@ -402,10 +402,10 @@ function getExampleValue(
           go.isAdditionalProperties(f),
         )!;
         const isAdditionalPropertiesFieldByValue =
-          additionalPropertiesField.type.valueTypeByValue ?? false;
+          additionalPropertiesField.type.valueType.kind !== "ptr";
         const isAdditionalPropertiesPolymorphic =
           additionalPropertiesField.type.valueType.kind === "interface";
-        exampleText += `${indent}\t${additionalPropertiesField.name}: ${getRef(additionalPropertiesField.byValue)}${go.getTypeDeclaration(additionalPropertiesField.type, pkg)}{\n`;
+        exampleText += `${indent}\t${additionalPropertiesField.name}: ${getRef(isAdditionalPropertiesFieldByValue)}${go.getTypeDeclaration(additionalPropertiesField.type, pkg)}{\n`;
         for (const key in example.additionalProperties) {
           exampleText += `${indent}\t"${key}": ${getExampleValue(pkg, example.additionalProperties[key], indent + "\t", imports, isAdditionalPropertiesFieldByValue && !isAdditionalPropertiesPolymorphic).slice(indent.length + 1)},\n`;
         }
@@ -805,7 +805,7 @@ function isParamByValue(p: go.ParameterExample): boolean {
     case "interface":
       return p.value.kind === "null";
     default:
-      return p.parameter.byValue;
+      return p.parameter.type.kind !== "ptr";
   }
 }
 
@@ -841,5 +841,5 @@ function getParamExampleValue(
     ).slice(1);
   }
   const fakeValue = generateFakeExample(param.type, param.name);
-  return getExampleValue(pkg, fakeValue, "\t", imports, param.byValue).slice(1);
+  return getExampleValue(pkg, fakeValue, "\t", imports, param.type.kind !== "ptr").slice(1);
 }
