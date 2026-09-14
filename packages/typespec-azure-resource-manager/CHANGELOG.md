@@ -1,5 +1,24 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.72.0
+
+### Features
+
+- [#4145](https://github.com/Azure/typespec-azure/pull/4145) Add linter rule `lro-response-mismatch` to warn when a long-running operation's final result type does not match the expected response
+- [#5358](https://github.com/Azure/typespec-azure/pull/5358) Add the `list-response-envelope` rule for ARM collection GET response envelopes.
+- [#5302](https://github.com/Azure/typespec-azure/pull/5302) Add the `use-application-json-content-type` rule to require JSON request and response bodies for ARM operations.
+- [#5281](https://github.com/Azure/typespec-azure/pull/5281) Add the `no-query-in-post` ARM lint rule to warn when POST operations declare query parameters other than `api-version`.
+- [#5318](https://github.com/Azure/typespec-azure/pull/5318) Add the `no-query-in-collection` ARM lint rule, disabled by default in the resource-manager ruleset.
+- [#5420](https://github.com/Azure/typespec-azure/pull/5420) Add the `no-tenant-level-apis` ARM linter rule.
+- [#5273](https://github.com/Azure/typespec-azure/pull/5273) Add an ARM lint rule that warns when point GET, PUT, PATCH, or DELETE operations declare query parameters other than `api-version`.
+- [#5379](https://github.com/Azure/typespec-azure/pull/5379) Add the `list-operation-missing-pageable` lint rule for ARM collection GET operations that do not define TypeSpec paging metadata.
+
+### Bug Fixes
+
+- [#4851](https://github.com/Azure/typespec-azure/pull/4851) Fix `resolveArmResources` resource identity detection to seed resources from strict ARM resource instance paths instead of inferring resource IDs from list or action operation paths.
+- [#5383](https://github.com/Azure/typespec-azure/pull/5383) Do not emit empty legacy feature files, apply `version-enum-strategy` to feature enums, and return the configured enum from the ARM feature-file accessor.
+
+
 ## 0.71.0
 
 ### Breaking Changes

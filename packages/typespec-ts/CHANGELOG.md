@@ -1,5 +1,20 @@
 # Change Log - @azure-tools/typespec-ts
 
+## 0.57.0
+
+### Features
+
+- [#5326](https://github.com/Azure/typespec-azure/pull/5326) Add a default `customize` script (`echo skipped`) to generated Azure SDK package metadata, and preserve an existing `customize` script when regenerating a package.
+- [#5331](https://github.com/Azure/typespec-azure/pull/5331) Honor TCGC `exact()` names without applying TypeScript casing transformations.
+- [#5081](https://github.com/Azure/typespec-azure/pull/5081) Add an experimental option to generate visibility-specific request models that exclude lifecycle-invisible properties while preserving HTTP metadata properties in the client model.
+
+### Bug Fixes
+
+- [#5280](https://github.com/Azure/typespec-azure/pull/5280) Fix double encoding of URI template parameter names for array and record query parameter values (e.g. `$Select` becoming `%2524Select` instead of `%24Select`)
+- [#5328](https://github.com/Azure/typespec-azure/pull/5328) Fix generated operation groups and model namespace paths when a package contains multiple services.
+- [#5325](https://github.com/Azure/typespec-azure/pull/5325) Preserve the original parsed response body when flattening response headers for storage compatibility.
+
+
 ## 0.56.0
 
 ### Features

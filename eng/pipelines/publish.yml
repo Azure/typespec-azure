@@ -34,6 +34,7 @@ extends:
       - stage: spector_coverage
         displayName: Spector Coverage
         dependsOn: build
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
         pool:
           name: $(LINUXPOOL)
           image: $(LINUXVMIMAGE)
