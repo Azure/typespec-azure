@@ -72,6 +72,16 @@ When the caller is `/do-linter-development-task-one-by-one` and provides the
 pass that context and the queue's process-review ownership constraint to both
 nested agents. Standalone review behavior is unchanged.
 
+The outer queue may invoke this skill directly after a worker returns
+`review-handoff` because nested persistent-agent controls are unavailable.
+In that mode the outer queue is this skill's parent/orchestrator and creates its
+own fresh collector/fixer pair; the development worker stays idle throughout.
+The same model pin, follow-up verification, evidence gates, publication approval,
+five-round limit and stop conditions apply. Run all target operations explicitly
+in the handed-off worktree. Return the reviewed/pushed head, complete review
+result and evidence to the queue before it resumes the worker. Do not switch
+owners after a review failure or treat a handoff as clean verification.
+
 In promotion PR mode, a confirmed `source-semantic-issue` still stops this loop
 without changing the source or making the promoted copy diverge. Return the
 worker outcome `source-repair-required` with the pinned source SHA, exact source

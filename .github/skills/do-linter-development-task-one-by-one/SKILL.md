@@ -19,10 +19,11 @@ cycles, for at most four complete cycles. Finish the current task, including any
 repair cycles, before starting the next rule. Never have more than one top-level
 worker running at a time.
 
-Each review-and-fix invocation creates its own two persistent nested subagents.
-Those nested subagents are allowed and do not violate the one-top-level-worker
-limit. Each invocation retains its independent five-round limit; do not share
-that budget across PRs or cycles.
+Each review-and-fix invocation creates its own two persistent review/fix agents.
+The worker normally owns them; when nested launch controls are unavailable, the
+outer queue owns the review phase using the capability handoff below. These two
+agents do not violate the one-top-level-worker limit. Each invocation retains its
+independent five-round limit; do not share that budget across PRs or cycles.
 
 ## Workflow
 
@@ -112,19 +113,25 @@ Keep an ordered ledger with one entry per input command:
   change, observed evidence, impact, and source task
 - total worker attempt count, separate orchestration-retry count and reason,
   and source-repair reasons
+- review owner (`worker` or `outer`), observed launch/follow-up capabilities,
+  waiting phase, handoff artifact, and review invocation/agent IDs
 - blocker or failure, when applicable
 
 Update the ledger after every phase handoff and worker result so a later failure
 does not erase earlier outcomes. `source-repair-required` is a worker outcome,
 not a terminal task status: keep the task `running` while a permitted repair
 cycle is pending. Never count repair cycles as additional queue tasks.
+Likewise, `review-handoff` is a nonterminal worker outcome: keep the task
+`running` while the outer queue owns that review phase.
 
 ## Sequential orchestration
 
 For each valid pending command, in input order:
 
-1. Launch exactly one fresh top-level general-purpose subagent. Do not reuse a
-   prior worker with a follow-up message.
+1. Launch exactly one fresh top-level general-purpose subagent per cycle. Do not
+   reuse a worker from a prior task or cycle. Follow-up messages to the same
+   idle worker are allowed only for capability coordination or continuation
+   after an outer-owned review in this cycle.
 2. Give it the complete worker prompt below, including the original command and
    parsed TypeSpec worktree, cycle number, and cycle handoff when resuming.
 3. Wait for that subagent to finish before launching another top-level subagent.
@@ -132,6 +139,8 @@ For each valid pending command, in input order:
 4. Record its structured result in the ledger. Verify returned PR identities,
    pushed heads, source provenance, and review evidence directly rather than
    inferring success from worker prose.
+   For `review-handoff`, complete the outer-owned review protocol below before
+   resuming the same worker or declaring the task terminal.
 5. For `source-repair-required`, apply the bounded source-repair loop below.
    Launch a fresh worker for the same task only after the prior worker is
    terminal and its nested agents and commands have stopped doing work.
@@ -140,7 +149,8 @@ For each valid pending command, in input order:
 
 Use background mode for a worker when the runtime requires multiple turns for a
 long-running development and review workflow. After its completion notification,
-read its result once, update the ledger, and only then launch the next worker.
+read its result once and update the ledger. An idle `review-handoff` worker has
+not completed its cycle; handle the review before launching the next worker.
 Use sync mode only when the complete workflow can realistically finish within
 that invocation.
 
@@ -150,6 +160,60 @@ If the user requests status while the worker is running, read the latest
 heartbeat and report its timestamp, phase, active command, elapsed time, and
 last completed milestone. Do not launch another worker or duplicate the active
 command merely to obtain status.
+
+### Review capability preflight and handoff
+
+Do not assume that a worker inherits the outer agent's tools. Before launching
+it, inspect the outer agent's exposed tools for background/persistent launch and
+follow-up messaging and pass the observed capabilities in the worker prompt.
+Require the worker to inspect its own exposed schema before development starts.
+Do not invent unsupported tool arguments or require speculative GitHub requests
+to probe capabilities. Tool exposure is only the routing preflight; the selected
+review owner must still verify actual persistent-agent follow-ups during review
+initialization.
+
+- Select `worker` when the worker can launch and message persistent agents.
+- Select `outer` when the worker cannot but the outer agent can, and the outer
+  agent can resume this same worker with a follow-up after a phase handoff.
+- If neither route is available, stop before repository/dependency/publication
+  work and report an orchestration capability blocker, not a source-rule defect.
+  Do not substitute synchronous reviewers or reuse agents from earlier loops.
+
+For `outer` mode:
+
+1. The worker completes development, records the canonical PR, pushed SHA,
+   applicable validation evidence and exact worktree state, then returns
+   `review-handoff` with `phase: development-review`. It remains idle; no worker
+   command or nested agent may keep acting on either worktree. Use the structured
+   return and durable handoff artifact when direct parent messaging is unavailable;
+   do not assume an inherited session ID identifies a distinct parent.
+2. The outer queue verifies that handoff and invokes `/loop-for-fix-and-review`
+   itself, from the recorded target worktree. It creates a fresh persistent
+   collector/fixer pair, retains the fixer's model pin, independently verifies
+   evidence and authorizes publication exactly as that skill requires. The
+   development worker does not serve as either reviewer or fixer. Append review
+   milestones to the same log and retain the independent five-round budget,
+   backlog handling, validation gates and all stop conditions.
+3. On clean review, record the final pushed and reviewed SHA, ensure both review
+   agents and their commands are idle/finished, and send the verified result and
+   updated cycle handoff to the same worker. The worker verifies current
+   identities and proceeds to promotion from that exact source commit. This is
+   continuation of the same cycle, not another worker attempt or retry.
+4. After promotion publication and required validation, the worker returns
+   another `review-handoff` with `phase: promotion-review`, including the
+   promotion worktree and immutable source provenance. The outer queue runs a
+   separate review invocation with a new persistent pair. It may finalize the
+   task directly once this review and final provenance verification are complete.
+5. A review blocker or exhausted cap ends the task; do not resume the worker to
+   bypass it. A confirmed promotion source defect follows the existing bounded
+   source-repair protocol with a fresh worker only after all prior activity ends.
+   Missing/unverifiable handoff state is a blocker, not a clean review.
+
+This route must be selected before review side effects. It does not permit
+retrying an already-failed review under another owner, resetting review budgets,
+or converting operational failures into source-repair cycles. Explicit
+user-authorized restarts preserve the earlier failed run in history and reverify
+reused progress; they are not automatic retries.
 
 ## Bounded orchestration retry
 
@@ -250,6 +314,8 @@ fresh repair worker. It is an orchestration contract, not a new public CLI flag:
   unresolved source findings across cycles
 - absolute shared execution-log path and durable artifact paths for handoff
   evidence; no secrets or generated corpus payloads
+- review owner and capability evidence, pending review phase, review invocation
+  and agent IDs, and verified result when returning from an outer-owned review
 - worktree state manifest at handoff: branch/HEAD, tracked/staged/untracked
   task-owned paths, their diffs and content hashes, and the completed actions
   establishing ownership of any unfinished edits
@@ -289,6 +355,13 @@ Give each top-level subagent all of these instructions:
 > all TypeSpec repository and GitHub operations from that worktree unless an
 > invoked skill explicitly requires the supplied specs worktree or the recorded
 > promotion worktree. Never perform promotion edits in the source worktree.
+>
+> Before development, inspect your exposed tools and select the review owner
+> using the supplied outer capabilities and the review capability preflight
+> above. Report the selected route in the handoff. If nested persistent launch is
+> unavailable but the outer route is available, do not declare the task blocked:
+> return `review-handoff` at each review boundary and remain idle until continued.
+> A structured return is sufficient; no parent-message tool is required.
 >
 > Maintain an append-only execution log at `<typespec-worktree>\log.txt` for the
 > entire task. Before making repository changes, resolve the worktree's exclude
@@ -336,7 +409,7 @@ Give each top-level subagent all of these instructions:
 > Maintain the cycle handoff after every phase, preserving prior heads in history
 > and recording newly verified pushed heads before calling the next skill.
 >
-> After the draft PR exists, invoke:
+> After the draft PR exists, in worker-owned review mode invoke:
 >
 > `/loop-for-fix-and-review <canonical-development-pr-url>`
 >
@@ -344,6 +417,12 @@ Give each top-level subagent all of these instructions:
 > persistent subagents required by its own contract. Pass the same queue
 > ownership constraint to that skill and its subagents. Retain only
 > evidence-backed, high-confidence process suggestions for your result.
+>
+> In outer-owned mode, instead persist the complete development review handoff,
+> return `review-handoff`, and end this turn with no work still running. Do not
+> invoke the review skill or start promotion yourself. Resume this same cycle
+> only after the outer agent supplies a verified clean review result and updated
+> pushed source SHA. Recheck that identity before promotion.
 >
 > Stop this cycle if development or its review is blocked or reaches the review
 > cap without clean verification. Do not proceed to promotion. A successful
@@ -368,8 +447,8 @@ Give each top-level subagent all of these instructions:
 > do not repair the source yourself or launch the next cycle. Other blockers
 > stop this cycle and do not request repair.
 >
-> After a promotion PR exists and required promotion validation is complete,
-> invoke from its recorded worktree:
+> After a promotion PR exists and required promotion validation is complete, in
+> worker-owned review mode invoke from its recorded worktree:
 >
 > `/loop-for-fix-and-review <canonical-promotion-pr-url>`
 >
@@ -379,6 +458,10 @@ Give each top-level subagent all of these instructions:
 > defects found in either the unresolved backlog or a new review return
 > `source-repair-required`; never fix source semantics only in the promoted copy.
 > Caps, uncertain findings, and operational failures stop this cycle.
+>
+> In outer-owned mode, instead persist the complete promotion review handoff
+> with source provenance, return `review-handoff`, and remain idle. Do not claim
+> success before the outer queue completes that review and final verification.
 >
 > Before returning, ensure no delegated agent or command is still mutating the
 > worktrees or running this cycle's workflow. Do not modify any delegated skill.
@@ -502,6 +585,8 @@ Capture concrete suggestions for improving future queue runs, especially:
 - Never launch two top-level workers concurrently.
 - Never launch the next worker until the previous worker is terminal.
 - Never reuse a completed worker for another command.
+- Never let the worker and outer-owned review agents act on worktrees at the
+  same time. Same-cycle review handoffs do not authorize a second top-level worker.
 - Never ask the user a question during queue execution.
 - Reject any command whose `--target-branch` is not exactly
   `feature/lintdiff-migration-new`.
