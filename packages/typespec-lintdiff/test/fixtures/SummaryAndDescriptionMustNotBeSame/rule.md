@@ -44,6 +44,8 @@ The local lint covers the authorable upstream matrix:
 - both `summary` and `description` present with identical text => violation
 - both present with equality only after trimming surrounding whitespace =>
   violation
+- either field present as the empty string => compliant, matching the upstream
+  rule's truthy check before trimming
 - both present with different text => compliant
 - only one of the two fields present => compliant
 
@@ -56,10 +58,11 @@ The rule inspects each operation:
 
 ## Test Cases
 
-| ID                              | Violation | Description |
-| ------------------------------- | --------- | ----------- |
-| `same-summary-description`      | true      | Operation has identical summary and description text. |
-| `same-after-trimming-whitespace`| true      | Operation summary and description only differ by surrounding whitespace. |
-| `different-summary-description` | false     | Operation uses distinct summary and description text. |
-| `summary-only`                  | false     | Operation defines a summary without a description. |
-| `description-only`              | false     | Operation defines a description without a summary. |
+| ID                               | Violation | Description                                                              |
+| -------------------------------- | --------- | ------------------------------------------------------------------------ |
+| `same-summary-description`       | true      | Operation has identical summary and description text.                    |
+| `same-after-trimming-whitespace` | true      | Operation summary and description only differ by surrounding whitespace. |
+| `different-summary-description`  | false     | Operation uses distinct summary and description text.                    |
+| `empty-summary-description`      | false     | Operation has empty summary and description strings.                     |
+| `summary-only`                   | false     | Operation defines a summary without a description.                       |
+| `description-only`               | false     | Operation defines a description without a summary.                       |
