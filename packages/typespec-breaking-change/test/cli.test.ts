@@ -1,0 +1,568 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { formatResult, main, parseArgs, type CliOptions } from "../src/cli/cli.js";
+import * as compileModule from "../src/cli/compile.js";
+import * as orchestratorModule from "../src/pipeline/orchestrator.js";
+import type { AnalysisResult, Finding } from "../src/types.js";
+
+function createSummary(
+  overrides: Partial<AnalysisResult["summary"]> = {},
+): AnalysisResult["summary"] {
+  return {
+    servicesAnalyzed: 1,
+    comparisonsPerformed: 1,
+    versionComparisons: [],
+    ...overrides,
+  };
+}
+
+describe("CLI argument parsing", () => {
+  it("parses positional entry argument", () => {
+    const opts = parseArgs(["main.tsp"]);
+    expect(opts.entry).toBe("main.tsp");
+    expect(opts.format).toBe("console");
+  });
+
+  it("parses --entry flag", () => {
+    const opts = parseArgs(["--entry", "src/main.tsp"]);
+    expect(opts.entry).toBe("src/main.tsp");
+  });
+
+  it("parses short flags", () => {
+    const opts = parseArgs(["-e", "main.tsp", "-f", "json", "-p", "cross-version"]);
+    expect(opts.entry).toBe("main.tsp");
+    expect(opts.format).toBe("json");
+    expect(opts.phase).toBe("cross-version");
+  });
+
+  it("parses --base for two-program comparison", () => {
+    const opts = parseArgs(["--base", "base/main.tsp", "--entry", "head/main.tsp"]);
+    expect(opts.base).toBe("base/main.tsp");
+    expect(opts.entry).toBe("head/main.tsp");
+  });
+
+  it("parses short --base and --service aliases", () => {
+    const opts = parseArgs(["-b", "base/main.tsp", "-s", "Widgets", "head/main.tsp"]);
+    expect(opts.base).toBe("base/main.tsp");
+    expect(opts.service).toBe("Widgets");
+    expect(opts.entry).toBe("head/main.tsp");
+  });
+
+  it("parses --base-ref for git-revision-based comparison", () => {
+    const opts = parseArgs(["main.tsp", "--base-ref", "origin/main"]);
+    expect(opts.baseRef).toBe("origin/main");
+    expect(opts.base).toBeUndefined();
+  });
+
+  it("parses --service filter", () => {
+    const opts = parseArgs(["main.tsp", "--service", "Widgets"]);
+    expect(opts.service).toBe("Widgets");
+  });
+
+  it("parses --phase flag", () => {
+    const opts = parseArgs(["main.tsp", "--phase", "same-version"]);
+    expect(opts.phase).toBe("same-version");
+  });
+
+  it("parses --show-suppressed flag", () => {
+    const opts = parseArgs(["main.tsp", "--show-suppressed"]);
+    expect(opts.showSuppressed).toBe(true);
+  });
+
+  it("parses --show-ignored flag", () => {
+    const opts = parseArgs(["main.tsp", "--show-ignored"]);
+    expect(opts.showIgnored).toBe(true);
+  });
+
+  it("parses --show-suppressed and --show-ignored", () => {
+    const opts = parseArgs(["main.tsp", "--show-suppressed", "--show-ignored"]);
+    expect(opts.showSuppressed).toBe(true);
+    expect(opts.showIgnored).toBe(true);
+  });
+
+  it("parses Markdown title options", () => {
+    const opts = parseArgs([
+      "main.tsp",
+      "--report-title",
+      "General Versioning Analysis",
+      "--omit-title",
+    ]);
+    expect(opts.reportTitle).toBe("General Versioning Analysis");
+    expect(opts.omitTitle).toBe(true);
+  });
+
+  it("prints usage and exits for --help", () => {
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const exitSpy = vi.spyOn(process, "exit").mockImplementation(((
+      code?: string | number | null,
+    ) => {
+      throw new Error(`process.exit:${code ?? ""}`);
+    }) as typeof process.exit);
+
+    expect(() => parseArgs(["--help"])).toThrow("process.exit:0");
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining("Usage: typespec-breaking-change"));
+
+    logSpy.mockRestore();
+    exitSpy.mockRestore();
+  });
+
+  it("defaults a missing --entry value to an empty string", () => {
+    const opts = parseArgs(["--entry"]);
+    expect(opts.entry).toBe("");
+  });
+
+  it("defaults a missing --format value to console", () => {
+    const opts = parseArgs(["main.tsp", "--format"]);
+    expect(opts.format).toBe("console");
+  });
+
+  it("ignores extra positional arguments once entry is set", () => {
+    const opts = parseArgs(["main.tsp", "secondary.tsp"]);
+    expect(opts.entry).toBe("main.tsp");
+  });
+
+  it("ignores unknown dashed arguments as positional entries", () => {
+    const opts = parseArgs(["--unknown"]);
+    expect(opts.entry).toBe("");
+  });
+});
+
+describe("CLI formatResult", () => {
+  const mockResult: AnalysisResult = {
+    findings: [
+      {
+        diff: {
+          kind: "ResponsePropertyRemoved" as any,
+          identity: {
+            operation: { method: "GET", path: "/widgets" },
+            component: "response",
+            element: "body.name",
+          },
+          message: "Response property 'name' was removed",
+        },
+        severity: "error",
+        rule: "ResponsePropertyRemoved",
+        phase: "cross-version",
+        suppressed: false,
+        versionPair: {
+          baseVersion: "2024-01-01",
+          headVersion: "2025-01-01",
+          phase: "cross-version",
+        },
+      } as Finding,
+    ],
+    timing: {
+      compileBaseMs: 100,
+      compileHeadMs: 200,
+      versionMutatorsMs: 10,
+      canonicalizeMs: 50,
+      identityMatchingMs: 20,
+      diffEngineMs: 300,
+      classifyMs: 15,
+      suppressMs: 5,
+      reportMs: 0,
+      totalMs: 700,
+    },
+    summary: createSummary({ phase: "cross-version" }),
+  };
+
+  it("formats as JSON", () => {
+    const opts: CliOptions = { entry: "main.tsp", format: "json" };
+    const output = formatResult(mockResult, opts);
+    const parsed = JSON.parse(output);
+    expect(parsed.counts.errors).toBe(1);
+    expect(parsed.findings).toHaveLength(1);
+    expect(parsed.findings[0].kind).toBe("ResponsePropertyRemoved");
+    expect(parsed.requiresAction).toBe(true);
+  });
+
+  it("formats as GitHub markdown", () => {
+    const opts: CliOptions = { entry: "main.tsp", format: "github" };
+    const output = formatResult(mockResult, opts);
+    expect(output).toContain("## Breaking Change Analysis");
+    expect(output).toContain("1 breaking change");
+  });
+
+  it("formats as console", () => {
+    const opts: CliOptions = { entry: "main.tsp", format: "console" };
+    const output = formatResult(mockResult, opts);
+    expect(output).toContain("ERROR");
+    expect(output).toContain("ResponsePropertyRemoved");
+  });
+});
+
+describe("CLI main", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("returns exit code 2 when no entry specified", async () => {
+    const code = await main([]);
+    expect(code).toBe(2);
+  });
+
+  it("returns exit code 2 when the entry file does not exist", async () => {
+    // Compiling a nonexistent entry produces a "file-not-found" error
+    // diagnostic; the CLI now surfaces that as a hard failure instead of
+    // silently analyzing an empty program and reporting "no changes".
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const code = await main(["nonexistent.tsp"]);
+    expect(code).toBe(2);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("Failed to compile"));
+  });
+
+  it("runs two-program comparison when --base is provided", async () => {
+    const compileSpy = vi
+      .spyOn(compileModule, "compileService")
+      .mockImplementation(async (path: string) => ({ path }) as any);
+    const analyzeSpy = vi.spyOn(orchestratorModule, "analyzeBaseAndHead").mockReturnValue({
+      findings: [],
+      timing: {
+        compileBaseMs: 0,
+        compileHeadMs: 0,
+        versionMutatorsMs: 0,
+        canonicalizeMs: 0,
+        identityMatchingMs: 0,
+        diffEngineMs: 0,
+        classifyMs: 0,
+        suppressMs: 0,
+        reportMs: 0,
+        totalMs: 0,
+      },
+      summary: createSummary({ phase: "same-version" }),
+    });
+
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    const code = await main([
+      "--base",
+      "base.tsp",
+      "--entry",
+      "head.tsp",
+      "--service",
+      "Test",
+      "--phase",
+      "same-version",
+    ]);
+
+    expect(code).toBe(0);
+    expect(compileSpy).toHaveBeenNthCalledWith(1, expect.stringMatching(/base\.tsp$/));
+    expect(compileSpy).toHaveBeenNthCalledWith(2, expect.stringMatching(/head\.tsp$/));
+    expect(analyzeSpy).toHaveBeenCalledWith(
+      { path: expect.stringMatching(/base\.tsp$/) },
+      { path: expect.stringMatching(/head\.tsp$/) },
+      { serviceName: "Test", phase: "same-version", log: expect.any(Function) },
+    );
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining("No unversioned changes found"));
+  });
+
+  it("returns exit code 1 when single-program analysis finds an unsuppressed error", async () => {
+    const compileSpy = vi
+      .spyOn(compileModule, "compileService")
+      .mockImplementation(async (path: string) => ({ path }) as any);
+    const analyzeSpy = vi.spyOn(orchestratorModule, "analyzeProgram").mockReturnValue({
+      findings: [
+        {
+          diff: {
+            kind: "ResponsePropertyRemoved",
+            identity: {
+              operation: { method: "GET", path: "/widgets" },
+              component: "response",
+              element: "body.name",
+            },
+            message: "Response property 'name' was removed",
+          },
+          severity: "error",
+          rule: "ResponsePropertyRemoved",
+          phase: "cross-version",
+          suppressed: false,
+          versionPair: {
+            baseVersion: "2024-01-01",
+            headVersion: "2025-01-01",
+            phase: "cross-version",
+          },
+        },
+      ] as Finding[],
+      timing: {
+        compileBaseMs: 0,
+        compileHeadMs: 0,
+        versionMutatorsMs: 0,
+        canonicalizeMs: 0,
+        identityMatchingMs: 0,
+        diffEngineMs: 0,
+        classifyMs: 0,
+        suppressMs: 0,
+        reportMs: 0,
+        totalMs: 0,
+      },
+      summary: createSummary({ phase: "cross-version" }),
+    });
+
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    const code = await main(["head.tsp"]);
+
+    expect(code).toBe(1);
+    expect(compileSpy).toHaveBeenCalledWith(expect.stringMatching(/head\.tsp$/));
+    expect(analyzeSpy).toHaveBeenCalledWith(
+      { path: expect.stringMatching(/head\.tsp$/) },
+      { serviceName: undefined, phase: undefined, log: expect.any(Function) },
+    );
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining("ResponsePropertyRemoved"));
+  });
+
+  it("returns exit code 2 when analysis throws", async () => {
+    vi.spyOn(compileModule, "compileService").mockImplementation(async () => {
+      throw new Error("boom");
+    });
+
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    const code = await main(["head.tsp"]);
+
+    expect(code).toBe(2);
+    expect(errorSpy).toHaveBeenCalledWith("Analysis failed: boom");
+  });
+
+  it("parses --json-output flag", () => {
+    const opts = parseArgs(["main.tsp", "--json-output", "report.json"]);
+    expect(opts.jsonOutput).toBe("report.json");
+  });
+
+  it("parses --markdown-output flag", () => {
+    const opts = parseArgs(["main.tsp", "--markdown-output", "report.md"]);
+    expect(opts.markdownOutput).toBe("report.md");
+  });
+
+  it("parses --github-annotations flag", () => {
+    const opts = parseArgs(["main.tsp", "--github-annotations"]);
+    expect(opts.githubAnnotations).toBe(true);
+  });
+
+  it("parses --fail-on-breaking flag", () => {
+    const opts = parseArgs(["main.tsp", "--fail-on-breaking"]);
+    expect(opts.failOnBreaking).toBe(true);
+  });
+
+  it("writes JSON and Markdown output files", async () => {
+    // We can't spy on fs/promises in ESM, so we test via the CLI behavior:
+    // verify that the main function doesn't throw when output paths are specified.
+    // The actual file writing is implicitly tested by integration tests.
+    vi.spyOn(compileModule, "compileService").mockResolvedValue({} as any);
+    vi.spyOn(orchestratorModule, "analyzeProgram").mockReturnValue({
+      findings: [],
+      timing: {
+        compileBaseMs: 0,
+        compileHeadMs: 0,
+        versionMutatorsMs: 0,
+        canonicalizeMs: 0,
+        identityMatchingMs: 0,
+        diffEngineMs: 0,
+        classifyMs: 0,
+        suppressMs: 0,
+        reportMs: 0,
+        totalMs: 0,
+      },
+      summary: createSummary({ phase: "cross-version" }),
+    });
+
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    // Use temp directory for output
+    const { mkdtemp, readFile, rm } = await import("fs/promises");
+    const { tmpdir } = await import("os");
+    const { join } = await import("path");
+    const dir = await mkdtemp(join(tmpdir(), "bc-test-"));
+
+    try {
+      const code = await main([
+        "head.tsp",
+        "--json-output",
+        join(dir, "report.json"),
+        "--markdown-output",
+        join(dir, "report.md"),
+      ]);
+
+      expect(code).toBe(0);
+
+      const jsonContent = await readFile(join(dir, "report.json"), "utf8");
+      const parsed = JSON.parse(jsonContent);
+      expect(parsed.requiresAction).toBe(false);
+      expect(parsed.counts).toBeDefined();
+
+      const mdContent = await readFile(join(dir, "report.md"), "utf8");
+      expect(mdContent).toContain("## Breaking Change Analysis");
+      expect(mdContent).toContain("No cross-version breaking changes found");
+    } finally {
+      await rm(dir, { recursive: true });
+    }
+  });
+
+  it("emits GitHub annotations for errors", async () => {
+    vi.spyOn(compileModule, "compileService").mockResolvedValue({} as any);
+    vi.spyOn(orchestratorModule, "analyzeProgram").mockReturnValue({
+      findings: [
+        {
+          diff: {
+            kind: "ResponsePropertyRemoved",
+            identity: {
+              operation: { method: "GET", path: "/test" },
+              component: "response",
+              element: "body.x",
+            },
+            message: "Property removed",
+            headSourceLocation: {
+              file: { path: "src/test.tsp", text: "line1\nline2\nline3" },
+              pos: 12,
+              end: 15,
+            },
+          },
+          severity: "error",
+          rule: "test",
+          phase: "cross-version",
+          suppressed: false,
+          versionPair: { baseVersion: "v1", headVersion: "v2", phase: "cross-version" },
+        },
+      ] as Finding[],
+      timing: {
+        compileBaseMs: 0,
+        compileHeadMs: 0,
+        versionMutatorsMs: 0,
+        canonicalizeMs: 0,
+        identityMatchingMs: 0,
+        diffEngineMs: 0,
+        classifyMs: 0,
+        suppressMs: 0,
+        reportMs: 0,
+        totalMs: 0,
+      },
+      summary: createSummary({ phase: "cross-version" }),
+    });
+
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await main(["head.tsp", "--github-annotations"]);
+
+    const annotationCall = logSpy.mock.calls.find((c) => String(c[0]).startsWith("::error"));
+    expect(annotationCall).toBeDefined();
+    expect(annotationCall![0]).toContain("file=src/test.tsp");
+    expect(annotationCall![0]).toContain("line=3");
+    expect(annotationCall![0]).toContain("Breaking change: ResponsePropertyRemoved");
+  });
+
+  it("emits annotation without location when no source location", async () => {
+    vi.spyOn(compileModule, "compileService").mockResolvedValue({} as any);
+    vi.spyOn(orchestratorModule, "analyzeProgram").mockReturnValue({
+      findings: [
+        {
+          diff: {
+            kind: "OperationRemoved",
+            identity: { element: "operations.GET /test" },
+            message: "Operation removed",
+          },
+          severity: "error",
+          rule: "test",
+          phase: "cross-version",
+          suppressed: false,
+          versionPair: { baseVersion: "v1", headVersion: "v2", phase: "cross-version" },
+        },
+      ] as Finding[],
+      timing: {
+        compileBaseMs: 0,
+        compileHeadMs: 0,
+        versionMutatorsMs: 0,
+        canonicalizeMs: 0,
+        identityMatchingMs: 0,
+        diffEngineMs: 0,
+        classifyMs: 0,
+        suppressMs: 0,
+        reportMs: 0,
+        totalMs: 0,
+      },
+      summary: createSummary({ phase: "cross-version" }),
+    });
+
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    await main(["head.tsp", "--github-annotations"]);
+
+    const annotationCall = logSpy.mock.calls.find((c) => String(c[0]).startsWith("::error"));
+    expect(annotationCall).toBeDefined();
+    expect(annotationCall![0]).not.toContain("file=");
+    expect(annotationCall![0]).toContain("Breaking change: OperationRemoved");
+  });
+
+  it("--fail-on-breaking returns 1 when errors exist", async () => {
+    vi.spyOn(compileModule, "compileService").mockResolvedValue({} as any);
+    vi.spyOn(orchestratorModule, "analyzeProgram").mockReturnValue({
+      findings: [
+        {
+          diff: {
+            kind: "ResponsePropertyRemoved",
+            identity: {
+              operation: { method: "GET", path: "/test" },
+              component: "response",
+              element: "body.x",
+            },
+            message: "Property removed",
+          },
+          severity: "error",
+          rule: "test",
+          phase: "cross-version",
+          suppressed: false,
+          versionPair: { baseVersion: "v1", headVersion: "v2", phase: "cross-version" },
+        },
+      ] as Finding[],
+      timing: {
+        compileBaseMs: 0,
+        compileHeadMs: 0,
+        versionMutatorsMs: 0,
+        canonicalizeMs: 0,
+        identityMatchingMs: 0,
+        diffEngineMs: 0,
+        classifyMs: 0,
+        suppressMs: 0,
+        reportMs: 0,
+        totalMs: 0,
+      },
+      summary: createSummary({ phase: "cross-version" }),
+    });
+
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const code = await main(["head.tsp", "--fail-on-breaking"]);
+    expect(code).toBe(1);
+  });
+
+  it("--fail-on-breaking returns 0 when no errors", async () => {
+    vi.spyOn(compileModule, "compileService").mockResolvedValue({} as any);
+    vi.spyOn(orchestratorModule, "analyzeProgram").mockReturnValue({
+      findings: [],
+      timing: {
+        compileBaseMs: 0,
+        compileHeadMs: 0,
+        versionMutatorsMs: 0,
+        canonicalizeMs: 0,
+        identityMatchingMs: 0,
+        diffEngineMs: 0,
+        classifyMs: 0,
+        suppressMs: 0,
+        reportMs: 0,
+        totalMs: 0,
+      },
+      summary: createSummary({ phase: "cross-version" }),
+    });
+
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const code = await main(["head.tsp", "--fail-on-breaking"]);
+    expect(code).toBe(0);
+  });
+
+  it("catches non-Error throws and reports as string", async () => {
+    vi.spyOn(compileModule, "compileService").mockImplementation(async () => {
+      throw "string error";
+    });
+
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const code = await main(["head.tsp"]);
+    expect(code).toBe(2);
+    expect(errorSpy).toHaveBeenCalledWith("Analysis failed: string error");
+  });
+});

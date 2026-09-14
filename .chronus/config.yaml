@@ -37,6 +37,7 @@ versionPolicies:
     step: minor
     packages:
       - "@azure-tools/typespec-autorest"
+      - "@azure-tools/typespec-breaking-change"
       - "@azure-tools/typespec-azure-core"
       - "@azure-tools/typespec-azure-portal-core"
       - "@azure-tools/typespec-azure-resource-manager"

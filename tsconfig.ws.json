@@ -3,6 +3,7 @@
     { "path": "core/tsconfig.ws.json" },
     { "path": "packages/typespec-autorest/tsconfig.build.json" },
     { "path": "packages/typespec-autorest-canonical/tsconfig.build.json" },
+    { "path": "packages/typespec-breaking-change/tsconfig.build.json" },
     { "path": "packages/typespec-azure-core/tsconfig.build.json" },
     { "path": "packages/typespec-azure-resource-manager/tsconfig.build.json" },
     { "path": "packages/typespec-client-generator-core/tsconfig.build.json" },
