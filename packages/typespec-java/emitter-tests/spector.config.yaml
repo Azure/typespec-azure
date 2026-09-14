@@ -90,6 +90,7 @@ specs:
   payload/xml: true
   resiliency/srv-driven/main.tsp: { options: { advanced-versioning: true } }
   resiliency/srv-driven/old.tsp: { options: { namespace: resiliency.servicedriven.v1, advanced-versioning: true } }
+  response/body-or-no-content: true
   response/status-code-range: true
   routes: true
   serialization/encoded-name/json: true
