@@ -317,6 +317,7 @@ Parameters used in client (either API version parameter or client parameter defi
 The method's return type is determined by the underlying operation's normal responses:
 
 - If `@responseAsBool` is on the method, then the response is a `boolean` (never optional). In this case, the underlying HTTP response objects have `type: undefined` — the boolean return type is a client-side concept handled at the method response level, not at the HTTP response level.
+- If `@override` uses `replaceResponseWithVoid` or `replaceResponseWithBytes`, the method response is respectively empty or `bytes`, while the underlying HTTP responses and exceptions keep their original wire types and metadata. Either replacement disables pageable-method classification. An intentional replacement reports `override-response-replacement`; another incompatible override response reports `override-response-mismatch`.
 - If the responses contain multiple return types, the return type is a union of all the types.
 - If the responses contain empty return type, the return type is wrapped with a nullable type.
 
@@ -333,6 +334,8 @@ TCGC infers the body parameter type from TypeSpec HTTP lib type [`HttpOperationB
 TCGC creates the `Content-Type` header parameter for any operation with body parameter if it doesn't exist, and creates the `Accept` header parameter for any operation with response that contains body. TCGC also creates corresponding method parameters for the operation's upper layer method for each case.
 
 For request bodies with multiple content types, the `Content-Type` parameter is modeled as an enum with one value per content type. For responses with multiple content types, the `Accept` header parameter is modeled as a single constant whose value is a comma-joined string of all response content types. Structured content types (JSON, XML, `text/plain`) are sorted before unstructured ones. For example, if a response can return `image/png` or `application/json`, the `Accept` constant value is `"application/json, image/png"`.
+
+For a `File` request body without an explicit content type, the HTTP library reports the unconstrained marker `*/*`. TCGC exposes the generated method and HTTP `Content-Type` parameters as optional strings with `clientDefaultValue: "application/octet-stream"` rather than generating a required `"*/*"` constant. This special case applies only to uploads; a `File` response without an explicit content type still has a constant `Accept: "*/*"` parameter.
 
 TCGC uses several ways to find an HTTP operation's parameter's corresponding method parameter or model property:
 
