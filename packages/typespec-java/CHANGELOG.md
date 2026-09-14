@@ -4,7 +4,7 @@
 
 ### Features
 
-- [#5461](https://github.com/Azure/typespec-azure/pull/5461) Update TypeSpec dependencies to their September minor versions. Includes behavior changes from upstream libraries such as TCGC ([microsoft/typespec#11936](https://github.com/microsoft/typespec/pull/11936)).
+- Update TypeSpec dependencies to their September minor versions. Includes behavior changes from upstream libraries such as TCGC ([microsoft/typespec#11936](https://github.com/microsoft/typespec/pull/11936)).
 
 
 ## 0.46.4
