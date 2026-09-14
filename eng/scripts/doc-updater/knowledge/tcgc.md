@@ -90,7 +90,7 @@
 
 ### Covered in azure/client-generator-core/
 
-access, alternate-type, api-version, client-default-value, client-doc, client-initialization, client-location, deserialize-empty-string-as-null, exact-name, file-content-type, flatten-property, hierarchy-building, next-link-verb, override, response-as-bool, usage
+access, alternate-type, api-version, client-default-value, client-doc, client-initialization, client-location, deserialize-empty-string-as-null, exact-name, flatten-property, hierarchy-building, next-link-verb, override, response-as-bool, usage
 
 ### Covered in client/
 
