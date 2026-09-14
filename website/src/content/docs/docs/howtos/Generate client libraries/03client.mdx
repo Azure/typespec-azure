@@ -609,30 +609,6 @@ You can override this using `@clientNamespace` if needed.
 
 The sequence of clients and sub clients is determined by the order of the `@client` decorators.
 
-### Language-specific decorator options
-
-Most TCGC decorators whose final parameter is `scope` accept either the legacy string form, such as
-`"csharp"`, or the typed `DecoratorOptions` value-bag form, such as `#{ scope: "csharp" }`.
-Existing string scopes remain supported and are not deprecated. Scope expressions continue to
-support comma-separated emitters and negation.
-
-The `@client` and `@clientInitialization` decorators already have options bags, so set `scope`
-directly in `ClientOptions` or `ClientInitializationOptions` rather than passing a separate value
-bag. Their legacy positional scope argument is also still supported. If both locations specify
-different effective scopes, TCGC reports `conflicting-scope` and uses the scope in the options bag.
-Equivalent expressions, including reordered or regrouped expressions, do not conflict.
-
-All options are resolved through model inheritance. For example, a model derived from
-`ClientOptions` can inherit `scope` and `service` from a base model while declaring `name` itself.
-Likewise, a model derived from `ClientInitializationOptions` can inherit `scope`, `parameters`, or
-`initializedBy`.
-
-For backward compatibility, a raw client-initialization parameters model that happens to contain a
-property named `scope` is still treated as parameters unless TCGC recognizes it as
-`ClientInitializationOptions`, including through inheritance or a mapped source model. For a raw
-parameters model, `scope` is therefore generated as a client parameter rather than interpreted as
-an emitter selector.
-
 ### Move All Operations to Root Client
 
 This can be achieved with the augment decorator: `@clientLocation` from `typespec-client-generator-core`.

@@ -999,17 +999,6 @@ Expected response body:
 }
 ```
 
-### Azure_ClientGenerator_Core_FileContentType_uploadDefault
-
-- Endpoint: `post /azure/client-generator-core/file-content-type/default`
-
-Upload a File request body without an explicit content type.
-Expected request:
-
-- Content-Type: application/octet-stream
-- Body: test file content
-  Expected response: 204 No Content
-
 ### Azure_ClientGenerator_Core_FlattenProperty_putFlattenModel
 
 - Endpoint: `put /azure/client-generator-core/flatten-property/flattenModel`
