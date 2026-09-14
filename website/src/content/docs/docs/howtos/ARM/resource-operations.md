@@ -200,17 +200,19 @@ The `ArmListBySubscriptionScope` template is used for listing a resource directl
 scope, generating a flat subscription-level path regardless of the resource's parent hierarchy.
 Use this instead of `ArmListBySubscription` when you need a subscription-level list operation for a child resource.
 
-#### Adding the standard `$filter` query parameter
+#### Adding standard `$top`, `$filter`, and `$skip` query parameters
 
-ARM collection GET operations may have only the standard `api-version` and `$filter` query
-parameters. Pass `ArmFilterParameter` through the `Parameters` template argument instead of
-defining a custom query property. Parameters such as `$top`, `$skip`, `$skiptoken`, and custom
-continuation tokens are not allowed on collection GET operations.
+Pass ARM's standard list query parameters through the `Parameters` template argument instead of
+defining custom `@query("$top")`, `@query("$filter")`, or `@query("$skip")` properties yourself.
+Compose the reusable ARM parameter models for the options your operation supports.
 
 ```typespec
 @armResourceOperations
 interface Employees {
-  listBySubscription is ArmListBySubscription<Employee, Parameters = ArmFilterParameter>;
+  listBySubscription is ArmListBySubscription<
+    Employee,
+    Parameters = ArmTopParameter & ArmFilterParameter & ArmSkipParameter
+  >;
 }
 ```
 
@@ -228,8 +230,8 @@ that do not fit the standard parent or subscription scopes.
 
 Point GET, PUT, PATCH, and DELETE operations may use only the standard `api-version` query
 parameter. POST operations must also avoid additional query parameters; put action-specific input
-in the request body instead. Collection GET operations additionally allow `$filter`, as described
-above.
+in the request body instead. Collection GET operations may use the standard list query parameter
+models described above, but should not define custom query parameters.
 
 ARM request and response bodies must use `application/json`. The standard ARM operation and
 response templates apply the expected content type. When writing a custom operation, model the body

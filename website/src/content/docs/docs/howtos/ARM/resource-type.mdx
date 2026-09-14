@@ -52,13 +52,13 @@ You can find a complete sample of Tracked Resources below.
 
 ### Tenant Resources
 
-Tenant resources use the `TrackedResource<TProperties>` as their base resource type, where
+Tenant resources use the `ProxyResource<TProperties>` as their base resource type, where
 `TProperties` is the properties model for the RP-specific properties of the resource. Here is an
 example:
 
 ```typespec
 @tenantResource
-model Employee is TrackedResource<EmployeeProperties> {
+model Employee is ProxyResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
 ```
