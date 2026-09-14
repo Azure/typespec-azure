@@ -25,6 +25,23 @@ op postIfMatch(
   ifMatch?: eTag,
 ): NoContentResponse;
 
+alias RequiredIfMatchHeader = {
+  @header("If-Match")
+  @doc("The request should only proceed if an entity matches this string.")
+  ifMatch: eTag;
+};
+
+@scenario
+@doc("Check when a required If-Match header is defined with eTag type.")
+@scenarioDoc("""
+  Check when a required If-Match header is defined with eTag type.
+  Expected header parameters:
+  - if-match="required"
+  """)
+@post
+@route("/required-if-match")
+op postRequiredIfMatch(...RequiredIfMatchHeader): NoContentResponse;
+
 @scenario
 @doc("Check when only If-None-Match in header is defined with eTag type.")
 @scenarioDoc("""

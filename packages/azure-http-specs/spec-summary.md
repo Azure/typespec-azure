@@ -5580,6 +5580,15 @@ Expected header parameters:
 
 - if-none-match="invalid"
 
+### Azure_SpecialHeaders_ConditionalRequest_postRequiredIfMatch
+
+- Endpoint: `post /azure/special-headers/conditional-request/required-if-match`
+
+Check when a required If-Match header is defined with eTag type.
+Expected header parameters:
+
+- if-match="required"
+
 ### Azure_SpecialHeaders_XmsClientRequestId
 
 - Endpoint: `get /azure/special-headers/x-ms-client-request-id/`
