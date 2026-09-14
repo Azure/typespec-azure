@@ -4,8 +4,10 @@ import { csharpNoUrlSuffixRule } from "./rules/csharp-no-url-suffix.js";
 import { csharpUseStandardAcronymsRule } from "./rules/csharp-use-standard-acronyms.js";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
+import { useCreateForPutRule } from "./rules/use-create-for-put.js";
 
 const rules = [
+  useCreateForPutRule,
   requireClientSuffixRule,
   propertyNameConflictRule,
   csharpNoUrlSuffixRule,

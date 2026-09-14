@@ -1,23 +1,20 @@
-import { Tester } from "#test/tester.js";
 import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it, vi } from "vitest";
 import { useCreateForPutRule } from "../../src/rules/use-create-for-put.js";
+import { ArmTester } from "../tester.js";
 
 vi.mock("@azure-tools/typespec-autorest", () => {
   throw new Error("Native lint must not load the AutoRest emitter.");
-});
-vi.mock("@azure-tools/typespec-client-generator-core", () => {
-  throw new Error("ARM lint must not load TCGC.");
 });
 
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  const runner = await Tester.createInstance();
+  const runner = await ArmTester.import("@typespec/openapi").createInstance();
   tester = createLinterRuleTester(
     runner,
     useCreateForPutRule,
-    "@azure-tools/typespec-azure-resource-manager",
+    "@azure-tools/typespec-client-generator-core",
   );
 });
 
@@ -34,16 +31,88 @@ const widget = `
   model Properties { provisioningState?: ResourceProvisioningState; }
 `;
 
-function diagnostic(operationName: string) {
+function diagnostic(operationName: string, target = operationName) {
   return {
-    code: "@azure-tools/typespec-azure-resource-manager/use-create-for-put",
+    code: "@azure-tools/typespec-client-generator-core/use-create-for-put",
     severity: "warning" as const,
-    message: `'PUT' operation '${operationName}' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.`,
-    target: operationName,
+    message: `PUT SDK method name '${operationName}' should start with 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change.`,
+    target,
   };
 }
 
 describe("use-create-for-put", () => {
+  it("accepts an unscoped client name override", async () => {
+    await tester
+      .expect(`${header} @clientName("createWidget") @put @route("/item") op set(): string;`)
+      .toBeValid();
+  });
+
+  it("reports an invalid unscoped client name on the authored operation", async () => {
+    await tester
+      .expect(`${header} @clientName("replaceWidget") @put @route("/item") op create(): string;`)
+      .toEmitDiagnostics([diagnostic("replaceWidget", "create")]);
+  });
+
+  it("ignores emitter-scoped overrides of a compliant default name", async () => {
+    await tester
+      .expect(
+        `${header} @clientName("setWidget", "csharp") @put @route("/item") op create(): string;`,
+      )
+      .toBeValid();
+  });
+
+  it("does not let an emitter-scoped override mask an invalid default name", async () => {
+    await tester
+      .expect(
+        `${header} @clientName("createWidget", "python") @put @route("/item") op set(): string;`,
+      )
+      .toEmitDiagnostics([diagnostic("set")]);
+  });
+
+  it("uses the unscoped name when scoped and unscoped overrides coexist", async () => {
+    await tester
+      .expect(
+        `${header}
+        @clientName("createWidget")
+        @clientName("setWidget", "csharp")
+        @put @route("/item") op set(): string;`,
+      )
+      .toBeValid();
+  });
+
+  it("honors client names on standard ARM template aliases", async () => {
+    await tester
+      .expect(
+        `${header}
+        ${widget}
+        @armResourceOperations interface Widgets {
+          @clientName("createOrUpdate")
+          set is ArmResourceCreateOrReplaceAsync<Widget>;
+        }`,
+      )
+      .toBeValid();
+  });
+
+  it("normalizes exact client names", async () => {
+    await tester
+      .expect(
+        `${header}
+        @clientName(exact("CreateWidget"))
+        @put @route("/item") op set(): string;`,
+      )
+      .toBeValid();
+  });
+
+  it("uses the friendly name fallback", async () => {
+    await tester
+      .expect(
+        `${header}
+        @friendlyName("createWidget")
+        @put @route("/item") op set(): string;`,
+      )
+      .toBeValid();
+  });
+
   // cspell:ignore creat
   it.each(["set", "put", "recreate", "replace", "c", "creat"])(
     "rejects PUT name %s",
@@ -190,7 +259,7 @@ describe("use-create-for-put", () => {
       .expect(
         `
         ${header}
-        @TypeSpec.OpenAPI.operationId("Widgets_Set")
+        @TypeSpec.OpenAPI.operationId("Widgets_Create")
         @route("/config") @put
         op setWidgetConfig(@body body: { config: string }): {
           @statusCode statusCode: 200;

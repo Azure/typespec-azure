@@ -47,7 +47,6 @@ import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 import { useApiVersionRule } from "./rules/use-api-version.js";
 import { useApplicationJsonContentTypeRule } from "./rules/use-application-json-content-type.js";
-import { useCreateForPutRule } from "./rules/use-create-for-put.js";
 import { useInterfaceRule } from "./rules/use-interface.js";
 import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
@@ -106,7 +105,6 @@ const rules = [
   noReservedResourcePropertyRule,
   noTenantLevelApisRule,
   noQueryInPointOpRule,
-  useCreateForPutRule,
 ];
 
 export const $linter = defineLinter({
