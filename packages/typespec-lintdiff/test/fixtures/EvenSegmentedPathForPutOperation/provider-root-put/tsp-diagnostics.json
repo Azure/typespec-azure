@@ -1,8 +1,13 @@
 [
   {
-    "code": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+    "code": "tsp-lintdiff-local-linter/put-in-operation-name",
     "severity": "warning",
-    "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    "message": "'PUT' operation 'putProviderRoot' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/tenant-level-apis-not-allowed",
+    "severity": "warning",
+    "message": "'putProviderRoot' is a tenant level api. Tenant level APIs are strongly discouraged and subscription or resource group level APIs are preferred instead. Please note that these APIs require a review from the security RBAC team during manifest check-in. For details, refer to the Manifest security review process: https://eng.ms/docs/microsoft-security/identity/auth-authz/access-control-managed-identityacmi/policy-administration-service/pas-wiki/livesite/security/manifest"
   },
   {
     "code": "@azure-tools/typespec-azure-core/no-openapi",
@@ -13,11 +18,6 @@
     "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
     "severity": "warning",
     "message": "ARM PUT path '/providers/Microsoft.TestService' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/put-in-operation-name",
-    "severity": "warning",
-    "message": "'PUT' operation 'putProviderRoot' should use method name 'Create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
   },
   {
     "code": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",
@@ -63,11 +63,6 @@
     "code": "@azure-tools/typespec-azure-core/no-openapi",
     "severity": "warning",
     "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
-    "severity": "warning",
-    "message": "Properties of a PATCH request body must not be required, property:name."
   },
   {
     "code": "tsp-lintdiff-local-linter/path-parameter-schema",
