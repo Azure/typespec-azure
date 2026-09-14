@@ -788,12 +788,7 @@ model Azure.ResourceManager.ExtensionResource<Properties, PropertiesOptional>
 
 ```typespec
 model PetInstance is ExtensionResource<PetProperties> {
-  @key
-  @path
-  @segment("petInstances")
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @visibility(Lifecycle.Read)
-  name: string;
+  ...ResourceNameParameter<PetInstance>;
 }
 ```
 
@@ -1136,7 +1131,7 @@ None
 ### `ResourceKindProperty` {#Azure.ResourceManager.ResourceKindProperty}
 
 Model representing the standard `kind` envelope property for a resource.
-Spread this model into a resource model if the resource support ARM `kind`.
+Spread this model into a resource model if the resource supports ARM `kind`.
 
 ```typespec
 model Azure.ResourceManager.ResourceKindProperty<Type>
@@ -4736,7 +4731,7 @@ model Foo is TrackedResource<FooProperties> {
 ### `PolymorphicResourceKindProperty` {#Azure.ResourceManager.Legacy.PolymorphicResourceKindProperty}
 
 Model representing the `kind` envelope property only for use with a polymorphic resource..
-Spread this model into a resource model if the resource support ARM `kind`.
+Spread this model into a resource model if the resource supports ARM `kind`.
 
 ```typespec
 model Azure.ResourceManager.Legacy.PolymorphicResourceKindProperty<Type>

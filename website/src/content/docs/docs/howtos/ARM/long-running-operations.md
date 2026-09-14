@@ -21,7 +21,10 @@ The `Azure.ResourceManager` library provides the following header models for lon
 | `ArmCombinedLroHeaders`   | Provides both `Azure-AsyncOperation` and `Location` headers for polling |
 
 Each header model accepts a `FinalResult` parameter that indicates the type of the logical result
-of the operation. It is important that this value matches what the operation actually returns.
+of the operation. It is important that this value matches what the operation actually returns. The
+[`lro-response-mismatch`](/docs/libraries/azure-resource-manager/rules/lro-response-mismatch)
+rule reports a mismatch for resource PUT, PATCH, and DELETE operations and for long-running POST
+actions.
 
 ## CreateOrUpdate (PUT)
 

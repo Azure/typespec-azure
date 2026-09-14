@@ -36,7 +36,7 @@ well, and vice-versa.
 
 ## TypeSpec Operation Templates and Interface Templates
 
-TypeSpec provide operation templates that describe the request and response of standard resource
+TypeSpec provides operation templates that describe the request and response of standard resource
 operations. A description of the options available for each resource template, and how to choose
 which one is described in the sections below.
 
@@ -75,8 +75,8 @@ provisioningState: ProvisioningState;
 
 ### Resource Get Operations
 
-Get is the operation to retrieve a single resource TypeSpec provides a single operation template for
-GET:
+GET is the operation to retrieve a single resource. TypeSpec provides a single operation template
+for GET:
 
 ```typespec
 op get is ArmResourceRead<MyResource>;
@@ -109,7 +109,7 @@ completes).
 
 - Simple resources may have synchronous PUT operations. If a resource may need to perform additional
   checks, creation of other dependent resources, or the like, it is best to use an Asynchronous API.
-- Asynchronous operations for PUT occur when the RP needs to perform additional validaton actions,
+- Asynchronous operations for PUT occur when the RP needs to perform additional validation actions,
   create other resources, or perform other tasks as part of resource creation or update that can
   cause the operation to take longer than the length of a single request/response.
 
@@ -216,13 +216,30 @@ interface Employees {
 }
 ```
 
+The standard ARM list templates add TypeSpec paging metadata and return
+`ResourceListResult<ResourceType>`, whose response envelope contains `value` and `nextLink`. Use
+these templates instead of defining a custom collection GET whenever possible. A custom collection
+GET must use `@list`, mark its items with `@pageItems`, mark its continuation link with `@nextLink`,
+and return an envelope with exactly `value` and `nextLink`.
+
 The `ArmResourceListAtScope` template is used when the scope of the list operation is determined by
 the `BaseParameters` type parameter. This is useful for resources with custom scope requirements
 that do not fit the standard parent or subscription scopes.
 
+### Query Parameters and Content Types
+
+Point GET, PUT, PATCH, and DELETE operations may use only the standard `api-version` query
+parameter. POST operations must also avoid additional query parameters; put action-specific input
+in the request body instead. Collection GET operations may use the standard list query parameter
+models described above, but should not define custom query parameters.
+
+ARM request and response bodies must use `application/json`. The standard ARM operation and
+response templates apply the expected content type. When writing a custom operation, model the body
+as a TypeSpec model and do not override its content type with another media type.
+
 ### Resource Actions (POST)
 
-Custom actions define any operations over resources outside the simple CRUDL (Create< Read, Update,
+Custom actions define any operations over resources outside the simple CRUDL (Create, Read, Update,
 Delete, List) or lifecycle operations described above. Any operation that returns data that is not
 made up of resources, performs a prescriptive state change on the resource (cycling power,
 upgrading, etc.), or any operation that does not fit into the operations described above should be
@@ -234,7 +251,7 @@ modelled as a _resource action_. Examples of resource actions include:
 
 #### Actions that take input and output
 
-Operations that manage credentials are a good example fo this category. TypeSpec defines synchronous
+Operations that manage credentials are a good example of this category. TypeSpec defines synchronous
 and asynchronous templates for actions that consume and produce information.
 
 | Operation                    | TypeSpec                                                                       |
@@ -248,7 +265,7 @@ model for the operation Response body.
 #### Actions that take input but produce no output (state changing actions)
 
 Operations that make state changes will often take some user configuration, and will return a
-seccess code or an error code depending on success or failure. TypeSpec defines synchronous and
+success code or an error code depending on success or failure. TypeSpec defines synchronous and
 asynchronous operation templates for state changing actions.
 
 | Operation                     | TypeSpec                                                                              |
