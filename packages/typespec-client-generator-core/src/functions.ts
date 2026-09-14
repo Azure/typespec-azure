@@ -1,6 +1,6 @@
 import type { FunctionContext, ModelProperty, Operation, Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { EXACT_NAME_PREFIX } from "./internal-utils.js";
+import { EXACT_NAME_PREFIX, responseOverrideKey } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
 
 // Helper function to clone an operation with new parameters and/or return type
@@ -241,6 +241,47 @@ export function reorderParameters(
 }
 
 /**
+ * Replace the method response type of an operation with `void`.
+ *
+ * The operation's HTTP response metadata is preserved; only the client method
+ * return type is changed when the operation is used with `@override`.
+ *
+ * @param context The function context provided by TypeSpec
+ * @param operation The operation to transform
+ * @returns A new operation whose method response type is `void`
+ */
+export function replaceResponseWithVoid(context: FunctionContext, operation: Operation): Operation {
+  const tk = $(context.program);
+  const replacement = cloneOperation(tk, operation, {
+    returnType: tk.intrinsic.void,
+  });
+  context.program.stateMap(responseOverrideKey).set(replacement, true);
+  return replacement;
+}
+
+/**
+ * Replace the method response type of an operation with the raw bytes of the HTTP response body.
+ *
+ * The operation's HTTP response metadata is preserved; only the client method
+ * return type is changed when the operation is used with `@override`.
+ *
+ * @param context The function context provided by TypeSpec
+ * @param operation The operation to transform
+ * @returns A new operation whose method response type is `bytes`
+ */
+export function replaceResponseWithBytes(
+  context: FunctionContext,
+  operation: Operation,
+): Operation {
+  const tk = $(context.program);
+  const replacement = cloneOperation(tk, operation, {
+    returnType: tk.builtin.bytes,
+  });
+  context.program.stateMap(responseOverrideKey).set(replacement, true);
+  return replacement;
+}
+
+/**
  * Mark a client name as exact, preventing language emitters from applying
  * their usual casing transformations.
  *
@@ -269,7 +310,10 @@ export function hasExactNameMarker(name: string): boolean {
  * @param name The name to normalize
  * @returns An object with the clean name and whether it was marked as exact
  */
-export function normalizeExactName(name: string): { name: string; isExactName: boolean } {
+export function normalizeExactName(name: string): {
+  name: string;
+  isExactName: boolean;
+} {
   if (name.startsWith(EXACT_NAME_PREFIX)) {
     return { name: name.slice(EXACT_NAME_PREFIX.length), isExactName: true };
   }

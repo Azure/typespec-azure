@@ -24,6 +24,11 @@ mise is recommended but not required; if you use another version manager,
 install the versions declared in `mise.toml` and the pnpm version declared by
 the `packageManager` field in `package.json`.
 
+The Python CI setup action uses the Python and uv versions declared in
+`mise.toml`. After updating either version, run `pnpm deps fix` to sync the
+action. `pnpm deps check` reports version drift as part of the CI consistency
+checks.
+
 # Testing a change in repo azure-rest-api-specs
 
 If you are proposing a change that is likely to impact existing specs, it's

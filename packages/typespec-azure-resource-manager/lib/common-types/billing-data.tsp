@@ -139,7 +139,7 @@ union BillingState {
   /** Resource's billing has not yet started. */
   Pending: "Pending",
 
-  /** Resource's billing is activate. */
+  /** Resource's billing is active. */
   Active: "Active",
 
   /** Resource's billing is in a warning state. */

@@ -55,6 +55,99 @@ it("basic", async () => {
   strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsParam);
 });
 
+it("does not report a response diagnostic for a plain parameter-only override that declares void", async () => {
+  // Historically the override operation's declared return type is ignored; a
+  // customization operation commonly declares `void` just to satisfy the signature.
+  // This must not be treated as an intentional response replacement.
+  const diagnostics = await SimpleBaseTester.diagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+    model Widget { name: string; }
+    @post op func(@body body: Widget): Widget;
+    `,
+      `
+    namespace MyCustomizations;
+    op func(params: MyService.Widget): void;
+    @@override(MyService.func, MyCustomizations.func);
+    `,
+    ),
+  );
+
+  expectDiagnosticEmpty(
+    diagnostics.filter((d) =>
+      d.code.startsWith("@azure-tools/typespec-client-generator-core/override-response"),
+    ),
+  );
+});
+
+it("does not report a response diagnostic when a plain override declares an unrelated return type", async () => {
+  const diagnostics = await SimpleBaseTester.diagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+    @post op func(): string;
+    `,
+      `
+    namespace MyCustomizations;
+    op func(): int32;
+    @@override(MyService.func, MyCustomizations.func);
+    `,
+    ),
+  );
+
+  expectDiagnosticEmpty(
+    diagnostics.filter((d) =>
+      d.code.startsWith("@azure-tools/typespec-client-generator-core/override-response"),
+    ),
+  );
+});
+
+it("reports a warning for an intentional void response replacement", async () => {
+  const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+    @post op func(): string;
+    `,
+      `
+    namespace MyCustomizations;
+    @@override(MyService.func, replaceResponseWithVoid(MyService.func));
+    `,
+    ),
+  );
+
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/override-response-replacement",
+    severity: "warning",
+  });
+});
+
+it("reports a warning for an intentional bytes response replacement", async () => {
+  const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace MyService;
+    @post op func(): string;
+    `,
+      `
+    namespace MyCustomizations;
+    #suppress "experimental-feature" "testing replaceResponseWithBytes"
+    @@override(MyService.func, replaceResponseWithBytes(MyService.func));
+    `,
+    ),
+  );
+
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/override-response-replacement",
+    severity: "warning",
+  });
+});
+
 it("basic with scope", async () => {
   const mainCode = `
     @service

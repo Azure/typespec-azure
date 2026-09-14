@@ -9,6 +9,7 @@ import {
   type ArmResourceDetails,
   getArmResources,
   getFeature,
+  getFeatureFileSet,
   getResourceFeature,
   getResourceFeatureSet,
 } from "../src/resource.js";
@@ -397,6 +398,15 @@ describe("ARM resource model:", () => {
     });
   });
   describe("features support", () => {
+    it("returns undefined when feature files are not configured", async () => {
+      const { program, MSTest } = await Tester.compile(t.code`
+        @armProviderNamespace("Microsoft.Test")
+        namespace ${t.namespace("MSTest")};
+      `);
+
+      strictEqual(getFeatureFileSet(program, MSTest), undefined);
+    });
+
     it("sets standard features and feature options", async () => {
       const [result, diagnostics] = await Tester.compileAndDiagnose(t.code`
 
@@ -428,6 +438,10 @@ enum Features {
       }
       `);
       expectDiagnosticEmpty(diagnostics);
+      strictEqual(
+        getFeatureFileSet(result.program, result.MSTest),
+        result.MSTest.enums.get("Features"),
+      );
       const features = getResourceFeatureSet(result.program, result.MSTest);
       expect(features).toBeDefined();
       ok(features);

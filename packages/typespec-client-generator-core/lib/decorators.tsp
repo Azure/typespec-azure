@@ -3,6 +3,28 @@ using Reflection;
 namespace Azure.ClientGenerator.Core;
 
 /**
+ * Common typed options bag for the `scope` argument accepted by scoped TCGC decorators.
+ *
+ * Every scoped decorator's own options model can extend this base so new, decorator-specific
+ * settings can be added over time without breaking the legacy plain-string scope argument.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language
+ * emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns for `scope`:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
+ */
+model DecoratorOptions {
+  /**
+   * Specifies the target language emitters that a decorator should apply to. If not set, the
+   * decorator applies to all language emitters by default.
+   */
+  scope?: string;
+}
+
+/**
  * Overrides the generated name for client SDK elements including clients, methods, parameters,
  * unions, models, enums, and model properties.
  *
@@ -57,7 +79,11 @@ namespace Azure.ClientGenerator.Core;
  * ```
  *
  */
-extern dec clientName(target: unknown, rename: valueof string, scope?: valueof string);
+extern dec clientName(
+  target: unknown,
+  rename: valueof string,
+  scope?: valueof DecoratorOptions | string
+);
 
 /**
  * Whether you want to generate an operation as a convenient method.
@@ -100,7 +126,7 @@ extern dec clientName(target: unknown, rename: valueof string, scope?: valueof s
 extern dec convenientAPI(
   target: Operation | Namespace | Interface,
   flag?: valueof boolean,
-  scope?: valueof string
+  scope?: valueof DecoratorOptions | string
 );
 
 /**
@@ -144,7 +170,7 @@ extern dec convenientAPI(
 extern dec protocolAPI(
   target: Operation | Namespace | Interface,
   flag?: valueof boolean,
-  scope?: valueof string
+  scope?: valueof DecoratorOptions | string
 );
 
 /**
@@ -152,7 +178,10 @@ extern dec protocolAPI(
  * If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
  * This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
  * @param target The target namespace or interface that you want to define as a client.
- * @param options Optional configuration for the service.
+ * @param options Optional configuration for the service. `options.scope` can also be used to set the
+ * language scope instead of (or in addition to) the legacy third positional `scope` argument. If
+ * both are set with conflicting values, a warning diagnostic is reported and the `options.scope`
+ * value is used.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
@@ -184,8 +213,11 @@ extern dec client(target: Namespace | Interface, options?: ClientOptions, scope?
 
 /**
  * Client customization options.
+ *
+ * In addition to the properties below, this inherits `scope` from `DecoratorOptions`, so
+ * `options.scope` can select which language emitters the `@client` customization applies to.
  */
-model ClientOptions {
+model ClientOptions extends DecoratorOptions {
   /**
    * The services that this client is generated for. The root explicit client must have `service` config.
    * The namespace should be decorated with `@service`.
@@ -225,7 +257,7 @@ model ClientOptions {
  * interface MyInterface{}
  * ```
  */
-extern dec operationGroup(target: Namespace | Interface, scope?: valueof string);
+extern dec operationGroup(target: Namespace | Interface, scope?: valueof DecoratorOptions | string);
 
 /**
  * Usage value.
@@ -328,7 +360,7 @@ enum Usage {
 extern dec usage(
   target: Model | Enum | Union | Namespace,
   value: EnumMember | Union,
-  scope?: valueof string
+  scope?: valueof DecoratorOptions | string
 );
 
 /**
@@ -499,7 +531,7 @@ enum Access {
 extern dec access(
   target: ModelProperty | Model | Operation | Enum | Union | Namespace,
   value: EnumMember,
-  scope?: valueof string
+  scope?: valueof DecoratorOptions | string
 );
 
 /**
@@ -556,7 +588,11 @@ extern dec access(
  * // method signature is now `op myOperation(params: Params)` just for csharp // method signature is now `op myOperation(foo: string, bar: string)`
  * ```
  */
-extern dec override(target: Operation, override: Operation, scope?: valueof string);
+extern dec override(
+  target: Operation,
+  override: Operation,
+  scope?: valueof DecoratorOptions | string
+);
 
 /**
  * Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
@@ -578,7 +614,7 @@ extern dec override(target: Operation, override: Operation, scope?: valueof stri
  * }
  * ```
  */
-extern dec useSystemTextJsonConverter(target: Model, scope?: valueof string);
+extern dec useSystemTextJsonConverter(target: Model, scope?: valueof DecoratorOptions | string);
 
 /**
  * InitializedBy value.
@@ -607,7 +643,10 @@ enum InitializedBy {
  * With `@clientInitialization` decorator, you can elevate operation level parameters to client level, and set how the client is initialized.
  * This decorator can be combined with `@paramAlias` decorator to change the parameter name in client initialization.
  * @param target The target client that you want to customize client initialization for.
- * @param options The options for client initialization. You can use `ClientInitializationOptions` model to set the options.
+ * @param options The options for client initialization. You can use `ClientInitializationOptions` model to set the options. `options.scope` can also be used to set the
+ * language scope instead of (or in addition to) the legacy third positional `scope` argument. If
+ * both are set with conflicting values, a warning diagnostic is reported and the `options.scope`
+ * value is used.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  *
  * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
@@ -644,8 +683,12 @@ extern dec clientInitialization(
 
 /**
  * Client initialization customization options.
+ *
+ * In addition to the properties below, this inherits `scope` from `DecoratorOptions`, so
+ * `options.scope` can select which language emitters the `@clientInitialization` customization
+ * applies to.
  */
-model ClientInitializationOptions {
+model ClientInitializationOptions extends DecoratorOptions {
   /**
    * Redefine the client initialization parameters you would like to add to the client. All the model properties should have corresponding operation level parameters.
    * By default, we apply endpoint, credential, and API version parameters. If you specify a parameters model, we will append the properties of the model to the parameters list of the client initialization.
@@ -691,7 +734,11 @@ model ClientInitializationOptions {
  * // Because of @@paramAlias, it will be matched to the `blobName` operation parameter.
  * ```
  */
-extern dec paramAlias(target: ModelProperty, paramAlias: valueof string, scope?: valueof string);
+extern dec paramAlias(
+  target: ModelProperty,
+  paramAlias: valueof string,
+  scope?: valueof DecoratorOptions | string
+);
 
 /**
  * Changes the namespace of a client, model, enum or union generated in the client SDK.
@@ -724,7 +771,7 @@ extern dec paramAlias(target: ModelProperty, paramAlias: valueof string, scope?:
 extern dec clientNamespace(
   target: Namespace | Interface | Model | Enum | Union,
   rename: valueof string,
-  scope?: valueof string
+  scope?: valueof DecoratorOptions | string
 );
 
 /**
@@ -837,7 +884,7 @@ model ExternalType {
 extern dec alternateType(
   target: ModelProperty | Scalar | Model | Enum | Union,
   alternate: unknown | ExternalType,
-  scope?: valueof string
+  scope?: valueof DecoratorOptions | string
 );
 
 /**
@@ -885,7 +932,7 @@ extern dec alternateType(
  * ): void;
  * ```
  */
-extern dec scope(target: Operation | ModelProperty, scope?: valueof string);
+extern dec scope(target: Operation | ModelProperty, scope?: valueof DecoratorOptions | string);
 
 /**
  * Specify whether a parameter is an API version parameter or not.
@@ -924,7 +971,11 @@ extern dec scope(target: Operation | ModelProperty, scope?: valueof string);
  * ): void;
  * ```
  */
-extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: valueof string);
+extern dec apiVersion(
+  target: ModelProperty,
+  value?: valueof boolean,
+  scope?: valueof DecoratorOptions | string
+);
 
 /**
  * Specify additional API versions that the client can support. These versions should include those defined by the service's versioning configuration.
@@ -956,7 +1007,11 @@ extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: va
  * @@clientApiVersions(Contoso, ClientApiVersions)
  * ```
  */
-extern dec clientApiVersions(target: Namespace, value: Enum, scope?: valueof string);
+extern dec clientApiVersions(
+  target: Namespace,
+  value: Enum,
+  scope?: valueof DecoratorOptions | string
+);
 
 /**
  * Indicates that a model property of type `string` or a `Scalar` type derived from `string` should be deserialized as `null` when its value is an empty string (`""`).
@@ -984,7 +1039,10 @@ extern dec clientApiVersions(target: Namespace, value: Enum, scope?: valueof str
  * }
  * ```
  */
-extern dec deserializeEmptyStringAsNull(target: ModelProperty, scope?: valueof string);
+extern dec deserializeEmptyStringAsNull(
+  target: ModelProperty,
+  scope?: valueof DecoratorOptions | string
+);
 
 /**
  * Indicates that a HEAD operation should be modeled as Response<bool>.
@@ -1007,7 +1065,7 @@ extern dec deserializeEmptyStringAsNull(target: ModelProperty, scope?: valueof s
  * op headOperation(): void;
  * ```
  */
-extern dec responseAsBool(target: Operation, scope?: valueof string);
+extern dec responseAsBool(target: Operation, scope?: valueof DecoratorOptions | string);
 
 /**
  * Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name. For this usage, the decorator cannot be used along with `@client` or `@operationGroup` decorators.
@@ -1102,7 +1160,7 @@ extern dec responseAsBool(target: Operation, scope?: valueof string);
 extern dec clientLocation(
   source: Operation | ModelProperty,
   target: Interface | Namespace | Operation | (valueof string),
-  scope?: valueof string
+  scope?: valueof DecoratorOptions | string
 );
 
 /**
@@ -1163,7 +1221,7 @@ extern dec clientDoc(
   target: unknown,
   documentation: valueof string,
   mode: EnumMember,
-  scope?: valueof string
+  scope?: valueof DecoratorOptions | string
 );
 
 /**
@@ -1210,5 +1268,5 @@ extern dec clientOption(
   target: unknown,
   name: valueof string,
   value: unknown | (valueof unknown),
-  scope?: valueof string
+  scope?: valueof DecoratorOptions | string
 );

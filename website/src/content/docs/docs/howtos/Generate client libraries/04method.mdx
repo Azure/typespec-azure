@@ -2225,6 +2225,165 @@ func (client *MyServiceClient) MyOp(ctx context.Context, c bool, a string, b int
 </ClientTabItem>
 </ClientTabs>
 
+#### `replaceResponseWithVoid`
+
+Replace only the generated client method response with `void` while preserving the original HTTP responses, including their status codes, response bodies, and error metadata:
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using TypeSpec.Http;
+
+@service
+namespace MyService;
+
+model Widget {
+  name: string;
+}
+
+@route("/widgets")
+@post
+op create(@body widget: Widget): Widget;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+#suppress "@azure-tools/typespec-client-generator-core/override-response-replacement" "The client intentionally ignores the response body."
+@@override(MyService.create, replaceResponseWithVoid(MyService.create));
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# NOT_SUPPORTED
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+export async function create(
+  context: Client,
+  widget: Widget,
+  options?: CreateOptionalParams,
+): Promise<void>;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+type MyServiceClientCreateResponse struct {}
+
+func (client *MyServiceClient) Create(ctx context.Context, widget Widget, options *MyServiceClientCreateOptions) (MyServiceClientCreateResponse, error)
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+#### `replaceResponseWithBytes`
+
+Replace only the generated client method response with the raw HTTP response bytes while preserving the original HTTP response metadata:
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec title="main.tsp"
+import "@typespec/http";
+
+using TypeSpec.Http;
+
+@service
+namespace MyService;
+
+model Widget {
+  name: string;
+}
+
+@route("/widgets/download")
+@get
+op download(): Widget;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+#suppress "@azure-tools/typespec-client-generator-core/override-response-replacement" "The client intentionally exposes the raw response bytes."
+@@override(MyService.download, replaceResponseWithBytes(MyService.download));
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# NOT_SUPPORTED
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+export type DownloadResponse = { body: Uint8Array };
+
+export async function download(
+  context: Client,
+  options?: DownloadOptionalParams,
+): Promise<DownloadResponse>;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+Both response transformations can be chained with parameter transformations and scoped through `@override`. Replacing a pageable operation's response with either `void` or `bytes` also makes the generated method non-pageable.
+
+An intentional `void` or `bytes` replacement reports the `override-response-replacement` warning; suppress it at the customization site after confirming the replacement is expected. An override operation with any other response incompatible with the original reports the `override-response-mismatch` error. Use these functions instead of declaring an arbitrary incompatible return type.
+
 ### Chaining transformations
 
 Transformation functions can be chained together. Each function returns a new operation that can be passed to the next transformation:
