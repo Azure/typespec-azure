@@ -78,7 +78,58 @@ for confirmation, pause at the applicable confirmation points for that run.
   prerequisites are missing, evidence cannot support a safe recommendation, or
   a source-semantic gap requires reopening repair, stop and report the blocker
   without asking. The done-status assumption applies in both modes; do not
-  reopen source repair automatically.
+  reopen source repair automatically. Queue-controlled runs return the structured
+  handoff below instead of asking; only the outer queue may start source repair.
+
+## Queue-controlled promotion and resumption
+
+When invoked by `/do-linter-development-task-one-by-one` with the
+`lintdiff-development-queue` marker and a
+[cycle handoff](../do-linter-development-task-one-by-one/SKILL.md#cycle-handoff),
+apply this narrowly scoped contract. Standalone promotion behavior is unchanged.
+
+- Require a clean, successfully reviewed development PR head. Verify its
+  canonical PR identity, current pushed SHA, and local source worktree against
+  the handoff. Pin that exact commit as immutable source for this invocation;
+  do not silently consume a newer branch tip or uncommitted source changes.
+- Use the existing destination analysis, same-repository `origin/main` target,
+  disabled-by-default rulesets, and required validation. Do not wait for the
+  development PR to merge. Pass the queue's no-skill-edits/no-skill-update-PR
+  constraint to all delegated agents and append milestones to the shared log.
+- For initial promotion, create/select the separate promotion worktree as usual.
+  Report its absolute path and branch as soon as selected, including on failure
+  before PR creation.
+- On a repair cycle, reuse the recorded promotion worktree, branch, and open
+  draft PR when they exist. Verify repository/base/head identities and the
+  recorded pushed promotion SHA before changes. Do not create replacements,
+  close PRs, reset, rebase, or force-push. If the PR was closed/merged or state
+  changed outside the handoff, stop.
+- The queue's recorded unfinished promotion edits may be resumed only when the
+  worktree state manifest proves their exact content and task ownership. This is
+  the sole exception to clean-worktree preparation/reuse requirements; unrelated,
+  unexplained, or externally changed edits remain blockers. Do not clean, stash,
+  overwrite them, or make speculative checkpoint commits. Promotion PR review
+  still requires a clean worktree at the pushed head.
+- After source repair and a new clean development review, refresh the native
+  implementation from the new pinned source commit. Preserve valid prior
+  promotion adaptations and review fixes; reconcile changes incrementally rather
+  than blindly copying over files or merging/cherry-picking the whole development
+  branch. Update native regression coverage, fixture mappings, docs, and PR
+  provenance, including the previous and new source SHAs and reason for refresh.
+  Re-run required promotion validation before appending and pushing new commits.
+- If a verified source-semantic defect is found during preparation, validation,
+  or review, stop this invocation without modifying the source or implementing
+  divergent semantics only in the official copy. Return
+  `source-repair-required` with the cycle handoff's complete defect evidence,
+  acceptance criteria, both PR/worktree identities when available, and the
+  manifest of any unfinished promotion edits. A failing command or review comment
+  alone is not proof of a source defect.
+- Only the outer queue decides whether its three-repair budget permits a new
+  worker. This queue invocation supplies advance repair authorization, replacing
+  the standalone requirement to ask the user to reopen repair; it does not
+  waive this skill's source-immutability or stop conditions. Uncertain findings,
+  adaptation issues, and operational blockers must not be relabeled
+  `source-repair-required`; record any accompanying operational blocker.
 
 ## Fast path for repeat promotions
 
@@ -262,7 +313,9 @@ Keep both PRs aligned:
 - The lintdiff PR remains the source of truth for rule behavior.
 - If review on the native-library PR reveals that the source lintdiff rule has a
   semantic gap, stop promotion and report the blocker. The user must explicitly
-  choose to reopen lintdiff rule repair before any source changes are made.
+  choose to reopen lintdiff rule repair before any source changes are made,
+  except for the outer queue's advance authorization under the queue-controlled
+  handoff above. In that mode, return evidence and stop; never repair here.
 - Do not let the promoted rule diverge from the lintdiff source without
   explicitly documenting why.
 
@@ -390,7 +443,10 @@ reference entries as a substitute for regeneration. After docs regeneration,
 inspect the generated target-package README and website linter/rule references
 for the official rule name, page path, links, and table entry. Format the changed
 Markdown files and check them with Prettier so generated tables use the expected
-layout.
+layout. Use the scoped empty-ignore override in step 9: ordinary Prettier
+commands silently skip website references covered by `.prettierignore` and
+generated rule pages covered by `.gitignore`. Leave both ignore files untouched
+and do not force-add ignored generated rule pages.
 
 ### 7. Update rulesets
 
@@ -471,7 +527,8 @@ Optimized validation order:
 5. inspect the generated package README and website linter/rule references for
    the official rule name, page path, links, and table entry
 6. format changed Markdown and run a Prettier check over the generated package
-   README, rule documentation, and website linter/rule references
+   README, rule documentation, and website linter/rule references, using an
+   empty-ignore override and explicit filenames as shown below
 7. `@azure-tools/typespec-azure-rulesets` build and test when rulesets changed
 8. affected package test
 9. if broad local validation is warranted, run the repo build or
@@ -484,7 +541,9 @@ dedicated Website job runs without the skip and is the authoritative Astro check
 and build for generated website content.
 
 For ARM rule promotion, use this command set as the default targeted validation
-loop, replacing `<rule-name>` with the promoted rule file stem:
+loop, setting `RULE_NAME` to the exact official TypeSpec rule name/file stem
+(for example, `use-create-for-put`, not the validator slug
+`put-in-operation-name`):
 
 ```bash
 RULE_NAME="replace-with-rule-name"
@@ -493,8 +552,8 @@ pnpm --filter @azure-tools/typespec-azure-resource-manager exec vitest run "test
 pnpm --filter @azure-tools/typespec-azure-resource-manager build
 pnpm --filter @azure-tools/typespec-azure-resource-manager lint
 pnpm --filter @azure-tools/typespec-azure-resource-manager regen-docs
-pnpm exec prettier --write packages/typespec-azure-resource-manager/README.md "packages/typespec-azure-resource-manager/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-resource-manager/reference/linter.md
-pnpm exec prettier --check packages/typespec-azure-resource-manager/README.md "packages/typespec-azure-resource-manager/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-resource-manager/reference/linter.md
+pnpm exec prettier --ignore-path /dev/null --write packages/typespec-azure-resource-manager/README.md "packages/typespec-azure-resource-manager/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-resource-manager/reference/linter.md "website/src/content/docs/docs/libraries/azure-resource-manager/rules/${RULE_NAME}.md"
+pnpm exec prettier --ignore-path /dev/null --check packages/typespec-azure-resource-manager/README.md "packages/typespec-azure-resource-manager/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-resource-manager/reference/linter.md "website/src/content/docs/docs/libraries/azure-resource-manager/rules/${RULE_NAME}.md"
 pnpm --filter @azure-tools/typespec-azure-rulesets build
 pnpm --filter @azure-tools/typespec-azure-rulesets test
 pnpm --filter @azure-tools/typespec-azure-resource-manager test
@@ -511,14 +570,41 @@ pnpm --filter @azure-tools/typespec-azure-core exec vitest run "test/rules/${RUL
 pnpm --filter @azure-tools/typespec-azure-core build
 pnpm --filter @azure-tools/typespec-azure-core lint
 pnpm --filter @azure-tools/typespec-azure-core regen-docs
-pnpm exec prettier --write packages/typespec-azure-core/README.md "packages/typespec-azure-core/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-core/reference/linter.md
-pnpm exec prettier --check packages/typespec-azure-core/README.md "packages/typespec-azure-core/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-core/reference/linter.md
+pnpm exec prettier --ignore-path /dev/null --write packages/typespec-azure-core/README.md "packages/typespec-azure-core/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-core/reference/linter.md "website/src/content/docs/docs/libraries/azure-core/rules/${RULE_NAME}.md"
+pnpm exec prettier --ignore-path /dev/null --check packages/typespec-azure-core/README.md "packages/typespec-azure-core/src/rules/${RULE_NAME}.md" website/src/content/docs/docs/libraries/azure-core/reference/linter.md "website/src/content/docs/docs/libraries/azure-core/rules/${RULE_NAME}.md"
 pnpm --filter @azure-tools/typespec-azure-rulesets build
 pnpm --filter @azure-tools/typespec-azure-rulesets test
 pnpm --filter @azure-tools/typespec-azure-core test
 pnpm exec cross-env TYPESPEC_SKIP_WEBSITE_BUILD=true pnpm validate:pr
 git diff --check
 ```
+
+The Bash examples use the POSIX empty ignore path `/dev/null`. In Windows
+PowerShell, use `NUL` instead; the equivalent four-file formatting commands are
+below. Set `$Library` to `azure-resource-manager` or `azure-core` and `$RuleName`
+to the exact official rule name:
+
+```powershell
+$Library = "azure-resource-manager"
+$RuleName = "use-create-for-put"
+$DocFiles = @(
+  "packages\typespec-$Library\README.md"
+  "packages\typespec-$Library\src\rules\$RuleName.md"
+  "website\src\content\docs\docs\libraries\$Library\reference\linter.md"
+  "website\src\content\docs\docs\libraries\$Library\rules\$RuleName.md"
+)
+pnpm exec prettier --ignore-path NUL --write @DocFiles
+pnpm exec prettier --ignore-path NUL --check @DocFiles
+```
+
+An explicit empty ignore file is also valid in place of the platform null path.
+Apply this override only to these explicit filenames, never a directory, glob,
+or repo-wide formatting command. Confirm the `--write` output actually lists all
+four files, including `reference/linter.md` and `rules/<official-rule-name>.md`;
+a successful `--check` summary alone does not prove ignored files were checked.
+If needed, use `prettier --ignore-path <empty-ignore-path> --file-info <filename>`
+for each generated file and confirm `"ignored": false`, then rerun the scoped
+write/check commands.
 
 Run a focused code review after steps 1-2 pass and before steps 3-6 when the
 rule logic is non-trivial. This catches semantic gaps before expensive full
@@ -542,7 +628,8 @@ promotion. For every review or validation finding, classify it before editing:
 - **source semantic issue**: promotion is blocked; by default, report the exact
   gap without asking or reopening repair. If the user requested confirmation,
   ask whether they want to reopen lintdiff repair; source changes still require
-  explicit authorization
+  explicit authorization. In queue-controlled mode, return
+  `source-repair-required` to the outer queue under the handoff contract
 - **promotion adaptation issue**: fix only the promotion worktree, and document
   why lintdiff does not need the change
 - **pre-existing or environmental issue**: record the evidence and do not change
@@ -582,6 +669,10 @@ whose head branch and `main` base both belong to `Azure/typespec-azure`. If the
 push is rejected, stop and report the permission blocker; do not push the branch
 to a personal fork instead.
 
+In queue-controlled resumption, update the recorded open draft PR after pushing
+incremental commits; do not create a duplicate. Verify the current remote head
+still matches the handoff before pushing and stop on external changes.
+
 Use this stable PR title pattern:
 
 - `[Swagger Linter Migration] <ValidatorRuleId>`
@@ -602,7 +693,8 @@ It must include:
   and any known validator defects, stale maps, emitted-occurrence duplication, or
   other discrepancies that should not be copied.
 - **Source TypeSpec lintdiff rule:** identify the source lintdiff rule id, local
-  rule name, canonical validator rule slug, source branch, source worktree path,
+  rule name, canonical validator rule slug, source branch, pinned source commit,
+  source worktree path,
   and whether the source worktree had uncommitted rule changes. Link only to the
   original lintdiff source rule file. Use a branch-based GitHub URL, not a
   commit-SHA URL. State that the source rule was assumed done for this run and
@@ -638,8 +730,10 @@ It must include:
   promotion validation is blocked or incomplete. Do not mention skipped lintdiff
   harness validation as a blocker; the harness is not part of promotion.
 - **Promotion sync policy:** semantic gaps found after promotion should block the
-  promotion PR until the user explicitly reopens lintdiff repair; do not describe
-  unapproved source-rule edits as part of the promotion flow.
+  promotion PR until the user explicitly reopens lintdiff repair, or the owning
+  queue starts an authorized source-repair cycle. In queue mode, describe the
+  bounded return-to-development flow and refresh this PR only after clean source
+  review. Never describe source-rule edits as part of promotion itself.
 
 Prefer concrete examples, project names, and before/after evidence. Avoid a
 generic bullet such as "promote lint rule" without explaining the actual rule
@@ -658,10 +752,13 @@ Produce:
   default "do not ask" policy or explicitly selected by the user
 - a clean worktree branch, named from the canonical validator rule slug,
   containing only native-library promotion changes
+- the absolute promotion worktree path, including on an early stop if selected
 - source, tests, docs, rulesets, and change entries in the target packages
 - validation evidence
-- a draft PR link
+- a created or updated draft PR link and verified pushed head SHA
 - any sync notes for the corresponding lintdiff source PR
+- in queue mode, the pinned source SHA, required-validation outcome, and complete
+  cycle handoff for `source-repair-required` or any other blocker
 
 ## Post-run process review
 

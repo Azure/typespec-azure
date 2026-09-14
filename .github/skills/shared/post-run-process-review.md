@@ -61,9 +61,10 @@ For qualifying improvements:
    or release/change entries.
 5. Push the dedicated branch to the personal fork and open an independent PR
    against `Azure/typespec-azure` with base
-   `feature/lintdiff-migration-new` explicitly selected. Describe the observed
-   evidence, rationale, affected skills, and narrow validation in the PR body.
-   Do not add skill changes to the primary task's PR.
+   `feature/lintdiff-migration-new` explicitly selected, following the
+   publication targeting guidance below. Describe the observed evidence,
+   rationale, affected skills, and narrow validation in the PR body. Do not
+   add skill changes to the primary task's PR.
 6. Verify the created PR's base, head, and complete file list. All changes must
    be skill instructions or supporting skill documentation. Do not report
    successful completion if the PR target or scope is wrong.
@@ -72,6 +73,36 @@ If the base is unavailable, the correction is unsafe, or publishing fails,
 stop the skill-update attempt without asking the user or modifying the primary
 workflow's result. Report a concrete operational blocker briefly when a
 qualifying update could not be published. Never merge the PR automatically.
+
+### Publication targeting
+
+- Record the intended base repository and branch, personal-fork owner, and
+  pushed head branch before choosing the publication tool. Git upstream
+  tracking, `branch.<name>.gh-merge-base`, and an app session's comparison base
+  are separate settings; changing one does not prove the others changed.
+- When creating an app-native worktree session for this PR, explicitly pass
+  `base_branch: "feature/lintdiff-migration-new"` rather than accepting the
+  project's default branch. Confirm the resulting session's base before
+  preparing changes. Do not assume registering an existing worktree as a
+  project or branch session preserves its intended PR base.
+- Where the environment permits GitHub CLI PR creation, select both branches
+  explicitly: use `gh pr create --repo Azure/typespec-azure --base
+feature/lintdiff-migration-new --head <fork-owner>:<skill-branch>` with the
+  reviewed title and body. Do not rely on inferred defaults.
+- Honor the environment's PR-creation tool requirements. If an integrated
+  tool is required, inspect its available targeting controls and supported
+  fallback before proceeding; this skill does not authorize bypassing those
+  requirements. A skill change cannot add a missing tool parameter.
+- A mismatched app change overview is a warning, not evidence that GitHub
+  rejected a PR or that the creation tool necessarily uses that same base.
+  Inspect the actual skill-only diff against the fetched base. Resolve the
+  publication target through supported controls; do not knowingly publish
+  against `main`, or report a creation failure when no attempt was made.
+- After creation, query the PR's actual base repository/branch, head
+  repository/branch, and complete file list. If explicit targeting cannot be
+  established, preserve the pushed branch and report the missing control,
+  whether creation was attempted, and the exact intended base/head separately
+  from the primary workflow's outcome.
 
 ## Lightweight validation and CI
 
