@@ -514,35 +514,53 @@ supplemental or self-waive it because its diagnostics appear unrelated.
 
 ### Bounded draft correction
 
-An agent-introduced error in an unpublished draft is not automatically an
-external blocker. Allow the same fix agent up to **three corrective attempts
-total per backlog pass or review round**, not per command or finding. Each
-attempt is one recorded corrective change set followed by validation. The first
-failed validation triggers attempt 1; a new failure during its rerun consumes
+An agent-introduced error in an unpublished draft or its validation command is
+not automatically an external blocker. Allow the same fix agent up to **three
+corrective attempts total per backlog pass or review round**, not per command or
+finding. Each
+attempt is one recorded corrective code or command change set followed by
+validation. Command corrections share this budget; they do not get a separate
+retry allowance. The first failed validation triggers attempt 1; a new failure
+during its rerun consumes
 the next attempt. Do not reset this budget by changing commands, reclassifying
 findings, switching agents or restarting a phase.
 
 1. Preserve the failed command, working directory, exit status, output, draft
    identity and planned validation scope. Establish a concrete causal link to
-   the agent's current task-owned edits: for example, a compiler error at a new
-   call passing an optional value, or a regression assertion caused by the
-   changed rule. A failed command alone is not sufficient evidence.
+   the agent's current task-owned edits or invocation: for example, a compiler
+   error at a new call passing an optional value, a regression assertion caused
+   by the changed rule, or a selector using regex where the runner requires a
+   literal substring. A failed command alone is not sufficient evidence.
 2. If the cause is understood, the correction is in scope, and budget remains,
    record the attempt and correct the draft in place without another user
    prompt. Do not request another Copilot review or consume a review round.
    Respect native API boundaries and promotion's immutable source semantics.
-3. Rerun the failed required check at its original scope after correction.
+3. For an invocation error, inspect the runner's documented or implemented
+   argument semantics and verify the failed command's side effects before
+   rerunning. Correct deterministic quoting, working-directory, option or
+   selector mistakes only when no external failure is involved and the prior
+   execution either made no changes or left fully understood, safely
+   recoverable task-owned state. Preserve the intended validation population;
+   splitting an invalid multi-selector into supported commands must cover the
+   same intended projects. Prove selectors match a nonempty population using
+   the runner's actual matching semantics, not a different shell predicate.
+   Uncertain completion or side effects remain blockers.
+4. Rerun the failed required check at its original intended scope after correction.
    Then run every remaining required check and repeat earlier checks invalidated
    by the new edits. Focused debugging may supplement, never replace, the
    required build, tests, fixtures or corpus. A corpus regression qualifies only
    when evidence proves it is caused by the draft, not an unexplained count gap.
-4. Preserve original failures alongside the corrective diffs and passing reruns.
+5. Preserve original failures alongside the corrective code/command diffs and
+   passing reruns.
    Return `ready-for-publication` only when the final draft satisfies the complete
    required scope. The parent independently verifies that every prior failure
    is accounted for and no failed required check remains unresolved.
-5. Stop on an unknown cause, unsafe/out-of-scope correction, exhausted budget,
-   or an operational failure (such as credentials, network, dependency/tool
-   availability, harness/emitter crash, or publication failure). Do not blindly
+6. Stop on an unknown cause, unsafe/out-of-scope correction, exhausted budget,
+   or an external/indeterminate operational failure (such as credentials, network,
+   dependency/tool availability, harness/emitter crash, or publication failure).
+   An agent-authored argument error rejected before work starts is not a
+   harness crash. This policy never retries review requests, pushes, email
+   sends or other publication operations. Do not blindly
    rerun commands, weaken assertions, skip fixtures, suppress diagnostics or
    waive failures. A confirmed immutable promotion-source defect still returns
    `source-repair-required`; it is not repaired in the promoted copy.

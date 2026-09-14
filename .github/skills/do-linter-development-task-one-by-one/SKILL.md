@@ -251,19 +251,24 @@ orchestration retry fails, record the task's terminal result and continue the qu
 
 Apply the review skill's
 [bounded draft-correction policy](../loop-for-fix-and-review/SKILL.md#bounded-draft-correction)
-to agent-introduced errors in unpublished task-owned changes. Review phases use
-that skill's three-attempt budget per backlog pass or round. Development and
+to agent-introduced errors in unpublished task-owned changes or validation
+commands. Review phases use that skill's three-attempt budget per backlog pass
+or round. Development and
 promotion preparation each allow three corrective attempts per phase per cycle
 under the same causal-evidence, scope, rerun and stop requirements. Track these
 budgets separately; returning to a phase does not reset its count.
 
-The active worker or fix agent corrects eligible compiler, lint, test or semantic
-regression failures in place and reruns the original required checks. It must
-not report a terminal blocker merely because its own draft needs a safe,
+The active worker or fix agent corrects eligible compiler, lint, test, semantic
+regression or deterministic invocation failures in place and reruns the original
+intended required checks. Command corrections share the existing three-attempt
+budget and require verified argument semantics, validation population and
+side-effect safety; they are not worker restarts or external-operation retries.
+It must not report a terminal blocker merely because its own draft needs a safe,
 understood correction and budget remains. Preserve all failed-attempt evidence;
 do not restart the worker, consume a source-repair cycle, or weaken validation.
-Operational failures, unknown causes, exhausted budgets and confirmed immutable
-promotion-source defects retain their existing stop/handoff behavior.
+External/indeterminate operational failures, unknown causes, exhausted budgets
+and confirmed immutable promotion-source defects retain their existing
+stop/handoff behavior.
 
 ## Bounded source-repair loop
 
@@ -410,10 +415,12 @@ Give each top-level subagent all of these instructions:
 > expected to exceed 10 minutes, run it in a form that permits monitoring and
 > append another heartbeat at least every 10 minutes until it ends.
 >
-> For agent-introduced draft errors, apply the local draft-correction policy
-> above. Record the causal evidence and attempt count, correct eligible failures
+> For agent-introduced draft or validation-command errors, apply the local
+> draft-correction policy above. Record the causal evidence and attempt count, correct eligible failures
 > in place, and rerun the failed required command plus affected remaining checks.
-> Do not stop merely on the first build/test failure in your own draft. Do stop
+> Do not stop merely on the first build/test failure in your own draft or a
+> safely correctable invocation mistake. Confirm command semantics and side
+> effects, preserve the intended scope and count the correction. Do stop
 > on ineligible failures or exhausted budget, and never publish a failing draft.
 >
 > Do not fetch, pull, merge, rebase, or reset the target or rule branch before
