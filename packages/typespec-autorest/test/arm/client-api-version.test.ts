@@ -107,6 +107,12 @@ describe("client API version inference", () => {
         ${suppressStandardOperations}
         @get @route("/feature-b") op get(): string;
       }
+
+      @Azure.ResourceManager.featureFile(Features.Common)
+      interface CommonOperations {
+        ${suppressStandardOperations}
+        @get @route("/common") op get(): string;
+      }
     `);
 
     expectDiagnosticEmpty(diagnostics);
@@ -172,6 +178,52 @@ describe("client API version inference", () => {
     expect(openapi.info.version).toBe("fallback-version");
   });
 
+  it("retains the fallback for an inconsistent feature while overriding a consistent feature", async () => {
+    const [openapi, diagnostics] = await emitFeatures(`
+      @service
+      @info(#{version: "fallback-version"})
+      @Azure.ResourceManager.featureFiles(Features)
+      @armProviderNamespace("Microsoft.Test")
+      namespace Microsoft.Test;
+
+      enum Features {
+        FeatureA,
+        FeatureB,
+      }
+
+      @Azure.ResourceManager.featureFile(Features.FeatureA)
+      @Azure.Core.Legacy.overrideApiVersion("2020-01-01")
+      interface FeatureAFirst {
+        ${suppressStandardOperations}
+        @get @route("/feature-a/first") op get(): string;
+      }
+
+      @Azure.ResourceManager.featureFile(Features.FeatureA)
+      @Azure.Core.Legacy.overrideApiVersion("2021-02-02")
+      interface FeatureASecond {
+        ${suppressStandardOperations}
+        @get @route("/feature-a/second") op get(): string;
+      }
+
+      @Azure.ResourceManager.featureFile(Features.FeatureB)
+      @Azure.Core.Legacy.overrideApiVersion("2022-03-03")
+      interface FeatureBOperations {
+        ${suppressStandardOperations}
+        @get @route("/feature-b") op get(): string;
+      }
+    `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-autorest/inconsistent-client-api-version-override",
+      severity: "warning",
+      message:
+        "Operations emitted to the same OpenAPI document must specify one consistent `@overrideApiVersion` value. Found values: 2020-01-01, 2021-02-02. The normal document version fallback-version will be retained.",
+    });
+    expect(diagnostics[0].target.kind).toBe("Namespace");
+    expect(openapi.featureA.info.version).toBe("fallback-version");
+    expect(openapi.featureB.info.version).toBe("2022-03-03");
+  });
+
   it("gives explicit feature versions highest precedence and suppresses file mismatch warnings", async () => {
     const [openapi, diagnostics] = await emitFeatures(`
       @service
@@ -205,6 +257,18 @@ describe("client API version inference", () => {
         ${suppressStandardOperations}
         @get @route("/second") op get(): string;
       }
+
+      @Azure.ResourceManager.featureFile(Features.FeatureB)
+      interface FeatureBOperations {
+        ${suppressStandardOperations}
+        @get @route("/feature-b") op get(): string;
+      }
+
+      @Azure.ResourceManager.featureFile(Features.Common)
+      interface CommonOperations {
+        ${suppressStandardOperations}
+        @get @route("/common") op get(): string;
+      }
     `);
 
     expectDiagnosticEmpty(diagnostics);
@@ -236,6 +300,18 @@ describe("client API version inference", () => {
       interface FeatureAOperations {
         ${suppressStandardOperations}
         @get @route("/feature-a") op get(): string;
+      }
+
+      @Azure.ResourceManager.featureFile(Features.FeatureB)
+      interface FeatureBOperations {
+        ${suppressStandardOperations}
+        @get @route("/feature-b") op get(): string;
+      }
+
+      @Azure.ResourceManager.featureFile(Features.Common)
+      interface CommonOperations {
+        ${suppressStandardOperations}
+        @get @route("/common") op get(): string;
       }
     `);
 
