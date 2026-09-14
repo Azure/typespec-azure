@@ -16,8 +16,27 @@ projectionScope: http-reachable
 PATCH body properties must correspond to properties in the PUT resource model.
 
 The local lint `tsp-lintdiff-local-linter/patch-properties-correspond-to-put-properties`
-compares the JSON leaf-property names emitted for corresponding ARM PATCH and PUT request bodies.
-Like the Swagger rule, nesting containers do not contribute to property identity.
+compares JSON leaf-property names in corresponding ARM PATCH and PUT request bodies through
+supported compiler, HTTP, and versioning metadata. Like the Swagger rule, nesting containers
+with direct payload properties do not contribute to property identity.
+
+For each service version, `resolveVersions` supplies the service and dependency version map.
+`getAddedOnVersions` and `getRemovedOnVersions` determine operation, interface, explicit body
+parameter, and model-property availability before pairing operations or comparing leaves.
+Inherited and spread properties and nested namespaces use the same availability check.
+Diagnostics are deduplicated across versions by PATCH operation for body errors and by source
+target plus JSON name for missing properties.
+
+This is **availability-aware comparison, not historical shape projection**: `@renamedFrom`,
+`@typeChangedFrom`, historical route changes, and historical body-type changes are not reconstructed.
+Current names and types can therefore produce inaccurate historical results; neither the native
+tests nor selected-version reachability filtering establishes full historical equivalence.
+Production logic does not emit Swagger, import an emitter, use OpenAPI/TCGC helpers, or mutate
+the compiler graph. See [migration evidence](migration.md) for the observed limits.
+
+The provider-namespace guard isolates ARM services in lintdiff's mixed all-rules runner.
+Promotion to an ARM-only ruleset should remove this infrastructure guard, retain ordinary and
+nested-namespace coverage, and leave the new official rule disabled by default.
 
 The staging Swagger implementation compares whole emitted property-schema objects with deep
 equality, despite the rule documentation defining correspondence by property presence. That
