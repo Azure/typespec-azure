@@ -19,6 +19,12 @@ An error response without a body is not checked. Success responses, synchronous
 operations, and GET operations are also outside this rule.
 Operations are checked even without a `@service` decorator.
 
+## Suppression
+
+Suppress only when required to match an existing API; otherwise use
+`Azure.ResourceManager.CommonTypes.ErrorResponse` for long-running operation
+error payloads.
+
 ## ❌ Incorrect
 
 ```tsp
