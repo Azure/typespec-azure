@@ -97,6 +97,13 @@ apply this narrowly scoped contract. Standalone promotion behavior is unchanged.
   development PR to merge. Pass the queue's no-skill-edits/no-skill-update-PR
   constraint to all delegated agents and append milestones to the shared log.
 - For initial promotion, create/select the separate promotion worktree as usual.
+  When the handoff selects
+  [app-session execution](../do-linter-development-task-one-by-one/app-session-execution.md),
+  reuse the supplied, verified app-owned promotion worktree even on cycle `0`.
+  Its main session agent owns PR creation. Verify its `origin/main` base and
+  distinct branch before setup; do not create a third worktree or publish from
+  the development/coordinator session. Keep the app-returned directory name
+  and record the canonical validator slug in the branch suffix and handoff.
   Report its absolute path and branch as soon as selected, including on failure
   before PR creation.
 - On a repair cycle, reuse the recorded promotion worktree, branch, and open
@@ -280,7 +287,10 @@ policy.
 2. Verify that `origin` points to the canonical `Azure/typespec-azure`
    repository, then fetch `origin/main`. Do not use a personal-fork remote for
    either the base or the eventual PR source branch.
-3. Create a new worktree and dedicated branch from `origin/main`. Use the
+3. Create a new worktree and dedicated branch from `origin/main`, or verify and
+   reuse the app-owned promotion worktree supplied by the queue contract above.
+   In that mode, the app has already created the separate checkout; this step
+   must not replace it. Use the
    canonical validator rule slug in both the branch and worktree directory name
    so the promotion source can be linked and the worktree can be reused later,
    for example:
