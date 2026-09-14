@@ -298,7 +298,7 @@ function generateConstructors(
     ): string {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
       let bodyText = `${indent.get()}if options == nil {\n`;
-      bodyText += `${indent.push().get()}options = &${optionsTypeName}{}\n`;
+      bodyText += `${indent.push().get()}options = ${optionsTypeName}{}\n`;
       bodyText += `${indent.pop().get()}}\n`;
       let apiVersionConfig = "";
       // check if there's an api version parameter
@@ -410,7 +410,7 @@ function generateConstructors(
               const tokenPolicy = `\n${indent.get()}PerCall: []policy.Policy{\n${indent.get()}runtime.NewBearerTokenPolicy(credential, []string{c.Audience + "${helpers.splitScope(credentialParam.type.scopes[0]).scope}"}, ${tokenPolicyOpts}),\n${indent.get()}},\n`;
               indent.pop(); // back to level 1
               prolog = emitProlog(
-                go.getTypeDeclaration(clientOptions, client.pkg),
+                go.getTypeDeclaration(clientOptions, client.pkg, true),
                 true,
                 tokenPolicy,
               );
@@ -434,7 +434,7 @@ function generateConstructors(
           break;
       }
     } else {
-      prolog = emitProlog(go.getTypeDeclaration(clientOptions, client.pkg), false);
+      prolog = emitProlog(go.getTypeDeclaration(clientOptions, client.pkg, true), false);
     }
 
     // add client options last
@@ -466,7 +466,7 @@ function generateConstructors(
         }
         ctorText += `${indent.get()}${param.name} := ${helpers.formatLiteralValue(param.style.defaultValue, false)}\n`;
         ctorText += `${indent.get()}if options.${name} != ${helpers.zeroValue(param)} {\n`;
-        ctorText += `${indent.push().get()}${param.name} = ${helpers.star(param.byValue)}options.${name}\n`;
+        ctorText += `${indent.push().get()}${param.name} = options.${name}\n`;
         ctorText += `${indent.pop().get()}}\n`;
       }
     };
