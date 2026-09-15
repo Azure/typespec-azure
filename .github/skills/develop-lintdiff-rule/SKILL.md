@@ -10,6 +10,16 @@ user-invocable: true
 Use this skill to implement or correct migrated Swagger validator rules in
 `packages/typespec-lintdiff`.
 
+For dispatcher and standalone/queued worker invocations, perform the read-only
+ARM eligibility gate before creating anything, then apply the shared
+[publication preflight](../do-linter-development-task-one-by-one/app-session-execution.md#publication-preflight)
+and [lifecycle classification](../do-linter-development-task-one-by-one/app-session-execution.md#lifecycle-and-reuse).
+Establish the owner, actual root/branch, canonical base, head repository, push
+destination and required backend before expensive setup or edits. Completion
+delivery is required only for delegated workflows. `origin` in the commands
+below denotes the verified canonical fetch remote, not an assumed push target;
+substitute the actual canonical remote name when different.
+
 The invocation names one or more Swagger validator rules:
 
 ```text
@@ -56,9 +66,14 @@ Fetch the user-supplied target branch from `origin` and use
 `refs/remotes/origin/<target-branch>` as the source of truth. Do not use or
 update a same-named local branch; it may be stale or checked out in another
 worktree. Before deeper investigation, use GitHub's exact head/base and PR-title
-evidence to detect whether this rule's migration PR already merged. Also compare
-the rule branch with the remote target. If a merged PR already supplied the
-migration, stop before dependency setup and report the existing PR evidence.
+evidence to detect whether this rule's migration PR already merged, verifying
+the actual repository/head/base and semantic diff rather than title alone. Also
+compare the rule branch with the remote target. For initial migration, a merged
+PR already supplying the migration stops duplicate work before dependency setup.
+It does not prohibit a separately user-authorized post-merge bug fix under the
+shared lifecycle contract. Such a fix gets its own authorized repair branch and
+scope; never reopen the merged PR or invent queue context. Reapply the coverage
+gates below to the proposed defect, not just the historical migration.
 An empty diff alone is not a stop condition: a freshly prepared rule branch
 normally has no changes, and an existing implementation may still need migration
 evidence. Continue the semantic coverage check below and, when its classification
@@ -172,7 +187,7 @@ the publication binding before dependency work: a session-bound PR must be
 created by the main agent of the app session owning the supplied worktree,
 not by a coordinator's subagent that merely changed directory. Follow the
 [backend preflight](../do-linter-development-task-one-by-one/app-session-execution.md#preflight-and-existing-worktrees).
-Then verify
+Apply bounded checkout readiness before accepting the checkout. Then verify
 that the supplied typespec-azure worktree is on the rule branch, the supplied
 specs worktree is at the pinned `specsCommit`, and both are clean except for
 known in-progress changes for that rule. Skip branch and worktree creation,
@@ -182,6 +197,13 @@ described below, then execute the Development workflow. A missing or incomplete
 dependency installation is recoverable worker setup, not a reason to require
 another user invocation. Never accept multiple rule IDs in worker mode and
 never delegate the complete workflow to a development subagent.
+
+For publication-only recovery of already validated completed work, follow the
+shared lifecycle and publication-recovery contract instead of rerunning worker
+discovery, dependency setup and development unnecessarily. Verify matching code,
+dependency/tool context and required validation evidence; rerun invalidated
+checks, not an entire migration by default. Ownership adoption still requires
+its separate authorization and does not permit silent commit transfers.
 
 ### Queue-controlled source repair
 
@@ -199,8 +221,9 @@ cycle `0` uses ordinary worker development and does not require an existing PR.
   is a blocker; do not create a replacement PR or overwrite newer work.
 - Re-run worker setup, eligibility and coverage gates, evidence gathering, and
   the full required development workflow. The existing open development PR is
-  not a reason to skip repair. Existing merged-PR and coverage stop conditions
-  still apply; report them rather than forcing development through.
+  not a reason to skip repair. A closed/merged recorded PR still blocks this
+  queue repair mode; the separately authorized post-merge lifecycle is not an
+  automatic queue restart. Coverage stop conditions still apply.
 - Use the handoff's source-defect evidence and acceptance criteria to scope the
   repair. Preserve earlier commits, add regression coverage, refresh
   `migration.md`, and append focused repair commits only after required
@@ -961,10 +984,11 @@ creating a draft PR.
    target branch.
 3. Commit only the explicit rule-related paths and any required fixture-harness
    dependency repair identified above.
-4. Push the rule branch to the `origin` repository. Do not push or update the
-   target branch; the fetched remote target is the source of truth.
-5. Create the pull request in the `origin` repository as a **draft**, with the
-   rule branch as head and the user-supplied target branch as base. Do not mark
+4. Push the rule branch to the preflight's verified personal-fork destination
+   for a new head, or the recorded head repository for an existing task PR.
+   Use an explicit remote/refspec; do not push or update the canonical target.
+5. Create the pull request in `Azure/typespec-azure` as a **draft**, with the
+   recorded head repository/branch and user-supplied target branch as base. Do not mark
    it ready for review; the user decides when the migration evidence and rule
    behavior are ready for formal review.
    In queue-controlled source repair, verify and update the recorded open draft
@@ -974,17 +998,22 @@ creating a draft PR.
    the required creation tool. Recheck the session binding immediately before
    creation and verify the actual GitHub repository/base/head/SHA immediately
    afterward, before returning a URL or starting review.
-   If creation returns an ambiguous transport error or claims a conflicting
-   PR, query GitHub for the exact repository/head/base first. Reuse only a
-   matching open PR with the expected pushed head. Do not automatically resend
-   an uncertain creation request. A CLI fallback is permitted only when the
-   environment allows it; if the required tool restricts fallback to an
-   explicitly authorized failure, honor that restriction. This skill does not
-   authorize bypassing it or treating a wrong-target PR as fallback permission.
+   Apply the shared
+   [duplicate-safe publication recovery](../do-linter-development-task-one-by-one/app-session-execution.md#publication-recovery)
+   before creation and after any failure. Its single evidenced task-local
+   correction/retry is not a worker restart; ambiguous transport/API failures
+   remain blockers. Only a required-tool failure explicitly permitting a
+   fallback authorizes that fallback.
    Never return an unrelated, closed, or merged PR as successful publication.
 6. Set the PR title to the exact stable pattern
    `[Swagger Linter Migration] <ValidatorRuleId> (origin)`, replacing
-   `<ValidatorRuleId>` with the original Swagger validator rule ID.
+   `<ValidatorRuleId>` with the original Swagger validator rule ID. `(origin)`
+   denotes the source migration (as opposed to promotion), not the Git remote
+   or head repository. Record actual base/head identities separately.
+   For separately authorized post-merge source repair, use
+   `[Swagger Linter Repair] <ValidatorRuleId>` and link the original merged
+   migration plus the new defect scope. Preserve an existing OPEN task PR's
+   recorded title unless a correction is part of the request.
 7. Write the PR description as an engineering explanation, not only a change
    list. It must include:
    - **Original Swagger linter:** include both of these direct GitHub hyperlinks

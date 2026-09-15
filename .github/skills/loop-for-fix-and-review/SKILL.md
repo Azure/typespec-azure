@@ -79,8 +79,11 @@ own fresh collector/fixer pair; the development worker stays idle throughout.
 The same model pin, follow-up verification, evidence gates, publication approval,
 five-round limit and stop conditions apply. Run all target operations explicitly
 in the handed-off worktree. Return the reviewed/pushed head, complete review
-result and evidence to the queue before it resumes the worker. Do not switch
-owners after a review failure or treat a handoff as clean verification.
+result and evidence to the queue. In `explicit-target` lifecycle mode, the
+queue resumes the whole-cycle worker with that reviewed SHA. In `app-session`
+lifecycle mode, keep the development owner idle; the outer queue dispatches a
+distinct promotion owner with the reviewed SHA instead. Do not switch owners
+after a review failure or treat a handoff as clean verification.
 
 In promotion PR mode, a confirmed `source-semantic-issue` still stops this loop
 without changing the source or making the promoted copy diverge. Return the
@@ -136,15 +139,20 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
 
 ## Initialize
 
-1. Resolve the pull request to its canonical URL, repository, number, base
+1. Before creating agents or collecting review evidence, apply the shared
+   [publication preflight](../do-linter-development-task-one-by-one/app-session-execution.md#publication-preflight)
+   for existing PRs. Record the publication binding and retain the PR's head
+   repository/owner and head branch for publication routing; do not retarget a
+   canonical or fork head to a different remote as part of this loop.
+2. Resolve the pull request to its canonical URL, repository, number, base
    branch, head branch, head repository owner, and current head SHA:
 
    ```bash
    gh pr view "$PR" --json url,number,state,isDraft,baseRefName,headRefName,headRepositoryOwner,headRefOid
    ```
 
-2. Confirm the pull request is open.
-3. In standard PR mode, confirm the current worktree is the pull request's head
+3. Confirm the pull request is open.
+4. In standard PR mode, confirm the current worktree is the pull request's head
    branch and has no unrelated changes. Do not overwrite, discard, or include
    unrelated work.
    In promotion PR mode, the orchestrating session may start in another
@@ -162,11 +170,11 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
    After pinning the path, run every promotion filesystem inspection,
    validation, edit, commit, and push explicitly in that target worktree; never
    rely on the orchestrating session's current directory.
-4. In promotion PR mode, resolve and record the immutable lintdiff source rule,
+5. In promotion PR mode, resolve and record the immutable lintdiff source rule,
    source branch or ref, source commit, and migration evidence identified by the
    promotion PR. If this provenance is missing or cannot be verified, stop as a
    blocker rather than guessing the source behavior.
-5. Create the two persistent subagents once in background mode so the parent can
+6. Create the two persistent subagents once in background mode so the parent can
    deliver later rounds with `write_agent`. A sync-mode task is not persistent
    for this workflow and must not be used. Pin the fix subagent to
    `gpt-5.6-sol`; do not allow automatic model selection or substitution for
@@ -175,7 +183,7 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
    processing backlog comments or requesting a review, verify that both agent
    IDs accept follow-up messages; if either does not, stop before GitHub or
    worktree side effects.
-6. Maintain a round ledger containing:
+7. Maintain a round ledger containing:
    - pull request mode: `standard` or `promotion`
    - absolute target worktree path in promotion PR mode
    - promotion source provenance when applicable
@@ -336,13 +344,20 @@ ledger. It owns these steps:
    Run all collector and supporting Python commands with `python -X utf8`
    (prefixed by `mise exec --` when available). Read the collector's structured,
    ASCII-escaped JSON instead of printing raw Unicode review bodies through
-   ad-hoc scripts.
+   ad-hoc scripts. After `verify-request`, poll from the verified request JSON
+   instead of extracting or reparsing timestamps in shell code:
+
+   ```powershell
+   mise exec -- python -X utf8 .github\skills\loop-for-fix-and-review\review_evidence.py poll --repo $repo --pr $pr --request "$evidence\request\result.json" --output "$evidence\polling"
+   ```
 
 5. Poll the paginated REST pull-reviews endpoint,
-   `GET /repos/{owner}/{repo}/pulls/{number}/reviews`, at a moderate interval
+   `GET /repos/{owner}/{repo}/pulls/{number}/reviews`, at a positive moderate interval
    rather than repeatedly requesting reviews. Treat its raw response as the
    source of truth for review completion and the numeric review ID. Allow up to
-   30 minutes, using monotonic elapsed time only for deadline accounting.
+   30 minutes, using the maximum of wall-clock elapsed time since the active
+   request's raw UTC `created_at` and monotonic elapsed time for the current
+   invocation.
    - Across REST, GraphQL, timeline, and comment surfaces, normalize login
      values case-insensitively and accept exactly `Copilot`,
      `copilot-pull-request-reviewer`, and
@@ -358,34 +373,37 @@ ledger. It owns these steps:
    - Treat a non-2xx response, incomplete or failed pagination, parse failure,
      missing required field, or timestamp-validation failure as a
      collector/polling failure, never as a successful empty result.
-   - Compare submission timestamps without changing their timezone. Prefer
-     filtering the raw GitHub JSON with `gh api --jq` and comparing normalized
-     UTC instants. If PowerShell parses the response with `ConvertFrom-Json`,
-     compare its UTC `DateTime` value directly with the request event's
-     `UtcDateTime`. Never pass that converted `DateTime` back through
-     `[DateTimeOffset]::Parse(...)`: PowerShell can stringify it without the
-     `Z`, reinterpret it in the local timezone, and make a new review appear
+   - Compare submission timestamps only through the bundled collector's raw UTC
+     JSON handling, or equivalent stdlib code that preserves GitHub's `Z`
+     timestamp strings. Do not parse GitHub JSON with PowerShell and then feed
+     the converted `DateTime` back through another parser; that can drop `Z`,
+     reinterpret the value in the local timezone, and make a new review appear
      older than the request.
-     A safe PowerShell comparison for `ConvertFrom-Json` output is:
-
-     ```powershell
-     $eventUtc = [DateTimeOffset]::Parse($activeRequestCreatedAt).UtcDateTime
-     $submittedUtc = if ($review.submitted_at -is [DateTime]) {
-       $review.submitted_at.ToUniversalTime()
-     } else {
-       [DateTimeOffset]::Parse(
-         [string]$review.submitted_at,
-         [Globalization.CultureInfo]::InvariantCulture
-       ).UtcDateTime
-     }
-     $isNewReview = $submittedUtc -ge $eventUtc
-     ```
-
-   - Immediately before the deadline could be reported, perform a mandatory,
-     independent, fully paginated REST pull-reviews refetch. It must discard or
-     bypass collector caches and accumulated state and avoid conditional-cache
-     headers or behavior where practical. Preserve both the ordinary-poll and
-     final-refetch evidence.
+   - Use the collector's `poll` action for the executable bounded wait. It must
+     anchor the original deadline to the verified request event's raw UTC
+     `created_at` (including already-pending-active provenance), preserve any
+     earlier recorded deadline across `--resume-from`, cap the polling window at
+     30 minutes, use a positive moderate interval, write distinct evidence directories,
+     and cap subprocess/API timeouts by the remaining ordinary-poll deadline.
+     Omitting `--resume-from` must not start another 30-minute window for an old
+     verified request. Resumed artifacts must preserve a deadline anchor exactly
+     equal to the active request's original raw UTC `created_at`. When ordinary
+     polling records a pending response and will continue, it must write an
+     explicit nonterminal checkpoint; `--resume-from` accepts only that
+     in-progress checkpoint and rejects failed or completed artifacts. When
+     ordinary polling reaches a pending/deadline outcome without a collector
+     error, the mandatory independent final refetch runs once before reporting
+     failure, even after the ordinary polling deadline has expired; it uses a
+     separately recorded bounded allowance capped at 60 seconds, not a new
+     polling window.
+     The final refetch must discard or bypass
+     collector caches and accumulated state and avoid conditional-cache headers
+     or behavior where practical. Preserve both the ordinary-poll and
+     final-refetch evidence, including timeout metadata and any partial
+     stdout/stderr captured from a hung `gh` invocation. A flag or resumption
+     artifact never authorizes recovery from a failed collector or terminal
+     attempt; only the parent local-collector recovery gate can approve one
+     read-only recollection, and it cannot request another review.
    - If the final refetch finds the completed review, classify ordinary polling
      as unreliable and continue with that review; do not call the result a
      Copilot timeout. If the final refetch does not establish a completed

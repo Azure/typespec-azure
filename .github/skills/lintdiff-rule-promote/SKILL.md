@@ -14,6 +14,18 @@ Promotion is a handoff workflow, not a rule-design workflow. The rule's source
 PR in `packages/typespec-lintdiff` remains the source of truth while the
 official-library PR is prepared in a clean worktree.
 
+Before expensive source investigation, setup or edits, apply the shared
+[publication preflight](../do-linter-development-task-one-by-one/app-session-execution.md#publication-preflight)
+and lifecycle classification for standalone as well as queued runs. Select the
+backend, owner, worktree, canonical base, head repository and push destination.
+For session-bound tools, standalone promotion also needs its own verified app
+owner based on canonical `main`; use the shared setup-only/readiness procedure
+with promotion identities. Do not first create a plain Git worktree that the
+required tool cannot publish. Completion delivery is needed only when delegated.
+`origin` below denotes the verified canonical fetch remote; substitute its actual
+name when different. Publication-only recovery uses the shared recovery contract,
+not another source investigation or promotion run when validation remains valid.
+
 ## Native semantic boundary
 
 Apply the development skill's
@@ -63,11 +75,11 @@ See the
   lintdiff development or repair flow first.
 - Do not edit or clean up the current lintdiff worktree as part of promotion.
   The promotion PR must be created from a separate worktree.
-- Create and push the promotion PR's source branch in the canonical
-  `Azure/typespec-azure` repository through the `origin` remote, not in a
-  personal fork. Verify that `origin` points to `Azure/typespec-azure` before
-  creating the worktree. If `origin` is not writable, stop and report the
-  permission blocker; do not silently fall back to a fork.
+- Fetch the promotion base from canonical `Azure/typespec-azure:main` and
+  default a new dedicated promotion head to the user's verified personal fork.
+  Existing task PRs keep their recorded head repository and branch. Verify URL
+  identity and permissions, not remote names; never change destinations after
+  a failed push as an operational fallback.
 - Treat the source lintdiff rule as immutable during promotion. Do not
   change `packages/typespec-lintdiff` source, fixtures, snapshots, package
   manifests, or docs unless the user explicitly redirects from promotion back to
@@ -129,7 +141,7 @@ apply this narrowly scoped contract. Standalone promotion behavior is unchanged.
   canonical PR identity, current pushed SHA, and local source worktree against
   the handoff. Pin that exact commit as immutable source for this invocation;
   do not silently consume a newer branch tip or uncommitted source changes.
-- Use the existing destination analysis, same-repository `origin/main` target,
+- Use the existing destination analysis, canonical `origin/main` base,
   disabled-by-default rulesets, and required validation. Do not wait for the
   development PR to merge. Pass the queue's no-skill-edits/no-skill-update-PR
   constraint to all delegated agents and append milestones to the shared log.
@@ -328,11 +340,11 @@ policy.
 ### 3. Create a clean promotion worktree
 
 1. Keep the current lintdiff worktree untouched.
-2. Verify that `origin` points to the canonical `Azure/typespec-azure`
-   repository, then fetch `origin/main`. Do not use a personal-fork remote for
-   either the base or the eventual PR source branch.
+2. Resolve and verify the canonical `Azure/typespec-azure` fetch remote, then
+   fetch its `main`. Do not use the personal fork as base; it is the default
+   new-head push destination, independently recorded in publication preflight.
 3. Create a new worktree and dedicated branch from `origin/main`, or verify and
-   reuse the app-owned promotion worktree supplied by the queue contract above.
+   reuse the app-owned promotion worktree established by shared preflight.
    In that mode, the app has already created the separate checkout; this step
    must not replace it. Use the
    canonical validator rule slug in both the branch and worktree directory name
@@ -731,11 +743,15 @@ promotion diff. The review should inspect:
 - absence of generated lintdiff corpus artifacts
 
 Commit only the promotion-worktree changes needed for the native-library PR.
-Push the promotion branch to `origin` (for example,
-`git push --set-upstream origin HEAD`) and create a same-repository draft PR
-whose head branch and `main` base both belong to `Azure/typespec-azure`. If the
-push is rejected, stop and report the permission blocker; do not push the branch
-to a personal fork instead.
+Push the promotion branch to the preflight's verified head repository using an
+explicit remote/refspec (personal fork for a new head; recorded repository for an
+existing PR). Create a draft PR against `Azure/typespec-azure:main` using the
+required publication tool from the verified owner. A rejected push is a blocker,
+not permission to change head repositories. Apply the shared
+[publication checks and duplicate-safe recovery](../do-linter-development-task-one-by-one/app-session-execution.md#publication-recovery);
+verify actual base/head repository, branch, SHA, draft status and full file scope
+before reporting success. The single evidenced creation-configuration correction
+is separate from draft/source-repair/review budgets, never a workflow restart.
 
 In queue-controlled resumption, update the recorded open draft PR after pushing
 incremental commits; do not create a duplicate. Verify the current remote head
@@ -765,7 +781,8 @@ It must include:
   source worktree path,
   and whether the source worktree had uncommitted rule changes. Link only to the
   original lintdiff source rule file. Use a branch-based GitHub URL, not a
-  commit-SHA URL. State that the source rule was assumed done for this run and
+  commit-SHA URL, and use the recorded source head repository (which may be a
+  personal fork), not an assumed canonical branch URL. State that the source rule was assumed done for this run and
   was not modified during promotion; do not claim explicit user confirmation
   of done status unless it was actually given.
 - **Destination analysis:** explain the selected official package, plausible
@@ -779,7 +796,7 @@ It must include:
   relevant original lintdiff fixture to the exact native `vitest` test title or
   titles that cover it, including compliant cases and any review-regression
   tests. Link each fixture name to its original `main.tsp` with a branch-based
-  GitHub URL, and write the native title exactly as it appears in the promoted
+  GitHub URL in the recorded source repository, and write the native title exactly as it appears in the promoted
   test file, including the full `it("...")` string. If one fixture maps to
   multiple native tests, include one row per test title; if one native test
   combines multiple fixtures or semantic branches, include each fixture/branch in
