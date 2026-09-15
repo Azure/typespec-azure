@@ -384,10 +384,13 @@ ledger. It owns these steps:
      30 minutes, use a moderate interval, write distinct evidence directories,
      and cap subprocess/API timeouts by the remaining ordinary-poll deadline.
      Omitting `--resume-from` must not start another 30-minute window for an old
-     verified request. The mandatory independent final refetch always runs once
-     before reporting failure, even after the ordinary polling deadline has
-     expired; it uses a separately recorded bounded allowance capped at 60
-     seconds, not a new polling window. The final refetch must discard or bypass
+     verified request. Resumed artifacts must preserve a deadline anchor exactly
+     equal to the active request's original raw UTC `created_at`. When ordinary
+     polling reaches a pending/deadline outcome without a collector error, the
+     mandatory independent final refetch runs once before reporting failure,
+     even after the ordinary polling deadline has expired; it uses a separately
+     recorded bounded allowance capped at 60 seconds, not a new polling window.
+     The final refetch must discard or bypass
      collector caches and accumulated state and avoid conditional-cache headers
      or behavior where practical. Preserve both the ordinary-poll and
      final-refetch evidence, including timeout metadata and any partial

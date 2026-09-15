@@ -425,6 +425,9 @@ def resume_polling_state(resume_from, repo, pr, request):
     if polling.get("head") != request["head"] or polling.get("request") != request["request"]:
         raise EvidenceError("Previous polling artifact is for a different active request")
     utc(polling["deadline_started_at"])
+    utc(request["request"]["created_at"])
+    if polling["deadline_started_at"] != request["request"]["created_at"]:
+        raise EvidenceError("Previous polling deadline anchor does not match the active request")
     if positive_number(polling["deadline_seconds"], "deadline") > DEFAULT_DEADLINE_SECONDS:
         raise EvidenceError("Previous polling artifact exceeds the maximum deadline")
     return polling
@@ -489,7 +492,6 @@ def poll(repo, pr, request, output, deadline_seconds=DEFAULT_DEADLINE_SECONDS,
         final_timeout = min(
             DEFAULT_API_TIMEOUT_SECONDS,
             final_refetch_seconds,
-            max(0.001, remaining) if remaining > 0 else final_refetch_seconds,
         )
         final = collect_once(
             repo, pr, final_dir, head, request_time, review_id=review_id,

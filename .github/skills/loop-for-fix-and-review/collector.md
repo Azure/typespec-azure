@@ -57,14 +57,18 @@ mise exec -- python -X utf8 $collector threads --repo $repo --pr $pr --output "$
 `poll` records every ordinary poll and anchors the original polling deadline to
 the verified request's raw UTC `request.created_at`, including strict
 already-pending-active provenance. Passing `--resume-from` preserves the earlier
-recorded deadline; omitting it cannot create another 30-minute window for the
-same old request. `--deadline-seconds` may shorten the window but is capped at
-30 minutes. If the ordinary deadline has expired, `poll` skips ordinary polling
-and performs one mandatory independent final refetch using a separately
-recorded bounded allowance capped at 60 seconds. Subprocess/API timeouts are
-capped by the remaining ordinary deadline during ordinary polls and by the final
-refetch allowance for the final read. `pending` is reported as a failure unless
-that independent final refetch establishes a completed review. A completed
+recorded deadline, and the resumed deadline anchor must exactly equal the active
+request's original raw UTC `created_at`; omitting `--resume-from` cannot create
+another 30-minute window for the same old request. `--deadline-seconds` may
+shorten the window but is capped at 30 minutes. If the ordinary deadline has
+expired or ordinary polling only finds `pending`, `poll` performs one mandatory
+independent final refetch using a separately recorded bounded allowance capped
+at 60 seconds before reporting that pending/deadline failure. Subprocess/API
+timeouts are capped by the remaining ordinary deadline during ordinary polls and
+by the final refetch allowance for the final read. A failed ordinary collector
+attempt remains a terminal collector failure and does not trigger automatic
+final recollection. `pending` is reported as a failure unless that independent
+final refetch establishes a completed review. A completed
 `COMMENTED` review counts; approval is not required. Already-pending-active
 request artifacts are accepted only when they include strict active-request
 provenance for the same head, request event and before/after requested-reviewer

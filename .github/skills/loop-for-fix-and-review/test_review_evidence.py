@@ -402,9 +402,9 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(len(set(directories)), 3)
 
     def test_poll_deadline_final_refetch_no_deadline_reset_and_pending_recovery_fails(self):
-        request = self.active_request()
-        previous = self.scratch_root / "previous.json"
         old_start = (dt.datetime.now(evidence.UTC) - dt.timedelta(seconds=2)).isoformat().replace("+00:00", "Z")
+        request = self.active_request(old_start)
+        previous = self.scratch_root / "previous.json"
         previous.write_text(json.dumps({
             "repo": "owner/repo", "pr": 1,
             "polling": {
@@ -426,6 +426,61 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(pending["status"], "failed")
         self.assertIn("Final refetch did not establish", pending["error"])
 
+    def test_resume_rejects_shifted_deadline_anchor_but_accepts_original(self):
+        original_start = (
+            dt.datetime.now(evidence.UTC) - dt.timedelta(seconds=10)
+        ).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        request = self.active_request(original_start)
+        previous = self.scratch_root / "previous-original.json"
+        previous.write_text(json.dumps({
+            "repo": "owner/repo", "pr": 1,
+            "polling": {
+                "head": HEAD, "request": request["request"], "deadline_started_at": original_start,
+                "deadline_seconds": 30, "interval_seconds": 0, "ordinary_polls": [],
+            },
+        }), encoding="utf-8")
+        self.assertEqual(
+            evidence.resume_polling_state(previous, "owner/repo", 1, request)["deadline_started_at"],
+            original_start,
+        )
+        equivalent_instant = original_start.replace("Z", ".000Z")
+        self.assertEqual(evidence.utc(equivalent_instant), evidence.utc(original_start))
+        for name, deadline_started_at in (
+            ("previous-newer.json", self.fresh_time()),
+            ("previous-equivalent-instant.json", equivalent_instant),
+            (
+                "previous-older.json",
+                (dt.datetime.now(evidence.UTC) - dt.timedelta(seconds=20))
+                .isoformat()
+                .replace("+00:00", "Z"),
+            ),
+        ):
+            shifted = self.scratch_root / name
+            shifted.write_text(json.dumps({
+                "repo": "owner/repo", "pr": 1,
+                "polling": {
+                    "head": HEAD, "request": request["request"],
+                    "deadline_started_at": deadline_started_at,
+                    "deadline_seconds": 30, "interval_seconds": 0, "ordinary_polls": [],
+                },
+            }), encoding="utf-8")
+            with self.subTest(name=name), self.assertRaises(evidence.EvidenceError):
+                evidence.resume_polling_state(shifted, "owner/repo", 1, request)
+
+    def test_final_refetch_timeout_uses_independent_allowance_after_ordinary_poll(self):
+        output = self.scratch_root / "final-timeout"
+        request = self.active_request()
+        complete = {"status": "comments", "review": {"id": REVIEW["id"]}}
+
+        with patch.object(evidence, "collect_once", side_effect=[complete, complete]) as collect_once, \
+             patch.object(evidence.time, "monotonic", side_effect=[0.0, 0.0, 9.5]):
+            evidence.poll("owner/repo", 1, request, output, deadline_seconds=10, interval_seconds=0)
+
+        self.assertEqual(
+            collect_once.call_args_list[1].kwargs["timeout"],
+            evidence.DEFAULT_FINAL_REFETCH_SECONDS,
+        )
+
     def test_poll_preserves_hung_or_error_collection_evidence(self):
         output = self.scratch_root / "poll-error"
         request = self.active_request()
@@ -446,11 +501,14 @@ class EvidenceTests(unittest.TestCase):
             seen_timeouts.append(timeout)
             return {"status": "pending"}
 
-        with patch.object(evidence, "collect_once", side_effect=fake_collect_once):
+        with patch.object(evidence, "collect_once", side_effect=fake_collect_once), \
+             patch.object(evidence.time, "monotonic", side_effect=[0.0, 0.0, 2.0, 2.0]), \
+             patch.object(evidence.time, "sleep"):
             with self.assertRaises(evidence.EvidenceError):
-                evidence.poll("owner/repo", 1, request, output, deadline_seconds=0.2, interval_seconds=0)
-        self.assertTrue(seen_timeouts)
-        self.assertLessEqual(max(seen_timeouts), 0.2)
+                evidence.poll("owner/repo", 1, request, output, deadline_seconds=2, interval_seconds=0)
+        self.assertEqual(len(seen_timeouts), 2)
+        self.assertLessEqual(seen_timeouts[0], 1.0)
+        self.assertEqual(seen_timeouts[1], evidence.DEFAULT_FINAL_REFETCH_SECONDS)
 
     def test_api_timeout_budget_is_aggregate_across_requests(self):
         temp = self.scratch_root / "aggregate-timeout"
