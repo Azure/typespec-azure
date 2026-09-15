@@ -1,6 +1,7 @@
 import copy
 import datetime as dt
 import importlib.util
+import io
 import json
 import subprocess
 import tempfile
@@ -129,6 +130,61 @@ class EvidenceTests(unittest.TestCase):
             evidence.collect(self.client([review], []), HEAD, TIME)
         with self.assertRaises(evidence.EvidenceError):
             evidence.collect(self.client(comments=[]), HEAD, TIME)
+
+    def test_metadata_preserves_unicode_summary_without_details(self):
+        summary = "### \U0001f7e1 Changes recommended\n\nGenerated 1 comment."
+        review = REVIEW | {
+            "body": summary + "\n\n<DETAILS><summary>Review details</summary>\n"
+            "**Comments generated:** 1\nSuppressed finding\n</DETAILS>",
+        }
+        result = evidence.collect(self.client([review]), HEAD, TIME)
+        self.assertEqual(result["review_metadata"], {
+            "summary": summary, "generated_comment_counts": [1], "rest_comment_count": 1,
+        })
+
+    def test_missing_count_marker_is_not_a_zero_comment_declaration(self):
+        for body in ("Generated one comment.", "", None):
+            with self.subTest(body=body):
+                result = evidence.collect(self.client([REVIEW | {"body": body}]), HEAD, TIME)
+                self.assertEqual(result["review_metadata"], {
+                    "summary": body or "", "generated_comment_counts": [], "rest_comment_count": 1,
+                })
+
+    def test_metadata_checks_all_generated_count_markers(self):
+        review = REVIEW | {"body": "**Comments generated:** 0\n**Comments generated:** 2"}
+        with self.assertRaises(evidence.EvidenceError):
+            evidence.collect(self.client([review]), HEAD, TIME)
+
+    def test_clean_review_summary_excludes_suppressed_details(self):
+        review = REVIEW | {
+            "body": "No new comments.\n<details>\n**Comments generated:** 0\n"
+            "Suppressed finding\n</details>",
+        }
+        result = evidence.collect(self.client([review], [], []), HEAD, TIME)
+        self.assertEqual(result["status"], "no-new-comments")
+        self.assertEqual(result["review_metadata"], {
+            "summary": "No new comments.", "generated_comment_counts": [0], "rest_comment_count": 0,
+        })
+
+    def test_cli_metadata_and_comments_round_trip_through_cp1252_stdout(self):
+        review = REVIEW | {"body": "### \U0001f7e1 Changes recommended\n**Comments generated:** 1"}
+        comment = COMMENT | {"body": "Check \U0001f7e1 and \u4e2d\u6587"}
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "attempt"
+            argv = ["review_evidence.py", "collect", "--repo", "owner/repo", "--pr", "1",
+                    "--head", HEAD, "--request-time", TIME, "--output", str(output)]
+            with io.TextIOWrapper(io.BytesIO(), encoding="cp1252", errors="strict") as stdout:
+                with patch("sys.argv", argv), patch("sys.stdout", stdout), patch.object(
+                    evidence, "Client", return_value=self.client([review], [comment])
+                ):
+                    self.assertEqual(evidence.main(), 0)
+                stdout.flush()
+                rendered = stdout.buffer.getvalue().decode("cp1252")
+            result = json.loads(rendered)
+            self.assertTrue(rendered.isascii())
+            self.assertEqual(result, json.loads((output / "result.json").read_text(encoding="utf-8")))
+            self.assertEqual(result["review_metadata"]["summary"], review["body"])
+            self.assertEqual(result["comments"][0]["body"], comment["body"])
 
     def test_pending_and_wrong_review_never_become_clean(self):
         for review in (REVIEW | {"commit_id": "b" * 40},

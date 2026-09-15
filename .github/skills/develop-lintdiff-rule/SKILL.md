@@ -752,6 +752,17 @@ If a quick iteration is needed first, use the existing `--filter`, `--limit`,
 and `--concurrency` options. The final behavioral check should use the full
 corpus when practical.
 
+`--filter` is one **case-sensitive literal substring** of a dataset project's
+`sourcePath`, not a regex or rule ID. For example, use
+`--filter ProviderHub.Management`, not
+`--filter 'ProviderHub|AgriculturePlatform'`. Before launching, verify the
+selected dataset paths and nonzero count with the same semantics as the runner
+(`sourcePath.includes(filter)`, or PowerShell `.Contains($filter)`), including
+any `--limit`; do not use PowerShell `-match` or `-like` as a proxy. To sample
+multiple unrelated paths, run separate supported literal-filter commands and
+retain evidence for each. A failed selector that processes zero projects does
+not satisfy the representative preflight or replace the required full run.
+
 #### Long-running corpus status protocol
 
 - Run a representative filtered corpus first to confirm the command, links, and

@@ -2,12 +2,7 @@
   {
     "code": "tsp-lintdiff-local-linter/consistent-patch-properties",
     "severity": "warning",
-    "message": "The property 'properties.extraPatchOnly' in the request body either does not appear in the resource model or is nested at the wrong level."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/patch-properties-correspond-to-put-properties",
-    "severity": "warning",
-    "message": "The property 'extraPatchOnly' in the PATCH body does not correspond to a property in the PUT body."
+    "message": "The property 'details.description' in the request body either does not appear in the resource model or is nested at the wrong level."
   },
   {
     "code": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
@@ -78,6 +73,11 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+    "severity": "warning",
+    "message": "Resource PATCH models must be a subset of the resource type. The following properties: [details] do not exist in resource Model 'Widget'."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",

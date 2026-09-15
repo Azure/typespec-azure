@@ -119,8 +119,48 @@ replacement session, rewrite the supplied command/path, check out the source
 branch elsewhere, or transfer commits. Registration of a folder as a project
 does not prove PR-base ownership. Reuse an existing exact owner only if its
 binding can be established; otherwise preserve all work and fail that entry at
-preflight. Recovery of already-developed branches requires its own explicitly
-authorized workflow, not an automatic queue retry.
+preflight. Only explicit user authorization permits the legacy adoption below;
+a queue reinvocation is not permission to create a replacement checkout.
+
+### Authorized legacy-worktree adoption
+
+Use this recovery path only when the user explicitly authorizes establishing
+app-session ownership for the named existing worktree. It does not authorize
+resetting correction budgets; any additional correction must independently meet
+the queue's [bounded-resumption contract](SKILL.md#explicitly-authorized-bounded-resumption).
+
+1. Stop prior task agents/commands before adoption. Record the authorization,
+   canonical absolute path, repository/remotes, branch, HEAD, submodule state,
+   staged/unstaged patches, and hashes of all task-owned new/changed files in
+   durable artifacts. Match the previous handoff and stop on unexplained changes.
+2. Search session and project inventories for the exact path, not just repository
+   name. Reuse a matching idle owner only if it has the expected branch and no
+   unrelated PR/activity. If absent, use `create_project` with the existing local
+   `path`, not a clone URL. Verify the returned project uses that exact path.
+3. Create an idle local session in that project with `workspace_type: "branch"`,
+   `coordinate_with_creator: true`, and `notify_on_idle: "always"`. Omit kickoff
+   and `base_branch`: for branch sessions the latter selects a checkout, not the
+   PR comparison base. In particular, passing `main` would switch away from the
+   preserved promotion branch. Never create another worktree, rename the branch,
+   stash, reset, or move files as part of adoption.
+4. Independently read `get_session` and `get_changes_overview`. Require the exact
+   path, branch, repository, and comparison base (`main`/`origin/main` for
+   promotion; the migration target for development). Recheck HEAD, index and
+   file hashes against the pre-adoption manifest. Project registration or a
+   default-branch field alone does not establish the publication binding.
+5. If comparison-base correction is needed, use only a supported app control
+   that changes comparison metadata without checking out another branch. If none
+   is available, stop with the exact missing control; do not edit app databases,
+   infer success from Git tracking settings, or bypass the required PR tool.
+6. Send the verified owner a setup-only message to confirm its path, unchanged
+   manifest and publication binding, then remain idle. Establish completion
+   delivery using the procedure below. Record project/session IDs and evidence
+   in the handoff. Resume task work only after every remaining gate is satisfied,
+   including a current-head development review before promotion.
+
+Adoption is not a source-repair cycle or proof that PR creation succeeded. Do not
+archive the adopted session: its existing checkout and unfinished work must be
+preserved. The owning session must itself publish and verify the resulting PR.
 
 ## Queue execution
 

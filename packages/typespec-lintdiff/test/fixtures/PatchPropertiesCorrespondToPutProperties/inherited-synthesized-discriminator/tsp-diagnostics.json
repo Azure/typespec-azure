@@ -1,0 +1,67 @@
+[
+  {
+    "code": "tsp-lintdiff-local-linter/patch-properties-correspond-to-put-properties",
+    "severity": "warning",
+    "message": "The property 'kind' in the PATCH body does not correspond to a property in the PUT body."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-string-discriminator",
+    "severity": "warning",
+    "message": "Use an extensible union instead of a plain string (ex: `union PetKind { cat: \"cat\", dog: \"dog\", string };`)"
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/no-empty-model",
+    "severity": "warning",
+    "message": "Properties with type:object must have definition of a reference model."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/composition-over-inheritance",
+    "severity": "warning",
+    "message": "Model 'ConcreteWidgetPatch' is extending 'Microsoft.TestService.WidgetPatchProperties' that doesn't define a discriminator. If 'Microsoft.TestService.WidgetPatchProperties' is meant to be used:\n - For composition consider using spread `...` or `model is` instead.\n - As a polymorphic relation, add the `@discriminator` decorator on the base model."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator",
+    "severity": "warning",
+    "message": "Each resource interface must have an @armResourceOperations decorator."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/operation-missing-api-version",
+    "severity": "warning",
+    "message": "Operation is missing an api version parameter."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+    "severity": "warning",
+    "message": "ARM PUT path '/widgets/{widgetName}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/operation-missing-api-version",
+    "severity": "warning",
+    "message": "Operation is missing an api version parameter."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+    "severity": "warning",
+    "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
+    "severity": "warning",
+    "message": "Properties of a PATCH request body must not be required, property:kind."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  }
+]

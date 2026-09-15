@@ -72,6 +72,16 @@ When the caller is `/do-linter-development-task-one-by-one` and provides the
 pass that context and the queue's process-review ownership constraint to both
 nested agents. Standalone review behavior is unchanged.
 
+The outer queue may invoke this skill directly after a worker returns
+`review-handoff` because nested persistent-agent controls are unavailable.
+In that mode the outer queue is this skill's parent/orchestrator and creates its
+own fresh collector/fixer pair; the development worker stays idle throughout.
+The same model pin, follow-up verification, evidence gates, publication approval,
+five-round limit and stop conditions apply. Run all target operations explicitly
+in the handed-off worktree. Return the reviewed/pushed head, complete review
+result and evidence to the queue before it resumes the worker. Do not switch
+owners after a review failure or treat a handoff as clean verification.
+
 In promotion PR mode, a confirmed `source-semantic-issue` still stops this loop
 without changing the source or making the promoted copy diverge. Return the
 worker outcome `source-repair-required` with the pinned source SHA, exact source
@@ -118,11 +128,11 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
   round's valid fixes, then stop and report that the cap prevented another
   verification review.
 - Stop immediately on an unverified review request, indeterminate collector
-  failure, validation failure, corpus failure, push failure, or finding whose
-  validity cannot be determined safely. Report the blocker instead of silently
-  continuing. The only exception is the bounded, parent-authorized
-  [local collector recovery](#local-collector-recovery) below; it never permits
-  an agent to silently resume or erase a failed attempt.
+  failure, push failure, uncertain finding, or validation/corpus failure that
+  does not qualify for [bounded draft correction](#bounded-draft-correction).
+  The only recovery paths are that in-place correction and the separately
+  bounded, parent-authorized [local collector recovery](#local-collector-recovery).
+  Neither permits erasing failed attempts or publishing unverified changes.
 
 ## Initialize
 
@@ -189,6 +199,8 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
    - validity decision for each comment
    - promotion finding category when applicable
    - planned validation scope, command results, and corpus applicability/results
+   - draft-correction count, failure evidence, causal classification, corrective
+     diff identity and rerun results for the backlog pass or current round
    - publication handoff identity and the parent's approval or rejection
    - pushed fix commit SHA
    - processed review-thread IDs and their final resolution state
@@ -199,9 +211,11 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
 ## Local collector recovery
 
 A visible comment is not by itself permission to resume an unverified request.
-However, a proven local parsing or result-shape bug need not discard an
-otherwise verifiable review. This exception applies only to collection, never
-to finding validity, validation, corpus runs, staging, commits, or pushes.
+However, a proven local parsing, result-shape, or display-encoding bug need not
+discard an otherwise verifiable review. Distinguish failed evidence collection
+from failed display of successfully saved evidence; neither permits automatic
+resumption. This exception applies only to collection and evidence display,
+never to finding validity, validation, corpus runs, staging, commits, or pushes.
 
 1. **Pause on failure.** Preserve the original command, exit/error, raw
    responses and ledger entry. Report to the parent. Do not request another
@@ -209,7 +223,12 @@ to finding validity, validation, corpus runs, staging, commits, or pushes.
    label the failed attempt successful.
 2. **Parent eligibility gate.** Permit at most one recovery attempt per round
    only when preserved raw API evidence conclusively identifies a local
-   timestamp-conversion or result-shape bug. The raw responses must be valid,
+   timestamp-conversion or result-shape bug, or a display-only encoding failure
+   after the bundled collector exited successfully and saved a complete
+   `result.json`. For display-only failures, record the failing output command,
+   its encoding/error, and the successful collector's separate exit status and
+   artifact identity. A decode error while reading API data or a failure to save
+   evidence is not a display-only failure. The raw responses must be valid,
    complete and successful, with trustworthy pre/post request evidence proving
    a new request-event cursor on the same head (or the already-recorded active
    pending-request provenance). Missing evidence, genuinely unverified requests,
@@ -221,7 +240,10 @@ to finding validity, validation, corpus runs, staging, commits, or pushes.
    collector. Do not edit skill instructions or helper code during the active
    loop. If the bundled helper itself needs repair, stop and repair it after
    termination. The parent performs one independent, fresh, fully paginated,
-   no-cache recollection into a new evidence directory.
+   no-cache recollection into a new evidence directory. Use UTF-8 execution and
+   the collector's structured `review_metadata`, not the failed display script.
+   Display-only recovery uses the same one-attempt budget and all remaining
+   checks; it does not request another review.
 4. **Re-establish all evidence.** Verify the current head, numeric completed
    review ID, exact review commit and UTC submission/request correlation,
    review-specific REST comments and review metadata, and complete GraphQL
@@ -311,6 +333,10 @@ ledger. It owns these steps:
    mapping. Both agents and the parent reuse its raw-UTC parsing and array
    handling rather than generating inline PowerShell collectors. Each
    invocation writes a new evidence directory; never overwrite failed evidence.
+   Run all collector and supporting Python commands with `python -X utf8`
+   (prefixed by `mise exec --` when available). Read the collector's structured,
+   ASCII-escaped JSON instead of printing raw Unicode review bodies through
+   ad-hoc scripts.
 
 5. Poll the paginated REST pull-reviews endpoint,
    `GET /repos/{owner}/{repo}/pulls/{number}/reviews`, at a moderate interval
@@ -385,7 +411,10 @@ ledger. It owns these steps:
    thread handling but cannot be mapped, return a mapping collection failure
    without discarding the completed-review evidence or handing off a partial
    list.
-9. Cross-check the result against available review metadata. If the review body
+9. Cross-check the result against the collector's `review_metadata` summary,
+   generated-comment counts, and REST comment count. The summary excludes
+   collapsed details; do not inspect suppressed findings as actionable input.
+   An absent count marker is not a zero-comment declaration. If the review body
    reports generated comments but the endpoint returns fewer comments, return a
    collection failure instead of `no-new-comments`.
 10. Return either:
@@ -477,11 +506,68 @@ exit code, outcome, and output or durable log path, including failed attempts.
 Also record whether corpus validation is required, why, and its results when
 applicable.
 
-On a command failure, stop and return the evidence before staging, committing,
-or pushing. A passing narrower command does not erase a failed required check.
-Do not retrospectively relabel a failed command as supplemental or self-waive
-it because its diagnostics appear unrelated. Preserve the failure in the
-ledger and report the blocker.
+On a command failure, preserve the evidence and classify it using the bounded
+draft-correction policy below before deciding whether to stop. Never stage,
+commit or push a failing draft. A passing narrower command does not erase a
+failed required check. Do not retrospectively relabel a failed command as
+supplemental or self-waive it because its diagnostics appear unrelated.
+
+### Bounded draft correction
+
+An agent-introduced error in an unpublished draft or its validation command is
+not automatically an external blocker. Allow the same fix agent up to **three
+corrective attempts total per backlog pass or review round**, not per command or
+finding. Each
+attempt is one recorded corrective code or command change set followed by
+validation. Command corrections share this budget; they do not get a separate
+retry allowance. The first failed validation triggers attempt 1; a new failure
+during its rerun consumes
+the next attempt. Do not reset this budget by changing commands, reclassifying
+findings, switching agents or restarting a phase.
+
+1. Preserve the failed command, working directory, exit status, output, draft
+   identity and planned validation scope. Establish a concrete causal link to
+   the agent's current task-owned edits or invocation: for example, a compiler
+   error at a new call passing an optional value, a regression assertion caused
+   by the changed rule, or a selector using regex where the runner requires a
+   literal substring. A failed command alone is not sufficient evidence.
+2. If the cause is understood, the correction is in scope, and budget remains,
+   record the attempt and correct the draft in place without another user
+   prompt. Do not request another Copilot review or consume a review round.
+   Respect native API boundaries and promotion's immutable source semantics.
+3. For an invocation error, inspect the runner's documented or implemented
+   argument semantics and verify the failed command's side effects before
+   rerunning. Correct deterministic quoting, working-directory, option or
+   selector mistakes only when no external failure is involved and the prior
+   execution either made no changes or left fully understood, safely
+   recoverable task-owned state. Preserve the intended validation population;
+   splitting an invalid multi-selector into supported commands must cover the
+   same intended projects. Prove selectors match a nonempty population using
+   the runner's actual matching semantics, not a different shell predicate.
+   Uncertain completion or side effects remain blockers.
+4. Rerun the failed required check at its original intended scope after correction.
+   Then run every remaining required check and repeat earlier checks invalidated
+   by the new edits. Focused debugging may supplement, never replace, the
+   required build, tests, fixtures or corpus. A corpus regression qualifies only
+   when evidence proves it is caused by the draft, not an unexplained count gap.
+5. Preserve original failures alongside the corrective code/command diffs and
+   passing reruns.
+   Return `ready-for-publication` only when the final draft satisfies the complete
+   required scope. The parent independently verifies that every prior failure
+   is accounted for and no failed required check remains unresolved.
+6. Stop on an unknown cause, unsafe/out-of-scope correction, exhausted budget,
+   or an external/indeterminate operational failure (such as credentials, network,
+   dependency/tool availability, harness/emitter crash, or publication failure).
+   An agent-authored argument error rejected before work starts is not a
+   harness crash. This policy never retries review requests, pushes, email
+   sends or other publication operations. Do not blindly
+   rerun commands, weaken assertions, skip fixtures, suppress diagnostics or
+   waive failures. A confirmed immutable promotion-source defect still returns
+   `source-repair-required`; it is not repaired in the promoted copy.
+
+This budget is separate from the five review rounds, queue orchestration retry
+and queue source-repair cycles. The invocation authorizes eligible corrections;
+parent approval is still required for publication, not for each local correction.
 
 ### Linter source changes
 
@@ -491,8 +577,8 @@ documentation, or `migration.md` do not require corpus validation. When
 production linter-rule code changes, follow the current linter-source validation
 and corpus procedure in `/develop-lintdiff-rule` in full. Treat that skill as
 the source of truth for setup, commands, evidence updates, analysis, and
-generated-output cleanup. Surface any required validation or corpus failure and
-stop the loop.
+generated-output cleanup. Record every required validation or corpus failure;
+continue only for an eligible bounded draft correction, otherwise stop the loop.
 
 In promotion PR mode, do not run `/develop-lintdiff-rule`, the lintdiff fixture
 harness, or corpus validation. Follow the current targeted validation procedure
@@ -503,7 +589,9 @@ broader validation when warranted. Treat `/lintdiff-rule-promote` as the source
 of truth for the exact current commands and generated-output checks. A
 production rule edit is permitted only when it is a verified
 `promotion-adaptation-issue` that preserves the immutable source semantics.
-Surface any required promotion validation failure and stop the loop.
+Record every required promotion validation failure; continue only for an
+eligible bounded draft correction that preserves the pinned source semantics,
+otherwise stop the loop.
 
 ### Parent publication gate
 
@@ -515,8 +603,9 @@ After all required validation succeeds, return `ready-for-publication` with:
 - the validation scope and complete command/corpus evidence described above
 
 The parent independently inspects the proposed diff and evidence, confirms that
-the required scope is satisfied and no command failure or unresolved blocker
-remains, and records its decision in the ledger. Only then may it send explicit
+the required scope is satisfied, all earlier failures have verified corrective
+evidence, and no unresolved failed check or blocker remains, and records its
+decision in the ledger. Only then may it send explicit
 publication approval to the same persistent fix subagent, identifying the
 approved head SHA and change-content identity. This is an agent-to-agent gate,
 not an additional user approval prompt. It applies to backlog fixes and every
@@ -573,8 +662,11 @@ For rounds 1 through 5:
 4. If the fix subagent returns `no-valid-comments`, reply with its rejection
    rationale, resolve the safely rejected threads, verify that no processed
    thread remains unresolved, and then end successfully.
-5. If it returns `uncertain-or-blocked` or any command failure, stop and report
-   the blocker. In queue-controlled promotion mode, return
+5. If it returns `uncertain-or-blocked` or a command failure that is ineligible
+   for correction or has exhausted its correction budget, stop and report the
+   blocker. Do not terminate solely because a ready-for-publication handoff
+   retains a failed attempt followed by a verified eligible correction.
+   In queue-controlled promotion mode, return
    `source-repair-required` for a confirmed source defect with the complete
    evidence contract above; retain any separate operational failure rather than
    hiding it behind that outcome.
