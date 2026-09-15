@@ -26,9 +26,6 @@ onlyBuiltDependencies:
 
 # Minimum age (in minutes) for a new dependency version to be able to be used.
 minimumReleaseAge: 10080 # 7 days
-minimumReleaseAgeExclude:
-  - "@alloy-js/*"
-  - "@typespec/*"
 
 catalog:
   "@alloy-js/cli": ^0.25.0
