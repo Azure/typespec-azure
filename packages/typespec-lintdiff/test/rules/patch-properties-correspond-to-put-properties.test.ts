@@ -30,6 +30,58 @@ beforeEach(async () => {
 });
 
 describe("patch-properties-correspond-to-put-properties", () => {
+  it.each(["shared", "distinct"] as const)(
+    "deduplicates cross-service findings by property target with %s PATCH models",
+    async (models) => {
+      const missingNames =
+        models === "shared" ? ["extra", "other"] : ["extra", "other", "extra", "other"];
+      await tester
+        .expect(
+          `
+          using TypeSpec.Http;
+
+          model PutBody {
+            common?: string;
+          }
+          model FirstPatchBody {
+            common?: string;
+            extra?: string;
+            other?: string;
+          }
+          model SecondPatchBody {
+            common?: string;
+            extra?: string;
+            other?: string;
+          }
+
+          @Azure.ResourceManager.armProviderNamespace
+          @service
+          namespace Microsoft.FirstService {
+            @route("/first/widgets")
+            @put op create(@body body: PutBody): void;
+            @route("/first/widgets")
+            @patch op update(@body body: FirstPatchBody): void;
+          }
+
+          @Azure.ResourceManager.armProviderNamespace
+          @service
+          namespace Microsoft.SecondService {
+            @route("/second/widgets")
+            @put op create(@body body: PutBody): void;
+            @route("/second/widgets")
+            @patch op update(@body body: ${models === "shared" ? "FirstPatchBody" : "SecondPatchBody"}): void;
+          }
+          `,
+        )
+        .toEmitDiagnostics(
+          missingNames.map((propertyName) => ({
+            code: "tsp-lintdiff-local-linter/patch-properties-correspond-to-put-properties",
+            message: `The property '${propertyName}' in the PATCH body does not correspond to a property in the PUT body.`,
+          })),
+        );
+    },
+  );
+
   it("compares emitted operation bodies instead of same-endpoint overload bodies", async () => {
     await tester
       .expect(

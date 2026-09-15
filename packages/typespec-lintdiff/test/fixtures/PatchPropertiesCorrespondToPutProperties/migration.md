@@ -2,15 +2,15 @@
 
 ## Result and gap summary
 
-Across 462 successfully compiled projects, the staging validator reports 1,374 diagnostics in 316 projects; reachability-filtered TypeSpec reports 100 in 43, all overlapping, with 273 validator-only projects. Raw TypeSpec output is 118 diagnostics in 45 projects: selected-version HTTP reachability removes 16, and excluding failed Quota removes two more. The dominant demonstrated gap is whole-schema deep comparison: Swagger rejects description, `readOnly`, constraint, and client-name differences, while TypeSpec compares property presence. The rule update now evaluates added/removed availability per service and dependency version. This is not historical shape projection: renames and type changes remain unsupported, and reachable source targets can retain historical-only findings. Functional equivalence to all Swagger behavior is therefore not established; the 273-project remainder is not individually proven false positive. All six failed projects and their compiler-error causes match the accepted baseline, with fresh raw details retained. Same-endpoint overload Swagger comparison remains unavailable because AutoRest crashes.
+Across 462 successfully compiled projects, the staging validator reports 1,374 diagnostics in 316 projects; reachability-filtered TypeSpec reports 100 in 43, all overlapping, leaving 273 validator-only projects. Raw TypeSpec reports 118 in 45: HTTP reachability removes 16 diagnostics, and excluding failed Quota removes two more. The dominant demonstrated gap is whole-schema deep comparison: Swagger rejects metadata differences while TypeSpec compares property presence. The latest repair removes repeated shared-model warnings across services; corpus diagnostic identities are unchanged. Added/removed availability is supported, but historical renames and type changes are not reconstructed; reachable targets can retain historical-only findings. Full Swagger equivalence is not established, and the 273-project remainder is not individually proven false positive. All six compiler failures match the accepted baseline, with fresh details retained. Same-endpoint overload Swagger comparison remains unavailable because AutoRest crashes.
 
 ## Evidence provenance
 
 - External report: `packages/typespec-lintdiff/docs/coverage_old.md` (source gist linked in that file), 450 compiled projects and 210 validator rules. Its row reports 308 fired projects, 20 local-lint projects, 0 official-rule projects, and 6.5% coverage under a different snapshot/methodology.
 - Current dataset: azure-rest-api-specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`, recorded in `packages/typespec-lintdiff/specs/_meta.json`.
-- Final TypeSpec run: `2026-09-14T07:30:53.285Z`, full scope, 468 attempted, 462 successful, 6 compile failures; runner duration 1,757,470 ms (29 minutes 17 seconds), wall time 29 minutes 22 seconds.
-- Representative preflight: separate literal `ProviderHub.Management` and `AgriculturePlatform.Management` selections, one successful project each; the earlier rejected regex-like selector processed no projects. The existing full runner then ran without a filter at concurrency six.
-- Raw project stdout/stderr, selected-version HTTP graphs, result summaries, rule shards, exact failure details, and population analysis were retained outside generated directories in the queue's `queue-patch-run4` evidence bundle before cleanup.
+- Final TypeSpec run: generated timestamp `2026-09-15T06:35:48.804Z`, process completed `2026-09-15T06:38:37.1698665Z`, full scope, 468 attempted, 462 successful, 6 compile failures; runner duration 1,816,235 ms (30 minutes 16 seconds), wall time 30 minutes 20 seconds.
+- Representative preflight: literal `ProviderHub.Management` selected one successful project. The existing full runner then ran without a filter at concurrency six.
+- Raw project stdout/stderr, selected-version HTTP graphs, result summaries, rule shards, exact failure details, and population analysis were retained outside generated directories in the queue's `queue-run6-cycle1/corpus` evidence bundle before cleanup. Target diagnostic identity multisets and project sets match the preceding `queue-patch-run4` run exactly; unchanged corpus output does not by itself cover shared-model multi-service authoring.
 - Staging validator source: `packages/rulesets/src/spectral/functions/patch-properties-correspond-to-put-properties.ts` in azure-openapi-validator. The catalog marks this rule `stagingOnly: true`.
 - Generated `packages/typespec-lintdiff/specs` changes are validation evidence only and are excluded from this PR.
 
@@ -23,7 +23,7 @@ The registered official ARM rule `arm-resource-patch` checks that a PATCH body e
 - Added and enabled `tsp-lintdiff-local-linter/patch-properties-correspond-to-put-properties`.
 - Grouped every PUT and PATCH operation in ARM HTTP services by emitted route, matching the Swagger path-item scope.
 - Evaluated operation/interface, explicit body parameter, and property added/removed metadata within each `resolveVersions` service/dependency resolution. This repairs the missed case where PUT removes a property while PATCH retains it. Inheritance, spreads, nested namespaces, and nonconcurrent operations have native regression coverage.
-- Deduplicated body errors by PATCH operation and missing properties by source target plus JSON name across versions. No unsafe graph mutation or emitter/OpenAPI/TCGC helper is used.
+- Deduplicated body errors by PATCH operation across versions, and missing properties by source target plus JSON name across versions and services. Shared PATCH models produce one warning per missing property rather than repeating it for each service; distinct targets remain separate. No unsafe graph mutation or emitter/OpenAPI/TCGC helper is used.
 - Ignored same-endpoint overload siblings before route pairing; a native regression test gives the base and overload operations distinct bodies.
 - Declared `projectionScope: http-reachable` so the comparison harness filters diagnostic locations against the dataset-selected API version's HTTP graph. This does not rerun the rule on that version or prove that a retained mismatch occurs in that version.
 - Reported missing, `void`, and property-free PATCH bodies, implementing the documented
@@ -70,11 +70,18 @@ The combined `type-family-compliant` fixture also contains out-of-contract shape
 establish valid ARM support for records, nullable models, empty models, or arbitrary model unions.
 No new special case was added to simulate those emitted shapes.
 
-Ten emitter-free native cases cover overload selection; removed current PUT and historical PATCH
+Twelve emitter-free native cases cover shared and distinct PATCH models across services;
+overload selection; removed current PUT and historical PATCH
 properties; inherited and spread availability in nested namespaces; dependency version maps;
 nonconcurrent operations and interfaces; jointly added compliant properties; and removed explicit
 PUT/PATCH body parameters. Library registration includes transitive OpenAPI requirements, but the
 tests use no OpenAPI decorators, emitter, TCGC, or unsafe mutation.
+
+The shared-model regression first reproduced four diagnostics for two missing properties shared
+by two services, then required exactly two after moving property-deduplication state outside the
+service loop. A companion case retains four diagnostics when the services use distinct property
+targets with the same names. These native tests, rather than unchanged corpus counts, establish
+the cross-service deduplication behavior.
 
 ### Historical-shape limitation
 

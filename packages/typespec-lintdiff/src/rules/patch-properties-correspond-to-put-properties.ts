@@ -47,6 +47,7 @@ export const patchPropertiesCorrespondToPutPropertiesRule = createRule({
     return {
       root: (program) => {
         const [services] = getAllHttpServices(program);
+        const missingProperties = new Map<DiagnosticTarget, Set<string>>();
         for (const service of services) {
           if (getArmProviderNamespace(program, service.namespace) === undefined) {
             continue;
@@ -55,7 +56,6 @@ export const patchPropertiesCorrespondToPutPropertiesRule = createRule({
           const missingPatchBodies = new Set<Operation>();
           const emptyPatchBodies = new Set<Operation>();
           const missingPutBodies = new Set<Operation>();
-          const missingProperties = new Map<DiagnosticTarget, Set<string>>();
 
           for (const version of resolveVersions(program, service.namespace)) {
             const operationsByPath = new Map<

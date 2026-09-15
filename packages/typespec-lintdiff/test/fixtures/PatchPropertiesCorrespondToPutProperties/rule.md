@@ -24,8 +24,9 @@ For each service version, `resolveVersions` supplies the service and dependency 
 `getAddedOnVersions` and `getRemovedOnVersions` determine operation, interface, explicit body
 parameter, and model-property availability before pairing operations or comparing leaves.
 Inherited and spread properties and nested namespaces use the same availability check.
-Diagnostics are deduplicated across versions by PATCH operation for body errors and by source
-target plus JSON name for missing properties.
+Body errors are deduplicated across versions by PATCH operation. Missing properties are
+deduplicated across versions and services by source target plus JSON name, so services sharing
+a PATCH model do not repeat the same property warning. Distinct property targets remain separate.
 
 This is **availability-aware comparison, not historical shape projection**: `@renamedFrom`,
 `@typeChangedFrom`, historical route changes, and historical body-type changes are not reconstructed.
