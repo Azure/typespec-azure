@@ -102,6 +102,11 @@ omitting either triggers the
 rule. Use the `AgentConversation` and `AgentResponse` templates, which both take the child property
 bag and the parent `Agent` resource type:
 
+Both `ConversationProperties` and `ResponseProperties` include a required `input: InputItem`
+property. `InputItem.type` selects whether the input is a message, function call, function-call
+output, or compaction summary. Clients provide the fields for that variant, but `id`, `role`, and
+`status` are service-assigned and read-only.
+
 ```typespec
 model ContosoConversationProperties is ConversationProperties {
   ...DefaultProvisioningStateProperty;
@@ -156,7 +161,7 @@ on a properties model directly, apply the decorator with a `BaseTypeInfo` value.
 multiple times to declare conformance to multiple base types; duplicate entries are ignored:
 
 ```typespec
-@azureBaseType(#{ baseType: "Agent", version: "2024-06-01" })
+@azureBaseType(#{ baseType: "Agent", version: "2026-04-01" })
 model MyAgentProperties {
   ...AgentPropertiesPlatform<MyDefinition>;
   ...DefaultProvisioningStateProperty;

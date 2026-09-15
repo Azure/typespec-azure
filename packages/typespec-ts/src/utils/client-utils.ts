@@ -12,11 +12,12 @@ import {
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   type Namespace,
+  NoTarget,
   type Operation,
 } from "@typespec/compiler";
 import type { ClientModuleInfo } from "../modular/interfaces.js";
 import type { SdkContext } from "./interfaces.js";
-import { NameType, normalizeName } from "./name-utils.js";
+import { NameType, normalizeSdkName, reportInvalidExactName } from "./name-utils.js";
 
 export function getClients(dpgContext: SdkContext): SdkClient[] {
   const clients = listClients(dpgContext);
@@ -116,8 +117,9 @@ export function isMultiEndpointClient(dpgContext: SdkContext): boolean {
 
 export function getClientModuleInfo(clientMap: [string[], SdkClientType<SdkServiceOperation>]) {
   const [hierarchy, client] = clientMap;
+  const clientName = client.name.replace(/Client$/, "");
   const clientModuleInfo: ClientModuleInfo = {
-    clientName: `${client.name.replace(/Client$/, "")}Context`,
+    clientName: `${clientName}Context`,
   };
   clientModuleInfo.subfolder = hierarchy.join("/");
   return clientModuleInfo;
@@ -133,13 +135,33 @@ export function getClientHierarchyMap(
   const clients = individualClients.map((client) => {
     return [
       context.sdkPackage.clients.length > 1
-        ? [normalizeName(client.name.replace("Client", ""), NameType.File)]
+        ? [
+            normalizeSdkName(client, NameType.File, {
+              nameOverride: client.name.replace(/Client$/, ""),
+            }),
+          ]
         : [],
       client,
     ];
   }) as [string[], SdkClientType<SdkServiceOperation>][];
   for (let i = 0; i < clients.length; i++) {
     const [hierarchy, client] = clients[i]!;
+    reportInvalidExactName(
+      context.program,
+      client,
+      NameType.Class,
+      "client",
+      client.__raw.type ?? NoTarget,
+    );
+    for (const parameter of client.clientInitialization.parameters) {
+      reportInvalidExactName(
+        context.program,
+        parameter,
+        NameType.Parameter,
+        "parameter",
+        parameter.__raw ?? NoTarget,
+      );
+    }
     clientMap.push([hierarchy, client]);
     const childClientsToGenerate = client.children?.filter((child) => {
       return (
@@ -151,7 +173,9 @@ export function getClientHierarchyMap(
       childClientsToGenerate.forEach((child) => {
         const childHierarchy = [
           ...hierarchy,
-          normalizeName(child.name.replace("Client", ""), NameType.File),
+          normalizeSdkName(child, NameType.File, {
+            nameOverride: child.name.replace(/Client$/, ""),
+          }),
         ];
         clients.push([childHierarchy, child]);
       });

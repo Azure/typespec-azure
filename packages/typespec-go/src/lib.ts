@@ -151,7 +151,7 @@ const libDef = {
     InternalError: {
       severity: "error",
       messages: {
-        default: paramMessage`The emitter encountered an internal error during preprocessing. Please open an issue at https://github.com/Azure/autorest.go/issues and include the complete error message.\n${"stack"}`,
+        default: paramMessage`The emitter encountered an internal error during preprocessing. Please open an issue at https://github.com/Azure/typespec-azure/issues and include the complete error message.\n${"stack"}`,
       },
     },
     InvalidArgument: {

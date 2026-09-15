@@ -7,7 +7,7 @@ import type {
   SdkType,
 } from "@azure-tools/typespec-client-generator-core";
 import type { SdkContext } from "../../utils/interfaces.js";
-import { NameType, normalizeName } from "../../utils/name-utils.js";
+import { normalizeSdkPropertyName } from "../../utils/name-utils.js";
 import {
   getPropertyWithOverrides,
   type ModelOverrideOptions,
@@ -110,10 +110,7 @@ export function buildPropertyNameMapper(
       continue;
     }
     const prop = getPropertyWithOverrides(p, overrides);
-    mapper.set(
-      prop.serializationOptions.json?.name || prop.name,
-      normalizeName(prop.name, NameType.Property),
-    );
+    mapper.set(prop.serializationOptions.json?.name || prop.name, normalizeSdkPropertyName(prop));
   }
   return mapper;
 }

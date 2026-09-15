@@ -2,7 +2,7 @@ import { type CompilerHost, joinPaths } from "@typespec/compiler";
 import { SourceFile } from "ts-morph";
 import { resolveReference } from "../framework/reference.js";
 import type { SdkContext } from "../utils/interfaces.js";
-import { NameType, normalizeName } from "../utils/name-utils.js";
+import { NameType, normalizeName, normalizeSdkName } from "../utils/name-utils.js";
 import type { ServiceOperation } from "../utils/operation-util.js";
 import { AzureTestDependencies } from "./external-dependencies.js";
 import {
@@ -41,7 +41,7 @@ async function cleanupTestFolder(dpgContext: SdkContext, host: CompilerHost) {
   // If there are multiple clients, clean up subfolders
   if (clients.length > 1) {
     for (const client of clients) {
-      const subFolder = normalizeName(getClassicalClientName(client), NameType.File);
+      const subFolder = normalizeSdkName(client, NameType.File);
       const clientTestFolder = joinPaths(baseTestFolder, subFolder);
       if (await dirExists(clientTestFolder)) {
         await host.rm(clientTestFolder, { recursive: true });

@@ -278,7 +278,7 @@ function exportClassicalClient(
   subfolder: string,
   isSubClient: boolean = false,
 ) {
-  const clientName = client.name;
+  const clientName = getClassicalClientName(client);
   enqueueStatement(indexFile, {
     kind: StructureKind.ExportDeclaration,
     namedExports: [clientName],

@@ -27,72 +27,6 @@ export interface XMLSourceInfo {
 }
 
 /**
- * creates XMLInfo for models and model fields.
- * returns undefined if no XMLInfo is required.
- *
- * @param src the source information to adapt
- * @returns XMLInfo or undefined
- */
-export function adaptXMLInfo(src: XMLSourceInfo): go.XMLInfo | undefined {
-  const xmlInfo = new go.XMLInfo();
-  let returnXMLInfo = false;
-
-  if (src.xml?.name && src.xml.name !== src.goTypeName) {
-    xmlInfo.name = src.xml.name;
-    returnXMLInfo = true;
-  }
-
-  if (src.xml?.attribute) {
-    xmlInfo.attribute = true;
-    returnXMLInfo = true;
-  }
-  if (src.type.kind === "slice") {
-    const elementXMLInfo = hasXMLInfo(src.type.elementType);
-    if (src.xml?.unwrapped === false) {
-      if (src.xml.itemsName) {
-        xmlInfo.wraps = src.xml.itemsName;
-      } else if (elementXMLInfo?.name) {
-        xmlInfo.wraps = elementXMLInfo.name;
-      } else if (src.orTypeName !== src.goTypeName) {
-        xmlInfo.wraps = src.orTypeName;
-      } else {
-        xmlInfo.wraps = src.goTypeName;
-      }
-      returnXMLInfo = true;
-    } else if (elementXMLInfo?.name) {
-      xmlInfo.name = elementXMLInfo.name;
-      returnXMLInfo = true;
-    } else if (src.orTypeName !== src.goTypeName) {
-      // we can land here if the Go-specific type name was renamed to remove stuttering
-      xmlInfo.name = src.orTypeName;
-      returnXMLInfo = true;
-    }
-  } else if (src.xml?.unwrapped && src.type.kind === "string") {
-    // an unwrapped string means it's text
-    xmlInfo.text = true;
-    // the ",chardata" tag is mutually exclusive
-    // with a name tag so clear it if set
-    xmlInfo.name = undefined;
-    returnXMLInfo = true;
-  }
-
-  return returnXMLInfo ? xmlInfo : undefined;
-}
-
-/**
- * returns any XMLInfo available for the provided type or undefined
- *
- * @param type the type to inspect for XMLInfo
- * @returns the XMLInfo or undefined
- */
-export function hasXMLInfo(type: go.WireType): go.XMLInfo | undefined {
-  if ("xml" in type) {
-    return type.xml;
-  }
-  return undefined;
-}
-
-/**
  * returns true if model is a polymorphic root type.
  *
  * @param model the model to inspect
@@ -110,24 +44,25 @@ export function isPolymorphicRoot(model: tcgc.SdkModelType): boolean {
   }
 }
 
-/**
- * returns true if the specified type doesn't need to be pointer-to-type
- * because it's implicitly nil-able.
- *
- * @param type the type to inspect
- * @returns true if the type is implicitly nil-able
- */
-export function isTypePassedByValue(type: tcgc.SdkType): boolean {
-  if (type.kind === "nullable") {
-    type = type.type;
+/** narrows type to a PtrType within the conditional block */
+export function isPtrType<T extends Exclude<go.WireType, go.Ptr>>(
+  type: T,
+): type is Extract<T, go.PtrType> {
+  switch (type.kind) {
+    case "constant":
+    case "etag":
+    case "literal":
+    case "model":
+    case "multipartContent":
+    case "polymorphicModel":
+    case "scalar":
+    case "string":
+    case "time":
+    case "unionStruct":
+      return true;
+    default:
+      return false;
   }
-  return (
-    type.kind === "unknown" ||
-    type.kind === "array" ||
-    type.kind === "bytes" ||
-    type.kind === "dict" ||
-    (type.kind === "model" && isPolymorphicRoot(type))
-  );
 }
 
 /** contains the set of client options */

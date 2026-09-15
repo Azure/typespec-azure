@@ -481,7 +481,6 @@ export class ClientAdapter {
       const adaptedParam = new go.Parameter(
         getEscapedReservedName(helpers.getEffectiveName(param, true), "Param"),
         this.ta.getWireType(param.type, true, true),
-        true,
       );
       adaptedParam.docs.summary = param.summary;
       adaptedParam.docs.description = param.doc;
@@ -498,12 +497,9 @@ export class ClientAdapter {
    * @returns the adapted URI parameter
    */
   private adaptURIParam(sdkParam: tcgc.SdkPathParameter, forceRequired: boolean): go.URIParameter {
-    let paramType: go.WireType;
-    if (sdkParam.isApiVersionParam) {
-      paramType = this.ta.getStringType();
-    } else {
-      paramType = this.ta.getWireType(sdkParam.type, true, false);
-    }
+    const paramType = sdkParam.isApiVersionParam
+      ? this.ta.getStringType()
+      : this.ta.getWireType(sdkParam.type, true, false);
 
     if (go.isURIParameterType(paramType)) {
       const style = forceRequired ? "required" : this.adaptParameterStyle(sdkParam);
@@ -517,9 +513,8 @@ export class ClientAdapter {
       const uriParam = new go.URIParameter(
         sdkParam.name,
         sdkParam.serializedName,
-        paramType,
+        sdkParam.optional ? this.ta.getPtrType(paramType) : paramType,
         style,
-        helpers.isTypePassedByValue(sdkParam.type) || !sdkParam.optional,
         "client",
       );
       uriParam.docs.summary = sdkParam.summary;
@@ -1052,9 +1047,7 @@ export class ClientAdapter {
           "Param",
         );
         // if the param is required then it's always passed by value
-        const byVal = go.isRequiredParameter(paramStyle)
-          ? true
-          : helpers.isTypePassedByValue(param.type);
+        const isRequired = go.isRequiredParameter(paramStyle);
         const contentType = this.adaptContentType(opParam.defaultContentType);
         const getSerializedNameFromProperty = function (
           property: tcgc.SdkModelPropertyType,
@@ -1088,13 +1081,15 @@ export class ClientAdapter {
                 param.__raw?.node,
               );
             }
+            const paramType = this.ta.getWireType(param.type, true, true);
             adaptedParam = new go.PartialBodyParameter(
               paramName,
               serializedName,
               contentType,
-              this.ta.getWireType(param.type, true, true),
+              !isRequired && helpers.isPtrType(paramType)
+                ? this.ta.getPtrType(paramType)
+                : paramType,
               paramStyle,
-              byVal,
             );
             break;
           }
@@ -1104,7 +1099,7 @@ export class ClientAdapter {
                 param.name,
                 opParam.type,
                 paramStyle,
-                byVal,
+                isRequired,
               );
             } else {
               const contentTypeLiteral = this.ta.getLiteral(
@@ -1117,7 +1112,6 @@ export class ClientAdapter {
                 contentTypeLiteral,
                 this.ta.getReadSeekCloser(false),
                 paramStyle,
-                byVal,
               );
             }
             break;
@@ -1398,7 +1392,6 @@ export class ClientAdapter {
             opParam.serializedName,
             paramType,
             paramStyle,
-            true,
             paramLoc,
           );
           break;
@@ -1409,7 +1402,6 @@ export class ClientAdapter {
             true,
             paramType,
             paramType.kind === "literal" ? new go.ClientSideDefault(paramType) : paramStyle,
-            true,
             paramLoc,
           );
           break;
@@ -1420,7 +1412,6 @@ export class ClientAdapter {
             true,
             paramType,
             paramStyle,
-            true,
             paramLoc,
           );
           break;
@@ -1493,9 +1484,8 @@ export class ClientAdapter {
       helpers.getEffectiveName(methodParam, paramStyle === "required"),
       "Param",
     );
-    const byVal = go.isRequiredParameter(paramStyle)
-      ? true
-      : helpers.isTypePassedByValue(methodParam.type);
+    // required and literal params are always passed by value
+    const byVal = go.isRequiredParameter(paramStyle) || paramStyle === "literal";
 
     let adaptedParam: go.MethodParameter;
     switch (opParam.kind) {
@@ -1522,14 +1512,12 @@ export class ClientAdapter {
             paramName,
             contentType,
             contentTypeLiteral,
-            bodyType,
+            !byVal && helpers.isPtrType(bodyType) ? this.ta.getPtrType(bodyType) : bodyType,
             paramStyle,
-            byVal,
           );
           if (contentType === "XML" && methodParam.type.kind === "array") {
-            // this is for compat with autorest.go
-            adaptedParam.xml = new go.XMLInfo();
-            adaptedParam.xml.wrapper = methodParam.type.name;
+            // this is for compat with legacy behavior
+            adaptedParam.xmlWrapper = methodParam.type.name;
           }
         }
         break;
@@ -1540,7 +1528,7 @@ export class ClientAdapter {
           "unsupported parameter type cookie",
           opParam.__raw?.node,
         );
-      case "header":
+      case "header": {
         const type = this.ta.getWireType(methodParam.type, true, false);
         if (type.kind === "map") {
           if (opParam.serializedName !== "x-ms-meta") {
@@ -1555,7 +1543,6 @@ export class ClientAdapter {
             `${opParam.serializedName}-`,
             type,
             paramStyle,
-            byVal,
             location,
           );
         } else if (opParam.collectionFormat) {
@@ -1566,8 +1553,6 @@ export class ClientAdapter {
               opParam.__raw?.node,
             );
           }
-          // TODO: is hard-coded false for element type by value correct?
-          const type = this.ta.getWireType(methodParam.type, true, false);
           if (type.kind !== "slice") {
             throw new AdapterError(
               "InternalError",
@@ -1581,31 +1566,32 @@ export class ClientAdapter {
             type,
             opParam.collectionFormat === "simple" ? "csv" : opParam.collectionFormat,
             paramStyle,
-            byVal,
             location,
           );
         } else {
+          const type = this.adaptHeaderScalarType(methodParam.type, true);
           adaptedParam = new go.HeaderScalarParameter(
             paramName,
             opParam.serializedName,
-            this.adaptHeaderScalarType(methodParam.type, true),
+            !byVal && helpers.isPtrType(type) ? this.ta.getPtrType(type) : type,
             paramStyle,
-            byVal,
             location,
           );
         }
         break;
-      case "path":
+      }
+      case "path": {
+        const type = this.adaptPathScalarParameterType(methodParam.type);
         adaptedParam = new go.PathScalarParameter(
           paramName,
           opParam.serializedName,
           !opParam.allowReserved,
-          this.adaptPathScalarParameterType(methodParam.type),
+          !byVal && helpers.isPtrType(type) ? this.ta.getPtrType(type) : type,
           paramStyle,
-          byVal,
           location,
         );
         break;
+      }
       case "query":
         if (opParam.collectionFormat) {
           const type = this.ta.getWireType(methodParam.type, true, false);
@@ -1628,18 +1614,17 @@ export class ClientAdapter {
                 ? "multi"
                 : opParam.collectionFormat,
             paramStyle,
-            byVal,
             location,
           );
         } else {
           // TODO: unencoded query param
+          const type = this.adaptQueryScalarParameterType(methodParam.type);
           adaptedParam = new go.QueryScalarParameter(
             paramName,
             opParam.serializedName,
             true,
-            this.adaptQueryScalarParameterType(methodParam.type),
+            !byVal && helpers.isPtrType(type) ? this.ta.getPtrType(type) : type,
             paramStyle,
-            byVal,
             location,
           );
         }
@@ -1703,13 +1688,16 @@ export class ClientAdapter {
       type = this.ta.getReadSeekCloser(false);
     } else {
       type = this.ta.getWireType(paramAsSdkType, true, true);
+      if (!byVal && helpers.isPtrType(type)) {
+        type = this.ta.getPtrType(type);
+      }
     }
 
     paramName = getEscapedReservedName(
       helpers.getEffectiveName({ name: paramName, isExactName }, paramStyle === "required"),
       "Param",
     );
-    return new go.MultipartFormBodyParameter(paramName, type, paramStyle, byVal);
+    return new go.MultipartFormBodyParameter(paramName, type, paramStyle);
   }
 
   private getMethodNameForDocComment(method: go.MethodType): string {
@@ -1796,11 +1784,11 @@ export class ClientAdapter {
               `${httpHeader.serializedName}-`,
             );
           } else {
+            const type = this.adaptHeaderScalarType(httpHeader.type, false);
             headerResp = new go.HeaderScalarResponse(
               helpers.getEffectiveName(httpHeader),
-              this.adaptHeaderScalarType(httpHeader.type, false),
+              helpers.isPtrType(type) ? this.ta.getPtrType(type) : type,
               httpHeader.serializedName,
-              helpers.isTypePassedByValue(httpHeader.type),
             );
             if (go.isPageableMethod(method)) {
               pageableRespHeadersMap.set(httpHeader, headerResp);
@@ -1994,16 +1982,16 @@ export class ClientAdapter {
       respEnv.result.docs.summary = `Possible types are ${[...possibleTypes].sort().join(", ")}`;
     } else {
       const resultType = this.ta.getWireType(sdkResponseType, false, false);
+
       if (go.isMonomorphicResultType(resultType)) {
         let fieldName: string | undefined;
-        let xmlInfo: go.XMLInfo | undefined;
+        let xmlWrapper: string | undefined;
         if (contentType === "XML" && sdkResponseType.kind === "array") {
-          // this is for compat with autorest.go
-          xmlInfo = new go.XMLInfo();
+          // this is for compat with legacy behavior
           fieldName = sdkResponseType.name;
-          const elementType = (<go.Slice>resultType).elementType;
-          const elementTypeXmlName = helpers.hasXMLInfo(elementType)?.name;
-          xmlInfo.wraps =
+          const elementType = go.unwrapPtr((<go.Slice>resultType).elementType);
+          const elementTypeXmlName = go.hasXMLName(elementType);
+          xmlWrapper =
             elementTypeXmlName ?? go.getTypeDeclaration(elementType, method.receiver.type.pkg);
         }
 
@@ -2024,10 +2012,9 @@ export class ClientAdapter {
         respEnv.result = new go.MonomorphicResult(
           fieldName,
           contentType,
-          resultType,
-          helpers.isTypePassedByValue(sdkResponseType),
+          helpers.isPtrType(resultType) ? this.ta.getPtrType(resultType) : resultType,
         );
-        respEnv.result.xml = xmlInfo;
+        respEnv.result.xmlWrapper = xmlWrapper;
       } else {
         throw new AdapterError(
           "InternalError",
@@ -2102,7 +2089,11 @@ export class ClientAdapter {
       case "unknown":
         return this.ta.codeModel.options["rawjson-as-bytes"] ? "RawJSON" : "Interface";
       default:
-        throw new Error(`unhandled monomorphic response type kind ${type.kind}`);
+        throw new AdapterError(
+          "UnsupportedTsp",
+          `unsupported kind ${type.kind} for monomorphic response`,
+          type.__raw?.node,
+        );
     }
   }
 
@@ -2113,22 +2104,14 @@ export class ClientAdapter {
       if (param.style === "literal") {
         continue;
       }
-      let byValue =
-        param.style === "required" ||
-        (param.location === "client" && go.isClientSideDefault(param.style));
-      // if the param isn't required, check if it should be passed by value or not.
-      // optional params that are implicitly nil-able shouldn't be pointer-to-type.
-      if (!byValue) {
-        byValue = param.byValue;
-      }
-      const field = new go.StructField(param.name, param.type, byValue);
+      const field = new go.StructField(param.name, param.type);
       field.docs = param.docs;
       structType.fields.push(field);
     }
     return structType;
   }
 
-  private adaptHeaderScalarType(sdkType: tcgc.SdkType, forParam: boolean): go.HeaderScalarType {
+  private adaptHeaderScalarType(sdkType: tcgc.SdkType, forParam: boolean): go.HeaderScalarWireType {
     // It would be ideal to force the ETag type for the known ETag headers per the RFC.
     // However, doing so introduces too many breaking changes (if-match and if-none-match).
     // TODO: If we decide to force ETag types by header name in the future,
@@ -2147,7 +2130,7 @@ export class ClientAdapter {
     );
   }
 
-  private adaptPathScalarParameterType(sdkType: tcgc.SdkType): go.PathScalarParameterType {
+  private adaptPathScalarParameterType(sdkType: tcgc.SdkType): go.PathScalarParameterWireType {
     const type = this.ta.getWireType(sdkType, false, false);
     if (go.isPathScalarParameterType(type)) {
       return type;
@@ -2159,7 +2142,7 @@ export class ClientAdapter {
     );
   }
 
-  private adaptQueryScalarParameterType(sdkType: tcgc.SdkType): go.QueryScalarParameterType {
+  private adaptQueryScalarParameterType(sdkType: tcgc.SdkType): go.QueryScalarParameterWireType {
     const type = this.ta.getWireType(sdkType, false, false);
     if (go.isQueryScalarParameterType(type)) {
       return type;
@@ -2368,6 +2351,7 @@ export class ClientAdapter {
     exampleType: tcgc.SdkExampleValue,
     goType: go.WireType,
   ): Exclude<go.ExampleType, go.TokenCredentialExample> {
+    goType = go.unwrapPtr(goType);
     switch (exampleType.kind) {
       case "string":
         switch (goType.kind) {
@@ -2467,21 +2451,14 @@ export class ClientAdapter {
           if (exampleType.additionalPropertiesValue) {
             ret.additionalProperties = {};
             for (const [k, v] of Object.entries(exampleType.additionalPropertiesValue)) {
-              const filed = concreteType.fields.find((f) => f.annotations.isAdditionalProperties);
-              if (!filed) {
+              const field = concreteType.fields.find((f) => go.isAdditionalProperties(f));
+              if (!field) {
                 throw new AdapterError(
                   "InternalError",
                   `additional properties field not found in model '${concreteType.name}'.`,
                 );
               }
-              if (filed.type.kind === "map") {
-                ret.additionalProperties[k] = this.adaptExampleType(v, filed.type.valueType);
-              } else {
-                throw new AdapterError(
-                  "InternalError",
-                  `additional properties field type should be map type, but got '${filed.type.kind}' in model '${concreteType.name}'`,
-                );
-              }
+              ret.additionalProperties[k] = this.adaptExampleType(v, field.type.valueType);
             }
           }
           return ret;

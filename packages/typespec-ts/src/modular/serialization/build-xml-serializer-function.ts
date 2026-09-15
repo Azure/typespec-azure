@@ -23,7 +23,7 @@ import { getAdditionalPropertiesName, normalizeModelName } from "../emit-models.
 import { getAllAncestors, getAllProperties } from "../helpers/operation-helpers.js";
 import { getAdditionalPropertiesType } from "../helpers/type-helpers.js";
 import { XmlHelpers } from "../static-helpers-metadata.js";
-import { normalizeModelPropertyName } from "../type-expressions/get-type-expression.js";
+import { getModelPropertyName } from "../type-expressions/get-type-expression.js";
 import { isSupportedSerializeType, type ModelSerializeOptions } from "./serialize-utils.js";
 
 /**
@@ -290,8 +290,8 @@ function buildXmlObjectPropertyAssignments(
     }
 
     const xmlOptions = property.serializationOptions?.xml;
-    const propertyName = normalizeModelPropertyName(context, property);
-    const cleanPropertyName = propertyName.replace(/^"|"$/g, "");
+    const propertyName = getModelPropertyName(context, property);
+    const propertyAccessor = `item[${JSON.stringify(propertyName)}]`;
 
     // Use XML name if available, fall back to serializedName, then JSON name, then property name
     const xmlName = xmlOptions?.name ?? property.name;
@@ -302,14 +302,14 @@ function buildXmlObjectPropertyAssignments(
     let valueExpr: string;
     if (nestedSerializer && property.type.kind === "model") {
       // Nested object - use XML object serializer
-      valueExpr = `item["${cleanPropertyName}"] !== undefined ? ${nestedSerializer}(item["${cleanPropertyName}"]) : undefined`;
+      valueExpr = `${propertyAccessor} !== undefined ? ${nestedSerializer}(${propertyAccessor}) : undefined`;
     } else if (
       nestedSerializer &&
       property.type.kind === "array" &&
       property.type.valueType.kind === "model"
     ) {
       // Array of objects - map each item through XML object serializer
-      const mappedExpr = `item["${cleanPropertyName}"]?.map((i: any) => ${nestedSerializer}(i))`;
+      const mappedExpr = `${propertyAccessor}?.map((i: any) => ${nestedSerializer}(i))`;
       if (xmlOptions?.unwrapped) {
         // Unwrapped: items are direct siblings under the item element name
         const itemKey = xmlOptions?.itemsName ?? xmlName;
@@ -326,7 +326,7 @@ function buildXmlObjectPropertyAssignments(
       const primitiveExpr = buildXmlValueSerializationExpr(
         context,
         property.type,
-        `item["${cleanPropertyName}"]`,
+        propertyAccessor,
       );
       if (xmlOptions?.unwrapped) {
         const itemKey = xmlOptions?.itemsName ?? xmlName;
@@ -339,11 +339,7 @@ function buildXmlObjectPropertyAssignments(
       }
     } else {
       // Handle type-specific serialization
-      valueExpr = buildXmlValueSerializationExpr(
-        context,
-        property.type,
-        `item["${cleanPropertyName}"]`,
-      );
+      valueExpr = buildXmlValueSerializationExpr(context, property.type, propertyAccessor);
     }
 
     assignments.push(`"${xmlName}": ${valueExpr}`);
@@ -419,14 +415,13 @@ function buildPropertyMetadataArray(
 
     const xmlOptions = property.serializationOptions?.xml;
     const jsonOptions = property.serializationOptions?.json;
-    const propertyName = normalizeModelPropertyName(context, property);
-    const cleanPropertyName = propertyName.replace(/^"|"$/g, "");
+    const propertyName = getModelPropertyName(context, property);
 
     // Use XML name if available, fall back to JSON name, then property name
     const serializedName = xmlOptions?.name ?? jsonOptions?.name ?? property.name;
 
     const metadataObj: string[] = [
-      `propertyName: "${cleanPropertyName}"`,
+      `propertyName: ${JSON.stringify(propertyName)}`,
       `xmlOptions: { name: "${serializedName}"${buildXmlOptionsString(xmlOptions)} }`,
     ];
 
@@ -737,14 +732,13 @@ function buildDeserializePropertyMetadataArray(
 
     const xmlOptions = property.serializationOptions?.xml;
     const jsonOptions = property.serializationOptions?.json;
-    const propertyName = normalizeModelPropertyName(context, property);
-    const cleanPropertyName = propertyName.replace(/^"|"$/g, "");
+    const propertyName = getModelPropertyName(context, property);
 
     // Use XML name if available, fall back to JSON name, then property name
     const serializedName = xmlOptions?.name ?? jsonOptions?.name ?? property.name;
 
     const metadataObj: string[] = [
-      `propertyName: "${cleanPropertyName}"`,
+      `propertyName: ${JSON.stringify(propertyName)}`,
       `xmlOptions: { name: "${serializedName}"${buildXmlOptionsString(xmlOptions)} }`,
     ];
 

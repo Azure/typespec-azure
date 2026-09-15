@@ -31,3 +31,37 @@ op getInteger(): {
 @post
 @route("/double-decode/{path}")
 op doubleDecode(@path path: string, @query query: string): void;
+
+/**
+ * A path parameter that allows reserved characters (RFC 6570 reserved
+ * expansion). The client skips url.PathEscape for these values, so the
+ * fake must pass them through verbatim without url.PathUnescape.
+ */
+@get
+@route("/reserved-chars/{+path}")
+op reservedCharacters(@path path: string): void;
+
+/**
+ * A non-string (int32) path parameter, used to verify the fake parses
+ * the numeric path value rather than treating it as a string.
+ */
+@get
+@route("/int-path/{value}")
+op intPath(@path value: int32): void;
+
+/**
+ * An enum backed by integer values.
+ */
+enum IntEnum {
+  One: 1,
+  Two: 2,
+  Three: 3,
+}
+
+/**
+ * A path parameter whose type is an int-based enum, used to verify the
+ * fake parses the numeric path value and casts it to the enum type.
+ */
+@get
+@route("/int-enum-path/{value}")
+op intEnumPath(@path value: IntEnum): void;
