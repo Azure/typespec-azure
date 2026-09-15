@@ -1,3 +1,5 @@
+import { unsafe_Realm } from "@typespec/compiler/experimental";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok } from "assert";
 import { describe, expect, it } from "vitest";
 import type { ArmOperationKind, ArmResourceOperation } from "../src/operations.js";
@@ -485,6 +487,728 @@ describe("unit tests for resource manager helpers", () => {
   });
 });
 describe("end-to-end tests for resource manager helpers", () => {
+  it("preserves the complete legacy provider view when returning the cached result", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model Parent is TrackedResource<{}> {
+  ...ResourceNameParameter<Parent>;
+}
+
+@parentResource(Parent)
+model Child is ProxyResource<{}> {
+  ...ResourceNameParameter<Child>;
+}
+
+@armResourceOperations
+interface Parents {
+  get is ArmResourceRead<Parent>;
+}
+
+@armResourceOperations
+interface Children {
+  get is ArmResourceRead<Child>;
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Child>;
+}
+`);
+
+    const first = resolveArmResources(program);
+    const second = resolveArmResources(program);
+
+    expect(second).toBe(first);
+    expect(
+      first.resources?.map((resource) => ({
+        name: resource.resourceName,
+        type: resource.type.name,
+        resourceType: resource.resourceType,
+        path: resource.resourceInstancePath,
+        parent: resource.parent?.resourceName,
+        scope: typeof resource.scope === "string" ? resource.scope : resource.scope?.resourceName,
+        lifecycle: Object.fromEntries(
+          Object.entries(resource.operations.lifecycle).map(([kind, operations]) => [
+            kind,
+            operations?.map((operation) => ({
+              group: operation.operationGroup,
+              name: operation.name,
+              path: operation.path,
+            })),
+          ]),
+        ),
+      })),
+    ).toEqual([
+      {
+        name: "Parent",
+        type: "Parent",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["parents"],
+        },
+        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}",
+        parent: undefined,
+        scope: "ResourceGroup",
+        lifecycle: {
+          read: [
+            {
+              group: "Parents",
+              name: "get",
+              path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}",
+            },
+          ],
+          createOrUpdate: undefined,
+          update: undefined,
+          delete: undefined,
+          checkExistence: undefined,
+        },
+      },
+      {
+        name: "Child",
+        type: "Child",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["parents", "children"],
+        },
+        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}/children/{childName}",
+        parent: "Parent",
+        scope: "ResourceGroup",
+        lifecycle: {
+          read: [
+            {
+              group: "Children",
+              name: "get",
+              path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}/children/{childName}",
+            },
+          ],
+          createOrUpdate: [
+            {
+              group: "Children",
+              name: "createOrUpdate",
+              path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}/children/{childName}",
+            },
+          ],
+          update: undefined,
+          delete: undefined,
+          checkExistence: undefined,
+        },
+      },
+    ]);
+    expect(
+      first.providerOperations?.map((operation) => ({
+        group: operation.operationGroup,
+        name: operation.name,
+        path: operation.path,
+      })),
+    ).toEqual([
+      {
+        group: "Operations",
+        name: "list",
+        path: "/providers/Microsoft.ContosoProviderHub/operations",
+      },
+    ]);
+  }, 30_000);
+
+  it("resolves resources and operations for a selected API version", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+@versioned(Versions)
+namespace Microsoft.ContosoProviderHub;
+
+enum Versions {
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v1: "2024-01-01",
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2: "2025-01-01",
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v3: "2026-01-01",
+}
+
+@renamedFrom(Versions.v2, "OldWidget")
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
+}
+
+model WidgetProperties {
+  @typeChangedFrom(Versions.v2, string)
+  value: int32;
+
+  @added(Versions.v2)
+  currentOnly?: string;
+
+  @madeOptional(Versions.v3)
+  flexible?: string;
+}
+
+@added(Versions.v2)
+model Gadget is ProxyResource<{}> {
+  ...ResourceNameParameter<Gadget>;
+}
+
+@added(Versions.v2)
+@removed(Versions.v3)
+model Temporary is ProxyResource<{}> {
+  ...ResourceNameParameter<Temporary>;
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@added(Versions.v2)
+@route("/providers/Microsoft.ContosoProviderHub/status")
+interface ProviderStatus {
+  @returnTypeChangedFrom(Versions.v3, string)
+  @get status(): int32;
+}
+
+@renamedFrom(Versions.v2, "OldWidgets")
+@armResourceOperations
+interface Widgets {
+  @renamedFrom(Versions.v2, "fetch")
+  get is ArmResourceRead<Widget>;
+
+  @added(Versions.v2)
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+
+  @added(Versions.v2)
+  @removed(Versions.v3)
+  update is ArmResourcePatchSync<Widget, WidgetProperties>;
+}
+
+@added(Versions.v2)
+@armResourceOperations
+interface Gadgets {
+  get is ArmResourceRead<Gadget>;
+}
+
+@added(Versions.v2)
+@removed(Versions.v3)
+@armResourceOperations
+interface Temporaries {
+  get is ArmResourceRead<Temporary>;
+}
+`);
+
+    const legacyBeforeProjection = resolveArmResources(program);
+    const v1 = resolveArmResources(program, { version: "2024-01-01" });
+    const repeatedV1 = resolveArmResources(program, { version: "2024-01-01" });
+    const namedV1 = resolveArmResources(program, {
+      version: "2024-01-01",
+      nameResolver: ({ kind, defaultName }) =>
+        kind === "operation" ? `client${defaultName}` : `Client${defaultName}`,
+    });
+    const differentlyNamedV1 = resolveArmResources(program, {
+      version: "2024-01-01",
+      nameResolver: ({ defaultName }) => `Other${defaultName}`,
+    });
+    const v2 = resolveArmResources(program, { version: "2025-01-01" });
+    const v3 = resolveArmResources(program, { version: "2026-01-01" });
+
+    expect(repeatedV1).toBe(v1);
+    expect(namedV1).not.toBe(v1);
+    expect(namedV1.resources?.[0].resourceName).toBe("ClientOldWidget");
+    expect(namedV1.resources?.[0].operations.lifecycle.read?.[0]).toMatchObject({
+      name: "clientfetch",
+      operationGroup: "ClientOldWidgets",
+      resourceName: "ClientOldWidget",
+    });
+    expect(differentlyNamedV1.resources?.[0].resourceName).toBe("OtherOldWidget");
+    expect(v1.resources).toHaveLength(1);
+    const oldWidget = v1.resources![0];
+    expect(oldWidget.type.name).toBe("OldWidget");
+    expect(oldWidget.resourceName).toBe("OldWidget");
+    expect(oldWidget.operations.lifecycle.read?.[0]).toMatchObject({
+      name: "fetch",
+      operationGroup: "OldWidgets",
+    });
+    expect(oldWidget.operations.lifecycle.createOrUpdate).toBeUndefined();
+    expect(v1.providerOperations?.map((x) => x.name)).not.toContain("status");
+
+    const oldWidgetRealm = unsafe_Realm.realmForType.get(oldWidget.type);
+    expect(oldWidgetRealm).toBeDefined();
+    expect(unsafe_Realm.realmForType.get(repeatedV1.resources![0].type)).toBe(oldWidgetRealm);
+
+    const oldProperties = oldWidget.type.properties.get("properties")?.type;
+    ok(oldProperties?.kind === "Model");
+    expect(oldProperties.properties.has("currentOnly")).toBe(false);
+    expect(oldProperties.properties.get("value")?.type).toMatchObject({
+      kind: "Scalar",
+      name: "string",
+    });
+
+    expect(v2.resources?.map((x) => x.type.name).sort()).toEqual(["Gadget", "Temporary", "Widget"]);
+    const widget = v2.resources!.find((x) => x.type.name === "Widget");
+    ok(widget);
+    expect(widget.operations.lifecycle.read?.[0]).toMatchObject({
+      name: "get",
+      operationGroup: "Widgets",
+    });
+    expect(widget.operations.lifecycle.createOrUpdate).toHaveLength(1);
+    expect(widget.operations.lifecycle.update).toHaveLength(1);
+    expect(v2.providerOperations?.map((x) => x.name)).toContain("status");
+    expect(
+      v2.providerOperations?.find((x) => x.name === "status")?.operation.returnType,
+    ).toMatchObject({
+      kind: "Scalar",
+      name: "string",
+    });
+
+    const currentProperties = widget.type.properties.get("properties")?.type;
+    ok(currentProperties?.kind === "Model");
+    expect(currentProperties.properties.has("currentOnly")).toBe(true);
+    expect(currentProperties.properties.get("value")?.type).toMatchObject({
+      kind: "Scalar",
+      name: "int32",
+    });
+    expect(currentProperties.properties.get("flexible")?.optional).toBe(false);
+
+    expect(v3.resources?.map((x) => x.type.name).sort()).toEqual(["Gadget", "Widget"]);
+    const latestWidget = v3.resources!.find((x) => x.type.name === "Widget");
+    ok(latestWidget);
+    expect(latestWidget.operations.lifecycle.update).toBeUndefined();
+    const latestProperties = latestWidget.type.properties.get("properties")?.type;
+    ok(latestProperties?.kind === "Model");
+    expect(latestProperties.properties.get("flexible")?.optional).toBe(true);
+    expect(
+      v3.providerOperations?.find((x) => x.name === "status")?.operation.returnType,
+    ).toMatchObject({
+      kind: "Scalar",
+      name: "int32",
+    });
+
+    const legacy = resolveArmResources(program);
+    expect(legacy).toBe(legacyBeforeProjection);
+    expect(legacy.resources?.map((x) => x.type.name).sort()).toEqual([
+      "Gadget",
+      "Temporary",
+      "Widget",
+    ]);
+    expect(legacy.resources?.some((x) => unsafe_Realm.realmForType.has(x.type))).toBe(false);
+  }, 30_000);
+
+  it("reports invalid selected API versions", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+@versioned(Versions)
+namespace Microsoft.ContosoProviderHub;
+
+enum Versions {
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v1: "2024-01-01",
+}
+
+model Widget is TrackedResource<{}> {
+  ...ResourceNameParameter<Widget>;
+}
+
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<Widget>;
+}
+`);
+
+    expect(resolveArmResources(program, { version: "2099-01-01" })).toEqual({});
+    expectDiagnostics(program.diagnostics, {
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-version-not-found",
+      message: "API version '2099-01-01' was not found. Available versions: 2024-01-01.",
+    });
+  });
+
+  it("reports a selected API version for a transiently versioned service", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+model Widget is TrackedResource<{}> {
+  ...ResourceNameParameter<Widget>;
+}
+
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<Widget>;
+}
+`);
+
+    expect(resolveArmResources(program, { version: "2024-01-01" })).toEqual({});
+    expectDiagnostics(program.diagnostics, {
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-version-transient",
+      message:
+        "API version '2024-01-01' cannot be selected because the ARM service uses transient versioning.",
+    });
+  });
+
+  it("customizes logical names without mutating the cached provider", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model Parent is TrackedResource<{}> {
+  ...ResourceNameParameter<Parent>;
+}
+
+@parentResource(Parent)
+model Child is ProxyResource<{}> {
+  ...ResourceNameParameter<Child>;
+}
+
+@armResourceOperations
+interface Children {
+  get is ArmResourceRead<Child>;
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Child>;
+}
+`);
+
+    const original = resolveArmResources(program);
+    const requests: Array<{
+      kind: string;
+      defaultName: string;
+      typeName: string;
+      resourceModel?: string;
+      resourceType?: string;
+      resourceInstancePath?: string;
+    }> = [];
+    const named = resolveArmResources(program, {
+      nameResolver: (request) => {
+        requests.push({
+          kind: request.kind,
+          defaultName: request.defaultName,
+          typeName: String(request.type.name),
+          resourceModel: request.resourceModel?.name,
+          resourceType: request.resourceType,
+          resourceInstancePath: request.resourceInstancePath,
+        });
+        switch (request.kind) {
+          case "resource":
+            return `Client${request.defaultName}`;
+          case "operation":
+            return `client${request.defaultName}`;
+          case "operation-group":
+            return `Client${request.defaultName}`;
+        }
+      },
+    });
+
+    expect(named).not.toBe(original);
+    const child = named.resources?.find((x) => x.type.name === "Child");
+    ok(child);
+    expect(child.resourceName).toBe("ClientChild");
+    expect(child.operations.lifecycle.read?.[0]).toMatchObject({
+      name: "clientget",
+      operationGroup: "ClientChildren",
+      resourceName: "ClientChild",
+      resourceModelName: "ClientChild",
+    });
+
+    const syntheticParent = named.resources?.find(
+      (x) => x.resourceType.types.join("/") === "parents",
+    );
+    ok(syntheticParent);
+    expect(syntheticParent.resourceName).toBe("Parent");
+
+    expect(requests).toContainEqual({
+      kind: "resource",
+      defaultName: "Child",
+      typeName: "Child",
+      resourceModel: undefined,
+      resourceType: "Microsoft.ContosoProviderHub/parents/children",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}/children/{childName}",
+    });
+    expect(requests).toContainEqual({
+      kind: "operation",
+      defaultName: "get",
+      typeName: "get",
+      resourceModel: "Child",
+      resourceType: "Microsoft.ContosoProviderHub/parents/children",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}/children/{childName}",
+    });
+    expect(requests).toContainEqual({
+      kind: "operation-group",
+      defaultName: "Children",
+      typeName: "Children",
+      resourceModel: "Child",
+      resourceType: "Microsoft.ContosoProviderHub/parents/children",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}/children/{childName}",
+    });
+
+    expect(resolveArmResources(program)).toBe(original);
+    expect(original.resources?.find((x) => x.type.name === "Child")?.resourceName).toBe("Child");
+    expect(
+      original.resources?.find((x) => x.type.name === "Child")?.operations.lifecycle.read?.[0],
+    ).toMatchObject({
+      name: "get",
+      operationGroup: "Children",
+      resourceName: "Child",
+      resourceModelName: "Child",
+    });
+  }, 30_000);
+
+  it("customizes every operation category without changing wire metadata", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  value?: string;
+}
+
+model MoveRequest {
+  destination: string;
+}
+
+model MoveResponse {
+  status: string;
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is ArmResourceDeleteSync<Employee>;
+  checkExistence is ArmResourceCheckExistence<Employee>;
+  listByResourceGroup is ArmResourceListByParent<Employee>;
+  move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+}
+`);
+
+    const original = resolveArmResources(program);
+    const named = resolveArmResources(program, {
+      nameResolver: ({ kind, defaultName }) =>
+        kind === "operation" ? `client${defaultName}` : `Client${defaultName}`,
+    });
+
+    const originalEmployee = original.resources?.find((x) => x.type.name === "Employee");
+    const employee = named.resources?.find((x) => x.type.name === "Employee");
+    ok(originalEmployee);
+    ok(employee);
+    expect(employee.resourceName).toBe("ClientEmployee");
+    expect(employee.resourceType).toEqual(originalEmployee.resourceType);
+    expect(employee.resourceInstancePath).toBe(originalEmployee.resourceInstancePath);
+
+    for (const kind of ["read", "createOrUpdate", "update", "delete", "checkExistence"] as const) {
+      const originalOperation = originalEmployee.operations.lifecycle[kind]?.[0];
+      const operation = employee.operations.lifecycle[kind]?.[0];
+      ok(originalOperation);
+      ok(operation);
+      expect(operation.name).toBe(`client${originalOperation.name}`);
+      expect(operation.operationGroup).toBe("ClientEmployees");
+      expect(operation.resourceName).toBe("ClientEmployee");
+      expect(operation.resourceModelName).toBe("ClientEmployee");
+      expect(operation.path).toBe(originalOperation.path);
+      expect(operation.httpOperation.verb).toBe(originalOperation.httpOperation.verb);
+    }
+
+    const originalList = originalEmployee.operations.lists[0];
+    const list = employee.operations.lists[0];
+    expect(list).toMatchObject({
+      name: "clientlistByResourceGroup",
+      operationGroup: "ClientEmployees",
+      resourceName: "ClientEmployee",
+      resourceModelName: "ClientEmployee",
+    });
+    expect(list.path).toBe(originalList.path);
+    expect(list.httpOperation.verb).toBe(originalList.httpOperation.verb);
+
+    const originalAction = originalEmployee.operations.actions[0];
+    const action = employee.operations.actions[0];
+    expect(action).toMatchObject({
+      name: "clientmove",
+      operationGroup: "ClientEmployees",
+      resourceName: "ClientEmployee",
+      resourceModelName: "ClientEmployee",
+    });
+    expect(action.path).toBe(originalAction.path);
+    expect(action.httpOperation.verb).toBe(originalAction.httpOperation.verb);
+
+    expect(employee.associatedOperations).toEqual([]);
+    expect(employee.associatedOperations).not.toBe(originalEmployee.associatedOperations);
+
+    const originalProviderOperation = original.providerOperations?.find((x) => x.name === "list");
+    const providerOperation = named.providerOperations?.find((x) => x.name === "clientlist");
+    ok(originalProviderOperation);
+    ok(providerOperation);
+    expect(providerOperation.operationGroup).toBe("ClientOperations");
+    expect(providerOperation.path).toBe(originalProviderOperation.path);
+    expect(providerOperation.httpOperation.verb).toBe(originalProviderOperation.httpOperation.verb);
+  }, 30_000);
+
+  it("preserves parent and resource-valued scope references in customized graphs", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+model Parent is TrackedResource<{}> {
+  ...ResourceNameParameter<Parent>;
+}
+
+@parentResource(Parent)
+model Child is ProxyResource<{}> {
+  ...ResourceNameParameter<Child>;
+}
+
+model OrphanParent is TrackedResource<{}> {
+  ...ResourceNameParameter<OrphanParent>;
+}
+
+@parentResource(OrphanParent)
+model OrphanChild is ProxyResource<{}> {
+  ...ResourceNameParameter<OrphanChild>;
+}
+
+model ExtensionWidget is ExtensionResource<{}> {
+  ...ResourceNameParameter<ExtensionWidget>;
+}
+
+alias VirtualMachine = Extension.ExternalResource<
+  "Microsoft.Compute",
+  "virtualMachines",
+  "vmName"
+>;
+
+@armResourceOperations
+interface Parents {
+  get is ArmResourceRead<Parent>;
+}
+
+@armResourceOperations
+interface Children {
+  get is ArmResourceRead<Child>;
+}
+
+@armResourceOperations
+interface OrphanChildren {
+  get is ArmResourceRead<OrphanChild>;
+}
+
+@armResourceOperations
+interface ExtensionWidgets {
+  get is Extension.Read<VirtualMachine, ExtensionWidget>;
+}
+`);
+
+    const original = resolveArmResources(program);
+    const named = resolveArmResources(program, {
+      nameResolver: ({ defaultName }) => `Client${defaultName}`,
+    });
+
+    const parent = named.resources?.find((x) => x.type.name === "Parent");
+    const child = named.resources?.find((x) => x.type.name === "Child");
+    ok(parent);
+    ok(child);
+    expect(child.parent).toBe(parent);
+    expect(child.parent).not.toBe(original.resources?.find((x) => x.type.name === "Child")?.parent);
+    expect(parent.resourceName).toBe("ClientParent");
+    expect(child.resourceName).toBe("ClientChild");
+
+    const orphanChild = named.resources?.find(
+      (x) => x.type.name === "OrphanChild" && x.resourceType.types.at(-1) === "orphanChildren",
+    );
+    ok(orphanChild);
+    ok(orphanChild.parent);
+    expect(orphanChild.parent.resourceName).toBe("OrphanParent");
+    expect(named.resources).toContain(orphanChild.parent);
+
+    const extensionWidget = named.resources?.find((x) => x.type.name === "ExtensionWidget");
+    ok(extensionWidget);
+    expect(typeof extensionWidget.scope).toBe("object");
+    ok(typeof extensionWidget.scope === "object");
+    expect(extensionWidget.scope.resourceName).toBe("VirtualMachine");
+    expect(named.resources).toContain(extensionWidget.scope);
+    expect(extensionWidget.scope).not.toBe(
+      original.resources?.find((x) => x.type.name === "ExtensionWidget")?.scope,
+    );
+  }, 30_000);
+
+  it("handles metadata name resolver fallback, empty names, and errors", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+model Widget is TrackedResource<{}> {
+  ...ResourceNameParameter<Widget>;
+}
+
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<Widget>;
+}
+`);
+
+    const original = resolveArmResources(program);
+    const fallback = resolveArmResources(program, {
+      nameResolver: () => undefined,
+    });
+    expect(fallback).not.toBe(original);
+    expect(fallback.resources?.[0].resourceName).toBe("Widget");
+
+    const empty = resolveArmResources(program, {
+      nameResolver: ({ kind }) => (kind === "resource" ? "" : undefined),
+    });
+    expect(empty.resources?.[0].resourceName).toBe("Widget");
+    const emptyOperation = resolveArmResources(program, {
+      nameResolver: ({ kind }) => (kind === "operation" ? "" : undefined),
+    });
+    expect(emptyOperation.resources?.[0].operations.lifecycle.read?.[0].name).toBe("get");
+    const emptyOperationGroup = resolveArmResources(program, {
+      nameResolver: ({ kind }) => (kind === "operation-group" ? "" : undefined),
+    });
+    expect(emptyOperationGroup.resources?.[0].operations.lifecycle.read?.[0].operationGroup).toBe(
+      "Widgets",
+    );
+    expectDiagnostics(program.diagnostics, [
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-metadata-name",
+        message: "The metadata name resolver returned an empty resource name for 'Widget'.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-metadata-name",
+        message: "The metadata name resolver returned an empty operation name for 'get'.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-metadata-name",
+        message: "The metadata name resolver returned an empty operation-group name for 'Widgets'.",
+      },
+    ]);
+
+    expect(() =>
+      resolveArmResources(program, {
+        nameResolver: () => {
+          throw new Error("consumer naming failed");
+        },
+      }),
+    ).toThrow("consumer naming failed");
+    expect(resolveArmResources(program)).toBe(original);
+  });
+
   it("collects operation information for tracked resources", async () => {
     const { program } = await Tester.compile(`
 using Azure.Core;
