@@ -30,10 +30,6 @@
       "count": 1
     },
     {
-      "code": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
-      "count": 1
-    },
-    {
       "code": "@azure-tools/typespec-azure-core/no-unnamed-types",
       "count": 1
     },

@@ -5,8 +5,8 @@ import {
   getLifecycleVisibilityEnum,
   getLocationContext,
   getVisibilityForClass,
-  isNullType,
   isNeverType,
+  isNullType,
   paramMessage,
   resolveEncodedName,
   type DiagnosticTarget,
@@ -46,12 +46,12 @@ export const patchBodyParametersSchemaRule = createRule({
           return;
         }
 
-        const patchBody = httpOperation.parameters.body?.type;
-        if (patchBody === undefined) {
+        const patchBody = httpOperation.parameters.body;
+        if (patchBody?.bodyKind !== "single") {
           return;
         }
 
-        for (const violation of findViolations(context.program, patchBody, operation)) {
+        for (const violation of findViolations(context.program, patchBody.type, operation)) {
           context.reportDiagnostic({
             target: violation.target,
             messageId: violation.messageId,
@@ -118,10 +118,7 @@ function collectViolations(
   if (
     discriminator !== undefined &&
     getModelProperty(model, discriminator.propertyName) === undefined &&
-    !isTopLevelIdentityProperty(
-      [...path, discriminator.propertyName],
-      discriminator.propertyName,
-    )
+    !isTopLevelIdentityProperty([...path, discriminator.propertyName], discriminator.propertyName)
   ) {
     violations.push({
       target: getLocationContext(program, model).type === "project" ? model : diagnosticTarget,

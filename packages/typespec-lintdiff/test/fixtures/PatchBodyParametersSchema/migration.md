@@ -1,6 +1,87 @@
 # PatchBodyParametersSchema migration evidence
 
-## Conclusion
+## Result and gap summary
+
+The payload-kind repair removes false positives on multipart wrappers and file payloads:
+HTTP `bodyKind` now limits property traversal to `single` bodies. Six native tests and
+fifteen comparison fixtures pass; ordinary and nullable single models retain required,
+default (including falsy values), and create-only checks. The new fixtures emit required
+`formData` parameters or a primitive binary body schema, with no Swagger or TypeSpec
+property-rule violations after the repair. Independent ARM non-JSON warnings remain.
+
+The September 15 full corpus completed with 462 of 468 projects compiling: 703 Swagger
+diagnostics in 93 projects versus 872 selected-version TypeSpec diagnostics in 105 projects,
+with all 93 overlapping and no validator-only projects. These rule totals and the twelve
+TypeSpec-only projects match the August 25 evidence. Six known compile-failure projects
+remain excluded. Falsy defaults explain part of the difference; the remaining per-path
+discrepancies are not fully classified, so coverage remains partial. Corpus counts alone
+do not prove payload-kind coverage; the new native tests and emitted fixtures provide it.
+
+## Current full corpus (September 15)
+
+The existing `specs:typespec` runner used pinned specs commit
+`f6b53f105b95da05276530a0754a1c71b4f16397`, no project filter or limit, and concurrency six.
+A two-project smoke run passed first. The full run exited zero, generated its report at
+`2026-09-15T05:41:34.365Z`, and finished at `2026-09-15T05:44:01.8726816Z`; recorded analysis
+duration was 1,233,287 ms. Generated corpus files are validation artifacts, not source changes.
+
+| Current result                                   |     Count |
+| ------------------------------------------------ | --------: |
+| Source projects                                  |       468 |
+| Successfully compiled projects                   |       462 |
+| Compile-failure projects                         |         6 |
+| Validator projects / diagnostics                 |  93 / 703 |
+| Selected-version TypeSpec projects / diagnostics | 105 / 872 |
+| Same-project overlap                             |        93 |
+| Validator-only projects                          |         0 |
+| TypeSpec-only projects                           |        12 |
+
+The twelve TypeSpec-only projects exactly match the [original aligned project list](#original-aligned-project-sets-august-25).
+The six failed projects exactly match the [original failure list](#original-compile-failures-august-25).
+They remain explicitly excluded from the aligned comparison; the runner's successful exit
+does not mean every project compiled. There are no unassessed validator projects for this rule.
+
+Across all rules and projects, including failed projects, recorded raw diagnostics total
+51,831 and the runner reports 51,515 projected diagnostics. Those aggregate counts reflect
+the current target branch's entire ruleset and are not attributed to this payload-kind fix.
+The selected-version policy remains `http-reachable`; ordinary source linting is unchanged.
+The twelve one-sided projects were not newly classified path by path in this repair: the
+documented falsy-default explanation and remaining uncertainty still apply.
+
+## Payload-kind repair evidence
+
+The source repair is based on `feature/lintdiff-migration-new` commit
+`274c4c327a4eef84ba6416281707dc9c2735781d`, after the original source PR was merged.
+The source namespace-isolation guard and all property-checking semantics are unchanged.
+The separate official-rule promotion's enablement-based applicability remains a promotion
+adaptation, not part of this source repair.
+
+Before the fix, emitter-free native tests reproduced two required-property warnings for
+multipart `name`/`contents` parts and one warning for `File.contents`. The multipart-tuple,
+single-binary, ordinary-model, and nullable-model controls passed. After the fix all six
+tests pass. The initial test-host attempt lacked the ARM library's transitive
+`@typespec/openapi` registration; adding that test library resolved setup without adding
+any emitter or production dependency.
+
+| Comparison fixture               | Emitted PATCH parameter                                                                            | Swagger / repaired TypeSpec result    |
+| -------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| `multipart-patch-body-compliant` | Required `name` string and `contents` file parameters, both `in: formData`; no wrapper body schema | Zero / zero property-rule diagnostics |
+| `file-patch-body-compliant`      | Required `in: body` parameter with `{ "type": "string", "format": "binary" }` schema               | Zero / zero property-rule diagnostics |
+
+The validator's `patch-body-parameters` function ignores parameters unless `in === "body"`
+and a schema is present; a primitive binary schema has no properties to inspect. Production
+code uses supported HTTP metadata, not emitted Swagger. The [payload-kind matrix](./rule.md#payload-kind-evidence)
+distinguishes valid HTTP authoring from unrelated ARM guideline violations. These comparison
+fixtures are not evidence that multipart or file updates satisfy all ARM guidelines.
+
+The full fifteen-case fixture validation also refreshed this rule's pre-existing snapshots:
+common-type references now use the fixture harness's stable repository-relative junction
+path instead of a machine-specific external path. Reviewed ambient expectations reflect
+the target branch's existing `parameters-schema-as-type-object` union handling and
+`consistent-patch-properties` discriminator check; the `never` fixture now records its
+previously unreviewed ambient diagnostics. No unrelated rule implementation changed.
+
+## Original migration conclusion (historical)
 
 The migrated TypeSpec rule required production and comparison-harness updates. The production rule now covers the Swagger rule's authorable required, default, and create-only branches; traverses model variants inside unions, including nullable top-level PATCH bodies; preserves project-owned diagnostic targets while traversing imported library models; and mirrors Swagger's top-level emitted-JSON `identity` exception. It uses the same HTTP metadata visibility and optionality APIs as the Autorest emitter, so it checks only properties present in the effective PATCH schema and reports required properties according to their emitted PATCH optionality.
 
@@ -8,7 +89,7 @@ The corpus comparison now projects opted-in rules to the dataset-selected API ve
 
 The final full corpus run reports all 93 validator projects in the TypeSpec set, with no validator-only projects. TypeSpec-only projects fell from 51 to 12 after selected-version reachability and emitted PATCH schema filtering were applied. The rule remains **partial** because the remaining TypeSpec-only findings include intentional detection of falsy defaults that Swagger misses and other source-to-emission differences that have not all been classified path by path.
 
-## Evidence provenance
+## Original evidence provenance (August 25)
 
 - Validator report: `packages/typespec-lintdiff/specs/validator-results.json`, generated from azure-rest-api-specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` by the dataset recorded in `packages/typespec-lintdiff/specs/_meta.json`.
 - TypeSpec report: local full run generated at `2026-08-25T04:55:45.589Z` from the same specs commit and this branch's review fixes documented below. Generated `packages/typespec-lintdiff/specs` artifacts were used as validation evidence only and intentionally excluded from this rule PR.
@@ -44,7 +125,7 @@ The final full corpus run reports all 93 validator projects in the TypeSpec set,
   - `never-property-compliant` covers a required source property omitted because its type is `never`;
   - `default-patch-property` includes `false`, `0`, and `""` defaults to prove those valid TypeSpec findings are retained.
 
-## Final corpus
+## Original full corpus (August 25)
 
 The final full run used specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` and was generated on `2026-08-25T04:55:45.589Z`.
 
@@ -153,9 +234,9 @@ model DerivedDiscriminator extends BaseSynthesizedDiscriminator {
 "DerivedDiscriminator": { "allOf": [{ "$ref": "#/definitions/BaseSynthesizedDiscriminator" }] }
 ```
 
-| Engine            | Observed result                                                                                                 |
-| ----------------- | --------------------------------------------------------------------------------------------------------------- |
-| Swagger validator | Three required-property diagnostics.                                                                            |
+| Engine            | Observed result                                                                                                  |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Swagger validator | Three required-property diagnostics.                                                                             |
 | TypeSpec lint     | Three matching diagnostics after mirroring Autorest's direct, synthesized, and inherited discriminator behavior. |
 
 **Disposition:** Production rule fix and focused violating fixture.
@@ -197,9 +278,9 @@ details?: WidgetPatchDetails | null;
 model WidgetPatchDetails { requiredProp: string; }
 ```
 
-| Engine            | Observed result                                                                                             |
-| ----------------- | ----------------------------------------------------------------------------------------------------------- |
-| Swagger validator | Reports required properties inside nullable model references.                                               |
+| Engine            | Observed result                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------------------ |
+| Swagger validator | Reports required properties inside nullable model references.                                                |
 | TypeSpec lint     | Reports `requiredProp` and `details.requiredProp` after traversing model variants in root and nested unions. |
 
 **Disposition:** Production recursive traversal fix.
@@ -247,7 +328,7 @@ Projected TypeSpec diagnostics: 51,000
 
 **Disposition:** Comparison projection only. Raw diagnostics remain recorded and normal lint behavior is unchanged.
 
-## Aligned project sets
+## Original aligned project sets (August 25)
 
 Validator-only projects: none.
 
@@ -283,7 +364,7 @@ The four validator-only projects in the pre-fix report had two concrete causes:
 
 Union traversal and the project-owned target fallback fixed both causes. The final corpus confirms all four projects overlap with validator findings.
 
-## Compile failures
+## Original compile failures (August 25)
 
 The full corpus run had six TypeSpec compile failures, excluded from the aligned behavioral comparison:
 
@@ -298,7 +379,7 @@ No `PatchBodyParametersSchema` validator-only project is hidden by these failure
 
 ## Fixture evidence
 
-The repository's fixture harness validates thirteen cases:
+The repository's fixture harness now validates fifteen cases:
 
 - `required-patch-property`: Swagger and TypeSpec report the required property.
 - `nullable-body-required-property`: Swagger and TypeSpec report a required property in a nullable top-level PATCH body.
@@ -313,6 +394,8 @@ The repository's fixture harness validates thirteen cases:
 - `implicit-optional-patch-compliant`: both sides are clean when the transformed PATCH schema makes required source properties optional and omits a create-only source property.
 - `multi-model-union-compliant`: both sides are clean for unsupported multi-model unions because Autorest emits no traversable PATCH schema properties.
 - `never-property-compliant`: both sides are clean when Autorest omits a required `never`-typed property.
+- `multipart-patch-body-compliant`: both sides are clean for required multipart parts emitted as `formData`, with independent ARM warnings recorded.
+- `file-patch-body-compliant`: both sides are clean for a file payload emitted as a primitive binary body schema, with independent ARM warnings recorded.
 
 An earlier review suggested treating `Lifecycle.Create` combined with non-emitted lifecycle members such as `Lifecycle.Delete` as create-only. A focused fixture showed that such a property is omitted from the PATCH schema and Swagger does not report it, so that suggestion was rejected to avoid a TypeSpec-only false positive.
 
