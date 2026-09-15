@@ -23,7 +23,6 @@ import {
   Visibility,
   type MetadataInfo,
 } from "@typespec/http";
-import { resolveProviderNamespace } from "../namespace.js";
 
 export const noUnsafePatchBodyPropertiesRule = createRule({
   name: "no-unsafe-patch-body-properties",
@@ -39,11 +38,6 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
   create(context) {
     return {
       operation: (operation) => {
-        const namespace = operation.interface?.namespace ?? operation.namespace;
-        if (resolveProviderNamespace(context.program, namespace) === undefined) {
-          return;
-        }
-
         const [httpOperation] = getHttpOperation(context.program, operation);
         if (httpOperation.verb !== "patch") {
           return;

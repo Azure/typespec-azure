@@ -8,6 +8,12 @@ PATCH describes partial updates. Required PATCH body properties, default-valued 
 
 The rule checks the effective emitted PATCH payload. Properties omitted from the PATCH payload, such as `never` properties or create-only properties removed by the PATCH visibility transform, are not reported. A top-level emitted property named `identity` is skipped to match ARM PATCH identity envelope behavior.
 
+## Applicability
+
+Enable this rule for compilations that should follow ARM PATCH guidance. When enabled, it checks PATCH operations in ordinary and nested namespaces, including interfaces, without requiring `@armProviderNamespace`. It does not distinguish ARM and data-plane services within the same compilation.
+
+The shared `@azure-tools/typespec-azure-rulesets/resource-manager` ruleset currently leaves this rule disabled; enable `@azure-tools/typespec-azure-resource-manager/no-unsafe-patch-body-properties` explicitly to use it.
+
 ## ❌ Incorrect
 
 ```tsp

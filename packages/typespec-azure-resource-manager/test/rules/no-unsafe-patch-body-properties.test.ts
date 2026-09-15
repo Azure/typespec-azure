@@ -32,6 +32,76 @@ function patchOperation(bodyType: string): string {
   `;
 }
 
+describe.each([
+  ["with provider metadata", "@armProviderNamespace"],
+  ["without provider metadata", ""],
+])("applicability %s", (_, providerDecorator) => {
+  it.each([
+    ["service namespace", "", ""],
+    ["nested namespace", "namespace Widgets {", "}"],
+    ["nested interface", "namespace Widgets { interface Operations {", "} }"],
+  ])("checks PATCH bodies in a %s", async (_, beforeOperation, afterOperation) => {
+    await tester
+      .expect(
+        `
+        ${providerDecorator}
+        namespace Microsoft.TestService;
+
+        model WidgetPatchBody {
+          displayName: string;
+          enabled?: boolean = false;
+          @visibility(Lifecycle.Create)
+          createdBy?: string;
+        }
+
+        ${beforeOperation}
+        @route("/widgets/{name}")
+        @patch
+        op update(@path name: string, @body body: WidgetPatchBody): void;
+        ${afterOperation}
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: ruleCode,
+          message: "Properties of a PATCH request body must not be required, property:displayName.",
+        },
+        {
+          code: ruleCode,
+          message:
+            "Properties of a PATCH request body must not have default value, property:enabled.",
+        },
+        {
+          code: ruleCode,
+          message:
+            'Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:createdBy.',
+        },
+      ]);
+  });
+
+  it.each(["post", "put"])("ignores %s request bodies", async (verb) => {
+    await tester
+      .expect(
+        `
+        ${providerDecorator}
+        namespace Microsoft.TestService;
+
+        namespace Widgets {
+          @route("/widgets")
+          @${verb}
+          op write(@body body: {
+            displayName: string;
+            enabled?: boolean = false;
+            @visibility(Lifecycle.Create)
+            createdBy?: string;
+          }): void;
+        }
+        `,
+      )
+      .toBeValid();
+  });
+});
+
 describe("invalid cases", () => {
   it("emits diagnostics for required PATCH body properties", async () => {
     await tester
