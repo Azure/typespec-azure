@@ -38,7 +38,12 @@ the verified canonical fetch remote; substitute its actual name when different.
 
 Git upstream controls tracking, push settings control push routing, and
 `gh-merge-base` is a CLI base hint. None changes an app session's comparison or
-publication binding. Record prior values and rationale before any task-local
+publication binding. Do not point upstream at the canonical BASE merely to
+select a PR base: a publisher that resolves its HEAD from upstream needs tracking
+of the actual remote task head. Verify the selected backend's behavior; this is
+not a claim that every publisher uses upstream. Keep canonical fetch/base refs
+and app/CLI base controls separate from head tracking.
+Record prior values and rationale before any task-local
 tracking/pushRemote/gh-merge-base adjustment; do not change global defaults or
 unrelated branches. Verify the effective destination afterward. A valid Git diff
 does not compensate for a missing/wrong app base. If no supported control can
