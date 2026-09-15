@@ -270,13 +270,14 @@ model Azure.ResourceManager.ArmFeatureFileOptions
 
 #### Properties
 
-| Name            | Type     | Description                               |
-| --------------- | -------- | ----------------------------------------- |
-| featureName     | `string` | The feature name                          |
-| fileName        | `string` | The associated file name for the features |
-| description     | `string` | The feature description in Swagger        |
-| title?          | `string` | The feature title in Swagger              |
-| termsOfService? | `string` | The feature terms of service in Swagger   |
+| Name            | Type     | Description                                                         |
+| --------------- | -------- | ------------------------------------------------------------------- |
+| featureName     | `string` | The feature name                                                    |
+| fileName        | `string` | The associated file name for the features                           |
+| description     | `string` | The feature description in Swagger                                  |
+| title?          | `string` | The feature title in Swagger                                        |
+| termsOfService? | `string` | The feature terms of service in Swagger                             |
+| version?        | `string` | The API version to use for clients generated from this feature file |
 
 ### `ArmFilterParameter` {#Azure.ResourceManager.ArmFilterParameter}
 
