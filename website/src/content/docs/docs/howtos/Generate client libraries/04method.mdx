@@ -1827,7 +1827,7 @@ The `@override` decorator allows you to customize method signatures in generated
 
 - Make optional parameters required for certain languages
 - Add language-specific convenience parameters
-- Change the return type for better developer experience
+- Replace the generated response with `void` or raw bytes
 - Group parameters into option bags
 - Remove parameters that shouldn't be exposed in the client
 
@@ -1840,7 +1840,7 @@ The `@override` decorator takes a target operation and a custom operation that d
 @@override(OriginalOperation, CustomOperation, "python"); // Language-specific
 ```
 
-When applied, the method parameters come from the override operation while the underlying HTTP operation remains unchanged. TCGC maps method parameters to operation parameters based on name matching.
+When applied, the method parameters come from the override operation while the underlying HTTP operation remains unchanged. TCGC maps method parameters to operation parameters based on name matching. The override operation's declared return type is ignored unless the operation was produced by `replaceResponseWithVoid` or `replaceResponseWithBytes`.
 
 :::caution
 The override operation must preserve every parameter that is realized as a path parameter in the original operation's HTTP route, keeping its `@path` decorator. Dropping such a parameter — or redeclaring it without `@path` — reports an `override-parameters-mismatch` error, because the underlying route still requires that value. To relocate a parameter instead of dropping it, use [`@clientLocation`](#using-clientlocation-to-control-parameter-placement).
@@ -2382,7 +2382,7 @@ export async function download(
 
 Both response transformations can be chained with parameter transformations and scoped through `@override`. Replacing a pageable operation's response with either `void` or `bytes` also makes the generated method non-pageable.
 
-An intentional `void` or `bytes` replacement reports the `override-response-replacement` warning; suppress it at the customization site after confirming the replacement is expected. An override operation with any other response incompatible with the original reports the `override-response-mismatch` error. Use these functions instead of declaring an arbitrary incompatible return type.
+An intentional `void` or `bytes` replacement reports the `override-response-replacement` warning; suppress it at the customization site after confirming the replacement is expected. Declaring a return type directly on a plain override operation does not replace the generated method response or produce a response diagnostic. Use these transformation functions when you intend to replace the response.
 
 ### Chaining transformations
 
