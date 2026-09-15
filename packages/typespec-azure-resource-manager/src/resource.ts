@@ -81,13 +81,7 @@ import {
 import { ArmStateKeys } from "./state.js";
 
 export type ArmResourceKind =
-  | "Tracked"
-  | "Proxy"
-  | "Extension"
-  | "Virtual"
-  | "Custom"
-  | "BuiltIn"
-  | "Generic";
+  "Tracked" | "Proxy" | "Extension" | "Virtual" | "Custom" | "BuiltIn" | "Generic";
 
 /**
  * The base details for all kinds of resources
