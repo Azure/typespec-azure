@@ -2,12 +2,12 @@
 
 ## Result and gap summary
 
-Across 462 successfully compiled projects out of 468, Swagger and TypeSpec report **160/153 diagnostics in 36/34 projects**, with 34 overlapping projects, two validator-only projects, and no TypeSpec-only projects. Eight Swagger-only occurrences have a request schema but no preferred success response schema: two in one-sided projects and six in overlapping projects. Native equality leaves those to response-body guidance. One extra native Batch finding belongs to an operation removed from the selected Swagger version; thus `8 - 1 = 7` explains the observed count gap. Excluding that older finding yields 152 native diagnostics. The repairs fix absent-request and equivalent-open-union false positives, with enum-member value checks preserving genuine mismatches. Native regressions, not unchanged corpus counts, prove the union repair. Coverage is partial: SDK enum metadata is intentionally excluded, six compile failures remain outside comparison, and these results are not universal Swagger equivalence.
+Across 462 successfully compiled projects out of 468, Swagger and TypeSpec report **160/153 diagnostics in 36/34 projects**, with 34 overlapping projects, two validator-only projects, and no TypeSpec-only projects. Eight Swagger-only occurrences have a request schema but no preferred success response schema: two in one-sided projects and six in overlapping projects. Native equality leaves those to response-body guidance. One extra native Batch finding belongs to an operation removed from the selected Swagger version; thus `8 - 1 = 7` explains the observed count gap. Excluding that older finding yields 152 native diagnostics. The repairs fix absent-request, equivalent-open-union, and implicit/explicit enum-default false positives while preserving genuine value mismatches. Native regressions, not unchanged corpus counts, prove the union and enum repairs. Coverage is partial: SDK enum metadata is intentionally excluded, six compile failures remain outside comparison, and these results are not universal Swagger equivalence.
 
 ## Conclusion
 
 - **Coverage classification:** partial, with intentional native-contract boundaries for missing success response schemas and emitted SDK enum metadata.
-- **TypeSpec rule update:** required and completed. `comparePutRequestAndResponse` skips `void` request bodies, and its shared union comparator matches unnamed variants structurally rather than by compiler-generated symbol identity. Enum-member labels and effective values must match; named-variant matching is unchanged.
+- **TypeSpec rule update:** required and completed. `comparePutRequestAndResponse` skips `void` request bodies, and its shared union comparator matches unnamed variants structurally rather than by compiler-generated symbol identity. Direct enums and enum-member types share the same label and effective-value comparison; named-variant matching is unchanged.
 - **Coverage limits:** the residual validator-only projects are explained by Swagger's empty-response-schema behavior on already-invalid/suppressed ARM operations. The six excluded compile failures and finite fixture matrix preclude a universal equivalence claim.
 
 ## Reports and source revisions
@@ -16,7 +16,7 @@ Across 462 successfully compiled projects out of 468, Swagger and TypeSpec repor
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | External coverage snapshot   | `packages/typespec-lintdiff/docs/coverage_old.md`, gist `https://gist.github.com/catalinaperalta/b2e7d29a33b4b451bcfcc87e8314565a`, 450 compiled projects, 210 validator rules                                                                                                                                                                                                                                                                                        |
 | Checked-in lintdiff baseline | [`packages/typespec-lintdiff/specs/coverage-breakdown.md`](../../../specs/coverage-breakdown.md), specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`, full scope 462/468 successful projects; this restored generated baseline records the before-fix row                                                                                                                                                                                                        |
-| Post-fix validation run      | Full-corpus validation generated `2026-09-15T14:28:45.241Z` at the same specs commit and scope, after the void-body, unnamed-union, and enum-member repairs; its post-fix row is recorded below. Generated `packages/typespec-lintdiff/specs` outputs are validation evidence only and were restored before publication.                                                                                                                                              |
+| Post-fix validation run      | Full-corpus validation generated `2026-09-15T16:24:14.609Z` at the same specs commit and scope, after the void-body, unnamed-union, enum-member, and direct-enum repairs; completed successfully at `2026-09-15T16:26:35.3414340Z`. Its post-fix row is recorded below. Generated `packages/typespec-lintdiff/specs` outputs are validation evidence only and were restored before publication.                                                                       |
 | Validator source             | Azure/azure-openapi-validator at `1198225afecbb818c3050d4d2a91da92e14e56ce`: [ARM rule registration](https://github.com/Azure/azure-openapi-validator/blob/1198225afecbb818c3050d4d2a91da92e14e56ce/packages/rulesets/src/spectral/az-arm.ts) and [`putRequestResponseScheme` implementation](https://github.com/Azure/azure-openapi-validator/blob/1198225afecbb818c3050d4d2a91da92e14e56ce/packages/rulesets/src/spectral/functions/put-request-response-scheme.ts) |
 | Migrated rule                | `packages/typespec-lintdiff/src/rules/put-request-response-scheme-arm.ts` plus shared comparison helper `put-request-response-scheme-shared.ts`                                                                                                                                                                                                                                                                                                                       |
 
@@ -105,6 +105,48 @@ An independent review caught a draft false negative when enum members were
 compared by name alone. Four native differing-value regressions failed before
 the correction and pass afterward, across ARM and data-plane consumers. This
 is native regression evidence, not a claim about emitted enum formatting.
+
+### Direct enums and implicit default values
+
+Direct enum properties use the same effective-value comparison as individual
+enum-member types. A second source repair fixes the inconsistent whole-enum
+branch, which previously compared raw `undefined` with an equal explicit
+string default:
+
+```typespec
+enum RequestState {
+  state,
+}
+enum ResponseState {
+  state: "state",
+}
+model Request {
+  state: RequestState;
+}
+model Result {
+  state: ResponseState;
+}
+@put @route("/widgets") op put(@body body: Request): Result;
+```
+
+Both member labels and effective values are `state`. The compiler/HTTP-native
+suite reproduced six false warnings across ARM and data-plane consumers
+before the repair; all pass after both enum comparison paths reuse one helper.
+Controls cover reversed implicit/explicit operands, reordered members, shared
+enum identity, unequal labels and member counts, unequal string/numeric values,
+and the distinction between explicit `0` or `""` and an implicit default.
+No emitter metadata is used to establish this native equivalence.
+
+This supported shape is covered by the native regressions rather than an
+assertion of Swagger parity: different declaration names can still produce
+the already-documented SDK enum-name discrepancy.
+
+The final full-corpus rerun after this repair retained exactly the preceding
+run's native and validator diagnostic records and project statuses, not merely
+their aggregate totals. The existing operation-level explanations below still
+apply. The six RED regressions and 68 passing native tests establish the
+direct-enum correction; the unchanged corpus is observational regression
+evidence, not proof that its projects contain that shape.
 
 ## Project-set comparison over aligned population
 
@@ -406,7 +448,7 @@ but the refreshed TypeSpec compile command failed and the project is excluded fr
 - 0 unresolved fixture gaps.
 
 The shared native suite `test/rules/put-request-response-scheme.test.ts` passes
-44 tests across ARM and data-plane consumers without importing an emitter.
+68 tests across ARM and data-plane consumers without importing an emitter.
 The data-plane `PutRequestResponseScheme` comparison command also exits
 successfully with four fixtures; its legacy `put-schema-match` compliance case
 still has unreviewed ambient diagnostics, so it is not claimed as a clean native

@@ -59,6 +59,9 @@ members are equivalent even when their unnamed members are reordered. Named
 variants retain name-and-type matching, and unnamed matches are one-to-one.
 Enum-member types retain their labels and compare their effective values, so
 the same label with different string or numeric values does not match.
+Direct enum types use the same member comparison: an implicit string default
+and an explicit value equal to that member's name match. Numeric zero and empty
+strings remain explicit values rather than falling back to the name.
 Native regression tests in `test/rules/put-request-response-scheme.test.ts`
 cover both ARM and data-plane consumers without importing an emitter, including
 different members, recursive models, response precedence, and absent bodies.

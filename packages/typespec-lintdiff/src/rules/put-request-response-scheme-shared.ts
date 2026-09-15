@@ -71,13 +71,8 @@ function areEquivalentTypes(left: Type, right: Type, seen: Map<Type, Set<Type>>)
       return areEquivalentScalars(left, right as Scalar);
     case "Enum":
       return areEquivalentEnums(left, right as Enum);
-    case "EnumMember": {
-      const rightMember = right as EnumMember;
-      return (
-        left.name === rightMember.name &&
-        (left.value ?? left.name) === (rightMember.value ?? rightMember.name)
-      );
-    }
+    case "EnumMember":
+      return areEquivalentEnumMembers(left, right as EnumMember);
     case "Tuple":
       return areEquivalentTuples(left, right as Tuple, seen);
     case "Union":
@@ -150,6 +145,10 @@ function areEquivalentScalars(left: Scalar, right: Scalar): boolean {
   return left.name === right.name;
 }
 
+function areEquivalentEnumMembers(left: EnumMember, right: EnumMember): boolean {
+  return left.name === right.name && (left.value ?? left.name) === (right.value ?? right.name);
+}
+
 function areEquivalentEnums(left: Enum, right: Enum): boolean {
   if (left.members.size !== right.members.size) {
     return false;
@@ -157,7 +156,7 @@ function areEquivalentEnums(left: Enum, right: Enum): boolean {
 
   for (const [name, leftMember] of left.members) {
     const rightMember = right.members.get(name);
-    if (rightMember === undefined || leftMember.value !== rightMember.value) {
+    if (rightMember === undefined || !areEquivalentEnumMembers(leftMember, rightMember)) {
       return false;
     }
   }

@@ -21,7 +21,7 @@ for (const [audience, rule] of [
   ["ARM", putRequestResponseSchemeArmRule],
   ["data-plane", putRequestResponseSchemeRule],
 ] as const) {
-  describe(`${audience} PUT request/response unions`, () => {
+  describe(`${audience} PUT request/response schemas`, () => {
     const RuleTester = Tester.wrap(
       (code) => `
         @service
@@ -49,6 +49,58 @@ for (const [audience, rule] of [
       severity: "warning" as const,
       message: "PUT request body schema should match the 200 response schema.",
     };
+
+    it.each([
+      ["state", 'state: "state"'],
+      ['state: "state"', "state"],
+      ["state: 0", "state: 0"],
+      ['state: ""', 'state: ""'],
+      ['state, inactive: "inactive"', 'inactive: "inactive", state: "state"'],
+    ])("accepts direct enums with equal effective values (%s versus %s)", async (left, right) => {
+      await (
+        await expect(`
+          enum RequestState { ${left} }
+          enum ResponseState { ${right} }
+          model Request { state: RequestState; }
+          model Result { state: ResponseState; }
+          @put @route("/widgets") op put(@body body: Request): Result;
+        `)
+      ).toBeValid();
+    });
+
+    it.each([
+      ["state", 'state: "active"'],
+      ["state: 0", 'state: "0"'],
+      ["state: 0", "state: 1"],
+      ['state: "state"', 'other: "state"'],
+      ["state", "state, other"],
+      ['state: ""', "state"],
+    ])("reports genuinely different direct enums (%s versus %s)", async (left, right) => {
+      await (
+        await expect(`
+          enum RequestState { ${left} }
+          enum ResponseState { ${right} }
+          model Request { state: RequestState; }
+          model Result { state: ResponseState; }
+          @put @route("/widgets") op /*put*/put(@body body: Request): Result;
+        `)
+      ).toEmitDiagnostics(({ put }) => ({
+        ...diagnostic,
+        pos: getSourceLocation(put).pos,
+        end: getSourceLocation(put).end,
+      }));
+    });
+
+    it("accepts models sharing the same enum", async () => {
+      await (
+        await expect(`
+          enum State { state }
+          model Request { state: State; }
+          model Result { state: State; }
+          @put @route("/widgets") op put(@body body: Request): Result;
+        `)
+      ).toBeValid();
+    });
 
     it.each([
       ['string, "active", "inactive"', '"inactive", string, "active"'],
