@@ -5,8 +5,10 @@ import { csharpUseStandardAcronymsRule } from "./rules/csharp-use-standard-acron
 import { getOperationNameRule } from "./rules/get-operation-name.rule.js";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
+import { useCreateForPutRule } from "./rules/use-create-for-put.js";
 
 const rules = [
+  useCreateForPutRule,
   requireClientSuffixRule,
   propertyNameConflictRule,
   csharpNoUrlSuffixRule,

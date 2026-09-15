@@ -64,4 +64,12 @@ describe("expect all rules to be defined", () => {
       ruleset.disable?.["@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms"],
     );
   });
+
+  it("keeps PUT SDK naming guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-client-generator-core/use-create-for-put";
+    ok($linter.ruleSets?.["client-sdk"].disable?.[ruleName]);
+    for (const rulesetName of ["data-plane", "resource-manager", "client-sdk"]) {
+      ok(!$linter.ruleSets?.[rulesetName].enable?.[ruleName]);
+    }
+  });
 });
