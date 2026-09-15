@@ -1,0 +1,15 @@
+{
+  "name": "typespec-benchmark-calibration",
+  "private": true,
+  "type": "module",
+  "description": "Frozen reference workload used to measure how fast the machine is. Versions are pinned exactly and must not be changed without bumping WORKLOAD_ID in src/calibration.ts.",
+  "dependencies": {
+    "@typespec/compiler": "1.15.0",
+    "@typespec/http": "1.15.0",
+    "@typespec/rest": "0.85.0",
+    "@typespec/versioning": "0.85.0",
+    "@typespec/openapi": "1.15.0",
+    "@azure-tools/typespec-azure-core": "0.71.0",
+    "@azure-tools/typespec-azure-rulesets": "0.71.0"
+  }
+}

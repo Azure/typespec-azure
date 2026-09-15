@@ -38,6 +38,21 @@ on:
         required: false
         type: string
         default: ""
+      backfill_to:
+        description: "Backfill up to this commit SHA, inclusive. Lets a long range be re-measured one chunk per run."
+        required: false
+        type: string
+        default: ""
+      backfill_reset:
+        description: "Re-measure commits that already have results, and drop the stored ones. Use on the first chunk only."
+        required: false
+        type: boolean
+        default: false
+      timeout-minutes:
+        description: "Job timeout. Re-measuring a long range needs far more than the 6h default."
+        required: false
+        type: number
+        default: 360
       branch:
         description: "Data branch to store results"
         required: false
@@ -51,6 +66,7 @@ jobs:
   benchmark:
     name: Run Benchmarks
     runs-on: ${{ inputs.runner }}
+    timeout-minutes: ${{ inputs.timeout-minutes }}
     env:
       TYPESPEC_VS_CI_BUILD: true
       TYPESPEC_SKIP_WEBSITE_BUILD: true
@@ -75,10 +91,16 @@ jobs:
         run: |
           node --max-old-space-size=6144 packages/benchmark/dist/src/cli.js backfill \
             --from ${{ inputs.backfill_from }} \
+            ${{ inputs.backfill_to != '' && format('--to {0}', inputs.backfill_to) || '' }} \
             --specs-dir ${{ inputs.specs-dir }} \
+            --results-dir ${{ inputs.results-dir }} \
             --iterations ${{ inputs.iterations }} \
             --warmup ${{ inputs.warmup }} \
+            --noise-cv-threshold ${{ inputs.noise-cv }} \
+            --max-reruns 1 \
+            --rerun-iterations ${{ inputs.rerun-iterations }} \
             --branch ${{ inputs.branch }} \
+            ${{ inputs.backfill_reset && '--reset' || '' }} \
             --push
 
       - name: Run benchmarks

@@ -78,8 +78,22 @@ export interface BenchmarkResult {
   commit: string;
   /** ISO 8601 timestamp of when the benchmark was run. */
   timestamp: string;
+  /**
+   * ISO 8601 date the benchmarked commit landed.
+   *
+   * Distinct from `timestamp`: a backfill measures months of history in an
+   * afternoon, so measurement time says nothing about where a point belongs on
+   * a timeline. Absent when the commit could not be resolved.
+   */
+  commitDate?: string;
   /** Runner environment info. */
   runner: RunnerInfo;
+  /**
+   * Speed of this machine against a frozen reference workload, used to make
+   * points measured on different runners comparable. Absent when calibration
+   * could not run, and on points measured before calibration existed.
+   */
+  calibration?: CalibrationInfo;
   /** Per-spec benchmark results, keyed by spec name. */
   specs: Record<string, SpecBenchmarkResult>;
 }
@@ -88,6 +102,24 @@ export interface RunnerInfo {
   os: string;
   nodeVersion: string;
   arch: string;
+  /** CPU model, which varies between CI runners and drives most of the spread. */
+  cpu?: string;
+  /** Logical core count. */
+  cores?: number;
+}
+
+/** Measurement of a frozen reference workload, used to normalize away machine speed. */
+export interface CalibrationInfo {
+  /** Pinned compiler release the reference was compiled with. */
+  compilerVersion: string;
+  /** Identifier of the frozen workload; changes invalidate cross-version comparison. */
+  workload: string;
+  /** Median reference compile time in ms on this machine. */
+  total: number;
+  /** Number of measured reference compiles. */
+  iterations: number;
+  /** Coefficient of variation across those compiles. */
+  cv: number;
 }
 
 /** A single metric comparison between baseline and current. */
