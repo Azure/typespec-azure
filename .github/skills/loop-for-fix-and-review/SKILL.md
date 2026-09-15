@@ -386,10 +386,14 @@ ledger. It owns these steps:
      Omitting `--resume-from` must not start another 30-minute window for an old
      verified request. Resumed artifacts must preserve a deadline anchor exactly
      equal to the active request's original raw UTC `created_at`. When ordinary
-     polling reaches a pending/deadline outcome without a collector error, the
-     mandatory independent final refetch runs once before reporting failure,
-     even after the ordinary polling deadline has expired; it uses a separately
-     recorded bounded allowance capped at 60 seconds, not a new polling window.
+     polling records a pending response and will continue, it must write an
+     explicit nonterminal checkpoint; `--resume-from` accepts only that
+     in-progress checkpoint and rejects failed or completed artifacts. When
+     ordinary polling reaches a pending/deadline outcome without a collector
+     error, the mandatory independent final refetch runs once before reporting
+     failure, even after the ordinary polling deadline has expired; it uses a
+     separately recorded bounded allowance capped at 60 seconds, not a new
+     polling window.
      The final refetch must discard or bypass
      collector caches and accumulated state and avoid conditional-cache headers
      or behavior where practical. Preserve both the ordinary-poll and

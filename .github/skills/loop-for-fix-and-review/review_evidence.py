@@ -419,9 +419,13 @@ def resume_polling_state(resume_from, repo, pr, request):
         raise EvidenceError("Cannot read previous polling artifact") from error
     if previous["repo"] != repo or previous["pr"] != pr:
         raise EvidenceError("Previous polling artifact belongs to a different PR")
+    if previous.get("status") != "polling-checkpoint":
+        raise EvidenceError("Previous polling artifact is not a nonterminal checkpoint")
     polling = previous.get("polling")
     if not isinstance(polling, dict):
         raise EvidenceError("Previous artifact has no polling state to resume")
+    if polling.get("status") != "in-progress":
+        raise EvidenceError("Previous polling artifact is not resumable")
     if polling.get("head") != request["head"] or polling.get("request") != request["request"]:
         raise EvidenceError("Previous polling artifact is for a different active request")
     utc(polling["deadline_started_at"])
@@ -431,6 +435,25 @@ def resume_polling_state(resume_from, repo, pr, request):
     if positive_number(polling["deadline_seconds"], "deadline") > DEFAULT_DEADLINE_SECONDS:
         raise EvidenceError("Previous polling artifact exceeds the maximum deadline")
     return polling
+
+
+def polling_checkpoint(
+    output, repo, pr, head, request, request_status, started_at, deadline_started_at,
+    deadline_seconds, interval_seconds, final_refetch_seconds, polls,
+):
+    emit(output, {
+        "repo": repo, "pr": pr, "status": "polling-checkpoint",
+        "started_at": started_at, "checkpoint_at": now(), "head": head,
+        "request": request, "request_status": request_status,
+        "polling": {
+            "status": "in-progress", "head": head, "request": request,
+            "deadline_started_at": deadline_started_at,
+            "deadline_seconds": deadline_seconds,
+            "interval_seconds": interval_seconds,
+            "final_refetch_allowance_seconds": final_refetch_seconds,
+            "ordinary_polls": polls,
+        },
+    })
 
 
 def remaining_deadline(deadline_started_at, deadline_seconds, monotonic_started_at, monotonic_now):
@@ -461,13 +484,13 @@ def poll(repo, pr, request, output, deadline_seconds=DEFAULT_DEADLINE_SECONDS,
         deadline_started_at = previous["deadline_started_at"] if previous else deadline_started_at
         if previous:
             deadline_seconds = previous["deadline_seconds"]
-        reserve = min(DEFAULT_API_TIMEOUT_SECONDS, max(1.0, deadline_seconds / 10))
+            polls = list(array(previous.get("ordinary_polls", [])))
         while True:
             remaining = remaining_deadline(deadline_started_at, deadline_seconds, started, time.monotonic())
-            if remaining <= reserve:
+            if remaining <= 0:
                 break
             poll_dir = output / f"poll-{len(polls) + 1:04}"
-            timeout = min(DEFAULT_API_TIMEOUT_SECONDS, max(0.001, remaining - reserve))
+            timeout = min(DEFAULT_API_TIMEOUT_SECONDS, max(0.001, remaining))
             poll_record = {"directory": str(poll_dir)}
             polls.append(poll_record)
             try:
@@ -482,7 +505,12 @@ def poll(repo, pr, request, output, deadline_seconds=DEFAULT_DEADLINE_SECONDS,
             if poll_result["status"] != "pending":
                 ordinary = poll_result
                 break
-            sleep_for = min(interval_seconds, max(0.0, remaining - reserve))
+            polling_checkpoint(
+                output, repo, pr, head, request["request"], request["status"], result["started_at"],
+                deadline_started_at, deadline_seconds, interval_seconds, final_refetch_seconds, polls,
+            )
+            remaining = remaining_deadline(deadline_started_at, deadline_seconds, started, time.monotonic())
+            sleep_for = min(interval_seconds, max(0.0, remaining))
             if sleep_for <= 0 and interval_seconds > 0:
                 break
             time.sleep(sleep_for)

@@ -406,8 +406,9 @@ class EvidenceTests(unittest.TestCase):
         request = self.active_request(old_start)
         previous = self.scratch_root / "previous.json"
         previous.write_text(json.dumps({
-            "repo": "owner/repo", "pr": 1,
+            "repo": "owner/repo", "pr": 1, "status": "polling-checkpoint",
             "polling": {
+                "status": "in-progress",
                 "head": HEAD, "request": request["request"], "deadline_started_at": old_start,
                 "deadline_seconds": 1, "interval_seconds": 0, "ordinary_polls": [],
             },
@@ -433,8 +434,9 @@ class EvidenceTests(unittest.TestCase):
         request = self.active_request(original_start)
         previous = self.scratch_root / "previous-original.json"
         previous.write_text(json.dumps({
-            "repo": "owner/repo", "pr": 1,
+            "repo": "owner/repo", "pr": 1, "status": "polling-checkpoint",
             "polling": {
+                "status": "in-progress",
                 "head": HEAD, "request": request["request"], "deadline_started_at": original_start,
                 "deadline_seconds": 30, "interval_seconds": 0, "ordinary_polls": [],
             },
@@ -457,8 +459,9 @@ class EvidenceTests(unittest.TestCase):
         ):
             shifted = self.scratch_root / name
             shifted.write_text(json.dumps({
-                "repo": "owner/repo", "pr": 1,
+                "repo": "owner/repo", "pr": 1, "status": "polling-checkpoint",
                 "polling": {
+                    "status": "in-progress",
                     "head": HEAD, "request": request["request"],
                     "deadline_started_at": deadline_started_at,
                     "deadline_seconds": 30, "interval_seconds": 0, "ordinary_polls": [],
@@ -466,6 +469,55 @@ class EvidenceTests(unittest.TestCase):
             }), encoding="utf-8")
             with self.subTest(name=name), self.assertRaises(evidence.EvidenceError):
                 evidence.resume_polling_state(shifted, "owner/repo", 1, request)
+
+    def test_resume_accepts_only_nonterminal_polling_checkpoints(self):
+        request = self.active_request(TIME)
+        checkpoint = self.scratch_root / "checkpoint.json"
+        checkpoint.write_text(json.dumps({
+            "repo": "owner/repo", "pr": 1, "status": "polling-checkpoint",
+            "polling": {
+                "status": "in-progress",
+                "head": HEAD, "request": request["request"], "deadline_started_at": TIME,
+                "deadline_seconds": 30, "interval_seconds": 0,
+                "ordinary_polls": [{"directory": "poll-0001", "status": "pending"}],
+            },
+        }), encoding="utf-8")
+        self.assertEqual(
+            evidence.resume_polling_state(checkpoint, "owner/repo", 1, request)["ordinary_polls"],
+            [{"directory": "poll-0001", "status": "pending"}],
+        )
+        for top_status, polling_status in (
+            ("failed", "failed"),
+            ("comments", "completed"),
+            ("no-new-comments", "completed"),
+            ("polling-checkpoint", "failed"),
+            ("polling-checkpoint", "completed"),
+        ):
+            artifact = self.scratch_root / f"{top_status}-{polling_status}.json"
+            artifact.write_text(json.dumps({
+                "repo": "owner/repo", "pr": 1, "status": top_status,
+                "polling": {
+                    "status": polling_status,
+                    "head": HEAD, "request": request["request"], "deadline_started_at": TIME,
+                    "deadline_seconds": 30, "interval_seconds": 0, "ordinary_polls": [],
+                },
+            }), encoding="utf-8")
+            with self.subTest(top_status=top_status, polling_status=polling_status), \
+                 self.assertRaises(evidence.EvidenceError):
+                evidence.resume_polling_state(artifact, "owner/repo", 1, request)
+
+    def test_polling_checkpoint_writes_safe_nonterminal_state(self):
+        output = self.scratch_root / "checkpoint-output"
+        request = self.active_request(TIME)
+        output.mkdir()
+        evidence.polling_checkpoint(
+            output, "owner/repo", 1, HEAD, request["request"], request["status"], TIME,
+            TIME, 30, 1, 60, [{"directory": "poll-0001", "status": "pending"}],
+        )
+        checkpoint = json.loads((output / "result.json").read_text(encoding="utf-8"))
+        self.assertEqual(checkpoint["status"], "polling-checkpoint")
+        self.assertEqual(checkpoint["polling"]["status"], "in-progress")
+        self.assertEqual(checkpoint["polling"]["deadline_started_at"], TIME)
 
     def test_final_refetch_timeout_uses_independent_allowance_after_ordinary_poll(self):
         output = self.scratch_root / "final-timeout"
@@ -480,6 +532,19 @@ class EvidenceTests(unittest.TestCase):
             collect_once.call_args_list[1].kwargs["timeout"],
             evidence.DEFAULT_FINAL_REFETCH_SECONDS,
         )
+
+    def test_poll_uses_last_ninety_seconds_for_ordinary_collection(self):
+        output = self.scratch_root / "last-ninety"
+        request = self.active_request()
+        complete = {"status": "comments", "review": {"id": REVIEW["id"]}}
+
+        with patch.object(evidence, "collect_once", side_effect=[complete, complete]) as collect_once, \
+             patch.object(evidence.time, "monotonic", side_effect=[0.0, 1711.0, 1711.1]):
+            evidence.poll("owner/repo", 1, request, output, deadline_seconds=1800, interval_seconds=60)
+
+        self.assertEqual(collect_once.call_args_list[0].args[2], output / "poll-0001")
+        self.assertLess(collect_once.call_args_list[0].kwargs["timeout"], evidence.DEFAULT_API_TIMEOUT_SECONDS)
+        self.assertEqual(collect_once.call_args_list[1].args[2], output / "final-refetch")
 
     def test_poll_preserves_hung_or_error_collection_evidence(self):
         output = self.scratch_root / "poll-error"
@@ -505,9 +570,9 @@ class EvidenceTests(unittest.TestCase):
              patch.object(evidence.time, "monotonic", side_effect=[0.0, 0.0, 2.0, 2.0]), \
              patch.object(evidence.time, "sleep"):
             with self.assertRaises(evidence.EvidenceError):
-                evidence.poll("owner/repo", 1, request, output, deadline_seconds=2, interval_seconds=0)
+                evidence.poll("owner/repo", 1, request, output, deadline_seconds=2, interval_seconds=1)
         self.assertEqual(len(seen_timeouts), 2)
-        self.assertLessEqual(seen_timeouts[0], 1.0)
+        self.assertLessEqual(seen_timeouts[0], 2.0)
         self.assertEqual(seen_timeouts[1], evidence.DEFAULT_FINAL_REFETCH_SECONDS)
 
     def test_api_timeout_budget_is_aggregate_across_requests(self):

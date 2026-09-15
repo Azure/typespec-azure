@@ -19,7 +19,8 @@ publication binding in durable session artifacts:
 - canonical base repository, fetched base ref and SHA, intended base branch,
   and independently inspected app comparison `base_ref` and merge base
 - head repository/owner, head branch, expected remote SHA, recorded PR if any,
-  exact push remote URL/refspec, and publication tool/backend/capabilities
+  exact credential-redacted push remote URL/refspec, and publication
+  tool/backend/capabilities
 - Git upstream (`branch.<name>.remote`/`merge`), effective push destination
   (explicit command remote/refspec, otherwise `branch.<name>.pushRemote`,
   `remote.pushDefault` and tracking fallback, with `remote.<name>.push` and
@@ -181,7 +182,7 @@ canonical_base_ref: <verified-canonical-remote>/<target-branch>
 base_sha: <fetched-commit>
 head_repository: <personal-fork-owner>/typespec-azure
 head_branch: <app-recorded-rule-branch>
-push_remote_url: <verified-personal-fork-push-url>
+push_remote_url: <verified-personal-fork-push-url with credentials/userinfo redacted>
 publication_tool: <required-tool>
 ```
 
