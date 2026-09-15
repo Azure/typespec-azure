@@ -29,6 +29,7 @@ export interface SdkTesterOptions extends BrandedSdkEmitterOptionsInterface {
 export const SimpleBaseTester = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
     "@typespec/http",
+    "@typespec/openapi",
     "@typespec/rest",
     "@typespec/versioning",
     "@azure-tools/typespec-client-generator-core",
