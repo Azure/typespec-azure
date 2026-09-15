@@ -3,10 +3,10 @@ validatorRuleId: PutRequestResponseSchemeArm
 engine: spectral
 tspLints:
   - tsp-lintdiff-local-linter/put-request-response-scheme-arm
-  - '@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response'
+  - "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response"
 coverageKind: lint
 officialTspLints:
-  - '@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response'
+  - "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response"
 tspRuleset: resource-manager
 ---
 
@@ -53,12 +53,37 @@ response schema when no `200` exists.
 Treat this rule as **direct/native lint coverage** now, with the official ARM
 lint retained as corroborating overlap for the response-mismatch subset.
 
+Union comparison uses native variant types, not compiler-generated symbol keys,
+for unnamed members. Separately declared named open unions with the same
+members are equivalent even when their unnamed members are reordered. Named
+variants retain name-and-type matching, and unnamed matches are one-to-one.
+Enum-member types retain their labels and compare their effective values, so
+the same label with different string or numeric values does not match.
+Direct enum types use the same member comparison: an implicit string default
+and an explicit value equal to that member's name match. Numeric zero and empty
+strings remain explicit values rather than falling back to the name.
+Native regression tests in `test/rules/put-request-response-scheme.test.ts`
+cover both ARM and data-plane consumers without importing an emitter, including
+different members, recursive models, response precedence, and absent bodies.
+The OpenAPI library is registered only to satisfy transitive test-host imports;
+these tests do not use OpenAPI decorators or helpers.
+
+The `equivalent-open-unions` comparison fixture intentionally differs from
+Swagger: its `RequestState` and `ResponseState` definitions have identical
+native members, but different emitted `x-ms-enum.name` values. The validator
+compares that SDK metadata too; the native rule does not predict emitter names.
+Its one validator diagnostic is explicitly reviewed, not treated as a missing
+native check. The custom request resource's unrelated missing-PUT warning is
+also explicitly recorded as ambient fixture evidence.
+
 ## Test Cases
 
-| ID          | Violation | Description                                          |
-| ----------- | --------- | ---------------------------------------------------- |
-| `compliant` | false     | Standard ARM resource templates emit matching PUT request/response schemas |
-| `arm-resource-mismatch` | true | Custom ARM createOrUpdate returns a different ARM resource model; both the new local lint and the official ARM response lint fire |
-| `arm-resource-mismatch-201` | true | ARM createOrUpdate only returns `201`, and that fallback schema differs from the PUT request body |
-| `request-body-mismatch-response-match` | true | ARM createOrUpdate keeps the canonical response model but accepts a different request model; this is the authorable gap filled by the new local lint |
-| `empty-arm-id-details` | false | Empty `x-ms-arm-id-details: {}` metadata does not break schema equality |
+| ID                                     | Violation | Description                                                                                                                                          |
+| -------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `compliant`                            | false     | Standard ARM resource templates emit matching PUT request/response schemas                                                                           |
+| `arm-resource-mismatch`                | true      | Custom ARM createOrUpdate returns a different ARM resource model; both the new local lint and the official ARM response lint fire                    |
+| `arm-resource-mismatch-201`            | true      | ARM createOrUpdate only returns `201`, and that fallback schema differs from the PUT request body                                                    |
+| `request-body-mismatch-response-match` | true      | ARM createOrUpdate keeps the canonical response model but accepts a different request model; this is the authorable gap filled by the new local lint |
+| `empty-arm-id-details`                 | false     | Empty `x-ms-arm-id-details: {}` metadata does not break schema equality                                                                              |
+| `no-request-body`                      | false     | PUT operations without an emitted request body are skipped because the Swagger rule has no request schema to compare                                 |
+| `equivalent-open-unions`               | false     | Separate equivalent named open unions match natively; the validator's SDK enum-name mismatch is an intentional parity gap                            |
