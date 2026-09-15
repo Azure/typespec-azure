@@ -39,6 +39,7 @@ import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-pro
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
+import { noUuidRule } from "./rules/no-uuid.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { resourceNameRule } from "./rules/resource-name.js";
@@ -93,6 +94,7 @@ const rules = [
   listOperationMissingPageableRule,
   missingXmsIdentifiersRule,
   noResponseBodyRule,
+  noUuidRule,
   noQueryInPostRule,
   operationsInterfaceMissingRule,
   patchEnvelopePropertiesRules,
