@@ -102,6 +102,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/no-query-in-post": false,
     "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint": true,
     "@azure-tools/typespec-azure-resource-manager/patch-envelope": true,
+    "@azure-tools/typespec-azure-resource-manager/put-response-schema-consistency": false,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-patch": true,
     "@azure-tools/typespec-azure-resource-manager/resource-name": true,
     "@azure-tools/typespec-azure-resource-manager/retry-after": false, // Disable https://github.com/Azure/typespec-azure/issues/3351
