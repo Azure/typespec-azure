@@ -137,6 +137,8 @@ Keep an ordered ledger with one entry per input command:
   waiting phase, handoff artifact, and review invocation/agent IDs
 - local draft-correction counts, causal evidence and rerun results, separate
   from worker attempts, review rounds and source-repair cycles
+- explicit recovery authorizations, including the user message, named failure,
+  additional attempt allowance and usage, and any legacy-worktree adoption binding
 - blocker or failure, when applicable
 
 Update the ledger after every phase handoff and worker result so a later failure
@@ -306,6 +308,41 @@ do not restart the worker, consume a source-repair cycle, or weaken validation.
 External/indeterminate operational failures, unknown causes, exhausted budgets
 and confirmed immutable promotion-source defects retain their existing
 stop/handoff behavior.
+
+### Explicitly authorized bounded resumption
+
+After a terminal stop, a user may explicitly authorize recovery of a named
+deterministic draft/command failure with a finite additional correction allowance.
+A generic queue invocation, "continue", or pasted failure history is not such
+authorization. This is not an automatic retry or a new source-repair cycle.
+
+1. Record the authorization text, failed command/evidence, task/cycle/phase,
+   preserved state manifest, and exact additional allowance before doing work.
+   Keep the original exhausted counter unchanged; track supplemental attempts
+   separately (for example, original `3/3`, user-authorized `0/1`).
+2. Reverify file ownership, content hashes, index/worktree state, PR identities
+   and publication bindings. For an explicitly authorized legacy checkout,
+   follow [legacy-worktree adoption](app-session-execution.md#authorized-legacy-worktree-adoption).
+   Do not discard, recreate, or overwrite unfinished work to satisfy preflight.
+3. Confirm the same causal and side-effect evidence required by bounded draft
+   correction. Limit the correction to the authorized failure. For a CLI error,
+   read the installed command's help or implementation before execution; do not
+   invent flags. Count the supplemental attempt before running its correction.
+4. Rerun the failed check at its intended scope, then complete remaining required
+   work and checks invalidated by the correction. Reuse earlier evidence only
+   when matching content and applicable requirements establish its validity.
+   Success resumes the normal phase, publication and review gates; a new failure
+   outside the authorization, or exhausted supplemental allowance, stops it.
+5. Preserve the original terminal result, all failures and passing reruns.
+   Do not reset other budgets, reinterpret an operational error as a source
+   defect, retry uncertain publication/network operations, waive validation,
+   or reuse an old review for a changed head. Each resumed review invocation
+   still requires a fresh persistent pair and the existing publication gates.
+
+The authorization is handoff metadata, not a new worker CLI flag. Pass it to
+the phase owner; the outer queue must not run promotion commands as a substitute
+for establishing the correct owning session. Skill changes requested as part of
+recovery must finish before starting a new review loop, not during one.
 
 ## Bounded source-repair loop
 
@@ -688,7 +725,9 @@ Capture concrete suggestions for improving future queue runs, especially:
   Do not apply orchestration retry after development begins or reinterpret
   operational failures as source defects.
 - Never exceed the separate three-attempt draft-correction budget for its
-  phase/backlog/round scope, reset it by relaunching agents, or hide failed checks.
+  phase/backlog/round scope automatically, reset it by relaunching agents, or hide
+  failed checks. Additional attempts require the separate explicit authorization
+  and ledger in [bounded resumption](#explicitly-authorized-bounded-resumption).
 - Never promote without clean development review, or report success without
   clean promotion review against the final source provenance.
 - Never let promotion or its review mutate the source; return evidence to the

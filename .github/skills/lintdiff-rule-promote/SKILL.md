@@ -154,6 +154,13 @@ apply this narrowly scoped contract. Standalone promotion behavior is unchanged.
   unexplained, or externally changed edits remain blockers. Do not clean, stash,
   overwrite them, or make speculative checkpoint commits. Promotion PR review
   still requires a clean worktree at the pushed head.
+- For a legacy checkout, accept the queue's verified
+  [adoption binding](../do-linter-development-task-one-by-one/app-session-execution.md#authorized-legacy-worktree-adoption)
+  without recreating the checkout. An exhausted correction budget may resume
+  only under the queue's recorded
+  [explicit bounded authorization](../do-linter-development-task-one-by-one/SKILL.md#explicitly-authorized-bounded-resumption).
+  Preserve the original counter and separately consume the authorized allowance;
+  neither adoption nor a fresh dispatch resets it.
 - After source repair and a new clean development review, refresh the native
   implementation from the new pinned source commit. Preserve valid prior
   promotion adaptations and review fixes; reconcile changes incrementally rather
