@@ -26,6 +26,13 @@ validator violation.
   `200` response schema and falls back to `201` when no `200` response exists.
 - The local TypeSpec lint mirrors that data-plane behavior and intentionally
   skips ARM namespaces so it does not overlap `PutRequestResponseSchemeArm`.
+- The shared comparator matches unnamed union variants by native member types
+  rather than compiler-generated symbol identity, independent of their order.
+  Named variants still require matching names and types. Enum-member types
+  compare both labels and effective values. The shared native
+  regression suite `test/rules/put-request-response-scheme.test.ts` covers
+  separate equivalent open unions, genuine differences, recursion, response
+  selection, and absent bodies for both consumers without importing an emitter.
 
 ## Test Cases
 

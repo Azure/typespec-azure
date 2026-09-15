@@ -3,6 +3,7 @@ import {
   isVoidType,
   walkPropertiesInherited,
   type Enum,
+  type EnumMember,
   type Model,
   type Scalar,
   type Tuple,
@@ -70,6 +71,13 @@ function areEquivalentTypes(left: Type, right: Type, seen: Map<Type, Set<Type>>)
       return areEquivalentScalars(left, right as Scalar);
     case "Enum":
       return areEquivalentEnums(left, right as Enum);
+    case "EnumMember": {
+      const rightMember = right as EnumMember;
+      return (
+        left.name === rightMember.name &&
+        (left.value ?? left.name) === (rightMember.value ?? rightMember.name)
+      );
+    }
     case "Tuple":
       return areEquivalentTuples(left, right as Tuple, seen);
     case "Union":
@@ -169,7 +177,27 @@ function areEquivalentUnions(left: Union, right: Union, seen: Map<Type, Set<Type
     return false;
   }
 
+  const unnamedRight = [...right.variants.values()].filter(
+    (variant) => typeof variant.name === "symbol",
+  );
+
   for (const [name, leftVariant] of left.variants) {
+    if (typeof name === "symbol") {
+      const index = unnamedRight.findIndex((rightVariant) =>
+        areEquivalentTypes(
+          leftVariant.type,
+          rightVariant.type,
+          // Failed candidates must not leave pairs that a later comparison treats as equivalent.
+          new Map([...seen].map(([type, pairs]) => [type, new Set(pairs)])),
+        ),
+      );
+      if (index === -1) {
+        return false;
+      }
+      unnamedRight.splice(index, 1);
+      continue;
+    }
+
     const rightVariant = right.variants.get(name);
     if (rightVariant === undefined) {
       return false;
