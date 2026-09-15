@@ -7,7 +7,7 @@
   {
     "code": "tsp-lintdiff-local-linter/consistent-patch-properties",
     "severity": "warning",
-    "message": "The property 'identity.principalId' in the request body either does not appear in the resource model or is nested at the wrong level."
+    "message": "The property 'customIdentity.principalId' in the request body either does not appear in the resource model or is nested at the wrong level."
   },
   {
     "code": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
