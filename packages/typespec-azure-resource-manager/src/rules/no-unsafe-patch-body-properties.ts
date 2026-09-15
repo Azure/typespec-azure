@@ -43,12 +43,12 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
           return;
         }
 
-        const patchBody = httpOperation.parameters.body?.type;
-        if (patchBody === undefined) {
+        const patchBody = httpOperation.parameters.body;
+        if (patchBody?.bodyKind !== "single") {
           return;
         }
 
-        for (const violation of findViolations(context.program, patchBody, operation)) {
+        for (const violation of findViolations(context.program, patchBody.type, operation)) {
           context.reportDiagnostic({
             target: violation.target,
             messageId: violation.messageId,

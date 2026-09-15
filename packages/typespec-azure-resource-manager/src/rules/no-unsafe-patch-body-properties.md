@@ -8,6 +8,8 @@ PATCH describes partial updates. Required PATCH body properties, default-valued 
 
 The rule checks the effective emitted PATCH payload. Properties omitted from the PATCH payload, such as `never` properties or create-only properties removed by the PATCH visibility transform, are not reported. A top-level emitted property named `identity` is skipped to match ARM PATCH identity envelope behavior.
 
+Property checks apply only to single HTTP bodies. Multipart wrappers and file models describe transport payloads, not properties of a PATCH document, and are not traversed. This does not exempt these operations from other ARM guidelines, including JSON content-type requirements. Ordinary and nullable single-body models retain the same property checks.
+
 ## Applicability
 
 Enable this rule for compilations that should follow ARM PATCH guidance. When enabled, it checks PATCH operations in ordinary and nested namespaces, including interfaces, without requiring `@armProviderNamespace`. It does not distinguish ARM and data-plane services within the same compilation.
