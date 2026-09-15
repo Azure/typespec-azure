@@ -80,6 +80,12 @@ class EvidenceTests(unittest.TestCase):
         for login in ("copilot-other", "copilot[bot]", " Copilot", "", None):
             self.assertFalse(evidence.is_copilot(login))
 
+    def test_positive_numbers_reject_zero_and_nonfinite_values(self):
+        for value in (0, -1, float("inf"), float("-inf"), float("nan")):
+            with self.subTest(value=value), self.assertRaises(evidence.EvidenceError):
+                evidence.positive_number(value, "test")
+        self.assertEqual(evidence.positive_number(0.001, "test"), 0.001)
+
     def test_invalid_candidate_fields_fail_closed(self):
         for key, value in (("id", "12"), ("id", True), ("commit_id", None),
                            ("state", "UNKNOWN"), ("submitted_at", None)):
@@ -257,7 +263,7 @@ class EvidenceTests(unittest.TestCase):
         request_file.write_text("{not json", encoding="utf-8")
         output = self.scratch_root / "poll-corrupt"
         argv = ["review_evidence.py", "poll", "--repo", "owner/repo", "--pr", "1",
-                "--request", str(request_file), "--output", str(output), "--interval-seconds", "0"]
+                "--request", str(request_file), "--output", str(output), "--interval-seconds", "1"]
         with patch("sys.argv", argv), patch("builtins.print"):
             self.assertEqual(evidence.main(), 1)
         result = json.loads((output / "result.json").read_text(encoding="utf-8"))
@@ -395,7 +401,7 @@ class EvidenceTests(unittest.TestCase):
         final = {"status": "comments", "review": {"id": REVIEW["id"]}, "comments": []}
         with patch.object(evidence, "collect_once", side_effect=[pending, complete, final]) as collect_once, \
              patch.object(evidence.time, "sleep"):
-            result = evidence.poll("owner/repo", 1, request, output, deadline_seconds=30, interval_seconds=0)
+            result = evidence.poll("owner/repo", 1, request, output, deadline_seconds=30, interval_seconds=1)
         self.assertEqual(result["polling"]["reliability"], "ordinary-poll-confirmed")
         directories = [call.args[2] for call in collect_once.call_args_list]
         self.assertEqual(directories, [output / "poll-0001", output / "poll-0002", output / "final-refetch"])
@@ -415,14 +421,14 @@ class EvidenceTests(unittest.TestCase):
         }), encoding="utf-8")
         with patch.object(evidence, "collect_once", return_value={"status": "comments", "review": {"id": REVIEW["id"]}}) as collect_once:
             result = evidence.poll("owner/repo", 1, request, self.scratch_root / "poll-expired",
-                                   deadline_seconds=30, interval_seconds=0, resume_from=previous)
+                                   deadline_seconds=30, interval_seconds=1, resume_from=previous)
         self.assertEqual(result["polling"]["deadline_seconds"], 1)
         self.assertTrue(result["polling"]["final_refetch_after_deadline"])
         self.assertEqual([call.args[2] for call in collect_once.call_args_list], [self.scratch_root / "poll-expired" / "final-refetch"])
         with patch.object(evidence, "collect_once", return_value={"status": "pending"}):
             with self.assertRaises(evidence.EvidenceError):
                 evidence.poll("owner/repo", 1, request, self.scratch_root / "poll-pending",
-                              deadline_seconds=1, interval_seconds=0)
+                              deadline_seconds=1, interval_seconds=1)
         pending = json.loads((self.scratch_root / "poll-pending" / "result.json").read_text(encoding="utf-8"))
         self.assertEqual(pending["status"], "failed")
         self.assertIn("Final refetch did not establish", pending["error"])
@@ -526,7 +532,7 @@ class EvidenceTests(unittest.TestCase):
 
         with patch.object(evidence, "collect_once", side_effect=[complete, complete]) as collect_once, \
              patch.object(evidence.time, "monotonic", side_effect=[0.0, 0.0, 9.5]):
-            evidence.poll("owner/repo", 1, request, output, deadline_seconds=10, interval_seconds=0)
+            evidence.poll("owner/repo", 1, request, output, deadline_seconds=10, interval_seconds=1)
 
         self.assertEqual(
             collect_once.call_args_list[1].kwargs["timeout"],
@@ -551,7 +557,7 @@ class EvidenceTests(unittest.TestCase):
         request = self.active_request()
         with patch.object(evidence, "collect_once", side_effect=evidence.EvidenceError("stale head")):
             with self.assertRaises(evidence.EvidenceError):
-                evidence.poll("owner/repo", 1, request, output, deadline_seconds=30, interval_seconds=0)
+                evidence.poll("owner/repo", 1, request, output, deadline_seconds=30, interval_seconds=1)
         failed = json.loads((output / "result.json").read_text(encoding="utf-8"))
         self.assertEqual(failed["status"], "failed")
         self.assertIn("stale head", failed["error"])
@@ -574,6 +580,15 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(len(seen_timeouts), 2)
         self.assertLessEqual(seen_timeouts[0], 2.0)
         self.assertEqual(seen_timeouts[1], evidence.DEFAULT_FINAL_REFETCH_SECONDS)
+
+    def test_poll_rejects_nonpositive_or_nonfinite_intervals(self):
+        request = self.active_request()
+        for value in (0, -1, float("inf"), float("nan")):
+            with self.subTest(value=value), self.assertRaises(evidence.EvidenceError):
+                evidence.poll(
+                    "owner/repo", 1, request, self.scratch_root / f"bad-interval-{value}",
+                    interval_seconds=value,
+                )
 
     def test_api_timeout_budget_is_aggregate_across_requests(self):
         temp = self.scratch_root / "aggregate-timeout"
@@ -598,7 +613,7 @@ class EvidenceTests(unittest.TestCase):
         request = self.active_request(old)
         with patch.object(evidence, "collect_once", return_value={"status": "pending"}) as collect_once:
             with self.assertRaises(evidence.EvidenceError):
-                evidence.poll("owner/repo", 1, request, output, deadline_seconds=1800, interval_seconds=0)
+                evidence.poll("owner/repo", 1, request, output, deadline_seconds=1800, interval_seconds=1)
         self.assertEqual([call.args[2] for call in collect_once.call_args_list], [output / "final-refetch"])
         failed = json.loads((output / "result.json").read_text(encoding="utf-8"))
         self.assertTrue(failed["polling"]["final_refetch_directory"].endswith("final-refetch"))
@@ -615,7 +630,7 @@ class EvidenceTests(unittest.TestCase):
         request = evidence.verified_request(active, "owner/repo", 1)
         output = self.scratch_root / "already-pending-old"
         with patch.object(evidence, "collect_once", return_value={"status": "comments", "review": {"id": REVIEW["id"]}}) as collect_once:
-            result = evidence.poll("owner/repo", 1, request, output, deadline_seconds=1800, interval_seconds=0)
+            result = evidence.poll("owner/repo", 1, request, output, deadline_seconds=1800, interval_seconds=1)
         self.assertTrue(result["polling"]["final_refetch_after_deadline"])
         self.assertEqual([call.args[2] for call in collect_once.call_args_list], [output / "final-refetch"])
 

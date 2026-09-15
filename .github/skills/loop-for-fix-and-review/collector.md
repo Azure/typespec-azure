@@ -35,7 +35,7 @@ before/after requested-reviewer checks.
 Use the verified request's `head` and `request.created_at` as `$head` and
 `$requestTime`, or pass the verified request artifact directly. Prefer the
 bounded `poll` action for review-agent polling; it owns the original 30-minute
-deadline, moderate interval, distinct poll directories, and mandatory final
+deadline, positive moderate interval, distinct poll directories, and mandatory final
 refetch:
 
 ```powershell

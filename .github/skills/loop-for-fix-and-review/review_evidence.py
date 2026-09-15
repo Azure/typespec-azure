@@ -5,6 +5,7 @@ import base64
 import datetime as dt
 import hashlib
 import json
+import math
 import re
 import subprocess
 import time
@@ -56,7 +57,7 @@ def numeric_id(value):
 
 
 def positive_number(value, name):
-    if type(value) not in {int, float} or value <= 0:
+    if type(value) not in {int, float} or not math.isfinite(value) or value <= 0:
         raise EvidenceError(f"Expected a positive {name}, got {value!r}")
     return value
 
@@ -465,8 +466,7 @@ def remaining_deadline(deadline_started_at, deadline_seconds, monotonic_started_
 def poll(repo, pr, request, output, deadline_seconds=DEFAULT_DEADLINE_SECONDS,
          interval_seconds=DEFAULT_POLL_INTERVAL_SECONDS, resume_from=None,
          final_refetch_seconds=DEFAULT_FINAL_REFETCH_SECONDS):
-    if interval_seconds < 0:
-        raise EvidenceError("Polling interval must be non-negative")
+    positive_number(interval_seconds, "polling interval")
     deadline_seconds = capped_deadline(deadline_seconds)
     final_refetch_seconds = min(capped_deadline(final_refetch_seconds), DEFAULT_FINAL_REFETCH_SECONDS)
     output.mkdir(parents=True, exist_ok=False)

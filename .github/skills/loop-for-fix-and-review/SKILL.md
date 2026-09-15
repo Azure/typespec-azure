@@ -352,7 +352,7 @@ ledger. It owns these steps:
    ```
 
 5. Poll the paginated REST pull-reviews endpoint,
-   `GET /repos/{owner}/{repo}/pulls/{number}/reviews`, at a moderate interval
+   `GET /repos/{owner}/{repo}/pulls/{number}/reviews`, at a positive moderate interval
    rather than repeatedly requesting reviews. Treat its raw response as the
    source of truth for review completion and the numeric review ID. Allow up to
    30 minutes, using monotonic elapsed time only for deadline accounting.
@@ -381,7 +381,7 @@ ledger. It owns these steps:
      anchor the original deadline to the verified request event's raw UTC
      `created_at` (including already-pending-active provenance), preserve any
      earlier recorded deadline across `--resume-from`, cap the polling window at
-     30 minutes, use a moderate interval, write distinct evidence directories,
+     30 minutes, use a positive moderate interval, write distinct evidence directories,
      and cap subprocess/API timeouts by the remaining ordinary-poll deadline.
      Omitting `--resume-from` must not start another 30-minute window for an old
      verified request. Resumed artifacts must preserve a deadline anchor exactly
