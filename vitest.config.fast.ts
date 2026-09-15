@@ -9,6 +9,8 @@ export default mergeConfig(
       projects: [
         "packages/*/vitest.config.ts",
         "packages/*/vitest.config.mts",
+        "!packages/typespec-ts/vitest.config.ts",
+        "packages/typespec-ts/vitest.config.repo.ts",
         "eng/vitest.config.ts",
       ],
     },
