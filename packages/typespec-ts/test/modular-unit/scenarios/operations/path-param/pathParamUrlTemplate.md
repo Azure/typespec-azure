@@ -79,10 +79,11 @@ export function _updateKeySend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).patch({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "text/plain",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: parameters,
   });
 }

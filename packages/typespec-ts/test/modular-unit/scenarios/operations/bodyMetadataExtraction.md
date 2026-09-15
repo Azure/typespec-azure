@@ -68,10 +68,11 @@ export function _bodyRootWithHeaderSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { foo: body.foo, ...options.requestOptions?.headers },
+    headers: { foo: body.foo, ...requestParameters.headers },
     body: requestBodySerializer(body),
   });
 }
@@ -256,12 +257,13 @@ export function _bodyRootWithOptionalHeaderSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
     headers: {
       ...(body.foo !== undefined ? { foo: body.foo } : {}),
-      ...options.requestOptions?.headers,
+      ...requestParameters.headers,
     },
     body: optionalHeaderBodySerializer(body),
   });
@@ -449,12 +451,13 @@ export function _createOptionalPathResourceSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
     headers: {
       ...(options?.body?.foo !== undefined ? { foo: options?.body?.foo } : {}),
-      ...options.requestOptions?.headers,
+      ...requestParameters.headers,
     },
     body: {
       body: !options?.body ? options?.body : optionalBodyWithHeaderSerializer(options?.body),

@@ -321,9 +321,10 @@ export function _downloadFileSend(
   context: Client,
   options: DownloadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/downloadFile").post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/octet-stream", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/octet-stream", ...requestParameters.headers },
   });
 }
 
@@ -378,9 +379,10 @@ export function _downloadFileSend(
   context: Client,
   options: DownloadFileOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/downloadFile").post({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/octet-stream", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/octet-stream", ...requestParameters.headers },
   });
 }
 
@@ -500,9 +502,10 @@ export function _testSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "text/plain", ...requestParameters.headers },
   });
 }
 
@@ -542,7 +545,10 @@ export function createTesting(
   const endpointUrl = options.endpoint ?? String(endpointParam);
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
 
@@ -628,9 +634,10 @@ export function _testSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "text/plain", ...requestParameters.headers },
   });
 }
 
@@ -670,7 +677,10 @@ export function createTesting(
   const endpointUrl = options.endpoint ?? String(endpointParam);
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
 
@@ -740,9 +750,10 @@ export function _test1Send(
   context: Client,
   options: Test1OptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/test1").get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "text/plain", ...requestParameters.headers },
   });
 }
 
@@ -776,9 +787,10 @@ export function _testSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "text/plain", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "text/plain", ...requestParameters.headers },
   });
 }
 
@@ -818,7 +830,10 @@ export function createTesting(
   const endpointUrl = options.endpoint ?? String(endpointParam);
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
 
@@ -1057,9 +1072,10 @@ export function _listSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).get({
-    ...operationOptionsToRequestParameters(options),
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    ...requestParameters,
+    headers: { accept: "application/json", ...requestParameters.headers },
   });
 }
 

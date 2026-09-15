@@ -528,10 +528,11 @@ export function _getSend(
   body: string,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "text/plain",
-    headers: { "test-header": testHeader, ...options.requestOptions?.headers },
+    headers: { "test-header": testHeader, ...requestParameters.headers },
     body: body,
   });
 }
@@ -609,10 +610,11 @@ export function _getSend(
   body: string,
   options: GetOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path("/").post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "text/plain",
-    headers: { "test-header": testHeader, ...options.requestOptions?.headers },
+    headers: { "test-header": testHeader, ...requestParameters.headers },
     body: body,
   });
 }

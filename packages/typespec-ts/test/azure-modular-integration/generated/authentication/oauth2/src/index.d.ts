@@ -23,6 +23,7 @@ export declare class OAuth2Client {
 }
 
 export declare interface OAuth2ClientOptionalParams extends ClientOptions {
+    credentialScopes?: string | string[];
 }
 
 export { RestError }

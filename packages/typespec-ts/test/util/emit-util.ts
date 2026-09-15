@@ -25,6 +25,7 @@ import { buildRootIndex } from "../../src/modular/build-root-index.js";
 import { buildSubpathIndexFile } from "../../src/modular/build-subpath-index.js";
 import { emitSamples } from "../../src/modular/emit-samples.js";
 import { emitTests } from "../../src/modular/emit-tests.js";
+import { getCredentialInfo } from "../../src/transform/transform-client-options.js";
 import { getClientHierarchyMap } from "../../src/utils/client-utils.js";
 
 export interface ModelConfigOptions extends ClientOptions {
@@ -258,6 +259,16 @@ export async function emitModularClientContextFromTypeSpec(
     needArmTemplate: options.needArmTemplate === true,
   });
   const dpgContext = await createDpgContextTestHelper(context.program);
+  Object.assign(
+    dpgContext.emitterOptions!,
+    getCredentialInfo(dpgContext.program, {
+      "add-credentials": options["add-credentials"],
+      "credential-scopes": options["credential-scopes"],
+      "credential-key-header-name": options["credential-key-header-name"],
+      "custom-http-auth-header-name": options["custom-http-auth-header-name"],
+      "custom-http-auth-shared-key-prefix": options["custom-http-auth-shared-key-prefix"],
+    }),
+  );
   if (options.packageDetails) {
     dpgContext.emitterOptions!.packageDetails = options.packageDetails;
   }

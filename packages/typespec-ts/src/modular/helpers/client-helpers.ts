@@ -299,7 +299,9 @@ function buildCredentials(
   const scopesString = credentialScopes
     ? credentialScopes.map((cs) => `"${cs}"`).join(", ") || `\`\${${endpointParam}}/.default\``
     : "";
-  const scopes = scopesString ? `scopes: options.credentials?.scopes ?? [${scopesString}],` : "";
+  const scopes = scopesString
+    ? `scopes: options.credentials?.scopes ?? (typeof options.credentialScopes === "string" ? [options.credentialScopes] : options.credentialScopes) ?? [${scopesString}],`
+    : "";
 
   const apiKeyHeaderName = credentialKeyHeaderName
     ? `apiKeyHeaderName: options.credentials?.apiKeyHeaderName ?? "${credentialKeyHeaderName}",`
@@ -313,7 +315,7 @@ function buildCredentials(
 }
 
 function buildLoggingOptions(): string | undefined {
-  return `{ logger: options.loggingOptions?.logger ?? logger.info }`;
+  return `{ ...options.loggingOptions, logger: options.loggingOptions?.logger ?? logger.info }`;
 }
 
 /**

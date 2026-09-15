@@ -167,10 +167,11 @@ export function _backupSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
-    headers: { accept: "application/json", ...options.requestOptions?.headers },
+    headers: { accept: "application/json", ...requestParameters.headers },
     body: !options?.backupRequestProperties
       ? options?.backupRequestProperties
       : backupRequestPropertiesSerializer(options?.backupRequestProperties),

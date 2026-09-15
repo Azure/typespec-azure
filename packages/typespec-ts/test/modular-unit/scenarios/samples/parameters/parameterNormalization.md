@@ -76,12 +76,13 @@ export function _postSend(
       allowReserved: options?.requestOptions?.skipUrlEncoding,
     },
   );
+  const requestParameters = operationOptionsToRequestParameters(options);
   return context.path(path).post({
-    ...operationOptionsToRequestParameters(options),
+    ...requestParameters,
     contentType: "application/json",
     headers: {
       ...(options?.headerParam !== undefined ? { header_param: options?.headerParam } : {}),
-      ...options.requestOptions?.headers,
+      ...requestParameters.headers,
     },
     body: !options?.listCredentialsRequest
       ? options?.listCredentialsRequest
