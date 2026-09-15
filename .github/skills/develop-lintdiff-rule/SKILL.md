@@ -130,10 +130,19 @@ mode with the paths reported by the dispatcher:
 ### Dispatcher mode
 
 An invocation without `--worker` is preparation-only, whether it contains one
-or multiple rule IDs. The current session creates and verifies isolated
+or multiple rule IDs. Select the
+[publication execution backend](../do-linter-development-task-one-by-one/app-session-execution.md)
+after eligibility, before creating worktrees or installing dependencies.
+When publication is session-bound, prepare app-owned development sessions and
+use their returned worktree paths; do not create ordinary Git worktrees first.
+Setup-only session messages may establish branch identity, but must not start
+rule development. In an explicit-target environment, preserve the Git-worktree
+preparation below.
+
+The current session creates and verifies isolated
 branches and worktrees, completes their dependency installation, then reports
 the copyable worktree path and worker command needed to open each rule in a new
-VS Code window and start its interactive worker. It must not launch a subagent,
+VS Code window or its owning app session and start its worker. It must not launch a development subagent,
 investigate the rule, prepare the comparison harness, edit, validate, commit, or
 create a PR.
 
@@ -151,13 +160,19 @@ invocation:
 
 Do not prefix the worktree path with `code -n` or any other command in the
 reported path field; the user should be able to copy the path directly. After
-opening the path in a new VS Code window, the user starts a new top-level chat
-and runs the reported worker command. Worker mode resumes from the existing
-branch and worktrees without recreating them.
+preparation, standalone users can start the reported worker command themselves;
+the queue instead starts the verified owning session automatically. Include its
+session ID and publication binding in the handoff when using app sessions.
+Worker mode resumes from the existing branch and worktrees without recreating them.
 
 ### Worker mode
 
 An invocation with `--worker` handles exactly one rule interactively. Verify
+the publication binding before dependency work: a session-bound PR must be
+created by the main agent of the app session owning the supplied worktree,
+not by a coordinator's subagent that merely changed directory. Follow the
+[backend preflight](../do-linter-development-task-one-by-one/app-session-execution.md#preflight-and-existing-worktrees).
+Then verify
 that the supplied typespec-azure worktree is on the rule branch, the supplied
 specs worktree is at the pinned `specsCommit`, and both are clean except for
 known in-progress changes for that rule. Skip branch and worktree creation,
@@ -237,6 +252,10 @@ separate VS Code windows and run independent top-level worker sessions.
    instead of creating another worktree with a different name. If the current
    worktree was created for the target branch, do not put the rule commit
    directly on that branch.
+   In app-session execution, steps 2 and 3 are instead performed by the
+   [session preparation procedure](../do-linter-development-task-one-by-one/app-session-execution.md#dispatcher-preparation).
+   Use the app-returned path, never move or recreate it to enforce a directory
+   name. Keep the canonical rule slug in the branch suffix and handoff.
 4. Read the pinned `specsCommit` from
    `packages/typespec-lintdiff/specs/_meta.json`.
 5. Create a separate azure-rest-api-specs worktree at that commit. Its directory
@@ -313,6 +332,9 @@ separate VS Code windows and run independent top-level worker sessions.
    branch, rule branch, specs branch when one was created, both absolute
    worktree paths, completed dependency status, and the exact worker-mode
    invocation. Do not include a `code -n` wrapper around any worktree path.
+   For app sessions, also report the owning session ID, project ID, actual
+   worktree and branch, and verified comparison base. Keep prepared sessions
+   idle; dispatcher completion does not authorize starting the queue.
 
 Create and verify worktree pairs serially. After `mise install` has completed,
 pipeline the repository-local dependency installs: start the typespec-azure and
@@ -537,6 +559,37 @@ Inspecting emitter source and comparing generated Swagger are permitted only
 for migration research and the test/comparison harness. Shared semantic APIs
 such as HTTP payload metadata and Azure common-type metadata are appropriate
 when they operate on the program without loading or running an emitter.
+
+Determine type identity, version, and other semantic properties from TypeSpec
+types and structured metadata, not by matching or parsing generated OpenAPI
+reference strings. This restriction is about how an API result is used, not
+only which package exports it: an allowed Azure library can also expose a
+reference-formatting helper. Do not construct a reference and parse it back
+when a supported API exposes the underlying record. For example, consume
+`findArmCommonTypeRecord(program, usage.type, { service, version: apiVersion })`
+and its record fields instead of parsing `getArmCommonTypeOpenAPIRef(...)`.
+An external reference to a standard type does not establish native type identity.
+Reference-formatting helpers remain appropriate for emitters and comparison
+research, not for inferring native lint semantics.
+
+When replacing reference-based logic, preserve the established version-selection
+and fallback policy, diagnostic population, and diagnostic targets unless an
+intentional semantic change is separately justified and documented. Handle
+diagnostics returned by metadata resolution explicitly using the repository's
+diagnostic conventions; do not discard them or silently treat failed resolution
+as compliance. Add regression coverage for version selection, fallback, and
+targets where relevant, and prove that checking a resolved record does not
+depend on its generated reference matching the old path or regex layout.
+Use supported native inputs or the existing test infrastructure; do not add
+production adapters or unsupported authoring shapes solely for this test.
+If no supported metadata API can establish the required property, document the
+limitation rather than introducing a reference-string heuristic.
+
+This also follows the
+[metadata-over-reference review on PR #5271](https://github.com/Azure/typespec-azure/pull/5271#issuecomment-5661318416).
+Distinguish architectural reference-format coupling from a demonstrated
+false positive or missed diagnostic; do not claim an affected service without
+evidence.
 
 Before adding special cases or helper complexity, require tests demonstrating
 that the added behavior affects valid supported idiomatic TypeSpec inputs.
@@ -863,6 +916,10 @@ The reviewer must:
 - verify that production rule imports and reachable helpers respect the native
   implementation boundary, native tests do not require an emitter, and any
   emitter-only divergence is documented rather than hidden by an adapter
+- check for reference-string inference even through allowed Azure library APIs;
+  require structured metadata where available, explicit handling of returned
+  resolution diagnostics, and regression evidence for reference-format
+  independence and preserved version-selection, fallback, and diagnostic targets
 - verify destination-compatible dependency direction and absence of TCGC
   dependencies in ARM rule logic, `@typespec/openapi` usage, and unsafe compiler
   mutation; check that their removal did not leave unsupported claims about
@@ -912,11 +969,19 @@ creating a draft PR.
    behavior are ready for formal review.
    In queue-controlled source repair, verify and update the recorded open draft
    PR instead of creating another one; retain its base and head branch.
-   If the preferred PR-creation tool returns an ambiguous transport error or
-   claims a conflicting PR, query GitHub for the exact head/base first. When no
-   PR exists, retry once with an explicit `gh pr create` command that supplies
-   `--head <rule-branch>`, `--base <target-branch>`, and `--draft`; when one
-   exists, return its canonical URL instead of creating a duplicate.
+   Honor the selected publication backend and environment tool requirements.
+   For session-bound publication, only the owning session's main agent calls
+   the required creation tool. Recheck the session binding immediately before
+   creation and verify the actual GitHub repository/base/head/SHA immediately
+   afterward, before returning a URL or starting review.
+   If creation returns an ambiguous transport error or claims a conflicting
+   PR, query GitHub for the exact repository/head/base first. Reuse only a
+   matching open PR with the expected pushed head. Do not automatically resend
+   an uncertain creation request. A CLI fallback is permitted only when the
+   environment allows it; if the required tool restricts fallback to an
+   explicitly authorized failure, honor that restriction. This skill does not
+   authorize bypassing it or treating a wrong-target PR as fallback permission.
+   Never return an unrelated, closed, or merged PR as successful publication.
 6. Set the PR title to the exact stable pattern
    `[Swagger Linter Migration] <ValidatorRuleId> (origin)`, replacing
    `<ValidatorRuleId>` with the original Swagger validator rule ID.
@@ -960,7 +1025,9 @@ creating a draft PR.
   workers with that same mapping.
 - Keep each rule's source branch names and worktree directory names tied to the
   canonical Swagger validator rule slug so source branches can be linked and
-  prepared worktrees can be found and reused later.
+  prepared worktrees can be found and reused later. App-managed directory
+  names are the exception: retain the returned path and identify it through
+  the session binding rather than renaming the directory.
 - Never share a writable specs worktree between concurrent workers.
 - Never allow two specs worktrees to resolve
   `node_modules/tsp-lintdiff-local-linter` to the same rule worktree.
@@ -986,6 +1053,9 @@ Dispatcher mode returns only:
 - per-rule 1-based handoff ID, worktree and dependency preparation status,
   target branch, rule branch, and both absolute worktree paths
 - the exact worker-mode invocation for every rule
+- in app-session mode, each publication binding as separate handoff metadata,
+  outside the copyable commands-only queue block; queue callers need copy only
+  that command block because session discovery uses its exact worktree paths
 - any branch, worktree, or dependency preparation failure that prevents handoff
 
 Worker mode returns:

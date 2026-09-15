@@ -1,6 +1,6 @@
 ---
 name: do-linter-development-task-one-by-one
-description: Run prepared lintdiff worker commands sequentially through development, review, promotion, and promotion review, with up to three source-repair cycles using fresh workers and the same PRs and worktrees. Use when the user supplies one or more /develop-lintdiff-rule --worker commands and wants them completed unattended, one at a time.
+description: Run prepared lintdiff worker commands sequentially through development, review, promotion, and promotion review, with up to three source-repair cycles and publication-aware worker or app-session ownership. Use when the user supplies one or more /develop-lintdiff-rule --worker commands and wants them completed unattended, one at a time.
 argument-hint: "<one /develop-lintdiff-rule --worker command per line>"
 user-invocable: true
 ---
@@ -8,7 +8,7 @@ user-invocable: true
 # Develop lintdiff rules one by one
 
 Run a queue of prepared lintdiff worker commands sequentially. Each command is
-an independent task. Each task cycle gets a fresh top-level subagent and runs:
+an independent task. Each task cycle runs:
 
 `development -> development review -> promotion -> promotion review`
 
@@ -19,11 +19,20 @@ cycles, for at most four complete cycles. Finish the current task, including any
 repair cycles, before starting the next rule. Never have more than one top-level
 worker running at a time.
 
+Select the [execution backend](app-session-execution.md) before dispatch.
+In an explicit-target environment, each cycle gets a fresh top-level
+general-purpose subagent as described below. When PR creation is bound to an
+app session, use the app-session procedure instead: development and promotion
+run sequentially in their separate owning sessions, with the outer queue
+coordinating phase handoffs. A directory change in a subagent is not a new
+publication context. The backend changes execution ownership, not the four
+phases, review requirements, or repair budgets.
+
 Each review-and-fix invocation creates its own two persistent review/fix agents.
-The worker normally owns them; when nested launch controls are unavailable, the
-outer queue owns the review phase using the capability handoff below. These two
-agents do not violate the one-top-level-worker limit. Each invocation retains its
-independent five-round limit; do not share that budget across PRs or cycles.
+The phase owner normally owns them; when nested launch controls are unavailable,
+the outer queue owns the review phase using the capability handoff below. These
+two agents do not violate the one-top-level-worker limit. Each invocation retains
+its independent five-round limit; do not share that budget across PRs or cycles.
 
 ## Workflow
 
@@ -32,7 +41,7 @@ entries are recorded as failed without launching a worker.
 
 ```mermaid
 flowchart TD
-    Start["Next valid task: initial cycle 0"] --> Worker["Launch fresh top-level worker"]
+    Start["Next valid task: initial cycle 0"] --> Worker["Dispatch cycle using selected execution backend"]
     Worker --> Develop["Develop or repair source rule<br/>Create or update development draft PR"]
     Develop --> DevReview["Development review/fix<br/>Up to 5 rounds per invocation"]
     DevReview -->|Clean review| Promote["Promote reviewed source commit<br/>Create or update promotion draft PR"]
@@ -72,6 +81,12 @@ Treat quoted arguments as one value. Ignore Markdown code-fence lines and blank
 lines, but otherwise preserve each command verbatim for the worker. Reject
 duplicate options even when one occurrence has the required value.
 
+Publication bindings are orchestration metadata, not input command lines or
+additional flags. The dispatcher must provide a separate commands-only block
+for queue invocation. In app-session mode the queue can discover the owner
+from each exact TypeSpec worktree path even when no binding metadata was pasted.
+Do not relax malformed-line rejection to accept arbitrary handoff prose.
+
 Validate the complete queue before launching the first subagent. Record malformed
 lines as failed tasks and continue with every valid command. Compare rule IDs
 case-insensitively after normalizing them to a stable key while preserving their
@@ -98,6 +113,10 @@ Keep an ordered ledger with one entry per input command:
 - original command
 - TypeSpec and specs worktrees
 - promotion worktree and branch, once selected
+- execution backend and development/promotion publication bindings: project and
+  owning session IDs when applicable, worktree, repository, base, and head branch
+- phase dispatch ID, owning session ID, cycle, expected head, and whether a
+  dispatched phase is awaiting a result; retain completed dispatch IDs
 - absolute log path
 - status: `pending`, `running`, `succeeded`, `partially-succeeded`, or `failed`
 - development and promotion draft PR URLs, when created, with their verified
@@ -105,7 +124,8 @@ Keep an ordered ledger with one entry per input command:
 - development, development-review, promotion, and promotion-review results,
   including completed review rounds, termination reason, and reviewed head SHA
 - cycle number (`0` for initial development, `1` through `3` for source repair),
-  source-repair count, and each cycle's fresh top-level worker ID
+  source-repair count, and each cycle's fresh worker ID or app-session phase
+  dispatch IDs
 - immutable source commit used for each promotion attempt
 - append-only cycle history, including source-repair evidence, prior results,
   PR identities, worktree state manifests, and final head states
@@ -127,6 +147,21 @@ Likewise, `review-handoff` is a nonterminal worker outcome: keep the task
 `running` while the outer queue owns that review phase.
 
 ## Sequential orchestration
+
+After complete input and eligibility validation, perform the read-only
+[publication preflight](app-session-execution.md#preflight-and-existing-worktrees)
+for all valid entries. This checks session metadata and tool capabilities, not
+Git synchronization or dependency readiness. Persist failures before launching
+development. Do not spend a full development run discovering that the caller
+cannot publish its branch.
+
+For session-bound publication, follow
+[app-session execution](app-session-execution.md#queue-execution) rather than
+launching a cycle subagent with the full worker prompt below. That procedure
+defines phase-scoped prompts, unattended notifications, and session reuse.
+The following subagent launch/wait procedure applies only to the explicit-target
+backend. Common logging, result classification, review and repair rules still
+apply to both backends.
 
 For each valid pending command, in input order:
 
@@ -221,7 +256,9 @@ reused progress; they are not automatic retries.
 
 This setup-only retry is distinct from the source-repair loop below. Allow at
 most one orchestration retry for the entire task, not one per cycle, and use a
-fresh top-level subagent for it.
+fresh top-level subagent for the explicit-target backend. App-session execution
+uses a new phase dispatch in the same verified owner, never another concurrent
+session on the same branch.
 Retry only when the first attempt proves an unambiguous defect in this outer
 skill's command parsing, worker prompt, worktree selection, log initialization,
 or skill-invocation mechanics before `/develop-lintdiff-rule` begins repository
@@ -293,6 +330,10 @@ agent to repair the source in place.
    the original command verbatim plus the complete cycle handoff as context, not
    extra command-line flags. This authorized reuse is within the same queue
    entry; it does not relax duplicate-input rejection.
+   In app-session execution, dispatch a new development phase in the recorded
+   development session instead; return to the recorded promotion session only
+   after the new development head has a clean review. Retaining session
+   ownership is required and does not authorize reusing review subagents.
 4. Restart at `/develop-lintdiff-rule`, not at promotion. Reuse the original
    TypeSpec/specs worktrees, source branch, and development PR. Preserve commits
    and add focused repair commits. Re-establish evidence, add regression
@@ -323,6 +364,8 @@ fresh repair worker. It is an orchestration contract, not a new public CLI flag:
 
 - queue ownership marker `lintdiff-development-queue`, task number, exact rule
   ID, original command, cycle number, and source-repair count
+- execution backend, phase dispatch ID and phase scope, both publication
+  bindings when known, coordinator session ID, and instruction-version paths
 - absolute TypeSpec/specs worktrees, source branch, canonical development PR
   URL, repository/base/head identities, and last verified pushed source SHA
 - canonical promotion PR URL when created, promotion worktree and branch when
@@ -367,7 +410,11 @@ refresh begins; never reuse them across review-loop invocations.
 
 ## Top-level worker prompt
 
-Give each top-level subagent all of these instructions:
+For the explicit-target backend, give each top-level subagent all of these
+instructions. App-session execution uses the
+[phase-scoped owner prompts](app-session-execution.md#phase-scoped-owner-prompts)
+instead, retaining these logging and evidence requirements without instructing
+one session to execute both publication phases.
 
 > You own exactly one cycle of one lintdiff rule task. Your cycle is
 > `<cycle-number>`; the initial cycle is `0` and repair cycles are `1` through `3`.
@@ -622,6 +669,10 @@ Capture concrete suggestions for improving future queue runs, especially:
 ## Guardrails
 
 - Never launch two top-level workers concurrently.
+- In app-session execution, never have development and promotion owners doing
+  task work simultaneously, or call the session-bound creation tool from the
+  outer queue or its subagents. Retain owning sessions across repair cycles;
+  do not reuse them for a different rule.
 - Never launch the next worker until the previous worker is terminal.
 - Never reuse a completed worker for another command.
 - Never let the worker and outer-owned review agents act on worktrees at the

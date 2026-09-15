@@ -14,6 +14,43 @@ Promotion is a handoff workflow, not a rule-design workflow. The rule's source
 PR in `packages/typespec-lintdiff` remains the source of truth while the
 official-library PR is prepared in a clean worktree.
 
+## Native semantic boundary
+
+Apply the development skill's
+[Native TypeSpec implementation boundary](../develop-lintdiff-rule/SKILL.md#native-typespec-implementation-boundary)
+to the promoted rule and its reachable helpers, including during source
+inspection, adaptation, and independent review. A source rule assumed done is
+not exempt from this boundary.
+
+Use native types and structured metadata to establish identity, versions, and
+other semantic properties. Do not infer them by matching or parsing generated
+OpenAPI reference strings, including strings returned by an otherwise allowed
+Azure library. Prefer the underlying supported record API over a
+construction/parsing round trip: for ARM common types, use
+`findArmCommonTypeRecord(...)` and its fields rather than parsing
+`getArmCommonTypeOpenAPIRef(...)`. An external reference to a standard type does
+not establish native type identity. Reference-formatting helpers remain
+appropriate for emitters, not for inferring native lint semantics.
+
+Preserve version-selection and fallback policy, diagnostic population, and
+diagnostic targets when replacing reference-based logic, unless a semantic
+change has been justified through the source-repair workflow. Handle returned
+metadata-resolution diagnostics explicitly using repository conventions; do not
+discard them or silently treat failed resolution as compliance. Require
+regression evidence that a resolved record is checked independently of generated
+reference path formatting. If supported metadata cannot establish the property,
+report the limitation rather than adding a reference-string heuristic.
+
+Follow the existing finding classifications before editing. A proven
+behavior-preserving destination adaptation can be made only in the promotion
+worktree with supporting evidence and documentation. A source-semantic defect
+blocks promotion and returns to the authorized repair workflow; this boundary
+does not authorize modifying the immutable source or silently changing semantics
+only in the official copy. Architectural coupling alone is not proof of an
+affected service or a source-semantic defect; report uncertain findings as such.
+See the
+[review on PR #5271](https://github.com/Azure/typespec-azure/pull/5271#issuecomment-5661318416).
+
 ## Preconditions
 
 - The user must name the rule. Assume a rule named for promotion is done for
@@ -97,6 +134,13 @@ apply this narrowly scoped contract. Standalone promotion behavior is unchanged.
   development PR to merge. Pass the queue's no-skill-edits/no-skill-update-PR
   constraint to all delegated agents and append milestones to the shared log.
 - For initial promotion, create/select the separate promotion worktree as usual.
+  When the handoff selects
+  [app-session execution](../do-linter-development-task-one-by-one/app-session-execution.md),
+  reuse the supplied, verified app-owned promotion worktree even on cycle `0`.
+  Its main session agent owns PR creation. Verify its `origin/main` base and
+  distinct branch before setup; do not create a third worktree or publish from
+  the development/coordinator session. Keep the app-returned directory name
+  and record the canonical validator slug in the branch suffix and handoff.
   Report its absolute path and branch as soon as selected, including on failure
   before PR creation.
 - On a repair cycle, reuse the recorded promotion worktree, branch, and open
@@ -280,7 +324,10 @@ policy.
 2. Verify that `origin` points to the canonical `Azure/typespec-azure`
    repository, then fetch `origin/main`. Do not use a personal-fork remote for
    either the base or the eventual PR source branch.
-3. Create a new worktree and dedicated branch from `origin/main`. Use the
+3. Create a new worktree and dedicated branch from `origin/main`, or verify and
+   reuse the app-owned promotion worktree supplied by the queue contract above.
+   In that mode, the app has already created the separate checkout; this step
+   must not replace it. Use the
    canonical validator rule slug in both the branch and worktree directory name
    so the promotion source can be linked and the worktree can be reused later,
    for example:
@@ -387,6 +434,15 @@ Use `createLinterRuleTester` and cover:
 - representative compliant cases
 - edge cases called out in source-of-truth notes
 - regression cases for any lintdiff review fixes
+
+For metadata-resolution or reference-based logic, explicitly cover relevant
+version-selection/fallback behavior, returned resolution diagnostics, and
+diagnostic targets. Prove that checking a resolved record does not depend on
+its generated reference matching the old path or regex layout. Use supported
+native inputs or existing test infrastructure, not production adapters or
+unsupported authoring shapes added solely for testing. Fixture conversion alone
+does not close a missing regression case; classify any newly exposed source
+defect before making changes.
 
 Use this standard fixture-to-native-test mapping:
 
@@ -646,6 +702,11 @@ promotion diff. The review should inspect:
 - rule semantics and diagnostic targets
 - TypeSpec linter naming convention compliance for the official rule name
 - target-library dependency direction
+- compliance with the linked native implementation boundary, including reachable
+  helpers and reference-string inference through allowed Azure library APIs
+- use of structured metadata where available, explicit handling of returned
+  resolution diagnostics, and regression evidence for reference-format
+  independence and preserved version-selection, fallback, and diagnostic targets
 - test conversion fidelity from lintdiff fixtures
 - docs accuracy, including front matter, full-name block, TypeSpec/SDK-focused
   rationale, and any Swagger/LintDiff provenance being confined to a provenance
