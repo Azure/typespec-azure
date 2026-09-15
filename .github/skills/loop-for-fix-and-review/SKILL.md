@@ -355,7 +355,9 @@ ledger. It owns these steps:
    `GET /repos/{owner}/{repo}/pulls/{number}/reviews`, at a positive moderate interval
    rather than repeatedly requesting reviews. Treat its raw response as the
    source of truth for review completion and the numeric review ID. Allow up to
-   30 minutes, using monotonic elapsed time only for deadline accounting.
+   30 minutes, using the maximum of wall-clock elapsed time since the active
+   request's raw UTC `created_at` and monotonic elapsed time for the current
+   invocation.
    - Across REST, GraphQL, timeline, and comment surfaces, normalize login
      values case-insensitively and accept exactly `Copilot`,
      `copilot-pull-request-reviewer`, and
