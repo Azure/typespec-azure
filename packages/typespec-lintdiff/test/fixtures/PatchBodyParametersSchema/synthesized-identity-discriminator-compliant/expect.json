@@ -2,6 +2,10 @@
   "violation": false,
   "ambientDiagnostics": [
     {
+      "code": "tsp-lintdiff-local-linter/consistent-patch-properties",
+      "count": 1
+    },
+    {
       "code": "@azure-tools/typespec-azure-core/no-string-discriminator",
       "count": 1
     },
