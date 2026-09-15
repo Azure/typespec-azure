@@ -63,7 +63,9 @@ flowchart TD
     Success --> Record["Persist terminal task result<br/>Finish all task activity"]
     Stop --> Record
     Cap --> Record
-    Record --> Next["Continue with next queue task<br/>or produce final report"]
+    Record --> Quiet{"All prior task activity verified stopped?"}
+    Quiet -->|Yes| Next["Continue with next queue task<br/>or produce final report"]
+    Quiet -->|No| Halt["Stop queue: quiescence-unverified<br/>Leave later tasks pending"]
 ```
 
 ## Required input
@@ -137,6 +139,10 @@ Keep an ordered ledger with one entry per input command:
   waiting phase, handoff artifact, and review invocation/agent IDs
 - local draft-correction counts, causal evidence and rerun results, separate
   from worker attempts, review rounds and source-repair cycles
+- publication attempt/error identities, exact base/head tuple and SHA, absence
+  query evidence, and the separate one-correction publication budget
+- original readiness/status/quiescence deadlines, last genuine progress,
+  status-request identity and evidence that previous task activity stopped
 - explicit recovery authorizations, including the user message, named failure,
   additional attempt allowance and usage, and any legacy-worktree adoption binding
 - blocker or failure, when applicable
@@ -183,8 +189,12 @@ For each valid pending command, in input order:
 5. For `source-repair-required`, apply the bounded source-repair loop below.
    Launch a fresh worker for the same task only after the prior worker is
    terminal and its nested agents and commands have stopped doing work.
-6. Once the task is terminal, continue with the next task even if this task
-   failed or only partially succeeded.
+6. Once the task is terminal AND all its owner/nested-agent/command activity is
+   verified stopped, continue with the next task even if this task failed or
+   only partially succeeded. Follow the shared
+   [finite reconciliation and quiescence gate](app-session-execution.md#completion-delivery-and-reconciliation).
+   If quiescence cannot be established, stop the queue with later entries
+   pending; a timeout is not permission to overlap owners.
 
 Use background mode for a worker when the runtime requires multiple turns for a
 long-running development and review workflow. After its completion notification,
@@ -212,8 +222,10 @@ review owner must still verify actual persistent-agent follow-ups during review
 initialization.
 
 - Select `worker` when the worker can launch and message persistent agents.
-- Select `outer` when the worker cannot but the outer agent can, and the outer
-  agent can resume this same worker with a follow-up after a phase handoff.
+- Select `outer` when the worker cannot but the outer agent can. Explicit-target
+  whole-cycle workers require same-worker follow-up; app-session phase owners
+  require session handoff/result delivery, not continuation into another
+  publication phase. Record capabilities and selection for each phase owner.
 - If neither route is available, stop before repository/dependency/publication
   work and report an orchestration capability blocker, not a source-rule defect.
   Do not substitute synchronous reviewers or reuse agents from earlier loops.
@@ -233,19 +245,26 @@ For `outer` mode:
    development worker does not serve as either reviewer or fixer. Append review
    milestones to the same log and retain the independent five-round budget,
    backlog handling, validation gates and all stop conditions.
-3. On clean review, record the final pushed and reviewed SHA, ensure both review
-   agents and their commands are idle/finished, and send the verified result and
-   updated cycle handoff to the same worker. The worker verifies current
-   identities and proceeds to promotion from that exact source commit. This is
-   continuation of the same cycle, not another worker attempt or retry.
-4. After promotion publication and required validation, the worker returns
+3. On clean review, record the final pushed and reviewed SHA and ensure both
+   review agents and their commands are idle/finished. In explicit-target mode,
+   send the result and updated cycle handoff to the same whole-cycle worker,
+   which rechecks identities and proceeds to promotion from that exact commit.
+   In app-session mode, keep the development owner idle and create/verify a
+   DISTINCT promotion owner under the shared app-session contract; dispatch
+   that owner with the reviewed source SHA. Never resume the development owner
+   into promotion or create the source PR from the coordinator. Neither route
+   consumes a worker retry or permits concurrent mutation.
+4. After promotion publication and required validation, the applicable worker
+   or app promotion owner returns
    another `review-handoff` with `phase: promotion-review`, including the
    promotion worktree and immutable source provenance. The outer queue runs a
    separate review invocation with a new persistent pair. It may finalize the
    task directly once this review and final provenance verification are complete.
 5. A review blocker or exhausted cap ends the task; do not resume the worker to
    bypass it. A confirmed promotion source defect follows the existing bounded
-   source-repair protocol with a fresh worker only after all prior activity ends.
+   source-repair protocol only after all prior activity ends: a fresh whole-cycle
+   worker for explicit-target mode, or the retained development/promotion owners
+   with new phase dispatch IDs for app-session mode.
    Missing/unverifiable handoff state is a blocker, not a clean review.
 
 This route must be selected before review side effects. It does not permit
@@ -280,11 +299,17 @@ corrected prompt. Never reuse the failed worker.
 
 Do not restart workers automatically for dependency, build, validation, corpus,
 review, network, credential, push or GitHub failures. This does not prohibit an
-eligible in-place draft correction below. An orchestration retry is forbidden
+eligible in-place draft correction below or the shared
+[single evidenced publication-configuration correction](app-session-execution.md#publication-recovery).
+That exception requires positive exact-PR absence and a specific proven defect,
+uses only the required creation tool, and never restarts a worker or retries
+unknown transport/API failures. Track it separately from every other budget.
+An orchestration retry is forbidden
 after development changed files, created a commit, pushed a branch, or created
 a pull request. Only a confirmed source defect under the separate source-repair
 contract permits an automatic cycle restart after development work. If the
-orchestration retry fails, record the task's terminal result and continue the queue.
+orchestration retry fails, record the task's terminal result and continue only
+after verified quiescence.
 
 ### Local draft correction is not a worker restart
 
@@ -389,8 +414,8 @@ agent to repair the source in place.
    state no longer matches the handoff, stop and report the blocker.
 
 Keep development PRs on their existing
-`feature/lintdiff-migration-new` target. Promotion follows its skill's existing
-same-repository `Azure/typespec-azure`/`main` target and agent-recommended
+`feature/lintdiff-migration-new` target. Promotion follows its skill's canonical
+`Azure/typespec-azure`/`main` base, recorded head-repository policy and agent-recommended
 destination, with new rules disabled by default. Do not wait for or perform a
 development merge before promotion, and never merge either PR automatically.
 
@@ -623,10 +648,16 @@ required-validation blocker even if the promotion skill returned a draft PR.
 
 ## Final result
 
-After every queue entry is terminal, output the heading
+After every queue entry is terminal, or a quiescence blocker stops the queue,
+output the heading
 `# LintDiff development results`, followed by this totals line:
 
 `**Completed:** <total> | **Succeeded:** <count> | **Partial:** <count> | **Failed:** <count>`
+
+Count only terminal entries as completed. If the queue stopped with unresolved
+activity, add `**Pending:** <count>` and identify the active owner/dispatch and
+quiescence blocker; include untouched later entries as `pending (not started)`.
+Do not mark them failed or claim the old task stopped without evidence.
 
 Then report every task in input order using this layout:
 
@@ -711,6 +742,8 @@ Capture concrete suggestions for improving future queue runs, especially:
   outer queue or its subagents. Retain owning sessions across repair cycles;
   do not reuse them for a different rule.
 - Never launch the next worker until the previous worker is terminal.
+- Terminal classification alone is insufficient: verify all previous task
+  activity stopped. An unresponsive owner stops the queue, not just its entry.
 - Never reuse a completed worker for another command.
 - Never let the worker and outer-owned review agents act on worktrees at the
   same time. Same-cycle review handoffs do not authorize a second top-level worker.

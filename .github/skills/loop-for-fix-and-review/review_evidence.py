@@ -1,16 +1,22 @@
 """Read-only GitHub review evidence collector. Uses Python's standard library and gh."""
 
 import argparse
+import base64
 import datetime as dt
 import hashlib
 import json
 import re
 import subprocess
+import time
 from pathlib import Path
 
 
 COPILOT = {"copilot", "copilot-pull-request-reviewer", "copilot-pull-request-reviewer[bot]"}
 UTC = dt.timezone.utc
+DEFAULT_DEADLINE_SECONDS = 30 * 60
+DEFAULT_POLL_INTERVAL_SECONDS = 60
+DEFAULT_API_TIMEOUT_SECONDS = 90
+DEFAULT_FINAL_REFETCH_SECONDS = 60
 
 
 class EvidenceError(ValueError):
@@ -29,8 +35,12 @@ def utc(value):
         raise EvidenceError(f"Invalid UTC timestamp: {value!r}") from error
 
 
+def utc_now():
+    return dt.datetime.now(UTC)
+
+
 def now():
-    return dt.datetime.now(UTC).isoformat().replace("+00:00", "Z")
+    return utc_now().isoformat().replace("+00:00", "Z")
 
 
 def array(value):
@@ -42,6 +52,33 @@ def array(value):
 def numeric_id(value):
     if type(value) is not int or value <= 0:
         raise EvidenceError(f"Expected a positive numeric database ID, got {value!r}")
+    return value
+
+
+def positive_number(value, name):
+    if type(value) not in {int, float} or value <= 0:
+        raise EvidenceError(f"Expected a positive {name}, got {value!r}")
+    return value
+
+
+def capped_deadline(value):
+    positive_number(value, "deadline")
+    return min(value, DEFAULT_DEADLINE_SECONDS)
+
+
+def partial_output(value):
+    if value is None:
+        return {"kind": "none"}
+    if isinstance(value, bytes):
+        return {"kind": "bytes", "base64": base64.b64encode(value).decode("ascii")}
+    if isinstance(value, str):
+        return {"kind": "text", "text": value}
+    return {"kind": type(value).__name__, "repr": repr(value)}
+
+
+def sha(value):
+    if not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{40}", value):
+        raise EvidenceError(f"Expected a 40-character lowercase SHA, got {value!r}")
     return value
 
 
@@ -94,10 +131,49 @@ def verify_request(before, after):
     }
 
 
+def verified_request(artifact, repo, pr):
+    if artifact["repo"] != repo or artifact["pr"] != pr:
+        raise EvidenceError("Verified request belongs to a different PR")
+    status = artifact["status"]
+    if status not in {"new-verified", "already-pending-active"}:
+        raise EvidenceError("Request artifact is not an active verified request")
+    head = sha(artifact["head"])
+    request = artifact["request"]
+    numeric_id(request["id"])
+    utc(request["created_at"])
+    if status == "already-pending-active":
+        if artifact.get("requested_before") is not True or artifact.get("requested_after") is not True:
+            raise EvidenceError("Already-pending request lacks before/after reviewer evidence")
+        provenance = artifact.get("active_pending_request")
+        if not isinstance(provenance, dict):
+            raise EvidenceError("Already-pending request lacks strict active provenance")
+        if sha(provenance.get("head")) != head:
+            raise EvidenceError("Already-pending provenance head does not match")
+        if provenance.get("request") != request:
+            raise EvidenceError("Already-pending provenance request does not match")
+    return {"status": status, "head": head, "request": request}
+
+
+def load_verified_request(path, repo, pr):
+    try:
+        artifact = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise EvidenceError("Cannot read verified request artifact") from error
+    return verified_request(artifact, repo, pr)
+
+
+def emit(output, result):
+    serialized = json.dumps(result, indent=2, ensure_ascii=True)
+    (output / "result.json").write_text(serialized, encoding="utf-8")
+    return serialized
+
+
 class Client:
     def __init__(self, repo, pr, output):
         self.repo, self.pr, self.output = repo, pr, output
         self.counter = 0
+        self.timeout = DEFAULT_API_TIMEOUT_SECONDS
+        self.deadline = None
 
     def request(self, endpoint, payload=None):
         self.counter += 1
@@ -106,12 +182,30 @@ class Client:
         if payload is not None:
             command += ["--input", "-"]
         record = {"utc": now(), "endpoint": endpoint, "payload": payload}
+        timeout = self.timeout
+        if self.deadline is not None:
+            remaining = self.deadline - time.monotonic()
+            if remaining <= 0:
+                record.update(error="API aggregate timeout budget exhausted", timeout_expired=True)
+                self.save(record)
+                raise EvidenceError("API aggregate timeout budget exhausted; inspect request evidence")
+            timeout = min(timeout, remaining)
         try:
             response = subprocess.run(
                 command, input=json.dumps(payload) if payload is not None else None,
-                capture_output=True, text=True, encoding="utf-8", timeout=90,
+                capture_output=True, text=True, encoding="utf-8", timeout=timeout,
             )
-        except (OSError, subprocess.TimeoutExpired) as error:
+        except subprocess.TimeoutExpired as error:
+            record.update(
+                error=str(error),
+                timeout_expired=True,
+                timeout_seconds=error.timeout,
+                stdout=partial_output(error.stdout),
+                stderr=partial_output(error.stderr),
+            )
+            self.save(record)
+            raise EvidenceError("API execution timed out; inspect request evidence") from error
+        except OSError as error:
             record["error"] = str(error)
             self.save(record)
             raise EvidenceError("API execution failed; inspect request evidence") from error
@@ -253,6 +347,7 @@ def map_comments(comments, threads, review):
 
 
 def collect(client, head, request_time, review_id=None):
+    sha(head)
     requested = utc(request_time)
     if client.head() != head:
         raise EvidenceError("PR head changed before collection")
@@ -297,6 +392,146 @@ def collect(client, head, request_time, review_id=None):
     return result
 
 
+def collect_once(repo, pr, output, head, request_time, review_id=None, timeout=DEFAULT_API_TIMEOUT_SECONDS):
+    output.mkdir(parents=True, exist_ok=False)
+    result = {"repo": repo, "pr": pr, "started_at": now()}
+    client = Client(repo, pr, output)
+    client.timeout = timeout
+    client.deadline = time.monotonic() + timeout
+    try:
+        result.update(collect(client, head, request_time, review_id))
+    except (EvidenceError, KeyError, TypeError, ValueError, OSError) as error:
+        result.update(status="failed", error=f"{type(error).__name__}: {error}")
+        result["finished_at"] = now()
+        emit(output, result)
+        raise EvidenceError("Collection failed; inspect evidence") from error
+    result["finished_at"] = now()
+    emit(output, result)
+    return result
+
+
+def resume_polling_state(resume_from, repo, pr, request):
+    if resume_from is None:
+        return None
+    try:
+        previous = json.loads(resume_from.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise EvidenceError("Cannot read previous polling artifact") from error
+    if previous["repo"] != repo or previous["pr"] != pr:
+        raise EvidenceError("Previous polling artifact belongs to a different PR")
+    polling = previous.get("polling")
+    if not isinstance(polling, dict):
+        raise EvidenceError("Previous artifact has no polling state to resume")
+    if polling.get("head") != request["head"] or polling.get("request") != request["request"]:
+        raise EvidenceError("Previous polling artifact is for a different active request")
+    utc(polling["deadline_started_at"])
+    if positive_number(polling["deadline_seconds"], "deadline") > DEFAULT_DEADLINE_SECONDS:
+        raise EvidenceError("Previous polling artifact exceeds the maximum deadline")
+    return polling
+
+
+def remaining_deadline(deadline_started_at, deadline_seconds, monotonic_started_at, monotonic_now):
+    wall_elapsed = max(0.0, (utc_now() - utc(deadline_started_at)).total_seconds())
+    monotonic_elapsed = max(0.0, monotonic_now - monotonic_started_at)
+    return deadline_seconds - max(wall_elapsed, monotonic_elapsed)
+
+
+def poll(repo, pr, request, output, deadline_seconds=DEFAULT_DEADLINE_SECONDS,
+         interval_seconds=DEFAULT_POLL_INTERVAL_SECONDS, resume_from=None,
+         final_refetch_seconds=DEFAULT_FINAL_REFETCH_SECONDS):
+    if interval_seconds < 0:
+        raise EvidenceError("Polling interval must be non-negative")
+    deadline_seconds = capped_deadline(deadline_seconds)
+    final_refetch_seconds = min(capped_deadline(final_refetch_seconds), DEFAULT_FINAL_REFETCH_SECONDS)
+    output.mkdir(parents=True, exist_ok=False)
+    started = time.monotonic()
+    request_time = request["request"]["created_at"]
+    head = request["head"]
+    polls, ordinary = [], None
+    deadline_started_at = request_time
+    result = {
+        "repo": repo, "pr": pr, "started_at": now(), "head": head,
+        "request": request["request"], "request_status": request["status"],
+    }
+    try:
+        previous = resume_polling_state(resume_from, repo, pr, request)
+        deadline_started_at = previous["deadline_started_at"] if previous else deadline_started_at
+        if previous:
+            deadline_seconds = previous["deadline_seconds"]
+        reserve = min(DEFAULT_API_TIMEOUT_SECONDS, max(1.0, deadline_seconds / 10))
+        while True:
+            remaining = remaining_deadline(deadline_started_at, deadline_seconds, started, time.monotonic())
+            if remaining <= reserve:
+                break
+            poll_dir = output / f"poll-{len(polls) + 1:04}"
+            timeout = min(DEFAULT_API_TIMEOUT_SECONDS, max(0.001, remaining - reserve))
+            poll_record = {"directory": str(poll_dir)}
+            polls.append(poll_record)
+            try:
+                poll_result = collect_once(repo, pr, poll_dir, head, request_time, timeout=timeout)
+            except EvidenceError:
+                poll_record["status"] = "failed"
+                raise
+            poll_record.update(
+                status=poll_result["status"],
+                review_id=(poll_result.get("review") or {}).get("id"),
+            )
+            if poll_result["status"] != "pending":
+                ordinary = poll_result
+                break
+            sleep_for = min(interval_seconds, max(0.0, remaining - reserve))
+            if sleep_for <= 0 and interval_seconds > 0:
+                break
+            time.sleep(sleep_for)
+        remaining = remaining_deadline(deadline_started_at, deadline_seconds, started, time.monotonic())
+        review_id = (ordinary.get("review") or {}).get("id") if ordinary else None
+        final_dir = output / "final-refetch"
+        final_timeout = min(
+            DEFAULT_API_TIMEOUT_SECONDS,
+            final_refetch_seconds,
+            max(0.001, remaining) if remaining > 0 else final_refetch_seconds,
+        )
+        final = collect_once(
+            repo, pr, final_dir, head, request_time, review_id=review_id,
+            timeout=final_timeout,
+        )
+        if final["status"] == "pending":
+            raise EvidenceError("Final refetch did not establish a completed review")
+        if ordinary and final["review"]["id"] != ordinary["review"]["id"]:
+            raise EvidenceError("Final refetch disagrees with ordinary polling review")
+        final["polling"] = {
+            "status": "completed", "head": head, "request": request["request"],
+            "deadline_started_at": deadline_started_at,
+            "deadline_seconds": deadline_seconds,
+            "interval_seconds": interval_seconds,
+            "final_refetch_allowance_seconds": final_refetch_seconds,
+            "final_refetch_after_deadline": remaining <= 0,
+            "ordinary_polls": polls,
+            "ordinary_outcome": "completed" if ordinary else "pending-or-deadline",
+            "final_refetch_directory": str(final_dir),
+            "reliability": "ordinary-poll-confirmed" if ordinary else "ordinary-poll-unreliable",
+        }
+        emit(output, final)
+        return final
+    except (EvidenceError, KeyError, TypeError, ValueError, OSError) as error:
+        result["finished_at"] = now()
+        result.update(
+            status="failed", error=f"{type(error).__name__}: {error}",
+            polling={
+                "status": "failed", "head": head, "request": request["request"],
+                "deadline_started_at": deadline_started_at,
+                "deadline_seconds": deadline_seconds,
+                "interval_seconds": interval_seconds,
+                "final_refetch_allowance_seconds": final_refetch_seconds,
+                "ordinary_polls": polls,
+                "ordinary_outcome": "completed" if ordinary else "pending-or-deadline",
+                "final_refetch_directory": str(output / "final-refetch"),
+            },
+        )
+        emit(output, result)
+        raise
+
+
 def snapshot(client):
     head = client.head()
     events = client.pages(f"repos/{client.repo}/issues/{client.pr}/events")
@@ -322,23 +557,33 @@ def snapshot(client):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["snapshot", "verify-request", "collect", "threads"])
+    parser.add_argument("action", choices=["snapshot", "verify-request", "collect", "poll", "threads"])
     parser.add_argument("--repo", required=True)
     parser.add_argument("--pr", required=True, type=int)
     parser.add_argument("--output", required=True, type=Path, help="New evidence directory; never reused")
     parser.add_argument("--head")
     parser.add_argument("--request-time")
     parser.add_argument("--review-id", type=int)
+    parser.add_argument("--request", type=Path, help="Verified request result.json")
+    parser.add_argument("--resume-from", type=Path, help="Previous poll result.json; preserves deadline")
+    parser.add_argument("--deadline-seconds", type=float, default=DEFAULT_DEADLINE_SECONDS)
+    parser.add_argument("--interval-seconds", type=float, default=DEFAULT_POLL_INTERVAL_SECONDS)
+    parser.add_argument("--final-refetch-seconds", type=float, default=DEFAULT_FINAL_REFETCH_SECONDS)
     parser.add_argument("--before", type=Path)
     parser.add_argument("--after", type=Path)
     args = parser.parse_args()
     if not re.fullmatch(r"[\w.-]+/[\w.-]+", args.repo) or args.pr <= 0:
         parser.error("Expected owner/repository and positive PR number")
-    if args.action == "collect" and not (args.head and args.request_time):
-        parser.error("collect requires --head and --request-time")
+    if args.action == "collect" and not (args.request or (args.head and args.request_time)):
+        parser.error("collect requires --request or --head and --request-time")
+    if args.action == "poll" and not args.request:
+        parser.error("poll requires --request")
     if args.action == "verify-request" and not (args.before and args.after):
         parser.error("verify-request requires --before and --after snapshot result.json paths")
-    args.output.mkdir(parents=True, exist_ok=False)
+    if args.action != "poll":
+        args.output.mkdir(parents=True, exist_ok=False)
+    elif args.output.exists():
+        raise FileExistsError(args.output)
     result = {"repo": args.repo, "pr": args.pr, "started_at": now()}
     client = Client(args.repo, args.pr, args.output)
     try:
@@ -361,14 +606,29 @@ def main():
                 raise EvidenceError("PR head changed during thread collection")
             result.update(status="threads", head=head, threads=threads,
                           unresolved_copilot_threads=unresolved(threads))
+        elif args.action == "poll":
+            request = load_verified_request(args.request, args.repo, args.pr)
+            result = poll(
+                args.repo, args.pr, request, args.output,
+                args.deadline_seconds, args.interval_seconds, args.resume_from,
+                args.final_refetch_seconds,
+            )
         else:
-            result.update(collect(client, args.head, args.request_time, args.review_id))
+            if args.request:
+                request = load_verified_request(args.request, args.repo, args.pr)
+                result.update(collect(client, request["head"], request["request"]["created_at"], args.review_id))
+            else:
+                result.update(collect(client, args.head, args.request_time, args.review_id))
     except (EvidenceError, KeyError, TypeError, ValueError, OSError) as error:
+        if args.action == "poll" and (args.output / "result.json").exists():
+            print((args.output / "result.json").read_text(encoding="utf-8"))
+            return 1
+        if args.action == "poll":
+            args.output.mkdir(parents=True, exist_ok=True)
         result.update(status="failed", error=f"{type(error).__name__}: {error}")
     result["finished_at"] = now()
     # Escape Unicode for redirected Windows stdout without losing the original text.
-    serialized = json.dumps(result, indent=2, ensure_ascii=True)
-    (args.output / "result.json").write_text(serialized, encoding="utf-8")
+    serialized = emit(args.output, result)
     print(serialized)
     return 1 if result["status"] == "failed" else 0
 

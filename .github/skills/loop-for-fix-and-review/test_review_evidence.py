@@ -3,8 +3,8 @@ import datetime as dt
 import importlib.util
 import io
 import json
+import shutil
 import subprocess
-import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -37,6 +37,23 @@ THREAD = {
 
 
 class EvidenceTests(unittest.TestCase):
+    def setUp(self):
+        self.scratch_root = Path(__file__).with_name(".test-output")
+        shutil.rmtree(self.scratch_root, ignore_errors=True)
+        self.scratch_root.mkdir()
+
+    def tearDown(self):
+        shutil.rmtree(self.scratch_root, ignore_errors=True)
+
+    def fresh_time(self):
+        return dt.datetime.now(evidence.UTC).isoformat().replace("+00:00", "Z")
+
+    def active_request(self, created_at=None):
+        return {
+            "status": "new-verified", "head": HEAD,
+            "request": {"id": 1, "created_at": created_at or self.fresh_time()},
+        }
+
     def test_utc_comparison_does_not_depend_on_local_timezone(self):
         self.assertGreater(evidence.utc(REVIEW["submitted_at"]), evidence.utc(TIME))
         plus_eight = dt.timezone(dt.timedelta(hours=8))
@@ -90,6 +107,34 @@ class EvidenceTests(unittest.TestCase):
     def test_request_verified_by_event_not_requested_reviewer_presence(self):
         before, after = self.snapshots()
         self.assertEqual(evidence.verify_request(before, after)["status"], "new-verified")
+
+    def test_verified_request_artifact_preserves_raw_utc_and_rejects_bad_provenance(self):
+        before, after = self.snapshots()
+        verified = {"repo": "owner/repo", "pr": 1} | evidence.verify_request(before, after)
+        self.assertEqual(evidence.verified_request(verified, "owner/repo", 1)["request"]["created_at"], TIME)
+        for corrupt in (
+            verified | {"repo": "other/repo"},
+            verified | {"pr": 2},
+            verified | {"status": "pending"},
+            verified | {"head": "not-a-sha"},
+            verified | {"request": {"id": 1, "created_at": "2026-09-11T13:25:05+08:00"}},
+            {"repo": "owner/repo", "pr": 1, "status": "already-pending-active",
+             "head": HEAD, "request": {"id": 1, "created_at": TIME},
+             "requested_before": True, "requested_after": True},
+            {"repo": "owner/repo", "pr": 1, "status": "already-pending-active",
+             "head": HEAD, "request": {"id": 1, "created_at": TIME},
+             "requested_before": True, "requested_after": False,
+             "active_pending_request": {"head": HEAD, "request": {"id": 1, "created_at": TIME}}},
+        ):
+            with self.subTest(corrupt=corrupt), self.assertRaises(evidence.EvidenceError):
+                evidence.verified_request(corrupt, "owner/repo", 1)
+        active = {
+            "repo": "owner/repo", "pr": 1, "status": "already-pending-active",
+            "head": HEAD, "request": {"id": 1, "created_at": TIME},
+            "requested_before": True, "requested_after": True,
+            "active_pending_request": {"head": HEAD, "request": {"id": 1, "created_at": TIME}},
+        }
+        self.assertEqual(evidence.verified_request(active, "owner/repo", 1)["status"], "already-pending-active")
 
     def test_request_rejects_stale_or_missing_evidence(self):
         before, after = self.snapshots()
@@ -169,22 +214,55 @@ class EvidenceTests(unittest.TestCase):
     def test_cli_metadata_and_comments_round_trip_through_cp1252_stdout(self):
         review = REVIEW | {"body": "### \U0001f7e1 Changes recommended\n**Comments generated:** 1"}
         comment = COMMENT | {"body": "Check \U0001f7e1 and \u4e2d\u6587"}
-        with tempfile.TemporaryDirectory() as temp:
-            output = Path(temp) / "attempt"
-            argv = ["review_evidence.py", "collect", "--repo", "owner/repo", "--pr", "1",
-                    "--head", HEAD, "--request-time", TIME, "--output", str(output)]
-            with io.TextIOWrapper(io.BytesIO(), encoding="cp1252", errors="strict") as stdout:
-                with patch("sys.argv", argv), patch("sys.stdout", stdout), patch.object(
-                    evidence, "Client", return_value=self.client([review], [comment])
-                ):
-                    self.assertEqual(evidence.main(), 0)
-                stdout.flush()
-                rendered = stdout.buffer.getvalue().decode("cp1252")
-            result = json.loads(rendered)
-            self.assertTrue(rendered.isascii())
-            self.assertEqual(result, json.loads((output / "result.json").read_text(encoding="utf-8")))
-            self.assertEqual(result["review_metadata"]["summary"], review["body"])
-            self.assertEqual(result["comments"][0]["body"], comment["body"])
+        output = self.scratch_root / "cp1252" / "attempt"
+        argv = ["review_evidence.py", "collect", "--repo", "owner/repo", "--pr", "1",
+                "--head", HEAD, "--request-time", TIME, "--output", str(output)]
+        with io.TextIOWrapper(io.BytesIO(), encoding="cp1252", errors="strict") as stdout:
+            with patch("sys.argv", argv), patch("sys.stdout", stdout), patch.object(
+                evidence, "Client", return_value=self.client([review], [comment])
+            ):
+                self.assertEqual(evidence.main(), 0)
+            stdout.flush()
+            rendered = stdout.buffer.getvalue().decode("cp1252")
+        result = json.loads(rendered)
+        self.assertTrue(rendered.isascii())
+        self.assertEqual(result, json.loads((output / "result.json").read_text(encoding="utf-8")))
+        self.assertEqual(result["review_metadata"]["summary"], review["body"])
+        self.assertEqual(result["comments"][0]["body"], comment["body"])
+
+    def test_collect_cli_reads_verified_request_json_directly(self):
+        request_dir = self.scratch_root / "request"
+        request_dir.mkdir()
+        request_file = request_dir / "result.json"
+        request_file.write_text(json.dumps({
+            "repo": "owner/repo", "pr": 1, "status": "new-verified", "head": HEAD,
+            "request": {"id": 30950876959, "created_at": TIME},
+        }), encoding="utf-8")
+        output = self.scratch_root / "collect-request"
+        argv = ["review_evidence.py", "collect", "--repo", "owner/repo", "--pr", "1",
+                "--request", str(request_file), "--output", str(output)]
+        with patch("sys.argv", argv), patch("builtins.print"), patch.object(
+            evidence, "Client", return_value=self.client()
+        ):
+            self.assertEqual(evidence.main(), 0)
+        result = json.loads((output / "result.json").read_text(encoding="utf-8"))
+        self.assertEqual(result["request_time"], TIME)
+        request_file.write_text("{not json", encoding="utf-8")
+        argv[-1] = str(self.scratch_root / "collect-corrupt")
+        with patch("sys.argv", argv), patch("builtins.print"):
+            self.assertEqual(evidence.main(), 1)
+
+    def test_poll_cli_preserves_corrupt_request_artifact_failure(self):
+        request_file = self.scratch_root / "corrupt-request.json"
+        request_file.write_text("{not json", encoding="utf-8")
+        output = self.scratch_root / "poll-corrupt"
+        argv = ["review_evidence.py", "poll", "--repo", "owner/repo", "--pr", "1",
+                "--request", str(request_file), "--output", str(output), "--interval-seconds", "0"]
+        with patch("sys.argv", argv), patch("builtins.print"):
+            self.assertEqual(evidence.main(), 1)
+        result = json.loads((output / "result.json").read_text(encoding="utf-8"))
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("Cannot read verified request artifact", result["error"])
 
     def test_pending_and_wrong_review_never_become_clean(self):
         for review in (REVIEW | {"commit_id": "b" * 40},
@@ -269,30 +347,154 @@ class EvidenceTests(unittest.TestCase):
     def test_raw_http_failures_and_parse_failures_are_preserved(self):
         for code, raw in ((1, "HTTP/2.0 403 Forbidden\n\n{}"),
                           (0, "HTTP/2.0 200 OK\nX-RateLimit-Remaining: 10\n\nnot json")):
-            with tempfile.TemporaryDirectory() as temp:
-                client = evidence.Client("owner/repo", 1, Path(temp))
-                with patch.object(evidence.subprocess, "run", return_value=subprocess.CompletedProcess(
-                    [], code, stdout=raw, stderr="error" if code else ""
-                )) as run:
-                    with self.assertRaises((evidence.EvidenceError, json.JSONDecodeError)):
-                        client.request("endpoint")
-                    self.assertIn("Cache-Control: no-cache", run.call_args.args[0])
-                recorded = json.loads((Path(temp) / "request-0001.json").read_text())
-                self.assertEqual(recorded["raw"], raw)
-                self.assertEqual(recorded["exit_code"], code)
+            temp = self.scratch_root / f"raw-{code}-{len(raw)}"
+            temp.mkdir()
+            client = evidence.Client("owner/repo", 1, temp)
+            with patch.object(evidence.subprocess, "run", return_value=subprocess.CompletedProcess(
+                [], code, stdout=raw, stderr="error" if code else ""
+            )) as run:
+                with self.assertRaises((evidence.EvidenceError, json.JSONDecodeError)):
+                    client.request("endpoint")
+                self.assertIn("Cache-Control: no-cache", run.call_args.args[0])
+            recorded = json.loads((temp / "request-0001.json").read_text())
+            self.assertEqual(recorded["raw"], raw)
+            self.assertEqual(recorded["exit_code"], code)
+
+    def test_timeout_preserves_partial_stdout_stderr_losslessly(self):
+        temp = self.scratch_root / "timeout"
+        temp.mkdir()
+        client = evidence.Client("owner/repo", 1, temp)
+        timeout = subprocess.TimeoutExpired(["gh"], 3, output=b"\xffpartial", stderr=b"\x80err")
+        with patch.object(evidence.subprocess, "run", side_effect=timeout):
+            with self.assertRaises(evidence.EvidenceError):
+                client.request("endpoint")
+        recorded = json.loads((temp / "request-0001.json").read_text(encoding="utf-8"))
+        self.assertTrue(recorded["timeout_expired"])
+        self.assertEqual(recorded["timeout_seconds"], 3)
+        self.assertEqual(recorded["stdout"]["kind"], "bytes")
+        self.assertEqual(recorded["stdout"]["base64"], "/3BhcnRpYWw=")
+        self.assertEqual(recorded["stderr"]["base64"], "gGVycg==")
 
     def test_failed_collection_writes_failure_and_never_overwrites_evidence(self):
-        with tempfile.TemporaryDirectory() as temp:
-            output = Path(temp) / "attempt"
-            argv = ["review_evidence.py", "collect", "--repo", "owner/repo", "--pr", "1",
-                    "--head", HEAD, "--request-time", TIME, "--output", str(output)]
-            with patch("sys.argv", argv), patch.object(evidence, "collect", side_effect=KeyError("id")), patch("builtins.print"):
-                self.assertEqual(evidence.main(), 1)
-                original = (output / "result.json").read_bytes()
-                self.assertEqual(json.loads(original)["status"], "failed")
-                with self.assertRaises(FileExistsError):
-                    evidence.main()
-                self.assertEqual((output / "result.json").read_bytes(), original)
+        output = self.scratch_root / "attempt"
+        argv = ["review_evidence.py", "collect", "--repo", "owner/repo", "--pr", "1",
+                "--head", HEAD, "--request-time", TIME, "--output", str(output)]
+        with patch("sys.argv", argv), patch.object(evidence, "collect", side_effect=KeyError("id")), patch("builtins.print"):
+            self.assertEqual(evidence.main(), 1)
+            original = (output / "result.json").read_bytes()
+            self.assertEqual(json.loads(original)["status"], "failed")
+            with self.assertRaises(FileExistsError):
+                evidence.main()
+            self.assertEqual((output / "result.json").read_bytes(), original)
+
+    def test_poll_pending_to_complete_requires_final_refetch_and_distinct_dirs(self):
+        output = self.scratch_root / "poll-complete"
+        request = self.active_request()
+        pending = {"status": "pending"}
+        complete = {"status": "comments", "review": {"id": REVIEW["id"]}}
+        final = {"status": "comments", "review": {"id": REVIEW["id"]}, "comments": []}
+        with patch.object(evidence, "collect_once", side_effect=[pending, complete, final]) as collect_once, \
+             patch.object(evidence.time, "sleep"):
+            result = evidence.poll("owner/repo", 1, request, output, deadline_seconds=30, interval_seconds=0)
+        self.assertEqual(result["polling"]["reliability"], "ordinary-poll-confirmed")
+        directories = [call.args[2] for call in collect_once.call_args_list]
+        self.assertEqual(directories, [output / "poll-0001", output / "poll-0002", output / "final-refetch"])
+        self.assertEqual(len(set(directories)), 3)
+
+    def test_poll_deadline_final_refetch_no_deadline_reset_and_pending_recovery_fails(self):
+        request = self.active_request()
+        previous = self.scratch_root / "previous.json"
+        old_start = (dt.datetime.now(evidence.UTC) - dt.timedelta(seconds=2)).isoformat().replace("+00:00", "Z")
+        previous.write_text(json.dumps({
+            "repo": "owner/repo", "pr": 1,
+            "polling": {
+                "head": HEAD, "request": request["request"], "deadline_started_at": old_start,
+                "deadline_seconds": 1, "interval_seconds": 0, "ordinary_polls": [],
+            },
+        }), encoding="utf-8")
+        with patch.object(evidence, "collect_once", return_value={"status": "comments", "review": {"id": REVIEW["id"]}}) as collect_once:
+            result = evidence.poll("owner/repo", 1, request, self.scratch_root / "poll-expired",
+                                   deadline_seconds=30, interval_seconds=0, resume_from=previous)
+        self.assertEqual(result["polling"]["deadline_seconds"], 1)
+        self.assertTrue(result["polling"]["final_refetch_after_deadline"])
+        self.assertEqual([call.args[2] for call in collect_once.call_args_list], [self.scratch_root / "poll-expired" / "final-refetch"])
+        with patch.object(evidence, "collect_once", return_value={"status": "pending"}):
+            with self.assertRaises(evidence.EvidenceError):
+                evidence.poll("owner/repo", 1, request, self.scratch_root / "poll-pending",
+                              deadline_seconds=1, interval_seconds=0)
+        pending = json.loads((self.scratch_root / "poll-pending" / "result.json").read_text(encoding="utf-8"))
+        self.assertEqual(pending["status"], "failed")
+        self.assertIn("Final refetch did not establish", pending["error"])
+
+    def test_poll_preserves_hung_or_error_collection_evidence(self):
+        output = self.scratch_root / "poll-error"
+        request = self.active_request()
+        with patch.object(evidence, "collect_once", side_effect=evidence.EvidenceError("stale head")):
+            with self.assertRaises(evidence.EvidenceError):
+                evidence.poll("owner/repo", 1, request, output, deadline_seconds=30, interval_seconds=0)
+        failed = json.loads((output / "result.json").read_text(encoding="utf-8"))
+        self.assertEqual(failed["status"], "failed")
+        self.assertIn("stale head", failed["error"])
+        self.assertEqual(failed["polling"]["ordinary_polls"][0]["directory"], str(output / "poll-0001"))
+
+    def test_api_timeout_is_bounded_by_poll_deadline(self):
+        output = self.scratch_root / "timeout-bound"
+        request = self.active_request()
+        seen_timeouts = []
+
+        def fake_collect_once(repo, pr, directory, head, request_time, review_id=None, timeout=None):
+            seen_timeouts.append(timeout)
+            return {"status": "pending"}
+
+        with patch.object(evidence, "collect_once", side_effect=fake_collect_once):
+            with self.assertRaises(evidence.EvidenceError):
+                evidence.poll("owner/repo", 1, request, output, deadline_seconds=0.2, interval_seconds=0)
+        self.assertTrue(seen_timeouts)
+        self.assertLessEqual(max(seen_timeouts), 0.2)
+
+    def test_api_timeout_budget_is_aggregate_across_requests(self):
+        temp = self.scratch_root / "aggregate-timeout"
+        temp.mkdir()
+        client = evidence.Client("owner/repo", 1, temp)
+        client.timeout = 60
+        client.deadline = 100.5
+        response = subprocess.CompletedProcess([], 0, stdout="HTTP/2.0 200 OK\n\n{}", stderr="")
+        with patch.object(evidence.time, "monotonic", side_effect=[100.0, 100.6]), \
+             patch.object(evidence.subprocess, "run", return_value=response) as run:
+            self.assertEqual(client.request("endpoint")[0], {})
+            with self.assertRaises(evidence.EvidenceError):
+                client.request("endpoint")
+        self.assertLessEqual(run.call_args.kwargs["timeout"], 0.5)
+        recorded = json.loads((temp / "request-0002.json").read_text(encoding="utf-8"))
+        self.assertTrue(recorded["timeout_expired"])
+        self.assertIn("aggregate timeout budget", recorded["error"])
+
+    def test_omitted_resume_on_old_request_does_not_start_new_polling_window(self):
+        output = self.scratch_root / "old-request"
+        old = (dt.datetime.now(evidence.UTC) - dt.timedelta(seconds=1900)).isoformat().replace("+00:00", "Z")
+        request = self.active_request(old)
+        with patch.object(evidence, "collect_once", return_value={"status": "pending"}) as collect_once:
+            with self.assertRaises(evidence.EvidenceError):
+                evidence.poll("owner/repo", 1, request, output, deadline_seconds=1800, interval_seconds=0)
+        self.assertEqual([call.args[2] for call in collect_once.call_args_list], [output / "final-refetch"])
+        failed = json.loads((output / "result.json").read_text(encoding="utf-8"))
+        self.assertTrue(failed["polling"]["final_refetch_directory"].endswith("final-refetch"))
+        self.assertEqual(failed["polling"]["ordinary_polls"], [])
+
+    def test_already_pending_deadline_anchors_to_original_request(self):
+        old = (dt.datetime.now(evidence.UTC) - dt.timedelta(seconds=1900)).isoformat().replace("+00:00", "Z")
+        active = {
+            "repo": "owner/repo", "pr": 1, "status": "already-pending-active",
+            "head": HEAD, "request": {"id": 1, "created_at": old},
+            "requested_before": True, "requested_after": True,
+            "active_pending_request": {"head": HEAD, "request": {"id": 1, "created_at": old}},
+        }
+        request = evidence.verified_request(active, "owner/repo", 1)
+        output = self.scratch_root / "already-pending-old"
+        with patch.object(evidence, "collect_once", return_value={"status": "comments", "review": {"id": REVIEW["id"]}}) as collect_once:
+            result = evidence.poll("owner/repo", 1, request, output, deadline_seconds=1800, interval_seconds=0)
+        self.assertTrue(result["polling"]["final_refetch_after_deadline"])
+        self.assertEqual([call.args[2] for call in collect_once.call_args_list], [output / "final-refetch"])
 
 
 if __name__ == "__main__":

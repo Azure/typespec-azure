@@ -14,8 +14,13 @@ do not ask the user whether to adopt them.
 - Under `/do-linter-development-task-one-by-one`, workers and their delegated
   skills only return evidence-backed, high-confidence suggestions to the outer
   queue agent. Pass this ownership constraint to every delegated skill. Only
-  the outer agent may create the consolidated skill-update PR, after every
+  the outer agent may authorize the consolidated skill-update publication, after every
   queue entry and review loop is terminal.
+- Ownership here is decision ownership. When publication is app-session-bound,
+  that orchestrator delegates ONE skill-only publication to a verified dedicated
+  app owner under the shared preflight; the owner performs edits and the required
+  creation call, while the orchestrator coordinates and verifies. Do not create
+  a second PR from the coordinator or run a recursive post-run update.
 - Deduplicate suggestions by root cause and proposed change, retaining each
   source task and its evidence. Create at most one skill-update PR per completed
   standalone run or queue.
@@ -43,30 +48,40 @@ the user-facing response.
 
 For qualifying improvements:
 
-1. Resolve the remote for `Azure/typespec-azure`, fetch its
+1. Apply the reusable
+   [publication preflight](../do-linter-development-task-one-by-one/app-session-execution.md#publication-preflight)
+   before edits or expensive setup. Resolve the remote for `Azure/typespec-azure`, fetch its
    `feature/lintdiff-migration-new` branch explicitly, and verify that remote
    ref exists. This is the required base regardless of the primary workflow's
    PR target. Do not fall back to `main` or a stale local branch.
-2. Create a dedicated branch and clean worktree from that fetched ref. Leave
+2. Establish the dedicated owner/branch and clean worktree from that fetched ref
+   using the selected backend. For app-session tools, create the app owner with
+   the explicit migration base and a setup-only handoff FIRST; verify its actual
+   root/branch/base and bounded readiness before authorizing edits. Do not create
+   an ordinary worktree and discover publication incompatibility afterward. Leave
    primary rule, promotion, and review worktrees untouched. Do not carry over
    primary-workflow commits or cherry-pick a mixed commit.
 3. Read the current skills and supporting documents in that worktree and
    recheck the evidence gate. Skip improvements already present or no longer
    applicable. Change only relevant skill instructions and supporting skill
    documentation under `.github/skills/`, including this shared policy when
-   justified. Update contradictory references together.
+   justified. Explicitly authorized supporting skill helper code/tests may also
+   change there; this is not permission for rule/package work. Update
+   contradictory references together.
 4. Perform the lightweight validation below, then stage explicit file paths
-   and create a dedicated skill-only commit. Do not include rule code, tests,
+   and create a dedicated skill-only commit. Do not include rule code or rule tests,
    package docs, logs, generated output, submodule changes, dependency files,
    or release/change entries.
-5. Push the dedicated branch to the personal fork and open an independent PR
+5. Push a new dedicated branch to the personal fork (retain the recorded head
+   repository when recovering an existing skill PR) and open an independent PR
    against `Azure/typespec-azure` with base
    `feature/lintdiff-migration-new` explicitly selected, following the
    publication targeting guidance below. Describe the observed evidence,
    rationale, affected skills, and narrow validation in the PR body. Do not
    add skill changes to the primary task's PR.
 6. Verify the created PR's base, head, and complete file list. All changes must
-   be skill instructions or supporting skill documentation. Do not report
+   be skill instructions, supporting skill documentation, or authorized helper
+   code/tests. Do not report
    successful completion if the PR target or scope is wrong.
 
 If the base is unavailable, the correction is unsafe, or publishing fails,
@@ -76,45 +91,39 @@ qualifying update could not be published. Never merge the PR automatically.
 
 ### Publication targeting
 
-- Record the intended base repository and branch, personal-fork owner, and
-  pushed head branch before choosing the publication tool. Git upstream
-  tracking, `branch.<name>.gh-merge-base`, and an app session's comparison base
-  are separate settings; changing one does not prove the others changed.
-- When creating an app-native worktree session for this PR, explicitly pass
-  `base_branch: "feature/lintdiff-migration-new"` rather than accepting the
-  project's default branch. Confirm the resulting session's base before
-  preparing changes. Do not assume registering an existing worktree as a
-  project or branch session preserves its intended PR base.
-- Where the environment permits GitHub CLI PR creation, select both branches
-  explicitly: use `gh pr create --repo Azure/typespec-azure --base
-feature/lintdiff-migration-new --head <fork-owner>:<skill-branch>` with the
-  reviewed title and body. Do not rely on inferred defaults.
-- Honor the environment's PR-creation tool requirements. If an integrated
-  tool is required, inspect its available targeting controls and supported
-  fallback before proceeding; this skill does not authorize bypassing those
-  requirements. A skill change cannot add a missing tool parameter.
-- A mismatched app change overview is a warning, not evidence that GitHub
-  rejected a PR or that the creation tool necessarily uses that same base.
-  Inspect the actual skill-only diff against the fetched base. Resolve the
-  publication target through supported controls; do not knowingly publish
-  against `main`, or report a creation failure when no attempt was made.
-- After creation, query the PR's actual base repository/branch, head
-  repository/branch, and complete file list. If explicit targeting cannot be
-  established, preserve the pushed branch and report the missing control,
-  whether creation was attempted, and the exact intended base/head separately
-  from the primary workflow's outcome.
+Use the shared contract's
+[publication checks](../do-linter-development-task-one-by-one/app-session-execution.md#publication-checks)
+and [duplicate-safe recovery](../do-linter-development-task-one-by-one/app-session-execution.md#publication-recovery),
+not a separate fallback policy. New skill heads default to the personal fork;
+base is always canonical `feature/lintdiff-migration-new`. Existing verified
+skill PRs retain their recorded head repository. Separate Git tracking/push/base
+hints from the independently verified app binding. A stale deletion count with
+clean Git and correct binding is not a missing base or a creation failure.
+
+Preserve complete failed attempt evidence and intended tuple. Reconcile an exact
+existing PR; only proven absence plus a specific correctable configuration defect
+permits the single required-tool correction/retry. Never infer the cause from
+HTTP 422 or retry an ambiguous transport/API failure. A required-tool fallback
+needs that tool's explicit failure permission. Publication-only recovery reuses
+matching validated work without restarting development or post-run review.
+If blocked, preserve the branch and report the missing control, whether creation
+was attempted, and the exact tuple separately from the primary workflow's result.
 
 ## Lightweight validation and CI
 
 - Inspect the complete diff against the fetched base and the staged file list.
   Check Markdown references, ownership rules, and contradictory instructions.
-- Use existing formatting tooling only on changed skill documents and run
+- Format ONLY explicit changed files supported by the existing formatter and run
   `git diff --check`. Follow a configured documentation-specific check if one
   applies; do not run repository-wide formatting or source linting for a
-  Markdown-only skill update.
+  Markdown-only skill update. Never run `pnpm format` across the repo. Do not
+  pass Python to a formatter without Python support; use configured focused
+  Python checks when present.
 - Do not initialize submodules, install the monorepo dependency closure, build
-  packages, regenerate docs, or run unit/corpus/integration suites merely for
-  this PR. If formatting tooling is unavailable, report that limitation instead
+  packages, regenerate docs, or run package/corpus/integration suites merely for
+  a documentation update. Explicitly authorized skill helper changes DO require
+  their focused offline unit tests (for example, stdlib Python tests with
+  mise-managed `python -X utf8`), not monorepo installation/builds. If formatting tooling is unavailable, report that limitation instead
   of doing expensive environment setup.
 - Let normal CI run. Do not wait for all jobs, repeatedly poll or rerun CI, or
   investigate unrelated CI failures. Never bypass required checks or change CI
