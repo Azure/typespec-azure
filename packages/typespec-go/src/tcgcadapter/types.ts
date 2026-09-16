@@ -332,6 +332,11 @@ export class TypeAdapter {
           helpers.isHttpFileType(type) ||
           (type.baseModel && helpers.isHttpFileType(type.baseModel))
         ) {
+          // Http.File type can only be binary or multipart/form
+          // so check which serialization option is set
+          if (type.serializationOptions.binary) {
+            return this.getReadSeekCloser(false);
+          }
           return this.getMultipartContent(false);
         }
         return this.getModel(type);
