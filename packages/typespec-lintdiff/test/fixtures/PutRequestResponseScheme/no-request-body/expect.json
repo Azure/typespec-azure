@@ -2,16 +2,8 @@
   "violation": false,
   "ambientDiagnostics": [
     {
-      "code": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
-      "count": 1
-    },
-    {
-      "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
-      "count": 1
-    },
-    {
       "code": "tsp-lintdiff-local-linter/path-parameter-schema",
-      "count": 10
+      "count": 1
     },
     {
       "code": "tsp-lintdiff-local-linter/security-definition-description",
@@ -19,7 +11,7 @@
     },
     {
       "code": "tsp-lintdiff-local-linter/xms-examples-required",
-      "count": 6
+      "count": 1
     }
   ]
 }
