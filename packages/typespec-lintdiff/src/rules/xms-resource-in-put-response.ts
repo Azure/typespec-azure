@@ -11,8 +11,7 @@ export const xmsResourceInPutResponseRule = createRule({
     "ARM PUT success responses must return a model with native Azure resource semantics.",
   severity: "warning",
   messages: {
-    default:
-      "PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics.",
+    default: "PUT 200/201 resource response models must be registered as ARM resources.",
   },
   create(context) {
     return {

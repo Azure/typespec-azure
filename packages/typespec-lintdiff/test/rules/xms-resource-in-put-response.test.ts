@@ -46,8 +46,7 @@ async function expectLint(code: string, violation: boolean) {
   if (violation) {
     await tester.expect(code).toEmitDiagnostics({
       code: "tsp-lintdiff-local-linter/xms-resource-in-put-response",
-      message:
-        "PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics.",
+      message: "PUT 200/201 resource response models must be registered as ARM resources.",
     });
   } else {
     await tester.expect(code).toBeValid();
