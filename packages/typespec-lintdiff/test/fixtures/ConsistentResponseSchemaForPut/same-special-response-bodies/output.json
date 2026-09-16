@@ -70,11 +70,12 @@
         }
       }
     },
-    "/multipart": {
+    "/binary-json": {
       "put": {
-        "operationId": "MultipartBody",
+        "operationId": "BinaryAndJsonBody",
         "produces": [
-          "multipart/form-data"
+          "application/octet-stream",
+          "application/json"
         ],
         "parameters": [
           {
@@ -89,105 +90,14 @@
           "200": {
             "description": "The request has succeeded.",
             "schema": {
-              "type": "string"
+              "type": "file"
             }
           },
           "201": {
             "description": "The request has succeeded and a new resource has been created as a result.",
             "schema": {
-              "type": "string"
-            }
-          }
-        }
-      }
-    },
-    "/multipart-string": {
-      "put": {
-        "operationId": "MultipartAndString",
-        "produces": [
-          "multipart/form-data",
-          "text/plain"
-        ],
-        "parameters": [
-          {
-            "name": "api-version",
-            "in": "query",
-            "required": true,
-            "type": "string",
-            "x-ms-client-name": "apiVersion"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded.",
-            "schema": {
-              "type": "string"
-            }
-          },
-          "201": {
-            "description": "The request has succeeded and a new resource has been created as a result.",
-            "schema": {
-              "type": "string"
-            }
-          }
-        }
-      }
-    },
-    "/tuple": {
-      "put": {
-        "operationId": "TupleBody",
-        "parameters": [
-          {
-            "name": "api-version",
-            "in": "query",
-            "required": true,
-            "type": "string",
-            "x-ms-client-name": "apiVersion"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded.",
-            "schema": {
-              "type": "array",
-              "items": {}
-            }
-          },
-          "201": {
-            "description": "The request has succeeded and a new resource has been created as a result.",
-            "schema": {
-              "type": "array",
-              "items": {}
-            }
-          }
-        }
-      }
-    },
-    "/tuple-unknown-array": {
-      "put": {
-        "operationId": "TupleAndUnknownArray",
-        "parameters": [
-          {
-            "name": "api-version",
-            "in": "query",
-            "required": true,
-            "type": "string",
-            "x-ms-client-name": "apiVersion"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded.",
-            "schema": {
-              "type": "array",
-              "items": {}
-            }
-          },
-          "201": {
-            "description": "The request has succeeded and a new resource has been created as a result.",
-            "schema": {
-              "type": "array",
-              "items": {}
+              "type": "string",
+              "format": "byte"
             }
           }
         }
@@ -219,91 +129,12 @@
         "body"
       ]
     },
-    "FormData": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "type": "object"
-        }
-      },
-      "required": [
-        "value"
-      ]
-    },
-    "MultipartCreated": {
+    "JsonBytesCreated": {
       "type": "object",
       "properties": {
         "body": {
-          "$ref": "#/definitions/OtherFormData"
-        }
-      },
-      "required": [
-        "body"
-      ]
-    },
-    "MultipartOk": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "$ref": "#/definitions/FormData"
-        }
-      },
-      "required": [
-        "body"
-      ]
-    },
-    "OtherFormData": {
-      "type": "object",
-      "properties": {
-        "count": {
-          "type": "object"
-        }
-      },
-      "required": [
-        "count"
-      ]
-    },
-    "StringCreated": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "body"
-      ]
-    },
-    "TupleCreated": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "type": "array",
-          "items": {}
-        }
-      },
-      "required": [
-        "body"
-      ]
-    },
-    "TupleOk": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "type": "array",
-          "items": {}
-        }
-      },
-      "required": [
-        "body"
-      ]
-    },
-    "UnknownArrayCreated": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "type": "array",
-          "items": {}
+          "type": "string",
+          "format": "byte"
         }
       },
       "required": [
