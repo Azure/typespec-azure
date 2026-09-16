@@ -50,9 +50,11 @@ import { useApplicationJsonContentTypeRule } from "./rules/use-application-json-
 import { useInterfaceRule } from "./rules/use-interface.js";
 import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
+import { useResourceModelForPutRule } from "./rules/use-resource-model-for-put.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
+  useResourceModelForPutRule,
   armAgentBaseTypeChildResourcesRule,
   armAgentBaseTypeLifecycleOperationsRule,
   useRelationshipRequiredPropertiesRule,

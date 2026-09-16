@@ -56,6 +56,7 @@ export default {
     "@azure-tools/typespec-azure-core/non-breaking-versioning": false,
 
     // Azure resource manager
+    "@azure-tools/typespec-azure-resource-manager/use-resource-model-for-put": false,
     "@azure-tools/typespec-azure-resource-manager/arm-no-record": true,
     "@azure-tools/typespec-azure-resource-manager/arm-no-path-casing-conflicts": true,
     "@azure-tools/typespec-azure-resource-manager/no-override-props": true,
