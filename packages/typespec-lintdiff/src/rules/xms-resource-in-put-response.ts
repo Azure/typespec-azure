@@ -4,12 +4,11 @@ import {
 } from "@azure-tools/typespec-azure-resource-manager";
 import { createRule, type Model, type ModelProperty } from "@typespec/compiler";
 import { getHttpOperation, type HttpOperationResponse } from "@typespec/http";
-import { getExtensions } from "@typespec/openapi";
 
 export const xmsResourceInPutResponseRule = createRule({
   name: "xms-resource-in-put-response",
   description:
-    "ARM PUT success responses must return an Azure resource model or a model with explicit x-ms-azure-resource metadata.",
+    "ARM PUT success responses must return a model with native Azure resource semantics.",
   severity: "warning",
   messages: {
     default:
@@ -40,10 +39,7 @@ export const xmsResourceInPutResponseRule = createRule({
           return;
         }
 
-        if (
-          getArmResource(context.program, responseModel) !== undefined ||
-          hasExplicitAzureResourceExtension(context.program, responseModel)
-        ) {
+        if (getArmResource(context.program, responseModel) !== undefined) {
           return;
         }
 
@@ -76,19 +72,6 @@ function getResponseModel(
   }
 
   return undefined;
-}
-
-function hasExplicitAzureResourceExtension(
-  program: Parameters<typeof getExtensions>[0],
-  model: Model,
-): boolean {
-  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
-    if (getExtensions(program, current).get("x-ms-azure-resource") === true) {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 function looksLikeManualResourceModel(model: Model): boolean {

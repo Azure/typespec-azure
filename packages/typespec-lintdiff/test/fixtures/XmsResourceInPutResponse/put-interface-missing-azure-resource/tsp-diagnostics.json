@@ -5,11 +5,6 @@
     "message": "Use the latest ARM common-types version 'v6' instead of 'v3'."
   },
   {
-    "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator",
-    "severity": "warning",
-    "message": "Each resource interface must have an @armResourceOperations decorator."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/operation-id-noun-verb",
     "severity": "warning",
     "message": "Per the Noun_Verb convention for Operation Ids, the noun 'CustomItems' should not appear after the underscore."

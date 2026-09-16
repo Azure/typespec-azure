@@ -9,5 +9,11 @@
       "code": "tsp-lintdiff-local-linter/xms-examples-required",
       "count": 1
     }
+  ],
+  "validatorDiagnostics": [
+    {
+      "code": "XmsResourceInPutResponse",
+      "count": 1
+    }
   ]
 }

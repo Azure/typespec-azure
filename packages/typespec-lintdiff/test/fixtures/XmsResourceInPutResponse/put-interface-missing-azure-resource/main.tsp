@@ -27,9 +27,10 @@ model CustomResource {
   type?: string;
 }
 
+@armResourceOperations(#{ allowStaticRoutes: true })
 interface CustomItems {
   /** Create a custom item. */
-  #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "Raw op needed to test swagger-level rule"
+  @armResourceCreateOrUpdate(CustomResource)
   @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/customItems/{itemName}")
   @put
   createCustomItem(

@@ -40,6 +40,9 @@
   "tags": [
     {
       "name": "Operations"
+    },
+    {
+      "name": "CustomItems"
     }
   ],
   "paths": {
@@ -77,6 +80,9 @@
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/customItems/{itemName}": {
       "put": {
         "operationId": "CustomItems_CreateCustomItem",
+        "tags": [
+          "CustomItems"
+        ],
         "description": "Create a custom item.",
         "parameters": [
           {
