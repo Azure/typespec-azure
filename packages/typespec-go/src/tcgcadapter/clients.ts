@@ -1881,7 +1881,10 @@ export class ClientAdapter {
       // or a binary response. the former seems unlikely, the latter though...??
       // TODO: https://github.com/Azure/typespec-azure/issues/535
       contentType = "JSON";
-    } else if ((sdkResponseType.kind === "bytes" && sdkResponseType.encode === "bytes") || (sdkResponseType.kind === 'model' && helpers.isHttpFileType(sdkResponseType))) {
+    } else if (
+      (sdkResponseType.kind === "bytes" && sdkResponseType.encode === "bytes") ||
+      (sdkResponseType.kind === "model" && helpers.isHttpFileType(sdkResponseType))
+    ) {
       // bytes type with bytes encoding, or a TypeSpec.Http.File type, indicates a streaming binary response
       contentType = "binary";
     } else if (sdkResponseType.kind === "union") {
