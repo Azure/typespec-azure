@@ -62,8 +62,12 @@ excluded.
 The comparison uses native type structure, including inherited properties,
 arrays, recursive models, and unions. Separate named open unions with equivalent
 members match; unnamed union variants are matched one-to-one independently of
-declaration order. Named variant labels and enum-member labels and values remain
-significant. This is not an assignability check and does not compare emitted SDK
+declaration order. Named variant labels and enum-member labels and effective
+values remain significant. Direct enums and individual enum-member types use the
+same comparison: an omitted value defaults to the member's name, so `enum A { state }`
+and `enum B { state: "state" }` match. Explicit zero and empty-string values are
+preserved rather than replaced by defaults.
+This is not an assignability check and does not compare emitted SDK
 type names, serialization extensions, or historical version projections.
 
 Operations without a request body, including a `void` request, are skipped.

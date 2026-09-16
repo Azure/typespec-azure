@@ -298,6 +298,89 @@ it.each([
 });
 
 it.each([
+  ["state", 'state: "state"'],
+  ['state: "state"', "state"],
+  ["state: 0", "state: 0"],
+  ['state: ""', 'state: ""'],
+  ['state, inactive: "inactive"', 'inactive: "inactive", state: "state"'],
+])("accepts direct enums with equal effective values (%s versus %s)", async (left, right) => {
+  await tester
+    .expect(
+      `
+    enum RequestState { ${left} }
+    enum ResponseState { ${right} }
+    model Request { state: RequestState; }
+    model Result { state: ResponseState; }
+    @put @route("/widgets") op create(@body body: Request): Result;
+  `,
+    )
+    .toBeValid();
+});
+
+it.each([
+  ["state", 'state: "active"'],
+  ["state: 0", 'state: "0"'],
+  ["state: 0", "state: 1"],
+  ['state: "state"', 'other: "state"'],
+  ["state", "state, other"],
+  ['state: ""', "state"],
+])("reports genuinely different direct enums (%s versus %s)", async (left, right) => {
+  await tester
+    .expect(
+      `
+    enum RequestState { ${left} }
+    enum ResponseState { ${right} }
+    model Request { state: RequestState; }
+    model Result { state: ResponseState; }
+    @put @route("/widgets") op /*create*/create(@body body: Request): Result;
+  `,
+    )
+    .toEmitDiagnostics(({ create }) => ({
+      ...diagnostic,
+      pos: getSourceLocation(create).pos,
+      end: getSourceLocation(create).end,
+    }));
+});
+
+it("accepts models sharing the same enum", async () => {
+  await tester
+    .expect(
+      `
+    enum State { state }
+    model Request { state: State; }
+    model Result { state: State; }
+    @put @route("/widgets") op create(@body body: Request): Result;
+  `,
+    )
+    .toBeValid();
+});
+
+it("accepts implicit and explicit enum defaults in separate ARM resource models", async () => {
+  await tester
+    .expect(
+      `
+    @armProviderNamespace namespace Microsoft.Test;
+    enum RequestState { state }
+    enum ResponseState { state: "state" }
+    model RequestProperties { state?: RequestState; }
+    model ResponseProperties { state?: ResponseState; }
+    model Widget is TrackedResource<ResponseProperties> {
+      ...ResourceNameParameter<Widget>;
+    }
+    model Request is TrackedResource<RequestProperties> {
+      ...ResourceNameParameter<Request, KeyName = "widgetName", SegmentName = "widgets">;
+    }
+    @armResourceOperations interface Widgets {
+      @put @armResourceCreateOrUpdate(Widget)
+      createOrUpdate(...ResourceInstanceParameters<Widget>, @bodyRoot body: Request):
+        ArmResponse<Widget> | ArmCreatedResponse<Widget> | ErrorResponse;
+    }
+  `,
+    )
+    .toBeValid();
+});
+
+it.each([
   ["string", "state", 'state: "state"'],
   ["int32", "state: 1", "state: 1"],
 ])("accepts equal enum-member effective values (%s)", async (base, left, right) => {
