@@ -1,15 +1,11 @@
 import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 import {
   createRule,
-  getFriendlyName,
-  isArrayModelType,
   isTemplateDeclarationOrInstance,
-  isTemplateInstance,
   type Model,
-  type Program,
+  type Tuple,
   type Type,
 } from "@typespec/compiler";
-import { SyntaxKind } from "@typespec/compiler/ast";
 import { getHttpOperation, type HttpOperationResponse, type HttpPayloadBody } from "@typespec/http";
 
 export const consistentResponseSchemaForPutRule = createRule({
@@ -57,7 +53,7 @@ export const consistentResponseSchemaForPutRule = createRule({
         if (
           response200Body === undefined ||
           response201Body === undefined ||
-          haveEquivalentEmittedSchemas(context.program, response200Body, response201Body)
+          haveEquivalentNativeBodies(response200Body, response201Body)
         ) {
           return;
         }
@@ -72,112 +68,47 @@ export const consistentResponseSchemaForPutRule = createRule({
 
 interface ResponseBody {
   body: HttpPayloadBody;
-  contentTypes: string[];
 }
 
 function getResponseBody(response: HttpOperationResponse): ResponseBody | undefined {
   let body: HttpPayloadBody | undefined;
-  const contentTypes: string[] = [];
   for (const content of response.responses) {
     if (content.body !== undefined) {
-      // AutoRest rejects conflicting body types; do not compare an arbitrary last variant.
-      if (body !== undefined && body.type !== content.body.type) {
+      // Cross-status equality is undefined when one status has multiple native bodies.
+      if (
+        body !== undefined &&
+        (body.type !== content.body.type || body.bodyKind !== content.body.bodyKind)
+      ) {
         return undefined;
       }
       body = content.body;
-      contentTypes.push(...content.body.contentTypes);
     }
   }
 
-  return body === undefined ? undefined : { body, contentTypes };
+  return body === undefined ? undefined : { body };
 }
 
-function haveEquivalentEmittedSchemas(
-  program: Program,
-  left: ResponseBody,
-  right: ResponseBody,
-): boolean {
-  const leftCategory = getConstantSchemaCategory(program, left);
-  const rightCategory = getConstantSchemaCategory(program, right);
-  if (leftCategory !== undefined || rightCategory !== undefined) {
-    return leftCategory === rightCategory;
-  }
-
+function haveEquivalentNativeBodies(left: ResponseBody, right: ResponseBody): boolean {
   return (
-    left.body.type === right.body.type ||
-    arePlainAnonymousTypesEquivalent(left.body.type, right.body.type, new Map())
+    left.body.bodyKind === right.body.bodyKind &&
+    areNativeTypesEquivalent(left.body.type, right.body.type, new Map())
   );
 }
 
-function getConstantSchemaCategory(
-  program: Program,
-  bodyInfo: ResponseBody,
-): "file" | "string" | "array-any" | undefined {
-  const { body } = bodyInfo;
-  if (emitsFileSchema(bodyInfo)) {
-    return "file";
-  }
-
-  if (
-    body.bodyKind === "multipart" ||
-    (body.type.kind === "Scalar" &&
-      body.type.name === "string" &&
-      program.checker.isStdType(body.type))
-  ) {
-    return "string";
-  }
-
-  if (
-    body.type.kind === "Tuple" ||
-    (body.type.kind === "Model" &&
-      isArrayModelType(body.type) &&
-      hasOnlyIntrinsicIndexer(program, body.type) &&
-      getFriendlyName(program, body.type) === undefined &&
-      (!body.type.name || isTemplateInstance(body.type)) &&
-      body.type.indexer.value.kind === "Intrinsic" &&
-      body.type.indexer.value.name === "unknown")
-  ) {
-    return "array-any";
-  }
-
-  return undefined;
-}
-
-function hasOnlyIntrinsicIndexer(program: Program, model: Model): boolean {
-  // The intrinsic is not a public decorator; obtain its identity from the standard Array.
-  const array = program.checker.getStdType("Array");
-  const indexer = array.decorators.find(
-    ({ node }) =>
-      node?.parent === array.node &&
-      node?.kind === SyntaxKind.DecoratorExpression &&
-      node.target.kind === SyntaxKind.Identifier &&
-      node.target.sv === "indexer",
-  )?.decorator;
-  return model.decorators.every(({ decorator }) => decorator === indexer);
-}
-
-function emitsFileSchema({ body, contentTypes }: ResponseBody): boolean {
-  return (
-    body.bodyKind === "file" ||
-    (body.type.kind === "Scalar" &&
-      body.type.name === "bytes" &&
-      contentTypes.every(
-        (contentType) => contentType !== "application/json" && contentType !== "text/plain",
-      ))
-  );
-}
-
-function arePlainAnonymousTypesEquivalent(
-  left: Type,
-  right: Type,
-  seen: Map<Type, Set<Type>>,
-): boolean {
+function areNativeTypesEquivalent(left: Type, right: Type, seen: Map<Type, Set<Type>>): boolean {
   if (left === right) {
     return true;
+  }
+  if (left.kind !== right.kind) {
+    return false;
+  }
+  if (left.kind === "Tuple" && right.kind === "Tuple") {
+    return areTuplesEquivalent(left, right, seen);
   }
   if (left.kind !== "Model" || right.kind !== "Model") {
     return false;
   }
+
   if (!isPlainAnonymousModel(left) || !isPlainAnonymousModel(right)) {
     return false;
   }
@@ -204,12 +135,19 @@ function arePlainAnonymousTypesEquivalent(
       rightProperty.defaultValue !== undefined ||
       leftProperty.decorators.length > 0 ||
       rightProperty.decorators.length > 0 ||
-      !arePlainAnonymousTypesEquivalent(leftProperty.type, rightProperty.type, seen)
+      !areNativeTypesEquivalent(leftProperty.type, rightProperty.type, seen)
     ) {
       return false;
     }
   }
   return true;
+}
+
+function areTuplesEquivalent(left: Tuple, right: Tuple, seen: Map<Type, Set<Type>>): boolean {
+  return (
+    left.values.length === right.values.length &&
+    left.values.every((value, index) => areNativeTypesEquivalent(value, right.values[index], seen))
+  );
 }
 
 function isPlainAnonymousModel(model: Model): boolean {
