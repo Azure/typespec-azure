@@ -317,6 +317,12 @@ initialization.
 
 For `outer` mode:
 
+Outer ownership applies only to the post-publication GitHub review-and-fix loop.
+It does not waive the development or promotion skill's independent local
+precommit review. Complete that local review and its validation gates before
+publication; if the worker cannot arrange it, hand the unpublished diff and
+evidence to the outer agent for that review before requesting publication.
+
 1. The worker completes development, records the canonical PR, pushed SHA,
    applicable validation evidence and exact worktree state, then returns
    `review-handoff` with `phase: development-review`. It remains idle; no worker
@@ -675,7 +681,9 @@ one session to execute both publication phases.
 >
 > In outer-owned mode, instead persist the complete development review handoff,
 > return `review-handoff`, and end this turn with no work still running. Do not
-> invoke the review skill or start promotion yourself. Resume this same cycle
+> invoke the GitHub review-loop skill or start promotion yourself. The required
+> independent local precommit review still precedes publication in both phases.
+> Resume this same cycle
 > only after the outer agent supplies a verified clean review result and updated
 > pushed source SHA. Recheck that identity before promotion.
 >
