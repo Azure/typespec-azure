@@ -1,6 +1,22 @@
 # Migration analysis: TagsAreNotAllowedForProxyResources
 
-## Conclusion
+## Result and gap summary
+
+- **Results:** In the pinned 462/468-project corpus, the explicit staging comparison found 892
+  validator diagnostics across 319 projects and 109 selected-version TypeSpec diagnostics across
+  22 projects; all 22 TypeSpec projects overlap validator projects.
+- **Why they differ:** The Swagger rule treats any emitted definition with `tags` but no `location`
+  as a proxy, producing 297 validator-only projects and repeated findings for generated update
+  schemas and arbitrary non-resource models. TypeSpec instead checks registered semantic proxy
+  resources. Four additional unprojected TypeSpec diagnostics belong only to removed older-version
+  operations.
+- **Decision:** The TypeSpec rule update is required and completed: it now checks both the proxy
+  envelope and properties hierarchy. The native rule is functionally equivalent for supported
+  authoring, despite intentionally unequal raw counts.
+- **Uncertainty:** Six compile-failing projects, including three with validator findings, remain
+  excluded from behavioral equivalence.
+
+## Detailed conclusion
 
 **TypeSpec rule update required and completed.** The prior implementation checked only a proxy
 resource's properties model. The Swagger rule also checks `definition.properties.tags`, so an

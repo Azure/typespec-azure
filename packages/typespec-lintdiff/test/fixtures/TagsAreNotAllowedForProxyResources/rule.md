@@ -22,7 +22,7 @@ the resource properties bag.
 
 | ID                         | Violation | Description                                    |
 | -------------------------- | --------- | ---------------------------------------------- |
-| `proxy-with-tags`          | true      | Proxy resource includes tags in properties bag |
+| `proxy-with-tags`          | true      | Proxy resource inherits tags in properties bag |
 | `proxy-with-envelope-tags` | true      | Proxy resource includes tags on its envelope   |
 | `proxy-without-tags`       | false     | Proxy resource has no tags                     |
 | `tracked-with-tags`        | false     | Tracked resource uses its supported tags       |

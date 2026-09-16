@@ -55,14 +55,17 @@ model Gadget is ProxyResource<GadgetProperties> {
   name: string;
 }
 
-/** Gadget properties. */
-model GadgetProperties {
-  /** Description of the gadget. */
-  description?: string;
-
+/** Shared gadget properties. */
+model GadgetBaseProperties {
   /** Tags on proxy resource - violates rule. */
   #suppress "@azure-tools/typespec-azure-resource-manager/arm-no-record" "Record needed to produce tags object in swagger"
   tags?: Record<string>;
+}
+
+/** Gadget properties. */
+model GadgetProperties extends GadgetBaseProperties {
+  /** Description of the gadget. */
+  description?: string;
 
   /** The provisioning state. */
   @visibility(Lifecycle.Read)
