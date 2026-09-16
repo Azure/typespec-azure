@@ -469,18 +469,23 @@ additional emitted occurrences.
 
 ## Emission matrix and fixture evidence
 
-| Authored TypeSpec shape                               | Emitter/result branch                                          | Selected OpenAPI field                       | Swagger        | TypeSpec  | Fixture                                                                       |
-| ----------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------- | -------------- | --------- | ----------------------------------------------------------------------------- |
-| Proxy resource with `tags` on envelope                | ARM resource model definition                                  | `properties.tags`, no sibling `location`     | violation      | violation | `proxy-with-envelope-tags`                                                    |
-| Proxy properties model with direct/inherited `tags`   | Resource `properties` schema and emitted properties definition | nested or definition-level `properties.tags` | violation      | violation | `proxy-with-tags`                                                             |
-| Proxy resource without `tags`                         | Proxy resource template                                        | no `tags` field                              | clean          | clean     | `proxy-without-tags`                                                          |
-| Tracked resource's supported tags                     | Tracked resource template                                      | `properties.tags` with sibling `location`    | clean          | clean     | `tracked-with-tags`                                                           |
-| Tracked update envelope                               | ARM update-model generation                                    | `properties.tags` without `location`         | false positive | clean     | pinned corpus example below                                                   |
-| Arbitrary nested/non-resource model containing `tags` | Generic model emission                                         | definition or nested `properties.tags`       | false positive | clean     | upstream validator test `ActionGroupPatchBody`/`ManagedServiceIdentity` cases |
+| Authored TypeSpec shape                                | Emitter/result branch                                          | Selected OpenAPI field                       | Swagger        | TypeSpec  | Fixture                                                                       |
+| ------------------------------------------------------ | -------------------------------------------------------------- | -------------------------------------------- | -------------- | --------- | ----------------------------------------------------------------------------- |
+| Proxy resource with `tags` on envelope                 | ARM resource model definition                                  | `properties.tags`, no sibling `location`     | violation      | violation | `proxy-with-envelope-tags`                                                    |
+| Proxy resource with another property encoded as `tags` | ARM resource model definition                                  | `properties.tags`, no sibling `location`     | violation      | violation | `proxy-with-encoded-tags`                                                     |
+| Proxy resource with authored `tags` encoded away       | ARM resource model definition                                  | no `tags` field                              | clean          | clean     | `proxy-tags-encoded-away`                                                     |
+| Proxy properties model with direct/inherited `tags`    | Resource `properties` schema and emitted properties definition | nested or definition-level `properties.tags` | violation      | violation | `proxy-with-tags`                                                             |
+| Proxy resource without `tags`                          | Proxy resource template                                        | no `tags` field                              | clean          | clean     | `proxy-without-tags`                                                          |
+| Tracked resource's supported tags                      | Tracked resource template                                      | `properties.tags` with sibling `location`    | clean          | clean     | `tracked-with-tags`                                                           |
+| Tracked update envelope                                | ARM update-model generation                                    | `properties.tags` without `location`         | false positive | clean     | pinned corpus example below                                                   |
+| Arbitrary nested/non-resource model containing `tags`  | Generic model emission                                         | definition or nested `properties.tags`       | false positive | clean     | upstream validator test `ActionGroupPatchBody`/`ManagedServiceIdentity` cases |
 
-Focused validation passed all four fixtures: two violations and two reviewed compliant controls.
-The existing properties-bag fixture emits three Swagger findings because the validator also flags
-generated tracked update definitions; one semantic TypeSpec diagnostic correctly identifies the
+Focused validation passed all six fixtures: three violations and three reviewed compliant controls.
+The encoded-name fixtures verify that the native rule follows the JSON payload name: a differently
+named property encoded as `tags` is rejected, while an authored `tags` property encoded to another
+name is accepted. The existing properties-bag fixture emits four Swagger findings: one for the
+inherited `tags` declaration, one for the derived properties definition, and two false positives for
+generated tracked update definitions. One semantic TypeSpec diagnostic correctly identifies the
 authored proxy violation. The final two matrix rows document validator defects rather than intended
 equivalence branches: the tracked-update row is executable in the pinned AgriculturePlatform corpus,
 and the arbitrary-model row is executable in the upstream validator test's
@@ -611,6 +616,7 @@ engines reject the authorable proxy-resource behavior.
 
 - Check the registered proxy resource model itself for an authored or inherited `tags` property.
 - Retain the properties-model hierarchy check.
-- Add envelope violation, properties-bag violation, tag-free proxy, and tracked-resource controls.
+- Resolve JSON-encoded property names before identifying the `tags` and `properties` payload fields.
+- Add envelope, properties-bag, encoded-name, tag-free proxy, and tracked-resource controls.
 - Target diagnostics at the offending authored property and avoid reproducing Swagger's
   name/location heuristic.

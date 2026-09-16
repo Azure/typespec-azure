@@ -1,5 +1,12 @@
 import { getArmResources } from "@azure-tools/typespec-azure-resource-manager";
-import { createRule, paramMessage, type Model, type ModelProperty } from "@typespec/compiler";
+import {
+  createRule,
+  paramMessage,
+  resolveEncodedName,
+  type Model,
+  type ModelProperty,
+  type Program,
+} from "@typespec/compiler";
 
 export const tagsAreNotAllowedForProxyResourcesRule = createRule({
   name: "tags-are-not-allowed-for-proxy-resources",
@@ -17,9 +24,17 @@ export const tagsAreNotAllowedForProxyResourcesRule = createRule({
             continue;
           }
 
-          const resourceTags = getPropertyInHierarchy(armResource.typespecType, "tags");
-          const propertiesModel = getResourcePropertiesModel(armResource.typespecType);
-          const propertiesTags = propertiesModel && getPropertyInHierarchy(propertiesModel, "tags");
+          const resourceTags = getPropertyInHierarchy(
+            context.program,
+            armResource.typespecType,
+            "tags",
+          );
+          const propertiesModel = getResourcePropertiesModel(
+            context.program,
+            armResource.typespecType,
+          );
+          const propertiesTags =
+            propertiesModel && getPropertyInHierarchy(context.program, propertiesModel, "tags");
 
           for (const tagsProperty of [resourceTags, propertiesTags]) {
             if (tagsProperty) {
@@ -37,16 +52,21 @@ export const tagsAreNotAllowedForProxyResourcesRule = createRule({
   },
 });
 
-function getResourcePropertiesModel(resourceModel: Model): Model | undefined {
-  const propertiesProperty = getPropertyInHierarchy(resourceModel, "properties");
+function getResourcePropertiesModel(program: Program, resourceModel: Model): Model | undefined {
+  const propertiesProperty = getPropertyInHierarchy(program, resourceModel, "properties");
   return propertiesProperty?.type.kind === "Model" ? propertiesProperty.type : undefined;
 }
 
-function getPropertyInHierarchy(model: Model, propertyName: string): ModelProperty | undefined {
+function getPropertyInHierarchy(
+  program: Program,
+  model: Model,
+  jsonName: string,
+): ModelProperty | undefined {
   for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
-    const property = current.properties.get(propertyName);
-    if (property !== undefined) {
-      return property;
+    for (const property of current.properties.values()) {
+      if (resolveEncodedName(program, property, "application/json") === jsonName) {
+        return property;
+      }
     }
   }
 

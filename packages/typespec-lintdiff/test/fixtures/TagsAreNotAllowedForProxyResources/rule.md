@@ -20,9 +20,11 @@ This rule is now covered by
 reports proxy resources that declare `tags` on either the resource envelope or
 the resource properties bag.
 
-| ID                         | Violation | Description                                    |
-| -------------------------- | --------- | ---------------------------------------------- |
-| `proxy-with-tags`          | true      | Proxy resource inherits tags in properties bag |
-| `proxy-with-envelope-tags` | true      | Proxy resource includes tags on its envelope   |
-| `proxy-without-tags`       | false     | Proxy resource has no tags                     |
-| `tracked-with-tags`        | false     | Tracked resource uses its supported tags       |
+| ID                         | Violation | Description                                              |
+| -------------------------- | --------- | -------------------------------------------------------- |
+| `proxy-with-tags`          | true      | Proxy resource inherits tags in properties bag           |
+| `proxy-with-envelope-tags` | true      | Proxy resource includes tags on its envelope             |
+| `proxy-with-encoded-tags`  | true      | Proxy resource encodes another property as tags          |
+| `proxy-without-tags`       | false     | Proxy resource has no tags                               |
+| `proxy-tags-encoded-away`  | false     | Proxy resource encodes its tags property to another name |
+| `tracked-with-tags`        | false     | Tracked resource uses its supported tags                 |
