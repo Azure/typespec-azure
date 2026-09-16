@@ -18,6 +18,14 @@ This rule is available for ARM specifications and is disabled by default in the 
 resource-manager ruleset. When selected, it checks project operations in ordinary, nested,
 and global namespaces without requiring a provider decorator as an applicability marker.
 
+## Impact
+
+- **Area:** API, SDK, Tooling
+
+An unregistered resource-shaped response violates the ARM modeling contract and prevents
+resource-aware emitters, SDK generators, and other tooling from recognizing the response as an
+ARM resource.
+
 #### ❌ Incorrect
 
 The response resembles a resource, but is not a registered resource model:
@@ -79,6 +87,12 @@ interface Widgets {
   createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
 }
 ```
+
+## Suppression
+
+Suppress only when preserving an existing, ARM-reviewed API whose response intentionally cannot
+use a registered resource model. Otherwise, define the response with `TrackedResource` or
+`ProxyResource` and use the corresponding standard resource operation template.
 
 ## LintDiff Equivalent
 

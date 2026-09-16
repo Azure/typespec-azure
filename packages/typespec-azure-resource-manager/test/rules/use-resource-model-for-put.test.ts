@@ -188,6 +188,43 @@ it("ignores uninstantiated operation and interface templates", async () => {
     .toBeValid();
 });
 
+it("ignores PUT operations declared by an imported library", async () => {
+  const libraryTester = createTester(resolvePath(import.meta.dirname, "../.."), {
+    libraries: [
+      "@typespec/http",
+      "@typespec/rest",
+      "@typespec/versioning",
+      "@azure-tools/typespec-azure-core",
+      "@azure-tools/typespec-azure-resource-manager",
+    ],
+  })
+    .files({
+      "node_modules/test-resource-library/package.json": JSON.stringify({
+        name: "test-resource-library",
+        version: "1.0.0",
+        tspMain: "main.tsp",
+      }),
+      "node_modules/test-resource-library/main.tsp": `
+        import "@typespec/http";
+        import "@azure-tools/typespec-azure-resource-manager";
+        using TypeSpec.Http;
+        using Azure.ResourceManager;
+        namespace TestResourceLibrary;
+        model Response { name: string; type: string; }
+        @put op create(): ArmResponse<Response>;
+      `,
+    })
+    .importLibraries()
+    .import("test-resource-library");
+  const libraryRuleTester = createLinterRuleTester(
+    await libraryTester.createInstance(),
+    useResourceModelForPutRule,
+    library,
+  );
+
+  await libraryRuleTester.expect("").toBeValid();
+});
+
 it("preserves source diagnostic counts for a template instantiation and alias", async () => {
   await tester
     .expect(
