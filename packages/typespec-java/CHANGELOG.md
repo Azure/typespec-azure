@@ -1,5 +1,16 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.47.1
+
+### Bug Fixes
+
+- [#5492](https://github.com/Azure/typespec-azure/pull/5492) Sync core to commit `057557b68`. Includes fixes for casting null parameters in generated samples and
+  tests ([microsoft/typespec#11967](https://github.com/microsoft/typespec/pull/11967)), redundant casts
+  in generated XML serializers ([microsoft/typespec#11982](https://github.com/microsoft/typespec/pull/11982)),
+  and generated Java path-length limits
+  ([microsoft/typespec#11983](https://github.com/microsoft/typespec/pull/11983)).
+
+
 ## 0.47.0
 
 ### Features
