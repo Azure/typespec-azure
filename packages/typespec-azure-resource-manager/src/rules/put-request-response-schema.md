@@ -67,6 +67,14 @@ values remain significant. Direct enums and individual enum-member types use the
 same comparison: an omitted value defaults to the member's name, so `enum A { state }`
 and `enum B { state: "state" }` match. Explicit zero and empty-string values are
 preserved rather than replaced by defaults.
+
+Matching indexers do not bypass named-property comparison: property types,
+optionality, counts, and inherited properties still matter. ARM's independent
+`arm-no-record` warning discourages records for new APIs but permits suppression
+when matching an existing API; it does not replace request/response equality.
+Scalar comparison checks the name at each level of the base chain, so same-named
+scalar declarations with incompatible underlying types do not match.
+
 This is not an assignability check and does not compare emitted SDK
 type names, serialization extensions, or historical version projections.
 
