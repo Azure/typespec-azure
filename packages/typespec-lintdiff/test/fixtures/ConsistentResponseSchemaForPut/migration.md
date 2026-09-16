@@ -19,7 +19,7 @@
   one body type for a cross-status equality comparison.
 - **Limits:** External-reference resolution was not independently verified, and
   the source's nested-namespace limitation remains. See the
-  [evidence limitations](#earlier-template-and-array-repair-findings) and
+  [evidence limitations](#retained-template-repair-and-known-scope) and
   [qualified conclusion](#official-coverage-and-conclusion).
 
 ## Sources and scope
