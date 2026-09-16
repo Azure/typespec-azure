@@ -51,6 +51,119 @@ for (const [audience, rule] of [
     };
 
     it.each([
+      ["extra: string;", "extra: int32;"],
+      ["extra: string;", "extra?: string;"],
+      ["extra: string;", ""],
+      ["next?: Request; value: string;", "next?: Result; value: int32;"],
+    ])(
+      "reports named-property differences despite equal indexers (%s versus %s)",
+      async (left, right) => {
+        await (
+          await expect(`
+          model Request is Record<unknown> { ${left} }
+          model Result is Record<unknown> { ${right} }
+          @put @route("/widgets") op put(@body body: Request): Result;
+        `)
+        ).toEmitDiagnostics(diagnostic);
+      },
+    );
+
+    it.each([
+      ["", ""],
+      ["extra: string;", "extra: string;"],
+      ["next?: Request;", "next?: Result;"],
+    ])("accepts equal indexers and named properties (%s)", async (left, right) => {
+      await (
+        await expect(`
+          model Request is Record<unknown> { ${left} }
+          model Result is Record<unknown> { ${right} }
+          @put @route("/widgets") op put(@body body: Request): Result;
+        `)
+      ).toBeValid();
+    });
+
+    it.each([
+      ["Record<string>", "Record<int32>"],
+      ["Record<unknown>", "{}"],
+      ["{}", "Record<unknown>"],
+      ["string[]", "int32[]"],
+    ])("preserves indexer and array mismatches (%s versus %s)", async (left, right) => {
+      await (
+        await expect(`
+          model Request { value: ${left}; }
+          model Result { value: ${right}; }
+          @put @route("/widgets") op put(@body body: Request): Result;
+        `)
+      ).toEmitDiagnostics(diagnostic);
+    });
+
+    it.each([
+      ["string", "int32"],
+      ["int32", "int64"],
+      ["float32", "int32"],
+    ])("reports same-named scalars with different bases (%s versus %s)", async (left, right) => {
+      await (
+        await expect(`
+          namespace A { scalar Value extends ${left}; }
+          namespace B { scalar Value extends ${right}; }
+          model Request { value: A.Value; }
+          model Result { value: B.Value; }
+          @put @route("/widgets") op put(@body body: Request): Result;
+        `)
+      ).toEmitDiagnostics(diagnostic);
+    });
+
+    it.each(["string", "int32"])(
+      "accepts same-named scalars with equal bases (%s)",
+      async (base) => {
+        await (
+          await expect(`
+          namespace A { scalar Value extends ${base}; }
+          namespace B { scalar Value extends ${base}; }
+          model Request { value: A.Value; }
+          model Result { value: B.Value; }
+          @put @route("/widgets") op put(@body body: Request): Result;
+        `)
+        ).toBeValid();
+      },
+    );
+
+    it("compares scalar base chains beyond the immediate base name", async () => {
+      await (
+        await expect(`
+          namespace A { scalar Base extends string; scalar Value extends Base; }
+          namespace B { scalar Base extends int32; scalar Value extends Base; }
+          model Request { value: A.Value; }
+          model Result { value: B.Value; }
+          @put @route("/widgets") op put(@body body: Request): Result;
+        `)
+      ).toEmitDiagnostics(diagnostic);
+    });
+
+    it("accepts equivalent independently declared scalar base chains", async () => {
+      await (
+        await expect(`
+          namespace A { scalar Base extends string; scalar Value extends Base; }
+          namespace B { scalar Base extends string; scalar Value extends Base; }
+          model Request { value: A.Value; }
+          model Result { value: B.Value; }
+          @put @route("/widgets") op put(@body body: Request): Result;
+        `)
+      ).toBeValid();
+    });
+
+    it("does not equate a shadowing scalar with its namesake standard scalar", async () => {
+      await (
+        await expect(`
+          namespace A { scalar string extends int32; }
+          model Request { value: A.string; }
+          model Result { value: string; }
+          @put @route("/widgets") op put(@body body: Request): Result;
+        `)
+      ).toEmitDiagnostics(diagnostic);
+    });
+
+    it.each([
       ["state", 'state: "state"'],
       ['state: "state"', "state"],
       ["state: 0", "state: 0"],

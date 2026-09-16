@@ -37,8 +37,8 @@ response schema when no `200` exists.
 ## Semantic coverage notes
 
 - The repository now adds `tsp-lintdiff-local-linter/put-request-response-scheme-arm`
-  to compare ARM PUT request bodies against the emitted `200`/fallback `201`
-  success schema directly in authorable TypeSpec.
+  to compare ARM PUT request body types against the native `200`/fallback `201`
+  success body types directly in authorable TypeSpec.
 - The official ARM lint
   `@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response`
   still overlaps when the response resource schema itself diverges across PUT,
@@ -62,11 +62,20 @@ the same label with different string or numeric values does not match.
 Direct enum types use the same member comparison: an implicit string default
 and an explicit value equal to that member's name match. Numeric zero and empty
 strings remain explicit values rather than falling back to the name.
+Matching indexers do not bypass named-property comparison: property types,
+optionality, counts, and inherited properties still matter. Scalar comparison
+checks the name at each level of the base chain, so same-named scalar declarations
+cannot hide incompatible underlying types.
 Native regression tests in `test/rules/put-request-response-scheme.test.ts`
 cover both ARM and data-plane consumers without importing an emitter, including
 different members, recursive models, response precedence, and absent bodies.
 The OpenAPI library is registered only to satisfy transitive test-host imports;
 these tests do not use OpenAPI decorators or helpers.
+
+Indexer-bearing named models are native-authorable. ARM's independent
+`arm-no-record` warning discourages this shape for new APIs but explicitly
+permits suppression to match existing APIs; it is not a compiler prohibition.
+The equality rule must still compare the named properties for such legacy APIs.
 
 The `equivalent-open-unions` comparison fixture intentionally differs from
 Swagger: its `RequestState` and `ResponseState` definitions have identical

@@ -105,12 +105,14 @@ function areEquivalentModels(left: Model, right: Model, seen: Map<Type, Set<Type
   const leftIndexer = left.indexer;
   const rightIndexer = right.indexer;
   if (leftIndexer !== undefined || rightIndexer !== undefined) {
-    return (
-      leftIndexer !== undefined &&
-      rightIndexer !== undefined &&
-      areEquivalentScalars(leftIndexer.key, rightIndexer.key) &&
-      areEquivalentTypes(leftIndexer.value, rightIndexer.value, seen)
-    );
+    if (
+      leftIndexer === undefined ||
+      rightIndexer === undefined ||
+      !areEquivalentScalars(leftIndexer.key, rightIndexer.key) ||
+      !areEquivalentTypes(leftIndexer.value, rightIndexer.value, seen)
+    ) {
+      return false;
+    }
   }
 
   const leftProperties = new Map(
@@ -142,7 +144,15 @@ function areEquivalentModels(left: Model, right: Model, seen: Map<Type, Set<Type
 }
 
 function areEquivalentScalars(left: Scalar, right: Scalar): boolean {
-  return left.name === right.name;
+  if (left.name !== right.name) {
+    return false;
+  }
+
+  if (left.baseScalar === undefined || right.baseScalar === undefined) {
+    return left.baseScalar === right.baseScalar;
+  }
+
+  return areEquivalentScalars(left.baseScalar, right.baseScalar);
 }
 
 function areEquivalentEnumMembers(left: EnumMember, right: EnumMember): boolean {

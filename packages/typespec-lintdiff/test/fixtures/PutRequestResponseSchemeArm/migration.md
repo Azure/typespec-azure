@@ -2,15 +2,24 @@
 
 ## Result and gap summary
 
-Across 462 successfully compiled projects out of 468, Swagger and TypeSpec report **160/153 diagnostics in 36/34 projects**, with 34 overlapping projects, two validator-only projects, and no TypeSpec-only projects. Eight Swagger-only occurrences have a request schema but no preferred success response schema: two in one-sided projects and six in overlapping projects. Native equality leaves those to response-body guidance. One extra native Batch finding belongs to an operation removed from the selected Swagger version; thus `8 - 1 = 7` explains the observed count gap. Excluding that older finding yields 152 native diagnostics. The repairs fix absent-request, equivalent-open-union, and implicit/explicit enum-default false positives while preserving genuine value mismatches. Native regressions, not unchanged corpus counts, prove the union and enum repairs. Coverage is partial: SDK enum metadata is intentionally excluded, six compile failures remain outside comparison, and these results are not universal Swagger equivalence.
+The completed full corpus reports **160/153 Swagger/TypeSpec diagnostics in 36/34 projects**, across 462 successfully compiled projects out of 468: 34 overlaps, two validator-only projects, and no TypeSpec-only projects. Eight Swagger-only missing-response-schema occurrences, minus one native Batch finding from an older API version, explain the seven-diagnostic gap. Native equality leaves missing schemas to response-body guidance; excluding the older finding yields 152 native diagnostics. The repairs cover absent requests, equivalent unions/enums, named properties alongside indexers, and scalar base chains. All 106 native tests pass, and both shared-rule consumers retain exactly their previous corpus diagnostic records. An initial corpus-output failure was retained and followed by successful authorized runs using an isolated copy of the same dataset. Coverage remains partial: SDK enum metadata is excluded, six known compile failures remain outside comparison, and corpus overlap does not prove universal Swagger equivalence.
 
 ## Conclusion
 
 - **Coverage classification:** partial, with intentional native-contract boundaries for missing success response schemas and emitted SDK enum metadata.
-- **TypeSpec rule update:** required and completed. `comparePutRequestAndResponse` skips `void` request bodies, and its shared union comparator matches unnamed variants structurally rather than by compiler-generated symbol identity. Direct enums and enum-member types share the same label and effective-value comparison; named-variant matching is unchanged.
+- **TypeSpec rule update:** required and completed. `comparePutRequestAndResponse` skips `void` request bodies, and its shared union comparator matches unnamed variants structurally rather than by compiler-generated symbol identity. Direct enums and enum-member types share the same label and effective-value comparison; named-variant matching is unchanged. The latest changes prevent matching indexers from bypassing named properties and compare scalar names through the base chain.
 - **Coverage limits:** the residual validator-only projects are explained by Swagger's empty-response-schema behavior on already-invalid/suppressed ARM operations. The six excluded compile failures and finite fixture matrix preclude a universal equivalence claim.
 
 ## Reports and source revisions
+
+The latest full-corpus validation generated results at
+`2026-09-16T09:46:34.170Z` and completed at
+`2026-09-16T09:49:05.0026262Z` after 1,241,040 ms of analysis. It ran all
+468 projects with concurrency 6 and no filter, using the existing runner's
+`--output` option on an isolated copy of the pinned dataset. All 76,313 input
+files were verified byte-identical before the recovery sample. The earlier
+2026-09-15 result below is retained for comparison; both rule consumers'
+diagnostic records and all project statuses match that completed run exactly.
 
 | Source                       | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -22,18 +31,18 @@ Across 462 successfully compiled projects out of 468, Swagger and TypeSpec repor
 
 ## Report reconciliation
 
-| Report                                                      | Row/category                | Validator projects | Local TypeSpec projects |             Official credited |    Overlap | Validator-only | TypeSpec-only | Diagnostics                   |
-| ----------------------------------------------------------- | --------------------------- | -----------------: | ----------------------: | ----------------------------: | ---------: | -------------: | ------------: | ----------------------------- |
-| `coverage_old.md`                                           | `100% coverage`             |                 36 |                      34 |                             2 | not listed |     not listed |    not listed | aggregate project counts only |
-| Checked-in `coverage-breakdown.md` baseline before this fix | `Partial observed coverage` |                 36 |                      42 | mapping present, not credited |         34 |              2 |             8 | 160 validator / 184 TypeSpec  |
-| Uncommitted full-corpus validation run after this fix       | `Partial observed coverage` |                 36 |                      34 | mapping present, not credited |         34 |              2 |             0 | 160 validator / 153 TypeSpec  |
+| Report                                                             | Row/category                | Validator projects | Local TypeSpec projects |             Official credited |    Overlap | Validator-only | TypeSpec-only | Diagnostics                   |
+| ------------------------------------------------------------------ | --------------------------- | -----------------: | ----------------------: | ----------------------------: | ---------: | -------------: | ------------: | ----------------------------- |
+| `coverage_old.md`                                                  | `100% coverage`             |                 36 |                      34 |                             2 | not listed |     not listed |    not listed | aggregate project counts only |
+| Checked-in `coverage-breakdown.md` baseline before this fix        | `Partial observed coverage` |                 36 |                      42 | mapping present, not credited |         34 |              2 |             8 | 160 validator / 184 TypeSpec  |
+| Latest isolated full-corpus validation after indexer/scalar repair | `Partial observed coverage` |                 36 |                      34 | mapping present, not credited |         34 |              2 |             0 | 160 validator / 153 TypeSpec  |
 
 The old report credited official or otherwise settled coverage, so it reported 100% even though only 34 direct local lint projects fired. The lintdiff report credits only same-project diagnostic overlap in successful TypeSpec projects, so the two response-body-only validator projects remain visible as gaps.
 
 The checked-in [`coverage-breakdown.md`](../../../specs/coverage-breakdown.md) is
 the restored generated baseline and therefore still contains the before-fix
 42-project/184-diagnostic TypeSpec row. The 34-project/153-diagnostic after-fix
-row comes from the uncommitted validation run recorded in this migration
+row comes from the isolated validation run recorded in this migration
 evidence; the generated coverage files were intentionally not committed.
 
 ## Validator behavior
@@ -147,6 +156,89 @@ their aggregate totals. The existing operation-level explanations below still
 apply. The six RED regressions and 68 passing native tests establish the
 direct-enum correction; the unchanged corpus is observational regression
 evidence, not proof that its projects contain that shape.
+
+### Indexers with named properties and derived scalars
+
+The third source repair closes two native semantic misses found during promotion
+review. Both were present in the identical source and official comparator, not
+introduced by the promotion adaptation.
+
+```typespec
+model Request is Record<unknown> {
+  extra: string;
+}
+model Result is Record<unknown> {
+  extra: int32;
+}
+@put @route("/widgets") op put(@body body: Request): Result;
+```
+
+The equal `string` keys and `unknown` values previously caused an early return,
+ignoring the incompatible named `extra` property. Indexer comparison now rejects
+unequal indexers but continues through named and inherited properties when the
+indexers match. This is compiler/HTTP-valid authoring. The independent
+`arm-no-record` warning discourages records for new ARM APIs; its documented
+suppression policy permits them when matching an existing API, so it does not
+make this shape impossible or replace schema equality.
+
+```typespec
+namespace A {
+  scalar Value extends string;
+}
+namespace B {
+  scalar Value extends int32;
+}
+model Request {
+  value: A.Value;
+}
+model Result {
+  value: B.Value;
+}
+@put @route("/widgets") op put(@body body: Request): Result;
+```
+
+These scalars have the same name but incompatible bases. Scalar equality now
+compares names recursively through the base chain, retaining the existing native
+name requirement and detecting differences beyond the immediate base. This is
+native type comparison, not reconstruction of emitted scalar schemas or formats.
+
+| Native shape                                                           | Before repair   | After repair | Support/evidence                                                                 |
+| ---------------------------------------------------------------------- | --------------- | ------------ | -------------------------------------------------------------------------------- |
+| Equal indexers, different named property types, optionality, or counts | Missed mismatch | Mismatch     | Native cases for both rule audiences; legacy ARM record suppression policy above |
+| Equal indexers and equivalent named or recursive properties            | No mismatch     | No mismatch  | Native compliant controls                                                        |
+| Unequal indexers, one-sided indexers, or unequal array element types   | Mismatch        | Mismatch     | Native regression controls                                                       |
+| Same scalar name with incompatible direct or deeper bases              | Missed mismatch | Mismatch     | Compiler/HTTP-valid scalar regressions                                           |
+| Same scalar name and equivalent independently declared base chains     | No mismatch     | No mismatch  | Native compliant controls                                                        |
+| A scalar shadowing a standard scalar's name with an incompatible base  | Missed mismatch | Mismatch     | Native regression in both audiences                                              |
+
+The complete updated native test file reproduced **18 missing-diagnostic
+assertions with 88 passing controls before the fix**, then passed **106/106**
+after it. These cases use native compiler/HTTP semantics without emitting
+OpenAPI. They establish the repair independently of corpus cardinality and do
+not expand the claim of Swagger equivalence.
+
+The representative corpus command on `2026-09-16` selected exactly one project
+using the literal filter `ProviderHub.Management`, at the same pinned specs
+commit. The project compiled successfully with 226 diagnostics across all
+enabled rules. The runner then failed while opening
+`packages/typespec-lintdiff/specs/typespec-results.json` for output, ending
+with exit 1 at `2026-09-16T08:38:47.5231367Z`. The file was subsequently
+readable, not read-only, and disk space was available; the cause is not
+established. This is an output/harness failure, not a proven semantic
+regression. That attempt stopped before a full run. Partial generated
+outputs were archived outside Git and the generated baseline restored.
+
+The explicitly authorized recovery used a byte-identical dataset copy outside
+the Git worktree and the runner's existing `--output` argument. The ProviderHub
+sample succeeded, followed by a full 468-project run: 462 succeeded and the same
+six projects failed compilation. The ARM rule retained all prior diagnostic
+records (153 diagnostics over 34 successful projects); the shared data-plane
+consumer also retained its prior three native diagnostics exactly. These are
+rule-local comparisons: the source branch separately incorporated an upstream
+`ConsistentResponseSchemaForPut` change before recovery, so unrelated aggregate
+diagnostic changes are not attributed to this repair. The successful isolated
+run establishes the current validation result, not the original file failure's
+historical cause.
 
 ## Project-set comparison over aligned population
 

@@ -31,7 +31,10 @@ validator violation.
   Named variants still require matching names and types. Enum-member types
   compare both labels and effective values. Direct enums use that same
   comparison, including implicit string defaults, numeric zero, and empty
-  strings. The shared native
+  strings. Equal indexers still require equal named/inherited properties,
+  including optionality. Same-named scalars also require matching names through
+  their base chains rather than accepting incompatible underlying types.
+  The shared native
   regression suite `test/rules/put-request-response-scheme.test.ts` covers
   separate equivalent open unions, genuine differences, recursion, response
   selection, and absent bodies for both consumers without importing an emitter.
