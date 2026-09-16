@@ -1,0 +1,170 @@
+[
+  {
+    "code": "LroErrorContent",
+    "message": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "path": [
+      "paths",
+      "/array/{name}",
+      "post",
+      "responses",
+      "400",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LroErrorContent",
+    "message": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "path": [
+      "paths",
+      "/derived/{name}",
+      "post",
+      "responses",
+      "400",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LroErrorContent",
+    "message": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "path": [
+      "paths",
+      "/enum/{name}",
+      "post",
+      "responses",
+      "400",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LroErrorContent",
+    "message": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "path": [
+      "paths",
+      "/friendly/{name}",
+      "post",
+      "responses",
+      "400",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LroErrorContent",
+    "message": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "path": [
+      "paths",
+      "/models/{name}",
+      "post",
+      "responses",
+      "400",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LroErrorContent",
+    "message": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "path": [
+      "paths",
+      "/nested/{name}",
+      "post",
+      "responses",
+      "400",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LroErrorContent",
+    "message": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "path": [
+      "paths",
+      "/nullable/{name}",
+      "post",
+      "responses",
+      "400",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LroErrorContent",
+    "message": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "path": [
+      "paths",
+      "/record/{name}",
+      "post",
+      "responses",
+      "400",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LroErrorContent",
+    "message": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "path": [
+      "paths",
+      "/scalar/{name}",
+      "post",
+      "responses",
+      "400",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LroErrorContent",
+    "message": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "path": [
+      "paths",
+      "/spread-effective/{name}",
+      "post",
+      "responses",
+      "400",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LroErrorContent",
+    "message": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "path": [
+      "paths",
+      "/spreads/{name}",
+      "post",
+      "responses",
+      "400",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "LroErrorContent",
+    "message": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "path": [
+      "paths",
+      "/union/{name}",
+      "post",
+      "responses",
+      "400",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
+  }
+]

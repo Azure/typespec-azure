@@ -13,6 +13,17 @@ This skill is intentionally **one rule at a time**. The goal is an auditable rep
 
 Use the [repair checklist](./repair-checklist.md) to keep the pass grounded in source evidence and repository quirks.
 
+When the requested repair includes publication, apply the shared
+[publication preflight and lifecycle contract](../do-linter-development-task-one-by-one/app-session-execution.md#publication-preflight)
+before expensive setup or edits. Distinguish repair of a recorded OPEN PR from a
+separately user-authorized follow-up after the original migration merged. The
+latter is a new scoped bug-fix branch/PR from the intended canonical target, not
+permission to reopen a merged PR, duplicate migration or invent queue markers.
+Preserve prior work and reapply the development skill's eligibility,
+semantic-coverage, native-boundary and required-validation gates; this skill
+does not waive them. Publication-only recovery of already validated work follows
+the shared recovery contract instead of rerunning this re-import investigation.
+
 ## Process
 
 1. Reconstruct the upstream source of truth for the named rule:

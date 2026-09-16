@@ -10,16 +10,8 @@
       "count": 1
     },
     {
-      "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
-      "count": 1
-    },
-    {
       "code": "tsp-lintdiff-local-linter/path-parameter-schema",
       "count": 7
-    },
-    {
-      "code": "tsp-lintdiff-local-linter/unsupported-patch-properties",
-      "count": 1
     },
     {
       "code": "tsp-lintdiff-local-linter/xms-examples-required",
