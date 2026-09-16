@@ -178,36 +178,23 @@ function emit(
         first = false;
       } else {
         let tag = "";
-        if (respEnv.result.kind === "monomorphicResult" && respEnv.result.format === "XML") {
+        if (respEnv.result.kind === "monomorphicResult" && respEnv.result.format === "XML" && respEnv.result.xmlWrapper) {
           // only emit tags for XML; JSON uses custom marshallers/unmarshallers
-          if (respEnv.result.xml?.wraps) {
-            tag = ` \`xml:"${respEnv.result.xml.wraps}"\``;
-          } else if (respEnv.result.xml?.name) {
-            tag = ` \`xml:"${respEnv.result.xml.name}"\``;
-          }
-        }
-
-        let byValue = true;
-        if (respEnv.result.kind === "monomorphicResult") {
-          byValue = respEnv.result.byValue;
+          tag = ` \`xml:"${respEnv.result.xmlWrapper}"\``;
         }
 
         fields.push({
           docs: respEnv.result.docs,
-          field: `${indent.get()}${respEnv.result.fieldName} ${helpers.star(byValue)}${go.getTypeDeclaration(respType, respEnv.method.receiver.type.pkg)}${tag}\n`,
+          field: `${indent.get()}${respEnv.result.fieldName} ${go.getTypeDeclaration(respType, respEnv.method.receiver.type.pkg)}${tag}\n`,
         });
       }
     }
 
     for (const header of respEnv.headers) {
       imports.addForType(header.type);
-      let byValue = true;
-      if (header.kind === "headerScalarResponse") {
-        byValue = header.byValue;
-      }
       fields.push({
         docs: header.docs,
-        field: `${indent.get()}${header.fieldName} ${helpers.star(byValue)}${go.getTypeDeclaration(header.type, respEnv.method.receiver.type.pkg)}\n`,
+        field: `${indent.get()}${header.fieldName} ${go.getTypeDeclaration(header.type, respEnv.method.receiver.type.pkg)}\n`,
       });
     }
 
