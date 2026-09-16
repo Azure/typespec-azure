@@ -992,8 +992,10 @@ creating a draft PR.
    target branch.
 3. Commit only the explicit rule-related paths and any required fixture-harness
    dependency repair identified above.
-4. Push the rule branch to the preflight's verified personal-fork destination
-   for a new head, or the recorded head repository for an existing task PR.
+4. Push a new rule branch to the preflight's verified `Azure/typespec-azure`
+   destination, or retain the recorded head repository for an existing task PR.
+   Verify canonical write permission before implementation; never fall back to
+   a personal fork when permission or publication binding is unavailable.
    Use an explicit remote/refspec; do not push or update the canonical target.
 5. Create the pull request in `Azure/typespec-azure` as a **draft**, with the
    recorded head repository/branch and user-supplied target branch as base. Do not mark

@@ -30,10 +30,18 @@ publication binding in durable session artifacts:
   completion channel; for reviews, selected owner and persistent capabilities
 
 Resolve repository identity from actual remote fetch/push URLs and GitHub
-metadata, never a remote's name. New dedicated heads default to the user's
-personal fork; `Azure/typespec-azure` supplies the fetched base. Existing verified
-task PRs retain their recorded head repository, including canonical heads; do not
-move them to a fork. Promotion targets canonical `main`; migration targets the
+metadata, never a remote's name. New development, repair and promotion heads
+must be created in `Azure/typespec-azure`, which also supplies the fetched base.
+This workflow-specific requirement overrides general personal-fork contribution
+guidance. Before implementation or dependency setup, verify canonical repository
+write permission, the explicit push URL/refspec, and the owning publication
+tool's ability to use that canonical head. Stop on missing permission or an
+unsupported binding; never fall back to a fork.
+Existing verified task PRs retain their recorded head repository and branch,
+including legacy fork heads, until the user separately authorizes a
+publication migration. Updating this policy alone does not authorize replacing
+or closing those PRs, moving their heads, or changing their owners/worktrees.
+Promotion targets canonical `main`; migration targets the
 explicitly selected migration branch. Post-run skill updates reuse an existing
 open development or repair PR targeting `feature/lintdiff-migration-new` and
 its recorded owner, branch, and worktree under the
@@ -184,9 +192,9 @@ repository: Azure/typespec-azure
 base_branch: feature/lintdiff-migration-new
 canonical_base_ref: <verified-canonical-remote>/<target-branch>
 base_sha: <fetched-commit>
-head_repository: <personal-fork-owner>/typespec-azure
+head_repository: Azure/typespec-azure
 head_branch: <app-recorded-rule-branch>
-push_remote_url: <verified-personal-fork-push-url with credentials/userinfo redacted>
+push_remote_url: <verified-canonical-push-url with credentials/userinfo redacted>
 publication_tool: <required-tool>
 ```
 
@@ -323,7 +331,9 @@ Session IDs persist across repair cycles; dispatch IDs do not. The explicit-targ
 backend's fresh-cycle-subagent rule does not apply to these retained app owners.
 The initial cycle plus at most three source repairs, independent five-round
 review limits and single-active-task rule remain unchanged. The prohibition on
-automatic operational retries has only the narrow task-local
+automatic operational retries has only the narrow
+[timeout-only test rerun](../loop-for-fix-and-review/SKILL.md#bounded-timeout-only-test-rerun)
+and task-local
 [publication correction exception](#publication-recovery), not a workflow
 restart. The outer queue alone owns post-run skill suggestions/updates.
 
@@ -461,7 +471,7 @@ base repo/branch and head repo/owner/branch, app binding and relevant Git settin
 in durable evidence (redact credentials only).
 
 1. Before creation and after any ambiguous or failed response, query the EXACT
-   target repository for open PRs with the fork-owner-qualified head and exact
+   target repository for open PRs with the head-owner-qualified head and exact
    base. Fully paginate; independently verify returned base repository/branch,
    head repository/branch, state, head SHA, draft status and complete file scope.
    Do not rely on a title, branch name without owner, or search snippets.

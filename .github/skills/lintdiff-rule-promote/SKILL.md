@@ -76,10 +76,12 @@ See the
 - Do not edit or clean up the current lintdiff worktree as part of promotion.
   The promotion PR must be created from a separate worktree.
 - Fetch the promotion base from canonical `Azure/typespec-azure:main` and
-  default a new dedicated promotion head to the user's verified personal fork.
-  Existing task PRs keep their recorded head repository and branch. Verify URL
-  identity and permissions, not remote names; never change destinations after
-  a failed push as an operational fallback.
+  create every new dedicated promotion head in `Azure/typespec-azure`, not a
+  personal fork. Verify canonical write permission and publication-tool binding
+  before implementation or dependency setup. Stop if either is unavailable;
+  never change destinations as an operational fallback. Existing task PRs keep
+  their recorded head repository and branch unless the user separately
+  authorizes a publication migration. Verify URL identity, not remote names.
 - Treat the source lintdiff rule as immutable during promotion. Do not
   change `packages/typespec-lintdiff` source, fixtures, snapshots, package
   manifests, or docs unless the user explicitly redirects from promotion back to
@@ -341,8 +343,8 @@ policy.
 
 1. Keep the current lintdiff worktree untouched.
 2. Resolve and verify the canonical `Azure/typespec-azure` fetch remote, then
-   fetch its `main`. Do not use the personal fork as base; it is the default
-   new-head push destination, independently recorded in publication preflight.
+   fetch its `main`. Use that same canonical repository for a new promotion
+   head, independently recording and verifying the push destination in preflight.
 3. Create a new worktree and dedicated branch from `origin/main`, or verify and
    reuse the app-owned promotion worktree established by shared preflight.
    In that mode, the app has already created the separate checkout; this step
@@ -590,6 +592,16 @@ line-ending conversion.
 
 Use the repo's mise-managed toolchain when available.
 
+Do not run the full affected-package test suite concurrently with task-owned
+formatting, documentation generation, builds, linting, or another test/corpus
+run. Finish source-rewriting commands before testing the final content. Preserve
+the suite's existing test population, worker configuration and timeout values.
+If a completed required native suite fails only with individual test timeouts,
+apply the shared
+[bounded timeout-only test rerun](../loop-for-fix-and-review/SKILL.md#bounded-timeout-only-test-rerun).
+This permits one isolated rerun, not a validation waiver, timeout increase,
+source-repair cycle, or retry of review/publication operations.
+
 Optimized validation order:
 
 0. In a fresh worktree, run
@@ -744,7 +756,7 @@ promotion diff. The review should inspect:
 
 Commit only the promotion-worktree changes needed for the native-library PR.
 Push the promotion branch to the preflight's verified head repository using an
-explicit remote/refspec (personal fork for a new head; recorded repository for an
+explicit remote/refspec (`Azure/typespec-azure` for a new head; recorded repository for an
 existing PR). Create a draft PR against `Azure/typespec-azure:main` using the
 required publication tool from the verified owner. A rejected push is a blocker,
 not permission to change head repositories. Apply the shared
