@@ -19,8 +19,10 @@ Before expensive source investigation, setup or edits, apply the shared
 and lifecycle classification for standalone as well as queued runs. Select the
 backend, owner, worktree, canonical base, head repository and push destination.
 For session-bound tools, standalone promotion also needs its own verified app
-owner based on canonical `main`; use the shared setup-only/readiness procedure
-with promotion identities. Do not first create a plain Git worktree that the
+owner based on canonical `main`; use the promotion subset of the queue-owned
+[workspace preparation contract](../do-linter-development-task-one-by-one/preparation.md).
+Queued promotion consumes the bundle prepared before development and never
+creates its own worktree. Do not first create a plain Git worktree that the
 required tool cannot publish. Completion delivery is needed only when delegated.
 `origin` below denotes the verified canonical fetch remote; substitute its actual
 name when different. Publication-only recovery uses the shared recovery contract,
@@ -84,11 +86,7 @@ See the
   change `packages/typespec-lintdiff` source, fixtures, snapshots, package
   manifests, or docs unless the user explicitly redirects from promotion back to
   rule repair.
-- Use the exact Swagger validator rule ID as the stable naming source for any
-  lintdiff source branch, specs worktree, typespec-azure worktree, and promotion
-  worktree that this workflow creates or reuses. Convert that ID to kebab-case
-  and keep all words, for example `LatestVersionOfCommonTypesMustBeUsed` becomes
-  `latest-version-of-common-types-must-be-used`.
+- Use the shared preparation contract's validator-based branch/worktree naming.
 - The canonical validator rule slug is for source traceability, branch names, and
   worktree names. It is not automatically the official TypeSpec rule name. Choose
   the promoted rule's user-facing `createRule({ name })` using the TypeSpec
@@ -137,6 +135,10 @@ When invoked by `/do-linter-development-task-one-by-one` with the
 [cycle handoff](../do-linter-development-task-one-by-one/SKILL.md#cycle-handoff),
 apply this narrowly scoped contract. Standalone promotion behavior is unchanged.
 
+- Inherit `worktrees_folder` and the publication operation from the handoff.
+  Reuse only the in-folder promotion checkout; never fall back to the current
+  session's cwd. Use the shared existing-PR path for updates and the exact
+  worktree-owning session for new PR creation.
 - Require a clean, successfully reviewed development PR head. Verify its
   canonical PR identity, current pushed SHA, and local source worktree against
   the handoff. Pin that exact commit as immutable source for this invocation;
@@ -145,12 +147,16 @@ apply this narrowly scoped contract. Standalone promotion behavior is unchanged.
   disabled-by-default rulesets, and required validation. Do not wait for the
   development PR to merge. Pass the queue's no-skill-edits/no-skill-update-PR
   constraint to all delegated agents and append milestones to the shared log.
-- For initial promotion, create/select the separate promotion worktree as usual.
+- On every queue cycle, including initial promotion, require the separate
+  promotion worktree and readiness manifest already prepared by the queue.
+  Reverify the recorded base, branch, current state and dependency fingerprints;
+  do not create/select a new checkout or repeat setup that still passes.
+  Missing or mismatched preparation is a blocker returned to the queue.
   When the handoff selects
   [app-session execution](../do-linter-development-task-one-by-one/app-session-execution.md),
   reuse the supplied, verified app-owned promotion worktree even on cycle `0`.
   Its main session agent owns PR creation. Verify its `origin/main` base and
-  distinct branch before setup; do not create a third worktree or publish from
+  distinct branch before any invalidated setup; do not create a third worktree or publish from
   the development/coordinator session. Keep the app-returned directory name
   and record the canonical validator slug in the branch suffix and handoff.
   Report its absolute path and branch as soon as selected, including on failure
@@ -199,45 +205,40 @@ apply this narrowly scoped contract. Standalone promotion behavior is unchanged.
 After the first promotion in a repo, use this optimized order unless the rule
 needs special investigation:
 
-1. Run the destination analysis and proceed with the agent's recommendation by
-   default, or obtain the user's choice when confirmation was requested, before
-   creating or preparing a worktree.
+1. For standalone promotion, run the destination analysis after publication
+   preflight and before dependency preparation. Proceed with the agent's
+   recommendation, or obtain the user's choice when confirmation was requested.
+   Queue runs already have a base environment; destination analysis still
+   precedes adaptation and destination-specific builds, not checkout creation.
 2. Read checked-in source evidence from the existing source worktree or fetched
    git refs; prefer source branches and worktrees whose names use the canonical
    Swagger validator rule slug. Do not create a source worktree just to inspect
    files that can be read with `git show <ref>:<path>`.
-3. Reuse a clean, already-prepared promotion worktree pattern when available:
-   submodules initialized, `mise trust` completed, and dependencies already
-   installed. If the worktree is new, perform those setup steps immediately after
-   creation and before code edits.
-4. For a new promotion worktree, install JS dependencies without unrelated
-   package lifecycle scripts first: `pnpm install --ignore-scripts`. Run a full
-   `pnpm install` only when the target validation actually needs lifecycle
-   outputs.
-5. Do not run the lintdiff harness during promotion. The source rule's
+3. Complete the prepared-environment gate in process step 3 below.
+4. Do not run the lintdiff harness during promotion. The source rule's
    `migration.md` is the source of migration evidence; use source package build
    plus native target tests for promotion validation.
-6. Convert fixture coverage with the standard mapping in step 5 instead of
+5. Convert fixture coverage with the standard mapping in step 5 instead of
    copying snapshots or recreating the full harness layout.
-7. In a fresh worktree, build the target package dependency closure once before
+6. In a fresh worktree, build the target package dependency closure once before
    running `vitest` directly; otherwise tests may fail only because workspace
    packages such as `@typespec/compiler` have no `dist` output yet.
-8. Run a focused review after the native rule and tests compile, before broad
+7. Run a focused review after the native rule and tests compile, before broad
    package validation. If the review finds a source-semantic issue, stop and
    report that promotion is blocked by a source-rule gap; do not repair the
    lintdiff source as part of promotion.
-9. Validate in this order: one-time target-package dependency-closure build if
+8. Validate in this order: one-time target-package dependency-closure build if
    needed, focused rule test, affected package build/lint, required target-package
    `regen-docs`, inspection and formatting of the generated package README and
    website linter/rule references, rulesets build/test, affected package test.
    Do not build the website or its dependency closure locally.
-10. For broad local validation, set `TYPESPEC_SKIP_WEBSITE_BUILD=true` when
-    running the repo build or `pnpm validate:pr`. Keep a bounded wait; if
-    validation makes no progress for five minutes after an already-passed narrow
-    validation set, stop it, classify it as an environmental/pre-existing
-    validation blocker, and include the evidence in the PR instead of waiting
-    indefinitely. Rely on CI's dedicated Website job for the authoritative Astro
-    check and build.
+9. For broad local validation, set `TYPESPEC_SKIP_WEBSITE_BUILD=true` when
+   running the repo build or `pnpm validate:pr`. Keep a bounded wait; if
+   validation makes no progress for five minutes after an already-passed narrow
+   validation set, stop it, classify it as an environmental/pre-existing
+   validation blocker, and include the evidence in the PR instead of waiting
+   indefinitely. Rely on CI's dedicated Website job for the authoritative Astro
+   check and build.
 
 `pnpm validate:pr` is intentionally broad: it fetches/checks the branch, then
 runs full-repo build, test, lint, format check, spelling check, docs regen,
@@ -266,20 +267,11 @@ validation commands below and only use bounded `validate:pr` with
      `catalog/validator-rule-metadata.json` when present
 3. Do not run lintdiff harness validation as part of promotion; rely on the
    source rule's checked-in migration evidence.
-4. Record the lintdiff source branch, commit, and source location in your notes.
-   Prefer one of these source-location forms:
-   - existing worktree path, when a matching local worktree is already present
-     and its directory name uses the canonical validator rule slug, for example
-     `C:\dev\worktrees\lintdiff-<validator-rule-slug>`
-   - fetched ref name plus commit, when reading checked-in source with
-     `git show <ref>:<path>`; prefer refs whose suffix is
-     `lintdiff-<validator-rule-slug>`
-   - newly created source worktree path, only when uncommitted local source
-     changes are intentionally part of the source of truth or the user
-     explicitly asks for a local source branch. Name the source branch
-     `feature/lintdiff-<validator-rule-slug>` unless the repo or user supplies a
-     different prefix, and name the source worktree
-     `C:\dev\worktrees\lintdiff-<validator-rule-slug>`.
+4. Record the lintdiff source branch, commit and source location: use an existing
+   verified worktree or read a fetched ref with `git show <ref>:<path>`. Honor
+   app-returned paths regardless of directory naming. Do not create a source
+   checkout as part of promotion; a separately requested source workspace follows
+   the shared development preparation contract.
 5. If there are uncommitted source-rule changes, treat the current working tree
    as the source only after making that explicit in the PR description.
 
@@ -337,42 +329,18 @@ confirmation, wait for their selection before continuing. If the evidence cannot
 support a safe recommendation, stop and report the blocker under the confirmation
 policy.
 
-### 3. Create a clean promotion worktree
+### 3. Verify the prepared environment
 
-1. Keep the current lintdiff worktree untouched.
-2. Resolve and verify the canonical `Azure/typespec-azure` fetch remote, then
-   fetch its `main`. Do not use the personal fork as base; it is the default
-   new-head push destination, independently recorded in publication preflight.
-3. Create a new worktree and dedicated branch from `origin/main`, or verify and
-   reuse the app-owned promotion worktree established by shared preflight.
-   In that mode, the app has already created the separate checkout; this step
-   must not replace it. Use the
-   canonical validator rule slug in both the branch and worktree directory name
-   so the promotion source can be linked and the worktree can be reused later,
-   for example:
-   - `promote-lintdiff-<validator-rule-slug>`
-   - `promote-<validator-rule-slug>-to-core`
-   - `promote-<validator-rule-slug>-to-arm`
-     A matching worktree directory should use the same slug, for example
-     `C:\dev\worktrees\promote-lintdiff-<validator-rule-slug>`.
-4. Initialize repository prerequisites in the new worktree before installing or
-   validating:
-   - run `git submodule update --init` so the `core/` workspace packages such
-     as `@typespec/compiler` are present
-   - run `mise trust` and use `mise exec --` for `pnpm` commands when mise is
-     available
-   - if dependencies are not installed, first run
-     `mise exec -- pnpm install --ignore-scripts` to avoid unrelated workspace
-     lifecycle setup such as Python package preparation; run full
-     `mise exec -- pnpm install` only if a later target validation proves those
-     scripts are required
-   - prefer reusing an already-prepared clean promotion worktree only if it has
-     no uncommitted or unrelated changes and is based on the requested main
-     branch
-5. Copy only the selected rule's implementation and evidence from the lintdiff
-   source worktree into the promotion worktree.
-6. Do not copy generated artifacts, `dist`, `temp`, validator snapshots,
-   `specs/results`, full corpus output, or unrelated lintdiff harness files.
+Use the [shared preparation contract](../do-linter-development-task-one-by-one/preparation.md)
+as the sole setup procedure: standalone promotion completes its promotion subset;
+queued promotion revalidates the supplied manifest without creating resources.
+Preserve the queue-controlled unfinished-state exception above. Keep the source
+untouched; destination-specific builds and native validation remain required
+after adaptation.
+
+Copy only the selected rule's implementation and evidence into the prepared
+promotion worktree. Do not copy generated artifacts, `dist`, `temp`, validator
+snapshots, `specs/results`, full corpus output or unrelated lintdiff harness files.
 
 Keep both PRs aligned:
 

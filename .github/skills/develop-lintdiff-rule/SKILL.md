@@ -145,21 +145,13 @@ mode with the paths reported by the dispatcher:
 ### Dispatcher mode
 
 An invocation without `--worker` is preparation-only, whether it contains one
-or multiple rule IDs. Select the
-[publication execution backend](../do-linter-development-task-one-by-one/app-session-execution.md)
-after eligibility, before creating worktrees or installing dependencies.
-When publication is session-bound, prepare app-owned development sessions and
-use their returned worktree paths; do not create ordinary Git worktrees first.
-Setup-only session messages may establish branch identity, but must not start
-rule development. In an explicit-target environment, preserve the Git-worktree
-preparation below.
-
-The current session creates and verifies isolated
-branches and worktrees, completes their dependency installation, then reports
-the copyable worktree path and worker command needed to open each rule in a new
-VS Code window or its owning app session and start its worker. It must not launch a development subagent,
-investigate the rule, prepare the comparison harness, edit, validate, commit, or
-create a PR.
+or multiple rule IDs. After eligibility, follow the development/specs subset of the
+[workspace preparation contract](../do-linter-development-task-one-by-one/preparation.md);
+do not invoke the queue or prepare promotion for a standalone dispatcher.
+That contract exclusively defines worktree discovery/creation, publication
+ownership, synchronization and dependencies. Return its verified readiness
+manifest and the handoff below. Do not investigate or develop the rule, prepare
+the comparison harness, edit, commit, create a PR or launch a development worker.
 
 For every prepared rule, return a 1-based handoff ID starting at `1`, the
 copyable typespec-azure worktree path by itself, and the exact worker-mode
@@ -179,24 +171,26 @@ preparation, standalone users can start the reported worker command themselves;
 the queue instead starts the verified owning session automatically. Include its
 session ID and publication binding in the handoff when using app sessions.
 Worker mode resumes from the existing branch and worktrees without recreating them.
+For end-to-end execution from rule IDs, invoke
+`/do-linter-development-task-one-by-one` instead; that queue prepares all three
+worktrees and both publication owners before starting development.
 
 ### Worker mode
 
-An invocation with `--worker` handles exactly one rule interactively. Verify
-the publication binding before dependency work: a session-bound PR must be
-created by the main agent of the app session owning the supplied worktree,
-not by a coordinator's subagent that merely changed directory. Follow the
-[backend preflight](../do-linter-development-task-one-by-one/app-session-execution.md#preflight-and-existing-worktrees).
-Apply bounded checkout readiness before accepting the checkout. Then verify
-that the supplied typespec-azure worktree is on the rule branch, the supplied
-specs worktree is at the pinned `specsCommit`, and both are clean except for
-known in-progress changes for that rule. Skip branch and worktree creation,
-perform the existing TypeSpec coverage check, verify or repair the
-dispatcher-prepared dependencies, and prepare the fixture comparison harness as
-described below, then execute the Development workflow. A missing or incomplete
-dependency installation is recoverable worker setup, not a reason to require
-another user invocation. Never accept multiple rule IDs in worker mode and
-never delegate the complete workflow to a development subagent.
+An invocation with `--worker` handles exactly one rule in the supplied worktrees.
+Follow Worker setup below, then the Development workflow. Never create replacement
+worktrees or delegate the complete workflow to a development subagent.
+
+Queue invocations consume the effective worker command, both publication
+bindings and readiness manifest prepared by the outer queue. Preserve the
+supplied command/paths and verify this handoff before development; missing
+preparation evidence is a blocker, not permission to run dispatcher mode or
+reconstruct publication ownership. Standalone workers use the shared contract's
+existing-worker revalidation path without creating new worktrees.
+Honor the queue's `worktrees_folder` metadata throughout rule work and auxiliary
+setup; it is not a worker CLI flag. The shared publication contract determines
+whether this phase creates a worktree-owned PR or explicitly updates an existing
+verified PR without invoking the creation tool.
 
 For publication-only recovery of already validated completed work, follow the
 shared lifecycle and publication-recovery contract instead of rerunning worker
@@ -239,220 +233,21 @@ This is an explicitly authorized new repair cycle, not an automatic retry of
 failed validation or publication. Standalone worker and dispatcher behavior is
 unchanged.
 
-## Orchestration
-
-The dispatcher must isolate each requested rule before handing it back to the
-user for interactive development.
-
-Derive the canonical rule slug for every branch and worktree from the exact
-Swagger validator rule ID, not from the local TypeSpec rule file name, catalog
-shorthand, or an abbreviated description. Convert the validator rule ID to
-kebab-case and keep all words, for example
-`LatestVersionOfCommonTypesMustBeUsed` becomes
-`latest-version-of-common-types-must-be-used` and `ParametersInPointGet` becomes
-`parameters-in-point-get`.
-
-When the user requests multiple rules, treat them as independent development
-units. For each rule, create a distinct rule branch, typespec-azure worktree,
-and azure-rest-api-specs worktree. Create and verify the worktrees serially to
-avoid competing large checkouts. The user may then open the worktrees in
-separate VS Code windows and run independent top-level worker sessions.
-
-1. Treat the user-supplied branch name as the target branch, not as the
-   rule-development branch. Fetch that branch explicitly from `origin`, verify
-   `refs/remotes/origin/<target-branch>` exists, and record its commit. Do not
-   require, update, or compare against a same-named local branch.
-2. Create a new rule-specific branch from
-   `refs/remotes/origin/<target-branch>`. Its name must use the canonical
-   validator rule slug, for example
-   `feature/lintdiff-latest-version-of-common-types-must-be-used`. If the repo
-   or user supplies a different branch prefix, keep that prefix but keep the
-   suffix as `lintdiff-<validator-rule-slug>`.
-3. Create a dedicated typespec-azure worktree for that rule branch. Its
-   directory name must use the same canonical validator rule slug, for example
-   `C:\dev\worktrees\lintdiff-latest-version-of-common-types-must-be-used`. If a
-   matching clean worktree already exists for the same rule branch, reuse it
-   instead of creating another worktree with a different name. If the current
-   worktree was created for the target branch, do not put the rule commit
-   directly on that branch.
-   In app-session execution, steps 2 and 3 are instead performed by the
-   [session preparation procedure](../do-linter-development-task-one-by-one/app-session-execution.md#dispatcher-preparation).
-   Use the app-returned path, never move or recreate it to enforce a directory
-   name. Keep the canonical rule slug in the branch suffix and handoff.
-4. Read the pinned `specsCommit` from
-   `packages/typespec-lintdiff/specs/_meta.json`.
-5. Create a separate azure-rest-api-specs worktree at that commit. Its directory
-   name must use the same canonical validator rule slug, for example
-   `C:\dev\worktrees\azure-rest-api-specs-lintdiff-latest-version-of-common-types-must-be-used`.
-   If a local branch is needed for the specs worktree instead of detached HEAD,
-   name it `lintdiff-specs-<validator-rule-slug>` at the pinned `specsCommit`.
-   Concurrent rule-development workers must not share a writable specs checkout
-   because the existing runner links packages and may change the checked-out
-   revision.
-6. Verify both worktrees exist at the expected branch or commit and are clean.
-7. Complete dependency installation before handoff:
-   - initialize the `core` submodule in every typespec-azure worktree
-   - trust the typespec-azure mise configuration and run `mise install` before
-     starting concurrent installs so tool installation cannot race
-   - install only the repository-root tooling, the nested `core/` workspace-root
-     tooling, and the lintdiff package dependency closure with
-     `mise exec -- pnpm install --filter . --filter ./core --filter "tsp-lintdiff-local-linter..." --frozen-lockfile --ignore-scripts`
-     in every typespec-azure worktree. Both root filters are required: build
-     scripts in `core` packages load tools such as
-     `prettier-plugin-organize-imports` from the `core/` importer, while
-     repository commands use the top-level importer. The lintdiff closure
-     filter alone does not materialize either root's complete tooling. Do not
-     run an unfiltered 69-workspace install merely because a package link is
-     missing
-   - if and only if pnpm reports `ERR_PNPM_OUTDATED_LOCKFILE` because the target
-     branch's lintdiff importer is missing from `pnpm-lock.yaml`, run
-     `mise exec -- pnpm install --filter . --filter ./core --filter "tsp-lintdiff-local-linter..." --no-frozen-lockfile --lockfile=false --ignore-scripts`;
-     the filters limit the fallback to both roots' build tooling plus lintdiff
-     and its workspace dependency closure while creating the links needed by
-     the dependency build, without modifying the tracked lockfile or running
-     unrelated monorepo lifecycle setup such as the Python package environment
-   - distinguish lockfile completeness from installation state:
-     `--frozen-lockfile` confirms that selected manifests agree with
-     `pnpm-lock.yaml`, but the lockfile does not contain installed package files
-     and does not prove that the selected `node_modules` links exist. A missing
-     package that is already present in the manifest and lockfile is an install
-     scope or incomplete-install problem, not a reason to regenerate the
-     lockfile
-   - on Windows, allow up to 10 minutes for a first install and require pnpm's
-     final `Done in ...` line plus a successful process exit before treating it
-     as complete. If the tool wait expires, inspect the tracked shell and its
-     `pnpm.exe` process, then continue reading that same shell; do not start a
-     duplicate install or infer completion from a quiet progress reporter
-   - use the same mise-managed Node.js to run `npm ci` in every specs worktree;
-     do not use `--ignore-scripts`, and confirm the pinned specs repository's
-     Node.js engine requirement is satisfied
-   - run
-     `mise exec -- pnpm -r --filter "tsp-lintdiff-local-linter..." build`
-     after the typespec-azure install; workspace packages link to source
-     checkouts whose `dist` output is not produced by installation alone
-   - verify the pnpm workspace install and the specs worktree's
-     `node_modules/.bin/tsp`, and confirm the lintdiff package build succeeds;
-     the existence of `node_modules` alone is not sufficient
-   - from the lintdiff package, resolve every package imported directly by the
-     fixture harness, including
-     `@microsoft.azure/openapi-validator-core`,
-     `@microsoft.azure/openapi-validator-rulesets`, `lodash`, and `yaml`;
-     also resolve the declared `@microsoft.azure/openapi-validator` harness
-     dependency and the `tsx` loader. Also resolve the official
-     `@azure-tools/typespec-azure-rulesets` package and its
-     `@azure-tools/typespec-client-generator-core` peer from the lintdiff
-     package because focused fixtures load the resource-manager ruleset. A
-     transitive package present only under pnpm's virtual store does not satisfy
-     a direct harness or fixture import
-   - run this lightweight smoke check from the repository root; it verifies
-     fixture-harness package and loader resolution without executing a full
-     fixture comparison:
-     `mise exec -- pnpm --dir packages/typespec-lintdiff exec node --import tsx/esm --input-type=module -e "await Promise.all(['@azure-tools/typespec-azure-rulesets', '@azure-tools/typespec-client-generator-core', '@microsoft.azure/openapi-validator-core', '@microsoft.azure/openapi-validator-rulesets', '@microsoft.azure/openapi-validator', 'lodash', 'yaml'].map((specifier) => import(specifier)))"`
-     Do not rely only on build output that excludes the test harness
-   - treat any install or verification failure as a dispatch failure and do not
-     hand off that worker for interactive development
-8. Report the 1-based handoff ID, rule ID, canonical validator rule slug, target
-   branch, rule branch, specs branch when one was created, both absolute
-   worktree paths, completed dependency status, and the exact worker-mode
-   invocation. Do not include a `code -n` wrapper around any worktree path.
-   For app sessions, also report the owning session ID, project ID, actual
-   worktree and branch, and verified comparison base. Keep prepared sessions
-   idle; dispatcher completion does not authorize starting the queue.
-
-Create and verify worktree pairs serially. After `mise install` has completed,
-pipeline the repository-local dependency installs: start the typespec-azure and
-specs installs for a verified pair in parallel, then create the next pair while
-those installs run. Keep at most two pairs in the install phase at once to
-avoid excessive shared package-cache, network, and disk contention. Wait for
-all installs and verifications before reporting the handoffs.
-
-Do not run `compare:setup` in dispatcher mode. The worker performs that
-rule-specific direct link step after development begins and rebuilds the local
-linter when source changes.
-
 ## Worker setup
 
-Before starting the Development workflow, the top-level worker must prepare
-its supplied worktrees:
-
-1. Ensure both worktrees are at the expected branch or commit and are clean
-   except for known in-progress changes for this rule. Stop only when continuing
-   would overwrite or mix unrelated changes.
-   Fetch the user-supplied target branch explicitly from `origin` and use
-   `refs/remotes/origin/<target-branch>` for base verification and all target
-   comparisons; never substitute a same-named local branch. If the dedicated
-   rule branch has no rule-specific commits or changes and is behind the remote
-   target, fast-forward it to the fetched remote target before continuing. If
-   rule work already exists, preserve it and verify that the diff from its
-   merge base contains only known work for this rule. Do not treat commits that
-   exist only on the advancing remote target as unrelated rule-branch changes,
-   and do not rebase or reset the rule branch automatically.
+1. Revalidate the supplied environment through the shared
+   [readiness contract](../do-linter-development-task-one-by-one/preparation.md#durable-readiness-and-revalidation),
+   including its existing-worker path when no standalone manifest was supplied.
+   Do not run creation or dependency repair before the coverage gate.
 2. Perform the mandatory Worker existing TypeSpec coverage check before doing
    dependency work. Stop without installing dependencies or preparing the
    comparison harness when the result is `already covered`,
    `template-enforced`, or `uncertain`.
-3. Verify the dispatcher-prepared dependencies against their lockfiles. Confirm
-   the typespec-azure worktree has its initialized `core` submodule and usable
-   pnpm workspace dependencies, confirm the lintdiff dependency closure has
-   built output, confirm direct fixture-harness imports resolve from the
-   lintdiff package, and confirm the specs worktree has
-   `node_modules/.bin/tsp`. Do not reinstall or rebuild dependencies that pass
-   these checks.
-4. If a dependency or build check fails, recover in the current worker session
-   instead of stopping for another user invocation:
-   - identify the narrow failed layer: submodule initialization, mise tools,
-     typespec-azure pnpm install, lintdiff dependency build, specs `npm ci`, or
-     direct harness package resolution
-   - rerun only that layer using the same pinned, filtered,
-     lockfile-respecting commands required in dispatcher mode, then repeat its
-     concrete verification. When a declared and locked root build tool is
-     missing, rerun the two-roots-plus-lintdiff filtered install; do not
-     escalate directly to an unfiltered workspace install
-   - if `ERR_PNPM_OUTDATED_LOCKFILE` matches the documented lintdiff-importer
-     case, use the documented no-lockfile fallback rather than editing the
-     lockfile merely to complete local setup
-   - if harness source directly imports a package that is absent from its
-     manifest, treat that as a repository dependency defect rather than an
-     installation defect: add the narrow direct development dependency with
-     the repository package manager, retain the manifest and lockfile change as
-     an explicit harness prerequisite, and continue the rule workflow. Apply
-     the same rule when focused fixture compilation loads an official ruleset
-     whose package or required peer is absent from the lintdiff manifest
-   - for an existing workspace package, update the lintdiff manifest with
-     `pnpm pkg set` rather than `pnpm add`; `pnpm add` can resolve all lockfile
-     entries and rewrite machine-specific registry metadata even though no new
-     external package is needed. Then use the filtered lockfile-only command
-     below, discard unrelated churn, and verify the retained importer entry
-     with the frozen filtered install
-   - when that dependency repair requires refreshing `pnpm-lock.yaml`, inspect
-     the resulting churn. The target branch can lack a
-     `packages/typespec-lintdiff` importer, so adding the importer and its
-     necessary dependency closure can be correct. Preserve target-branch
-     entries and retain only that new importer plus dependency nodes genuinely
-     absent from the target branch. Do not silently accept unrelated resolution,
-     integrity, tarball, or private-feed URL rewrites caused by machine-specific
-     registry metadata.
-   - generate the lockfile separately from package installation with
-     `mise exec -- pnpm install --filter "tsp-lintdiff-local-linter..." --lockfile-only --ignore-scripts`.
-     Always use pnpm's configured default registry. Do not pass
-     `--registry=https://registry.npmjs.org/` locally; direct access is not
-     supported in the development environment. Inspect the diff before
-     proceeding and discard unrelated lockfile churn, including private-feed
-     tarball URL or integrity rewrites
-   - verify the normalized manifest and lockfile with a frozen-lockfile install,
-     using
-     `mise exec -- pnpm install --filter . --filter ./core --filter "tsp-lintdiff-local-linter..." --frozen-lockfile --offline --ignore-scripts`
-     when the required artifacts are already in the pnpm store, or omit
-     `--offline` when they are not. If the lockfile cannot be normalized and
-     verified reliably, stop and report that blocker rather than hand-editing
-     an unverifiable lockfile.
-   - never use an unversioned global install, manually copy packages into
-     `node_modules`, or silently bypass the lockfile
-   - stop only after the bounded repair fails because of a concrete external
-     blocker such as unavailable credentials or network, insufficient disk,
-     an unsatisfied pinned toolchain, or conflicting unrelated worktree changes;
-     report the attempted repair and exact blocker
-5. Prepare the fixture comparison harness:
+3. Verify the shared
+   [development/specs dependency profile](../do-linter-development-task-one-by-one/preparation.md#development-and-specs).
+   Use its bounded in-place repair policy only for failed layers; do not repeat
+   passing setup or require another worker invocation to repair missing dependencies.
+4. Prepare the fixture comparison harness:
    - run `pnpm --dir packages/typespec-lintdiff compare:setup -- --specs-repo
 <isolated-specs-worktree>` to build the linter and create the direct link in the
      specs worktree
@@ -464,7 +259,7 @@ its supplied worktrees:
      `compare:setup` does not populate these sources. Do not assume a fresh rule
      worktree already contains `test/azure-openapi-validator` or
      `test/common-types`
-6. Verify that the specs worktree's local
+5. Verify that the specs worktree's local
    `node_modules/tsp-lintdiff-local-linter` resolves directly to the supplied
    typespec-azure worktree. `compare:setup` creates a direct per-worktree link
    and does not use npm's shared global link registry, so separate specs

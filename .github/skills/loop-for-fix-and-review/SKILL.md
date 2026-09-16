@@ -144,6 +144,20 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
    for existing PRs. Record the publication binding and retain the PR's head
    repository/owner and head branch for publication routing; do not retarget a
    canonical or fork head to a different remote as part of this loop.
+   For queue-owned review, consume its prepared phase binding, readiness manifest
+   and authoritative instruction paths/hashes. Enforce the inherited
+   `worktrees_folder` boundary for the target and any auxiliary task checkouts.
+   Use the shared `update-existing` publication path: the verified GitHub PR base,
+   not an unrelated app comparison base, selects the explicit Git diff.
+   Outer-owned review verifies the
+   recorded PR owner rather than requiring the coordinator to own that checkout;
+   this loop updates an existing PR and never calls the PR-creation tool.
+   Pass the exact target path and explicit remote/head identities to both agents.
+   Every shell invocation must select and verify that path with terminating
+   error handling; PowerShell directory/environment changes do not persist.
+   A correct command directory does not change app publication ownership.
+   Do not create worktrees or reinstall passing prerequisites. Revalidate
+   affected dependency/build fingerprints when review edits change their inputs.
 2. Resolve the pull request to its canonical URL, repository, number, base
    branch, head branch, head repository owner, and current head SHA:
 
@@ -152,9 +166,11 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
    ```
 
 3. Confirm the pull request is open.
-4. In standard PR mode, confirm the current worktree is the pull request's head
-   branch and has no unrelated changes. Do not overwrite, discard, or include
-   unrelated work.
+4. In standard PR mode, resolve the absolute target worktree from the supplied
+   binding or verified worktree inventory. Use the current checkout only if it
+   matches the PR head; the coordinator may run elsewhere. Confirm the target is
+   on the PR head branch and has no unrelated changes. Do not create a replacement
+   checkout or overwrite, discard, or include unrelated work.
    In promotion PR mode, the orchestrating session may start in another
    worktree or a folder outside the target checkout. Discover an existing local
    promotion worktree from the available repository worktree or workspace
@@ -185,7 +201,7 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
    worktree side effects.
 7. Maintain a round ledger containing:
    - pull request mode: `standard` or `promotion`
-   - absolute target worktree path in promotion PR mode
+   - absolute target worktree path in both modes and inherited folder boundary
    - promotion source provenance when applicable
    - round number
    - head SHA reviewed
@@ -447,10 +463,10 @@ next review on its own.
 ## Fix subagent
 
 Deliver the complete structured comment list to the same persistent fix
-subagent each round. In promotion PR mode, every backlog and round handoff must
-also include the absolute target worktree path; instruct the subagent to perform
+subagent each round. In both modes, every backlog and round handoff must
+include the absolute target worktree path; instruct the subagent to perform
 all file reads, edits, validation, git status checks, staging, commits, and
-pushes from that path. Include the pinned lintdiff source ref and commit, exact
+pushes from that path. In promotion mode, include the pinned lintdiff source ref and commit, exact
 source rule and migration-evidence paths, and the verified source-semantics
 summary recorded in the ledger. The fix subagent must use that evidence when
 distinguishing a promotion adaptation issue from a source semantic issue. It
@@ -634,7 +650,7 @@ counted round, including round five.
 Only after receiving the parent's explicit publication approval:
 
 1. Reconfirm the target worktree diff contains no unrelated or generated corpus
-   data. In promotion PR mode, run this and all remaining git commands from the
+   data. In both modes, run this and all remaining git commands from the
    ledger's absolute target worktree path. Confirm that the local and remote
    head, proposed content, and validation evidence still match the approval.
    Any change invalidates approval: return to the parent without publishing.

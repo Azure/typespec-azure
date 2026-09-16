@@ -1,16 +1,25 @@
 ---
 name: do-linter-development-task-one-by-one
-description: Run prepared lintdiff worker commands sequentially through development, review, promotion, and promotion review, with up to three source-repair cycles and publication-aware worker or app-session ownership. Use when the user supplies one or more /develop-lintdiff-rule --worker commands and wants them completed unattended, one at a time.
-argument-hint: "<one /develop-lintdiff-rule --worker command per line>"
+description: Develop lintdiff rules end-to-end from any coordinator session, creating or reusing worktrees only under --worktrees-folder (default C:\dev\worktrees), with worktree-bound publication owners and sequential development, review, promotion, and promotion review.
+argument-hint: "[--worktrees-folder <absolute-path>] <rule ID ...> or <prepared worker commands>"
 user-invocable: true
 ---
 
 # Develop lintdiff rules one by one
 
-Run a queue of prepared lintdiff worker commands sequentially. Each command is
-an independent task. Each task cycle runs:
+Run a queue of rule IDs or prepared lintdiff worker commands sequentially. Each
+rule is an independent task. The queue owns
+[workspace preparation](preparation.md): create/verify development, specs and
+promotion worktrees, both publication owners, and dependency readiness before
+starting that rule. Each task cycle then runs:
 
 `development -> development review -> promotion -> promotion review`
+
+The coordinator may run from an unrelated folder. Its cwd, branch and app
+project are not defaults for task work or publication. Resolve the target
+repository and authoritative instructions through the shared
+[coordinator and folder scope](preparation.md#coordinator-and-folder-scope).
+All task worktrees must be inside the selected worktrees folder.
 
 Only a clean development review permits promotion. A confirmed source-rule
 defect found during promotion or promotion review returns the task to development
@@ -41,7 +50,9 @@ entries are recorded as failed without launching a worker.
 
 ```mermaid
 flowchart TD
-    Start["Next valid task: initial cycle 0"] --> Worker["Dispatch cycle using selected execution backend"]
+    Start["Next valid task: initial cycle 0"] --> Prepare["Queue prepares development, specs and promotion<br/>Verify both publication owners and dependency readiness"]
+    Prepare -->|Ready and setup activity stopped| Worker["Dispatch cycle using selected execution backend"]
+    Prepare -->|Blocker| Stop
     Worker --> Develop["Develop or repair source rule<br/>Create or update development draft PR"]
     Develop --> DevReview["Development review/fix<br/>Up to 5 rounds per invocation"]
     DevReview -->|Clean review| Promote["Promote reviewed source commit<br/>Create or update promotion draft PR"]
@@ -70,7 +81,43 @@ flowchart TD
 
 ## Required input
 
-Accept one command per non-empty input line. Every command must:
+Accept the optional queue-level argument `--worktrees-folder <absolute-path>`.
+When omitted, use `C:\dev\worktrees`, independently of the coordinator's cwd.
+Accept `C:/dev/worktrees` as the same Windows path and normalize to backslashes.
+The option applies to the entire queue, including existing paths in supplied
+worker commands, repair cycles, review agents and auxiliary task worktrees.
+
+Parse this option once, before entry validation, from rule-ID lines or a
+standalone option line. It may precede or follow rule IDs on that line. Quoted
+paths with spaces are one argument. Reject duplicate options (even equal values),
+missing/empty values, relative or drive-relative paths, unresolved variables,
+wildcards and unknown queue options before any setup. Do not expand shell text.
+A malformed queue option blocks the invocation; do not run entries under a
+guessed/default folder. An option-only invocation has no tasks and must not
+prepare resources.
+
+Do not extract this option from a `/develop-lintdiff-rule --worker` line:
+that line retains its strict grammar below. For prepared-command input, place
+`--worktrees-folder` on its own line outside the worker commands. Pass the
+resolved folder to subskills as handoff metadata, not as a new worker flag.
+
+```text
+/do-linter-development-task-one-by-one TagsAreNotAllowedForProxyResources
+/do-linter-development-task-one-by-one --worktrees-folder "D:\lint worktrees" TagsAreNotAllowedForProxyResources
+```
+
+These are alternative invocations, not a two-entry queue.
+
+Accept either input form, ignoring blank lines and Markdown code-fence lines:
+
+- **Rule IDs (preferred):** one or more whitespace-separated catalog validator
+  IDs, on one or more lines after removing the queue-level option. Each token is
+  a queue entry. No other flags, commas or handoff prose. The target is fixed to
+  `feature/lintdiff-migration-new`.
+- **Prepared worker commands (compatibility/resumption):** one complete command
+  per non-empty line.
+
+Every prepared worker command must:
 
 - start with `/develop-lintdiff-rule --worker`
 - name exactly one rule
@@ -79,27 +126,49 @@ Accept one command per non-empty input line. Every command must:
 - include exactly one `--target-branch feature/lintdiff-migration-new`
 - contain no other flags or positional arguments
 
-Treat quoted arguments as one value. Ignore Markdown code-fence lines and blank
-lines, but otherwise preserve each command verbatim for the worker. Reject
-duplicate options even when one occurrence has the required value.
+For example, `/do-linter-development-task-one-by-one ParametersInPointGet PatchBodyParametersSchema`
+prepares and completes the first rule before preparing the second.
+
+Determine the form for each line before parsing: a line beginning with
+`/develop-lintdiff-rule` is a command candidate and must satisfy the entire
+command grammar; never reinterpret its malformed arguments as rule IDs. Other
+lines are rule-ID candidates whose tokens must individually match the catalog.
+Mixed queues are allowed and preserve input order. Treat quoted command
+arguments as one value and preserve supplied commands verbatim. Reject duplicate
+options even when one occurrence has the required value. Never execute input as
+shell text. Invalid command lines count as one failed entry; invalid rule-ID
+tokens count as individual failed entries.
 
 Publication bindings are orchestration metadata, not input command lines or
-additional flags. The dispatcher must provide a separate commands-only block
+additional flags. A standalone dispatcher must provide a separate commands-only block
 for queue invocation. In app-session mode the queue can discover the owner
 from each exact TypeSpec worktree path even when no binding metadata was pasted.
 Do not relax malformed-line rejection to accept arbitrary handoff prose.
 
-Validate the complete queue before launching the first subagent. Record malformed
+Validate the complete queue before preparation or launching the first subagent. Record malformed
 lines as failed tasks and continue with every valid command. Compare rule IDs
 case-insensitively after normalizing them to a stable key while preserving their
 original casing for display. Compare Windows worktree paths case-insensitively
 after resolving them to normalized absolute paths. The first occurrence of a
 rule ID, TypeSpec worktree, or specs worktree may remain valid; mark every later
 queue entry that reuses any of them as failed. Do not ask the user to repair
-malformed input during the run.
+malformed input during the run. Paths absent from rule-ID input are selected
+during preparation; perform cross-role path and owner collision checks again
+before any setup mutation in those paths.
+Reject an entry whose supplied or discovered task worktree falls outside the
+selected folder under the shared physical-containment check. Do not rewrite its
+path, move its checkout or silently widen the folder to make it eligible.
+
+For rule-ID input, generate the effective worker command only after actual paths
+are known, quoting paths with spaces. Persist it alongside the original input;
+use it unchanged in every cycle. For supplied commands, the effective command is
+the original command. In the worker prompts and repair protocol below,
+`original-command` means this persisted effective worker command, never a bare
+rule ID or reconstructed command with changed paths.
 
 As part of complete-queue validation, read
 `packages/typespec-lintdiff/catalog/validator-rule-metadata.json` as a JSON array
+from the explicitly resolved target repository, not the coordinator's cwd,
 and match each rule by its rule-ID field case-insensitively. Mark a missing or
 `DataPlane`-only rule as failed before launching a worker; only `ARM` and `Both`
 are eligible for `/develop-lintdiff-rule`. Record the observed applicability as
@@ -108,15 +177,21 @@ or worktree verification.
 
 ## Queue state
 
-Keep an ordered ledger with one entry per input command:
+Keep an ordered ledger with one entry per parsed queue entry:
 
 - 1-based task number
 - rule ID
-- original command
+- original input, input form and effective worker command (once prepared)
+- resolved `worktrees_folder`, target repository root/project, authoritative
+  instruction source and canonical/physical containment evidence for every path
 - TypeSpec and specs worktrees
-- promotion worktree and branch, once selected
+- promotion worktree and branch, selected during preparation
+- preparation phase/status, durable readiness manifest and instruction-version
+  hashes, setup dispatches/results, dependency fingerprints and invalidations
 - execution backend and development/promotion publication bindings: project and
   owning session IDs when applicable, worktree, repository, base, and head branch
+- publication operation for each phase (`create` or `update-existing`), exact
+  existing PR identity when applicable and supported folder-placement capability
 - phase dispatch ID, owning session ID, cycle, expected head, and whether a
   dispatched phase is awaiting a result; retain completed dispatch IDs
 - absolute log path
@@ -158,10 +233,20 @@ Likewise, `review-handoff` is a nonterminal worker outcome: keep the task
 
 After complete input and eligibility validation, perform the read-only
 [publication preflight](app-session-execution.md#preflight-and-existing-worktrees)
-for all valid entries. This checks session metadata and tool capabilities, not
-Git synchronization or dependency readiness. Persist failures before launching
-development. Do not spend a full development run discovering that the caller
-cannot publish its branch.
+for supplied bindings and existing-worktree commands, and check backend/review
+capabilities for every valid entry. New rule-ID entries do not yet have owner
+bindings; do not reject them merely because preparation has not created owners.
+Persist known failures before development.
+
+For each remaining entry in input order, complete the queue-owned
+[preparation phase](preparation.md) for all three resources. Both development
+and promotion publication bindings, completion channels and required dependency
+profiles must be ready before launching development. Prepare only the current
+task; keep later tasks pending until its work is terminal and quiescent.
+Compatibility input reuses its exact development/specs paths and adds/verifies
+the promotion resource; it never silently replaces an unbound legacy checkout.
+Preparation is not repeated for repair cycles: revalidate the retained manifest
+and repair only invalidated layers. Record setup failures and preserve resources.
 
 For session-bound publication, follow
 [app-session execution](app-session-execution.md#queue-execution) rather than
@@ -171,7 +256,7 @@ The following subagent launch/wait procedure applies only to the explicit-target
 backend. Common logging, result classification, review and repair rules still
 apply to both backends.
 
-For each valid pending command, in input order:
+For each successfully prepared command, in input order:
 
 1. Launch exactly one fresh top-level general-purpose subagent per cycle. Do not
    reuse a worker from a prior task or cycle. Follow-up messages to the same
@@ -249,8 +334,8 @@ For `outer` mode:
    review agents and their commands are idle/finished. In explicit-target mode,
    send the result and updated cycle handoff to the same whole-cycle worker,
    which rechecks identities and proceeds to promotion from that exact commit.
-   In app-session mode, keep the development owner idle and create/verify a
-   DISTINCT promotion owner under the shared app-session contract; dispatch
+   In app-session mode, keep the development owner idle and reverify the
+   DISTINCT promotion owner already recorded during preparation; dispatch
    that owner with the reviewed source SHA. Never resume the development owner
    into promotion or create the source PR from the coordinator. Neither route
    consumes a worker retry or permits concurrent mutation.
@@ -282,12 +367,15 @@ uses a new phase dispatch in the same verified owner, never another concurrent
 session on the same branch.
 Retry only when the first attempt proves an unambiguous defect in this outer
 skill's command parsing, worker prompt, worktree selection, log initialization,
-or skill-invocation mechanics before `/develop-lintdiff-rule` begins repository
-or dependency work.
+or skill-invocation mechanics before rule work begins. It may correct a dispatch
+of an already-successfully-prepared bundle, but must reuse that exact verified
+bundle without replaying preparation. Failed provisioning, synchronization,
+installation or build operations are not setup-only routing defects and cannot
+be retried under this exception.
 
 Before retrying, verify all of the following:
 
-- the TypeSpec and specs worktrees have no task changes
+- every already-selected development, specs and promotion worktree has no task changes
 - no task commit was created or pushed
 - no pull request was created
 - the proposed orchestration-skill correction is narrow and directly addresses
@@ -305,8 +393,8 @@ That exception requires positive exact-PR absence and a specific proven defect,
 uses only the required creation tool, and never restarts a worker or retries
 unknown transport/API failures. Track it separately from every other budget.
 An orchestration retry is forbidden
-after development changed files, created a commit, pushed a branch, or created
-a pull request. Only a confirmed source defect under the separate source-repair
+after task-owned tracked edits (including dependency-manifest repair), a commit,
+push or PR. Only a confirmed source defect under the separate source-repair
 contract permits an automatic cycle restart after development work. If the
 orchestration retry fails, record the task's terminal result and continue only
 after verified quiescence.
@@ -321,6 +409,11 @@ or round. Development and
 promotion preparation each allow three corrective attempts per phase per cycle
 under the same causal-evidence, scope, rerun and stop requirements. Track these
 budgets separately; returning to a phase does not reset its count.
+Agent-introduced setup draft/command mistakes debit that same phase's cycle-0
+allowance (specs setup belongs to development); starting development or promotion
+does not grant a fresh allowance. Initial installation of a verified missing
+prerequisite is normal preparation, not a corrective retry. Provisioning,
+credential, network and other external failures remain outside draft correction.
 
 The active worker or fix agent corrects eligible compiler, lint, test, semantic
 regression or deterministic invocation failures in place and reruns the original
@@ -426,8 +519,11 @@ fresh repair worker. It is an orchestration contract, not a new public CLI flag:
 
 - queue ownership marker `lintdiff-development-queue`, task number, exact rule
   ID, original command, cycle number, and source-repair count
-- execution backend, phase dispatch ID and phase scope, both publication
-  bindings when known, coordinator session ID, and instruction-version paths
+- execution backend, phase dispatch ID and phase scope, both verified publication
+  bindings, coordinator session ID, readiness manifest and instruction-version
+  paths/hashes acknowledged by the owner
+- resolved worktrees folder, target repository root/project, physical path
+  containment and each phase's `create`/`update-existing` publication operation
 - absolute TypeSpec/specs worktrees, source branch, canonical development PR
   URL, repository/base/head identities, and last verified pushed source SHA
 - canonical promotion PR URL when created, promotion worktree and branch when
@@ -485,11 +581,20 @@ one session to execute both publication phases.
 > evidence. If a concrete blocker cannot be resolved safely, return the blocker
 > instead of waiting for input.
 >
-> Your TypeSpec worktree is `<typespec-worktree>`. Begin by changing your working
-> directory to that exact path and verify that it is the repository root. Run
+> Your TypeSpec worktree is `<typespec-worktree>`. In EVERY shell call, explicitly
+> select the intended absolute path with terminating error handling and verify
+> that it is the repository root before commands run; directory and environment
+> changes do not persist across PowerShell calls. Run
 > all TypeSpec repository and GitHub operations from that worktree unless an
 > invoked skill explicitly requires the supplied specs worktree or the recorded
-> promotion worktree. Never perform promotion edits in the source worktree.
+> promotion worktree. Use absolute file paths. Never perform promotion edits in
+> the source worktree. A directory change does not alter publication ownership;
+> this full-cycle prompt is valid only for the explicit-target backend.
+> All task worktrees must remain under `<worktrees-folder>`, including review,
+> repair and auxiliary worktrees. Apply the shared physical-containment check
+> before mutations; never use the coordinator's cwd or an out-of-folder checkout
+> as a fallback. Existing PR operations explicitly name the verified PR; new
+> creation must use the selected worktree's verified publication binding.
 >
 > Before development, inspect your exposed tools and select the review owner
 > using the supplied outer capabilities and the review capability preflight
@@ -537,10 +642,12 @@ one session to execute both publication phases.
 > effects, preserve the intended scope and count the correction. Do stop
 > on ineligible failures or exhausted budget, and never publish a failing draft.
 >
-> Do not fetch, pull, merge, rebase, or reset the target or rule branch before
-> invoking `/develop-lintdiff-rule`. That delegated skill exclusively owns
-> worktree cleanliness checks, target-branch fetching, remote-base verification,
-> and any safe fast-forward of an untouched rule branch.
+> The queue has already prepared all three worktrees and publication bindings.
+> Read and verify the preparation manifest and supplied instruction versions.
+> Do not recreate worktrees, rerun dispatcher mode or repeat passing dependency
+> setup. The development skill revalidates the prepared state and may repair only
+> invalidated layers under the shared preparation contract. Never pull, reset,
+> rebase or move a target branch as an ad hoc setup fix.
 >
 > Next invoke this skill command verbatim as a slash-command/skill invocation,
 > not as a shell command:
@@ -582,8 +689,9 @@ one session to execute both publication phases.
 > `/lintdiff-rule-promote <rule-id>`
 >
 > Supply the queue marker and cycle handoff, exact reviewed source SHA, source
-> worktree and development PR URL, and existing promotion worktree/branch/PR
-> identities when resuming. Source repair is authorized only after this skill
+> worktree and development PR URL, the already-prepared promotion worktree/branch
+> and readiness manifest, plus its PR identity when present. Never defer promotion
+> owner selection until this phase. Source repair is authorized only after this skill
 > stops and returns evidence to the outer queue. Source remains immutable during
 > promotion. Do not ask for destination confirmation; keep existing destination
 > and ruleset enablement unless the evidence requires reporting a blocker.
@@ -638,7 +746,7 @@ Classify a task as:
 - `partially-succeeded` when a development PR exists but the complete workflow
   cannot finish, including promotion blockers, either review cap, failed repair,
   or exhaustion of the three-source-repair budget
-- `failed` when input validation, branch synchronization, or rule development
+- `failed` when input validation, preparation, branch synchronization, or rule development
   failed before a development draft PR was created
 
 Do not describe a task as fully successful merely because it created one or both
@@ -653,6 +761,10 @@ output the heading
 `# LintDiff development results`, followed by this totals line:
 
 `**Completed:** <total> | **Succeeded:** <count> | **Partial:** <count> | **Failed:** <count>`
+
+Report the resolved `**Worktrees folder:** <absolute-path>` after the totals.
+A malformed global folder option or empty queue produces no task rows; report
+zero completed tasks and the input blocker without inventing a failed rule.
 
 Count only terminal entries as completed. If the queue stopped with unresolved
 activity, add `**Pending:** <count>` and identify the active owner/dispatch and
@@ -698,8 +810,8 @@ Then report every task in input order using this layout:
 Put each TypeSpec and promotion worktree in its own standalone `text` code block with no
 prompt, label, `code -n`, or other command on the same line. This lets the user
 copy the folder path directly. Do the same for the execution-log path. Omit the
-`Blocker` line when there is no blocker. For malformed input whose worktree
-cannot be parsed, use `Not available` for its TypeSpec and log paths. Use
+`Blocker` line when there is no blocker. For malformed input or a rule-ID entry whose preparation has not selected a worktree,
+use `Not available` for its TypeSpec and log paths. Use
 `Not available` for a promotion worktree that was never created or selected.
 Keep existing PR links and promotion paths visible even when a later repair fails.
 Distinguish earlier successful reviews from phases not rerun in the latest cycle.
@@ -752,8 +864,12 @@ Capture concrete suggestions for improving future queue runs, especially:
   `feature/lintdiff-migration-new`.
 - Reject duplicate or unknown arguments and later queue entries that reuse a
   rule ID, TypeSpec worktree, or specs worktree.
-- Leave target synchronization and worktree verification exclusively to
-  `/develop-lintdiff-rule`; the outer worker must not mutate Git state first.
+- The queue owns initial preparation of all three resources. Phase owners
+  revalidate that manifest; neither development nor promotion creates replacement
+  worktrees or reconstructs publication ownership.
+- Never create or reuse task worktrees outside `worktrees_folder`. App-generated
+  directory names are allowed only inside that folder; tool placement limitations
+  are blockers, not permission to ignore the parameter.
 - Never exceed one setup-only orchestration retry or three source-repair cycles.
   Do not apply orchestration retry after development begins or reinterpret
   operational failures as source defects.

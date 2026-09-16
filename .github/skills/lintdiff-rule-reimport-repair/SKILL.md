@@ -24,6 +24,18 @@ semantic-coverage, native-boundary and required-validation gates; this skill
 does not waive them. Publication-only recovery of already validated work follows
 the shared recovery contract instead of rerunning this re-import investigation.
 
+When delegated as part of a queue-controlled source repair, consume the queue's
+[preparation manifest](../do-linter-development-task-one-by-one/preparation.md#durable-readiness-and-revalidation)
+and cycle handoff. Reuse its development/specs paths, owning session, PR and
+instruction versions; do not create worktrees or reset repair/review budgets.
+Keep all task checkouts under the inherited `worktrees_folder` and apply the
+shared `update-existing` path when the source PR already exists.
+Revalidate changed dependency inputs rather than repeating passing setup. Run
+every command explicitly in its intended checkout; directory changes do not
+change the app-bound PR publisher. Return source-repair evidence to the owning
+development phase, which still completes development review before promotion.
+Standalone repair remains a single-rule investigation, not an implicit queue run.
+
 ## Process
 
 1. Reconstruct the upstream source of truth for the named rule:

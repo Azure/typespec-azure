@@ -14,10 +14,13 @@ Before expensive investigation, edits, dependencies or builds, classify the
 publication binding in durable session artifacts:
 
 - task/lifecycle and authorization; owner identity and absolute worktree root
+- publication operation (`create` or `update-existing`), exact existing PR tuple
+  when applicable, and inherited worktrees-folder/containment evidence for queues
 - app project/session IDs when applicable, actual Git and app head branch, HEAD,
   index/worktree status and readiness evidence
 - canonical base repository, fetched base ref and SHA, intended base branch,
-  and independently inspected app comparison `base_ref` and merge base
+  and independently inspected app comparison `base_ref` and merge base; for
+  existing PRs record discrepancies without using that app base for task diffs
 - head repository/owner, head branch, expected remote SHA, recorded PR if any,
   exact credential-redacted push remote URL/refspec, and publication
   tool/backend/capabilities
@@ -46,9 +49,40 @@ not a claim that every publisher uses upstream. Keep canonical fetch/base refs
 and app/CLI base controls separate from head tracking.
 Record prior values and rationale before any task-local
 tracking/pushRemote/gh-merge-base adjustment; do not change global defaults or
-unrelated branches. Verify the effective destination afterward. A valid Git diff
-does not compensate for a missing/wrong app base. If no supported control can
-establish the required binding, preserve the work and stop before setup.
+unrelated branches. Verify the effective destination afterward. For NEW PR
+creation, a valid Git diff does not compensate for a missing/wrong app base.
+If no supported control can establish that creation binding, preserve the work
+and stop before setup. Existing PRs follow the operation-specific path below.
+
+### Existing PR updates
+
+Select `update-existing` only after an exact GitHub query verifies one open task
+PR's base repository/branch, head repository/branch, pushed SHA and complete file
+scope. Preserve recorded PR identities and earlier attempt/review budgets. In
+app-session execution, still verify the owning session's exact worktree, branch,
+task ownership and quiescence; the coordinator may be anywhere.
+
+The verified GitHub PR base is authoritative for this path. A different app
+comparison `base_ref` alone is NOT a blocker, and does not require adoption or
+replacement of an already correctly owned checkout. Record the discrepancy.
+Fetch the exact PR base from its verified repository; compute the Git merge base
+and task diff explicitly in the target checkout. Do not use an app overview
+based on another branch as validation scope or as evidence of unrelated changes.
+Local/pushed SHA and task-owned edits must still match the handoff; changed
+content invalidates review and validation evidence.
+
+Push only from the recorded worktree to the verified PR head repository/ref.
+Use explicit repository/PR-number arguments for PR reads, description updates
+and review operations; never default these to the coordinator's tracked PR.
+Where required, use `update_pull_request` with `repo_full_name` and `pr_number`.
+This path MUST NOT call `create_pull_request`, create a replacement PR, retarget
+the existing PR or fall back to another head repository.
+
+If the PR is closed/merged, disappears, changes identity or cannot be verified,
+stop. Do not silently convert the update into creation. A separately authorized
+new PR must pass the full new-creation binding preflight first. This distinction
+does not waive clean-head review gates, source provenance, Git identity checks,
+folder containment or any validation requirement.
 
 ## Lifecycle and reuse
 
@@ -88,13 +122,20 @@ index population (`git ls-files`), staged and unstaged diffs, full status includ
 untracked files, and any active provisioning status. A path appearing or an
 empty index alone is not readiness. Do not start dependencies during checkout.
 
-For a new checkout require the expected fetched HEAD, populated matching index,
-clean full Git status and the correct app root/branch/comparison-base binding.
+For a new checkout, first require completed provisioning at the app-selected
+starting HEAD, a populated matching index, clean full Git status and the correct
+app root/branch/comparison-base binding. If that starting HEAD is an older
+ancestor of the recorded fetched base, the identity-only setup dispatch may
+perform the safe fast-forward described below. Require the resulting fetched
+HEAD and clean matching index before declaring the checkout dependency-ready;
+do not block that safe synchronization on an expected initial base lag.
 For resumed work require the recorded content/ownership manifest instead of
 discarding expected edits. Clean Git plus verified app comparison binding can
 establish readiness even when a changed-file overview still shows stale mass
 deletions; record that discrepancy and recheck actual Git before editing.
-Missing/wrong binding cannot be excused as a stale display.
+For `update-existing`, apply the existing-PR path instead of requiring equality
+with the app comparison base. Other missing/wrong identity cannot be excused as
+a stale display.
 
 At the deadline, return terminal `checkout-readiness-blocked` with timestamps,
 session identity, HEAD/index/status evidence and last provisioning result.
@@ -111,43 +152,70 @@ Before another task starts, apply the quiescence gate in
   that explicitly selects the intended repository, base and head independently
   of the coordinator's session. Do not assume that installed `gh` authorizes
   bypassing a required integrated tool.
-- In app-session mode, require session inspection and change-base inspection,
+- In app-session mode, require session inspection and, for creation, change-base inspection,
   plus session creation when a new owner is needed. Delegated workflows also
   require session messaging and completion delivery. If unavailable,
   report `publication-context-unavailable` before setup or development. Do not
   silently downgrade to a known incorrectly bound publisher.
+- For queues, also apply the shared folder-placement capability gate before
+  creating an app worktree. A `base_branch` argument selects a branch, not a
+  filesystem destination. Reusing an exact in-folder owner does not need a new
+  worktree-placement control.
 
 ## Dispatcher preparation
 
-Preparation remains preparation-only. Do not start development, a review loop,
-promotion or PR creation here.
+This is the app-owned checkout primitive used by the queue's
+[workspace preparation contract](preparation.md), the standalone development
+dispatcher and standalone promotion. The caller owns overall preparation and
+dependency sequencing; this procedure establishes one publication owner.
+For a queue task, run it for BOTH development and promotion before development.
+Preparation remains preparation-only: no rule edits, review or PR creation.
 
-1. After the existing eligibility gate and target fetch, identify the configured
-   local repository project for `Azure/typespec-azure`. Use `list_projects`;
-   do not pick a different project just because it has the same repository.
-   Prefer the current matching repository project.
+Supply `phase`, publication operation, `base_branch`, recorded canonical base SHA
+and branch suffix; queued calls also supply the resolved `worktrees_folder`:
+development uses `feature/lintdiff-migration-new` and `lintdiff-<validator-rule-slug>`;
+promotion uses `main` and `promote-lintdiff-<validator-rule-slug>`.
+Standalone development retains its user-supplied target.
+
+1. Use the exact target repository/project already resolved by the shared
+   preparation contract, not the coordinator's current project. Verify its
+   repository identity through `list_projects` and Git metadata.
 2. Discover existing sessions before creating one. Reuse only a recorded,
-   idle, task-owned development session whose branch, worktree, repository and
-   comparison base match this rule. Do not take over unrelated user activity.
-3. For a new rule, call `create_session` in that project with
+   idle, task-owned session for this phase whose branch, worktree, repository and
+   operation-specific base match this rule, and whose path satisfies the inherited
+   folder boundary. Do not take over unrelated user activity.
+3. Before creating a new worktree, establish supported placement inside the
+   selected folder under the shared folder-scope contract. If unavailable, stop
+   without creating an app-default checkout elsewhere. When placement is supported,
+   call `create_session` with `project_id: "<verified-target-project-id>"`,
    `workspace_type: "worktree"`,
-   `base_branch: "<target-branch>"`, `coordinate_with_creator: true`, and
+   `base_branch: "<phase-base-branch>"`, `coordinate_with_creator: true`, and
    `notify_on_idle: "always"`. Omit `kickoff` so rule work cannot race setup.
-   The base is `feature/lintdiff-migration-new` for this queue, never the
-   project's default `main`.
+   Explicitly select the phase base; never inherit the coordinator branch or
+   assume the project's default is correct. Never omit `project_id` when the
+   coordinator belongs to another project.
 4. Record the returned session ID immediately. Use `get_session` for its actual
-   branch and path, and `get_changes_overview` for its `base_ref`. Apply
+   branch and path, verify physical folder containment, and use
+   `get_changes_overview` for its `base_ref`. An unexpected out-of-folder path
+   stops setup; do not move the checkout or proceed with dependencies. Apply
    [bounded checkout readiness](#bounded-checkout-readiness) before editing or
    dependencies; retain the first inspection time across setup messages.
-5. Give the owner a setup-only message using `send_session_message` with
+5. Establish completion delivery and persist a unique setup dispatch/result
+   identity before giving the owner a setup-only message using `send_session_message` with
    `mode: "autopilot"` and `delivery_mode: "immediate"`. Instruct it to verify its
    own root and dedicated branch, use the app's `rename_branch` to retain the
-   `lintdiff-<validator-rule-slug>` suffix if needed, report the resulting
-   identity, and stop. No dependency work, rule edits, PR or review is allowed
-   in that message. Do not rename the branch behind the app with shell Git.
+   supplied phase suffix if needed, acknowledge the authoritative instruction
+   paths/hashes and exposed review capabilities, perform only an eligible
+   untouched-branch fast-forward under step 6 if needed, report the resulting
+   identity in its durable result, and stop. No dependency work, rule edits, PR or review
+   is allowed in this identity-only message. Later setup-only dependency dispatches
+   are authorized by the preparation contract only after all required bindings
+   pass. Do not rename the branch behind the app with shell Git.
 6. Re-read the session metadata and base after setup. The worktree must be
    separate from the target checkout, the head must not be the target branch,
-   and its starting commit must match the fetched target. A named local base
+   and a new checkout's starting commit must match the fetched target.
+   Existing PR owners use the verified PR base and current task HEAD, not a
+   requirement that their HEAD equal the base commit. A named local base
    can lag the fetched remote: during preparation only, the owner may
    fast-forward its clean, newly created branch to that recorded remote commit
    if it has no task commits and is an ancestor. Never move the target branch,
@@ -156,29 +224,32 @@ promotion or PR creation here.
    Use the actual
    app-returned worktree path, even if its directory has an app-generated name.
    Never move it to the old dispatcher naming pattern.
-7. Prepare the separate pinned specs worktree and complete the existing
-   dependency checks in these exact paths. Generate the original worker command
-   with the app-owned TypeSpec path and preserve the specs path. Return the
-   command plus the publication binding below; leave the owner idle.
+7. Return the verified publication binding and leave the owner idle. The caller
+   prepares remaining resources/dependencies through the shared contract. For a
+   queue, development cannot start until BOTH owners and all three environments
+   have passed; a development-only binding is not a ready queue bundle.
 
 Store the binding in the dispatcher's durable session artifacts, not in a
 tracked repository file. Include it in the handoff text so another queue session
 can discover the owner through the supported session tools. Keep this metadata
-outside the copyable commands-only block; the queue input grammar is unchanged.
-Copying only the commands is sufficient: exact worktree-path matching through
-the session tools recovers the owner and project, and change-base inspection
-recovers the base without requiring access to the dispatcher's artifacts.
+outside the copyable commands-only block.
+Copying only prepared worker commands is sufficient to discover the development
+owner/project and comparison base by exact path. The queue still verifies setup
+evidence and creates/verifies the missing promotion owner during preparation;
+it must not infer full-bundle readiness from a command alone.
 
 ```text
 backend: app-session
 rule_id: <exact-rule-id>
 project_id: <repository-project-id>
-development_session_id: <owning-session-id>
-typespec_worktree: <app-returned-absolute-path>
-specs_worktree: <isolated-specs-absolute-path>
+phase: <development-or-promotion>
+publication_operation: <create-or-update-existing>
+owning_session_id: <phase-owning-session-id>
+worktree: <app-returned-absolute-path>
+worktrees_folder: <resolved-queue-folder-or-not-applicable-for-standalone>
 repository: Azure/typespec-azure
-base_branch: feature/lintdiff-migration-new
-canonical_base_ref: <verified-canonical-remote>/<target-branch>
+base_branch: <phase-base-branch>
+canonical_base_ref: <verified-canonical-remote>/<phase-base-branch>
 base_sha: <fetched-commit>
 head_repository: <personal-fork-owner>/typespec-azure
 head_branch: <app-recorded-rule-branch>
@@ -193,19 +264,30 @@ select the requested repository/base/head independently for every task; no app
 session binding is required. The remainder of this section applies to
 `app-session` execution.
 
-For queues, after complete parsing and catalog eligibility, resolve each TypeSpec
-path to exactly one idle, task-owned app session using the handoff and
+For queues, after complete parsing and catalog eligibility, resolve each supplied
+or recorded TypeSpec path to exactly one idle, task-owned app session using the handoff and
 `list_sessions_and_chats` / `get_session`. Normalize Windows paths
 case-insensitively. Confirm repository, head branch, worktree and comparison
-base (`get_changes_overview`), not just the session's title.
+base (`get_changes_overview`), not just the session's title. Apply physical folder
+containment before selecting a queue owner. For `update-existing`, record any app
+base discrepancy and verify the actual PR/Git base through the existing-PR path.
+
+Rule-ID entries without resources proceed to queue-owned preparation, not a
+missing-owner failure. Prepared commands must resolve their supplied development
+owner; an absent promotion resource is created during preparation, never during
+the promotion phase. Recheck this preflight for both resulting bindings before
+dependencies or development.
 
 Both owning-session IDs and worktree paths must be unique across queue tasks.
-A development binding's base must be `feature/lintdiff-migration-new`; a
-promotion binding's base must be `main`. A known wrong base, a head equal to the
+A development binding's actual publication base must be
+`feature/lintdiff-migration-new`; a promotion binding's must be `main`.
+For creation this must also match the app binding. A wrong actual PR base (or
+wrong app base for creation), a head equal to the
 base, a session already attached to an unrelated PR, or a missing/ambiguous
 binding is `publication-context-unavailable`. Read-only preflight does not
 fetch, fast-forward, install dependencies or inspect future tasks' rule code.
-Leave Git preflight and synchronization to the development skill.
+The queue-owned preparation contract handles initial Git synchronization and
+readiness; phase owners subsequently revalidate its recorded state.
 
 Standalone owners verify their own exact binding through the same controls;
 they do not need a coordinator or completion automation. For delegated work,
@@ -235,6 +317,8 @@ the queue's [bounded-resumption contract](SKILL.md#explicitly-authorized-bounded
    canonical absolute path, repository/remotes, branch, HEAD, submodule state,
    staged/unstaged patches, and hashes of all task-owned new/changed files in
    durable artifacts. Match the previous handoff and stop on unexplained changes.
+   Queue adoption also requires containment in the selected worktrees folder;
+   authorization to adopt is not authorization to move or widen that boundary.
 2. Search session and project inventories for the exact path, not just repository
    name. Reuse a matching idle owner only if it has the expected branch and no
    unrelated PR/activity. If absent, use `create_project` with the existing local
@@ -246,11 +330,12 @@ the queue's [bounded-resumption contract](SKILL.md#explicitly-authorized-bounded
    preserved promotion branch. Never create another worktree, rename the branch,
    stash, reset, or move files as part of adoption.
 4. Independently read `get_session` and `get_changes_overview`. Require the exact
-   path, branch, repository, and comparison base (`main`/`origin/main` for
-   promotion; the migration target for development). Recheck HEAD, index and
+   path, branch, repository, and operation-specific base (`main` for promotion;
+   the migration target for development). For creation require the app comparison
+   base to match; for an existing PR use its verified actual base. Recheck HEAD, index and
    file hashes against the pre-adoption manifest. Project registration or a
    default-branch field alone does not establish the publication binding.
-5. If comparison-base correction is needed, use only a supported app control
+5. If creation requires comparison-base correction, use only a supported app control
    that changes comparison metadata without checking out another branch. If none
    is available, stop with the exact missing control; do not edit app databases,
    infer success from Git tracking settings, or bypass the required PR tool.
@@ -292,12 +377,14 @@ publication proxy for a full-cycle subagent running in the coordinator.
    actions. Missing results or errors require status reconciliation, not
    assumptions of success.
 4. Only after clean development review and all development agents/commands have
-   stopped task work, create the promotion owner if absent. Use the same
-   project and app worktree procedure, but `base_branch: "main"` and a
-   `promote-lintdiff-<validator-rule-slug>` branch suffix. Promotion's existing
-   canonical `origin/main` verification and source immutability still apply.
-   Record and verify this second binding before promotion dependencies or edits.
-   Do not branch the promotion session from the development branch.
+   stopped task work, reverify the promotion owner prepared before development.
+   Require its recorded `main` publication base and distinct branch, matching readiness
+   fingerprint, instruction versions and completion channel. If absent or
+   mismatched, return a preparation/publication-context blocker; do not create
+   a replacement owner or worktree in this phase. Any safe fast-forward of an
+   untouched promotion branch must follow the preparation manifest's
+   revalidation/invalidation policy before promotion dependencies or edits.
+   Source immutability still applies.
    This also applies after outer-owned development review: keep the development
    owner idle and dispatch a DISTINCT promotion owner, never resume development
    into promotion or create its source PR from the coordinator.
@@ -369,21 +456,34 @@ activity explicitly reported; clearing a timer is not proof of quiescence.
 ## Phase-scoped owner prompts
 
 Include the original command verbatim, the complete cycle handoff, the queue's
-logging and heartbeat requirements, both bindings when known, the coordinator
+logging and heartbeat requirements, both prepared bindings, the coordinator
 session ID, unique result-artifact path, and absolute paths to the coordinator's
 current skill instructions.
 Include exposed persistent launch/follow-up capabilities and selected review
 owner (`worker` or `outer`), as established by the queue's
 [capability preflight](SKILL.md#review-capability-preflight-and-handoff).
-The target branch (especially `main`) can contain older instructions: read the
-supplied versions as invocation context, without copying skills into either PR.
+Include the preparation manifest and exact dependency/input fingerprints.
+Include the worktrees folder, containment evidence, and `create`/`update-existing`
+operation for each phase. The owner's current project or cwd cannot override them.
+The target branch (especially `main`) can contain older instructions: acknowledge
+the supplied authoritative files and hashes as invocation context before work,
+without copying skills into either PR. An unreadable or changed version set is
+a blocker, not permission to use the owner's older checkout copy.
 Invoke the named skills through the skill tool, never as shell executables.
+
+Every owner and delegated agent must apply the preparation contract's
+[command-location guard](preparation.md#command-location-and-publication-identity)
+in every shell invocation and use absolute file-tool paths. Never rely on an
+earlier call's directory or confuse it with the session-bound PR context.
 
 **Development owner**
 
 > You own only development and development review for this dispatch, directly
 > in your app-owned source worktree. Invoke the supplied `/develop-lintdiff-rule
 --worker ...` command, reusing the recorded development PR during repair.
+> Consume the verified three-resource preparation manifest; do not run dispatcher
+> mode or create worktrees. Revalidate dependencies rather than repeating passing
+> setup. Both publication owners must already be recorded and ready.
 > Your main session agent owns PR creation; do not delegate the complete phase
 > or its creation call to a coordinator subagent. If review owner is `worker`,
 > invoke `/loop-for-fix-and-review <verified-development-pr-url>`. If it is
@@ -399,7 +499,9 @@ Invoke the named skills through the skill tool, never as shell executables.
 > `/lintdiff-rule-promote <rule-id>` with both bindings, your supplied promotion
 > worktree and the exact cleanly reviewed source SHA. Reuse your app-owned
 > promotion worktree even on cycle 0; never create another checkout or change
-> the source worktree. Your main session agent owns promotion PR creation.
+> the source worktree. Revalidate the prepared environment and perform only
+> invalidated setup or destination-specific builds. Your main session agent owns
+> promotion PR creation.
 > After required validation and a verified PR, invoke `/loop-for-fix-and-review
 <verified-promotion-pr-url>` only when review owner is `worker`. Otherwise return
 > `review-handoff` with `phase: promotion-review`, pinned source provenance and
@@ -424,8 +526,20 @@ subagent handoffs. Each review loop may use its two required nested agents.
 
 ## Publication checks
 
-Immediately before creation, the owner rechecks its app metadata, comparison
-base, local head, intended push repository and remote head. The source owner
+First reverify the selected worktree's physical containment under the inherited
+queue folder. For `update-existing`, follow
+[existing PR updates](#existing-pr-updates), including explicit PR targeting, and
+skip creation entirely. The remainder of this section applies to `create`.
+
+Immediately before creation, require the caller's actual session ID to equal the
+recorded phase owner ID. The owner rechecks its app path/head/comparison base,
+local Git root/branch/SHA, intended push repository and remote head against the
+binding. Do not derive caller identity from inherited environment variables.
+For `create_pull_request`, absence of explicit repository/base/head/session
+arguments means only the owning session's main agent may call it; changing a
+subagent's directory or passing a path in the PR body cannot select its context.
+If a supported metadata control cannot establish the correct binding, stop
+before the call. The source owner
 targets `Azure/typespec-azure:feature/lintdiff-migration-new`; the promotion
 owner targets `Azure/typespec-azure:main`. Both use their own distinct branches
 as heads, according to the delegated skills' publication policy.
