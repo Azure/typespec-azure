@@ -139,8 +139,6 @@ Keep an ordered ledger with one entry per input command:
   waiting phase, handoff artifact, and review invocation/agent IDs
 - local draft-correction counts, causal evidence and rerun results, separate
   from worker attempts, review rounds and source-repair cycles
-- timeout-only suite rerun eligibility, consumed allowance per phase/cycle or
-  review pass/round, unchanged input identity, isolation evidence and both outcomes
 - publication attempt/error identities, exact base/head tuple and SHA, absence
   query evidence, and the separate one-correction publication budget
 - original readiness/status/quiescence deadlines, last genuine progress,
@@ -302,8 +300,6 @@ corrected prompt. Never reuse the failed worker.
 Do not restart workers automatically for dependency, build, validation, corpus,
 review, network, credential, push or GitHub failures. This does not prohibit an
 eligible in-place draft correction below or the shared
-[timeout-only test rerun](../loop-for-fix-and-review/SKILL.md#bounded-timeout-only-test-rerun).
-Neither restarts a worker. Publication retains the separate
 [single evidenced publication-configuration correction](app-session-execution.md#publication-recovery).
 That exception requires positive exact-PR absence and a specific proven defect,
 uses only the required creation tool, and never restarts a worker or retries
@@ -334,23 +330,14 @@ side-effect safety; they are not worker restarts or external-operation retries.
 It must not report a terminal blocker merely because its own draft needs a safe,
 understood correction and budget remains. Preserve all failed-attempt evidence;
 do not restart the worker, consume a source-repair cycle, or weaken validation.
-The separate
-[bounded timeout-only test rerun](../loop-for-fix-and-review/SKILL.md#bounded-timeout-only-test-rerun)
-permits one isolated rerun of a completed native package suite whose failures
-are exclusively individual test timeouts. Apply its eligibility and unchanged
-scope gates; never run the full suite alongside task-owned formatting/builds
-or other expensive validation. Track the allowance separately and preserve the
-first failure even if the rerun passes. All other external/indeterminate
-operational failures, unknown causes, exhausted budgets and confirmed immutable
-promotion-source defects retain their existing stop/handoff behavior.
+External/indeterminate operational failures, unknown causes, exhausted budgets
+and confirmed immutable promotion-source defects retain their existing
+stop/handoff behavior.
 
 ### Explicitly authorized bounded resumption
 
 After a terminal stop, a user may explicitly authorize recovery of a named
 deterministic draft/command failure with a finite additional correction allowance.
-A named terminal timeout-only test failure may likewise receive explicit
-authorization for one isolated rerun under the shared timeout-only policy,
-without assuming a proven draft defect or starting another source-repair cycle.
 A generic queue invocation, "continue", or pasted failure history is not such
 authorization. This is not an automatic retry or a new source-repair cycle.
 
@@ -366,9 +353,6 @@ authorization. This is not an automatic retry or a new source-repair cycle.
    correction. Limit the correction to the authorized failure. For a CLI error,
    read the installed command's help or implementation before execution; do not
    invent flags. Count the supplemental attempt before running its correction.
-   For an explicitly authorized timeout-only resumption, use that policy's
-   eligibility, unchanged-input and isolation gates instead of requiring proof
-   of an authored draft defect; record and consume its one rerun allowance.
 4. Rerun the failed check at its intended scope, then complete remaining required
    work and checks invalidated by the correction. Reuse earlier evidence only
    when matching content and applicable requirements establish its validity.
@@ -621,8 +605,7 @@ one session to execute both publication phases.
 > agents. Complete its independent bounded loop in promotion PR mode. Source
 > defects found in either the unresolved backlog or a new review return
 > `source-repair-required`; never fix source semantics only in the promoted copy.
-> Caps, uncertain findings, and operational failures stop this cycle unless
-> the narrowly scoped timeout-only test-rerun policy applies.
+> Caps, uncertain findings, and operational failures stop this cycle.
 >
 > In outer-owned mode, instead persist the complete promotion review handoff
 > with source provenance, return `review-handoff`, and remain idle. Do not claim
@@ -641,12 +624,9 @@ one session to execute both publication phases.
 > change, concrete observed evidence, impact, and source task. Do not ask the
 > user about suggestions or include low-confidence suggestions.
 
-The outer agent exclusively owns the consolidated post-run review and
-authorizes its skill-only commit on an eligible existing development or repair
-PR under the shared policy. When another app session owns that PR, use a
-post-run-only handoff after the queue has ended; do not restart its rule work.
-This does not override safety stops, validation requirements, review-loop
-limits, or repository guardrails.
+The outer agent exclusively owns the consolidated post-run review and any
+skill-update PR under the shared policy. This does not override safety stops,
+validation requirements, review-loop limits, or repository guardrails.
 
 ## Result classification
 
@@ -654,8 +634,7 @@ Classify a task as:
 
 - `succeeded` only when both draft PRs exist, both review loops reached a clean
   successful termination condition on their current pushed heads, and promotion
-  provenance matches the final reviewed source commit at primary-workflow
-  termination, before any post-run skill-only commit
+  provenance matches the final reviewed source commit
 - `partially-succeeded` when a development PR exists but the complete workflow
   cannot finish, including promotion blockers, either review cap, failed repair,
   or exhaustion of the three-source-repair budget
@@ -726,11 +705,8 @@ Keep existing PR links and promotion paths visible even when a later repair fail
 Distinguish earlier successful reviews from phases not rerun in the latest cycle.
 
 Never omit failed input lines or stop the final report at the first failure.
-After the task sections, include the existing PR link, post-run skill-only
-commit, and brief summary, or a publishing blocker, only when required by the
-shared policy's final handoff. Preserve the primary workflow's reviewed SHAs
-and outcomes; separately identify the post-run head without claiming it was
-reviewed or changing promotion provenance.
+After the task sections, include the skill-update PR link and brief summary, or
+a publishing blocker, only when required by the shared policy's final handoff.
 Do not print a process-suggestions list or low-confidence observations.
 
 ## Post-run process review
@@ -738,7 +714,7 @@ Do not print a process-suggestions list or low-confidence observations.
 After every queue entry is terminal, briefly review the complete run before the
 final user response. Read and follow the
 [shared post-run process review](../shared/post-run-process-review.md), including
-its confidence gate, ownership, existing-PR skill commit, and reporting rules. This review
+its confidence gate, ownership, independent PR, and reporting rules. This review
 belongs to the outer agent; workers only return qualifying evidence.
 
 Capture concrete suggestions for improving future queue runs, especially:
@@ -793,10 +769,7 @@ Capture concrete suggestions for improving future queue runs, especially:
 - Never stage, commit, or push a worker's `log.txt`.
 - Never infer success from subagent prose when the PR or pushed head can be
   verified directly.
-- Workers must not publish skill changes based on their own post-run
-  suggestions. Only the outer agent may authorize a post-run-only handoff to
-  the existing development or repair PR owner after all queue work has ended.
-- High-confidence post-run skill updates use one skill-only commit on an
-  existing open development or repair PR targeting
-  `feature/lintdiff-migration-new`, under the shared policy. Never create a
-  separate skill-update PR or put these changes in a promotion PR.
+- Workers must never edit skills or create skill-update PRs based on post-run
+  suggestions.
+- The outer agent may make high-confidence post-run skill updates only through
+  the shared policy's independent skill-only PR after the queue has ended.

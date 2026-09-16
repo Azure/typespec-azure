@@ -132,11 +132,10 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
   verification review.
 - Stop immediately on an unverified review request, indeterminate collector
   failure, push failure, uncertain finding, or validation/corpus failure that
-  does not qualify for [bounded draft correction](#bounded-draft-correction)
-  or the [timeout-only test rerun](#bounded-timeout-only-test-rerun).
-  The only recovery paths are those bounded validation procedures and the separately
+  does not qualify for [bounded draft correction](#bounded-draft-correction).
+  The only recovery paths are that in-place correction and the separately
   bounded, parent-authorized [local collector recovery](#local-collector-recovery).
-  None permits erasing failed attempts or publishing unverified changes.
+  Neither permits erasing failed attempts or publishing unverified changes.
 
 ## Initialize
 
@@ -526,10 +525,7 @@ Also record whether corpus validation is required, why, and its results when
 applicable.
 
 On a command failure, preserve the evidence and classify it using the bounded
-draft-correction or timeout-only test-rerun policy below before deciding whether
-to stop. Run full native package suites without concurrent task-owned formatting,
-documentation generation, builds, linting or other test/corpus runs. Finish
-source-rewriting commands before testing the final content. Never stage,
+draft-correction policy below before deciding whether to stop. Never stage,
 commit or push a failing draft. A passing narrower command does not erase a
 failed required check. Do not retrospectively relabel a failed command as
 supplemental or self-waive it because its diagnostics appear unrelated.
@@ -580,8 +576,6 @@ findings, switching agents or restarting a phase.
 6. Stop on an unknown cause, unsafe/out-of-scope correction, exhausted budget,
    or an external/indeterminate operational failure (such as credentials, network,
    dependency/tool availability, harness/emitter crash, or publication failure).
-   A completed native suite with only individual test timeouts may instead
-   qualify for the separate timeout-only policy below; it is not a draft correction.
    An agent-authored argument error rejected before work starts is not a
    harness crash. This policy never retries review requests, pushes, email
    sends or other publication operations. Do not blindly
@@ -593,45 +587,6 @@ This budget is separate from the five review rounds, queue orchestration retry
 and queue source-repair cycles. The invocation authorizes eligible corrections;
 parent approval is still required for publication, not for each local correction.
 
-### Bounded timeout-only test rerun
-
-Allow at most **one isolated rerun per validation phase** when a required native
-package test suite completes with only individual test-timeout failures. In a
-queue, development and promotion preparation each have one allowance per task
-cycle; a review backlog pass or counted round each has one allowance. Share it
-across all eligible commands in that scope, not one allowance per test/command.
-Retain it across handoffs and resumption; it is separate from draft corrections,
-source-repair cycles, review rounds and publication recovery.
-
-1. Preserve the exact command, cwd, exit code, complete output, failed test
-   names/timeouts, source-content identity and dependency/tool configuration.
-   Require a completed test summary: every failure must be an individual test
-   timeout. Assertion failures, worker/process crashes, missing results,
-   compiler/harness/emitter errors, dependency/network/auth failures, or a hung
-   command killed by an outer deadline do not qualify. This exception never
-   applies to corpus runs, builds, review requests/collection, or publication.
-2. Record eligibility and consume the allowance **before** the rerun. No proven
-   resource-contention cause is required, but do not claim one from timeouts
-   alone. Keep all other failure and recovery budgets unchanged.
-3. Confirm prior task-owned commands ended and inputs still match the recorded
-   source/configuration. Run the exact full-suite command alone, with no
-   concurrent task-owned formatting, docs generation, build, lint or other
-   test/corpus command. Do not alter timeouts, worker counts, selectors,
-   assertions or dependencies, skip tests, or kill unrelated users' processes.
-   Retain the original command's finite execution bound; if none was recorded,
-   record a finite whole-command deadline before rerunning.
-4. If the complete suite passes, retain both results and report
-   `passed-on-isolated-rerun`, not an erased failure or a proven root cause.
-   Complete remaining required checks and normal publication/review gates.
-   If the rerun fails for any reason or inputs/eligibility cannot be verified,
-   stop. Do not request another rerun, increase limits, reset the allowance,
-   or convert this operational failure into a source-repair cycle.
-
-This is prospective recovery within an active invocation, not permission to
-restart a previously terminal task after changing its skill. A terminal timeout
-blocker still requires explicit user authorization for one bounded resumption;
-record the old result and new authorization before reusing preserved work.
-
 ### Linter source changes
 
 In standard PR mode, run the corpus procedure only when a valid fix changes
@@ -641,9 +596,7 @@ production linter-rule code changes, follow the current linter-source validation
 and corpus procedure in `/develop-lintdiff-rule` in full. Treat that skill as
 the source of truth for setup, commands, evidence updates, analysis, and
 generated-output cleanup. Record every required validation or corpus failure;
-continue only for an eligible bounded draft correction or native-suite
-timeout-only rerun, otherwise stop the loop. Corpus timeouts do not qualify
-for the native-suite rerun allowance.
+continue only for an eligible bounded draft correction, otherwise stop the loop.
 
 In promotion PR mode, do not run `/develop-lintdiff-rule`, the lintdiff fixture
 harness, or corpus validation. Follow the current targeted validation procedure
@@ -655,8 +608,8 @@ of truth for the exact current commands and generated-output checks. A
 production rule edit is permitted only when it is a verified
 `promotion-adaptation-issue` that preserves the immutable source semantics.
 Record every required promotion validation failure; continue only for an
-eligible bounded draft correction that preserves the pinned source semantics
-or the timeout-only native-suite rerun, otherwise stop the loop.
+eligible bounded draft correction that preserves the pinned source semantics,
+otherwise stop the loop.
 
 ### Parent publication gate
 
@@ -730,8 +683,7 @@ For rounds 1 through 5:
 5. If it returns `uncertain-or-blocked` or a command failure that is ineligible
    for correction or has exhausted its correction budget, stop and report the
    blocker. Do not terminate solely because a ready-for-publication handoff
-   retains a failed attempt followed by a verified eligible correction or
-   timeout-only rerun. Verify both attempts and the separate rerun allowance.
+   retains a failed attempt followed by a verified eligible correction.
    In queue-controlled promotion mode, return
    `source-repair-required` for a confirmed source defect with the complete
    evidence contract above; retain any separate operational failure rather than
@@ -754,7 +706,7 @@ Do not create replacement subagents between rounds.
 After the loop reaches a termination condition and the deliverable is complete,
 briefly review the run before the final user response. Read and follow the
 [shared post-run process review](../shared/post-run-process-review.md), including
-its confidence gate, ownership, existing-PR skill commit, and reporting rules. Focus on:
+its confidence gate, ownership, independent PR, and reporting rules. Focus on:
 
 - review-request or completion checks that were slow, stale, or unreliable, and
   better cursor or polling evidence to use next time

@@ -923,14 +923,6 @@ validation scoped to the change.
 Before committing or creating the PR, the main agent must assign the complete
 rule-related diff to a separate code-review subagent.
 
-Launch that reviewer in persistent background mode so it can receive the
-same-agent follow-up required below; a synchronous one-shot task cannot receive
-`write_agent` follow-ups. Verify the returned agent ID accepts a follow-up
-message before substantive review begins. If that capability is unavailable,
-report the blocker rather than substituting a one-shot reviewer. Prompt the
-subagent to perform the review itself, not to launch a replacement reviewer,
-and retain its ID for subsequent review of fixes and updated evidence.
-
 The reviewer must:
 
 - compare the rule branch against the freshly fetched
@@ -992,10 +984,8 @@ creating a draft PR.
    target branch.
 3. Commit only the explicit rule-related paths and any required fixture-harness
    dependency repair identified above.
-4. Push a new rule branch to the preflight's verified `Azure/typespec-azure`
-   destination, or retain the recorded head repository for an existing task PR.
-   Verify canonical write permission before implementation; never fall back to
-   a personal fork when permission or publication binding is unavailable.
+4. Push the rule branch to the preflight's verified personal-fork destination
+   for a new head, or the recorded head repository for an existing task PR.
    Use an explicit remote/refspec; do not push or update the canonical target.
 5. Create the pull request in `Azure/typespec-azure` as a **draft**, with the
    recorded head repository/branch and user-supplied target branch as base. Do not mark
@@ -1115,7 +1105,7 @@ Worker mode returns:
 After the draft PR is created and the deliverable is complete, briefly review
 the run before the final user response. Read and follow the
 [shared post-run process review](../shared/post-run-process-review.md), including
-its confidence gate, ownership, existing-PR skill commit, and reporting rules. Focus on:
+its confidence gate, ownership, independent PR, and reporting rules. Focus on:
 
 - steps that cost unexpected time and how to avoid or parallelize them next time
 - status reporting that was missing, stale, or too noisy, and the progress or
