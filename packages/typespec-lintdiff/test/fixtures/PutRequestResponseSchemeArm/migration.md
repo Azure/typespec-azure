@@ -540,7 +540,7 @@ but the refreshed TypeSpec compile command failed and the project is excluded fr
 - 0 unresolved fixture gaps.
 
 The shared native suite `test/rules/put-request-response-scheme.test.ts` passes
-68 tests across ARM and data-plane consumers without importing an emitter.
+106 tests across ARM and data-plane consumers without importing an emitter.
 The data-plane `PutRequestResponseScheme` comparison command also exits
 successfully with four fixtures; its legacy `put-schema-match` compliance case
 still has unreviewed ambient diagnostics, so it is not claimed as a clean native
