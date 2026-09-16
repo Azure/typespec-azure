@@ -1,15 +1,8 @@
-import {
-  $minItems,
-  getSourceLocation,
-  resolvePath,
-  type DecoratorContext,
-  type Model,
-} from "@typespec/compiler";
+import { getSourceLocation, resolvePath } from "@typespec/compiler";
 import {
   createLinterRuleTester,
   createTester,
   expectDiagnostics,
-  mockFile,
   type LinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
@@ -28,23 +21,8 @@ const Tester = createTester(resolvePath(import.meta.dirname, "../.."), {
 })
   .importLibraries()
   .using("TypeSpec.Http", "Azure.ResourceManager")
-  .files({
-    "decorators.js": mockFile.js({
-      $decorators: {
-        Custom: {
-          indexer: function indexerDecorator(context: DecoratorContext, target: Model) {
-            $minItems(context, target, 1);
-          },
-        },
-      },
-    }),
-  })
-  .import("./decorators.js")
   .wrap(
     (code) => `
-      namespace Custom {
-        extern dec indexer(target: TypeSpec.Reflection.Model);
-      }
       @service
       @armProviderNamespace
       namespace Microsoft.TestService {
@@ -172,53 +150,85 @@ describe("operation templates", () => {
   });
 });
 
-describe("constant array schemas", () => {
-  it.each(["unknown[]", "Array<unknown>"])("normalizes a tuple and %s", async (array) => {
+describe("native response type equality", () => {
+  it("accepts separately authored tuples with the same native element types", async () => {
     await tester
       .expect(
         `
-        @put op put(): OkBody<[string]> | CreatedBody<${array}>;
+        @put op put(): OkBody<[string, { value: int32 }]> | CreatedBody<[string, { value: int32 }]>;
       `,
       )
       .toBeValid();
   });
 
-  it("normalizes unknown[] when it is the 200 body", async () => {
+  it("reports separately authored tuples with different native element types", async () => {
     await tester
       .expect(
         `
-        @put op put(): OkBody<unknown[]> | CreatedBody<[int32, boolean]>;
-      `,
-      )
-      .toBeValid();
-  });
-
-  it.each([
-    ["named", "model Items is Array<unknown>;", "Items"],
-    ["constrained", "@minItems(1) model Items<T> is Array<unknown>;", "Items<unknown>"],
-    ["friendly named", '@friendlyName("Items") model Items<T> is Array<T>;', "Items<unknown>"],
-    ["custom decorated", "@Custom.indexer model Items<T> is Array<T>;", "Items<unknown>"],
-    ["typed", "", "string[]"],
-  ])("does not normalize %s arrays", async (_, declaration, array) => {
-    await tester
-      .expect(
-        `
-        ${declaration}
-        @put op put(): OkBody<[string]> | CreatedBody<${array}>;
+        @put op put(): OkBody<[string]> | CreatedBody<[int32]>;
       `,
       )
       .toEmitDiagnostics(diagnostic);
   });
 
-  it("preserves equality for the same constrained array type", async () => {
+  it("does not collapse a tuple and an unknown array", async () => {
     await tester
       .expect(
         `
-        @minItems(1) model Items<T> is Array<unknown>;
-        @put op put(): OkBody<Items<unknown>> | CreatedBody<Items<unknown>>;
+        @put op put(): OkBody<[string]> | CreatedBody<unknown[]>;
       `,
       )
-      .toBeValid();
+      .toEmitDiagnostics(diagnostic);
+  });
+
+  it("does not collapse distinct multipart body types", async () => {
+    await tester
+      .expect(
+        `
+        model FormData { value: HttpPart<string>; }
+        model OtherFormData { count: HttpPart<int32>; }
+        model MultipartOk {
+          @statusCode statusCode: 200;
+          @multipartBody body: FormData;
+        }
+        model MultipartCreated {
+          @statusCode statusCode: 201;
+          @multipartBody body: OtherFormData;
+        }
+        @put op put(): MultipartOk | MultipartCreated;
+      `,
+      )
+      .toEmitDiagnostics(diagnostic);
+  });
+
+  it("does not collapse multipart and ordinary string bodies", async () => {
+    await tester
+      .expect(
+        `
+        model FormData { value: HttpPart<string>; }
+        model MultipartOk {
+          @statusCode statusCode: 200;
+          @multipartBody body: FormData;
+        }
+        @put op put(): MultipartOk | CreatedBody<string>;
+      `,
+      )
+      .toEmitDiagnostics(diagnostic);
+  });
+
+  it("does not collapse multipart and ordinary bodies that share a type", async () => {
+    await tester
+      .expect(
+        `
+        model FormData { value: HttpPart<string>; }
+        model MultipartOk {
+          @statusCode statusCode: 200;
+          @multipartBody body: FormData;
+        }
+        @put op put(): MultipartOk | CreatedBody<FormData>;
+      `,
+      )
+      .toEmitDiagnostics(diagnostic);
   });
 });
 
@@ -268,6 +278,32 @@ describe("response content variants", () => {
       .toBeValid();
   });
 
+  it.each([
+    [200, 201],
+    [201, 200],
+  ])(
+    "ignores conflicting body kinds at status %s regardless of their order",
+    async (status, otherStatus) => {
+      for (const bodies of ["Ordinary | Multipart", "Multipart | Ordinary"]) {
+        await tester
+          .expect(
+            `
+              ${responses}
+              model FormData { value: HttpPart<string>; }
+              model Ordinary is Response<${status}, FormData, "application/json">;
+              model Multipart {
+                @statusCode statusCode: ${status};
+                @multipartBody body: FormData;
+              }
+              model Other is Response<${otherStatus}, FormData, "application/json">;
+              @put op put(): ${bodies} | Other;
+            `,
+          )
+          .toBeValid();
+      }
+    },
+  );
+
   it.each(["Json | Xml", "Xml | Json"])(
     "allows shared body types across reordered variants: %s",
     async (variants) => {
@@ -308,7 +344,7 @@ describe("response content variants", () => {
   );
 
   it.each(["Json | Binary", "Binary | Json"])(
-    "aggregates every content type for a shared bytes body: %s",
+    "ignores content-type-driven byte schema differences for the same native body: %s",
     async (variants) => {
       await tester
         .expect(
@@ -320,9 +356,22 @@ describe("response content variants", () => {
             @put op put(): ${variants} | Created;
           `,
         )
-        .toEmitDiagnostics(diagnostic);
+        .toBeValid();
     },
   );
+
+  it("ignores emitter-specific byte schema differences for the same native body type", async () => {
+    await tester
+      .expect(
+        `
+          ${responses}
+          model Binary is Response<200, bytes, "application/octet-stream">;
+          model Json is Response<201, bytes, "application/json">;
+          @put op put(): Binary | Json;
+        `,
+      )
+      .toBeValid();
+  });
 
   it.each(["Empty | OkBody<string>", "OkBody<string> | Empty"])(
     "does not treat a bodyless variant as a conflicting body: %s",

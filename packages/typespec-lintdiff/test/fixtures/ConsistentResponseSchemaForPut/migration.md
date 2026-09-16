@@ -2,8 +2,9 @@
 
 ## Result and gap summary
 
-- **Results:** In the 2026-09-09 staging/latest-version comparison, Swagger reports
-  **13 diagnostics across 8 projects**; TypeSpec reports **1 in 1 project**.
+- **Results:** The retained 2026-09-09 staging/latest-version Swagger scan reports
+  **13 diagnostics across 8 projects**. The refreshed 2026-09-15 full TypeSpec
+  corpus reports **1 in 1 project**.
   The assessed population is 462 of 468 projects; six compile failures are excluded.
 - **Why 13 versus 1:** Both catch the same genuine Reservations/Quota mismatch.
   The other **12 findings across 7 projects** have identical `200`/`201` schema
@@ -11,10 +12,11 @@
   separate objects representing the same schema trigger false positives.
   TypeSpec compares schema types instead and intentionally avoids these findings.
   See the [reference-pair evidence](#gap-example-resolved-external-reference-identity).
-- **Decision:** The source now skips conflicting body types within one status,
-  avoiding order-dependent secondary warnings on inputs AutoRest already rejects.
-  Valid-response behavior and corpus counts are unchanged; the count gap does not
-  require reproducing validator defects.
+- **Decision:** The source now compares native TypeSpec response-body identity and
+  body kind. It no longer predicts emitter schema categories from content types,
+  intrinsic decorators, tuple/array shapes, or multipart bodies. A status with
+  multiple distinct native body identities is skipped because it does not define
+  one body type for a cross-status equality comparison.
 - **Limits:** External-reference resolution was not independently verified, and
   the source's nested-namespace limitation remains. See the
   [evidence limitations](#earlier-template-and-array-repair-findings) and
@@ -35,17 +37,15 @@
   `@microsoft.azure/openapi-validator-rulesets@2.2.6`; its function retains the
   same exact-status and object-identity logic as the pinned upstream source above.
 - Repaired TypeSpec corpus run: full, 468 projects, index `generatedAt`
-  `2026-09-09T05:17:51.600Z`, recorded duration 1,693,363 ms
-  (28 minutes 13 seconds), with 462 successful projects and six compile failures.
-  The process completed with exit code zero at `2026-09-09T05:20:31.6454966Z`;
+  `2026-09-16T03:58:03.588Z`, recorded duration 1,020,334 ms
+  (17 minutes), with 462 successful projects and six compile failures.
+  The process completed with exit code zero after all 468 entries were processed;
   the index timestamp precedes final output writing.
-- Repaired source rule Git blob: `78a6d1857da53097cbbe6e657b951de4ca27f9d8`.
+- Repaired source rule Git blob: `7fe3dedfa5cf5a2e2ba9e8aa46591afea67b1e31`.
   The run used uncommitted repair changes on source HEAD
-  `bc936175f30133b02b1cf6a714afc491701a7365`, with core at
+  `022c357c9d2361ef7840face054107253228c64d`, with core at
   `a6137cac43a727ce0c2656364fd72d50c272ee4a`. The fetched migration target was
-  `fbc43e9abaeeeb200a7fbe349a833deb8a8f52ef`.
-  The corpus metadata recorded local-linter fingerprint
-  `sha256:9cae0ee6b15b6f896edc50f62447609d8fbf49b49d07e8ae66d6dca4b6c82b84`.
+  `022c357c9d2361ef7840face054107253228c64d`.
 - One-rule staging scan: `2026-09-09T04:51:52.035Z`, same pinned Swagger dataset
   and installed validator runtime as the focused repair.
 
@@ -79,57 +79,59 @@ and coverage definitions: official-rule credit in the external report is not
 observed local-lint overlap. No unsupported project correspondence is inferred
 from the external aggregate row.
 
-## Focused behavior (revalidated 2026-09-09)
+## Focused behavior (revalidated 2026-09-15)
 
-Twelve focused fixtures cover the exact verb/status gates, absent statuses and
-bodies, named and inline schema families, external references, binary and
-multipart responses, and multiple content variants. Three violation fixtures are
+Thirteen focused fixtures cover the exact verb/status gates, absent statuses and
+bodies, named and anonymous native types, external references, bytes, multipart
+bodies, tuples, and multiple content variants. Four violation fixtures are
 covered by the local lint. Six validator-clean compliance fixtures remain clean.
-Three compliance fixtures explicitly record reviewed Swagger false positives:
+Three compliance fixtures explicitly record reviewed Swagger identity false
+positives:
 
 - 1 identical external-reference diagnostic;
 - 6 identical inline-schema diagnostics;
-- 5 identical binary/multipart/tuple/string/array-schema diagnostics.
+- 2 identical `bytes` diagnostics, including binary versus JSON content types.
 
-These false positives come from comparing resolved JavaScript objects with
-`!==`, not from a difference in emitted schema values.
+The native suite has 26 passing tests. It includes equal and unequal tuples,
+tuple versus array, different multipart models, multipart versus ordinary body
+kinds, and content-type-independent `bytes` identity.
 
-### Mixed-body response repair
+### Native equality repair
 
 Promotion review [comment 3956634943](https://github.com/Azure/typespec-azure/pull/5423#discussion_r3956634943)
-identified order-dependent last-body selection in `getResponseBody`. Source
-inspection showed that AutoRest's `emitResponseObject` performs the same selection,
-but also reports `@azure-tools/typespec-autorest/duplicate-body-types` whenever
-body type identities differ within one status. Thus the finding did not establish
-a missed check on successfully emitted Swagger. The user explicitly selected a
-conservative source repair: omit this secondary lint comparison on emitter-invalid
-mixed-body responses rather than retain the arbitrary last-body warning.
+identified order-dependent last-body selection in `getResponseBody`. Follow-up
+[comment 5661862723](https://github.com/Azure/typespec-azure/pull/5423#issuecomment-5661862723)
+identified the broader problem: the rule scraped decorator function names and
+content types to predict OpenAPI categories, causing its definition of equality
+to depend on one emitter's current output rather than supported TypeSpec
+semantics.
 
-`getResponseBody` now returns no comparable body when two body-bearing variants
-have different `Type` identities. Either exact status can trigger this exemption.
-The emitter error remains; no schema is synthesized, bodies are not structurally
-merged, and valid response groups still aggregate all content types. A bodyless
-variant is not a conflicting body type. This change applies to the source rule;
-the promotion copy must be synchronized separately, not silently changed here.
+The repaired rule defines equality before emission:
 
-Twenty-six native tests pass. The three new failing cases before the guard were
-conflicts at `200`, conflicts at `201`, and distinct anonymous body types with equal
-properties. Regression tests cover both variant orders, and separately invoke
-AutoRest to assert its `duplicate-body-types` error at each exact status. Controls
-preserve matching named bodies, genuine `200`/`201` differences, mixed JSON/binary
-classification, and bodyless variants.
+1. The exact `200` and `201` responses must each expose one native body contract:
+   one type identity and one `HttpPayloadBody.bodyKind`.
+2. `HttpPayloadBody.bodyKind` must match.
+3. The body types must be identical, or be structurally equal plain anonymous
+   models or tuples.
 
-The new `different-multiple-content-types` fixture has four genuine violations in
-both engines: two reversed named-body variant orders and two reversed JSON/binary
-orders at `201`. All twelve fixture comparisons and 36 snapshots pass. Existing
-fixtures and their snapshots are unchanged. Invalid mixed-body inputs are covered
-by native/emitter diagnostic tests, not misrepresented as successful Swagger
-fixture compilations.
+Plain anonymous models exclude decorators, base models, indexers, defaults, and
+decorated properties. Tuple comparison is recursive and positional. Named types,
+multipart body kinds, tuples, arrays, and scalar families are not collapsed based
+on predicted OpenAPI output.
 
-The intrinsic-indexer review suggestion was not adopted: the compiler's standard
-`Array` declares `@indexer`, and no missing intrinsic identity was demonstrated.
-The promotion's fully qualified suppression-code documentation correction is
-outside this source repair.
+`getResponseBody` returns no comparable body when two body-bearing variants have
+different `Type` identities or body kinds. The native reason is that no single
+body contract exists for that status; selecting one would be order-dependent. AutoRest's
+`duplicate-body-types` error independently confirms that those inputs do not
+produce a stable comparison artifact, but the production decision does not depend
+on that emitter diagnostic. A bodyless variant is not a conflicting body type.
+
+The revised `different-native-response-bodies` fixture establishes four genuine
+native violations: distinct multipart models, different tuple elements,
+multipart versus ordinary string body kinds, and tuple versus `unknown[]`.
+`same-special-response-bodies` now establishes only supported native equality:
+the same `bytes` type is compliant even when content types cause different
+emitted schema categories.
 
 ### Gap example: secondary warning on invalid response variants
 
@@ -163,39 +165,15 @@ test's generic response wrapper.
 **Disposition:** Defer schema comparison until each status has one body type.
 This avoids noisy diagnostics on invalid input, not a validator count mismatch.
 
-### Earlier template and array repair findings
+### Retained template repair and known scope
 
-The previous conclusion overstated the evidence: the stored
-`same-special-response-bodies/tsp-diagnostics.json` contained a local lint warning
-for `tupleAndUnknownArray`, despite the emission matrix claiming it was clean.
-Both responses emit `{ "type": "array", "items": {} }`. Ordinary `unknown[]`
-carries the compiler's intrinsic `indexerDecorator`, so a zero-decorators test
-incorrectly prevented normalization.
-
-The repair permits only that intrinsic decorator, identified by function identity
-from the standard `Array` declaration through `checker.getStdType("Array")`.
-It does not whitelist arbitrary decorators by JavaScript function name. Named
-arrays, friendly-named arrays, constraints, custom decorators (including one
-also named `indexerDecorator`), and typed array elements remain distinct.
-
-The semantic walker also follows `sourceOperation`, exposing instantiated
-operation and interface templates in addition to their concrete aliases.
-`isTemplateDeclarationOrInstance` now filters the template operation or its
-template interface, while preserving concrete namespace operations, interface
-members, and inherited operations on concrete interfaces. A same/different pair
-of aliases now produces exactly one diagnostic on the differing alias; two
-violating aliases still produce two diagnostics.
-
-Fifteen focused native regression tests pass. Seven failed against the original
-implementation: four template-source duplication cases and three tuple/unknown
-array normalization cases. The eleven-fixture harness also passes: two covered
-violation fixtures, six validator-clean fixtures with reviewed ambient warnings,
-and three reviewed validator discrepancies. All 33 selected snapshots were
-regenerated; only the erroneous local tuple/unknown-array warning changed.
-The fixture snapshots retain the focused results. The repaired implementation
-was then run over the full corpus; the results below supersede the
-earlier historical counts. An independent source-diff review found no significant
-issues in the repairs.
+The semantic walker follows `sourceOperation`, exposing instantiated operation
+and interface templates in addition to concrete aliases.
+`isTemplateDeclarationOrInstance` continues to filter a template operation or
+its template interface while preserving concrete namespace operations, interface
+members, and inherited operations on concrete interfaces. Native target
+assertions prove that one differing concrete alias produces one diagnostic and
+two differing aliases produce two.
 
 External-reference limitation: the focused Spectral harness uses a fixed
 `test/openapi.json` document URI and filters `invalid-ref` diagnostics.
@@ -204,9 +182,8 @@ does not prove successful external-reference resolution. The staging helper also
 does not retain resolver diagnostics. The identical-reference conclusion below
 rests on inspected emitted reference pairs and the validator's identity-comparison
 implementation, not a claim of independently verified resolution in these runs.
-The repaired template and tuple/array regressions do not use external references.
+The repaired template and native-type regressions do not use external references.
 
-The earlier repair was limited to template duplication and intrinsic-array normalization.
 The source's existing provider-namespace guard remains unchanged. Its
 `resolveProviderNamespace` call searches the supplied namespace and descendants,
 not ancestors, so nested operation namespaces remain a known source limitation.
@@ -231,7 +208,7 @@ Package build and focused lint pass. Package-wide `pnpm --filter
 tsp-lintdiff-local-linter lint` remains blocked by 232 existing warnings in
 unmodified files; none comes from the repaired rule or its tests.
 
-For the 2026-09-09 repair, validation used the explicit source/test paths above,
+For the 2026-09-15 repair, validation used the explicit source/test paths above,
 not package-wide lint. Temporary `test/common-types` and
 `test/azure-openapi-validator` junctions supplied the focused fixture inputs and
 were removed afterward. Their presence does not establish successful external
@@ -348,24 +325,26 @@ their emitted references are equal.
 
 **Disposition:** Do not reproduce the validator's resolved-object identity defect.
 
-### Gap example: intrinsic array normalization
+### Gap example: emitted array shape is not native equality
 
 - **Classification:** fixture diagnostic-count difference
-- **Status:** fixed
+- **Status:** intentional native boundary
 - **Project/API version:** local focused fixture, not a real-service corpus finding
-- **Source:** `same-special-response-bodies/main.tsp:71-78`,
+- **Source:** `different-native-response-bodies/main.tsp:28-45,60-62`,
   `tupleAndUnknownArray`
 
 **TypeSpec source**
 
 ```typespec
+model TupleOk {
+  @statusCode statusCode: 200;
+  @body body: [string];
+}
 model UnknownArrayCreated {
   @statusCode statusCode: 201;
   @body body: unknown[];
 }
-@route("/tuple-unknown-array")
-@put
-op tupleAndUnknownArray(@query("api-version") apiVersion: string): TupleOk | UnknownArrayCreated;
+@put op tupleAndUnknownArray(): TupleOk | UnknownArrayCreated;
 ```
 
 **Emitted OpenAPI**
@@ -376,14 +355,14 @@ Both `TupleOk` and `UnknownArrayCreated` emit:
 { "type": "array", "items": {} }
 ```
 
-| Engine                      | Observed result                                                                  |
-| --------------------------- | -------------------------------------------------------------------------------- |
-| Swagger validator           | Reports equal inline objects because it compares JavaScript identity.            |
-| TypeSpec lint before repair | One false warning: the intrinsic array decorator prevented schema normalization. |
-| TypeSpec lint after repair  | No warning; genuine intrinsic indexer identity is allowed.                       |
+| Engine            | Observed result                                                                   |
+| ----------------- | --------------------------------------------------------------------------------- |
+| Swagger validator | Emission-dependent; both shapes can serialize as unconstrained array schemas.     |
+| TypeSpec lint     | One diagnostic: a fixed-length tuple and an open array are distinct native types. |
 
-**Disposition:** Keep named, constrained, custom-decorated, and typed arrays
-distinct; only remove the false warning for equivalent unconstrained arrays.
+**Disposition:** Do not use predicted emitted shape as the equality contract.
+Equal separately authored tuples are compared recursively, while tuple/array
+and distinct tuple element shapes remain different.
 
 ### Gap example: instantiated source-operation duplication
 
@@ -451,17 +430,16 @@ operation surface. The existing local rule remains the repair owner; no new
 overlapping rule was added.
 
 Within the applicable namespaces covered by these fixtures, the dedicated rule
-implements the intended
-`ConsistentResponseSchemaForPut` contract: ARM PUT only, exact `200` and `201`
-responses only, both schemas required, and consistent emitted schema identity.
-It deliberately excludes the validator's resolved-object identity defects while
-preserving genuine named-schema and inline-schema differences. The emission
-matrix in `rule.md` and the rerun focused fixtures support the tested contract,
-including the repaired template, intrinsic-array, and mixed-body cases. This is not a proof of
-equivalence for all possible decorated or emitter-specific shapes. The new full
-run confirms unchanged real-service behavior and no unexplained one-sided
-projects; the documented nested-namespace source limitation remains. The source
-repairs address false-positive, duplicate, and invalid-input secondary diagnostic
-behavior, not raw Swagger/TypeSpec count equality. The mixed-body exemption is an
-intentional boundary for unsuccessful emission, not an assertion that conflicting
-schemas are equal.
+implements a supported native `ConsistentResponseSchemaForPut` contract: ARM PUT
+only, exact `200` and `201` responses only, both bodies required, matching body
+kinds, and native type equality with conservative structural handling for plain
+anonymous models and tuples. It deliberately excludes the validator's
+resolved-object identity defects and does not scrape compiler internals or
+predict emitter-specific schema categories.
+
+The fixture matrix and native tests support the repaired tuple, multipart,
+content-type, template, and mixed-body boundaries. The full corpus determines
+whether the valid real-service behavior remains unchanged; the documented
+nested-namespace source limitation remains. Raw Swagger/TypeSpec diagnostic
+equality is neither expected nor required because the validator's remaining
+one-sided findings are identity false positives.
