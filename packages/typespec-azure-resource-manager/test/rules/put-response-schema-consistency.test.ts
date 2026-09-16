@@ -171,7 +171,7 @@ it("allows equal inline schemas and shared scalar enum and union types", async (
     .toBeValid();
 });
 
-it("reports inline metadata defaults content types and constrained schema differences", async () => {
+it("reports inline metadata defaults and constrained native type differences", async () => {
   await tester
     .expect(
       `${arm}
@@ -181,28 +181,6 @@ it("reports inline metadata defaults content types and constrained schema differ
       CreatedBody<{ @encodedName("application/json", "createdValue") value: string }>;
     @route("/defaults") @put op defaults():
       OkBody<{ value: string = "current" }> | CreatedBody<{ value: string = "created" }>;
-    model BinaryOk {
-      @statusCode statusCode: 200;
-      @header contentType: "application/octet-stream";
-      @body body: bytes;
-    }
-    model JsonOk {
-      @statusCode statusCode: 200;
-      @header contentType: "application/json";
-      @body body: bytes;
-    }
-    model BinaryCreated {
-      @statusCode statusCode: 201;
-      @header contentType: "application/octet-stream";
-      @body body: bytes;
-    }
-    model JsonCreated {
-      @statusCode statusCode: 201;
-      @header contentType: "application/json";
-      @body body: bytes;
-    }
-    @route("/bytes") @put op bytesContent(): BinaryOk | JsonCreated;
-    @route("/mixed") @put op mixedContent(): BinaryOk | JsonOk | BinaryCreated;
     @minItems(1) model ConstrainedUnknownArray is Array<unknown>;
     @route("/constrained") @put op constrained():
       OkBody<[string]> | CreatedBody<ConstrainedUnknownArray>;
@@ -212,19 +190,14 @@ it("reports inline metadata defaults content types and constrained schema differ
   `,
     )
     .toEmitDiagnostics(
-      [
-        "primitive",
-        "encodedMetadata",
-        "defaults",
-        "bytesContent",
-        "mixedContent",
-        "constrained",
-        "customString",
-      ].map((target) => ({ ...diagnostic, target })),
+      ["primitive", "encodedMetadata", "defaults", "constrained", "customString"].map((target) => ({
+        ...diagnostic,
+        target,
+      })),
     );
 });
 
-it("allows equivalent binary multipart tuple string and unknown-array schemas", async () => {
+it("allows shared binary and multipart native bodies", async () => {
   await tester
     .expect(
       `${arm}
@@ -238,22 +211,65 @@ it("allows equivalent binary multipart tuple string and unknown-array schemas", 
       @header contentType: "application/octet-stream";
       @body body: bytes;
     }
+    model FormData { value: HttpPart<string>; }
     model MultipartOk {
       @statusCode statusCode: 200;
-      @multipartBody body: { value: HttpPart<string> };
+      @multipartBody body: FormData;
     }
     model MultipartCreated {
       @statusCode statusCode: 201;
-      @multipartBody body: { count: HttpPart<int32> };
+      @multipartBody body: FormData;
     }
     @route("/binary") @put op binaryBody(): BinaryOk | BinaryCreated;
     @route("/multipart") @put op multipartBody(): MultipartOk | MultipartCreated;
-    @route("/tuple") @put op tupleBody(): OkBody<[string]> | CreatedBody<[int32, boolean]>;
-    @route("/multipart-string") @put op multipartString(): MultipartOk | CreatedBody<string>;
-    @route("/tuple-array") @put op tupleArray(): OkBody<[string]> | CreatedBody<unknown[]>;
   `,
     )
     .toBeValid();
+});
+
+it("reports different multipart bodies and ordinary bodies with the same type", async () => {
+  await tester
+    .expect(
+      `${arm}
+      model FormData { value: HttpPart<string>; }
+      model OtherFormData { count: HttpPart<int32>; }
+      model MultipartOk {
+        @statusCode statusCode: 200;
+        @multipartBody body: FormData;
+      }
+      model MultipartCreated {
+        @statusCode statusCode: 201;
+        @multipartBody body: OtherFormData;
+      }
+      @route("/multipart") @put op multipartBody(): MultipartOk | MultipartCreated;
+      @route("/string") @put op multipartString(): MultipartOk | CreatedBody<string>;
+      @route("/same-type") @put op multipartOrdinary(): MultipartOk | CreatedBody<FormData>;
+    `,
+    )
+    .toEmitDiagnostics(
+      ["multipartBody", "multipartString", "multipartOrdinary"].map((target) => ({
+        ...diagnostic,
+        target,
+      })),
+    );
+});
+
+it("compares separately authored tuples by ordered native element types and length", async () => {
+  await tester
+    .expect(
+      `${arm}
+      @route("/same") @put op same():
+        OkBody<[string, { value: int32 }]> | CreatedBody<[string, { value: int32 }]>;
+      @route("/element") @put op element(): OkBody<[string]> | CreatedBody<[int32]>;
+      @route("/length") @put op length(): OkBody<[string]> | CreatedBody<[string, int32]>;
+      @route("/order") @put op order(): OkBody<[string, int32]> | CreatedBody<[int32, string]>;
+      @route("/nested") @put op nested():
+        OkBody<{ values: [string] }> | CreatedBody<{ values: [int32] }>;
+    `,
+    )
+    .toEmitDiagnostics(
+      ["element", "length", "order", "nested"].map((target) => ({ ...diagnostic, target })),
+    );
 });
 
 it("allows shared schemas across multiple content variants", async () => {
@@ -465,7 +481,7 @@ it("checks aliases of operations on instantiated interfaces", async () => {
     .toEmitDiagnostics([{ ...diagnostic, target: "different" }]);
 });
 
-it("normalizes explicit Array unknown and reversed tuple response schemas", async () => {
+it("keeps explicit and reversed unknown arrays distinct from tuples", async () => {
   await tester
     .expect(
       `${arm}
@@ -475,7 +491,9 @@ it("normalizes explicit Array unknown and reversed tuple response schemas", asyn
       OkBody<unknown[]> | CreatedBody<[int32, boolean]>;
   `,
     )
-    .toBeValid();
+    .toEmitDiagnostics(
+      ["explicitArray", "reversedArray"].map((target) => ({ ...diagnostic, target })),
+    );
 });
 
 it("keeps named constrained friendly-named and typed arrays distinct from tuples", async () => {
@@ -574,6 +592,31 @@ it("does not merge distinct anonymous body variants with equal properties", asyn
     .toBeValid();
 });
 
+it("ignores conflicting body kinds at either exact status in either order", async () => {
+  for (const [status, otherStatus] of [
+    [200, 201],
+    [201, 200],
+  ]) {
+    for (const variants of ["Ordinary | Multipart", "Multipart | Ordinary"]) {
+      await tester
+        .expect(
+          `
+          ${contentResponses}
+          model FormData { value: HttpPart<string>; }
+          model Ordinary is ContentResponse<${status}, FormData, "application/json">;
+          model Multipart {
+            @statusCode statusCode: ${status};
+            @multipartBody body: FormData;
+          }
+          model Other is ContentResponse<${otherStatus}, FormData, "application/json">;
+          @put op createOrUpdate(): ${variants} | Other;
+        `,
+        )
+        .toBeValid();
+    }
+  }
+});
+
 it("allows shared body types across reordered content variants", async () => {
   for (const variants of ["Json | Xml", "Xml | Json"]) {
     await tester
@@ -607,12 +650,12 @@ it("reports schema differences across valid reordered response groups", async ()
   }
 });
 
-it("aggregates JSON and binary variants at either status regardless of order", async () => {
+it("allows the same bytes type across content types and reordered variants", async () => {
   for (const [status, otherStatus] of [
     [200, 201],
     [201, 200],
   ]) {
-    for (const variants of ["Json | Binary", "Binary | Json"]) {
+    for (const variants of ["Json", "Json | Binary", "Binary | Json"]) {
       await tester
         .expect(
           `
@@ -623,7 +666,7 @@ it("aggregates JSON and binary variants at either status regardless of order", a
           @put op createOrUpdate(): ${variants} | Other;
         `,
         )
-        .toEmitDiagnostics([{ ...diagnostic, target: "createOrUpdate" }]);
+        .toBeValid();
     }
   }
 });

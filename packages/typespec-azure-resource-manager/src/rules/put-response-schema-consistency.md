@@ -7,15 +7,18 @@ declares both exact status codes and both have bodies. It
 does not require either status code or a body, and does not compare `202`
 responses or other HTTP verbs.
 
-Shared types and structurally equal, undecorated anonymous models are accepted.
+The HTTP body kinds must match. Shared types and structurally equal, undecorated
+anonymous models and tuples are accepted. Tuple elements are compared in order,
+including their types and the tuple length.
 Distinct named types remain distinct schemas, even if their properties match.
-The comparison also accounts for equivalent emitted binary, multipart, and tuple
-response schemas.
+Multipart bodies are not interchangeable with ordinary bodies, and tuples are
+not interchangeable with arrays. Content types alone do not change native type
+equality, including for `bytes`.
 
-If either status declares multiple distinct body types, this rule skips the
-comparison. AutoRest rejects those conflicting bodies with `duplicate-body-types`;
-correct that error before comparing the `200` and `201` schemas. Multiple content
-types sharing one body type remain supported.
+If either status declares multiple distinct body types or body kinds, this rule
+skips the comparison because that status has no single unambiguous native body
+to compare. This does not establish that the response variants are otherwise
+valid. Multiple content types sharing one body type and body kind remain supported.
 
 #### ❌ Incorrect
 
@@ -98,4 +101,7 @@ This rule corresponds to
 [`ConsistentResponseSchemaForPut`](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#consistentresponseschemaforput).
 See the [original rule documentation](https://github.com/Azure/azure-openapi-validator/blob/main/docs/consistent-response-schema-for-put.md).
 Unlike the original resolved-object identity comparison, this rule accepts
-identical external references and equivalent inline schemas.
+shared native types and equivalent plain anonymous models. It compares native
+TypeSpec bodies, not emitted Swagger: lossy multipart and tuple representations
+do not make different native bodies equal, and content-type-driven differences
+in emitted `bytes` schemas do not make the same native body type unequal.
