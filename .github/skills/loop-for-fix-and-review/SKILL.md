@@ -706,7 +706,7 @@ Do not create replacement subagents between rounds.
 After the loop reaches a termination condition and the deliverable is complete,
 briefly review the run before the final user response. Read and follow the
 [shared post-run process review](../shared/post-run-process-review.md), including
-its confidence gate, ownership, independent PR, and reporting rules. Focus on:
+its confidence gate, ownership, existing-PR skill commit, and reporting rules. Focus on:
 
 - review-request or completion checks that were slow, stale, or unreliable, and
   better cursor or polling evidence to use next time

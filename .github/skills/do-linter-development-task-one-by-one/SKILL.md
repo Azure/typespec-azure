@@ -624,9 +624,12 @@ one session to execute both publication phases.
 > change, concrete observed evidence, impact, and source task. Do not ask the
 > user about suggestions or include low-confidence suggestions.
 
-The outer agent exclusively owns the consolidated post-run review and any
-skill-update PR under the shared policy. This does not override safety stops,
-validation requirements, review-loop limits, or repository guardrails.
+The outer agent exclusively owns the consolidated post-run review and
+authorizes its skill-only commit on an eligible existing development or repair
+PR under the shared policy. When another app session owns that PR, use a
+post-run-only handoff after the queue has ended; do not restart its rule work.
+This does not override safety stops, validation requirements, review-loop
+limits, or repository guardrails.
 
 ## Result classification
 
@@ -634,7 +637,8 @@ Classify a task as:
 
 - `succeeded` only when both draft PRs exist, both review loops reached a clean
   successful termination condition on their current pushed heads, and promotion
-  provenance matches the final reviewed source commit
+  provenance matches the final reviewed source commit at primary-workflow
+  termination, before any post-run skill-only commit
 - `partially-succeeded` when a development PR exists but the complete workflow
   cannot finish, including promotion blockers, either review cap, failed repair,
   or exhaustion of the three-source-repair budget
@@ -705,8 +709,11 @@ Keep existing PR links and promotion paths visible even when a later repair fail
 Distinguish earlier successful reviews from phases not rerun in the latest cycle.
 
 Never omit failed input lines or stop the final report at the first failure.
-After the task sections, include the skill-update PR link and brief summary, or
-a publishing blocker, only when required by the shared policy's final handoff.
+After the task sections, include the existing PR link, post-run skill-only
+commit, and brief summary, or a publishing blocker, only when required by the
+shared policy's final handoff. Preserve the primary workflow's reviewed SHAs
+and outcomes; separately identify the post-run head without claiming it was
+reviewed or changing promotion provenance.
 Do not print a process-suggestions list or low-confidence observations.
 
 ## Post-run process review
@@ -714,7 +721,7 @@ Do not print a process-suggestions list or low-confidence observations.
 After every queue entry is terminal, briefly review the complete run before the
 final user response. Read and follow the
 [shared post-run process review](../shared/post-run-process-review.md), including
-its confidence gate, ownership, independent PR, and reporting rules. This review
+its confidence gate, ownership, existing-PR skill commit, and reporting rules. This review
 belongs to the outer agent; workers only return qualifying evidence.
 
 Capture concrete suggestions for improving future queue runs, especially:
@@ -769,7 +776,10 @@ Capture concrete suggestions for improving future queue runs, especially:
 - Never stage, commit, or push a worker's `log.txt`.
 - Never infer success from subagent prose when the PR or pushed head can be
   verified directly.
-- Workers must never edit skills or create skill-update PRs based on post-run
-  suggestions.
-- The outer agent may make high-confidence post-run skill updates only through
-  the shared policy's independent skill-only PR after the queue has ended.
+- Workers must not publish skill changes based on their own post-run
+  suggestions. Only the outer agent may authorize a post-run-only handoff to
+  the existing development or repair PR owner after all queue work has ended.
+- High-confidence post-run skill updates use one skill-only commit on an
+  existing open development or repair PR targeting
+  `feature/lintdiff-migration-new`, under the shared policy. Never create a
+  separate skill-update PR or put these changes in a promotion PR.

@@ -2,7 +2,7 @@
 
 Use this shared contract for development preparation and standalone workers,
 standalone and queued promotion, authorized follow-up repair, publication-only
-recovery, and post-run skill PRs. It changes execution and publication ownership,
+recovery, and post-run skill commits. It changes execution and publication ownership,
 not eligibility, semantic coverage, validation, or source immutability. It adds
 no public command-line options. Queue-only dispatch and completion requirements
 do not apply to a standalone owner reporting directly to its user.
@@ -33,9 +33,13 @@ Resolve repository identity from actual remote fetch/push URLs and GitHub
 metadata, never a remote's name. New dedicated heads default to the user's
 personal fork; `Azure/typespec-azure` supplies the fetched base. Existing verified
 task PRs retain their recorded head repository, including canonical heads; do not
-move them to a fork. Promotion targets canonical `main`; migration and skill PRs
-target the explicitly selected migration branch. Examples using `origin` mean
-the verified canonical fetch remote; substitute its actual name when different.
+move them to a fork. Promotion targets canonical `main`; migration targets the
+explicitly selected migration branch. Post-run skill updates reuse an existing
+open development or repair PR targeting `feature/lintdiff-migration-new` and
+its recorded owner, branch, and worktree under the
+[shared post-run policy](../shared/post-run-process-review.md). They do not
+create a new session or PR. Examples using `origin` mean the verified canonical
+fetch remote; substitute its actual name when different.
 
 Git upstream controls tracking, push settings control push routing, and
 `gh-merge-base` is a CLI base hint. None changes an app session's comparison or

@@ -850,7 +850,7 @@ Produce:
 After the promotion PR is created and the deliverable is complete, briefly
 review the run before the final user response. Read and follow the
 [shared post-run process review](../shared/post-run-process-review.md), including
-its confidence gate, ownership, independent PR, and reporting rules. Focus on:
+its confidence gate, ownership, existing-PR skill commit, and reporting rules. Focus on:
 
 - steps that cost unexpected time and how to avoid or parallelize them next time
 - commands that were too broad, stalled, or failed for environmental reasons
