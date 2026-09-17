@@ -69,11 +69,7 @@ function emit(pkg: go.PackageContent, struct: go.Struct, imports: ImportManager)
         typeName = go.getLiteralTypeDeclaration(field.type.type);
       }
 
-      let pointer = "*";
-      if (field.byValue) {
-        pointer = "";
-      }
-      text += `${indent.get()}${naming.capitalize(field.name)} ${pointer}${typeName}\n`;
+      text += `${indent.get()}${naming.capitalize(field.name)} ${typeName}\n`;
       first = false;
     }
   }
