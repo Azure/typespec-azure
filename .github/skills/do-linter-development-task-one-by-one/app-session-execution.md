@@ -33,10 +33,11 @@ publication binding in durable session artifacts:
   completion channel; for reviews, selected owner and persistent capabilities
 
 Resolve repository identity from actual remote fetch/push URLs and GitHub
-metadata, never a remote's name. New dedicated heads default to the user's
-personal fork; `Azure/typespec-azure` supplies the fetched base. Existing verified
-task PRs retain their recorded head repository, including canonical heads; do not
-move them to a fork. Promotion targets canonical `main`; migration and skill PRs
+metadata, never a remote's name. New lintdiff development/migration heads publish
+as dedicated branches in canonical `Azure/typespec-azure`; new promotion and
+skill-update heads default to the user's personal fork. Existing verified task
+PRs retain their recorded head repository, including legacy fork heads; do not
+move or replace them. Promotion targets canonical `main`; migration and skill PRs
 target the explicitly selected migration branch. Examples using `origin` mean
 the verified canonical fetch remote; substitute its actual name when different.
 
@@ -251,9 +252,9 @@ repository: Azure/typespec-azure
 base_branch: <phase-base-branch>
 canonical_base_ref: <verified-canonical-remote>/<phase-base-branch>
 base_sha: <fetched-commit>
-head_repository: <personal-fork-owner>/typespec-azure
+head_repository: <Azure/typespec-azure-for-development-or-personal-fork-for-promotion>
 head_branch: <app-recorded-rule-branch>
-push_remote_url: <verified-personal-fork-push-url with credentials/userinfo redacted>
+push_remote_url: <verified-phase-head-repository-push-url with credentials/userinfo redacted>
 publication_tool: <required-tool>
 ```
 
@@ -571,7 +572,7 @@ base repo/branch and head repo/owner/branch, app binding and relevant Git settin
 in durable evidence (redact credentials only).
 
 1. Before creation and after any ambiguous or failed response, query the EXACT
-   target repository for open PRs with the fork-owner-qualified head and exact
+   target repository for open PRs with the owner-qualified head and exact
    base. Fully paginate; independently verify returned base repository/branch,
    head repository/branch, state, head SHA, draft status and complete file scope.
    Do not rely on a title, branch name without owner, or search snippets.
