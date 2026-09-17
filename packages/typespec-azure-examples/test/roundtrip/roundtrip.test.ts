@@ -13,7 +13,9 @@ import {
  * Round-trip proof on a real (small) service pulled from `azure-rest-api-specs`
  * (`specification/contosowidgetmanager`, Microsoft.Contoso). It proves the migrate → resolve
  * pipeline is lossless: for every API version, the examples materialized back from the unified
- * `examples.yaml` reproduce the original `x-ms-examples` files byte-for-byte (structurally).
+ * `examples.yaml` reproduce each original `x-ms-examples` document — the `title`/`operationId`
+ * envelope, `parameters`, and `responses` all match. (Parameter *ordering* is normalized by the
+ * bucketing, so the match is structural, not necessarily a raw byte diff.)
  *
  * This is the CI gate described in the epic (#4838): a service can only adopt `examples.yaml` if the
  * generated legacy files match what shipped before.
@@ -24,8 +26,8 @@ const fixtureRoot = fileURLToPath(new URL("./fixtures/contoso", import.meta.url)
 const versionOrder = ["2021-10-01-preview", "2021-11-01"];
 
 interface OriginalExample {
-  readonly parameters: Record<string, unknown>;
-  readonly responses: Record<string, unknown>;
+  readonly operationId: string;
+  readonly doc: Record<string, unknown>;
   readonly bodyParameterName?: string;
 }
 
@@ -46,8 +48,8 @@ describe("migrate → resolve round-trip (Microsoft.Contoso)", () => {
     for (const example of crawl.examples) {
       const key = `${example.version}::${deriveOperationKey(example.operationId)}`;
       originals.set(key, {
-        parameters: example.doc.parameters ?? {},
-        responses: example.doc.responses ?? {},
+        operationId: example.operationId,
+        doc: example.doc as Record<string, unknown>,
         bodyParameterName: bodyParameterName(example.paramLocations),
       });
     }
@@ -74,12 +76,16 @@ describe("migrate → resolve round-trip (Microsoft.Contoso)", () => {
         expect(original, `no original example for ${key}`).toBeDefined();
 
         const legacy = materializeLegacyExample(example, {
+          operationId: original!.operationId,
           apiVersion: version,
           bodyParameterName: original!.bodyParameterName,
         });
 
-        expect(legacy.parameters, `parameters mismatch for ${key}`).toEqual(original!.parameters);
-        expect(legacy.responses, `responses mismatch for ${key}`).toEqual(original!.responses);
+        // The full reconstructed document (title + operationId envelope, parameters, responses)
+        // must match the original x-ms-examples file exactly.
+        expect(legacy, `document mismatch for ${key}`).toEqual(original!.doc);
+        // `title` must be the first key, matching the dominant legacy convention.
+        expect(Object.keys(legacy).slice(0, 2)).toEqual(["title", "operationId"]);
       }
 
       // Completeness: every original at this version was reproduced.
