@@ -422,6 +422,12 @@ Use `createLinterRuleTester` and cover:
 - edge cases called out in source-of-truth notes
 - regression cases for any lintdiff review fixes
 
+When promotion adds or preserves project/library declaration filtering, include
+an imported library declaration that would otherwise violate the rule and assert
+that it is excluded. Pair it with a violating project declaration so the test
+cannot pass merely because the rule never ran. Test template filtering separately;
+ordinary and nested project namespace cases do not prove library exclusion.
+
 For metadata-resolution or reference-based logic, explicitly cover relevant
 version-selection/fallback behavior, returned resolution diagnostics, and
 diagnostic targets. Prove that checking a resolved record does not depend on
@@ -471,6 +477,10 @@ library documentation:
 - focus the rationale on TypeSpec authoring, generated SDKs, API consistency, and
   Azure emitter/tooling behavior
 - include realistic TypeSpec incorrect and correct examples
+- follow the destination's authored-document conventions, including `## Impact`
+  with the affected areas and `## Suppression` guidance when used by neighboring
+  rules; explain when suppression is appropriate rather than only how to fix
+  the violation
 - keep Swagger or LintDiff provenance only in a dedicated provenance section such
   as `## LintDiff Equivalent`; link the original validator rule name to its
   source documentation or source file, and do not frame the rule primarily as
@@ -490,6 +500,12 @@ layout. Use the scoped empty-ignore override in step 9: ordinary Prettier
 commands silently skip website references covered by `.prettierignore` and
 generated rule pages covered by `.gitignore`. Leave both ignore files untouched
 and do not force-add ignored generated rule pages.
+
+For ARM promotions, also inspect the manually maintained rule matrix at
+`website/src/content/docs/docs/howtos/ARM/arm-rules.md`. Add the official rule
+with the correct documentation link and applicability columns, following the
+table's alphabetical ordering. `regen-docs` does not update this matrix; include
+it in the explicit formatting and diff review scope.
 
 ### 7. Update rulesets
 
