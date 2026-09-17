@@ -112,6 +112,10 @@ Classify before applying merged-PR or reuse gates; titles are leads, not identit
   dependency/tool context, validation requirements and prior attempt evidence.
   Reuse validation only when these still match; changes invalidate affected
   checks. Preserve the branch and use [publication recovery](#publication-recovery).
+- **Explicitly authorized PR replacement:** the user requests a replacement or
+  migration from a fork-backed PR to a canonical head. Apply the
+  [replacement procedure](#explicitly-authorized-pr-replacement) below as a
+  separate lifecycle, not as `update-existing` or an automatic recovery retry.
 
 Legacy ownership adoption is a separate explicitly authorized operation below,
 not any of these lifecycle classes or permission to transfer commits, replace
@@ -609,3 +613,48 @@ separate from worker attempts, setup retries, source repairs, draft corrections
 and review rounds. Neither a fresh dispatch nor publication-only recovery resets
 it. If blocked, retain validated work and report the exact tuple, attempts,
 query evidence and missing control; do not fall back to another base or tool.
+
+## Explicitly authorized PR replacement
+
+Use only when the user explicitly requests replacing a PR or migrating its head
+to the canonical repository. This is not authorized by a failed publication,
+a generic queue resumption, or a desire to clear review findings.
+
+1. Stop prior task activity and record the user's request and original PR's
+   repository/number, state, base and head identities, exact commit SHA, title,
+   body, draft status, labels, assignees, milestone, and worktree binding.
+   Preserve this snapshot outside tracked files before any mutation.
+2. Record the intended replacement tuple separately from copied content:
+   `Azure/typespec-azure` as head repository, exact head branch, base repository
+   and branch, and pinned commit. "Same title/body/commit" does not mean "reuse
+   the old fork owner." Verify canonical push permission and source SHA before
+   creating a branch. Preserve commits and commit messages; do not rebase,
+   amend, or force-push to manufacture a replacement.
+3. Reuse an existing canonical branch only if its SHA matches the requested
+   commit and it is owned by this task. Never overwrite a conflicting branch.
+   If creation must precede closing an open PR on that same head/base, record
+   the need for a distinct canonical branch at the same commit; do not silently
+   close the old PR first or fall back to a fork. Apply the selected backend's
+   owner/worktree binding and exact-head duplicate checks before creation.
+4. Create the replacement using the intended tuple and copied metadata. Do not
+   copy reviews, approval state, check results, or reviewer requests as if they
+   belonged to the new PR. On ambiguous creation, reconcile by the exact tuple
+   instead of blindly issuing another request.
+5. Independently verify the new PR's actual head repository/owner/branch/SHA,
+   base, complete file scope, title/body, draft state and requested metadata
+   against the snapshot. Only then close the original if authorized. Recheck
+   its current metadata before editing; if another actor changed it, preserve
+   that change and report the conflict rather than overwriting it.
+6. Clear the old title/body only if requested. GitHub requires a nonempty title;
+   explain and use a neutral title such as `Superseded` instead of claiming it
+   is blank. Verify the old PR's final state and requested edits. Never delete
+   branches or comments as implicit cleanup.
+7. Update the task ledger and publication binding to the new PR/head repository,
+   branch, explicit push destination and matching local worktree; preserve the
+   old PR and review IDs as history. A remote branch creation alone does not
+   update local tracking or app ownership. Re-establish that binding before
+   subsequent edits or publication; never leave an old fork as the push target.
+   Record historical validation reuse only when content and inputs match.
+   Reviews of the old PR remain historical even with an identical commit.
+   If the task requires a clean reviewed replacement, run a fresh review loop
+   on the new PR; otherwise report that no new-PR review was requested.

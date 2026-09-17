@@ -132,10 +132,11 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
   verification review.
 - Stop immediately on an unverified review request, indeterminate collector
   failure, push failure, uncertain finding, or validation/corpus failure that
-  does not qualify for [bounded draft correction](#bounded-draft-correction).
-  The only recovery paths are that in-place correction and the separately
+  does not qualify for [bounded draft correction](#bounded-draft-correction)
+  or [bounded native-test timeout diagnosis](#bounded-native-test-timeout-diagnosis).
+  The only recovery paths are those procedures and the separately
   bounded, parent-authorized [local collector recovery](#local-collector-recovery).
-  Neither permits erasing failed attempts or publishing unverified changes.
+  None permits erasing failed attempts or publishing unverified changes.
 
 ## Initialize
 
@@ -228,6 +229,8 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
    - planned validation scope, command results, and corpus applicability/results
    - draft-correction count, failure evidence, causal classification, corrective
      diff identity and rerun results for the backlog pass or current round
+   - native-test timeout-diagnosis allowance owner, usage, eligibility evidence,
+     unchanged test population/timeouts, concurrency change and rerun result
    - publication handoff identity and the parent's approval or rejection
    - pushed fix commit SHA
    - processed review-thread IDs and their final resolution state
@@ -544,7 +547,8 @@ Also record whether corpus validation is required, why, and its results when
 applicable.
 
 On a command failure, preserve the evidence and classify it using the bounded
-draft-correction policy below before deciding whether to stop. Never stage,
+draft-correction or native-test timeout-diagnosis policy below before deciding
+whether to stop. Never stage,
 commit or push a failing draft. A passing narrower command does not erase a
 failed required check. Do not retrospectively relabel a failed command as
 supplemental or self-waive it because its diagnostics appear unrelated.
@@ -592,7 +596,8 @@ findings, switching agents or restarting a phase.
    Return `ready-for-publication` only when the final draft satisfies the complete
    required scope. The parent independently verifies that every prior failure
    is accounted for and no failed required check remains unresolved.
-6. Stop on an unknown cause, unsafe/out-of-scope correction, exhausted budget,
+6. Except for an eligible native-test timeout diagnosis below, stop on an
+   unknown cause, unsafe/out-of-scope correction, exhausted budget,
    or an external/indeterminate operational failure (such as credentials, network,
    dependency/tool availability, harness/emitter crash, or publication failure).
    An agent-authored argument error rejected before work starts is not a
@@ -606,6 +611,45 @@ This budget is separate from the five review rounds, queue orchestration retry
 and queue source-repair cycles. The invocation authorizes eligible corrections;
 parent approval is still required for publication, not for each local correction.
 
+### Bounded native-test timeout diagnosis
+
+A completed native unit-test run whose only failures are test-runner-reported
+per-test timeouts may receive **one diagnostic rerun with reduced concurrency**.
+In queue mode, the outer queue owns one allowance for the entire task, shared
+across phases, review rounds, and source-repair cycles. Outside queue mode, the
+invoking standalone workflow owns one allowance across its nested reviews.
+Pass and preserve that ownership and usage in handoffs; a new agent, phase,
+review invocation, or resumption does not reset it.
+
+1. Preserve the original command, runner exit status and complete test summary,
+   timeout failures, test counts/skips, working tree identity, and output.
+   Require natural runner completion, no remaining child process, and known
+   task-owned side effects. Mixed assertion/compiler failures, setup/hook
+   timeouts, crashed workers, killed or hung commands, corpus/emitter failures,
+   dependency/network/auth errors, and uncertain completion are not eligible.
+2. Inspect the installed runner's documented concurrency option. Require that
+   concurrency can actually be reduced. Record and consume the allowance before
+   running; in queue mode the outer queue grants the worker this recorded allowance
+   without another user prompt. For Vitest, use a supported `--maxWorkers=1`
+   invocation. Keep the same test selection, assertions, skips, code, fixtures,
+   dependencies, and configured test/hook timeouts. Do not reinstall, raise
+   timeouts, add retries, or change production code for this diagnostic run.
+3. Run the original full validation scope once with only the concurrency change.
+   Verify that the discovered test population and skip set match. A focused
+   subset cannot substitute for this rerun. Preserve both attempts.
+4. If it passes, record a recovered timeout with unproven cause, not proof of
+   environmental contention, and complete the remaining required validation.
+   If it fails, do not repeat the diagnostic run. An understood defect in the
+   agent's draft may still use the existing bounded draft-correction allowance,
+   with concrete causal evidence and a full-scope passing rerun. An unexplained
+   timeout or ineligible failure remains a blocker. Source-semantic defects in
+   promotion still require the source-repair handoff.
+
+This allowance is separate from draft corrections and does not authorize
+review requests, pushes, PR creation, email retries, or publication of a failing
+draft. The parent verifies eligibility and all failure/recovery evidence before
+approving publication.
+
 ### Linter source changes
 
 In standard PR mode, run the corpus procedure only when a valid fix changes
@@ -615,7 +659,8 @@ production linter-rule code changes, follow the current linter-source validation
 and corpus procedure in `/develop-lintdiff-rule` in full. Treat that skill as
 the source of truth for setup, commands, evidence updates, analysis, and
 generated-output cleanup. Record every required validation or corpus failure;
-continue only for an eligible bounded draft correction, otherwise stop the loop.
+continue only for an eligible bounded draft correction or native-test timeout
+diagnosis. The timeout exception never applies to corpus runs.
 
 In promotion PR mode, do not run `/develop-lintdiff-rule`, the lintdiff fixture
 harness, or corpus validation. Follow the current targeted validation procedure
@@ -627,8 +672,8 @@ of truth for the exact current commands and generated-output checks. A
 production rule edit is permitted only when it is a verified
 `promotion-adaptation-issue` that preserves the immutable source semantics.
 Record every required promotion validation failure; continue only for an
-eligible bounded draft correction that preserves the pinned source semantics,
-otherwise stop the loop.
+eligible bounded draft correction that preserves the pinned source semantics
+or bounded native-test timeout diagnosis, otherwise stop the loop.
 
 ### Parent publication gate
 

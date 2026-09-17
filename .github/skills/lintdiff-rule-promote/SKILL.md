@@ -234,12 +234,11 @@ needs special investigation:
    website linter/rule references, rulesets build/test, affected package test.
    Do not build the website or its dependency closure locally.
 9. For broad local validation, set `TYPESPEC_SKIP_WEBSITE_BUILD=true` when
-   running the repo build or `pnpm validate:pr`. Keep a bounded wait; if
-   validation makes no progress for five minutes after an already-passed narrow
-   validation set, stop it, classify it as an environmental/pre-existing
-   validation blocker, and include the evidence in the PR instead of waiting
-   indefinitely. Rely on CI's dedicated Website job for the authoritative Astro
-   check and build.
+   running the repo build or `pnpm validate:pr`. Apply the
+   [bounded broad-validation monitoring](#bounded-broad-validation-monitoring)
+   procedure below; wrapper silence alone does not establish a stall. Record
+   any incomplete broad validation in the PR. Rely on CI's dedicated Website
+   job for the authoritative Astro check and build.
 
 `pnpm validate:pr` is intentionally broad: it fetches/checks the branch, then
 runs full-repo build, test, lint, format check, spelling check, docs regen,
@@ -423,6 +422,13 @@ Use `createLinterRuleTester` and cover:
 - edge cases called out in source-of-truth notes
 - regression cases for any lintdiff review fixes
 
+Follow a neighboring native rule test's setup and teardown lifecycle, not just
+its helper imports. With the Core `Tester`, create the fresh tester and rule
+tester in `beforeEach`, as the package's existing tests do. Keep lazy library
+filesystem/host initialization out of the first test body, await asynchronous
+setup, and preserve per-test isolation. Do not compensate for setup mistakes
+by raising timeouts, caching mutable testers across cases, or weakening assertions.
+
 When promotion adds or preserves project/library declaration filtering, include
 an imported library declaration that would otherwise violate the rule and assert
 that it is excluded. Pair it with a violating project declaration so the test
@@ -594,6 +600,12 @@ Optimized validation order:
 9. if broad local validation is warranted, run the repo build or
    `pnpm validate:pr` with `TYPESPEC_SKIP_WEBSITE_BUILD=true`
 
+For timeout-only native test failures, apply the shared
+[bounded native-test timeout diagnosis](../loop-for-fix-and-review/SKILL.md#bounded-native-test-timeout-diagnosis)
+before declaring an unexplained terminal blocker. Queued promotion consumes the
+queue's single task-wide allowance; it does not receive a new allowance here.
+This exception does not apply to the broad build or lintdiff corpus.
+
 Do not manually build the website package or its dependency closure during local
 promotion validation. The website build script honors
 `TYPESPEC_SKIP_WEBSITE_BUILD=true`, matching the general CI build jobs. CI's
@@ -678,9 +690,32 @@ the session after the required narrow validation has already passed:
 pnpm exec cross-env TYPESPEC_SKIP_WEBSITE_BUILD=true pnpm validate:pr
 ```
 
-If `validate:pr` stalls with no new output for five minutes, stop it and
-include a **Validation blocker** section in the PR body with the last observed
-step, elapsed time, and the successful narrower validations.
+#### Bounded broad-validation monitoring
+
+Before launching the optional broad command, record its start time, a finite
+overall deadline of at most 30 minutes, output artifact, and progress signal.
+Preserve that deadline across tool waits and monitoring resumptions. Inspect
+whether the wrapper streams or buffers child output; where supported, use a
+child-output log or verbose/streaming option without changing validation scope.
+Keep long-running output separate from the shared execution log.
+
+Apply the five-minute inactivity limit only to an observable child-progress
+signal, such as streamed build output or a build step/artifact advancing.
+Wrapper stdout silence alone is insufficient when child output is buffered.
+A live PID or unchanged process status alone is also not evidence of progress.
+If no reliable child-progress signal is available, record that limitation and
+use the original overall deadline rather than diagnosing a build stall from
+wrapper silence. Do not change repository tooling just to add monitoring.
+
+At five minutes of observed child inactivity or the overall deadline, stop the
+specific command's process tree and verify quiescence. Include a **Validation
+blocker** section in the PR with the last observable step, signal source,
+elapsed time, termination reason, and successful required narrow validations.
+Distinguish a monitoring/deadline limitation from an established code or
+environmental failure; never invent a natural exit code for a terminated process.
+Do not rerun the broad command automatically or waive a failed required check.
+
+#### Validation findings
 
 If validation reveals a semantic issue, do not edit the lintdiff source during
 promotion. For every review or validation finding, classify it before editing:

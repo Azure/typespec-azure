@@ -214,6 +214,8 @@ Keep an ordered ledger with one entry per parsed queue entry:
   waiting phase, handoff artifact, and review invocation/agent IDs
 - local draft-correction counts, causal evidence and rerun results, separate
   from worker attempts, review rounds and source-repair cycles
+- native-test timeout-diagnosis usage (at most one per task across all phases
+  and cycles), eligibility evidence, concurrency change and full-scope results
 - publication attempt/error identities, exact base/head tuple and SHA, absence
   query evidence, and the separate one-correction publication budget
 - original readiness/status/quiescence deadlines, last genuine progress,
@@ -393,7 +395,8 @@ corrected prompt. Never reuse the failed worker.
 
 Do not restart workers automatically for dependency, build, validation, corpus,
 review, network, credential, push or GitHub failures. This does not prohibit an
-eligible in-place draft correction below or the shared
+eligible in-place draft correction, the single
+[native-test timeout diagnosis](#native-test-timeout-diagnosis) below, or the shared
 [single evidenced publication-configuration correction](app-session-execution.md#publication-recovery).
 That exception requires positive exact-PR absence and a specific proven defect,
 uses only the required creation tool, and never restarts a worker or retries
@@ -429,9 +432,31 @@ side-effect safety; they are not worker restarts or external-operation retries.
 It must not report a terminal blocker merely because its own draft needs a safe,
 understood correction and budget remains. Preserve all failed-attempt evidence;
 do not restart the worker, consume a source-repair cycle, or weaken validation.
-External/indeterminate operational failures, unknown causes, exhausted budgets
+Except for the narrowly eligible native-test timeout diagnosis below,
+external/indeterminate operational failures, unknown causes, exhausted budgets
 and confirmed immutable promotion-source defects retain their existing
 stop/handoff behavior.
+
+### Native-test timeout diagnosis
+
+Apply the review skill's
+[bounded native-test timeout diagnosis](../loop-for-fix-and-review/SKILL.md#bounded-native-test-timeout-diagnosis)
+to completed native unit-test runs with only per-test timeout failures.
+The queue invocation authorizes at most one such diagnostic rerun per task,
+shared across development, promotion, nested reviews, and source-repair cycles.
+The outer queue verifies eligibility and records usage before dispatching the
+same phase owner or fix agent; it does not restart a worker. Preserve the
+original failure, test population, skip set, and configured timeouts.
+If the owner cannot obtain approval within its current turn, return a
+nonterminal `timeout-diagnosis-handoff` with all commands stopped and the
+eligibility evidence. Keep the task `running` while the outer queue evaluates
+and dispatches this allowance; a rejected handoff returns to the normal stop
+policy. This same-owner continuation does not consume an orchestration retry.
+
+This is not permission to retry a corpus, build, hung command, assertion failure,
+or external operation. If the allowance is used or eligibility is unproven,
+retain the existing stop policy. A subsequent understood draft defect uses the
+remaining draft-correction budget, never a fresh diagnostic allowance.
 
 ### Explicitly authorized bounded resumption
 
@@ -539,6 +564,8 @@ fresh repair worker. It is an orchestration contract, not a new public CLI flag:
   and existing promotion adaptations that must be preserved on refresh
 - all completed phase outcomes, review-round counts, reviewed SHAs, and previous
   repair reasons; do not overwrite earlier results when a later cycle fails
+- task-wide native-test timeout-diagnosis allowance and usage, including failed
+  and passing evidence; no phase or source-repair cycle receives a new allowance
 - source defect evidence: discovery phase, exact source paths and locations,
   source SHA, expected versus actual behavior, reproducer or regression case,
   technical explanation of why this is a source defect rather than promotion
@@ -643,6 +670,9 @@ one session to execute both publication phases.
 > For agent-introduced draft or validation-command errors, apply the local
 > draft-correction policy above. Record the causal evidence and attempt count, correct eligible failures
 > in place, and rerun the failed required command plus affected remaining checks.
+> For an eligible completed native-test timeout-only failure, report the evidence
+> and inherited task-wide allowance to the outer queue for the single diagnostic
+> rerun. Do not consume it independently or treat it as a new worker/cycle.
 > Do not stop merely on the first build/test failure in your own draft or a
 > safely correctable invocation mistake. Confirm command semantics and side
 > effects, preserve the intended scope and count the correction. Do stop
