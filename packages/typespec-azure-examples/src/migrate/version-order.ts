@@ -37,6 +37,15 @@ export function earliestVersion(
   return [...versions].sort(compare)[0];
 }
 
+/** Return the latest version under the given comparator. */
+export function latestVersion(
+  versions: readonly string[],
+  compare: (a: string, b: string) => number,
+): string | undefined {
+  if (versions.length === 0) return undefined;
+  return [...versions].sort(compare)[versions.length - 1];
+}
+
 function datePart(version: string): string {
   const match = /^\d{4}-\d{2}-\d{2}/.exec(version);
   return match ? match[0] : version;

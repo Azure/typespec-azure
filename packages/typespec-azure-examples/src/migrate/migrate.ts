@@ -1,10 +1,16 @@
+import type { ExampleDiagnostic } from "../types.js";
 import { buildLineages, type CollectedExample } from "./dedup.js";
 import { planFiles, type EmittedFile, type OperationEntry } from "./emit.js";
 import { normalizeApiVersion } from "./normalize.js";
 import { deriveOperationKey } from "./operation-key.js";
 import { crawlExamples } from "./swagger.js";
 import { transformExample } from "./transform.js";
-import { comparatorFromOrder, defaultCompareVersions, earliestVersion } from "./version-order.js";
+import {
+  comparatorFromOrder,
+  defaultCompareVersions,
+  earliestVersion,
+  latestVersion,
+} from "./version-order.js";
 
 /** Options controlling a migration run. */
 export interface MigrateOptions {
@@ -31,6 +37,13 @@ export interface MigrateResult {
   readonly versions: string[];
   /** The number of operations migrated. */
   readonly operationCount: number;
+  /**
+   * Warnings surfaced during migration — currently, example lineages that stop appearing before the
+   * service's latest version. The unified format has no removal marker, so such an example is
+   * re-materialized for every version from its last appearance onward; the migrator flags it so the
+   * author can confirm it still applies (or remove it).
+   */
+  readonly diagnostics: ExampleDiagnostic[];
 }
 
 /**
@@ -92,5 +105,46 @@ export async function migrate(root: string, options: MigrateOptions = {}): Promi
   });
 
   const versions = options.versionOrder ? [...options.versionOrder] : crawl.versions;
-  return { files, namespace, versions, operationCount: entries.length };
+  const diagnostics = collectRemovalDiagnostics(byOperation, versions, compareVersions);
+  return { files, namespace, versions, operationCount: entries.length, diagnostics };
+}
+
+/**
+ * Flag example lineages that stop appearing before the latest version. Because the unified format
+ * has no removal marker, such an example would be re-materialized for versions it never shipped in,
+ * so the author should confirm it still applies (or drop it).
+ */
+function collectRemovalDiagnostics(
+  byOperation: ReadonlyMap<string, readonly CollectedExample[]>,
+  versions: readonly string[],
+  compareVersions: (a: string, b: string) => number,
+): ExampleDiagnostic[] {
+  const latest = latestVersion(versions, compareVersions);
+  if (latest === undefined) return [];
+
+  const diagnostics: ExampleDiagnostic[] = [];
+  for (const [operationKey, collected] of byOperation) {
+    const lastByLineage = new Map<string, string>();
+    for (const example of collected) {
+      const current = lastByLineage.get(example.exampleName);
+      if (current === undefined || compareVersions(example.version, current) > 0) {
+        lastByLineage.set(example.exampleName, example.version);
+      }
+    }
+    for (const [lineage, lastSeen] of lastByLineage) {
+      if (compareVersions(lastSeen, latest) < 0) {
+        diagnostics.push({
+          code: "example-removed-before-latest",
+          message:
+            `Example "${lineage}" for operation "${operationKey}" last appears in "${lastSeen}", ` +
+            `before the latest version "${latest}". The unified format has no removal marker, so it ` +
+            `will be re-materialized for every version from "${lastSeen}" onward — confirm it still ` +
+            `applies to later versions, or remove it.`,
+          severity: "warning",
+          file: "examples.yaml",
+        });
+      }
+    }
+  }
+  return diagnostics;
 }

@@ -98,11 +98,20 @@ What it does:
 - Buckets each example parameter into `request.path` / `query` / `headers` / `body` using the
   operation's declared parameter locations, and drops the implicit `api-version`.
 - Normalizes embedded version strings (in `Location`, `Azure-AsyncOperation`, `nextLink`, ...) to
-  the `{api-version}` placeholder, then dedups identical examples across versions into `since`
+  the `{api-version}` placeholder, then dedupes identical examples across versions into `since`
   lineages — one base entry plus a `since` variant whenever the content changes.
 
 Options: `--out <dir>` (default `.`), `--namespace <ns>`, `--service <path>`,
 `--split-by-interface`, `--dry-run`, `--warn-as-error`.
+
+### Known limitation: examples removed in a later version
+
+The format has a `since` ("applies from") marker but no `until`/removal marker, so an example that
+existed in an earlier version but was **dropped** in a later one is still re-materialized for the
+later versions (its base entry applies from its first appearance onward). Migration flags each such
+lineage with an `example-removed-before-latest` **warning** so the author can confirm it still
+applies to later versions, or delete it. Services that rely on removing examples across versions are
+not yet fully supported.
 
 ## API
 

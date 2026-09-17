@@ -27,4 +27,9 @@ export {
   type ExtractedOperation,
 } from "./swagger.js";
 export { transformExample } from "./transform.js";
-export { comparatorFromOrder, defaultCompareVersions, earliestVersion } from "./version-order.js";
+export {
+  comparatorFromOrder,
+  defaultCompareVersions,
+  earliestVersion,
+  latestVersion,
+} from "./version-order.js";
