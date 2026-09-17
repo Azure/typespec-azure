@@ -25,6 +25,11 @@
     "message": "Resource 'Widget' must have a delete operation."
   },
   {
+    "code": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
+    "severity": "warning",
+    "message": "Tracked resource 'Widget' must have patch operation that at least supports the update of tags."
+  },
+  {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."

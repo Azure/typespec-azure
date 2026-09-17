@@ -138,7 +138,7 @@
   "definitions": {
     "Widget": {
       "type": "object",
-      "description": "A registered proxy resource.",
+      "description": "A widget resource.",
       "properties": {
         "properties": {
           "$ref": "#/definitions/WidgetProperties",
@@ -147,7 +147,7 @@
       },
       "allOf": [
         {
-          "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ProxyResource"
+          "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/TrackedResource"
         }
       ]
     },

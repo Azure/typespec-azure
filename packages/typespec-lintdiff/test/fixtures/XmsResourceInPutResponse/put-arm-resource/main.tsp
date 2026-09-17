@@ -16,8 +16,8 @@ enum Versions {
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
-/** A registered proxy resource. */
-model Widget is ProxyResource<WidgetProperties> {
+/** A widget resource. */
+model Widget is TrackedResource<WidgetProperties> {
   ...ResourceNameParameter<Widget>;
 }
 
