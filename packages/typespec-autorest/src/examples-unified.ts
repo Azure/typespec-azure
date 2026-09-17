@@ -2,10 +2,10 @@ import {
   defaultLegacyExampleFilename,
   deriveOperationKey,
   loadExampleFile,
+  materializeLegacyExample,
   resolveExampleFiles,
   stripJsonExtension,
   type ExampleDiagnostic,
-  type ExampleRequest,
   type LoadedExampleFile,
   type ResolvedExample,
 } from "@azure-tools/typespec-azure-examples";
@@ -126,23 +126,10 @@ export function toLegacyExampleDoc(
   resolved: ResolvedExample,
   options: { operationId: string; apiVersion: string; bodyParameterName?: string },
 ): LegacyExampleDoc {
-  const request = (resolved.request ?? {}) as ExampleRequest;
-  const parameters: Record<string, unknown> = { "api-version": options.apiVersion };
-
-  for (const bucket of [request.path, request.query, request.headers]) {
-    if (bucket && typeof bucket === "object") {
-      Object.assign(parameters, bucket);
-    }
-  }
-
-  if (request.body !== undefined) {
-    parameters[options.bodyParameterName ?? "body"] = request.body;
-  }
-
-  const responses =
-    resolved.responses && typeof resolved.responses === "object"
-      ? (resolved.responses as Record<string, unknown>)
-      : {};
+  const { parameters, responses } = materializeLegacyExample(resolved, {
+    apiVersion: options.apiVersion,
+    bodyParameterName: options.bodyParameterName,
+  });
 
   return {
     operationId: options.operationId,
