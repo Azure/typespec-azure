@@ -154,6 +154,22 @@ export interface AutorestEmitterOptions {
    * @default "auto"
    */
   "service-yaml"?: "auto" | "always" | "never";
+
+  /**
+   * Controls how the emitter sources `x-ms-examples`.
+   *
+   * - `"auto"`: Use the unified `examples.yaml` format when a `examples.yaml` (or
+   *   `examples/*.yaml`) file is present at the project root; otherwise fall back to loading legacy
+   *   per-version `x-ms-examples` JSON files from `examples-dir`. (default)
+   * - `"legacy"`: Only load legacy per-version `x-ms-examples` JSON files.
+   * - `"unified"`: Only load the unified `examples.yaml` format, resolving and materializing the
+   *   applicable example for each operation at the emitted API version and writing the resulting
+   *   legacy `x-ms-examples` JSON files. Enables a smooth rollout of the new format without
+   *   changing downstream consumers.
+   *
+   * @default "auto"
+   */
+  "examples-format"?: "auto" | "legacy" | "unified";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -313,6 +329,14 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       description:
         'Controls emission of a `service.yaml` manifest at the project root. "auto" (default) emits it only if the file already exists, "always" always emits it, "never" disables it. When an existing file is present it is updated in place, preserving comments and unrelated keys.',
     },
+    "examples-format": {
+      type: "string",
+      enum: ["auto", "legacy", "unified"],
+      nullable: true,
+      default: "auto",
+      description:
+        'Controls how the emitter sources `x-ms-examples`. "auto" (default) uses the unified `examples.yaml` format when present and otherwise loads legacy per-version JSON files, "legacy" only loads legacy JSON files, and "unified" only reads `examples.yaml`, materializing the applicable legacy `x-ms-examples` files for the emitted API version.',
+    },
   },
   required: [],
 };
@@ -399,6 +423,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Skipped loading invalid example file: ${"filename"}. Error: ${"error"}`,
         noDirectory: paramMessage`Skipping example loading from ${"directory"} because there was an error reading the directory.`,
         noOperationId: paramMessage`Skipping example file ${"filename"} because it does not contain an operationId and/or title.`,
+      },
+    },
+    "unified-example-loading": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`${"message"}`,
       },
     },
     "unsupported-http-auth-scheme": {
