@@ -548,7 +548,10 @@ function emitBody(
         imports.add("bytes");
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming");
         setBody = `req.SetBody(streaming.NopCloser(bytes.NewReader(${body})), "application/${bodyParam.bodyFormat.toLowerCase()}")`;
+      } else if (bodyParam.type.kind === "readSeekCloser") {
+        setBody = `req.SetBody(${body}, "application/${bodyParam.bodyFormat.toLowerCase()}")`;
       }
+
       if (go.isRequiredParameter(bodyParam.style) || go.isLiteralParameter(bodyParam.style)) {
         text += emitSetBodyWithErrCheck(setBody, indent, contentType);
       } else {
