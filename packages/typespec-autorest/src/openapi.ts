@@ -10,6 +10,7 @@ import {
   getUnionAsEnum,
   hasUniqueItems,
 } from "@azure-tools/typespec-azure-core";
+import { materializeLegacyExample } from "@azure-tools/typespec-azure-examples";
 import {
   type ArmFeatureFileOptions,
   getArmCommonTypeOpenAPIRef,
@@ -165,7 +166,6 @@ import {
   legacyExampleFileName,
   loadUnifiedExamples,
   operationKeyForId,
-  toLegacyExampleDoc,
   uniqueExampleKey,
 } from "./examples-unified.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
@@ -726,7 +726,7 @@ export async function getOpenAPIForService(
     const record: Record<string, LoadedExample> = exampleMap.get(operationId) ?? {};
     const usedTitles = new Set<string>();
     for (const resolved of resolvedExamples) {
-      const doc = toLegacyExampleDoc(resolved, {
+      const doc = materializeLegacyExample(resolved, {
         operationId,
         apiVersion: unified.apiVersion!,
         bodyParameterName,

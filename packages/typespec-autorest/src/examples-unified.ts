@@ -2,7 +2,6 @@ import {
   defaultLegacyExampleFilename,
   deriveOperationKey,
   loadExampleFile,
-  materializeLegacyExample,
   resolveExampleFiles,
   stripJsonExtension,
   type ExampleDiagnostic,
@@ -15,14 +14,6 @@ import {
   normalizePath,
   type Program,
 } from "@typespec/compiler";
-
-/** A legacy `x-ms-examples` document materialized from the unified format. */
-export interface LegacyExampleDoc {
-  readonly title: string;
-  readonly operationId: string;
-  readonly parameters: Record<string, unknown>;
-  readonly responses: Record<string, unknown>;
-}
 
 /** The outcome of loading a service's unified examples for a single target API version. */
 export interface UnifiedExamplesResult {
@@ -114,32 +105,6 @@ export async function loadUnifiedExamples(
 /** Map a Swagger `operationId` (`Interface_Method`) to its unified operation key. */
 export function operationKeyForId(operationId: string): string {
   return deriveOperationKey(operationId);
-}
-
-/**
- * Materialize a resolved unified example into a legacy `x-ms-examples` document. The unified
- * `request` buckets (`path`/`query`/`headers`/`body`) are flattened back into the legacy flat
- * `parameters` bag; the implicit `api-version` parameter (dropped in the unified format) is
- * re-added, and the request body is placed under the operation's body parameter name.
- */
-export function toLegacyExampleDoc(
-  resolved: ResolvedExample,
-  options: { operationId: string; apiVersion: string; bodyParameterName?: string },
-): LegacyExampleDoc {
-  const { parameters, responses } = materializeLegacyExample(resolved, {
-    apiVersion: options.apiVersion,
-    bodyParameterName: options.bodyParameterName,
-  });
-
-  return {
-    title:
-      resolved.title ??
-      (resolved.legacyFilename ? stripJsonExtension(resolved.legacyFilename) : undefined) ??
-      options.operationId,
-    operationId: options.operationId,
-    parameters,
-    responses,
-  };
 }
 
 /**
