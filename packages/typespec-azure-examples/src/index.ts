@@ -4,6 +4,7 @@
  * used by the `tsp-examples validate` command.
  */
 export { discoverExampleFiles, validateExamplesDir, type ValidateDirResult } from "./discover.js";
+export { materializeLegacyExample, type LegacyExample } from "./legacy.js";
 export {
   isQuotedScalar,
   loadExampleFile,
