@@ -15,6 +15,7 @@ import { noErrorStatusCodesRule } from "./rules/no-error-status-codes.js";
 import { noExplicitRoutesResourceOps } from "./rules/no-explicit-routes-resource-ops.js";
 import { noGenericNumericRule } from "./rules/no-generic-numeric.js";
 import { noHeaderExplodeRule } from "./rules/no-header-explode.js";
+import { noIdenticalSummaryAndDescriptionRule } from "./rules/no-identical-summary-and-description.js";
 import { noLegacyUsage } from "./rules/no-legacy-usage.js";
 import { noMultipleDiscriminatorRule } from "./rules/no-multiple-discriminator.js";
 import { noNullableRule } from "./rules/no-nullable.js";
@@ -67,6 +68,7 @@ const rules = [
   noOpenAPIRule,
   noUnnamedTypesRule,
   noHeaderExplodeRule,
+  noIdenticalSummaryAndDescriptionRule,
   preventFormatRule,
   noMultipleDiscriminatorRule,
   preventRestLibraryInterfaces,
