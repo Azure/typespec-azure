@@ -18,8 +18,8 @@ import {
 
 /** A legacy `x-ms-examples` document materialized from the unified format. */
 export interface LegacyExampleDoc {
-  readonly operationId: string;
   readonly title: string;
+  readonly operationId: string;
   readonly parameters: Record<string, unknown>;
   readonly responses: Record<string, unknown>;
 }
@@ -132,11 +132,11 @@ export function toLegacyExampleDoc(
   });
 
   return {
-    operationId: options.operationId,
     title:
       resolved.title ??
       (resolved.legacyFilename ? stripJsonExtension(resolved.legacyFilename) : undefined) ??
       options.operationId,
+    operationId: options.operationId,
     parameters,
     responses,
   };

@@ -110,11 +110,13 @@ describe("unified examples format", () => {
       )!,
     );
     expect(file).toEqual({
-      operationId: "Widgets_Get",
       title: "Widgets_Get",
+      operationId: "Widgets_Get",
       parameters: { "api-version": "2023-01-01", id: "1", expand: true },
       responses: { "200": { body: { name: "base" } } },
     });
+    // Match the dominant legacy convention: `title` is the first key, then `operationId`.
+    expect(Object.keys(file).slice(0, 2)).toEqual(["title", "operationId"]);
   });
 
   it("preserves the original legacy file name and derives the key from it", async () => {
@@ -199,6 +201,45 @@ Widgets.get:
       expect(
         tester.fs.fs.has(resolveVirtualPath(`./tsp-output/stable/2023-01-01/${entry.$ref}`)),
       ).toBe(true);
+    }
+  });
+
+  it("keeps materialized file names unique across different operations", async () => {
+    // Two different operations hand-author the same legacyFilename; they share one examples/ dir,
+    // so the second must be suffixed rather than overwrite the first.
+    const collidingFiles = `
+$namespace: WidgetService
+Widgets.get:
+  - legacyFilename: Shared.json
+    request:
+      path:
+        id: "1"
+    responses:
+      200:
+        body:
+          name: base
+Widgets.create:
+  - legacyFilename: Shared.json
+    request:
+      path:
+        id: "1"
+      body:
+        name: created
+    responses:
+      200:
+        body:
+          name: created
+`;
+    const { v1 } = await compileVersioned(collidingFiles);
+
+    const getRef = v1.paths["/widgets/{id}"]?.get?.["x-ms-examples"]?.["Shared"]?.$ref;
+    const putRef = v1.paths["/widgets/{id}"]?.put?.["x-ms-examples"]?.["Shared"]?.$ref;
+    expect(getRef).toBe("./examples/Shared.json");
+    expect(putRef).toBe("./examples/Shared_2.json");
+    for (const ref of [getRef, putRef]) {
+      expect(tester.fs.fs.has(resolveVirtualPath(`./tsp-output/stable/2023-01-01/${ref}`))).toBe(
+        true,
+      );
     }
   });
 
