@@ -82,11 +82,15 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  // Validate the generated output through the same rules as `tsp-examples validate`.
-  const diagnostics = validateExampleFiles(
-    result.files.map((f) => loadExampleFile(f.path, f.content)),
-    { serviceVersions: result.versions },
-  );
+  // Validate the generated output through the same rules as `tsp-examples validate`, and surface
+  // the migration's own warnings (e.g. examples removed before the latest version).
+  const diagnostics = [
+    ...result.diagnostics,
+    ...validateExampleFiles(
+      result.files.map((f) => loadExampleFile(f.path, f.content)),
+      { serviceVersions: result.versions },
+    ),
+  ];
 
   if (args["dry-run"]) {
     for (const file of result.files) {

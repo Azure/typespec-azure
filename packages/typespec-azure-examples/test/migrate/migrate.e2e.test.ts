@@ -128,6 +128,40 @@ describe("migrate (end-to-end)", () => {
     );
     expect(diagnostics.filter((d) => d.severity === "error")).toEqual([]);
   });
+
+  it("has no removal warnings when every example carries to the latest version", async () => {
+    const root = await buildFixture();
+    const result = await migrate(root);
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it("warns when an example is dropped before the latest version", async () => {
+    const root = await mkdtemp(join(tmpdir(), "examples-migrate-"));
+    roots.push(root);
+    // 2023-01-01 has both Get and Create; 2024-06-01 drops Create entirely.
+    await writeVersion(root, "2023-01-01", "basic");
+    const laterDir = join(root, "stable", "2024-06-01");
+    await mkdir(join(laterDir, "examples"), { recursive: true });
+    const getOnly = swagger("2024-06-01");
+    delete (getOnly.paths as Record<string, Record<string, unknown>>)[
+      "/subscriptions/{subscriptionId}/providers/Microsoft.Test/things/{id}"
+    ].put;
+    await writeFile(join(laterDir, "service.json"), JSON.stringify(getOnly));
+    await writeFile(
+      join(laterDir, "examples", "Get.json"),
+      JSON.stringify(getExample("2024-06-01")),
+    );
+
+    const result = await migrate(root);
+    const removal = result.diagnostics.filter((d) => d.code === "example-removed-before-latest");
+    expect(removal).toHaveLength(1);
+    expect(removal[0].severity).toBe("warning");
+    expect(removal[0].message).toContain("Things.create");
+    expect(removal[0].message).toContain("2023-01-01");
+    expect(removal[0].message).toContain("2024-06-01");
+    // Get is present in the latest version, so it must not be flagged.
+    expect(removal[0].message).not.toContain("Things.get");
+  });
 });
 
 afterAll(() => {
