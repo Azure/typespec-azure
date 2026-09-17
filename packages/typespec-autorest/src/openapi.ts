@@ -382,6 +382,9 @@ export async function getOpenAPIForService(
     ? [new Map<string, Record<string, LoadedExample>>(), [] as readonly Diagnostic[]]
     : await loadExamples(program, options, context.version);
   program.reportDiagnostics(diagnostics);
+  // Materialized unified example files all land in one shared `examples/` directory, so their names
+  // must be unique across every operation, not just within one.
+  const usedUnifiedFileNames = new Set<string>();
 
   const routes = httpService.operations;
   // Filter routes to only include operations in scope for this emitter
@@ -721,7 +724,6 @@ export async function getOpenAPIForService(
     )?.name;
 
     const record: Record<string, LoadedExample> = exampleMap.get(operationId) ?? {};
-    const usedFileNames = new Set<string>();
     const usedTitles = new Set<string>();
     for (const resolved of resolvedExamples) {
       const doc = toLegacyExampleDoc(resolved, {
@@ -732,7 +734,7 @@ export async function getOpenAPIForService(
       const relativePath = legacyExampleFileName(
         operationId,
         resolved.title,
-        usedFileNames,
+        usedUnifiedFileNames,
         resolved.legacyFilename,
       );
       const key = uniqueExampleKey(doc.title, usedTitles);
