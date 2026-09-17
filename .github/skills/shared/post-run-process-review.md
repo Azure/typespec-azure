@@ -72,8 +72,8 @@ For qualifying improvements:
    and create a dedicated skill-only commit. Do not include rule code or rule tests,
    package docs, logs, generated output, submodule changes, dependency files,
    or release/change entries.
-5. Push a new dedicated branch to the personal fork (retain the recorded head
-   repository when recovering an existing skill PR) and open an independent PR
+5. Push a new dedicated branch to canonical `Azure/typespec-azure` (retain the
+   head branch when recovering an existing canonical skill PR) and open an independent PR
    against `Azure/typespec-azure` with base
    `feature/lintdiff-migration-new` explicitly selected, following the
    publication targeting guidance below. Describe the observed evidence,
@@ -94,9 +94,12 @@ qualifying update could not be published. Never merge the PR automatically.
 Use the shared contract's
 [publication checks](../do-linter-development-task-one-by-one/app-session-execution.md#publication-checks)
 and [duplicate-safe recovery](../do-linter-development-task-one-by-one/app-session-execution.md#publication-recovery),
-not a separate fallback policy. New skill heads default to the personal fork;
-base is always canonical `feature/lintdiff-migration-new`. Existing verified
-skill PRs retain their recorded head repository. Separate Git tracking/push/base
+not a separate fallback policy. Skill source branches must be in
+`Azure/typespec-azure`, never a personal fork; the base is
+`feature/lintdiff-migration-new` in that same repository. Existing canonical
+skill PRs retain their head branch. A legacy fork-backed PR requires explicit
+user-authorized migration before proceeding; do not silently replace it.
+Separate Git tracking/push/base
 hints from the independently verified app binding. A stale deletion count with
 clean Git and correct binding is not a missing base or a creation failure.
 

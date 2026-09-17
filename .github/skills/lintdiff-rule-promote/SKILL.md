@@ -78,10 +78,11 @@ See the
 - Do not edit or clean up the current lintdiff worktree as part of promotion.
   The promotion PR must be created from a separate worktree.
 - Fetch the promotion base from canonical `Azure/typespec-azure:main` and
-  default a new dedicated promotion head to the user's verified personal fork.
-  Existing task PRs keep their recorded head repository and branch. Verify URL
-  identity and permissions, not remote names; never change destinations after
-  a failed push as an operational fallback.
+  create the dedicated promotion source (head) branch in `Azure/typespec-azure`,
+  never a personal fork. Existing canonical task PRs keep their head branch;
+  fork-backed PRs require explicit user-authorized migration before proceeding.
+  Verify URL identity and canonical push permission, not remote names; never
+  fall back to a fork after a failed push.
 - Treat the source lintdiff rule as immutable during promotion. Do not
   change `packages/typespec-lintdiff` source, fixtures, snapshots, package
   manifests, or docs unless the user explicitly redirects from promotion back to
@@ -727,9 +728,10 @@ promotion diff. The review should inspect:
 - absence of generated lintdiff corpus artifacts
 
 Commit only the promotion-worktree changes needed for the native-library PR.
-Push the promotion branch to the preflight's verified head repository using an
-explicit remote/refspec (personal fork for a new head; recorded repository for an
-existing PR). Create a draft PR against `Azure/typespec-azure:main` using the
+Push the promotion branch to canonical `Azure/typespec-azure` using the
+preflight's verified explicit remote/refspec. The source branch, not just the
+PR's base, must be in that repository. Create a draft PR against
+`Azure/typespec-azure:main` using the
 required publication tool from the verified owner. A rejected push is a blocker,
 not permission to change head repositories. Apply the shared
 [publication checks and duplicate-safe recovery](../do-linter-development-task-one-by-one/app-session-execution.md#publication-recovery);
@@ -765,8 +767,10 @@ It must include:
   source worktree path,
   and whether the source worktree had uncommitted rule changes. Link only to the
   original lintdiff source rule file. Use a branch-based GitHub URL, not a
-  commit-SHA URL, and use the recorded source head repository (which may be a
-  personal fork), not an assumed canonical branch URL. State that the source rule was assumed done for this run and
+  commit-SHA URL, and verify that the recorded source head repository is
+  `Azure/typespec-azure` before constructing the link. A legacy fork source
+  requires explicit user-authorized migration; do not invent a canonical URL
+  for a branch that exists only in a fork. State that the source rule was assumed done for this run and
   was not modified during promotion; do not claim explicit user confirmation
   of done status unless it was actually given.
 - **Destination analysis:** explain the selected official package, plausible

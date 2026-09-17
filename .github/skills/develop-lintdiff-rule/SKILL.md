@@ -781,10 +781,11 @@ creating a draft PR.
    dependency repair identified above.
 4. For a new migration head, push the dedicated rule branch to canonical
    `Azure/typespec-azure`, while leaving the user-supplied target branch
-   untouched. For an existing task PR, preserve and push to its recorded head
-   repository and branch, including a legacy fork head. Use an explicit
-   remote/refspec; never push the rule commit to or update the target branch
-   itself.
+   untouched. For an existing canonical task PR, preserve its head branch.
+   A legacy fork-backed PR requires explicit user-authorized migration to
+   `Azure/typespec-azure` before proceeding. Use an explicit canonical
+   remote/refspec; never fall back to a fork or push the rule commit to the
+   target branch itself.
 5. Create the pull request in `Azure/typespec-azure` as a **draft**, with the
    recorded head repository/branch and user-supplied target branch as base. Do not mark
    it ready for review; the user decides when the migration evidence and rule

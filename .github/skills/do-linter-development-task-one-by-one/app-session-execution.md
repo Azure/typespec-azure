@@ -33,11 +33,14 @@ publication binding in durable session artifacts:
   completion channel; for reviews, selected owner and persistent capabilities
 
 Resolve repository identity from actual remote fetch/push URLs and GitHub
-metadata, never a remote's name. New lintdiff development/migration heads publish
-as dedicated branches in canonical `Azure/typespec-azure`; new promotion and
-skill-update heads default to the user's personal fork. Existing verified task
-PRs retain their recorded head repository, including legacy fork heads; do not
-move or replace them. Promotion targets canonical `main`; migration and skill PRs
+metadata, never a remote's name. All development, migration, promotion, and
+skill-update PR source (head) branches must live in canonical
+`Azure/typespec-azure`, not a personal fork. An Azure base repository alone does
+not satisfy this requirement. Verify canonical push permission before setup;
+if unavailable, stop rather than falling back to a fork. Existing canonical task
+PRs retain their recorded head branch. A legacy fork-backed PR is blocked until
+the user explicitly authorizes migration to a canonical head; do not silently
+move, replace, or close it. Promotion targets canonical `main`; migration and skill PRs
 target the explicitly selected migration branch. Examples using `origin` mean
 the verified canonical fetch remote; substitute its actual name when different.
 
@@ -59,7 +62,9 @@ and stop before setup. Existing PRs follow the operation-specific path below.
 
 Select `update-existing` only after an exact GitHub query verifies one open task
 PR's base repository/branch, head repository/branch, pushed SHA and complete file
-scope. Preserve recorded PR identities and earlier attempt/review budgets. In
+scope. Require the head repository to be `Azure/typespec-azure`; a recorded fork
+binding does not waive the canonical-head requirement. Preserve recorded PR
+identities and earlier attempt/review budgets. In
 app-session execution, still verify the owning session's exact worktree, branch,
 task ownership and quiescence; the coordinator may be anywhere.
 
@@ -252,7 +257,7 @@ repository: Azure/typespec-azure
 base_branch: <phase-base-branch>
 canonical_base_ref: <verified-canonical-remote>/<phase-base-branch>
 base_sha: <fetched-commit>
-head_repository: <Azure/typespec-azure-for-development-or-personal-fork-for-promotion>
+head_repository: Azure/typespec-azure
 head_branch: <app-recorded-rule-branch>
 push_remote_url: <verified-phase-head-repository-push-url with credentials/userinfo redacted>
 publication_tool: <required-tool>
@@ -543,7 +548,9 @@ If a supported metadata control cannot establish the correct binding, stop
 before the call. The source owner
 targets `Azure/typespec-azure:feature/lintdiff-migration-new`; the promotion
 owner targets `Azure/typespec-azure:main`. Both use their own distinct branches
-as heads, according to the delegated skills' publication policy.
+in `Azure/typespec-azure` as heads. With explicit GitHub CLI targeting, use
+`--repo Azure/typespec-azure --head Azure:<verified-head-branch>` and the
+phase-specific `--base`; never use a personal-fork owner in `--head`.
 
 Query existing PRs by exact repository/head/base before creation, following
 [publication recovery](#publication-recovery) for duplicate-safe reconciliation.
@@ -553,8 +560,11 @@ the outer queue. A required-tool fallback is permitted only when that tool's
 failure explicitly authorizes it; availability of `gh` is not authorization.
 
 After creation, independently verify the actual GitHub base repository/branch,
-head repository/branch, head SHA, draft status and complete file scope. A
-returned URL alone is not success. On a mismatch, record the incorrect PR and
+head repository/branch, head SHA, draft status and complete file scope. Require
+`headRepository.nameWithOwner` to equal `Azure/typespec-azure` and
+`headRepositoryOwner.login` to equal `Azure`; the PR URL or base repository alone
+does not prove the source branch is canonical. A returned URL alone is not
+success. On a mismatch, record the incorrect PR and
 stop without starting review, promotion, another creation attempt or silently
 closing someone else's PR. Do not retarget to `main` to make creation succeed.
 

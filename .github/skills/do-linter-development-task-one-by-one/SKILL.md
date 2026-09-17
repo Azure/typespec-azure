@@ -887,6 +887,11 @@ Capture concrete suggestions for improving future queue runs, especially:
   and ledger in [bounded resumption](#explicitly-authorized-bounded-resumption).
 - Never promote without clean development review, or report success without
   clean promotion review against the final source provenance.
+- Require every development, promotion, and skill-update source branch to live
+  in `Azure/typespec-azure`, not a personal fork. Verify the actual PR head
+  repository as well as its base. Missing canonical push access is a blocker,
+  not permission to use a fork; legacy fork-backed PRs require explicit
+  user-authorized migration under the shared publication preflight.
 - Never let promotion or its review mutate the source; return evidence to the
   outer queue for a fresh repair worker.
 - Never run a slash command as a PowerShell or shell executable.

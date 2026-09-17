@@ -142,8 +142,11 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
 1. Before creating agents or collecting review evidence, apply the shared
    [publication preflight](../do-linter-development-task-one-by-one/app-session-execution.md#publication-preflight)
    for existing PRs. Record the publication binding and retain the PR's head
-   repository/owner and head branch for publication routing; do not retarget a
-   canonical or fork head to a different remote as part of this loop.
+   repository/owner and head branch for publication routing. For lintdiff
+   development, promotion, and skill-update PRs, require the head repository
+   to be `Azure/typespec-azure`. A legacy fork-backed task PR must stop before
+   review side effects for explicit user-authorized migration outside this loop.
+   Do not retarget any PR head to a different remote as part of this loop.
    For queue-owned review, consume its prepared phase binding, readiness manifest
    and authoritative instruction paths/hashes. Enforce the inherited
    `worktrees_folder` boundary for the target and any auxiliary task checkouts.
