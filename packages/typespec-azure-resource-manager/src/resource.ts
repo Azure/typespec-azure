@@ -72,7 +72,12 @@ import {
   getResourceNameForOperation,
   resolveResourceOperations,
 } from "./operations.js";
-import { getArmResource, listArmResources, registerArmResource } from "./private.decorators.js";
+import {
+  getArmResource,
+  listArmResources,
+  registerArmResource,
+  registerArmResourceFromModel,
+} from "./private.decorators.js";
 import { ArmStateKeys } from "./state.js";
 
 export type ArmResourceKind =
@@ -357,6 +362,22 @@ export function isCustomAzureResource(program: Program, target: Model): boolean 
   return false;
 }
 
+export function isCustomAzureResourceMarkedAzure(program: Program, target: Model): boolean {
+  const resourceOptions = getCustomResourceOptions(program, target);
+  if (resourceOptions) return resourceOptions.isAzureResource === true;
+  if (target.baseModel) return isCustomAzureResourceMarkedAzure(program, target.baseModel);
+  return false;
+}
+
+function registerCustomAzureResourceOperationModels(program: Program): void {
+  for (const resourceType of program.stateMap(ArmStateKeys.resourceOperationList).keys()) {
+    if (resourceType.kind !== "Model") continue;
+    if (!isCustomAzureResourceMarkedAzure(program, resourceType)) continue;
+    if (getArmResource(program, resourceType)) continue;
+    registerArmResourceFromModel(program, resourceType);
+  }
+}
+
 function getArmResourceItemPath(operations: ArmResourceOperations): string | undefined {
   const returnPath =
     operations.lifecycle.read?.path ||
@@ -507,6 +528,7 @@ export function resolveArmResources(program: Program): Provider {
     // Return the cached resource details
     return resolvedResources;
   }
+  registerCustomAzureResourceOperationModels(program);
 
   // We haven't generated the full resource details yet
   const resources: ResolvedResource[] = [];
