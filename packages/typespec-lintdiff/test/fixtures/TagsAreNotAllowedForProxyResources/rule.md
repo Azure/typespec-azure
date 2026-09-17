@@ -4,6 +4,7 @@ engine: spectral
 tspLints:
   - tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources
 coverageKind: lint
+projectionScope: http-reachable
 ---
 
 # TagsAreNotAllowedForProxyResources
@@ -16,9 +17,14 @@ Proxy resources must not have a tags property.
 
 This rule is now covered by
 `tsp-lintdiff-local-linter/tags-are-not-allowed-for-proxy-resources`, which
-reports proxy resource properties bags that declare a top-level `tags`
-property.
+reports proxy resources that declare `tags` on either the resource envelope or
+the resource properties bag.
 
-| ID                | Violation | Description                                    |
-| ----------------- | --------- | ---------------------------------------------- |
-| `proxy-with-tags` | true      | Proxy resource includes tags in properties bag |
+| ID                         | Violation | Description                                              |
+| -------------------------- | --------- | -------------------------------------------------------- |
+| `proxy-with-tags`          | true      | Proxy resource inherits tags in properties bag           |
+| `proxy-with-envelope-tags` | true      | Proxy resource includes tags on its envelope             |
+| `proxy-with-encoded-tags`  | true      | Proxy resource encodes another property as tags          |
+| `proxy-without-tags`       | false     | Proxy resource has no tags                               |
+| `proxy-tags-encoded-away`  | false     | Proxy resource encodes its tags property to another name |
+| `tracked-with-tags`        | false     | Tracked resource uses its supported tags                 |
