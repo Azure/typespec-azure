@@ -57,6 +57,8 @@ describe("migrate → resolve round-trip (Microsoft.Contoso)", () => {
     // 2. Migrate the whole tree into the unified format.
     const result = await migrate(fixtureRoot, { versionOrder });
     expect(result.operationCount).toBe(7);
+    // Every operation exists in both versions, so nothing is flagged as removed.
+    expect(result.diagnostics).toEqual([]);
     const files = result.files.map((file) => loadExampleFile(file.path, file.content));
 
     // The two versions differ only by `api-version`, so every lineage collapses to a single base
