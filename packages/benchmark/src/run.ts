@@ -6,6 +6,7 @@ import os from "os";
 import { join, resolve } from "path";
 import { fileURLToPath } from "url";
 import { aggregateDurations } from "./aggregate.js";
+import { measureCalibration } from "./calibration.js";
 import {
   EXTERNAL_SPEC_CONFIG,
   loadExternalSpecConfig,
@@ -211,10 +212,13 @@ function averageRuntimeStats(runtimes: RuntimeStats[]): RuntimeStats {
 }
 
 function getRunnerInfo(): RunnerInfo {
+  const cpus = os.cpus();
   return {
     os: `${os.platform()}-${os.release()}`,
     nodeVersion: process.version,
     arch: os.arch(),
+    cpu: cpus[0]?.model,
+    cores: cpus.length,
   };
 }
 
@@ -224,6 +228,25 @@ function getGitCommit(providedCommit?: string): string {
     return execSync("git rev-parse HEAD", { encoding: "utf-8" }).trim();
   } catch {
     return "unknown";
+  }
+}
+
+/**
+ * When the commit landed, as opposed to when it was measured.
+ *
+ * Uses the committer date rather than the author date, because that is the
+ * order the commits reached the branch; an author date can predate its own
+ * parent after a rebase.
+ */
+function getCommitDate(commit: string): string | undefined {
+  if (commit === "unknown") return undefined;
+  try {
+    return execSync(`git show -s --format=%cI ${commit}`, {
+      encoding: "utf-8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    return undefined;
   }
 }
 
@@ -241,6 +264,15 @@ export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResul
   console.log(
     `Running benchmarks: ${specSources.length} spec(s), ${warmup} warmup + ${iterations} iterations each`,
   );
+
+  console.log(`\n  Calibrating machine speed against the frozen reference workload...`);
+  const calibration = await measureCalibration();
+  if (calibration) {
+    console.log(
+      `    Reference (@typespec/compiler@${calibration.compilerVersion}, workload ${calibration.workload}): ` +
+        `${calibration.total.toFixed(1)}ms, CV ${(calibration.cv * 100).toFixed(1)}%`,
+    );
+  }
 
   const specs: Record<string, SpecBenchmarkResult> = {};
   const noiseCvThreshold = options.noiseCvThreshold;
@@ -319,7 +351,9 @@ export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResul
   return {
     commit,
     timestamp: new Date().toISOString(),
+    commitDate: getCommitDate(commit),
     runner: getRunnerInfo(),
+    calibration,
     specs,
   };
 }

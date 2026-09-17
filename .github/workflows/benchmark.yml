@@ -10,6 +10,20 @@ on:
         description: "Backfill from: commit SHA or number of recent commits. Leave empty to run a normal benchmark."
         required: false
         type: string
+      backfill_to:
+        description: "Backfill up to this commit SHA, inclusive. Lets a long range be re-measured one chunk per run."
+        required: false
+        type: string
+      backfill_reset:
+        description: "Re-measure commits that already have results, and drop the stored ones. Use on the first chunk only."
+        required: false
+        type: boolean
+        default: false
+      timeout_minutes:
+        description: "Job timeout in minutes. Re-measuring a long range needs far more than the 6h default."
+        required: false
+        type: string
+        default: "360"
       branch:
         description: "Data branch to store results (default: benchmark-data)"
         required: false
@@ -40,6 +54,9 @@ jobs:
       rerun-iterations: 10
       runner: ${{ github.event_name == 'workflow_dispatch' && inputs.runner || vars.BENCHMARK_RUNNER || 'ubuntu-latest' }}
       backfill_from: ${{ github.event_name == 'workflow_dispatch' && inputs.backfill_from || '' }}
+      backfill_to: ${{ github.event_name == 'workflow_dispatch' && inputs.backfill_to || '' }}
+      backfill_reset: ${{ github.event_name == 'workflow_dispatch' && inputs.backfill_reset || false }}
+      timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && fromJSON(inputs.timeout_minutes) || 360 }}
       branch: ${{ github.event_name == 'workflow_dispatch' && inputs.branch || 'benchmark-data' }}
     permissions:
       contents: write
