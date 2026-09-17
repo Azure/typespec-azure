@@ -27,7 +27,8 @@
     }
   },
   "bin": {
-    "tsp-examples": "./dist/src/cli.js"
+    "tsp-examples": "./dist/src/cli.js",
+    "tsp-examples-migrate": "./dist/src/migrate-cli.js"
   },
   "engines": {
     "node": ">=22.0.0"
