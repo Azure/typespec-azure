@@ -9,6 +9,7 @@ export default {
     "@azure-tools/typespec-azure-core/casing-style": true,
     "@azure-tools/typespec-azure-core/composition-over-inheritance": true,
     "@azure-tools/typespec-azure-core/no-boolean": false,
+    "@azure-tools/typespec-azure-core/no-identical-summary-and-description": false,
     "@azure-tools/typespec-azure-core/known-encoding": true,
     "@azure-tools/typespec-azure-core/long-running-polling-operation-required": true,
     "@azure-tools/typespec-azure-core/no-case-mismatch": true,
