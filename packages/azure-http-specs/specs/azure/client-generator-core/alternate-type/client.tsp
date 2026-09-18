@@ -30,7 +30,7 @@ using Azure.ClientGenerator.Core;
 );
 
 @@alternateType(
-  _Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Point,
+  _Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Geometry,
   {
     identity: "Azure.Core.GeoJson.GeoPoint",
     package: "Azure.Core",

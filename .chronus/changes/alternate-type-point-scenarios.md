@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Add Point model and property alternate-type scenarios mapped to `Azure.Core.GeoJson.GeoPoint` for C#, replacing the invalid C# Feature mapping while preserving existing Feature scenarios.
+Customize the existing alternate-type scenarios for C# by mapping `Geometry` to `Azure.Core.GeoJson.GeoPoint` from `Azure.Core` 1.61.0 or later instead of the invalid Feature mapping. Preserve all existing scenarios and payloads.

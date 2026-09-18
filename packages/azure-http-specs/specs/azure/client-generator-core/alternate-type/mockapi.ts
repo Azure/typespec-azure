@@ -73,34 +73,3 @@ Scenarios.Azure_ClientGenerator_Core_AlternateType_ExternalType_getProperty = pa
 Scenarios.Azure_ClientGenerator_Core_AlternateType_ExternalType_putProperty = passOnSuccess(
   modelPropertyScenarioTypes[1],
 );
-
-const point = {
-  type: "Point",
-  coordinates: [-122.25, 37.87],
-};
-
-const pointScenarioTypes = createMockApiDefinitions("point/model", json(point));
-
-Scenarios.Azure_ClientGenerator_Core_AlternateType_ExternalType_getPoint = passOnSuccess(
-  pointScenarioTypes[0],
-);
-Scenarios.Azure_ClientGenerator_Core_AlternateType_ExternalType_putPoint = passOnSuccess(
-  pointScenarioTypes[1],
-);
-
-const modelWithPointProperty = {
-  point,
-  additionalProperty: "extra",
-};
-
-const pointPropertyScenarioTypes = createMockApiDefinitions(
-  "point/property",
-  json(modelWithPointProperty),
-);
-
-Scenarios.Azure_ClientGenerator_Core_AlternateType_ExternalType_getPointProperty = passOnSuccess(
-  pointPropertyScenarioTypes[0],
-);
-Scenarios.Azure_ClientGenerator_Core_AlternateType_ExternalType_putPointProperty = passOnSuccess(
-  pointPropertyScenarioTypes[1],
-);

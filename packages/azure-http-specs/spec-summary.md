@@ -81,39 +81,6 @@ Example response:
 }
 ```
 
-### Azure_ClientGenerator_Core_AlternateType_ExternalType_getPoint
-
-- Endpoint: `get /azure/client-generator-core/alternate-type/external/point/model`
-
-Input: None
-Output: Point object with type and coordinates fields (200 response).
-Example response:
-
-```json
-{
-  "type": "Point",
-  "coordinates": [-122.25, 37.87]
-}
-```
-
-### Azure_ClientGenerator_Core_AlternateType_ExternalType_getPointProperty
-
-- Endpoint: `get /azure/client-generator-core/alternate-type/external/point/property`
-
-Input: None
-Output: ModelWithPointProperty object with point and additionalProperty fields (200 response).
-Example response:
-
-```json
-{
-  "point": {
-    "type": "Point",
-    "coordinates": [-122.25, 37.87]
-  },
-  "additionalProperty": "extra"
-}
-```
-
 ### Azure_ClientGenerator_Core_AlternateType_ExternalType_getProperty
 
 - Endpoint: `get /azure/client-generator-core/alternate-type/external/property`
@@ -161,41 +128,6 @@ Example input:
     "elevation": 100
   },
   "id": "feature-1"
-}
-```
-
-Output: None (204/empty response)
-
-### Azure_ClientGenerator_Core_AlternateType_ExternalType_putPoint
-
-- Endpoint: `put /azure/client-generator-core/alternate-type/external/point/model`
-
-Input: Point object in request body.
-Example input:
-
-```json
-{
-  "type": "Point",
-  "coordinates": [-122.25, 37.87]
-}
-```
-
-Output: None (204/empty response)
-
-### Azure_ClientGenerator_Core_AlternateType_ExternalType_putPointProperty
-
-- Endpoint: `put /azure/client-generator-core/alternate-type/external/point/property`
-
-Input: ModelWithPointProperty object in request body.
-Example input:
-
-```json
-{
-  "point": {
-    "type": "Point",
-    "coordinates": [-122.25, 37.87]
-  },
-  "additionalProperty": "extra"
 }
 ```
 
