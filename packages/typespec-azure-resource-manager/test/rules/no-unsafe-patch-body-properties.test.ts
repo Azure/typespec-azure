@@ -74,7 +74,7 @@ describe.each([
         {
           code: ruleCode,
           message:
-            'Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:createdBy.',
+            "Properties of a PATCH request body must not be visible only during Lifecycle.Create, property:createdBy.",
         },
       ]);
   });
@@ -155,9 +155,129 @@ describe("payload kinds", () => {
           {
             code: ruleCode,
             message:
-              'Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:createdBy.',
+              "Properties of a PATCH request body must not be visible only during Lifecycle.Create, property:createdBy.",
           },
         ]);
+    },
+  );
+});
+
+describe("traversal", () => {
+  it("checks inherited properties without duplicating overridden properties", async () => {
+    await tester
+      .expect(
+        `
+        ${patchOperation("WidgetPatchBody")}
+
+        model BasePatchBody {
+          displayName: string;
+          /*default*/enabled?: boolean = false;
+        }
+
+        model WidgetPatchBody extends BasePatchBody {
+          /*required*/displayName: "widget";
+        }
+        `,
+      )
+      .toEmitDiagnostics((x) => [
+        {
+          code: ruleCode,
+          message: "Properties of a PATCH request body must not be required, property:displayName.",
+          pos: x.pos.required.pos,
+        },
+        {
+          code: ruleCode,
+          message:
+            "Properties of a PATCH request body must not have default value, property:enabled.",
+          pos: x.pos.default.pos,
+        },
+      ]);
+  });
+
+  it("finds an inherited discriminator property without synthesizing another diagnostic", async () => {
+    await tester
+      .expect(
+        `
+        ${patchOperation("WidgetPatchBody")}
+
+        @discriminator("kind")
+        model BasePatchBody {
+          /*kind*/kind: string;
+        }
+
+        model WidgetPatchBody extends BasePatchBody {
+          name?: string;
+        }
+
+        model ConcretePatchBody extends WidgetPatchBody {
+          kind: "widget";
+        }
+        `,
+      )
+      .toEmitDiagnostics((x) => ({
+        code: ruleCode,
+        message: "Properties of a PATCH request body must not be required, property:kind.",
+        pos: x.pos.kind.pos,
+      }));
+  });
+
+  it("checks a shared recursive body independently for each operation", async () => {
+    await tester
+      .expect(
+        `
+        ${patchOperation("WidgetPatchBody")}
+
+        model WidgetPatchBody {
+          displayName: string;
+          next?: WidgetPatchBody;
+        }
+
+        @route("/other-widgets/{name}")
+        @patch
+        op updateOther(@path name: string, @body body: WidgetPatchBody): void;
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: ruleCode,
+          message: "Properties of a PATCH request body must not be required, property:displayName.",
+        },
+        {
+          code: ruleCode,
+          message: "Properties of a PATCH request body must not be required, property:displayName.",
+        },
+      ]);
+  });
+
+  it.each([true, false])(
+    "keeps shared-body optionality operation-specific with implicit optionality first: %s",
+    async (implicitFirst) => {
+      const implicitOperation = `
+        #suppress "@typespec/http/deprecated-implicit-optionality" "Test legacy PATCH transform."
+        @route("/implicit")
+        @patch(#{ implicitOptionality: true })
+        op implicitUpdate(@body body: WidgetPatchBody): void;
+      `;
+      const explicitOperation = `
+        @route("/explicit")
+        @patch
+        op explicitUpdate(@body body: WidgetPatchBody): void;
+      `;
+      await tester
+        .expect(
+          `
+          model WidgetPatchBody {
+            displayName: string;
+          }
+
+          ${implicitFirst ? implicitOperation : explicitOperation}
+          ${implicitFirst ? explicitOperation : implicitOperation}
+          `,
+        )
+        .toEmitDiagnostics({
+          code: ruleCode,
+          message: "Properties of a PATCH request body must not be required, property:displayName.",
+        });
     },
   );
 });
@@ -318,7 +438,7 @@ describe("invalid cases", () => {
       .toEmitDiagnostics({
         code: ruleCode,
         message:
-          'Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:createdBy.',
+          "Properties of a PATCH request body must not be visible only during Lifecycle.Create, property:createdBy.",
       });
   });
 
