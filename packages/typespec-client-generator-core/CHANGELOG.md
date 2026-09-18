@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.72.1
+
+### Bug Fixes
+
+- [#5509](https://github.com/Azure/typespec-azure/pull/5509) Limit SDK type resolution for model-valued decorator arguments to `@clientOption`, preventing unrelated decorators from adding models to SDK type discovery.
+
+
 ## 0.72.0
 
 ### Features
