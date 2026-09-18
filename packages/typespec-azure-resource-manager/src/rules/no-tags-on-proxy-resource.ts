@@ -1,12 +1,16 @@
 import {
   createRule,
+  defineCodeFix,
   fileRef,
+  getSourceLocation,
   paramMessage,
   resolveEncodedName,
+  type CodeFix,
   type Model,
   type ModelProperty,
   type Program,
 } from "@typespec/compiler";
+import { SyntaxKind } from "@typespec/compiler/ast";
 
 import { getArmResources } from "../resource.js";
 
@@ -42,8 +46,10 @@ export const noTagsOnProxyResourceRule = createRule({
 
           for (const tagsProperty of [resourceTags, propertiesTags]) {
             if (tagsProperty) {
+              const codefix = createRemoveTagsCodeFix(armResource.typespecType, tagsProperty);
               context.reportDiagnostic({
                 target: tagsProperty,
+                codefixes: codefix ? [codefix] : undefined,
                 format: {
                   resourceName: armResource.name,
                 },
@@ -55,6 +61,36 @@ export const noTagsOnProxyResourceRule = createRule({
     };
   },
 });
+
+function createRemoveTagsCodeFix(resource: Model, property: ModelProperty): CodeFix | undefined {
+  const node = property.node;
+  // Avoid editing inherited/copied properties, properties bags, and reusable resource templates.
+  if (
+    property.model !== resource ||
+    property.sourceProperty ||
+    node?.kind !== SyntaxKind.ModelProperty ||
+    node.parent !== resource.node ||
+    (node.parent?.kind === SyntaxKind.ModelStatement && node.parent.templateParameters.length > 0)
+  ) {
+    return undefined;
+  }
+
+  return defineCodeFix({
+    id: "remove-proxy-resource-tags",
+    label: "Remove tags property",
+    fix(context) {
+      const location = getSourceLocation(node);
+      // Include the separator even when whitespace or comments follow the property type.
+      const separator = /^(?:\s|\/\*[\s\S]*?\*\/|\/\/[^\r\n]*)*[;,]/.exec(
+        location.file.text.slice(location.end),
+      );
+      return context.replaceText(
+        { ...location, end: location.end + (separator?.[0].length ?? 0) },
+        "",
+      );
+    },
+  });
+}
 
 function getResourcePropertiesModel(program: Program, resourceModel: Model): Model | undefined {
   const propertiesProperty = getPropertyInHierarchy(program, resourceModel, "properties");

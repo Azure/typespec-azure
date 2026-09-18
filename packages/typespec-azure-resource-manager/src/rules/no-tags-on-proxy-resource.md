@@ -3,6 +3,15 @@ resource envelope or its resource-specific properties can give callers the false
 resource participates in Azure Resource Manager tag operations. Use a tracked resource when tags are
 required.
 
+The rule checks JSON property names, including names assigned with `@encodedName`.
+
+## Code fix
+
+The **Remove tags property** quick fix removes a property declared directly on the proxy resource
+envelope. Properties inherited or copied from another model, properties on reusable resource
+templates, and properties inside the resource's properties bag require a manual fix to avoid changing
+shared declarations.
+
 ## ❌ Incorrect
 
 ```tsp

@@ -1,10 +1,11 @@
 import { Tester } from "#test/tester.js";
 import {
   createLinterRuleTester,
+  expectDiagnostics,
   type LinterRuleTester,
   type TesterInstance,
 } from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import { noTagsOnProxyResourceRule } from "../../src/rules/no-tags-on-proxy-resource.js";
 
@@ -19,6 +20,119 @@ beforeEach(async () => {
     runner,
     noTagsOnProxyResourceRule,
     "@azure-tools/typespec-azure-resource-manager",
+  );
+});
+
+describe("codefix", () => {
+  it.each([
+    "tags?: Record<string>;",
+    "tags?: Record<string> /* Resource tags. */;",
+    "tags?: Record<string> // Resource tags.\n;",
+    '@encodedName("application/json", "tags") labels?: Record<string>;',
+    '/** Resource tags. */ @doc("Resource tags.") tags?: Record<string>;',
+    "tags?: Record<string>,",
+    "tags?: Record<string>",
+  ])("removes a directly declared envelope property: %s", async (declaration) => {
+    const code = `
+      @armProviderNamespace namespace MyService;
+      model Widget is ProxyResource<WidgetProperties> {
+        @key @segment("widgets") name: string;
+        ${declaration}
+      }
+      model WidgetProperties { description?: string; }
+    `;
+    const fixed = code.replace(declaration, "");
+    await tester.expect(code).applyCodeFix("remove-proxy-resource-tags").toEqual(fixed);
+    await tester.expect(fixed).toBeValid();
+  });
+
+  it("preserves adjacent envelope properties", async () => {
+    const code = `
+      @armProviderNamespace namespace MyService;
+      model Widget is ProxyResource<{}> {
+        @key @segment("widgets") name: string;
+        tags?: Record<string>; description?: string;
+      }
+    `;
+    const fixed = code.replace("tags?: Record<string>;", "");
+    await tester.expect(code).applyCodeFix("remove-proxy-resource-tags").toEqual(fixed);
+    await tester.expect(fixed).toBeValid();
+  });
+
+  it.each([
+    {
+      name: "spread envelope property",
+      resource: "model Widget is ProxyResource<WidgetProperties>",
+      members: '@key @segment("widgets") name: string; ...Tags;',
+      models: "model Tags { tags?: Record<string>; } model WidgetProperties {}",
+    },
+    {
+      name: "copied envelope property",
+      diagnosticNames: ["TaggedResource", "Widget"],
+      resource: "model Widget is TaggedResource<WidgetProperties>",
+      members: "",
+      models: `
+        model TaggedResource<T extends {}> is ProxyResource<T> {
+          @key @segment("widgets") name: string;
+          tags?: Record<string>;
+        }
+        model WidgetProperties {}
+      `,
+    },
+    {
+      name: "inherited envelope property",
+      diagnosticNames: ["TaggedResource"],
+      resource: "model Widget extends TaggedResource<WidgetProperties>",
+      members: "",
+      models: `
+        model TaggedResource<T extends {}> is ProxyResource<T> {
+          @key @segment("widgets") name: string;
+          tags?: Record<string>;
+        }
+        model WidgetProperties {}
+      `,
+    },
+    {
+      name: "shared properties bag",
+      resource: "model Widget is ProxyResource<WidgetProperties>",
+      members: '@key @segment("widgets") name: string;',
+      models: `
+        model WidgetProperties { tags?: Record<string>; }
+        model Other { properties: WidgetProperties; }
+      `,
+    },
+    {
+      name: "inherited properties bag",
+      resource: "model Widget is ProxyResource<WidgetProperties>",
+      members: '@key @segment("widgets") name: string;',
+      models: `
+        model BaseProperties { tags?: Record<string>; }
+        model WidgetProperties extends BaseProperties {}
+      `,
+    },
+  ])(
+    "does not offer removal for a $name",
+    async ({ resource, members, models, diagnosticNames = ["Widget"] }) => {
+      const diagnostics = await runner.diagnose(
+        `
+        @armProviderNamespace namespace MyService;
+        ${resource} {
+          ${members}
+        }
+        ${models}
+      `,
+        { compilerOptions: { linterRuleSet: { enable: { [ruleCode]: true } } } },
+      );
+      expectDiagnostics(
+        diagnostics,
+        diagnosticNames.map((name) => ({ code: ruleCode, message: new RegExp(`'${name}'`) })),
+      );
+      for (const diagnostic of diagnostics) {
+        expect(diagnostic.codefixes?.map((fix) => fix.id) ?? []).not.toContain(
+          "remove-proxy-resource-tags",
+        );
+      }
+    },
   );
 });
 
