@@ -1,0 +1,12 @@
+[
+  {
+    "code": "ListInOperationName",
+    "message": "Since operation response has model definition in array type, it should be of the form \"_list\".",
+    "path": [
+      "paths",
+      "/configs",
+      "get"
+    ],
+    "severity": 0
+  }
+]
