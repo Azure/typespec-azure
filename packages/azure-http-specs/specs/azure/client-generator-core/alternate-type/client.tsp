@@ -30,11 +30,11 @@ using Azure.ClientGenerator.Core;
 );
 
 @@alternateType(
-  _Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Feature,
+  _Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Point,
   {
-    identity: "NetTopologySuite.IO.GeoJSON.Feature",
-    package: "NetTopologySuite.IO.GeoJSON",
-    minVersion: "4.0.0",
+    identity: "Azure.Core.GeoJson.GeoPoint",
+    package: "Azure.Core",
+    minVersion: "1.61.0",
   },
   "csharp"
 );
