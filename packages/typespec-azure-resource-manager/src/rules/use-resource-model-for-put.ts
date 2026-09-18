@@ -12,11 +12,12 @@ import { getProperties, isTemplatedInterfaceOperation } from "./utils.js";
 export const useResourceModelForPutRule = createRule({
   name: "use-resource-model-for-put",
   docs: fileRef.fromPackageRoot("src/rules/use-resource-model-for-put.md"),
-  description: "Use registered ARM resource models for PUT resource responses.",
+  description: "Use ARM resource models for PUT create or update success responses.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-resource-model-for-put",
   messages: {
-    default: "PUT 200/201 resource response models must be registered as ARM resources.",
+    default:
+      "The success response for a PUT create or update operation must be an ARM resource model.",
   },
   create(context) {
     return {

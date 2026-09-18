@@ -16,7 +16,8 @@ let tester: LinterRuleTester;
 const library = "@azure-tools/typespec-azure-resource-manager";
 const diagnostic = {
   code: `${library}/use-resource-model-for-put`,
-  message: "PUT 200/201 resource response models must be registered as ARM resources.",
+  message:
+    "The success response for a PUT create or update operation must be an ARM resource model.",
   target: "Response",
 };
 const manual = "model Response { name: string; type: string; }";
