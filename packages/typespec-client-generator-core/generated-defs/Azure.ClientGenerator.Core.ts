@@ -469,8 +469,10 @@ export type AccessDecorator = (
 
 /**
  * Customize a method's signature in the generated client SDK.
- * Currently, only parameter signature customization is supported.
- * This decorator allows you to specify a different method signature for the client SDK than the original definition.
+ * The override operation defines the client method parameters, but its declared return type is
+ * ignored. To intentionally replace the generated method response, pass an operation returned by
+ * `replaceResponseWithVoid` or `replaceResponseWithBytes`; these functions preserve the original
+ * HTTP response metadata.
  *
  * @param target : The target operation that you want to override.
  * @param override : The override method definition that specifies the exact client method you want

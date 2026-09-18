@@ -120,11 +120,13 @@ Available ruleSets:
 
 | Name                                                                                                                                                                                                  | Description                                                                                     |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| [`@azure-tools/typespec-client-generator-core/use-create-for-put`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/use-create-for-put)                     | ARM PUT SDK method names should use 'create' as the verb prefix.                                |
 | [`@azure-tools/typespec-client-generator-core/require-client-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/require-client-suffix)               | Client names should end with 'Client'.                                                          |
 | [`@azure-tools/typespec-client-generator-core/property-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/property-name-conflict)             | Avoid naming conflicts between a property and a model of the same name.                         |
 | [`@azure-tools/typespec-client-generator-core/csharp-no-url-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-no-url-suffix)                 | Properties ending with 'Url' should use 'Uri' suffix instead to follow .NET naming conventions. |
 | [`@azure-tools/typespec-client-generator-core/csharp-model-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-model-suffix)                   | Model names should use recommended suffixes for C# SDKs.                                        |
 | [`@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/csharp-use-standard-acronyms) | C# SDK names should use standard acronym casing.                                                |
+| [`@azure-tools/typespec-client-generator-core/get-operation-name`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/get-operation-name)                     | GET SDK method names should use 'Get' or 'List' as the verb prefix.                             |
 
 ## Decorators
 
@@ -1030,8 +1032,10 @@ interface MyInterface {}
 #### `@override`
 
 Customize a method's signature in the generated client SDK.
-Currently, only parameter signature customization is supported.
-This decorator allows you to specify a different method signature for the client SDK than the original definition.
+The override operation defines the client method parameters, but its declared return type is
+ignored. To intentionally replace the generated method response, pass an operation returned by
+`replaceResponseWithVoid` or `replaceResponseWithBytes`; these functions preserve the original
+HTTP response metadata.
 
 ```typespec
 @Azure.ClientGenerator.Core.override(override: Operation, scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
