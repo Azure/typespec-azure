@@ -42,7 +42,7 @@ function service(code: string) {
   `;
 }
 
-function armPatch(models: string, response = "ArmResponse<Widget>") {
+function armPatch(models: string, response = "ArmResponse<Widget>", includeRead = true) {
   return `
     @armProviderNamespace
     @service namespace Microsoft.TestService;
@@ -54,7 +54,7 @@ function armPatch(models: string, response = "ArmResponse<Widget>") {
 
     @armResourceOperations
     interface Widgets {
-      read is ArmResourceRead<Widget>;
+      ${includeRead ? "read is ArmResourceRead<Widget>;" : ""}
       @patch
       @armResourceUpdate(Widget)
       update(...ResourceInstanceParameters<Widget>, @body body: WidgetPatchBody):
@@ -307,7 +307,7 @@ describe("native fixture contracts", () => {
       .toBeValid();
   });
 
-  it("accepts an async PATCH 202 body using the same-path ARM GET resource", async () => {
+  it("accepts an async PATCH 202 body for the associated ARM resource", async () => {
     await tester
       .expect(
         armPatch(
@@ -322,6 +322,111 @@ describe("native fixture contracts", () => {
           `,
           "Accepted202WithLocation",
         ),
+      )
+      .toBeValid();
+  });
+});
+
+describe("resource association", () => {
+  it("reports a moved property for an ARM PATCH returning only 202 without a GET", async () => {
+    await tester
+      .expect(
+        armPatch(
+          `
+            model WidgetProperties { displayName?: string; }
+            model WidgetPatchBody { displayName?: string; }
+            model AcceptedResponse { @statusCode statusCode: 202; }
+          `,
+          "AcceptedResponse",
+          false,
+        ),
+      )
+      .toEmitDiagnostics(invalid("displayName"));
+  });
+
+  it("accepts a resource subset for an ARM PATCH returning only 202 without a GET", async () => {
+    await tester
+      .expect(
+        armPatch(
+          `
+            model WidgetProperties { displayName?: string; }
+            model WidgetPatchBody { properties?: { displayName?: string }; }
+            model AcceptedResponse { @statusCode statusCode: 202; }
+          `,
+          "AcceptedResponse",
+          false,
+        ),
+      )
+      .toBeValid();
+  });
+
+  it.each([200, 201])(
+    "prefers the associated resource over a PATCH %s model response",
+    async (statusCode) => {
+      await tester
+        .expect(
+          armPatch(
+            `
+              model WidgetProperties { displayName?: string; }
+              model WidgetPatchBody { displayName?: string; }
+              model MatchingResponse {
+                @statusCode statusCode: ${statusCode};
+                @body body: WidgetPatchBody;
+              }
+            `,
+            "MatchingResponse",
+            false,
+          ),
+        )
+        .toEmitDiagnostics(invalid("displayName"));
+    },
+  );
+
+  it.each([200, 201])(
+    "prefers the associated resource over a PATCH %s scalar response",
+    async (statusCode) => {
+      await tester
+        .expect(
+          armPatch(
+            `
+              model WidgetProperties { displayName?: string; }
+              model WidgetPatchBody { properties?: { displayName?: string }; }
+              model ScalarResponse {
+                @statusCode statusCode: ${statusCode};
+                @body body: string;
+              }
+            `,
+            "ScalarResponse",
+            false,
+          ),
+        )
+        .toBeValid();
+    },
+  );
+
+  it("prefers a REST resource association over the same-path GET response", async () => {
+    await tester
+      .expect(
+        service(`
+          model Widget { properties: { displayName?: string }; }
+          model AcceptedResponse { @statusCode statusCode: 202; }
+          @route("/widgets") @get op read(): { displayName?: string };
+          @updatesResource(Widget)
+          @route("/widgets") @patch
+          op update(@body body: { displayName?: string }): AcceptedResponse;
+        `),
+      )
+      .toEmitDiagnostics(invalid("displayName"));
+  });
+
+  it("allows optional PATCH properties and omitted required resource properties", async () => {
+    await tester
+      .expect(
+        service(`
+          model Widget { name: string; description: string; }
+          model WidgetPatch { name?: string; }
+          @route("/widgets") @patch op update(@body body: WidgetPatch): Widget;
+        `),
       )
       .toBeValid();
   });

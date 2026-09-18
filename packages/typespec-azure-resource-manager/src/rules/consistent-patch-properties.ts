@@ -7,12 +7,14 @@ import {
   isNullType,
   paramMessage,
   resolveEncodedName,
+  walkPropertiesInherited,
   type Model,
   type ModelProperty,
   type Program,
   type Type,
 } from "@typespec/compiler";
 import { getAllHttpServices, type HttpOperation, type HttpOperationResponse } from "@typespec/http";
+import { getResourceOperation } from "@typespec/rest";
 import { isInternalTypeSpec } from "./utils.js";
 
 export const consistentPatchPropertiesRule = createRule({
@@ -39,7 +41,11 @@ export const consistentPatchPropertiesRule = createRule({
             }
 
             const patchBody = getObjectModel(httpOperation.parameters.body?.type);
-            const resourceType = getResourceType(httpOperation, service.operations);
+            const resourceType = getResourceType(
+              context.program,
+              httpOperation,
+              service.operations,
+            );
             if (patchBody === undefined) {
               continue;
             }
@@ -71,9 +77,15 @@ export const consistentPatchPropertiesRule = createRule({
 });
 
 function getResourceType(
+  program: Program,
   patchOperation: HttpOperation,
   operations: HttpOperation[],
 ): Type | undefined {
+  const associatedResource = getResourceOperation(program, patchOperation.operation)?.resourceType;
+  if (associatedResource !== undefined) {
+    return associatedResource;
+  }
+
   const getOperation = operations.find(
     (operation) => operation.verb === "get" && operation.path === patchOperation.path,
   );
@@ -102,6 +114,8 @@ function getResponseBodyType(
   return body?.type;
 }
 
+// Assignability checks requiredness and value types but permits extra named-model
+// properties; this rule instead compares the JSON property layout of a partial update.
 function findInvalidPatchProperties(
   program: Program,
   patchModel: Model,
@@ -205,16 +219,10 @@ interface PayloadProperty {
 function getPayloadProperties(program: Program, model: Model): Map<string, PayloadProperty> {
   const properties = new Map<string, PayloadProperty>();
 
-  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
-    for (const property of current.properties.values()) {
-      // A derived declaration shadows its base even when its payload type is never.
-      if (getProperty(model, property.name) !== property) {
-        continue;
-      }
-      const jsonName = resolveEncodedName(program, property, "application/json");
-      if (!properties.has(jsonName) && !isNeverType(property.type)) {
-        properties.set(jsonName, { target: property, type: property.type });
-      }
+  for (const property of walkPropertiesInherited(model)) {
+    const jsonName = resolveEncodedName(program, property, "application/json");
+    if (!properties.has(jsonName) && !isNeverType(property.type)) {
+      properties.set(jsonName, { target: property, type: property.type });
     }
   }
 

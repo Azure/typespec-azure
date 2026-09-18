@@ -5,10 +5,14 @@ Consistent shapes let API consumers and generated SDKs update a resource using
 the same property layout they receive when reading it.
 
 This rule checks all HTTP PATCH operations, including custom operations that do
-not use ARM lifecycle templates. It selects the comparison body from the PATCH
-`200` response, then `201`, then a same-path GET `200` or `201` response. An exact
-status code takes precedence over a range containing that code. Without a model
-request body or an eligible comparison body, there is nothing to compare.
+not use ARM lifecycle templates. It first uses the operation's associated resource
+model, such as the model specified by `@armResourceUpdate`. This association takes
+precedence over response bodies, including when PATCH returns only `202` and no
+GET operation exists. For operations without a resource association, it selects
+the comparison body from the PATCH `200` response, then `201`, then a same-path
+GET `200` or `201` response. An exact status code takes precedence over a range
+containing that code. Without a model request body or either an associated resource
+or an eligible comparison body, there is nothing to compare.
 
 The comparison uses JSON encoded names and includes inherited properties and
 discriminators. Derived declarations replace inherited properties by their
@@ -17,6 +21,10 @@ objects are compared recursively. Effective authored properties across the entir
 inheritance chain take precedence over synthesized discriminator metadata. Array
 elements, record keys, and scalar values are not checked as named properties.
 This is a property layout check, not a check of property types or requiredness.
+TypeSpec assignability is not equivalent: it compares authored names and value
+types, requires required target properties, and permits extra properties on named
+source models. This rule instead allows a partial resource shape while rejecting
+extra JSON properties.
 
 ## Incorrect
 
@@ -91,6 +99,9 @@ It is initially disabled in the shared Azure resource-manager ruleset.
 This rule provides partial equivalence to
 [ConsistentPatchProperties](https://github.com/Azure/azure-openapi-validator/blob/6243cb01c16c7535cd3b8df6f45fbeb3c095ed7f/docs/consistent-patch-properties.md).
 That validator checks emitted schemas; this rule checks native declarations.
+The native rule prefers an explicit resource association over response schemas,
+so it can validate asynchronous PATCH operations without a comparison response
+and can use a different resource shape than the selected response body.
 Emitter scope and API-version selection can therefore produce different
 results. Inherited `never` overrides can also differ: the native model excludes
 the property, while an emitted `allOf` reference can retain the base property.
