@@ -107,7 +107,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/retry-after": false, // Disable https://github.com/Azure/typespec-azure/issues/3351
     "@azure-tools/typespec-azure-resource-manager/secret-prop": true,
     "@azure-tools/typespec-azure-resource-manager/unsupported-type": true,
-    "@azure-tools/typespec-azure-resource-manager/no-tags-on-proxy-resources": false,
+    "@azure-tools/typespec-azure-resource-manager/no-tags-on-proxy-resource": false,
     "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op": false,
 
     // TCGC rules

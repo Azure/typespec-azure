@@ -10,13 +10,13 @@ import {
 
 import { getArmResources } from "../resource.js";
 
-export const noTagsOnProxyResourcesRule = createRule({
-  name: "no-tags-on-proxy-resources",
-  docs: fileRef.fromPackageRoot("src/rules/no-tags-on-proxy-resources.md"),
+export const noTagsOnProxyResourceRule = createRule({
+  name: "no-tags-on-proxy-resource",
+  docs: fileRef.fromPackageRoot("src/rules/no-tags-on-proxy-resource.md"),
   description:
     "Proxy ARM resources must not declare a tags property on the resource envelope or in their properties bag.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-tags-on-proxy-resources",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-tags-on-proxy-resource",
   messages: {
     default: paramMessage`Proxy resource '${"resourceName"}' must not declare \`tags\` on its resource envelope or in its properties bag. Use a tracked resource if tags are required.`,
   },

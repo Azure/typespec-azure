@@ -6,9 +6,9 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 
-import { noTagsOnProxyResourcesRule } from "../../src/rules/no-tags-on-proxy-resources.js";
+import { noTagsOnProxyResourceRule } from "../../src/rules/no-tags-on-proxy-resource.js";
 
-const ruleCode = "@azure-tools/typespec-azure-resource-manager/no-tags-on-proxy-resources";
+const ruleCode = "@azure-tools/typespec-azure-resource-manager/no-tags-on-proxy-resource";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -17,7 +17,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    noTagsOnProxyResourcesRule,
+    noTagsOnProxyResourceRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
