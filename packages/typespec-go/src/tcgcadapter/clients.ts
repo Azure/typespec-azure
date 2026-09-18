@@ -918,14 +918,15 @@ export class ClientAdapter {
           bodyParam.contentType = new go.ParameterRef(contentTypeParam.name);
           break;
         default: {
-          const style = go.isClientSideDefault(contentTypeParam.style)
-            ? "client-side default"
-            : contentTypeParam.style;
-          throw new AdapterError(
-            "UnsupportedTsp",
-            `unexpected content-type style ${style}`,
-            sdkMethod.__raw?.node,
-          );
+          if (go.isClientSideDefault(contentTypeParam.style)) {
+            bodyParam.contentType = new go.ParameterRef(contentTypeParam.name);
+          } else {
+            throw new AdapterError(
+              "UnsupportedTsp",
+              `unexpected content-type style ${contentTypeParam.style}`,
+              sdkMethod.__raw?.node,
+            );
+          }
         }
       }
     }
@@ -1517,8 +1518,7 @@ export class ClientAdapter {
           );
           if (contentType === "XML" && methodParam.type.kind === "array") {
             // this is for compat with legacy behavior
-            adaptedParam.xml = new go.XMLInfo();
-            adaptedParam.xml.wrapper = methodParam.type.name;
+            adaptedParam.xmlWrapper = methodParam.type.name;
           }
         }
         break;
@@ -1881,8 +1881,11 @@ export class ClientAdapter {
       // or a binary response. the former seems unlikely, the latter though...??
       // TODO: https://github.com/Azure/typespec-azure/issues/535
       contentType = "JSON";
-    } else if (sdkResponseType.kind === "bytes" && sdkResponseType.encode === "bytes") {
-      // bytes type with bytes encoding indicates a streaming binary response
+    } else if (
+      (sdkResponseType.kind === "bytes" && sdkResponseType.encode === "bytes") ||
+      (sdkResponseType.kind === "model" && helpers.isHttpFileType(sdkResponseType))
+    ) {
+      // bytes type with bytes encoding, or a TypeSpec.Http.File type, indicates a streaming binary response
       contentType = "binary";
     } else if (sdkResponseType.kind === "union") {
       // this is a multi-response operation, we assume the content-type to be JSON
@@ -1986,14 +1989,13 @@ export class ClientAdapter {
 
       if (go.isMonomorphicResultType(resultType)) {
         let fieldName: string | undefined;
-        let xmlInfo: go.XMLInfo | undefined;
+        let xmlWrapper: string | undefined;
         if (contentType === "XML" && sdkResponseType.kind === "array") {
           // this is for compat with legacy behavior
-          xmlInfo = new go.XMLInfo();
           fieldName = sdkResponseType.name;
           const elementType = go.unwrapPtr((<go.Slice>resultType).elementType);
-          const elementTypeXmlName = helpers.hasXMLInfo(elementType)?.name;
-          xmlInfo.wraps =
+          const elementTypeXmlName = go.hasXMLName(elementType);
+          xmlWrapper =
             elementTypeXmlName ?? go.getTypeDeclaration(elementType, method.receiver.type.pkg);
         }
 
@@ -2016,7 +2018,7 @@ export class ClientAdapter {
           contentType,
           helpers.isPtrType(resultType) ? this.ta.getPtrType(resultType) : resultType,
         );
-        respEnv.result.xml = xmlInfo;
+        respEnv.result.xmlWrapper = xmlWrapper;
       } else {
         throw new AdapterError(
           "InternalError",

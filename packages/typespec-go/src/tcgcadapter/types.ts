@@ -197,6 +197,7 @@ export class TypeAdapter {
     type: tcgc.SdkType,
     elementTypeByValue: boolean,
     substituteDiscriminator: boolean,
+    xmlItemsName?: string,
   ): Exclude<go.WireType, go.Ptr> {
     switch (type.kind) {
       case "boolean":
@@ -237,7 +238,7 @@ export class TypeAdapter {
             : this.codeModel.options["slice-elements-byval"] === true;
 
         const keyName = recursiveKeyName(
-          `array-${myElementTypeByValue}`,
+          `array-${myElementTypeByValue}${xmlItemsName ? `-${xmlItemsName}` : ""}`,
           valueType,
           substituteDiscriminator,
         );
@@ -269,6 +270,7 @@ export class TypeAdapter {
             ? this.getPtrType(elementType)
             : elementType,
         );
+        arrayType.xmlName = xmlItemsName;
         this.types.set(keyName, arrayType);
         return arrayType;
       }
@@ -330,6 +332,11 @@ export class TypeAdapter {
           helpers.isHttpFileType(type) ||
           (type.baseModel && helpers.isHttpFileType(type.baseModel))
         ) {
+          // Http.File type can only be binary or multipart/form
+          // so check which serialization option is set
+          if (type.serializationOptions.binary) {
+            return this.getReadSeekCloser(false);
+          }
           return this.getMultipartContent(false);
         }
         return this.getModel(type);
@@ -804,13 +811,13 @@ export class TypeAdapter {
       modelType.discriminatorValue = discriminatorLiteral;
     } else {
       modelType = new go.Model(this.getPkg(), modelName, annotations, usage);
-      // polymorphic types don't have XMLInfo
-      modelType.xml = helpers.adaptXMLInfo({
-        goTypeName: modelType.name,
-        orTypeName: model.name,
-        type: modelType,
-        xml: model.serializationOptions.xml,
-      });
+      // no XML support for polymorphic types
+      if (
+        model.serializationOptions.xml?.name &&
+        model.serializationOptions.xml.name !== modelType.name
+      ) {
+        modelType.xmlName = model.serializationOptions.xml.name;
+      }
     }
 
     modelType.docs.summary = model.summary;
@@ -866,7 +873,12 @@ export class TypeAdapter {
           : undefined;
       type = this.getMultipartContent(prop.type.kind === "array", fixedContentType);
     } else {
-      type = this.getWireType(prop.type, isMultipartFormData, true);
+      type = this.getWireType(
+        prop.type,
+        isMultipartFormData,
+        true,
+        prop.serializationOptions.xml?.itemsName,
+      );
     }
 
     if (prop.visibility) {
@@ -933,12 +945,15 @@ export class TypeAdapter {
       }
     }
 
-    field.xml = helpers.adaptXMLInfo({
-      goTypeName: field.name,
-      orTypeName: serializedName,
-      type: type,
-      xml: prop.serializationOptions.xml,
-    });
+    if (prop.serializationOptions.xml?.attribute) {
+      field.xmlKind = "attribute";
+    } else if (prop.serializationOptions.xml?.unwrapped) {
+      if (type.kind === "string") {
+        field.xmlKind = "text";
+      } else {
+        field.xmlKind = "unwrappedList";
+      }
+    }
 
     if (helpers.hasDecorator("@deserializeEmptyStringAsNull", prop.decorators)) {
       field.annotations.unmarshalEmptyStringAsNil = true;

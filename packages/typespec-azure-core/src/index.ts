@@ -10,6 +10,10 @@ export {
   type OperationLink,
   type OperationLinkMetadata,
 } from "./decorators/operation-link.js";
+export {
+  getApiVersionOverride,
+  getEffectiveApiVersionOverride,
+} from "./decorators/override-api-version.js";
 export { isPreviewVersion } from "./decorators/preview-version.js";
 export {
   getArmResourceIdentifierConfig,
