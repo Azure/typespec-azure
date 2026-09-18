@@ -50,6 +50,7 @@ export const useLatestVersionOfCommonTypesRule = createRule({
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-latest-version-of-common-types",
   messages: {
+    resolution: paramMessage`Unable to resolve the ARM common type used here. ${"details"}`,
     default: paramMessage`Use the latest ARM common-types version '${"latestVersion"}' instead of '${"currentVersion"}'.`,
     reference: paramMessage`This API version already selects the latest ARM common-types version '${"latestVersion"}', but the common-type ${"referenceKind"} '${"referenceName"}' resolves to '${"fileName"}' version '${"currentVersion"}'. Replace the TypeSpec usage that produces this legacy reference with a common type supported in '${"latestVersion"}'.`,
   },
@@ -156,13 +157,11 @@ function reportOutdatedSelection(
   latestVersion: string,
 ): void {
   context.reportDiagnostic({
+    messageId: "default",
     target,
     format: {
       currentVersion,
       latestVersion,
-      fileName: "common-types",
-      referenceKind: "selection",
-      referenceName: "common-types",
     },
   });
 }
@@ -499,7 +498,13 @@ function reportOutdatedUsages(
       service,
       version: apiVersion,
     });
-    context.program.reportDiagnostics(diagnostics);
+    for (const diagnostic of diagnostics) {
+      context.reportDiagnostic({
+        messageId: "resolution",
+        target: usage.target,
+        format: { details: diagnostic.message },
+      });
+    }
     if (record === undefined || record.version === latestVersion) {
       continue;
     }

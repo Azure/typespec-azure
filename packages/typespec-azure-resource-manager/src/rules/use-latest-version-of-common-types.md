@@ -8,6 +8,13 @@ types reachable from HTTP operation parameters and payloads so older legacy
 symbols are not emitted through an otherwise current API version.
 These checks use resolved ARM common-type metadata, including its version and
 reference file, rather than parsing generated OpenAPI reference paths.
+Selecting the latest version is not sufficient on its own: a legacy symbol can
+still resolve to an older supported common-type record. The rule therefore
+checks usages as well as the selected version.
+
+If a common type cannot be resolved, the rule reports the resolution failure at
+the usage in the user project under this rule's diagnostic code. This diagnostic
+can be suppressed in the same way as other diagnostics from this rule.
 
 ## Impact
 

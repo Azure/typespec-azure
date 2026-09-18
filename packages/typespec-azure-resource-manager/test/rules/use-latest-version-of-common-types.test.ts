@@ -1,12 +1,11 @@
 import { Tester } from "#test/tester.js";
-import { navigateProgram } from "@typespec/compiler";
 import {
   type LinterRuleTester,
   type TesterInstance,
   createLinterRuleTester,
   expectDiagnostics,
 } from "@typespec/compiler/testing";
-import { beforeEach, expect, it, vi } from "vitest";
+import { beforeEach, it } from "vitest";
 
 import { useLatestVersionOfCommonTypesRule } from "../../src/rules/use-latest-version-of-common-types.js";
 
@@ -453,8 +452,7 @@ it.each(["Legacy.json", "nested/Legacy.json"])(
   },
 );
 
-it("reports common-type resolution failures instead of silently skipping them", async () => {
-  const { program } = await runner.compile(`
+const unresolvedCommonTypeUsage = (suppress = false) => `
     ${serviceHeader(latestVersion)}
 
     @Azure.ResourceManager.CommonTypes.Private.armCommonDefinition(
@@ -466,21 +464,59 @@ it("reports common-type resolution failures instead of silently skipping them", 
 
     @route("/identity")
     @get
+    ${suppress ? '#suppress "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types" "Intentional unresolved common type for this test."' : ""}
     op getIdentity(): FutureIdentity;
-  `);
-  const reportDiagnostic = vi.fn();
-  navigateProgram(
-    program,
-    useLatestVersionOfCommonTypesRule.create({ program, options: {}, reportDiagnostic }),
-  );
+  `;
 
-  expectDiagnostics(program.diagnostics, {
-    code: "@azure-tools/typespec-azure-resource-manager/arm-common-types-incompatible-version",
-    target: "FutureIdentity",
-    message:
-      "No ARM common-types version for this type satisfies the expected version v6.  This type only supports the following version(s): v999",
-  });
-  expect(reportDiagnostic).not.toHaveBeenCalled();
+const resolutionDiagnostic = {
+  code: "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types",
+  target: "getIdentity",
+  message:
+    "Unable to resolve the ARM common type used here. No ARM common-types version for this type satisfies the expected version v6.  This type only supports the following version(s): v999",
+};
+
+it("reports common-type resolution failures instead of silently skipping them", async () => {
+  await tester.expect(unresolvedCommonTypeUsage()).toEmitDiagnostics(resolutionDiagnostic);
+});
+
+it.each([false, true])(
+  "respects rule suppression for resolution failures: %s",
+  async (suppress) => {
+    const diagnostics = await runner.diagnose(unresolvedCommonTypeUsage(suppress), {
+      compilerOptions: {
+        linterRuleSet: { enable: { [resolutionDiagnostic.code]: true } },
+      },
+    });
+    expectDiagnostics(diagnostics, suppress ? [] : [resolutionDiagnostic]);
+  },
+);
+
+it("does not report resolution failures for operations declared in libraries", async () => {
+  const libraryRunner = await Tester.import("test-common-type-service").createInstance();
+  const libraryTester = createLinterRuleTester(
+    libraryRunner,
+    useLatestVersionOfCommonTypesRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+  await libraryTester
+    .expect({
+      "main.tsp": "",
+      "node_modules/test-common-type-service/package.json": JSON.stringify({
+        name: "test-common-type-service",
+        version: "1.0.0",
+        tspMain: "main.tsp",
+      }),
+      "node_modules/test-common-type-service/main.tsp": `
+        import "@azure-tools/typespec-azure-resource-manager";
+        import "@typespec/http";
+        import "@typespec/versioning";
+        using Azure.ResourceManager;
+        using TypeSpec.Http;
+        using TypeSpec.Versioning;
+        ${unresolvedCommonTypeUsage()}
+      `,
+    })
+    .toBeValid();
 });
 
 it("does not report legacy common types excluded by request or response payload visibility", async () => {
