@@ -12,5 +12,19 @@
       "$ref"
     ],
     "severity": 0
+  },
+  {
+    "code": "LroErrorContent",
+    "message": "Error response content of long running operations must follow the error schema provided in the common types v2 and above.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/restartNative",
+      "post",
+      "responses",
+      "default",
+      "schema",
+      "$ref"
+    ],
+    "severity": 0
   }
 ]

@@ -1,0 +1,13 @@
+[
+  {
+    "code": "TagsAreNotAllowedForProxyResources",
+    "message": "Tags should not be specified in the properties bag for proxy resources. Consider using a Tracked resource instead.",
+    "path": [
+      "definitions",
+      "Gadget",
+      "properties",
+      "tags"
+    ],
+    "severity": 0
+  }
+]

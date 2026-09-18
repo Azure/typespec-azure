@@ -627,6 +627,19 @@
         }
       ]
     },
+    "GadgetBaseProperties": {
+      "type": "object",
+      "description": "Shared gadget properties.",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "description": "Tags on proxy resource - violates rule.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "GadgetListResult": {
       "type": "object",
       "description": "The response of a Gadget list operation.",
@@ -656,19 +669,17 @@
           "type": "string",
           "description": "Description of the gadget."
         },
-        "tags": {
-          "type": "object",
-          "description": "Tags on proxy resource - violates rule.",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
         "provisioningState": {
           "$ref": "#/definitions/ProvisioningState",
           "description": "The provisioning state.",
           "readOnly": true
         }
-      }
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/GadgetBaseProperties"
+        }
+      ]
     },
     "ProvisioningState": {
       "type": "string",

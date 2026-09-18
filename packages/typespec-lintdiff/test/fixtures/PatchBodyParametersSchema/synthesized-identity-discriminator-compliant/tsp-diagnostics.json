@@ -5,6 +5,11 @@
     "message": "Use the latest ARM common-types version 'v6' instead of 'v5'."
   },
   {
+    "code": "tsp-lintdiff-local-linter/consistent-patch-properties",
+    "severity": "warning",
+    "message": "The property 'identity' in the request body either does not appear in the resource model or is nested at the wrong level."
+  },
+  {
     "code": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
     "severity": "warning",
     "message": "Top-level resource 'Widget' should define a list by resource group operation."

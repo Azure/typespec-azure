@@ -1,0 +1,166 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Inherited encoded response discriminator",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "host": "management.azure.com",
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "azure_auth": [
+        "user_impersonation"
+      ]
+    }
+  ],
+  "securityDefinitions": {
+    "azure_auth": {
+      "type": "oauth2",
+      "description": "Azure Active Directory OAuth2 Flow.",
+      "flow": "implicit",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/authorize",
+      "scopes": {
+        "user_impersonation": "impersonate your user account"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Operations"
+    }
+  ],
+  "paths": {
+    "/providers/Microsoft.TestService/operations": {
+      "get": {
+        "operationId": "Operations_List",
+        "tags": [
+          "Operations"
+        ],
+        "description": "List the operations for the provider",
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/OperationListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/widgets": {
+      "patch": {
+        "operationId": "Update",
+        "description": "Update the resource.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Update body.",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "details": {
+                  "type": "object",
+                  "description": "Update details.",
+                  "properties": {
+                    "kind": {
+                      "type": "object",
+                      "description": "Object-valued kind.",
+                      "properties": {
+                        "extra": {
+                          "type": "string",
+                          "description": "Updated property."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "details": {
+                  "$ref": "#/definitions/Details",
+                  "description": "Resource details."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Base": {
+      "type": "object",
+      "description": "Authored payload inherited by the discriminated model.",
+      "properties": {
+        "kind": {
+          "type": "object",
+          "description": "Object represented as kind in the JSON payload.",
+          "properties": {
+            "extra": {
+              "type": "string",
+              "description": "Writable resource property."
+            }
+          },
+          "x-ms-client-name": "payload"
+        }
+      }
+    },
+    "Details": {
+      "type": "object",
+      "description": "Discriminator metadata must not replace the inherited authored object.",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "Discriminator property for Details."
+        }
+      },
+      "discriminator": "kind",
+      "required": [
+        "kind"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/Base"
+        }
+      ]
+    }
+  },
+  "parameters": {}
+}

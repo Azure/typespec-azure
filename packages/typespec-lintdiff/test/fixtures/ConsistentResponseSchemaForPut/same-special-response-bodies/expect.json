@@ -1,0 +1,39 @@
+{
+  "violation": false,
+  "ambientDiagnostics": [
+    {
+      "code": "@azure-tools/typespec-azure-core/documentation-required",
+      "count": 16
+    },
+    "@azure-tools/typespec-azure-core/require-versioned",
+    "@azure-tools/typespec-azure-resource-manager/arm-common-types-version",
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+      "count": 4
+    },
+    "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
+    {
+      "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
+      "count": 2
+    },
+    "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
+    {
+      "code": "tsp-lintdiff-local-linter/non-application-json-type",
+      "count": 3
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/put-in-operation-name",
+      "count": 2
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/xms-examples-required",
+      "count": 2
+    }
+  ],
+  "validatorDiagnostics": [
+    {
+      "code": "ConsistentResponseSchemaForPut",
+      "count": 2
+    }
+  ]
+}
