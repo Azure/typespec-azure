@@ -105,16 +105,6 @@ it("reports a UUID-typed resource name template parameter", async () => {
     .toEmitDiagnostics([diagnostic, diagnostic, diagnostic, diagnostic]);
 });
 
-it("reports a UUID-formatted resource name template parameter", async () => {
-  await tester
-    .expect(
-      `${versionedArmService("")}
-      @@format(Widget.name, "uuid");
-      `,
-    )
-    .toEmitDiagnostics([diagnostic, diagnostic, diagnostic, diagnostic]);
-});
-
 it("reports a direct UUID request body", async () => {
   await tester
     .expect(
@@ -163,39 +153,6 @@ it("reports a custom scalar derived from UUID", async () => {
         model WidgetProperties {
           id: WidgetId;
         }
-      `),
-    )
-    .toEmitDiagnostics(diagnostic);
-});
-
-it("reports a custom scalar with an explicit UUID format", async () => {
-  await tester
-    .expect(
-      inArmService(`
-        @format("uuid")
-        scalar WidgetId extends string;
-
-        model WidgetProperties {
-          id: WidgetId;
-        }
-      `),
-    )
-    .toEmitDiagnostics(diagnostic);
-});
-
-it("reports a property-level UUID format", async () => {
-  await tester
-    .expect(
-      inArmService(`
-        model IdentifierProperties {
-          id: string;
-        }
-
-        model WidgetProperties {
-          ...IdentifierProperties;
-        }
-
-        @@format(WidgetProperties.id, "uuid");
       `),
     )
     .toEmitDiagnostics(diagnostic);

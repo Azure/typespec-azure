@@ -10,7 +10,6 @@ import {
   type Type,
   createRule,
   fileRef,
-  getFormat,
   getLocationContext,
   isArrayModelType,
   isRecordModelType,
@@ -47,10 +46,7 @@ export const noUuidRule = createRule({
           return;
         }
 
-        if (
-          getFormat(context.program, property) === "uuid" ||
-          containsUuid(context.program, uuidScalar, property.type)
-        ) {
+        if (containsUuid(context.program, uuidScalar, property.type)) {
           reportTarget(context, property, reportedTargets);
         }
       },
@@ -77,8 +73,7 @@ export const noUuidRule = createRule({
             );
             if (
               parameter !== undefined &&
-              (getFormat(context.program, parameter.param) === "uuid" ||
-                containsUuid(context.program, uuidScalar, parameter.param.type))
+              containsUuid(context.program, uuidScalar, parameter.param.type)
             ) {
               reportTarget(context, operation, reportedTargets);
             }
@@ -145,7 +140,6 @@ function containsUuid(
     case "Scalar":
       return (
         type === uuidScalar ||
-        getFormat(program, type) === "uuid" ||
         (type.baseScalar !== undefined && containsUuid(program, uuidScalar, type.baseScalar, seen))
       );
     case "Model":
@@ -160,8 +154,7 @@ function containsUuid(
       return [...type.properties.values()].some(
         (property) =>
           getLocationContext(program, property).type !== "project" &&
-          (getFormat(program, property) === "uuid" ||
-            containsUuid(program, uuidScalar, property.type, new Set(seen))),
+          containsUuid(program, uuidScalar, property.type, new Set(seen)),
       );
     case "Tuple":
       return type.values.some((value) => containsUuid(program, uuidScalar, value, new Set(seen)));

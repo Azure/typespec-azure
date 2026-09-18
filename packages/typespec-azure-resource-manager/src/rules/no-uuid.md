@@ -6,7 +6,7 @@ Avoid UUID-typed schemas in Azure Resource Manager APIs unless their use has exp
 
 UUIDs are difficult for customers to create, recognize, and troubleshoot. Prefer stable, human-readable identifiers that follow the resource's naming constraints. UUID wire types also become language-specific UUID types in generated SDKs, which can make an API harder to use consistently across languages.
 
-The rule checks UUID model properties, HTTP parameters, request and response bodies, response headers, custom scalar aliases, and container types. It also checks UUID formats applied directly with `@format("uuid")`.
+The rule checks UUID model properties, HTTP parameters, request and response bodies, response headers, custom scalar aliases, and container types.
 
 ## Incorrect
 
