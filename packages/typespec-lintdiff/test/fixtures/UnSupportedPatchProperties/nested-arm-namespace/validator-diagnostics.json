@@ -1,0 +1,14 @@
+[
+  {
+    "code": "UnSupportedPatchProperties",
+    "message": "Mark the top-level property \"id\", specified in the patch operation body, as readOnly or immutable. You could also choose to remove it from the request payload of the Patch operation. This property is not patchable.",
+    "path": [
+      "paths",
+      "/widgets/{widgetName}",
+      "patch",
+      "parameters",
+      "1"
+    ],
+    "severity": 0
+  }
+]

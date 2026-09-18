@@ -11,14 +11,23 @@ nullable model bodies, request visibility, `readOnly`, and `x-ms-mutability`.
 
 The TypeSpec rule required an update. The previous implementation only checked
 `id`, `name`, and `type` on registered ARM lifecycle updates. The production
-rule and the violating/compliant fixtures beside this note are the complete
-required changes. No emitter, validator, or comparison-harness change is
-required.
+rule was then found to use descendant namespace search for ARM scoping, which
+missed operations nested below a provider namespace and could classify a global
+operation from an unrelated ARM service. The repaired rule uses upward provider
+ownership lookup instead. No emitter, validator, or comparison-harness change
+is required.
 
 Functional equivalence does not mean raw diagnostic equality. The remaining
 validator-only results are verified false positives caused by Spectral
 resolution dropping annotations beside `$ref`; the TypeSpec rule intentionally
 does not reproduce that validator defect.
+
+## Required changes
+
+- Use `getArmProviderNamespace` to scope operations through namespace ownership
+  rather than searching descendants with `resolveProviderNamespace`.
+- Add a violating nested-provider-namespace fixture and a compliant global
+  operation fixture alongside the existing direct semantic fixtures.
 
 ## Official coverage
 
@@ -36,7 +45,7 @@ official rule implements the `RPC-Patch-V1-02` checks represented by
 | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | [`docs/coverage_old.md`](../../../docs/coverage_old.md)                          | Historical external snapshot; 450 compiled projects and 210 validator rules. The snapshot records its gist URL but not a spec or generator revision.                                                | 42 validator projects, 7 local-lint projects, 0 official projects, 16.7%                                            |
 | Checked-in [`specs/coverage-breakdown.md`](../../../specs/coverage-breakdown.md) | Specs `f6b53f105b95da05276530a0754a1c71b4f16397`; 468 attempted, 462 assessed, 6 failed.                                                                                                            | production/lint; 45 validator, 24 TypeSpec, 7 overlap, 38 validator-only, 17 TypeSpec-only; 107/131 raw diagnostics |
-| Reproduced migration run                                                         | Same specs commit; generated `2026-09-01T15:05:17.215Z`; duration 1,213,472 ms; current lintdiff generator on this branch. Generated corpus artifacts were validation output and are not committed. | production/lint; 45 validator, 21 TypeSpec, 21 overlap, 24 validator-only, 0 TypeSpec-only; 107/59 raw diagnostics  |
+| Reproduced migration run                                                         | Same specs commit; generated `2026-09-03T07:33:12.381Z`; duration 3,157,792 ms; current lintdiff generator on this branch. Generated corpus artifacts were validation output and are not committed. | production/lint; 45 validator, 21 TypeSpec, 21 overlap, 24 validator-only, 0 TypeSpec-only; 107/59 raw diagnostics  |
 
 The historical 42/7 row and reproduced 45/21 row are not directly subtractable.
 They use different snapshots and populations, and the historical report credits
@@ -143,11 +152,12 @@ annotation-loss category described below.
 
 ## Fixture evidence
 
-The six fixtures exercise direct reserved properties, nullable bodies, nested
+The eight fixtures exercise direct reserved properties, nullable bodies, nested
 provisioning state, inherited and encoded names, read-only and immutable
-properties, referenced read-only properties, scalars, and multi-model unions.
-Focused validation covers all three violating fixtures and all three compliant
-fixtures. `audit:noise` found no unreviewed fixture noise.
+properties, referenced read-only properties, scalars, multi-model unions,
+nested ARM provider namespaces, and global operations beside an ARM service.
+Focused validation covers all four violating fixtures and all four compliant
+fixtures. No unreviewed fixture noise remains.
 
 ### Gap example: missing location and provisioning-state checks
 
@@ -188,6 +198,100 @@ on registered lifecycle updates. Operation traversal plus the complete reserved
 property set closes the semantic gap, including nullable request bodies.
 
 **Disposition:** Production rule and fixtures updated.
+
+### Gap example: nested provider namespace was not inherited
+
+- **Classification:** validator-only
+- **Status:** fixed
+- **Project/API version:** focused fixture / unversioned
+- **Source:** `nested-arm-namespace/main.tsp`
+
+**TypeSpec source**
+
+```typespec
+@armProviderNamespace
+@service(#{ title: "Test Service" })
+namespace Microsoft.TestService {
+  namespace Nested {
+    model WidgetPatch {
+      id?: string;
+    }
+
+    @patch
+    op update(@body body: WidgetPatch): void;
+  }
+}
+```
+
+**Emitted OpenAPI or validator behavior**
+
+```json
+{
+  "definitions": {
+    "Nested.WidgetPatch": {
+      "properties": {
+        "id": { "type": "string" }
+      }
+    }
+  }
+}
+```
+
+| Engine            | Observed result                                      |
+| ----------------- | ---------------------------------------------------- |
+| Swagger validator | Diagnostic for writable top-level `id`               |
+| TypeSpec lint     | Matching diagnostic after upward provider resolution |
+
+**Explanation:** The operation belongs to the decorated parent provider
+namespace. Descendant search starting from `Nested` could not find that parent,
+while `getArmProviderNamespace` follows the ownership chain upward.
+
+**Disposition:** Production namespace scoping and direct fixture fixed.
+
+### Gap example: unrelated global operation inherited a child provider
+
+- **Classification:** TypeSpec-only
+- **Status:** fixed
+- **Project/API version:** focused fixture / unversioned
+- **Source:** `global-operation-compliant/main.tsp`
+
+**TypeSpec source**
+
+```typespec
+@armProviderNamespace
+@service(#{ title: "Test Service" })
+namespace Microsoft.TestService {
+
+}
+
+model WidgetPatch {
+  id?: string;
+}
+
+@patch
+op update(@body body: WidgetPatch): void;
+```
+
+**Emitted OpenAPI or validator behavior**
+
+```json
+{
+  "paths": {},
+  "definitions": {}
+}
+```
+
+| Engine            | Observed result                                                |
+| ----------------- | -------------------------------------------------------------- |
+| Swagger validator | No diagnostic; the global operation is outside the ARM service |
+| TypeSpec lint     | No diagnostic after requiring an owning provider namespace     |
+
+**Explanation:** Searching downward from the global namespace found the
+separate `Microsoft.TestService` provider and incorrectly treated the global
+operation as ARM-owned. An undefined operation namespace now exits before
+provider lookup.
+
+**Disposition:** Production namespace scoping and compliant fixture fixed.
 
 ### Gap example: resolved `$ref` loses read-only annotation
 
@@ -300,6 +404,9 @@ Swagger output against an unavailable semantic program.
 
 ## Remaining uncertainty
 
-No semantic uncertainty remains in the assessed corpus. The six compile-failed
-projects are outside the aligned population and are recorded rather than
-silently discarded. Raw count equality is neither expected nor claimed.
+No semantic uncertainty remains in the assessed corpus. The namespace repair
+did not change the aligned project sets or diagnostic totals, showing that the
+new cases are direct authorable-shape regressions rather than corpus count
+artifacts. The six compile-failed projects are outside the aligned population
+and are recorded rather than silently discarded. Raw count equality is neither
+expected nor claimed.

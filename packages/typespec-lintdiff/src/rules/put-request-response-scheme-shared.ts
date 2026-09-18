@@ -1,7 +1,9 @@
 import {
   isArrayModelType,
+  isVoidType,
   walkPropertiesInherited,
   type Enum,
+  type EnumMember,
   type Model,
   type Scalar,
   type Tuple,
@@ -19,7 +21,7 @@ export function comparePutRequestAndResponse(
   httpOperation: HttpOperation,
 ): PutRequestResponseComparison | undefined {
   const requestBody = httpOperation.parameters.body;
-  if (requestBody === undefined) {
+  if (requestBody === undefined || isVoidType(requestBody.type)) {
     return undefined;
   }
 
@@ -39,20 +41,14 @@ export function comparePutRequestAndResponse(
   };
 }
 
-function getPrimaryResponse(
-  responses: HttpOperationResponse[],
-): HttpOperationResponse | undefined {
+function getPrimaryResponse(responses: HttpOperationResponse[]): HttpOperationResponse | undefined {
   return (
     responses.find((response) => response.statusCodes === 200) ??
     responses.find((response) => response.statusCodes === 201)
   );
 }
 
-function areEquivalentTypes(
-  left: Type,
-  right: Type,
-  seen: Map<Type, Set<Type>>,
-): boolean {
+function areEquivalentTypes(left: Type, right: Type, seen: Map<Type, Set<Type>>): boolean {
   if (left === right) {
     return true;
   }
@@ -75,6 +71,8 @@ function areEquivalentTypes(
       return areEquivalentScalars(left, right as Scalar);
     case "Enum":
       return areEquivalentEnums(left, right as Enum);
+    case "EnumMember":
+      return areEquivalentEnumMembers(left, right as EnumMember);
     case "Tuple":
       return areEquivalentTuples(left, right as Tuple, seen);
     case "Union":
@@ -93,11 +91,7 @@ function markSeen(seen: Map<Type, Set<Type>>, left: Type, right: Type): void {
   }
 }
 
-function areEquivalentModels(
-  left: Model,
-  right: Model,
-  seen: Map<Type, Set<Type>>,
-): boolean {
+function areEquivalentModels(left: Model, right: Model, seen: Map<Type, Set<Type>>): boolean {
   const leftIsArray = isArrayModelType(left);
   const rightIsArray = isArrayModelType(right);
   if (leftIsArray || rightIsArray) {
@@ -111,12 +105,14 @@ function areEquivalentModels(
   const leftIndexer = left.indexer;
   const rightIndexer = right.indexer;
   if (leftIndexer !== undefined || rightIndexer !== undefined) {
-    return (
-      leftIndexer !== undefined &&
-      rightIndexer !== undefined &&
-      areEquivalentScalars(leftIndexer.key, rightIndexer.key) &&
-      areEquivalentTypes(leftIndexer.value, rightIndexer.value, seen)
-    );
+    if (
+      leftIndexer === undefined ||
+      rightIndexer === undefined ||
+      !areEquivalentScalars(leftIndexer.key, rightIndexer.key) ||
+      !areEquivalentTypes(leftIndexer.value, rightIndexer.value, seen)
+    ) {
+      return false;
+    }
   }
 
   const leftProperties = new Map(
@@ -148,7 +144,19 @@ function areEquivalentModels(
 }
 
 function areEquivalentScalars(left: Scalar, right: Scalar): boolean {
-  return left.name === right.name;
+  if (left.name !== right.name) {
+    return false;
+  }
+
+  if (left.baseScalar === undefined || right.baseScalar === undefined) {
+    return left.baseScalar === right.baseScalar;
+  }
+
+  return areEquivalentScalars(left.baseScalar, right.baseScalar);
+}
+
+function areEquivalentEnumMembers(left: EnumMember, right: EnumMember): boolean {
+  return left.name === right.name && (left.value ?? left.name) === (right.value ?? right.name);
 }
 
 function areEquivalentEnums(left: Enum, right: Enum): boolean {
@@ -158,7 +166,7 @@ function areEquivalentEnums(left: Enum, right: Enum): boolean {
 
   for (const [name, leftMember] of left.members) {
     const rightMember = right.members.get(name);
-    if (rightMember === undefined || leftMember.value !== rightMember.value) {
+    if (rightMember === undefined || !areEquivalentEnumMembers(leftMember, rightMember)) {
       return false;
     }
   }
@@ -166,27 +174,39 @@ function areEquivalentEnums(left: Enum, right: Enum): boolean {
   return true;
 }
 
-function areEquivalentTuples(
-  left: Tuple,
-  right: Tuple,
-  seen: Map<Type, Set<Type>>,
-): boolean {
+function areEquivalentTuples(left: Tuple, right: Tuple, seen: Map<Type, Set<Type>>): boolean {
   return (
     left.values.length === right.values.length &&
     left.values.every((value, index) => areEquivalentTypes(value, right.values[index], seen))
   );
 }
 
-function areEquivalentUnions(
-  left: Union,
-  right: Union,
-  seen: Map<Type, Set<Type>>,
-): boolean {
+function areEquivalentUnions(left: Union, right: Union, seen: Map<Type, Set<Type>>): boolean {
   if (left.variants.size !== right.variants.size) {
     return false;
   }
 
+  const unnamedRight = [...right.variants.values()].filter(
+    (variant) => typeof variant.name === "symbol",
+  );
+
   for (const [name, leftVariant] of left.variants) {
+    if (typeof name === "symbol") {
+      const index = unnamedRight.findIndex((rightVariant) =>
+        areEquivalentTypes(
+          leftVariant.type,
+          rightVariant.type,
+          // Failed candidates must not leave pairs that a later comparison treats as equivalent.
+          new Map([...seen].map(([type, pairs]) => [type, new Set(pairs)])),
+        ),
+      );
+      if (index === -1) {
+        return false;
+      }
+      unnamedRight.splice(index, 1);
+      continue;
+    }
+
     const rightVariant = right.variants.get(name);
     if (rightVariant === undefined) {
       return false;

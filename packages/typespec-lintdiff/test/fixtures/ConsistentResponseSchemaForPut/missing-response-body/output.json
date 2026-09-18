@@ -1,0 +1,130 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "host": "management.azure.com",
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "azure_auth": [
+        "user_impersonation"
+      ]
+    }
+  ],
+  "securityDefinitions": {
+    "azure_auth": {
+      "type": "oauth2",
+      "description": "Azure Active Directory OAuth2 Flow.",
+      "flow": "implicit",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/authorize",
+      "scopes": {
+        "user_impersonation": "impersonate your user account"
+      }
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/missing-200-body": {
+      "put": {
+        "operationId": "Missing200Body",
+        "produces": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/missing-201-body": {
+      "put": {
+        "operationId": "Missing201Body",
+        "produces": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result."
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "CreatedWithBody": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "CreatedWithoutBody": {
+      "type": "object"
+    },
+    "OkWithBody": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "OkWithoutBody": {
+      "type": "object"
+    }
+  },
+  "parameters": {}
+}

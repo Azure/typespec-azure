@@ -1,0 +1,12 @@
+[
+  {
+    "code": "tsp-lintdiff-local-linter/descriptive-description-required",
+    "severity": "warning",
+    "message": "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  }
+]
