@@ -1,5 +1,13 @@
 # Release History
 
+## 0.17.4
+
+### Bug Fixes
+
+- [#5368](https://github.com/Azure/typespec-azure/pull/5368) Fixed handling of reserved characters in path params for fakes.
+- [#5382](https://github.com/Azure/typespec-azure/pull/5382) Unsupported types for string-encoded arrays resulted in bad codegen.
+
+
 ## 0.17.3
 
 ### Bug Fixes
