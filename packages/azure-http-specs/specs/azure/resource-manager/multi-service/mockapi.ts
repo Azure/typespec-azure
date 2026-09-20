@@ -58,6 +58,7 @@ Scenarios.Azure_ResourceManager_MultiService_Compute_VirtualMachines_createOrUpd
         },
         body: json({
           location: LOCATION,
+          properties: {},
         }),
       },
       response: {
@@ -98,6 +99,7 @@ Scenarios.Azure_ResourceManager_MultiService_ComputeDisk_Disks_createOrUpdate = 
       },
       body: json({
         location: LOCATION,
+        properties: {},
       }),
     },
     response: {

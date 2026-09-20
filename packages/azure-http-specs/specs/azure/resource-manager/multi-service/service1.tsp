@@ -88,7 +88,8 @@ interface VirtualMachines {
     Expected request body:
     ```json
     {
-      "location": "eastus"
+      "location": "eastus",
+      "properties": {}
     }
     ```
     Expected response body:
