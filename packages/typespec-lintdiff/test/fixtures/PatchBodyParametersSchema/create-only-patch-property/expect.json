@@ -1,3 +1,16 @@
 {
-  "violation": true
+  "violation": false,
+  "validatorDiagnostics": [{ "code": "PatchBodyParametersSchema", "count": 1 }],
+  "ambientDiagnostics": [
+    {
+      "code": "tsp-lintdiff-local-linter/patch-properties-correspond-to-put-properties",
+      "count": 1
+    },
+    { "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used", "count": 1 },
+    { "code": "tsp-lintdiff-local-linter/consistent-patch-properties", "count": 1 },
+    { "code": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group", "count": 1 },
+    { "code": "@azure-tools/typespec-azure-resource-manager/patch-envelope", "count": 1 },
+    { "code": "tsp-lintdiff-local-linter/xms-examples-required", "count": 4 },
+    { "code": "tsp-lintdiff-local-linter/path-parameter-schema", "count": 7 }
+  ]
 }

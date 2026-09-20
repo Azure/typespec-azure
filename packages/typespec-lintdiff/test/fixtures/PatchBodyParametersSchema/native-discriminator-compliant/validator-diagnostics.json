@@ -1,0 +1,47 @@
+[
+  {
+    "code": "PatchBodyParametersSchema",
+    "message": "Properties of a PATCH request body must not be required, property:kind.",
+    "path": [
+      "paths",
+      "/widgets",
+      "patch",
+      "parameters",
+      "0",
+      "schema",
+      "properties",
+      "absent"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "PatchBodyParametersSchema",
+    "message": "Properties of a PATCH request body must not be required, property:kind.",
+    "path": [
+      "paths",
+      "/widgets",
+      "patch",
+      "parameters",
+      "0",
+      "schema",
+      "properties",
+      "excluded"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "PatchBodyParametersSchema",
+    "message": "Properties of a PATCH request body must not be required, property:kind.",
+    "path": [
+      "paths",
+      "/widgets",
+      "patch",
+      "parameters",
+      "0",
+      "schema",
+      "properties",
+      "optional"
+    ],
+    "severity": 0
+  }
+]
