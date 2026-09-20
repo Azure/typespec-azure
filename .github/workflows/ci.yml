@@ -51,7 +51,7 @@ jobs:
         run: pnpm run build
 
       - name: Test
-        run: pnpm vitest run --config ./vitest.config.fast.ts --coverage --reporter=github-actions --reporter=default
+        run: pnpm vitest run --config ./vitest.config.fast.ts --coverage=${{ runner.os != 'Windows' }} --reporter=github-actions --reporter=default
 
       - name: Regen samples
         run: pnpm run regen-samples

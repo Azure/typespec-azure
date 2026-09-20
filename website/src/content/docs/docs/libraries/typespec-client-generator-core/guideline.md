@@ -317,7 +317,7 @@ Parameters used in client (either API version parameter or client parameter defi
 The method's return type is determined by the underlying operation's normal responses:
 
 - If `@responseAsBool` is on the method, then the response is a `boolean` (never optional). In this case, the underlying HTTP response objects have `type: undefined` — the boolean return type is a client-side concept handled at the method response level, not at the HTTP response level.
-- If `@override` uses `replaceResponseWithVoid` or `replaceResponseWithBytes`, the method response is respectively empty or `bytes`, while the underlying HTTP responses and exceptions keep their original wire types and metadata. Either replacement disables pageable-method classification. An intentional replacement reports `override-response-replacement`; another incompatible override response reports `override-response-mismatch`.
+- If `@override` uses `replaceResponseWithVoid` or `replaceResponseWithBytes`, the method response is respectively empty or `bytes`, while the underlying HTTP responses and exceptions keep their original wire types and metadata. Either replacement disables pageable-method classification and reports `override-response-replacement`. For any other override operation, TCGC ignores its declared return type, preserves the response calculated from the original operation, and does not perform response compatibility validation.
 - If the responses contain multiple return types, the return type is a union of all the types.
 - If the responses contain empty return type, the return type is wrapped with a nullable type.
 

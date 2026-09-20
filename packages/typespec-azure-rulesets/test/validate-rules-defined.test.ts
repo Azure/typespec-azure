@@ -4,7 +4,7 @@ import {
   $linter as ResourceManagerLinter,
 } from "@azure-tools/typespec-azure-resource-manager";
 import type { LinterDefinition } from "@typespec/compiler";
-import { fail, ok } from "node:assert";
+import { fail, ok, strictEqual } from "node:assert";
 import { describe, it } from "vitest";
 import { $linter } from "../src/index.js";
 
@@ -51,13 +51,25 @@ describe("expect all rules to be defined", () => {
     });
   });
 
-  it("client-sdk configures C# naming rules", () => {
+  it("client-sdk configures SDK naming rules", () => {
     const ruleset = $linter.ruleSets?.["client-sdk"];
     ok(ruleset);
     ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-no-url-suffix"]);
     ok(ruleset.enable?.["@azure-tools/typespec-client-generator-core/csharp-model-suffix"]);
+    strictEqual(
+      ruleset.enable?.["@azure-tools/typespec-client-generator-core/get-operation-name"],
+      false,
+    );
     ok(
       ruleset.disable?.["@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms"],
     );
+  });
+
+  it("keeps PUT SDK naming guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-client-generator-core/use-create-for-put";
+    ok($linter.ruleSets?.["client-sdk"].disable?.[ruleName]);
+    for (const rulesetName of ["data-plane", "resource-manager", "client-sdk"]) {
+      ok(!$linter.ruleSets?.[rulesetName].enable?.[ruleName]);
+    }
   });
 });
