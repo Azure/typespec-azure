@@ -88,6 +88,10 @@ the folder only if that publication backend is actually permitted.
    contract; do not require new-PR creation capabilities for an existing-PR update.
    Initialize the durable manifest and authoritative instruction paths/hashes
    before the first setup dispatch; later steps append their readiness evidence.
+   Include the [task recovery context](../shared/recovery-context.md): exact
+   authorizations, applicable validation profiles and inherited counters. Each
+   owner acknowledges it; do not rediscover permissions from older prose or
+   copy one package's timeout settings into another package.
 2. Mark the current entry running with `phase: preparation`. Resolve canonical
    fetch and intended head repositories by URL and GitHub identity. Fetch the
    canonical development target and `main`, recording both remote refs and SHAs;

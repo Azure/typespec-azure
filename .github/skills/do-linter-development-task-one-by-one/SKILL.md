@@ -67,7 +67,7 @@ flowchart TD
     Promote -->|Confirmed source defect only| Handoff["Persist defect evidence and worktree state<br/>Finish worker and nested-agent activity"]
     PromoReview -->|Confirmed source defect only| Handoff
     Handoff --> Budget{"Fewer than 3 repair cycles started?"}
-    Budget -->|Yes| Repair["Increment repair count<br/>Carry evidence and reuse existing PRs/worktrees"]
+    Budget -->|Yes| Repair["Verify repair lifecycle and authorization<br/>Increment existing count; preserve history/worktrees"]
     Repair --> Worker
     Budget -->|No| Cap["Partially-succeeded<br/>Source-repair cap exhausted"]
 
@@ -144,6 +144,12 @@ additional flags. A standalone dispatcher must provide a separate commands-only 
 for queue invocation. In app-session mode the queue can discover the owner
 from each exact TypeSpec worktree path even when no binding metadata was pasted.
 Do not relax malformed-line rejection to accept arbitrary handoff prose.
+
+Keep explicit task authorizations in a separate
+[recovery context](../shared/recovery-context.md), never in the strict worker
+command. In particular, post-merge source repair is opt-in, not implied by a
+generic queue invocation. Preserve approved validation settings and exact
+existing-fork exceptions across phases without repeatedly requesting approval.
 
 Validate the complete queue before preparation or launching the first subagent. Record malformed
 lines as failed tasks and continue with every valid command. Compare rule IDs
@@ -222,6 +228,9 @@ Keep an ordered ledger with one entry per parsed queue entry:
   status-request identity and evidence that previous task activity stopped
 - explicit recovery authorizations, including the user message, named failure,
   additional attempt allowance and usage, and any legacy-worktree adoption binding
+- recovery-context artifact/content identity, scoped validation profiles,
+  `legacy_fork_update`, `post_merge_source_repair`, `active_source_pr`, and
+  append-only `source_pr_history` for an authorized publication rollover
 - blocker or failure, when applicable
 
 Update the ledger after every phase handoff and worker result so a later failure
@@ -248,7 +257,9 @@ task; keep later tasks pending until its work is terminal and quiescent.
 Compatibility input reuses its exact development/specs paths and adds/verifies
 the promotion resource; it never silently replaces an unbound legacy checkout.
 Preparation is not repeated for repair cycles: revalidate the retained manifest
-and repair only invalidated layers. Record setup failures and preserve resources.
+and repair only invalidated layers. An opted-in post-merge transition requires
+a new source-creation binding, not a new dependency installation or new task.
+Record setup failures and preserve resources.
 
 For session-bound publication, follow
 [app-session execution](app-session-execution.md#queue-execution) rather than
@@ -439,6 +450,11 @@ stop/handoff behavior.
 
 ### Native-test timeout diagnosis
 
+Select the applicable [validation profile](../shared/recovery-context.md#reusable-validation-profiles)
+before the initial test run and carry it across handoffs. An existing approved
+hook setting is not a new diagnostic allowance. Do not silently revert it to
+defaults, expand its scope, or increase it after a failure.
+
 Apply the review skill's
 [bounded native-test timeout diagnosis](../loop-for-fix-and-review/SKILL.md#bounded-native-test-timeout-diagnosis)
 to completed native unit-test runs with only per-test timeout failures.
@@ -512,7 +528,11 @@ agent to repair the source in place.
    source-repair cycles have already started, stop as `partially-succeeded` with
    `source-repair-cap-exhausted` and the remaining defect. There is no fourth
    repair cycle, including for a newly discovered defect.
-3. Otherwise increment the repair count and launch a fresh top-level worker with
+3. Otherwise verify the recorded source PR lifecycle before dispatch. Reuse an
+   OPEN source PR. For MERGED source PRs, require and complete the shared
+   [opt-in transition](../shared/recovery-context.md#opt-in-post-merge-source-repair);
+   without that authorization stop. CLOSED-without-merge remains a blocker.
+   Increment the existing repair count when launching a fresh top-level worker with
    the original command verbatim plus the complete cycle handoff as context, not
    extra command-line flags. This authorized reuse is within the same queue
    entry; it does not relax duplicate-input rejection.
@@ -521,7 +541,9 @@ agent to repair the source in place.
    after the new development head has a clean review. Retaining session
    ownership is required and does not authorize reusing review subagents.
 4. Restart at `/develop-lintdiff-rule`, not at promotion. Reuse the original
-   TypeSpec/specs worktrees, source branch, and development PR. Preserve commits
+   TypeSpec/specs worktrees and the active source publication binding. Reuse the
+   source branch/PR when OPEN; only the authorized post-merge transition may
+   introduce a successor branch/PR, retaining the predecessor in history. Preserve commits
    and add focused repair commits. Re-establish evidence, add regression
    coverage, complete required validation and migration evidence, then run a new
    development review loop. No prior clean review covers a changed source head.
@@ -533,9 +555,11 @@ agent to repair the source in place.
    promotion review loop. Do not merge or cherry-pick the entire development
    branch into the promotion branch.
 6. Repeat only for another confirmed source defect. Never close or replace an
-   existing PR, force-push, reset, or rebase to manufacture a fresh cycle. If a
-   recorded PR is closed/merged, its branch identity changed, or its head/worktree
-   state no longer matches the handoff, stop and report the blocker.
+   existing PR, force-push, reset, or rebase to manufacture a fresh cycle. A
+   merged-source successor is allowed only under the opt-in transition; it
+   never resets budgets or replaces historical results. A closed-without-merge
+   source PR, closed/merged promotion PR, unexplained branch identity change,
+   or head/worktree mismatch still stops the task.
 
 Keep development PRs on their existing
 `feature/lintdiff-migration-new` target. Promotion follows its skill's canonical
@@ -550,6 +574,9 @@ fresh repair worker. It is an orchestration contract, not a new public CLI flag:
 
 - queue ownership marker `lintdiff-development-queue`, task number, exact rule
   ID, original command, cycle number, and source-repair count
+- recovery context/content identity, acknowledged authorizations and validation
+  profiles, active source PR and predecessor history; include the verified
+  new-creation binding when an opted-in merged-source successor is needed
 - execution backend, phase dispatch ID and phase scope, both verified publication
   bindings, coordinator session ID, readiness manifest and instruction-version
   paths/hashes acknowledged by the owner
@@ -680,6 +707,9 @@ one session to execute both publication phases.
 >
 > The queue has already prepared all three worktrees and publication bindings.
 > Read and verify the preparation manifest and supplied instruction versions.
+> Acknowledge the task-scoped recovery context before commands. Reuse exact
+> applicable fork-update permissions and validation profiles; do not infer new
+> authorization, reset counters, or independently roll over a merged source PR.
 > Do not recreate worktrees, rerun dispatcher mode or repeat passing dependency
 > setup. The development skill revalidates the prepared state and may repair only
 > invalidated layers under the shared preparation contract. Never pull, reset,
@@ -691,7 +721,8 @@ one session to execute both publication phases.
 > `<original-command>`
 >
 > Follow `/develop-lintdiff-rule` through draft pull-request creation, or update
-> the existing development PR during source repair. Pass the repair evidence and
+> the active development PR during source repair (or create the explicitly
+> authorized post-merge successor). Pass the repair evidence and
 > existing PR identity as invocation context without changing the original command.
 > Do not stop after implementation, validation, commit, or push. Capture the canonical
 > development PR URL and pushed head. Pass the shared post-run policy's queue ownership
@@ -917,11 +948,11 @@ Capture concrete suggestions for improving future queue runs, especially:
   and ledger in [bounded resumption](#explicitly-authorized-bounded-resumption).
 - Never promote without clean development review, or report success without
   clean promotion review against the final source provenance.
-- Require every development, promotion, and skill-update source branch to live
-  in `Azure/typespec-azure`, not a personal fork. Verify the actual PR head
-  repository as well as its base. Missing canonical push access is a blocker,
-  not permission to use a fork; legacy fork-backed PRs require explicit
-  user-authorized migration under the shared publication preflight.
+- Require new development/promotion heads and skill-update heads to live in
+  `Azure/typespec-azure`. Only an exact explicit `legacy_fork_update`
+  authorization permits retaining an existing fork-backed rule PR. Verify the
+  actual head and base; missing canonical access never permits a fork fallback.
+  The exception does not authorize successor fork PRs or skill-update fork PRs.
 - Never let promotion or its review mutate the source; return evidence to the
   outer queue for a fresh repair worker.
 - Never run a slash command as a PowerShell or shell executable.
