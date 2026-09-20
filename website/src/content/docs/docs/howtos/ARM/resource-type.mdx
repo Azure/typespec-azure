@@ -535,7 +535,20 @@ In addition to the resource-specific property bag, a resource may configure on o
 - **ResourceKind**: A standard mechanism for specifying a type of user experience in the portal.
 - **ManagedBy**: Indicating that this resource is managed by another Azure resource.
 - **ExtendedLocation**: Enabling deployment to custom locations such as Azure Arc-connected environments.
+- **Availability Zones**: Identifying the availability zones where a resource is deployed.
 - **Billing Data**: A standard mechanism for specifying billing properties for prepaid resources.
+
+### Availability Zones
+
+Spread `AvailabilityZonesProperty` into the resource model to add the standard optional `zones`
+envelope property:
+
+```typespec
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+  ...AvailabilityZonesProperty;
+}
+```
 
 ### Billing Data
 
@@ -544,6 +557,9 @@ Billing Data provides a standard description of resource's billing state, includ
 ```typespec
 model Employee is TrackedResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
   ...BillingDataProperty;
 }
 ```

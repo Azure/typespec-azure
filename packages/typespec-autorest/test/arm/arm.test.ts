@@ -1,6 +1,13 @@
+import { resolvePath } from "@typespec/compiler";
+import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { expect, it } from "vitest";
-import { compileOpenAPI, CompileOpenApiWithFeatures } from "../test-host.js";
+import {
+  AzureTester,
+  compileOpenAPI,
+  CompileOpenApiWithFeatures,
+  ignoreDiagnostics,
+} from "../test-host.js";
 
 it("can share types with a library namespace", async () => {
   const openapi: any = await compileOpenAPI(
@@ -572,6 +579,104 @@ it("can split resources and operations by feature", async () => {
     "../../common-types/resource-management/v5/privatelinks.json#/definitions/PrivateLinkResourceListResult",
   );
 });
+it("does not emit empty feature files for versions without feature content", async () => {
+  const runner = await AzureTester.createInstance();
+  const [{ outputs }, diagnostics] = await runner.compileAndDiagnose(
+    `
+      @versioned(Versions)
+      @Azure.ResourceManager.featureFiles(Features)
+      @service
+      namespace Microsoft.Contoso;
+
+      enum Features {
+        Student: "student",
+        Teacher: "teacher",
+      }
+
+      enum Versions {
+        v1,
+        v2,
+      }
+
+      @Azure.ResourceManager.featureFile(Features.Student)
+      @added(Versions.v2)
+      @route("/students")
+      op getStudent(): string;
+
+      @Azure.ResourceManager.featureFile(Features.Teacher)
+      @route("/teachers")
+      op getTeacher(): string;
+    `,
+    {
+      compilerOptions: {
+        options: {
+          "@azure-tools/typespec-autorest": {
+            "output-splitting": "legacy-feature-files",
+            "output-file": "{emitter-output-dir}/{version-status}/{version}/{feature}.json",
+          },
+        },
+      },
+    },
+  );
+
+  expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
+  ok(!outputs[resolvePath("stable", "v1", "student.json")]);
+  ok(outputs[resolvePath("stable", "v2", "student.json")]);
+  ok(outputs[resolvePath("stable", "v1", "teacher.json")]);
+  ok(outputs[resolvePath("stable", "v2", "teacher.json")]);
+});
+
+it.each([
+  ["omit", false],
+  ["include", true],
+] as const)(
+  "applies version enum strategy '%s' to the feature enum",
+  async (strategy, included) => {
+    const runner = await AzureTester.createInstance();
+    const [{ outputs }, diagnostics] = await runner.compileAndDiagnose(
+      `
+      @versioned(Versions)
+      @Azure.ResourceManager.featureFiles(Features)
+      @service
+      namespace Microsoft.Contoso;
+
+      enum Features {
+        Student: "student",
+        Teacher: "teacher",
+      }
+
+      enum Versions {
+        v1,
+        v2,
+      }
+
+      @route("/health")
+      op getHealth(): string;
+
+      @Azure.ResourceManager.featureFile(Features.Student)
+      @route("/students")
+      op getStudent(): string;
+    `,
+      {
+        compilerOptions: {
+          options: {
+            "@azure-tools/typespec-autorest": {
+              "output-splitting": "legacy-feature-files",
+              "output-file": "{emitter-output-dir}/{feature}.json",
+              "version-enum-strategy": strategy,
+            },
+          },
+        },
+      },
+    );
+
+    expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
+    const common = JSON.parse(outputs["common.json"]);
+    strictEqual("Features" in common.definitions, included);
+    strictEqual("Versions" in common.definitions, included);
+  },
+);
+
 it("can represent type references within and between features", async () => {
   const { featureA, featureB, shared } = await CompileOpenApiWithFeatures(
     `
