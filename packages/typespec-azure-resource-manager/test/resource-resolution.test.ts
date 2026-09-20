@@ -1,6 +1,7 @@
 import { ok } from "assert";
 import { describe, expect, it } from "vitest";
 import type { ArmOperationKind, ArmResourceOperation } from "../src/operations.js";
+import { listArmResources } from "../src/private.decorators.js";
 import {
   isResourceOperationMatch,
   parseArmResourceInstancePath,
@@ -4479,6 +4480,8 @@ interface ApplicationGateways {
   listByResourceGroup is ApplicationGatewayOps.List<ApplicationGateway>;
 }
 `);
+    expect(listArmResources(program)).toHaveLength(1);
+
     const provider = resolveArmResources(program);
     expect(provider).toBeDefined();
     expect(provider.resources).toBeDefined();
@@ -4562,6 +4565,8 @@ interface ApplicationGateways {
   get is ArmResourceRead<ApplicationGateway>;
 }
 `);
+    expect(listArmResources(program)).toHaveLength(0);
+
     const provider = resolveArmResources(program);
     expect(provider.resources).toHaveLength(0);
   });
