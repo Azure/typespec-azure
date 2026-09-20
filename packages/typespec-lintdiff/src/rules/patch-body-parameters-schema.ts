@@ -1,7 +1,6 @@
 import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 import {
   createRule,
-  getDiscriminator,
   getLifecycleVisibilityEnum,
   getLocationContext,
   getVisibilityForClass,
@@ -9,6 +8,7 @@ import {
   isNullType,
   paramMessage,
   resolveEncodedName,
+  walkPropertiesInherited,
   type DiagnosticTarget,
   type Model,
   type ModelProperty,
@@ -31,9 +31,10 @@ export const patchBodyParametersSchemaRule = createRule({
   messages: {
     required: paramMessage`Properties of a PATCH request body must not be required, property:${"propertyName"}.`,
     default: paramMessage`Properties of a PATCH request body must not have default value, property:${"propertyName"}.`,
-    createOnly: paramMessage`Properties of a PATCH request body must not be x-ms-mutability: ["create"], property:${"propertyName"}.`,
+    createOnly: paramMessage`Properties of a PATCH request body must not be visible only during Lifecycle.Create, property:${"propertyName"}.`,
   },
   create(context) {
+    const metadataInfo = createMetadataInfo(context.program);
     return {
       operation: (operation) => {
         const namespace = operation.interface?.namespace ?? operation.namespace;
@@ -51,7 +52,12 @@ export const patchBodyParametersSchemaRule = createRule({
           return;
         }
 
-        for (const violation of findViolations(context.program, patchBody.type, operation)) {
+        for (const violation of findViolations(
+          context.program,
+          patchBody.type,
+          operation,
+          metadataInfo,
+        )) {
           context.reportDiagnostic({
             target: violation.target,
             messageId: violation.messageId,
@@ -71,12 +77,13 @@ type Violation = {
   messageId: "required" | "default" | "createOnly";
 };
 
-function findViolations(program: Program, patchBody: Type, operation: Operation): Violation[] {
+function findViolations(
+  program: Program,
+  patchBody: Type,
+  operation: Operation,
+  metadataInfo: MetadataInfo,
+): Violation[] {
   const violations: Violation[] = [];
-  const metadataInfo = createMetadataInfo(program, {
-    canonicalVisibility: Visibility.Read,
-    canShareProperty: (property) => canSharePropertyUsingReadonlyOrXmsMutability(program, property),
-  });
   const visibility = resolveRequestVisibility(program, operation, "patch");
   collectNestedViolations(
     program,
@@ -101,39 +108,23 @@ function collectViolations(
   metadataInfo: MetadataInfo,
   visibility: Visibility,
 ) {
-  const schemaVisibility = metadataInfo.isTransformed(model, visibility)
-    ? visibility
-    : Visibility.Read;
   const visitedVisibilities = visited.get(model);
-  if (visitedVisibilities?.has(schemaVisibility)) {
+  if (visitedVisibilities?.has(visibility)) {
     return;
   }
   if (visitedVisibilities === undefined) {
-    visited.set(model, new Set([schemaVisibility]));
+    visited.set(model, new Set([visibility]));
   } else {
-    visitedVisibilities.add(schemaVisibility);
+    visitedVisibilities.add(visibility);
   }
 
-  const discriminator = getInheritedDiscriminator(program, model);
-  if (
-    discriminator !== undefined &&
-    getModelProperty(model, discriminator.propertyName) === undefined &&
-    !isTopLevelIdentityProperty([...path, discriminator.propertyName], discriminator.propertyName)
-  ) {
-    violations.push({
-      target: getLocationContext(program, model).type === "project" ? model : diagnosticTarget,
-      propertyName: [...path, discriminator.propertyName].join("."),
-      messageId: "required",
-    });
-  }
-
-  for (const property of getModelProperties(model)) {
+  for (const property of walkPropertiesInherited(model)) {
     const jsonName = resolveEncodedName(program, property, "application/json");
     const propertyPath = [...path, jsonName];
     if (isTopLevelIdentityProperty(propertyPath, jsonName)) {
       continue;
     }
-    if (!metadataInfo.isPayloadProperty(property, schemaVisibility)) {
+    if (!metadataInfo.isPayloadProperty(property, visibility)) {
       continue;
     }
     if (isNeverType(property.type)) {
@@ -142,10 +133,7 @@ function collectViolations(
     const propertyTarget =
       getLocationContext(program, property).type === "project" ? property : diagnosticTarget;
 
-    if (
-      !metadataInfo.isOptional(property, schemaVisibility) ||
-      property.name === discriminator?.propertyName
-    ) {
+    if (!metadataInfo.isOptional(property, visibility)) {
       violations.push({
         target: propertyTarget,
         propertyName: propertyPath.join("."),
@@ -177,7 +165,7 @@ function collectViolations(
       visited,
       propertyTarget,
       metadataInfo,
-      schemaVisibility,
+      visibility,
     );
   }
 }
@@ -238,56 +226,4 @@ function isCreateOnlyMutability(program: Program, property: ModelProperty): bool
 
   const visibility = getVisibilityForClass(program, property, lifecycle);
   return visibility.size === 1 && visibility.has(create);
-}
-
-function getInheritedDiscriminator(program: Program, model: Model) {
-  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
-    const discriminator = getDiscriminator(program, current);
-    if (discriminator !== undefined) {
-      return discriminator;
-    }
-  }
-
-  return undefined;
-}
-
-function canSharePropertyUsingReadonlyOrXmsMutability(
-  program: Program,
-  property: ModelProperty,
-): boolean {
-  const lifecycle = getLifecycleVisibilityEnum(program);
-  const visibility = getVisibilityForClass(program, property, lifecycle);
-  if (visibility.size === lifecycle.members.size) {
-    return true;
-  }
-
-  return (
-    visibility.size > 0 &&
-    [...visibility].every((member) => ["Read", "Create", "Update"].includes(member.name))
-  );
-}
-
-function getModelProperty(model: Model, name: string): ModelProperty | undefined {
-  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
-    const property = current.properties.get(name);
-    if (property !== undefined) {
-      return property;
-    }
-  }
-
-  return undefined;
-}
-
-function getModelProperties(model: Model): ModelProperty[] {
-  const properties = new Map<string, ModelProperty>();
-
-  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
-    for (const property of current.properties.values()) {
-      if (!properties.has(property.name)) {
-        properties.set(property.name, property);
-      }
-    }
-  }
-
-  return [...properties.values()];
 }

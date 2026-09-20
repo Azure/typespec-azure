@@ -2,165 +2,341 @@
 
 ## Result and gap summary
 
-The payload-kind repair removes false positives on multipart wrappers and file payloads:
-HTTP `bodyKind` now limits property traversal to `single` bodies. Six native tests and
-fifteen comparison fixtures pass; ordinary and nullable single models retain required,
-default (including falsy values), and create-only checks. The new fixtures emit required
-`formData` parameters or a primitive binary body schema, with no Swagger or TypeSpec
-property-rule violations after the repair. Independent ARM non-JSON warnings remain.
+The September 18 full corpus completed: 462/468 projects compile, with **703 Swagger
+diagnostics in 93 projects versus 769 selected-version TypeSpec diagnostics in 101 projects**.
+Ninety projects overlap. The three Swagger-only projects have four diagnostics on excluded
+Read/Create input or descendants of Read-only properties. Of eleven TypeSpec-only projects,
+ten have 24 falsy defaults missed by the validator; ProgrammableConnectivity's six required
+properties remain an unresolved source-to-recorded-Swagger attribution, not an older-version
+explanation.
 
-The September 15 full corpus completed with 462 of 468 projects compiling: 703 Swagger
-diagnostics in 93 projects versus 872 selected-version TypeSpec diagnostics in 105 projects,
-with all 93 overlapping and no validator-only projects. These rule totals and the twelve
-TypeSpec-only projects match the August 25 evidence. Six known compile-failure projects
-remain excluded. Falsy defaults explain part of the difference; the remaining per-path
-discrepancies are not fully classified, so coverage remains partial. Corpus counts alone
-do not prove payload-kind coverage; the new native tests and emitted fixtures provide it.
+The repair now checks resolved PATCH input and authored discriminator optionality rather
+than AutoRest schema sharing or synthesized/forced discriminators. Twenty-three emitter-free
+native tests and eighteen comparison fixtures pass. This intentionally provides **partial
+Swagger coverage**, not full functional equivalence. Six known compile failures and
+unclassified differences within overlapping projects remain limitations. Corpus overlap
+does not justify restoring emitter behavior or establish universal native-shape coverage.
 
-## Current full corpus (September 15)
+## Scope and decision
 
-The existing `specs:typespec` runner used pinned specs commit
-`f6b53f105b95da05276530a0754a1c71b4f16397`, no project filter or limit, and concurrency six.
-A two-project smoke run passed first. The full run exited zero, generated its report at
-`2026-09-15T05:41:34.365Z`, and finished at `2026-09-15T05:44:01.8726816Z`; recorded analysis
-duration was 1,233,287 ms. Generated corpus files are validation artifacts, not source changes.
+This is an explicitly authorized post-merge source repair following merged PR
+[#5480](https://github.com/Azure/typespec-azure/pull/5480), not a duplicate migration.
+It addresses promotion review comments
+[4037343644](https://github.com/Azure/typespec-azure/pull/5294#discussion_r4037343644) and
+[4037402479](https://github.com/Azure/typespec-azure/pull/5294#discussion_r4037402479).
+The new branch starts at `e5ad7b749fad60e4b2d78634897cc8cad211e8c2`.
+Prior source `bbd50fc21b5c7fe3b7bcf57084e410ba17d6ea6b` is unchanged.
 
-| Current result                                   |     Count |
-| ------------------------------------------------ | --------: |
-| Source projects                                  |       468 |
-| Successfully compiled projects                   |       462 |
-| Compile-failure projects                         |         6 |
-| Validator projects / diagnostics                 |  93 / 703 |
-| Selected-version TypeSpec projects / diagnostics | 105 / 872 |
-| Same-project overlap                             |        93 |
-| Validator-only projects                          |         0 |
-| TypeSpec-only projects                           |        12 |
+**TypeSpec rule update required and implemented:** use resolved request visibility for
+membership and optionality; remove canonical Read sharing and discriminator synthesis/forcing.
+Use `walkPropertiesInherited` rather than a local property walker; cache HTTP metadata per
+rule instance and retain fresh traversal state per operation. Describe create-only visibility
+using TypeSpec wording rather than `x-ms-mutability`.
 
-The twelve TypeSpec-only projects exactly match the [original aligned project list](#original-aligned-project-sets-august-25).
-The six failed projects exactly match the [original failure list](#original-compile-failures-august-25).
-They remain explicitly excluded from the aligned comparison; the runner's successful exit
-does not mean every project compiled. There are no unassessed validator projects for this rule.
+The enabled official `arm-resource-patch` implementation checks body shape, tags and
+resource-property subsets, not this rule's required/default/create-only checks. Although
+`rpc-guidelines-coverage.md` labels RPC-Patch-V1-10 covered, that prose overstates the
+implementation. ARM templates optionalize standard update models but do not prevent valid
+independently authored PATCH bodies. The proposed defect is an uncovered native semantic
+gap. The source's mixed-ruleset provider isolation remains unchanged; removing that guard
+in the official ARM copy remains a promotion-specific adaptation.
 
-Across all rules and projects, including failed projects, recorded raw diagnostics total
-51,831 and the runner reports 51,515 projected diagnostics. Those aggregate counts reflect
-the current target branch's entire ruleset and are not attributed to this payload-kind fix.
-The selected-version policy remains `http-reachable`; ordinary source linting is unchanged.
-The twelve one-sided projects were not newly classified path by path in this repair: the
-documented falsy-default explanation and remaining uncertainty still apply.
+## Native contract and upstream evidence
 
-## Payload-kind repair evidence
+- [Validator implementation](https://github.com/Azure/azure-openapi-validator/blob/1198225afecbb818c3050d4d2a91da92e14e56ce/packages/rulesets/src/spectral/functions/patch-body-parameters.ts)
+- [Validator tests](https://github.com/Azure/azure-openapi-validator/blob/1198225afecbb818c3050d4d2a91da92e14e56ce/packages/rulesets/src/spectral/test/patch-body-parameters.test.ts)
+- [Validator documentation](https://github.com/Azure/azure-openapi-validator/blob/1198225afecbb818c3050d4d2a91da92e14e56ce/docs/patch-body-parameters-schema.md)
+- Installed fixture validator: `@microsoft.azure/openapi-validator-rulesets` 2.2.5.
+- Compiler/HTTP source: core gitlink `a6137cac43a727ce0c2656364fd72d50c272ee4a`.
+- Native implementation: `src/rules/patch-body-parameters-schema.ts`.
+- Native regressions: `test/rules/patch-body-parameters-schema.test.ts`.
+- [Rule-local native shape/emission matrix](./rule.md#native-shape-and-emission-matrix).
 
-The source repair is based on `feature/lintdiff-migration-new` commit
-`274c4c327a4eef84ba6416281707dc9c2735781d`, after the original source PR was merged.
-The source namespace-isolation guard and all property-checking semantics are unchanged.
-The separate official-rule promotion's enablement-based applicability remains a promotion
-adaptation, not part of this source repair.
+The upstream selector checks PATCH `in: body` parameters with schemas. It resolves object
+properties and required lists through inheritance, skips only top-level case-insensitive
+`identity`, checks truthy defaults, required membership and exact `["create"]` mutability,
+then recursively checks nested objects. Diagnostics target the selected schema path.
+Upstream tests prove direct/inherited defaults and required/create-only fields, nested
+defaults, compliant optional properties, and the top-level versus nested identity boundary.
 
-Before the fix, emitter-free native tests reproduced two required-property warnings for
-multipart `name`/`contents` parts and one warning for `File.contents`. The multipart-tuple,
-single-binary, ordinary-model, and nullable-model controls passed. After the fix all six
-tests pass. The initial test-host attempt lacked the ARM library's transitive
-`@typespec/openapi` registration; adding that test library resolved setup without adding
-any emitter or production dependency.
+The native rule inspects HTTP `single` body models and nullable single-model unions.
+Resolved request visibility comes from `resolveRequestVisibility`; the same visibility is
+passed to `MetadataInfo.isPayloadProperty` and `isOptional`. Excluded properties are never
+checked or traversed. A request-visibility override can expose a create-only property;
+ordinary Update visibility cannot. No emitter or OpenAPI APIs participate in decisions.
+The encoded top-level identity exemption, inherited override handling, recursive protection,
+`never` exclusion, imported-property diagnostic fallback and all falsy defaults are retained.
+No array/indexer or multi-model-union traversal was added.
 
-| Comparison fixture               | Emitted PATCH parameter                                                                            | Swagger / repaired TypeSpec result    |
-| -------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| `multipart-patch-body-compliant` | Required `name` string and `contents` file parameters, both `in: formData`; no wrapper body schema | Zero / zero property-rule diagnostics |
-| `file-patch-body-compliant`      | Required `in: body` parameter with `{ "type": "string", "format": "binary" }` schema               | Zero / zero property-rule diagnostics |
+### Compiler discriminator boundary
 
-The validator's `patch-body-parameters` function ignores parameters unless `in === "body"`
-and a schema is present; a primitive binary schema has no properties to inspect. Production
-code uses supported HTTP metadata, not emitted Swagger. The [payload-kind matrix](./rule.md#payload-kind-evidence)
-distinguishes valid HTTP authoring from unrelated ARM guideline violations. These comparison
-fixtures are not evidence that multipart or file updates satisfy all ARM guidelines.
+Compiler `validateInheritanceDiscriminatedUnions` calls
+`getDiscriminatedUnionFromInheritance`, whose validation walks **derived variants**.
+An absent or optional discriminator on a root model is valid TypeSpec. A derived leaf
+without a discriminator is rejected as `missing-discriminator-property`; an authored
+optional derived discriminator is rejected as `invalid-discriminator-value`.
+The native rule does not duplicate either compiler check.
 
-The full fifteen-case fixture validation also refreshed this rule's pre-existing snapshots:
-common-type references now use the fixture harness's stable repository-relative junction
-path instead of a machine-specific external path. Reviewed ambient expectations reflect
-the target branch's existing `parameters-schema-as-type-object` union handling and
-`consistent-patch-properties` discriminator check; the `never` fixture now records its
-previously unreviewed ambient diagnostics. No unrelated rule implementation changed.
+The tests use valid inherited hierarchies with a concrete descendant, rather than suppressing
+compiler errors to construct invalid variants. Required inherited properties are diagnosed
+once at their authored target; excluded inherited discriminators are ignored. Legacy
+implicit-optional tests suppress only HTTP's deprecation warning, following the existing
+official tests; this does not suppress discriminator validation or make an invalid shape valid.
 
-## Original migration conclusion (historical)
+## Report reconciliation
 
-The migrated TypeSpec rule required production and comparison-harness updates. The production rule now covers the Swagger rule's authorable required, default, and create-only branches; traverses model variants inside unions, including nullable top-level PATCH bodies; preserves project-owned diagnostic targets while traversing imported library models; and mirrors Swagger's top-level emitted-JSON `identity` exception. It uses the same HTTP metadata visibility and optionality APIs as the Autorest emitter, so it checks only properties present in the effective PATCH schema and reports required properties according to their emitted PATCH optionality.
+Both reports were read before implementation:
 
-The corpus comparison now projects opted-in rules to the dataset-selected API version and keeps only diagnostics reachable from that version's HTTP operations. Raw TypeSpec diagnostics remain recorded for audit. This is comparison-only behavior: ordinary linting still reports diagnostics for every authored version.
+| Report                                                   | Population and meaning                                                                       | Rule row before this repair                                                                                  |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `docs/coverage_old.md`                                   | 450 compiled projects, 210 rules; migration disposition including official/structural credit | Partial, 87 validator projects, 85 local, 0 official, 97.7%; raw totals and unmatched identities unavailable |
+| `specs/coverage-breakdown.md` at the fetched source base | 462/468 projects, 215 rules; production same-project overlap only                            | 93 validator, 128 TypeSpec, 89 overlap, 4 validator-only, 39 TypeSpec-only; 703/1,230 diagnostics            |
+| September 15 repair note (historical)                    | Same pinned specs, full run after payload-kind repair                                        | 93/105 projects, 93 overlap, 0 validator-only, 12 TypeSpec-only; 703/872 diagnostics                         |
+| September 18 native repair                               | Same pinned specs, full run; 462/468 successfully compile                                    | 93/101 projects, 90 overlap, 3 validator-only, 11 TypeSpec-only; 703/769 diagnostics                         |
 
-The final full corpus run reports all 93 validator projects in the TypeSpec set, with no validator-only projects. TypeSpec-only projects fell from 51 to 12 after selected-version reachability and emitted PATCH schema filtering were applied. The rule remains **partial** because the remaining TypeSpec-only findings include intentional detection of falsy defaults that Swagger misses and other source-to-emission differences that have not all been classified path by path.
+The old external report records no reconstructible per-project detail or spec/generator SHA.
+Its checked-in snapshot came from commit `6a418911dbe5d35992fb5845cf4460d45643fec8`
+(August 11); the base coverage file last changed in
+`bf4e84189edc4ebcfcd2fc6ef881e74e3f485ece` (August 10). These are repository
+provenance, not invented report generation revisions. The base corpus report is stale relative
+to the September source repairs. Different project denominators and definitions preclude
+identifying external-report missing projects by subtraction.
 
-## Original evidence provenance (August 25)
+### Current corpus
 
-- Validator report: `packages/typespec-lintdiff/specs/validator-results.json`, generated from azure-rest-api-specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` by the dataset recorded in `packages/typespec-lintdiff/specs/_meta.json`.
-- TypeSpec report: local full run generated at `2026-08-25T04:55:45.589Z` from the same specs commit and this branch's review fixes documented below. Generated `packages/typespec-lintdiff/specs` artifacts were used as validation evidence only and intentionally excluded from this rule PR.
-- Population: 468 source projects, 462 successful projects, and 6 compile failures. The full run took 1,267,110 ms.
-- Raw/projected totals: 51,137 raw TypeSpec diagnostics and 51,000 selected-version projected diagnostics across all rules.
-- Rule totals: 703 raw emitted Swagger diagnostics and 872 projected TypeSpec diagnostics.
-- Deduplicated totals: not defined for this rule. `normalizedValidatorDiagnosticCount` and `normalizedTypeSpecDiagnosticCount` are `null` because emitted occurrences and semantic source targets do not have a proven one-to-one identity. No inferred deduplicated count is presented as evidence.
+This is the full, unfiltered 468-project corpus at `Azure/azure-rest-api-specs`
+commit `f6b53f105b95da05276530a0754a1c71b4f16397`, using compiler 1.14.0 and
+the existing runner at concurrency six. The isolated specs checkout remained pinned.
 
-## Implemented changes
+The run exited zero after 1,429,808 ms (about 24 minutes); report generation time is
+`2026-09-18T09:35:11.092Z`. Zero runner exit does not mean every project compiled.
 
-- Production rule: `src/rules/patch-body-parameters-schema.ts`
-  - report `@visibility(Lifecycle.Create)` properties that emit exactly `x-ms-mutability: ["create"]`;
-  - recurse into models nested in unions, including nullable nested models and nullable top-level PATCH bodies;
-  - report imported-library violations at the nearest project-owned target;
-  - skip a top-level PATCH body property whose emitted JSON name is `identity`;
-  - resolve each operation's request visibility with `resolveRequestVisibility`;
-  - use `MetadataInfo.isTransformed`, `isPayloadProperty`, and `isOptional` with the same canonical Read schema sharing policy as Autorest;
-  - force authored discriminator properties required and report discriminator properties synthesized by Autorest;
-  - omit `never`-typed properties that Autorest does not emit;
-  - omit properties absent from the emitted PATCH schema while retaining defaults and exact create-only mutability when they remain in the emitted schema.
-- Corpus harness:
-  - declare selected-version comparison through `projectionScope: http-reachable`;
-  - project the service to the dataset-selected API version and index source locations reachable from its HTTP operations;
-  - retain the point-query rule's selected-version filter against projected query-parameter locations;
-  - retain locationless and unrelated-rule diagnostics conservatively;
-  - record raw and projected diagnostic totals separately;
-  - retain the broader, rule-specific emitted-name normalization for `EnumInsteadOfBoolean` rather than forcing it through strict HTTP reachability.
-- Fixtures:
-  - required, create-only, discriminator, nullable-union, nullable-body, imported-model, and emitted top-level `identity` behavior remain covered;
-  - `multi-model-union-compliant` covers unsupported multi-model unions that Autorest emits without traversable PATCH schema properties;
-  - `synthesized-identity-discriminator-compliant` covers a top-level `identity` discriminator synthesized by Autorest and skipped by the Swagger rule;
-  - `implicit-optional-patch-compliant` covers required and create-only source properties that are optional or omitted in a transformed PATCH schema;
-  - `never-property-compliant` covers a required source property omitted because its type is `never`;
-  - `default-patch-property` includes `false`, `0`, and `""` defaults to prove those valid TypeSpec findings are retained.
+| Population / identity                                                   |         Count |
+| ----------------------------------------------------------------------- | ------------: |
+| Source / successful / failed projects                                   | 468 / 462 / 6 |
+| Validator projects / diagnostics, successful population                 |      93 / 703 |
+| Selected-version TypeSpec projects / diagnostics, successful population |     101 / 769 |
+| Overlap / validator-only / TypeSpec-only projects                       |   90 / 3 / 11 |
+| Raw TypeSpec diagnostics, all projects including failures               |           787 |
+| Raw TypeSpec diagnostics, successful projects                           |           779 |
+| Selected-version TypeSpec diagnostics, all projects including failures  |           777 |
+| Validator project + Swagger file + JSON path identities                 |           276 |
+| Validator project + JSON path identities                                |           276 |
+| TypeSpec project + source file + line + column identities               |           613 |
+| TypeSpec diagnostics without source locations                           |             0 |
 
-## Original full corpus (August 25)
+Independent shard aggregation agrees with the runner's 703/769 totals. The ten-diagnostic
+reduction from 779 raw successful-project diagnostics to 769 uses the existing selected-version
+HTTP-reachability filter; it is not production suppression. The additional eight diagnostics
+in failed projects are excluded from both engines' behavioral population.
 
-The final full run used specs commit `f6b53f105b95da05276530a0754a1c71b4f16397` and was generated on `2026-08-25T04:55:45.589Z`.
+Path-only identities intentionally collapse different property messages reported at the same
+schema node, while source identities collapse reused declaration targets. They are not a
+cross-engine canonical identity. Among the 104 projects in the union, raw counts are equal
+in 51, validator-higher in 15 (74 excess occurrences), and TypeSpec-higher in 38 (140 excess
+occurrences): net +66 native diagnostics. No equality of these identities proves equivalence.
 
-| Population                                |  Count |
-| ----------------------------------------- | -----: |
-| Source projects                           |    468 |
-| Successfully compiled projects            |    462 |
-| Compile failures                          |      6 |
-| Raw TypeSpec diagnostics, all rules       | 51,137 |
-| Projected TypeSpec diagnostics, all rules | 51,000 |
+### Complete one-sided project sets
 
-The 137-diagnostic overall reduction includes selected-version HTTP reachability, point-query selected-version filtering, and the existing enum emitted-name normalization. It is not a `PatchBodyParametersSchema`-only count.
+Each row below was inspected against the pinned source, selected API version and retained
+Swagger. All eleven native-only projects' reported targets survive the runner's selected-version
+projection. In particular, ApiCenter `restore` was added in March 2024 and exists in the
+selected June version; Oracle's three DNS flags were added in July 2025 and exist in September;
+ProgrammableConnectivity's six members are added/made required in the selected March 2025
+version. None of these retained findings is explained away as older-version-only.
 
-| PatchBodyParametersSchema result      | Count |
-| ------------------------------------- | ----: |
-| Validator projects                    |    93 |
-| Selected-version TypeSpec projects    |   105 |
-| Same-project overlap                  |    93 |
-| Validator-only projects               |     0 |
-| TypeSpec-only projects                |    12 |
-| Validator diagnostics                 |   703 |
-| Selected-version TypeSpec diagnostics |   872 |
+| Validator-only project                                                                              | Selected version   | Count | Source-backed cause                                                                                                                |
+| --------------------------------------------------------------------------------------------------- | ------------------ | ----: | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview`   | 2021-12-01-preview |     2 | `AccessReviewDecisionProperties.principal` and `.resource` are Read-only; their nested required `type` members are not PATCH input |
+| `specification/confidentialledger/resource-manager/Microsoft.ConfidentialLedger/ConfidentialLedger` | 2026-05-22-preview |     1 | PATCH reuses `ConfidentialLedger`; inherited tracked-resource `location` has Read/Create visibility, not Update                    |
+| `specification/workloads/Workloads.SAPDiscoverySite.Management`                                     | 2023-10-01-preview |     1 | `ServerInstanceProperties.performanceData` is Read-only; its required `dataSource` discriminator is excluded with its parent       |
 
-Raw diagnostic equality is not expected: Swagger reports emitted OpenAPI occurrences, while TypeSpec reports semantic source properties that can be reused by multiple operations or versions.
+| TypeSpec-only project                                                                                         | Selected version   | Count | Inspected targets / disposition                                                                       |
+| ------------------------------------------------------------------------------------------------------------- | ------------------ | ----: | ----------------------------------------------------------------------------------------------------- |
+| `specification/apicenter/ApiCenter.Management`                                                                | 2024-06-01-preview |     1 | `models.tsp:240`, `restore = false`                                                                   |
+| `specification/azuredatatransfer/resource-manager/Microsoft.AzureDataTransfer/AzureDataTransfer`              | 2026-02-06-preview |     2 | `models.flowprofile.tsp:217,253`, archive minimum and data-size minimum `= 0`                         |
+| `specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits`                    | 2026-06-01         |     3 | `models.tsp:1307,1428,2512`, two `renew` defaults and `allowContributors = false`                     |
+| `specification/computeschedule/resource-manager/Microsoft.ComputeSchedule/ComputeSchedule`                    | 2026-04-15-preview |     1 | `scheduledactionmodels.tsp:168`, `disabled = false`                                                   |
+| `specification/discovery/Discovery.Management`                                                                | 2026-06-01         |     1 | `../Discovery.Supercomputer.Management/nodePool.tsp:106`, `minNodeCount = 0`                          |
+| `specification/imagebuilder/resource-manager/Microsoft.VirtualMachineImages/ImageBuilder`                     | 2025-10-01         |     3 | `models.tsp:652,660,690`, two empty VM-size strings and disk size `= 0`                               |
+| `specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/fluxConfigurations` | 2025-04-01         |     2 | `models.tsp:1299,1305`, `insecure` and `useWorkloadIdentity = false`                                  |
+| `specification/oracle/resource-manager/Oracle.Database/OracleDatabase`                                        | 2025-09-01         |     6 | `models/common.tsp:147,150,153` and `models/anchors/networkAnchor.tsp:55,60,65`, six `false` defaults |
+| `specification/postgresql/DBforPostgreSQL.Management`                                                         | 2026-04-01-preview |     3 | `models.tsp:3328,3434,3517`, cluster size `= 0` and two empty availability-zone strings               |
+| `specification/programmableconnectivity/ProgrammableConnectivity.Management`                                  | 2025-03-30-preview |     6 | `Gateway.tsp:167,173,185,191,197,204`; unresolved attribution described below                         |
+| `specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations`                    | 2022-11-01         |     2 | `models.tsp:1444,2169`, `renew = false`                                                               |
 
-As a cross-rule regression check, `EnumInsteadOfBoolean` returned to 293 validator projects, 293 TypeSpec projects, and 293 overlapping projects after preserving its rule-specific projection semantics.
+### Count outliers and remaining uncertainty
+
+| Project            | Swagger / native | Schema paths / source locations | Observed evidence                                                                                                                                                                  |
+| ------------------ | ---------------: | ------------------------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SQL                |          42 / 13 |                          15 / 7 | Swagger includes many Create-only restore/source fields; native excludes them. Native `sku.name` repeats six times at one declaration                                              |
+| NotificationHubs   |          41 / 56 |                          4 / 29 | Credential fields appear under both direct credentials and `pnsCredentials`; source targets repeat across operations. Multiple property diagnostics share each Swagger schema path |
+| DomainRegistration |           15 / 1 |                           1 / 1 | Fifteen Swagger property diagnostics collapse onto one body schema; full per-property correspondence remains unclassified                                                          |
+| ServiceFabric      |          15 / 28 |                          3 / 25 | Different schema-path and declaration populations; full per-property correspondence remains unclassified                                                                           |
+| AppService         |          19 / 31 |                          7 / 13 | Reused source locations and multiple schema targets; full per-property correspondence remains unclassified                                                                         |
+| EventGrid          |          62 / 51 |                         38 / 16 | Many emitted occurrences share source targets; full per-property correspondence remains unclassified                                                                               |
+
+These observations describe actual multiplicity, not an inferred normalization that cancels
+all differences. The SQL and NotificationHubs message groups were inspected, but the full
+positive/negative remainder within overlapping projects has not been proven equivalent.
+
+### Compile failures
+
+These six projects match the preceding repair's known failure set and are excluded from
+aligned comparison; none is hidden or counted as compliant:
+
+- `specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices`
+- `specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups`
+- `specification/network/resource-manager/Microsoft.Network/Network/Network`
+- `specification/quota/resource-manager/Microsoft.Quota/Quota`
+- `specification/resources/resource-manager/Microsoft.Resources/deployments`
+- `specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker`
+
+The specs input remains `f6b53f105b95da05276530a0754a1c71b4f16397`. Dataset metadata
+was generated August 6 with 468 ARM projects and 625 emitted Swagger files. Swagger is the
+dataset-selected latest API version; readme suppressions were not applied. The existing
+`specs:typespec` runner executes all local rules with concurrency six, no filter or limit.
+A representative `ApiCenter.Management` smoke run passed first (one project, 99 total
+diagnostics across rules). Only successfully compiled projects enter the behavioral comparison.
+
+The rule retains `projectionScope: http-reachable`: comparison projects to the selected
+service API version and retains reachable diagnostics; ordinary source linting still sees
+all authored versions. Raw totals remain separate. Generated corpus files are validation
+artifacts and must not be committed.
 
 ## Code-backed gap examples
 
-### Gap example: falsy defaults missed by Swagger
+### Gap example: selected-version property reachability is not exact PATCH attribution
 
 - **Classification:** TypeSpec-only
-- **Status:** intentional
-- **Project/API version:** fixture `default-patch-property` / `2024-01-01`
-- **Source:** `WidgetPatchProperties.enabled`, `count`, and `label`
+- **Status:** unresolved, pre-existing in the September 15 one-sided project list
+- **Project/API version:** `ProgrammableConnectivity.Management` / `2025-03-30-preview`
+- **Source:** `Gateway.tsp`, `ApplicationProperties` and `Gateways.update`
+
+```typespec
+@TypeSpec.Versioning.madeRequired(Versions.v2025_03_30_preview)
+name: string;
+// The selected service operation:
+update is ArmTagsPatchSync<Gateway>;
+```
+
+The selected recorded Swagger PATCH body references `GatewayTagsUpdate`, containing only
+optional `tags`; the six required `ApplicationProperties` members exist elsewhere in the same
+selected Swagger document. Native diagnostics target those six source members through
+`properties.configuredApplication`.
+
+```json
+{
+  "GatewayTagsUpdate": {
+    "properties": { "tags": { "type": "object", "additionalProperties": { "type": "string" } } }
+  }
+}
+```
+
+| Engine          | Observed result                                                                  |
+| --------------- | -------------------------------------------------------------------------------- |
+| Swagger         | Zero: the selected PATCH body is tags-only                                       |
+| Native TypeSpec | Six required-property diagnostics retained by selected-version HTTP reachability |
+
+**Disposition:** Preserve and disclose the unresolved operation/source-to-recorded-emission
+attribution. The properties exist in the selected version, so simply labeling these as
+older-version diagnostics is incorrect. This repair does not change template/operation
+traversal or the comparison harness to erase the discrepancy.
+
+### Gap example: schema sharing is not native PATCH membership
+
+- **Classification:** validator-only
+- **Status:** intentional after native repair
+- **Project/API version:** `native-visibility-compliant`, unversioned fixture
+- **Source:** `PatchBody`, `AugmentedPatchBody`, `DefaultPatchBody`
+
+```typespec
+model PatchBody {
+  @visibility(Lifecycle.Read) id: string;
+  @visibility(Lifecycle.Create) createdBy?: string;
+  name?: string;
+}
+model AugmentedPatchBody {
+  ...PatchBody;
+  @visibility(Lifecycle.Read, Lifecycle.Query) unrelated?: string;
+}
+```
+
+AutoRest's `canSharePropertyUsingReadonlyOrXMSMutability` retains the Read/Create fields
+in the first schema. Adding the Read/Query property makes it select a transformed schema:
+
+```json
+{
+  "PatchBody": {
+    "properties": {
+      "id": { "type": "string", "readOnly": true },
+      "createdBy": { "type": "string", "x-ms-mutability": ["create"] },
+      "name": { "type": "string" }
+    },
+    "required": ["id"]
+  },
+  "AugmentedPatchBody": { "properties": { "name": { "type": "string" } } }
+}
+```
+
+| Engine          | Observed result                                                                                                                             |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Swagger         | Two warnings on `PatchBody`, none on `AugmentedPatchBody`; two additional warnings for the read-only required/default `DefaultPatchBody.id` |
+| Native TypeSpec | Zero for all three; each effective input contains only optional `name`                                                                      |
+
+**Disposition:** Intentionally reject emitter schema sharing as a native membership rule.
+The older `create-only-patch-property` fixture likewise retains its one Swagger warning but
+expects no native warning. `create-visibility-override` separately proves that explicit
+Create request visibility still diagnoses an actual create-only input. That fixture records
+four Swagger warnings (shared-schema `id` required/default, `name` required, and `createdBy`
+create-only) versus one native warning on `createdBy`; excluded Read/Update fields are not
+Create request input.
+
+### Gap example: emitted discriminator synthesis and requiredness
+
+- **Classification:** validator-only
+- **Status:** intentional after native repair
+- **Project/API version:** `native-discriminator-compliant`, unversioned fixture
+- **Source:** `AbsentDiscriminator`, `OptionalDiscriminator`, `ExcludedDiscriminator`
+
+```typespec
+@discriminator("kind")
+model AbsentDiscriminator {}
+@discriminator("kind")
+model OptionalDiscriminator {
+  kind?: string;
+}
+@discriminator("kind")
+model ExcludedDiscriminator {
+  @visibility(Lifecycle.Read) kind: string;
+  name?: string;
+}
+```
+
+AutoRest's model emission inserts or forces `kind` into `required` in each definition:
+
+```json
+{ "discriminator": "kind", "required": ["kind"] }
+```
+
+| Engine          | Observed result                                                       |
+| --------------- | --------------------------------------------------------------------- |
+| Swagger         | Three required-property warnings                                      |
+| Native TypeSpec | Zero: absent, optional, and excluded are not required effective input |
+
+**Disposition:** Remove synthesis/forcing, not compiler checks. The original mixed
+`discriminator-required-patch-property` fixture keeps three Swagger warnings but only one
+native warning, on the genuinely required `inheritedDiscriminator.kind`.
+The native suite also proves root required, valid inherited required/excluded, and legacy
+implicit optionality. Ambient no-string-discriminator/no-empty-model guidance remains
+visible in comparison fixtures; it is not a compiler-error suppression.
+
+### Gap example: falsy defaults
+
+- **Classification:** TypeSpec-only
+- **Status:** intentional, unchanged
+- **Project/API version:** `default-patch-property` / `2024-01-01`
+- **Source:** `WidgetPatchProperties.enabled`, `count`, `label`
 
 ```typespec
 enabled?: boolean = false;
@@ -172,233 +348,50 @@ label?: string = "";
 { "enabled": { "default": false }, "count": { "default": 0 }, "label": { "default": "" } }
 ```
 
-| Engine            | Observed result                                                                                |
-| ----------------- | ---------------------------------------------------------------------------------------------- |
-| Swagger validator | No diagnostics for the three falsy values because the validator tests `default` by truthiness. |
-| TypeSpec lint     | Three default diagnostics because each authored default is defined.                            |
+| Engine          | Observed result                                                              |
+| --------------- | ---------------------------------------------------------------------------- |
+| Swagger         | No warnings for these three values because `default` is tested by truthiness |
+| Native TypeSpec | Three warnings because each authored effective-input default is defined      |
 
-**Disposition:** Retain the TypeSpec findings; copying the validator's truthiness bug would weaken the guideline.
+**Disposition:** Preserve the guideline rather than copy the validator bug. ApiCenter's
+`ServiceUpdateProperties.restore` with default `false` is a corpus example, inspected in
+the historical analysis and retained by the current representative run.
 
-### Gap example: transformed PATCH optionality and omission
+### Gap example: transport payloads are not PATCH documents
 
-- **Classification:** TypeSpec-only
-- **Status:** fixed
-- **Project/API version:** fixture `implicit-optional-patch-compliant` / `2025-01-01`
-- **Source:** `WidgetProperties.description` and `createOnly`
-
-```typespec
-model WidgetProperties {
-  description: string;
-  @visibility(Lifecycle.Create) createOnly: string;
-}
-```
-
-```json
-"WidgetPropertiesUpdate": {
-  "properties": { "description": { "type": "string" } }
-}
-```
-
-| Engine            | Observed result                                                                             |
-| ----------------- | ------------------------------------------------------------------------------------------- |
-| Swagger validator | Clean: `description` is emitted optional and `createOnly` is absent from the update schema. |
-| TypeSpec lint     | Clean after using `isOptional` and `isPayloadProperty` with PATCH visibility.               |
-
-**Disposition:** Production rule fix; HTTP reachability alone cannot represent schema transformation.
-
-### Gap example: discriminator requiredness
-
-- **Classification:** validator-only
-- **Status:** fixed
-- **Project/API version:** fixture `discriminator-required-patch-property` / `2024-01-01`
-- **Source:** `OptionalDiscriminator.kind`, `SynthesizedDiscriminator.kind`, and inherited `DerivedDiscriminator.kind`
+- **Classification:** historical TypeSpec-only false positives
+- **Status:** fixed by the preceding payload-kind repair, retained here
+- **Project/API version:** multipart/file comparison fixtures, unversioned
+- **Source:** required multipart fields and `File.contents`
 
 ```typespec
-@discriminator("kind")
-model OptionalDiscriminator {
-  kind?: string;
-}
-@discriminator("kind")
-model SynthesizedDiscriminator {}
-@discriminator("kind")
-model BaseSynthesizedDiscriminator {}
-model DerivedDiscriminator extends BaseSynthesizedDiscriminator {
-  kind: "derived";
-}
+@multipartBody body: { name: HttpPart<string>; contents: HttpPart<bytes>; }
 ```
 
-```json
-"OptionalDiscriminator": { "discriminator": "kind", "required": ["kind"] },
-"SynthesizedDiscriminator": { "discriminator": "kind", "required": ["kind"] },
-"BaseSynthesizedDiscriminator": { "discriminator": "kind", "required": ["kind"] },
-"DerivedDiscriminator": { "allOf": [{ "$ref": "#/definitions/BaseSynthesizedDiscriminator" }] }
-```
+AutoRest emits required `in: formData` parameters for multipart fields and a primitive
+`{ "type": "string", "format": "binary" }` schema for a file body. Neither exposes object
+properties selected by this Swagger rule. The native rule uses `bodyKind === "single"`;
+both engines remain clean. Native model/tuple multipart, file, binary and nullable-model
+controls pass. This does not approve non-JSON payloads under other ARM rules.
 
-| Engine            | Observed result                                                                                                  |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Swagger validator | Three required-property diagnostics.                                                                             |
-| TypeSpec lint     | Three matching diagnostics after mirroring Autorest's direct, synthesized, and inherited discriminator behavior. |
+## Validation and limitations
 
-**Disposition:** Production rule fix and focused violating fixture.
+The native suite passes 23 tests. Focused comparison passes all 18 cases: seven violating
+cases with partial coverage, eight validator-clean compliance cases with reviewed ambient
+warnings, and three reviewed validator discrepancies. Build and changed-file oxlint pass.
+Only explicit maintained files are formatted; harness snapshots retain serializer formatting.
+The existing catalog-wide `audit:noise` has no rule selector; the focused harness's complete
+ambient diagnostics provide this rule's noise evidence rather than auditing unrelated rules.
 
-### Gap example: `never` property omitted by Autorest
+One native draft correction added suppression of the supported legacy-option deprecation
+warning (four initial failures, nineteen passes). One fixture draft correction refreshed
+the pre-existing target branch's `patch-properties-correspond-to-put-properties` ambient
+warning expectations in five rule-local cases. No other rule, validator, emitter, or harness
+implementation changed. A third correction fixed a read-only analysis script's schema
+assertion: comparison `projectCount` is 462 successful projects, while `sourceProjectCount`
+and the execution index contain all 468. The complete corpus itself passed on its first
+full invocation and was not rerun. All original failures remain in execution artifacts.
 
-- **Classification:** TypeSpec-only
-- **Status:** fixed
-- **Project/API version:** fixture `never-property-compliant` / unversioned service
-- **Source:** `WidgetPatchBody.omitted`
-
-```typespec
-model WidgetPatchBody {
-  omitted: never;
-}
-```
-
-```json
-"WidgetPatchBody": { "type": "object", "description": "Patch envelope for widget." }
-```
-
-| Engine            | Observed result                                    |
-| ----------------- | -------------------------------------------------- |
-| Swagger validator | Clean because no `omitted` property is emitted.    |
-| TypeSpec lint     | Clean after skipping `isNeverType(property.type)`. |
-
-**Disposition:** Production rule fix and focused compliant fixture.
-
-### Gap example: nullable union traversal
-
-- **Classification:** validator-only
-- **Status:** fixed
-- **Project/API version:** fixtures `nullable-body-required-property` and `nullable-model-required-property` / `2024-01-01`
-- **Source:** nullable top-level `WidgetPatchBody | null`, `WidgetPatchBody.details`, and nested `requiredProp`
-
-```typespec
-@body body: WidgetPatchBody | null;
-details?: WidgetPatchDetails | null;
-model WidgetPatchDetails { requiredProp: string; }
-```
-
-| Engine            | Observed result                                                                                              |
-| ----------------- | ------------------------------------------------------------------------------------------------------------ |
-| Swagger validator | Reports required properties inside nullable model references.                                                |
-| TypeSpec lint     | Reports `requiredProp` and `details.requiredProp` after traversing model variants in root and nested unions. |
-
-**Disposition:** Production recursive traversal fix.
-
-### Gap example: imported-library diagnostic target
-
-- **Classification:** validator-only
-- **Status:** fixed
-- **Project/API version:** `ConfidentialLedger`, `DevCenter`, and `HybridCompute` / dataset-selected versions
-- **Source:** required PATCH properties declared in the imported ARM library
-
-```text
-Swagger target: emitted project PATCH schema
-Original TypeSpec target: imported library ModelProperty (diagnostic discarded)
-Fixed TypeSpec target: nearest project-owned PATCH model or operation
-```
-
-| Engine            | Observed result                                                                    |
-| ----------------- | ---------------------------------------------------------------------------------- |
-| Swagger validator | Reports the emitted required property in each project.                             |
-| TypeSpec lint     | Reports after retargeting imported violations to the nearest project-owned target. |
-
-**Disposition:** Production diagnostic-target fix. The final project overlap includes all three services.
-
-### Gap example: selected-version population
-
-- **Classification:** TypeSpec-only
-- **Status:** population mismatch
-- **Project/API version:** full corpus / dataset-selected API versions
-- **Source:** diagnostics attached only to selected-out versions or declarations outside the selected HTTP graph
-
-```yaml
-projectionScope: http-reachable
-```
-
-```text
-Raw TypeSpec diagnostics:       51,137
-Projected TypeSpec diagnostics: 51,000
-```
-
-| Engine            | Observed result                                                                                                                       |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Swagger validator | Evaluates the dataset-selected emitted API version.                                                                                   |
-| TypeSpec lint     | Ordinary linting sees every authored version; comparison retains only selected-version HTTP-reachable diagnostics for opted-in rules. |
-
-**Disposition:** Comparison projection only. Raw diagnostics remain recorded and normal lint behavior is unchanged.
-
-## Original aligned project sets (August 25)
-
-Validator-only projects: none.
-
-TypeSpec-only projects after selected-version reachability and emitted PATCH schema filtering:
-
-- `specification/apicenter/ApiCenter.Management`
-- `specification/azuredatatransfer/resource-manager/Microsoft.AzureDataTransfer/AzureDataTransfer`
-- `specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits`
-- `specification/computeschedule/resource-manager/Microsoft.ComputeSchedule/ComputeSchedule`
-- `specification/discovery/Discovery.Management`
-- `specification/imagebuilder/resource-manager/Microsoft.VirtualMachineImages/ImageBuilder`
-- `specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/fluxConfigurations`
-- `specification/mission/resource-manager/Microsoft.Mission/Mission`
-- `specification/oracle/resource-manager/Oracle.Database/OracleDatabase`
-- `specification/postgresql/DBforPostgreSQL.Management`
-- `specification/programmableconnectivity/ProgrammableConnectivity.Management`
-- `specification/reservations/resource-manager/Microsoft.Capacity/Reservations/Reservations`
-
-The falsy-default subset is intentional TypeSpec coverage, not a false alert. Swagger checks `properties[prop].default` by truthiness and therefore misses emitted defaults such as `false`, `0`, and `""`. ApiCenter's `ServiceUpdateProperties.restore` with `default: false` is one concrete example. The TypeSpec rule checks `property.defaultValue !== undefined`, which enforces the stated rule for all authored defaults.
-
-The previous AppLink finding was a false alert: its required source properties are emitted optional by `ArmResourcePatchAsync` through `implicitOptionality: true`. Azure Resilience Management exposed the second shape difference: `RecoveryPlanProperties.planType` is create-only in source but omitted from the transformed `RecoveryPlanPropertiesUpdate` schema. The production rule now uses the same metadata decisions as Autorest for both requiredness and payload membership. The generic corpus filter cannot solve either transformation because those source locations remain HTTP-reachable.
-
-The other projects removed from the earlier 51-project TypeSpec-only set were diagnostics attached only to older selected-out versions or declarations unreachable from the selected version's HTTP graph. They are still available in raw corpus counts and remain visible during normal TypeSpec linting.
-
-The remaining 12 projects have not all received a fresh per-path emitted-Swagger classification after projection. Known examples include valid falsy defaults and semantic source shapes that differ from emitted PATCH schemas. They are retained rather than suppressed without evidence.
-
-## Former validator-only projects
-
-The four validator-only projects in the pre-fix report had two concrete causes:
-
-- `AccessReview`: nullable union variants contained required `type` properties, but the rule only recursed when the immediate property type was a model.
-- `ConfidentialLedger`, `DevCenter`, and `HybridCompute`: the violations were declared by the imported ARM library. The compiler drops linter diagnostics targeted at library declarations, so the rule found the violations but its reports were discarded.
-
-Union traversal and the project-owned target fallback fixed both causes. The final corpus confirms all four projects overlap with validator findings.
-
-## Original compile failures (August 25)
-
-The full corpus run had six TypeSpec compile failures, excluded from the aligned behavioral comparison:
-
-- `specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices`
-- `specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups`
-- `specification/network/resource-manager/Microsoft.Network/Network/Network`
-- `specification/quota/resource-manager/Microsoft.Quota/Quota`
-- `specification/resources/resource-manager/Microsoft.Resources/deployments`
-- `specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker`
-
-No `PatchBodyParametersSchema` validator-only project is hidden by these failures.
-
-## Fixture evidence
-
-The repository's fixture harness now validates fifteen cases:
-
-- `required-patch-property`: Swagger and TypeSpec report the required property.
-- `nullable-body-required-property`: Swagger and TypeSpec report a required property in a nullable top-level PATCH body.
-- `default-patch-property`: Swagger reports the truthy default; TypeSpec additionally reports `false`, `0`, and `""` defaults by design.
-- `create-only-patch-property`: Swagger and TypeSpec report the create-only property.
-- `nullable-model-required-property`: Swagger and TypeSpec report a required property inside a nullable model.
-- `discriminator-required-patch-property`: Swagger and TypeSpec report both an authored optional discriminator and a discriminator synthesized by Autorest as required.
-- `top-level-identity-compliant`: both sides are clean for the skipped top-level `identity` shape.
-- `synthesized-identity-discriminator-compliant`: both sides are clean when Autorest synthesizes a top-level `identity` discriminator that the Swagger rule skips.
-- `encoded-identity-compliant`: both sides are clean when an authored property emits as top-level JSON `identity`.
-- `encoded-non-identity-violating`: Swagger and TypeSpec both check an authored `identity` property that emits as a non-identity JSON property.
-- `implicit-optional-patch-compliant`: both sides are clean when the transformed PATCH schema makes required source properties optional and omits a create-only source property.
-- `multi-model-union-compliant`: both sides are clean for unsupported multi-model unions because Autorest emits no traversable PATCH schema properties.
-- `never-property-compliant`: both sides are clean when Autorest omits a required `never`-typed property.
-- `multipart-patch-body-compliant`: both sides are clean for required multipart parts emitted as `formData`, with independent ARM warnings recorded.
-- `file-patch-body-compliant`: both sides are clean for a file payload emitted as a primitive binary body schema, with independent ARM warnings recorded.
-
-An earlier review suggested treating `Lifecycle.Create` combined with non-emitted lifecycle members such as `Lifecycle.Delete` as create-only. A focused fixture showed that such a property is omitted from the PATCH schema and Swagger does not report it, so that suggestion was rejected to avoid a TypeSpec-only false positive.
-
-## Remaining uncertainty
-
-The production rule covers every observed validator project and all known authorable Swagger branches. Selected-version comparison no longer counts older or HTTP-unreachable declarations, and emitter-aligned payload filtering removes known AppLink- and Azure Resilience-style false alerts. Classification remains **partial** because the 12 remaining TypeSpec-only projects are not all path-by-path equivalent to emitted Swagger and because intentional falsy-default diagnostics exceed the validator's buggy truthiness behavior.
+The historical payload-kind repair's clean corpus overlap did not establish native semantic
+equivalence. This repair intentionally breaks emitted parity for the code-backed cases above.
+Remaining unclassified corpus differences must be reported, never hidden to imply parity.
