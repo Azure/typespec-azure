@@ -17,7 +17,12 @@ import {
   type Type,
   type Union,
 } from "@typespec/compiler";
-import type { HttpOperation } from "@typespec/http";
+import type {
+  AuthenticationReference,
+  HttpAuth,
+  HttpOperation,
+  HttpServiceAuthentication,
+} from "@typespec/http";
 import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
@@ -83,6 +88,7 @@ export function createTCGCContext(
     __responseHeaderCache: new Map<ModelProperty, SdkServiceResponseHeader>(),
     __generatedNames: new Map<Union | Model | TspLiteralType, string>(),
     __httpOperationCache: new Map<Operation, HttpOperation>(),
+    __httpServiceAuthenticationCache: new Map(),
     __clientParametersCache: new Map(),
     __tspTypeToApiVersions: new Map(),
     __clientApiVersionDefaultValueCache: new Map(),
@@ -349,6 +355,29 @@ function validateOperationNamesInClients(context: SdkContext) {
 }
 
 async function exportTCGCOutput(context: SdkContext) {
+  const serializeAuthScheme = (auth: HttpAuth) => {
+    const { model, ...rest } = auth;
+    return rest;
+  };
+  const serializeAuthReference = (reference: AuthenticationReference) => ({
+    options: reference.options.map((option) => ({
+      all: option.all.map((authRef) => ({
+        ...authRef,
+        auth: serializeAuthScheme(authRef.auth),
+      })),
+    })),
+  });
+  const serializeAuthentication = (authentication: HttpServiceAuthentication) => ({
+    schemes: authentication.schemes.map(serializeAuthScheme),
+    defaultAuth: serializeAuthReference(authentication.defaultAuth),
+    operationsAuth: Object.fromEntries(
+      [...authentication.operationsAuth].map(([operation, reference]) => [
+        operation.name,
+        serializeAuthReference(reference),
+      ]),
+    ),
+  });
+
   await emitFile(context.program, {
     path: resolvePath(context.emitContext.emitterOutputDir, "tcgc-output.yaml"),
     content: stringify(
@@ -357,7 +386,10 @@ async function exportTCGCOutput(context: SdkContext) {
         if (typeof k === "string" && k.startsWith("__")) {
           return undefined; // skip keys starting with "__" from the output
         }
-        if (k === "scheme") {
+        if (k === "authentication") {
+          return serializeAuthentication(v);
+        }
+        if (k === "scheme" && typeof v === "object" && v !== null && "model" in v) {
           const { model, ...rest } = v;
           return rest; // remove credential schema's model property
         }

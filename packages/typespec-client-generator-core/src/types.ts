@@ -1268,26 +1268,30 @@ function getSdkCredentialType(
   context: TCGCContext,
   client: SdkClientType<SdkHttpOperation>,
   authentication: Authentication,
-): SdkCredentialType | SdkUnionType<SdkCredentialType> {
-  const credentialTypes: SdkCredentialType[] = [];
+): SdkCredentialType | SdkUnionType<SdkCredentialType> | undefined {
+  const credentialTypes = new Map<string, SdkCredentialType>();
   for (const option of authentication.options) {
     for (const scheme of option.schemes) {
-      credentialTypes.push({
+      if (scheme.type === "noAuth" || credentialTypes.has(scheme.id)) {
+        continue;
+      }
+      credentialTypes.set(scheme.id, {
         // Multiple services only deal with the first server config
         __raw: client.__raw.services[0],
         kind: "credential",
-        scheme: scheme,
+        scheme,
         decorators: [],
       });
     }
   }
-  if (credentialTypes.length > 1) {
+  const types = [...credentialTypes.values()];
+  if (types.length > 1) {
     // Multiple services only deal with the first server config
     const service = client.__raw.services[0];
     return {
       __raw: service,
       kind: "union",
-      variantTypes: credentialTypes,
+      variantTypes: types,
       name: createGeneratedName(context, service, "CredentialUnion"),
       isGeneratedName: true,
       isExactName: false,
@@ -1299,7 +1303,7 @@ function getSdkCredentialType(
       usage: UsageFlags.None,
     } as SdkUnionType<SdkCredentialType>;
   }
-  return credentialTypes[0];
+  return types[0];
 }
 
 export function getSdkCredentialParameter(
@@ -1310,8 +1314,13 @@ export function getSdkCredentialParameter(
   const service = client.__raw.services[0];
   const auth = getAuthentication(context.program, service);
   if (!auth) return undefined;
+  const credentialType = getSdkCredentialType(context, client, auth);
+  if (!credentialType) return undefined;
+  const optional = auth.options.some((option) =>
+    option.schemes.every((scheme) => scheme.type === "noAuth"),
+  );
   return {
-    type: getSdkCredentialType(context, client, auth),
+    type: credentialType,
     kind: "credential",
     name: "credential",
     isGeneratedName: true,
@@ -1319,7 +1328,7 @@ export function getSdkCredentialParameter(
     doc: "Credential used to authenticate requests to the service.",
     apiVersions: client.apiVersions,
     onClient: true,
-    optional: false,
+    optional,
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.credential`,
     decorators: [],

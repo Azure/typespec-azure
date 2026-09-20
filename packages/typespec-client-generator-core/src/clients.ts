@@ -1,6 +1,12 @@
 import { createDiagnosticCollector, type Diagnostic, getDoc, getSummary } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { getServers, type HttpServer } from "@typespec/http";
+import {
+  getHttpService,
+  getServers,
+  type HttpServer,
+  type HttpServiceAuthentication,
+  resolveAuthentication,
+} from "@typespec/http";
 import {
   getClientInitializationOptions,
   getClientNameOverride,
@@ -42,6 +48,28 @@ function getVersionsEnum(context: TCGCContext, client: SdkClient): SdkEnumType |
     return undefined;
   }
   return context.getPackageVersionSdkEnum().get(client.services[0]);
+}
+
+function getClientAuthentication(
+  context: TCGCContext,
+  client: SdkClient,
+): [HttpServiceAuthentication, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const service = client.services[0];
+  if (!service) {
+    return diagnostics.wrap({
+      schemes: [],
+      defaultAuth: { options: [] },
+      operationsAuth: new Map(),
+    });
+  }
+  let authentication = context.__httpServiceAuthenticationCache.get(service);
+  if (!authentication) {
+    const httpService = diagnostics.pipe(getHttpService(context.program, service));
+    authentication = resolveAuthentication(httpService);
+    context.__httpServiceAuthenticationCache.set(service, authentication);
+  }
+  return diagnostics.wrap(authentication);
 }
 
 function getEndpointTypeFromSingleServer<
@@ -217,6 +245,9 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),
     ),
+    // Multiple services currently use the first service for client-level endpoint and credential
+    // metadata. Keep authentication aligned with that behavior.
+    authentication: diagnostics.pipe(getClientAuthentication(context, client)),
     decorators: client.type ? diagnostics.pipe(getTypeDecorators(context, client.type)) : [],
     parent,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, clientType),

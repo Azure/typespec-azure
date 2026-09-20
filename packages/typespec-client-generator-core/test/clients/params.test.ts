@@ -224,6 +224,107 @@ it("initialization default endpoint with union auth", async () => {
   strictEqual(oauth2Scheme.flows[0].scopes[0].value, "https://security.microsoft.com/.default");
 });
 
+it("preserves OR authentication requirements", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key"> | OAuth2Auth<[MyFlow]>)
+    namespace My.Service;
+
+    op myOp(): void;
+
+    model MyFlow {
+      type: OAuth2FlowType.implicit;
+      authorizationUrl: "https://login.microsoftonline.com/common/oauth2/authorize";
+      scopes: ["https://security.microsoft.com/.default"];
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const client = context.sdkPackage.clients[0];
+
+  strictEqual(client.authentication.defaultAuth.options.length, 2);
+  strictEqual(client.authentication.defaultAuth.options[0].all.length, 1);
+  strictEqual(client.authentication.defaultAuth.options[1].all.length, 1);
+  strictEqual(client.authentication.defaultAuth.options[0].all[0].auth.type, "apiKey");
+  strictEqual(client.authentication.defaultAuth.options[1].all[0].auth.type, "oauth2");
+});
+
+it("preserves AND authentication requirements", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @useAuth([
+      ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">,
+      OAuth2Auth<[MyFlow]>
+    ])
+    namespace My.Service;
+
+    op myOp(): void;
+
+    model MyFlow {
+      type: OAuth2FlowType.implicit;
+      authorizationUrl: "https://login.microsoftonline.com/common/oauth2/authorize";
+      scopes: ["https://security.microsoft.com/.default"];
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const client = context.sdkPackage.clients[0];
+
+  strictEqual(client.authentication.defaultAuth.options.length, 1);
+  strictEqual(client.authentication.defaultAuth.options[0].all.length, 2);
+  strictEqual(client.authentication.defaultAuth.options[0].all[0].auth.type, "apiKey");
+  strictEqual(client.authentication.defaultAuth.options[0].all[1].auth.type, "oauth2");
+});
+
+it("makes the credential optional when NoAuth is an alternative", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @useAuth(
+      NoAuth
+      | ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">
+      | OAuth2Auth<[MyFlow]>
+    )
+    namespace My.Service;
+
+    op myOp(): void;
+
+    model MyFlow {
+      type: OAuth2FlowType.implicit;
+      authorizationUrl: "https://login.microsoftonline.com/common/oauth2/authorize";
+      scopes: ["https://security.microsoft.com/.default"];
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const client = context.sdkPackage.clients[0];
+  const credentialParam = client.clientInitialization.parameters.find(
+    (parameter): parameter is SdkCredentialParameter => parameter.kind === "credential",
+  );
+
+  ok(credentialParam);
+  strictEqual(credentialParam.optional, true);
+  strictEqual(credentialParam.type.kind, "union");
+  strictEqual(credentialParam.type.variantTypes.length, 2);
+  strictEqual(client.authentication.defaultAuth.options.length, 3);
+  strictEqual(client.authentication.defaultAuth.options[0].all[0].kind, "noAuth");
+});
+
+it("omits the credential parameter when only NoAuth is configured", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @useAuth(NoAuth)
+    namespace My.Service;
+
+    op myOp(): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const client = context.sdkPackage.clients[0];
+  const credentialParam = client.clientInitialization.parameters.find(
+    (parameter) => parameter.kind === "credential",
+  );
+
+  strictEqual(credentialParam, undefined);
+  strictEqual(client.authentication.defaultAuth.options.length, 1);
+  strictEqual(client.authentication.defaultAuth.options[0].all[0].kind, "noAuth");
+});
+
 it("initialization one server parameter with apikey auth", async () => {
   const { program } = await SimpleTester.compile(`
         @server(
