@@ -1,0 +1,17 @@
+{
+  "violation": false,
+  "validatorDiagnostics": [{ "code": "PatchBodyParametersSchema", "count": 4 }],
+  "ambientDiagnostics": [
+    { "code": "@azure-tools/typespec-azure-core/documentation-required", "count": 18 },
+    { "code": "@azure-tools/typespec-azure-core/require-versioned", "count": 1 },
+    { "code": "@azure-tools/typespec-azure-resource-manager/arm-common-types-version", "count": 1 },
+    { "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation", "count": 6 },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
+      "count": 1
+    },
+    { "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used", "count": 1 },
+    { "code": "tsp-lintdiff-local-linter/unsupported-patch-properties", "count": 3 },
+    { "code": "tsp-lintdiff-local-linter/xms-examples-required", "count": 3 }
+  ]
+}
