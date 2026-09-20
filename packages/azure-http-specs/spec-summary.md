@@ -3001,8 +3001,7 @@ Expected request body:
 
 ```json
 {
-  "location": "eastus",
-  "properties": {}
+  "location": "eastus"
 }
 ```
 
@@ -3057,8 +3056,7 @@ Expected request body:
 
 ```json
 {
-  "location": "eastus",
-  "properties": {}
+  "location": "eastus"
 }
 ```
 
