@@ -1,15 +1,18 @@
 import {
   createRule,
+  ignoreDiagnostics,
   isNullType,
   type Model,
   type ModelProperty,
   paramMessage,
   type Program,
+  type Type,
   type Union,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 import {
   getHeaderFieldName,
+  getHttpOperation,
   isBody,
   isBodyRoot,
   isHeader,
@@ -34,7 +37,7 @@ export const noUnnamedTypesRule = createRule({
     const excludedUnions = new Set<Union>();
     const invalidUnions = new Set<Union>();
 
-    // Models: only flag anonymous models used as property types (inline in model properties).
+    // Models: collect anonymous property types and request bodies.
     const invalidModels = new Set<Model>();
     const excludedModels = new Set<Model>();
 
@@ -55,10 +58,7 @@ export const noUnnamedTypesRule = createRule({
 
         // Flag anonymous models used as property types.
         if (
-          type.kind === "Model" &&
-          type.name === "" &&
-          type.properties.size > 0 &&
-          !isHttpEnvelope(program, type) &&
+          needsModelName(program, type) &&
           !isInsideTemplateArgument(type) &&
           !isMultipartBodyProperty(program, prop)
         ) {
@@ -79,6 +79,16 @@ export const noUnnamedTypesRule = createRule({
         // Exclude the top-level return type union (response envelope).
         if (operation.returnType.kind === "Union") {
           excludedUnions.add(operation.returnType);
+        }
+
+        const { body } = ignoreDiagnostics(getHttpOperation(program, operation)).parameters;
+        if (
+          body?.bodyKind === "single" &&
+          body.property !== undefined &&
+          needsModelName(program, body.type) &&
+          isInsideTemplateArgument(body.type)
+        ) {
+          invalidModels.add(body.type);
         }
       },
       union: (union) => {
@@ -101,6 +111,15 @@ export const noUnnamedTypesRule = createRule({
     };
   },
 });
+
+function needsModelName(program: Program, type: Type): type is Model {
+  return (
+    type.kind === "Model" &&
+    type.name === "" &&
+    type.properties.size > 0 &&
+    !isHttpEnvelope(program, type)
+  );
+}
 
 /** Check if the type's source node is inside a template argument position */
 function isInsideTemplateArgument(type: { node?: { kind: SyntaxKind; parent?: any } }): boolean {

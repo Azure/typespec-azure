@@ -36,6 +36,15 @@ model Outer {
 }
 ```
 
+Using an anonymous request body as a template argument:
+
+```tsp
+@post op Send<T>(@body body: T): void;
+op send is Send<{
+  name: string;
+}>;
+```
+
 #### ✅ Correct
 
 Define unions as named types:
@@ -64,6 +73,17 @@ model Outer {
 }
 ```
 
+Define a named request model before passing it to an operation template:
+
+```tsp
+model Request {
+  name: string;
+}
+
+@post op Send<T>(@body body: T): void;
+op send is Send<Request>;
+```
+
 :::note
 Enums are also discouraged, see [no-enum rule](./no-enum.md) for more details.
 :::
@@ -76,8 +96,12 @@ The following patterns are **not** flagged:
 - Status code unions (e.g. `@statusCode _: 200 | 400`)
 - Content-type header unions (e.g. `@header contentType: "application/json" | "text/plain"`)
 - HTTP response envelope models (containing `@statusCode`, `@body`, `@header`, etc.)
+- Anonymous models used as template arguments outside request bodies, such as OAuth2 flow configuration
 - Types defined inside standard library namespaces (`TypeSpec.*`, `Azure.*`)
 - Unions where all non-null variants are scalars (e.g. `string | int32`)
+
+The template-argument exception does not apply to nonempty anonymous models used as
+the actual request body through `@body` or `@bodyRoot`, including ARM action templates.
 
 ## Suppression
 

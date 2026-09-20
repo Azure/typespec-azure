@@ -191,7 +191,7 @@ describe("models", () => {
       });
   });
 
-  it("does not flag anonymous models used as template arguments", async () => {
+  it("does not flag template arguments that are not request bodies", async () => {
     await tester
       .expect(
         `
@@ -203,5 +203,221 @@ describe("models", () => {
         `,
       )
       .toBeValid();
+  });
+
+  describe("template request bodies", () => {
+    it.each(["body", "bodyRoot"])("flags an anonymous @%s template argument", async (decorator) => {
+      await tester
+        .expect(
+          `
+          @service namespace TestService;
+          @post op Send<T>(@${decorator} body: T): void;
+          op send is Send</*anonymous*/{ name: string; }>;
+          `,
+        )
+        .toEmitDiagnostics((x) => ({
+          code: "@azure-tools/typespec-azure-core/no-unnamed-types",
+          message: "Anonymous model should be defined as a named model declaration.",
+          pos: x.pos.anonymous.pos,
+        }));
+    });
+
+    it("flags an anonymous body passed through an interface template", async () => {
+      await tester
+        .expect(
+          `
+          @service namespace TestService;
+          interface Actions<T> {
+            @post send(@body body: T): void;
+          }
+          interface Widgets extends Actions</*anonymous*/{ name: string; }> {}
+          `,
+        )
+        .toEmitDiagnostics((x) => ({
+          code: "@azure-tools/typespec-azure-core/no-unnamed-types",
+          message: "Anonymous model should be defined as a named model declaration.",
+          pos: x.pos.anonymous.pos,
+        }));
+    });
+
+    it("flags an anonymous body inside a spread request envelope", async () => {
+      await tester
+        .expect(
+          `
+          @service namespace TestService;
+          model Envelope<T> {
+            @header requestId: string;
+            @body body: T;
+          }
+          @post op send(...Envelope</*anonymous*/{ name: string; }>): void;
+          `,
+        )
+        .toEmitDiagnostics((x) => ({
+          code: "@azure-tools/typespec-azure-core/no-unnamed-types",
+          message: "Anonymous model should be defined as a named model declaration.",
+          pos: x.pos.anonymous.pos,
+        }));
+    });
+
+    it("reports a shared anonymous body once across operations", async () => {
+      await tester
+        .expect(
+          `
+          @service namespace TestService;
+          model Envelope<T> { @body body: T; }
+          alias Request = Envelope</*anonymous*/{ name: string; }>;
+          @route("/first") @post op first(...Request): void;
+          @route("/second") @post op second(...Request): void;
+          `,
+        )
+        .toEmitDiagnostics((x) => ({
+          code: "@azure-tools/typespec-azure-core/no-unnamed-types",
+          message: "Anonymous model should be defined as a named model declaration.",
+          pos: x.pos.anonymous.pos,
+        }));
+    });
+
+    it("flags a user argument to an imported operation template", async () => {
+      const importedTester = createLinterRuleTester(
+        await Tester.import("./templates.tsp").createInstance(),
+        noUnnamedTypesRule,
+        "@azure-tools/typespec-azure-core",
+      );
+      await importedTester
+        .expect({
+          "templates.tsp": `
+            namespace Templates;
+            @TypeSpec.Http.post op Send<T>(@TypeSpec.Http.body body: T): void;
+          `,
+          "main.tsp": `
+            @service namespace TestService;
+            op send is Templates.Send</*anonymous*/{ name: string; }>;
+          `,
+        })
+        .toEmitDiagnostics((x) => ({
+          code: "@azure-tools/typespec-azure-core/no-unnamed-types",
+          message: "Anonymous model should be defined as a named model declaration.",
+          pos: x.pos.anonymous.pos,
+        }));
+    });
+
+    it("does not report anonymous bodies declared in an external library", async () => {
+      const importedTester = createLinterRuleTester(
+        await Tester.import("models").createInstance(),
+        noUnnamedTypesRule,
+        "@azure-tools/typespec-azure-core",
+      );
+      await importedTester
+        .expect({
+          "node_modules/models/package.json": JSON.stringify({
+            exports: { ".": { typespec: "./main.tsp" } },
+          }),
+          "node_modules/models/main.tsp": `
+            namespace Imported;
+            model Envelope<T> { @TypeSpec.Http.body body: T; }
+            alias Request = Envelope<{ name: string; }>;
+          `,
+          "main.tsp": `
+            @service namespace TestService;
+            @post op send(...Imported.Request): void;
+          `,
+        })
+        .toBeValid();
+    });
+
+    it.each(["Request", "{}", "Record<string>"])("does not flag %s bodies", async (body) => {
+      await tester
+        .expect(
+          `
+          @service namespace TestService;
+          model Request { name: string; }
+          @post op Send<T>(@body body: T): void;
+          op send is Send<${body}>;
+          `,
+        )
+        .toBeValid();
+    });
+
+    it("does not flag OAuth2 configuration", async () => {
+      await tester
+        .expect(
+          `
+          @service @useAuth(Auth) namespace TestService;
+          model Auth is OAuth2Auth<[{
+            type: OAuth2FlowType.implicit;
+            authorizationUrl: "https://example.com/authorize";
+            scopes: ["read"];
+          }]>;
+          model Request { name: string; }
+          @post op send(@body body: Request): void;
+          `,
+        )
+        .toBeValid();
+    });
+
+    it("does not flag template parameter options", async () => {
+      await tester
+        .expect(
+          `
+          @service namespace TestService;
+          model Request { name: string; }
+          @post op Send<Options extends {}>(...Options, @body body: Request): void;
+          @route("/{name}") op send is Send<{
+            @path name: string;
+            @query filter?: string;
+            @header requestId?: string;
+          }>;
+          `,
+        )
+        .toBeValid();
+    });
+
+    it("does not flag a multipart template body", async () => {
+      await tester
+        .expect(
+          `
+          @service namespace TestService;
+          @post op Send<T>(@multipartBody body: T): void;
+          op send is Send<{ file: HttpPart<bytes>; }>;
+          `,
+        )
+        .toBeValid();
+    });
+
+    it("does not change template response-body exemptions", async () => {
+      await tester
+        .expect(
+          `
+          @service namespace TestService;
+          model Response<T> { @body body: T; }
+          @get op read(): Response<{ name: string; }>;
+          `,
+        )
+        .toBeValid();
+    });
+
+    it("does not flag an HTTP envelope passed to bodyRoot", async () => {
+      await tester
+        .expect(
+          `
+          @service namespace TestService;
+          @post op Send<T>(@bodyRoot body: T): void;
+          op send is Send<{ @header requestId: string; name: string; }>;
+          `,
+        )
+        .toBeValid();
+    });
+
+    it("does not flag a synthesized request body", async () => {
+      await tester
+        .expect(
+          `
+          @service namespace TestService;
+          @post op Send<Parameters extends {}>(...Parameters): void;
+          op send is Send<{ name: string; }>;
+          `,
+        )
+        .toBeValid();
+    });
   });
 });
