@@ -559,6 +559,19 @@ required integrated tool must be called by the actual owning session, not by
 the outer queue. A required-tool fallback is permitted only when that tool's
 failure explicitly authorizes it; availability of `gh` is not authorization.
 
+Before creating a rule PR or making an authorized title correction, apply the
+phase-specific title contract in
+[development](../develop-lintdiff-rule/SKILL.md#9-commit-push-and-create-the-draft-pr)
+or [promotion](../lintdiff-rule-promote/SKILL.md#10-review-commit-push-and-create-a-draft-pr).
+The title must show `<ValidatorRuleId> -> <TypeSpecRuleName>`, using the actual
+unqualified `createRule({ name })` from that phase's implementation: the local
+lintdiff name for development and the official destination name for promotion.
+Preserve the development-only `(origin)` suffix on new source-migration PRs.
+Do not use the validator slug as a substitute for a differently named rule.
+Read back the published title to confirm it matches the intended title before
+handoff. Preserve existing task PR titles unless correction was requested; do
+not rename them merely to apply the new convention during recovery or resumption.
+
 After creation, independently verify the actual GitHub base repository/branch,
 head repository/branch, head SHA, draft status and complete file scope. Require
 `headRepository.nameWithOwner` to equal `Azure/typespec-azure` and

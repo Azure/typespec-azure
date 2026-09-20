@@ -745,7 +745,21 @@ still matches the handoff before pushing and stop on external changes.
 
 Use this stable PR title pattern:
 
-- `[Swagger Linter Migration] <ValidatorRuleId>`
+- `[Swagger Linter Migration] <ValidatorRuleId> -> <OfficialTypeSpecRuleName>`
+
+Replace `<ValidatorRuleId>` with the original Swagger validator rule ID and
+`<OfficialTypeSpecRuleName>` with the destination rule's actual unqualified
+`createRule({ name })` value, not the canonical validator slug or the source
+lintdiff rule name. For example:
+`[Swagger Linter Migration] XmsResourceInPutResponse -> use-resource-model-for-put`.
+Keep both names in the title even when the PR body already explains the mapping;
+this preserves migration traceability in future Git history. See the
+[review suggestion on PR #5503](https://github.com/Azure/typespec-azure/pull/5503#discussion_r4046613960).
+Do not append environment or execution labels such as `devbox` or `heavy`.
+Before publication, confirm the title's destination name matches the final
+implementation, including any rename made during promotion or review. Preserve
+an existing OPEN task PR's recorded title unless a correction is part of the
+request; this convention alone does not authorize renaming existing PRs.
 
 Write the PR description as an engineering explanation, not only a change list.
 It must include:
