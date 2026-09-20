@@ -21,11 +21,13 @@ export const useStandardLroErrorRule = createRule({
   docs: fileRef.fromPackageRoot("src/rules/use-standard-lro-error.md"),
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-standard-lro-error",
   description:
-    "Long-running operation error payloads must use ErrorResponse from ARM common types.",
+    "Long-running operations must define an error response and use ErrorResponse from ARM common types for error payloads.",
   severity: "warning",
   messages: {
     default:
       "Error payloads of long-running operations must use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload.",
+    missingErrorResponse:
+      "Long-running operations must define at least one default, 4xx, or 5xx error response.",
   },
   create(context) {
     const program = context.program;
@@ -48,15 +50,22 @@ export const useStandardLroErrorRule = createRule({
           return;
         }
 
-        const invalidBody = httpOperation.responses.some(
-          (response) =>
-            isErrorResponse(response.statusCodes) &&
-            response.responses.some(
-              ({ body }) =>
-                body !== undefined &&
-                (body.bodyKind !== "single" ||
-                  !isStandardError(metadata.getEffectivePayloadType(body.type, Visibility.Read))),
-            ),
+        const errorResponses = httpOperation.responses.filter((response) =>
+          isErrorResponse(response.statusCodes),
+        );
+        if (errorResponses.length === 0) {
+          context.reportDiagnostic({ target: operation, messageId: "missingErrorResponse" });
+          reported.add(source);
+          return;
+        }
+
+        const invalidBody = errorResponses.some((response) =>
+          response.responses.some(
+            ({ body }) =>
+              body !== undefined &&
+              (body.bodyKind !== "single" ||
+                !isStandardError(metadata.getEffectivePayloadType(body.type, Visibility.Read))),
+          ),
         );
         if (invalidBody) {
           context.reportDiagnostic({ target: operation });

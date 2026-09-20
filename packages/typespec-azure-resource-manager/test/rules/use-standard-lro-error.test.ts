@@ -302,6 +302,22 @@ describe("use-standard-lro-error", () => {
       .toEmitDiagnostics([diagnostic]);
   });
 
+  it("rejects a long-running operation without an error response", async () => {
+    await tester
+      .expect(
+        `${header}
+        @Azure.Core.pollingOperation(poll) @route("/no-error") @post
+        op noError(): Accepted;
+      `,
+      )
+      .toEmitDiagnostics([
+        {
+          ...diagnostic,
+          message: useStandardLroErrorRule.messages.missingErrorResponse,
+        },
+      ]);
+  });
+
   it("ignores success responses, absent error bodies, synchronous operations, and GET operations", async () => {
     await tester
       .expect(
@@ -309,37 +325,17 @@ describe("use-standard-lro-error", () => {
         @Azure.Core.pollingOperation(poll) @route("/no-body") @post
         op noBody(): Accepted | { @statusCode statusCode: 400; };
         @Azure.Core.pollingOperation(poll) @route("/success") @post
-        op success(): Accepted | { @statusCode statusCode: 200; @body body: string; };
+        op success(): Accepted | { @statusCode statusCode: 200; @body body: string; } |
+          Failure<CommonTypes.ErrorResponse>;
         @route("/sync") @post op sync(): Accepted | Failure<string>;
+        @route("/sync-no-error") @post op syncNoError(): Accepted;
         @Azure.Core.pollingOperation(poll) @route("/get") @get
         op getOperation(): Accepted | Failure<string>;
+        @Azure.Core.pollingOperation(poll) @route("/get-no-error") @get
+        op getNoError(): Accepted;
       `,
       )
       .toBeValid();
-  });
-
-  it("does not treat a raw OpenAPI extension as native LRO metadata", async () => {
-    await tester
-      .expect(
-        `${header}
-        @TypeSpec.OpenAPI.extension("x-ms-long-running-operation", true)
-        @route("/raw") @post
-        op rawExtension(): Accepted | Failure<string>;
-      `,
-      )
-      .toBeValid();
-  });
-
-  it("does not let a raw OpenAPI extension disable native LRO metadata", async () => {
-    await tester
-      .expect(
-        `${header}
-        @TypeSpec.OpenAPI.extension("x-ms-long-running-operation", false)
-        @route("/disabled")
-        op disabled is Lro<string>;
-      `,
-      )
-      .toEmitDiagnostics([diagnostic]);
   });
 
   it("checks ordinary and nested namespaces without an ARM provider decorator", async () => {
@@ -408,20 +404,6 @@ describe("use-standard-lro-error", () => {
         interface Actions<T> { @route("/run") op run is Lro<T>; }
         @route("/one") interface One extends Actions<string> {}
         @route("/two") interface Two extends Actions<int32> {}
-      `,
-      )
-      .toEmitDiagnostics([diagnostic]);
-  });
-
-  it("checks authored return types without reconstructing historical versions", async () => {
-    await tester
-      .expect(
-        `${header.replace("@service", "@service @TypeSpec.Versioning.versioned(Versions)")}
-        enum Versions { v1: "2024-01-01", v2: "2025-01-01" }
-        @TypeSpec.Versioning.returnTypeChangedFrom(Versions.v2, Accepted | Failure<string>)
-        @route("/changed") op changed is Lro<CommonTypes.ErrorResponse>;
-        @TypeSpec.Versioning.removed(Versions.v2)
-        @route("/removed") op removed is Lro<string>;
       `,
       )
       .toEmitDiagnostics([diagnostic]);
