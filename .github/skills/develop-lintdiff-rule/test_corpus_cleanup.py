@@ -67,6 +67,29 @@ class CorpusCleanupTests(unittest.TestCase):
         self.assertEqual(b"", self.git("status", "--porcelain"))
         self.assertTrue((self.plan_dir / "objects" / cleanup.digest(b"new shard")).is_file())
 
+    def test_restores_deleted_legacy_projected_enum_output(self):
+        output = self.write(
+            "projects/example/raw/typespec.projected-enum.json",
+            b'{"legacy":true}\n',
+        )
+        self.git("add", ".")
+        self.git("commit", "-qm", "legacy projected enum baseline")
+        self.capture()
+        output.unlink()
+        plan = self.plan()
+        self.assertEqual(1, len(plan["changes"]))
+        change = plan["changes"][0]
+        self.assertEqual(
+            "projects/example/raw/typespec.projected-enum.json",
+            change["path"],
+        )
+        self.assertEqual(cleanup.digest(b'{"legacy":true}\n'), change["before"]["sha256"])
+        self.assertIsNone(change["after"])
+        self.assertEqual("restore", change["action"])
+        cleanup.apply(self.repo, self.plan_dir, plan["sha256"])
+        self.assertEqual(b'{"legacy":true}\n', output.read_bytes())
+        self.assertEqual(b"", self.git("status", "--porcelain"))
+
     def test_preserves_preexisting_untracked_files_and_rule_edits(self):
         self.write("notes.txt", b"untracked evidence")
         self.write("results/by-typespec-rule/preexisting.json", b"preexisting output")

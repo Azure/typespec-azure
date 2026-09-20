@@ -23,6 +23,7 @@ RAW_OUTPUTS = {
     "typespec.stdout.txt",
     "typespec.stderr.txt",
     "typespec.projected-http-graph.json",
+    "typespec.projected-enum.json",
 }
 
 

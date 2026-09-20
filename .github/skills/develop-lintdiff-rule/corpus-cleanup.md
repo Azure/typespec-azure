@@ -35,9 +35,10 @@ output ownership and plan. Unexpected concurrent activity stops cleanup.
 - The output policy is derived from `test\harness\typespec-results.ts`: top-level
   TypeSpec/comparison/coverage reports and `_meta.json`, **all** JSON rule shards
   under `results\by-typespec-rule`, and known TypeSpec stdout/stderr/projected
-  HTTP graph files under project `raw` directories. It is not restricted to the
-  rule currently being developed. Swagger inputs, source copies and other paths
-  are not eligible cleanup targets.
+  HTTP graph files plus the legacy `typespec.projected-enum.json` output under
+  project `raw` directories. It is not restricted to the rule currently being
+  developed. Swagger inputs, source copies and other paths are not eligible
+  cleanup targets.
 - Plan archives generated run output before any restoration, records additions,
   modifications and deletions, and refuses changes to non-output paths.
   Preexisting untracked files are retained; regenerated preexisting outputs are
