@@ -4,8 +4,8 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Add the `use-latest-version-of-common-types` ARM lint rule that warns when services select or emit older ARM common-types versions instead of the latest available common-types version.
+Extend `arm-common-types-version` to warn when an ARM service or API version selects an older common-types version, while preserving the existing warning for missing explicit version configuration.
 
-Resolve common-type versions from native TypeSpec metadata independently of OpenAPI reference path formatting.
+Latest-version warnings are now active wherever this existing rule is enabled, including the resource-manager ruleset. Update `@armCommonTypesVersion` to the latest version in `Azure.ResourceManager.CommonTypes.Versions`, or suppress `@azure-tools/typespec-azure-resource-manager/arm-common-types-version` when an older version is required for compatibility.
 
-Report common-type resolution failures at user usages through the linter so rule suppression and project-location filtering apply.
+The rule checks effective version selections only; it does not inspect legacy type usages or emitted OpenAPI references.
