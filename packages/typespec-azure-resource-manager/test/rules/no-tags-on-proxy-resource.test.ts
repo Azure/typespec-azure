@@ -42,7 +42,7 @@ describe("codefix", () => {
       model WidgetProperties { description?: string; }
     `;
     const fixed = code.replace(declaration, "");
-    await tester.expect(code).applyCodeFix("remove-proxy-resource-tags").toEqual(fixed);
+    await tester.expect(code).applyCodeFix("delete-property").toEqual(fixed);
     await tester.expect(fixed).toBeValid();
   });
 
@@ -55,9 +55,26 @@ describe("codefix", () => {
       }
     `;
     const fixed = code.replace("tags?: Record<string>;", "");
-    await tester.expect(code).applyCodeFix("remove-proxy-resource-tags").toEqual(fixed);
+    await tester.expect(code).applyCodeFix("delete-property").toEqual(fixed);
     await tester.expect(fixed).toBeValid();
   });
+
+  it.each(["/* first */", "// keep; comment", "// keep, comment"])(
+    "preserves trailing comments and the next model without a separator: %s",
+    async (comment) => {
+      const code = `
+        @armProviderNamespace namespace MyService;
+        model Widget is ProxyResource<{}> {
+          ...ResourceNameParameter<Widget>;
+          tags?: Record<string> ${comment}
+        }
+        model Other { value: string /* second */; }
+      `;
+      const fixed = code.replace("tags?: Record<string>", "");
+      await tester.expect(code).applyCodeFix("delete-property").toEqual(fixed);
+      await tester.expect(fixed).toBeValid();
+    },
+  );
 
   it.each([
     {
@@ -92,24 +109,6 @@ describe("codefix", () => {
         model WidgetProperties {}
       `,
     },
-    {
-      name: "shared properties bag",
-      resource: "model Widget is ProxyResource<WidgetProperties>",
-      members: '@key @segment("widgets") name: string;',
-      models: `
-        model WidgetProperties { tags?: Record<string>; }
-        model Other { properties: WidgetProperties; }
-      `,
-    },
-    {
-      name: "inherited properties bag",
-      resource: "model Widget is ProxyResource<WidgetProperties>",
-      members: '@key @segment("widgets") name: string;',
-      models: `
-        model BaseProperties { tags?: Record<string>; }
-        model WidgetProperties extends BaseProperties {}
-      `,
-    },
   ])(
     "does not offer removal for a $name",
     async ({ resource, members, models, diagnosticNames = ["Widget"] }) => {
@@ -128,15 +127,37 @@ describe("codefix", () => {
         diagnosticNames.map((name) => ({ code: ruleCode, message: new RegExp(`'${name}'`) })),
       );
       for (const diagnostic of diagnostics) {
-        expect(diagnostic.codefixes?.map((fix) => fix.id) ?? []).not.toContain(
-          "remove-proxy-resource-tags",
-        );
+        expect(diagnostic.codefixes?.map((fix) => fix.id) ?? []).not.toContain("delete-property");
       }
     },
   );
 });
 
 describe("valid cases", () => {
+  it("does not diagnose library types or non-resource models", async () => {
+    await tester.expect("model Other { tags?: Record<string>; }").toBeValid();
+  });
+
+  it.each([
+    "model WidgetProperties { tags?: Record<string>; }",
+    `model BaseProperties { tags?: Record<string>; }
+     model WidgetProperties extends BaseProperties {}`,
+    `model WidgetProperties { @encodedName("application/json", "tags") labels?: Record<string>; }`,
+  ])("allows resource-specific tags: %s", async (properties) => {
+    await tester
+      .expect(
+        `
+      @armProviderNamespace namespace MyService;
+      model Widget is ProxyResource<WidgetProperties> {
+        ...ResourceNameParameter<Widget>;
+      }
+      ${properties}
+      model Other { properties: WidgetProperties; }
+    `,
+      )
+      .toBeValid();
+  });
+
   it("is valid for a proxy resource without tags", async () => {
     await tester
       .expect(
@@ -181,11 +202,12 @@ describe("valid cases", () => {
 
         model Widget is ProxyResource<WidgetProperties> {
           @key @segment("widgets") name: string;
+          @encodedName("application/json", "labels")
+          tags?: Record<string>;
         }
 
         model WidgetProperties {
-          @encodedName("application/json", "labels")
-          tags?: Record<string>;
+          description?: string;
         }
         `,
       )
@@ -194,13 +216,39 @@ describe("valid cases", () => {
 });
 
 describe("invalid cases", () => {
-  it("emits a warning for tags on the proxy resource envelope", async () => {
+  it.each([
+    "@armVirtualResource model Widget",
+    "model Widget is Azure.ResourceManager.Legacy.GenericResource<{}>",
+    `@Azure.ResourceManager.Private.armResourceInternal({})
+     @Azure.ResourceManager.Legacy.customAzureResource
+     model Widget`,
+  ])("checks other registered non-tracked resources: %s", async (declaration) => {
     await tester
       .expect(
         `
+      @armProviderNamespace namespace MyService;
+      ${declaration} {
+        ...ResourceNameParameter<Widget>;
+        tags?: Record<string>;
+      }
+    `,
+      )
+      .toEmitDiagnostics({
+        code: ruleCode,
+        message:
+          "Non-tracked resource 'Widget' must not declare `tags` on its resource envelope. Use a tracked resource if ARM tags are required.",
+      });
+  });
+
+  it.each(["ProxyResource", "ExtensionResource"])(
+    "emits a warning for tags on a %s envelope",
+    async (resourceType) => {
+      await tester
+        .expect(
+          `
         @armProviderNamespace namespace MyService;
 
-        model Widget is ProxyResource<WidgetProperties> {
+        model Widget is ${resourceType}<WidgetProperties> {
           @key @segment("widgets") name: string;
           tags?: Record<string>;
         }
@@ -209,39 +257,14 @@ describe("invalid cases", () => {
           description?: string;
         }
         `,
-      )
-      .toEmitDiagnostics({
-        code: ruleCode,
-        message:
-          "Proxy resource 'Widget' must not declare `tags` on its resource envelope or in its properties bag. Use a tracked resource if tags are required.",
-      });
-  });
-
-  it("emits a warning for inherited tags in the properties bag", async () => {
-    await tester
-      .expect(
-        `
-        @armProviderNamespace namespace MyService;
-
-        model Widget is ProxyResource<WidgetProperties> {
-          @key @segment("widgets") name: string;
-        }
-
-        model WidgetProperties extends BaseProperties {
-          description?: string;
-        }
-
-        model BaseProperties {
-          tags?: Record<string>;
-        }
-        `,
-      )
-      .toEmitDiagnostics({
-        code: ruleCode,
-        message:
-          "Proxy resource 'Widget' must not declare `tags` on its resource envelope or in its properties bag. Use a tracked resource if tags are required.",
-      });
-  });
+        )
+        .toEmitDiagnostics({
+          code: ruleCode,
+          message:
+            "Non-tracked resource 'Widget' must not declare `tags` on its resource envelope. Use a tracked resource if ARM tags are required.",
+        });
+    },
+  );
 
   it("emits a warning when another property is encoded as tags", async () => {
     await tester
@@ -251,18 +274,19 @@ describe("invalid cases", () => {
 
         model Widget is ProxyResource<WidgetProperties> {
           @key @segment("widgets") name: string;
+          @encodedName("application/json", "tags")
+          labels?: Record<string>;
         }
 
         model WidgetProperties {
-          @encodedName("application/json", "tags")
-          labels?: Record<string>;
+          description?: string;
         }
         `,
       )
       .toEmitDiagnostics({
         code: ruleCode,
         message:
-          "Proxy resource 'Widget' must not declare `tags` on its resource envelope or in its properties bag. Use a tracked resource if tags are required.",
+          "Non-tracked resource 'Widget' must not declare `tags` on its resource envelope. Use a tracked resource if ARM tags are required.",
       });
   });
 });
