@@ -42,6 +42,7 @@ specs:
   "type/dictionary": { options: { module: dictionarygroup } }
   "type/enum/extensible": { options: { module: extensiblegroup } }
   "type/enum/fixed": { options: { module: fixedgroup } }
+  "type/file": { options: { module: filegroup } }
   "type/model/empty": { options: { module: emptygroup, single-client: true } }
   "type/model/inheritance/enum-discriminator": { options: { module: enumdiscgroup } }
   "type/model/inheritance/not-discriminated": { options: { module: nodiscgroup } }
