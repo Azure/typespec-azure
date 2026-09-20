@@ -4,6 +4,7 @@ import {
   expectDiagnostics,
   type LinterRuleTester,
 } from "@typespec/compiler/testing";
+import { readFileSync } from "node:fs";
 import { beforeEach, it } from "vitest";
 import { putResourceSchemaConsistencyRule } from "../../src/rules/put-resource-schema-consistency.js";
 
@@ -18,15 +19,18 @@ beforeEach(async () => {
 
 const code = "@azure-tools/typespec-azure-resource-manager/put-resource-schema-consistency";
 const models = `
-  model Widget { value: string; }
-  model Other { value: string; }
+  @armProviderNamespace namespace Resources {
+    model Widget is TrackedResource<{}> { ...ResourceNameParameter<Widget>; }
+    model Other is ProxyResource<{}> { ...ResourceNameParameter<Other>; }
+  }
+  using Resources;
   model Ok<T> { @statusCode statusCode: 200; @body body: T; }
   model Created<T> { @statusCode statusCode: 201; @body body: T; }
 `;
 const diagnostic = (bodies: string, target = "put") => ({
   code,
   severity: "warning" as const,
-  message: `PUT bodies must reuse the same resource model. Found ${bodies}.`,
+  message: `PUT bodies must reuse the same resource model. Found ${bodies.replaceAll("Widget", "Resources.Widget").replaceAll("Other", "Resources.Other")}.`,
   target,
 });
 
@@ -67,10 +71,68 @@ it.each([
     ]);
 });
 
-it("compares responses even without a request", async () => {
+const missingRequest = {
+  code,
+  severity: "warning" as const,
+  message: "ARM PUT operations must have a request body.",
+  target: "put",
+};
+const unregistered = (bodies: string) => ({
+  code,
+  severity: "warning" as const,
+  message: `PUT bodies must use registered ARM resource models. Found ${bodies}.`,
+  target: "put",
+});
+
+it("prioritizes the missing request over response mismatches", async () => {
   await tester
     .expect(`${models} @put op put(): Ok<Widget> | Created<Other>;`)
-    .toEmitDiagnostics([diagnostic("200 response: Widget; 201 response: Other")]);
+    .toEmitDiagnostics([missingRequest]);
+});
+
+it.each([
+  "@put op put(): Ok<Widget>;",
+  "@put op put(): void;",
+  "@put op put(@body body: void): Ok<Widget>;",
+  "@put op put(@header token: string, @query filter?: string): Created<Widget>;",
+])("reports an absent request body: %s", async (operation) => {
+  await tester.expect(`${models} ${operation}`).toEmitDiagnostics([missingRequest]);
+});
+
+it.each([200, 201])(
+  "requires registration for a shared plain model at status %s",
+  async (status) => {
+    await tester
+      .expect(
+        `${models}
+    model Plain { name: string; type: string; }
+    @put op put(@body body: Plain): ${status === 200 ? "Ok" : "Created"}<Plain>;
+  `,
+      )
+      .toEmitDiagnostics([unregistered(`request: Plain; ${status} response: Plain`)]);
+  },
+);
+
+it("does not require name/type property heuristics to reject an unregistered model", async () => {
+  await tester
+    .expect(
+      `${models}
+    model Plain { value: string; }
+    @put op put(@body body: Plain): Ok<Plain> | Created<Plain>;
+  `,
+    )
+    .toEmitDiagnostics([unregistered("request: Plain; 200 response: Plain; 201 response: Plain")]);
+});
+
+it("checks an identifiable unregistered response even with an unsupported request", async () => {
+  await tester
+    .expect(
+      `${models}
+    model Plain { value: string; }
+    @put op put(@body body: string): Created<Plain>;
+  `,
+    )
+    .toEmitDiagnostics([unregistered("201 response: Plain")]);
 });
 
 it("compares request and 201 even when 200 is bodyless", async () => {
@@ -84,7 +146,6 @@ it("compares request and 201 even when 200 is bodyless", async () => {
 });
 
 it.each([
-  "@put op put(): Ok<Widget>;",
   "@put op put(@body body: Widget): void;",
   "@put op put(@body body: Widget): { @statusCode status: 204; };",
   "@post op put(@body body: Other): Ok<Widget> | Created<Other>;",
@@ -110,12 +171,14 @@ it("accepts shared models with lifecycle visibility, defaults and constraints", 
     .expect(
       `
     ${models}
-    model ResourceModel {
-      @visibility(Lifecycle.Read) id: string;
-      @visibility(Lifecycle.Create, Lifecycle.Update) secret?: string;
-      @minLength(1) value: string = "same";
+    @armProviderNamespace namespace Custom {
+      model ResourceModel is ProxyResource<{
+        @visibility(Lifecycle.Create, Lifecycle.Update) secret?: string;
+        @minLength(1) value: string = "same";
+      }> { ...ResourceNameParameter<ResourceModel>; }
     }
-    @put op put(@bodyRoot body: ResourceModel): Ok<ResourceModel> | Created<ResourceModel>;
+    @put op put(@bodyRoot body: Custom.ResourceModel):
+      Ok<Custom.ResourceModel> | Created<Custom.ResourceModel>;
   `,
     )
     .toBeValid();
@@ -145,11 +208,11 @@ it.each(["model Copy is Widget;", "model Copy extends Widget {}", "model Copy { 
     await tester
       .expect(
         `${models}
-      ${copy}
-      @put op put(@body body: Widget): Ok<Copy>;
+      @armProviderNamespace namespace Copies { ${copy} }
+      @put op put(@body body: Widget): Ok<Copies.Copy>;
     `,
       )
-      .toEmitDiagnostics([diagnostic("request: Widget; 200 response: Copy")]);
+      .toEmitDiagnostics([diagnostic("request: Widget; 200 response: Copies.Copy")]);
   },
 );
 
@@ -300,12 +363,54 @@ it("accepts standard ARM create-or-replace templates", async () => {
     .toBeValid();
 });
 
+it.each(["TrackedResource", "ProxyResource"])(
+  "accepts %s with both success statuses",
+  async (base) => {
+    await tester
+      .expect(
+        `
+    @armProviderNamespace @service namespace Microsoft.Test;
+    model Widget is ${base}<{}> { ...ResourceNameParameter<Widget>; }
+    @armResourceOperations interface Widgets {
+      createOrReplace is ArmResourceCreateOrReplaceSync<Widget>;
+    }
+  `,
+      )
+      .toBeValid();
+  },
+);
+
+it("keeps canonical-resource validation in the existing lifecycle rule", async () => {
+  const { armResourceOperationsRule } =
+    await import("../../src/rules/arm-resource-operation-response.js");
+  const source = `${models}
+    @armProviderNamespace namespace Operations {
+      @armResourceOperations interface Widgets {
+        @put @armResourceCreateOrUpdate(Resources.Widget)
+        put(...ResourceInstanceParameters<Resources.Widget>, @bodyRoot body: Other):
+          ArmResponse<Other> | ErrorResponse;
+      }
+    }
+  `;
+  await tester.expect(source).toBeValid();
+  await createLinterRuleTester(
+    await Tester.createInstance(),
+    armResourceOperationsRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  )
+    .expect(source)
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
+      message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+    });
+});
+
 it("checks unannotated and nested namespaces", async () => {
   await tester
     .expect(
       `${models}
     namespace Custom {
-      @put op put(@body body: Widget): Ok<Other>;
+      @put op put(@bodyRoot body: Widget): Ok<Other>;
     }
   `,
     )
@@ -356,13 +461,14 @@ it("reports once on an authored versioned operation", async () => {
   await tester
     .expect(
       `
-    @service @versioned(Versions) namespace Test;
-    enum Versions { v1, v2 }
     ${models}
-    @put op put(@body body: Widget): Ok<Other>;
+    @service @versioned(Versions) namespace Test {
+      enum Versions { v1, v2 }
+      @put op put(@bodyRoot body: Widget): ArmResponse<Other>;
+    }
   `,
     )
-    .toEmitDiagnostics([diagnostic("request: Test.Widget; 200 response: Test.Other")]);
+    .toEmitDiagnostics([diagnostic("request: Widget; 200 response: Other")]);
 });
 
 it("supports the fully qualified suppression directive", async () => {
@@ -378,4 +484,56 @@ it("supports the fully qualified suppression directive", async () => {
   `,
     options,
   );
+});
+
+it("ignores imported library operations but checks their project aliases", async () => {
+  const libraryTester = createLinterRuleTester(
+    await Tester.import("put-library").createInstance(),
+    putResourceSchemaConsistencyRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+  await libraryTester
+    .expect({
+      "node_modules/put-library/package.json": JSON.stringify({
+        name: "put-library",
+        version: "1.0.0",
+        tspMain: "main.tsp",
+      }),
+      "node_modules/put-library/main.tsp": `
+      import "@typespec/http";
+      namespace PutLibrary;
+      @TypeSpec.Http.put op missing(): void;
+    `,
+      "main.tsp": `
+      op put is PutLibrary.missing;
+    `,
+    })
+    .toEmitDiagnostics([missingRequest]);
+});
+
+const examples = [
+  ...readFileSync(
+    new URL("../../src/rules/put-resource-schema-consistency.md", import.meta.url),
+    "utf8",
+  ).matchAll(/```typespec\r?\n([\s\S]*?)```/g),
+].map((match) => match[1]);
+
+it("compiles the documented standard template", async () => {
+  await tester.expect(examples[0]).toBeValid();
+});
+
+it("diagnoses the documented request override", async () => {
+  await tester.expect(examples[1]).toEmitDiagnostics([
+    {
+      code,
+      message:
+        "PUT bodies must reuse the same resource model. Found request: Microsoft.Example.WidgetInput; 200 response: Microsoft.Example.Widget; 201 response: Microsoft.Example.Widget.",
+    },
+  ]);
+});
+
+it("honors the documented suppression through the compiler pipeline", async () => {
+  await Tester.compile(examples[2], {
+    compilerOptions: { linterRuleSet: { enable: { [code]: true } } },
+  });
 });

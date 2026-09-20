@@ -1,8 +1,10 @@
 import {
   createRule,
   fileRef,
+  getLocationContext,
   getTypeName,
   isTemplateDeclarationOrInstance,
+  isVoidType,
   paramMessage,
   type Model,
 } from "@typespec/compiler";
@@ -14,16 +16,20 @@ import {
   type HttpOperationResponse,
   type HttpPayloadBody,
 } from "@typespec/http";
+import { getArmResource } from "../resource.js";
 import { isInternalTypeSpec } from "./utils.js";
 
 export const putResourceSchemaConsistencyRule = createRule({
   name: "put-resource-schema-consistency",
-  description: "ARM PUT requests and 200/201 responses should reuse the same resource model.",
+  description:
+    "ARM PUT operations must have a request body and reuse a registered ARM resource model.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/put-resource-schema-consistency",
   docs: fileRef.fromPackageRoot("src/rules/put-resource-schema-consistency.md"),
   messages: {
     default: paramMessage`PUT bodies must reuse the same resource model. Found ${"bodies"}.`,
+    missingRequest: "ARM PUT operations must have a request body.",
+    unregistered: paramMessage`PUT bodies must use registered ARM resource models. Found ${"bodies"}.`,
   },
   create(context) {
     const metadata = createMetadataInfo(context.program);
@@ -42,6 +48,7 @@ export const putResourceSchemaConsistencyRule = createRule({
       operation(operation) {
         if (
           isInternalTypeSpec(context.program, operation) ||
+          getLocationContext(context.program, operation).type !== "project" ||
           isTemplateDeclarationOrInstance(operation) ||
           (operation.interface !== undefined &&
             isTemplateDeclarationOrInstance(operation.interface))
@@ -52,9 +59,15 @@ export const putResourceSchemaConsistencyRule = createRule({
         const [httpOperation] = getHttpOperation(context.program, operation);
         if (httpOperation.verb !== "put") return;
 
+        const requestBody = httpOperation.parameters.body;
+        if (requestBody === undefined || isVoidType(requestBody.type)) {
+          context.reportDiagnostic({ target: operation, messageId: "missingRequest" });
+          return;
+        }
+
         const bodies: { label: string; model: Model }[] = [];
         const request = getResourceModel(
-          httpOperation.parameters.body,
+          requestBody,
           resolveRequestVisibility(context.program, operation, httpOperation.verb),
         );
         if (request !== undefined) bodies.push({ label: "request", model: request });
@@ -73,6 +86,22 @@ export const putResourceSchemaConsistencyRule = createRule({
             target: operation,
             format: {
               bodies: bodies
+                .map(({ label, model }) => `${label}: ${getTypeName(model)}`)
+                .join("; "),
+            },
+          });
+          return;
+        }
+
+        const unregistered = bodies.filter(
+          ({ model }) => getArmResource(context.program, model) === undefined,
+        );
+        if (unregistered.length > 0) {
+          context.reportDiagnostic({
+            target: operation,
+            messageId: "unregistered",
+            format: {
+              bodies: unregistered
                 .map(({ label, model }) => `${label}: ${getTypeName(model)}`)
                 .join("; "),
             },
