@@ -2,19 +2,21 @@
 
 ## Result and gap summary
 
-The latest full lintdiff corpus run at specs commit
-`f6b53f105b95da05276530a0754a1c71b4f16397` covered 462 successfully compiled
-projects out of 468. `RepeatedPathInfo` fired in the same 25 projects on both
-engines, with 25/25 same-project overlap, no validator-only projects, and no
-TypeSpec-only projects. Raw diagnostics differ by one: Swagger reports 61 and
-TypeSpec reports 62. The extra TypeSpec diagnostic is
-`ManagedCCFProperties.appName` in Confidential Ledger; that model is removed
-from the selected Swagger API version (`2026-05-22-preview`), so the difference
-is an API-version/population mismatch rather than a missed Swagger check.
-Focused fixtures cover the supported PUT request-body semantics, so no
-production rule update is required. The migrated rule is functionally equivalent
-for the supported native TypeSpec contract; raw diagnostic equality is not
-expected.
+The latest full corpus covers 462/468 successfully compiled projects.
+`RepeatedPathInfo` fires in the same 25 projects on both engines, with no
+one-sided projects. Swagger reports 61 diagnostics versus 62 native diagnostics.
+The extra native `ManagedCCFProperties.appName` belongs to a model removed from
+Confidential Ledger's selected Swagger version (`2026-05-22-preview`): a
+version/population mismatch, not a missed check.
+
+The native contract compares authored properties-bag member names with supported
+HTTP path/query names, not JSON-encoded keys. Valid `@encodedName` cases
+intentionally differ in both directions: an alias can introduce or remove a
+JSON duplicate without changing the native result. **Swagger parity is partial**;
+corpus overlap does not establish universal equivalence. No production update
+is needed for the authoring-name contract. Emitter-free tests cover that contract,
+and separate comparison fixtures prove the encoding gap. Six compile failures
+remain unassessed; corpus pinning and detailed evidence follow.
 
 ## Rule identity
 
@@ -62,10 +64,17 @@ The native rule visits operations, skips template declarations/instances,
 requires the HTTP verb to be `put`, gathers HTTP path and query parameter names,
 and inspects a single model request body. It looks for a model-valued
 `properties` member and walks inherited properties inside that bag. A diagnostic
-is reported on each source property whose name matches a PUT path or query
-parameter. The rule deduplicates by repeated property name because TypeSpec
-reports semantic source targets while the Swagger validator reports emitted
-OpenAPI occurrences.
+is reported on each source property whose authored `ModelProperty.name` matches
+a supported HTTP PUT path or query parameter name. JSON `@encodedName` overrides
+do not change this authoring-name check.
+
+The diagnostic unit is one matching name per concrete PUT operation. The
+deduplication set is local to that operation: two PUT operations sharing one
+properties declaration produce two diagnostics at the same declaration. Inherited
+members are included, but nested model-valued members are not traversed recursively;
+cycles and shared siblings therefore do not create extra payload-path diagnostics.
+Project-imported members retain their source target. Template sources are skipped
+while concrete aliases are checked.
 
 ## Native semantic matrix
 
@@ -79,6 +88,40 @@ OpenAPI occurrences.
 | PUT body has no repeated `properties` member                              | Supported                                                                       | no matching property                                                                               | No violation   | No mapped diagnostic     | `body-no-repeats`              |
 | Duplicate exists only as a top-level body/envelope property               | Already covered by another ARM lint, outside this validator's nested-bag target | ignored by this rule                                                                               | No violation   | No mapped diagnostic     | `top-level-body-property-only` |
 | PATCH body repeats a path parameter                                       | Outside validator scope                                                         | non-PUT skipped                                                                                    | No violation   | No mapped diagnostic     | `patch-body-repeats-path`      |
+
+### Emitted-field evidence and intentional encoding boundary
+
+The validator selects keys of the resolved request schema's nested `properties`
+bag, not TypeSpec source identifiers. The following research matrix distinguishes
+field presence from the authored surface; it does not prescribe emitter logic
+for the native rule.
+
+| Authored shape                                                      | Validity/support                                            | Selected OpenAPI field present/value                                     | Native check and emission behavior                                                                                                | Swagger / native result | Evidence                                                           |
+| ------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------ |
+| Ordinary or inherited `widgetName` in the bag                       | Supported                                                   | Yes: resolved bag key `widgetName`                                       | Authored name matches; emitted key is unchanged, including through inherited schemas                                              | 1 / 1                   | `body-repeats-path`, `body-repeats-path-in-base`                   |
+| Bag member `mode`, HTTP query `mode`                                | HTTP-supported; ARM point-operation lint also reports       | Yes: bag key `mode`                                                      | Native HTTP name matches; emitted JSON key matches query name                                                                     | 1 / 1                   | `body-repeats-query`                                               |
+| Multiple direct repeated members                                    | Supported                                                   | Yes: `widgetName`, `resourceGroupName`                                   | Native reports both source names; historical validator snapshot is a representative occurrence rather than normalized count proof | Violation / 2           | `body-repeats-multiple-paths`                                      |
+| Tenant-scoped bag member `configName`                               | Supported                                                   | Yes: `configName`                                                        | Native and emitted names match the tenant resource path name                                                                      | 1 / 1                   | `tenant-body-repeats-path`                                         |
+| Distinct bag members                                                | Supported                                                   | Bag exists; no matching key                                              | No authored-name or JSON-key match                                                                                                | 0 / 0                   | `body-no-repeats`                                                  |
+| Duplicate only on envelope                                          | Rejected by `arm-resource-invalid-envelope-property`        | No matching nested bag key; duplicate is outside selected bag            | Neither check selects the envelope duplicate                                                                                      | 0 / 0                   | `top-level-body-property-only`                                     |
+| Duplicate only on PATCH                                             | Supported operation, outside rule scope                     | No selected PUT duplicate; PATCH key is not selected                     | Both checks restrict operation verb to PUT                                                                                        | 0 / 0                   | `patch-body-repeats-path`                                          |
+| `@encodedName("application/json", "widgetName") otherName?: string` | Supported, compiles and emits without diagnostics           | Yes: key `widgetName`; `otherName` absent                                | Authored `otherName` does not match; AutoRest applies JSON name override                                                          | 1 / 0, intentional      | `encoded-names/json-name-only.tsp`, native and emission suites     |
+| `@encodedName("application/json", "otherName") widgetName?: string` | Supported, compiles and emits without diagnostics           | Yes: key `otherName`; `widgetName` absent                                | Authored `widgetName` matches; AutoRest applies JSON name override                                                                | 0 / 1, intentional      | `encoded-names/authored-name-only.tsp`, native and emission suites |
+| Path and query sharing the same HTTP name                           | Already rejected by `@typespec/http/incompatible-uri-param` | Not assessed: invalid source is not an emission-completeness requirement | Native compiler rejects before the lint test                                                                                      | Not applicable          | Native rejection regression                                        |
+
+The alias fixtures are standalone `.tsp` inputs, not parity-harness `main.tsp`
+cases. `repeated-path-info.test.ts` loads them without an emitter and asserts the
+native outcomes; `repeated-path-info-emission.test.ts` independently emits each,
+asserts the precise JSON key and its opposite's absence, resolves local references,
+and invokes the installed `RepeatedPathInfo` validator function as Spectral does
+on a resolved path item. Both suites require successful compilation; comparison
+tests also assert no compiler/emitter diagnostics.
+
+Additional emitter-free regressions assert inherited diagnostic source spans,
+supported HTTP parameter aliases, nonrecursive cycles/shared siblings, two
+per-operation diagnostics on a shared declaration, project-imported diagnostic
+targets, non-model bags, PATCH/envelope exclusion, and template-source exclusion.
+They prove the stated native diagnostic unit, not universal emitted-schema parity.
 
 ## Coverage report reconciliation
 
@@ -209,18 +252,47 @@ after refreshing stale snapshots and ambient compliance expectations. It found
 validator-clean compliance cases with reviewed ambient diagnostics and no mapped
 `repeated-path-info` diagnostic.
 
+Same-cycle recovery adds the following reproducible command, using the repository's
+pinned mise tools and checked-in Vitest configuration (30-second test timeout):
+
+```powershell
+mise exec -- pnpm --dir packages\typespec-lintdiff exec vitest run test/rules/repeated-path-info.test.ts test/rules/repeated-path-info-emission.test.ts
+```
+
+The alias probes show native/Swagger counts `0/1` for `json-name-only` and `1/0`
+for `authored-name-only`. Both inputs use standard ARM resource templates and
+compile without diagnostics. An initial proposed path/query same-name deduplication
+case instead produced `@typespec/http/incompatible-uri-param`; its regression now
+asserts that compiler rejection rather than suppressing it or expanding the
+native contract to invalid inputs.
+
+The final focused run passes all 12 Vitest tests (10 native, 2 comparison).
+The eight existing parity fixtures also pass after the classification change:
+five partial-coverage violation cases, three reviewed-ambient compliant cases,
+zero unresolved gaps, and unchanged snapshots. Targeted formatting, linting of
+the two new test files, and the local package build pass.
+
+The historical full-corpus observations are retained rather than rerun: source
+production logic, harness, tool/dependency manifests, lockfile, and specs revision
+are unchanged. New tests and corrected local classification do not invalidate
+those diagnostic observations. They do invalidate the former universal-equivalence
+interpretation. The `coverageKind` is now `partial` to represent intentional
+Swagger encoding differences.
+
 ## Required TypeSpec changes
 
-No production rule update is required. This PR refreshes the rule metadata,
-stale focused snapshots, ambient compliance expectations, and this migration
-evidence note.
+No production rule update is required for the authored-name native contract.
+This PR refreshes stale focused snapshots and ambient compliance expectations,
+records partial Swagger parity in rule metadata, adds emitter-free native and
+separate encoding comparison regressions, and corrects this migration evidence.
 
 ## Final conclusion
 
-`tsp-lintdiff-local-linter/repeated-path-info` is functionally equivalent to
-Swagger `RepeatedPathInfo` for valid supported TypeSpec inputs in the native
-contract: PUT request-body `properties` members must not repeat PUT path or
-query parameter names. The latest full corpus has complete project overlap and
-no one-sided projects. The remaining raw diagnostic count difference is
-explained by a removed older-version TypeSpec declaration and does not require a
-rule behavior change.
+`tsp-lintdiff-local-linter/repeated-path-info` enforces the native authoring
+contract: PUT request-body `properties` members must not repeat supported HTTP
+PUT path or query parameter names. JSON-encoded property-name overrides remain
+outside that check, so Swagger parity is **partial** in both alias directions.
+The latest full corpus has complete observed project overlap and no one-sided
+projects, not universal supported-shape equivalence. Its raw-count difference
+is explained by a removed older-version declaration. Neither that population
+difference nor the intentional JSON-name gap requires production encoding logic.

@@ -1,7 +1,7 @@
 ---
 validatorRuleId: RepeatedPathInfo
 engine: spectral
-coverageKind: lint
+coverageKind: partial
 tspRuleset: resource-manager
 tspLints:
   - tsp-lintdiff-local-linter/repeated-path-info
@@ -41,9 +41,32 @@ The TypeSpec rule visits non-template PUT operations, reads their HTTP operation
 metadata, gathers path and query parameter names, and checks the single model
 request body. It reports each repeated property name found in the resource
 `properties` model, including inherited properties, and deduplicates repeated
-source properties by name. This intentionally follows TypeSpec semantics rather
-than trying to reproduce Swagger parameter-array locations or emitted duplicate
-occurrences.
+names within each operation. The comparison uses the **authored property name**
+(`ModelProperty.name`) and the supported HTTP path/query parameter name.
+The diagnostic unit is one matching name per concrete PUT operation: two PUT
+operations sharing a properties declaration report twice at that declaration.
+The rule does not recursively descend into nested members of the properties bag.
+
+This intentionally follows TypeSpec authoring semantics rather than reconstructing
+JSON encoding, Swagger parameter-array locations, or emitted duplicate occurrences.
+In particular, `@encodedName("application/json", ...)` does not change the authored
+property name. **Swagger parity is partial**, even for valid TypeSpec: an alias
+can introduce or remove a duplicate JSON key without changing the native result.
+For a `{widgetName}` path:
+
+| Properties member                                                   | Native diagnostics | Swagger diagnostics |
+| ------------------------------------------------------------------- | -----------------: | ------------------: |
+| `@encodedName("application/json", "widgetName") otherName?: string` |                  0 |                   1 |
+| `@encodedName("application/json", "otherName") widgetName?: string` |                  1 |                   0 |
+
+The two source fixtures in `encoded-names/` are compiled by
+`test/rules/repeated-path-info.test.ts` without an emitter and independently by
+`test/rules/repeated-path-info-emission.test.ts` with AutoRest and the installed
+Swagger validator function. They intentionally are not parity-harness `main.tsp`
+cases: that harness expects mapped native diagnostics for Swagger violations.
+The comparison suite instead asserts both emitted JSON keys and validator counts.
+This explicit native contract does not require adding JSON-name handling to
+production to obtain Swagger parity.
 
 ## Semantic coverage notes
 
@@ -56,10 +79,16 @@ The authorable semantic matrix covered locally is:
 - tenant-scoped PUT resource repeats its path parameter inside `properties` => invalid
 - compliant PUT body with distinct `properties` members => valid
 - repeated property only in PATCH/update payload => valid for this rule
+- JSON alias alone repeats a path name => native compliant, Swagger violation
+- authored name repeats a path name but JSON alias does not => native violation, Swagger compliant
+- cycles and shared sibling models inside the bag => not recursively traversed
+- a shared properties model used by two PUT operations => two diagnostics at the same source property
+- a project-imported properties declaration => diagnostic targets that declaration
 
 Additional scope note:
 
 - A duplicate top-level resource envelope property is not a clean authorable ARM compliance case in TypeSpec because the existing `arm-resource-invalid-envelope-property` lint rejects it before this rule matters. The local fixture keeps that boundary documented but it should not be treated as a migration gap.
+- A path and query parameter with the same HTTP name is rejected by `@typespec/http/incompatible-uri-param`; the native regression suite asserts that rejection rather than treating it as valid extra deduplication coverage.
 
 | ID                             | Violation | Description                                                        |
 | ------------------------------ | --------- | ------------------------------------------------------------------ |
