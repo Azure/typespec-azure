@@ -71,11 +71,6 @@ describe.each([
           message:
             "Properties of a PATCH request body must not have default value, property:enabled.",
         },
-        {
-          code: ruleCode,
-          message:
-            "Properties of a PATCH request body must not be visible only during Lifecycle.Create, property:createdBy.",
-        },
       ]);
   });
 
@@ -128,7 +123,7 @@ describe("payload kinds", () => {
   });
 
   it.each(["PatchBody", "PatchBody | null"])(
-    "preserves all checks for a single %s payload",
+    "checks required and default properties in a single %s payload",
     async (bodyType) => {
       await tester
         .expect(
@@ -151,11 +146,6 @@ describe("payload kinds", () => {
             code: ruleCode,
             message:
               "Properties of a PATCH request body must not have default value, property:enabled.",
-          },
-          {
-            code: ruleCode,
-            message:
-              "Properties of a PATCH request body must not be visible only during Lifecycle.Create, property:createdBy.",
           },
         ]);
     },
@@ -339,7 +329,7 @@ describe("invalid cases", () => {
       });
   });
 
-  it("emits diagnostics for discriminator properties that Autorest requires", async () => {
+  it("checks only authored required discriminator properties in effective input", async () => {
     await tester
       .expect(
         `
@@ -367,23 +357,10 @@ describe("invalid cases", () => {
         }
         `,
       )
-      .toEmitDiagnostics([
-        {
-          code: ruleCode,
-          message:
-            "Properties of a PATCH request body must not be required, property:optional.kind.",
-        },
-        {
-          code: ruleCode,
-          message:
-            "Properties of a PATCH request body must not be required, property:synthesized.kind.",
-        },
-        {
-          code: ruleCode,
-          message:
-            "Properties of a PATCH request body must not be required, property:derived.kind.",
-        },
-      ]);
+      .toEmitDiagnostics({
+        code: ruleCode,
+        message: "Properties of a PATCH request body must not be required, property:derived.kind.",
+      });
   });
 
   it("emits diagnostics for PATCH body properties with defaults", async () => {
@@ -423,16 +400,20 @@ describe("invalid cases", () => {
       ]);
   });
 
-  it("emits diagnostics for PATCH body properties that are only visible on create", async () => {
+  it("checks create-only properties when request visibility explicitly includes them", async () => {
     await tester
       .expect(
         `
-        ${patchOperation("WidgetPatchBody")}
-
         model WidgetPatchBody {
+          @visibility(Lifecycle.Read)
+          id: string = "server";
           @visibility(Lifecycle.Create)
           createdBy?: string;
+          @visibility(Lifecycle.Update)
+          name: string;
         }
+        @parameterVisibility(Lifecycle.Create)
+        @patch op update(@body body: WidgetPatchBody): void;
         `,
       )
       .toEmitDiagnostics({
@@ -552,7 +533,7 @@ describe("valid cases", () => {
       .toBeValid();
   });
 
-  it("allows top-level identity discriminator properties synthesized by Autorest", async () => {
+  it("does not synthesize absent top-level identity discriminator properties", async () => {
     await tester
       .expect(
         `
@@ -580,7 +561,7 @@ describe("valid cases", () => {
       .toBeValid();
   });
 
-  it("allows required and create-only source properties removed from the emitted PATCH schema", async () => {
+  it("respects legacy implicit optionality and excludes create-only PATCH inputs", async () => {
     await tester
       .expect(
         `
@@ -600,5 +581,161 @@ describe("valid cases", () => {
         `,
       )
       .toBeValid();
+  });
+
+  describe("native PATCH input regressions", () => {
+    it.each(["", "@visibility(Lifecycle.Read, Lifecycle.Query) unrelated?: string;"])(
+      "ignores excluded properties independently of schema sharing: %s",
+      async (extra) => {
+        await tester
+          .expect(
+            `
+            ${patchOperation("PatchBody")}
+            model PatchBody {
+              @visibility(Lifecycle.Read) id: string;
+              @visibility(Lifecycle.Create) createdBy?: string;
+              name?: string;
+              ${extra}
+            }
+            `,
+          )
+          .toBeValid();
+      },
+    );
+
+    it.each([false, true])(
+      "ignores excluded defaults with implicitOptionality %s",
+      async (implicitOptionality) => {
+        await tester
+          .expect(
+            `
+            model PatchBody {
+              @visibility(Lifecycle.Read) id: string = "server";
+              @visibility(Lifecycle.Create) createdBy: string = "creator";
+              name?: string;
+            }
+            ${implicitOptionality ? '#suppress "@typespec/http/deprecated-implicit-optionality" "Test legacy PATCH transform."' : ""}
+            @patch(#{ implicitOptionality: ${implicitOptionality} })
+            op update(@body body: PatchBody): void;
+            `,
+          )
+          .toBeValid();
+      },
+    );
+
+    it("excludes ordinary create-only PATCH inputs", async () => {
+      await tester
+        .expect(
+          `
+          ${patchOperation("PatchBody")}
+          model PatchBody {
+            @visibility(Lifecycle.Create) createdBy?: string;
+          }
+          `,
+        )
+        .toBeValid();
+    });
+
+    it("uses each operation's request visibility for a shared model", async () => {
+      await tester
+        .expect(
+          `
+          model PatchBody {
+            @visibility(Lifecycle.Create) creator: string;
+            @visibility(Lifecycle.Update) name: string;
+          }
+          @route("/update") @patch op update(@body body: PatchBody): void;
+          @route("/create") @parameterVisibility(Lifecycle.Create)
+          @patch op create(@body body: PatchBody): void;
+          `,
+        )
+        .toEmitDiagnostics([
+          {
+            code: ruleCode,
+            message: "Properties of a PATCH request body must not be required, property:name.",
+          },
+          {
+            code: ruleCode,
+            message: "Properties of a PATCH request body must not be required, property:creator.",
+          },
+          {
+            code: ruleCode,
+            message:
+              "Properties of a PATCH request body must not be visible only during Lifecycle.Create, property:creator.",
+          },
+        ]);
+    });
+
+    it("exempts only the top-level encoded identity", async () => {
+      await tester
+        .expect(
+          `
+          ${patchOperation("PatchBody")}
+          model PatchBody {
+            @encodedName("application/json", "identity") envelope: { required: string; };
+            nested?: { identity: string; };
+          }
+          `,
+        )
+        .toEmitDiagnostics({
+          code: ruleCode,
+          message:
+            "Properties of a PATCH request body must not be required, property:nested.identity.",
+        });
+    });
+
+    it.each(["", "kind?: string;", "@visibility(Lifecycle.Read) kind: string;"])(
+      "does not synthesize or force an excluded or optional discriminator: %s",
+      async (property) => {
+        await tester
+          .expect(
+            `
+            ${patchOperation("PatchBody")}
+            @discriminator("kind") model PatchBody { ${property} name?: string; }
+            `,
+          )
+          .toBeValid();
+      },
+    );
+
+    it("checks an authored required discriminator", async () => {
+      await tester
+        .expect(
+          `
+          ${patchOperation("PatchBody")}
+          @discriminator("kind") model PatchBody { /*kind*/kind: string; }
+          `,
+        )
+        .toEmitDiagnostics((x) => ({
+          code: ruleCode,
+          message: "Properties of a PATCH request body must not be required, property:kind.",
+          pos: x.pos.kind.pos,
+        }));
+    });
+
+    it("respects legacy implicit optionality for an authored discriminator", async () => {
+      await tester
+        .expect(
+          `
+          @discriminator("kind") model PatchBody { kind: string; }
+          #suppress "@typespec/http/deprecated-implicit-optionality" "Test legacy PATCH transform."
+          @patch(#{ implicitOptionality: true }) op update(@body body: PatchBody): void;
+          `,
+        )
+        .toBeValid();
+    });
+
+    it("ignores an inherited excluded discriminator", async () => {
+      await tester
+        .expect(
+          `
+          ${patchOperation("PatchBody")}
+          @discriminator("kind") model Base { @visibility(Lifecycle.Read) kind: string; }
+          model PatchBody extends Base { name?: string; }
+          model Concrete extends PatchBody { kind: "concrete"; }
+          `,
+        )
+        .toBeValid();
+    });
   });
 });

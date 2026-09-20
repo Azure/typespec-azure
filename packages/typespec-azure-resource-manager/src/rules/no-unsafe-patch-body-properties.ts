@@ -1,10 +1,8 @@
 import {
   createRule,
   fileRef,
-  getDiscriminator,
   getLifecycleVisibilityEnum,
   getLocationContext,
-  getProperty,
   getVisibilityForClass,
   isNeverType,
   isNullType,
@@ -38,11 +36,7 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
   },
   create(context) {
     const { program } = context;
-    const metadataInfo = createMetadataInfo(program, {
-      canonicalVisibility: Visibility.Read,
-      canShareProperty: (property) =>
-        canSharePropertyUsingReadonlyOrXmsMutability(program, property),
-    });
+    const metadataInfo = createMetadataInfo(program);
 
     return {
       operation: (operation) => {
@@ -81,34 +75,14 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
         diagnosticTarget: DiagnosticTarget,
         visibility: Visibility,
       ) {
-        const schemaVisibility = metadataInfo.isTransformed(model, visibility)
-          ? visibility
-          : Visibility.Read;
         const visitedVisibilities = visited.get(model);
-        if (visitedVisibilities?.has(schemaVisibility)) {
+        if (visitedVisibilities?.has(visibility)) {
           return;
         }
         if (visitedVisibilities === undefined) {
-          visited.set(model, new Set([schemaVisibility]));
+          visited.set(model, new Set([visibility]));
         } else {
-          visitedVisibilities.add(schemaVisibility);
-        }
-
-        const discriminator = getInheritedDiscriminator(program, model);
-        if (
-          discriminator !== undefined &&
-          getProperty(model, discriminator.propertyName) === undefined &&
-          !isTopLevelIdentityProperty(
-            [...path, discriminator.propertyName],
-            discriminator.propertyName,
-          )
-        ) {
-          violations.push({
-            target:
-              getLocationContext(program, model).type === "project" ? model : diagnosticTarget,
-            propertyName: [...path, discriminator.propertyName].join("."),
-            messageId: "required",
-          });
+          visitedVisibilities.add(visibility);
         }
 
         for (const property of walkPropertiesInherited(model)) {
@@ -117,7 +91,7 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
           if (isTopLevelIdentityProperty(propertyPath, jsonName)) {
             continue;
           }
-          if (!metadataInfo.isPayloadProperty(property, schemaVisibility)) {
+          if (!metadataInfo.isPayloadProperty(property, visibility)) {
             continue;
           }
           if (isNeverType(property.type)) {
@@ -126,10 +100,7 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
           const propertyTarget =
             getLocationContext(program, property).type === "project" ? property : diagnosticTarget;
 
-          if (
-            !metadataInfo.isOptional(property, schemaVisibility) ||
-            property.name === discriminator?.propertyName
-          ) {
+          if (!metadataInfo.isOptional(property, visibility)) {
             violations.push({
               target: propertyTarget,
               propertyName: propertyPath.join("."),
@@ -153,7 +124,7 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
             });
           }
 
-          collectNestedViolations(property.type, propertyPath, propertyTarget, schemaVisibility);
+          collectNestedViolations(property.type, propertyPath, propertyTarget, visibility);
         }
       }
 
@@ -200,31 +171,4 @@ function isCreateOnlyMutability(program: Program, property: ModelProperty): bool
 
   const visibility = getVisibilityForClass(program, property, lifecycle);
   return visibility.size === 1 && visibility.has(create);
-}
-
-function getInheritedDiscriminator(program: Program, model: Model) {
-  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
-    const discriminator = getDiscriminator(program, current);
-    if (discriminator !== undefined) {
-      return discriminator;
-    }
-  }
-
-  return undefined;
-}
-
-function canSharePropertyUsingReadonlyOrXmsMutability(
-  program: Program,
-  property: ModelProperty,
-): boolean {
-  const lifecycle = getLifecycleVisibilityEnum(program);
-  const visibility = getVisibilityForClass(program, property, lifecycle);
-  if (visibility.size === lifecycle.members.size) {
-    return true;
-  }
-
-  return (
-    visibility.size > 0 &&
-    [...visibility].every((member) => ["Read", "Create", "Update"].includes(member.name))
-  );
 }
