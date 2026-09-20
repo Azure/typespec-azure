@@ -79,9 +79,10 @@ See the
   The promotion PR must be created from a separate worktree.
 - Fetch the promotion base from canonical `Azure/typespec-azure:main` and
   create the dedicated promotion source (head) branch in `Azure/typespec-azure`,
-  never a personal fork. Existing canonical task PRs keep their head branch;
-  fork-backed PRs require explicit user-authorized migration before proceeding.
-  Verify URL identity and canonical push permission, not remote names; never
+  never a personal fork. Existing task PRs keep their verified head branch;
+  retaining a legacy fork requires the exact
+  [fork-update authorization](../shared/recovery-context.md#existing-fork-updates).
+  Verify URL identity and applicable push permission, not remote names; never
   fall back to a fork after a failed push.
 - Treat the source lintdiff rule as immutable during promotion. Do not
   change `packages/typespec-lintdiff` source, fixtures, snapshots, package
@@ -428,6 +429,9 @@ tester in `beforeEach`, as the package's existing tests do. Keep lazy library
 filesystem/host initialization out of the first test body, await asynchronous
 setup, and preserve per-test isolation. Do not compensate for setup mistakes
 by raising timeouts, caching mutable testers across cases, or weakening assertions.
+For recursive traversal, port the source matrix for cycles, shared siblings,
+cross-operation reuse and imported diagnostic targets without silently changing
+the intended diagnostic unit. Any discovered source defect returns to the queue.
 
 When promotion adds or preserves project/library declaration filtering, include
 an imported library declaration that would otherwise violate the rule and assert
@@ -599,6 +603,12 @@ Optimized validation order:
 8. affected package test
 9. if broad local validation is warranted, run the repo build or
    `pnpm validate:pr` with `TYPESPEC_SKIP_WEBSITE_BUILD=true`
+
+Before running tests, consume the task's verified
+[validation profile](../shared/recovery-context.md#reusable-validation-profiles).
+Preserve applicable explicitly approved hook settings across focused/full runs
+and review handoffs; never treat prior passing output alone as permission to
+change configured timeouts. No profile grants an extra retry.
 
 For timeout-only native test failures, apply the shared
 [bounded native-test timeout diagnosis](../loop-for-fix-and-review/SKILL.md#bounded-native-test-timeout-diagnosis)

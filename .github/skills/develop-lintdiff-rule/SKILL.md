@@ -209,21 +209,27 @@ the original worker command is unchanged. Repair context is supplied separately;
 do not add public flags or run the slash command as a shell executable. Initial
 cycle `0` uses ordinary worker development and does not require an existing PR.
 
-- Reuse the exact supplied TypeSpec/specs worktrees, rule branch, and development
-  PR. Verify the recorded repository/base/head identities and pushed SHA before
-  editing. A closed/merged PR, changed remote head, or unexplained local changes
-  is a blocker; do not create a replacement PR or overwrite newer work.
+- Reuse the exact supplied TypeSpec/specs worktrees and active publication
+  binding. Verify the recorded repository/base/head identities and pushed SHA
+  before editing. Normally reuse the OPEN rule branch/PR. A merged source PR
+  permits a successor only after the outer queue completes the explicitly
+  [opted-in post-merge transition](../shared/recovery-context.md#opt-in-post-merge-source-repair)
+  and supplies its new-creation binding and predecessor history. Never infer
+  that authorization or recreate the old remote branch. A closed-without-merge
+  PR, unexplained remote head, or unexplained local changes remains a blocker.
 - Re-run worker setup, eligibility and coverage gates, evidence gathering, and
   the full required development workflow. The existing open development PR is
-  not a reason to skip repair. A closed/merged recorded PR still blocks this
-  queue repair mode; the separately authorized post-merge lifecycle is not an
-  automatic queue restart. Coverage stop conditions still apply.
+  not a reason to skip repair. Without the explicit post-merge transition,
+  closed/merged source PRs still block queue repair. Coverage stop conditions
+  apply equally to authorized successor repairs.
 - Use the handoff's source-defect evidence and acceptance criteria to scope the
   repair. Preserve earlier commits, add regression coverage, refresh
   `migration.md`, and append focused repair commits only after required
   validation and independent review. Do not reset, rebase, or force-push.
-- Refresh the same development PR's description and return its canonical URL
-  and verified pushed head SHA. Do not close it or attempt duplicate creation.
+- Refresh the active development PR's description and return its canonical URL
+  and verified pushed head SHA. Create a successor only under the supplied
+  post-merge new-creation binding, linking the predecessor and defect; otherwise
+  do not close the PR or attempt duplicate creation.
   The queue runs a new review loop before promotion can consume the repaired head.
 - Do not edit the promotion worktree or launch promotion from this skill.
   Append milestones to the queue's shared log and return evidence-backed process
@@ -540,6 +546,9 @@ Pass the runner options directly as shown. Do not insert an additional `--`
 after `specs:typespec`; in this repository that separator is forwarded to the
 runner and rejected as an unknown argument.
 
+Before the first representative/full run, capture a baseline using the
+[manifest-based cleanup helper](corpus-cleanup.md). Keep its evidence outside
+the repository. Do not capture an already-modified corpus as a clean baseline.
 The command runs all local rules and rewrites canonical TypeSpec results and
 coverage files in this development worktree. Use the refreshed rule row and
 rule shard to verify project overlap, validator-only projects, TypeSpec-only
@@ -674,8 +683,13 @@ Do not commit it.
 Before preparing the PR:
 
 1. Confirm `migration.md` contains the latest corpus evidence.
-2. Restore all generated changes under
-   `packages/typespec-lintdiff/specs`.
+2. After verifying corpus writers have stopped, use the
+   [manifest-based cleanup helper](corpus-cleanup.md) to archive and plan all
+   generated changes under `packages/typespec-lintdiff/specs`, including shards
+   for other rules. Inspect the complete plan and approve its exact digest
+   before apply. Unknown paths or changed hashes stop cleanup; never broaden an
+   ad-hoc deletion allowlist, use blanket restore/clean, or discard preexisting
+   files. Retain the baseline, generated evidence and apply journal externally.
 3. Confirm the remaining diff contains only the production TypeSpec rule,
    directly related fixtures, snapshots, tests, and migration note, plus any
    explicit package manifest and lockfile repair required for the fixture
@@ -731,6 +745,10 @@ The reviewer must:
   usage, version/projection mistakes, unstable diagnostic targets, ineffective
   deduplication, and misleading diagnostics
 - verify that fixture evidence covers the implementation's important branches
+- for model-traversal rules, cover cycles, shared siblings, shared models across
+  operations and imported diagnostic targets; assert the intended diagnostic
+  unit/count and targeting, as described in the
+  [regression matrix](../shared/recovery-context.md#bounded-corrections-and-earlier-regressions)
 - verify that production rule imports and reachable helpers respect the native
   implementation boundary, native tests do not require an emitter, and any
   emitter-only divergence is documented rather than hidden by an adapter
@@ -781,17 +799,19 @@ creating a draft PR.
    dependency repair identified above.
 4. For a new migration head, push the dedicated rule branch to canonical
    `Azure/typespec-azure`, while leaving the user-supplied target branch
-   untouched. For an existing canonical task PR, preserve its head branch.
-   A legacy fork-backed PR requires explicit user-authorized migration to
-   `Azure/typespec-azure` before proceeding. Use an explicit canonical
-   remote/refspec; never fall back to a fork or push the rule commit to the
-   target branch itself.
+   untouched. Preserve the exact head for existing task PRs; a fork head needs
+   the recorded [fork-update authorization](../shared/recovery-context.md#existing-fork-updates).
+   Use the verified explicit remote/refspec. That exception does not extend to
+   new successor PRs. Never fall back to a fork after a failed push or push the
+   rule commit to the target branch itself.
 5. Create the pull request in `Azure/typespec-azure` as a **draft**, with the
    recorded head repository/branch and user-supplied target branch as base. Do not mark
    it ready for review; the user decides when the migration evidence and rule
    behavior are ready for formal review.
    In queue-controlled source repair, verify and update the recorded open draft
-   PR instead of creating another one; retain its base and head branch.
+   PR instead of creating another one; retain its base and head branch. The only
+   exception is the outer-authorized post-merge successor with a verified
+   new-creation binding and preserved predecessor history.
    Honor the selected publication backend and environment tool requirements.
    For session-bound publication, only the owning session's main agent calls
    the required creation tool. Recheck the session binding immediately before
@@ -820,7 +840,7 @@ creating a draft PR.
    promotion, and confirm the mapping matches the final implementation.
    Do not append environment or execution labels such as `devbox` or `heavy`.
    Record actual base/head identities separately.
-   For separately authorized post-merge source repair, use
+   For separately authorized or opted-in queue post-merge source repair, use
    `[Swagger Linter Repair] <ValidatorRuleId> -> <LocalTypeSpecRuleName>` and link
    the original merged migration plus the new defect scope. Preserve an existing
    OPEN task PR's recorded title unless a correction is part of the request;

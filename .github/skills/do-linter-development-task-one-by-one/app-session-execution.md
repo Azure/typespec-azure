@@ -14,6 +14,8 @@ Before expensive investigation, edits, dependencies or builds, classify the
 publication binding in durable session artifacts:
 
 - task/lifecycle and authorization; owner identity and absolute worktree root
+- durable [recovery context](../shared/recovery-context.md), including exact
+  task-scoped authorizations, validation profiles and inherited counters
 - publication operation (`create` or `update-existing`), exact existing PR tuple
   when applicable, and inherited worktrees-folder/containment evidence for queues
 - app project/session IDs when applicable, actual Git and app head branch, HEAD,
@@ -33,14 +35,18 @@ publication binding in durable session artifacts:
   completion channel; for reviews, selected owner and persistent capabilities
 
 Resolve repository identity from actual remote fetch/push URLs and GitHub
-metadata, never a remote's name. All development, migration, promotion, and
-skill-update PR source (head) branches must live in canonical
+metadata, never a remote's name. New development, migration and promotion heads,
+and all skill-update PR heads, must live in canonical
 `Azure/typespec-azure`, not a personal fork. An Azure base repository alone does
-not satisfy this requirement. Verify canonical push permission before setup;
-if unavailable, stop rather than falling back to a fork. Existing canonical task
-PRs retain their recorded head branch. A legacy fork-backed PR is blocked until
-the user explicitly authorizes migration to a canonical head; do not silently
-move, replace, or close it. Promotion targets canonical `main`; migration and skill PRs
+not satisfy this requirement. Verify push permission for the authorized head
+repository before setup; for new publications that is the canonical repository.
+If unavailable, stop rather than falling back to a fork. Existing canonical task
+PRs retain their recorded head branch. An existing legacy fork-backed rule PR
+may retain its head only with the exact
+[fork-update authorization](../shared/recovery-context.md#existing-fork-updates).
+Otherwise stop for explicit migration authorization; do not silently
+move, replace, or close it. New PRs and skill-only PRs retain the canonical-head
+policy. Promotion targets canonical `main`; migration and skill PRs
 target the explicitly selected migration branch. Examples using `origin` mean
 the verified canonical fetch remote; substitute its actual name when different.
 
@@ -62,8 +68,9 @@ and stop before setup. Existing PRs follow the operation-specific path below.
 
 Select `update-existing` only after an exact GitHub query verifies one open task
 PR's base repository/branch, head repository/branch, pushed SHA and complete file
-scope. Require the head repository to be `Azure/typespec-azure`; a recorded fork
-binding does not waive the canonical-head requirement. Preserve recorded PR
+scope. Require the head repository to be `Azure/typespec-azure` unless the exact
+existing rule PR has a verified `legacy_fork_update` authorization. A fork
+binding alone is not authorization. Preserve recorded PR
 identities and earlier attempt/review budgets. In
 app-session execution, still verify the owning session's exact worktree, branch,
 task ownership and quiescence; the coordinator may be anywhere.
@@ -85,8 +92,10 @@ This path MUST NOT call `create_pull_request`, create a replacement PR, retarget
 the existing PR or fall back to another head repository.
 
 If the PR is closed/merged, disappears, changes identity or cannot be verified,
-stop. Do not silently convert the update into creation. A separately authorized
-new PR must pass the full new-creation binding preflight first. This distinction
+stop this update path. Do not silently convert the update into creation. The
+outer queue may select the explicitly opted-in post-merge lifecycle below;
+otherwise a separately authorized new PR must pass the full new-creation
+binding preflight first. This distinction
 does not waive clean-head review gates, source provenance, Git identity checks,
 folder containment or any validation requirement.
 
@@ -99,6 +108,12 @@ Classify before applying merged-PR or reuse gates; titles are leads, not identit
 - **Repair on a recorded OPEN PR:** preserve its worktree, head repository,
   branch, base and history; verify current SHA/ownership before focused repair.
   Closed/merged or externally changed state blocks this repair mode.
+- **Opted-in queue post-merge source repair:** follow the shared
+  [post-merge transition](../shared/recovery-context.md#opt-in-post-merge-source-repair).
+  This requires explicit task authorization, a confirmed defect and remaining
+  existing repair budget. Preserve the predecessor PR and branch, establish a
+  new-creation binding for its successor, and keep the promotion PR unchanged.
+  A closed-without-merge source PR or closed/merged promotion PR still blocks.
 - **Separately authorized follow-up source repair:** an explicit user request
   naming the post-merge defect and scope permits a new repair, not reopening the
   merged PR or repeating migration. Preserve the old work; establish a new
@@ -106,7 +121,8 @@ Classify before applying merged-PR or reuse gates; titles are leads, not identit
   eligibility, semantic coverage, native-boundary and validation requirements;
   covered/uncertain behavior is not waived. Use the
   [repair skill](../lintdiff-rule-reimport-repair/SKILL.md) for source investigation.
-  This is not a queue repair cycle; never invent a queue marker to authorize it.
+  Outside an explicitly opted-in queue this is not a queue repair cycle; never
+  invent a queue marker or opt-in to authorize it.
 - **Publication-only recovery:** validated completed work needs publication or
   reconciliation, not another discovery/development run. Pin its content, commit,
   dependency/tool context, validation requirements and prior attempt evidence.
@@ -406,8 +422,10 @@ publication proxy for a full-cycle subagent running in the coordinator.
    A confirmed source defect permits only the existing bounded repair cycle.
    Wait for all prior phase activity to stop, then send a new development-phase
    dispatch to the same development owner. After clean source review, send a
-   new promotion-phase dispatch to the same promotion owner. Reuse both PRs
-   and worktrees; use fresh review subagents for every review-loop invocation.
+   new promotion-phase dispatch to the same promotion owner. Reuse both worktrees
+   and the open PRs; an opted-in merged-source transition must first reverify
+   the development owner's new-creation binding and preserve the predecessor.
+   Use fresh review subagents for every review-loop invocation.
 7. Advance to the next rule only after this task is terminal. Never archive a
    source or promotion session during the queue: archiving can remove its
    worktree, which is needed for repairs and the final handoff.
@@ -575,7 +593,7 @@ in the PR body instead. Promotion PRs retain
 For mappings, use the actual unqualified `createRule({ name })` from that phase's
 implementation: the local lintdiff name for development and the official
 destination name for promotion. Do not use the validator slug as a substitute
-for a differently named rule. Separately authorized post-merge source repair
+for a differently named rule. Separately authorized or opted-in queue post-merge source repair
 retains the development skill's `[Swagger Linter Repair]` title pattern.
 Read back the published title to confirm it matches the intended title before
 handoff. Preserve existing task PR titles unless correction was requested; do

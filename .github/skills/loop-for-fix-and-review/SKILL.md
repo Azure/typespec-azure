@@ -145,8 +145,10 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
    for existing PRs. Record the publication binding and retain the PR's head
    repository/owner and head branch for publication routing. For lintdiff
    development, promotion, and skill-update PRs, require the head repository
-   to be `Azure/typespec-azure`. A legacy fork-backed task PR must stop before
-   review side effects for explicit user-authorized migration outside this loop.
+   to be `Azure/typespec-azure`, except for the exact existing rule PR covered by
+   the shared [fork-update authorization](../shared/recovery-context.md#existing-fork-updates).
+   Consume and acknowledge its durable recovery context; do not repeatedly ask
+   for the same permission. Skill-only PRs are not covered by that exception.
    Do not retarget any PR head to a different remote as part of this loop.
    For queue-owned review, consume its prepared phase binding, readiness manifest
    and authoritative instruction paths/hashes. Enforce the inherited
@@ -227,6 +229,8 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
    - validity decision for each comment
    - promotion finding category when applicable
    - planned validation scope, command results, and corpus applicability/results
+   - recovery-context identity, acknowledged authorization scopes and applicable
+     validation profiles; retain all inherited counters and failed attempts
    - draft-correction count, failure evidence, causal classification, corrective
      diff identity and rerun results for the backlog pass or current round
    - native-test timeout-diagnosis allowance owner, usage, eligibility evidence,
@@ -545,6 +549,12 @@ with the instruction that determines its scope. Record every executed command's
 exit code, outcome, and output or durable log path, including failed attempts.
 Also record whether corpus validation is required, why, and its results when
 applicable.
+
+Use the matching [validation profile](../shared/recovery-context.md#reusable-validation-profiles)
+from the task's recovery context. Reverify its configuration/dependency identity,
+preserve approved settings and separately bounded attempt usage, and do not
+silently fall back to default timeouts. A profile does not waive the failure
+classification or publication gate.
 
 On a command failure, preserve the evidence and classify it using the bounded
 draft-correction or native-test timeout-diagnosis policy below before deciding
