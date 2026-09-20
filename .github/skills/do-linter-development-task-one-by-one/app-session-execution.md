@@ -567,11 +567,16 @@ Before creating a rule PR or making an authorized title correction, apply the
 phase-specific title contract in
 [development](../develop-lintdiff-rule/SKILL.md#9-commit-push-and-create-the-draft-pr)
 or [promotion](../lintdiff-rule-promote/SKILL.md#10-review-commit-push-and-create-a-draft-pr).
-The title must show `<ValidatorRuleId> -> <TypeSpecRuleName>`, using the actual
-unqualified `createRule({ name })` from that phase's implementation: the local
-lintdiff name for development and the official destination name for promotion.
-Preserve the development-only `(origin)` suffix on new source-migration PRs.
-Do not use the validator slug as a substitute for a differently named rule.
+New source-development PRs use
+`[WIP][Swagger Linter Development] <ValidatorRuleId>`, with no summary,
+`->` mapping, or `(origin)` suffix; record the validator-to-local-TypeSpec mapping
+in the PR body instead. Promotion PRs retain
+`[Swagger Linter Migration] <ValidatorRuleId> -> <OfficialTypeSpecRuleName>`.
+For mappings, use the actual unqualified `createRule({ name })` from that phase's
+implementation: the local lintdiff name for development and the official
+destination name for promotion. Do not use the validator slug as a substitute
+for a differently named rule. Separately authorized post-merge source repair
+retains the development skill's `[Swagger Linter Repair]` title pattern.
 Read back the published title to confirm it matches the intended title before
 handoff. Preserve existing task PR titles unless correction was requested; do
 not rename them merely to apply the new convention during recovery or resumption.

@@ -805,18 +805,21 @@ creating a draft PR.
    fallback authorizes that fallback.
    Never return an unrelated, closed, or merged PR as successful publication.
 6. Set the PR title to the exact stable pattern
-   `[Swagger Linter Migration] <ValidatorRuleId> -> <LocalTypeSpecRuleName> (origin)`,
-   replacing `<ValidatorRuleId>` with the original Swagger validator rule ID and
-   `<LocalTypeSpecRuleName>` with the source lintdiff rule's actual unqualified
-   `createRule({ name })` value. Do not substitute a proposed official name that
-   will only be chosen during promotion. For example:
-   `[Swagger Linter Migration] XmsResourceInPutResponse -> xms-resource-in-put-response (origin)`.
-   Keep the mapping in the title for Git-history traceability, not only in the
-   PR body, and confirm it matches the final implementation before publication.
+   `[WIP][Swagger Linter Development] <ValidatorRuleId>`,
+   replacing `<ValidatorRuleId>` with the original Swagger validator rule ID.
+   For example:
+   `[WIP][Swagger Linter Development] XmsResourceInPutResponse`.
+   Keep both prefixes, without a space between them, to distinguish development
+   PRs from official promotion PRs. Do not append a summary, use the
+   promotion-style `->` mapping, or append the old `(origin)` suffix.
+   The `[WIP]` prefix does not replace the
+   requirement to create the PR as a draft.
+   Record the validator-to-local-TypeSpec mapping in the PR body, using the
+   source lintdiff rule's actual unqualified `createRule({ name })` value.
+   Do not substitute a proposed official name that will only be chosen during
+   promotion, and confirm the mapping matches the final implementation.
    Do not append environment or execution labels such as `devbox` or `heavy`.
-   `(origin)`
-   denotes the source migration (as opposed to promotion), not the Git remote
-   or head repository. Record actual base/head identities separately.
+   Record actual base/head identities separately.
    For separately authorized post-merge source repair, use
    `[Swagger Linter Repair] <ValidatorRuleId> -> <LocalTypeSpecRuleName>` and link
    the original merged migration plus the new defect scope. Preserve an existing
