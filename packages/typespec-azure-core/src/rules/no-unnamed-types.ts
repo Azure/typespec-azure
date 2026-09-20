@@ -1,5 +1,6 @@
 import {
   createRule,
+  fileRef,
   ignoreDiagnostics,
   isNullType,
   type Model,
@@ -23,6 +24,7 @@ import {
 
 export const noUnnamedTypesRule = createRule({
   name: "no-unnamed-types",
+  docs: fileRef.fromPackageRoot("src/rules/no-unnamed-types.md"),
   description:
     "Azure services should not have anonymous models, union expressions, enum expressions, or scalar expressions. Define them as named declarations.",
   severity: "warning",

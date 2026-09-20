@@ -240,6 +240,42 @@ describe("models", () => {
         }));
     });
 
+    it.each(["First & Second", "{ ...First, ...Second }"])(
+      "flags an unnamed composed request body: %s",
+      async (body) => {
+        await tester
+          .expect(
+            `
+            @service namespace TestService;
+            model First { first: string; }
+            model Second { second: string; }
+            @post op Send<T>(@body body: T): void;
+            op send is Send</*anonymous*/${body}>;
+            `,
+          )
+          .toEmitDiagnostics((x) => ({
+            code: "@azure-tools/typespec-azure-core/no-unnamed-types",
+            message: "Anonymous model should be defined as a named model declaration.",
+            pos: x.pos.anonymous.pos,
+          }));
+      },
+    );
+
+    it("does not flag a named composed request body", async () => {
+      await tester
+        .expect(
+          `
+          @service namespace TestService;
+          model First { first: string; }
+          model Second { second: string; }
+          model Request { ...First; ...Second; }
+          @post op Send<T>(@body body: T): void;
+          op send is Send<Request>;
+          `,
+        )
+        .toBeValid();
+    });
+
     it("flags an anonymous body inside a spread request envelope", async () => {
       await tester
         .expect(

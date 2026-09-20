@@ -102,7 +102,17 @@ The following patterns are **not** flagged:
 
 The template-argument exception does not apply to nonempty anonymous models used as
 the actual request body through `@body` or `@bodyRoot`, including ARM action templates.
+This includes unnamed models composed with intersections or model spreads; define a
+named model for the composed request body.
 
 ## Suppression
 
 Suppress only when required to match an existing API; otherwise define the type as a named declaration.
+
+## LintDiff Equivalent
+
+The request-body check partially covers
+[AvoidAnonymousParameter](https://github.com/Azure/azure-openapi-validator/blob/main/docs/anonymous-body-parameter.md).
+This rule checks native TypeSpec names, not emitted schema names. Named dictionary
+types such as `Record<string>` remain valid even when an emitter inlines their schemas
+and the Swagger validator reports them.
