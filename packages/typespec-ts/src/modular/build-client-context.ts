@@ -125,7 +125,10 @@ export function buildClientContext(
   const propertiesInOptions = getClientParameters(client, dpgContext, {
     optionalOnly: true,
   })
-    .filter((p) => getClientParameterName(p) !== "endpoint")
+    .filter((p) => {
+      const name = getClientParameterName(p);
+      return name !== "endpoint" && name !== "credential";
+    })
     .map((p) => {
       return {
         name: getClientParameterName(p),
@@ -176,6 +179,7 @@ export function buildClientContext(
     parameters: getClientParametersDeclaration(client, dpgContext, {
       onClientOnly: false,
       requiredOnly: true,
+      includeOptionalCredentials: true,
     }),
     isExported: true,
   });

@@ -227,6 +227,9 @@ export class ClientAdapter {
             if (!constructable) {
               continue;
             }
+            if (param.optional) {
+              authType |= AuthTypes.NoAuth;
+            }
             switch (param.type.kind) {
               case "credential":
                 authType |= processCredential(goClient, constructable, param.type.scheme);

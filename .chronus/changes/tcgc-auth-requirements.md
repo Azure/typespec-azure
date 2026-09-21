@@ -2,6 +2,8 @@
 changeKind: feature
 packages:
   - "@azure-tools/typespec-client-generator-core"
+  - "@azure-tools/typespec-go"
+  - "@azure-tools/typespec-ts"
 ---
 
-Expose normalized HTTP authentication requirements on SDK clients and make generated credential parameters optional when `NoAuth` is supported.
+Expose normalized HTTP authentication requirements on SDK clients and generate optional or credential-free client initialization when `NoAuth` is supported.
