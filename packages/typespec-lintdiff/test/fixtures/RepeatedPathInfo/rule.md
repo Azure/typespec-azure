@@ -3,6 +3,7 @@ validatorRuleId: RepeatedPathInfo
 engine: spectral
 coverageKind: partial
 tspRuleset: resource-manager
+projectionScope: http-reachable
 tspLints:
   - tsp-lintdiff-local-linter/repeated-path-info
 ---

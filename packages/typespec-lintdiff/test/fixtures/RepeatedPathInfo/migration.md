@@ -2,12 +2,15 @@
 
 ## Result and gap summary
 
-The latest full corpus covers 462/468 successfully compiled projects.
+The historical full corpus run covers 462/468 successfully compiled projects.
 `RepeatedPathInfo` fires in the same 25 projects on both engines, with no
 one-sided projects. Swagger reports 61 diagnostics versus 62 native diagnostics.
 The extra native `ManagedCCFProperties.appName` belongs to a model removed from
 Confidential Ledger's selected Swagger version (`2026-05-22-preview`): a
-version/population mismatch, not a missed check.
+version/population mismatch, not a missed check. The fixture now applies
+`projectionScope: http-reachable` so selected-version comparisons exclude that
+unreachable declaration. A focused rerun of the Confidential Ledger project
+reports one diagnostic from each engine after projection.
 
 The native contract compares authored properties-bag member names with supported
 HTTP path/query names, not JSON-encoded keys. Valid `@encodedName` cases
@@ -125,10 +128,10 @@ They prove the stated native diagnostic unit, not universal emitted-schema parit
 
 ## Coverage report reconciliation
 
-| Report                                          | Source/pinning                                                                                                  | Row/category           | Validator projects | Local TypeSpec projects | Official credited projects | Same-project overlap |                            Validator-only |                             TypeSpec-only |                   Raw validator diagnostics |                    Raw TypeSpec diagnostics |
-| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------- | -----------------: | ----------------------: | -------------------------: | -------------------: | ----------------------------------------: | ----------------------------------------: | ------------------------------------------: | ------------------------------------------: |
-| `docs/coverage_old.md`                          | External gist snapshot, 450 compiled projects, 210 validator rules                                              | 100% coverage          |                 23 |           23 local lint |                          0 |                   23 | not reconstructable from aggregate report | not reconstructable from aggregate report | aggregate report omits this row's raw count | aggregate report omits this row's raw count |
-| `specs/coverage-breakdown.md` refreshed locally | specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`, 462/468 successful projects, 215 known validator rules | 100% observed coverage |                 25 |                      25 |                          0 |                   25 |                                         0 |                                         0 |                                          61 |                                          62 |
+| Report                                                   | Source/pinning                                                                                                  | Row/category           | Validator projects | Local TypeSpec projects | Official credited projects | Same-project overlap |                            Validator-only |                             TypeSpec-only |                   Raw validator diagnostics |                    Raw TypeSpec diagnostics |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------- | -----------------: | ----------------------: | -------------------------: | -------------------: | ----------------------------------------: | ----------------------------------------: | ------------------------------------------: | ------------------------------------------: |
+| `docs/coverage_old.md`                                   | External gist snapshot, 450 compiled projects, 210 validator rules                                              | 100% coverage          |                 23 |           23 local lint |                          0 |                   23 | not reconstructable from aggregate report | not reconstructable from aggregate report | aggregate report omits this row's raw count | aggregate report omits this row's raw count |
+| `specs/coverage-breakdown.md` historical unprojected run | specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`, 462/468 successful projects, 215 known validator rules | 100% observed coverage |                 25 |                      25 |                          0 |                   25 |                                         0 |                                         0 |                                          61 |                                          62 |
 
 The two reports use different corpus snapshots and different coverage
 definitions. The external report is an aggregate disposition view and does not
@@ -136,10 +139,12 @@ include per-project one-sided sets for this row. The refreshed lintdiff report
 requires observed same-project diagnostics and provides the project sets used
 below.
 
-## Full corpus evidence
+## Historical full corpus evidence
 
-- **Command:** `pnpm --dir packages/typespec-lintdiff specs:typespec --specs-repo C:\dev\worktrees\azure-rest-api-specs-lintdiff-repeated-path-info --concurrency 6`
-- **Coverage refresh:** `pnpm --dir packages/typespec-lintdiff specs:coverage -- --specs-repo C:\dev\worktrees\azure-rest-api-specs-lintdiff-repeated-path-info`
+- **Command:** `pnpm --dir packages/typespec-lintdiff specs:typespec --specs-repo <azure-rest-api-specs-worktree> --concurrency 6`
+- **Coverage refresh:** `pnpm --dir packages/typespec-lintdiff specs:coverage -- --specs-repo <azure-rest-api-specs-worktree>`
+- **Specs path:** replace `<azure-rest-api-specs-worktree>` with the absolute path
+  to a clean checkout of the pinned specs commit.
 - **Specs commit:** `f6b53f105b95da05276530a0754a1c71b4f16397`
 - **Generated at:** `2026-09-14T00:49:26.301Z`
 - **Run scope:** full, 468 source projects; 462 successful; 6 unassessed compile failures
@@ -148,6 +153,16 @@ below.
 - **TypeSpec-only projects:** none
 - **Raw diagnostic counts:** 61 Swagger validator, 62 TypeSpec
 - **Normalized diagnostic counts:** not computed by the report for this rule
+
+### Focused selected-version projection check
+
+The Confidential Ledger project was recompiled at its selected API version,
+`2026-05-22-preview`, with the harness projection worker. Applying the harness's
+`http-reachable` location filter to the historical diagnostics changes the
+project's TypeSpec count from 2 to 1: it removes only
+`ManagedCCFProperties.appName` and retains `LedgerProperties.ledgerName`. The
+project's Swagger count is 1. This focused result validates the metadata change
+without presenting the historical 61/62 full-corpus totals as refreshed results.
 
 ### Overlap projects
 
