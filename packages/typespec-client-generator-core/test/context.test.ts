@@ -73,11 +73,10 @@ it("export HTTP authentication metadata from emitter", async () => {
   ok(output);
   const codeModel = parse(output);
   const authentication = codeModel.clients[0].authentication;
-  strictEqual(authentication.schemes.length, 3);
-  strictEqual(authentication.defaultAuth.options.length, 2);
-  strictEqual(authentication.defaultAuth.options[0].all[0].kind, "noAuth");
-  strictEqual(authentication.defaultAuth.options[1].all[0].auth.type, "apiKey");
-  strictEqual(authentication.operationsAuth.read.options[0].all[0].auth.scheme, "Bearer");
+  strictEqual(authentication.options.length, 2);
+  strictEqual(authentication.options[0].schemes[0].type, "noAuth");
+  strictEqual(authentication.options[1].schemes[0].type, "apiKey");
+  strictEqual(authentication.options[1].schemes[0].model, undefined);
 });
 
 it("export complex TCGC output from emitter", async () => {

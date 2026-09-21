@@ -22,10 +22,10 @@ import type {
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
+  type Authentication,
   type HttpAuth,
   type HttpOperation,
   type HttpOperationResponse,
-  type HttpServiceAuthentication,
   type HttpStatusCodeRange,
   type HttpVerb,
   Visibility,
@@ -74,7 +74,6 @@ export interface TCGCContext {
   __responseHeaderCache: Map<ModelProperty, SdkServiceResponseHeader>;
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
-  __httpServiceAuthenticationCache: Map<Namespace, HttpServiceAuthentication>;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __explicitClients?: Set<SdkClient>;
   __rawClientsCache?: Map<Namespace | Interface | string, SdkClient>;
@@ -232,8 +231,8 @@ export interface SdkClientType<
   summary?: string;
   /** Client initialization way. */
   clientInitialization: SdkClientInitializationType;
-  /** HTTP authentication requirements for the service. */
-  authentication: HttpServiceAuthentication;
+  /** HTTP authentication requirements declared on the service. */
+  authentication?: Authentication;
   /** Methods of the client. */
   methods: SdkMethod<TServiceOperation>[];
   /** API versions supported for current type. */

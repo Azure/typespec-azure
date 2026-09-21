@@ -1,11 +1,10 @@
 import { createDiagnosticCollector, type Diagnostic, getDoc, getSummary } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import {
-  getHttpService,
+  type Authentication,
+  getAuthentication,
   getServers,
   type HttpServer,
-  type HttpServiceAuthentication,
-  resolveAuthentication,
 } from "@typespec/http";
 import {
   getClientInitializationOptions,
@@ -53,23 +52,9 @@ function getVersionsEnum(context: TCGCContext, client: SdkClient): SdkEnumType |
 function getClientAuthentication(
   context: TCGCContext,
   client: SdkClient,
-): [HttpServiceAuthentication, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
+): Authentication | undefined {
   const service = client.services[0];
-  if (!service) {
-    return diagnostics.wrap({
-      schemes: [],
-      defaultAuth: { options: [] },
-      operationsAuth: new Map(),
-    });
-  }
-  let authentication = context.__httpServiceAuthenticationCache.get(service);
-  if (!authentication) {
-    const httpService = diagnostics.pipe(getHttpService(context.program, service));
-    authentication = resolveAuthentication(httpService);
-    context.__httpServiceAuthenticationCache.set(service, authentication);
-  }
-  return diagnostics.wrap(authentication);
+  return service ? getAuthentication(context.program, service) : undefined;
 }
 
 function getEndpointTypeFromSingleServer<
@@ -247,7 +232,7 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     ),
     // Multiple services currently use the first service for client-level endpoint and credential
     // metadata. Keep authentication aligned with that behavior.
-    authentication: diagnostics.pipe(getClientAuthentication(context, client)),
+    authentication: getClientAuthentication(context, client),
     decorators: client.type ? diagnostics.pipe(getTypeDecorators(context, client.type)) : [],
     parent,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, clientType),

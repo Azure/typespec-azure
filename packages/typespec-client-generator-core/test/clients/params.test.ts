@@ -241,11 +241,12 @@ it("preserves OR authentication requirements", async () => {
   const context = await createSdkContextForTester(program);
   const client = context.sdkPackage.clients[0];
 
-  strictEqual(client.authentication.defaultAuth.options.length, 2);
-  strictEqual(client.authentication.defaultAuth.options[0].all.length, 1);
-  strictEqual(client.authentication.defaultAuth.options[1].all.length, 1);
-  strictEqual(client.authentication.defaultAuth.options[0].all[0].auth.type, "apiKey");
-  strictEqual(client.authentication.defaultAuth.options[1].all[0].auth.type, "oauth2");
+  ok(client.authentication);
+  strictEqual(client.authentication.options.length, 2);
+  strictEqual(client.authentication.options[0].schemes.length, 1);
+  strictEqual(client.authentication.options[1].schemes.length, 1);
+  strictEqual(client.authentication.options[0].schemes[0].type, "apiKey");
+  strictEqual(client.authentication.options[1].schemes[0].type, "oauth2");
 });
 
 it("preserves AND authentication requirements", async () => {
@@ -268,10 +269,11 @@ it("preserves AND authentication requirements", async () => {
   const context = await createSdkContextForTester(program);
   const client = context.sdkPackage.clients[0];
 
-  strictEqual(client.authentication.defaultAuth.options.length, 1);
-  strictEqual(client.authentication.defaultAuth.options[0].all.length, 2);
-  strictEqual(client.authentication.defaultAuth.options[0].all[0].auth.type, "apiKey");
-  strictEqual(client.authentication.defaultAuth.options[0].all[1].auth.type, "oauth2");
+  ok(client.authentication);
+  strictEqual(client.authentication.options.length, 1);
+  strictEqual(client.authentication.options[0].schemes.length, 2);
+  strictEqual(client.authentication.options[0].schemes[0].type, "apiKey");
+  strictEqual(client.authentication.options[0].schemes[1].type, "oauth2");
 });
 
 it("makes the credential optional when NoAuth is an alternative", async () => {
@@ -302,8 +304,9 @@ it("makes the credential optional when NoAuth is an alternative", async () => {
   strictEqual(credentialParam.optional, true);
   strictEqual(credentialParam.type.kind, "union");
   strictEqual(credentialParam.type.variantTypes.length, 2);
-  strictEqual(client.authentication.defaultAuth.options.length, 3);
-  strictEqual(client.authentication.defaultAuth.options[0].all[0].kind, "noAuth");
+  ok(client.authentication);
+  strictEqual(client.authentication.options.length, 3);
+  strictEqual(client.authentication.options[0].schemes[0].type, "noAuth");
 });
 
 it("omits the credential parameter when only NoAuth is configured", async () => {
@@ -321,8 +324,9 @@ it("omits the credential parameter when only NoAuth is configured", async () => 
   );
 
   strictEqual(credentialParam, undefined);
-  strictEqual(client.authentication.defaultAuth.options.length, 1);
-  strictEqual(client.authentication.defaultAuth.options[0].all[0].kind, "noAuth");
+  ok(client.authentication);
+  strictEqual(client.authentication.options.length, 1);
+  strictEqual(client.authentication.options[0].schemes[0].type, "noAuth");
 });
 
 it("initialization one server parameter with apikey auth", async () => {
