@@ -39,10 +39,11 @@ This repo pins its development tools with [mise](https://mise.jdx.dev) via `mise
 
 ## Branch and PR Workflow
 
-- When creating worktrees or branches for new work, base them off the main Azure fork's `main` branch (Azure/typespec-azure). Depending on the user's local git remote setup, this may be called `upstream` or `origin`.
+- By default, when creating worktrees or branches for new work, base them off the main Azure fork's `main` branch (Azure/typespec-azure). Depending on the user's local git remote setup, this may be called `upstream` or `origin`.
 - When creating worktrees (which clone the repo), always clone recursively with `--recurse-submodules` and run `git submodule update --init` if the `core/` submodule is missing or not at the correct commit. See [CONTRIBUTING.md - Cloning recursively](https://github.com/Azure/typespec-azure/blob/main/CONTRIBUTING.md#cloning-recursively) for details.
 - A new clone or worktree also needs `mise trust` (and `mise install` if tools are missing) before `pnpm` and other tools will work — see [Development Environment (mise)](#development-environment-mise).
-- When pushing changes and creating pull requests, push to your personal fork and open PRs against the main Azure fork's `main` branch.
+- When pushing changes and creating pull requests, push to your personal fork and, by default, open PRs against the main Azure fork's `main` branch.
+- LintDiff development exception: base new development worktrees and branches on `Azure/typespec-azure`'s `feature/lintdiff-migration-new` branch and target development PRs at that branch. Promotion worktrees, branches, and PRs continue to use `Azure/typespec-azure`'s `main` branch. This exception changes only the base branch, not the source-repository requirements.
 
 ## LintDiff → TypeSpec migration skills
 
