@@ -6,4 +6,4 @@ packages:
   - "@azure-tools/typespec-ts"
 ---
 
-Expose normalized HTTP authentication requirements on SDK clients and generate optional or credential-free client initialization when `NoAuth` is supported.
+Expose service-level HTTP authentication requirements on SDK clients and generate optional or credential-free client initialization when `NoAuth` is supported.
