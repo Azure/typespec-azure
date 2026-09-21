@@ -394,6 +394,7 @@ describe("validator and TypeSpec comparison", () => {
     expect(metadata.get("ValidQueryParametersForPointOperations")?.projectionScope).toBe(
       "http-reachable",
     );
+    expect(metadata.get("RepeatedPathInfo")?.projectionScope).toBe("http-reachable");
     expect(metadata.get("DeleteInOperationName")?.projectionScope).toBe("none");
   });
 
