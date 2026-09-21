@@ -128,6 +128,8 @@ The retained Swagger shard for `specification/resources/resource-manager/Microso
 | Swagger validator | No diagnostic; the SDK-scoped TypeSpec client operation is absent from the retained ARM Swagger path set. |
 | TypeSpec lint     | One diagnostic at `client.tsp:44:6` for path `/{policyAssignmentId}`.                                     |
 
+The `+` in the authored `@route` is the RFC 6570 reserved-expansion operator. `getHttpOperation` preserves that behavior in the URI-template parameter metadata but normalizes its legacy `path` representation to `/{policyAssignmentId}`, which is the value reported by the lint diagnostic.
+
 **Explanation:** The migrated rule checks ARM namespace `PUT` operations in the TypeSpec semantic program. It intentionally does not import TypeSpec Client Generator Core or simulate SDK `@scope` filtering, because ARM rules must remain promotion-compatible and must not depend on TCGC. This can expose client-scoped operations that are not present in the selected Swagger population.
 
 **Disposition:** No production rule change. The extra diagnostic is documented as a TypeSpec-only population difference outside the emitted ARM Swagger comparison, not a missed Swagger parity behavior.
