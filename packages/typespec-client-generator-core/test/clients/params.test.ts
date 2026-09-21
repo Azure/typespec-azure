@@ -276,7 +276,7 @@ it("preserves AND authentication requirements", async () => {
   strictEqual(client.authentication.options[0].schemes[1].type, "oauth2");
 });
 
-it("makes the credential optional when NoAuth is an alternative", async () => {
+it("preserves the required credential projection when NoAuth is an alternative", async () => {
   const { program } = await SimpleTester.compile(`
     @service
     @useAuth(
@@ -301,15 +301,16 @@ it("makes the credential optional when NoAuth is an alternative", async () => {
   );
 
   ok(credentialParam);
-  strictEqual(credentialParam.optional, true);
+  strictEqual(credentialParam.optional, false);
   strictEqual(credentialParam.type.kind, "union");
-  strictEqual(credentialParam.type.variantTypes.length, 2);
+  strictEqual(credentialParam.type.variantTypes.length, 3);
+  strictEqual(credentialParam.type.variantTypes[0].scheme.type, "noAuth");
   ok(client.authentication);
   strictEqual(client.authentication.options.length, 3);
   strictEqual(client.authentication.options[0].schemes[0].type, "noAuth");
 });
 
-it("omits the credential parameter when only NoAuth is configured", async () => {
+it("preserves the credential parameter when only NoAuth is configured", async () => {
   const { program } = await SimpleTester.compile(`
     @service
     @useAuth(NoAuth)
@@ -320,10 +321,13 @@ it("omits the credential parameter when only NoAuth is configured", async () => 
   const context = await createSdkContextForTester(program);
   const client = context.sdkPackage.clients[0];
   const credentialParam = client.clientInitialization.parameters.find(
-    (parameter) => parameter.kind === "credential",
+    (parameter): parameter is SdkCredentialParameter => parameter.kind === "credential",
   );
 
-  strictEqual(credentialParam, undefined);
+  ok(credentialParam);
+  strictEqual(credentialParam.optional, false);
+  strictEqual(credentialParam.type.kind, "credential");
+  strictEqual(credentialParam.type.scheme.type, "noAuth");
   ok(client.authentication);
   strictEqual(client.authentication.options.length, 1);
   strictEqual(client.authentication.options[0].schemes[0].type, "noAuth");

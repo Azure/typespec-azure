@@ -12,7 +12,7 @@ export { RestError }
 export declare class UnionClient {
     private _client;
     readonly pipeline: Pipeline;
-    constructor(credential?: TokenCredential, options?: UnionClientOptionalParams);
+    constructor(credential: any | TokenCredential, options?: UnionClientOptionalParams);
     validToken(options?: ValidTokenOptionalParams): Promise<void>;
     validNoAuth(options?: ValidNoAuthOptionalParams): Promise<void>;
 }

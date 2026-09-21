@@ -41,12 +41,10 @@ export function buildClassicalClient(
   const classicalClientName = `${getClassicalClientName(client)}`;
   const classicalParams = getClientParametersDeclaration(client, dpgContext, {
     requiredOnly: true,
-    includeOptionalCredentials: true,
   });
   const contextParams = getClientParametersDeclaration(client, dpgContext, {
     onClientOnly: false,
     requiredOnly: true,
-    includeOptionalCredentials: true,
   });
   const srcPath = emitterOptions.modularOptions.sourceRoot;
   const { subfolder, clientName } = getClientModuleInfo(clientMap);
@@ -310,11 +308,9 @@ function addChildClient(
 ) {
   const parentParams = getClientParametersDeclaration(parentClient, context, {
     requiredOnly: true,
-    includeOptionalCredentials: true,
   });
   const clientParams = getClientParametersDeclaration(client, context, {
     requiredOnly: true,
-    includeOptionalCredentials: true,
   });
   const diffParams = clientParams.filter((p) => {
     return !parentParams.some((pp) => pp.name === p.name && pp.name !== "options");

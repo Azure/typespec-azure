@@ -26,7 +26,6 @@ interface ClientParameterOptions {
   onClientOnly?: boolean;
   requiredOnly?: boolean;
   optionalOnly?: boolean;
-  includeOptionalCredentials?: boolean;
   skipArmSpecific?: boolean;
   skipEndpointTemplate?: boolean;
   apiVersionAsRequired?: boolean;
@@ -82,9 +81,7 @@ export function getClientParameters(
 
   const isRequired = (p: SdkParameter) =>
     // Special case: when apiVersionAsRequired is true, apiVersion should always be considered required
-    (options.apiVersionAsRequired && p.isApiVersionParam) ||
-    (options.includeOptionalCredentials && p.kind === "credential") ||
-    (!p.optional && !hasDefaultValue(p));
+    (options.apiVersionAsRequired && p.isApiVersionParam) || (!p.optional && !hasDefaultValue(p));
   const isOptional = (p: SdkParameter) =>
     p.optional || p.clientDefaultValue || p.__raw?.defaultValue || p.type.kind === "constant";
   const skipCredentials = (p: SdkParameter) => p.kind !== "credential";
@@ -132,8 +129,6 @@ export function getClientParametersDeclaration(
       return {
         name,
         type: typeExpression,
-        hasQuestionToken:
-          options.includeOptionalCredentials && p.kind === "credential" && p.optional,
       };
     }),
   ];
