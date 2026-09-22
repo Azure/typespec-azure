@@ -51,14 +51,14 @@ jobs:
     with:
       specs-dir: packages/benchmark/specs
       results-dir: results
-      iterations: ${{ github.event_name == 'push' && 25 || inputs.iterations }}
-      warmup: ${{ github.event_name == 'push' && 3 || inputs.warmup }}
+      iterations: ${{ fromJSON(format('{0}', github.event_name == 'push' && 25 || inputs.iterations)) }}
+      warmup: ${{ fromJSON(format('{0}', github.event_name == 'push' && 3 || inputs.warmup)) }}
       noise-cv: 0.08
       rerun-iterations: 10
       runner: ${{ github.event_name == 'workflow_dispatch' && inputs.runner || vars.BENCHMARK_RUNNER || 'ubuntu-latest' }}
       backfill_from: ${{ github.event_name == 'workflow_dispatch' && inputs.backfill_from || '' }}
       backfill_to: ${{ inputs.backfill_to || '' }}
-      backfill_force: ${{ inputs.backfill_force || false }}
+      backfill_force: ${{ fromJSON(format('{0}', inputs.backfill_force || false)) }}
       branch: ${{ github.event_name == 'workflow_dispatch' && inputs.branch || 'benchmark-data' }}
     permissions:
       contents: write
