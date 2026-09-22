@@ -1,6 +1,6 @@
 ---
 name: lintdiff-rule-promote
-description: Promote a named LintDiff rule from packages/typespec-lintdiff into the correct official TypeSpec Azure library, assuming it is done, with a clean worktree, agent-recommended destination by default (or user-confirmed destination when requested), native tests/docs/ruleset wiring, validation, and a draft PR. Use when the user names a migrated lintdiff rule and asks to move or promote it to typespec-azure-core or typespec-azure-resource-manager.
+description: Promote a named LintDiff rule from packages/typespec-lintdiff into the correct official TypeSpec Azure library, assuming it is done, with a clean worktree, agent-recommended destination by default (or user-confirmed destination when requested), native tests/docs/ruleset wiring, validation, and a draft PR. Use when the user names a migrated lintdiff rule and asks to move or promote it to typespec-azure-core, typespec-azure-resource-manager, or typespec-client-generator-core.
 argument-hint: "[validator rule id or local rule name] [ask for confirmation]"
 user-invocable: true
 ---
@@ -285,6 +285,13 @@ only when they explicitly requested confirmation.
 
 Use these signals:
 
+- Prefer `@azure-tools/typespec-client-generator-core` (TCGC) when the policy
+  governs generated SDK APIs, including common SDK method names. Check this
+  semantic ownership before routing an ARM-origin validator to ARM. Compare
+  related SDK rules and supported name resolution (for example,
+  `getLibraryName(..., AllScopes)` for a common-name contract); raw
+  `operation.name` and emitted `operationId` are not interchangeable with SDK
+  names. Do not introduce TCGC dependencies into Core or ARM.
 - Prefer `@azure-tools/typespec-azure-resource-manager` when the rule is
   ARM-specific: it depends on `@azure-tools/typespec-azure-resource-manager`,
   inspects ARM resources, provider namespaces, ARM lifecycle operations,
@@ -295,8 +302,8 @@ Use these signals:
   or model patterns, and does not need ARM helpers.
 - Treat validator metadata such as `applicability: Both`, `sources: ["common"]`,
   or fixture text that says "Both ARM and DataPlane" as strong evidence for
-  `@azure-tools/typespec-azure-core`, unless the implementation needs ARM-only
-  helpers or ARM-specific semantics.
+  `@azure-tools/typespec-azure-core`, unless the native contract governs SDK APIs
+  or needs ARM-only helpers or ARM-specific semantics.
 - `@azure-tools/typespec-azure-core` must not take a dependency on
   `@azure-tools/typespec-azure-resource-manager`. If a candidate core rule
   currently imports ARM helpers, either recommend ARM or explain the rewrite
@@ -358,8 +365,16 @@ Keep both PRs aligned:
 
 Place the rule in the selected package:
 
-- `packages/typespec-azure-core/src/rules/<rule-name>.ts`, or
+- `packages/typespec-azure-core/src/rules/<rule-name>.ts`
 - `packages/typespec-azure-resource-manager/src/rules/<rule-name>.ts`
+- `packages/typespec-client-generator-core/src/rules/`, following neighboring
+  rule filename/export conventions
+
+Check the source contract against the
+[implementation checkpoints](../typespec-lint-implement/SKILL.md#implementation-checkpoints).
+Classify any proposed semantic change under the existing source-repair policy
+before editing; selecting a better destination does not authorize divergence
+from the immutable source.
 
 Then adapt it to the destination package:
 
@@ -411,6 +426,15 @@ existing tester helper:
 
 - core: `packages/typespec-azure-core/test/test-host.ts`
 - ARM: `packages/typespec-azure-resource-manager/test/tester.ts`
+- TCGC: `packages/typespec-client-generator-core/test/tester.ts`; confirm the
+  current context setup against adjacent rule tests
+
+Apply the [contract-driven coverage](../typespec-lint-validate/SKILL.md#contract-driven-coverage)
+checklist in addition to fixture conversion. In ARM resource examples and tests,
+prefer standard operation templates with named customization arguments and
+omitted defaults. Preserve handcrafted cases that specifically prove scope or
+non-resource behavior. For SDK naming, prove common versus language-scoped
+override behavior and the intended name domain.
 
 Create:
 
@@ -488,6 +512,9 @@ library documentation:
 - focus the rationale on TypeSpec authoring, generated SDKs, API consistency, and
   Azure emitter/tooling behavior
 - include realistic TypeSpec incorrect and correct examples
+- for ARM resource operations, use standard templates in both examples, showing
+  the invalid customization through named arguments where applicable; compile
+  the examples using the existing example/test workflow
 - follow the destination's authored-document conventions, including `## Impact`
   with the affected areas and `## Suppression` guidance when used by neighboring
   rules; explain when suppression is appropriate rather than only how to fix
@@ -536,6 +563,16 @@ explicitly listed.
   rule, must still be explicitly listed in `resource-manager.ts` with a plain
   `false` value and no annotation or explanatory comment, matching the existing
   resource-manager ruleset style for disabled entries.
+- SDK-policy rules go in `src/rulesets/client-sdk.ts`, under `enable` with a plain
+  `false` value by default. Do not place a rule in ARM/data-plane rulesets merely
+  because of its Swagger origin; verify the destination's rule-discovery test
+  and intended applicability before adding other entries.
+
+For a renamed rule, verify the same public name across source, exports,
+registration, tests, docs/links, generated references, and changesets. Keep
+diagnostics short; put compatibility impact and suppression rationale in docs.
+Keep Swagger crosswalks in the provenance section rather than the native
+description or remediation.
 
 Run or plan to run the rulesets build and test after updating the lists.
 
@@ -543,8 +580,9 @@ Run or plan to run the rulesets build and test after updating the lists.
 
 Add a change entry for every touched official package:
 
-- `@azure-tools/typespec-azure-core` or
-  `@azure-tools/typespec-azure-resource-manager`
+- the destination: `@azure-tools/typespec-azure-core`,
+  `@azure-tools/typespec-azure-resource-manager`, or
+  `@azure-tools/typespec-client-generator-core`
 - `@azure-tools/typespec-azure-rulesets` when its rulesets changed
 
 Choose the change kind separately for each package:
@@ -624,8 +662,7 @@ and build for generated website content.
 
 For ARM rule promotion, use this command set as the default targeted validation
 loop, setting `RULE_NAME` to the exact official TypeSpec rule name/file stem
-(for example, `use-create-for-put`, not the validator slug
-`put-in-operation-name`):
+(for example, `no-query-in-post`, not the validator slug `parameters-in-post`):
 
 ```bash
 RULE_NAME="replace-with-rule-name"
@@ -661,6 +698,16 @@ pnpm exec cross-env TYPESPEC_SKIP_WEBSITE_BUILD=true pnpm validate:pr
 git diff --check
 ```
 
+For TCGC promotion, use the same validation order with the exact package
+`@azure-tools/typespec-client-generator-core` and its discovered rule test
+filename. Run that package's build, lint, `regen-docs`, and tests, plus the
+rulesets build/tests when registration changes. Do not mechanically substitute
+`azure-core`: the package directory is `packages/typespec-client-generator-core`,
+while the website library directory is
+`website/src/content/docs/docs/libraries/typespec-client-generator-core`.
+Derive the generated reference/rule files from its `regen-docs` configuration
+and inspect/format those exact files with the same empty-ignore policy.
+
 The Bash examples use the POSIX empty ignore path `/dev/null`. In Windows
 PowerShell, use `NUL` instead; the equivalent four-file formatting commands are
 below. Set `$Library` to `azure-resource-manager` or `azure-core` and `$RuleName`
@@ -668,7 +715,7 @@ to the exact official rule name:
 
 ```powershell
 $Library = "azure-resource-manager"
-$RuleName = "use-create-for-put"
+$RuleName = "no-query-in-post"
 $DocFiles = @(
   "packages\typespec-$Library\README.md"
   "packages\typespec-$Library\src\rules\$RuleName.md"
