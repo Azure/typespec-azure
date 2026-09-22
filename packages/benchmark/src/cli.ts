@@ -67,9 +67,11 @@ Store-results options:
 Backfill options:
   --from <sha|n>        Start point: a commit SHA or number of recent commits (default: 100)
   --to <sha>            End commit SHA, inclusive (default: HEAD of source branch)
-  --source-branch <b>   Branch to read commits from (default: main)
+  --source-branch <b>   Ref to read commits from (default: origin/main)
   --branch <name>       Branch for storing results (default: benchmark-data)
-  --push                Push results to remote after backfill
+  --push                Publish each successful backfill result
+  --force               Replace existing results instead of skipping them
+  --results-dir <dir>   Data directory (default: results)
   --specs-dir <dir>     Directory containing benchmark specs (default: built-in specs)
   --iterations <n>      Number of measured iterations per spec (default: 5)
   --warmup <n>          Number of warmup iterations (default: 1)
@@ -200,13 +202,15 @@ function storeResultsCommand(args: Record<string, string>): void {
   });
 }
 
-function backfillCommand(args: Record<string, string>): void {
-  backfill({
+async function backfillCommand(args: Record<string, string>): Promise<void> {
+  await backfill({
     from: args["from"],
     to: args["to"],
     sourceBranch: args["source-branch"],
     dataBranch: args["branch"],
     push: args["push"] === "true",
+    force: args["force"] === "true",
+    resultsDir: args["results-dir"],
     iterations: args["iterations"] ? parseInt(args["iterations"], 10) : undefined,
     warmup: args["warmup"] ? parseInt(args["warmup"], 10) : undefined,
     specs: args["specs"],
@@ -240,7 +244,7 @@ async function main(): Promise<void> {
       storeResultsCommand(args);
       break;
     case "backfill":
-      backfillCommand(args);
+      await backfillCommand(args);
       break;
     default:
       console.error(`Unknown command: ${command}`);

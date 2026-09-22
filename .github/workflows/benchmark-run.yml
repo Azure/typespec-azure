@@ -38,6 +38,14 @@ on:
         required: false
         type: string
         default: ""
+      backfill_to:
+        required: false
+        type: string
+        default: ""
+      backfill_force:
+        required: false
+        type: boolean
+        default: false
       branch:
         description: "Data branch to store results"
         required: false
@@ -83,19 +91,34 @@ jobs:
         run: pnpm -r --filter "@azure-tools/typespec-benchmark..." build
 
       - name: Install C# emitter from npm
-        if: ${{ inputs.backfill_from == '' }}
         run: node packages/benchmark/scripts/setup-csharp.ts
 
       - name: Run backfill
         if: ${{ inputs.backfill_from != '' }}
+        env:
+          BACKFILL_FROM: ${{ inputs.backfill_from }}
+          BACKFILL_TO: ${{ inputs.backfill_to }}
+          BACKFILL_FORCE: ${{ inputs.backfill_force }}
+          SPECS_DIR: ${{ inputs.specs-dir }}
+          RESULTS_DIR: ${{ inputs.results-dir }}
+          DATA_BRANCH: ${{ inputs.branch }}
+          ITERATIONS: ${{ inputs.iterations }}
+          WARMUP: ${{ inputs.warmup }}
         run: |
-          node packages/benchmark/dist/src/cli.js backfill \
-            --from ${{ inputs.backfill_from }} \
-            --specs-dir ${{ inputs.specs-dir }} \
-            --iterations ${{ inputs.iterations }} \
-            --warmup ${{ inputs.warmup }} \
-            --branch ${{ inputs.branch }} \
-            --push
+          args=(--from "$BACKFILL_FROM" --specs-dir "$SPECS_DIR"
+            --results-dir "$RESULTS_DIR" --branch "$DATA_BRANCH"
+            --iterations "$ITERATIONS" --warmup "$WARMUP" --push)
+          if [ -n "$BACKFILL_TO" ]; then args+=(--to "$BACKFILL_TO"); fi
+          if [ "$BACKFILL_FORCE" = "true" ]; then args+=(--force); fi
+          node packages/benchmark/dist/src/cli.js backfill "${args[@]}"
+
+      - name: Upload backfill results and logs
+        if: ${{ always() && inputs.backfill_from != '' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: backfill-results
+          path: /tmp/bench-backfill-results-*/
+          if-no-files-found: ignore
 
       - name: Run benchmarks
         if: ${{ inputs.backfill_from == '' }}

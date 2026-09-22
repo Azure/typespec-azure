@@ -113,8 +113,8 @@ timing begins. Missing tools, unresolved emitters, and missing/invalid emitter
 timings fail the run rather than silently reducing coverage.
 
 The dashboard discovers emitters from result metrics; new emitter series start
-with the first run that includes them. Existing history is not backfilled or
-rewritten. Its missing emitter samples remain gaps, not zero-duration samples.
+with the first run that includes them. Existing history is only replaced when
+explicitly backfilled with `--force`. Missing samples remain gaps, not zero-duration samples.
 
 ## CI integration
 
@@ -130,32 +130,44 @@ Results are stored on the `benchmark-data` orphan branch:
 
 ### Backfill historical data
 
-The historical backfill command's package restoration predates the expanded
-client-emitter matrix. It does not provision the full client set or npm C#;
-the full-generation coverage above applies to normal runs only.
-
-To backfill benchmark results for past commits:
+Build the current harness and install C# as shown above, then fetch the source
+history before backfilling. The default source is `origin/main`, independently of
+the branch containing the harness (so a fix branch can benchmark main's history).
 
 ```bash
-# Backfill last 100 commits (default)
+# Fill missing results among the last 100 first-parent commits (default)
 node packages/benchmark/dist/src/cli.js backfill
 
-# Backfill last 50 commits, then push
-node packages/benchmark/dist/src/cli.js backfill --from 50 --push
+# Replace the last 10 results with the current emitter matrix, matching CI sampling
+NODE_OPTIONS=--max-old-space-size=12288 node packages/benchmark/dist/src/cli.js backfill \
+  --from 10 --force --iterations 25 --warmup 3 --push
 
-# Backfill from a specific commit to HEAD of main
+# Backfill from a specific commit to the source branch tip
 node packages/benchmark/dist/src/cli.js backfill --from abc1234
 
-# Backfill a specific commit range
+# Backfill an inclusive commit range (use the same SHA for exactly one commit)
 node packages/benchmark/dist/src/cli.js backfill --from abc1234 --to def5678
 ```
 
 The backfill command:
 
-1. Builds and saves the current benchmark CLI
-2. Checks out each historical commit, builds its dependencies, and runs benchmarks using the saved CLI
-3. Skips commits that already have results on the `benchmark-data` branch
-4. Commits all new results to the `benchmark-data` branch
+1. Resolves the selected commit range once and skips existing results unless `--force` is set.
+2. Creates an isolated temporary worktree, leaving the caller's branch and dirty files untouched.
+3. Restores the current harness/configuration before installing and building each historical workspace's complete emitter dependencies.
+4. Reuses the job's installed C# version with peers resolved against that historical workspace.
+5. Keeps per-commit results and real build/generation logs in the printed temporary output directory. Any failed commit makes the command fail.
+6. With `--push`, publishes each successful result immediately. Without it, retains the JSON files locally without changing branches.
+
+Backfilled points use the historical commit timestamp. Publishing an older result
+does not move `latest.json` backwards, and concurrent writers regenerate history
+against the latest data branch rather than rebasing conflicting generated JSON.
+
+The `Benchmark` workflow exposes `backfill_from`, `backfill_to`, `backfill_force`,
+`iterations`, and `warmup`. Backfill runs have separate concurrency groups from
+normal main runs. For a large full-generation backfill, dispatch one SHA per run
+(`backfill_from` and `backfill_to` equal) to avoid one job hitting the execution
+time limit. Use a separate `branch` input to smoke-test publication without
+changing dashboard data. Results and logs are also uploaded as workflow artifacts.
 
 ## What gets measured
 

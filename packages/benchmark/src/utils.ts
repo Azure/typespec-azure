@@ -1,6 +1,15 @@
-import { execSync } from "node:child_process";
+import { execFileSync, execSync } from "node:child_process";
 
 export const DEFAULT_BRANCH = "benchmark-data";
+
+export function gitCommand(args: string[], cwd?: string): string {
+  return execFileSync("git", args, {
+    cwd,
+    input: "",
+    encoding: "utf8",
+    maxBuffer: 50_000_000,
+  }).trim();
+}
 
 export function git(args: string, cwd?: string): string {
   return execSync(`git ${args}`, { encoding: "utf-8", cwd }).trim();
