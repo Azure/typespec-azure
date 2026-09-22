@@ -575,21 +575,13 @@ const armResourceVersionSnapshots = new WeakMap<
 const syntheticResources = new WeakSet<ResolvedResource>();
 
 /**
- * Resolves the multi-version declaration view of ARM resources and operations.
+ * Resolves ARM resources and operations.
  *
- * This overload preserves the original resolver behavior.
+ * With no options, this returns the multi-version declaration view and preserves the original
+ * resolver behavior. When an exact API version is selected, the returned TypeSpec references are
+ * projected with `@typespec/versioning` to reflect availability, renames, and type changes in that
+ * version.
  */
-export function resolveArmResources(program: Program): Provider;
-/**
- * Resolves ARM resources and operations for an exact API version or with customized logical names.
- *
- * Selected versions are projected with `@typespec/versioning`, so returned TypeSpec references
- * reflect availability, renames, and type changes in that version.
- */
-export function resolveArmResources(
-  program: Program,
-  options: ResolveArmResourcesOptions,
-): Provider;
 export function resolveArmResources(
   program: Program,
   options: ResolveArmResourcesOptions = {},
