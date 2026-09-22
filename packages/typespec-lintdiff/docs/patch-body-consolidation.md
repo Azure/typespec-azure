@@ -69,6 +69,24 @@ Swagger output and validator-diagnostic snapshots are unchanged. Only native
 diagnostic snapshots and reviewed expectations were updated; three new fixtures
 add evidence for the intentional contract expansion.
 
+Because the registered ruleset changed, exact native-diagnostic snapshots were
+also refreshed for **76 PATCH-bearing fixtures across 19 fixture families**:
+74 replaced diagnostics from one or more retired rule IDs, and two fixtures
+gained a combined-rule diagnostic that no legacy rule had produced. A full
+574-fixture no-update run verified all 76 files byte-for-byte with the harness
+serializer and found no retired IDs in any fixture. Compared with the exact
+`0cc1c2d73f30d0d0e57d1b1a7dc64bb932040da3` snapshot baseline under identical
+inputs, the final run retained the same 574 cases, case classifications and
+coverage summary, including the same 21 known unresolved gaps. The remaining 92
+snapshot mismatches are unchanged, unrelated baseline drift; none is in the 76
+files updated by this consolidation. Eleven of the 76 required complete-file
+refreshes rather than category-only replacement: ten capture the current
+same-code operation-name diagnostic text or target, while three ambient
+diagnostics are newly present (`get-in-operation-name`,
+`tenant-level-apis-not-allowed` and `no-unnamed-types`). These are exact current
+harness output in PATCH-bearing fixtures, not added parity claims or changes to
+Swagger evidence.
+
 | Fixture / family                                             | Retained evidence                                                                                                          |
 | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
 | `PatchBodyParametersSchema/array-replacement-elements`       | Native default and missing item-property findings; required item fields accepted; validator stays silent                   |
