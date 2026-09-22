@@ -143,33 +143,25 @@ function parseArgs(args: string[]): Record<string, string> {
   return parsed;
 }
 
-function runOptions(args: Record<string, string>): RunOptions {
-  const specsDir = args["specs-dir"] ?? defaultSpecsDir;
-  const iterations = args["iterations"] !== undefined ? Number(args["iterations"]) : undefined;
-  const warmup = args["warmup"] !== undefined ? Number(args["warmup"]) : undefined;
-  const specs = args["specs"]?.split(",");
-  const commit = args["commit"];
-  const noiseCvThreshold =
-    args["noise-cv-threshold"] !== undefined ? Number(args["noise-cv-threshold"]) : undefined;
-  const maxReruns = args["max-reruns"] !== undefined ? Number(args["max-reruns"]) : undefined;
-  const rerunIterations = args["rerun-iterations"] ? Number(args["rerun-iterations"]) : undefined;
-
-  // A spec source is either a local spec directory (with main.tsp) or an
-  // external spec directory (with spec.json). `--specs-dir` selects which set
-  // to run; both kinds run uniformly and produce a single result file.
+function samplingOptions(args: Record<string, string>) {
+  const number = (key: string) => (args[key] === undefined ? undefined : Number(args[key]));
   return {
-    specsDir,
-    iterations,
-    warmup,
-    specs,
-    commit,
-    noiseCvThreshold,
-    maxReruns,
-    rerunIterations,
-    emitterIterations:
-      args["emitter-iterations"] !== undefined ? Number(args["emitter-iterations"]) : undefined,
-    emitterWarmup:
-      args["emitter-warmup"] !== undefined ? Number(args["emitter-warmup"]) : undefined,
+    iterations: number("iterations"),
+    warmup: number("warmup"),
+    emitterIterations: number("emitter-iterations"),
+    emitterWarmup: number("emitter-warmup"),
+    noiseCvThreshold: number("noise-cv-threshold"),
+    maxReruns: number("max-reruns"),
+    rerunIterations: number("rerun-iterations"),
+  };
+}
+
+function runOptions(args: Record<string, string>): RunOptions {
+  return {
+    ...samplingOptions(args),
+    specsDir: args["specs-dir"] ?? defaultSpecsDir,
+    specs: args["specs"]?.split(","),
+    commit: args["commit"],
   };
 }
 
@@ -252,14 +244,14 @@ async function compareCommand(args: Record<string, string>): Promise<void> {
   );
 }
 
-function storeResultsCommand(args: Record<string, string>): void {
+async function storeResultsCommand(args: Record<string, string>): Promise<void> {
   const resultsFile = args["results"];
   const commit = args["commit"];
   if (!resultsFile || !commit) {
     console.error("Error: --results and --commit are required for store-results command");
     process.exit(1);
   }
-  storeResults({
+  await storeResults({
     resultsFile,
     commit,
     branch: args["branch"],
@@ -269,6 +261,7 @@ function storeResultsCommand(args: Record<string, string>): void {
 
 async function backfillCommand(args: Record<string, string>): Promise<void> {
   await backfill({
+    ...samplingOptions(args),
     from: args["from"],
     to: args["to"],
     sourceBranch: args["source-branch"],
@@ -276,12 +269,6 @@ async function backfillCommand(args: Record<string, string>): Promise<void> {
     push: args["push"] === "true",
     force: args["force"] === "true",
     resultsDir: args["results-dir"],
-    iterations: args["iterations"] ? parseInt(args["iterations"], 10) : undefined,
-    warmup: args["warmup"] ? parseInt(args["warmup"], 10) : undefined,
-    emitterIterations:
-      args["emitter-iterations"] !== undefined ? Number(args["emitter-iterations"]) : undefined,
-    emitterWarmup:
-      args["emitter-warmup"] !== undefined ? Number(args["emitter-warmup"]) : undefined,
     specs: args["specs"],
     specsDir: args["specs-dir"],
   });
@@ -319,7 +306,7 @@ async function main(): Promise<void> {
       generateHistoryMain(["", "", ...process.argv.slice(3)]);
       break;
     case "store-results":
-      storeResultsCommand(args);
+      await storeResultsCommand(args);
       break;
     case "backfill":
       await backfillCommand(args);

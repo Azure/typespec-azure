@@ -1,67 +1,104 @@
-import { execFileSync, execSync } from "node:child_process";
+// cspell:ignore topo
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, rmdirSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 export const DEFAULT_BRANCH = "benchmark-data";
 
-export function gitCommand(args: string[], cwd?: string): string {
+export function gitCommand(args: string[], cwd?: string, input = ""): string {
   return execFileSync("git", args, {
     cwd,
-    input: "",
+    input,
     encoding: "utf8",
     maxBuffer: 50_000_000,
   }).trim();
 }
 
-export function git(args: string, cwd?: string): string {
-  return execSync(`git ${args}`, { encoding: "utf-8", cwd }).trim();
-}
-
-export function gitSilent(args: string, cwd?: string): boolean {
+export async function withTemporaryWorktree<T>(
+  repoRoot: string,
+  commit: string,
+  action: (dir: string) => T | Promise<T>,
+): Promise<T> {
+  const temp = mkdtempSync(join(tmpdir(), "bench-worktree-"));
+  const dir = join(temp, "worktree");
+  let added = false;
   try {
-    execSync(`git ${args}`, { cwd, stdio: "ignore" });
-    return true;
-  } catch {
-    return false;
+    gitCommand(["worktree", "add", "--detach", dir, commit], repoRoot);
+    added = true;
+    return await action(dir);
+  } finally {
+    if (added) gitCommand(["worktree", "remove", "--force", dir], repoRoot);
+    rmdirSync(temp);
   }
 }
 
-/** Run a shell command, returning stdout. Throws on failure. */
-export function exec(cmd: string, options?: { cwd?: string; quiet?: boolean }): string {
-  return execSync(cmd, {
-    encoding: "utf-8",
-    cwd: options?.cwd,
-    stdio: options?.quiet ? "ignore" : undefined,
-    maxBuffer: 50_000_000,
-  }).trim();
+export function getCommitTimestamp(commit: string, repoDir?: string): string {
+  return gitCommand(
+    ["show", "-s", "--no-show-signature", "--format=%cI", "--end-of-options", `${commit}^{commit}`],
+    repoDir,
+  );
 }
 
-/** Run a shell command, returning true on success, false on failure. */
-export function execOk(cmd: string, options?: { cwd?: string }): boolean {
-  try {
-    execSync(cmd, { cwd: options?.cwd, stdio: "ignore" });
-    return true;
-  } catch {
-    return false;
-  }
+export interface CommitMetadata {
+  timestamp: string;
+  /** Oldest-first topological order, independent of equal or skewed commit clocks. */
+  order: number;
 }
 
-/** List existing result SHAs on the benchmark-data branch. */
-export function listExistingResults(branch: string = DEFAULT_BRANCH): Set<string> {
-  const existing = new Set<string>();
-  try {
-    const fileList = git(`ls-tree --name-only origin/${branch} -- results/`);
-    for (const line of fileList.split("\n")) {
-      const trimmed = line.trim();
-      if (
-        trimmed.endsWith(".json") &&
-        !trimmed.includes("latest.json") &&
-        !trimmed.includes("history.json")
-      ) {
-        const sha = trimmed.replace("results/", "").replace(".json", "");
-        existing.add(sha);
-      }
+/** Recover source metadata for legacy results too, never substituting measurement time. */
+export function getCommitMetadata(
+  commits: string[],
+  repoDir?: string,
+): Map<string, CommitMetadata> {
+  const requested = [...new Set(commits)].sort();
+  if (requested.length === 0) return new Map();
+  for (const commit of requested) {
+    if (!/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/i.test(commit)) {
+      throw new Error(`Expected a full source commit SHA, got ${commit}`);
     }
-  } catch {
-    // Branch doesn't exist or no results directory
   }
-  return existing;
+  if (gitCommand(["rev-parse", "--is-shallow-repository"], repoDir) === "true") {
+    process.stderr.write("Fetching full source history to order benchmark commits.\n");
+    gitCommand(["fetch", "--unshallow", "--no-tags", "origin"], repoDir);
+  }
+  const input = requested.join("\n") + "\n";
+  const objects = gitCommand(
+    ["cat-file", "--batch-check=%(objectname) %(objecttype)"],
+    repoDir,
+    input,
+  ).split("\n");
+  const missing = objects
+    .filter((line) => line.endsWith(" missing"))
+    .map((line) => line.split(" ")[0]);
+  for (let i = 0; i < missing.length; i += 100) {
+    process.stderr.write("Fetching source commits referenced by published benchmark results.\n");
+    gitCommand(["fetch", "--no-tags", "origin", ...missing.slice(i, i + 100)], repoDir);
+  }
+  const log = gitCommand(
+    [
+      "log",
+      "--topo-order",
+      "--reverse",
+      "--no-show-signature",
+      "--no-decorate",
+      "--format=%H%x00%cI",
+      "--stdin",
+    ],
+    repoDir,
+    input,
+  );
+  const wanted = new Set(requested);
+  const metadata = new Map<string, CommitMetadata>();
+  for (const [order, line] of log.split("\n").entries()) {
+    const [commit, timestamp] = line.split("\0");
+    if (!wanted.has(commit)) continue;
+    if (!Number.isFinite(Date.parse(timestamp)))
+      throw new Error(`Invalid source timestamp for ${commit}`);
+    metadata.set(commit, { timestamp, order });
+  }
+  for (const commit of requested) {
+    if (!metadata.has(commit)) throw new Error(`Missing source commit metadata for ${commit}`);
+  }
+  return metadata;
 }

@@ -176,6 +176,7 @@ export function combineShards(plan: BenchmarkPlan, shards: BenchmarkShard[]): Be
   }
   const result: BenchmarkResult = {
     commit: plan.commit,
+    commitTimestamp: plan.commitTimestamp,
     timestamp: new Date().toISOString(),
     runner: shards[0].runner,
     measurementMode: "split",

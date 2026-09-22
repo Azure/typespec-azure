@@ -72,7 +72,7 @@ function withinRange(entries: HistoryEntry[], range: TimeRange): HistoryEntry[] 
   if (range === "all") return entries;
   const days = range === "30d" ? 30 : 90;
   const cutoff = Date.now() - days * DAY_MS;
-  return entries.filter((e) => new Date(e.timestamp).getTime() >= cutoff);
+  return entries.filter((e) => new Date(e.commitTimestamp ?? e.timestamp).getTime() >= cutoff);
 }
 
 /** Read the metric bag a spec selection refers to. `all` means the averaged bag. */
@@ -92,7 +92,7 @@ export function buildMetricView(data: HistoryData, spec: string, range: TimeRang
   const entries = withinRange(data.entries, range);
   const points: ChartPoint[] = entries.map((e) => ({
     commit: e.commit,
-    timestamp: e.timestamp,
+    timestamp: e.commitTimestamp ?? e.timestamp,
     measurementMode: e.measurementMode,
   }));
 
@@ -127,7 +127,7 @@ export function buildComparisonView(
   const entries = withinRange(data.entries, range);
   const points: ChartPoint[] = entries.map((e) => ({
     commit: e.commit,
-    timestamp: e.timestamp,
+    timestamp: e.commitTimestamp ?? e.timestamp,
     measurementMode: e.measurementMode,
   }));
 
@@ -177,14 +177,15 @@ const FALLBACK_BASELINE_SAMPLES = 10;
  * number of preceding runs. Only runs using the same measurement method are comparable.
  */
 export function trailingBaseline(values: (number | null)[], points: ChartPoint[]): number | null {
-  if (values.length < 2) return null;
+  const latestIndex = lastValueIndex(values);
+  if (latestIndex < 1) return null;
 
-  const latestTime = new Date(points[points.length - 1].timestamp).getTime();
-  const mode = points[points.length - 1].measurementMode;
+  const latestTime = new Date(points[latestIndex].timestamp).getTime();
+  const mode = points[latestIndex].measurementMode;
   const cutoff = latestTime - BASELINE_DAYS * DAY_MS;
 
   const windowed: number[] = [];
-  for (let i = 0; i < values.length - 1; i++) {
+  for (let i = 0; i < latestIndex; i++) {
     const value = values[i];
     if (value === null || points[i].measurementMode !== mode) continue;
     if (new Date(points[i].timestamp).getTime() >= cutoff) windowed.push(value);
@@ -192,7 +193,7 @@ export function trailingBaseline(values: (number | null)[], points: ChartPoint[]
   if (windowed.length >= MIN_BASELINE_SAMPLES) return median(windowed);
 
   const recent: number[] = [];
-  for (let i = values.length - 2; i >= 0 && recent.length < FALLBACK_BASELINE_SAMPLES; i--) {
+  for (let i = latestIndex - 1; i >= 0 && recent.length < FALLBACK_BASELINE_SAMPLES; i--) {
     const value = values[i];
     if (value !== null && points[i].measurementMode === mode) recent.push(value);
   }
@@ -201,10 +202,14 @@ export function trailingBaseline(values: (number | null)[], points: ChartPoint[]
 
 /** Last non-null value in a column. */
 export function latestValue(values: (number | null)[]): number | null {
+  return values[lastValueIndex(values)] ?? null;
+}
+
+function lastValueIndex(values: (number | null)[]): number {
   for (let i = values.length - 1; i >= 0; i--) {
-    if (values[i] !== null) return values[i];
+    if (values[i] !== null) return i;
   }
-  return null;
+  return -1;
 }
 
 /**

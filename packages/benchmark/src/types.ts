@@ -80,6 +80,8 @@ export interface BenchmarkResult {
   commit: string;
   /** ISO 8601 timestamp of when the benchmark was run. */
   timestamp: string;
+  /** Source commit's committer date, separate from measurement time. Absent in legacy results. */
+  commitTimestamp?: string;
   /** Runner environment info. */
   runner: RunnerInfo;
   /** Split runs measure compilation and each emitter in separate processes. */
@@ -112,6 +114,7 @@ export interface BenchmarkSpec {
 export interface BenchmarkPlan {
   id: string;
   commit: string;
+  commitTimestamp: string;
   specs: BenchmarkSpec[];
   workloads: Workload[];
   compiler: {

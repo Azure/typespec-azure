@@ -4,6 +4,8 @@
 export interface HistoryEntry {
   commit: string;
   timestamp: string;
+  /** Source commit date; legacy feeds may only have the measurement timestamp. */
+  commitTimestamp?: string;
   measurementMode?: "split";
   /** Metrics averaged across every spec in the run. */
   metrics: Record<string, number>;

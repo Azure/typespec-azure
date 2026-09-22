@@ -12,7 +12,7 @@ import {
   resolveExternalSpecs,
 } from "./external-specs.js";
 import type { BenchmarkPlan, BenchmarkResult, BenchmarkShard } from "./types.js";
-import { gitCommand } from "./utils.js";
+import { getCommitTimestamp, gitCommand } from "./utils.js";
 import { combineShards, createWorkloads, measureWorkload } from "./workloads.js";
 
 export interface RunOptions {
@@ -74,6 +74,7 @@ export async function createBenchmarkPlan(options: RunOptions): Promise<Benchmar
     throw new Error("Benchmark spec names must be unique.");
   }
   const iterations = count(options.iterations ?? 25, "iterations", 1);
+  const commit = options.commit ?? gitCommand(["rev-parse", "HEAD"]);
   if (
     options.noiseCvThreshold !== undefined &&
     (!Number.isFinite(options.noiseCvThreshold) || options.noiseCvThreshold < 0)
@@ -81,7 +82,8 @@ export async function createBenchmarkPlan(options: RunOptions): Promise<Benchmar
     throw new Error("noise-cv-threshold must be a nonnegative finite number.");
   return {
     id: randomUUID(),
-    commit: options.commit ?? gitCommand(["rev-parse", "HEAD"]),
+    commit,
+    commitTimestamp: getCommitTimestamp(commit, root),
     specs,
     workloads: createWorkloads(specs),
     compiler: {

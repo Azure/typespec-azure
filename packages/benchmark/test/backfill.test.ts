@@ -4,7 +4,8 @@ import { mkdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { resolveCommitRange, restoreBenchmark, withBenchmarkWorktree } from "../src/backfill.js";
+import { resolveCommitRange, restoreBenchmark } from "../src/backfill.js";
+import { withTemporaryWorktree } from "../src/utils.js";
 
 let root: string;
 function git(...args: string[]) {
@@ -54,7 +55,7 @@ it("leaves the caller's branch and dirty files untouched, including on failure",
   writeFileSync(join(root, "file"), "uncommitted");
   let worktree = "";
   await expect(
-    withBenchmarkWorktree(root, old, async (dir) => {
+    withTemporaryWorktree(root, old, async (dir) => {
       worktree = dir;
       expect(readFileSync(join(dir, "file"), "utf8")).toBe("old");
       writeFileSync(join(dir, "generated"), "output");
@@ -99,7 +100,7 @@ it("cleans up an initialized submodule without changing the caller's submodule c
   git("-c", "protocol.file.allow=always", "submodule", "add", library, "core");
   git("commit", "-qam", "submodule");
   const url = git("config", "submodule.core.url");
-  await withBenchmarkWorktree(root, git("rev-parse", "HEAD"), async (dir) => {
+  await withTemporaryWorktree(root, git("rev-parse", "HEAD"), async (dir) => {
     git("-C", dir, "-c", "protocol.file.allow=always", "submodule", "update", "--init");
     expect(readFileSync(join(dir, "core/library"), "utf8")).toBe("library");
   });

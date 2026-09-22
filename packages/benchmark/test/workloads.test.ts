@@ -27,6 +27,7 @@ function plan(): BenchmarkPlan {
   return {
     id: "plan",
     commit: "commit",
+    commitTimestamp: "2026-09-22T00:00:00Z",
     specs,
     workloads: createWorkloads(specs),
     compiler: { iterations: 3, warmup: 1, noiseCvThreshold: 0.1, maxReruns: 1, rerunIterations: 2 },

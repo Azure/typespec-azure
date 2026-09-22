@@ -4,13 +4,11 @@ import {
   closeSync,
   copyFileSync,
   cpSync,
-  existsSync,
   mkdirSync,
   mkdtempSync,
   openSync,
   readFileSync,
   rmSync,
-  rmdirSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -18,7 +16,7 @@ import { isAbsolute, join, relative, resolve } from "node:path";
 import { inspectCSharpInstallation, linkCSharpEmitter } from "./csharp.js";
 import { storeResults } from "./store-results.js";
 import type { BenchmarkResult } from "./types.js";
-import { DEFAULT_BRANCH, gitCommand } from "./utils.js";
+import { DEFAULT_BRANCH, getCommitTimestamp, gitCommand, withTemporaryWorktree } from "./utils.js";
 
 export interface BackfillOptions {
   /** Starting commit, or number of recent first-parent commits. Defaults to 100. */
@@ -36,6 +34,9 @@ export interface BackfillOptions {
   warmup?: number;
   emitterIterations?: number;
   emitterWarmup?: number;
+  noiseCvThreshold?: number;
+  maxReruns?: number;
+  rerunIterations?: number;
   specs?: string;
   specsDir?: string;
 }
@@ -71,22 +72,6 @@ export function resolveCommitRange(
     repoRoot,
   );
   return [start, ...rest.split("\n").filter(Boolean)];
-}
-
-export async function withBenchmarkWorktree<T>(
-  repoRoot: string,
-  commit: string,
-  action: (dir: string) => Promise<T>,
-): Promise<T> {
-  const temp = mkdtempSync(join(tmpdir(), "bench-backfill-worktree-"));
-  const dir = join(temp, "source");
-  gitCommand(["worktree", "add", "--detach", dir, commit], repoRoot);
-  try {
-    return await action(dir);
-  } finally {
-    gitCommand(["worktree", "remove", "--force", dir], repoRoot);
-    rmdirSync(temp);
-  }
 }
 
 /** Overlay the current harness before installing the historical workspace's dependencies. */
@@ -141,22 +126,21 @@ export async function backfill(options: BackfillOptions = {}): Promise<void> {
   const output = mkdtempSync(join(tmpdir(), "bench-backfill-results-"));
   console.log(`Results and logs: ${output}`);
   let failed = 0;
-  await withBenchmarkWorktree(repoRoot, pending[0], async (worktree) => {
-    const benchmarkDir = join(worktree, "packages/benchmark");
-    for (const [index, sha] of pending.entries()) {
-      const logFile = join(output, `${sha}.log`);
-      const log = openSync(logFile, "w");
-      const run = (command: string, args: string[]) => {
-        writeFileSync(log, `$ ${command} ${args.join(" ")}\n`);
-        execFileSync(command, args, {
-          cwd: worktree,
-          stdio: ["ignore", log, log],
-          shell: process.platform === "win32" && command === "pnpm",
-        });
-      };
-      console.log(`[${index + 1}/${pending.length}] ${sha.slice(0, 7)} (log: ${logFile})`);
-      try {
-        run("git", ["checkout", "--detach", "--force", sha]);
+  for (const [index, sha] of pending.entries()) {
+    const logFile = join(output, `${sha}.log`);
+    const log = openSync(logFile, "w");
+    console.log(`[${index + 1}/${pending.length}] ${sha.slice(0, 7)} (log: ${logFile})`);
+    try {
+      await withTemporaryWorktree(repoRoot, sha, async (worktree) => {
+        const benchmarkDir = join(worktree, "packages/benchmark");
+        const run = (command: string, args: string[]) => {
+          writeFileSync(log, `$ ${command} ${args.join(" ")}\n`);
+          execFileSync(command, args, {
+            cwd: worktree,
+            stdio: ["ignore", log, log],
+            shell: process.platform === "win32" && command === "pnpm",
+          });
+        };
         run("git", ["submodule", "update", "--init", "--recursive"]);
         restoreBenchmark(source, worktree);
         run("pnpm", ["install", "--no-frozen-lockfile"]);
@@ -164,9 +148,7 @@ export async function backfill(options: BackfillOptions = {}): Promise<void> {
 
         // Keep one published C# version across the whole backfill, but resolve its peers
         // through each historical workspace rather than the harness checkout.
-        if (!existsSync(join(benchmarkDir, ".emitters"))) {
-          cpSync(join(source, ".emitters"), join(benchmarkDir, ".emitters"), { recursive: true });
-        }
+        cpSync(join(source, ".emitters"), join(benchmarkDir, ".emitters"), { recursive: true });
         await linkCSharpEmitter(benchmarkDir);
         inspectCSharpInstallation(benchmarkDir);
 
@@ -187,14 +169,19 @@ export async function backfill(options: BackfillOptions = {}): Promise<void> {
           args.push("--emitter-iterations", String(options.emitterIterations));
         if (options.emitterWarmup !== undefined)
           args.push("--emitter-warmup", String(options.emitterWarmup));
+        if (options.noiseCvThreshold !== undefined)
+          args.push("--noise-cv-threshold", String(options.noiseCvThreshold));
+        if (options.maxReruns !== undefined) args.push("--max-reruns", String(options.maxReruns));
+        if (options.rerunIterations !== undefined)
+          args.push("--rerun-iterations", String(options.rerunIterations));
         if (options.specs) args.push("--specs", options.specs);
         run(process.execPath, args);
 
         const result = JSON.parse(readFileSync(resultFile, "utf8")) as BenchmarkResult;
-        result.timestamp = gitCommand(["show", "-s", "--format=%cI", sha], repoRoot);
+        result.commitTimestamp = getCommitTimestamp(sha, repoRoot);
         writeFileSync(resultFile, JSON.stringify(result, null, 2));
         if (options.push) {
-          storeResults({
+          await storeResults({
             resultsFile: resultFile,
             commit: sha,
             branch,
@@ -202,16 +189,16 @@ export async function backfill(options: BackfillOptions = {}): Promise<void> {
             repoDir: repoRoot,
           });
         }
-        console.log(`  ${sha.slice(0, 7)} completed.`);
-      } catch (error) {
-        failed++;
-        console.error(`  ${sha.slice(0, 7)} failed:`, error);
-        console.error(readFileSync(logFile, "utf8").slice(-12_000));
-      } finally {
-        closeSync(log);
-      }
+      });
+      console.log(`  ${sha.slice(0, 7)} completed.`);
+    } catch (error) {
+      failed++;
+      console.error(`  ${sha.slice(0, 7)} failed:`, error);
+      console.error(readFileSync(logFile, "utf8").slice(-12_000));
+    } finally {
+      closeSync(log);
     }
-  });
+  }
   if (failed > 0) {
     throw new Error(`${failed}/${pending.length} backfill commits failed. See logs in ${output}`);
   }

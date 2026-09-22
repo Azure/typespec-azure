@@ -122,11 +122,14 @@ jobs:
           WARMUP: ${{ inputs.warmup }}
           EMITTER_ITERATIONS: ${{ inputs.emitter-iterations }}
           EMITTER_WARMUP: ${{ inputs.emitter-warmup }}
+          NOISE_CV: ${{ inputs.noise-cv }}
+          RERUN_ITERATIONS: ${{ inputs.rerun-iterations }}
         run: |
           args=(--from "$BACKFILL_FROM" --specs-dir "$SPECS_DIR"
             --results-dir "$RESULTS_DIR" --branch "$DATA_BRANCH"
             --iterations "$ITERATIONS" --warmup "$WARMUP"
-            --emitter-iterations "$EMITTER_ITERATIONS" --emitter-warmup "$EMITTER_WARMUP" --push)
+            --emitter-iterations "$EMITTER_ITERATIONS" --emitter-warmup "$EMITTER_WARMUP"
+            --noise-cv-threshold "$NOISE_CV" --max-reruns 1 --rerun-iterations "$RERUN_ITERATIONS" --push)
           if [ -n "$BACKFILL_TO" ]; then args+=(--to "$BACKFILL_TO"); fi
           if [ "$BACKFILL_FORCE" = "true" ]; then args+=(--force); fi
           if [ -n "$SPECS" ]; then args+=(--specs "$SPECS"); fi
@@ -233,6 +236,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
+          fetch-depth: 0
       - uses: ./.github/actions/setup
         with:
           node-version: 24.15.0

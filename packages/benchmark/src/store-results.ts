@@ -1,19 +1,10 @@
 /* eslint-disable no-console */
 // cspell:ignore mktree
-import {
-  copyFileSync,
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmdirSync,
-  writeFileSync,
-} from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { generateHistory } from "./generate-history.js";
 import type { BenchmarkResult } from "./types.js";
-import { DEFAULT_BRANCH, gitCommand } from "./utils.js";
+import { DEFAULT_BRANCH, gitCommand, withTemporaryWorktree } from "./utils.js";
 
 export interface StoreResultsOptions {
   resultsFile: string;
@@ -32,7 +23,7 @@ const BOT_IDENTITY = [
 ];
 
 /** Store a result without rewinding latest or rebasing generated history files. */
-export function storeResults(options: StoreResultsOptions): void {
+export async function storeResults(options: StoreResultsOptions): Promise<void> {
   const { resultsFile, commit } = options;
   const branch = options.branch ?? DEFAULT_BRANCH;
   const resultsDirName = options.resultsDir ?? "results";
@@ -46,8 +37,6 @@ export function storeResults(options: StoreResultsOptions): void {
   if (result.commit !== commit || !Number.isFinite(Date.parse(result.timestamp))) {
     throw new Error(`Invalid commit or timestamp in ${resultsFile}`);
   }
-  const temp = mkdtempSync(join(tmpdir(), "bench-data-"));
-  const worktree = join(temp, "data");
   const remoteRef = `refs/remotes/origin/${branch}`;
   const fetchBranch = () => git(["fetch", "origin", `+refs/heads/${branch}:${remoteRef}`]);
   let ref: string;
@@ -57,27 +46,25 @@ export function storeResults(options: StoreResultsOptions): void {
   } else {
     ref = git([...BOT_IDENTITY, "commit-tree", git(["mktree"]), "-m", "Initialize benchmark data"]);
   }
-  git(["worktree", "add", "--detach", worktree, ref]);
-  try {
+  await withTemporaryWorktree(repo, ref, async (worktree) => {
     for (let attempt = 1; attempt <= 5; attempt++) {
       const resultsDir = join(worktree, resultsDirName);
       mkdirSync(resultsDir, { recursive: true });
-      copyFileSync(resultsFile, join(resultsDir, `${commit}.json`));
-      const latestFile = join(resultsDir, "latest.json");
-      const latest: BenchmarkResult | undefined = existsSync(latestFile)
-        ? JSON.parse(readFileSync(latestFile, "utf8"))
-        : undefined;
-      if (
-        !latest ||
-        latest.commit === commit ||
-        Date.parse(result.timestamp) >= Date.parse(latest.timestamp)
-      ) {
-        copyFileSync(resultsFile, latestFile);
-      }
-      writeFileSync(
-        join(resultsDir, "history.json"),
-        JSON.stringify(generateHistory({ dir: resultsDir }), null, 2),
+      const storedFile = join(resultsDir, `${commit}.json`);
+      writeFileSync(storedFile, JSON.stringify(result, null, 2));
+      const history = generateHistory({ dir: resultsDir, repoDir: repo });
+      const stored = history.entries.find((entry) => entry.commit === commit);
+      if (!stored) throw new Error(`Result for ${commit} could not be included in history.`);
+      result.commitTimestamp = stored.commitTimestamp;
+      writeFileSync(storedFile, JSON.stringify(result, null, 2));
+
+      const latest = history.entries[history.entries.length - 1];
+      const latestResult: BenchmarkResult = JSON.parse(
+        readFileSync(join(resultsDir, `${latest.commit}.json`), "utf8"),
       );
+      latestResult.commitTimestamp = latest.commitTimestamp;
+      writeFileSync(join(resultsDir, "latest.json"), JSON.stringify(latestResult, null, 2));
+      writeFileSync(join(resultsDir, "history.json"), JSON.stringify(history, null, 2));
       git(["add", "--", `${resultsDirName}/`], worktree);
       git(
         [...BOT_IDENTITY, "commit", "-m", `Benchmark results (${resultsDirName}) for ${commit}`],
@@ -101,8 +88,5 @@ export function storeResults(options: StoreResultsOptions): void {
         git(["checkout", "--detach", "--force", remoteRef], worktree);
       }
     }
-  } finally {
-    git(["worktree", "remove", "--force", worktree]);
-    rmdirSync(temp);
-  }
+  });
 }

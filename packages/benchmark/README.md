@@ -42,6 +42,10 @@ node packages/benchmark/dist/src/cli.js run \
 
 ### Compare results
 
+Comparisons require the same measurement method. The CLI rejects legacy combined
+results versus split results instead of reporting methodological differences as
+performance improvements or regressions.
+
 ```bash
 # Console summary
 node packages/benchmark/dist/src/cli.js compare \
@@ -159,6 +163,13 @@ Results are stored on the `benchmark-data` orphan branch:
 - `results/latest.json` — latest main baseline
 - `results/history.json` — aggregated history for the website
 
+`timestamp` records measurement completion; `commitTimestamp` records the source
+commit's committer date. `latest.json` and history use the same Git topological
+commit order, so late measurements, equal commit dates, or clock skew cannot move
+the baseline backwards. Charts use commit dates rather than measurement dates.
+Publication recovers metadata from Git for legacy results without rewriting their
+original timestamp values, fetching missing source history when necessary.
+
 ### Backfill historical data
 
 Build the current harness and install C# as shown above, then fetch the source
@@ -171,7 +182,8 @@ node packages/benchmark/dist/src/cli.js backfill
 
 # Replace the last 10 results with the current emitter matrix, matching CI sampling
 NODE_OPTIONS=--max-old-space-size=12288 node packages/benchmark/dist/src/cli.js backfill \
-  --from 10 --force --iterations 25 --warmup 3 --push
+  --from 10 --force --iterations 25 --warmup 3 \
+  --noise-cv-threshold 0.08 --max-reruns 1 --rerun-iterations 10 --push
 
 # Backfill from a specific commit to the source branch tip
 node packages/benchmark/dist/src/cli.js backfill --from abc1234
@@ -183,13 +195,15 @@ node packages/benchmark/dist/src/cli.js backfill --from abc1234 --to def5678
 The backfill command:
 
 1. Resolves the selected commit range once and skips existing results unless `--force` is set.
-2. Creates an isolated temporary worktree, leaving the caller's branch and dirty files untouched.
+2. Creates a fresh temporary worktree for each commit, leaving the caller's branch and dirty files untouched and preventing stale generated files from contaminating another commit.
 3. Restores the current harness/configuration before installing and building each historical workspace's complete emitter dependencies.
 4. Reuses the job's installed C# version with peers resolved against that historical workspace.
 5. Keeps per-commit results and real build/generation logs in the printed temporary output directory. Any failed commit makes the command fail.
 6. With `--push`, publishes each successful result immediately. Without it, retains the JSON files locally without changing branches.
 
-Backfilled points use the historical commit timestamp. Publishing an older result
+Backfilled points retain both measurement time and historical commit time. Compiler
+noise settings are forwarded exactly, including explicit zeros; CI uses the same
+configured noise gate as normal runs. Publishing an older result
 does not move `latest.json` backwards, and concurrent writers regenerate history
 against the latest data branch rather than rebasing conflicting generated JSON.
 
@@ -228,6 +242,8 @@ measurement as a methodology change when comparing against old results.
 Existing history remains readable and is not rewritten automatically.
 Dashboard baseline comparisons only use runs with the same measurement method,
 so this transition is not presented as a compiler or emitter performance regression.
+When a metric is absent from the last run, its comparison window and method are
+anchored to the last non-null sample that actually supplies its displayed value.
 
 ## Benchmark specs
 
