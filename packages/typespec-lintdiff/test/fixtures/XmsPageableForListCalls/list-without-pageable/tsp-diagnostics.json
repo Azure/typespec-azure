@@ -5,11 +5,6 @@
     "message": "Use the latest ARM common-types version 'v6' instead of 'v3'."
   },
   {
-    "code": "tsp-lintdiff-local-linter/unsupported-patch-properties",
-    "severity": "warning",
-    "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
-  },
-  {
     "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
     "severity": "warning",
     "message": "All operations must be inside an interface declaration."

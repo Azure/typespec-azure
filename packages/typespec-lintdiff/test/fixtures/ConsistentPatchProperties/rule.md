@@ -2,7 +2,7 @@
 validatorRuleId: ConsistentPatchProperties
 engine: spectral
 tspLints:
-  - tsp-lintdiff-local-linter/consistent-patch-properties
+  - tsp-lintdiff-local-linter/no-unsafe-patch-body-properties
 coverageKind: partial
 officialTspLints:
   - "@azure-tools/typespec-azure-resource-manager/arm-resource-patch"
@@ -13,6 +13,19 @@ officialTspLints:
 **Severity:** error
 
 **Applies to:** Resource Manager (ARM)
+
+## Consolidated native contract
+
+This legacy rule maps to the shared
+[`no-unsafe-patch-body-properties`](../../../src/rules/no-unsafe-patch-body-properties.md)
+implementation. The linked contract supersedes the historical description below:
+only effective PATCH input and authored discriminators participate; explicit resource
+association precedes response fallback; arrays compare replacement-element layouts.
+Comparison snapshots include all combined categories, not just missing-property findings.
+The historical synthesized-discriminator expectations are intentionally superseded,
+not evidence that native TypeSpec should reproduce emitter-created properties.
+
+## Historical subset-rule evidence
 
 **Rule engine:** Spectral
 

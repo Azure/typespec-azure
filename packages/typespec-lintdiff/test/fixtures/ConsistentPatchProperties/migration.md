@@ -1,5 +1,16 @@
 # ConsistentPatchProperties migration evidence
 
+## Current consolidated contract
+
+The September 22 consolidation supersedes the standalone implementation and
+conclusions below. See [consolidated migration evidence](../../../docs/patch-body-consolidation.md)
+and [the combined rule contract](../../../src/rules/no-unsafe-patch-body-properties.md).
+In particular, comparison now uses native authored discriminators, explicit
+resource association, and corresponding array items. The historical counts and
+synthetic-discriminator behavior below are not the current combined contract.
+
+## Historical standalone evidence
+
 ## Result and gap summary
 
 The final September 11 full production run has **151 Swagger diagnostics in 27
