@@ -1,0 +1,59 @@
+name: Benchmark worktree check
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.x
+      - name: Reproduce worktree cleanup
+        shell: bash
+        run: |
+          node --input-type=module - <<'JS'
+          import { execFileSync } from "node:child_process";
+          import { mkdtempSync, mkdirSync, writeFileSync, symlinkSync, existsSync, readdirSync, lstatSync } from "node:fs";
+          import { tmpdir } from "node:os";
+          import { join, dirname } from "node:path";
+          import { withTemporaryWorktree } from "./packages/benchmark/src/utils.ts";
+          const root = mkdtempSync(join(tmpdir(), "benchmark-worktree-repro-"));
+          const git = (...args) => execFileSync("git", args, { cwd: root, encoding: "utf8" }).trim();
+          git("init", "-q", "-b", "main");
+          git("config", "user.name", "Test");
+          git("config", "user.email", "test@example.com");
+          writeFileSync(join(root, "source"), "source");
+          git("add", "source");
+          git("commit", "-qm", "source");
+          let worktree;
+          try {
+            await withTemporaryWorktree(root, "HEAD", async (dir) => {
+              worktree = dir;
+              const target = join(dir, "packages/benchmark/.emitters/node_modules/@azure-typespec/http-client-csharp");
+              const link = join(dir, "packages/benchmark/node_modules/@azure-typespec/http-client-csharp");
+              mkdirSync(target, { recursive: true });
+              writeFileSync(join(target, "package.json"), "{}");
+              mkdirSync(dirname(link), { recursive: true });
+              symlinkSync(target, link, "junction");
+              writeFileSync(join(dir, "untracked"), "generated");
+              console.log("worktree", dir, "contents", readdirSync(dirname(dir)));
+            });
+          } catch (error) {
+            console.error(error);
+            const temp = dirname(worktree);
+            const inspect = (dir) => {
+              if (!existsSync(dir)) return;
+              for (const name of readdirSync(dir)) {
+                const file = join(dir, name);
+                const stat = lstatSync(file);
+                console.log("remaining", file, { directory: stat.isDirectory(), symlink: stat.isSymbolicLink() });
+                if (stat.isDirectory() && !stat.isSymbolicLink()) inspect(file);
+              }
+            };
+            inspect(temp);
+            process.exitCode = 1;
+          }
+          JS
