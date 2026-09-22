@@ -325,6 +325,8 @@ The paging method's return type is an array type of the page items type. It is i
 
 The LRO method's return type is `lroMetadata.finalResponse.result`, or absent when there is no final response. For native LROs, TCGC selects this client result from Azure.Core's `getLroProtocolMetadata` facts, then translates the selected types into the SDK type graph. The same TCGC selection supplies native LRO model usage, access, and naming.
 
+`LroProtocolMetadata` keeps `operation` at the top level and groups facts into required `initial`, `polling`, and `completion` objects. `initial` contains `initialResponse`, `resourceOperation?`, and `isAction`; `polling` contains `statusMonitorStep?`, `pollingInfo`, and `statusMonitorResult?`; `completion` contains `finalStateVia`, `finalStep?`, and `originalUriHasGetOperation?`. This grouping preserves every leaf's type and semantics; the combined `LroMetadata` and raw compatibility projections remain flat.
+
 Azure.Core remains responsible for polling links, parameter bindings, terminal states, `finalStateVia`, and required final HTTP requests. Client-result selection must not replace or discard a `finalOperationLink` or `finalOperationReference`. The `finalStep` union also retains success-property and no-result variants.
 
 `lroMetadata.finalResponse.envelopeResult` is the intact response type and `resultSegments` describes extraction of the client result. Existing LRO-only extraction uses a single result property; nested paging paths belong to the paging metadata and remain separate when an operation combines LRO and paging.

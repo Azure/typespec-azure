@@ -236,41 +236,50 @@ export interface PollingSuccessNoResult extends LogicalOperationStep {
 
 /**
  * Protocol and declaration facts for a long-running operation, before selecting
- * a client-facing result. Required final requests remain part of `finalStep`.
+ * a client-facing result. Required final requests remain part of `completion.finalStep`.
  */
 export interface LroProtocolMetadata {
   /** The operation that was processed. */
   operation: Operation;
-  /** The successful initial response model, before client projection. */
-  initialResponse: Model;
-  /** REST resource metadata, including inferred DELETE resource metadata. */
-  resourceOperation?: ResourceOperation;
-  /** Whether the operation has REST action metadata. */
-  isAction: boolean;
-  /** The protocol strategy, including any explicit final-state override. */
-  finalStateVia: FinalStateValue;
-  /** How to reach the status monitor. */
-  statusMonitorStep?: NextOperationLink | NextOperationReference;
-  /** The polling response and its status, result, and error declarations. */
-  pollingInfo: PollingOperationStep;
-  /**
-   * A required final request, a declared polling success property, or an explicit
-   * absence of polling results. This is not a client result projection.
-   */
-  finalStep?: FinalOperationStep;
-  /**
-   * Success information from a fallback status monitor. Absent means no usable
-   * monitor was found; a void type means the monitor has no success value.
-   */
-  statusMonitorResult?: {
-    type: Model | Scalar | UnknownType | VoidType;
-    property?: ModelProperty;
+  /** Initial response and operation classification. */
+  initial: {
+    /** The successful initial response model, before client projection. */
+    initialResponse: Model;
+    /** REST resource metadata, including inferred DELETE resource metadata. */
+    resourceOperation?: ResourceOperation;
+    /** Whether the operation has REST action metadata. */
+    isAction: boolean;
   };
-  /**
-   * Whether a GET exists when original-uri was explicitly requested.
-   * Undefined means this validation was not applicable.
-   */
-  originalUriHasGetOperation?: boolean;
+  /** Status-monitor access and polling declarations. */
+  polling: {
+    /** How to reach the status monitor. */
+    statusMonitorStep?: NextOperationLink | NextOperationReference;
+    /** The polling response and its status, result, and error declarations. */
+    pollingInfo: PollingOperationStep;
+    /**
+     * Success information from a fallback status monitor. Absent means no usable
+     * monitor was found; a void type means the monitor has no success value.
+     */
+    statusMonitorResult?: {
+      type: Model | Scalar | UnknownType | VoidType;
+      property?: ModelProperty;
+    };
+  };
+  /** Completion strategy and final-step declarations. */
+  completion: {
+    /** The protocol strategy, including any explicit final-state override. */
+    finalStateVia: FinalStateValue;
+    /**
+     * A required final request, a declared polling success property, or an explicit
+     * absence of polling results. This is not a client result projection.
+     */
+    finalStep?: FinalOperationStep;
+    /**
+     * Whether a GET exists when original-uri was explicitly requested.
+     * Undefined means this validation was not applicable.
+     */
+    originalUriHasGetOperation?: boolean;
+  };
 }
 
 /**
@@ -381,7 +390,7 @@ interface LroContext {
   statusMonitorStep?: nextOperationStep;
   statusMonitorInfo?: StatusMonitorMetadata;
   pollingStep?: PollingOperationStep;
-  statusMonitorResult?: LroProtocolMetadata["statusMonitorResult"];
+  statusMonitorResult?: LroProtocolMetadata["polling"]["statusMonitorResult"];
 }
 
 /** Contains all relevant data about a StatusMonitor, including
@@ -482,25 +491,33 @@ function createLroProtocolMetadata(
 
   return {
     operation,
-    initialResponse: context.originalModel,
-    resourceOperation,
-    isAction,
-    finalStateVia: finalState,
-    statusMonitorStep: context.statusMonitorStep,
-    pollingInfo: context.pollingStep,
-    finalStep: context.finalStep,
-    statusMonitorResult: context.statusMonitorResult,
-    originalUriHasGetOperation,
+    initial: {
+      initialResponse: context.originalModel,
+      resourceOperation,
+      isAction,
+    },
+    polling: {
+      statusMonitorStep: context.statusMonitorStep,
+      pollingInfo: context.pollingStep,
+      statusMonitorResult: context.statusMonitorResult,
+    },
+    completion: {
+      finalStateVia: finalState,
+      finalStep: context.finalStep,
+      originalUriHasGetOperation,
+    },
   };
 }
 
 /** Compatibility result policy for callers of the combined Core API. */
 function resolveLegacyLroMetadata(protocol: LroProtocolMetadata): LroMetadata {
-  const { finalStep, pollingInfo, resourceOperation } = protocol;
+  const { finalStep, originalUriHasGetOperation } = protocol.completion;
+  const { pollingInfo, statusMonitorResult } = protocol.polling;
+  const { initialResponse, resourceOperation, isAction } = protocol.initial;
   let model: Model | Scalar | UnknownType | VoidType | "void" =
-    protocol.isAction || resourceOperation?.operation === "delete"
+    isAction || resourceOperation?.operation === "delete"
       ? pollingInfo.responseModel
-      : protocol.initialResponse;
+      : initialResponse;
   if (
     finalStep &&
     finalStep.kind !== "noPollingResult" &&
@@ -510,10 +527,10 @@ function resolveLegacyLroMetadata(protocol: LroProtocolMetadata): LroMetadata {
     model = finalStep.responseModel;
   } else if (resourceOperation?.operation === "createOrReplace") {
     model = resourceOperation.resourceType;
-  } else if (protocol.statusMonitorResult) {
-    model = protocol.statusMonitorResult.type;
+  } else if (statusMonitorResult) {
+    model = statusMonitorResult.type;
   }
-  if (protocol.originalUriHasGetOperation === false) model = "void";
+  if (originalUriHasGetOperation === false) model = "void";
 
   const logicalPathName =
     finalStep?.kind === "pollingSuccessProperty" ? finalStep.target.name : undefined;
@@ -530,8 +547,8 @@ function resolveLegacyLroMetadata(protocol: LroProtocolMetadata): LroMetadata {
   return {
     operation: protocol.operation,
     logicalResult: model !== "void" && model.kind === "Model" ? model : pollingInfo.responseModel,
-    finalStateVia: protocol.finalStateVia,
-    statusMonitorStep: protocol.statusMonitorStep,
+    finalStateVia: protocol.completion.finalStateVia,
+    statusMonitorStep: protocol.polling.statusMonitorStep,
     pollingInfo,
     finalStep,
     envelopeResult: pollingInfo.responseModel,

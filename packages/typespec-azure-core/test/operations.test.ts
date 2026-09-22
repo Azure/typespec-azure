@@ -250,10 +250,10 @@ async function compileLroOperation(
   if (lro) {
     ok(protocol);
     strictEqual(protocol.operation, lro.operation);
-    strictEqual(protocol.finalStateVia, lro.finalStateVia);
-    deepStrictEqual(protocol.statusMonitorStep, lro.statusMonitorStep);
-    deepStrictEqual(protocol.pollingInfo, lro.pollingInfo);
-    deepStrictEqual(protocol.finalStep, lro.finalStep);
+    strictEqual(protocol.completion.finalStateVia, lro.finalStateVia);
+    deepStrictEqual(protocol.polling.statusMonitorStep, lro.statusMonitorStep);
+    deepStrictEqual(protocol.polling.pollingInfo, lro.pollingInfo);
+    deepStrictEqual(protocol.completion.finalStep, lro.finalStep);
     strictEqual("finalResult" in protocol, false);
     strictEqual("finalEnvelopeResult" in protocol, false);
     strictEqual("finalResultPath" in protocol, false);

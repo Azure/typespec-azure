@@ -25,10 +25,10 @@ it("retains required final requests and polling parameter bindings as protocol f
   const protocol = getLroProtocolMetadata(runner.program, operation);
   ok(protocol);
   strictEqual(protocol.operation, operation);
-  strictEqual(protocol.finalStateVia, "original-uri");
-  strictEqual(protocol.originalUriHasGetOperation, undefined);
-  strictEqual(protocol.finalStep?.kind, "finalOperationReference");
-  const finalTarget = protocol.finalStep.target;
+  strictEqual(protocol.completion.finalStateVia, "original-uri");
+  strictEqual(protocol.completion.originalUriHasGetOperation, undefined);
+  strictEqual(protocol.completion.finalStep?.kind, "finalOperationReference");
+  const finalTarget = protocol.completion.finalStep.target;
   strictEqual(
     finalTarget.operation,
     operations.find((o) => o.operation.name === "read")!.operation,
@@ -38,28 +38,35 @@ it("retains required final requests and polling parameter bindings as protocol f
   strictEqual(finalParameter.source, operation.parameters.properties.get("id"));
   strictEqual(finalParameter.target, finalTarget.operation.parameters.properties.get("id"));
   strictEqual(finalParameter.sourceKind, "RequestParameter");
-  strictEqual(protocol.statusMonitorStep?.kind, "nextOperationReference");
-  const pollingParameter = protocol.statusMonitorStep.target.parameters?.get("operationId");
+  strictEqual(protocol.polling.statusMonitorStep?.kind, "nextOperationReference");
+  const pollingParameter = protocol.polling.statusMonitorStep.target.parameters?.get("operationId");
   ok(pollingParameter);
-  strictEqual(pollingParameter.source, protocol.initialResponse.properties.get("operationId"));
-  strictEqual(pollingParameter.sourceKind, "ResponseBody");
-  strictEqual(protocol.pollingInfo.terminationStatus.kind, "model-property");
   strictEqual(
-    protocol.pollingInfo.terminationStatus.property,
-    protocol.pollingInfo.responseModel.properties.get("status"),
+    pollingParameter.source,
+    protocol.initial.initialResponse.properties.get("operationId"),
   );
-  deepStrictEqual(protocol.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
-  deepStrictEqual(Object.keys(protocol).sort(), [
-    "finalStateVia",
-    "finalStep",
+  strictEqual(pollingParameter.sourceKind, "ResponseBody");
+  strictEqual(protocol.polling.pollingInfo.terminationStatus.kind, "model-property");
+  strictEqual(
+    protocol.polling.pollingInfo.terminationStatus.property,
+    protocol.polling.pollingInfo.responseModel.properties.get("status"),
+  );
+  deepStrictEqual(protocol.polling.pollingInfo.terminationStatus.succeededState, ["Succeeded"]);
+  deepStrictEqual(Object.keys(protocol).sort(), ["completion", "initial", "operation", "polling"]);
+  deepStrictEqual(Object.keys(protocol.initial).sort(), [
     "initialResponse",
     "isAction",
-    "operation",
-    "originalUriHasGetOperation",
-    "pollingInfo",
     "resourceOperation",
+  ]);
+  deepStrictEqual(Object.keys(protocol.polling).sort(), [
+    "pollingInfo",
     "statusMonitorResult",
     "statusMonitorStep",
+  ]);
+  deepStrictEqual(Object.keys(protocol.completion).sort(), [
+    "finalStateVia",
+    "finalStep",
+    "originalUriHasGetOperation",
   ]);
   expectDiagnosticEmpty(runner.program.diagnostics);
 });
@@ -78,9 +85,9 @@ it.each([false, true])("reports explicit original-uri GET availability: %s", asy
   const operation = operations.find((o) => o.operation.name === "start")!.operation;
   const protocol = getLroProtocolMetadata(runner.program, operation);
   ok(protocol);
-  strictEqual(protocol.originalUriHasGetOperation, hasGet);
-  strictEqual(protocol.finalStateVia, "original-uri");
-  strictEqual(protocol.finalStep?.kind, "noPollingResult");
+  strictEqual(protocol.completion.originalUriHasGetOperation, hasGet);
+  strictEqual(protocol.completion.finalStateVia, "original-uri");
+  strictEqual(protocol.completion.finalStep?.kind, "noPollingResult");
   if (hasGet) {
     expectDiagnosticEmpty(runner.program.diagnostics);
   } else {

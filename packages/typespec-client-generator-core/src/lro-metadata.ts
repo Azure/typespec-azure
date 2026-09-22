@@ -28,11 +28,13 @@ type LroClientResult = Pick<
  * Core keeps a separate compatibility policy for its combined metadata API.
  */
 export function resolveLroClientResult(protocol: LroProtocolMetadata): LroClientResult {
-  const { finalStep, pollingInfo, resourceOperation } = protocol;
+  const { finalStep, originalUriHasGetOperation } = protocol.completion;
+  const { pollingInfo, statusMonitorResult } = protocol.polling;
+  const { initialResponse, resourceOperation, isAction } = protocol.initial;
   let model: Model | Scalar | UnknownType | VoidType | "void" =
-    protocol.isAction || resourceOperation?.operation === "delete"
+    isAction || resourceOperation?.operation === "delete"
       ? pollingInfo.responseModel
-      : protocol.initialResponse;
+      : initialResponse;
 
   if (
     finalStep &&
@@ -43,10 +45,10 @@ export function resolveLroClientResult(protocol: LroProtocolMetadata): LroClient
     model = finalStep.responseModel;
   } else if (resourceOperation?.operation === "createOrReplace") {
     model = resourceOperation.resourceType;
-  } else if (protocol.statusMonitorResult) {
-    model = protocol.statusMonitorResult.type;
+  } else if (statusMonitorResult) {
+    model = statusMonitorResult.type;
   }
-  if (protocol.originalUriHasGetOperation === false) model = "void";
+  if (originalUriHasGetOperation === false) model = "void";
 
   let finalResult: Model | Scalar | UnknownType | "void" =
     model === "void" || isVoidType(model) ? "void" : model;
@@ -77,10 +79,10 @@ export function getNativeLroMetadata(
   if (!protocol) return undefined;
   return {
     operation: protocol.operation,
-    finalStateVia: protocol.finalStateVia,
-    statusMonitorStep: protocol.statusMonitorStep,
-    pollingInfo: protocol.pollingInfo,
-    finalStep: protocol.finalStep,
+    finalStateVia: protocol.completion.finalStateVia,
+    statusMonitorStep: protocol.polling.statusMonitorStep,
+    pollingInfo: protocol.polling.pollingInfo,
+    finalStep: protocol.completion.finalStep,
     ...resolveLroClientResult(protocol),
   };
 }

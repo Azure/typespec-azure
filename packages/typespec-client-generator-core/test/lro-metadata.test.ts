@@ -59,9 +59,17 @@ it.each([
   const operation = services[0].operations.find((o) => o.operation.name === "start")!.operation;
   const protocol = getLroProtocolMetadata(program, operation);
   ok(protocol);
-  const before = { ...protocol };
+  const before = {
+    ...protocol,
+    initial: { ...protocol.initial },
+    polling: { ...protocol.polling },
+    completion: { ...protocol.completion },
+  };
   Object.freeze(protocol);
-  if (protocol.finalStep) Object.freeze(protocol.finalStep);
+  Object.freeze(protocol.initial);
+  Object.freeze(protocol.polling);
+  Object.freeze(protocol.completion);
+  if (protocol.completion.finalStep) Object.freeze(protocol.completion.finalStep);
   const selected = resolveLroClientResult(protocol);
   const native = getNativeLroMetadata(program, operation);
   const legacy = getLroMetadata(program, operation);
