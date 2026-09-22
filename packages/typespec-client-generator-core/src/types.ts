@@ -1,4 +1,4 @@
-import { type UnionEnum, getLroMetadata, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
+import { type UnionEnum, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   type BooleanLiteral,
   type Diagnostic,
@@ -116,6 +116,7 @@ import {
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getNativeLroMetadata } from "./lro-metadata.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -1933,7 +1934,7 @@ function updateTypesFromOperation(
     }
     popNamingContext(context);
 
-    const lroMetaData = getLroMetadata(program, operation);
+    const lroMetaData = getNativeLroMetadata(program, operation);
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         // Process headers BEFORE body so header types get cached with header naming context first.

@@ -17,6 +17,22 @@ The `@azure-tools/typespec-azure-core` library contains specific operation templ
 
 ## Long-running Operation Helpers for Emitters and Libraries
 
+### Protocol analysis and client results
+
+`getLroProtocolMetadata(program, operation)` returns `LroProtocolMetadata`, or `undefined` when usable LRO information is unavailable. This additive API describes the initial response, REST resource/action classification, polling links and parameter bindings, status-monitor declarations, terminal states, and completion strategy. It does not select a client-facing result model, envelope, or extraction path.
+
+Core owns `finalStateVia` and `finalStep`. In particular, a final operation link or reference describes an additional HTTP request needed to obtain the result; choosing a client result must not remove that request. The existing `finalStep` union also represents a declared polling success property or the absence of a polling result. It is not exclusively an HTTP-request field.
+
+`statusMonitorResult` records success information when completion falls back to a status monitor. An absent value means no usable fallback monitor information was found, while a void type means that monitor has no success value. `originalUriHasGetOperation` records GET availability only when `original-uri` was explicitly requested. Core continues to report the existing diagnostic when that GET is missing.
+
+TCGC consumes these protocol facts and owns selection of the client result and envelope, SDK type translation, and the method's result segments. Client emitters should use TCGC's `lroMetadata.finalResponse` and method response rather than independently reconstructing the client result.
+
+### Combined metadata compatibility
+
+`getLroMetadata(program, operation)` remains available with its existing `LroMetadata` contract. It uses the same protocol analysis and a compatibility result resolver for existing emitters and libraries. No migration is required for existing callers.
+
+The separation preserves current result defaults, raw TypeSpec object identities, and result/envelope/path combinations. It does not correct inconsistent combinations or introduce new result-selection decorators. In particular, resource PUT result selection and a declared polling result property can describe different types; this refactor does not change that behavior.
+
 The Azure.Core library provides a helper that emitters can use to determine if an operation being processed is an LRO, and to provide details about how the LRO should be processed by clients, or about how operations are linked.
 
 ```typespec
