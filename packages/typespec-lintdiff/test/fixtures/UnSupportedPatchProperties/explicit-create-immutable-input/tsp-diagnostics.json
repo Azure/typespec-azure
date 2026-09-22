@@ -22,26 +22,6 @@
   {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
-    "message": "The Model named 'PatchBody' should have a documentation or description, use doc comment /** */ to provide it."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/documentation-required",
-    "severity": "warning",
-    "message": "The ModelProperty named 'id' should have a documentation or description, use doc comment /** */ to provide it."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/documentation-required",
-    "severity": "warning",
-    "message": "The ModelProperty named 'createdBy' should have a documentation or description, use doc comment /** */ to provide it."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/documentation-required",
-    "severity": "warning",
-    "message": "The ModelProperty named 'name' should have a documentation or description, use doc comment /** */ to provide it."
-  },
-  {
-    "code": "@azure-tools/typespec-azure-core/documentation-required",
-    "severity": "warning",
     "message": "The Operation named 'update' should have a documentation or description, use doc comment /** */ to provide it."
   },
   {
@@ -60,13 +40,28 @@
     "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
   },
   {
+    "code": "tsp-lintdiff-local-linter/avoid-anonymous-parameter",
+    "severity": "warning",
+    "message": "Operation request body should use a named model instead of an anonymous inline model expression."
+  },
+  {
     "code": "tsp-lintdiff-local-linter/no-unsafe-patch-body-properties",
     "severity": "warning",
-    "message": "PATCH request body property 'createdBy' must include Lifecycle.Update visibility."
+    "message": "PATCH request body property 'location' is immutable and must be excluded from PATCH input."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/no-unsafe-patch-body-properties",
+    "severity": "warning",
+    "message": "PATCH request body property 'location' must include Lifecycle.Update visibility."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/no-unnamed-types",
+    "severity": "warning",
+    "message": "Anonymous model should be defined as a named model declaration."
   }
 ]

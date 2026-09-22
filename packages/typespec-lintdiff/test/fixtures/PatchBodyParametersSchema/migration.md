@@ -1,5 +1,16 @@
 # PatchBodyParametersSchema migration evidence
 
+## Current consolidated contract
+
+The September 22 consolidation supersedes the standalone implementation and
+conclusions below. See [consolidated migration evidence](../../../docs/patch-body-consolidation.md)
+and [the combined rule contract](../../../src/rules/no-unsafe-patch-body-properties.md).
+This legacy ID now maps to `no-unsafe-patch-body-properties` together with
+`ConsistentPatchProperties` and `UnSupportedPatchProperties`. The historical
+counts below are not results for the combined diagnostic population.
+
+## Historical standalone evidence
+
 ## Result and gap summary
 
 The September 18 full corpus completed: 462/468 projects compile, with **703 Swagger
