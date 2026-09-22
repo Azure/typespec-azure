@@ -27,6 +27,18 @@ on:
         description: "Warmup iterations per spec"
         type: number
         default: 3
+      specs:
+        description: "Optional comma-separated spec filter"
+        type: string
+        default: ""
+      emitter_iterations:
+        description: "Full-generation measurements per emitter/spec"
+        type: number
+        default: 3
+      emitter_warmup:
+        description: "Full-generation warmups per emitter/spec"
+        type: number
+        default: 1
       branch:
         description: "Data branch to store results (default: benchmark-data)"
         required: false
@@ -53,6 +65,9 @@ jobs:
       results-dir: results
       iterations: ${{ fromJSON(format('{0}', github.event_name == 'push' && 25 || inputs.iterations)) }}
       warmup: ${{ fromJSON(format('{0}', github.event_name == 'push' && 3 || inputs.warmup)) }}
+      emitter-iterations: ${{ fromJSON(format('{0}', github.event_name == 'push' && 3 || inputs.emitter_iterations)) }}
+      emitter-warmup: ${{ fromJSON(format('{0}', github.event_name == 'push' && 1 || inputs.emitter_warmup)) }}
+      specs: ${{ inputs.specs || '' }}
       noise-cv: 0.08
       rerun-iterations: 10
       runner: ${{ github.event_name == 'workflow_dispatch' && inputs.runner || vars.BENCHMARK_RUNNER || 'ubuntu-latest' }}

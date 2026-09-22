@@ -4,11 +4,11 @@ Performance benchmarking tool for TypeSpec Azure compilation. Tracks compilation
 
 ## How it works
 
-1. **Benchmark runner** compiles dedicated TypeSpec specs using the compiler's programmatic API
+1. **Benchmark runner** measures compilation and each emitter independently using the compiler's programmatic API
 2. The compiler provides built-in `Stats` data including per-stage timing and per-linter-rule breakdown
 3. Runtime metrics are aggregated with an outlier-resistant estimator (trimmed mean for 5+ samples, median for smaller sample sizes)
 4. Per-spec variability (standard deviation and coefficient of variation) is captured from raw iterations
-5. Optional noise-gating can auto-run extra iterations when variance is high
+5. Optional noise-gating retries compilation only; it never regenerates SDKs
 6. PR baseline can be built from a rolling window of recent `main` results instead of only `latest.json`
 7. Results are stored as JSON — on CI, they're saved to the `benchmark-data` branch
 8. PR comments show a comparison table highlighting performance changes
@@ -24,13 +24,15 @@ pnpm -r --filter "@azure-tools/typespec-benchmark..." build
 # Install the Azure C# emitter from npm for this benchmark job/session
 node packages/benchmark/scripts/setup-csharp.ts
 
-# Run all benchmark specs (5 iterations + 1 warmup by default)
+# Compiler: 25 measurements + 3 warmups; each emitter: 3 measurements + 1 warmup
 node packages/benchmark/dist/src/cli.js run --output results.json
 
 # Run with custom options
 node packages/benchmark/dist/src/cli.js run \
   --iterations 3 \
   --warmup 1 \
+  --emitter-iterations 3 \
+  --emitter-warmup 1 \
   --noise-cv-threshold 0.08 \
   --max-reruns 1 \
   --rerun-iterations 5 \
@@ -118,7 +120,36 @@ explicitly backfilled with `--force`. Missing samples remain gaps, not zero-dura
 
 ## CI integration
 
-Benchmarks run **on push to `main`** (via `benchmark.yml` and `benchmark-external.yml`, each instantiating the reusable `benchmark-run.yml`). Each run stores its results to the `benchmark-data` branch via the `store-results` CLI command — the built-in specs under `results/` and the external specs under `external-results/`. Changes are monitored on the [benchmarks dashboard](https://typespec.io/benchmarks); benchmarks do not run on pull requests.
+Benchmarks run **on push to `main`** (via `benchmark.yml` and `benchmark-external.yml`, each instantiating the reusable `benchmark-run.yml`). Each run stores its results to the `benchmark-data` branch via the `store-results` CLI command — the built-in specs under `results/` and the external specs under `external-results/`. Changes are monitored on the [benchmarks dashboard](https://azure.github.io/typespec-azure/benchmarks/); benchmarks do not run on pull requests.
+
+The reusable workflow builds dependencies and installs C# once, then snapshots the
+external specs and prepares an explicit workload plan. Independent jobs measure
+each spec's compiler and each configured emitter. They reuse that prepared build
+and source snapshot, rather than rebuilding packages or fetching a moving spec
+branch for every job. Each job runs one workload serially, avoiding CPU/memory
+contention between emitters on the same runner.
+
+Both datasets use **25 compiler measurements + 3 warmups** and **3 full-generation
+measurements + 1 warmup per emitter/spec**. Compiler noise retries do not affect
+emitter sample counts. Workloads have a 30-minute execution limit; missing,
+failed, duplicated, or mismatched workload results prevent publication rather
+than silently reducing coverage. The end-to-end runtime target is under 30
+minutes excluding runner queue delays; the job timeout is a failure boundary,
+not evidence that the target was met.
+
+The final job combines the complete matrix and publishes the same dashboard
+metric labels as before. Manual runs upload the combined JSON as an artifact
+without publishing feature-branch results to the production dashboard.
+
+For local debugging, `run` executes the same workloads serially. To reproduce an
+individual CI workload:
+
+```bash
+node packages/benchmark/dist/src/cli.js plan \
+  --specs-dir packages/benchmark/external-spec --specs network --output plan.json
+node packages/benchmark/dist/src/cli.js run-workload \
+  --plan plan.json --workload network--azure-typespec-http-client-csharp --output csharp.json
+```
 
 ### Data storage
 
@@ -163,7 +194,7 @@ does not move `latest.json` backwards, and concurrent writers regenerate history
 against the latest data branch rather than rebasing conflicting generated JSON.
 
 The `Benchmark` workflow exposes `backfill_from`, `backfill_to`, `backfill_force`,
-`iterations`, and `warmup`. Backfill runs have separate concurrency groups from
+compiler `iterations`/`warmup`, and `emitter_iterations`/`emitter_warmup`. Backfill runs have separate concurrency groups from
 normal main runs. For a large full-generation backfill, dispatch one SHA per run
 (`backfill_from` and `backfill_to` equal) to avoid one job hitting the execution
 time limit. Use a separate `branch` input to smoke-test publication without
@@ -181,6 +212,20 @@ The TypeSpec compiler provides built-in `Stats` covering:
   - `validation` — per-validator timing (compiler, @typespec/http, @typespec/versioning, etc.)
   - `linter` — per-rule timing (e.g., `@azure-tools/typespec-azure-core/auth-required`)
   - `emit` — per-emitter timing with per-step breakdown
+
+New results use `measurementMode: "split"`. `iterations`, `rawIterations`, and
+compiler variability describe compilation-only samples (`noEmit: true`).
+`emitterMeasurements` records each emitter's actual sample/warmup counts, raw
+timings, variability, and runner. Emitter timings do not include recompilation
+or process startup, although the workload log reports end-to-end elapsed time.
+The aggregate `emit` value is the sum of independently aggregated emitter times,
+not the wall time of parallel jobs.
+
+Unlike legacy combined runs, compiler complexity excludes emitter mutations and
+compilation-only runs skip loading emitter modules. Emitters run in
+isolation without another emitter's cached state. Treat the switch to split
+measurement as a methodology change when comparing against old results.
+Existing history remains readable and is not rewritten automatically.
 
 ## Benchmark specs
 

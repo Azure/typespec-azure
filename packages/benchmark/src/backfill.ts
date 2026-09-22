@@ -34,6 +34,8 @@ export interface BackfillOptions {
   force?: boolean;
   iterations?: number;
   warmup?: number;
+  emitterIterations?: number;
+  emitterWarmup?: number;
   specs?: string;
   specsDir?: string;
 }
@@ -181,6 +183,10 @@ export async function backfill(options: BackfillOptions = {}): Promise<void> {
         ];
         if (options.iterations !== undefined) args.push("--iterations", String(options.iterations));
         if (options.warmup !== undefined) args.push("--warmup", String(options.warmup));
+        if (options.emitterIterations !== undefined)
+          args.push("--emitter-iterations", String(options.emitterIterations));
+        if (options.emitterWarmup !== undefined)
+          args.push("--emitter-warmup", String(options.emitterWarmup));
         if (options.specs) args.push("--specs", options.specs);
         run(process.execPath, args);
 

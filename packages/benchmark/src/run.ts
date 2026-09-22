@@ -1,11 +1,9 @@
 /* eslint-disable no-console */
-import { execSync } from "child_process";
-import { existsSync } from "fs";
-import { readdir } from "fs/promises";
-import os from "os";
-import { join, resolve } from "path";
-import { fileURLToPath } from "url";
-import { aggregateDurations } from "./aggregate.js";
+import { NodeHost, formatDiagnostic, resolveCompilerOptions } from "@typespec/compiler";
+import { randomUUID } from "node:crypto";
+import { existsSync } from "node:fs";
+import { readdir } from "node:fs/promises";
+import { isAbsolute, join, relative, resolve } from "node:path";
 import { compileSpec } from "./compile.js";
 import { inspectCSharpInstallation } from "./csharp.js";
 import {
@@ -13,286 +11,133 @@ import {
   loadExternalSpecConfig,
   resolveExternalSpecs,
 } from "./external-specs.js";
-import { summarize } from "./statistics.js";
-import type {
-  BenchmarkResult,
-  NoiseGateInfo,
-  RunnerInfo,
-  RuntimeStats,
-  SpecBenchmarkResult,
-  Stats,
-} from "./types.js";
-
-const DEFAULT_ITERATIONS = 5;
-const DEFAULT_WARMUP = 1;
+import type { BenchmarkPlan, BenchmarkResult, BenchmarkShard } from "./types.js";
+import { gitCommand } from "./utils.js";
+import { combineShards, createWorkloads, measureWorkload } from "./workloads.js";
 
 export interface RunOptions {
-  /** Directory containing benchmark specs (subdirectories). */
   specsDir: string;
-  /** Number of measured iterations per spec. */
+  /** Compilation-only sampling. */
   iterations?: number;
-  /** Number of warmup iterations. */
   warmup?: number;
-  /** Specific spec names to run (if empty, runs all). */
+  /** Full-generation sampling, independent of compiler noise retries. */
+  emitterIterations?: number;
+  emitterWarmup?: number;
   specs?: string[];
-  /** Git commit SHA to record. */
   commit?: string;
-  /** If set, rerun a spec when total-runtime coefficient of variation exceeds threshold. */
   noiseCvThreshold?: number;
-  /** Max number of rerun cycles for noisy specs. */
   maxReruns?: number;
-  /** Number of additional measured iterations on each rerun (default: iterations). */
   rerunIterations?: number;
 }
 
-/** A benchmark spec source: a name and the directory containing its main.tsp. */
-interface SpecSource {
-  name: string;
-  dir: string;
+function count(value: number, name: string, minimum: number): number {
+  if (!Number.isSafeInteger(value) || value < minimum) {
+    throw new Error(`${name} must be an integer >= ${minimum}.`);
+  }
+  return value;
 }
 
-/** Discover benchmark spec sources under the given directory.
- *
- * Each subdirectory is a spec: one containing a `main.tsp` is a local spec; one
- * containing a `spec.json` is an external spec (sparse-checked-out from another
- * repository). Both are treated uniformly as spec sources. */
-async function discoverSpecSources(specsDir: string, filter?: string[]): Promise<SpecSource[]> {
-  const dirs = (await readdir(specsDir, { withFileTypes: true })).filter((e) => e.isDirectory());
-
-  const localSources: SpecSource[] = dirs
-    .filter((e) => existsSync(join(specsDir, e.name, "main.tsp")))
-    .map((e) => ({ name: e.name, dir: join(specsDir, e.name) }));
-
-  const externalConfigs = dirs
-    .filter((e) => existsSync(join(specsDir, e.name, EXTERNAL_SPEC_CONFIG)))
-    .map((e) => loadExternalSpecConfig(join(specsDir, e.name)));
-
-  const externalSources: SpecSource[] =
-    externalConfigs.length > 0
-      ? resolveExternalSpecs(externalConfigs).map((s) => ({ name: s.name, dir: s.dir }))
-      : [];
-
-  const sources = [...localSources, ...externalSources].sort((a, b) =>
+/** Snapshot external sources once; every CI workload consumes this same prepared checkout. */
+export async function createBenchmarkPlan(options: RunOptions): Promise<BenchmarkPlan> {
+  const root = gitCommand(["rev-parse", "--show-toplevel"]);
+  const specsDir = resolve(options.specsDir);
+  const includes = (name: string) => !options.specs?.length || options.specs.includes(name);
+  const dirs = (await readdir(specsDir, { withFileTypes: true })).filter((entry) =>
+    entry.isDirectory(),
+  );
+  const local = dirs
+    .filter((entry) => includes(entry.name) && existsSync(join(specsDir, entry.name, "main.tsp")))
+    .map((entry) => ({ name: entry.name, dir: join(specsDir, entry.name) }));
+  const external = dirs
+    .filter((entry) => existsSync(join(specsDir, entry.name, EXTERNAL_SPEC_CONFIG)))
+    .map((entry) => loadExternalSpecConfig(join(specsDir, entry.name)))
+    .filter((config) => includes(config.name));
+  const sources = [...local, ...resolveExternalSpecs(external)].sort((a, b) =>
     a.name.localeCompare(b.name),
   );
-
-  if (filter && filter.length > 0) {
-    return sources.filter((s) => filter.includes(s.name));
-  }
-  return sources;
-}
-
-/** Average multiple Stats objects. */
-function averageStats(statsList: Stats[]): Stats {
-  const n = statsList.length;
-  if (n === 0) throw new Error("No stats to average");
-  if (n === 1) return statsList[0];
-
-  const avgRuntime = averageRuntimeStats(statsList.map((s) => s.runtime));
-
-  return {
-    complexity: {
-      createdTypes: Math.round(statsList.reduce((s, x) => s + x.complexity.createdTypes, 0) / n),
-      finishedTypes: Math.round(statsList.reduce((s, x) => s + x.complexity.finishedTypes, 0) / n),
-    },
-    runtime: avgRuntime,
-  };
-}
-
-function averageRuntimeStats(runtimes: RuntimeStats[]): RuntimeStats {
-  const aggregate = (accessor: (r: RuntimeStats) => number) =>
-    aggregateDurations(runtimes.map((r) => accessor(r)));
-
-  // Average validation
-  const validatorKeys = new Set<string>();
-  for (const r of runtimes) {
-    for (const k of Object.keys(r.validation.validators)) {
-      validatorKeys.add(k);
+  if (sources.length === 0) throw new Error(`No benchmark specs found in ${specsDir}`);
+  const specs: BenchmarkPlan["specs"] = [];
+  for (const source of sources) {
+    const [config, diagnostics] = await resolveCompilerOptions(NodeHost, {
+      entrypoint: join(source.dir, "main.tsp"),
+      cwd: source.dir,
+    });
+    if (diagnostics.some((diagnostic) => diagnostic.severity === "error")) {
+      throw new Error(diagnostics.map((diagnostic) => formatDiagnostic(diagnostic)).join("\n"));
     }
+    const dir = relative(root, source.dir);
+    if (dir.startsWith("..") || isAbsolute(dir))
+      throw new Error("Benchmark sources must be inside the repository.");
+    specs.push({ name: source.name, dir, emitters: config.emit ?? [] });
   }
-  const validators: Record<string, number> = {};
-  for (const k of validatorKeys) {
-    validators[k] = aggregateDurations(runtimes.map((r) => r.validation.validators[k] ?? 0));
+  if (new Set(specs.map((spec) => spec.name)).size !== specs.length) {
+    throw new Error("Benchmark spec names must be unique.");
   }
-
-  // Average linter rules
-  const ruleKeys = new Set<string>();
-  for (const r of runtimes) {
-    for (const k of Object.keys(r.linter.rules)) {
-      ruleKeys.add(k);
-    }
-  }
-  const rules: Record<string, number> = {};
-  for (const k of ruleKeys) {
-    rules[k] = aggregateDurations(runtimes.map((r) => r.linter.rules[k] ?? 0));
-  }
-
-  // Average emitters
-  const emitterNames = new Set<string>();
-  for (const r of runtimes) {
-    for (const k of Object.keys(r.emit.emitters)) {
-      emitterNames.add(k);
-    }
-  }
-  const emitters: RuntimeStats["emit"]["emitters"] = {};
-  for (const name of emitterNames) {
-    const stepKeys = new Set<string>();
-    for (const r of runtimes) {
-      const em = r.emit.emitters[name];
-      if (em) {
-        for (const k of Object.keys(em.steps)) {
-          stepKeys.add(k);
-        }
-      }
-    }
-    const steps: Record<string, number> = {};
-    for (const k of stepKeys) {
-      steps[k] = aggregateDurations(runtimes.map((r) => r.emit.emitters[name]?.steps[k] ?? 0));
-    }
-    emitters[name] = {
-      total: aggregateDurations(runtimes.map((r) => r.emit.emitters[name]?.total ?? 0)),
-      steps,
-    };
-  }
-
-  return {
-    total: aggregate((r) => r.total),
-    loader: aggregate((r) => r.loader),
-    resolver: aggregate((r) => r.resolver),
-    checker: aggregate((r) => r.checker),
-    validation: {
-      total: aggregate((r) => r.validation.total),
-      validators,
-    },
-    linter: {
-      total: aggregate((r) => r.linter.total),
-      rules,
-    },
-    emit: {
-      total: aggregate((r) => r.emit.total),
-      emitters,
-    },
-  };
-}
-
-function getRunnerInfo(): RunnerInfo {
-  return {
-    os: `${os.platform()}-${os.release()}`,
-    nodeVersion: process.version,
-    arch: os.arch(),
-  };
-}
-
-function getGitCommit(providedCommit?: string): string {
-  if (providedCommit) return providedCommit;
-  try {
-    return execSync("git rev-parse HEAD", { encoding: "utf-8" }).trim();
-  } catch {
-    return "unknown";
-  }
-}
-
-/** Run benchmarks for all discovered specs. */
-export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResult> {
-  const specsDir = resolve(options.specsDir);
-  const iterations = options.iterations ?? DEFAULT_ITERATIONS;
-  const warmup = options.warmup ?? DEFAULT_WARMUP;
-
-  const specSources = await discoverSpecSources(specsDir, options.specs);
-  if (specSources.length === 0) {
-    throw new Error(`No benchmark specs found in ${specsDir}`);
-  }
-
-  const benchmarkDir = fileURLToPath(new URL("../../", import.meta.url));
-  const externalEmitterVersions = existsSync(
-    join(benchmarkDir, "node_modules/@azure-typespec/http-client-csharp"),
+  const iterations = count(options.iterations ?? 25, "iterations", 1);
+  if (
+    options.noiseCvThreshold !== undefined &&
+    (!Number.isFinite(options.noiseCvThreshold) || options.noiseCvThreshold < 0)
   )
-    ? inspectCSharpInstallation(benchmarkDir)
-    : undefined;
+    throw new Error("noise-cv-threshold must be a nonnegative finite number.");
+  return {
+    id: randomUUID(),
+    commit: options.commit ?? gitCommand(["rev-parse", "HEAD"]),
+    specs,
+    workloads: createWorkloads(specs),
+    compiler: {
+      iterations,
+      warmup: count(options.warmup ?? 3, "warmup", 0),
+      noiseCvThreshold: options.noiseCvThreshold,
+      maxReruns: count(options.maxReruns ?? 0, "max-reruns", 0),
+      rerunIterations: count(options.rerunIterations ?? iterations, "rerun-iterations", 1),
+    },
+    emitter: {
+      iterations: count(options.emitterIterations ?? 3, "emitter-iterations", 1),
+      warmup: count(options.emitterWarmup ?? 1, "emitter-warmup", 0),
+    },
+    externalEmitterVersions: specs.some((spec) =>
+      spec.emitters.includes("@azure-typespec/http-client-csharp"),
+    )
+      ? inspectCSharpInstallation(join(root, "packages/benchmark"))
+      : undefined,
+  };
+}
 
-  console.log(
-    `Running benchmarks: ${specSources.length} spec(s), ${warmup} warmup + ${iterations} iterations each`,
-  );
-
-  const specs: Record<string, SpecBenchmarkResult> = {};
-  const noiseCvThreshold = options.noiseCvThreshold;
-  const maxReruns = options.maxReruns ?? 0;
-  const rerunIterations = options.rerunIterations ?? iterations;
-
-  for (const source of specSources) {
-    const specName = source.name;
-    const specDir = source.dir;
-    console.log(`\n  Benchmarking: ${specName}`);
-
-    // Warmup
-    for (let i = 0; i < warmup; i++) {
-      console.log(`    Warmup ${i + 1}/${warmup}...`);
-      await compileSpec(specDir);
-    }
-
-    // Measured iterations
-    const rawIterations: Stats[] = [];
-    for (let i = 0; i < iterations; i++) {
-      console.log(`    Iteration ${i + 1}/${iterations}...`);
-      const stats = await compileSpec(specDir);
-      rawIterations.push(stats);
-    }
-
-    let rerunsPerformed = 0;
-    if (noiseCvThreshold !== undefined && maxReruns > 0 && rerunIterations > 0) {
-      for (let rerun = 0; rerun < maxReruns; rerun++) {
-        const totalSummary = summarize(rawIterations.map((x) => x.runtime.total));
-        if (totalSummary.cv <= noiseCvThreshold) {
-          break;
-        }
-
-        rerunsPerformed++;
-        console.log(
-          `    Noise gate triggered (CV ${(totalSummary.cv * 100).toFixed(1)}% > ${(noiseCvThreshold * 100).toFixed(1)}%), running ${rerunIterations} extra iteration(s)...`,
-        );
-        for (let i = 0; i < rerunIterations; i++) {
-          console.log(`    Rerun iteration ${i + 1}/${rerunIterations}...`);
-          const stats = await compileSpec(specDir);
-          rawIterations.push(stats);
-        }
-      }
-    }
-
-    const totalSummary = summarize(rawIterations.map((x) => x.runtime.total));
-    const noiseGateInfo: NoiseGateInfo | undefined =
-      noiseCvThreshold === undefined
-        ? undefined
-        : {
-            thresholdCv: noiseCvThreshold,
-            maxReruns,
-            rerunIterations,
-            rerunsPerformed,
-            triggered: rerunsPerformed > 0,
-          };
-
-    specs[specName] = {
-      name: specName,
-      iterations: rawIterations.length,
-      stats: averageStats(rawIterations),
-      rawIterations,
-      variability: {
-        total: totalSummary,
-        noiseGate: noiseGateInfo,
-      },
-    };
-
-    console.log(
-      `    Total: ${specs[specName].stats.runtime.total.toFixed(1)}ms (avg), CV ${(totalSummary.cv * 100).toFixed(1)}%`,
+export async function runWorkload(
+  plan: BenchmarkPlan,
+  workloadId: string,
+): Promise<BenchmarkShard> {
+  const workload = plan.workloads.find((item) => item.id === workloadId);
+  if (!workload) throw new Error(`Unknown workload ${workloadId}`);
+  const spec = plan.specs.find((item) => item.name === workload.spec)!;
+  const root = gitCommand(["rev-parse", "--show-toplevel"]);
+  const currentCommit = gitCommand(["rev-parse", "HEAD"]);
+  if (plan.commit !== currentCommit) {
+    throw new Error(
+      `Workload checkout ${currentCommit} does not match plan commit ${plan.commit}.`,
     );
   }
+  if (workload.kind === "emitter" && workload.emitter === "@azure-typespec/http-client-csharp") {
+    const versions = inspectCSharpInstallation(join(root, "packages/benchmark"));
+    for (const [name, version] of Object.entries(versions)) {
+      if (plan.externalEmitterVersions?.[name] !== version) {
+        throw new Error(`C# package ${name} differs from the prepared plan.`);
+      }
+    }
+  }
+  return measureWorkload(plan, workload, (item) =>
+    compileSpec(
+      join(root, spec.dir),
+      undefined,
+      item.kind === "compiler" ? { kind: "compiler" } : { kind: "emitter", emitter: item.emitter },
+    ),
+  );
+}
 
-  const commit = getGitCommit(options.commit);
-
-  return {
-    commit,
-    timestamp: new Date().toISOString(),
-    runner: getRunnerInfo(),
-    externalEmitterVersions,
-    specs,
-  };
+/** Local runs are serial; CI distributes the same plan across independent jobs. */
+export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResult> {
+  const plan = await createBenchmarkPlan(options);
+  const shards: BenchmarkShard[] = [];
+  for (const workload of plan.workloads) shards.push(await runWorkload(plan, workload.id));
+  return combineShards(plan, shards);
 }

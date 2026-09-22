@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:
     inputs:
+      specs:
+        description: "Optional comma-separated service filter"
+        type: string
+        default: ""
       runner:
         description: "Runner label (for stable runs prefer self-hosted or larger dedicated runner)"
         required: false
@@ -25,8 +29,11 @@ jobs:
     with:
       specs-dir: packages/benchmark/external-spec
       results-dir: external-results
-      iterations: 3
-      warmup: 1
+      iterations: 25
+      warmup: 3
+      emitter-iterations: 3
+      emitter-warmup: 1
+      specs: ${{ inputs.specs || '' }}
       noise-cv: 0.1
       rerun-iterations: 2
       runner: ${{ github.event_name == 'workflow_dispatch' && inputs.runner || vars.BENCHMARK_RUNNER || 'ubuntu-latest' }}
