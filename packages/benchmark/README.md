@@ -226,6 +226,8 @@ compilation-only runs skip loading emitter modules. Emitters run in
 isolation without another emitter's cached state. Treat the switch to split
 measurement as a methodology change when comparing against old results.
 Existing history remains readable and is not rewritten automatically.
+Dashboard baseline comparisons only use runs with the same measurement method,
+so this transition is not presented as a compiler or emitter performance regression.
 
 ## Benchmark specs
 

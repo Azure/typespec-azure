@@ -1,7 +1,9 @@
 import { expect, it } from "vitest";
 import {
+  buildComparisonView,
   buildMetricView,
   getEmitterNames,
+  trailingBaseline,
 } from "../../../website/src/components/benchmarks/data.js";
 import { buildHistory } from "../src/generate-history.js";
 import type { BenchmarkResult, RuntimeStats } from "../src/types.js";
@@ -48,8 +50,15 @@ it("discovers all emitters while preserving gaps in legacy history", () => {
       name: "legacy.json",
       content: JSON.stringify(makeResult([names[8]], "2026-01-01T00:00:00Z")),
     },
-    { name: "current.json", content: JSON.stringify(makeResult(names, "2026-01-02T00:00:00Z")) },
+    {
+      name: "current.json",
+      content: JSON.stringify({
+        ...makeResult(names, "2026-01-02T00:00:00Z"),
+        measurementMode: "split",
+      }),
+    },
   ]);
+  expect(history.entries[1].measurementMode).toBe("split");
 
   for (const spec of ["all", "sample"]) {
     const view = buildMetricView(history, spec, "all");
@@ -59,4 +68,30 @@ it("discovers all emitters while preserving gaps in legacy history", () => {
       expect(view.values[`emit/${name}/generate`]).toEqual([name === names[8] ? 15 : null, 15]);
     }
   }
+});
+
+it("does not interpret a sampling-method change as a performance regression", () => {
+  const entries = [
+    { commit: "legacy1", timestamp: "2026-01-01T00:00:00Z", metrics: { total: 100 } },
+    { commit: "legacy2", timestamp: "2026-01-02T00:00:00Z", metrics: { total: 110 } },
+    {
+      commit: "split1",
+      timestamp: "2026-01-03T00:00:00Z",
+      measurementMode: "split" as const,
+      metrics: { total: 20 },
+    },
+    {
+      commit: "split2",
+      timestamp: "2026-01-04T00:00:00Z",
+      measurementMode: "split" as const,
+      metrics: { total: 22 },
+    },
+  ].map((entry) => ({ ...entry, specMetrics: { sample: entry.metrics } }));
+  const data = { generated: "now", labels: ["total"], entries };
+  const single = buildMetricView(data, "sample", "all");
+  expect(trailingBaseline(single.values.total, single.points)).toBe(20);
+  const compare = buildComparisonView(data, "total", ["sample"], "all");
+  expect(trailingBaseline(compare.values.sample, compare.points)).toBe(20);
+  expect(trailingBaseline(single.values.total.slice(0, 3), single.points.slice(0, 3))).toBeNull();
+  expect(trailingBaseline(single.values.total.slice(0, 2), single.points.slice(0, 2))).toBe(100);
 });

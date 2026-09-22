@@ -182,7 +182,7 @@ export function MetricChart({
                 hour: "numeric",
                 minute: "2-digit",
               });
-              return `${point.commit.slice(0, 7)} · ${date}`;
+              return `${point.commit.slice(0, 7)} · ${date}${point.measurementMode === "split" ? " · split sampling" : ""}`;
             },
             label: (item) => `${item.dataset.label}: ${formatMs(item.parsed.y)}`,
             footer: () => "Click to open this commit on GitHub",

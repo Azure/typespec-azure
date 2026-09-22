@@ -4,6 +4,7 @@
 export interface HistoryEntry {
   commit: string;
   timestamp: string;
+  measurementMode?: "split";
   /** Metrics averaged across every spec in the run. */
   metrics: Record<string, number>;
   /** Per-spec metrics (spec name → flat metrics). */
@@ -31,6 +32,7 @@ export type TimeRange = "30d" | "90d" | "all";
 export interface ChartPoint {
   commit: string;
   timestamp: string;
+  measurementMode?: "split";
 }
 
 /** A named line, with values aligned to the current `ChartPoint[]`. */

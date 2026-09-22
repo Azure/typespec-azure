@@ -9,6 +9,7 @@ import type { BenchmarkResult, RuntimeStats, SpecBenchmarkResult } from "./types
 export interface HistoryEntry {
   commit: string;
   timestamp: string;
+  measurementMode?: "split";
   /** Averaged metrics across all specs */
   metrics: Record<string, number>;
   /** Per-spec metrics (spec name → flat metrics) */
@@ -144,6 +145,7 @@ export function buildHistory(resultFiles: ResultFile[]): HistoryData {
       entries.push({
         commit: result.commit,
         timestamp: result.timestamp,
+        measurementMode: result.measurementMode,
         metrics,
         specMetrics,
       });
