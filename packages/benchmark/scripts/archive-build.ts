@@ -12,6 +12,7 @@ const paths = [
   "core/node_modules",
   "packages/benchmark/.emitters",
   "packages/benchmark/.external",
+  "packages/typespec-autorest/schema/dist",
   "packages/typespec-java/generator/http-client-generator/target",
 ];
 for (const root of ["packages", "core/packages"]) {

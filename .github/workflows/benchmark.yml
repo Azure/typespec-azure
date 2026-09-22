@@ -54,7 +54,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: benchmark-${{ inputs.backfill_from != '' && 'backfill' || 'main' }}-${{ github.ref }}-${{ inputs.backfill_from }}-${{ inputs.backfill_to }}
+  group: benchmark-${{ inputs.backfill_from != '' && 'backfill' || 'main' }}-${{ github.ref }}-${{ inputs.backfill_from }}-${{ inputs.backfill_to }}-${{ inputs.specs }}
   cancel-in-progress: ${{ inputs.backfill_from == '' }}
 
 jobs:

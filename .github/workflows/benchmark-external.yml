@@ -20,7 +20,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: benchmark-external-${{ github.ref }}
+  group: benchmark-external-${{ github.ref }}-${{ inputs.specs }}
   cancel-in-progress: true
 
 jobs:
