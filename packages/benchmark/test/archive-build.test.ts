@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
-it("archives runtime build assets without checkout metadata, SDK output, or virtualenvs", async () => {
+it("archives runtime build assets without checkout metadata, SDK output, or virtual environments", async () => {
   const root = await mkdtemp(join(tmpdir(), "benchmark-archive-test-"));
   const assets = [
     "node_modules/dependency/index.js",
@@ -34,7 +34,7 @@ it("archives runtime build assets without checkout metadata, SDK output, or virt
       [fileURLToPath(new URL("../scripts/archive-build.ts", import.meta.url)), archive],
       { cwd: root },
     );
-    const paths = execFileSync("tar", ["-tzf", archive], { encoding: "utf8" }).split("\n");
+    const paths = execFileSync("tar", ["-tzf", archive], { encoding: "utf8" }).split(/\r?\n/);
     for (const file of assets) expect(paths).toContain(file);
     for (const file of excluded) expect(paths).not.toContain(file);
   } finally {

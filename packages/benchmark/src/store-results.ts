@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+// cspell:ignore mktree
 import {
   copyFileSync,
   existsSync,
