@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.72.2
+
+### Bug Fixes
+
+- [#5547](https://github.com/Azure/typespec-azure/pull/5547) Override operation API-version parameter defaults from `Azure.Core.Legacy.overrideApiVersion`.
+
+
 ## 0.72.1
 
 ### Bug Fixes
