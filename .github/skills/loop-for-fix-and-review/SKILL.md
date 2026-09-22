@@ -227,6 +227,8 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
      timestamp, and any reliability classification
    - comment IDs delivered to the fix subagent
    - validity decision for each comment
+   - final disposition and evidence under
+     [review adoption evidence](#review-adoption-evidence)
    - promotion finding category when applicable
    - planned validation scope, command results, and corpus applicability/results
    - recovery-context identity, acknowledged authorization scopes and applicable
@@ -241,6 +243,40 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
    - any local collector failure, its original evidence, recovery eligibility,
      the parent's one-time recollection authorization, fresh evidence identity,
      and final recovery approval or rejection
+
+## Review adoption evidence
+
+For each collected finding, retain the exact reviewer/comment permalink,
+request, author/agent reasoning, validity classification, and final disposition.
+Split compound requests when their outcomes differ. Link an implemented finding
+to the change commit, final file/line or test evidence, validation result, and
+verified pushed head. For historical analysis, use the merge revision instead.
+
+Use dispositions distinct from the finding-validity categories:
+
+- **Implemented:** the final revision contains the accepted behavior.
+- **Retained with rationale:** existing behavior was defended with evidence; do
+  not claim a new fix merely because the thread was answered.
+- **Declined:** evidence shows the requested change is invalid or inapplicable.
+- **Deferred:** record explicit scope/approval, tracking reference, and remaining
+  impact. A valid unresolved requirement still blocks clean completion.
+- **Superseded:** later analysis replaced an earlier fix or decision; link the
+  final outcome instead of counting both as adopted.
+- **Uncertain/blocked:** evidence or a required decision is missing; keep the
+  thread open and follow the existing stop conditions.
+
+Reconcile dispositions against the final head before publication handoff and
+the final report. An earlier "fixed" reply, approval, resolved thread, or stated
+deferral is not proof of the final implementation. Revalidate affected behavior
+when later edits supersede a fix. Distinguish reviewer feedback from author
+self-audits and other participants' policy decisions; do not infer preferences
+from an empty approval.
+
+This evidence contract does not broaden collection scope, request extra reviews,
+inspect suppressed comments, or authorize source repair. In this loop, apply it
+only to findings admitted by the existing collector/backlog rules. Dispositions
+do not override validity categories, clean-head gates, or the prohibition on
+resolving uncertain or unfixed source-defect threads.
 
 ## Local collector recovery
 
