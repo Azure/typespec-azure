@@ -1,8 +1,8 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { mkdir, rm } from "node:fs/promises";
+import { mkdir, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { afterEach, beforeEach, expect, it } from "vitest";
 import { resolveCommitRange, restoreBenchmark } from "../src/backfill.js";
 import { withTemporaryWorktree } from "../src/utils.js";
@@ -66,6 +66,27 @@ it("leaves the caller's branch and dirty files untouched, including on failure",
   expect(git("branch", "--show-current")).toBe("main");
   expect(readFileSync(join(root, "file"), "utf8")).toBe("uncommitted");
   expect(existsSync(worktree)).toBe(false);
+});
+
+it("removes package junctions without deleting targets outside the temporary worktree", async () => {
+  const sha = commit("initial");
+  const outside = join(root, "shared-package");
+  await mkdir(outside);
+  writeFileSync(join(outside, "keep"), "preserved");
+  let worktree = "";
+  await withTemporaryWorktree(root, sha, async (dir) => {
+    worktree = dir;
+    const target = join(dir, "packages/benchmark/.emitters/node_modules/csharp");
+    const modules = join(dir, "packages/benchmark/node_modules");
+    await mkdir(target, { recursive: true });
+    await mkdir(modules, { recursive: true });
+    writeFileSync(join(target, "package.json"), "{}");
+    await symlink(target, join(modules, "csharp"), "junction");
+    await symlink(outside, join(modules, "shared"), "junction");
+  });
+  expect(existsSync(dirname(worktree))).toBe(false);
+  expect(readFileSync(join(outside, "keep"), "utf8")).toBe("preserved");
+  expect(git("worktree", "list", "--porcelain")).not.toContain(worktree);
 });
 
 it("restores the current harness without stale sources or deleting installed packages", async () => {

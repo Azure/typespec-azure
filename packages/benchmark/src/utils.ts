@@ -1,6 +1,7 @@
 // cspell:ignore topo
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, rmdirSync } from "node:fs";
+import { rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -29,6 +30,8 @@ export async function withTemporaryWorktree<T>(
     return await action(dir);
   } finally {
     if (added) gitCommand(["worktree", "remove", "--force", dir], repoRoot);
+    // Git for Windows can unregister the worktree while leaving dangling package junctions.
+    await rm(dir, { recursive: true, force: true, maxRetries: 3 });
     rmdirSync(temp);
   }
 }
