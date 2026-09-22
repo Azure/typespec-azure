@@ -1,6 +1,11 @@
 name: Benchmark worktree check
 on:
   workflow_dispatch:
+  push:
+    branches: [benchmark/fix-backfill]
+    paths:
+      - .github/workflows/benchmark-worktree-check.yml
+      - packages/benchmark/src/utils.ts
 permissions:
   contents: read
 jobs:
