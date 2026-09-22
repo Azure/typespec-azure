@@ -79,7 +79,15 @@ serializer and found no retired IDs in any fixture. Compared with the exact
 inputs, the final run retained the same 574 cases, case classifications and
 coverage summary, including the same 21 known unresolved gaps. The remaining 92
 snapshot mismatches are unchanged, unrelated baseline drift; none is in the 76
-files updated by this consolidation. Eleven of the 76 required complete-file
+files updated by this consolidation.
+
+Reviewed ambient-diagnostic metadata was refreshed in 34 affected
+`expect.json` files from each fixture's exact final diagnostics. This resolved
+29 consolidation-caused ambient mismatches, changing the full-suite summary
+from 117 reviewed matches and 44 mismatches to 146 reviewed matches and 15
+unrelated mismatches. Four other compliant cases contain a mapped combined-rule
+finding, so ambient comparison is not applicable; the remaining updated case is
+a violation fixture. Eleven of the 76 snapshots required complete-file
 refreshes rather than category-only replacement: ten capture the current
 same-code operation-name diagnostic text or target, while three ambient
 diagnostics are newly present (`get-in-operation-name`,
