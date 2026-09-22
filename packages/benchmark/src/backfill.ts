@@ -8,6 +8,7 @@ import {
   mkdtempSync,
   openSync,
   readFileSync,
+  realpathSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -89,7 +90,7 @@ export function restoreBenchmark(source: string, repoRoot: string): void {
 }
 
 export async function backfill(options: BackfillOptions = {}): Promise<void> {
-  const repoRoot = gitCommand(["rev-parse", "--show-toplevel"]);
+  const repoRoot = realpathSync(gitCommand(["rev-parse", "--show-toplevel"]));
   const source = join(repoRoot, "packages/benchmark");
   const commits = resolveCommitRange(
     repoRoot,
@@ -100,7 +101,10 @@ export async function backfill(options: BackfillOptions = {}): Promise<void> {
   const branch = options.dataBranch ?? DEFAULT_BRANCH;
   const resultsDir = options.resultsDir ?? "results";
   gitCommand(["check-ref-format", `refs/heads/${branch}`], repoRoot);
-  const specsPath = relative(repoRoot, resolve(options.specsDir ?? join(source, "specs")));
+  const specsPath = relative(
+    repoRoot,
+    realpathSync(resolve(options.specsDir ?? join(source, "specs"))),
+  );
   if (specsPath.startsWith("..") || isAbsolute(specsPath)) {
     throw new Error("Backfill specs must be inside the source repository.");
   }

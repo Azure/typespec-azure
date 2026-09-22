@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { chmod, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { delimiter, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -65,6 +65,8 @@ writeFileSync(value("--output"), JSON.stringify({
         await writeFile(join(dir, "index.js"), "");
       }
       await linkCSharpEmitter(benchmark);
+      const alias = `${root}-alias`;
+      await symlink(benchmark, alias, "junction");
       const bin = join(root, "bin");
       await mkdir(bin);
       const pnpm = join(bin, process.platform === "win32" ? "pnpm.cmd" : "pnpm");
@@ -87,7 +89,7 @@ writeFileSync(value("--output"), JSON.stringify({
           "main",
           "--force",
           "--specs-dir",
-          "packages/benchmark/specs",
+          join(alias, "specs"),
           "--iterations",
           "1",
           "--warmup",
@@ -128,6 +130,7 @@ writeFileSync(value("--output"), JSON.stringify({
       expect(git("rev-parse", "HEAD")).toBe(head);
       expect(git("branch", "--show-current")).toBe("main");
     } finally {
+      await rm(`${root}-alias`, { force: true });
       if (output) await rm(output, { recursive: true, force: true });
       await rm(root, { recursive: true, force: true });
     }
