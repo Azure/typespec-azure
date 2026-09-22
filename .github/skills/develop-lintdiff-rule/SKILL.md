@@ -318,6 +318,16 @@ The top-level worker works only in the supplied typespec-azure worktree.
   workflow.
 - Do not require equal raw Swagger and TypeSpec diagnostic counts.
 
+Record the [native rule contract](../typespec-lint-discovery/SKILL.md#native-rule-contract)
+in the existing rule evidence before editing. Use the portable
+[implementation checkpoints](../typespec-lint-implement/SKILL.md#implementation-checkpoints)
+and [contract-driven coverage](../typespec-lint-validate/SKILL.md#contract-driven-coverage)
+within this workflow's required fixture/build/corpus steps; they do not replace
+those steps or relax the native boundary below. Include the selected semantic
+layer/API, a sibling-rule comparison, the diagnostic unit/target, and test
+evidence for custom complexity. Keep intentional parity differences separate
+from unresolved gaps.
+
 #### Native TypeSpec implementation boundary
 
 Prefer idiomatic TypeSpec validation. Preserve Swagger parity only where it
@@ -367,8 +377,12 @@ internal transitive dependencies; do not use wrappers or private state to access
 prohibited functionality. Research and comparison fixtures may still use the
 prohibited libraries to demonstrate Swagger divergence. Native tests may
 register transitive libraries required by the test host, but must exercise the
-rule through supported native semantics rather than TCGC, OpenAPI decorators,
-or unsafe mutation.
+rule through supported native semantics rather than OpenAPI decorators or
+unsafe mutation. ARM-destination rule tests must not rely on TCGC to implement
+the check. A rule whose contract genuinely concerns SDK APIs belongs in TCGC,
+where supported SDK-name resolution and common/scoped override tests are
+appropriate; this does not authorize a TCGC dependency in ARM or waive the
+worker's eligibility gate.
 
 Removing a prohibited dependency can change the diagnostic population. Record
 the native contract and explicit differences for SDK scope, legacy markers,
@@ -745,6 +759,10 @@ The reviewer must:
   usage, version/projection mistakes, unstable diagnostic targets, ineffective
   deduplication, and misleading diagnostics
 - verify that fixture evidence covers the implementation's important branches
+- verify the native contract and the linked implementation/coverage checkpoints:
+  check sibling naming and API choices, realistic template customizations,
+  necessary scope guards, exact diagnostic targets/counts, and concise messages
+  independently of Swagger parity
 - for model-traversal rules, cover cycles, shared siblings, shared models across
   operations and imported diagnostic targets; assert the intended diagnostic
   unit/count and targeting, as described in the
@@ -778,6 +796,10 @@ After the review:
 2. Apply every finding that is technically correct and within the rule PR's
    scope.
 3. Record why any rejected finding does not apply.
+   Track the final disposition using the
+   [review adoption evidence](../loop-for-fix-and-review/SKILL.md#review-adoption-evidence)
+   contract; recheck earlier replies against the final head so an implemented
+   follow-up is not still reported as deferred, or a superseded fix as adopted.
 4. Rerun the affected focused tests, build, lint, and corpus validation when a
    review fix changes rule behavior.
 5. Request a follow-up review from the same subagent when changes materially
