@@ -1,4 +1,5 @@
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
+import { $ } from "@typespec/compiler/typekit";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { getLroProtocolMetadata } from "../src/index.js";
@@ -8,6 +9,7 @@ it("retains required final requests and polling parameter bindings as protocol f
   const [operations, diagnostics, runner] = await getOperations(`
     model Status {
       @lroStatus status: "Succeeded" | "Canceled" | "Failed" | "Running";
+      @lroResult result: unknown;
     }
     model Widget { value: string; }
     @route("/widgets/{id}") @get op read(@path id: string): Widget;
@@ -28,6 +30,7 @@ it("retains required final requests and polling parameter bindings as protocol f
   strictEqual(protocol.completion.finalStateVia, "original-uri");
   strictEqual(protocol.completion.originalUriHasGetOperation, undefined);
   strictEqual(protocol.completion.finalStep?.kind, "finalOperationReference");
+  strictEqual(protocol.polling.statusMonitorResult, undefined);
   const finalTarget = protocol.completion.finalStep.target;
   strictEqual(
     finalTarget.operation,
@@ -70,6 +73,40 @@ it("retains required final requests and polling parameter bindings as protocol f
   ]);
   expectDiagnosticEmpty(runner.program.diagnostics);
 });
+
+it.each([false, true])(
+  "exposes fallback monitor result facts with a success property: %s",
+  async (hasResult) => {
+    const [operations, diagnostics, runner] = await getOperations(`
+    model Status {
+      @lroStatus status: "Succeeded" | "Failed" | "Canceled";
+      ${hasResult ? "@lroResult result: unknown;" : ""}
+    }
+    @route("/jobs") @post op start(): {
+      @pollingLocation @header("Operation-Location") location: ResourceLocation<Status>;
+    };
+  `);
+    expectDiagnosticEmpty(diagnostics);
+    const protocol = getLroProtocolMetadata(runner.program, operations[0].operation);
+    ok(protocol);
+    const result = protocol.polling.statusMonitorResult;
+    ok(result);
+    if (hasResult) {
+      const property = protocol.polling.pollingInfo.responseModel.properties.get("result");
+      ok(property);
+      strictEqual(result.type.kind, "Intrinsic");
+      strictEqual(result.type.name, "unknown");
+      strictEqual(result.type, property.type);
+      strictEqual(result.property, property);
+      strictEqual(protocol.completion.finalStep, undefined);
+    } else {
+      strictEqual(result.type, $(runner.program).intrinsic.void);
+      strictEqual(result.property, undefined);
+      strictEqual(protocol.completion.finalStep?.kind, "noPollingResult");
+    }
+    expectDiagnosticEmpty(runner.program.diagnostics);
+  },
+);
 
 it.each([false, true])("reports explicit original-uri GET availability: %s", async (hasGet) => {
   const [operations, diagnostics, runner] = await getOperations(`

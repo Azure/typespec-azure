@@ -2,7 +2,7 @@ import { getLroMetadata, getLroProtocolMetadata } from "@azure-tools/typespec-az
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { getAllHttpServices } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { it } from "vitest";
+import { describe, it } from "vitest";
 import { getNativeLroMetadata, resolveLroClientResult } from "../src/lro-metadata.js";
 import { AzureCoreTester } from "./tester.js";
 
@@ -120,6 +120,52 @@ it.each([getLroMetadata, getNativeLroMetadata])(
     strictEqual(metadata.finalStateVia, "original-uri");
     expectDiagnostics(program.diagnostics, {
       code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+    });
+  },
+);
+
+describe.each([getLroMetadata, getNativeLroMetadata])(
+  "%s with a result-bearing original-uri monitor",
+  (getMetadata) => {
+    it.each([false, true])("selects the result when a same-path GET exists: %s", async (hasGet) => {
+      const { program } = await AzureCoreTester.compile(
+        prefix +
+          `
+        model Status {
+          @lroStatus status: "Succeeded" | "Failed" | "Canceled";
+          @lroResult result: Widget;
+        }
+        @useFinalStateVia("original-uri")
+        @route("/jobs") @post op start(): {
+          @pollingLocation @header("Operation-Location") location: ResourceLocation<Status>;
+        };
+        ${hasGet ? '@route("/jobs") @get op read(): Widget;' : ""}
+      `,
+      );
+      const [services] = getAllHttpServices(program);
+      const operation = services[0].operations.find((o) => o.operation.name === "start")!.operation;
+      const metadata = getMetadata(program, operation);
+      ok(metadata);
+      const monitor = metadata.pollingInfo.responseModel;
+      const result = monitor.properties.get("result");
+      ok(result);
+      strictEqual(result.type.kind, "Model");
+      strictEqual(result.type.name, "Widget");
+      strictEqual(metadata.finalStep?.kind, "pollingSuccessProperty");
+      strictEqual(metadata.finalResult, hasGet ? result.type : "void");
+      strictEqual(metadata.finalEnvelopeResult, monitor);
+      strictEqual(metadata.finalResultPath, "result");
+      strictEqual(metadata.logicalResult, hasGet ? result.type : monitor);
+      strictEqual(metadata.envelopeResult, monitor);
+      strictEqual(metadata.logicalPath, "result");
+      strictEqual(metadata.finalStateVia, "original-uri");
+      if (hasGet) {
+        expectDiagnosticEmpty(program.diagnostics);
+      } else {
+        expectDiagnostics(program.diagnostics, {
+          code: "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+        });
+      }
     });
   },
 );
