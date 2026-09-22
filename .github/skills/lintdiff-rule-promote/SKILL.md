@@ -709,9 +709,9 @@ Derive the generated reference/rule files from its `regen-docs` configuration
 and inspect/format those exact files with the same empty-ignore policy.
 
 The Bash examples use the POSIX empty ignore path `/dev/null`. In Windows
-PowerShell, use `NUL` instead; the equivalent four-file formatting commands are
-below. Set `$Library` to `azure-resource-manager` or `azure-core` and `$RuleName`
-to the exact official rule name:
+PowerShell, use `NUL` instead. For ARM or core, set `$Library` to
+`azure-resource-manager` or `azure-core` and `$RuleName` to the exact official
+rule name:
 
 ```powershell
 $Library = "azure-resource-manager"
@@ -721,6 +721,21 @@ $DocFiles = @(
   "packages\typespec-$Library\src\rules\$RuleName.md"
   "website\src\content\docs\docs\libraries\$Library\reference\linter.md"
   "website\src\content\docs\docs\libraries\$Library\rules\$RuleName.md"
+)
+pnpm exec prettier --ignore-path NUL --write @DocFiles
+pnpm exec prettier --ignore-path NUL --check @DocFiles
+```
+
+For TCGC, use its exact package and website library paths rather than the
+`typespec-$Library` convention:
+
+```powershell
+$RuleName = "replace-with-rule-name"
+$DocFiles = @(
+  "packages\typespec-client-generator-core\README.md"
+  "packages\typespec-client-generator-core\src\rules\$RuleName.md"
+  "website\src\content\docs\docs\libraries\typespec-client-generator-core\reference\linter.md"
+  "website\src\content\docs\docs\libraries\typespec-client-generator-core\rules\$RuleName.md"
 )
 pnpm exec prettier --ignore-path NUL --write @DocFiles
 pnpm exec prettier --ignore-path NUL --check @DocFiles
