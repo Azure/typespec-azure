@@ -6,7 +6,7 @@ packages:
 
 Add the `no-unsafe-patch-body-properties` ARM linter rule, consolidating resource-layout, immutable-field, and partial-update safety checks in one PATCH-body traversal.
 
-Report missing or misnested resource properties, writable immutable fields, required or default-valued input, and exposed input lacking Update visibility. Prefer associated resource metadata, with PATCH and same-path GET response fallbacks.
+Report missing or incorrectly nested resource properties, writable immutable fields, required or default-valued input, and exposed input lacking Update visibility. Prefer associated resource metadata, with PATCH and same-path GET response fallbacks.
 
 When enabled, the rule applies ARM PATCH guidance throughout the compilation, including nested namespaces and interfaces, without requiring `@armProviderNamespace`.
 

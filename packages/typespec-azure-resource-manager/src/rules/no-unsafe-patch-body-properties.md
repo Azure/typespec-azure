@@ -64,7 +64,7 @@ An array-versus-scalar mismatch alone is not a type-equality diagnostic.
 Recursive active-context tracking terminates cycles without suppressing sibling
 uses of a shared model or different resource counterparts. Diagnostics contain
 JSON paths and target authored project properties; imported declarations are
-retargeted to the nearest local use or the operation.
+reported at the nearest local use or the operation.
 
 ## Correct example
 

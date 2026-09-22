@@ -155,7 +155,7 @@ describe("partial resource layout", () => {
     ["properties?: { extra?: string; };", "properties.extra"],
     ["extra?: { nested?: { leaf?: string } };", "extra.nested.leaf"],
     ["properties?: { value?: { nested?: string } };", "properties.value.nested"],
-  ])("reports missing or misnested layout: %s", async (properties, path) => {
+  ])("reports missing or incorrectly nested layout: %s", async (properties, path) => {
     await tester
       .expect(
         `${service}
@@ -504,7 +504,7 @@ describe("partial-update safety and traversal policies", () => {
       .toEmitDiagnostics([required("other.value"), defaultValue("other.enabled")]);
   });
 
-  it("retargets every imported Page occurrence to its local use", async () => {
+  it("reports every imported Page occurrence at its local use", async () => {
     await tester
       .expect(
         `${service}
