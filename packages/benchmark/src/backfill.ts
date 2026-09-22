@@ -90,7 +90,8 @@ export function restoreBenchmark(source: string, repoRoot: string): void {
 }
 
 export async function backfill(options: BackfillOptions = {}): Promise<void> {
-  const repoRoot = realpathSync(gitCommand(["rev-parse", "--show-toplevel"]));
+  // The native resolver also expands Windows short names such as RUNNER~1.
+  const repoRoot = realpathSync.native(gitCommand(["rev-parse", "--show-toplevel"]));
   const source = join(repoRoot, "packages/benchmark");
   const commits = resolveCommitRange(
     repoRoot,
@@ -101,12 +102,10 @@ export async function backfill(options: BackfillOptions = {}): Promise<void> {
   const branch = options.dataBranch ?? DEFAULT_BRANCH;
   const resultsDir = options.resultsDir ?? "results";
   gitCommand(["check-ref-format", `refs/heads/${branch}`], repoRoot);
-  const specsPath = relative(
-    repoRoot,
-    realpathSync(resolve(options.specsDir ?? join(source, "specs"))),
-  );
+  const specsDir = realpathSync.native(resolve(options.specsDir ?? join(source, "specs")));
+  const specsPath = relative(repoRoot, specsDir);
   if (specsPath.startsWith("..") || isAbsolute(specsPath)) {
-    throw new Error("Backfill specs must be inside the source repository.");
+    throw new Error(`Backfill specs ${specsDir} must be inside the source repository ${repoRoot}.`);
   }
 
   const existing = new Set<string>();
