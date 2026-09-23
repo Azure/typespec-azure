@@ -1,10 +1,7 @@
 import {
   createRule,
   fileRef,
-  getDiscriminator,
-  getLifecycleVisibilityEnum,
   getLocationContext,
-  getVisibilityForClass,
   isNeverType,
   isNullType,
   isVoidType,
@@ -42,10 +39,10 @@ export const patchPropertiesCorrespondToPutRule = createRule({
   messages: {
     missingPatchBody: "The PATCH operation must have a request body.",
     emptyPatchBody: "The PATCH request body must contain at least one property.",
-    missingPutBody: "A PATCH request body requires the corresponding PUT operation to have a body.",
     missingProperty: paramMessage`The property '${"propertyName"}' in the PATCH body does not correspond to a property in the PUT body.`,
   },
   create(context) {
+    const metadataInfo = createMetadataInfo(context.program);
     return {
       root: (program) => {
         const [services] = getAllHttpServices(program);
@@ -53,7 +50,6 @@ export const patchPropertiesCorrespondToPutRule = createRule({
         for (const service of services) {
           const missingPatchBodies = new Set<Operation>();
           const emptyPatchBodies = new Set<Operation>();
-          const missingPutBodies = new Set<Operation>();
 
           for (const version of resolveVersions(program, service.namespace)) {
             const operationsByPath = new Map<
@@ -62,6 +58,7 @@ export const patchPropertiesCorrespondToPutRule = createRule({
             >();
             for (const httpOperation of service.operations) {
               if (
+                getLocationContext(program, httpOperation.operation).type !== "project" ||
                 !isAvailableAtVersion(program, httpOperation.operation, version) ||
                 (httpOperation.overloading !== undefined &&
                   isOverloadSameEndpoint(
@@ -93,28 +90,15 @@ export const patchPropertiesCorrespondToPutRule = createRule({
                 }
                 continue;
               }
-              const putBody = getBodyAtVersion(program, put, version);
-              if (putBody === undefined || isVoidType(putBody)) {
-                if (!missingPutBodies.has(patch.operation)) {
-                  missingPutBodies.add(patch.operation);
-                  context.reportDiagnostic({
-                    target: patch.operation,
-                    messageId: "missingPutBody",
-                  });
-                }
+              if (patch.parameters.body?.bodyKind !== "single" || !isObjectBody(patchBody)) {
                 continue;
               }
 
-              const putPropertyNames = new Set(
-                collectLeafProperties(program, putBody, put.operation, "put", version).map(
-                  (property) => property.jsonName,
-                ),
-              );
               const patchProperties = collectLeafProperties(
                 program,
                 patchBody,
-                patch.operation,
-                "patch",
+                patch,
+                metadataInfo,
                 version,
               );
               if (patchProperties.length === 0) {
@@ -127,6 +111,19 @@ export const patchPropertiesCorrespondToPutRule = createRule({
                 }
                 continue;
               }
+              const putBody = getBodyAtVersion(program, put, version);
+              if (
+                putBody === undefined ||
+                put.parameters.body?.bodyKind !== "single" ||
+                !isObjectBody(putBody)
+              ) {
+                continue;
+              }
+              const putPropertyNames = new Set(
+                collectLeafProperties(program, putBody, put, metadataInfo, version).map(
+                  (property) => property.jsonName,
+                ),
+              );
               for (const patchProperty of patchProperties) {
                 if (putPropertyNames.has(patchProperty.jsonName)) {
                   continue;
@@ -170,16 +167,36 @@ function getBodyAtVersion(
 function collectLeafProperties(
   program: Program,
   body: Type,
-  operation: Operation,
-  verb: "patch" | "put",
+  operation: HttpOperation,
+  metadataInfo: MetadataInfo,
   version: VersionResolution,
 ): LeafProperty[] {
-  const metadataInfo = createMetadataInfo(program, {
-    canonicalVisibility: Visibility.Read,
-    canShareProperty: (property) => canSharePropertyUsingReadonlyOrXmsMutability(program, property),
-  });
-  const visibility = resolveRequestVisibility(program, operation, verb);
-  return collectTypeLeaves(program, body, operation, metadataInfo, visibility, version, new Set());
+  const visibility = resolveRequestVisibility(program, operation.operation, operation.verb);
+  const bodyParameter = operation.parameters.body;
+  return collectTypeLeaves(
+    program,
+    body,
+    operation.operation,
+    metadataInfo,
+    visibility,
+    bodyParameter?.bodyKind === "single" ? bodyParameter.isExplicit : false,
+    version,
+    new Set(),
+  );
+}
+
+function isObjectBody(type: Type): boolean {
+  if (type.kind === "Union") {
+    const variants = [...type.variants.values()]
+      .map((variant) => variant.type)
+      .filter((variant) => !isNullType(variant));
+    return variants.length === 1 && isObjectBody(variants[0]);
+  }
+  if (type.kind !== "Model") return false;
+  for (let model: Model | undefined = type; model !== undefined; model = model.baseModel) {
+    if (model.indexer !== undefined) return false;
+  }
+  return true;
 }
 
 function collectTypeLeaves(
@@ -188,6 +205,7 @@ function collectTypeLeaves(
   diagnosticTarget: DiagnosticTarget,
   metadataInfo: MetadataInfo,
   visibility: Visibility,
+  inExplicitBody: boolean | undefined,
   version: VersionResolution,
   visiting: Set<Model>,
 ): LeafProperty[] {
@@ -202,6 +220,7 @@ function collectTypeLeaves(
           diagnosticTarget,
           metadataInfo,
           visibility,
+          inExplicitBody,
           version,
           visiting,
         )
@@ -211,13 +230,10 @@ function collectTypeLeaves(
     return [];
   }
 
-  const schemaVisibility = metadataInfo.isTransformed(type, visibility)
-    ? visibility
-    : Visibility.Read;
   const properties = getModelProperties(type).filter(
     (property) =>
       isAvailableAtVersion(program, property, version) &&
-      metadataInfo.isPayloadProperty(property, schemaVisibility) &&
+      metadataInfo.isPayloadProperty(property, visibility, inExplicitBody) &&
       !isNeverType(property.type),
   );
   visiting.add(type);
@@ -230,7 +246,8 @@ function collectTypeLeaves(
       program,
       property.type,
       metadataInfo,
-      schemaVisibility,
+      visibility,
+      inExplicitBody,
       version,
     )
       ? collectTypeLeaves(
@@ -238,7 +255,8 @@ function collectTypeLeaves(
           property.type,
           target,
           metadataInfo,
-          schemaVisibility,
+          visibility,
+          inExplicitBody,
           version,
           visiting,
         )
@@ -247,19 +265,6 @@ function collectTypeLeaves(
       leaves.push({ jsonName, target });
     } else {
       leaves.push(...nested);
-    }
-  }
-  const leafNames = new Set(leaves.map((leaf) => leaf.jsonName));
-  for (const discriminator of getSynthesizedDiscriminators(program, type)) {
-    if (!leafNames.has(discriminator.jsonName)) {
-      leaves.push({
-        jsonName: discriminator.jsonName,
-        target:
-          getLocationContext(program, discriminator.target).type === "project"
-            ? discriminator.target
-            : diagnosticTarget,
-      });
-      leafNames.add(discriminator.jsonName);
     }
   }
   visiting.delete(type);
@@ -271,6 +276,7 @@ function hasDirectPayloadProperties(
   type: Type,
   metadataInfo: MetadataInfo,
   visibility: Visibility,
+  inExplicitBody: boolean | undefined,
   version: VersionResolution,
 ): boolean {
   if (type.kind === "Union") {
@@ -279,23 +285,25 @@ function hasDirectPayloadProperties(
       .filter((variant) => !isNullType(variant));
     return (
       variants.length === 1 &&
-      hasDirectPayloadProperties(program, variants[0], metadataInfo, visibility, version)
+      hasDirectPayloadProperties(
+        program,
+        variants[0],
+        metadataInfo,
+        visibility,
+        inExplicitBody,
+        version,
+      )
     );
   }
   if (type.kind !== "Model") {
     return false;
   }
 
-  const schemaVisibility = metadataInfo.isTransformed(type, visibility)
-    ? visibility
-    : Visibility.Read;
-  return (
-    [...type.properties.values()].some(
-      (property) =>
-        isAvailableAtVersion(program, property, version) &&
-        metadataInfo.isPayloadProperty(property, schemaVisibility) &&
-        !isNeverType(property.type),
-    ) || hasDirectSynthesizedDiscriminator(program, type)
+  return [...type.properties.values()].some(
+    (property) =>
+      isAvailableAtVersion(program, property, version) &&
+      metadataInfo.isPayloadProperty(property, visibility, inExplicitBody) &&
+      !isNeverType(property.type),
   );
 }
 
@@ -333,31 +341,6 @@ function isAvailableAtVersion(
   return available;
 }
 
-function hasDirectSynthesizedDiscriminator(program: Program, model: Model): boolean {
-  const discriminator = getDiscriminator(program, model);
-  return (
-    discriminator !== undefined && model.properties.get(discriminator.propertyName) === undefined
-  );
-}
-
-function getSynthesizedDiscriminators(
-  program: Program,
-  model: Model,
-): { jsonName: string; target: Model }[] {
-  const discriminators = new Map<string, Model>();
-  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
-    const discriminator = getDiscriminator(program, current);
-    if (
-      discriminator !== undefined &&
-      current.properties.get(discriminator.propertyName) === undefined &&
-      !discriminators.has(discriminator.propertyName)
-    ) {
-      discriminators.set(discriminator.propertyName, current);
-    }
-  }
-  return [...discriminators].map(([jsonName, target]) => ({ jsonName, target }));
-}
-
 function getModelProperties(model: Model): ModelProperty[] {
   const properties = new Map<string, ModelProperty>();
   for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
@@ -368,20 +351,4 @@ function getModelProperties(model: Model): ModelProperty[] {
     }
   }
   return [...properties.values()];
-}
-
-function canSharePropertyUsingReadonlyOrXmsMutability(
-  program: Program,
-  property: ModelProperty,
-): boolean {
-  const lifecycle = getLifecycleVisibilityEnum(program);
-  const visibility = getVisibilityForClass(program, property, lifecycle);
-  if (visibility.size === lifecycle.members.size) {
-    return true;
-  }
-
-  return (
-    visibility.size > 0 &&
-    [...visibility].every((member) => ["Read", "Create", "Update"].includes(member.name))
-  );
 }
