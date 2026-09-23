@@ -616,6 +616,12 @@ during its rerun consumes
 the next attempt. Do not reset this budget by changing commands, reclassifying
 findings, switching agents or restarting a phase.
 
+In queue mode, an exhausted ordinary allowance may use the shared
+[coordinator-owned local recovery reserve](../shared/recovery-context.md#coordinator-owned-local-recovery-reserve).
+Return its nonterminal handoff before a terminal budget stop; only the outer
+queue may debit the task-wide reserve and resume this same fix agent and round.
+Standalone review does not receive that reserve.
+
 1. Preserve the failed command, working directory, exit status, output, draft
    identity and planned validation scope. Establish a concrete causal link to
    the agent's current task-owned edits or invocation: for example, a compiler
@@ -646,7 +652,8 @@ findings, switching agents or restarting a phase.
    Return `ready-for-publication` only when the final draft satisfies the complete
    required scope. The parent independently verifies that every prior failure
    is accounted for and no failed required check remains unresolved.
-6. Except for an eligible native-test timeout diagnosis below, stop on an
+6. Except for the queue reserve above or an eligible native-test timeout
+   diagnosis below, stop on an
    unknown cause, unsafe/out-of-scope correction, exhausted budget,
    or an external/indeterminate operational failure (such as credentials, network,
    dependency/tool availability, harness/emitter crash, or publication failure).
@@ -692,7 +699,11 @@ review invocation, or resumption does not reset it.
    If it fails, do not repeat the diagnostic run. An understood defect in the
    agent's draft may still use the existing bounded draft-correction allowance,
    with concrete causal evidence and a full-scope passing rerun. An unexplained
-   timeout or ineligible failure remains a blocker. Source-semantic defects in
+   timeout remains blocking unless the outer queue grants the shared
+   [bounded native baseline comparison](../shared/recovery-context.md#bounded-native-baseline-comparison).
+   Return its nonterminal handoff with commands stopped; the review pair stays
+   idle until that same-owner continuation. Standalone runs and ineligible
+   failures retain the stop. Source-semantic defects in
    promotion still require the source-repair handoff.
 
 This allowance is separate from draft corrections and does not authorize
