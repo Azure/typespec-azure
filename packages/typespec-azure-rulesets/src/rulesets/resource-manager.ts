@@ -109,6 +109,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/unsupported-type": true,
     "@azure-tools/typespec-azure-resource-manager/no-query-in-point-op": false,
     "@azure-tools/typespec-azure-resource-manager/use-model-request-body": false,
+    "@azure-tools/typespec-azure-resource-manager/use-even-segmented-put-path": false,
 
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
