@@ -32,32 +32,32 @@
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'old' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    "message": "Operation 'old' defines disallowed response status '400'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'standard' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    "message": "Operation 'standard' defines disallowed response status '400'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'wrong' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    "message": "Operation 'wrong' defines disallowed response status '400'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'legacy' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    "message": "Operation 'legacy' defines disallowed response status '400'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'localError' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    "message": "Operation 'localError' defines disallowed response status '400'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'overriddenStandard' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    "message": "Operation 'overriddenStandard' defines disallowed response status '400'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",

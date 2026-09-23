@@ -12,7 +12,7 @@
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'check' defines explicit error status code '404'. Remove it and use the default response for errors instead."
+    "message": "Operation 'check' defines disallowed response status '404'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",

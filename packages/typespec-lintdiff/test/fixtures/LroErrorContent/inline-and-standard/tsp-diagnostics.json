@@ -102,117 +102,117 @@
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'standard' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'standard' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'copied' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'copied' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'nullableStandard' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'nullableStandard' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'anonymous' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'anonymous' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'arrayBody' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'arrayBody' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'recordBody' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'recordBody' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'generic' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'generic' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'scalarBody' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'scalarBody' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'literalBody' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'literalBody' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'numberBody' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'numberBody' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'booleanBody' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'booleanBody' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'templateBody' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'templateBody' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'enumMember' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'enumMember' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'tupleBody' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'tupleBody' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'unionBody' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'unionBody' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'unknownBody' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'unknownBody' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'bytesBody' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'bytesBody' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'noBody' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    "message": "Operation 'noBody' defines disallowed response status '400'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'binary' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'binary' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'sync' defines explicit error status code '400'. Remove it and use the default response for errors instead."
+    "message": "Operation 'sync' defines disallowed response status '400'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'disabled' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'disabled' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'fileBody' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'fileBody' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'multipartBody' defines explicit error status code '500'. Remove it and use the default response for errors instead."
+    "message": "Operation 'multipartBody' defines disallowed response status '500'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",

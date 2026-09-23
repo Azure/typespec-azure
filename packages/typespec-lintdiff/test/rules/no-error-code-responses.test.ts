@@ -41,7 +41,7 @@ async function tester() {
 function diagnostic(operationName: string, statusCode: number | string) {
   return {
     code: "tsp-lintdiff-local-linter/no-error-code-responses",
-    message: `Operation '${operationName}' defines explicit error status code '${statusCode}'. Remove it and use the default response for errors instead.`,
+    message: `Operation '${operationName}' defines disallowed response status '${statusCode}'. Use only 200, 201, 202, 204, or default responses.`,
   };
 }
 

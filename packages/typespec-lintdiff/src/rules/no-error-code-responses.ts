@@ -9,7 +9,7 @@ export const noErrorCodeResponsesRule = createRule({
   description: "Operations must not define response codes outside 200, 201, 202, 204, or default.",
   severity: "warning",
   messages: {
-    default: paramMessage`Operation '${"operationName"}' defines explicit error status code '${"statusCode"}'. Remove it and use the default response for errors instead.`,
+    default: paramMessage`Operation '${"operationName"}' defines disallowed response status '${"statusCode"}'. Use only 200, 201, 202, 204, or default responses.`,
   },
   create(context) {
     return {
