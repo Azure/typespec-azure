@@ -2,7 +2,7 @@
 validatorRuleId: PatchBodyParametersSchema
 engine: spectral
 tspLints:
-  - tsp-lintdiff-local-linter/patch-body-parameters-schema
+  - tsp-lintdiff-local-linter/no-unsafe-patch-body-properties
 coverageKind: partial
 projectionScope: http-reachable
 ---
@@ -12,6 +12,19 @@ projectionScope: http-reachable
 **Severity:** error
 
 **Applies to:** Resource Manager (ARM)
+
+## Consolidated native contract
+
+This legacy rule maps to the shared
+[`no-unsafe-patch-body-properties`](../../../src/rules/no-unsafe-patch-body-properties.md)
+implementation together with `ConsistentPatchProperties` and `UnSupportedPatchProperties`.
+The linked contract and diagnostic mapping supersede the historical description below.
+In particular, exposed non-Update input and array elements are now checked;
+required array-element properties remain permitted. Identity exempts safety, not layout.
+Comparison snapshots contain **all categories** of the combined diagnostic ID,
+not category-filtered counts proving equivalence to this one Swagger rule.
+
+## Historical safety-rule evidence
 
 PATCH body parameters must not have required properties, defaults, or create-only members.
 

@@ -6,7 +6,7 @@
       "count": 1
     },
     {
-      "code": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+      "code": "tsp-lintdiff-local-linter/no-unsafe-patch-body-properties",
       "count": 2
     },
     {

@@ -22,10 +22,6 @@
       "count": 1
     },
     {
-      "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
-      "count": 1
-    },
-    {
       "code": "tsp-lintdiff-local-linter/xms-examples-required",
       "count": 2
     }

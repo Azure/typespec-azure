@@ -8,6 +8,7 @@
     {
       "code": "@azure-tools/typespec-azure-core/no-openapi",
       "count": 1
-    }
+    },
+    "tsp-lintdiff-local-linter/xms-pageable-for-list-calls"
   ]
 }

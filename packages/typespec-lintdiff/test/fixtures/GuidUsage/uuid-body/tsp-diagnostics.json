@@ -5,11 +5,6 @@
     "message": "Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board."
   },
   {
-    "code": "tsp-lintdiff-local-linter/unsupported-patch-properties",
-    "severity": "warning",
-    "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
     "severity": "warning",
     "message": "Description must not match the name of the node it describes. Node name:'description' Description:'Description'"

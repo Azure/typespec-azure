@@ -38,7 +38,7 @@ Sources:
 
 Classification at development base
 `a213b2d6265b16ccd1a6dff22547b5d7fa84980e`, rechecked against
-`64cf4af2850f436944284fb7dbef994c4e2a081b` and publication target
+`64cf4af2850f436944284fb7dbef994c4e2a081b` and integrated publication target
 `e3fcd29b245a5393beb448872f5018ddc8147c84`: **partial**.
 The intervening target commits update skill instructions and consolidate
 unrelated ARM PATCH-property rules. They do not change the official anonymous-type
@@ -297,9 +297,25 @@ The one-project `CustomLocations` preflight also succeeded. Both used the pinned
 specs commit above; no project selector or timeout was relaxed.
 
 Validation used the preserved development checkout at
-`a213b2d6265b16ccd1a6dff22547b5d7fa84980e` plus this PR's changes. The later
-target's unrelated PATCH-rule consolidation was inspected but not merged into
-that checkout; this report does not claim to validate a merge commit.
+`a213b2d6265b16ccd1a6dff22547b5d7fa84980e` plus this PR's changes. The recorded
+full corpus predates integration of target
+`e3fcd29b245a5393beb448872f5018ddc8147c84`; it remains AvoidAnonymousTypes
+evidence because the target merge and review fix do not change this rule's
+production source, native tests, or corpus population. The target contributes
+an independently reviewed, unrelated ARM PATCH-rule consolidation, so this note
+does not claim that the whole merged all-rule corpus was rerun.
+
+The target was integrated with an ordinary no-auto-commit merge whose parents
+are `f907ed8e24331626c86cb4db59c3bf8eb99d7a3b` and
+`e3fcd29b245a5393beb448872f5018ddc8147c84`. Post-integration validation rebuilt
+the lintdiff dependency closure, passed all 60 AvoidAnonymousTypes native tests
+and all seven rule fixtures, and strictly validated the complete affected shared
+fixture populations: 13 ConsistentResponseSchemaForPut, six LroErrorContent,
+13 GetCollectionOnlyHasValueAndNextLink, and 23 ConsistentPatchProperties cases.
+The GetCollection snapshots were refreshed from the strict harness to reconcile
+the current `xms-pageable-for-list-calls` diagnostic population and canonical
+OpenAPI JSON serialization; the accepted AvoidAnonymousTypes removals remain
+limited to the five reviewed shared fixture cases and two ambient expectations.
 
 The raw validator shard has 32 occurrences. Excluding failures on **both** sides
 leaves ten. The complete affected-project population is:
@@ -370,7 +386,7 @@ Reproduction from the prepared isolated specs checkout:
 ```powershell
 pnpm --dir packages/typespec-lintdiff build
 pnpm --dir packages/typespec-lintdiff exec vitest run test/rules/avoid-anonymous-types.test.ts
-pnpm --dir packages/typespec-lintdiff validate --rule AvoidAnonymousTypes
+pnpm --dir packages/typespec-lintdiff validate AvoidAnonymousTypes --parallelism=1
 pnpm --dir packages/typespec-lintdiff specs:typespec --specs-repo <isolated-specs-worktree> --concurrency 6
 ```
 
