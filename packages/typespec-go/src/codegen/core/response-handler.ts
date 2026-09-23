@@ -22,7 +22,7 @@ export function createResponseHandler(
   indent: helpers.Indentation,
 ): string {
   const name = method.naming.responseMethod;
-  let text = `${helpers.comment(name, "// ")} handles the ${method.name} response.\n`;
+  let text = `${helpers.comment(name, "// ")} handles the ${go.isLROMethod(method) || go.isPageableMethod(method) ? method.naming.operationMethod : method.name} response.\n`;
   text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${name}(resp *http.Response, successCodes ...int) (${method.returns.name}, error) {\n`;
 
   const resultVarName = "result";

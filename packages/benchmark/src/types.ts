@@ -80,6 +80,8 @@ export interface BenchmarkResult {
   timestamp: string;
   /** Runner environment info. */
   runner: RunnerInfo;
+  /** Published C# packages used by this run; absent in older results or non-C# runs. */
+  externalEmitterVersions?: Record<string, string>;
   /** Per-spec benchmark results, keyed by spec name. */
   specs: Record<string, SpecBenchmarkResult>;
 }

@@ -57,6 +57,28 @@ it("export TCGC output from emitter", async () => {
   strictEqual(codeModel["models"][0]["name"], "Test");
 });
 
+it("export HTTP authentication metadata from emitter", async () => {
+  const { outputs } = await SimpleTester.emit(SdkTestLibrary.name).compile(
+    `
+      @service
+      @useAuth(NoAuth | ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
+      namespace Contoso;
+
+      @useAuth(BearerAuth)
+      op read(): void;
+    `,
+  );
+
+  const output = outputs["tcgc-output.yaml"];
+  ok(output);
+  const codeModel = parse(output);
+  const authentication = codeModel.clients[0].authentication;
+  strictEqual(authentication.options.length, 2);
+  strictEqual(authentication.options[0].schemes[0].type, "noAuth");
+  strictEqual(authentication.options[1].schemes[0].type, "apiKey");
+  strictEqual(authentication.options[1].schemes[0].model, undefined);
+});
+
 it("export complex TCGC output from emitter", async () => {
   const { outputs } = await ArmTester.emit(SdkTestLibrary.name).compile(
     `
