@@ -61,6 +61,84 @@ covers both. It is not a repository-wide timeout default.
   attempt allowance. The existing timeout-diagnosis policy still excludes hook
   failures from its automatic per-test diagnostic rerun.
 
+## Validation gates and supplemental checks
+
+Before executing validation, record each command's exact scope, input identity,
+authority and gate level: `required` or `supplemental`. Required includes checks
+mandated by the user or applicable repository/phase instructions. A user's
+explicit "publish only if this passes" condition is a required gate, even for a
+normally optional command. A retry allowance by itself does not change a gate's
+level. Carry this plan and all results across owners; do not infer gating from
+a command's name, breadth, exit code or the word "blocker" in an old summary.
+
+For promotion, affected native checks are required; the optional final
+`validate:pr` run is supplemental unless separately required. Generic "stop on
+validation failure" and "never publish a failing draft" rules prohibit failed
+required gates and task defects; they do not silently make every supplemental
+check mandatory.
+
+| Evidence                                                                                                                                                  | Disposition                                                                                   |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Required check fails, is incomplete, or no longer matches the draft                                                                                       | Block publication; apply only an existing eligible correction/recovery allowance.             |
+| Any check reveals a task-caused defect, or a failure plausibly involving changed behavior remains unclassified                                            | Block publication; investigate and use the applicable correction or immutable-source handoff. |
+| Predeclared supplemental check fails or reaches its deadline, all required checks still pass on the final draft, and triage finds no task-relevant defect | Preserve the failure as a validation limitation and continue without rerunning it.            |
+| Gate authority, failure scope, current content, or command quiescence cannot be verified                                                                  | Return the exact missing evidence; do not assume a nonblocking result.                        |
+
+Supplemental triage inspects the actual failed step, locations and relevant
+changed code/dependencies, not just package names. Record why required evidence
+remains applicable, the exit or termination status, counts and any unknown cause.
+A setup-hook timeout outside required coverage may remain unexplained; do not
+claim baseline reproduction or an environmental cause without evidence. It is
+not an eligible automatic timeout rerun. A plausible task regression still
+blocks regardless of which command found it.
+
+Report retained supplemental failures in the PR and final result. Continuing
+with that disclosed limitation is neither a passing full suite nor a retry;
+it consumes no correction budget. Do not repeatedly run optional suites seeking
+green, increase timeouts, skip tests, or fix unrelated code. A failed required
+check cannot be demoted after the fact, and missing prior classification must
+not be filled in opportunistically.
+
+## Read-only blocker reconciliation
+
+Before declaring a terminal stop or requesting renewed permission, the
+coordinator checks the original operation, evidence and applicable contract.
+Do not require the user to debug policy selection. Separate these cases:
+
+- **Actual permission/capability missing:** name the repository, operation and
+  unsupported control or denied access. Previously verified access is not a
+  blocker merely because an earlier summary says "authorization required."
+- **Already permitted continuation:** verified explicit-target worktree reuse,
+  an unattempted publication after its preflight obstacle is resolved, or a
+  disclosed supplemental limitation may permit the next unfinished step.
+  Verify their specific contracts; do not rerun a failed command.
+- **A new exception or retry is needed:** preserve the stop and exact finite
+  authorization required. Generic "continue" or "give access" does not increase
+  a retry budget, override a user-imposed gate, permit app ownership adoption,
+  or authorize resending a failed/indeterminate publication.
+
+Workers may return `policy-reconciliation-handoff` with commands stopped, the
+current draft identity, gate authority, preserved results/counters and the
+proposed next step. The coordinator resolves it once from read-only evidence.
+Record a corrected classification separately from the original stop. Continue
+the same idle phase owner only if the next action was already authorized and
+no failed required gate, task defect or side-effect uncertainty remains. This
+does not launch a fresh worker, reset counters, renew deadlines or retry an
+external operation. Otherwise retain the normal stop and recovery policy.
+
+Use these decision cases when reviewing changes to the contracts:
+
+| Case                                                                                   | Expected outcome                                                            |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Clean, recorded CLI task worktree; no PR attempt; explicit targeting now available     | Verify reuse and creation binding; continue without app adoption.           |
+| Ownerless worktree needs an app-session creation binding                               | Require authorized app adoption; CLI presence is not a bypass.              |
+| Optional broad run times out; exact required checks pass; no task-linked failure found | Disclose the limitation and continue; no automatic full-suite retry.        |
+| Same run was explicitly required by the user                                           | Remain blocked until the required gate is satisfied or the user changes it. |
+| Required test fails, even in apparently unrelated setup                                | Preserve the failed gate and bounded recovery policy.                       |
+| Supplemental assertion demonstrates a source-rule defect                               | Return source-repair evidence; do not patch only the promoted copy.         |
+| PR creation response is indeterminate and the exact query is empty                     | Do not resend; preserve publication-recovery stop.                          |
+| Content changes or prior owner activity is uncertain                                   | Invalidate affected evidence or stop; do not reuse by path/name alone.      |
+
 ## Opt-in post-merge source repair
 
 This is a transition owned by the outer queue, **not** publication-error recovery

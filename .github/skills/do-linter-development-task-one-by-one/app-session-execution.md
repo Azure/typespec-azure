@@ -134,9 +134,40 @@ Classify before applying merged-PR or reuse gates; titles are leads, not identit
   separate lifecycle, not as `update-existing` or an automatic recovery retry.
 
 Legacy ownership adoption is a separate explicitly authorized operation below,
-not any of these lifecycle classes or permission to transfer commits, replace
+needed only for establishing an app-session owner, not for ordinary
+explicit-target reuse. It is not permission to transfer commits, replace
 worktrees, reset budgets or ignore failed validation. Stop prior task activity
 before any reuse or new authorized work.
+
+### Verified explicit-target resumption
+
+A request to complete a named rule permits reuse of its recorded task-owned
+work in the permitted `explicit-target` backend. It does not require a separate
+"adopt this legacy checkout" approval just because another agent created it or
+an earlier environment lacked publication controls. Apply these checks before
+dispatching any continuation:
+
+1. Verify exact task/rule ownership from the prior handoff and full Git diff,
+   folder containment, repository, branch, local/pushed HEAD, task-file hashes,
+   index/worktree state, specs pin, and prior owner/command quiescence. A name
+   match alone or unexplained edits are insufficient; preserve all work.
+2. Reuse only validation and review evidence whose content and inputs still
+   match. Restore the existing phase, counters, failures and publication
+   history; do not start over at discovery or re-create dependencies/worktrees.
+3. Reconcile the exact PR tuple. Reuse a verified open PR; for an unattempted
+   creation, verify absence and the current explicit repository/base/head
+   controls before the first attempt. A historical preflight refusal before
+   any creation call is not a failed API request. A failed/indeterminate call
+   still follows the bounded publication-recovery policy below.
+4. Record the current publication owner and next unfinished step. No app
+   registration/adoption is needed. Within an active cycle, retain its idle
+   phase owner; on a resumed invocation, retain the task/cycle history and
+   establish one owner only after prior activity is verified stopped.
+
+This does not authorize closed/merged PR replacement, fork exceptions, new
+retry allowances, failed required validation, or bypassing a required app tool.
+If the environment requires `app-session` publication, use its adoption and
+binding rules instead; installing or finding `gh` does not change that backend.
 
 ## Bounded checkout readiness
 
@@ -287,7 +318,9 @@ publication_tool: <required-tool>
 
 For the `explicit-target` backend, verify that the permitted creation tool can
 select the requested repository/base/head independently for every task; no app
-session binding is required. The remainder of this section applies to
+session binding is required. Apply
+[verified explicit-target resumption](#verified-explicit-target-resumption)
+for existing task work. The remainder of this section applies to
 `app-session` execution.
 
 For queues, after complete parsing and catalog eligibility, resolve each supplied

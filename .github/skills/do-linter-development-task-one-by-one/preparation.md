@@ -70,7 +70,7 @@ undocumented app settings, create an out-of-folder session and move it, or treat
 the selected project root as proof of its worktree destination.
 
 Exact existing in-folder owners may still be reused without a placement control.
-Non-destructive registration of an ownerless existing checkout uses only the
+In app-session mode, registration of an ownerless existing checkout uses only the
 explicitly authorized adoption procedure. For NEW PRs, registration alone is
 insufficient: a supported exact-folder owner and correct publication base must
 both be established. An explicit-target backend may create a Git worktree under
@@ -103,7 +103,10 @@ the folder only if that publication backend is actually permitted.
    checkout. For bare rule input, discover only recorded task-owned resources or
    create new ones. Never appropriate a same-named unrelated worktree/session.
    Existing publication failures retain their lifecycle and recovery budgets;
-   bare rule input is not authorization to replace failed work or restart it.
+   bare rule input is not authorization to replace failed work or retry a failed
+   operation. It does permit
+   [verified explicit-target resumption](app-session-execution.md#verified-explicit-target-resumption)
+   at the next unfinished step; do not apply app adoption rules to CLI worktrees.
 4. Create or verify the two distinct TypeSpec publication owners through
    [app-owned checkout preparation](app-session-execution.md#dispatcher-preparation)
    in app-session mode. The development base is
@@ -133,8 +136,9 @@ the folder only if that publication backend is actually permitted.
    with any other queue entry's resources or owner IDs. Development and promotion
    must have distinct branches and, in app-session mode, distinct app owners.
    An existing exact-path owner may
-   be reused only with verified task ownership and quiescence; ordinary legacy
-   worktrees require the separate explicit adoption authorization. Never use an
+   be reused only with verified task ownership and quiescence; ordinary worktrees
+   requiring a new app-session owner need the separate adoption authorization.
+   Explicit-target reuse follows its own verified resumption path. Never use an
    unrelated coordinator checkout for task edits or builds.
 8. Apply bounded checkout readiness to every created owner and verify specs
    HEAD/status. For queued work, initialize the ignored shared development `log.txt` using the
@@ -293,8 +297,13 @@ Run full `mise exec -- pnpm install` only when an actual required validation
 demonstrates that lifecycle outputs are missing. Do not prepare Python or other
 unrelated lifecycle environments speculatively.
 
-Require the selected package manager and repository validation tools to resolve
-and `core` to match its gitlink. Destination-specific dependency builds and
+Derive tool probes from this checkout's `package.json` scripts, declared
+dependencies and referenced configuration before executing them. Do not assume
+the development worktree and promotion base use the same linter (for example,
+ESLint versus oxlint), or install an unconfigured tool because a guessed probe
+failed. Record the selected script/tool and version in readiness evidence.
+Require those tools and the selected package manager to resolve, and `core` to
+match its gitlink. Destination-specific dependency builds and
 native tests remain promotion work after destination selection; base-environment
 readiness is not a claim that those checks passed.
 

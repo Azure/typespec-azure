@@ -222,6 +222,8 @@ Keep an ordered ledger with one entry per parsed queue entry:
   from worker attempts, review rounds and source-repair cycles
 - native-test timeout-diagnosis usage (at most one per task across all phases
   and cycles), eligibility evidence, concurrency change and full-scope results
+- predeclared required/supplemental validation plan, authority and per-command
+  disposition; disclosed limitations and read-only blocker-reconciliation decisions
 - publication attempt/error identities, exact base/head tuple and SHA, absence
   query evidence, and the separate one-correction publication budget
 - original readiness/status/quiescence deadlines, last genuine progress,
@@ -274,7 +276,8 @@ For each successfully prepared command, in input order:
 1. Launch exactly one fresh top-level general-purpose subagent per cycle. Do not
    reuse a worker from a prior task or cycle. Follow-up messages to the same
    idle worker are allowed only for capability coordination or continuation
-   after an outer-owned review in this cycle.
+   after an outer-owned review, an approved bounded resumption, or a verified
+   read-only blocker reconciliation in this cycle. None starts a fresh cycle.
 2. Give it the complete worker prompt below, including the original command and
    parsed TypeSpec worktree, cycle number, and cycle handoff when resuming.
 3. Wait for that subagent to finish before launching another top-level subagent.
@@ -284,6 +287,10 @@ For each successfully prepared command, in input order:
    inferring success from worker prose.
    For `review-handoff`, complete the outer-owned review protocol below before
    resuming the same worker or declaring the task terminal.
+   Before accepting any terminal blocker, apply the shared
+   [read-only reconciliation](../shared/recovery-context.md#read-only-blocker-reconciliation).
+   A `policy-reconciliation-handoff` remains nonterminal while this one
+   adjudication runs; it does not authorize another command attempt.
 5. For `source-repair-required`, apply the bounded source-repair loop below.
    Launch a fresh worker for the same task only after the prior worker is
    terminal and its nested agents and commands have stopped doing work.
@@ -405,7 +412,10 @@ failure and correction in the ledger, then launch one fresh worker with the
 corrected prompt. Never reuse the failed worker.
 
 Do not restart workers automatically for dependency, build, validation, corpus,
-review, network, credential, push or GitHub failures. This does not prohibit an
+review, network, credential, push or GitHub failures. First apply the recorded
+[validation gate levels](../shared/recovery-context.md#validation-gates-and-supplemental-checks):
+continuing after a disclosed supplemental limitation is not a worker restart
+or command retry. This does not prohibit an
 eligible in-place draft correction, the single
 [native-test timeout diagnosis](#native-test-timeout-diagnosis) below, or the shared
 [single evidenced publication-configuration correction](app-session-execution.md#publication-recovery).
@@ -703,7 +713,14 @@ one session to execute both publication phases.
 > Do not stop merely on the first build/test failure in your own draft or a
 > safely correctable invocation mistake. Confirm command semantics and side
 > effects, preserve the intended scope and count the correction. Do stop
-> on ineligible failures or exhausted budget, and never publish a failing draft.
+> on ineligible required-check failures or when a needed correction has exhausted
+> its recovery budget, and never
+> publish a draft with a failed required gate or task defect. Record required
+> versus supplemental commands before execution and follow the shared
+> validation-disposition contract; do not turn an optional broad failure into
+> a required gate. If policy application is unclear, return
+> `policy-reconciliation-handoff` with all commands stopped and exact evidence,
+> rather than requesting another retry or declaring a terminal failure yourself.
 >
 > The queue has already prepared all three worktrees and publication bindings.
 > Read and verify the preparation manifest and supplied instruction versions.
@@ -822,6 +839,9 @@ Do not describe a task as fully successful merely because it created one or both
 PRs. A later failed repair does not erase the earlier PR or clean review history,
 but that history cannot establish success for newer, unreviewed heads. Report a
 required-validation blocker even if the promotion skill returned a draft PR.
+Disclosed supplemental limitations do not alone change `succeeded` to
+`partially-succeeded`; include them in the result without claiming full-suite
+success. Required-check failures and task defects still block success.
 
 ## Final result
 
