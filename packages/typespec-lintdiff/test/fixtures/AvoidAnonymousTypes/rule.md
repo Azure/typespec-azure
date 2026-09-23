@@ -33,6 +33,13 @@ Explicit `@body` and `@bodyRoot` property types already belong to that official
 rule and are excluded. HTTP metadata is resolved with `getHttpOperation`; the
 diagnostic targets the original response expression, not a synthesized payload.
 Shared response model identities are reported once across operations.
+Response unions are checked constituent by constituent, including nested unions.
+HTTP groups responses by status code and can combine plain bodies into a union;
+the group's first `type` is not the identity of every payload. The rule uses
+the actual body types and compiler `sourceModels` provenance to recover original
+return-type constituents after HTTP metadata filtering. Diagnostic identity is
+the original declaration, independent of status grouping, content type, and
+variant order. Explicit-body content remains excluded before this traversal.
 Complete spreads of named models are accepted using the compiler's
 `getEffectiveModelType` semantic source-property mapping. Its property filter
 excludes headers and status codes from both the payload and candidate named
@@ -51,18 +58,27 @@ Both ARM and data-plane authors can use implicit responses; there is no provider
 namespace guard. Promotion must retain this supplemental boundary and must not
 duplicate the official rule's property-position diagnostics.
 
-| ID                               | Violation | Description                                         |
-| -------------------------------- | --------- | --------------------------------------------------- |
-| `compliant`                      | false     | Named response model                                |
-| `implicit-response`              | true      | Inline response model with a payload property       |
-| `intersection-response`          | true      | Anonymous intersection response                     |
-| `metadata-response`              | true      | Inline payload with status and header metadata      |
-| `metadata-spread-response`       | false     | Complete named spread containing HTTP metadata      |
-| `split-metadata-spread-response` | false     | Named spreads with HTTP metadata inside and outside |
-| `spread-response`                | false     | Complete reuse of a named model using spread        |
+| ID                               | Violation | Description                                                 |
+| -------------------------------- | --------- | ----------------------------------------------------------- |
+| `compliant`                      | false     | Named response model                                        |
+| `implicit-response`              | true      | Inline response model with a payload property               |
+| `intersection-response`          | true      | Anonymous intersection response                             |
+| `metadata-response`              | true      | Inline payload with status and header metadata              |
+| `metadata-spread-response`       | false     | Complete named spread containing HTTP metadata              |
+| `split-metadata-spread-response` | false     | Named spreads with HTTP metadata inside and outside         |
+| `spread-response`                | false     | Complete reuse of a named model using spread                |
+| `shared-multi-status-response`   | true      | One original response reused across operations/status codes |
 
 The named control's `use-standard-operations` suppression is ambient: custom
 HTTP operations compile without the canonical-operation recommendation.
 Emitter-free native tests additionally cover aliases, intersections, inherited/named models,
 explicit bodies, empty and non-model bodies, templates, dictionaries, cycles,
 shared siblings, multiple operations, and imported diagnostic targets.
+
+Native-only response-union regressions compile with HTTP and no emitter: plain
+anonymous alternatives, nested/shared unions, and same-status JSON/XML
+alternatives in both orders (named/anonymous, anonymous/anonymous, complete
+named spread/anonymous, and explicit-body/implicit-body). These are valid native
+HTTP shapes. AutoRest's `union-unsupported` and `duplicate-body-types`
+limitations prevent a complete Swagger comparison for distinct payloads at the
+same status; they do not exempt those shapes from the native authoring guideline.
