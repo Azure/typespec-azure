@@ -83,8 +83,8 @@ interface Widgets {
 Prefer the standard responses for new APIs. Suppression can be appropriate for
 an existing, ARM-reviewed contract whose response statuses cannot change without
 breaking compatibility. Apply
-`#suppress "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes"`
-with a reason to the concrete operation, not its reusable template.
+`#suppress "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes" "Existing ARM-reviewed response contract retained for backward compatibility."`
+to the concrete operation, not its reusable template.
 
 ## LintDiff Equivalent
 
