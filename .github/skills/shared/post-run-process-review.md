@@ -44,6 +44,17 @@ responses; do not ask the user to evaluate them. If nothing qualifies, make no
 changes and omit post-run suggestions and an empty process-review section from
 the user-facing response.
 
+Review the stops as well as the final result. For each human intervention,
+record the blocker immediately before it, what the user actually supplied
+(access, authorization, technical information or a changed requirement), and
+what action made progress possible afterward. Distinguish active execution time
+from waiting for the user. Successful completion does not erase a repeatable
+workflow defect: if unchanged content passed the same required gates and later
+proceeded through corrected policy selection alone, inspect contradictory
+instructions and backend-specific rules applied outside their scope. Preserve
+real permission and required-validation gates; do not generalize one user's
+explicit retry allowance into unattended retry permission.
+
 ## Independent skill-only PR
 
 For qualifying improvements:

@@ -601,27 +601,33 @@ Choose the change kind separately for each package:
   internal-only guidance.
 
 Chronus change files must use LF line endings. Do not run Prettier directly on a
-new change file when the Windows checkout would rewrite it with CRLF. After
-formatting, run `pnpm chronus status`; if it reports `missing-front-matter`,
-normalize the change file to LF and rerun the command. On Windows, a reliable
-workflow for a new change file is:
+new change file when the Windows checkout would rewrite it with CRLF. Normalize
+only the explicitly named task-owned change files before the first
+`pnpm chronus status`, without staging them or changing global Git settings.
+On Windows:
 
 ```powershell
-$path = ".chronus/changes/<change-file>.md"
-git -c core.autocrlf=false add -- $path
-cmd /d /c "git show :$($path.Replace('\', '/')) > $path"
-$content = [System.IO.File]::ReadAllText((Resolve-Path $path))
+$path = (Resolve-Path -LiteralPath ".chronus\changes\<change-file>.md").Path
+$content = [System.IO.File]::ReadAllText($path)
+[System.IO.File]::WriteAllText($path, $content.Replace("`r`n", "`n"), [System.Text.UTF8Encoding]::new($false))
+$content = [System.IO.File]::ReadAllText($path)
 if ($content.Contains("`r`n")) { throw "Chronus change file still contains CRLF" }
 pnpm chronus status
 ```
 
-Staging first creates an LF-normalized index blob according to the repository
-attributes; `cmd` writes that blob back without PowerShell text-encoding or
-line-ending conversion.
+Inspect the resulting diff. Preserve the existing index until the ordinary
+publication gate; in review mode, staging still requires the parent's exact
+head/content approval. If Chronus fails, classify the actual error rather than
+assuming every front-matter failure is a line-ending issue.
 
 ### 9. Validate narrowly, then broadly enough for PR
 
-Use the repo's mise-managed toolchain when available.
+Use the repo's mise-managed toolchain when available. Before the first command,
+record the shared
+[validation gate plan](../shared/recovery-context.md#validation-gates-and-supplemental-checks).
+The applicable checks in steps 0-8, Chronus status and diff hygiene are required.
+Step 9 is supplemental unless the user or repository explicitly requires it.
+No phase handoff or generic failure rule changes that classification.
 
 Optimized validation order:
 
@@ -676,7 +682,6 @@ pnpm exec prettier --ignore-path /dev/null --check packages/typespec-azure-resou
 pnpm --filter @azure-tools/typespec-azure-rulesets build
 pnpm --filter @azure-tools/typespec-azure-rulesets test
 pnpm --filter @azure-tools/typespec-azure-resource-manager test
-pnpm exec cross-env TYPESPEC_SKIP_WEBSITE_BUILD=true pnpm validate:pr
 git diff --check
 ```
 
@@ -694,7 +699,6 @@ pnpm exec prettier --ignore-path /dev/null --check packages/typespec-azure-core/
 pnpm --filter @azure-tools/typespec-azure-rulesets build
 pnpm --filter @azure-tools/typespec-azure-rulesets test
 pnpm --filter @azure-tools/typespec-azure-core test
-pnpm exec cross-env TYPESPEC_SKIP_WEBSITE_BUILD=true pnpm validate:pr
 git diff --check
 ```
 
@@ -754,9 +758,11 @@ Run a focused code review after steps 1-2 pass and before steps 3-6 when the
 rule logic is non-trivial. This catches semantic gaps before expensive full
 package validation.
 
-Before PR creation, run the repo's pre-PR validation if available with the
-website build skipped, but bound the wait and do not let it consume the rest of
-the session after the required narrow validation has already passed:
+The default gate is the complete required targeted plan above, not the
+repository-wide wrapper. If broader validation is warranted by the changed
+scope, optionally run the following once with the website build skipped.
+Record why the additional coverage is useful, its supplemental status and its
+deadline before starting; do not add it merely because the command exists:
 
 ```bash
 pnpm exec cross-env TYPESPEC_SKIP_WEBSITE_BUILD=true pnpm validate:pr
@@ -781,11 +787,18 @@ wrapper silence. Do not change repository tooling just to add monitoring.
 
 At five minutes of observed child inactivity or the overall deadline, stop the
 specific command's process tree and verify quiescence. Include a **Validation
-blocker** section in the PR with the last observable step, signal source,
+limitations** section in the PR with the last observable step, signal source,
 elapsed time, termination reason, and successful required narrow validations.
 Distinguish a monitoring/deadline limitation from an established code or
 environmental failure; never invent a natural exit code for a terminated process.
 Do not rerun the broad command automatically or waive a failed required check.
+Apply the same disposition when a supplemental child command exits nonzero
+before the deadline. Inspect its failures under the shared gate plan: a
+task-relevant defect still blocks, but a supplemental limitation with passing
+required checks need not block publication or trigger a full-suite retry.
+Preserve every failure and any unknown cause. A required check remains required
+even when run inside a supplemental wrapper; a contradictory result must be
+resolved rather than hidden by an earlier targeted pass.
 
 #### Validation findings
 
@@ -920,9 +933,14 @@ It must include:
   counts, one-sided project explanations, compile failures, and remaining
   uncertainty. Do not duplicate the detailed migration table or corpus
   declaration in the PR description when `migration.md` already contains it.
-- **Validation blocker:** include this section only when required native
-  promotion validation is blocked or incomplete. Do not mention skipped lintdiff
-  harness validation as a blocker; the harness is not part of promotion.
+- **Validation:** state the required checks and their outcomes. Failed or
+  incomplete required checks block new publication; on an existing PR report
+  them as **Validation blocker** and stop the affected workflow.
+- **Validation limitations:** disclose any failed, skipped or deadline-limited
+  supplemental run with its command, scope, evidence, unresolved cause and
+  disposition. Distinguish it from a required blocker; never claim the full
+  suite passed. Do not describe omitted lintdiff harness validation as a
+  limitation or blocker; that harness is not part of promotion.
 - **Promotion sync policy:** semantic gaps found after promotion should block the
   promotion PR until the user explicitly reopens lintdiff repair, or the owning
   queue starts an authorized source-repair cycle. In queue mode, describe the

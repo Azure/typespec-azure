@@ -131,9 +131,11 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
   round's valid fixes, then stop and report that the cap prevented another
   verification review.
 - Stop immediately on an unverified review request, indeterminate collector
-  failure, push failure, uncertain finding, or validation/corpus failure that
+  failure, push failure, uncertain finding, or required validation/corpus failure that
   does not qualify for [bounded draft correction](#bounded-draft-correction)
   or [bounded native-test timeout diagnosis](#bounded-native-test-timeout-diagnosis).
+  Apply the shared gate disposition to supplemental validation; a task defect
+  discovered there still blocks. Its optional status never excuses a regression.
   The only recovery paths are those procedures and the separately
   bounded, parent-authorized [local collector recovery](#local-collector-recovery).
   None permits erasing failed attempts or publishing unverified changes.
@@ -592,10 +594,12 @@ preserve approved settings and separately bounded attempt usage, and do not
 silently fall back to default timeouts. A profile does not waive the failure
 classification or publication gate.
 
-On a command failure, preserve the evidence and classify it using the bounded
-draft-correction or native-test timeout-diagnosis policy below before deciding
-whether to stop. Never stage,
-commit or push a failing draft. A passing narrower command does not erase a
+On a command failure, preserve the evidence and apply the predeclared
+[gate disposition](../shared/recovery-context.md#validation-gates-and-supplemental-checks)
+before considering bounded draft correction or native-test timeout diagnosis.
+A disclosed supplemental promotion limitation does not automatically block this
+loop or authorize a rerun. Never stage, commit or push a draft with a failed
+required gate or task defect. A passing narrower command does not erase a
 failed required check. Do not retrospectively relabel a failed command as
 supplemental or self-waive it because its diagnostics appear unrelated.
 
@@ -731,8 +735,10 @@ After all required validation succeeds, return `ready-for-publication` with:
 - the validation scope and complete command/corpus evidence described above
 
 The parent independently inspects the proposed diff and evidence, confirms that
-the required scope is satisfied, all earlier failures have verified corrective
-evidence, and no unresolved failed check or blocker remains, and records its
+the required scope is satisfied, every earlier required failure has verified
+corrective evidence, and no unresolved required check or task defect remains.
+Independently verify the original gate classification and disclosed disposition
+of supplemental failures; no retroactive demotion is allowed. Record its
 decision in the ledger. Only then may it send explicit
 publication approval to the same persistent fix subagent, identifying the
 approved head SHA and change-content identity. This is an agent-to-agent gate,
@@ -790,10 +796,12 @@ For rounds 1 through 5:
 4. If the fix subagent returns `no-valid-comments`, reply with its rejection
    rationale, resolve the safely rejected threads, verify that no processed
    thread remains unresolved, and then end successfully.
-5. If it returns `uncertain-or-blocked` or a command failure that is ineligible
-   for correction or has exhausted its correction budget, stop and report the
+5. If it returns `uncertain-or-blocked` or a required command failure that is
+   ineligible for correction or has exhausted its correction budget, stop and report the
    blocker. Do not terminate solely because a ready-for-publication handoff
    retains a failed attempt followed by a verified eligible correction.
+   For supplemental failures, independently verify their predeclared scope and
+   disposition rather than making them required gates during this handoff.
    In queue-controlled promotion mode, return
    `source-repair-required` for a confirmed source defect with the complete
    evidence contract above; retain any separate operational failure rather than
