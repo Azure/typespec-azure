@@ -770,6 +770,17 @@ validation scoped to the change.
 Before committing or creating the PR, the main agent must assign the complete
 rule-related diff to a separate code-review subagent.
 
+Select an owner that can retain the reviewer for the same-agent follow-up below.
+When the runtime distinguishes synchronous and persistent/background launches,
+use the persistent form and verify that the reviewer accepts a follow-up message
+before assigning the initial review. A returned agent ID or an idle status alone
+does not prove follow-up capability. In queue mode, a worker with only synchronous
+launch support must hand the unpublished diff and validation evidence to the
+outer coordinator before launching a local reviewer. The coordinator owns that
+reviewer and its follow-ups; the worker remains idle during review and resumes
+only for coordinated corrections. This routing does not waive review or permit
+publication before its findings are resolved.
+
 The reviewer must:
 
 - compare the rule branch against the freshly fetched

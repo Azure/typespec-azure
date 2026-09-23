@@ -338,13 +338,19 @@ initialization.
   work and report an orchestration capability blocker, not a source-rule defect.
   Do not substitute synchronous reviewers or reuse agents from earlier loops.
 
-For `outer` mode:
+Separately preflight the independent local precommit review required by development
+and promotion. When that review requires same-reviewer follow-up, select an owner
+with persistent launch and messaging before the initial review; a synchronous
+reviewer's returned ID or idle status is not evidence of follow-up capability.
+If the worker has only synchronous launch support, hand the unpublished diff and
+validation evidence to the outer agent before launching the local reviewer.
+The selected owner must verify actual follow-up delivery and retain that reviewer
+through any material corrections. Keep the worker idle while the outer reviewer
+is active, and coordinate corrections without concurrent worktree mutation.
+Complete local review and its validation gates before publication.
 
-Outer ownership applies only to the post-publication GitHub review-and-fix loop.
-It does not waive the development or promotion skill's independent local
-precommit review. Complete that local review and its validation gates before
-publication; if the worker cannot arrange it, hand the unpublished diff and
-evidence to the outer agent for that review before requesting publication.
+For `outer` mode, the following protocol governs the separate post-publication
+GitHub review-and-fix loop; it does not replace local precommit review:
 
 1. The worker completes development, records the canonical PR, pushed SHA,
    applicable validation evidence and exact worktree state, then returns
