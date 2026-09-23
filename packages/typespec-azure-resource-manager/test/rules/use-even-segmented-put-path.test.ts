@@ -161,7 +161,7 @@ it("ignores operation template instances while checking project declarations", a
   await tester
     .expect(
       `
-      @route("/providers/Microsoft.Contoso/widgets/default")
+      @route("/providers/Microsoft.Template")
       @put op Template<T>(@body body: T): void;
       alias Instance = Template<string>;
       @route("/providers/Microsoft.Contoso")

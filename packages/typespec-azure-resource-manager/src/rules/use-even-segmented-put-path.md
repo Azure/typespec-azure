@@ -35,6 +35,26 @@ model Widget {
 
 ## ✅ Correct
 
+Prefer a standard ARM create-or-replace template, which constructs the resource
+instance path from the resource model:
+
+```tsp
+@armProviderNamespace
+namespace Microsoft.Contoso;
+
+model Widget is TrackedResource<{}> {
+  ...ResourceNameParameter<Widget>;
+}
+
+@armResourceOperations
+interface Widgets {
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+}
+```
+
+When a custom PUT operation is necessary, include the resource name after the
+resource type:
+
 ```tsp
 @route("/providers/Microsoft.Contoso/widgets/{widgetName}")
 @put
