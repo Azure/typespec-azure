@@ -9,13 +9,21 @@
       }
     ]
   },
-  "schemes": ["https"],
+  "schemes": [
+    "https"
+  ],
   "host": "management.azure.com",
-  "produces": ["application/json"],
-  "consumes": ["application/json"],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
   "security": [
     {
-      "azure_auth": ["user_impersonation"]
+      "azure_auth": [
+        "user_impersonation"
+      ]
     }
   ],
   "securityDefinitions": {
@@ -41,7 +49,9 @@
     "/providers/Microsoft.TestService/operations": {
       "get": {
         "operationId": "Operations_List",
-        "tags": ["Operations"],
+        "tags": [
+          "Operations"
+        ],
         "description": "List the operations for the provider",
         "parameters": [
           {
@@ -70,7 +80,9 @@
     "/scope/providers/Microsoft.TestService/customdefault": {
       "get": {
         "operationId": "CustomDefaults_GetCustomDefaults",
-        "tags": ["CustomDefaults"],
+        "tags": [
+          "CustomDefaults"
+        ],
         "description": "Get custom defaults.",
         "parameters": [
           {
@@ -105,7 +117,9 @@
           "description": "The widget name."
         }
       },
-      "required": ["name"]
+      "required": [
+        "name"
+      ]
     },
     "WidgetValueOnlyResult": {
       "type": "object",
@@ -119,7 +133,9 @@
           }
         }
       },
-      "required": ["value"]
+      "required": [
+        "value"
+      ]
     }
   },
   "parameters": {}

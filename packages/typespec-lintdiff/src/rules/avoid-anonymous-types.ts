@@ -1,13 +1,15 @@
 import {
   createRule,
-  getSourceLocation,
+  getEffectiveModelType,
+  getLocationContext,
   isTemplateDeclaration,
   isTemplateInstance,
   type Model,
   type Operation,
+  type Type,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
-import { getHttpOperation } from "@typespec/http";
+import { getHttpOperation, isHeader, isStatusCode } from "@typespec/http";
 
 export const avoidAnonymousTypesRule = createRule({
   name: "avoid-anonymous-types",
@@ -19,25 +21,44 @@ export const avoidAnonymousTypesRule = createRule({
       "Operation response body should use a named model instead of an anonymous inline model expression.",
   },
   create(context) {
+    const reported = new Set<Model>();
     return {
       operation: (operation) => {
-        if (shouldSkipOperation(operation)) {
+        if (
+          shouldSkipOperation(operation) ||
+          getLocationContext(context.program, operation).type !== "project"
+        ) {
           return;
         }
 
         const [httpOperation] = getHttpOperation(context.program, operation);
-        const reported = new Set<Model>();
         for (const response of httpOperation.responses) {
+          const responseType = response.type;
+          if (!isAnonymousModel(responseType) || reported.has(responseType)) {
+            continue;
+          }
           for (const content of response.responses) {
             const bodyType = content.body?.type;
-            if (!isAnonymousModelExpression(bodyType) || reported.has(bodyType)) {
+            // Property-position bodies belong to Azure Core's no-unnamed-types rule.
+            if (
+              content.body?.property ||
+              bodyType?.kind !== "Model" ||
+              bodyType.properties.size === 0 ||
+              getEffectiveModelType(
+                context.program,
+                bodyType,
+                (property) =>
+                  !isHeader(context.program, property) && !isStatusCode(context.program, property),
+              ).name !== ""
+            ) {
               continue;
             }
 
-            reported.add(bodyType);
+            reported.add(responseType);
             context.reportDiagnostic({
-              target: bodyType,
+              target: responseType,
             });
+            break;
           }
         }
       },
@@ -48,10 +69,8 @@ export const avoidAnonymousTypesRule = createRule({
 function shouldSkipOperation(operation: Operation): boolean {
   return (
     isTemplateInstance(operation) ||
-    isTemplatedInterfaceOperation(operation) ||
-    isNodeModulesPath(
-      operation.node ? getSourceLocation(operation.node as any).file.path : undefined,
-    )
+    isTemplateDeclaration(operation) ||
+    isTemplatedInterfaceOperation(operation)
   );
 }
 
@@ -63,17 +82,6 @@ function isTemplatedInterfaceOperation(target: Operation): boolean {
   );
 }
 
-function isAnonymousModelExpression(type: unknown): type is Model {
-  return (
-    typeof type === "object" &&
-    type !== null &&
-    (type as Model).kind === "Model" &&
-    (type as Model).name === "" &&
-    (type as Model).node?.kind === SyntaxKind.ModelExpression
-  );
-}
-
-function isNodeModulesPath(path: string | undefined): boolean {
-  return path?.includes("/node_modules/") === true ||
-    path?.includes("\\node_modules\\") === true;
+function isAnonymousModel(type: Type | undefined): type is Model {
+  return type?.kind === "Model" && type.name === "";
 }

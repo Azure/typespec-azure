@@ -960,11 +960,6 @@
     "message": "A 202 response should include a Location response header."
   },
   {
-    "code": "tsp-lintdiff-local-linter/avoid-anonymous-types",
-    "severity": "warning",
-    "message": "Operation response body should use a named model instead of an anonymous inline model expression."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/missing-xms-error-response",
     "severity": "warning",
     "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
