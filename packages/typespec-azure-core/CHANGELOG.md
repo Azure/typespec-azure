@@ -1,5 +1,20 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.72.1
+
+### Bug Fixes
+
+- [#5547](https://github.com/Azure/typespec-azure/pull/5547) Add the legacy `@Azure.Core.Legacy.overrideApiVersion` decorator for overriding inherited
+  API-version wire defaults on namespaces and interfaces.
+
+  ```typespec
+  @Azure.Core.Legacy.overrideApiVersion("2021-11-01")
+  interface Widgets {
+    get(): void;
+  }
+  ```
+
+
 ## 0.72.0
 
 ### Features

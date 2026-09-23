@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.72.1
+
+### Bug Fixes
+
+- [#5547](https://github.com/Azure/typespec-azure/pull/5547) Honor inherited Azure Core API-version overrides in emitted OpenAPI documents and warn when a document has inconsistent overrides.
+
+
 ## 0.72.0
 
 ### Bug Fixes

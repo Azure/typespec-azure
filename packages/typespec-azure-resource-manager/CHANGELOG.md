@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.72.1
+
+### Bug Fixes
+
+- [#5547](https://github.com/Azure/typespec-azure/pull/5547) Add a `version` option to `@featureFileOptions` for overriding the generated client API version.
+
+
 ## 0.72.0
 
 ### Features
