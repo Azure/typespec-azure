@@ -511,6 +511,15 @@ When evidence requires a rule update:
 - update snapshots and fixture `rule.md`
 - update the rule's `migration.md`
 
+When comparing effective HTTP model identity, inspect the supported compiler/HTTP
+API before adding special cases. Cover headers and status codes inside the named
+model, outside its spread, and split across both, with added-payload negative
+controls. When the rule excludes metadata from identity, apply equivalent
+filtering on both sides of the comparison. Run the
+focused matrix and an independent semantic review before an expensive full
+corpus run when correcting a model-identity regression; this does not replace
+the final complete-diff review.
+
 Do not change Swagger validator code, emitters, or unrelated TypeSpec rules.
 
 #### ARM applicability without redundant namespace guards
@@ -545,6 +554,18 @@ because those commands can load compiled package output. Rebuild after changing
 production TypeScript or diagnostic messages before rerunning validation. Then
 run the narrowest existing fixture tests and package lint commands that cover
 the changed rule. Fix failures before running the corpus.
+
+The fixture harness can enable multiple lint rules and compare the complete
+diagnostic snapshot. Before publication, search existing fixture diagnostics and
+ambient expectations for the changed rule ID/message, including fixtures owned
+by other rules. Also inspect fixtures exercising newly included/excluded shapes;
+an absent old diagnostic is not proof that a fixture is unaffected. Validate
+every affected group, not only the named rule's group.
+Reconcile only explained changes using the harness snapshot writer and strict
+reruns; preserve its exact encoding/newlines (including LF on Windows), and
+inspect the full generated diff. Never bulk-accept unrelated diagnostics. If
+current-target drift appears, record fetched versus integrated target SHAs and
+use the existing synchronization/recovery contract; fetching alone is not merging.
 
 ### 4. Run the existing corpus analysis
 
@@ -723,6 +744,9 @@ After restoring generated corpus data and removing temporary fixture links:
    `rule.md`, `migration.md`, and any directly changed tests. On PowerShell,
    append each command result to the same array; do not create a nested array
    whose entries become space-joined formatter arguments.
+   Derive this list from the actual reviewed diff, deduplicate it and verify
+   membership, existence and supported extensions. Record the count for evidence,
+   not as a guessed fixed-number assertion that can prevent formatting.
 2. Run Prettier with those explicit paths only. Do not include harness-owned
    `output.json`, `tsp-diagnostics.json`, or `validator-diagnostics.json`
    snapshots, and never use `prettier --write .`.

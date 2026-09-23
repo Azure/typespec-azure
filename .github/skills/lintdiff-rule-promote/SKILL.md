@@ -177,7 +177,9 @@ apply this narrowly scoped contract. Standalone promotion behavior is unchanged.
 - For a legacy checkout, accept the queue's verified
   [adoption binding](../do-linter-development-task-one-by-one/app-session-execution.md#authorized-legacy-worktree-adoption)
   without recreating the checkout. An exhausted correction budget may resume
-  only under the queue's recorded
+  under a recorded queue grant from the
+  [local recovery reserve](../shared/recovery-context.md#coordinator-owned-local-recovery-reserve),
+  when eligible, or the queue's
   [explicit bounded authorization](../do-linter-development-task-one-by-one/SKILL.md#explicitly-authorized-bounded-resumption).
   Preserve the original counter and separately consume the authorized allowance;
   neither adoption nor a fresh dispatch resets it.
@@ -658,6 +660,10 @@ For timeout-only native test failures, apply the shared
 [bounded native-test timeout diagnosis](../loop-for-fix-and-review/SKILL.md#bounded-native-test-timeout-diagnosis)
 before declaring an unexplained terminal blocker. Queued promotion consumes the
 queue's single task-wide allowance; it does not receive a new allowance here.
+If that reduced-concurrency diagnostic still has only per-test timeouts, return
+the shared [native comparison handoff](../shared/recovery-context.md#bounded-native-baseline-comparison)
+to the queue before a terminal stop. Only its recorded grant permits the bounded
+baseline/draft comparison and full rerun; standalone promotion gains no allowance.
 This exception does not apply to the broad build or lintdiff corpus.
 
 Do not manually build the website package or its dependency closure during local

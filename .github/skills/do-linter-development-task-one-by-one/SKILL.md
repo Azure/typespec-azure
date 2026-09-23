@@ -222,6 +222,9 @@ Keep an ordered ledger with one entry per parsed queue entry:
   from worker attempts, review rounds and source-repair cycles
 - native-test timeout-diagnosis usage (at most one per task across all phases
   and cycles), eligibility evidence, concurrency change and full-scope results
+- coordinator-owned local reserve usage (three total per task) and native
+  baseline-comparison usage (one per task), eligibility decisions, same-owner
+  handoffs and required rerun results; preserve these across every phase/cycle
 - predeclared required/supplemental validation plan, authority and per-command
   disposition; disclosed limitations and read-only blocker-reconciliation decisions
 - publication attempt/error identities, exact base/head tuple and SHA, absence
@@ -458,6 +461,18 @@ external/indeterminate operational failures, unknown causes, exhausted budgets
 and confirmed immutable promotion-source defects retain their existing
 stop/handoff behavior.
 
+Before treating an exhausted local allowance as terminal, apply the shared
+[coordinator-owned local recovery reserve](../shared/recovery-context.md#coordinator-owned-local-recovery-reserve).
+Keep the task running during its nonterminal handoff. This queue invocation
+authorizes the coordinator, not the worker, to allocate up to three reserve
+attempts across the entire rule task. Continue the same owner without restarting
+its phase or review pair; retain ordinary counters and all failed attempts.
+Local-recovery and native-comparison handoffs are explicit exceptions to the
+otherwise restricted same-worker follow-ups. In app-session mode, continue the
+recorded phase owner instead. Do not create a replacement worker or a fresh
+review invocation for either handoff. Pass both task-wide counters and the
+coordinator's exact decision in every continuation/cycle handoff.
+
 ### Native-test timeout diagnosis
 
 Select the applicable [validation profile](../shared/recovery-context.md#reusable-validation-profiles)
@@ -480,9 +495,13 @@ and dispatches this allowance; a rejected handoff returns to the normal stop
 policy. This same-owner continuation does not consume an orchestration retry.
 
 This is not permission to retry a corpus, build, hung command, assertion failure,
-or external operation. If the allowance is used or eligibility is unproven,
-retain the existing stop policy. A subsequent understood draft defect uses the
-remaining draft-correction budget, never a fresh diagnostic allowance.
+or external operation. After the diagnostic is used, only the shared
+[bounded native baseline comparison](../shared/recovery-context.md#bounded-native-baseline-comparison)
+may authorize a further timeout investigation and full rerun: one allowance per
+rule task, granted by the coordinator to the same owner without user input.
+Keep the task running during `native-comparison-handoff`. Ineligible or exhausted
+recovery still stops; a subsequent understood draft defect uses its own remaining
+correction allowance, never a fresh timeout allowance.
 
 ### Explicitly authorized bounded resumption
 
@@ -963,9 +982,10 @@ Capture concrete suggestions for improving future queue runs, especially:
   Do not apply orchestration retry after development begins or reinterpret
   operational failures as source defects.
 - Never exceed the separate three-attempt draft-correction budget for its
-  phase/backlog/round scope automatically, reset it by relaunching agents, or hide
-  failed checks. Additional attempts require the separate explicit authorization
-  and ledger in [bounded resumption](#explicitly-authorized-bounded-resumption).
+  phase/backlog/round scope without a recorded coordinator grant from the shared
+  task-wide reserve. Never reset counters by relaunching agents or hide failed
+  checks. Beyond the finite reserve/comparison allowances, retain the explicit
+  authorization and ledger in [bounded resumption](#explicitly-authorized-bounded-resumption).
 - Never promote without clean development review, or report success without
   clean promotion review against the final source provenance.
 - Require new development/promotion heads and skill-update heads to live in

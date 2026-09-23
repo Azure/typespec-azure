@@ -48,7 +48,8 @@ covers both. It is not a repository-wide timeout default.
 
 - Historical passing output is supporting evidence, not authorization to
   override today's configuration. Record whether a setting comes from current
-  checked-in configuration or an exact user-approved exception.
+  checked-in configuration, an applicable bounded recovery below, or an exact
+  user-approved exception.
 - Preserve test population, skips, assertions and ordinary timeout. Different
   compiler/package worktrees require distinct profiles; never copy the source
   package's settings blindly into promotion.
@@ -189,7 +190,8 @@ resumption; generic "continue" is not permission to create a follow-up PR.
 
 ## Bounded corrections and earlier regressions
 
-Keep existing three-attempt draft/command correction budgets. Prefer tested
+Keep existing three-attempt draft/command correction budgets and the separate
+coordinator-owned reserve below. Prefer tested
 helpers and executable invariants over giving each command a new retry budget.
 Corpus counts must distinguish source population, successfully compiled
 population and selected comparison population rather than asserting equality.
@@ -202,3 +204,98 @@ matrix before source publication. State the intended diagnostic unit (unique
 declaration or payload path) and assert counts and targets accordingly. Do not
 automatically change a rule to path-local visitation solely to satisfy this
 matrix; its semantics still require evidence.
+
+### Coordinator-owned local recovery reserve
+
+For queue tasks started under this contract, invocation also authorizes **three
+additional local corrective attempts total per rule task**, shared across
+development, promotion, reviews and source-repair cycles. This is a finite
+reserve, not three more attempts per phase or failure. Standalone skills retain
+their existing budgets. A historical task stopped under an older contract does
+not gain this allowance merely because the skill file changed. Explicit user
+limits narrower than these defaults take precedence.
+
+Before a worker declares an exhausted local budget terminal, return
+`local-recovery-handoff` to the coordinator, with all commands stopped. The
+coordinator may grant one reserve attempt to the **same owner** without user
+input only when all of these conditions hold:
+
+- The ordinary allowance is exhausted, reserve remains, and a reproducer or
+  command evidence proves an understood task-owned draft/invocation defect.
+  Unknown causes, external failures and immutable promotion-source defects
+  remain outside this path.
+- The proposed correction changes the failed approach based on new evidence:
+  identify the root cause, exact files/command, expected result and regression
+  matrix. Do not repeat an unsuccessful patch or run an unchanged check hoping
+  it passes. A wrapper's wrong hardcoded file count is a command defect, not
+  missing user permission; derive and verify the actual explicit path set.
+- Content hashes, index, ownership, applicable contracts and required validation
+  scope are verified. No concurrent owner, unrelated edit or uncertain side
+  effect may be hidden by the handoff.
+- The coordinator records the original counters, evidence, decision and reserve
+  debit **before** dispatch. One coherent correction plus its required validation
+  consumes one attempt; a newly discovered failure needs a new eligibility
+  decision and remaining reserve. No owner/phase/review restart resets it.
+
+Rerun the original failed required scope and every invalidated check. A production
+lint change still requires the normal corpus/native procedure and independent
+review; promotion still preserves the pinned source. All publication gates
+remain in force. Neither this reserve nor policy reconciliation permits retries
+of network/authentication, review requests, publication, email or unknown
+cleanup. When ineligible or exhausted, report the precise blocker rather than
+asking the user for a generic "continue." Explicit finite resumption remains
+available, but is not needed for an eligible reserve attempt.
+
+### Bounded native baseline comparison
+
+For queue tasks under this contract, a naturally completed required native suite
+that still has **only per-test timeouts after the single reduced-concurrency
+diagnostic** may return `native-comparison-handoff`. The coordinator owns **one
+comparison allowance per rule task**, separate from the reserve and original
+diagnostic. The same prospective-task and explicit-user-limit rules as the
+reserve apply. It covers at most one focused baseline run, one focused draft run,
+and one original-full-scope rerun, not an open-ended runner experiment.
+
+1. Preserve both prior full runs, exact failing test IDs, skips, configured
+   test/hook limits and input fingerprints. Require natural completion,
+   quiescence and understood side effects. Hook/setup failures, assertions,
+   crashes, killed/hung commands, corpus failures and external failures are
+   ineligible. Do not diagnose these through the local reserve.
+2. Before dispatch, record one supported alternate runner execution profile,
+   its documented semantics and why it is appropriate to test. For example,
+   inspect the installed Vitest version before selecting
+   `--pool=threads --maxWorkers=1`; do not make this a universal default. Change neither
+   timeouts, test selection/assertions/skips, dependencies nor production code
+   to make the suite pass. A user-mandated execution profile cannot be overridden.
+3. Verify an isolated baseline at the recorded pre-change commit and the
+   restored draft against manifests, including compiled outputs actually loaded
+   by the test. Use all remaining timeout test IDs and the same candidate profile once
+   for each. Safe reversible isolation must preserve staged/untracked work
+   byte-for-byte, without reset/stash or discarding files; if that cannot be
+   established, stop. A comparison using stale draft runtime is not a baseline.
+4. Only if both focused runs pass and exact draft restoration is verified, run
+   the original full suite once with that profile. Require identical test IDs,
+   skip set and timeouts, and zero failures. Focused passes never replace this
+   gate. A failure at any stage ends the allowance, not another pool trial.
+5. Retain all failures and passing evidence. Report a recovered timeout with
+   **unproven original cause**, not an environmental diagnosis. Persist the
+   passing package-scoped profile for later phases with fresh fingerprints;
+   that profile does not renew any retry allowance.
+
+The coordinator records eligibility, profile, isolation/restoration plan and
+allowance debit before the same owner executes. No publication is allowed until
+the full required scope passes. A confirmed source defect still follows the
+source-repair protocol, never a promotion-only semantic fix.
+
+### Local recovery decision cases
+
+| Case                                                                                                   | Expected outcome                                                                                            |
+| ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| Three local attempts used; new reproducer proves an in-scope metadata-filter defect; reserve available | Coordinator grants one recorded correction to the same owner, without user input.                           |
+| Formatter wrapper rejects an incorrect expected count before formatting                                | Verify side effects and exact path set; use ordinary correction or one reserve attempt, never a free retry. |
+| Same semantic patch failed again with no new causal evidence                                           | Do not grant reserve merely to repeat it.                                                                   |
+| Required suite retains only per-test timeouts after reduced concurrency                                | Consider the single baseline-comparison allowance; no timeout increase.                                     |
+| Baseline passes but draft focused run fails, or restored runtime cannot be verified                    | Stop comparison; no full rerun or success claim.                                                            |
+| Both focused runs pass but full scope fails or changes test IDs/skips                                  | Required gate remains blocked; no second comparison.                                                        |
+| Required hook timeout, permission denial or indeterminate push                                         | Neither local reserve nor native comparison applies.                                                        |
+| Owner/phase changes or a historical task reloads newer skills                                          | Preserve counters; no replenishment or retroactive recovery grant.                                          |
