@@ -9,13 +9,11 @@ nested dictionaries, and four dictionary-valued properties literally named
 `additionalProperties`. The native extra is an SDK override declaration, not an
 older API version.
 
-**Rule update completed:** implicit response checks retain original targets, cover
-intersections, deduplicate shared declarations, and avoid duplicating Azure Core's
-explicit-body checks. A consistent metadata filter accepts complete named-model
-spreads, including mixed inside/outside headers and status codes, without
-suppressing added payload properties. Sixty native tests and seven comparison
-fixtures establish those cases; corpus totals are observational evidence, not
-universal equivalence.
+**Rule update completed:** the successor repair checks plain/nested union
+constituents and every same-status content body, targeting each original
+anonymous declaration once. Named spreads and explicit-body exclusions are
+preserved. All 73 native tests and eight comparison fixtures pass. Corpus totals
+remain unchanged: the new regressions, not corpus overlap, demonstrate the fix.
 
 Exact Swagger equivalence remains **partial**. Assessed discrepancies are explained
 below. Six unchanged compile failures exclude 22 validator occurrences, whose
@@ -43,6 +41,10 @@ Classification at development base
 The intervening target commits update skill instructions and consolidate
 unrelated ARM PATCH-property rules. They do not change the official anonymous-type
 coverage, this rule's implementation or registration, or its fixture paths.
+The post-merge repair rechecked this classification at
+`de173bb8109f02bcfd355aff16572ae539cd800b`, the successor's fetched migration
+base. The uncovered implicit response surface remains unchanged in the official
+rule and ARM templates.
 `@azure-tools/typespec-azure-core/no-unnamed-types` is registered in Azure Core
 and enabled in both official Azure rulesets. Its `modelProperty` listener checks
 nonempty anonymous property types, including explicit response bodies; its
@@ -68,7 +70,10 @@ The rule uses compiler and HTTP semantic APIs only:
 
 1. Ignore library operation declarations and generic template declarations and
    instances.
-2. Resolve HTTP responses with `getHttpOperation`.
+2. Resolve HTTP responses with `getHttpOperation`, then inspect each content's
+   body rather than the status-code group's first response identity. Recursively
+   enumerate model constituents of both original return unions and body unions,
+   with identity-based visitation for shared/nested unions.
 3. Require an original anonymous model response with a nonempty
    implicit model payload; explicit body properties are outside this rule.
    Anonymous intersections are models too; no syntax-kind restriction is used.
@@ -78,8 +83,14 @@ The rule uses compiler and HTTP semantic APIs only:
    properties from both the payload and candidate named models. This preserves
    named identity whether metadata occurs inside, outside, or on both sides of
    a complete spread. Added payload properties still prevent a named match.
-5. Report once per original response model identity across the program.
+5. Recover a filtered payload's original return constituent through the
+   compiler's structured `Model.sourceModels` provenance. Stop at the original
+   constituent, including a named one: do not mistake its own spread sources
+   for independently authored response alternatives.
+6. Report once per original response model identity across the program.
    Metadata stripping must not redirect the diagnostic to a synthetic model.
+   HTTP status grouping and content-type ordering do not define diagnostic
+   identity. Explicit body content is excluded before body-union traversal.
 
 No emitter, OpenAPI helper, TCGC API, reference-string inference, private state,
 or version mutation is used. Source semantics are checked without projecting
@@ -94,32 +105,33 @@ payload types before its inline/reference decision; `utils.ts:shouldInline`
 also considers template instances and friendly names. Neither helper is used
 by the production rule.
 
-| Authored shape                                                  | Validity / support                                                                                                                                      | Selected Swagger field and validator outcome                                          | Native outcome                                                              | Evidence                                                                                                      |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `op read(): { value: string }`                                  | Valid HTTP TypeSpec                                                                                                                                     | Response schema has object properties; violation                                      | One diagnostic on expression                                                | `implicit-response` fixture                                                                                   |
-| Inline response with `@statusCode`, `@header`, and `value`      | Valid HTTP TypeSpec                                                                                                                                     | Metadata is removed; remaining object properties violate                              | One diagnostic on original expression                                       | `metadata-response` fixture and native tests                                                                  |
-| `{ first: string } & { second: string }`                        | Valid anonymous intersection; named-model intersections are also supported                                                                              | Response schema contains merged object properties; violation                          | One diagnostic on the anonymous response model                              | `intersection-response` fixture and two native regressions                                                    |
-| Named response model                                            | Valid                                                                                                                                                   | Response `$ref`; accepted                                                             | Accepted                                                                    | `compliant` fixture                                                                                           |
-| `{ ...Fields }`                                                 | Valid reuse of named source                                                                                                                             | Effective payload is `Fields`, emitted as `$ref`; accepted                            | Accepted through compiler source identity                                   | `spread-response` fixture                                                                                     |
-| `{ ...Fields; extra: string }`                                  | Valid new anonymous shape                                                                                                                               | Inline object with additional properties; violation                                   | Diagnostic                                                                  | Native regression; `getEffectiveModelType` rejects unsourced properties                                       |
-| Explicit `@body` / `@bodyRoot` anonymous property               | Valid                                                                                                                                                   | Inline object schema can violate                                                      | Excluded here; official property-position rule owns it                      | Native controls; Azure Core `no-unnamed-types.test.ts` response-body regression                               |
-| Empty model / metadata-only response / `void`                   | Valid HTTP shapes                                                                                                                                       | No response body schema, or empty object without material members; accepted           | Accepted                                                                    | Native controls; HTTP `payload.ts` body resolution                                                            |
-| Scalar / array response                                         | Valid HTTP shapes                                                                                                                                       | Primitive or array schema has no own object members; accepted                         | Accepted                                                                    | Native controls; validator predicate                                                                          |
-| `Record<string>`, `Record<unknown>`, nested `Record<Record<T>>` | Valid native dictionaries; ARM's separate dictionary rule may require suppression                                                                       | Inline `additionalProperties` causes validator findings                               | Not anonymous model declarations; accepted here                             | Native controls and real-service examples below                                                               |
-| Named inherited / `model is` response                           | Valid                                                                                                                                                   | Named reference; named base normally appears as `$ref` in `allOf`                     | Accepted                                                                    | Native controls; emitter `getSchemaForModel` base-model branches                                              |
-| Generic template declarations                                   | Non-endpoint authoring definitions                                                                                                                      | No independently emitted endpoint response                                            | Excluded                                                                    | Native controls                                                                                               |
-| Alias/shared/imported anonymous expression                      | Valid                                                                                                                                                   | May appear at several emitted response occurrences                                    | One source diagnostic, targeted at the imported declaration when applicable | Native count and file/position assertions                                                                     |
-| Anonymous model alternatives with distinct HTTP status codes    | Valid supported response union                                                                                                                          | Separate response schemas, each checked independently                                 | One diagnostic per distinct response model identity                         | Native distinct-response regression                                                                           |
-| Multiple distinct object payloads for the same HTTP status      | HTTP can group these, but AutoRest rejects plain model unions with `union-unsupported`, or distinct grouped envelope bodies with `duplicate-body-types` | No valid emitted comparison population; any partial output is not compliance evidence | Outside the supported contract; no complete-variant coverage claim          | HTTP `responses.ts:resolveResponseVariants`; AutoRest `openapi.ts:getSchemaForUnion` and `emitResponseObject` |
-| `x-ms-client-name` / schema extension overrides                 | Emitter-specific override, not native naming                                                                                                            | Validator explicitly exempts the extension                                            | Not consulted                                                               | Validator predicate and native dependency boundary                                                            |
-| Named model inheriting a generic dictionary base                | Named native model; generic base emission differs from ordinary named inheritance                                                                       | Emitter can put an inline object in `allOf`, which the selector diagnoses             | Named model accepted; no schema-format simulation                           | `openapi.ts` generic-base / `getSchemaOrRef` branches and validator selector                                  |
-| Arbitrary inline object inserted through schema overrides       | Swagger/emitter representation, not an extra native type family                                                                                         | Can violate the `allOf` selector                                                      | No override inspection                                                      | Validator selector; native boundary                                                                           |
-| Explicit body plus unannotated body parameters                  | Already rejected by HTTP `duplicate-body`                                                                                                               | No valid comparison population                                                        | No extra special case                                                       | Failed-project stdout for DeviceProvisioningServices, deployments, and ServiceLinker                          |
+| Authored shape                                                  | Validity / support                                                                                      | Selected Swagger field and validator outcome                                | Native outcome                                                                                                                | Evidence                                                                                               |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `op read(): { value: string }`                                  | Valid HTTP TypeSpec                                                                                     | Response schema has object properties; violation                            | One diagnostic on expression                                                                                                  | `implicit-response` fixture                                                                            |
+| Inline response with `@statusCode`, `@header`, and `value`      | Valid HTTP TypeSpec                                                                                     | Metadata is removed; remaining object properties violate                    | One diagnostic on original expression                                                                                         | `metadata-response` fixture and native tests                                                           |
+| `{ first: string } & { second: string }`                        | Valid anonymous intersection; named-model intersections are also supported                              | Response schema contains merged object properties; violation                | One diagnostic on the anonymous response model                                                                                | `intersection-response` fixture and two native regressions                                             |
+| Named response model                                            | Valid                                                                                                   | Response `$ref`; accepted                                                   | Accepted                                                                                                                      | `compliant` fixture                                                                                    |
+| `{ ...Fields }`                                                 | Valid reuse of named source                                                                             | Effective payload is `Fields`, emitted as `$ref`; accepted                  | Accepted through compiler source identity                                                                                     | `spread-response` fixture                                                                              |
+| `{ ...Fields; extra: string }`                                  | Valid new anonymous shape                                                                               | Inline object with additional properties; violation                         | Diagnostic                                                                                                                    | Native regression; `getEffectiveModelType` rejects unsourced properties                                |
+| Explicit `@body` / `@bodyRoot` anonymous property               | Valid                                                                                                   | Inline object schema can violate                                            | Excluded here; official property-position rule owns it                                                                        | Native controls; Azure Core `no-unnamed-types.test.ts` response-body regression                        |
+| Empty model / metadata-only response / `void`                   | Valid HTTP shapes                                                                                       | No response body schema, or empty object without material members; accepted | Accepted                                                                                                                      | Native controls; HTTP `payload.ts` body resolution                                                     |
+| Scalar / array response                                         | Valid HTTP shapes                                                                                       | Primitive or array schema has no own object members; accepted               | Accepted                                                                                                                      | Native controls; validator predicate                                                                   |
+| `Record<string>`, `Record<unknown>`, nested `Record<Record<T>>` | Valid native dictionaries; ARM's separate dictionary rule may require suppression                       | Inline `additionalProperties` causes validator findings                     | Not anonymous model declarations; accepted here                                                                               | Native controls and real-service examples below                                                        |
+| Named inherited / `model is` response                           | Valid                                                                                                   | Named reference; named base normally appears as `$ref` in `allOf`           | Accepted                                                                                                                      | Native controls; emitter `getSchemaForModel` base-model branches                                       |
+| Generic template declarations                                   | Non-endpoint authoring definitions                                                                      | No independently emitted endpoint response                                  | Excluded                                                                                                                      | Native controls                                                                                        |
+| Alias/shared/imported anonymous expression                      | Valid                                                                                                   | May appear at several emitted response occurrences                          | One source diagnostic, targeted at the imported declaration when applicable                                                   | Native count and file/position assertions                                                              |
+| Anonymous model alternatives with distinct HTTP status codes    | Valid supported response union                                                                          | Separate response schemas, each checked independently                       | One diagnostic per distinct response model identity                                                                           | Native distinct-response regression                                                                    |
+| Plain anonymous response unions, including nested/shared unions | Valid supported HTTP TypeSpec; AutoRest cannot represent these object unions (`union-unsupported`)      | No complete valid AutoRest comparison population                            | One diagnostic per original anonymous model declaration                                                                       | Native original-response-constituent regressions                                                       |
+| Same-status JSON/XML alternatives with distinct payloads        | Valid supported HTTP TypeSpec; AutoRest reports `duplicate-body-types` even for different content types | No complete valid AutoRest comparison population                            | Check every original implicit anonymous payload, independent of variant order; preserve named/spread/explicit-body exemptions | Thirteen native constituent regressions; HTTP `responses.ts`; AutoRest `openapi.ts:emitResponseObject` |
+| `x-ms-client-name` / schema extension overrides                 | Emitter-specific override, not native naming                                                            | Validator explicitly exempts the extension                                  | Not consulted                                                                                                                 | Validator predicate and native dependency boundary                                                     |
+| Named model inheriting a generic dictionary base                | Named native model; generic base emission differs from ordinary named inheritance                       | Emitter can put an inline object in `allOf`, which the selector diagnoses   | Named model accepted; no schema-format simulation                                                                             | `openapi.ts` generic-base / `getSchemaOrRef` branches and validator selector                           |
+| Arbitrary inline object inserted through schema overrides       | Swagger/emitter representation, not an extra native type family                                         | Can violate the `allOf` selector                                            | No override inspection                                                                                                        | Validator selector; native boundary                                                                    |
+| Explicit body plus unannotated body parameters                  | Already rejected by HTTP `duplicate-body`                                                               | No valid comparison population                                              | No extra special case                                                                                                         | Failed-project stdout for DeviceProvisioningServices, deployments, and ServiceLinker                   |
 
-The test host imports only `@typespec/http`, not an emitter. Sixty native
+The test host imports only `@typespec/http`, not an emitter. Seventy-three native
 tests cover violating/compliant shapes, cycles and shared siblings without
-recursive descent, shared operations, and an imported diagnostic target.
-The seven comparison fixtures contain three direct violations and four controls.
+descending through payload properties, shared operations, and imported targets.
+The eight comparison fixtures contain four direct violations and four controls.
 The controls' unrelated diagnostics are explicitly reviewed in `expect.json`.
 
 | Regression shape                                                                   | Validity / support            | Selected Swagger field and validator outcome                                                 | Native outcome                                                   | Evidence                                                                |
@@ -133,6 +145,83 @@ Each row covers a complete spread, a direct named return, a compliant shared
 imported alias, and an added payload property in that alias. The last case must
 still report exactly once at the shared imported anonymous declaration, with
 exact file/position assertions.
+
+### Post-merge response-constituent repair
+
+The preceding migration incorrectly treated AutoRest's inability to emit
+multiple same-status payloads as a native-contract exclusion. That limitation
+does not invalidate the TypeSpec/HTTP authoring shape. The source repair keeps
+the compiler/HTTP contract separate from Swagger representation limits.
+
+Before changing production logic, 13 new native cases brought the suite to
+73 tests: nine failed and 64 passed. Plain and nested unions produced zero
+instead of two diagnostics. Named-first alternatives suppressed anonymous
+payloads; two envelopes collapsed to one; complete-spread-first and
+explicit-body-first alternatives targeted the compliant first declaration.
+All 73 pass after the repair, including exact imported source positions, both
+JSON/XML orderings, nested shared unions, and reuse across operations.
+
+The comparison fixture `shared-multi-status-response` exercises metadata
+filtering and one original declaration used by two operations with two status
+codes: four Swagger occurrences versus one native diagnostic. It is
+representable by AutoRest. Distinct same-status payloads stay in
+emitter-free native regressions rather than suppressing an emitter failure to
+manufacture a Swagger parity claim.
+
+**API evidence:** HTTP `resolveResponseVariants` combines plain variants into
+unions; `ResponseIndex` preserves only the first variant's `type` per status
+while appending every body. Compiler `filterModelProperties` records the
+unfiltered model in `sourceModels`; this public structured provenance recovers
+the original declaration without private metadata, synthetic operations, or
+emission inference. Existing Azure Core `no-response-body` checks status groups
+because its contract concerns status codes; this rule instead diagnoses
+individual authored model declarations.
+
+**Plain-union example (fixed native miss):**
+
+```typespec
+@get op read():
+  | {
+      first: string;
+    }
+  | {
+      second: int32;
+    };
+```
+
+The emitter-free native regression returns the equivalent aliased union from two
+operations, asserting exactly two warnings at the original model expressions.
+Before repair it found zero, because HTTP represents the body as a union.
+AutoRest's `getSchemaForUnion` rejects the object union with `union-unsupported`;
+there is no valid emitted Swagger population for this example.
+
+**Status-group example (fixed miss and order-dependent targeting):**
+
+```typespec
+model Named {
+  @statusCode status: 200;
+  @header contentType: "application/json";
+  first: string;
+}
+@get op read():
+  | Named
+  | {
+      @statusCode status: 200;
+      @header contentType: "application/xml";
+      second: int32;
+    };
+```
+
+| Engine               | Observed behavior                                                                                           |
+| -------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Native before repair | Zero warnings in named-first order; one in anonymous-first order                                            |
+| Native after repair  | One warning at the anonymous declaration in either order                                                    |
+| AutoRest comparison  | `emitResponseObject` reports `duplicate-body-types`; it cannot represent both object payloads at status 200 |
+
+The same native matrix includes two anonymous envelopes (two warnings) and a
+complete named spread before an anonymous envelope (only the second warned).
+These supported HTTP shapes establish source correctness independently of
+AutoRest's representational limitation, not an unexplained corpus discrepancy.
 
 Independent local reviews exposed false positives from comparing a filtered
 payload against an unfiltered named candidate. Checking the original response
@@ -292,30 +381,28 @@ is expected in the retained service comparison.
 ## Final corpus evidence
 
 The existing `specs:typespec` runner completed all 468 projects at concurrency 6.
-The final report records `2026-09-22T08:50:19.910Z` and duration `1155158 ms`.
+The successor repair's final report records `2026-09-23T07:43:21.622Z` and
+duration `1332102 ms`; the process completed successfully at
+`2026-09-23T07:46:13Z` (approximately 22 minutes after launch).
 The one-project `CustomLocations` preflight also succeeded. Both used the pinned
 specs commit above; no project selector or timeout was relaxed.
 
-Validation used the preserved development checkout at
-`a213b2d6265b16ccd1a6dff22547b5d7fa84980e` plus this PR's changes. The recorded
-full corpus predates integration of target
-`e3fcd29b245a5393beb448872f5018ddc8147c84`; it remains AvoidAnonymousTypes
-evidence because the target merge and review fix do not change this rule's
-production source, native tests, or corpus population. The target contributes
-an independently reviewed, unrelated ARM PATCH-rule consolidation, so this note
-does not claim that the whole merged all-rule corpus was rerun.
+Validation used successor base `de173bb8109f02bcfd355aff16572ae539cd800b`
+plus this repair. The installed dependency fingerprints and direct specs linter
+link were reverified; unchanged setup was reused. The package was rebuilt after
+the production change and formatting. This is a fresh full all-rule corpus,
+not reused pre-merge validation.
 
-The target was integrated with an ordinary no-auto-commit merge whose parents
-are `f907ed8e24331626c86cb4db59c3bf8eb99d7a3b` and
-`e3fcd29b245a5393beb448872f5018ddc8147c84`. Post-integration validation rebuilt
-the lintdiff dependency closure, passed all 60 AvoidAnonymousTypes native tests
-and all seven rule fixtures, and strictly validated the complete affected shared
-fixture populations: 13 ConsistentResponseSchemaForPut, six LroErrorContent,
-13 GetCollectionOnlyHasValueAndNextLink, and 23 ConsistentPatchProperties cases.
-The GetCollection snapshots were refreshed from the strict harness to reconcile
-the current `xms-pageable-for-list-calls` diagnostic population and canonical
-OpenAPI JSON serialization; the accepted AvoidAnonymousTypes removals remain
-limited to the five reviewed shared fixture cases and two ambient expectations.
+All 73 native tests and eight AvoidAnonymousTypes fixtures passed. Strict
+validation also passed the full shared groups selected by prior diagnostic
+matches and response-union shapes: 23 ConsistentPatchProperties,
+19 PatchBodyParametersSchema, 13 ConsistentResponseSchemaForPut, and six
+LroErrorContent cases. Their existing complete snapshots were unchanged.
+The new shared-response fixture's snapshots were produced by the harness
+and passed a strict rerun; no ambient diagnostic was suppressed to get a pass.
+Formatting and linting use only explicit changed maintained files, excluding
+generated snapshots. Independent semantic review found no significant issue
+before the full corpus.
 
 The raw validator shard has 32 occurrences. Excluding failures on **both** sides
 leaves ten. The complete affected-project population is:

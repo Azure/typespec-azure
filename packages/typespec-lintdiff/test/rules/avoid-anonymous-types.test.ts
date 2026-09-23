@@ -70,6 +70,102 @@ describe("avoid-anonymous-types", () => {
     ).toEmitDiagnostics([diagnostic, diagnostic]);
   });
 
+  describe("original response constituents", () => {
+    const first = "{ first: string }";
+    const second = "{ second: int32 }";
+    const json =
+      '{ @statusCode status: 200; @header contentType: "application/json"; first: string }';
+    const xml =
+      '{ @statusCode status: 200; @header contentType: "application/xml"; second: int32 }';
+    const named =
+      'model Named { @statusCode status: 200; @header contentType: "application/json"; first: string; }';
+    const spread = "{ ...Named }";
+
+    it.each([
+      {
+        name: "plain union",
+        declarations: "",
+        result: `${first} | ${second}`,
+        targets: [first, second],
+      },
+      {
+        name: "plain union reversed",
+        declarations: "",
+        result: `${second} | ${first}`,
+        targets: [second, first],
+      },
+      { name: "named first", declarations: named, result: `Named | ${xml}`, targets: [xml] },
+      { name: "named last", declarations: named, result: `${xml} | Named`, targets: [xml] },
+      { name: "two envelopes", declarations: "", result: `${json} | ${xml}`, targets: [json, xml] },
+      {
+        name: "two envelopes reversed",
+        declarations: "",
+        result: `${xml} | ${json}`,
+        targets: [xml, json],
+      },
+      { name: "spread first", declarations: named, result: `${spread} | ${xml}`, targets: [xml] },
+      { name: "spread last", declarations: named, result: `${xml} | ${spread}`, targets: [xml] },
+      {
+        name: "explicit body first",
+        declarations: "",
+        result: `{ @header contentType: "application/json"; @body body: ${first} } | ${xml}`,
+        targets: [xml],
+      },
+      {
+        name: "explicit body last",
+        declarations: "",
+        result: `${xml} | { @header contentType: "application/json"; @bodyRoot body: ${first} }`,
+        targets: [xml],
+      },
+      {
+        name: "nested shared unions",
+        declarations: `alias First = ${first}; union Inner { First, ${second} } union Outer { Inner, First, string, null }`,
+        result: "Outer",
+        targets: [first, second],
+      },
+      {
+        name: "shared envelope alias",
+        declarations: `alias Shared = ${xml}; union Inner { Shared, Named }`,
+        result: "Inner | Shared",
+        targets: [xml],
+        prefix: named,
+      },
+      {
+        name: "non-model alternatives",
+        declarations: "",
+        result: `${first} | string | string[] | Record<string> | null`,
+        targets: [first],
+      },
+    ])(
+      "$name targets each original declaration once across operations",
+      async ({ declarations, result, targets, prefix }) => {
+        const source = `using TypeSpec.Http;
+@service namespace Service;
+${prefix ?? ""}
+${declarations}
+alias Result = ${result};
+@get @route("/first") op first(): Result;
+@get @route("/second") op second(): Result;`;
+        const runner = await createTester(resolvePath(import.meta.dirname, "../.."), {
+          libraries: ["@typespec/http"],
+        })
+          .importLibraries()
+          .import("./responses.tsp")
+          .files({ "responses.tsp": source })
+          .createInstance();
+        await createLinterRuleTester(runner, avoidAnonymousTypesRule, "tsp-lintdiff-local-linter")
+          .expect("")
+          .toEmitDiagnostics(
+            targets.map((target) => ({
+              ...diagnostic,
+              file: /responses\.tsp$/,
+              pos: source.indexOf(target),
+            })),
+          );
+      },
+    );
+  });
+
   describe.each([
     { name: "no metadata", inside: "", outside: "" },
     { name: "header inside", inside: "@header etag: string;", outside: "" },
