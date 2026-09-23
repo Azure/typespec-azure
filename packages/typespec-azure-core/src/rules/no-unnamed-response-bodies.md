@@ -46,6 +46,8 @@ A complete spread can reuse a named model even when headers or status codes are 
 
 The rule checks implicit model response bodies on project operations. It reports each anonymous response declaration once, including declarations shared by multiple operations or imported from another project file. Anonymous aliases and intersections are checked by their semantic model identity.
 
+Each model alternative in a response union is checked, including nested unions. Responses sharing a status code but using different content types are checked independently: changing the order of JSON and XML alternatives does not change which declarations are reported. Diagnostics target the original model expressions, not synthesized HTTP payloads, and reuse across operations or status codes does not duplicate a warning.
+
 Named responses, complete spreads of a named payload, empty responses, scalar and array responses, and operation templates are not reported. Library operations are excluded.
 
 Explicit `@body` and `@bodyRoot` properties are outside this rule's scope. Anonymous models in those property positions are covered by [no-unnamed-types](./no-unnamed-types.md).

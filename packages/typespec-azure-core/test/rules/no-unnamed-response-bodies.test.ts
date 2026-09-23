@@ -70,6 +70,104 @@ describe("no-unnamed-response-bodies", () => {
       .toEmitDiagnostics([diagnostic, diagnostic]);
   });
 
+  describe("original response constituents", () => {
+    const first = "{ first: string }";
+    const second = "{ second: int32 }";
+    const json =
+      '{ @statusCode status: 200; @header contentType: "application/json"; first: string }';
+    const xml =
+      '{ @statusCode status: 200; @header contentType: "application/xml"; second: int32 }';
+    const named =
+      'model Named { @statusCode status: 200; @header contentType: "application/json"; first: string; }';
+    const spread = "{ ...Named }";
+
+    describe.each([
+      {
+        name: "plain union",
+        declarations: "",
+        result: `${first} | ${second}`,
+        targets: [first, second],
+      },
+      {
+        name: "plain union reversed",
+        declarations: "",
+        result: `${second} | ${first}`,
+        targets: [second, first],
+      },
+      { name: "named first", declarations: named, result: `Named | ${xml}`, targets: [xml] },
+      { name: "named last", declarations: named, result: `${xml} | Named`, targets: [xml] },
+      { name: "two envelopes", declarations: "", result: `${json} | ${xml}`, targets: [json, xml] },
+      {
+        name: "two envelopes reversed",
+        declarations: "",
+        result: `${xml} | ${json}`,
+        targets: [xml, json],
+      },
+      { name: "spread first", declarations: named, result: `${spread} | ${xml}`, targets: [xml] },
+      { name: "spread last", declarations: named, result: `${xml} | ${spread}`, targets: [xml] },
+      {
+        name: "explicit body first",
+        declarations: "",
+        result: `{ @header contentType: "application/json"; @body body: ${first} } | ${xml}`,
+        targets: [xml],
+      },
+      {
+        name: "explicit body last",
+        declarations: "",
+        result: `${xml} | { @header contentType: "application/json"; @bodyRoot body: ${first} }`,
+        targets: [xml],
+      },
+      {
+        name: "nested shared unions",
+        declarations: `alias First = ${first}; union Inner { First, ${second} } union Outer { Inner, First, string, null }`,
+        result: "Outer",
+        targets: [first, second],
+      },
+      {
+        name: "shared envelope alias",
+        declarations: `alias Shared = ${xml}; union Inner { Shared, Named }`,
+        result: "Inner | Shared",
+        targets: [xml],
+        prefix: named,
+      },
+      {
+        name: "non-model alternatives",
+        declarations: "",
+        result: `${first} | string | string[] | Record<string> | null`,
+        targets: [first],
+      },
+    ])("$name", ({ declarations, result, targets, prefix }) => {
+      const source = `using TypeSpec.Http;
+@service namespace Service;
+${prefix ?? ""}
+${declarations}
+alias Result = ${result};
+@get @route("/first") op first(): Result;
+@get @route("/second") op second(): Result;`;
+
+      beforeEach(async () => {
+        const runner = await Tester.import("./responses.tsp")
+          .files({ "responses.tsp": source })
+          .createInstance();
+        tester = createLinterRuleTester(
+          runner,
+          noUnnamedResponseBodiesRule,
+          "@azure-tools/typespec-azure-core",
+        );
+      });
+
+      it("targets each original declaration once across operations", async () => {
+        await tester.expect("").toEmitDiagnostics(
+          targets.map((target) => ({
+            ...diagnostic,
+            file: /responses\.tsp$/,
+            pos: source.indexOf(target),
+          })),
+        );
+      });
+    });
+  });
+
   describe.each([
     { name: "no metadata", inside: "", outside: "" },
     { name: "header inside", inside: "@header etag: string;", outside: "" },
@@ -226,6 +324,22 @@ alias Result = { ...Fields; ${outside} ${addPayload ? "extra: string;" : ""} };`
   });
 
   describe("fixture conversion", () => {
+    it("reports one original response across operations and status codes", async () => {
+      await tester
+        .expect(
+          `
+        alias Result = /*target*/{
+          @statusCode status: 200 | 201;
+          @header etag: string;
+          value: string;
+        };
+        @get @route("/first") op first(): Result;
+        @get @route("/second") op second(): Result;
+      `,
+        )
+        .toEmitDiagnostics((x) => ({ ...diagnostic, pos: x.pos.target.pos }));
+    });
+
     it("accepts a named widget response", async () => {
       await tester
         .expect(

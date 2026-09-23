@@ -35,39 +35,69 @@ export const noUnnamedResponseBodiesRule = createRule({
         }
 
         const [httpOperation] = getHttpOperation(context.program, operation);
+        const originals = new Set(getModelConstituents(operation.returnType));
         for (const response of httpOperation.responses) {
-          const responseType = response.type;
-          if (!isAnonymousModel(responseType) || reported.has(responseType)) {
-            continue;
-          }
           for (const content of response.responses) {
-            const bodyType = content.body?.type;
             // Property-position bodies belong to Azure Core's no-unnamed-types rule.
-            if (
-              content.body?.property ||
-              bodyType?.kind !== "Model" ||
-              bodyType.properties.size === 0 ||
-              getEffectiveModelType(
-                context.program,
-                bodyType,
-                (property) =>
-                  !isHeader(context.program, property) && !isStatusCode(context.program, property),
-              ).name !== ""
-            ) {
+            if (!content.body || content.body.property) {
               continue;
             }
-
-            reported.add(responseType);
-            context.reportDiagnostic({
-              target: responseType,
-            });
-            break;
+            for (const bodyType of getModelConstituents(content.body.type)) {
+              if (
+                bodyType.properties.size === 0 ||
+                getEffectiveModelType(
+                  context.program,
+                  bodyType,
+                  (property) =>
+                    !isHeader(context.program, property) &&
+                    !isStatusCode(context.program, property),
+                ).name !== ""
+              ) {
+                continue;
+              }
+              for (const responseType of getOriginalModels(bodyType, originals)) {
+                if (!isAnonymousModel(responseType) || reported.has(responseType)) {
+                  continue;
+                }
+                reported.add(responseType);
+                context.reportDiagnostic({ target: responseType });
+              }
+            }
           }
         }
       },
     };
   },
 });
+
+function* getModelConstituents(type: Type, visited = new Set<Type>()): Iterable<Model> {
+  if (visited.has(type)) return;
+  visited.add(type);
+  if (type.kind === "Model") {
+    yield type;
+  } else if (type.kind === "Union") {
+    for (const variant of type.variants.values()) {
+      yield* getModelConstituents(variant.type, visited);
+    }
+  }
+}
+
+function* getOriginalModels(
+  model: Model,
+  originals: Set<Model>,
+  visited = new Set<Model>(),
+): Iterable<Model> {
+  if (visited.has(model)) return;
+  visited.add(model);
+  if (originals.has(model)) {
+    yield model;
+  } else {
+    // HTTP-filtered payloads preserve their original model in compiler provenance.
+    for (const source of model.sourceModels) {
+      yield* getOriginalModels(source.model, originals, visited);
+    }
+  }
+}
 
 function shouldSkipOperation(operation: Operation): boolean {
   return (
