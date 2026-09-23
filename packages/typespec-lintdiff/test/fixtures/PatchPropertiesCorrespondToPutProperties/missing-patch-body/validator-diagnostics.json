@@ -1,0 +1,13 @@
+[
+  {
+    "code": "PatchPropertiesCorrespondToPutProperties",
+    "message": "Patch operations body cannot be empty.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "parameters"
+    ],
+    "severity": 0
+  }
+]

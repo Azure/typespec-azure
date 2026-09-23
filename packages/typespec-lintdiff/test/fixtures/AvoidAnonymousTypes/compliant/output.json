@@ -57,27 +57,32 @@
           "200": {
             "description": "The request has succeeded.",
             "schema": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "string",
-                  "description": "The ID"
-                },
-                "widgetName": {
-                  "type": "string",
-                  "description": "The name"
-                }
-              },
-              "required": [
-                "id",
-                "widgetName"
-              ]
+              "$ref": "#/definitions/Widget"
             }
           }
         }
       }
     }
   },
-  "definitions": {},
+  "definitions": {
+    "Widget": {
+      "type": "object",
+      "description": "A named widget",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The ID"
+        },
+        "widgetName": {
+          "type": "string",
+          "description": "The name"
+        }
+      },
+      "required": [
+        "id",
+        "widgetName"
+      ]
+    }
+  },
   "parameters": {}
 }

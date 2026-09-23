@@ -64,6 +64,54 @@ tests, documentation, generated official-library references, ruleset
 registration, or change metadata. They must not silently change the source
 rule's semantics only in the promoted copy.
 
+### Queue-controlled source-repair handoff
+
+When the caller is `/do-linter-development-task-one-by-one` and provides the
+`lintdiff-development-queue` marker with its
+[cycle handoff](../do-linter-development-task-one-by-one/SKILL.md#cycle-handoff),
+pass that context and the queue's process-review ownership constraint to both
+nested agents. Standalone review behavior is unchanged.
+
+The outer queue may invoke this skill directly after a worker returns
+`review-handoff` because nested persistent-agent controls are unavailable.
+In that mode the outer queue is this skill's parent/orchestrator and creates its
+own fresh collector/fixer pair; the development worker stays idle throughout.
+The same model pin, follow-up verification, evidence gates, publication approval,
+five-round limit and stop conditions apply. Run all target operations explicitly
+in the handed-off worktree. Return the reviewed/pushed head, complete review
+result and evidence to the queue. In `explicit-target` lifecycle mode, the
+queue resumes the whole-cycle worker with that reviewed SHA. In `app-session`
+lifecycle mode, keep the development owner idle; the outer queue dispatches a
+distinct promotion owner with the reviewed SHA instead. Do not switch owners
+after a review failure or treat a handoff as clean verification.
+
+In promotion PR mode, a confirmed `source-semantic-issue` still stops this loop
+without changing the source or making the promoted copy diverge. Return the
+worker outcome `source-repair-required` with the pinned source SHA, exact source
+locations, expected/actual behavior, reproducer or regression case, why it is not
+an adaptation defect, acceptance criteria, review/comment IDs, and PR/worktree
+identities. This applies to unresolved backlog findings as well as new rounds.
+Include any unfinished task-owned state and any accompanying operational blocker
+in the handoff. Do not resolve an unfixed source-defect thread or declare the
+review clean simply because repair was delegated.
+
+Only the outer queue may start a fresh source-repair worker. In promotion PR mode,
+this skill and its fix agent must not invoke development or promotion, edit
+source semantics, refresh promotion from a new source SHA, or resume this loop
+after returning a source defect. Standard development PR reviews may still fix
+valid source findings under their normal scope. `source-repair-required` is a
+specific blocked outcome, not a successful review or an exception to the stop
+conditions. Uncertain findings,
+ordinary adaptation fixes, and operational failures do not authorize repair.
+
+Every new invocation after source repair or promotion refresh uses two new
+persistent agents and its own five-round budget. It still drains unresolved
+threads, verifies the current pushed head, and requires a clean promotion
+worktree. Prior reviews do not count as clean verification of a changed head.
+Before returning to the queue, ensure neither nested agent nor its commands is
+still acting on the PR/worktree. Append milestones and the final result to the
+queue's shared execution log; do not truncate it or create a skill-update PR.
+
 ## Loop limits
 
 - Run at most **five review/fix rounds**.
@@ -83,25 +131,54 @@ rule's semantics only in the promoted copy.
   round's valid fixes, then stop and report that the cap prevented another
   verification review.
 - Stop immediately on an unverified review request, indeterminate collector
-  failure, validation failure, corpus failure, push failure, or finding whose
-  validity cannot be determined safely. Report the blocker instead of silently
-  continuing. The only exception is the bounded, parent-authorized
-  [local collector recovery](#local-collector-recovery) below; it never permits
-  an agent to silently resume or erase a failed attempt.
+  failure, push failure, uncertain finding, or required validation/corpus failure that
+  does not qualify for [bounded draft correction](#bounded-draft-correction)
+  or [bounded native-test timeout diagnosis](#bounded-native-test-timeout-diagnosis).
+  Apply the shared gate disposition to supplemental validation; a task defect
+  discovered there still blocks. Its optional status never excuses a regression.
+  The only recovery paths are those procedures and the separately
+  bounded, parent-authorized [local collector recovery](#local-collector-recovery).
+  None permits erasing failed attempts or publishing unverified changes.
 
 ## Initialize
 
-1. Resolve the pull request to its canonical URL, repository, number, base
+1. Before creating agents or collecting review evidence, apply the shared
+   [publication preflight](../do-linter-development-task-one-by-one/app-session-execution.md#publication-preflight)
+   for existing PRs. Record the publication binding and retain the PR's head
+   repository/owner and head branch for publication routing. For lintdiff
+   development, promotion, and skill-update PRs, require the head repository
+   to be `Azure/typespec-azure`, except for the exact existing rule PR covered by
+   the shared [fork-update authorization](../shared/recovery-context.md#existing-fork-updates).
+   Consume and acknowledge its durable recovery context; do not repeatedly ask
+   for the same permission. Skill-only PRs are not covered by that exception.
+   Do not retarget any PR head to a different remote as part of this loop.
+   For queue-owned review, consume its prepared phase binding, readiness manifest
+   and authoritative instruction paths/hashes. Enforce the inherited
+   `worktrees_folder` boundary for the target and any auxiliary task checkouts.
+   Use the shared `update-existing` publication path: the verified GitHub PR base,
+   not an unrelated app comparison base, selects the explicit Git diff.
+   Outer-owned review verifies the
+   recorded PR owner rather than requiring the coordinator to own that checkout;
+   this loop updates an existing PR and never calls the PR-creation tool.
+   Pass the exact target path and explicit remote/head identities to both agents.
+   Every shell invocation must select and verify that path with terminating
+   error handling; PowerShell directory/environment changes do not persist.
+   A correct command directory does not change app publication ownership.
+   Do not create worktrees or reinstall passing prerequisites. Revalidate
+   affected dependency/build fingerprints when review edits change their inputs.
+2. Resolve the pull request to its canonical URL, repository, number, base
    branch, head branch, head repository owner, and current head SHA:
 
    ```bash
    gh pr view "$PR" --json url,number,state,isDraft,baseRefName,headRefName,headRepositoryOwner,headRefOid
    ```
 
-2. Confirm the pull request is open.
-3. In standard PR mode, confirm the current worktree is the pull request's head
-   branch and has no unrelated changes. Do not overwrite, discard, or include
-   unrelated work.
+3. Confirm the pull request is open.
+4. In standard PR mode, resolve the absolute target worktree from the supplied
+   binding or verified worktree inventory. Use the current checkout only if it
+   matches the PR head; the coordinator may run elsewhere. Confirm the target is
+   on the PR head branch and has no unrelated changes. Do not create a replacement
+   checkout or overwrite, discard, or include unrelated work.
    In promotion PR mode, the orchestrating session may start in another
    worktree or a folder outside the target checkout. Discover an existing local
    promotion worktree from the available repository worktree or workspace
@@ -117,11 +194,11 @@ rule's semantics only in the promoted copy.
    After pinning the path, run every promotion filesystem inspection,
    validation, edit, commit, and push explicitly in that target worktree; never
    rely on the orchestrating session's current directory.
-4. In promotion PR mode, resolve and record the immutable lintdiff source rule,
+5. In promotion PR mode, resolve and record the immutable lintdiff source rule,
    source branch or ref, source commit, and migration evidence identified by the
    promotion PR. If this provenance is missing or cannot be verified, stop as a
    blocker rather than guessing the source behavior.
-5. Create the two persistent subagents once in background mode so the parent can
+6. Create the two persistent subagents once in background mode so the parent can
    deliver later rounds with `write_agent`. A sync-mode task is not persistent
    for this workflow and must not be used. Pin the fix subagent to
    `gpt-5.6-sol`; do not allow automatic model selection or substitution for
@@ -130,9 +207,9 @@ rule's semantics only in the promoted copy.
    processing backlog comments or requesting a review, verify that both agent
    IDs accept follow-up messages; if either does not, stop before GitHub or
    worktree side effects.
-6. Maintain a round ledger containing:
+7. Maintain a round ledger containing:
    - pull request mode: `standard` or `promotion`
-   - absolute target worktree path in promotion PR mode
+   - absolute target worktree path in both modes and inherited folder boundary
    - promotion source provenance when applicable
    - round number
    - head SHA reviewed
@@ -152,8 +229,16 @@ rule's semantics only in the promoted copy.
      timestamp, and any reliability classification
    - comment IDs delivered to the fix subagent
    - validity decision for each comment
+   - final disposition and evidence under
+     [review adoption evidence](#review-adoption-evidence)
    - promotion finding category when applicable
    - planned validation scope, command results, and corpus applicability/results
+   - recovery-context identity, acknowledged authorization scopes and applicable
+     validation profiles; retain all inherited counters and failed attempts
+   - draft-correction count, failure evidence, causal classification, corrective
+     diff identity and rerun results for the backlog pass or current round
+   - native-test timeout-diagnosis allowance owner, usage, eligibility evidence,
+     unchanged test population/timeouts, concurrency change and rerun result
    - publication handoff identity and the parent's approval or rejection
    - pushed fix commit SHA
    - processed review-thread IDs and their final resolution state
@@ -161,12 +246,48 @@ rule's semantics only in the promoted copy.
      the parent's one-time recollection authorization, fresh evidence identity,
      and final recovery approval or rejection
 
+## Review adoption evidence
+
+For each collected finding, retain the exact reviewer/comment permalink,
+request, author/agent reasoning, validity classification, and final disposition.
+Split compound requests when their outcomes differ. Link an implemented finding
+to the change commit, final file/line or test evidence, validation result, and
+verified pushed head. For historical analysis, use the merge revision instead.
+
+Use dispositions distinct from the finding-validity categories:
+
+- **Implemented:** the final revision contains the accepted behavior.
+- **Retained with rationale:** existing behavior was defended with evidence; do
+  not claim a new fix merely because the thread was answered.
+- **Declined:** evidence shows the requested change is invalid or inapplicable.
+- **Deferred:** record explicit scope/approval, tracking reference, and remaining
+  impact. A valid unresolved requirement still blocks clean completion.
+- **Superseded:** later analysis replaced an earlier fix or decision; link the
+  final outcome instead of counting both as adopted.
+- **Uncertain/blocked:** evidence or a required decision is missing; keep the
+  thread open and follow the existing stop conditions.
+
+Reconcile dispositions against the final head before publication handoff and
+the final report. An earlier "fixed" reply, approval, resolved thread, or stated
+deferral is not proof of the final implementation. Revalidate affected behavior
+when later edits supersede a fix. Distinguish reviewer feedback from author
+self-audits and other participants' policy decisions; do not infer preferences
+from an empty approval.
+
+This evidence contract does not broaden collection scope, request extra reviews,
+inspect suppressed comments, or authorize source repair. In this loop, apply it
+only to findings admitted by the existing collector/backlog rules. Dispositions
+do not override validity categories, clean-head gates, or the prohibition on
+resolving uncertain or unfixed source-defect threads.
+
 ## Local collector recovery
 
 A visible comment is not by itself permission to resume an unverified request.
-However, a proven local parsing or result-shape bug need not discard an
-otherwise verifiable review. This exception applies only to collection, never
-to finding validity, validation, corpus runs, staging, commits, or pushes.
+However, a proven local parsing, result-shape, or display-encoding bug need not
+discard an otherwise verifiable review. Distinguish failed evidence collection
+from failed display of successfully saved evidence; neither permits automatic
+resumption. This exception applies only to collection and evidence display,
+never to finding validity, validation, corpus runs, staging, commits, or pushes.
 
 1. **Pause on failure.** Preserve the original command, exit/error, raw
    responses and ledger entry. Report to the parent. Do not request another
@@ -174,7 +295,12 @@ to finding validity, validation, corpus runs, staging, commits, or pushes.
    label the failed attempt successful.
 2. **Parent eligibility gate.** Permit at most one recovery attempt per round
    only when preserved raw API evidence conclusively identifies a local
-   timestamp-conversion or result-shape bug. The raw responses must be valid,
+   timestamp-conversion or result-shape bug, or a display-only encoding failure
+   after the bundled collector exited successfully and saved a complete
+   `result.json`. For display-only failures, record the failing output command,
+   its encoding/error, and the successful collector's separate exit status and
+   artifact identity. A decode error while reading API data or a failure to save
+   evidence is not a display-only failure. The raw responses must be valid,
    complete and successful, with trustworthy pre/post request evidence proving
    a new request-event cursor on the same head (or the already-recorded active
    pending-request provenance). Missing evidence, genuinely unverified requests,
@@ -186,7 +312,10 @@ to finding validity, validation, corpus runs, staging, commits, or pushes.
    collector. Do not edit skill instructions or helper code during the active
    loop. If the bundled helper itself needs repair, stop and repair it after
    termination. The parent performs one independent, fresh, fully paginated,
-   no-cache recollection into a new evidence directory.
+   no-cache recollection into a new evidence directory. Use UTF-8 execution and
+   the collector's structured `review_metadata`, not the failed display script.
+   Display-only recovery uses the same one-attempt budget and all remaining
+   checks; it does not request another review.
 4. **Re-establish all evidence.** Verify the current head, numeric completed
    review ID, exact review commit and UTC submission/request correlation,
    review-specific REST comments and review metadata, and complete GraphQL
@@ -276,12 +405,23 @@ ledger. It owns these steps:
    mapping. Both agents and the parent reuse its raw-UTC parsing and array
    handling rather than generating inline PowerShell collectors. Each
    invocation writes a new evidence directory; never overwrite failed evidence.
+   Run all collector and supporting Python commands with `python -X utf8`
+   (prefixed by `mise exec --` when available). Read the collector's structured,
+   ASCII-escaped JSON instead of printing raw Unicode review bodies through
+   ad-hoc scripts. After `verify-request`, poll from the verified request JSON
+   instead of extracting or reparsing timestamps in shell code:
+
+   ```powershell
+   mise exec -- python -X utf8 .github\skills\loop-for-fix-and-review\review_evidence.py poll --repo $repo --pr $pr --request "$evidence\request\result.json" --output "$evidence\polling"
+   ```
 
 5. Poll the paginated REST pull-reviews endpoint,
-   `GET /repos/{owner}/{repo}/pulls/{number}/reviews`, at a moderate interval
+   `GET /repos/{owner}/{repo}/pulls/{number}/reviews`, at a positive moderate interval
    rather than repeatedly requesting reviews. Treat its raw response as the
    source of truth for review completion and the numeric review ID. Allow up to
-   30 minutes, using monotonic elapsed time only for deadline accounting.
+   30 minutes, using the maximum of wall-clock elapsed time since the active
+   request's raw UTC `created_at` and monotonic elapsed time for the current
+   invocation.
    - Across REST, GraphQL, timeline, and comment surfaces, normalize login
      values case-insensitively and accept exactly `Copilot`,
      `copilot-pull-request-reviewer`, and
@@ -297,34 +437,37 @@ ledger. It owns these steps:
    - Treat a non-2xx response, incomplete or failed pagination, parse failure,
      missing required field, or timestamp-validation failure as a
      collector/polling failure, never as a successful empty result.
-   - Compare submission timestamps without changing their timezone. Prefer
-     filtering the raw GitHub JSON with `gh api --jq` and comparing normalized
-     UTC instants. If PowerShell parses the response with `ConvertFrom-Json`,
-     compare its UTC `DateTime` value directly with the request event's
-     `UtcDateTime`. Never pass that converted `DateTime` back through
-     `[DateTimeOffset]::Parse(...)`: PowerShell can stringify it without the
-     `Z`, reinterpret it in the local timezone, and make a new review appear
+   - Compare submission timestamps only through the bundled collector's raw UTC
+     JSON handling, or equivalent stdlib code that preserves GitHub's `Z`
+     timestamp strings. Do not parse GitHub JSON with PowerShell and then feed
+     the converted `DateTime` back through another parser; that can drop `Z`,
+     reinterpret the value in the local timezone, and make a new review appear
      older than the request.
-     A safe PowerShell comparison for `ConvertFrom-Json` output is:
-
-     ```powershell
-     $eventUtc = [DateTimeOffset]::Parse($activeRequestCreatedAt).UtcDateTime
-     $submittedUtc = if ($review.submitted_at -is [DateTime]) {
-       $review.submitted_at.ToUniversalTime()
-     } else {
-       [DateTimeOffset]::Parse(
-         [string]$review.submitted_at,
-         [Globalization.CultureInfo]::InvariantCulture
-       ).UtcDateTime
-     }
-     $isNewReview = $submittedUtc -ge $eventUtc
-     ```
-
-   - Immediately before the deadline could be reported, perform a mandatory,
-     independent, fully paginated REST pull-reviews refetch. It must discard or
-     bypass collector caches and accumulated state and avoid conditional-cache
-     headers or behavior where practical. Preserve both the ordinary-poll and
-     final-refetch evidence.
+   - Use the collector's `poll` action for the executable bounded wait. It must
+     anchor the original deadline to the verified request event's raw UTC
+     `created_at` (including already-pending-active provenance), preserve any
+     earlier recorded deadline across `--resume-from`, cap the polling window at
+     30 minutes, use a positive moderate interval, write distinct evidence directories,
+     and cap subprocess/API timeouts by the remaining ordinary-poll deadline.
+     Omitting `--resume-from` must not start another 30-minute window for an old
+     verified request. Resumed artifacts must preserve a deadline anchor exactly
+     equal to the active request's original raw UTC `created_at`. When ordinary
+     polling records a pending response and will continue, it must write an
+     explicit nonterminal checkpoint; `--resume-from` accepts only that
+     in-progress checkpoint and rejects failed or completed artifacts. When
+     ordinary polling reaches a pending/deadline outcome without a collector
+     error, the mandatory independent final refetch runs once before reporting
+     failure, even after the ordinary polling deadline has expired; it uses a
+     separately recorded bounded allowance capped at 60 seconds, not a new
+     polling window.
+     The final refetch must discard or bypass
+     collector caches and accumulated state and avoid conditional-cache headers
+     or behavior where practical. Preserve both the ordinary-poll and
+     final-refetch evidence, including timeout metadata and any partial
+     stdout/stderr captured from a hung `gh` invocation. A flag or resumption
+     artifact never authorizes recovery from a failed collector or terminal
+     attempt; only the parent local-collector recovery gate can approve one
+     read-only recollection, and it cannot request another review.
    - If the final refetch finds the completed review, classify ordinary polling
      as unreliable and continue with that review; do not call the result a
      Copilot timeout. If the final refetch does not establish a completed
@@ -350,7 +493,10 @@ ledger. It owns these steps:
    thread handling but cannot be mapped, return a mapping collection failure
    without discarding the completed-review evidence or handing off a partial
    list.
-9. Cross-check the result against available review metadata. If the review body
+9. Cross-check the result against the collector's `review_metadata` summary,
+   generated-comment counts, and REST comment count. The summary excludes
+   collapsed details; do not inspect suppressed findings as actionable input.
+   An absent count marker is not a zero-comment declaration. If the review body
    reports generated comments but the endpoint returns fewer comments, return a
    collection failure instead of `no-new-comments`.
 10. Return either:
@@ -365,10 +511,10 @@ next review on its own.
 ## Fix subagent
 
 Deliver the complete structured comment list to the same persistent fix
-subagent each round. In promotion PR mode, every backlog and round handoff must
-also include the absolute target worktree path; instruct the subagent to perform
+subagent each round. In both modes, every backlog and round handoff must
+include the absolute target worktree path; instruct the subagent to perform
 all file reads, edits, validation, git status checks, staging, commits, and
-pushes from that path. Include the pinned lintdiff source ref and commit, exact
+pushes from that path. In promotion mode, include the pinned lintdiff source ref and commit, exact
 source rule and migration-evidence paths, and the verified source-semantics
 summary recorded in the ledger. The fix subagent must use that evidence when
 distinguishing a promotion adaptation issue from a source semantic issue. It
@@ -405,7 +551,9 @@ owns these steps:
    `uncertain-or-blocked`. In promotion PR mode, always classify a verified
    `source-semantic-issue` as `uncertain-or-blocked` for this loop and stop the
    promotion. Report that the source rule must return to lintdiff repair; do not
-   edit either the immutable source or the promoted copy.
+   edit either the immutable source or the promoted copy. In queue mode, attach
+   the verified defect evidence needed for the parent's
+   `source-repair-required` handoff; no repair is performed in this loop.
 5. If no finding is `valid-actionable`, make no changes and return
    `no-valid-comments`.
 6. Apply all and only the `valid-actionable` findings that are in the pull
@@ -440,11 +588,128 @@ exit code, outcome, and output or durable log path, including failed attempts.
 Also record whether corpus validation is required, why, and its results when
 applicable.
 
-On a command failure, stop and return the evidence before staging, committing,
-or pushing. A passing narrower command does not erase a failed required check.
-Do not retrospectively relabel a failed command as supplemental or self-waive
-it because its diagnostics appear unrelated. Preserve the failure in the
-ledger and report the blocker.
+Use the matching [validation profile](../shared/recovery-context.md#reusable-validation-profiles)
+from the task's recovery context. Reverify its configuration/dependency identity,
+preserve approved settings and separately bounded attempt usage, and do not
+silently fall back to default timeouts. A profile does not waive the failure
+classification or publication gate.
+
+On a command failure, preserve the evidence and apply the predeclared
+[gate disposition](../shared/recovery-context.md#validation-gates-and-supplemental-checks)
+before considering bounded draft correction or native-test timeout diagnosis.
+A disclosed supplemental promotion limitation does not automatically block this
+loop or authorize a rerun. Never stage, commit or push a draft with a failed
+required gate or task defect. A passing narrower command does not erase a
+failed required check. Do not retrospectively relabel a failed command as
+supplemental or self-waive it because its diagnostics appear unrelated.
+
+### Bounded draft correction
+
+An agent-introduced error in an unpublished draft or its validation command is
+not automatically an external blocker. Allow the same fix agent up to **three
+corrective attempts total per backlog pass or review round**, not per command or
+finding. Each
+attempt is one recorded corrective code or command change set followed by
+validation. Command corrections share this budget; they do not get a separate
+retry allowance. The first failed validation triggers attempt 1; a new failure
+during its rerun consumes
+the next attempt. Do not reset this budget by changing commands, reclassifying
+findings, switching agents or restarting a phase.
+
+In queue mode, an exhausted ordinary allowance may use the shared
+[coordinator-owned local recovery reserve](../shared/recovery-context.md#coordinator-owned-local-recovery-reserve).
+Return its nonterminal handoff before a terminal budget stop; only the outer
+queue may debit the task-wide reserve and resume this same fix agent and round.
+Standalone review does not receive that reserve.
+
+1. Preserve the failed command, working directory, exit status, output, draft
+   identity and planned validation scope. Establish a concrete causal link to
+   the agent's current task-owned edits or invocation: for example, a compiler
+   error at a new call passing an optional value, a regression assertion caused
+   by the changed rule, or a selector using regex where the runner requires a
+   literal substring. A failed command alone is not sufficient evidence.
+2. If the cause is understood, the correction is in scope, and budget remains,
+   record the attempt and correct the draft in place without another user
+   prompt. Do not request another Copilot review or consume a review round.
+   Respect native API boundaries and promotion's immutable source semantics.
+3. For an invocation error, inspect the runner's documented or implemented
+   argument semantics and verify the failed command's side effects before
+   rerunning. Correct deterministic quoting, working-directory, option or
+   selector mistakes only when no external failure is involved and the prior
+   execution either made no changes or left fully understood, safely
+   recoverable task-owned state. Preserve the intended validation population;
+   splitting an invalid multi-selector into supported commands must cover the
+   same intended projects. Prove selectors match a nonempty population using
+   the runner's actual matching semantics, not a different shell predicate.
+   Uncertain completion or side effects remain blockers.
+4. Rerun the failed required check at its original intended scope after correction.
+   Then run every remaining required check and repeat earlier checks invalidated
+   by the new edits. Focused debugging may supplement, never replace, the
+   required build, tests, fixtures or corpus. A corpus regression qualifies only
+   when evidence proves it is caused by the draft, not an unexplained count gap.
+5. Preserve original failures alongside the corrective code/command diffs and
+   passing reruns.
+   Return `ready-for-publication` only when the final draft satisfies the complete
+   required scope. The parent independently verifies that every prior failure
+   is accounted for and no failed required check remains unresolved.
+6. Except for the queue reserve above or an eligible native-test timeout
+   diagnosis below, stop on an
+   unknown cause, unsafe/out-of-scope correction, exhausted budget,
+   or an external/indeterminate operational failure (such as credentials, network,
+   dependency/tool availability, harness/emitter crash, or publication failure).
+   An agent-authored argument error rejected before work starts is not a
+   harness crash. This policy never retries review requests, pushes, email
+   sends or other publication operations. Do not blindly
+   rerun commands, weaken assertions, skip fixtures, suppress diagnostics or
+   waive failures. A confirmed immutable promotion-source defect still returns
+   `source-repair-required`; it is not repaired in the promoted copy.
+
+This budget is separate from the five review rounds, queue orchestration retry
+and queue source-repair cycles. The invocation authorizes eligible corrections;
+parent approval is still required for publication, not for each local correction.
+
+### Bounded native-test timeout diagnosis
+
+A completed native unit-test run whose only failures are test-runner-reported
+per-test timeouts may receive **one diagnostic rerun with reduced concurrency**.
+In queue mode, the outer queue owns one allowance for the entire task, shared
+across phases, review rounds, and source-repair cycles. Outside queue mode, the
+invoking standalone workflow owns one allowance across its nested reviews.
+Pass and preserve that ownership and usage in handoffs; a new agent, phase,
+review invocation, or resumption does not reset it.
+
+1. Preserve the original command, runner exit status and complete test summary,
+   timeout failures, test counts/skips, working tree identity, and output.
+   Require natural runner completion, no remaining child process, and known
+   task-owned side effects. Mixed assertion/compiler failures, setup/hook
+   timeouts, crashed workers, killed or hung commands, corpus/emitter failures,
+   dependency/network/auth errors, and uncertain completion are not eligible.
+2. Inspect the installed runner's documented concurrency option. Require that
+   concurrency can actually be reduced. Record and consume the allowance before
+   running; in queue mode the outer queue grants the worker this recorded allowance
+   without another user prompt. For Vitest, use a supported `--maxWorkers=1`
+   invocation. Keep the same test selection, assertions, skips, code, fixtures,
+   dependencies, and configured test/hook timeouts. Do not reinstall, raise
+   timeouts, add retries, or change production code for this diagnostic run.
+3. Run the original full validation scope once with only the concurrency change.
+   Verify that the discovered test population and skip set match. A focused
+   subset cannot substitute for this rerun. Preserve both attempts.
+4. If it passes, record a recovered timeout with unproven cause, not proof of
+   environmental contention, and complete the remaining required validation.
+   If it fails, do not repeat the diagnostic run. An understood defect in the
+   agent's draft may still use the existing bounded draft-correction allowance,
+   with concrete causal evidence and a full-scope passing rerun. An unexplained
+   timeout remains blocking unless the outer queue grants the shared
+   [bounded native baseline comparison](../shared/recovery-context.md#bounded-native-baseline-comparison).
+   Return its nonterminal handoff with commands stopped; the review pair stays
+   idle until that same-owner continuation. Standalone runs and ineligible
+   failures retain the stop. Source-semantic defects in
+   promotion still require the source-repair handoff.
+
+This allowance is separate from draft corrections and does not authorize
+review requests, pushes, PR creation, email retries, or publication of a failing
+draft. The parent verifies eligibility and all failure/recovery evidence before
+approving publication.
 
 ### Linter source changes
 
@@ -454,8 +719,9 @@ documentation, or `migration.md` do not require corpus validation. When
 production linter-rule code changes, follow the current linter-source validation
 and corpus procedure in `/develop-lintdiff-rule` in full. Treat that skill as
 the source of truth for setup, commands, evidence updates, analysis, and
-generated-output cleanup. Surface any required validation or corpus failure and
-stop the loop.
+generated-output cleanup. Record every required validation or corpus failure;
+continue only for an eligible bounded draft correction or native-test timeout
+diagnosis. The timeout exception never applies to corpus runs.
 
 In promotion PR mode, do not run `/develop-lintdiff-rule`, the lintdiff fixture
 harness, or corpus validation. Follow the current targeted validation procedure
@@ -466,7 +732,9 @@ broader validation when warranted. Treat `/lintdiff-rule-promote` as the source
 of truth for the exact current commands and generated-output checks. A
 production rule edit is permitted only when it is a verified
 `promotion-adaptation-issue` that preserves the immutable source semantics.
-Surface any required promotion validation failure and stop the loop.
+Record every required promotion validation failure; continue only for an
+eligible bounded draft correction that preserves the pinned source semantics
+or bounded native-test timeout diagnosis, otherwise stop the loop.
 
 ### Parent publication gate
 
@@ -478,8 +746,11 @@ After all required validation succeeds, return `ready-for-publication` with:
 - the validation scope and complete command/corpus evidence described above
 
 The parent independently inspects the proposed diff and evidence, confirms that
-the required scope is satisfied and no command failure or unresolved blocker
-remains, and records its decision in the ledger. Only then may it send explicit
+the required scope is satisfied, every earlier required failure has verified
+corrective evidence, and no unresolved required check or task defect remains.
+Independently verify the original gate classification and disclosed disposition
+of supplemental failures; no retroactive demotion is allowed. Record its
+decision in the ledger. Only then may it send explicit
 publication approval to the same persistent fix subagent, identifying the
 approved head SHA and change-content identity. This is an agent-to-agent gate,
 not an additional user approval prompt. It applies to backlog fixes and every
@@ -490,7 +761,7 @@ counted round, including round five.
 Only after receiving the parent's explicit publication approval:
 
 1. Reconfirm the target worktree diff contains no unrelated or generated corpus
-   data. In promotion PR mode, run this and all remaining git commands from the
+   data. In both modes, run this and all remaining git commands from the
    ledger's absolute target worktree path. Confirm that the local and remote
    head, proposed content, and validation evidence still match the approval.
    Any change invalidates approval: return to the parent without publishing.
@@ -536,8 +807,16 @@ For rounds 1 through 5:
 4. If the fix subagent returns `no-valid-comments`, reply with its rejection
    rationale, resolve the safely rejected threads, verify that no processed
    thread remains unresolved, and then end successfully.
-5. If it returns `uncertain-or-blocked` or any command failure, stop and report
-   the blocker.
+5. If it returns `uncertain-or-blocked` or a required command failure that is
+   ineligible for correction or has exhausted its correction budget, stop and report the
+   blocker. Do not terminate solely because a ready-for-publication handoff
+   retains a failed attempt followed by a verified eligible correction.
+   For supplemental failures, independently verify their predeclared scope and
+   disposition rather than making them required gates during this handoff.
+   In queue-controlled promotion mode, return
+   `source-repair-required` for a confirmed source defect with the complete
+   evidence contract above; retain any separate operational failure rather than
+   hiding it behind that outcome.
 6. For `ready-for-publication`, apply the parent publication gate, then send
    approval to the same fix subagent and await its commit/push result. Stop on
    failed publication or invalidated approval; do not request another review.
@@ -584,3 +863,6 @@ Report:
 - commits pushed
 - focused validation and corpus outcome when applicable
 - termination reason: no comments, no valid comments, five-round cap, or blocker
+- in queue mode, reviewed and final pushed head SHAs, pinned promotion source
+  SHA when applicable, and the complete evidence handoff for a confirmed
+  `source-repair-required` blocker

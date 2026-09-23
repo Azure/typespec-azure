@@ -1,5 +1,16 @@
 # UnSupportedPatchProperties migration
 
+## Current consolidated contract
+
+The September 22 consolidation supersedes the standalone implementation and
+equivalence conclusion below. See [consolidated migration evidence](../../../docs/patch-body-consolidation.md)
+and [the combined rule contract](../../../src/rules/no-unsafe-patch-body-properties.md).
+Immutable checks now use effective native PATCH input, not emitted mutability.
+All three legacy IDs map to `no-unsafe-patch-body-properties`; exact Swagger
+equivalence is not claimed. Counts below describe the historical standalone rule.
+
+## Historical standalone evidence
+
 ## Conclusion
 
 The migrated `tsp-lintdiff-local-linter/unsupported-patch-properties` rule is

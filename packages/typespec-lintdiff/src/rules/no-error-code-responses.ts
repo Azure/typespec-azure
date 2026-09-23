@@ -1,6 +1,6 @@
 import { getArmProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 import { createRule, paramMessage } from "@typespec/compiler";
-import { getHttpOperation, type HttpStatusCodeRange } from "@typespec/http";
+import { getAllHttpServices, type HttpStatusCodeRange } from "@typespec/http";
 
 const allowedStatusCodes = new Set<number | "*">([200, 201, 202, 204, "*"]);
 
@@ -13,26 +13,26 @@ export const noErrorCodeResponsesRule = createRule({
   },
   create(context) {
     return {
-      operation: (operation) => {
-        const namespace = operation.interface?.namespace ?? operation.namespace;
-        if (
-          namespace === undefined ||
-          getArmProviderNamespace(context.program, namespace) === undefined
-        ) {
-          return;
-        }
-
-        const [httpOperation] = getHttpOperation(context.program, operation);
-
-        for (const response of httpOperation.responses) {
-          if (isExplicitErrorCode(response.statusCodes)) {
-            context.reportDiagnostic({
-              target: operation,
-              format: {
-                operationName: operation.name,
-                statusCode: formatStatusCode(response.statusCodes),
-              },
-            });
+      root: () => {
+        const [services] = getAllHttpServices(context.program);
+        for (const service of services) {
+          for (const { operation, responses } of service.operations) {
+            const namespace = operation.interface?.namespace ?? operation.namespace;
+            // The mixed lintdiff ruleset also runs on data-plane services.
+            if (!namespace || !getArmProviderNamespace(context.program, namespace)) {
+              continue;
+            }
+            for (const response of responses) {
+              if (isExplicitErrorCode(response.statusCodes)) {
+                context.reportDiagnostic({
+                  target: operation,
+                  format: {
+                    operationName: operation.name,
+                    statusCode: formatStatusCode(response.statusCodes),
+                  },
+                });
+              }
+            }
           }
         }
       },

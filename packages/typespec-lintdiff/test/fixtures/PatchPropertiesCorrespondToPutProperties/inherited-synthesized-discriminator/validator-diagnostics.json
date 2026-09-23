@@ -1,0 +1,13 @@
+[
+  {
+    "code": "PatchPropertiesCorrespondToPutProperties",
+    "message": "kind property in patch body is not present in the corresponding put body. A patch request body must only contain properties present in the corresponding put request body, and must contain at least one of the properties.",
+    "path": [
+      "paths",
+      "/widgets/{widgetName}",
+      "patch",
+      "parameters"
+    ],
+    "severity": 0
+  }
+]

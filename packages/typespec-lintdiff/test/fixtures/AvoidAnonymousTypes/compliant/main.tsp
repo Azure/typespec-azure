@@ -16,12 +16,20 @@ enum Versions {
   v2024_01_01: "2024-01-01",
 }
 
+@doc("A named widget")
+model Widget {
+  @doc("The ID")
+  id: string;
+
+  @doc("The name")
+  widgetName: string;
+}
+
 #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "test"
 @route("/widgets/{name}")
 @doc("Get a widget")
-@get op getWidget(@path @doc("Widget name") name: string, @query("api-version") @doc("API version") apiVersion: string): {
-  @doc("The ID")
-  id: string;
-  @doc("The name")
-  widgetName: string;
-};
+@get
+op getWidget(
+  @path @doc("Widget name") name: string,
+  @query("api-version") @doc("API version") apiVersion: string,
+): Widget;

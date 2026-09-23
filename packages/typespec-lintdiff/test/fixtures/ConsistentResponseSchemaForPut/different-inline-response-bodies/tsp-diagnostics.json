@@ -185,16 +185,6 @@
     "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
   },
   {
-    "code": "tsp-lintdiff-local-linter/avoid-anonymous-types",
-    "severity": "warning",
-    "message": "Operation response body should use a named model instead of an anonymous inline model expression."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/avoid-anonymous-types",
-    "severity": "warning",
-    "message": "Operation response body should use a named model instead of an anonymous inline model expression."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/consistent-response-schema-for-put",
     "severity": "warning",
     "message": "200 response schema does not match 201 response schema. A PUT API must always return the same response schema for both the 200 and 201 status codes."
@@ -235,16 +225,6 @@
     "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
   },
   {
-    "code": "tsp-lintdiff-local-linter/avoid-anonymous-types",
-    "severity": "warning",
-    "message": "Operation response body should use a named model instead of an anonymous inline model expression."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/avoid-anonymous-types",
-    "severity": "warning",
-    "message": "Operation response body should use a named model instead of an anonymous inline model expression."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/consistent-response-schema-for-put",
     "severity": "warning",
     "message": "200 response schema does not match 201 response schema. A PUT API must always return the same response schema for both the 200 and 201 status codes."
@@ -280,11 +260,6 @@
     "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
   },
   {
-    "code": "tsp-lintdiff-local-linter/consistent-response-schema-for-put",
-    "severity": "warning",
-    "message": "200 response schema does not match 201 response schema. A PUT API must always return the same response schema for both the 200 and 201 status codes."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
     "severity": "warning",
     "message": "ARM PUT path '/bytes-content-type' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
@@ -318,11 +293,6 @@
     "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
     "severity": "warning",
     "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/consistent-response-schema-for-put",
-    "severity": "warning",
-    "message": "200 response schema does not match 201 response schema. A PUT API must always return the same response schema for both the 200 and 201 status codes."
   },
   {
     "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
