@@ -2,19 +2,20 @@ Non-GET long-running ARM operations must define at least one default, 4xx, or 5x
 error response and use `Azure.ResourceManager.CommonTypes.ErrorResponse` for every
 such response body.
 
-The rule checks the TypeSpec model, not an emitted OpenAPI reference. Aliases,
-`model is` copies, and nullable unions with a single non-null standard error type
-are accepted. An external reference to the Swagger common-types `ErrorResponse`
-does not make a custom TypeSpec model compliant.
+Aliases, unchanged `model is` copies, and nullable unions with a single non-null
+standard error type are accepted. Responses may wrap the standard payload with
+HTTP status codes and headers, including by spreading `CommonTypes.ErrorResponse`
+into a response model. The rule checks the body after HTTP metadata is removed.
+Copies that add payload fields or an indexer are not accepted.
 
 ## Impact
 
 - **Area:** API design and generated SDKs
 
 Using one standard error contract gives generated SDKs and Azure tooling a
-consistent error shape across long-running operations. Custom, derived, inline,
-primitive, collection, binary, and multipart error payloads are not substitutes
-for `Azure.ResourceManager.CommonTypes.ErrorResponse`.
+consistent error shape across long-running operations. Independently defined
+lookalikes, derived models, and primitive, collection, binary, or multipart error
+payloads are not substitutes for `Azure.ResourceManager.CommonTypes.ErrorResponse`.
 
 An error response without a body satisfies the response requirement; its absent
 body is not checked. Success response bodies, synchronous operations, and GET
@@ -52,6 +53,18 @@ interface Widgets {
 ```
 
 `ArmResourceActionAsync` uses the standard `ErrorResponse` by default.
+
+When an error response needs HTTP metadata, keep its payload standard:
+
+```tsp
+model Failure {
+  ...CommonTypes.ErrorResponse;
+  @statusCode status: 400;
+  @header requestId: string;
+}
+```
+
+The status code and header are not payload fields, so this wrapper is accepted.
 
 ## LintDiff Equivalent
 

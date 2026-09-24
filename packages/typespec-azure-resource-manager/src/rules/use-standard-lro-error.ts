@@ -59,6 +59,7 @@ export const useStandardLroErrorRule = createRule({
           return;
         }
 
+        // HTTP metadata removal can leave an anonymous body; recover its standard payload model.
         const invalidBody = errorResponses.some((response) =>
           response.responses.some(
             ({ body }) =>
@@ -87,6 +88,22 @@ function isStandardError(type: Type): boolean {
     return false;
   }
   while (type.sourceModel) {
+    const source = type.sourceModel;
+    if (
+      type.indexer !== source.indexer ||
+      type.properties.size !== source.properties.size ||
+      [...type.properties.values()].some((property) => {
+        const original = source.properties.get(property.name);
+        return (
+          original === undefined ||
+          property.sourceProperty !== original ||
+          property.type !== original.type ||
+          property.optional !== original.optional
+        );
+      })
+    ) {
+      return false;
+    }
     type = type.sourceModel;
   }
   return (

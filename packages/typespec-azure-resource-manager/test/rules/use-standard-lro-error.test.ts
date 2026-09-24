@@ -104,6 +104,75 @@ describe("use-standard-lro-error", () => {
       .toBeValid();
   });
 
+  it.each([
+    "{ ...CommonTypes.ErrorResponse; @statusCode status: 400; @header requestId: string; }",
+    "SpreadError",
+    "CopiedError",
+  ])("accepts a standard error payload wrapped with HTTP metadata: %s", async (response) => {
+    await tester
+      .expect(
+        `${header}
+        model SpreadError {
+          ...CommonTypes.ErrorResponse;
+          @statusCode status: 400;
+          @header requestId: string;
+        }
+        model CopiedError is CommonTypes.ErrorResponse {
+          @statusCode status: 400;
+          @header requestId: string;
+        }
+        @Azure.Core.pollingOperation(poll) @route("/wrapped") @post
+        op wrapped(): Accepted | ${response};
+      `,
+      )
+      .toBeValid();
+  });
+
+  it.each(["Copy", "CopyAgain", "CopyAgain | null", "{ ...CopyAgain; }"])(
+    "rejects a model-is copy with an added payload field: %s",
+    async (payload) => {
+      await tester
+        .expect(
+          `${header}
+        model Copy is CommonTypes.ErrorResponse { extra: string; }
+        model CopyAgain is Copy;
+        @route("/modified") op modified is Lro<${payload}>;
+      `,
+        )
+        .toEmitDiagnostics([diagnostic]);
+    },
+  );
+
+  it("rejects a model-is copy with an added indexer", async () => {
+    await tester
+      .expect(
+        `${header}
+        model Copy is CommonTypes.ErrorResponse { ...Record<string>; }
+        @route("/modified") op modified is Lro<Copy>;
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
+  it.each([
+    "{ ...CommonTypes.ErrorResponse; extra: string; @statusCode status: 400; }",
+    "CopiedError",
+  ])("rejects wrapped standard errors with an added payload field: %s", async (response) => {
+    await tester
+      .expect(
+        `${header}
+        model CopiedError is CommonTypes.ErrorResponse {
+          extra: string;
+          @statusCode status: 400;
+          @header requestId: string;
+        }
+        @Azure.Core.pollingOperation(poll) @route("/modified") @post
+        op modified(): Accepted | ${response};
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
   it("rejects a custom error supplied to an ARM template", async () => {
     await tester
       .expect(
