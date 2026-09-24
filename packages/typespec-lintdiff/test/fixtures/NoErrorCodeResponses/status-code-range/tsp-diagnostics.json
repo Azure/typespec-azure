@@ -1,5 +1,10 @@
 [
   {
+    "code": "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
+    "severity": "warning",
+    "message": "Synchronous post operations must have a 200 or 204 response and a default response. They must not have any other responses."
+  },
+  {
     "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
     "severity": "warning",
     "message": "Use the latest ARM common-types version 'v6' instead of 'v5'."
@@ -7,7 +12,7 @@
   {
     "code": "tsp-lintdiff-local-linter/no-error-code-responses",
     "severity": "warning",
-    "message": "Operation 'probeHead' defines disallowed response status '404'. Use only 200, 201, 202, 204, or default responses."
+    "message": "Operation 'redirect' defines disallowed response status '300-399'. Use only 200, 201, 202, 204, or default responses."
   },
   {
     "code": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
@@ -23,6 +28,11 @@
     "code": "tsp-lintdiff-local-linter/tracked-resource-patch-operation",
     "severity": "warning",
     "message": "Tracked resource 'Widget' must have patch operation that at least supports the update of tags."
+  },
+  {
+    "code": "@azure-tools/typespec-azure-core/documentation-required",
+    "severity": "warning",
+    "message": "The ModelProperty named '_' should have a documentation or description, use doc comment /** */ to provide it."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
