@@ -6,6 +6,7 @@ the standard create-or-replace operation templates.
 Use lifecycle visibility for request/response property differences rather than
 declaring separate models. This rule checks model reuse, not structural equality.
 It checks both `200` and `201` when present; it does not require those status codes.
+Bodyless response variants, including explicit `void` bodies, are ignored.
 Bodies without an identifiable named resource model are not compared.
 
 #### ✅ Correct

@@ -115,7 +115,7 @@ export const putResourceSchemaConsistencyRule = createRule({
 function getUnambiguousBody(response: HttpOperationResponse): HttpPayloadBody | undefined {
   let body: HttpPayloadBody | undefined;
   for (const content of response.responses) {
-    if (content.body === undefined) continue;
+    if (content.body === undefined || isVoidType(content.body.type)) continue;
     // Do not choose an arbitrary variant or infer equality for an ambiguous status.
     if (
       body !== undefined &&

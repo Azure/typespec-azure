@@ -2,10 +2,13 @@ import { Tester } from "#test/tester.js";
 import {
   createLinterRuleTester,
   expectDiagnostics,
+  t,
   type LinterRuleTester,
 } from "@typespec/compiler/testing";
+import { getHttpOperation } from "@typespec/http";
 import { readFileSync } from "node:fs";
-import { beforeEach, it } from "vitest";
+import { beforeEach, expect, it } from "vitest";
+import { armResourceOperationsRule } from "../../src/rules/arm-resource-operation-response.js";
 import { putResourceSchemaConsistencyRule } from "../../src/rules/put-resource-schema-consistency.js";
 
 let tester: LinterRuleTester;
@@ -42,6 +45,22 @@ it("accepts the same model across the request and both responses", async () => {
   `,
     )
     .toBeValid();
+});
+
+it.each(["body", "bodyRoot"])("resolves @%s payloads to their property type", async (decorator) => {
+  const { program, put, Input, Output } = await Tester.compile(t.code`
+    model ${t.model("Input")} { value: string; }
+    model ${t.model("Output")} { value: string; }
+    @put op ${t.op("put")}(@${decorator} body: Input):
+      { @statusCode status: 200; @${decorator} body: Output; };
+  `);
+  const [http] = getHttpOperation(program, put);
+  const request = http.parameters.body;
+  const response = http.responses[0].responses[0].body;
+  expect(request?.type).toBe(Input);
+  expect(request?.property?.type).toBe(Input);
+  expect(response?.type).toBe(Output);
+  expect(response?.property?.type).toBe(Output);
 });
 
 it.each([200, 201])("compares the request with a lone %s response", async (status) => {
@@ -305,6 +324,51 @@ it("accepts shared content variants and ignores bodyless variants regardless of 
   }
 });
 
+it.each([200, 201])(
+  "ignores void %s variants without hiding mismatches or registration errors",
+  async (status) => {
+    for (const variants of ["Empty | ResourceResponse", "ResourceResponse | Empty"]) {
+      await tester
+        .expect(
+          `${models}
+      model Empty { @statusCode status: ${status}; @bodyRoot body: void; }
+      model ResourceResponse { @statusCode status: ${status}; @bodyRoot body: Other; }
+      @put op put(@bodyRoot body: Widget): ${variants};
+    `,
+        )
+        .toEmitDiagnostics([diagnostic(`request: Widget; ${status} response: Other`)]);
+
+      await tester
+        .expect(
+          `
+      model Plain { value: string; }
+      model Empty { @statusCode status: ${status}; @body body: void; }
+      model ResourceResponse { @statusCode status: ${status}; @body body: Plain; }
+      @put op put(@body body: string): ${variants};
+    `,
+        )
+        .toEmitDiagnostics([unregistered(`${status} response: Plain`)]);
+    }
+  },
+);
+
+it.each([200, 201])(
+  "accepts void %s variants with the same resource or no resource",
+  async (status) => {
+    for (const variants of ["Empty | ResourceResponse", "ResourceResponse | Empty", "Empty"]) {
+      await tester
+        .expect(
+          `${models}
+      model Empty { @statusCode status: ${status}; @bodyRoot body: void; }
+      model ResourceResponse { @statusCode status: ${status}; @bodyRoot body: Widget; }
+      @put op put(@bodyRoot body: Widget): ${variants};
+    `,
+        )
+        .toBeValid();
+    }
+  },
+);
+
 it.each(["Record<string>", "Array<string>"])("skips inherited indexers from %s", async (base) => {
   await tester
     .expect(
@@ -381,8 +445,6 @@ it.each(["TrackedResource", "ProxyResource"])(
 );
 
 it("keeps canonical-resource validation in the existing lifecycle rule", async () => {
-  const { armResourceOperationsRule } =
-    await import("../../src/rules/arm-resource-operation-response.js");
   const source = `${models}
     @armProviderNamespace namespace Operations {
       @armResourceOperations interface Widgets {
@@ -404,6 +466,44 @@ it("keeps canonical-resource validation in the existing lifecycle rule", async (
       message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
     });
 });
+
+it.each([
+  ["missing request", "", "Resources.Widget", missingRequest],
+  [
+    "request mismatch",
+    ", @bodyRoot body: Resources.Other",
+    "Resources.Widget",
+    diagnostic("request: Other; 200 response: Widget"),
+  ],
+  [
+    "unregistered bodies",
+    ", @bodyRoot body: Plain",
+    "Plain",
+    unregistered("request: Operations.Plain; 200 response: Operations.Plain"),
+  ],
+] as const)(
+  "covers %s not checked by the lifecycle rule",
+  async (_, request, response, expected) => {
+    const source = `${models}
+    @armProviderNamespace namespace Operations {
+      model Plain { value: string; }
+      @armResourceOperations interface Widgets {
+        @put @armResourceCreateOrUpdate(Resources.Widget)
+        put(...ResourceInstanceParameters<Resources.Widget>${request}):
+          ArmResponse<${response}> | ErrorResponse;
+      }
+    }
+  `;
+    await createLinterRuleTester(
+      await Tester.createInstance(),
+      armResourceOperationsRule,
+      "@azure-tools/typespec-azure-resource-manager",
+    )
+      .expect(source)
+      .toBeValid();
+    await tester.expect(source).toEmitDiagnostics([expected]);
+  },
+);
 
 it("checks unannotated and nested namespaces", async () => {
   await tester
