@@ -63,6 +63,13 @@ Compile documentation examples through the repository's existing example or
 test workflow when available. A plausible-looking template snippet is not
 evidence that the recommended customization works.
 
+Review user-facing rule docs against the
+[native rule documentation contract](../typespec-lint-implement/SKILL.md#native-rule-documentation).
+Read the main explanation and examples without the migration section and verify
+that they teach the native requirement without legacy validator or
+emitted-reference comparisons. Apply the same check to regenerated public pages;
+compiling examples alone does not prove the documentation meets this contract.
+
 ## Deliverable
 
 Produce:
