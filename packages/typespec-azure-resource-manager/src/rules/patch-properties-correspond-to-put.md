@@ -10,8 +10,8 @@ visibility, and authored discriminator properties participate in the comparison.
 
 ## Effective input and rule ownership
 
-Each operation's resolved request visibility determines its input. The rule does not reuse
-AutoRest canonical schemas, fall back to Read visibility, or synthesize discriminator properties.
+Each operation's resolved request visibility determines its input. Only authored discriminator
+properties participate in the comparison.
 Read-only and Create-only properties excluded from ordinary PATCH input are ignored.
 Explicit `@parameterVisibility` overrides are respected independently for PUT and PATCH.
 HTTP metadata inside `@body` remains JSON input; transport metadata inside `@bodyRoot` is excluded.
@@ -21,22 +21,21 @@ Using the same named resource model does not guarantee identical input. For exam
 That mismatch is still checked even though resource-model identity and PATCH-to-resource layout
 checks can both pass. Adding unrelated, excluded properties does not change this comparison.
 
-The rule does not diagnose a missing PUT body. PUT-body validity belongs to the separate
-`put-resource-schema-consistency` rule proposed in
-[#5423](https://github.com/Azure/typespec-azure/pull/5423); it must be available and enabled to provide
-that coverage. This rule does not require a PUT operation to exist either. An absent or `void`
+The rule does not diagnose a missing PUT body. PUT-body validity is a separate concern from
+property correspondence, covered by `put-resource-schema-consistency` when enabled.
+This rule does not require a PUT operation to exist either. An absent or `void`
 PUT body skips correspondence, including when a body parameter is unavailable in a service version.
 
 For paired operations, missing or `void` PATCH bodies and object bodies with no effective input
-properties are still diagnosed. These safeguards remain until equivalent coverage is provided
-by the PATCH-body rules; declared properties alone do not establish nonempty effective input.
-They do not depend on the corresponding PUT having a usable body.
+properties are diagnosed. Declared properties alone do not establish nonempty effective input.
+These diagnostics do not depend on the corresponding PUT having a usable body.
 
-Required envelope properties remain the responsibility of `patch-envelope` and `arm-resource-patch`.
+Required envelope properties remain the responsibility of [`patch-envelope`](./patch-envelope.md)
+and [`arm-resource-patch`](./arm-resource-patch.md).
 For example, a resource's supported `tags` must be exposed in its PATCH schema, but need not be
 required in every PATCH request. This rule does not add another tags diagnostic.
-Recursive PATCH-to-resource layout and safety validation is separate, consolidated in
-`no-unsafe-patch-body-properties` in [#5294](https://github.com/Azure/typespec-azure/pull/5294).
+Recursive PATCH-to-resource layout and safety validation is the separate responsibility of
+`no-unsafe-patch-body-properties`.
 This leaf-name comparison is not a replacement for that rule's nesting checks.
 
 ## Supported bodies
