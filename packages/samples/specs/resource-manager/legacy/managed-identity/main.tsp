@@ -19,6 +19,7 @@ namespace Microsoft.UpdateTests;
 /** UpdateTests API versions */
 enum Versions {
   /** 2023-03-01-preview version */
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-common-types-version" "This sample intentionally mixes v3 common types with the legacy v4 managed identity."
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
   @previewVersion
   `2023-03-01-preview`,

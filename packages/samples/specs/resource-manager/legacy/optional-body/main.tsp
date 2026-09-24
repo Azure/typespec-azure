@@ -13,6 +13,7 @@ namespace Microsoft.OptionalBody;
 interface Operations extends Azure.ResourceManager.Operations {}
 
 enum Versions {
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-common-types-version" "Preserve older common-types schemas for this grandfathered API sample."
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   @Azure.Core.previewVersion
   `2025-01-01-preview`,

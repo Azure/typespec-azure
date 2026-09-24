@@ -72,4 +72,19 @@ describe("expect all rules to be defined", () => {
       ok(!$linter.ruleSets?.[rulesetName].enable?.[ruleName]);
     }
   });
+
+  it("enables consolidated ARM common-types version guidance", () => {
+    const ruleset = $linter.ruleSets?.["resource-manager"];
+    ok(ruleset);
+    ok(ruleset.enable?.["@azure-tools/typespec-azure-resource-manager/arm-common-types-version"]);
+    const removedRule =
+      "@azure-tools/typespec-azure-resource-manager/use-latest-version-of-common-types";
+    strictEqual(ruleset.enable?.[removedRule], undefined);
+    strictEqual(ruleset.disable?.[removedRule], undefined);
+    ok(
+      !ResourceManagerLinter.rules.some(
+        (rule) => rule.name === "use-latest-version-of-common-types",
+      ),
+    );
+  });
 });
