@@ -5,6 +5,9 @@ emit:
   - "@typespec/http-client-js"
   - "@azure-tools/typespec-ts"
   - "@azure-tools/typespec-java"
+  - "@azure-tools/typespec-go"
+  - "@azure-typespec/http-client-csharp"
+  - "@azure-tools/typespec-client-generator-core"
 options:
   "@azure-tools/typespec-autorest":
     use-read-only-status-schema: true
@@ -19,6 +22,10 @@ options:
     namespace: "com.contoso.benchmarkfull"
     generate-samples: false
     generate-tests: false
+  "@azure-tools/typespec-go":
+    module: "example.com/benchmark/full"
+  "@azure-typespec/http-client-csharp":
+    namespace: "Contoso.BenchmarkFull"
 linter:
   extends:
     - "@azure-tools/typespec-azure-rulesets/data-plane"
