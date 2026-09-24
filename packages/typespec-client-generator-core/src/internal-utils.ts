@@ -1,5 +1,6 @@
 import {
   FinalStateValue,
+  getEffectiveApiVersionOverride,
   getLroMetadata,
   isPreviewVersion,
   type LroMetadata,
@@ -372,7 +373,29 @@ export function updateWithApiVersionInformation(
   clientDefaultValue?: string;
 } {
   const isApiVersionParam = isApiVersion(context, type);
-  if (!isApiVersionParam || !client) {
+  if (!isApiVersionParam) {
+    return { isApiVersionParam, clientDefaultValue: undefined };
+  }
+
+  let apiVersionOverride: string | undefined;
+  if (operation) {
+    let declaration: Operation | undefined = operation;
+    while (declaration && apiVersionOverride === undefined) {
+      apiVersionOverride = getEffectiveApiVersionOverride(context.program, declaration);
+      declaration = declaration.sourceOperation;
+    }
+  } else if (client) {
+    apiVersionOverride = getEffectiveApiVersionOverride(
+      context.program,
+      getActualClientType(client),
+    );
+  }
+
+  if (apiVersionOverride !== undefined) {
+    return { isApiVersionParam, clientDefaultValue: apiVersionOverride };
+  }
+
+  if (!client) {
     return { isApiVersionParam, clientDefaultValue: undefined };
   }
 
@@ -613,7 +636,10 @@ function getDecoratorArgValue(
 ): [any, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof arg === "object" && arg !== null && "kind" in arg) {
-    if (arg.kind === "EnumMember" || arg.kind === "Model") {
+    if (
+      arg.kind === "EnumMember" ||
+      (arg.kind === "Model" && decoratorName === "Azure.ClientGenerator.Core.@clientOption")
+    ) {
       return diagnostics.wrap(diagnostics.pipe(getClientTypeWithDiagnostics(context, arg as any)));
     }
     if (

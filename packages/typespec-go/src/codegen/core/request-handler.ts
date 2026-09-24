@@ -37,7 +37,7 @@ export function createRequestHandler(
   }
 
   const returns = ["*policy.Request", "error"];
-  let text = `${helpers.comment(name, "// ")} creates the ${method.name} request.\n`;
+  let text = `${helpers.comment(name, "// ")} creates the ${method.kind !== "nextPageMethod" && (go.isLROMethod(method)  || go.isPageableMethod(method)) ? method.naming.operationMethod : method.name} request.\n`;
   text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${name}(${helpers.getCreateRequestParametersSig(method)}) (${returns.join(", ")}) {\n`;
 
   // BEGIN create request
@@ -548,7 +548,10 @@ function emitBody(
         imports.add("bytes");
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming");
         setBody = `req.SetBody(streaming.NopCloser(bytes.NewReader(${body})), "application/${bodyParam.bodyFormat.toLowerCase()}")`;
+      } else if (bodyParam.type.kind === "readSeekCloser") {
+        setBody = `req.SetBody(${body}, "application/${bodyParam.bodyFormat.toLowerCase()}")`;
       }
+
       if (go.isRequiredParameter(bodyParam.style) || go.isLiteralParameter(bodyParam.style)) {
         text += emitSetBodyWithErrCheck(setBody, indent, contentType);
       } else {

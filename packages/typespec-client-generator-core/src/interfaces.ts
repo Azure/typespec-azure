@@ -22,6 +22,7 @@ import type {
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
+  type Authentication,
   type HttpAuth,
   type HttpOperation,
   type HttpOperationResponse,
@@ -230,6 +231,8 @@ export interface SdkClientType<
   summary?: string;
   /** Client initialization way. */
   clientInitialization: SdkClientInitializationType;
+  /** HTTP authentication requirements declared on the service. */
+  authentication?: Authentication;
   /** Methods of the client. */
   methods: SdkMethod<TServiceOperation>[];
   /** API versions supported for current type. */

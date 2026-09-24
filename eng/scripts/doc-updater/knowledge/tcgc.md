@@ -19,7 +19,7 @@
 5. `@operationGroup(target, scope?)` — DEPRECATED, use @client
 6. `@usage(target, value, scope?)` — mark model/enum/union/namespace usage (input/output/json/xml); on namespace, propagates recursively to all contained types
 7. `@access(target, value, scope?)` — public/internal visibility
-8. `@override(target, override, scope?)` — customize method signatures
+8. `@override(target, override, scope?)` — customize method parameters; a plain override's declared return type is ignored, while response replacement requires `replaceResponseWithVoid` or `replaceResponseWithBytes`
 9. `@useSystemTextJsonConverter(target, scope?)` — C# backward compat only
 10. `@clientInitialization(target, options, scope?)` — customize client init; options has parameters model and initializedBy flags
 11. `@paramAlias(target, alias, scope?)` — alias client init parameter names
@@ -118,6 +118,7 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - `duplicate-client-name-warning` (warning): C# operation-name collisions are warnings because distinct signatures may be valid overloads, including when operations from multiple services are combined into one client. Other language scopes continue to report `duplicate-client-name` errors. Suppress only after confirming the generated C# signatures form valid overloads.
 - `legacy-hierarchy-building-conflict` (warning): Now only has `property-type-mismatch` message ID (the old `property-missing` and `type-mismatch` message IDs were removed). Emitted during property reconciliation when a dropped property's type is incompatible with the same-named property on the new base chain.
 - `override-parameters-mismatch` (error): In addition to the general "different parameters definition" case, `@override` now reports this when the override operation drops a parameter that is realized as a `@path` parameter in the original operation's HTTP route, or redeclares it without `@path` (the underlying route still needs it). The check is skipped when any override parameter carries `@clientLocation` (intentional relocation). Matching between original/override parameters is by **name**, not position (so overrides may add/remove/regroup parameters). "Realized path parameter" is resolved from `getHttpOperation(...).parameters` (route ground truth), not from the `@path` decorator alone, because templated params (e.g. ARM scope models) can carry `@path` without appearing in the route. Documented in 04method.mdx `@override` section as a `:::caution`.
+- `override-response-replacement` (warning): Emitted only when `@override` receives an operation produced by `replaceResponseWithVoid` or `replaceResponseWithBytes`, identified by the internal `responseOverrideKey` marker. A plain override operation's declared return type is historically ignored, even when it is `void` or incompatible with the original return type; it neither changes the generated response nor emits a response diagnostic. The former `override-response-mismatch` error was removed in September 2026 because it broke parameter-only overrides.
 - `client-location-conflict` / `parameterTypeConflict` (warning): `@clientLocation` cannot move multiple parameters that share a name but have different types to the same client. Common when `@clientLocation` is on a templated parameter instantiated with different types across operations; the client parameter collapses to a single (last) type, breaking the SDK. Fix: move the parameter on each operation instead. Validated in `src/validations/types.ts` (`validateClientLocationParameterTypes`). Documented in 04method.mdx `@clientLocation` section as a `:::caution`.
 
 ## External Type Usage Propagation
@@ -134,6 +135,7 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 ## Common Mistakes to Avoid
 
 - Don't copy @param descriptions between decorators — @clientApiVersions had @apiVersion's description.
+- Model-reference arguments are converted to SDK types only for `@clientOption`. For other decorators captured through `additionalDecorators`, TCGC reports `unsupported-generic-decorator-arg-type` and records the argument as `undefined`.
 - The 03client.mdx file had a typo "@clientLocaton" (missing 'i') — fixed to "@clientLocation".
 - In mockapi.ts files, query parameters use `query:` not `params:` in the request object.
 - The guideline.md previously said `encode` is set only when `@encode` exists — this was inaccurate since encode can also be set contextually (e.g., multipart).
@@ -187,6 +189,18 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - `@apiVersion(false)` prevents a parameter from matching to a client API version parameter, keeping it on the method.
 - Body model properties named "apiVersion" are NOT treated as API version params — only HTTP metadata params (header/query/path/cookie) and server URL template parameters (from `@server`) are matched by name.
 - Server URL template parameters (declared in `@server` decorator's parameter model) named `apiVersion`/`api-version` are recognized as API version params, even with plain `string` type in versioned services.
+
+## Legacy API-Version Overrides
+
+- `@Azure.Core.Legacy.overrideApiVersion` changes an operation API-version parameter's `clientDefaultValue` without changing client `apiVersions` metadata.
+- Override lookup follows the operation's declaration scope and source-operation chain. Moving an operation with `@clientLocation` does not make it inherit the destination client's override.
+- The Spector scenario under `azure/core/api-version-override` verifies the overridden wire query value. Detailed inheritance and metadata behavior remain unit-test concerns.
+
+## SDK Method Naming Rules
+
+- `get-operation-name` checks the common TCGC SDK name of concrete GET operations and requires a `get` or `list` prefix. It honors unscoped `@clientName`, ignores emitter-scoped overrides and OpenAPI operation IDs, and skips template declarations/artifacts and non-GET operations.
+- `use-create-for-put` checks concrete PUT endpoints and requires the common TCGC SDK name to start with `create`, case-insensitively. It uses the same common-name resolution, applies without requiring ARM provider metadata, and is disabled by default in the `client-sdk` ruleset.
+- Linter-only naming rules do not alter the generated client graph or wire behavior, so their unit tests and generated rule reference pages are the appropriate coverage; do not add Spector carrier scenarios for them.
 
 ## isExactName Property (May 2026)
 
