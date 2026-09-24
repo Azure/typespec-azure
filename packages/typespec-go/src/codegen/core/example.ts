@@ -76,7 +76,7 @@ export function generateExamples(
         exampleText += `// Generated from example definition: ${example.filePath}\n`;
         const exampleFuncNamePrefix =
           method.examples.length > 1 ? `_${helpers.camelCase(example.name)}` : "";
-        exampleText += `func Example${client.name}_${helpers.fixUpMethodName(method)}${exampleFuncNamePrefix}() {\n`;
+        exampleText += `func Example${client.name}_${method.name}${exampleFuncNamePrefix}() {\n`;
 
         // create credential
         exampleText += `${indent.get()}cred, err := azidentity.NewDefaultAzureCredential(nil)\n`;
@@ -194,7 +194,7 @@ export function generateExamples(
         switch (method.kind) {
           case "lroMethod":
           case "lroPageableMethod":
-            exampleText += `${indent.get()}poller, err := ${clientRef}.${helpers.fixUpMethodName(method)}(ctx, ${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
+            exampleText += `${indent.get()}poller, err := ${clientRef}.${method.name}(ctx, ${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
             exampleText += `${indent.get()}if err != nil {\n`;
             exampleText += `${indent.push().get()}log.Fatalf("failed to finish the request: %v", err)\n`;
             exampleText += `${indent.pop().get()}}\n`;
@@ -205,13 +205,13 @@ export function generateExamples(
             exampleText += `${indent.pop().get()}}\n`;
             break;
           case "method":
-            exampleText += `${indent.get()}${checkResponse ? "res" : "_"}, err ${checkResponse ? ":=" : "="} ${clientRef}.${helpers.fixUpMethodName(method)}(ctx, ${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
+            exampleText += `${indent.get()}${checkResponse ? "res" : "_"}, err ${checkResponse ? ":=" : "="} ${clientRef}.${method.name}(ctx, ${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
             exampleText += `${indent.get()}if err != nil {\n`;
             exampleText += `${indent.push().get()}log.Fatalf("failed to finish the request: %v", err)\n`;
             exampleText += `${indent.pop().get()}}\n`;
             break;
           case "pageableMethod":
-            exampleText += `${indent.get()}pager := ${clientRef}.${helpers.fixUpMethodName(method)}(${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
+            exampleText += `${indent.get()}pager := ${clientRef}.${method.name}(${renderedParams.join(", ")}${renderedParams.length > 0 ? ", " : ""}${methodOptionalParametersText.split("\n").join("\n" + indent.get())})\n`;
             break;
           default:
             method satisfies never;
