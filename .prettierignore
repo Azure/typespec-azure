@@ -19,6 +19,11 @@
 # Coverage report directory
 **/coverage/
 
+# Benchmark inputs downloaded from other repos and generated SDK output.
+packages/benchmark/.external/
+packages/benchmark/.emitters/
+packages/benchmark/**/tsp-output/
+
 packages/samples/specs/resource-manager/common-types/**/*
 
 # These are standard and should not be edited

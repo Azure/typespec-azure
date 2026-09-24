@@ -37,7 +37,7 @@ export function createRequestHandler(
   }
 
   const returns = ["*policy.Request", "error"];
-  let text = `${helpers.comment(name, "// ")} creates the ${method.name} request.\n`;
+  let text = `${helpers.comment(name, "// ")} creates the ${method.kind !== "nextPageMethod" && (go.isLROMethod(method)  || go.isPageableMethod(method)) ? method.naming.operationMethod : method.name} request.\n`;
   text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${name}(${helpers.getCreateRequestParametersSig(method)}) (${returns.join(", ")}) {\n`;
 
   // BEGIN create request
