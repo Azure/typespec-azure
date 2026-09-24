@@ -26,7 +26,7 @@ op listWidgets(): string[];
 op listWidgets(): string[];
 ```
 
-The rule checks native operation declarations rather than emitted endpoints. A concrete operation
+The rule checks operation declarations. A concrete operation
 alias and its instantiated project-defined source can each receive a warning at their own source
 locations. Uninstantiated templates are not visited, and diagnostics on imported library
 declarations are excluded by the compiler.
