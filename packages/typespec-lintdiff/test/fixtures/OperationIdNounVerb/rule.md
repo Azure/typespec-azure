@@ -4,6 +4,8 @@ engine: spectral
 tspLints:
   - tsp-lintdiff-local-linter/operation-id-noun-verb
 tspRuleset: none
+coverageKind: lint
+projectionScope: http-reachable
 ---
 
 # OperationIdNounVerb
@@ -45,6 +47,8 @@ names that emit the same `Noun_Verb` shapes the upstream Spectral rule inspects:
 - `Paths_ListPath` => invalid
 - `Paths_List` => valid
 - `GetWidget` (no underscore) => valid and ignored
+- explicit `@operationId("Certificates_GetCertificate")` => invalid
+- namespace fallback `Admins_ListAdmins` => invalid
 
 That evidence supports a native local lint that inspects the resolved emitted
 operationId and reproduces the upstream noun-repetition check directly. The
@@ -59,6 +63,8 @@ The local suite now covers the authorable branches that matter for migration:
 - singularized form of a plural noun in the verb => invalid
 - `Noun_Verb` without noun repetition => valid
 - no underscore => ignored / valid
+- explicit `@operationId` values => checked exactly like emitted operation IDs
+- namespace fallback operation IDs => checked like interface operation IDs
 
 The remaining upstream ignored branches are not especially useful as local
 TypeSpec fixtures: `@operationId` already requires a string literal, and the
@@ -66,9 +72,11 @@ no-underscore path overlaps separate operationId-format rules.
 
 ## Test Cases
 
-| ID                          | Violation | Description |
-| --------------------------- | --------- | ----------- |
-| `noun-in-verb`              | true      | OperationId repeats the full plural noun after the underscore |
-| `singularized-noun-in-verb` | true      | OperationId repeats the noun in singularized form after the underscore |
+| ID                          | Violation | Description                                                                  |
+| --------------------------- | --------- | ---------------------------------------------------------------------------- |
+| `noun-in-verb`              | true      | OperationId repeats the full plural noun after the underscore                |
+| `singularized-noun-in-verb` | true      | OperationId repeats the noun in singularized form after the underscore       |
 | `noun-not-in-verb`          | false     | Emitted `Noun_Verb` operationId stays compliant when the verb omits the noun |
-| `no-underscore`             | false     | OperationId without an underscore is ignored, matching upstream behavior |
+| `no-underscore`             | false     | OperationId without an underscore is ignored, matching upstream behavior     |
+| `explicit-operation-id`     | true      | Explicit `@operationId` repeats the noun in the verb                         |
+| `namespace-operation`       | true      | Namespace-derived operationId repeats the namespace noun in the verb         |
