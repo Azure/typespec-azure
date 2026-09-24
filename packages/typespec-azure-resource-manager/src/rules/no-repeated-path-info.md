@@ -18,8 +18,6 @@ Azure resource-manager ruleset.
 `@encodedName("application/json", ...)` does not change an authored property
 name for this check. A JSON alias alone cannot introduce or remove a diagnostic;
 HTTP `@path` and `@query` name overrides do determine the parameter names.
-The rule checks the compiler's native operation graph, not an emitted
-single-version schema.
 
 ## Impact
 
@@ -95,3 +93,5 @@ This rule corresponds to
 and ARM guideline `RPC-Put-V1-05`. Unlike the Swagger validator, which compares
 serialized JSON keys, this rule deliberately compares authored TypeSpec member
 names. JSON name overrides therefore have only partial Swagger parity.
+The rule checks the compiler's native operation graph, not an emitted
+single-version schema.
