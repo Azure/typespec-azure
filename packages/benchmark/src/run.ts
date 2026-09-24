@@ -1,11 +1,13 @@
 /* eslint-disable no-console */
-import { execSync, spawn } from "child_process";
+import { execSync } from "child_process";
 import { existsSync } from "fs";
 import { readdir } from "fs/promises";
 import os from "os";
 import { join, resolve } from "path";
 import { fileURLToPath } from "url";
 import { aggregateDurations } from "./aggregate.js";
+import { compileSpec } from "./compile.js";
+import { inspectCSharpInstallation } from "./csharp.js";
 import {
   EXTERNAL_SPEC_CONFIG,
   loadExternalSpecConfig,
@@ -78,43 +80,6 @@ async function discoverSpecSources(specsDir: string, filter?: string[]): Promise
     return sources.filter((s) => filter.includes(s.name));
   }
   return sources;
-}
-
-const compileOncePath = fileURLToPath(new URL("./compile-once.js", import.meta.url));
-
-/** Compile a single spec in an isolated process and return its stats. */
-async function compileSpec(specDir: string): Promise<Stats> {
-  return await new Promise<Stats>((resolve, reject) => {
-    const child = spawn(process.execPath, [compileOncePath, specDir], {
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-    let stdout = "";
-    let stderr = "";
-    child.stdout.on("data", (chunk) => {
-      stdout += chunk.toString();
-    });
-    child.stderr.on("data", (chunk) => {
-      stderr += chunk.toString();
-    });
-    child.on("error", (error) => {
-      reject(error);
-    });
-    child.on("close", (code) => {
-      if (code !== 0) {
-        reject(new Error(stderr.trim() || `Compilation process exited with code ${code}`));
-        return;
-      }
-      try {
-        resolve(JSON.parse(stdout) as Stats);
-      } catch (error) {
-        reject(
-          new Error(
-            `Failed to parse benchmark stats output: ${error instanceof Error ? error.message : String(error)}`,
-          ),
-        );
-      }
-    });
-  });
 }
 
 /** Average multiple Stats objects. */
@@ -238,6 +203,13 @@ export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResul
     throw new Error(`No benchmark specs found in ${specsDir}`);
   }
 
+  const benchmarkDir = fileURLToPath(new URL("../../", import.meta.url));
+  const externalEmitterVersions = existsSync(
+    join(benchmarkDir, "node_modules/@azure-typespec/http-client-csharp"),
+  )
+    ? inspectCSharpInstallation(benchmarkDir)
+    : undefined;
+
   console.log(
     `Running benchmarks: ${specSources.length} spec(s), ${warmup} warmup + ${iterations} iterations each`,
   );
@@ -320,6 +292,7 @@ export async function runBenchmarks(options: RunOptions): Promise<BenchmarkResul
     commit,
     timestamp: new Date().toISOString(),
     runner: getRunnerInfo(),
+    externalEmitterVersions,
     specs,
   };
 }

@@ -116,7 +116,7 @@ export function generateServers(pkg: go.FakePackage, target: go.CodeModelType): 
           break;
       }
 
-      const operationName = helpers.fixUpMethodName(method);
+      const operationName = method.name;
       content += `${indent.get()}// ${operationName} is the fake for method ${client.name}.${operationName}\n`;
       const successCodes = new Array<string>();
       if (method.returns.result?.kind === "anyResult") {
@@ -180,11 +180,11 @@ export function generateServers(pkg: go.FakePackage, target: go.CodeModelType): 
               respType = `azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]`;
             }
             requiredHelpers.tracker = true;
-            content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))}: newTracker[azfake.PollerResponder[${respType}]](),\n`;
+            content += `${indent.get()}${naming.uncapitalize(method.name)}: newTracker[azfake.PollerResponder[${respType}]](),\n`;
             break;
           case "pageableMethod":
             requiredHelpers.tracker = true;
-            content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))}: newTracker[azfake.PagerResponder[${respType}]](),\n`;
+            content += `${indent.get()}${naming.uncapitalize(method.name)}: newTracker[azfake.PagerResponder[${respType}]](),\n`;
             break;
         }
       }
@@ -218,11 +218,11 @@ export function generateServers(pkg: go.FakePackage, target: go.CodeModelType): 
             respType = `azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]`;
           }
           requiredHelpers.tracker = true;
-          content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))} *tracker[azfake.PollerResponder[${respType}]]\n`;
+          content += `${indent.get()}${naming.uncapitalize(method.name)} *tracker[azfake.PollerResponder[${respType}]]\n`;
           break;
         case "pageableMethod":
           requiredHelpers.tracker = true;
-          content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))} *tracker[azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]]\n`;
+          content += `${indent.get()}${naming.uncapitalize(method.name)} *tracker[azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]]\n`;
           break;
       }
     }
@@ -399,9 +399,8 @@ function generateServerTransportMethodDispatch(
   content += `${indent.get()}switch method {\n`;
 
   for (const method of finalMethods) {
-    const operationName = helpers.fixUpMethodName(method);
-    content += `${indent.get()}case "${client.name}.${operationName}":\n`;
-    content += `${indent.push().get()}res.resp, res.err = ${receiverName}.dispatch${operationName}(req)\n`;
+    content += `${indent.get()}case "${client.name}.${method.name}":\n`;
+    content += `${indent.push().get()}res.resp, res.err = ${receiverName}.dispatch${method.name}(req)\n`;
     indent.pop();
   }
 
@@ -453,9 +452,9 @@ function generateServerTransportMethods(
 
   let content = "";
   for (const method of finalMethods) {
-    content += `func (${receiverName} *${serverTransport}) dispatch${helpers.fixUpMethodName(method)}(req *http.Request) (*http.Response, error) {\n`;
-    content += `${indent.get()}if ${receiverName}.srv.${helpers.fixUpMethodName(method)} == nil {\n`;
-    content += `${indent.push().get()}return nil, &nonRetriableError{errors.New("fake for method ${helpers.fixUpMethodName(method)} not implemented")}\n`;
+    content += `func (${receiverName} *${serverTransport}) dispatch${method.name}(req *http.Request) (*http.Response, error) {\n`;
+    content += `${indent.get()}if ${receiverName}.srv.${method.name} == nil {\n`;
+    content += `${indent.push().get()}return nil, &nonRetriableError{errors.New("fake for method ${method.name} not implemented")}\n`;
     content += `${indent.pop().get()}}\n`;
 
     switch (method.kind) {
@@ -928,7 +927,7 @@ function dispatchForOperationBody(
     );
   }
 
-  const apiCall = `:= ${receiverName}.srv.${helpers.fixUpMethodName(method)}(${populateApiParams(pkg, method, result.params, imports)})`;
+  const apiCall = `:= ${receiverName}.srv.${method.name}(${populateApiParams(pkg, method, result.params, imports)})`;
   if (method.kind === "pageableMethod") {
     content += `resp ${apiCall}\n`;
     return content;
@@ -1050,9 +1049,8 @@ function dispatchForLROBody(
   imports: ImportManager,
   indent: helpers.Indentation,
 ): string {
-  const operationName = helpers.fixUpMethodName(method);
-  const localVarName = naming.uncapitalize(operationName);
-  const operationStateMachine = `${receiverName}.${naming.uncapitalize(operationName)}`;
+  const localVarName = naming.uncapitalize(method.name);
+  const operationStateMachine = `${receiverName}.${naming.uncapitalize(method.name)}`;
   let content = `${indent.get()}${localVarName} := ${operationStateMachine}.get(req)\n`;
   content += `${indent.get()}if ${localVarName} == nil {\n`;
   content += dispatchForOperationBody(pkg, receiverName, method, imports, indent);
@@ -1097,9 +1095,8 @@ function dispatchForPagerBody(
   imports: ImportManager,
   indent: helpers.Indentation,
 ): string {
-  const operationName = helpers.fixUpMethodName(method);
-  const localVarName = naming.uncapitalize(operationName);
-  const operationStateMachine = `${receiverName}.${naming.uncapitalize(operationName)}`;
+  const localVarName = naming.uncapitalize(method.name);
+  const operationStateMachine = `${receiverName}.${naming.uncapitalize(method.name)}`;
   let content = `${indent.get()}${localVarName} := ${operationStateMachine}.get(req)\n`;
   content += `${indent.get()}if ${localVarName} == nil {\n`;
   content += dispatchForOperationBody(pkg, receiverName, method, imports, indent);
