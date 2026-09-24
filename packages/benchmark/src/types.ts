@@ -59,12 +59,14 @@ export interface NoiseGateInfo {
 export interface SpecBenchmarkResult {
   /** The spec name (directory name). */
   name: string;
-  /** Number of measured iterations (excluding warmup). */
+  /** Number of compiler measurements (all phases in legacy results), excluding warmup. */
   iterations: number;
   /** Averaged stats across measured iterations. */
   stats: Stats;
-  /** Per-iteration raw stats. */
+  /** Compiler-only samples in split mode; legacy samples also contain emission. */
   rawIterations: Stats[];
+  /** Independently sampled full-generation emitters in split-mode results. */
+  emitterMeasurements?: Record<string, EmitterMeasurement>;
   /** Variability summary for measured iterations. */
   variability?: {
     total: MetricVariability;
@@ -78,12 +80,62 @@ export interface BenchmarkResult {
   commit: string;
   /** ISO 8601 timestamp of when the benchmark was run. */
   timestamp: string;
+  /** Source commit's committer date, separate from measurement time. Absent in legacy results. */
+  commitTimestamp?: string;
   /** Runner environment info. */
   runner: RunnerInfo;
+  /** Split runs measure compilation and each emitter in separate processes. */
+  measurementMode?: "split";
   /** Published C# packages used by this run; absent in older results or non-C# runs. */
   externalEmitterVersions?: Record<string, string>;
   /** Per-spec benchmark results, keyed by spec name. */
   specs: Record<string, SpecBenchmarkResult>;
+}
+
+export interface EmitterMeasurement {
+  iterations: number;
+  warmup: number;
+  rawIterations: RuntimeStats["emit"]["emitters"][string][];
+  variability: MetricVariability;
+  runner: RunnerInfo;
+}
+
+export type Workload =
+  | { id: string; spec: string; kind: "compiler" }
+  | { id: string; spec: string; kind: "emitter"; emitter: string };
+
+export interface BenchmarkSpec {
+  name: string;
+  /** Path relative to the repository root, portable between CI jobs. */
+  dir: string;
+  emitters: string[];
+}
+
+export interface BenchmarkPlan {
+  id: string;
+  commit: string;
+  commitTimestamp: string;
+  specs: BenchmarkSpec[];
+  workloads: Workload[];
+  compiler: {
+    iterations: number;
+    warmup: number;
+    noiseCvThreshold?: number;
+    maxReruns: number;
+    rerunIterations: number;
+  };
+  emitter: { iterations: number; warmup: number };
+  externalEmitterVersions?: Record<string, string>;
+}
+
+export interface BenchmarkShard {
+  planId: string;
+  workloadId: string;
+  runner: RunnerInfo;
+  rawIterations: Stats[];
+  warmup: number;
+  elapsedMs: number;
+  noiseGate?: NoiseGateInfo;
 }
 
 export interface RunnerInfo {

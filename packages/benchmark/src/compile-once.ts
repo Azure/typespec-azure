@@ -3,10 +3,10 @@ import { compile, formatDiagnostic, NodeHost, resolveCompilerOptions } from "@ty
 import { execFileSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { join } from "path";
-import { validateEmitterStats } from "./compile.js";
+import { validateEmitterStats, type CompilationMode } from "./compile.js";
 import type { Stats } from "./types.js";
 
-async function compileSpec(specDir: string): Promise<Stats> {
+async function compileSpec(specDir: string, mode: CompilationMode): Promise<Stats> {
   const mainFile = join(specDir, "main.tsp");
   const [options, diagnostics] = await resolveCompilerOptions(NodeHost, {
     entrypoint: mainFile,
@@ -20,8 +20,12 @@ async function compileSpec(specDir: string): Promise<Stats> {
     process.stderr.write(`Warnings resolving options for ${specDir}:\n${msgs}\n`);
   }
 
+  if (mode.kind === "emitter" && !options.emit?.includes(mode.emitter)) {
+    throw new Error(`Emitter ${mode.emitter} is not configured for ${specDir}`);
+  }
+  const emitters = mode.kind === "emitter" ? [mode.emitter] : [];
   // Go otherwise reports only a warning and skips its post-generation work.
-  if (options.emit?.includes("@azure-tools/typespec-go")) {
+  if (emitters.includes("@azure-tools/typespec-go")) {
     try {
       execFileSync("go", ["version"], { stdio: "pipe" });
     } catch (cause) {
@@ -31,6 +35,8 @@ async function compileSpec(specDir: string): Promise<Stats> {
 
   const program = await compile(NodeHost, mainFile, {
     ...options,
+    noEmit: mode.kind === "compiler",
+    emit: emitters,
     outputDir: join(specDir, "tsp-output"),
   });
 
@@ -44,7 +50,8 @@ async function compileSpec(specDir: string): Promise<Stats> {
 
   // The compiler strips its internal Stats property from the published declarations.
   const stats = (program as typeof program & { stats: Stats }).stats;
-  validateEmitterStats(stats, options.emit ?? []);
+  validateEmitterStats(stats, emitters);
+  if (mode.kind === "compiler") stats.runtime.emit = { total: 0, emitters: {} };
   stats.runtime.total =
     (stats.runtime.loader ?? 0) +
     (stats.runtime.resolver ?? 0) +
@@ -59,7 +66,10 @@ async function main() {
   if (!specDir) {
     throw new Error("Missing spec directory");
   }
-  const stats = await compileSpec(specDir);
+  const mode: CompilationMode = JSON.parse(process.argv[3] ?? '{"kind":"compiler"}');
+  if (mode.kind !== "compiler" && mode.kind !== "emitter")
+    throw new Error("Invalid compilation mode");
+  const stats = await compileSpec(specDir, mode);
   writeFileSync(3, JSON.stringify(stats));
 }
 
