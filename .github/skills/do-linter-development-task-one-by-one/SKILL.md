@@ -995,8 +995,10 @@ Capture concrete suggestions for improving future queue runs, especially:
 - Never promote without clean development review, or report success without
   clean promotion review against the final source provenance.
 - Require new development/promotion heads and skill-update heads to live in
-  `Azure/typespec-azure`. Only an exact explicit `legacy_fork_update`
-  authorization permits retaining an existing fork-backed rule PR. Verify the
+  `Azure/typespec-azure`, except for an explicitly authorized
+  [first development publication from an existing fork worktree](../shared/recovery-context.md#existing-fork-worktree-publication).
+  An exact explicit `legacy_fork_update` authorization permits retaining an
+  existing fork-backed rule PR. Verify the
   actual head and base; missing canonical access never permits a fork fallback.
   The exception does not authorize successor fork PRs or skill-update fork PRs.
 - Never let promotion or its review mutate the source; return evidence to the

@@ -37,16 +37,19 @@ publication binding in durable session artifacts:
 Resolve repository identity from actual remote fetch/push URLs and GitHub
 metadata, never a remote's name. New development, migration and promotion heads,
 and all skill-update PR heads, must live in canonical
-`Azure/typespec-azure`, not a personal fork. An Azure base repository alone does
+`Azure/typespec-azure`, not a personal fork, except for explicitly authorized
+[first development publication from an existing fork worktree](../shared/recovery-context.md#existing-fork-worktree-publication).
+An Azure base repository alone does
 not satisfy this requirement. Verify push permission for the authorized head
-repository before setup; for new publications that is the canonical repository.
+repository before setup; for new publications that is the canonical repository
+unless that exact existing-worktree exception applies.
 If unavailable, stop rather than falling back to a fork. Existing canonical task
 PRs retain their recorded head branch. An existing legacy fork-backed rule PR
 may retain its head only with the exact
 [fork-update authorization](../shared/recovery-context.md#existing-fork-updates).
 Otherwise stop for explicit migration authorization; do not silently
-move, replace, or close it. New PRs and skill-only PRs retain the canonical-head
-policy. Promotion targets canonical `main`; migration and skill PRs
+move, replace, or close it. Other new PRs and all skill-only PRs retain the
+canonical-head policy. Promotion targets canonical `main`; migration and skill PRs
 target the explicitly selected migration branch. Examples using `origin` mean
 the verified canonical fetch remote; substitute its actual name when different.
 

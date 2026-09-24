@@ -12,12 +12,13 @@ Record the exact user authorization, task/rule scope, publication binding and
 limits. Missing fields mean **not authorized**, never permission to infer an
 exception. A permission survives a phase handoff only within its recorded scope:
 
-| Field                      | Required scope and evidence                                                                                                                                                                  |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `legacy_fork_update`       | Exact existing PR URL, base repository/branch, head repository/branch, verified ownership/push access, and user authorization to retain that fork head.                                      |
-| `post_merge_source_repair` | Explicit permission to create follow-up source-repair PRs for confirmed defects within this named queue task and its existing three-cycle limit. Default false.                              |
-| `validation_profiles`      | Named package/worktree, test runner and configuration/dependency fingerprints, exact command/selection, ordinary and hook timeouts, and the source of authority for each nondefault setting. |
-| `budgets`                  | Original counters and failures for task-wide and phase/round allowances, including separately authorized finite recovery. Never reset them during handoff or publication rollover.           |
+| Field                         | Required scope and evidence                                                                                                                                                                       |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `legacy_fork_update`          | Exact existing PR URL, base repository/branch, head repository/branch, verified ownership/push access, and user authorization to retain that fork head.                                           |
+| `legacy_fork_worktree_create` | Exact existing development worktree, rule, head repository/branch/SHA, canonical base repository/branch, verified ownership/push access, and explicit authorization for its first development PR. |
+| `post_merge_source_repair`    | Explicit permission to create follow-up source-repair PRs for confirmed defects within this named queue task and its existing three-cycle limit. Default false.                                   |
+| `validation_profiles`         | Named package/worktree, test runner and configuration/dependency fingerprints, exact command/selection, ordinary and hook timeouts, and the source of authority for each nondefault setting.      |
+| `budgets`                     | Original counters and failures for task-wide and phase/round allowances, including separately authorized finite recovery. Never reset them during handoff or publication rollover.                |
 
 Do not ask the user to repeat an authorization that still matches. Reverify
 current identities and content instead. Changed scope, an unexplained head, or
@@ -36,6 +37,22 @@ This exception does **not** authorize a new fork branch/PR, a replacement PR, a
 different rule, or a skill-update PR. New publications still use the canonical
 head policy unless the user separately and explicitly authorizes their exact
 publication scope. Skill-only PRs retain their canonical-head requirement.
+
+### Existing fork worktree publication
+
+An explicit `legacy_fork_worktree_create` permits the first development PR from
+the recorded existing task-owned fork-backed worktree. Before setup, verify the
+exact worktree, branch, local and remote state, ownership, push permission, and
+canonical development base. Query existing PRs first; an existing PR must use
+its verified lifecycle and `legacy_fork_update`, not this creation exception.
+Record this authorization separately from worker-command arguments and retain
+it across preparation, development, publication, and review handoffs.
+
+After creation, record the exact PR identity and carry the same scoped permission
+as `legacy_fork_update` for subsequent updates and reviews. This does not authorize
+creating a replacement worktree or fork branch, successor PRs, promotion or
+instruction-only fork PRs, retargeting, or closing an existing PR. Preserve all
+containment, publication-binding, validation, review, and retry requirements.
 
 ## Reusable validation profiles
 

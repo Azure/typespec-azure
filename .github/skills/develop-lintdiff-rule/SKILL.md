@@ -861,7 +861,9 @@ creating a draft PR.
    dependency repair identified above.
 4. For a new migration head, push the dedicated rule branch to canonical
    `Azure/typespec-azure`, while leaving the user-supplied target branch
-   untouched. Preserve the exact head for existing task PRs; a fork head needs
+   untouched, except for an explicitly authorized
+   [first development publication from an existing fork worktree](../shared/recovery-context.md#existing-fork-worktree-publication).
+   Preserve the exact head for existing task PRs; a fork head needs
    the recorded [fork-update authorization](../shared/recovery-context.md#existing-fork-updates).
    Use the verified explicit remote/refspec. That exception does not extend to
    new successor PRs. Never fall back to a fork after a failed push or push the
