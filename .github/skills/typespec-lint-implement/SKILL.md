@@ -59,6 +59,36 @@ discovery rather than silently choosing different semantics.
 - When renaming or changing semantics, update implementation, tests,
   registration, rulesets, docs/links, and change metadata together. Describe
   registered-but-inactive behavior accurately; availability is not activation.
+- Apply the [native rule documentation contract](#native-rule-documentation)
+  when writing or updating user-facing rule documentation.
+
+## Native rule documentation
+
+Write the main documentation for a TypeSpec author who does not know the source
+validator or migration history:
+
+- Explain the native requirement, applicability, rationale, and corrective
+  TypeSpec pattern. Describe accepted and rejected authoring constructs directly.
+- Do not explain the rule by contrasting TypeSpec models with emitted OpenAPI
+  references, Swagger reference overrides, or legacy validator mechanics, even
+  when that comparison is technically accurate. Do not recommend an output
+  reference override as a substitute for the required native type.
+- Keep historical provenance and parity comparisons in a dedicated migration
+  section (such as `## LintDiff Equivalent`), migration evidence, and the PR
+  description, not the main explanation or incorrect/correct examples.
+- Mention OpenAPI or emitter behavior in the main documentation only when it
+  explains an actual user-facing requirement or consequence of the native rule,
+  not merely how the migrated validator worked. This is an audience/content
+  check, not a blanket ban on those words.
+
+For example, a rule requiring `CommonTypes.ErrorResponse` should explain that
+requirement and its supported TypeSpec authoring forms, without adding "not an
+emitted OpenAPI reference" or discussing Swagger reference overrides.
+
+Before handoff, read the main explanation and examples without the migration
+section: they must stand alone as native TypeSpec guidance. Check both the
+authored documentation and regenerated public pages when applicable; correct
+the authored source and regenerate rather than patching generated copies.
 
 ## Deliverable
 

@@ -328,6 +328,11 @@ layer/API, a sibling-rule comparison, the diagnostic unit/target, and test
 evidence for custom complexity. Keep intentional parity differences separate
 from unresolved gaps.
 
+Apply the [native rule documentation contract](../typespec-lint-implement/SKILL.md#native-rule-documentation)
+to the user-facing explanation and examples in `rule.md`. Keep emitted-reference
+comparisons and legacy validator mechanics in a dedicated migration section,
+`migration.md`, and the PR description, rather than teaching them as native usage.
+
 #### Native TypeSpec implementation boundary
 
 Prefer idiomatic TypeSpec validation. Preserve Swagger parity only where it

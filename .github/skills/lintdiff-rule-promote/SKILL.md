@@ -505,14 +505,16 @@ Create or update:
 - `packages/<target>/src/rules/<rule-name>.md`
 
 Use the lintdiff `rule.md` as source material, but rewrite it as official
-library documentation:
+library documentation following the
+[native rule documentation contract](../typespec-lint-implement/SKILL.md#native-rule-documentation):
 
 - remove lintdiff front matter and harness-only notes
 - do not add a rule heading or `Full name` block; `tspd doc` generates that
   metadata
 - explain what the rule checks and why for TypeSpec authors
 - focus the rationale on TypeSpec authoring, generated SDKs, API consistency, and
-  Azure emitter/tooling behavior
+  user-facing consequences in Azure tooling; do not carry over emitted-reference
+  mechanics merely to explain the migration
 - include realistic TypeSpec incorrect and correct examples
 - for ARM resource operations, use standard templates in both examples, showing
   the invalid customization through named arguments where applicable; compile
@@ -525,6 +527,10 @@ library documentation:
   as `## LintDiff Equivalent`; link the original validator rule name to its
   source documentation or source file, and do not frame the rule primarily as
   keeping Swagger up to date
+- remove migration comparisons from the main explanation and examples, including
+  technically accurate statements about emitted OpenAPI references or Swagger
+  reference overrides; for a standard-type requirement, explain the required
+  TypeSpec type and supported authoring forms instead
 - check the generated docs page path and title match the official TypeSpec rule
   name, not the source validator slug, when the names differ
 
@@ -641,7 +647,9 @@ Optimized validation order:
 3. affected package lint, if available
 4. required affected-package `regen-docs`
 5. inspect the generated package README and website linter/rule references for
-   the official rule name, page path, links, and table entry
+   the official rule name, page path, links, and table entry; check the authored
+   rule docs and generated rule page against the native rule documentation
+   contract, reading the main guidance independently of its migration section
 6. format changed Markdown and run a Prettier check over the generated package
    README, rule documentation, and website linter/rule references, using an
    empty-ignore override and explicit filenames as shown below
