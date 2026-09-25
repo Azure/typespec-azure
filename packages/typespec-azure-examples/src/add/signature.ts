@@ -14,7 +14,7 @@ export interface OperationSignature {
   readonly parameters: Record<string, unknown>;
   /** The resolved request body schema, when the operation has a body parameter. */
   readonly body?: unknown;
-  /** Response status code → resolved response body schema (absent bodies are recorded as `null`). */
+  /** Response status code → `{ body, headers? }` with `$ref`s inlined (absent body is `null`). */
   readonly responses: Record<string, unknown>;
 }
 
@@ -63,8 +63,14 @@ export function extractOperationSignatures(doc: AnyRecord): Map<string, Operatio
 
       const responses: Record<string, unknown> = {};
       for (const [code, response] of Object.entries(operation.responses ?? {})) {
-        const schema = (response as AnyRecord | null)?.schema;
-        responses[code] = schema === undefined ? null : resolveRefs(schema, definitions, new Set());
+        const raw = response as AnyRecord | null;
+        const body =
+          raw?.schema === undefined ? null : resolveRefs(raw.schema, definitions, new Set());
+        // Response headers are part of the contract and are emitted in unified examples, so a change
+        // to them (e.g. adding `Location`) must count as a change.
+        const headers =
+          raw?.headers === undefined ? undefined : resolveRefs(raw.headers, definitions, new Set());
+        responses[code] = headers === undefined ? { body } : { body, headers };
       }
 
       signatures.set(operationId, { operationId, parameters, body, responses });

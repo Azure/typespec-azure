@@ -45,11 +45,14 @@ export function skeletonForOperation(signature: OperationSignature): ExampleSkel
   }
 
   const responses: Record<string, { body?: unknown }> = {};
-  const codes = Object.keys(signature.responses);
-  const chosen = codes.filter((code) => SUCCESS_CODES.includes(code));
-  for (const code of (chosen.length > 0 ? chosen : codes.slice(0, 1)) ?? []) {
-    const schema = signature.responses[code];
-    responses[code] = schema == null ? {} : { body: skeletonForSchema(schema, 0) };
+  // Only concrete 100–599 status codes can appear in a unified example; `default` and other
+  // non-numeric response keys are excluded (the validator rejects them).
+  const codes = Object.keys(signature.responses).filter((code) => /^[1-5]\d\d$/.test(code));
+  const success = codes.filter((code) => SUCCESS_CODES.includes(code));
+  for (const code of success.length > 0 ? success : codes.slice(0, 1)) {
+    const entry = signature.responses[code] as { body?: unknown } | null;
+    const body = entry?.body ?? null;
+    responses[code] = body == null ? {} : { body: skeletonForSchema(body, 0) };
   }
 
   return { request, responses };

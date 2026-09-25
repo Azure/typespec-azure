@@ -39,8 +39,7 @@ describe("extractOperationSignatures", () => {
     // The body $ref is inlined to the resolved Thing schema.
     expect(create.body).toEqual({ type: "object", properties: { name: { type: "string" } } });
     expect(create.responses["200"]).toEqual({
-      type: "object",
-      properties: { name: { type: "string" } },
+      body: { type: "object", properties: { name: { type: "string" } } },
     });
   });
 
@@ -61,8 +60,7 @@ describe("extractOperationSignatures", () => {
     };
     const node = extractOperationSignatures(doc).get("Node_Get")!;
     expect(node.responses["200"]).toEqual({
-      type: "object",
-      properties: { next: { $circularRef: "Node" } },
+      body: { type: "object", properties: { next: { $circularRef: "Node" } } },
     });
   });
 });
@@ -97,5 +95,17 @@ describe("diffOperation", () => {
     expect(forward.reasons).toContain('added parameter "expand"');
     const backward = diffOperation(next.get("Things_Get")!, previous.get("Things_Get")!);
     expect(backward.reasons).toContain('removed parameter "expand"');
+  });
+
+  it("detects a response header change", () => {
+    const withoutHeader = extractOperationSignatures(swagger({}));
+    const withHeaderDoc = swagger({});
+    (withHeaderDoc.paths["/things/{id}"].get.responses as any)["200"].headers = {
+      "x-ms-thing": { type: "string" },
+    };
+    const withHeader = extractOperationSignatures(withHeaderDoc);
+    const diff = diffOperation(withoutHeader.get("Things_Get")!, withHeader.get("Things_Get")!);
+    expect(diff.changed).toBe(true);
+    expect(diff.reasons).toContain('changed response "200"');
   });
 });
