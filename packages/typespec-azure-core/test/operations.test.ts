@@ -9,7 +9,7 @@ import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { isFinalLocation } from "../src/decorators/final-location.js";
 import { isPollingLocation } from "../src/decorators/polling-location.js";
-import { type LroMetadata, getLroMetadata } from "../src/lro-helpers.js";
+import { type LroMetadata, getLroMetadata, getLroProtocolMetadata } from "../src/lro-helpers.js";
 import { getNamespaceName } from "../src/rules/utils.js";
 import { type SimpleHttpOperation, getOperations, getSimplifiedOperations } from "./test-host.js";
 
@@ -246,6 +246,21 @@ async function compileLroOperation(
 
   strictEqual(operations.length, 1);
   const lro = getLroMetadata(runner.program, operations[0].operation);
+  const protocol = getLroProtocolMetadata(runner.program, operations[0].operation);
+  if (lro) {
+    ok(protocol);
+    strictEqual(protocol.operation, lro.operation);
+    strictEqual(protocol.completion.finalStateVia, lro.finalStateVia);
+    deepStrictEqual(protocol.polling.statusMonitorStep, lro.statusMonitorStep);
+    deepStrictEqual(protocol.polling.pollingInfo, lro.pollingInfo);
+    deepStrictEqual(protocol.completion.finalStep, lro.finalStep);
+    strictEqual("finalResult" in protocol, false);
+    strictEqual("finalEnvelopeResult" in protocol, false);
+    strictEqual("finalResultPath" in protocol, false);
+    strictEqual("logicalResult" in protocol, false);
+  } else {
+    strictEqual(protocol, undefined);
+  }
   expectDiagnosticEmpty(runner.program.diagnostics);
 
   return [operations[0], lro, runner];
