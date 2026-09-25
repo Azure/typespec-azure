@@ -36,6 +36,18 @@ describe("normalizeApiVersion", () => {
       nextLink: "https://host/things?api-version={api-version}",
     });
   });
+
+  it("preserves a bare date scalar equal to the api-version", () => {
+    const input = {
+      // A real data field that happens to equal the api-version must not be rewritten.
+      effectiveDate: "2024-06-01",
+      nextLink: "https://host/things?api-version=2024-06-01",
+    };
+    expect(normalizeApiVersion(input, "2024-06-01")).toEqual({
+      effectiveDate: "2024-06-01",
+      nextLink: "https://host/things?api-version={api-version}",
+    });
+  });
 });
 
 describe("normalizeApiVersions", () => {

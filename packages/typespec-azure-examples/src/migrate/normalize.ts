@@ -8,7 +8,7 @@
 
 /** Recursively replace occurrences of `version` in string values with `{api-version}`. */
 export function normalizeApiVersion<T>(value: T, version: string): T {
-  return normalize(value, buildMatcher(version)) as T;
+  return normalize(value, buildMatcher([version])) as T;
 }
 
 /**
@@ -16,12 +16,9 @@ export function normalizeApiVersion<T>(value: T, version: string): T {
  * win over prefixes).
  */
 export function normalizeApiVersions<T>(value: T, versions: readonly string[]): T {
-  const ordered = [...new Set(versions)]
-    .filter((v) => v.length > 0)
-    .sort((a, b) => b.length - a.length);
+  const ordered = [...new Set(versions)].filter((v) => v.length > 0);
   if (ordered.length === 0) return value;
-  const matcher = new RegExp(`(?:${ordered.map(escapeRegExp).join("|")})${VERSION_BOUNDARY}`, "g");
-  return normalize(value, matcher) as T;
+  return normalize(value, buildMatcher(ordered)) as T;
 }
 
 /**
@@ -31,14 +28,32 @@ export function normalizeApiVersions<T>(value: T, versions: readonly string[]): 
  */
 const VERSION_BOUNDARY = "(?![T\\d])";
 
-function buildMatcher(version: string): RegExp {
-  return new RegExp(escapeRegExp(version) + VERSION_BOUNDARY, "g");
+interface Matcher {
+  /** Matches every embedded api-version occurrence (URLs, headers, ...). */
+  readonly embedded: RegExp;
+  /** Matches a scalar whose entire value is a bare api-version (real data, not an embedded ref). */
+  readonly bare: RegExp;
 }
 
-function normalize(value: unknown, matcher: RegExp): unknown {
+function buildMatcher(versions: readonly string[]): Matcher {
+  // Longest first so a more specific version (e.g. `...-preview`) wins over a prefix.
+  const alternation = [...versions]
+    .sort((a, b) => b.length - a.length)
+    .map(escapeRegExp)
+    .join("|");
+  return {
+    embedded: new RegExp(`(?:${alternation})${VERSION_BOUNDARY}`, "g"),
+    bare: new RegExp(`^(?:${alternation})$`),
+  };
+}
+
+function normalize(value: unknown, matcher: Matcher): unknown {
   if (typeof value === "string") {
-    matcher.lastIndex = 0;
-    return value.replace(matcher, "{api-version}");
+    // A scalar whose entire value is a bare api-version is real data (e.g. a `date` field), not a
+    // version embedded in a URL or header — leave it untouched so migration stays lossless.
+    if (matcher.bare.test(value)) return value;
+    matcher.embedded.lastIndex = 0;
+    return value.replace(matcher.embedded, "{api-version}");
   }
   if (Array.isArray(value)) {
     return value.map((item) => normalize(item, matcher));

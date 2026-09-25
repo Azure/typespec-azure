@@ -60,7 +60,16 @@ export function serializeExamplesYaml(object: Record<string, unknown>): string {
 
 /** Whether the visited node sits inside a `responses` mapping. */
 function isUnderResponses(path: readonly unknown[]): boolean {
-  return path.some((node) => isPair(node) && isScalar(node.key) && node.key.value === "responses");
+  // Only the status-code keys are direct children of a `responses` mapping. Walking up to the
+  // nearest enclosing Pair (rather than any ancestor) avoids rewriting numeric-looking keys nested
+  // inside a response body or headers, e.g. a body map key such as "001".
+  for (let i = path.length - 1; i >= 0; i--) {
+    const node = path[i];
+    if (isPair(node)) {
+      return isScalar(node.key) && node.key.value === "responses";
+    }
+  }
+  return false;
 }
 
 /**
