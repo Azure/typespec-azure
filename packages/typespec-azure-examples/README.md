@@ -71,6 +71,29 @@ found (use `--warn-as-error` to also fail on warnings).
 - `{api-version}` is the only supported placeholder, and `api-version` must not appear as a
   request parameter.
 
+## `tsp-examples add`
+
+Add examples for a **newly-introduced API version**, adding an entry only where it is actually
+needed:
+
+```bash
+tsp-examples add SERVICE_DIR [--api-version VERSION]
+```
+
+For each operation in the target version's Swagger, `add` diffs the operation's contract against the
+previous version (parity with OpenAPI-diff / `oad`) and:
+
+- **unchanged** → does nothing (the existing lineage already resolves forward);
+- **changed** (parameters, request body, or a response shape differ) → appends a
+  `since: <target>` variant **cloned** from the operation's previous example, so you only edit the
+  delta;
+- **new operation** → adds a schema-shaped skeleton entry to fill in.
+
+The target version defaults to the newest one in `service.yaml`; override it with `--api-version`.
+The command is idempotent (re-running adds nothing) and validates its output. Use `--dry-run` to
+preview the updated files. The change detection reads the emitted Swagger during rollout; results
+are written back into the existing `examples.yaml` / `examples/*.yaml`.
+
 ## `tsp-examples-migrate`
 
 > **Transitional tool.** Used to bulk-convert existing specs during rollout; it will be removed

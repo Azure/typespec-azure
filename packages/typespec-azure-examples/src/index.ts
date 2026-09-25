@@ -3,6 +3,7 @@
  * (`examples.yaml`). This entrypoint exposes the JSON Schema and the programmatic validation API
  * used by the `tsp-examples validate` command.
  */
+export * from "./add/index.js";
 export { discoverExampleFiles, validateExamplesDir, type ValidateDirResult } from "./discover.js";
 export { materializeLegacyExample, type LegacyExample } from "./legacy.js";
 export {
