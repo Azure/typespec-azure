@@ -37,8 +37,10 @@
     "build": "npm run regen-examples-yaml-schema && tsc -p tsconfig.build.json",
     "watch": "tsc -p tsconfig.build.json --watch",
     "regen-examples-yaml-schema": "tsp compile ./schema/examples-yaml.tsp --warn-as-error",
+    "pretest": "npm run regen-examples-yaml-schema",
     "test": "vitest run",
     "test:watch": "vitest -w",
+    "pretest:ci": "npm run regen-examples-yaml-schema",
     "test:ci": "vitest run --coverage --reporter=junit --reporter=default",
     "lint": "oxlint . --deny-warnings",
     "lint:fix": "oxlint . --fix"
