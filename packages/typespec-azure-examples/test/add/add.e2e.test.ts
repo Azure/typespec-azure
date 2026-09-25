@@ -147,6 +147,34 @@ describe("add (end-to-end)", () => {
     expect(doc["Things.replace"][0].responses["200"].body).toEqual({ name: "" });
   });
 
+  it("is idempotent on the first/baseline version (no duplicate base entry)", async () => {
+    // A single-version service with no existing examples: every operation is "new" and the target
+    // is the baseline, so skeletons are written without a `since`. Re-running must not duplicate.
+    const root = await mkdtemp(join(tmpdir(), "examples-add-"));
+    roots.push(root);
+    const dir = join(root, "stable", "2023-01-01");
+    await mkdir(dir, { recursive: true });
+    await writeFile(join(dir, "service.json"), JSON.stringify(swagger(false, false)));
+    await writeFile(
+      join(root, "service.yaml"),
+      `versions:\n  - version: "2023-01-01"\n    source: typespec\n`,
+    );
+
+    const first = await add(root);
+    expect(first.added.length).toBeGreaterThan(0);
+    for (const file of first.files) await writeFile(join(root, file.path), file.content);
+
+    const second = await add(root);
+    expect(second.added).toEqual([]);
+    // The re-run output (if any) still validates: no lineage has two base entries.
+    const doc = parse(first.files[0].content);
+    for (const key of Object.keys(doc).filter((k) => !k.startsWith("$"))) {
+      expect(
+        doc[key].filter((v: { since?: string }) => v.since === undefined).length,
+      ).toBeLessThanOrEqual(1);
+    }
+  });
+
   it("is idempotent — a second run adds nothing", async () => {
     const root = await fixture();
     const first = await add(root);

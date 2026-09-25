@@ -17,7 +17,11 @@ import { discoverSwaggerFiles, namespaceFromPaths, versionFromPath } from "../mi
 import { selectApplicable } from "../resolve/select.js";
 import type { ExampleDiagnostic } from "../types.js";
 import { diffOperation } from "./diff.js";
-import { extractOperationSignatures, type OperationSignature } from "./signature.js";
+import {
+  createDocLoader,
+  extractOperationSignatures,
+  type OperationSignature,
+} from "./signature.js";
 import { skeletonForOperation } from "./skeleton.js";
 
 /** Options controlling an `add` run. */
@@ -132,7 +136,13 @@ export async function add(root: string, options: AddOptions = {}): Promise<AddRe
     const isNew = previousSignature === undefined;
 
     if (isNew) {
-      if (hasEntrySince(existing?.entries, targetVersion)) continue;
+      // Skip if this operation already has an example that applies at the target (a `since: target`
+      // entry, or a base entry when the target is the first version) — keeps `add` idempotent.
+      if (
+        existing !== undefined &&
+        selectApplicable(existing.entries, targetVersion, order) !== undefined
+      )
+        continue;
       const skeleton = buildSkeletonVariant(targetSignature, targetVersion, baselineVersion);
       const file = store.append(operationKey, skeleton);
       added.push({
@@ -216,6 +226,7 @@ async function crawlSignatures(root: string): Promise<{
 }> {
   const files = await discoverSwaggerFiles(root);
   const signaturesByVersion = new Map<string, Map<string, OperationSignature>>();
+  const readDoc = createDocLoader();
   let namespace: string | undefined;
 
   for (const file of files) {
@@ -231,7 +242,8 @@ async function crawlSignatures(root: string): Promise<{
     namespace ??= namespaceFromPaths(Object.keys(doc.paths));
 
     const merged = signaturesByVersion.get(version) ?? new Map<string, OperationSignature>();
-    for (const [id, signature] of extractOperationSignatures(doc)) merged.set(id, signature);
+    for (const [id, signature] of await extractOperationSignatures(doc, { docPath: file, readDoc }))
+      merged.set(id, signature);
     signaturesByVersion.set(version, merged);
   }
 

@@ -31,4 +31,26 @@ describe("skeletonForOperation", () => {
     );
     expect(Object.keys(skeleton.responses)).toEqual(["200"]);
   });
+
+  it("keeps read-only fields in response bodies but drops them from request bodies", () => {
+    const resource = {
+      type: "object",
+      properties: {
+        name: { type: "string" },
+        id: { type: "string", readOnly: true },
+        provisioningState: { type: "string", readOnly: true },
+      },
+    };
+    const sig: OperationSignature = {
+      operationId: "R_Put",
+      parameters: {},
+      body: resource,
+      responses: { "200": { body: resource } },
+    };
+    const skeleton = skeletonForOperation(sig);
+    // Request body omits server-populated read-only fields...
+    expect(skeleton.request.body).toEqual({ name: "" });
+    // ...but the response body includes them (that's the data a real example must show).
+    expect(skeleton.responses["200"].body).toEqual({ name: "", id: "", provisioningState: "" });
+  });
 });
