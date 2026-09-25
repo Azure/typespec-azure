@@ -86,3 +86,7 @@ packages/typespec-java/emitter-tests/
 packages/typespec-java/src/**
 !packages/typespec-java/src/options.ts
 packages/typespec-java/test/
+
+# Round-trip proof fixtures are copied verbatim from azure-rest-api-specs
+# (Microsoft.Contoso); keep them byte-for-byte as shipped, not reformatted.
+packages/typespec-azure-examples/test/roundtrip/fixtures/**
