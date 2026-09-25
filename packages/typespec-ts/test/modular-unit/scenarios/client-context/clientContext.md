@@ -79,7 +79,10 @@ export function createService(
   const endpointUrl = options.endpoint ?? `${endpointParam}/client/structure/${clientParam}`;
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
 
@@ -173,7 +176,10 @@ export function createService(options: ServiceClientOptionalParams = {}): Servic
   const endpointUrl = options.endpoint ?? `${endpointParam}/client/structure/${clientParam}`;
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
 
@@ -269,7 +275,10 @@ export function createTestService(
   const endpointUrl = options.endpoint ?? `${endpointParam}/client/structure/${clientParam}`;
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
 
