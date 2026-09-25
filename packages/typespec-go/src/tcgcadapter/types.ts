@@ -1383,11 +1383,11 @@ function recursiveVariantFieldName(type: go.WireType): string {
     case "literal":
       return `Literal${recursiveVariantFieldName(type.type)}`;
     case "map":
-      return `MapOf${recursiveVariantFieldName(type.valueType)}`;
+      return `MapOf${recursiveVariantFieldName(type.itemType)}`;
     case "ptr":
       return recursiveVariantFieldName(type.ptrType);
     case "slice":
-      return `SliceOf${recursiveVariantFieldName(type.elementType)}`;
+      return `SliceOf${recursiveVariantFieldName(type.itemType)}`;
     case "scalar":
       return naming.capitalize(type.type);
     default:

@@ -80,7 +80,7 @@ export function createResponseHandler(
       case "modelResult":
         text += generateResponseUnmarshaller(
           method,
-          result.modelType,
+          result.type,
           result.format,
           `${resultVarName}.${helpers.getResultFieldName(method)}`,
           imports,
@@ -90,12 +90,12 @@ export function createResponseHandler(
       case "monomorphicResult":
         let target = `${resultVarName}.${helpers.getResultFieldName(method)}`;
         // when unmarshalling a wrapped XML array, unmarshal into the response envelope
-        if (result.format === "XML" && result.monomorphicType.kind === "slice") {
+        if (result.format === "XML" && result.type.kind === "slice") {
           target = resultVarName;
         }
         text += generateResponseUnmarshaller(
           method,
-          result.monomorphicType,
+          result.type,
           result.format,
           target,
           imports,
@@ -105,7 +105,7 @@ export function createResponseHandler(
       case "polymorphicResult":
         text += generateResponseUnmarshaller(
           method,
-          result.interface,
+          result.type,
           result.format,
           resultVarName,
           imports,
@@ -143,8 +143,8 @@ function generateResponseUnmarshaller(
     return unmarshallerText;
   } else if (go.isSlice(type, "time")) {
     // unmarshalling arrays of date/time is a little more involved
-    const timeType = go.unwrapPtr(type.elementType);
-    const elementPtr = type.elementType.kind === "ptr" ? "*" : "";
+    const timeType = go.unwrapPtr(type.itemType);
+    const elementPtr = type.itemType.kind === "ptr" ? "*" : "";
     imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
     unmarshallerText += `${indent.get()}var aux []${elementPtr}datetime.${timeType.format}\n`;
     unmarshallerText += `${indent.get()}if err := runtime.UnmarshalAs${format}(resp, &aux); err != nil {\n`;
@@ -157,7 +157,7 @@ function generateResponseUnmarshaller(
     unmarshallerText += `${indent.get()}${unmarshalTarget} = cp\n`;
     return unmarshallerText;
   } else if (go.isMap(type, "time")) {
-    const timeType = type.valueType.ptrType;
+    const timeType = type.itemType.ptrType;
     imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
     unmarshallerText += `${indent.get()}aux := map[string]*datetime.${timeType.format}{}\n`;
     unmarshallerText += `${indent.get()}if err := runtime.UnmarshalAs${format}(resp, &aux); err != nil {\n`;

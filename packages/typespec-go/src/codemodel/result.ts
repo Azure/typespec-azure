@@ -25,6 +25,9 @@ export interface AnyResult {
   /** the name of the field within the response envelope */
   fieldName: string;
 
+  /** the result field type */
+  type: type.Any;
+
   /** any docs for the result */
   docs: type.Docs;
 
@@ -45,6 +48,9 @@ export interface BinaryResult {
   /** the name of the field within the response envelope */
   fieldName: string;
 
+  /** the result field type */
+  type: type.ReadCloser;
+
   /** any docs for the result */
   docs: type.Docs;
 }
@@ -55,6 +61,9 @@ export interface HeadAsBooleanResult {
 
   /** the name of the field within the response envelope */
   fieldName: string;
+
+  /** the result field type */
+  type: type.Scalar<"bool">;
 
   /** any docs for the result */
   docs: type.Docs;
@@ -117,7 +126,7 @@ export interface ModelResult {
    * will be a PolymorphicModel when the response envelope
    * is a concrete type from a polymorphic hierarchy
    */
-  modelType: type.Model | type.PolymorphicModel;
+  type: type.Model | type.PolymorphicModel;
 
   /** the format in which the result is returned */
   format: ModelResultFormat;
@@ -140,7 +149,7 @@ export interface MonomorphicResult {
   docs: type.Docs;
 
   /** the type returned in the response envelope */
-  monomorphicType: MonomorphicResultType;
+  type: MonomorphicResultType;
 
   /** the format in which the result is returned */
   format: ResultFormat;
@@ -171,7 +180,7 @@ export interface PolymorphicResult {
   docs: type.Docs;
 
   /** the interface type used for the discriminated union of possible types */
-  interface: type.Interface;
+  type: type.Interface;
 
   /**
    * the format in which the result is returned.
@@ -209,32 +218,6 @@ export interface ResponseEnvelope {
 /** indicates the wire format for response bodies */
 export type ResultFormat = "JSON" | "XML" | "Text";
 
-/** returns the underlying type used for the specified result type */
-export function getResultType(
-  result: Result,
-):
-  | type.Interface
-  | type.Model
-  | MonomorphicResultType
-  | type.Scalar
-  | type.ReadCloser
-  | type.PolymorphicModel {
-  switch (result.kind) {
-    case "anyResult":
-      return new type.Any();
-    case "binaryResult":
-      return new type.ReadCloser();
-    case "headAsBooleanResult":
-      return new type.Scalar("bool", false);
-    case "modelResult":
-      return result.modelType;
-    case "monomorphicResult":
-      return result.monomorphicType;
-    case "polymorphicResult":
-      return result.interface;
-  }
-}
-
 /** narrows type to a MonomorphicResultType within the conditional block */
 export function isMonomorphicResultType(
   type: Exclude<type.WireType, type.Ptr>,
@@ -262,6 +245,7 @@ export class AnyResult implements AnyResult {
   constructor(fieldName: string, format: ResultFormat, resultTypes: Record<number, type.WireType>) {
     this.kind = "anyResult";
     this.fieldName = fieldName;
+    this.type = new type.Any();
     this.format = format;
     this.httpStatusCodeType = resultTypes;
     this.docs = {};
@@ -272,6 +256,7 @@ export class BinaryResult implements BinaryResult {
   constructor(fieldName: string) {
     this.kind = "binaryResult";
     this.fieldName = fieldName;
+    this.type = new type.ReadCloser();
     this.docs = {};
   }
 }
@@ -280,6 +265,7 @@ export class HeadAsBooleanResult implements HeadAsBooleanResult {
   constructor(fieldName: string) {
     this.kind = "headAsBooleanResult";
     this.fieldName = fieldName;
+    this.type = new type.Scalar("bool", false);
     this.docs = {};
   }
 }
@@ -307,7 +293,7 @@ export class HeaderScalarResponse implements HeaderScalarResponse {
 export class ModelResult implements ModelResult {
   constructor(type: type.Model | type.PolymorphicModel, format: ModelResultFormat) {
     this.kind = "modelResult";
-    this.modelType = type;
+    this.type = type;
     this.format = format;
     this.docs = {};
   }
@@ -318,7 +304,7 @@ export class MonomorphicResult implements MonomorphicResult {
     this.kind = "monomorphicResult";
     this.fieldName = fieldName;
     this.format = format;
-    this.monomorphicType = type;
+    this.type = type;
     this.docs = {};
   }
 }
@@ -326,7 +312,7 @@ export class MonomorphicResult implements MonomorphicResult {
 export class PolymorphicResult implements PolymorphicResult {
   constructor(type: type.Interface) {
     this.kind = "polymorphicResult";
-    this.interface = type;
+    this.type = type;
     this.format = "JSON";
     this.docs = {};
   }
