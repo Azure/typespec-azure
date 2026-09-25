@@ -192,7 +192,7 @@ export interface Map<T extends MapValueType = MapValueType> {
    * note that the type is always pointer-to-type
    * unless the type is implicitly nil-able.
    */
-  valueType: T;
+  itemType: T;
 }
 
 /** the set of map value types */
@@ -349,7 +349,7 @@ export interface Slice<T extends SliceElementType = SliceElementType> {
   kind: "slice";
 
   /** the element type for this slice */
-  elementType: T;
+  itemType: T;
 
   /** the XML name for the elements */
   xmlName?: string;
@@ -381,7 +381,7 @@ export interface SliceArray {
   kind: "sliceArray";
 
   /** the element type for this slice */
-  elementType: SliceArrayElementType;
+  itemType: SliceArrayElementType;
 
   /** the delimiter used to separate elements */
   delimiter: SliceArrayDelimiter;
@@ -580,14 +580,14 @@ export function getTypeDeclaration(
     case "literal":
       return getTypeDeclaration(type.type, scope);
     case "map":
-      return `map[string]${getTypeDeclaration(type.valueType, scope)}`;
+      return `map[string]${getTypeDeclaration(type.itemType, scope)}`;
     case "ptr":
       return `${instance ? "&" : "*"}${getTypeDeclaration(type.ptrType, scope)}`;
     case "scalar":
       return type.type;
     case "slice":
     case "sliceArray":
-      return `[]${getTypeDeclaration(type.elementType, scope)}`;
+      return `[]${getTypeDeclaration(type.itemType, scope)}`;
     case "time":
       return "time.Time";
     case "armClientOptions":
@@ -660,8 +660,8 @@ export function isMap<T extends MapValueType["kind"] | MapPtrType["kind"] = MapV
   }
   return (
     kinds.length === 0 ||
-    (kinds as Array<string>).includes(type.valueType.kind) ||
-    (kinds as Array<string>).includes(unwrapPtr(type.valueType).kind)
+    (kinds as Array<string>).includes(type.itemType.kind) ||
+    (kinds as Array<string>).includes(unwrapPtr(type.itemType).kind)
   );
 }
 
@@ -706,8 +706,8 @@ export function isSlice<
   }
   return (
     kinds.length === 0 ||
-    (kinds as Array<string>).includes(type.elementType.kind) ||
-    (kinds as Array<string>).includes(unwrapPtr(type.elementType).kind)
+    (kinds as Array<string>).includes(type.itemType.kind) ||
+    (kinds as Array<string>).includes(unwrapPtr(type.itemType).kind)
   );
 }
 
@@ -902,9 +902,9 @@ export class Literal<T> implements Literal<T> {
 }
 
 export class Map<T extends MapValueType = MapValueType> implements Map<T> {
-  constructor(valueType: T) {
+  constructor(itemType: T) {
     this.kind = "map";
-    this.valueType = valueType;
+    this.itemType = itemType;
   }
 }
 
@@ -1009,16 +1009,16 @@ export class Scalar<T extends ScalarType = ScalarType> implements Scalar<T> {
 }
 
 export class Slice<T extends SliceElementType = SliceElementType> implements Slice<T> {
-  constructor(elementType: T) {
+  constructor(itemType: T) {
     this.kind = "slice";
-    this.elementType = elementType;
+    this.itemType = itemType;
   }
 }
 
 export class SliceArray implements SliceArray {
-  constructor(elementType: SliceArrayElementType, delimiter: SliceArrayDelimiter) {
+  constructor(itemType: SliceArrayElementType, delimiter: SliceArrayDelimiter) {
     this.kind = "sliceArray";
-    this.elementType = elementType;
+    this.itemType = itemType;
     this.delimiter = delimiter;
   }
 }

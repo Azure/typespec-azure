@@ -481,10 +481,10 @@ function generateServerTransportMethods(
           content += `${indent.get()}ContentType: req.Header.Get("Content-Type"),\n`;
           content += `${indent.pop().get()}})\n`;
         } else if (method.returns.result.kind === "monomorphicResult") {
-          if (method.returns.result.monomorphicType.kind === "encodedBytes") {
-            const encoding = method.returns.result.monomorphicType.encoding;
+          if (method.returns.result.type.kind === "encodedBytes") {
+            const encoding = method.returns.result.type.encoding;
             content += `${indent.get()}resp, err := server.MarshalResponseAsByteArray(respContent, server.GetResponse(respr).${getResultFieldName(method.returns.result)}, runtime.Base64${encoding}Format, req)\n`;
-          } else if (method.returns.result.monomorphicType.kind === "rawJSON") {
+          } else if (method.returns.result.type.kind === "rawJSON") {
             imports.add("bytes");
             imports.add("io");
             content += `${indent.get()}resp, err := server.NewResponse(respContent, req, &server.ResponseOptions{\n`;
@@ -496,8 +496,8 @@ function generateServerTransportMethods(
             let contentToMarshal: string;
             const respField = getResultFieldName(method.returns.result);
             const getResponseField = `server.GetResponse(respr).${respField}`;
-            if (go.isPtr(method.returns.result.monomorphicType, "scalar", "string")) {
-              switch (method.returns.result.monomorphicType.ptrType.kind) {
+            if (go.isPtr(method.returns.result.type, "scalar", "string")) {
+              switch (method.returns.result.type.ptrType.kind) {
                 case "scalar": {
                   imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
                   // create a local var that will hold the string-formatted scalar
@@ -505,7 +505,7 @@ function generateServerTransportMethods(
                   content += `${indent.get()}var ${contentToMarshal} *string\n`;
                   const localVar = naming.uncapitalize(respField);
                   // we want the wrapped type so formatValue will deref it
-                  const monomorphicType = method.returns.result.monomorphicType;
+                  const monomorphicType = method.returns.result.type;
                   // if value := server.GetResponse(respr).Value; value != nil {...format as string...}
                   content += `${indent.get()}${helpers.buildIfBlock(indent, {
                     condition: `${localVar} := ${getResponseField}; ${localVar} != nil`,
@@ -521,7 +521,7 @@ function generateServerTransportMethods(
             } else {
               throw new CodegenError(
                 "UnsupportedTsp",
-                `unsupported text return kind ${method.returns.result.monomorphicType.kind} for method ${method.receiver.type.name}.${method.name}`,
+                `unsupported text return kind ${method.returns.result.type.kind} for method ${method.receiver.type.name}.${method.name}`,
               );
             }
             content += `${indent.get()}resp, err := server.MarshalResponseAsText(respContent, ${contentToMarshal}, req)\n`;
@@ -529,14 +529,14 @@ function generateServerTransportMethods(
             let respField = `.${getResultFieldName(method.returns.result)}`;
             if (
               method.returns.result.format === "XML" &&
-              method.returns.result.monomorphicType.kind === "slice"
+              method.returns.result.type.kind === "slice"
             ) {
               respField = "";
             }
             let responseField = `server.GetResponse(respr)${respField}`;
-            if (go.isPtr(method.returns.result.monomorphicType, "time")) {
+            if (go.isPtr(method.returns.result.type, "time")) {
               imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-              responseField = `(*datetime.${method.returns.result.monomorphicType.ptrType.format})(${responseField})`;
+              responseField = `(*datetime.${method.returns.result.type.ptrType.format})(${responseField})`;
             }
             content += `${indent.get()}resp, err := server.MarshalResponseAs${method.returns.result.format}(respContent, ${responseField}, req)\n`;
           }
@@ -819,14 +819,14 @@ function dispatchForOperationBody(
           caseContent += `${indent.get()}${paramVar}.Filename = ${filename}\n`;
         }
       } else if (type.kind === "slice") {
-        if (type.elementType.kind === "readSeekCloser") {
+        if (type.itemType.kind === "readSeekCloser") {
           imports.add("bytes");
           imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming");
           assignedValue = `append(${paramVar}, streaming.NopCloser(bytes.NewReader(content)))`;
         } else {
           throw new CodegenError(
             "InternalError",
-            `unhandled multipart parameter array element kind ${type.elementType.kind}`,
+            `unhandled multipart parameter array element kind ${type.itemType.kind}`,
           );
         }
       } else if (type.kind === "encodedBytes") {
@@ -1309,7 +1309,7 @@ function parseHeaderPathQueryParams(
       param.kind === "pathCollectionParam" ||
       param.kind === "queryCollectionParam"
     ) {
-      const elementType = go.unwrapPtr(param.type.elementType);
+      const elementType = go.unwrapPtr(param.type.itemType);
       // any element type other than string will require some form of conversion/parsing
       if (elementType.kind !== "string") {
         if (param.collectionFormat !== "multi") {
@@ -1336,7 +1336,7 @@ function parseHeaderPathQueryParams(
             throw new CodegenError("InternalError", `unhandled element kind ${elementType.kind}`);
         }
 
-        const toType = go.getTypeDeclaration(param.type.elementType, pkg);
+        const toType = go.getTypeDeclaration(param.type.itemType, pkg);
         content += `${indent.get()}${paramVar} := make([]${toType}, len(${paramValue}))\n`;
         content += `${indent.get()}for i := 0; i < len(${paramValue}); i++ {\n`;
         indent.push();
@@ -1727,7 +1727,7 @@ function getFinalParamValue(
     ) {
       // for required params that are collections of strings, we split them inline.
       // not necessary for optional params as they're already in slice format.
-      if (param.collectionFormat !== "multi" && param.type.elementType.kind === "string") {
+      if (param.collectionFormat !== "multi" && param.type.itemType.kind === "string") {
         requiredHelpers.splitHelper = true;
         return `splitHelper(${paramValue}, "${helpers.getDelimiterForCollectionFormat(param.collectionFormat)}")`;
       }
@@ -1807,12 +1807,9 @@ function getResultFieldName(
     go.AnyResult | go.BinaryResult | go.MonomorphicResult | go.PolymorphicResult | go.ModelResult,
 ): string {
   switch (result.kind) {
-    case "anyResult":
-      return result.fieldName;
     case "modelResult":
-      return result.modelType.name;
     case "polymorphicResult":
-      return result.interface.name;
+      return result.type.name;
     default:
       return result.fieldName;
   }

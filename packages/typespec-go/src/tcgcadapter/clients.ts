@@ -1994,7 +1994,7 @@ export class ClientAdapter {
         if (contentType === "XML" && sdkResponseType.kind === "array") {
           // this is for compat with legacy behavior
           fieldName = sdkResponseType.name;
-          const elementType = go.unwrapPtr((<go.Slice>resultType).elementType);
+          const elementType = go.unwrapPtr((<go.Slice>resultType).itemType);
           const elementTypeXmlName = go.hasXMLName(elementType);
           xmlWrapper =
             elementTypeXmlName ?? go.getTypeDeclaration(elementType, method.receiver.type.pkg);
@@ -2317,21 +2317,11 @@ export class ClientAdapter {
                   );
                   break;
                 case "modelResult":
-                  goExample.responseEnvelope.result = this.adaptExampleType(
-                    response.bodyValue,
-                    method.returns.result.modelType,
-                  );
-                  break;
                 case "monomorphicResult":
-                  goExample.responseEnvelope.result = this.adaptExampleType(
-                    response.bodyValue,
-                    method.returns.result.monomorphicType,
-                  );
-                  break;
                 case "polymorphicResult":
                   goExample.responseEnvelope.result = this.adaptExampleType(
                     response.bodyValue,
-                    method.returns.result.interface,
+                    method.returns.result.type,
                   );
                   break;
               }
@@ -2399,7 +2389,7 @@ export class ClientAdapter {
         if (goType.kind === "slice") {
           const ret = new go.ArrayExample(goType);
           for (const v of exampleType.value) {
-            ret.value.push(this.adaptExampleType(v, goType.elementType));
+            ret.value.push(this.adaptExampleType(v, goType.itemType));
           }
           return ret;
         }
@@ -2408,7 +2398,7 @@ export class ClientAdapter {
         if (goType.kind === "map") {
           const ret = new go.DictionaryExample(goType);
           for (const [k, v] of Object.entries(exampleType.value)) {
-            ret.value[k] = this.adaptExampleType(v, goType.valueType);
+            ret.value[k] = this.adaptExampleType(v, goType.itemType);
           }
           return ret;
         }
@@ -2463,7 +2453,7 @@ export class ClientAdapter {
                   `additional properties field not found in model '${concreteType.name}'.`,
                 );
               }
-              ret.additionalProperties[k] = this.adaptExampleType(v, field.type.valueType);
+              ret.additionalProperties[k] = this.adaptExampleType(v, field.type.itemType);
             }
           }
           return ret;

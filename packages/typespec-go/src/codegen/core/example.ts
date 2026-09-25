@@ -228,7 +228,7 @@ export function generateExamples(
           }
           const itemType = (
             (method as go.PageableMethod).returns.result as go.ModelResult
-          ).modelType.fields.find((f) => f.type.kind === "slice")!;
+          ).type.fields.find((f) => f.type.kind === "slice")!;
           exampleText += `${indent.get()}for ${resultName}.More() {\n`;
           exampleText += `${indent.push().get()}page, err := ${resultName}.NextPage(ctx)\n`;
           exampleText += `${indent.get()}if err != nil {\n`;
@@ -281,9 +281,9 @@ export function generateExamples(
               ? fieldName
               : (example.responseEnvelope?.result.type as go.Model).name;
             if (method.returns.result?.kind === "monomorphicResult") {
-              resultByValue = method.returns.result.monomorphicType.kind !== "ptr";
+              resultByValue = method.returns.result.type.kind !== "ptr";
             } else if (method.returns.result?.kind === "polymorphicResult") {
-              resultFieldName = method.returns.result.interface.name;
+              resultFieldName = method.returns.result.type.name;
               resultByValue = false;
             }
             exampleText += `${indent.get()}// \t${resultFieldName}: ${getExampleValue(pkg, example.responseEnvelope.result, "", undefined, resultByValue).split("\n").join(`\n${indent.get()}// \t`)},\n`;
@@ -365,10 +365,10 @@ function getExampleValue(
     case "any":
       return jsonToGo(example.value, indent);
     case "array": {
-      const isElementByValue = example.type.elementType.kind !== "ptr";
+      const isElementByValue = example.type.itemType.kind !== "ptr";
       // if polymorphic, need to add type name in array, so inArray will be set to false
       // if other case, no need to add type name in array, so inArray will be set to true
-      const isElementPolymorphic = example.type.elementType.kind === "interface";
+      const isElementPolymorphic = example.type.itemType.kind === "interface";
       let exampleText = `${indent}${getRef(byValue)}${go.getTypeDeclaration(example.type, pkg)}{\n`;
       for (const element of example.value) {
         exampleText += `${getExampleValue(pkg, element, indent + "\t", imports, isElementByValue && !isElementPolymorphic, !isElementPolymorphic)},\n`;
@@ -378,8 +378,8 @@ function getExampleValue(
     }
     case "dictionary": {
       let exampleText = `${indent}${getRef(byValue)}${go.getTypeDeclaration(example.type, pkg)}{\n`;
-      const isValueByValue = example.type.valueType.kind !== "ptr";
-      const isValuePolymorphic = example.type.valueType.kind === "interface";
+      const isValueByValue = example.type.itemType.kind !== "ptr";
+      const isValuePolymorphic = example.type.itemType.kind === "interface";
       for (const key in example.value) {
         exampleText += `${indent}\t"${key}": ${getExampleValue(pkg, example.value[key], indent + "\t", imports, isValueByValue && !isValuePolymorphic).slice(indent.length + 1)},\n`;
       }
@@ -402,9 +402,9 @@ function getExampleValue(
           go.isAdditionalProperties(f),
         )!;
         const isAdditionalPropertiesFieldByValue =
-          additionalPropertiesField.type.valueType.kind !== "ptr";
+          additionalPropertiesField.type.itemType.kind !== "ptr";
         const isAdditionalPropertiesPolymorphic =
-          additionalPropertiesField.type.valueType.kind === "interface";
+          additionalPropertiesField.type.itemType.kind === "interface";
         exampleText += `${indent}\t${additionalPropertiesField.name}: ${getRef(isAdditionalPropertiesFieldByValue)}${go.getTypeDeclaration(additionalPropertiesField.type, pkg)}{\n`;
         for (const key in example.additionalProperties) {
           exampleText += `${indent}\t"${key}": ${getExampleValue(pkg, example.additionalProperties[key], indent + "\t", imports, isAdditionalPropertiesFieldByValue && !isAdditionalPropertiesPolymorphic).slice(indent.length + 1)},\n`;
