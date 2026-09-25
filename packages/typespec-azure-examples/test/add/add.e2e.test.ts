@@ -158,6 +158,36 @@ describe("add (end-to-end)", () => {
     expect(second.added).toEqual([]);
     expect(second.files).toEqual([]);
   });
+
+  it("aborts without writing when an existing examples file is malformed", async () => {
+    const root = await fixture();
+    await writeFile(join(root, "examples.yaml"), "$namespace: Microsoft.Test\nThings.get: [oops");
+    const result = await add(root);
+    expect(result.files).toEqual([]);
+    expect(result.added).toEqual([]);
+    expect(result.diagnostics.some((d) => d.code === "invalid-examples-file")).toBe(true);
+  });
+
+  it("preserves a source legacyFilename when cloning a changed example", async () => {
+    const root = await fixture();
+    await writeFile(
+      join(root, "examples.yaml"),
+      `$namespace: Microsoft.Test
+Things.create:
+  - legacyFilename: Custom_Create.json
+    request:
+      path: { id: "1" }
+      body: { name: created }
+    responses:
+      200: { body: { name: created } }
+`,
+    );
+    const result = await add(root);
+    const doc = parse(result.files[0].content);
+    // The cloned since-variant keeps the original legacy file name so the round-trip stays stable.
+    expect(doc["Things.create"][1].since).toBe("2024-01-01");
+    expect(doc["Things.create"][1].legacyFilename).toBe("Custom_Create.json");
+  });
 });
 
 afterAll(() => {

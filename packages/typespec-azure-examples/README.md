@@ -77,7 +77,7 @@ Add examples for a **newly-introduced API version**, adding an entry only where 
 needed:
 
 ```bash
-tsp-examples add < service-dir > [--api-version < version > ]
+tsp-examples add SERVICE_DIR [--api-version VERSION]
 ```
 
 For each operation in the target version's Swagger, `add` diffs the operation's contract against the

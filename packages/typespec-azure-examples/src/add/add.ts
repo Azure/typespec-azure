@@ -8,6 +8,7 @@
  */
 
 import { readFile } from "fs/promises";
+import { join, relative, sep } from "path";
 import { discoverExampleFiles } from "../discover.js";
 import { loadExampleFile, parseServiceVersions } from "../loader.js";
 import { serializeExamplesYaml } from "../migrate/emit.js";
@@ -108,7 +109,20 @@ export async function add(root: string, options: AddOptions = {}): Promise<AddRe
     return { targetVersion, previousVersion, files: [], added: [], diagnostics };
   }
 
-  const store = await loadExampleStore(root, options.namespace ?? detectedNamespace);
+  const { store, parseErrors } = await loadExampleStore(
+    root,
+    options.namespace ?? detectedNamespace,
+  );
+  if (parseErrors.length > 0) {
+    // Abort before touching anything: a malformed existing file must never be overwritten.
+    return {
+      targetVersion,
+      previousVersion,
+      files: [],
+      added: [],
+      diagnostics: [...diagnostics, ...parseErrors],
+    };
+  }
   const added: AddedExample[] = [];
 
   for (const [operationId, targetSignature] of sortedByKey(targetSignatures)) {
@@ -190,15 +204,13 @@ export async function add(root: string, options: AddOptions = {}): Promise<AddRe
 
 async function readVersionOrder(root: string): Promise<string[] | undefined> {
   try {
-    return parseServiceVersions(await readFile(`${root}/service.yaml`, "utf-8")).versions;
+    return parseServiceVersions(await readFile(join(root, "service.yaml"), "utf-8")).versions;
   } catch {
     return undefined;
   }
 }
 
-async function crawlSignatures(
-  root: string,
-): Promise<{
+async function crawlSignatures(root: string): Promise<{
   signaturesByVersion: Map<string, Map<string, OperationSignature>>;
   namespace?: string;
 }> {
@@ -238,17 +250,29 @@ interface ExampleStore {
 async function loadExampleStore(
   root: string,
   namespace: string | undefined,
-): Promise<ExampleStore> {
+): Promise<{ store: ExampleStore; parseErrors: ExampleDiagnostic[] }> {
   const paths = await discoverExampleFiles(root);
   const fileData = new Map<string, AnyRecord>();
   const lineages = new Map<string, { file: string; entries: Variant[] }>();
   const modified = new Set<string>();
+  const parseErrors: ExampleDiagnostic[] = [];
   let split = false;
 
   for (const absPath of paths) {
     const relative = toRelative(root, absPath);
     if (relative.startsWith("examples/")) split = true;
     const file = loadExampleFile(relative, await readFile(absPath, "utf-8"));
+    // Never treat a file that fails to parse as empty — appending to `{}` and re-serializing would erase
+    // the whole file. Record the error so the caller can abort before writing anything.
+    if (file.parseError !== undefined) {
+      parseErrors.push({
+        code: "invalid-examples-file",
+        message: `Could not parse ${relative}: ${file.parseError}`,
+        severity: "error",
+        file: relative,
+      });
+      continue;
+    }
     const data = (file.data ?? {}) as AnyRecord;
     fileData.set(relative, data);
     for (const [key, value] of Object.entries(data)) {
@@ -267,7 +291,7 @@ async function loadExampleStore(
     return path;
   };
 
-  return {
+  const store: ExampleStore = {
     lineages,
     append(operationKey, variant) {
       const target = lineages.get(operationKey);
@@ -286,6 +310,8 @@ async function loadExampleStore(
         .map((path) => ({ path, content: serializeExamplesYaml(fileData.get(path)!) }));
     },
   };
+
+  return { store, parseErrors };
 }
 
 function groupByLineage(entries: readonly Variant[]): Map<string, Variant[]> {
@@ -308,6 +334,11 @@ function cloneVariant(source: Variant, title: string, targetVersion: string): Va
   const variant: Variant = {};
   if (title !== "") variant.title = title;
   variant.since = targetVersion;
+  // Preserve identifying metadata so the new version keeps the same legacy file name (and any
+  // author description), otherwise resolving the new version would derive a different filename and
+  // break the round-trip.
+  if (typeof source.legacyFilename === "string") variant.legacyFilename = source.legacyFilename;
+  if (source.description !== undefined) variant.description = source.description;
   variant.request = structuredClone(source.request ?? {});
   variant.responses = structuredClone(source.responses ?? {});
   return variant;
@@ -332,7 +363,7 @@ function sortedByKey(signatures: Map<string, OperationSignature>): [string, Oper
 }
 
 function toRelative(root: string, absolute: string): string {
-  const normalizedRoot = root.replace(/[\\/]+$/, "");
-  const prefix = `${normalizedRoot}/`;
-  return absolute.startsWith(prefix) ? absolute.slice(prefix.length) : absolute;
+  // `path.relative` handles platform separators; normalize to `/` so downstream checks
+  // (e.g. `startsWith("examples/")`) and emitted paths are consistent across OSes.
+  return relative(root, absolute).split(sep).join("/");
 }
