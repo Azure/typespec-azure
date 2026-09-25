@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
 import { mkdir, writeFile } from "fs/promises";
-import { dirname, resolve } from "path";
+import { join, resolve } from "path";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { formatDiagnostics, formatSummary } from "./reporter.js";
-import { resolveExamplesDir } from "./resolve/index.js";
+import { resolveLegacyExamples } from "./resolve/index.js";
 
 async function main(): Promise<void> {
   const args = await yargs(hideBin(process.argv))
     .scriptName("tsp-examples-legacy-expand")
     .usage(
       "$0 <dir>",
-      "Expand the unified examples into concrete per-version examples for a target API version",
+      "Expand the unified examples into classic x-ms-examples files for a target API version",
     )
     .positional("dir", {
       type: "string",
@@ -26,7 +26,7 @@ async function main(): Promise<void> {
     })
     .option("out", {
       type: "string",
-      describe: "Write the resolved examples JSON to this file instead of stdout",
+      describe: "Directory to write the classic x-ms-examples JSON files into (defaults to stdout)",
     })
     .strict()
     .help()
@@ -35,7 +35,7 @@ async function main(): Promise<void> {
   const dir = resolve(process.cwd(), (args.dir as string | undefined) ?? ".");
   const apiVersion = args["api-version"] as string;
 
-  const result = await resolveExamplesDir(dir, apiVersion);
+  const result = await resolveLegacyExamples(dir, apiVersion);
 
   if (result.diagnostics.length > 0) {
     console.error(formatDiagnostics(result.diagnostics));
@@ -46,25 +46,17 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const output = {
-    apiVersion: result.apiVersion,
-    examples: result.examples.map((e) => ({
-      operation: e.operation,
-      ...(e.title ? { title: e.title } : {}),
-      ...(e.legacyFilename ? { legacyFilename: e.legacyFilename } : {}),
-      request: e.request,
-      responses: e.responses,
-    })),
-  };
-  const json = JSON.stringify(output, null, 2);
-
   if (args.out) {
-    const target = resolve(process.cwd(), args.out as string);
-    await mkdir(dirname(target), { recursive: true });
-    await writeFile(target, json + "\n", "utf-8");
-    console.error(`Wrote ${result.examples.length} resolved example(s) to ${target}`);
+    const outDir = resolve(process.cwd(), args.out as string);
+    await mkdir(outDir, { recursive: true });
+    for (const file of result.files) {
+      await writeFile(join(outDir, file.fileName), JSON.stringify(file.document, null, 2) + "\n");
+    }
+    console.error(`Wrote ${result.files.length} x-ms-examples file(s) to ${outDir}`);
   } else {
-    console.log(json);
+    // Print a filename -> document map so the output is inspectable without writing to disk.
+    const map = Object.fromEntries(result.files.map((f) => [f.fileName, f.document]));
+    console.log(JSON.stringify(map, null, 2));
   }
 }
 

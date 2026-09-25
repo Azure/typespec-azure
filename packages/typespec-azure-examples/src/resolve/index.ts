@@ -2,6 +2,11 @@
  * `tsp-examples-legacy-expand`: expand the unified examples into the concrete example for each
  * operation at a target API version.
  */
+export {
+  resolveLegacyExamples,
+  type LegacyExampleFile,
+  type ResolveLegacyResult,
+} from "./legacy.js";
 export { substituteApiVersion } from "./materialize.js";
 export { resolveExamplesDir, type ResolveDirResult } from "./resolve-dir.js";
 export { resolveExampleFiles, type ResolveResult, type ResolvedExample } from "./resolve.js";
