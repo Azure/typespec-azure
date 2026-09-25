@@ -34,6 +34,17 @@ describe("serializeExamplesYaml", () => {
     expect(Object.keys(parsed["Things.get"][0].responses)).toEqual(["200"]);
     expect(typeof parsed["Things.get"][0].since).toBe("string");
   });
+
+  it("does not convert numeric-looking keys nested inside a response body", () => {
+    const object = {
+      "Things.get": [{ request: {}, responses: { "200": { body: { "001": "keep-as-string" } } } }],
+    };
+    const yaml = serializeExamplesYaml(object);
+    const parsed = parse(yaml);
+    // The status code is an integer key; the body map key "001" must stay a string.
+    expect(Object.keys(parsed["Things.get"][0].responses)).toEqual(["200"]);
+    expect(Object.keys(parsed["Things.get"][0].responses["200"].body)).toEqual(["001"]);
+  });
 });
 
 describe("planFiles", () => {
