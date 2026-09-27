@@ -98,6 +98,7 @@ import {
   getResourceBaseType,
   isArmVirtualResource,
   isCustomAzureResource,
+  isCustomAzureResourceMarkedAzure,
   resolveResourceBaseType,
   ResourceBaseType,
   setResourceBaseType,
@@ -532,7 +533,7 @@ export function registerArmResource(
   registerArmResourceCore(context.program, context, resourceType, type, nameParameter);
 }
 
-export function registerArmResourceFromModel(
+function registerArmResourceFromModel(
   program: Program,
   resourceType: Model,
   type?: string,
@@ -667,7 +668,18 @@ function registerArmResourceCore(
   setArmResource(program, resourceType, armResourceDetails);
 }
 
+function registerCustomAzureResourceOperationModels(program: Program): void {
+  for (const resourceType of program.stateMap(ArmStateKeys.resourceOperationList).keys()) {
+    if (resourceType.kind !== "Model") continue;
+    if (!isCustomAzureResourceMarkedAzure(program, resourceType)) continue;
+    if (getArmResource(program, resourceType)) continue;
+    registerArmResourceFromModel(program, resourceType);
+  }
+}
+
 export function listArmResources(program: Program): ArmResourceDetails[] {
+  registerCustomAzureResourceOperationModels(program);
+
   // Deduplicate by namespace-qualified name. Versioning mutations (from TCGC's
   // createSdkContext or autorest's per-version snapshots) re-apply decorators on
   // realm copies, registering them alongside the originals. By keeping only the

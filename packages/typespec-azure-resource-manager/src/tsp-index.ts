@@ -39,7 +39,6 @@ import {
 } from "./resource.js";
 
 export { $lib } from "./lib.js";
-export { $onValidate } from "./validate.js";
 
 /** @internal */
 export const $decorators = {
