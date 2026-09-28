@@ -25,6 +25,7 @@ specs:
   azure/special-headers/conditional-request: true
   parameters/collection-format: true
   azure/core/basic: true
+  azure/core/api-version-override: true
   type/dictionary: true
   type/property/nullable: true
   type/property/optionality: true
@@ -107,8 +108,9 @@ specs:
   azure/client-generator-core/hierarchy-building: true
   client/overload: true
   azure/client-generator-core/override: true
-  # Disabled until all language emitters support response replacement.
-  azure/client-generator-core/response-replacement: false
+  # Only voidResponse is covered; bytesResponse returns a parsed object instead of raw bytes.
+  # Tracking: https://github.com/Azure/typespec-azure/issues/5313
+  azure/client-generator-core/response-replacement: true
   azure/client-generator-core/alternate-type: true
   azure/versioning/previewVersion: true
   azure/client-generator-core/next-link-verb: true
