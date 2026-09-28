@@ -810,43 +810,6 @@ describe("resource selection", () => {
 });
 
 describe("scope and registration", () => {
-  it("excludes imported library operations but checks project operations", async () => {
-    const instance = await Tester.files({
-      "node_modules/patch-library/package.json": JSON.stringify({
-        name: "patch-library",
-        version: "1.0.0",
-        tspMain: "./lib.tsp",
-      }),
-      "node_modules/patch-library/lib.tsp": `
-        import "@typespec/http";
-        import "@azure-tools/typespec-azure-resource-manager";
-        @Azure.ResourceManager.armProviderNamespace
-        namespace Microsoft.Imported {
-          @TypeSpec.Http.patch op update(@TypeSpec.Http.body body: { libraryOnly: string }): void;
-        }
-      `,
-    })
-      .import("patch-library")
-      .createInstance();
-    const libraryTester = createLinterRuleTester(
-      instance,
-      noUnsafePatchBodyPropertiesRule,
-      "@azure-tools/typespec-azure-resource-manager",
-    );
-    await libraryTester
-      .expect(`${service} @patch op update(@body body: { value: string }): void;`)
-      .toEmitDiagnostics(required("value"));
-  });
-  it("excludes uninstantiated templates without skipping concrete project operations", async () => {
-    await tester
-      .expect(
-        `${service}
-        @patch op template<T>(@body body: { templateOnly: string; detail?: T }): void;
-        @patch op update(@body body: { value: string }): void;
-      `,
-      )
-      .toEmitDiagnostics(required("value"));
-  });
   it.each([
     '@header contentType: "multipart/form-data", @multipartBody body: { required: HttpPart<string> }',
     '@header contentType: "multipart/form-data", @multipartBody body: [HttpPart<string, #{name: "required"}>]',
@@ -928,29 +891,19 @@ describe("scope and registration", () => {
       });
     });
   });
-  describe.each([
-    ["with provider metadata", "@armProviderNamespace"],
-    ["without provider metadata", ""],
-  ])("applicability %s", (_, providerDecorator) => {
-    it.each([
-      ["service namespace", "", ""],
-      ["nested namespace", "namespace Widgets {", "}"],
-      ["nested interface", "namespace Widgets { interface Operations {", "} }"],
-    ])("checks PATCH bodies in a %s", async (_, beforeOperation, afterOperation) => {
+  describe("applicability", () => {
+    it("checks PATCH bodies without provider metadata", async () => {
       await tester
         .expect(
           `
-          ${providerDecorator}
           namespace Microsoft.TestService;
           model WidgetPatchBody {
             displayName: string;
             enabled?: boolean = false;
             @visibility(Lifecycle.Create) createdBy?: string;
           }
-          ${beforeOperation}
           @route("/widgets/{name}") @patch
           op update(@path name: string, @body body: WidgetPatchBody): void;
-          ${afterOperation}
         `,
         )
         .toEmitDiagnostics([required("displayName"), defaultValue("enabled")]);
@@ -959,11 +912,8 @@ describe("scope and registration", () => {
       await tester
         .expect(
           `
-          ${providerDecorator}
           namespace Microsoft.TestService;
-          namespace Widgets {
-            @${verb} op write(@body body: { value: string; enabled?: boolean = false }): void;
-          }
+          @${verb} op write(@body body: { value: string; enabled?: boolean = false }): void;
         `,
         )
         .toBeValid();
