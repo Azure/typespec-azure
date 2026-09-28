@@ -695,15 +695,15 @@ function generateJSONMarshallerBody(
       marshaller += `${indent.get()}populateByteArray(objectMap, "${field.serializedName}", ${receiver}.${field.name}, func() any {\n`;
       marshaller += `${indent.push().get()}encodedValue := make([]string, len(${receiver}.${field.name}))\n`;
       marshaller += `${indent.get()}for i := 0; i < len(${receiver}.${field.name}); i++ {\n`;
-      marshaller += `${indent.push().get()}encodedValue[i] = runtime.EncodeByteArray(${receiver}.${field.name}[i], runtime.Base64${fieldType.elementType.encoding}Format)\n`;
+      marshaller += `${indent.push().get()}encodedValue[i] = runtime.EncodeByteArray(${receiver}.${field.name}[i], runtime.Base64${fieldType.itemType.encoding}Format)\n`;
       marshaller += `${indent.pop().get()}}\n`;
       marshaller += `${indent.get()}return encodedValue\n`;
       marshaller += `${indent.pop().get()}})\n`;
       modelDef.SerDe.needsJSONPopulateByteArray = true;
     } else if (go.isSlice(fieldType, "time")) {
       const source = `${receiver}.${field.name}`;
-      const elementType = go.unwrapPtr(fieldType.elementType);
-      const elementPtr = helpers.deref(fieldType.elementType);
+      const elementType = go.unwrapPtr(fieldType.itemType);
+      const elementPtr = helpers.deref(fieldType.itemType);
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
       marshaller += `${indent.get()}aux := make([]${elementPtr}datetime.${elementType.format}, len(${source}), len(${source}))\n`;
       marshaller += `${indent.get()}for i := 0; i < len(${source}); i++ {\n`;
@@ -801,19 +801,19 @@ function generateJSONMarshallerBody(
   if (addlProps) {
     marshaller += `${indent.get()}if ${receiver}.AdditionalProperties != nil {\n`;
     marshaller += `${indent.push().get()}for key, val := range ${receiver}.AdditionalProperties {\n`;
-    if (go.isPtr(addlProps.valueType, "time") && addlProps.valueType.ptrType.utc) {
+    if (go.isPtr(addlProps.itemType, "time") && addlProps.itemType.ptrType.utc) {
       // normalize utc datetimes before casting the (pointer) map value
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
       marshaller += `${indent.push().get()}if val != nil {\n`;
       marshaller += `${indent.push().get()}utcTime := val.UTC()\n`;
-      marshaller += `${indent.get()}objectMap[key] = (*datetime.${addlProps.valueType.ptrType.format})(&utcTime)\n`;
+      marshaller += `${indent.get()}objectMap[key] = (*datetime.${addlProps.itemType.ptrType.format})(&utcTime)\n`;
       marshaller += `${indent.pop().get()}} else {\n`;
       marshaller += `${indent.push().get()}objectMap[key] = nil\n`;
       marshaller += `${indent.pop().get()}}\n`;
     } else {
       let assignment = "val";
-      if (go.isPtr(addlProps.valueType, "time")) {
-        assignment = `(*${addlProps.valueType.ptrType.format})(val)`;
+      if (go.isPtr(addlProps.itemType, "time")) {
+        assignment = `(*${addlProps.itemType.ptrType.format})(val)`;
       }
       marshaller += `${indent.push().get()}objectMap[key] = ${assignment}\n`;
     }
@@ -887,15 +887,15 @@ function generateJSONUnmarshallerBody(
   const emitAddlProps = function (addlProps: go.Map): string {
     // indent is at the case body level when called
     let addlPropsText = `${indent.get()}if ${receiver}.AdditionalProperties == nil {\n`;
-    const ref = addlProps.valueType.kind === "ptr" ? "&" : "";
+    const ref = addlProps.itemType.kind === "ptr" ? "&" : "";
     addlPropsText += `${indent.push().get()}${receiver}.AdditionalProperties = ${go.getTypeDeclaration(addlProps, modelDef.Model.pkg)}{}\n`;
     addlPropsText += `${indent.pop().get()}}\n`;
     addlPropsText += `${indent.get()}if val != nil {\n`;
-    let auxType = go.getTypeDeclaration(go.unwrapPtr(addlProps.valueType), modelDef.Model.pkg);
+    let auxType = go.getTypeDeclaration(go.unwrapPtr(addlProps.itemType), modelDef.Model.pkg);
     let assignment = `${ref}aux`;
-    if (go.isPtr(addlProps.valueType, "time")) {
+    if (go.isPtr(addlProps.itemType, "time")) {
       imports.add("time");
-      auxType = addlProps.valueType.ptrType.format;
+      auxType = addlProps.itemType.ptrType.format;
       assignment = `(*time.Time)(${assignment})`;
     }
     addlPropsText += `${indent.push().get()}var aux ${auxType}\n`;
@@ -935,8 +935,8 @@ function generateJSONUnmarshallerBody(
       } else if (go.isSlice(fieldType, "time")) {
         imports.add("time");
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-        const elementType = go.unwrapPtr(fieldType.elementType);
-        const elementPtr = helpers.deref(fieldType.elementType);
+        const elementType = go.unwrapPtr(fieldType.itemType);
+        const elementPtr = helpers.deref(fieldType.itemType);
         unmarshalBody += `${indent.get()}var aux []${elementPtr}datetime.${elementType.format}\n`;
         unmarshalBody += `${indent.get()}err = unpopulate(val, "${field.name}", &aux)\n`;
         unmarshalBody += `${indent.get()}for _, au := range aux {\n`;
@@ -958,7 +958,7 @@ function generateJSONUnmarshallerBody(
         indent.push();
         unmarshalBody += `${indent.get()}${receiver}.${field.name} = make([][]byte, len(encodedValue))\n`;
         unmarshalBody += `${indent.get()}for i := 0; i < len(encodedValue) && err == nil; i++ {\n`;
-        unmarshalBody += `${indent.push().get()}err = runtime.DecodeByteArray(encodedValue[i], &${receiver}.${field.name}[i], runtime.Base64${fieldType.elementType.encoding}Format)\n`;
+        unmarshalBody += `${indent.push().get()}err = runtime.DecodeByteArray(encodedValue[i], &${receiver}.${field.name}[i], runtime.Base64${fieldType.itemType.encoding}Format)\n`;
         unmarshalBody += `${indent.pop().get()}}\n`;
         indent.pop();
         unmarshalBody += `${indent.get()}}\n`;
@@ -1096,9 +1096,8 @@ function hasDiscriminatorInterface(item: go.WireType): boolean {
     case "interface":
       return true;
     case "map":
-      return hasDiscriminatorInterface(item.valueType);
     case "slice":
-      return hasDiscriminatorInterface(item.elementType);
+      return hasDiscriminatorInterface(item.itemType);
     default:
       return false;
   }
@@ -1117,9 +1116,9 @@ function generateDiscriminatorUnmarshaller(
   if (field.type.kind === "interface") {
     return `${indent.get()}${receiver}.${propertyName}, err = unmarshal${field.type.name}(val)\n`;
   } else if (go.isSlice(field.type, "interface")) {
-    return `${indent.get()}${receiver}.${propertyName}, err = unmarshal${field.type.elementType.name}Array(val)\n`;
+    return `${indent.get()}${receiver}.${propertyName}, err = unmarshal${field.type.itemType.name}Array(val)\n`;
   } else if (go.isMap(field.type, "interface")) {
-    return `${indent.get()}${receiver}.${propertyName}, err = unmarshal${field.type.valueType.name}Map(val)\n`;
+    return `${indent.get()}${receiver}.${propertyName}, err = unmarshal${field.type.itemType.name}Map(val)\n`;
   }
 
   // nested case (e.g. [][]InterfaceType, map[string]map[string]InterfaceType etc)
@@ -1167,12 +1166,12 @@ function recursiveGetDiscriminatorTypeName(
 ): string {
   // when raw is true, stop recursing at the level before the leaf schema
   if (item.kind === "slice") {
-    if (!raw || item.elementType.kind !== "interface") {
-      return `[]${recursiveGetDiscriminatorTypeName(modelType, item.elementType, raw)}`;
+    if (!raw || item.itemType.kind !== "interface") {
+      return `[]${recursiveGetDiscriminatorTypeName(modelType, item.itemType, raw)}`;
     }
   } else if (item.kind === "map") {
-    if (!raw || item.valueType.kind !== "interface") {
-      return `map[string]${recursiveGetDiscriminatorTypeName(modelType, item.valueType, raw)}`;
+    if (!raw || item.itemType.kind !== "interface") {
+      return `map[string]${recursiveGetDiscriminatorTypeName(modelType, item.itemType, raw)}`;
     }
   }
   if (raw) {
@@ -1207,7 +1206,7 @@ function recursivePopulateDiscriminator(
   let targetType = "";
 
   if (item.kind === "slice") {
-    if (item.elementType.kind !== "interface") {
+    if (item.itemType.kind !== "interface") {
       if (nesting > 1) {
         // at nestling level 1, the destination var was already created in generateDiscriminatorUnmarshaller()
         text += `${indent.get()}${dest} = make(${recursiveGetDiscriminatorTypeName(modelType, item, false)}, len(${rawSrc}))\n`;
@@ -1219,7 +1218,7 @@ function recursivePopulateDiscriminator(
       indent.push();
       text += recursivePopulateDiscriminator(
         modelType,
-        item.elementType,
+        item.itemType,
         receiver,
         rawSrc,
         dest,
@@ -1232,10 +1231,10 @@ function recursivePopulateDiscriminator(
     }
 
     // we're at leaf node - 1, so get the interface from the element's type
-    interfaceName = go.getTypeDeclaration(item.elementType, modelType.pkg);
+    interfaceName = go.getTypeDeclaration(item.itemType, modelType.pkg);
     targetType = "Array";
   } else if (item.kind === "map") {
-    if (item.valueType.kind !== "interface") {
+    if (item.itemType.kind !== "interface") {
       if (nesting > 1) {
         // at nestling level 1, the destination var was already created in generateDiscriminatorUnmarshaller()
         text += `${indent.get()}${dest} = ${recursiveGetDiscriminatorTypeName(modelType, item, false)}{}\n`;
@@ -1247,7 +1246,7 @@ function recursivePopulateDiscriminator(
       indent.push();
       text += recursivePopulateDiscriminator(
         modelType,
-        item.valueType,
+        item.itemType,
         receiver,
         rawSrc,
         dest,
@@ -1260,7 +1259,7 @@ function recursivePopulateDiscriminator(
     }
 
     // we're at leaf node - 1, so get the interface from the element's type
-    interfaceName = go.getTypeDeclaration(item.valueType, modelType.pkg);
+    interfaceName = go.getTypeDeclaration(item.itemType, modelType.pkg);
     targetType = "Map";
   }
 
@@ -1592,7 +1591,7 @@ function getXMLSerialization(field: go.ModelField, pkg: go.PackageContent): stri
     // for unwrapped lists we use the serialized name on the field
     if (field.xmlKind !== "unwrappedList") {
       // start with the serialized name of the element, preferring xml name if available
-      const unwrappedPtrType = go.unwrapPtr(field.type.elementType);
+      const unwrappedPtrType = go.unwrapPtr(field.type.itemType);
       const inner = field.type.xmlName ? field.type.xmlName : go.hasXMLName(unwrappedPtrType) ?? go.getTypeDeclaration(unwrappedPtrType, pkg);
       serialization += `>${inner}`;
     }
