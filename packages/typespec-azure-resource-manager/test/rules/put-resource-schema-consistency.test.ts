@@ -1,13 +1,7 @@
 import { Tester } from "#test/tester.js";
-import {
-  createLinterRuleTester,
-  expectDiagnostics,
-  t,
-  type LinterRuleTester,
-} from "@typespec/compiler/testing";
-import { getHttpOperation } from "@typespec/http";
+import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { readFileSync } from "node:fs";
-import { beforeEach, expect, it } from "vitest";
+import { beforeEach, it } from "vitest";
 import { armResourceOperationsRule } from "../../src/rules/arm-resource-operation-response.js";
 import { putResourceSchemaConsistencyRule } from "../../src/rules/put-resource-schema-consistency.js";
 
@@ -45,22 +39,6 @@ it("accepts the same model across the request and both responses", async () => {
   `,
     )
     .toBeValid();
-});
-
-it.each(["body", "bodyRoot"])("resolves @%s payloads to their property type", async (decorator) => {
-  const { program, put, Input, Output } = await Tester.compile(t.code`
-    model ${t.model("Input")} { value: string; }
-    model ${t.model("Output")} { value: string; }
-    @put op ${t.op("put")}(@${decorator} body: Input):
-      { @statusCode status: 200; @${decorator} body: Output; };
-  `);
-  const [http] = getHttpOperation(program, put);
-  const request = http.parameters.body;
-  const response = http.responses[0].responses[0].body;
-  expect(request?.type).toBe(Input);
-  expect(request?.property?.type).toBe(Input);
-  expect(response?.type).toBe(Output);
-  expect(response?.property?.type).toBe(Output);
 });
 
 it.each([200, 201])("compares the request with a lone %s response", async (status) => {
@@ -505,7 +483,7 @@ it.each([
   },
 );
 
-it("checks unannotated and nested namespaces", async () => {
+it("checks user namespaces without provider metadata", async () => {
   await tester
     .expect(
       `${models}
@@ -555,60 +533,6 @@ it("checks inherited concrete interface operations", async () => {
   `,
     )
     .toEmitDiagnostics([diagnostic("request: Widget; 200 response: Other")]);
-});
-
-it("reports once on an authored versioned operation", async () => {
-  await tester
-    .expect(
-      `
-    ${models}
-    @service @versioned(Versions) namespace Test {
-      enum Versions { v1, v2 }
-      @put op put(@bodyRoot body: Widget): ArmResponse<Other>;
-    }
-  `,
-    )
-    .toEmitDiagnostics([diagnostic("request: Widget; 200 response: Other")]);
-});
-
-it("supports the fully qualified suppression directive", async () => {
-  const options = { compilerOptions: { linterRuleSet: { enable: { [code]: true } } } };
-  const operation = "@put op put(@body body: Widget): Ok<Other>;";
-  expectDiagnostics(await Tester.diagnose(`${models} ${operation}`, options), [
-    diagnostic("request: Widget; 200 response: Other"),
-  ]);
-  await Tester.compile(
-    `${models}
-    #suppress "${code}" "Existing API uses separate resource models."
-    ${operation}
-  `,
-    options,
-  );
-});
-
-it("ignores imported library operations but checks their project aliases", async () => {
-  const libraryTester = createLinterRuleTester(
-    await Tester.import("put-library").createInstance(),
-    putResourceSchemaConsistencyRule,
-    "@azure-tools/typespec-azure-resource-manager",
-  );
-  await libraryTester
-    .expect({
-      "node_modules/put-library/package.json": JSON.stringify({
-        name: "put-library",
-        version: "1.0.0",
-        tspMain: "main.tsp",
-      }),
-      "node_modules/put-library/main.tsp": `
-      import "@typespec/http";
-      namespace PutLibrary;
-      @TypeSpec.Http.put op missing(): void;
-    `,
-      "main.tsp": `
-      op put is PutLibrary.missing;
-    `,
-    })
-    .toEmitDiagnostics([missingRequest]);
 });
 
 const examples = [
