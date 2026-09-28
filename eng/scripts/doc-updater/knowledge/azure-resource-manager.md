@@ -155,3 +155,7 @@ The former multi-purpose `arm-resource-operation` checks are represented by thre
 ## Resource Identity Resolution
 
 Concrete ARM resource identities are seeded only by registered read or createOrUpdate operations with valid ARM resource instance paths. List, action, update, delete, and check-existence operations can attach to an existing resolved resource but do not create resource identities by themselves.
+
+## Incremental Linter Documentation
+
+When an ARM linter rule is added or promoted, `regen-docs` updates the generated linter reference, but it does not update the hand-authored rule evaluation table in `website/src/content/docs/docs/howtos/ARM/arm-rules.md`. Incremental documentation updates must compare newly registered rules against both locations and add missing table rows with the rule's current implementation scope, LintDiff equivalent, and API/SDK impact.
