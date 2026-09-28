@@ -399,9 +399,9 @@ Then adapt it to the destination package:
   - use neighboring destination rules and ruleset registration as evidence,
     document the deliberate adaptation in the PR, and add a native test that
     would fail if the destination unnecessarily retained the lintdiff-only
-    guard. Cover both ordinary and nested namespaces without a provider
-    decorator when the official ruleset supplies the applicability boundary;
-    keep library-declaration and template filtering as separate concerns
+    guard. Use a minimal case without a provider decorator when the official
+    ruleset supplies the applicability boundary; add nested-namespace cases
+    only for rule-owned namespace logic, not framework traversal
   - do not use `resolveProviderNamespace(program, operationNamespace)` as an
     ancestor-membership check: it searches the supplied namespace and its
     descendants. If a semantic membership check is required, verify the helper's
@@ -432,7 +432,9 @@ existing tester helper:
   current context setup against adjacent rule tests
 
 Apply the [contract-driven coverage](../typespec-lint-validate/SKILL.md#contract-driven-coverage)
-checklist in addition to fixture conversion. In ARM resource examples and tests,
+checklist and [rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary)
+before fixture conversion. Do not port framework-only cases merely because they
+exist in the source suite or migration harness. In ARM resource examples and tests,
 prefer standard operation templates with named customization arguments and
 omitted defaults. Preserve handcrafted cases that specifically prove scope or
 non-resource behavior. For SDK naming, prove common versus language-scoped
@@ -455,15 +457,13 @@ tester in `beforeEach`, as the package's existing tests do. Keep lazy library
 filesystem/host initialization out of the first test body, await asynchronous
 setup, and preserve per-test isolation. Do not compensate for setup mistakes
 by raising timeouts, caching mutable testers across cases, or weakening assertions.
-For recursive traversal, port the source matrix for cycles, shared siblings,
-cross-operation reuse and imported diagnostic targets without silently changing
-the intended diagnostic unit. Any discovered source defect returns to the queue.
-
-When promotion adds or preserves project/library declaration filtering, include
-an imported library declaration that would otherwise violate the rule and assert
-that it is excluded. Pair it with a violating project declaration so the test
-cannot pass merely because the rule never ran. Test template filtering separately;
-ordinary and nested project namespace cases do not prove library exclusion.
+For custom recursive traversal implemented by the rule, port the relevant source
+matrix for cycles, shared siblings, cross-operation reuse, and diagnostic targets
+without silently changing the intended diagnostic unit. Do not add imported
+library, alias/source identity, template-filtering, or inheritance tests merely
+to prove standard framework behavior. Test custom declaration filtering only
+when it implements a rule-specific policy, with included and excluded cases.
+Any discovered source defect returns to the queue.
 
 For metadata-resolution or reference-based logic, explicitly cover relevant
 version-selection/fallback behavior, returned resolution diagnostics, and
@@ -476,7 +476,9 @@ defect before making changes.
 
 Use this standard fixture-to-native-test mapping:
 
-- one lintdiff fixture directory usually becomes one `it(...)` case
+- one lintdiff fixture directory that proves rule-owned behavior usually becomes
+  one `it(...)` case; mark framework-only fixtures as not ported with the reason
+  in the mapping instead of inventing native tests
 - a fixture that exercises several independent semantic branches may become
   multiple `it(...)` cases, one per branch
 - validator `expect.json`, `tsp-diagnostics.json`, `validator-diagnostics.json`,
@@ -484,14 +486,15 @@ Use this standard fixture-to-native-test mapping:
   package
 - use the fixture's `main.tsp` as source material, then reduce it to the
   smallest direct TypeSpec snippet that triggers only the promoted rule
-- preserve compliant fixtures as `toBeValid()` tests
-- preserve duplicate-diagnostic and target-location behavior with explicit
+- preserve rule-relevant compliant fixtures as `toBeValid()` tests
+- preserve rule-owned duplicate-diagnostic and target-location behavior with explicit
   diagnostic count or target assertions when the target package tester supports
   them
 - add regression tests for semantic fixes discovered during review, even when
   they were not part of the original fixture set
 - keep a written mapping from each original fixture `main.tsp` to the exact
-  native `it("...")` test title or titles that replace it; do not paraphrase test
+  native `it("...")` test title or titles that replace it, or an explicit
+  `Not ported (framework-only)` disposition and reason; do not paraphrase test
   titles in mapping tables or PR notes
 
 Prefer direct TypeSpec snippets and expected diagnostics over OpenAPI output
@@ -846,6 +849,8 @@ promotion diff. The review should inspect:
   resolution diagnostics, and regression evidence for reference-format
   independence and preserved version-selection, fallback, and diagnostic targets
 - test conversion fidelity from lintdiff fixtures
+- adherence to the rule-test responsibility boundary: remove framework-only
+  cases, preserve distinct rule coverage, and explain fixtures not ported
 - docs accuracy, including front matter, full-name block, TypeSpec/SDK-focused
   rationale, and any Swagger/LintDiff provenance being confined to a provenance
   section
@@ -941,7 +946,9 @@ It must include:
   source value. Use this shape:
   `| Original lintdiff fixture | Native vitest case | Coverage note |`. Do not
   paraphrase native test titles, and do not claim copied snapshot parity when
-  snapshots were not copied.
+  snapshots were not copied. For framework-only fixtures, write
+  `Not ported (framework-only)` in the native-case column and explain which
+  framework guarantee they exercise; do not create a rule test to fill the row.
 - **Migration evidence:** link directly to the rule's `migration.md` for the
   declared focused tests, real-service project comparison, latest full-corpus
   counts, one-sided project explanations, compile failures, and remaining

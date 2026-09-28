@@ -28,12 +28,49 @@ Use this skill when the main task is to **prove lint behavior with concrete exam
 5. If the rule needs a larger redesign, stop and hand back to `/typespec-lint-discovery` or `/typespec-lint-implement` with a precise explanation.
 6. End with a concise statement of what is now proven, what still is not, and what command output supports that claim.
 
+## Rule-test responsibility boundary
+
+Keep native rule unit tests focused on the rule's predicate, supported target
+kinds, and diagnostic contract. Do not re-test behavior owned by the compiler,
+linter framework, or shared test harness in every rule suite.
+
+- Do not add tests solely to prove imported-library exclusion, suppression or
+  rule enablement, alias/source identity, traversal of nested namespaces,
+  uninstantiated-template filtering, or ordinary inheritance/spread behavior
+  supplied by the framework.
+- Use those authoring forms only when they exercise a distinct decision made by
+  the rule, such as a custom applicability guard, inherited-property lookup,
+  recursive traversal, name resolution, or diagnostic deduplication. Identify
+  the rule-owned branch or regression the case proves; a framework guarantee
+  mentioned in the contract is not sufficient justification.
+- Prefer minimal compliant and violating snippets for each meaningful predicate
+  branch and supported target kind. Assert rule-owned messages, counts, and
+  authored locations without asserting compiler object identity or traversal
+  internals.
+- When updating an existing suite, remove framework-only cases within the task's
+  scope; retain any distinct rule assertion in a simpler case. If a genuine
+  framework regression needs coverage, place it in the owning framework/helper
+  suite rather than duplicating it across rules. Do not edit unrelated PRs unless
+  that cleanup is explicitly part of the task.
+- Keep migration fixtures and corpus comparisons that explain Swagger/TypeSpec
+  differences in the migration harness. They do not automatically become native
+  rule unit tests; record why a framework-only fixture is not ported.
+
+For example, a summary/documentation equality rule needs equality, inequality,
+missing-value, normalization, and supported-declaration cases. A fake imported
+package proving that the linter filters library declarations adds no coverage of
+that predicate. A rule that implements its own service guard does need included
+and excluded service cases.
+
+This boundary incorporates the
+[review feedback on #5507](https://github.com/Azure/typespec-azure/pull/5507#discussion_r4093555025).
+
 ## Contract-driven coverage
 
-Map each relevant decision in the
+Map each rule-owned decision in the
 [native rule contract](../typespec-lint-discovery/SKILL.md#native-rule-contract)
-to a concrete test. Apply the following dimensions when the rule exercises them,
-not as an unconditional test matrix for every rule:
+to a concrete test, applying the [responsibility boundary](#rule-test-responsibility-boundary)
+first. The dimensions below are not an unconditional test matrix for every rule:
 
 - Prove ordinary compliant authoring and a realistic violating customization.
   In template-based libraries such as ARM, use standard operation templates for
@@ -44,9 +81,9 @@ not as an unconditional test matrix for every rule:
   offending properties, shared/inherited declarations, missing-member fallback,
   and no redundant aggregate warning when property findings already cover it.
   Equal Swagger totals are not a substitute for this native diagnostic contract.
-- Test the intended applicability boundary: direct enablement, nested namespaces,
-  unrelated services, and imported declarations when relevant. Pair exclusion
-  cases with an included violation so filtering cannot pass by checking nothing.
+- Test custom applicability decisions implemented by the rule, not standard
+  framework filtering or enablement. Pair rule-owned exclusion cases with an
+  included violation so the custom guard cannot pass by checking nothing.
 - For SDK-name policies, test overrides in both directions: a common override
   that fixes a source name and one that makes it invalid. Cover language-scoped
   overrides, aliases/inheritance, fallback naming, and independence from emitted
@@ -55,9 +92,10 @@ not as an unconditional test matrix for every rule:
 - Exercise every added resolver/special case with supported authoring. Preserve
   rejection or comparison evidence for intentional migration gaps without
   expanding the production contract to unsupported inputs.
-- Remove a redundant test only after identifying the retained assertion that
-  proves its behavior. Template tests asserting only custom-query diagnostics,
-  for example, can also prove standard parameters are not reported.
+- Before removing a case, check for distinct rule-owned assertions to retain;
+  framework-only cases need no replacement in the rule suite. Template tests
+  asserting only custom-query diagnostics, for example, can also prove standard
+  parameters are not reported by the rule.
 
 Compile documentation examples through the repository's existing example or
 test workflow when available. A plausible-looking template snippet is not

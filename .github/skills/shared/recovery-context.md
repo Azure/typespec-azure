@@ -198,10 +198,13 @@ population and selected comparison population rather than asserting equality.
 Unknown cleanup paths, mismatched hashes, external failures and uncertain
 publication remain hard stops.
 
-For rules that traverse models, include cycles, shared sibling models, shared
-models across operations, and imported diagnostic targets in the regression
-matrix before source publication. State the intended diagnostic unit (unique
-declaration or payload path) and assert counts and targets accordingly. Do not
+For custom model traversal implemented by a rule, include relevant cycles,
+shared sibling models, shared models across operations, and diagnostic targets
+in the regression matrix before source publication. Apply the
+[rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary):
+do not require imported-library exclusion or ordinary compiler traversal tests
+in each rule suite. State the intended diagnostic unit (unique declaration or
+payload path) and assert rule-owned counts and targets accordingly. Do not
 automatically change a rule to path-local visitation solely to satisfy this
 matrix; its semantics still require evidence.
 

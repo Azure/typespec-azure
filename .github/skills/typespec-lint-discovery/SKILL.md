@@ -49,7 +49,10 @@ Record these decisions in the brief before implementation:
 - **Implementation surface:** compare a sibling rule and the supported
   compiler/TypeKit/library APIs. For each proposed custom resolver, traversal, or
   special case, name a supported input that requires it and the test that will
-  prove that requirement. Mark unresolved API questions explicitly.
+  prove that requirement. Separate rule-owned decisions from guarantees supplied
+  by those APIs or the linter framework; apply the
+  [rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary)
+  when planning coverage. Mark unresolved API questions explicitly.
 - **Diagnostic contract:** specify the unit (property, operation, model, etc.),
   authored target, expected multiplicity, exemptions, and concise corrective
   message. Extra diagnostics and suppressed duplicates are behavior decisions.
