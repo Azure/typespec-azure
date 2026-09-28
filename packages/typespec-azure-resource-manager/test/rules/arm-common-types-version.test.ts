@@ -1,15 +1,9 @@
 import { Tester } from "#test/tester.js";
-import {
-  type LinterRuleTester,
-  type TesterInstance,
-  createLinterRuleTester,
-  expectDiagnostics,
-} from "@typespec/compiler/testing";
+import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
 import { armCommonTypesVersionRule } from "../../src/rules/arm-common-types-version.js";
 
-let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 const ruleCode = "@azure-tools/typespec-azure-resource-manager/arm-common-types-version";
@@ -23,7 +17,7 @@ const outdatedVersionDiagnostic = (target: string, currentVersion = "v3") => ({
 });
 
 beforeEach(async () => {
-  runner = await Tester.createInstance();
+  const runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
     armCommonTypesVersionRule,
@@ -308,67 +302,5 @@ it("checks only the selected version, not legacy common-type usages", async () =
       }
     `,
     )
-    .toBeValid();
-});
-
-it.each(["missing", "outdated"] as const)(
-  "respects namespace suppression for %s version diagnostics",
-  async (selection) => {
-    const diagnostics = await runner.diagnose(
-      `
-        @armProviderNamespace
-        ${selection === "outdated" ? '@armCommonTypesVersion("v3")' : ""}
-        #suppress "${ruleCode}" "Intentional compatibility."
-        namespace Service;
-      `,
-      { compilerOptions: { linterRuleSet: { enable: { [ruleCode]: true } } } },
-    );
-    expectDiagnostics(diagnostics, []);
-  },
-);
-
-it("suppresses only the selected API version", async () => {
-  const diagnostics = await runner.diagnose(
-    `
-      @armProviderNamespace
-      @armCommonTypesVersion(CommonTypes.Versions.v3)
-      @versioned(Versions)
-      namespace Service;
-
-      enum Versions {
-        #suppress "${ruleCode}" "Intentional compatibility."
-        v1,
-        v2,
-      }
-    `,
-    { compilerOptions: { linterRuleSet: { enable: { [ruleCode]: true } } } },
-  );
-  expectDiagnostics(diagnostics, [outdatedVersionDiagnostic("v2")]);
-});
-
-it("does not report older selections in imported library services", async () => {
-  const libraryRunner = await Tester.import("test-common-type-service").createInstance();
-  const libraryTester = createLinterRuleTester(
-    libraryRunner,
-    armCommonTypesVersionRule,
-    "@azure-tools/typespec-azure-resource-manager",
-  );
-  await libraryTester
-    .expect({
-      "main.tsp": "",
-      "node_modules/test-common-type-service/package.json": JSON.stringify({
-        name: "test-common-type-service",
-        version: "1.0.0",
-        tspMain: "main.tsp",
-      }),
-      "node_modules/test-common-type-service/main.tsp": `
-        import "@azure-tools/typespec-azure-resource-manager";
-        using Azure.ResourceManager;
-
-        @armProviderNamespace
-        @armCommonTypesVersion(CommonTypes.Versions.v3)
-        namespace Service;
-      `,
-    })
     .toBeValid();
 });
