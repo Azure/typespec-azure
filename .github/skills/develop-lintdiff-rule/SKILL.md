@@ -328,6 +328,10 @@ layer/API, a sibling-rule comparison, the diagnostic unit/target, and test
 evidence for custom complexity. Keep intentional parity differences separate
 from unresolved gaps.
 
+Apply the [rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary)
+to native unit tests. Keep framework-only migration evidence in the fixture or
+comparison harness rather than duplicating it in each rule suite.
+
 Apply the [native rule documentation contract](../typespec-lint-implement/SKILL.md#native-rule-documentation)
 to the user-facing explanation and examples in `rule.md`. Keep emitted-reference
 comparisons and legacy validator mechanics in a dedicated migration section,
@@ -547,10 +551,11 @@ neighboring rules in the intended official destination.
   applicability predicate. `resolveProviderNamespace(program, namespace)` searches
   that namespace and its descendants, not its ancestors; it does not establish
   whether an operation is inside an ARM provider.
-- Document the intended promotion adaptation in `rule.md`. Native ARM tests should
-  cover ordinary and nested namespaces without an unnecessary provider decorator
-  when the selected official ruleset is the applicability boundary. Filtering
-  library declarations and non-endpoint templates is a separate concern.
+- Document the intended promotion adaptation in `rule.md`. A minimal native ARM
+  case without a provider decorator can prove removal of an unnecessary guard
+  when the selected official ruleset is the applicability boundary. Add nested
+  namespaces only for rule-owned namespace logic; do not require library or
+  template-filtering tests for framework behavior.
 
 ### 3. Run focused validation
 
@@ -803,8 +808,11 @@ The reviewer must:
   check sibling naming and API choices, realistic template customizations,
   necessary scope guards, exact diagnostic targets/counts, and concise messages
   independently of Swagger parity
-- for model-traversal rules, cover cycles, shared siblings, shared models across
-  operations and imported diagnostic targets; assert the intended diagnostic
+- reject framework-only native unit tests; require a distinct rule-owned
+  predicate, target, or regression for each retained case
+- for custom model traversal implemented by the rule, cover relevant cycles,
+  shared siblings, shared models across operations, and diagnostic targets;
+  assert the intended diagnostic
   unit/count and targeting, as described in the
   [regression matrix](../shared/recovery-context.md#bounded-corrections-and-earlier-regressions)
 - verify that production rule imports and reachable helpers respect the native

@@ -29,7 +29,11 @@ If the semantics are still fuzzy, use `/typespec-lint-discovery` first.
 2. Implement the smallest correct design that fully satisfies the current rule brief.
 3. Reuse existing helpers and conventions before creating new abstractions.
 4. Keep diagnostics explicit, actionable, and consistent with the surrounding package.
-5. Identify the minimum validation coverage that should exist after the implementation lands.
+5. Identify the minimum validation coverage for the rule's predicate, supported
+   target kinds, and diagnostics, following the
+   [rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary).
+   Do not copy neighboring framework-only tests or add production guards merely
+   to justify such tests.
 6. Hand off to `/typespec-lint-validate` with a clear statement of what should now be proven.
 
 ## Implementation checkpoints
