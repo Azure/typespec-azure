@@ -66,19 +66,15 @@ describe("use-standard-lro-error", () => {
     expect(imports).not.toContain("@typespec/compiler/experimental");
   });
 
-  it("accepts common-type errors, model-is copies, and nullable standard errors", async () => {
+  it("accepts common-type errors, aliases, and nullable standard errors", async () => {
     await tester
       .expect(
         `${header}
-        model Copy is CommonTypes.ErrorResponse;
-        model CopyAgain is Copy;
         alias StandardError = CommonTypes.ErrorResponse;
         @route("/standard") op standard is Lro<CommonTypes.ErrorResponse>;
-        @route("/copy") op copy is Lro<Copy>;
-        @route("/copy-again") op copyAgain is Lro<CopyAgain>;
         @route("/alias") op aliasError is Lro<StandardError>;
         @route("/nullable") op nullable is Lro<CommonTypes.ErrorResponse | null>;
-        @route("/nullable-copy") op nullableCopy is Lro<CopyAgain | null>;
+        @route("/nullable-alias") op nullableAlias is Lro<StandardError | null>;
       `,
       )
       .toBeValid();
@@ -108,7 +104,7 @@ describe("use-standard-lro-error", () => {
     "{ ...CommonTypes.ErrorResponse; @statusCode status: 400; @header requestId: string; }",
     "SpreadError",
     "CopiedError",
-  ])("accepts a standard error payload wrapped with HTTP metadata: %s", async (response) => {
+  ])("rejects implicit standard error wrappers with HTTP metadata: %s", async (response) => {
     await tester
       .expect(
         `${header}
@@ -125,8 +121,42 @@ describe("use-standard-lro-error", () => {
         op wrapped(): Accepted | ${response};
       `,
       )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
+  it("accepts direct and explicit standard error bodies with HTTP metadata", async () => {
+    await tester
+      .expect(
+        `${header}
+        model ExplicitError {
+          @statusCode status: 400;
+          @header requestId: string;
+          @body body: CommonTypes.ErrorResponse;
+        }
+        @Azure.Core.pollingOperation(poll) @route("/direct") @post
+        op direct(): Accepted | CommonTypes.ErrorResponse;
+        @Azure.Core.pollingOperation(poll) @route("/explicit") @post
+        op explicit(): Accepted | ExplicitError;
+      `,
+      )
       .toBeValid();
   });
+
+  it.each(["Copy", "CopyAgain", "CopyAgain | null", "Spread", "{ ...CommonTypes.ErrorResponse; }"])(
+    "rejects unchanged copies and spreads of the standard error: %s",
+    async (payload) => {
+      await tester
+        .expect(
+          `${header}
+          model Copy is CommonTypes.ErrorResponse;
+          model CopyAgain is Copy;
+          model Spread { ...CommonTypes.ErrorResponse; }
+          @route("/copy") op copy is Lro<${payload}>;
+        `,
+        )
+        .toEmitDiagnostics([diagnostic]);
+    },
+  );
 
   it.each(["Copy", "CopyAgain", "CopyAgain | null", "{ ...CopyAgain; }"])(
     "rejects a model-is copy with an added payload field: %s",
@@ -214,7 +244,7 @@ describe("use-standard-lro-error", () => {
       .toEmitDiagnostics([diagnostic]);
   });
 
-  it("does not let an external reference override the standard TypeSpec model", async () => {
+  it("rejects a model-is copy regardless of its external reference", async () => {
     await tester
       .expect(
         `${header}
@@ -223,7 +253,7 @@ describe("use-standard-lro-error", () => {
         @route("/copy") op copy is Lro<Copy>;
       `,
       )
-      .toBeValid();
+      .toEmitDiagnostics([diagnostic]);
   });
 
   it.each(["v3", "v4", "v5", "v6"])(

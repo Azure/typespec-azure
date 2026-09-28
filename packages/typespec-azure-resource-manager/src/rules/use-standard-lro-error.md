@@ -2,11 +2,11 @@ Non-GET long-running ARM operations must define at least one default, 4xx, or 5x
 error response and use `Azure.ResourceManager.CommonTypes.ErrorResponse` for every
 such response body.
 
-Aliases, unchanged `model is` copies, and nullable unions with a single non-null
-standard error type are accepted. Responses may wrap the standard payload with
-HTTP status codes and headers, including by spreading `CommonTypes.ErrorResponse`
-into a response model. The rule checks the body after HTTP metadata is removed.
-Copies that add payload fields or an indexer are not accepted.
+The response body must use the standard model directly. Aliases and nullable
+unions with a single non-null standard error type are accepted. `model is` copies
+and spreads are not accepted, even when they have the same properties as the
+standard model. Responses with HTTP status codes or headers can use an explicit
+`@body` property whose type is `CommonTypes.ErrorResponse`.
 
 ## Impact
 
@@ -54,17 +54,17 @@ interface Widgets {
 
 `ArmResourceActionAsync` uses the standard `ErrorResponse` by default.
 
-When an error response needs HTTP metadata, keep its payload standard:
+When an error response needs HTTP metadata, use the standard model as its explicit body:
 
 ```tsp
 model Failure {
-  ...CommonTypes.ErrorResponse;
   @statusCode status: 400;
   @header requestId: string;
+  @body body: CommonTypes.ErrorResponse;
 }
 ```
 
-The status code and header are not payload fields, so this wrapper is accepted.
+The body references the standard model directly; it does not copy or spread its properties.
 
 ## LintDiff Equivalent
 
