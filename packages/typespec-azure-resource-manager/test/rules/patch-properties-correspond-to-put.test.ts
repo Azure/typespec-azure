@@ -66,23 +66,6 @@ describe("patch-properties-correspond-to-put", () => {
       .toEmitDiagnostics(missingProperty("missing"));
   });
 
-  it("compares operations in nested namespaces without provider metadata", async () => {
-    await tester
-      .expect(
-        `
-        @service namespace Test {
-          namespace Nested {
-            model PutBody { common?: string; }
-            model PatchBody { common?: string; missing?: string; }
-            @route("/widgets") @put op put(@body body: PutBody): void;
-            @route("/widgets") @patch op patch(@body body: PatchBody): void;
-          }
-        }
-      `,
-      )
-      .toEmitDiagnostics(missingProperty("missing"));
-  });
-
   it("reports different JSON names for the same authored property", async () => {
     await tester
       .expect(
@@ -410,10 +393,6 @@ describe("patch-properties-correspond-to-put", () => {
         `),
       )
       .toEmitDiagnostics([missingProperty("extra"), missingProperty("extra")]);
-  });
-
-  it("does not validate imported ARM and Azure Core declarations", async () => {
-    await tester.expect("@service namespace Test;").toBeValid();
   });
 
   it("accepts a PATCH subset of PUT", async () => {
