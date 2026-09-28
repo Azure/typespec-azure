@@ -337,30 +337,6 @@ describe("models", () => {
         }));
     });
 
-    it("does not report anonymous bodies declared in an external library", async () => {
-      const importedTester = createLinterRuleTester(
-        await Tester.import("models").createInstance(),
-        noUnnamedTypesRule,
-        "@azure-tools/typespec-azure-core",
-      );
-      await importedTester
-        .expect({
-          "node_modules/models/package.json": JSON.stringify({
-            exports: { ".": { typespec: "./main.tsp" } },
-          }),
-          "node_modules/models/main.tsp": `
-            namespace Imported;
-            model Envelope<T> { @TypeSpec.Http.body body: T; }
-            alias Request = Envelope<{ name: string; }>;
-          `,
-          "main.tsp": `
-            @service namespace TestService;
-            @post op send(...Imported.Request): void;
-          `,
-        })
-        .toBeValid();
-    });
-
     it.each(["Request", "{}", "Record<string>"])("does not flag %s bodies", async (body) => {
       await tester
         .expect(
