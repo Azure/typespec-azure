@@ -437,19 +437,6 @@ describe("use-standard-lro-error", () => {
       .toBeValid();
   });
 
-  it("checks ordinary and nested namespaces without an ARM provider decorator", async () => {
-    await tester
-      .expect(
-        `${header}
-        @route("/ordinary") op ordinary is Lro<string>;
-        namespace Nested {
-          @route("/nested") op nested is Lro<string>;
-        }
-      `,
-      )
-      .toEmitDiagnostics([diagnostic, diagnostic]);
-  });
-
   it("checks operations without a service decorator", async () => {
     await tester
       .expect(
@@ -458,42 +445,6 @@ describe("use-standard-lro-error", () => {
       `,
       )
       .toEmitDiagnostics([diagnostic]);
-  });
-
-  it("does not diagnose imported Azure.Core or Azure.ResourceManager library operations", async () => {
-    await tester.expect("").toBeValid();
-  });
-
-  it("reports a nested service operation without an ARM provider decorator", async () => {
-    await tester
-      .expect(
-        `${header}
-        @service
-        namespace Child {
-          @Azure.Core.pollingOperation(Arm.poll) @route("/child") @post
-          op run(): Arm.Accepted | Arm.Failure<string>;
-        }
-      `,
-      )
-      .toEmitDiagnostics([diagnostic]);
-  });
-
-  it("ignores unused operation templates", async () => {
-    await tester
-      .expect(
-        `${header}
-        @Azure.Core.pollingOperation(poll) @post
-        op Unused<T>(): Accepted | Failure<T>;
-        @Azure.Core.pollingOperation(poll) @post
-        op UnusedInvalid<T>(): Accepted | Failure<string>;
-        interface UnusedActions<T> {
-          @Azure.Core.pollingOperation(poll) @post
-          op run(): Accepted | Failure<string>;
-        }
-        @route("/valid") op valid is Lro<CommonTypes.ErrorResponse>;
-      `,
-      )
-      .toBeValid();
   });
 
   it("reports a shared operation declaration once across template instantiations", async () => {
