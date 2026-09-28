@@ -1,5 +1,11 @@
-import { createRule, fileRef, paramMessage } from "@typespec/compiler";
-import { getAllHttpServices, type HttpStatusCodeRange } from "@typespec/http";
+import {
+  createRule,
+  fileRef,
+  isTemplateDeclarationOrInstance,
+  paramMessage,
+} from "@typespec/compiler";
+import { getHttpOperation, type HttpStatusCodeRange } from "@typespec/http";
+import { isTemplatedInterfaceOperation } from "./utils.js";
 
 const allowedStatusCodes = new Set<number | "*">([200, 201, 202, 204, "*"]);
 
@@ -14,21 +20,24 @@ export const useStandardResponseCodesRule = createRule({
   },
   create(context) {
     return {
-      root: () => {
-        const [services] = getAllHttpServices(context.program);
-        for (const service of services) {
-          for (const { operation, responses } of service.operations) {
-            for (const response of responses) {
-              if (isDisallowedStatusCode(response.statusCodes)) {
-                context.reportDiagnostic({
-                  target: operation,
-                  format: {
-                    operationName: operation.name,
-                    statusCode: formatStatusCode(response.statusCodes),
-                  },
-                });
-              }
-            }
+      operation: (operation) => {
+        if (
+          isTemplateDeclarationOrInstance(operation) ||
+          isTemplatedInterfaceOperation(operation)
+        ) {
+          return;
+        }
+
+        const [httpOperation] = getHttpOperation(context.program, operation);
+        for (const response of httpOperation.responses) {
+          if (isDisallowedStatusCode(response.statusCodes)) {
+            context.reportDiagnostic({
+              target: operation,
+              format: {
+                operationName: operation.name,
+                statusCode: formatStatusCode(response.statusCodes),
+              },
+            });
           }
         }
       },

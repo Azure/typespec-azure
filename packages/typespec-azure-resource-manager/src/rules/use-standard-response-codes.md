@@ -9,9 +9,10 @@ response status produces a warning on the operation. Distinct endpoints or
 statuses are not collapsed merely because they share a source location.
 Uninstantiated operation templates are not endpoints.
 
-The rule is intended for ARM specifications and does not require a provider
-namespace decorator when explicitly enabled. It is registered as disabled in
-the Azure resource manager ruleset.
+The rule is intended for ARM specifications and does not require `@service` or
+a provider namespace decorator when explicitly enabled. It also checks operations
+outside declared services. It is registered as disabled in the Azure resource
+manager ruleset.
 
 ## Impact
 

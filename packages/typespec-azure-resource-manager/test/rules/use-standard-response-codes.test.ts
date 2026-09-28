@@ -194,28 +194,28 @@ it("checks nested namespaces without provider metadata", async () => {
     .toEmitDiagnostics([diagnostic("read", 302)]);
 });
 
-it("excludes imported library endpoints while checking project endpoints", async () => {
+it.each(["", "namespace Contoso;", "namespace Contoso.Nested;"])(
+  "checks operations without service metadata: %s",
+  async (namespace) => {
+    await tester
+      .expect(`${namespace} @get op read(): { @statusCode status: 404; };`)
+      .toEmitDiagnostics([diagnostic("read", 404)]);
+  },
+);
+
+it("checks operations outside a declared service", async () => {
   await tester
-    .expect({
-      "node_modules/response-library/package.json": JSON.stringify({
-        name: "response-library",
-        version: "1.0.0",
-        tspMain: "main.tsp",
-      }),
-      "node_modules/response-library/main.tsp": `
-        import "@typespec/http";
-        using TypeSpec.Http;
-        @service namespace Library {
-          @get op libraryRead(): { @statusCode status: 500; };
+    .expect(
+      `
+        @service namespace Service {
+          @get op read(): { @statusCode status: 200; };
+        }
+        namespace Outside {
+          @get op readOutside(): { @statusCode status: 404; };
         }
       `,
-      "extra.tsp": `import "response-library";`,
-      "main.tsp": `
-        ${header}
-        @get op read(): { @statusCode status: 404; };
-      `,
-    })
-    .toEmitDiagnostics([diagnostic("read", 404)]);
+    )
+    .toEmitDiagnostics([diagnostic("readOutside", 404)]);
 });
 
 it("checks standard ARM read response customizations", async () => {
