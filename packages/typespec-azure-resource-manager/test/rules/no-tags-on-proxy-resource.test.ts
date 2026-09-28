@@ -134,7 +134,7 @@ describe("codefix", () => {
 });
 
 describe("valid cases", () => {
-  it("does not diagnose library types or non-resource models", async () => {
+  it("does not diagnose non-resource models", async () => {
     await tester.expect("model Other { tags?: Record<string>; }").toBeValid();
   });
 
