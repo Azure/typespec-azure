@@ -101,13 +101,11 @@ export class ImportManager {
   addForType(type: go.Client | go.Type): void {
     switch (type.kind) {
       case "map":
-        this.addForType(type.valueType);
+      case "slice":
+        this.addForType(type.itemType);
         break;
       case "ptr":
         this.addForType(type.ptrType);
-        break;
-      case "slice":
-        this.addForType(type.elementType);
         break;
       case "client":
       case "constant":
