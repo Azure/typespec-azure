@@ -15,7 +15,6 @@ import { noErrorStatusCodesRule } from "./rules/no-error-status-codes.js";
 import { noExplicitRoutesResourceOps } from "./rules/no-explicit-routes-resource-ops.js";
 import { noGenericNumericRule } from "./rules/no-generic-numeric.js";
 import { noHeaderExplodeRule } from "./rules/no-header-explode.js";
-import { noIdenticalSummaryAndDescriptionRule } from "./rules/no-identical-summary-and-description.js";
 import { noLegacyUsage } from "./rules/no-legacy-usage.js";
 import { noMultipleDiscriminatorRule } from "./rules/no-multiple-discriminator.js";
 import { noNullableRule } from "./rules/no-nullable.js";
@@ -24,6 +23,7 @@ import { noOpenapiClientExtensionsRule } from "./rules/no-openapi-client-extensi
 import { noOpenAPIRule } from "./rules/no-openapi.js";
 import { noPrivateUsage } from "./rules/no-private-usage.js";
 import { noQueryExplodeRule } from "./rules/no-query-explode.js";
+import { noRedundantSummaryRule } from "./rules/no-redundant-summary.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRouteParameterNameMismatchRule } from "./rules/no-route-parameter-name-mismatch.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
@@ -68,7 +68,7 @@ const rules = [
   noOpenAPIRule,
   noUnnamedTypesRule,
   noHeaderExplodeRule,
-  noIdenticalSummaryAndDescriptionRule,
+  noRedundantSummaryRule,
   preventFormatRule,
   noMultipleDiscriminatorRule,
   preventRestLibraryInterfaces,

@@ -73,8 +73,8 @@ describe("expect all rules to be defined", () => {
     }
   });
 
-  it("keeps identical operation documentation guidance opt-in", () => {
-    const ruleName = "@azure-tools/typespec-azure-core/no-identical-summary-and-description";
+  it("keeps redundant summary guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/no-redundant-summary";
     for (const rulesetName of ["data-plane", "resource-manager"]) {
       strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
     }
