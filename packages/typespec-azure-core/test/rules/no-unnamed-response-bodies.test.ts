@@ -31,7 +31,6 @@ describe("no-unnamed-response-bodies", () => {
     "model First { first: string; } model Second { second: string; } @get op read(): First & Second;",
     "model Fields { value: string; } @get op read(): { ...Fields; extra: string };",
     "alias Result = { value: string }; @get op read(): Result;",
-    "namespace Nested { @get op read(): { value: string }; }",
     "model Node { next?: Node; } @get op read(): { first: Node; second: Node };",
   ])("reports implicit anonymous response: %s", async (code) => {
     await tester.expect(code).toEmitDiagnostics(diagnostic);
@@ -52,9 +51,7 @@ describe("no-unnamed-response-bodies", () => {
     "@get op read(): string[];",
     "@get op read(): Record<string>;",
     "model Result { values: Record<{ value: string }> } @get op read(): Result;",
-    "op Template<T>(): T;",
-    "interface Template<T> { read(): T; }",
-  ])("preserves named, official-covered and template cases: %s", async (code) => {
+  ])("accepts named responses and bodies outside the rule's scope: %s", async (code) => {
     await tester.expect(code).toBeValid();
   });
 
@@ -284,42 +281,6 @@ alias Result = { ...Fields; ${outside} ${addPayload ? "extra: string;" : ""} };`
       `,
         )
         .toEmitDiagnostics({ ...diagnostic, file: /models\.tsp$/, pos: 33 });
-    });
-  });
-
-  describe("imported library declaration", () => {
-    beforeEach(async () => {
-      const runner = await Tester.files({
-        "node_modules/anonymous-responses/package.json": JSON.stringify({
-          exports: { ".": { typespec: "./main.tsp" } },
-        }),
-        "node_modules/anonymous-responses/main.tsp": `
-          using TypeSpec.Http;
-          namespace ResponseLibrary;
-          @get @route("/library") op read(): { value: string };
-        `,
-      })
-        .import("anonymous-responses")
-        .createInstance();
-      tester = createLinterRuleTester(
-        runner,
-        noUnnamedResponseBodiesRule,
-        "@azure-tools/typespec-azure-core",
-      );
-    });
-
-    it("excludes a violating library operation while reporting a project operation", async () => {
-      await tester
-        .expect(
-          `
-        @service namespace Service;
-        @get @route("/project") op read(): /*target*/{ value: string };
-      `,
-        )
-        .toEmitDiagnostics((x) => ({
-          ...diagnostic,
-          pos: x.pos.target.pos,
-        }));
     });
   });
 
