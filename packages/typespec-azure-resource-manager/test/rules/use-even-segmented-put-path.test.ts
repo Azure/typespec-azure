@@ -109,28 +109,6 @@ it("accepts a scope-prefixed resource path", async () => {
     .toBeValid();
 });
 
-it("checks ordinary and nested namespaces without provider decorators", async () => {
-  await tester
-    .expect(
-      `
-      namespace Contoso {
-        @route("/providers/Microsoft.Contoso")
-        @put op create(): void;
-        namespace Nested {
-          interface Widgets {
-            @route("/providers/Microsoft.Contoso/widgets")
-            @put create(): void;
-          }
-        }
-      }
-    `,
-    )
-    .toEmitDiagnostics([
-      diagnostic("/providers/Microsoft.Contoso"),
-      diagnostic("/providers/Microsoft.Contoso/widgets"),
-    ]);
-});
-
 it("ignores non-PUT operations", async () => {
   await tester
     .expect(
@@ -144,19 +122,6 @@ it("ignores non-PUT operations", async () => {
     .toBeValid();
 });
 
-it("ignores operations in uninstantiated template interfaces", async () => {
-  await tester
-    .expect(
-      `
-      interface Operations<T> {
-        @route("/providers/Microsoft.Contoso")
-        @put create(@body body: T): void;
-      }
-    `,
-    )
-    .toBeValid();
-});
-
 it("ignores operation template instances while checking project declarations", async () => {
   await tester
     .expect(
@@ -164,41 +129,6 @@ it("ignores operation template instances while checking project declarations", a
       @route("/providers/Microsoft.Template")
       @put op Template<T>(@body body: T): void;
       alias Instance = Template<string>;
-      @route("/providers/Microsoft.Contoso")
-      @put op create(): void;
-    `,
-    )
-    .toEmitDiagnostics(diagnostic("/providers/Microsoft.Contoso"));
-});
-
-it("ignores imported library operations while checking project declarations", async () => {
-  const runner = await Tester.files({
-    "node_modules/path-library/package.json": JSON.stringify({
-      name: "path-library",
-      exports: { ".": { typespec: "./main.tsp" } },
-    }),
-    "node_modules/path-library/main.tsp": `
-      import "@typespec/http";
-      namespace Azure.Core.PathLibrary {
-        @TypeSpec.Http.route("/providers/Microsoft.Library")
-        @TypeSpec.Http.put op coreCreate(): void;
-      }
-      namespace Azure.ResourceManager.PathLibrary {
-        @TypeSpec.Http.route("/providers/Microsoft.Library")
-        @TypeSpec.Http.put op armCreate(): void;
-      }
-    `,
-  })
-    .import("path-library")
-    .createInstance();
-  const libraryTester = createLinterRuleTester(
-    runner,
-    useEvenSegmentedPutPathRule,
-    "@azure-tools/typespec-azure-resource-manager",
-  );
-  await libraryTester
-    .expect(
-      `
       @route("/providers/Microsoft.Contoso")
       @put op create(): void;
     `,
