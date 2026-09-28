@@ -148,6 +148,10 @@ Emitters can get first-level clients of a client package from `SdkPackage.client
 
 `SdkClientType.versionsEnum` is the [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) describing the API versions supported by this client's service (its `usage` includes the `ApiVersionEnum` flag, and it is the same object that appears in `SdkPackage.enums`). It is `undefined` for unversioned services and for multi-service root clients (which span more than one service). Sub clients that map to a single service still expose their own service's `versionsEnum`.
 
+`SdkClientType.authentication` preserves the service's HTTP authentication requirements as an `Authentication` object. Each entry in `authentication.options` is an alternative authentication option (OR), while every scheme within one option is required together (AND). `NoAuth` remains an explicit scheme, including when it is the only option. The property is `undefined` when the client has no associated service or the service does not declare authentication. For a client that combines multiple services, it describes the first service, consistent with the client's endpoint and credential metadata.
+
+When `exportTCGCoutput` generates `tcgc-output.yaml`, the serialized authentication value preserves the option and scheme grouping but omits each scheme's compiler `model` reference.
+
 `SdkClientType.clientInitialization` tells emitters how to initialize the client. [`SdkClientInitializationType`](../reference/js-api/interfaces/sdkclientinitializationtype/) contains info about the client's initialization parameters and how the client can be initialized, controlled by the `initializedBy` flags:
 
 - `Individually` (1): The client can be instantiated directly by the user.
