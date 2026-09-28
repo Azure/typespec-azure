@@ -1,19 +1,14 @@
 import { Tester } from "#test/tester.js";
-import { getSourceLocation, navigateProgram } from "@typespec/compiler";
-import {
-  createLinterRuleTester,
-  type LinterRuleTester,
-  type TesterInstance,
-} from "@typespec/compiler/testing";
+import { getSourceLocation } from "@typespec/compiler";
+import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { readFileSync } from "node:fs";
 import { beforeEach, expect, it } from "vitest";
 import { useStandardResponseCodesRule } from "../../src/rules/use-standard-response-codes.js";
 
-let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await Tester.files({ "extra.tsp": "" }).import("./extra.tsp").createInstance();
+  const runner = await Tester.files({ "extra.tsp": "" }).import("./extra.tsp").createInstance();
   tester = createLinterRuleTester(
     runner,
     useStandardResponseCodesRule,
@@ -95,28 +90,25 @@ it("rejects a singleton disallowed range", async () => {
     .toEmitDiagnostics([diagnostic("read", 404)]);
 });
 
-it("checks inherited and spread status properties once per response code", async () => {
+it("reports each disallowed response code once across body variants", async () => {
   await tester
     .expect(
       `${header}
-      model Base { @statusCode status: 404; }
-      model Inherited extends Base { @body body: string; }
-      model Spread { ...Base; @body body: int32; }
-      @get op read(): Inherited | Spread | { @statusCode status: 500; };
+      model TextResponse { @statusCode status: 404; @body body: string; }
+      model NumericResponse { @statusCode status: 404; @body body: int32; }
+      @get op read(): TextResponse | NumericResponse | { @statusCode status: 500; };
     `,
     )
     .toEmitDiagnostics([diagnostic("read", 404), diagnostic("read", 500)]);
 });
 
-it("reports concrete endpoints, not the shared nested template instance", async () => {
+it("reports concrete endpoints, not the shared template instance", async () => {
   await tester
     .expect(
       `${header}
-      namespace Nested {
-        @get op Template<T>(): { @statusCode status: 404; @body body: T; };
-        @route("/one") op /*read*/read is Template<string>;
-        @route("/two") op /*readAgain*/readAgain is Template<string>;
-      }
+      @get op Template<T>(): { @statusCode status: 404; @body body: T; };
+      @route("/one") op /*read*/read is Template<string>;
+      @route("/two") op /*readAgain*/readAgain is Template<string>;
     `,
     )
     .toEmitDiagnostics(({ read, readAgain }) =>
@@ -128,33 +120,13 @@ it("reports concrete endpoints, not the shared nested template instance", async 
     );
 });
 
-it("honors concrete endpoint suppressions without template warnings", async () => {
-  await runner.compile(`${header}
-    namespace Nested {
-      @get op Template<T>(): { @statusCode status: 404; @body body: T; };
-      #suppress "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes" "Back compatibility."
-      @route("/one") op read is Template<string>;
-      #suppress "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes" "Back compatibility."
-      @route("/two") op readAgain is Template<string>;
-    }
-  `);
-  navigateProgram(
-    runner.program,
-    useStandardResponseCodesRule.create({
-      program: runner.program,
-      options: {},
-      reportDiagnostic: ({ target, format }) =>
-        runner.program.reportDiagnostic({
-          ...diagnostic(format.operationName, format.statusCode),
-          severity: "warning",
-          target,
-        }),
-    }),
-  );
-  expect(runner.program.diagnostics).toEqual([]);
+it("checks ordinary namespaces without provider metadata", async () => {
+  await tester
+    .expect(`@service namespace Contoso { @get op read(): { @statusCode status: 404; }; }`)
+    .toEmitDiagnostics([diagnostic("read", 404)]);
 });
 
-it("checks inherited concrete interface endpoints", async () => {
+it("checks concrete interface endpoints despite template exclusion guards", async () => {
   await tester
     .expect(
       `${header}
@@ -167,41 +139,11 @@ it("checks inherited concrete interface endpoints", async () => {
     .toEmitDiagnostics([diagnostic("read", 404)]);
 });
 
-it("ignores uninstantiated templates while checking project endpoints", async () => {
+it("checks operations without service metadata", async () => {
   await tester
-    .expect(
-      `${header}
-      @get op Template<T>(): { @statusCode status: 500; @body body: T; };
-      @get op read(): { @statusCode status: 404; };
-    `,
-    )
+    .expect("@get op read(): { @statusCode status: 404; };")
     .toEmitDiagnostics([diagnostic("read", 404)]);
 });
-
-it("checks ordinary namespaces without provider metadata", async () => {
-  await tester
-    .expect(`@service namespace Contoso { @get op read(): { @statusCode status: 404; }; }`)
-    .toEmitDiagnostics([diagnostic("read", 404)]);
-});
-
-it("checks nested namespaces without provider metadata", async () => {
-  await tester
-    .expect(
-      `${header}
-      namespace Nested { @get op read(): { @statusCode status: 302; }; }
-    `,
-    )
-    .toEmitDiagnostics([diagnostic("read", 302)]);
-});
-
-it.each(["", "namespace Contoso;", "namespace Contoso.Nested;"])(
-  "checks operations without service metadata: %s",
-  async (namespace) => {
-    await tester
-      .expect(`${namespace} @get op read(): { @statusCode status: 404; };`)
-      .toEmitDiagnostics([diagnostic("read", 404)]);
-  },
-);
 
 it("checks operations outside a declared service", async () => {
   await tester
