@@ -9,6 +9,15 @@ inherited members and reports on the repeated property declaration. Each matchin
 name is reported once per concrete PUT operation; a declaration shared by two PUT
 operations can receive two diagnostics.
 
+This rule complements
+[`arm-resource-duplicate-property`](./arm-resource-duplicate-property.md), which
+compares properties-bag members with envelope property names on ARM resource
+models, independently of operations. For example, an envelope `name` with
+`@key("widgetName")` makes `properties.widgetName` a URI duplication only.
+Conversely, `properties.identity` duplicates an envelope `identity` only under
+the envelope rule when no URI parameter is named `identity`. Both rules can
+report a member when its name matches both an envelope property and a URI parameter.
+
 The check does not recurse into nested models, inspect top-level envelope
 duplicates, or check PATCH bodies. Template sources are skipped, but concrete
 operation aliases are checked. Provider namespace metadata is not required when
