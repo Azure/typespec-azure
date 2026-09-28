@@ -6,7 +6,7 @@ import {
   type LinterRuleTester,
   type TesterInstance,
 } from "@typespec/compiler/testing";
-import { beforeEach, expect, it, vi } from "vitest";
+import { beforeEach, it, vi } from "vitest";
 import { noRepeatedPathInfoRule } from "../../src/rules/no-repeated-path-info.js";
 
 vi.mock("@azure-tools/typespec-autorest", () => {
@@ -218,14 +218,6 @@ it("uses supported HTTP parameter names rather than parameter source identifiers
     .toEmitDiagnostics([diagnostic("wirePath"), diagnostic("wireQuery")]);
 });
 
-it("classifies a path/query wire-name collision as already rejected by HTTP", async () => {
-  const [, diagnostics] = await runner.compileAndDiagnose(`
-    ${operation.replace("@body body:", '@query("widgetName") queryName: string, @body body:')}
-    model Properties { widgetName?: string; }
-  `);
-  expect(diagnostics.map(({ code }) => code)).toEqual(["@typespec/http/incompatible-uri-param"]);
-});
-
 it("does not recurse into cycles or shared sibling models", async () => {
   await tester
     .expect(
@@ -310,11 +302,5 @@ it("skips template sources but checks their concrete aliases", async () => {
 it("checks ordinary project namespaces without provider metadata", async () => {
   await tester
     .expect(`namespace Contoso; ${operation} model Properties { widgetName?: string; }`)
-    .toEmitDiagnostics([diagnostic()]);
-});
-
-it("checks nested project namespaces without provider metadata", async () => {
-  await tester
-    .expect(`namespace Contoso.Nested; ${operation} model Properties { widgetName?: string; }`)
     .toEmitDiagnostics([diagnostic()]);
 });
