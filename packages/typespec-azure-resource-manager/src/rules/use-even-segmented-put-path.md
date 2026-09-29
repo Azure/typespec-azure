@@ -3,8 +3,8 @@ end in resource type/name pairs after the provider namespace, such as
 `/providers/Microsoft.Contoso/widgets/{widgetName}`. A singleton may use the
 literal name `default`, and nested resources add further type/name pairs.
 
-A provider root, collection path, or action-like suffix such as
-`/widgets/{widgetName}/configure` is not a resource instance path for PUT.
+A provider root, collection path, or unmatched suffix such as
+`/widgets/{widgetName}/{configurationName}` is not a resource instance path for PUT.
 Prefer standard ARM resource operation templates, which construct resource paths
 for you. This rule also checks custom PUT operations when explicitly enabled.
 
@@ -24,19 +24,28 @@ resource-management contract.
 ## ❌ Incorrect
 
 ```tsp
-@route("/providers/Microsoft.Contoso/widgets")
-@put
-op createWidget(@body widget: Widget): Widget;
+@armProviderNamespace
+namespace Microsoft.Contoso;
 
-model Widget {
-  displayName: string;
+model Widget is TrackedResource<{}> {
+  ...ResourceNameParameter<Widget>;
+}
+
+@armResourceOperations
+interface Widgets {
+  createOrUpdate is ArmResourceCreateOrReplaceSync<
+    Widget,
+    Parameters = {
+      @path configurationName: string;
+    }
+  >;
 }
 ```
 
 ## ✅ Correct
 
-Prefer a standard ARM create-or-replace template, which constructs the resource
-instance path from the resource model:
+Use the standard ARM create-or-replace template without the additional path
+parameter, so the PUT targets the resource instance:
 
 ```tsp
 @armProviderNamespace
@@ -49,19 +58,6 @@ model Widget is TrackedResource<{}> {
 @armResourceOperations
 interface Widgets {
   createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
-}
-```
-
-When a custom PUT operation is necessary, include the resource name after the
-resource type:
-
-```tsp
-@route("/providers/Microsoft.Contoso/widgets/{widgetName}")
-@put
-op createWidget(@path widgetName: string, @body widget: Widget): Widget;
-
-model Widget {
-  displayName: string;
 }
 ```
 

@@ -1,5 +1,6 @@
 import { Tester } from "#test/tester.js";
 import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
+import { readFileSync } from "node:fs";
 import { beforeEach, it } from "vitest";
 import { useEvenSegmentedPutPathRule } from "../../src/rules/use-even-segmented-put-path.js";
 
@@ -74,6 +75,35 @@ it("accepts standard ARM create-or-update templates", async () => {
     `,
     )
     .toBeValid();
+});
+
+it("validates the published ARM template examples", async () => {
+  const doc = readFileSync(
+    new URL("../../src/rules/use-even-segmented-put-path.md", import.meta.url),
+    "utf8",
+  );
+  const examples = [...doc.matchAll(/```tsp\r?\n([\s\S]*?)\r?\n```/g)].map((match) => match[1]);
+  if (examples.length !== 2) {
+    throw new Error(`Expected exactly two published TypeSpec examples, got ${examples.length}`);
+  }
+
+  await tester.expect(examples[0]).toEmitDiagnostics((result) => {
+    const main = [...result.program.sourceFiles.values()].find((file) =>
+      file.file.text.includes("createOrUpdate is ArmResourceCreateOrReplaceSync"),
+    );
+    const pos = main?.file.text.indexOf("createOrUpdate is ArmResourceCreateOrReplaceSync");
+    if (!main || pos === undefined || pos < 0) {
+      throw new Error("The published createOrUpdate operation was not compiled");
+    }
+    return {
+      ...diagnostic(
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}/{configurationName}",
+      ),
+      file: main.file.path,
+      pos,
+    };
+  });
+  await tester.expect(examples[1]).toBeValid();
 });
 
 it("accepts a singleton default resource", async () => {
