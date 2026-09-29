@@ -274,11 +274,12 @@ export interface ArmMetadataNameRequest {
   /**
    * TypeSpec declaration that owns the logical name.
    *
-   * - resource: Model
+   * - declared resource: Model
+   * - synthetic resource: undefined
    * - operation: Operation
    * - operation-group: Interface
    */
-  type: Model | Operation | Interface;
+  type?: Model | Operation | Interface;
 
   /**
    * Resource model associated with operation metadata, when available.
@@ -308,6 +309,7 @@ Reasons for this shape:
 
 - It has no TCGC imports or TCGC types.
 - A consumer can close over a `TCGCContext`, emitter language scope, or any other naming service.
+- A synthetic resource does not misrepresent its child model as an authoritative declaration.
 - One callback gives future name kinds an additive extension path.
 - `defaultName` makes fallback behavior explicit.
 - `type` is the projected type in a selected-version call.
@@ -335,6 +337,7 @@ const tcgcContext = createTCGCContext(program, emitterName);
 const provider = resolveArmResources(program, {
   version: selectedVersion,
   nameResolver: ({ kind, type }) => {
+    if (type === undefined) return undefined;
     switch (kind) {
       case "resource":
       case "operation":
@@ -411,8 +414,10 @@ declared resource record exists. A synthetic parent has no authoritative TypeSpe
 
 Track synthetic parents when they are created, for example in an internal
 `WeakSet<ResolvedResource>` owned by the resolution context or through an internal-only source
-field. Do not call the resource name resolver for a synthetic parent using the child model as a
-proxy. Retain the path-derived parent name.
+field. Invoke the resource name resolver for synthetic parents with `type: undefined` and the
+path-derived name as `defaultName`. Consumers can explicitly name these entries by matching
+`defaultName`, `resourceType`, or `resourceInstancePath` without accidentally treating the child
+model as the synthetic parent's declaration.
 
 ## Selected-version resolution
 
@@ -672,7 +677,7 @@ view.
 
 ### Resource names
 
-For each declared `ResolvedResource`, invoke:
+For each returned `ResolvedResource`, invoke:
 
 ```ts
 nameResolver({
@@ -680,7 +685,7 @@ nameResolver({
   program,
   version,
   defaultName: resource.resourceName,
-  type: resource.type,
+  type: isSyntheticResource(resource) ? undefined : resource.type,
   resourceType: `${resource.resourceType.provider}/${resource.resourceType.types.join("/")}`,
   resourceInstancePath: resource.resourceInstancePath,
 });
@@ -810,7 +815,7 @@ expresses the supported customization and preserves invariants.
 
 1. Add public callback types.
 2. Preserve the structural logical names until post-processing.
-3. Mark synthetic resources so they are excluded from model-based naming.
+3. Mark synthetic resources so naming requests omit the reused child model.
 4. Add graph-preserving copy and name transformation.
 5. Test resource, operation, and operation-group names.
 6. Add a TCGC integration test in the TCGC package using `getLibraryName`.
@@ -832,7 +837,7 @@ Phases 1 through 4 are implemented by the draft PR associated with this RFC:
   declaration view;
 - projected provider namespaces key their own derived provider cache entries;
 - logical naming runs on a graph-preserving copy and leaves structural and wire metadata intact;
-- synthetic parent resources retain their path-derived names; and
+- synthetic parent resources can be named explicitly by default name or ARM identity; and
 - TCGC integration is exercised from the consumer package by passing `getLibraryName` as the
   callback implementation, without an ARM production dependency on TCGC.
 
@@ -906,7 +911,7 @@ Verify:
 - `undefined` preserves defaults;
 - empty names report a diagnostic and preserve defaults;
 - one operation receives a consistent name everywhere it appears;
-- synthetic parent names remain path-derived;
+- synthetic parent requests omit `type` and can be renamed by default name or ARM identity;
 - wire resource type segments and paths never change; and
 - two resolvers used sequentially do not mutate each other's results.
 
