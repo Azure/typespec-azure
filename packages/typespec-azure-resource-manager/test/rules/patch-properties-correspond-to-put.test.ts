@@ -1,6 +1,12 @@
 import { Tester } from "#test/tester.js";
-import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
+import { resolvePath } from "@typespec/compiler";
+import {
+  createLinterRuleTester,
+  createTester,
+  type LinterRuleTester,
+} from "@typespec/compiler/testing";
+import { readFileSync } from "node:fs";
+import { beforeEach, describe, expect, it } from "vitest";
 import { patchPropertiesCorrespondToPutRule } from "../../src/rules/patch-properties-correspond-to-put.js";
 
 const code = "@azure-tools/typespec-azure-resource-manager/patch-properties-correspond-to-put";
@@ -17,6 +23,45 @@ beforeEach(async () => {
 });
 
 describe("patch-properties-correspond-to-put", () => {
+  describe("documentation", () => {
+    const DocumentationTester = createTester(resolvePath(import.meta.dirname, "../.."), {
+      libraries: [
+        "@typespec/http",
+        "@typespec/rest",
+        "@typespec/versioning",
+        "@azure-tools/typespec-azure-core",
+        "@azure-tools/typespec-azure-resource-manager",
+      ],
+    });
+    const examples = [
+      ...readFileSync(
+        new URL("../../src/rules/patch-properties-correspond-to-put.md", import.meta.url),
+        "utf8",
+      ).matchAll(/```typespec\r?\n([\s\S]*?)```/g),
+    ].map((match) => match[1]);
+    let documentationTester: LinterRuleTester;
+
+    beforeEach(async () => {
+      documentationTester = createLinterRuleTester(
+        await DocumentationTester.createInstance(),
+        patchPropertiesCorrespondToPutRule,
+        "@azure-tools/typespec-azure-resource-manager",
+      );
+    });
+
+    it("diagnoses the incorrect ARM documentation example", async () => {
+      expect(examples).toHaveLength(2);
+      await documentationTester
+        .expect(examples[0])
+        .toEmitDiagnostics([{ ...missingProperty("label"), target: "label" }]);
+    });
+
+    it("accepts the correct ARM documentation example", async () => {
+      expect(examples).toHaveLength(2);
+      await documentationTester.expect(examples[1]).toBeValid();
+    });
+  });
+
   it.each(["shared", "distinct"] as const)(
     "deduplicates cross-service findings by property target with %s PATCH models",
     async (models) => {

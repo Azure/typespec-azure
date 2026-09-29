@@ -51,59 +51,95 @@ cycles. This rule is a property-name check, not whole-model assignability.
 
 ## Incorrect
 
+Use standard ARM operation templates, customizing the PATCH payload through
+the named `PatchModel` argument. Here, `label` is accepted by PATCH but is absent
+from the resource properties accepted by PUT:
+
 ```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-azure-resource-manager";
+
 using TypeSpec.Http;
+using Azure.ResourceManager;
 
 @service
+@armProviderNamespace
 namespace Contoso.Widgets;
 
-model WidgetCreate {
-  name?: string;
-}
-
-model WidgetUpdate {
+model WidgetProperties {
   displayName?: string;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ResourceProvisioningState;
 }
 
-@route("/widgets/{id}")
-@put
-op createOrUpdate(@path id: string, @body body: WidgetCreate): void;
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
+}
 
-@route("/widgets/{id}")
-@patch
-op update(@path id: string, @body body: WidgetUpdate): void;
+model WidgetPatchProperties {
+  label?: string;
+}
+
+model WidgetPatch {
+  tags?: Record<string>;
+  properties?: WidgetPatchProperties;
+}
+
+@armResourceOperations
+interface Widgets {
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+  update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+}
 ```
 
-`displayName` has no corresponding JSON property in the PUT body.
+`label` has no corresponding JSON property in the PUT body.
 
 ## Correct
 
+Use the same `displayName` property in the custom PATCH payload and resource
+model. Both operations retain their standard templates:
+
 ```typespec
+import "@typespec/http";
+import "@azure-tools/typespec-azure-resource-manager";
+
 using TypeSpec.Http;
+using Azure.ResourceManager;
 
 @service
+@armProviderNamespace
 namespace Contoso.Widgets;
 
-model WidgetCreate {
-  name?: string;
+model WidgetProperties {
+  displayName?: string;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ResourceProvisioningState;
 }
 
-model WidgetUpdate {
-  name?: string;
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
 }
 
-@route("/widgets/{id}")
-@put
-op createOrUpdate(@path id: string, @body body: WidgetCreate): void;
+model WidgetPatchProperties {
+  displayName?: string;
+}
 
-@route("/widgets/{id}")
-@patch
-op update(@path id: string, @body body: WidgetUpdate): void;
+model WidgetPatch {
+  tags?: Record<string>;
+  properties?: WidgetPatchProperties;
+}
+
+@armResourceOperations
+interface Widgets {
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+  update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+}
 ```
 
-These examples use `TypeSpec.Http` decorators. In an ARM service, prefer the standard resource
-operation templates; this check also covers custom HTTP operations without requiring provider
-namespace metadata.
+This check also covers custom HTTP operations without requiring provider namespace
+metadata; the examples above demonstrate the recommended ARM resource authoring pattern.
 
 ## Versioned services
 
