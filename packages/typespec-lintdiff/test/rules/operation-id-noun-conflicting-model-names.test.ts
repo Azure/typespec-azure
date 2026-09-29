@@ -323,6 +323,57 @@ describe("operation-id-noun-conflicting-model-names", () => {
       .toEmitDiagnostics([diagnostic]);
   });
 
+  it("finds a template model whose friendly name matches the group", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        model Item { id: string; }
+        @friendlyName("Widget", T)
+        model Wrapper<T> { value: T; }
+        interface Widget {
+          @get @route("/widgets") op read(): Wrapper<Item>;
+        }`,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
+  it("ignores an unnamed template instance whose declaration matches the group", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        model Item { id: string; }
+        model Widget<T> { value: T; }
+        namespace Operations {
+          interface Widget {
+            @get @route("/widgets") op read(): Example.Widget<Item>;
+          }
+        }`,
+      )
+      .toBeValid();
+  });
+
+  it("uses a friendly name rather than the template declaration name", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        model Item { id: string; }
+        @friendlyName("Widgets", T)
+        model Widget<T> { value: T; }
+        namespace Operations {
+          interface Widget {
+            @get @route("/widgets") op read(): Example.Widget<Item>;
+          }
+        }`,
+      )
+      .toBeValid();
+  });
+
   it("reports a named scalar definition colliding with an operation group", async () => {
     await (
       await tester()
@@ -370,6 +421,61 @@ describe("operation-id-noun-conflicting-model-names", () => {
           }
         }
       `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
+  it("finds a friendly-named template union in a reachable body", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        model Item { id: string; }
+        @friendlyName("Widget", T)
+        union Choice<T> { item: T, empty: "empty", other: string }
+        namespace Operations {
+          interface Widget {
+            @get @route("/widgets") op read(): Example.Choice<"one">;
+          }
+        }`,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
+  it("ignores unnamed template unions even when their declaration collides", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        union Widget<T> { item: T, empty: "empty", other: string }
+        namespace Operations {
+          interface Widget {
+            @get @route("/widgets") op read(): Example.Widget<"one">;
+          }
+        }`,
+      )
+      .toBeValid();
+  });
+
+  it.each([
+    ["scalar", "scalar Named extends string;"],
+    ["enum", "enum Named { one }"],
+    ["union", 'union Named { "one", "two" }'],
+  ])("honors the supported client name override on a %s", async (_kind, declaration) => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        ${declaration}
+        @@clientName(Named, "Widget");
+        namespace Operations {
+          interface Widget {
+            @get @route("/widgets") op read(): Example.Named;
+          }
+        }`,
       )
       .toEmitDiagnostics([diagnostic]);
   });

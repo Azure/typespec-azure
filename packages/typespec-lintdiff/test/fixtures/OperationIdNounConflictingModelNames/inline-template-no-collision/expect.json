@@ -1,0 +1,9 @@
+{
+  "violation": false,
+  "ambientDiagnostics": [
+    "tsp-lintdiff-local-linter/path-parameter-schema",
+    "tsp-lintdiff-local-linter/security-definition-description",
+    "tsp-lintdiff-local-linter/xms-examples-required",
+    "tsp-lintdiff-local-linter/xms-examples-required"
+  ]
+}

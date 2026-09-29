@@ -3,13 +3,16 @@ import {
   createTCGCContext,
   getClientLocation,
   getClientNameOverride,
+  getLibraryName,
   type TCGCContext,
 } from "@azure-tools/typespec-client-generator-core";
 import {
   createRule,
+  getFriendlyName,
   isGlobalNamespace,
   isService,
   isTemplateDeclaration,
+  isTemplateInstance,
   paramMessage,
   type Interface,
   type Namespace,
@@ -129,8 +132,13 @@ function collectSchemas(
 
   switch (type.kind) {
     case "Model":
-      if (type.name && type.namespace === service && !isArmCommonType(type)) {
-        names.add(getClientNameOverride(tcgcContext, type) ?? type.name);
+      if (
+        type.name &&
+        type.namespace === service &&
+        !isArmCommonType(type) &&
+        (!isTemplateInstance(type) || getFriendlyName(tcgcContext.program, type))
+      ) {
+        names.add(getLibraryName(tcgcContext, type));
       }
       if (type.baseModel) collectSchemas(type.baseModel, service, tcgcContext, names, visited);
       for (const derivedModel of type.derivedModels) {
@@ -146,8 +154,13 @@ function collectSchemas(
     case "Scalar":
     case "Enum":
     case "Union":
-      if (type.name && type.namespace === service && !isArmCommonType(type)) {
-        names.add(getClientNameOverride(tcgcContext, type) ?? type.name);
+      if (
+        type.name &&
+        type.namespace === service &&
+        !isArmCommonType(type) &&
+        (!isTemplateInstance(type) || getFriendlyName(tcgcContext.program, type))
+      ) {
+        names.add(getLibraryName(tcgcContext, type));
       }
       if (type.kind !== "Union") break;
       for (const variant of type.variants.values()) {

@@ -25,6 +25,9 @@ reachable from HTTP request and response bodies; query/path/header-only types,
 unused declarations, and types in distinct nested namespaces do not create a
 conflict. A direct service operation contributes a noun only when its effective
 operation name contains an underscore.
+For template models and supported template unions, a concrete instance
+with `@friendlyName` contributes its friendly schema name; an unnamed instance
+that remains inline does not contribute its template declaration name.
 The rule honors the effective AutoRest-scoped `@clientLocation` for operations
 and `@clientName` for interfaces, namespaces, and service schema types. Because
 the validator checks the operation ID segment before the first underscore, a
