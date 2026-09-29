@@ -248,16 +248,17 @@ export class TypeAdapter {
           return <go.Slice>arrayType;
         }
 
-        const elementType = this.getWireType(
+        const wireElementType = this.getWireType(
           valueType,
           elementTypeByValue,
           substituteDiscriminator,
         );
+        const elementType =
+          wireElementType.kind === "literal" ? wireElementType.type : wireElementType;
         switch (elementType.kind) {
           case "constantDef":
           case "constantValue":
           case "etag":
-          case "literal":
             throw new AdapterError(
               "UnsupportedTsp",
               `unsupported kind ${elementType.kind} for slice element type`,
@@ -1340,6 +1341,8 @@ function recursiveKeyName(
   switch (obj.kind) {
     case "array":
       return recursiveKeyName(`${root}-array`, obj.valueType, substituteDiscriminator);
+    case "constant":
+      return recursiveKeyName(`${root}-constant`, obj.valueType, substituteDiscriminator);
     case "enum":
       return `${root}-${obj.name}`;
     case "enumvalue":
