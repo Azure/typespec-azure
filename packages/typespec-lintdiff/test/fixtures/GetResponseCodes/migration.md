@@ -46,6 +46,51 @@ diagnostics are attributable to the provider lookup defect, not to additional
 valid ARM GET violations (see the [example](#gap-example-global-sdk-override)
 below).
 
+## Reproduction commands
+
+The post-fix results were produced from rule revision
+`0ce717da87719ba843f010f8b74530d6317ebe5c` with an isolated
+`azure-rest-api-specs` worktree at
+`f6b53f105b95da05276530a0754a1c71b4f16397`. The recorded Windows run used
+`C:\dev\worktrees\azure-rest-api-specs-lintdiff-get-response-codes` for
+`$specsRepo`; substitute any checkout at the same commit. The fixture harness
+also needs the validator source at the revision linked below and the ARM
+common-types directory:
+
+```powershell
+$specsRepo = "C:\path\to\azure-rest-api-specs"
+$validatorRoot = "C:\path\to\azure-openapi-validator"
+
+git -C $specsRepo rev-parse HEAD
+# Expected: f6b53f105b95da05276530a0754a1c71b4f16397
+git -C $validatorRoot rev-parse HEAD
+# Expected: 1198225afecbb818c3050d4d2a91da92e14e56ce
+
+$env:LINTDIFF_VALIDATOR_ROOT = $validatorRoot
+$env:LINTDIFF_COMMON_TYPES = Join-Path $specsRepo "specification\common-types"
+
+mise exec -- pnpm --dir packages/typespec-lintdiff compare:setup -- --specs-repo $specsRepo
+mise exec -- pnpm --dir packages/typespec-lintdiff build
+mise exec -- pnpm --dir packages/typespec-lintdiff validate GetResponseCodes
+mise exec -- pnpm --dir packages/typespec-lintdiff specs:typespec --specs-repo $specsRepo --concurrency 6
+```
+
+The strict fixture command reports seven passing cases. The corpus command
+attempts all 468 dataset projects and rewrites
+`packages/typespec-lintdiff/specs/coverage-breakdown.{json,md}` plus the
+per-rule shards; its `GetResponseCodes` row is the source of the post-fix
+15-project/96-diagnostic comparison. These generated corpus files are
+validation artifacts and are intentionally excluded from this PR.
+
+The 121-diagnostic/20-project shard is a **pre-fix baseline**, captured before
+the provider-ancestry change and archived outside the repository; rerunning the
+command above at the post-fix revision reproduces only the post-fix population. The
+checked-in pre-run report's 120/19 row also excludes the one project that did
+not compile. A before/after rerun therefore requires the same specs commit and
+commands on `69b9fd15213d593083e55c45207f0ab887d4d6e5` and
+`0ce717da87719ba843f010f8b74530d6317ebe5c`, respectively, while retaining
+each run's generated artifacts separately.
+
 ## Comparable project sets and diagnostic identities
 
 Validator-only projects: **none**. TypeSpec-only projects: **none**. All 15
