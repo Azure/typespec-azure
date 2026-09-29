@@ -45,7 +45,7 @@
   "paths": {
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService": {
       "get": {
-        "operationId": "Widgets_List",
+        "operationId": "Widgets_ListByResourceGroup",
         "tags": [
           "Widgets"
         ],
@@ -76,7 +76,8 @@
           }
         },
         "x-ms-pageable": {
-          "nextLinkName": "nextLink"
+          "nextLinkName": "nextLink",
+          "itemName": "items"
         }
       }
     },
