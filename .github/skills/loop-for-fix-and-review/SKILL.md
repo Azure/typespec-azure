@@ -408,6 +408,10 @@ ledger. It owns these steps:
    mapping. Both agents and the parent reuse its raw-UTC parsing and array
    handling rather than generating inline PowerShell collectors. Each
    invocation writes a new evidence directory; never overwrite failed evidence.
+   In a checkout without the bundled helper, resolve its absolute path from
+   the verified authoritative instruction source as described in
+   [collector.md](collector.md#request-and-collection); keep every command's
+   working directory in the target worktree.
    Run all collector and supporting Python commands with `python -X utf8`
    (prefixed by `mise exec --` when available). Read the collector's structured,
    ASCII-escaped JSON instead of printing raw Unicode review bodies through

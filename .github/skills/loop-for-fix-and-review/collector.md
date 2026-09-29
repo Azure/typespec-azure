@@ -18,6 +18,12 @@ From the repository root, set `$collector` to
 `.github\skills\loop-for-fix-and-review\review_evidence.py`, `$repo` to the
 canonical `owner/repository`, `$pr` to its numeric PR number, and `$evidence` to
 an absolute session-artifact directory.
+If the target checkout does not contain the collector (for example, a promotion
+worktree based on `main`), use the absolute path to the bundled collector in
+the verified authoritative instruction source instead. Confirm that path exists
+and matches the instruction version recorded in the handoff. Keep the command's
+working directory in the target worktree; do not copy the helper into it or
+substitute an ad-hoc collector.
 
 ```powershell
 mise exec -- python -X utf8 $collector snapshot --repo $repo --pr $pr --output "$evidence\pre"
