@@ -45,7 +45,7 @@
   "paths": {
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService": {
       "get": {
-        "operationId": "Widgets_List2",
+        "operationId": "Widgets_ListByResourceGroup",
         "tags": [
           "Widgets"
         ],
@@ -74,9 +74,6 @@
               "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
-        },
-        "x-ms-pageable": {
-          "nextLinkName": null
         }
       }
     },

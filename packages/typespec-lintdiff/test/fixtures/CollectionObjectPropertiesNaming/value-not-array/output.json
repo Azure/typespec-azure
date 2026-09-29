@@ -45,7 +45,7 @@
   "paths": {
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService": {
       "get": {
-        "operationId": "Widgets_List",
+        "operationId": "Widgets_ListByResourceGroup",
         "tags": [
           "Widgets"
         ],
@@ -76,7 +76,8 @@
           }
         },
         "x-ms-pageable": {
-          "nextLinkName": "nextLink"
+          "nextLinkName": "nextLink",
+          "itemName": "items"
         }
       }
     },
@@ -388,13 +389,21 @@
           "type": "string",
           "description": "Incorrect scalar value property"
         },
+        "items": {
+          "type": "array",
+          "description": "List of widgets",
+          "items": {
+            "$ref": "#/definitions/Widget"
+          }
+        },
         "nextLink": {
           "type": "string",
           "description": "Next link"
         }
       },
       "required": [
-        "value"
+        "value",
+        "items"
       ]
     },
     "WidgetProperties": {
