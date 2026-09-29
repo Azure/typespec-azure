@@ -15,7 +15,9 @@ are not established. Earlier supported naming and ARM-common-type fixes
 removed proven false positives and detected ApiManagement's
 `Operation_ListByTags` and PostgreSQL's named scalar. Source repair cycle 1
 fixes friendly-named and inline template instances, verified by emitted
-Swagger fixtures; the full corpus has **no net count change**. These counts
+Swagger fixtures. Development review round 1 also excludes legacy external-reference
+models while retaining their emitted children, matching observed AutoRest output;
+the full corpus has **no net count change**. These counts
 show **partial native coverage, not functional equivalence**. Explicit
 OpenAPI overrides remain an intentional native-contract limit; unexplained
 per-operation differences remain uncertain (see
@@ -43,7 +45,12 @@ OpenAPI name belongs in this rule. Source repair cycle 1 resolves supported
 `getLibraryName`, and skips unnamed concrete template instances that remain
 inline. The latter must not be treated as definitions even if their template
 declaration has the same name as an operation group. Functional equality is
-**not** established.
+**not** established. Development review round 1 additionally excludes a model
+decorated with `@Azure.ResourceManager.Legacy.externalTypeRef` before recording
+its name because AutoRest emits the configured external `$ref` instead of a
+local definition for that model. Emitted fixture evidence disproved the review
+suggestion to stop recursion: service-local property models still become local
+definitions and remain traversed.
 
 Within each HTTP service, compare the effective AutoRest-scoped client location
 or client name of an interface operation group (or a nested, non-service
@@ -52,7 +59,10 @@ underscore, with the effective client names of _reachable_ locally defined
 models, scalars, enums, and unions directly declared in that service namespace.
 ARM common types use external definitions and are not local name candidates
 even if copied into the service namespace; their child types are still
-traversed for local definitions.
+traversed for local definitions. Legacy external-reference models are different:
+AutoRest does not emit the decorated model as a local definition, but it does
+emit reachable service-local child models; the native traversal excludes only
+the decorated model's own name.
 For a direct service operation, or an operation explicitly relocated to the
 service/global namespace, use the effective operation name only when it
 contains the underscore required by the validator. Honor relevant
@@ -107,6 +117,7 @@ reconstruction of generated names.
 | Response property `@visibility(Lifecycle.Create) hidden: Hidden`                      | Yes                                       | AutoRest retains it with `x-ms-mutability: ["create"]` and emits `definitions.Hidden`, including when unreachable types are omitted           | Warn if group is `Hidden` | Warn on operation                                    | Focused AutoRest emission reproduction; visibility filtering would incorrectly drop an emitted definition                                    |
 | `Widget` model with `@@clientName(Widget, "widget")` and group `Widget`               | Yes                                       | Effective model definition `widget` is distinct from operation group `Widget`                                                                 | No warning                | No warning                                           | ResourceHealth selected Swagger has lowercased `event`/`events` definitions; native model-override regression                                |
 | `PrivateEndpointConnection is PrivateEndpointConnectionResource` and a matching group | Yes                                       | ARM common-type model uses an external definition, not a local `PrivateEndpointConnection` definition                                         | No warning                | No warning                                           | ApiManagement selected Swagger, `isArmCommonType` and native real-inheritance regression                                                     |
+| `@Legacy.externalTypeRef(...) model Widget { child: Child }` with matching groups     | Yes                                       | AutoRest omits local `Widget` but emits `definitions.Child`; only the `Child` group conflicts                                                 | Warn for `Child` only     | Warn on the `Child` operation only                   | `external-reference-no-collision` fixture output plus native regression; emitted output corrected the review's proposed recursion guard      |
 | `Models.Widget` returned by interface `Widget`                                        | Yes                                       | Qualified definition `Models.Widget` is distinct from interface group `Widget`                                                                | No warning                | No warning                                           | Native unit test for nested model; emitter branch verified during fixture TDD                                                                |
 | Unreferenced model `Widget` and interface `Widget`                                    | Yes                                       | No reachable definition for `Widget`                                                                                                          | No warning                | No warning                                           | Native unit test for unused declaration                                                                                                      |
 | Direct `Example.read` operation and service model `Example`                           | Yes                                       | Service name is not a generated operation-group noun; the validator requires an underscored ID                                                | No warning                | No warning                                           | Native service-root regression; real `Microsoft.ConfidentialLedger.checkNameAvailability` emits `CheckNameAvailability`                      |
@@ -130,8 +141,8 @@ or generator revision; its checked-in content hash is
 The corpus dataset was generated on `2026-08-06T08:03:27.940Z` by
 `test/harness/spec-dataset.ts` at TypeSpec repository base
 `deb8c8d4fbdd7d962e5b2ff4fd6e4b9c2cb3b168`; the final TypeSpec
-analysis was generated on `2026-09-29T20:51:14.916Z` using source repair
-cycle 1's draft. The older gist's source project revision is not recorded
+analysis was generated on `2026-09-29T22:20:52.763Z` using development review
+round 1's external-reference draft. The older gist's source project revision is not recorded
 there; its denominator and rule count cannot be equated to this run.
 
 The 53/55 difference reflects distinct report populations (450 versus 462

@@ -35,7 +35,11 @@ group such as `Widget_Admin` is compared as `Widget`. In particular, a schema
 renamed to a different OpenAPI definition name should not conflict merely
 because its authored TypeSpec name matches the group. ARM common types are
 excluded as group-name candidates; service-local models referenced by their
-properties remain eligible.
+properties remain eligible. Models decorated with
+`@Azure.ResourceManager.Legacy.externalTypeRef` are also excluded because
+AutoRest emits an external reference instead of a local definition for the
+decorated model. Their service-local property types remain eligible because
+AutoRest still emits those reachable definitions.
 
 The check uses supported TypeSpec SDK naming metadata rather than OpenAPI
 operation ID overrides. Azure's `no-openapi` rule already discourages

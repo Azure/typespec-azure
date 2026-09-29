@@ -551,6 +551,33 @@ describe("operation-id-noun-conflicting-model-names", () => {
       ]);
   });
 
+  it("excludes an external-reference model but traverses its emitted children", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        model Child { id: string; }
+        @Azure.ResourceManager.Legacy.externalTypeRef("./external.json#/definitions/Widget")
+        model Widget { child: Child; }
+        namespace Operations {
+          interface Widget {
+            @get @route("/widgets") op read(): Example.Widget;
+          }
+          interface Child {
+            @get @route("/children") op read(): Example.Widget;
+          }
+        }`,
+      )
+      .toEmitDiagnostics([
+        {
+          ...diagnostic,
+          message:
+            "Operation ID noun 'Child' conflicts with the schema type 'Child'. Consider a plural noun to avoid disambiguation in generated clients.",
+        },
+      ]);
+  });
+
   it("recognizes a client location on a direct service operation", async () => {
     await (
       await tester()

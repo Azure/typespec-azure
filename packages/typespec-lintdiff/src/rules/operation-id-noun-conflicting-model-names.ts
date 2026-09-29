@@ -1,4 +1,4 @@
-import { isArmCommonType } from "@azure-tools/typespec-azure-resource-manager";
+import { getExternalTypeRef, isArmCommonType } from "@azure-tools/typespec-azure-resource-manager";
 import {
   createTCGCContext,
   getClientLocation,
@@ -135,6 +135,7 @@ function collectSchemas(
       if (
         type.name &&
         type.namespace === service &&
+        !getExternalTypeRef(tcgcContext.program, type) &&
         !isArmCommonType(type) &&
         (!isTemplateInstance(type) || getFriendlyName(tcgcContext.program, type))
       ) {
