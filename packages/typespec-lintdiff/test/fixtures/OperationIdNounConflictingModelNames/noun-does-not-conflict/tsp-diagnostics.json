@@ -5,11 +5,6 @@
     "message": "Security definition should have a description."
   },
   {
-    "code": "tsp-lintdiff-local-linter/operation-id-noun-conflicting-model-names",
-    "severity": "warning",
-    "message": "Operation group 'Widget' conflicts with the model 'Widget'. Consider a plural group name to avoid disambiguation in generated clients."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/path-parameter-schema",
     "severity": "warning",
     "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."
