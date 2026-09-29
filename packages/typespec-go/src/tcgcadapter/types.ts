@@ -248,13 +248,11 @@ export class TypeAdapter {
           return <go.Slice>arrayType;
         }
 
-        const wireElementType = this.getWireType(
+        const elementType = this.getWireType(
           valueType,
           elementTypeByValue,
           substituteDiscriminator,
         );
-        const elementType =
-          wireElementType.kind === "literal" ? wireElementType.type : wireElementType;
         switch (elementType.kind) {
           case "constantDef":
           case "constantValue":
@@ -266,11 +264,25 @@ export class TypeAdapter {
             );
         }
 
-        arrayType = new go.Slice(
-          !myElementTypeByValue && helpers.isPtrType(elementType)
-            ? this.getPtrType(elementType)
-            : elementType,
-        );
+        let sliceElementType: go.SliceElementType;
+        if (elementType.kind === "literal") {
+          if (!helpers.isSliceElementLiteral(elementType)) {
+            throw new AdapterError(
+              "UnsupportedTsp",
+              `unsupported literal kind ${elementType.type.kind} for slice element type`,
+              type.valueType.__raw?.node,
+            );
+          }
+          // literals are always encoded by value
+          sliceElementType = elementType;
+        } else {
+          sliceElementType =
+            !myElementTypeByValue && helpers.isPtrType(elementType)
+              ? this.getPtrType(elementType)
+              : elementType;
+        }
+
+        arrayType = new go.Slice(sliceElementType);
         arrayType.xmlName = xmlItemsName;
         this.types.set(keyName, arrayType);
         return arrayType;
