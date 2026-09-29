@@ -35,7 +35,7 @@ model WidgetProperties {
   provisioningState?: ResourceProvisioningState;
 }
 
-@doc("Valid pageable collection result with null nextLinkName.")
+@doc("Valid list result without a next link.")
 model WidgetListResult {
   @doc("List of widgets")
   @pageItems

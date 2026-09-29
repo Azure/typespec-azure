@@ -52,6 +52,27 @@ it("checks a pageable ARM POST action without an OpenAPI decorator", async () =>
     });
 });
 
+it("ignores a pageable list operation outside an ARM provider", async () => {
+  await tester
+    .expect(
+      `
+      @service(#{ title: "Test" })
+      namespace Microsoft.Test;
+
+      model Results {
+        @pageItems items: string[];
+        @nextLink nextLink?: string;
+      }
+
+      @route("/items")
+      @get
+      @list
+      op listItems(): Results;
+    `,
+    )
+    .toBeValid();
+});
+
 it("checks a scalar value even when another property supplies page items", async () => {
   await tester
     .expect(

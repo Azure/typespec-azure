@@ -241,6 +241,29 @@ projects; it found all three retained validator findings. The two
 TypeSpec-only AzureArcData operations above account for the entire raw-count
 remainder.
 
+### Full-corpus reproduction
+
+The full run used the lintdiff harness at TypeSpec Azure revision
+`69b9fd15213d593083e55c45207f0ab887d4d6e5`. The rule working-tree content had
+fingerprint
+`D6CF83C056E93852F0B510B1E3B10E88FB0923EF935364189126FA43722CFDC8` and was
+subsequently committed without semantic changes as
+`c96f6bfeeb41f3dc69fa47b22f9c4e03e5763b19`. The isolated specs checkout was
+`C:\dev\worktrees\azure-rest-api-specs-lintdiff-collection-object-properties-naming`
+at `f6b53f105b95da05276530a0754a1c71b4f16397`.
+
+From the TypeSpec Azure repository root, the exact command was:
+
+```powershell
+mise exec -- pnpm --dir packages/typespec-lintdiff specs:typespec --specs-repo C:\dev\worktrees\azure-rest-api-specs-lintdiff-collection-object-properties-naming --concurrency 6
+```
+
+The `specs:typespec` runner writes `comparison-results.{json,md}` and
+`coverage-breakdown.{json,md}` after the project analysis, so no separate
+coverage-generation command was used for these reported results. The generated
+corpus files were then inspected and removed from the PR through the
+manifest-based cleanup procedure.
+
 ## Functional equivalence
 
 The updated rule covers all observed validator projects and all three

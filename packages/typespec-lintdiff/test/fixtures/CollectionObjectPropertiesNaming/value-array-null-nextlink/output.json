@@ -379,7 +379,7 @@
     },
     "WidgetListResult": {
       "type": "object",
-      "description": "Valid pageable collection result with null nextLinkName.",
+      "description": "Valid list result without a next link.",
       "properties": {
         "value": {
           "type": "array",
