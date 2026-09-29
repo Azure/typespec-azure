@@ -19,6 +19,7 @@ import {
   type Model,
   type ModelProperty,
   type Namespace,
+  NoTarget,
   type Operation,
   type Program,
   type Type,
@@ -161,7 +162,8 @@ export interface Provider {
  * ```ts
  * const provider = resolveArmResources(program, {
  *   version: "2025-01-01",
- *   nameResolver: ({ type, defaultName }) => getConsumerName(type) ?? defaultName,
+ *   nameResolver: ({ type, defaultName }) =>
+ *     type === undefined ? undefined : getConsumerName(type) ?? defaultName,
  * });
  * ```
  */
@@ -190,8 +192,8 @@ export interface ArmMetadataNameRequest {
   version?: string;
   /** The logical name produced by the ARM resolver. */
   defaultName: string;
-  /** The TypeSpec declaration that owns the logical name. */
-  type: Model | Operation | Interface;
+  /** The TypeSpec declaration that owns the logical name. Undefined for synthetic resources. */
+  type?: Model | Operation | Interface;
   /** The associated resource model for operation metadata. */
   resourceModel?: Model;
   /** The canonical ARM resource type formatted as `${provider}/${types.join("/")}`. */
@@ -742,17 +744,15 @@ function applyArmMetadataNames(
     for (let i = 0; i < provider.resources.length; i++) {
       const source = provider.resources[i];
       const target = resources[i];
-      target.resourceName = syntheticResources.has(source)
-        ? source.resourceName
-        : resolveArmMetadataName(program, nameResolver, {
-            kind: "resource",
-            program,
-            version: options.version,
-            defaultName: source.resourceName,
-            type: source.type,
-            resourceType: formatResourceType(source.resourceType),
-            resourceInstancePath: source.resourceInstancePath,
-          });
+      target.resourceName = resolveArmMetadataName(program, nameResolver, {
+        kind: "resource",
+        program,
+        version: options.version,
+        defaultName: source.resourceName,
+        type: syntheticResources.has(source) ? undefined : source.type,
+        resourceType: formatResourceType(source.resourceType),
+        resourceInstancePath: source.resourceInstancePath,
+      });
       target.operations = copyResolvedOperations(
         program,
         nameResolver,
@@ -882,7 +882,7 @@ function resolveArmMetadataName(
   reportDiagnostic(program, {
     code: "arm-resource-invalid-metadata-name",
     format: { kind: request.kind, name: request.defaultName },
-    target: request.type,
+    target: request.type ?? NoTarget,
   });
   return request.defaultName;
 }

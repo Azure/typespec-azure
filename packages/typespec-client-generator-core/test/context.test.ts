@@ -313,7 +313,7 @@ it("uses TCGC library names when supplied to resolveArmResources", async () => {
     emitterName: "@azure-tools/typespec-csharp",
   });
   const provider = resolveArmResources(program, {
-    nameResolver: ({ type }) => getLibraryName(context, type),
+    nameResolver: ({ type }) => (type === undefined ? undefined : getLibraryName(context, type)),
   });
 
   const widget = provider.resources?.find((x) => x.type.name === "Widget");
@@ -403,7 +403,7 @@ it("uses TCGC library names for selected ARM resource versions", async () => {
   const resolveVersion = (version: string) =>
     resolveArmResources(program, {
       version,
-      nameResolver: ({ type }) => getLibraryName(context, type),
+      nameResolver: ({ type }) => (type === undefined ? undefined : getLibraryName(context, type)),
     });
 
   const v1 = resolveVersion("2024-01-01");
