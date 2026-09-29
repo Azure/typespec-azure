@@ -1,0 +1,12 @@
+[
+  {
+    "code": "GetResponseCodes",
+    "message": "GET operation must have response codes 200 and default. In addition, can have 202 if the GET represents the location header polling url.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "get"
+    ],
+    "severity": 0
+  }
+]
