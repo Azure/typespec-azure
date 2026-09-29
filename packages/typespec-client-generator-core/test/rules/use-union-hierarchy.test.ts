@@ -28,7 +28,8 @@ function missingExtends(target: string) {
   return {
     code: `${libraryName}/use-union-hierarchy`,
     severity: "warning" as const,
-    message: "Named unions must declare an 'extends' constraint. Use 'union Name extends Base'.",
+    message:
+      "Named unions containing model variants must declare an 'extends' constraint. Use 'union Name extends Base'.",
     target,
   };
 }
@@ -45,34 +46,126 @@ function reusedModel(target: string, modelName = "Derived", unionName = "First")
 describe("named union constraints", () => {
   it.each([
     ["models", `${base} union Choice { Base }`],
-    ["scalars", "union Choice { string, int32 }"],
-    ["literals", 'union Choice { "first", "second" }'],
+    ["mixed variants", `${base} union Choice { Base, string, int32, null }`],
+    ["model after non-model variants", `${base} union Choice { string, int32, null, Base }`],
     ["nullable models", `${base} union Choice { Base, null }`],
-    ["empty union", "union Choice {}"],
-    ["named declaration expression", "op read(): union Choice { string, int32 };"],
+    ["structural models", `${base} model Other { id: string; } union Choice { Base, Other }`],
+    ["copied models", `${base} model Copy is Base; union Choice { Base, Copy }`],
+    ["spread models", `${base} model Copy { ...Base; } union Choice { Base, Copy }`],
+    ["aliased models", `${base} alias Alias = Base; union Choice { Alias }`],
+    ["inline models", "union Choice { value: { id: string } }"],
+    ["model template instances", "model Item<T> { value: T; } union Choice { Item<string> }"],
+    ["named declaration expression", `${base} op read(): union Choice { Base, string };`],
   ])("requires extends for %s", async (_, code) => {
     await tester.expect(code).toEmitDiagnostics([missingExtends("Choice")]);
+  });
+
+  it.each([
+    ["scalars", "union Choice { string, int32 }"],
+    ["literals", 'union Choice { "first", "second" }'],
+    ["extensible strings", 'union Choice { string, first: "first", second: "second" }'],
+    ["nullable strings", 'union Choice { "first", "second", null }'],
+    ["enum members", "enum Values { first, second } union Choice { Values.first, Values.second }"],
+    ["enums", "enum Values { first, second } union Choice { Values, string }"],
+    ["aliased strings", 'alias Text = string; union Choice { Text, "first" }'],
+    ["empty union", "union Choice {}"],
+    ["named declaration expression", "op read(): union Choice { string, int32 };"],
+  ])("does not require extends for %s", async (_, code) => {
+    await tester.expect(code).toBeValid();
   });
 
   it.each([
     ["property expression", `${base} model Usage { choice: Base | null; }`],
     ["return expression", `${base} op read(): Base | string;`],
     ["alias expression", `${base} alias Choice = Base | string; op read(): Choice;`],
-    ["unnamed declaration expression", "op read(): union { string, int32 };"],
+    ["unnamed declaration expression", `${base} op read(): union { Base, string };`],
   ])("does not require extends for an unnamed %s", async (_, code) => {
     await tester.expect(code).toBeValid();
   });
 
-  it("checks nested named unions independently", async () => {
+  it("allows an unconstrained union nested inside a constrained union", async () => {
     await tester
       .expect('union Inner { "first", "second" } union Outer extends string { Inner }')
-      .toEmitDiagnostics([missingExtends("Inner")]);
+      .toBeValid();
   });
 
-  it("checks reachable concrete templates without diagnosing unused templates", async () => {
+  it("does not diagnose unused templates or concrete non-model instantiations", async () => {
     await tester
-      .expect("union Unused<T> { T } union Choice<T> { T } model Usage { value: Choice<string>; }")
+      .expect(
+        `
+        ${base}
+        union Unused<T> { Base, T }
+        union Choice<T> { T }
+        model Usage { text: Choice<string>; number: Choice<int32>; }
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("checks concrete model instantiations even when a non-model instantiation is visited first", async () => {
+    await tester
+      .expect(
+        `
+        ${base}
+        union Unused<T> { T }
+        union Choice<T> { T }
+        model Usage { text: Choice<string>; value: Choice<Base>; again: Choice<Base>; }
+      `,
+      )
       .toEmitDiagnostics([missingExtends("Choice")]);
+  });
+
+  it("does not require model variants to belong to only one unconstrained union", async () => {
+    await tester
+      .expect(`${base} union First { Base } union Second { Base }`)
+      .toEmitDiagnostics([missingExtends("First"), missingExtends("Second")]);
+  });
+
+  it("does not claim model ownership before or after a constrained union", async () => {
+    await tester
+      .expect(
+        `
+        ${base}
+        model Derived extends Base {}
+        alias Alias = Derived;
+        union Before { Derived }
+        union Choice extends Base { Derived }
+        union After { Alias }
+      `,
+      )
+      .toEmitDiagnostics([missingExtends("Before"), missingExtends("After")]);
+  });
+
+  it("still requires inheritance when a constrained variant also appears in unconstrained unions", async () => {
+    await tester
+      .expect(
+        `
+        ${base}
+        model Copy is Base;
+        union Before { Copy }
+        union Choice extends Base { invalid: Copy }
+        union After { Copy }
+      `,
+      )
+      .toEmitDiagnostics([
+        missingExtends("Before"),
+        diagnostic("invalid"),
+        missingExtends("After"),
+      ]);
+  });
+
+  it("still rejects reuse between constrained unions when an unconstrained union is visited first", async () => {
+    await tester
+      .expect(
+        `
+        ${base}
+        model Derived extends Base {}
+        union Unconstrained { Derived }
+        union First extends Base { Derived }
+        union Second extends Base { invalid: Derived }
+      `,
+      )
+      .toEmitDiagnostics([missingExtends("Unconstrained"), reusedModel("invalid")]);
   });
 });
 
