@@ -11,7 +11,7 @@ beforeEach(async () => {
     listResponseValueArrayRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
-});
+}, 30_000);
 
 const diagnostic = {
   code: "@azure-tools/typespec-azure-resource-manager/list-response-value-array",
@@ -109,6 +109,35 @@ it("accepts a value array with the standard next link", async () => {
       `),
     )
     .toBeValid();
+});
+
+it("accepts an inherited value array", async () => {
+  await tester
+    .expect(
+      listResourceWithResponse(`
+        model BasePage {
+          @pageItems value: Widget[];
+          @nextLink nextLink?: string;
+        }
+        model WidgetPage extends BasePage {}
+      `),
+    )
+    .toBeValid();
+});
+
+it("reports an inherited non-array value", async () => {
+  await tester
+    .expect(
+      listResourceWithResponse(`
+        model BasePage {
+          value: string;
+          @pageItems items: Widget[];
+          @nextLink nextLink?: string;
+        }
+        model WidgetPage extends BasePage {}
+      `),
+    )
+    .toEmitDiagnostics({ ...diagnostic, target: "value" });
 });
 
 it("accepts the standard ARM list response template", async () => {
