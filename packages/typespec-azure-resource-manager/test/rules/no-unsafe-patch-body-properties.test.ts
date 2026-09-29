@@ -81,7 +81,7 @@ describe("documentation", () => {
     if (!valid || !invalid) throw new Error("Both documented TypeSpec examples are required.");
     await documentationTester
       .expect(
-        `${valid.replace("ArmCustomPatchSync<Widget, WidgetPatch>", "ArmCustomPatchSync<Widget, UnsafeWidgetPatch>")}\n${invalid}`,
+        `${valid.replace("ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>", "ArmCustomPatchSync<Widget, PatchModel = UnsafeWidgetPatch>")}\n${invalid}`,
       )
       .toEmitDiagnostics([
         immutable("location"),

@@ -108,7 +108,7 @@ model WidgetPatch {
 
 @armResourceOperations
 interface Widgets {
-  update is ArmCustomPatchSync<Widget, WidgetPatch>;
+  update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
 }
 ```
 
