@@ -199,8 +199,8 @@ reachability, query/header exclusions, base and eligible derived models,
 template-declaration exclusion, unused/nested/recursive models, direct
 underscored operation names, scoped string/typed client locations, client names
 on operations, groups, and schema types, and controls scoped only to another
-emitter. All **four** fixture cases (two violation, two reviewed-ambient
-compliance) and all **40** focused native tests pass (all **502** tests
+emitter. All **five** fixture cases (two violation, three reviewed-ambient
+compliance) and all **41** focused native tests pass (all **503** tests
 in the native rule suite also pass). The native suite covers direct service
 operation non-conflict and conflict, including actual emitted Swagger noun
 gaps. Other fixture diagnostics are explicitly reviewed ambient warnings, not
