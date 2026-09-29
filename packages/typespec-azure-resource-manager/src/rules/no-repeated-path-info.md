@@ -37,6 +37,9 @@ and ambiguity when the request URI and payload disagree.
 
 ## ❌ Incorrect
 
+The standard ARM create-or-replace operation carries `widgetName` in the URI.
+Repeating it in `WidgetProperties` triggers this rule.
+
 ```tsp
 @armProviderNamespace
 namespace Microsoft.Contoso;
@@ -60,6 +63,9 @@ interface Widgets {
 ```
 
 ## ✅ Correct
+
+Keep the same operation template and remove only the redundant properties-bag
+member.
 
 ```tsp
 @armProviderNamespace

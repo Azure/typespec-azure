@@ -6,7 +6,8 @@ import {
   type LinterRuleTester,
   type TesterInstance,
 } from "@typespec/compiler/testing";
-import { beforeEach, it, vi } from "vitest";
+import { readFileSync } from "node:fs";
+import { beforeEach, expect, it, vi } from "vitest";
 import { noRepeatedPathInfoRule } from "../../src/rules/no-repeated-path-info.js";
 
 vi.mock("@azure-tools/typespec-autorest", () => {
@@ -36,7 +37,7 @@ function diagnostic(name = "widgetName") {
   };
 }
 
-function armResource(properties: string, parameters = "{}") {
+function armResource(properties: string, parameters?: string) {
   return `
     @armProviderNamespace
     namespace Microsoft.Contoso;
@@ -48,12 +49,42 @@ function armResource(properties: string, parameters = "{}") {
 
     @armResourceOperations
     interface Widgets {
-      createOrUpdate is ArmResourceCreateOrReplaceSync<
-        Widget, Foundations.DefaultBaseParameters<Widget>, ${parameters}
-      >;
+      createOrUpdate is ArmResourceCreateOrReplaceSync<Widget${parameters === undefined ? "" : `, Parameters = ${parameters}`}>;
     }
   `;
 }
+
+it("compiles the published incorrect and correct examples with the rule enabled", async () => {
+  const documentation = readFileSync(
+    new URL("../../src/rules/no-repeated-path-info.md", import.meta.url),
+    "utf8",
+  );
+  const incorrect = documentation
+    .split("## ❌ Incorrect")[1]
+    ?.split("## ✅ Correct")[0]
+    ?.match(/```tsp\s*([\s\S]*?)```/)?.[1];
+  const correct = documentation
+    .split("## ✅ Correct")[1]
+    ?.split("## Suppression")[0]
+    ?.match(/```tsp\s*([\s\S]*?)```/)?.[1];
+  expect(incorrect).toBeDefined();
+  expect(correct).toBeDefined();
+
+  const [, diagnostics] = await runner.compileAndDiagnose(incorrect!, {
+    compilerOptions: {
+      linterRuleSet: {
+        enable: {
+          "@azure-tools/typespec-azure-resource-manager/no-repeated-path-info": true,
+        },
+      },
+    },
+  });
+  expectDiagnostics(diagnostics, [diagnostic()]);
+  const location = getSourceLocation(diagnostics[0].target);
+  expect(location.file.text.slice(location.pos, location.end)).toContain("widgetName?: string");
+
+  await tester.expect(correct!).toBeValid();
+});
 
 const operation = `
   @put @route("/widgets/{widgetName}")
@@ -157,7 +188,7 @@ it("reports a repeated tenant resource path name", async () => {
       @armResourceOperations
       interface TenantConfigs {
         createOrUpdate is ArmResourceCreateOrReplaceSync<
-          TenantConfig, Foundations.TenantBaseParameters
+          TenantConfig, BaseParameters = Foundations.TenantBaseParameters
         >;
       }
     `,
