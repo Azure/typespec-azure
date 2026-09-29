@@ -73,10 +73,14 @@ to a concrete test, applying the [responsibility boundary](#rule-test-responsibi
 first. The dimensions below are not an unconditional test matrix for every rule:
 
 - Prove ordinary compliant authoring and a realistic violating customization.
-  In template-based libraries such as ARM, use standard operation templates for
-  representative examples/tests. Use named customization arguments and omit
-  defaults. Keep handcrafted cases when they specifically prove a non-resource,
-  nonstandard, or applicability boundary.
+  Follow the [example authoring policy](../typespec-lint-implement/SKILL.md#example-authoring)
+  for documentation and representative scenarios: use standard ARM templates,
+  named customization arguments, and omitted defaults for ARM resource cases.
+  Retain minimal handwritten semantic tests when they isolate a rule-owned
+  decision involving unions, intersections, metadata, diagnostic targets, or
+  applicability. Do not rewrite them all as ARM scenarios or add ARM dependencies
+  to a shared Core test setup solely to satisfy documentation guidance. The
+  responsibility boundary still excludes framework-only template-filtering tests.
 - Assert the exact diagnostic set and authored targets where supported: multiple
   offending properties, shared/inherited declarations, missing-member fallback,
   and no redundant aggregate warning when property findings already cover it.
@@ -97,9 +101,28 @@ first. The dimensions below are not an unconditional test matrix for every rule:
   asserting only custom-query diagnostics, for example, can also prove standard
   parameters are not reported by the rule.
 
-Compile documentation examples through the repository's existing example or
-test workflow when available. A plausible-looking template snippet is not
-evidence that the recommended customization works.
+### Documentation example validation
+
+Validate the actual incorrect/correct snippets through the repository's existing
+example or focused test workflow, adding only the imports and service/resource
+setup needed to compile them. Record that setup so the result is reproducible;
+do not replace the published operation or response shape with an easier test.
+
+- Explicitly enable the target rule, including when its ruleset entry defaults
+  to disabled. Require both snippets to compile without unrelated errors.
+- Assert the intended target-rule diagnostic set for the incorrect snippet,
+  including its authored target where supported, and no target-rule diagnostics
+  for the corrected snippet. Compilation alone does not prove either result.
+- Check that template defaults or customizations have not erased the violation
+  or made the correction pass only through an exemption. For implicit response
+  examples, preserve implicit payloads rather than switching to explicit
+  `@body` or `@bodyRoot` bodies outside the rule's scope.
+- Record the example audience, chosen template/customization or justified
+  handwritten exception, and diagnostic evidence in the validation handoff or
+  PR notes. Reuse existing example infrastructure or a scratch workflow instead
+  of forcing ARM dependencies into a Core unit-test suite. If no suitable
+  workflow is available, report the missing evidence rather than claiming this
+  gate passed; do not add a new general-purpose harness just for the examples.
 
 Review user-facing rule docs against the
 [native rule documentation contract](../typespec-lint-implement/SKILL.md#native-rule-documentation).
