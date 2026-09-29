@@ -4,9 +4,12 @@ to rename one of them, producing an unexpected SDK API. Prefer plural operation-
 as `Widgets` when the service has a `Widget` schema.
 
 The rule checks effective AutoRest-scoped client names, including `@clientName` and
-`@clientLocation` overrides. A type used only as a header or query parameter, an unused type,
-or a type declared in another namespace is not a conflicting service schema. ARM common types
-are not local schema names, but locally declared types reachable through them are checked.
+`@clientLocation` overrides and friendly names of concrete template types. Unnamed concrete
+template instances do not contribute a local schema name. A type used only as a header or query
+parameter, an unused type, or a type declared in another namespace is not a conflicting service
+schema. ARM common types and externally referenced models are not local schema names, but
+locally declared types reachable through them are checked.
+
 Direct operations without a named group are checked only when an underscored operation name or
 an explicit client location supplies a group.
 
@@ -78,8 +81,9 @@ interface Widget {
 
 This rule promotes
 [`OperationIdNounConflictingModelNames`](https://github.com/Azure/azure-openapi-validator/blob/main/docs/operation-id-noun-conflicting-model-names.md)
+([automated guideline R2063](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r2063))
 from the local LintDiff rule `operation-id-noun-conflicting-model-names`. The native rule
 intentionally checks supported TypeSpec authoring rather than explicit OpenAPI operation-ID
 overrides; see the source rule's migration evidence for the limits of equivalence.
-The ARM common-type exclusion reads the same public decorator metadata as the source rule
-without requiring ARM as a runtime dependency of TCGC for data-plane SDKs.
+The ARM common-type and external-reference exclusions read public decorator metadata without
+requiring ARM as a runtime dependency of TCGC for data-plane SDKs.

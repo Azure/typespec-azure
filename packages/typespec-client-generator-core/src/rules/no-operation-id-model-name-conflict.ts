@@ -1,9 +1,12 @@
 import {
   createRule,
   fileRef,
+  getFriendlyName,
+  getNamespaceFullName,
   isGlobalNamespace,
   isService,
   isTemplateDeclaration,
+  isTemplateInstance,
   isTypeSpecValueTypeOf,
   paramMessage,
   type Interface,
@@ -17,6 +20,7 @@ import { getAllHttpServices } from "@typespec/http";
 import { createTCGCContext } from "../context.js";
 import { getClientLocation, getClientNameOverride } from "../decorators.js";
 import type { TCGCContext } from "../interfaces.js";
+import { getLibraryName } from "../public-utils.js";
 
 export const noOperationIdModelNameConflictRule = createRule({
   name: "no-operation-id-model-name-conflict",
@@ -129,8 +133,14 @@ function collectSchemas(
 
   switch (type.kind) {
     case "Model":
-      if (type.name && type.namespace === service && !isArmCommonSchema(type)) {
-        names.add(getClientNameOverride(tcgcContext, type) ?? type.name);
+      if (
+        type.name &&
+        type.namespace === service &&
+        !isExternalReferenceModel(type) &&
+        !isArmCommonSchema(type) &&
+        (!isTemplateInstance(type) || getFriendlyName(tcgcContext.program, type))
+      ) {
+        names.add(getLibraryName(tcgcContext, type));
       }
       if (type.baseModel) collectSchemas(type.baseModel, service, tcgcContext, names, visited);
       for (const derivedModel of type.derivedModels) {
@@ -146,8 +156,13 @@ function collectSchemas(
     case "Scalar":
     case "Enum":
     case "Union":
-      if (type.name && type.namespace === service && !isArmCommonSchema(type)) {
-        names.add(getClientNameOverride(tcgcContext, type) ?? type.name);
+      if (
+        type.name &&
+        type.namespace === service &&
+        !isArmCommonSchema(type) &&
+        (!isTemplateInstance(type) || getFriendlyName(tcgcContext.program, type))
+      ) {
+        names.add(getLibraryName(tcgcContext, type));
       }
       if (type.kind !== "Union") break;
       for (const variant of type.variants.values()) {
@@ -160,6 +175,16 @@ function collectSchemas(
       }
       break;
   }
+}
+
+function isExternalReferenceModel(type: Type & { kind: "Model" }): boolean {
+  // Inspect public decorator applications without loading ARM into data-plane SDK projects.
+  return type.decorators.some(
+    ({ definition }) =>
+      definition?.name === "@externalTypeRef" &&
+      definition.namespace &&
+      getNamespaceFullName(definition.namespace) === "Azure.ResourceManager.Legacy",
+  );
 }
 
 function isArmCommonSchema(type: Type): boolean {

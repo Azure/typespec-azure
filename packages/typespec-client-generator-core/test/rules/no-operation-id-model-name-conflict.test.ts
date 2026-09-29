@@ -234,6 +234,69 @@ describe("no-operation-id-model-name-conflict", () => {
     }
   });
 
+  it("uses friendly names for concrete template models and unions", async () => {
+    await tester
+      .expect(
+        `${header}
+      model Item { id: string; }
+      @friendlyName("Widget", T)
+      model Wrapper<T> { value: T; }
+      @friendlyName("Gizmo", T)
+      union Choice<T> { item: T, empty: "empty", other: string }
+      namespace Operations {
+        interface Widget { @get @route("/widgets") op read(): Example.Wrapper<Example.Item>; }
+        interface Gizmo { @get @route("/gizmos") op read(): Example.Choice<"one">; }
+      }`,
+      )
+      .toEmitDiagnostics([diagnostic("Widget"), diagnostic("Gizmo")]);
+  });
+
+  it("does not count unnamed inline template models or unions as definitions", async () => {
+    await tester
+      .expect(
+        `${header}
+      model Item { id: string; }
+      model Widget<T> { value: T; }
+      union Gizmo<T> { item: T, empty: "empty", other: string }
+      namespace Operations {
+        interface Widget { @get @route("/widgets") op read(): Example.Widget<Example.Item>; }
+        interface Gizmo { @get @route("/gizmos") op read(): Example.Gizmo<"one">; }
+      }`,
+      )
+      .toBeValid();
+  });
+
+  it("does not compare the declaration name when a friendly name removes the collision", async () => {
+    await tester
+      .expect(
+        `${header}
+      model Item { id: string; }
+      @friendlyName("Widgets", T)
+      model Widget<T> { value: T; }
+      namespace Operations {
+        interface Widget { @get @route("/widgets") op read(): Example.Widget<Example.Item>; }
+      }`,
+      )
+      .toBeValid();
+  });
+
+  it.each([
+    ["scalar", "scalar Named extends string;"],
+    ["enum", "enum Named { one }"],
+    ["union", 'union Named { "one", "two" }'],
+  ])("honors the effective client name override on a %s", async (_kind, declaration) => {
+    await tester
+      .expect(
+        `${header}
+      ${declaration}
+      @@clientName(Named, "Widget");
+      namespace Operations {
+        interface Widget { @get @route("/widgets") op read(): Example.Named; }
+      }`,
+      )
+      .toEmitDiagnostics([diagnostic("Widget")]);
+  });
+
   it("excludes ARM common models while retaining service-local models", async () => {
     await tester
       .expect(
@@ -259,6 +322,36 @@ describe("no-operation-id-model-name-conflict", () => {
       model Widget { child: Child; }
       namespace Operations {
         interface Child { @get @route("/widgets") op read(): Example.Widget; }
+      }`,
+      )
+      .toEmitDiagnostics([diagnostic("Child")]);
+  });
+
+  it("excludes external-reference models while traversing their local children", async () => {
+    await tester
+      .expect(
+        `${header}
+      model Child { id: string; }
+      @Azure.ResourceManager.Legacy.externalTypeRef("./external.json#/definitions/Widget")
+      model Widget { child: Child; }
+      namespace Operations {
+        interface Widget { @get @route("/widgets") op read(): Example.Widget; }
+        interface Child { @get @route("/children") op read(): Example.Widget; }
+      }`,
+      )
+      .toEmitDiagnostics([diagnostic("Child")]);
+  });
+
+  it("recognizes an external-reference model decorated with augment syntax", async () => {
+    await tester
+      .expect(
+        `${header}
+      model Child { id: string; }
+      model Widget { child: Child; }
+      @@Azure.ResourceManager.Legacy.externalTypeRef(Widget, "./external.json#/definitions/Widget");
+      namespace Operations {
+        interface Widget { @get @route("/widgets") op read(): Example.Widget; }
+        interface Child { @get @route("/children") op read(): Example.Widget; }
       }`,
       )
       .toEmitDiagnostics([diagnostic("Child")]);
