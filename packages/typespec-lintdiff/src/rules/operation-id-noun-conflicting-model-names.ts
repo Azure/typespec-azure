@@ -9,6 +9,7 @@ import {
   createRule,
   isGlobalNamespace,
   isService,
+  isTemplateDeclaration,
   paramMessage,
   type Interface,
   type Namespace,
@@ -21,10 +22,10 @@ import { getAllHttpServices } from "@typespec/http";
 
 export const operationIdNounConflictingModelNamesRule = createRule({
   name: "operation-id-noun-conflicting-model-names",
-  description: "Operation group names should not conflict with the names of service models.",
+  description: "Operation ID nouns should not conflict with service schema type names.",
   severity: "warning",
   messages: {
-    default: paramMessage`Operation group '${"noun"}' conflicts with the model '${"noun"}'. Consider a plural group name to avoid disambiguation in generated clients.`,
+    default: paramMessage`Operation ID noun '${"noun"}' conflicts with the schema type '${"noun"}'. Consider a plural noun to avoid disambiguation in generated clients.`,
   },
   create(context) {
     const tcgcContext = createTCGCContext(context.program, "@azure-tools/typespec-autorest", {
@@ -37,20 +38,29 @@ export const operationIdNounConflictingModelNamesRule = createRule({
           const schemaNames = new Set<string>();
           const visited = new Set<Type>();
           for (const httpOperation of service.operations) {
-            collectSchemas(
-              httpOperation.operation.parameters,
-              service.namespace,
-              tcgcContext,
-              schemaNames,
-              visited,
-            );
-            collectSchemas(
-              httpOperation.operation.returnType,
-              service.namespace,
-              tcgcContext,
-              schemaNames,
-              visited,
-            );
+            const requestBody = httpOperation.parameters.body;
+            if (requestBody?.bodyKind === "single") {
+              collectSchemas(
+                requestBody.type,
+                service.namespace,
+                tcgcContext,
+                schemaNames,
+                visited,
+              );
+            }
+            for (const response of httpOperation.responses) {
+              for (const content of response.responses) {
+                if (content.body?.bodyKind === "single") {
+                  collectSchemas(
+                    content.body.type,
+                    service.namespace,
+                    tcgcContext,
+                    schemaNames,
+                    visited,
+                  );
+                }
+              }
+            }
           }
 
           for (const httpOperation of service.operations) {
@@ -78,7 +88,7 @@ function getOperationGroup(
       location.kind === "Namespace" &&
       (isGlobalNamespace(program, location) || isService(program, location))
     ) {
-      return undefined;
+      return getOperationNameNoun(tcgcContext, operation);
     }
     return getOperationIdNoun(getClientName(tcgcContext, location));
   }
@@ -88,13 +98,18 @@ function getOperationGroup(
   }
   const namespace = operation.namespace;
   if (!namespace || isGlobalNamespace(program, namespace) || isService(program, namespace)) {
-    return undefined;
+    return getOperationNameNoun(tcgcContext, operation);
   }
   return getOperationIdNoun(getClientName(tcgcContext, namespace));
 }
 
-function getClientName(tcgcContext: TCGCContext, type: Interface | Namespace): string {
+function getClientName(tcgcContext: TCGCContext, type: Interface | Namespace | Operation): string {
   return getClientNameOverride(tcgcContext, type) ?? type.name;
+}
+
+function getOperationNameNoun(tcgcContext: TCGCContext, operation: Operation): string | undefined {
+  const name = getClientName(tcgcContext, operation);
+  return name.includes("_") ? getOperationIdNoun(name) : undefined;
 }
 
 function getOperationIdNoun(groupName: string): string | undefined {
@@ -118,6 +133,11 @@ function collectSchemas(
         names.add(getClientNameOverride(tcgcContext, type) ?? type.name);
       }
       if (type.baseModel) collectSchemas(type.baseModel, service, tcgcContext, names, visited);
+      for (const derivedModel of type.derivedModels) {
+        if (!isTemplateDeclaration(derivedModel)) {
+          collectSchemas(derivedModel, service, tcgcContext, names, visited);
+        }
+      }
       if (type.indexer) collectSchemas(type.indexer.value, service, tcgcContext, names, visited);
       for (const property of type.properties.values()) {
         collectSchemas(property.type, service, tcgcContext, names, visited);

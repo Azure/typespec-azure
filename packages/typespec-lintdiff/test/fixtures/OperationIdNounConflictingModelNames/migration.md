@@ -19,7 +19,9 @@ ApiManagement's six earlier false positives for an ARM common model are
 gone; its one remaining `Operation_ListByTags` warning agrees with Swagger.
 Round 1's named-scalar correction adds the matching PostgreSQL
 `PrivateDnsZoneSuffix_Get` warning and closes that project's prior one-warning
-deficit.
+deficit. Round 2's HTTP-body reachability, direct-operation naming, and derived
+model corrections leave the corpus totals unchanged while closing focused
+supported-shape gaps and removing inline parameter/header false positives.
 **This remains partial native coverage, not functional equivalence.**
 Explicit `@operationId` and selected-version differences are documented
 contract limits; other cardinality differences do not prove matching
@@ -34,12 +36,15 @@ The current draft adds
 `src/linter.ts`, and adds violating/compliant fixtures, snapshots and native
 tests for authored and supported effective names. Round 1 review corrections
 also cover the first operation-ID segment of underscored groups and reachable
-named scalars, enums, and supported unions. The root service namespace false
-positive and schema `@clientName` false positives were corrected with native
-regressions. An ARM common-type false positive was corrected using the exported
-`isArmCommonType` predicate. Explicit operation-ID differences remain accepted
-source-contract limits; no emitter call or guessed OpenAPI name belongs in this
-rule. Functional equality is **not** established.
+named scalars, enums, and supported unions. Round 2 corrections restrict
+definition reachability to HTTP request and response bodies, recognize
+underscored effective names on direct or service-located operations, traverse
+derived response models, and use schema-neutral diagnostics. The root service
+namespace false positive and schema `@clientName` false positives were
+corrected with native regressions. An ARM common-type false positive was
+corrected using the exported `isArmCommonType` predicate. Explicit operation-ID
+differences remain accepted source-contract limits; no emitter call or guessed
+OpenAPI name belongs in this rule. Functional equality is **not** established.
 
 Within each HTTP service, compare the effective AutoRest-scoped client location
 or client name of an interface operation group (or a nested, non-service
@@ -49,14 +54,16 @@ models, scalars, enums, and unions directly declared in that service namespace.
 ARM common types use external definitions and are not local name candidates
 even if copied into the service namespace; their child types are still
 traversed for local definitions.
-Do not treat a direct service operation as though the service name were its
-operation group unless `@clientLocation` explicitly supplies one: the
-generated ID can have no noun or a different group. Honor relevant
-`@clientName` overrides on interfaces, namespaces, and models, while ignoring
-overrides scoped exclusively to other emitters.
-Collect schema types reachable through operation inputs and results, including
-nested properties, base models, tuples and union variants, with cycle-safe
-traversal. Report one warning per colliding HTTP operation, on that operation.
+For a direct service operation, or an operation explicitly relocated to the
+service/global namespace, use the effective operation name only when it
+contains the underscore required by the validator. Honor relevant
+`@clientName` overrides on operations, interfaces, namespaces, and schema
+types, while ignoring overrides scoped exclusively to other emitters.
+Collect schema types reachable through single HTTP request and response bodies,
+including nested properties, base and derived models, indexers, tuples and
+union variants, with cycle-safe traversal. Do not treat query, path, request
+header, response header, status-code, multipart, or file metadata as emitted
+definitions. Report one warning per colliding HTTP operation, on that operation.
 Do not report an unused type, a differently qualified nested type, or a type
 from another service. The shared HTTP service API provides the operation
 population; the compiler type graph and supported SDK naming metadata provide
@@ -81,7 +88,11 @@ reconstruction of generated names.
 | `Widget` returned by `Widgets.get`                                                    | Yes                                       | Interface `Widgets` differs from reachable model `Widget`; emitted `operationId: Widgets_Get`, definition `Widget`                            | No warning                | No warning                                           | `noun-does-not-conflict/main.tsp` and snapshots                                                                         |
 | `ApiContracts.listByTags` with `@@clientLocation(..., "Operation", "!javascript")`    | Yes                                       | AutoRest-scoped location is `Operation`, not authored interface `ApiContracts`; Swagger has `Operation_ListByTags` and definition `Operation` | Warn                      | Warn on operation                                    | ApiManagement selected Swagger, back-compatible.tsp, full corpus, and scoped native regression                          |
 | `@@clientLocation(read, "Widget_Admin", "!javascript")` with schema `Widget`          | Yes                                       | Emitted `operationId: Widget_Admin_Read`; the validator compares the first segment `Widget`                                                   | Warn                      | Warn on operation                                    | Native regression plus AutoRest source and focused emission reproduction                                                |
+| Direct `Widget_read` operation, including when relocated to the service namespace     | Yes                                       | Emitted operation ID retains the effective operation name; its first segment is `Widget`                                                      | Warn                      | Warn on operation                                    | Native regressions plus `resolveOperationId` source                                                                     |
 | Named scalar, enum, or string-literal union `Widget` returned by group `Widget`       | Yes                                       | Each supported named type is referenced through an emitted `definitions.Widget` entry                                                         | Warn                      | Warn on operation                                    | Native regressions plus focused AutoRest emission reproduction                                                          |
+| Scalar `Widget` used only as a query parameter or response header                     | Yes                                       | OpenAPI v2 parameter/header schemas are inline and do not add `definitions.Widget`                                                            | No warning                | No warning                                           | Native negative regressions plus `getSimpleParameterSchema`/`getResponseHeader` source                                  |
+| `Widget extends Base` while group `Widget` returns `Base`                             | Yes                                       | Emitting `Base` schedules eligible derived model `Widget` as a definition                                                                     | Warn                      | Warn on operation                                    | Native regression plus AutoRest derived-model test and `getSchemaForModel` source                                       |
+| Template declaration `Widget<T> extends Base` while group `Widget` returns `Base`     | Yes                                       | Template declarations are not concrete emitted definitions                                                                                    | No warning                | No warning                                           | Native negative regression plus `includeDerivedModel` source                                                            |
 | Response property `@visibility(Lifecycle.Create) hidden: Hidden`                      | Yes                                       | AutoRest retains it with `x-ms-mutability: ["create"]` and emits `definitions.Hidden`, including when unreachable types are omitted           | Warn if group is `Hidden` | Warn on operation                                    | Focused AutoRest emission reproduction; visibility filtering would incorrectly drop an emitted definition               |
 | `Widget` model with `@@clientName(Widget, "widget")` and group `Widget`               | Yes                                       | Effective model definition `widget` is distinct from operation group `Widget`                                                                 | No warning                | No warning                                           | ResourceHealth selected Swagger has lowercased `event`/`events` definitions; native model-override regression           |
 | `PrivateEndpointConnection is PrivateEndpointConnectionResource` and a matching group | Yes                                       | ARM common-type model uses an external definition, not a local `PrivateEndpointConnection` definition                                         | No warning                | No warning                                           | ApiManagement selected Swagger, `isArmCommonType` and native real-inheritance regression                                |
@@ -108,7 +119,7 @@ or generator revision; its checked-in content hash is
 The corpus dataset was generated on `2026-08-06T08:03:27.940Z` by
 `test/harness/spec-dataset.ts` at TypeSpec repository base
 `deb8c8d4fbdd7d962e5b2ff4fd6e4b9c2cb3b168`; the final TypeSpec
-analysis was generated on `2026-09-29T16:05:36.430Z` using the round 1 review
+analysis was generated on `2026-09-29T18:22:43.353Z` using the round 2 review
 draft. The older gist's source project revision is not recorded
 there; its denominator and rule count cannot be equated to this run.
 
@@ -157,14 +168,16 @@ The violation fixture uses an operation in `Operations.Widget` returning the
 reachable service model `TestService.Widget`. The checked-in Swagger snapshot
 contains `"operationId": "Widget_Get"` and the `"Widget"` definition; the
 validator and native linter each report once. The plural `Widgets` fixture
-is validator-clean and native-clean. Native tests exercise a request model
-used by another operation, an unused model, a nested model, a recursive
-model, scoped string/typed client locations, client names on operation groups
-and models, and controls scoped only to another emitter. Both fixture tests
-and all 25 focused native tests pass (all 487 tests in the native rule suite
-also pass). The native suite covers direct service operation non-conflict,
-an actual emitted Swagger noun gap. Other fixture diagnostics are explicitly
-reviewed ambient warnings, not evidence of this rule's behavior.
+is validator-clean and native-clean. Native tests exercise body-only
+reachability, query/header exclusions, base and eligible derived models,
+template-declaration exclusion, unused/nested/recursive models, direct
+underscored operation names, scoped string/typed client locations, client names
+on operations, groups, and schema types, and controls scoped only to another
+emitter. Both fixture tests and all 32 focused native tests pass (all 494 tests
+in the native rule suite also pass). The native suite covers direct service
+operation non-conflict and conflict, including actual emitted Swagger noun
+gaps. Other fixture diagnostics are explicitly reviewed ambient warnings, not
+evidence of this rule's behavior.
 
 ## Systematic review of the original 55 validator-only projects
 
@@ -446,7 +459,10 @@ are **not** assumed to share the sampled ApiManagement cause:
 older removed resource) and ServiceFabricManagedClusters (two warnings where
 explicit lowercase `@operationId` overrides the inferred group).
 **Same-project overlap:** 54; not proof of individual operation equivalence.
-The rule fixes a valid authored shape demonstrated by the fixture and
-ApiManagement, but remaining model visibility and explicit-ID gaps mean
-functional equality is not established. Do not represent this migration as
-fully equivalent.
+The rule fixes valid authored shapes demonstrated by the fixture, focused
+native regressions, and ApiManagement. The remaining evidence-backed contract
+gap is explicit `@operationId`, which the official `no-openapi` rule discourages
+and this native implementation intentionally does not reconstruct. Corpus
+cardinality differences also remain only project-level evidence, so functional
+equality is not established. Do not represent this migration as fully
+equivalent.

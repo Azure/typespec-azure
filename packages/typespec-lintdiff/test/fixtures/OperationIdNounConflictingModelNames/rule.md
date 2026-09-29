@@ -16,14 +16,15 @@ tspLints:
 
 ## Description
 
-Use distinct names for operation groups and service models. An interface named
-`Widget` with an operation returning the service's `Widget` model can create a
-generated client/schema name conflict. The same conflict can occur with a
-reachable named scalar, enum, or union. Name the operation group `Widgets`
-instead. The rule checks reachable schema types from the service's HTTP
-operations; an unused declaration or a type in a distinct nested namespace does
-not create a conflict. A direct service operation does not use the service's
-name as an operation group unless an explicit client location supplies one.
+Use distinct names for operation ID nouns and service schema types. An interface
+named `Widget` with an operation returning the service's `Widget` model can
+create a generated client/schema name conflict. The same conflict can occur with
+a reachable named scalar, enum, union, or model derived from a response body
+model. Use the plural noun `Widgets` instead. The rule checks schema types
+reachable from HTTP request and response bodies; query/path/header-only types,
+unused declarations, and types in distinct nested namespaces do not create a
+conflict. A direct service operation contributes a noun only when its effective
+operation name contains an underscore.
 The rule honors the effective AutoRest-scoped `@clientLocation` for operations
 and `@clientName` for interfaces, namespaces, and service schema types. Because
 the validator checks the operation ID segment before the first underscore, a
@@ -40,7 +41,7 @@ diagnostics outside this native authoring contract.
 
 ## Test Cases
 
-| ID                       | Violation | Description                                                 |
-| ------------------------ | --------- | ----------------------------------------------------------- |
-| `noun-conflicts-model`   | true      | An interface group and reachable service model share a name |
-| `noun-does-not-conflict` | false     | A plural operation group has a distinct name                |
+| ID                       | Violation | Description                                                   |
+| ------------------------ | --------- | ------------------------------------------------------------- |
+| `noun-conflicts-model`   | true      | An operation ID noun and reachable service model share a name |
+| `noun-does-not-conflict` | false     | A plural operation ID noun has a distinct name                |

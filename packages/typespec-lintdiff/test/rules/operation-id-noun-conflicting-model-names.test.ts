@@ -36,7 +36,7 @@ using Azure.ClientGenerator.Core;
 const diagnostic = {
   code: "tsp-lintdiff-local-linter/operation-id-noun-conflicting-model-names",
   message:
-    "Operation group 'Widget' conflicts with the model 'Widget'. Consider a plural group name to avoid disambiguation in generated clients.",
+    "Operation ID noun 'Widget' conflicts with the schema type 'Widget'. Consider a plural noun to avoid disambiguation in generated clients.",
 };
 
 describe("operation-id-noun-conflicting-model-names", () => {
@@ -73,6 +73,40 @@ describe("operation-id-noun-conflicting-model-names", () => {
         }`,
       )
       .toEmitDiagnostics([diagnostic]);
+  });
+
+  it("ignores schema types used only by non-body parameters", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        scalar Widget extends string;
+        namespace Operations {
+          interface Widget {
+            @get @route("/widgets") op read(@query query: Example.Widget): string;
+          }
+        }`,
+      )
+      .toBeValid();
+  });
+
+  it("ignores schema types used only by response headers", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        scalar Widget extends string;
+        namespace Operations {
+          interface Widget {
+            @get @route("/widgets") op read(): {
+              @header widget: Example.Widget;
+            };
+          }
+        }`,
+      )
+      .toBeValid();
   });
 
   it("uses the containing namespace for operations without an interface", async () => {
@@ -152,6 +186,51 @@ describe("operation-id-noun-conflicting-model-names", () => {
       .toEmitDiagnostics([diagnostic]);
   });
 
+  it("uses an underscored direct operation name as the effective operation ID", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        model Widget { id: string; }
+        @get @route("/widgets") op Widget_read(): Widget;
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
+  it("uses an underscored client name override on a direct operation", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        model Widget { id: string; }
+        @get @route("/widgets") op read(): Widget;
+        @@clientName(read, "Widget_read", "!javascript");
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
+  it("uses the operation name when a client location is the service namespace", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        model Widget { id: string; }
+        namespace Operations {
+          interface Widgets {
+            @get @route("/widgets") op Widget_read(): Example.Widget;
+          }
+        }
+        @@clientLocation(Operations.Widgets.Widget_read, Example, "!javascript");
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
   it("uses the overridden name of a typed client location", async () => {
     await (
       await tester()
@@ -203,7 +282,7 @@ describe("operation-id-noun-conflicting-model-names", () => {
         {
           ...diagnostic,
           message:
-            "Operation group 'Widgets' conflicts with the model 'Widgets'. Consider a plural group name to avoid disambiguation in generated clients.",
+            "Operation ID noun 'Widgets' conflicts with the schema type 'Widgets'. Consider a plural noun to avoid disambiguation in generated clients.",
         },
       ]);
   });
@@ -336,7 +415,7 @@ describe("operation-id-noun-conflicting-model-names", () => {
         {
           ...diagnostic,
           message:
-            "Operation group 'Operation' conflicts with the model 'Operation'. Consider a plural group name to avoid disambiguation in generated clients.",
+            "Operation ID noun 'Operation' conflicts with the schema type 'Operation'. Consider a plural noun to avoid disambiguation in generated clients.",
         },
       ]);
   });
@@ -361,7 +440,7 @@ describe("operation-id-noun-conflicting-model-names", () => {
         {
           ...diagnostic,
           message:
-            "Operation group 'Child' conflicts with the model 'Child'. Consider a plural group name to avoid disambiguation in generated clients.",
+            "Operation ID noun 'Child' conflicts with the schema type 'Child'. Consider a plural noun to avoid disambiguation in generated clients.",
         },
       ]);
   });
@@ -407,6 +486,40 @@ describe("operation-id-noun-conflicting-model-names", () => {
         model Example { id: string; }
         @get @route("/example") op read(): Example;
       `,
+      )
+      .toBeValid();
+  });
+
+  it("reports a derived response model emitted with its base model", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        model Base { id: string; }
+        model Widget extends Base { name: string; }
+        namespace Operations {
+          interface Widget {
+            @get @route("/widgets") op read(): Example.Base;
+          }
+        }`,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
+  it("ignores a derived template declaration that is not emitted", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        model Base { id: string; }
+        model Widget<T> extends Base { value: T; }
+        namespace Operations {
+          interface Widget {
+            @get @route("/widgets") op read(): Example.Base;
+          }
+        }`,
       )
       .toBeValid();
   });
