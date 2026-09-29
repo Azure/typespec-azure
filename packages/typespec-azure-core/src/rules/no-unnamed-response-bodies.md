@@ -10,37 +10,82 @@ A named response model gives client generators a reusable type and helps authors
 
 #### Incorrect
 
-An anonymous response declares its payload inline:
+For an ARM resource read, use `ArmResourceRead` and customize its `Response` only when needed. Adding a payload property outside a named model creates an anonymous response shape:
 
 ```tsp
-@get
-@route("/widgets/{name}")
-op readWidget(@path name: string): {
-  @statusCode status: 200;
-  @header etag: string;
+import "@typespec/http";
+import "@azure-tools/typespec-azure-resource-manager";
+
+using TypeSpec.Http;
+using Azure.ResourceManager;
+
+@service
+@armProviderNamespace("Microsoft.Contoso")
+namespace Microsoft.Contoso;
+
+model WidgetProperties {
   value: string;
-};
+}
+
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
+}
+
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<
+    Widget,
+    Response = {
+      @statusCode status: 200;
+      ...Widget;
+      etag: string;
+    }
+  >;
+}
 ```
 
 #### Correct
 
-Define the payload as a named model and return it directly or spread it into a response envelope:
+Define the complete payload as a named model and spread it into the customized response:
 
 ```tsp
-model Widget {
+import "@typespec/http";
+import "@azure-tools/typespec-azure-resource-manager";
+
+using TypeSpec.Http;
+using Azure.ResourceManager;
+
+@service
+@armProviderNamespace("Microsoft.Contoso")
+namespace Microsoft.Contoso;
+
+model WidgetProperties {
   value: string;
 }
 
-@get
-@route("/widgets/{name}")
-op readWidget(@path name: string): {
-  @statusCode status: 200;
-  @header etag: string;
-  ...Widget;
-};
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
+}
+
+model WidgetResponse extends Widget {
+  etag: string;
+}
+
+@armResourceOperations
+interface Widgets {
+  get is ArmResourceRead<
+    Widget,
+    Response = {
+      @statusCode status: 200;
+      ...WidgetResponse;
+    }
+  >;
+}
 ```
 
 A complete spread can reuse a named model even when headers or status codes are declared inside the named model, outside its spread, or in both places. Adding payload properties outside the named model creates a new anonymous response shape and is reported.
+
+When no custom response is needed, prefer `ArmResourceRead<Widget>` without a `Response` override. Its default response uses an explicit `@bodyRoot`, which is outside this rule's scope. Concrete operations declared with `is ArmResourceRead<...>` are still checked when their customized responses have implicit payloads.
 
 ## Scope
 
