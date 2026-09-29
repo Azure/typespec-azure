@@ -434,11 +434,12 @@ existing tester helper:
 Apply the [contract-driven coverage](../typespec-lint-validate/SKILL.md#contract-driven-coverage)
 checklist and [rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary)
 before fixture conversion. Do not port framework-only cases merely because they
-exist in the source suite or migration harness. In ARM resource examples and tests,
-prefer standard operation templates with named customization arguments and
-omitted defaults. Preserve handcrafted cases that specifically prove scope or
-non-resource behavior. For SDK naming, prove common versus language-scoped
-override behavior and the intended name domain.
+exist in the source suite or migration harness. Apply the
+[example authoring policy](../typespec-lint-implement/SKILL.md#example-authoring)
+to representative ARM resource scenarios without rewriting focused handwritten
+semantic tests or introducing ARM coupling into shared Core test setup. For SDK
+naming, prove common versus language-scoped override behavior and the intended
+name domain.
 
 Create:
 
@@ -519,9 +520,13 @@ library documentation following the
   user-facing consequences in Azure tooling; do not carry over emitted-reference
   mechanics merely to explain the migration
 - include realistic TypeSpec incorrect and correct examples
-- for ARM resource operations, use standard templates in both examples, showing
-  the invalid customization through named arguments where applicable; compile
-  the examples using the existing example/test workflow
+- apply the shared [example authoring policy](../typespec-lint-implement/SKILL.md#example-authoring):
+  choose the example audience independently of the destination package, use
+  standard templates with named customizations for ARM resource scenarios, and
+  justify any handwritten ARM exception
+- pass the [documentation example validation](../typespec-lint-validate/SKILL.md#documentation-example-validation)
+  gate for the actual incorrect/correct snippets; preserve the diagnostic
+  contrast rather than substituting an exempt default template response
 - follow the destination's authored-document conventions, including `## Impact`
   with the affected areas and `## Suppression` guidance when used by neighboring
   rules; explain when suppression is appropriate rather than only how to fix
@@ -652,7 +657,9 @@ Optimized validation order:
 5. inspect the generated package README and website linter/rule references for
    the official rule name, page path, links, and table entry; check the authored
    rule docs and generated rule page against the native rule documentation
-   contract, reading the main guidance independently of its migration section
+   contract, reading the main guidance independently of its migration section;
+   require documentation-example evidence for the final snippets,
+   rerunning it if the operation, response, or supporting setup changes
 6. format changed Markdown and run a Prettier check over the generated package
    README, rule documentation, and website linter/rule references, using an
    empty-ignore override and explicit filenames as shown below
@@ -854,6 +861,10 @@ promotion diff. The review should inspect:
 - docs accuracy, including front matter, full-name block, TypeSpec/SDK-focused
   rationale, and any Swagger/LintDiff provenance being confined to a provenance
   section
+- example audience and template selection under the shared authoring policy,
+  justified handwritten ARM exceptions, and diagnostic evidence for the final
+  incorrect/correct snippets with the target rule enabled; compilation or a
+  passing exempt default-template example alone does not satisfy this gate
 - generated docs and formatting drift, especially after rule renames:
   `packages/<target>/README.md`,
   `website/src/content/docs/docs/libraries/<library>/reference/linter.md`, and

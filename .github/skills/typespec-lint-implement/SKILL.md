@@ -94,6 +94,31 @@ section: they must stand alone as native TypeSpec guidance. Check both the
 authored documentation and regenerated public pages when applicable; correct
 the authored source and regenerate rather than patching generated copies.
 
+### Example authoring
+
+Choose the example's audience explicitly: ARM resource authoring, data-plane,
+or generic HTTP/type semantics. Package ownership alone does not choose that
+audience: a shared Core rule can still need an ARM resource example.
+
+- For ARM resource scenarios, use standard ARM operation templates in both the
+  incorrect and correct examples. Express the violation through supported named
+  customization arguments and omit unchanged defaults.
+- For data-plane or generic examples, use authoring patterns appropriate to that
+  audience; do not introduce ARM solely because the rule also applies to ARM.
+- Before using a handwritten ARM route or operation, inspect the relevant
+  template's customization points. If none can express the rule-owned behavior
+  being explained, record that limitation and the reason for the handwritten
+  example in validation evidence or PR notes. Brevity alone is not a reason.
+- Preserve the semantic contrast when adopting templates. Both examples must
+  reach the rule's intended check; the correction should fix the violation,
+  not merely switch to an exempt construct. For an implicit-response-body rule,
+  for example, a default template returning an explicit body is not a substitute
+  for a violating implicit response customization.
+
+Apply the [documentation example validation](../typespec-lint-validate/SKILL.md#documentation-example-validation)
+gate to the actual published snippets. This authoring policy does not require
+rewriting focused semantic unit tests around ARM templates.
+
 ## Deliverable
 
 Produce:
