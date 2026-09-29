@@ -185,9 +185,10 @@ subscription-scoped and tenant-scoped resources can share the same resource type
 having different instance paths. Resource type alone does not encode scope, parent identifiers, or
 extension-resource targets.
 
-Track synthetic parents internally and do not invoke model-based naming for them. Current synthetic
-parents reuse the child model in their `type` field, so model identity alone cannot distinguish
-them.
+Track synthetic parents internally and invoke the name resolver with `type: undefined`. Current
+synthetic parents reuse the child model in their stored `type` field, but that model is not an
+authoritative declaration for the synthetic resource. Consumers can use `defaultName`,
+`resourceType`, or `resourceInstancePath` to name synthetic occurrences explicitly.
 
 For a TCGC integration test, let the consumer call `getLibraryName` or
 `getClientNameOverride`. Do not duplicate TCGC precedence in ARM.
@@ -197,7 +198,7 @@ The implemented consumer adapter is:
 ```ts
 resolveArmResources(program, {
   version,
-  nameResolver: ({ type }) => getLibraryName(tcgcContext, type),
+  nameResolver: ({ type }) => (type === undefined ? undefined : getLibraryName(tcgcContext, type)),
 });
 ```
 
@@ -244,7 +245,7 @@ realm ownership separately. No custom name may leak to another call.
 - Rename a resource model, operation, and operation interface.
 - Verify all aliases of one operation receive the same name.
 - Verify paths and resource type segments remain unchanged.
-- Verify synthetic parent names are not derived from the child model's client name.
+- Verify synthetic parents receive `type: undefined` and can be renamed by default name or path.
 - Verify empty callback results produce the intended diagnostic behavior.
 
 ## Common failure modes
@@ -260,7 +261,7 @@ realm ownership separately. No custom name may leak to another call.
 - Mutating a cached `Provider` during post-processing.
 - Checking only a state-map key while a value still references original types.
 - Applying TCGC names before resource identity matching.
-- Applying the child model's name to a synthetic parent.
+- Passing the reused child model as the authoritative type for a synthetic parent.
 - Renaming ARM wire resource type segments with a client name.
 - Clearing ARM registration maps program-wide.
 - Adding an ARM runtime dependency on TCGC.
