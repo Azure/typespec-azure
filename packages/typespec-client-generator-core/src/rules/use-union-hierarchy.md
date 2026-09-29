@@ -1,5 +1,6 @@
-Named unions containing at least one model variant must declare an `extends`
-constraint, including unions that mix models with other types.
+Named unions must declare an `extends` constraint unless all their variants are
+assignable to `string`. Numeric, model, and other non-string unions require a
+constraint, including unions that mix strings with other types.
 For a model constraint such as `union Pet extends PetBase`, each model variant must
 be `PetBase` itself or inherit from that exact model, directly or transitively.
 A model can be a variant of only one union with a model `extends` constraint.
@@ -55,10 +56,22 @@ union Pet extends PetBase {
 }
 ```
 
-## Unions without model variants
+## Numeric unions
 
-Named unions containing only non-model variants, including string unions, do not
-have to use `extends`:
+Numeric named unions must declare a constraint even when their variants are
+literals rather than models:
+
+```tsp
+union Priority extends int32 {
+  low: 1,
+  high: 2,
+}
+```
+
+## String unions
+
+String unions do not have to use `extends`. This includes string literals,
+extensible strings, scalars derived from `string`, and nested string unions:
 
 ```tsp
 union Color {
@@ -67,6 +80,9 @@ union Color {
   blue: "blue",
 }
 ```
+
+Mixing strings with numeric, model, or `null` variants does not qualify for this
+exemption.
 
 Anonymous union expressions such as `Cat | null` also do not require `extends`.
 
@@ -108,8 +124,8 @@ single union hierarchy avoids incompatible SDK inheritance requirements.
 
 ## Suppression
 
-Do not suppress this rule. Declare an `extends` constraint for named unions with
-model variants. When using a model constraint, use `model extends` to establish
+Do not suppress this rule. Declare an `extends` constraint for non-string named
+unions. When using a model constraint, use `model extends` to establish
 the required model hierarchy and keep each model variant in one such union.
 Suppression does not make an unsupported hierarchy representable in nominally
 typed SDKs.

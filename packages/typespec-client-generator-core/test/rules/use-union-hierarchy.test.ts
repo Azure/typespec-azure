@@ -29,7 +29,7 @@ function missingExtends(target: string) {
     code: `${libraryName}/use-union-hierarchy`,
     severity: "warning" as const,
     message:
-      "Named unions containing model variants must declare an 'extends' constraint. Use 'union Name extends Base'.",
+      "Named unions other than string unions must declare an 'extends' constraint. Use 'union Name extends Base'.",
     target,
   };
 }
@@ -56,20 +56,56 @@ describe("named union constraints", () => {
     ["inline models", "union Choice { value: { id: string } }"],
     ["model template instances", "model Item<T> { value: T; } union Choice { Item<string> }"],
     ["named declaration expression", `${base} op read(): union Choice { Base, string };`],
+    ["numeric literals", "union Choice { 1, 2 }"],
+    ["floating-point literals", "union Choice { 1.5, 2.5 }"],
+    ["numeric scalars", "union Choice { int32, float64 }"],
+    ["numeric", "union Choice { numeric }"],
+    ["extensible numbers", "union Choice { int32, first: 1, second: 2 }"],
+    ["nullable numbers", "union Choice { 1, 2, null }"],
+    ["aliased numbers", "alias Number = int32; union Choice { Number, 1 }"],
+    ["custom numeric scalars", "scalar Count extends int32; union Choice { Count, 1 }"],
+    ["mixed strings and numbers", 'union Choice { "first", 1, string }'],
+    ["mixed scalars", "union Choice { string, int32 }"],
+    ["booleans", "union Choice { true, false }"],
+    ["boolean scalars", "union Choice { boolean }"],
+    ["nullable strings", 'union Choice { "first", "second", null }'],
+    ["null", "union Choice { null }"],
+    ["enum members", "enum Values { first, second } union Choice { Values.first, Values.second }"],
+    [
+      "numeric enum members",
+      "enum Values { first: 1, second: 2 } union Choice { Values.first, Values.second }",
+    ],
+    ["enums", "enum Values { first, second } union Choice { Values, string }"],
+    ["numeric enums", "enum Values { first: 1, second: 2 } union Choice { Values }"],
+    ["empty union", "union Choice {}"],
+    [
+      "non-string scalar named string",
+      "namespace Custom { scalar string extends int32; } union Choice { Custom.string }",
+    ],
   ])("requires extends for %s", async (_, code) => {
     await tester.expect(code).toEmitDiagnostics([missingExtends("Choice")]);
   });
 
   it.each([
-    ["scalars", "union Choice { string, int32 }"],
+    ["string scalar", "union Choice { string }"],
     ["literals", 'union Choice { "first", "second" }'],
     ["extensible strings", 'union Choice { string, first: "first", second: "second" }'],
-    ["nullable strings", 'union Choice { "first", "second", null }'],
-    ["enum members", "enum Values { first, second } union Choice { Values.first, Values.second }"],
-    ["enums", "enum Values { first, second } union Choice { Values, string }"],
     ["aliased strings", 'alias Text = string; union Choice { Text, "first" }'],
-    ["empty union", "union Choice {}"],
-    ["named declaration expression", "op read(): union Choice { string, int32 };"],
+    ["custom string scalars", "scalar Text extends string; union Choice { Text }"],
+    [
+      "transitive string scalars",
+      "scalar Text extends string; scalar Label extends Text; union Choice { Label, url }",
+    ],
+    [
+      "string templates",
+      'alias Prefix = "prefix"; union Choice { "${Prefix}-first", "${Prefix}-second" }',
+    ],
+    ["nested string unions", 'union Inner { "first", "second" } union Choice { Inner, string }'],
+    [
+      "nested string expressions",
+      'alias Inner = "first" | "second"; union Choice { Inner, string }',
+    ],
+    ["named declaration expression", 'op read(): union Choice { string, "first" };'],
   ])("does not require extends for %s", async (_, code) => {
     await tester.expect(code).toBeValid();
   });
@@ -89,31 +125,34 @@ describe("named union constraints", () => {
       .toBeValid();
   });
 
-  it("does not diagnose unused templates or concrete non-model instantiations", async () => {
+  it("does not diagnose unused templates or concrete string instantiations", async () => {
     await tester
       .expect(
         `
         ${base}
         union Unused<T> { Base, T }
         union Choice<T> { T }
-        model Usage { text: Choice<string>; number: Choice<int32>; }
+        model Usage { text: Choice<string>; literal: Choice<"first">; }
       `,
       )
       .toBeValid();
   });
 
-  it("checks concrete model instantiations even when a non-model instantiation is visited first", async () => {
-    await tester
-      .expect(
-        `
+  it.each(["Base", "int32", "1", "boolean"])(
+    "checks concrete %s instantiations even when a string instantiation is visited first",
+    async (type) => {
+      await tester
+        .expect(
+          `
         ${base}
         union Unused<T> { T }
         union Choice<T> { T }
-        model Usage { text: Choice<string>; value: Choice<Base>; again: Choice<Base>; }
+        model Usage { text: Choice<string>; value: Choice<${type}>; again: Choice<${type}>; }
       `,
-      )
-      .toEmitDiagnostics([missingExtends("Choice")]);
-  });
+        )
+        .toEmitDiagnostics([missingExtends("Choice")]);
+    },
+  );
 
   it("does not require model variants to belong to only one unconstrained union", async () => {
     await tester
@@ -548,6 +587,10 @@ describe("templates", () => {
 describe("unaffected constructs", () => {
   it.each([
     ["scalar", 'union Choice extends string { "first", "second" }'],
+    ["numeric scalar", "union Choice extends int32 { 1, 2 }"],
+    ["extensible numeric scalar", "union Choice extends numeric { numeric, 1, 2.5 }"],
+    ["nullable numeric scalar", "union Choice extends int32 | null { 1, 2, null }"],
+    ["boolean scalar", "union Choice extends boolean { true, false }"],
     ["enum", "enum Values { first, second } union Choice extends Values { Values.first }"],
     [
       "union",
