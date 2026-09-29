@@ -224,6 +224,115 @@ it("initialization default endpoint with union auth", async () => {
   strictEqual(oauth2Scheme.flows[0].scopes[0].value, "https://security.microsoft.com/.default");
 });
 
+it("preserves OR authentication requirements", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key"> | OAuth2Auth<[MyFlow]>)
+    namespace My.Service;
+
+    op myOp(): void;
+
+    model MyFlow {
+      type: OAuth2FlowType.implicit;
+      authorizationUrl: "https://login.microsoftonline.com/common/oauth2/authorize";
+      scopes: ["https://security.microsoft.com/.default"];
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const client = context.sdkPackage.clients[0];
+
+  ok(client.authentication);
+  strictEqual(client.authentication.options.length, 2);
+  strictEqual(client.authentication.options[0].schemes.length, 1);
+  strictEqual(client.authentication.options[1].schemes.length, 1);
+  strictEqual(client.authentication.options[0].schemes[0].type, "apiKey");
+  strictEqual(client.authentication.options[1].schemes[0].type, "oauth2");
+});
+
+it("preserves AND authentication requirements", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @useAuth([
+      ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">,
+      OAuth2Auth<[MyFlow]>
+    ])
+    namespace My.Service;
+
+    op myOp(): void;
+
+    model MyFlow {
+      type: OAuth2FlowType.implicit;
+      authorizationUrl: "https://login.microsoftonline.com/common/oauth2/authorize";
+      scopes: ["https://security.microsoft.com/.default"];
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const client = context.sdkPackage.clients[0];
+
+  ok(client.authentication);
+  strictEqual(client.authentication.options.length, 1);
+  strictEqual(client.authentication.options[0].schemes.length, 2);
+  strictEqual(client.authentication.options[0].schemes[0].type, "apiKey");
+  strictEqual(client.authentication.options[0].schemes[1].type, "oauth2");
+});
+
+it("preserves the required credential projection when NoAuth is an alternative", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @useAuth(
+      NoAuth
+      | ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">
+      | OAuth2Auth<[MyFlow]>
+    )
+    namespace My.Service;
+
+    op myOp(): void;
+
+    model MyFlow {
+      type: OAuth2FlowType.implicit;
+      authorizationUrl: "https://login.microsoftonline.com/common/oauth2/authorize";
+      scopes: ["https://security.microsoft.com/.default"];
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const client = context.sdkPackage.clients[0];
+  const credentialParam = client.clientInitialization.parameters.find(
+    (parameter): parameter is SdkCredentialParameter => parameter.kind === "credential",
+  );
+
+  ok(credentialParam);
+  strictEqual(credentialParam.optional, false);
+  strictEqual(credentialParam.type.kind, "union");
+  strictEqual(credentialParam.type.variantTypes.length, 3);
+  strictEqual(credentialParam.type.variantTypes[0].scheme.type, "noAuth");
+  ok(client.authentication);
+  strictEqual(client.authentication.options.length, 3);
+  strictEqual(client.authentication.options[0].schemes[0].type, "noAuth");
+});
+
+it("preserves the credential parameter when only NoAuth is configured", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @useAuth(NoAuth)
+    namespace My.Service;
+
+    op myOp(): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const client = context.sdkPackage.clients[0];
+  const credentialParam = client.clientInitialization.parameters.find(
+    (parameter): parameter is SdkCredentialParameter => parameter.kind === "credential",
+  );
+
+  ok(credentialParam);
+  strictEqual(credentialParam.optional, false);
+  strictEqual(credentialParam.type.kind, "credential");
+  strictEqual(credentialParam.type.scheme.type, "noAuth");
+  ok(client.authentication);
+  strictEqual(client.authentication.options.length, 1);
+  strictEqual(client.authentication.options[0].schemes[0].type, "noAuth");
+});
+
 it("initialization one server parameter with apikey auth", async () => {
   const { program } = await SimpleTester.compile(`
         @server(

@@ -1,5 +1,29 @@
 emit:
+  - "@azure-tools/typespec-autorest"
+  - "@azure-tools/typespec-python"
+  - "@typespec/http-client-js"
+  - "@azure-tools/typespec-ts"
+  - "@azure-tools/typespec-java"
+  - "@azure-tools/typespec-go"
+  - "@azure-typespec/http-client-csharp"
   - "@azure-tools/typespec-client-generator-core"
+options:
+  "@azure-tools/typespec-autorest":
+    use-read-only-status-schema: true
+    output-file: "{emitter-output-dir}/{service-name}/{version}/openapi.json"
+  "@azure-tools/typespec-python":
+    namespace: "azure.mgmt.computebenchmark"
+  "@azure-tools/typespec-ts":
+    package-details:
+      name: "@msinternal/azure-mgmt-compute-benchmark"
+  "@azure-tools/typespec-java":
+    namespace: "com.azure.mgmt.computebenchmark"
+    generate-samples: false
+    generate-tests: false
+  "@azure-tools/typespec-go":
+    module: "example.com/benchmark/armcompute"
+  "@azure-typespec/http-client-csharp":
+    namespace: "Azure.ResourceManager.ComputeBenchmark"
 linter:
   extends:
     - "@azure-tools/typespec-azure-rulesets/resource-manager"

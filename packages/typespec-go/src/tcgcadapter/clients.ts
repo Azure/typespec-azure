@@ -15,7 +15,6 @@ import {
   createResponseEnvelopeDescription,
   ensureNameCase,
   getEscapedReservedName,
-  uncapitalize,
 } from "../naming/naming.js";
 import { AdapterError } from "./errors.js";
 import * as helpers from "./helpers.js";
@@ -533,13 +532,13 @@ export class ClientAdapter {
     sdkMethod: tcgc.SdkServiceMethod<tcgc.SdkHttpOperation>,
     goClient: go.Client,
   ): void {
-    const opName = helpers.getEffectiveName(sdkMethod, true);
-    const createReqName = helpers.getEffectiveName(sdkMethod, true, "CreateRequest");
-    const handleRespName = helpers.getEffectiveName(sdkMethod, true, "HandleResponse");
+    const exportOperation =
+      (sdkMethod.kind === "basic" || sdkMethod.kind === "paging") &&
+      sdkMethod.access !== "internal";
     const naming = new go.MethodNaming(
-      getEscapedReservedName(opName, "Operation"),
-      createReqName,
-      handleRespName,
+      helpers.getEffectiveName(sdkMethod, !exportOperation),
+      helpers.getEffectiveName(sdkMethod, true, "CreateRequest"),
+      helpers.getEffectiveName(sdkMethod, true, "HandleResponse"),
     );
 
     const getStatusCodes = function (httpOp: tcgc.SdkHttpOperation): Array<number> {
@@ -557,16 +556,7 @@ export class ClientAdapter {
       return statusCodes;
     };
 
-    let methodName = helpers.getEffectiveName(sdkMethod);
-    if (sdkMethod.access === "internal") {
-      methodName = uncapitalize(methodName);
-      if (sdkMethod.kind === "basic") {
-        // we add internal to the extra list so we don't end up with a method named "internal"
-        // which will collide with an unexported field with the same name. we don't need to
-        // do this for pagers/pollers as those methods get extra naming.
-        methodName = getEscapedReservedName(methodName, "Method", ["internal"]);
-      }
-    }
+    const methodName = this.getMethodName(sdkMethod);
 
     const setLROInfo = function (
       goMethod: go.LROMethod | go.LROPageableMethod,
@@ -854,16 +844,12 @@ export class ClientAdapter {
       );
     }
 
-    let prefix = method.receiver.type.name;
-    if (this.ta.ctx.emitContext.options["single-client"]) {
-      prefix = "";
-    }
-    if (go.isLROMethod(method)) {
-      prefix += "Begin";
-    }
-    let optionalParamsGroupName = `${prefix}${method.name}Options`;
+    const prefix = this.ta.ctx.emitContext.options["single-client"]
+      ? ""
+      : method.receiver.type.name;
+    let optionalParamsGroupName = `${prefix}${method.kind === "pageableMethod" ? ensureNameCase(method.naming.operationMethod) : ensureNameCase(method.name)}Options`;
     if (sdkMethod.access === "internal") {
-      optionalParamsGroupName = uncapitalize(optionalParamsGroupName);
+      optionalParamsGroupName = ensureNameCase(optionalParamsGroupName, true);
     }
     let optsGroupName = "options";
     // if there's an existing required parameter with the name options then pick something else.
@@ -883,7 +869,7 @@ export class ClientAdapter {
     );
     method.optionalParamsGroup.docs.summary = createOptionsTypeDescription(
       optionalParamsGroupName,
-      this.getMethodNameForDocComment(method),
+      this.getFullyQualifiedMethodName(method),
     );
     const respInfo = this.adaptResponseEnvelope(sdkMethod, method);
     method.returns = respInfo.respEnv;
@@ -1701,21 +1687,33 @@ export class ClientAdapter {
     return new go.MultipartFormBodyParameter(paramName, type, paramStyle);
   }
 
-  private getMethodNameForDocComment(method: go.MethodType): string {
+  private getMethodName(sdkMethod: tcgc.SdkServiceMethod<tcgc.SdkHttpOperation>): string {
     let methodName: string;
-    switch (method.kind) {
-      case "lroMethod":
-      case "lroPageableMethod":
-        methodName = `Begin${method.name}`;
+    const unexport = sdkMethod.access === "internal";
+    switch (sdkMethod.kind) {
+      case "basic":
+        methodName = helpers.getEffectiveName(sdkMethod, unexport);
+        if (unexport) {
+          // we add internal to the extra list so we don't end up with a method named "internal"
+          // which will collide with an unexported field with the same name. we don't need to
+          // do this for pagers/pollers as those methods get extra naming.
+          methodName = getEscapedReservedName(methodName, "Method", ["internal"]);
+        }
         break;
-      case "method":
-        methodName = method.name;
+      case "lro":
+      case "lropaging":
+        methodName = `${unexport ? "begin" : "Begin"}${helpers.getEffectiveName(sdkMethod, false)}`;
         break;
-      case "pageableMethod":
-        methodName = `New${method.name}Pager`;
+      case "paging":
+        methodName = `${unexport ? "new" : "New"}${helpers.getEffectiveName(sdkMethod, false)}Pager`;
         break;
     }
-    return `${method.receiver.type.name}.${methodName}`;
+
+    return methodName;
+  }
+
+  private getFullyQualifiedMethodName(method: go.MethodType): string {
+    return `${method.receiver.type.name}.${method.name}`;
   }
 
   private adaptResponseEnvelope(
@@ -1723,13 +1721,16 @@ export class ClientAdapter {
     method: go.MethodType,
   ): { respEnv: go.ResponseEnvelope; respHeaders: RespHeadersMapForPageable } {
     // TODO: add Envelope suffix if name collides with existing type
-    let prefix = method.receiver.type.name;
-    if (this.ta.ctx.emitContext.options["single-client"]) {
-      prefix = "";
-    }
-    let respEnvName = `${prefix}${method.name}Response`;
+    const prefix = this.ta.ctx.emitContext.options["single-client"]
+      ? ""
+      : method.receiver.type.name;
+    const methodName =
+      go.isLROMethod(method) || go.isPageableMethod(method)
+        ? ensureNameCase(method.naming.operationMethod)
+        : ensureNameCase(method.name);
+    let respEnvName = `${prefix}${methodName}Response`;
     if (sdkMethod.access === "internal") {
-      respEnvName = uncapitalize(respEnvName);
+      respEnvName = ensureNameCase(respEnvName, true);
     }
     const customName = helpers.getClientOption<string>(
       "responseEnvelopeName",
@@ -1744,7 +1745,7 @@ export class ClientAdapter {
       {
         summary: createResponseEnvelopeDescription(
           respEnvName,
-          this.getMethodNameForDocComment(method),
+          this.getFullyQualifiedMethodName(method),
         ),
       },
       method,
@@ -1993,7 +1994,7 @@ export class ClientAdapter {
         if (contentType === "XML" && sdkResponseType.kind === "array") {
           // this is for compat with legacy behavior
           fieldName = sdkResponseType.name;
-          const elementType = go.unwrapPtr((<go.Slice>resultType).elementType);
+          const elementType = go.unwrapPtr((<go.Slice>resultType).itemType);
           const elementTypeXmlName = go.hasXMLName(elementType);
           xmlWrapper =
             elementTypeXmlName ?? go.getTypeDeclaration(elementType, method.receiver.type.pkg);
@@ -2316,21 +2317,11 @@ export class ClientAdapter {
                   );
                   break;
                 case "modelResult":
-                  goExample.responseEnvelope.result = this.adaptExampleType(
-                    response.bodyValue,
-                    method.returns.result.modelType,
-                  );
-                  break;
                 case "monomorphicResult":
-                  goExample.responseEnvelope.result = this.adaptExampleType(
-                    response.bodyValue,
-                    method.returns.result.monomorphicType,
-                  );
-                  break;
                 case "polymorphicResult":
                   goExample.responseEnvelope.result = this.adaptExampleType(
                     response.bodyValue,
-                    method.returns.result.interface,
+                    method.returns.result.type,
                   );
                   break;
               }
@@ -2398,7 +2389,7 @@ export class ClientAdapter {
         if (goType.kind === "slice") {
           const ret = new go.ArrayExample(goType);
           for (const v of exampleType.value) {
-            ret.value.push(this.adaptExampleType(v, goType.elementType));
+            ret.value.push(this.adaptExampleType(v, goType.itemType));
           }
           return ret;
         }
@@ -2407,7 +2398,7 @@ export class ClientAdapter {
         if (goType.kind === "map") {
           const ret = new go.DictionaryExample(goType);
           for (const [k, v] of Object.entries(exampleType.value)) {
-            ret.value[k] = this.adaptExampleType(v, goType.valueType);
+            ret.value[k] = this.adaptExampleType(v, goType.itemType);
           }
           return ret;
         }
@@ -2462,7 +2453,7 @@ export class ClientAdapter {
                   `additional properties field not found in model '${concreteType.name}'.`,
                 );
               }
-              ret.additionalProperties[k] = this.adaptExampleType(v, field.type.valueType);
+              ret.additionalProperties[k] = this.adaptExampleType(v, field.type.itemType);
             }
           }
           return ret;

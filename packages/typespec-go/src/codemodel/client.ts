@@ -206,8 +206,13 @@ export interface SyncMethod extends HttpMethodBase {
 
 /** contains the names of the helper methods used to create a complete method implementation */
 export interface MethodNaming {
-  /** the name of the internal method for consumption by LROs/paging methods */
-  internalMethod: string;
+  /**
+   * the unadulterated method name (no prefix/suffix).
+   * for LROs the name is camel cased (i.e. not exported).
+   * all other methods are pascal cased unless they're
+   * explicitly marked as internal.
+   */
+  operationMethod: string;
 
   /** the name of the internal method that creates the HTTP request */
   requestMethod: string;
@@ -498,8 +503,8 @@ export class SyncMethod extends HttpMethodBase implements SyncMethod {
 }
 
 export class MethodNaming implements MethodNaming {
-  constructor(internalMethod: string, requestMethod: string, responseMethod: string) {
-    this.internalMethod = internalMethod;
+  constructor(operationMethod: string, requestMethod: string, responseMethod: string) {
+    this.operationMethod = operationMethod;
     this.requestMethod = requestMethod;
     this.responseMethod = responseMethod;
   }

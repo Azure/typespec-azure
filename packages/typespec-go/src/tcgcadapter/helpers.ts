@@ -226,10 +226,10 @@ export function isExtensibleEnum(type: tcgc.SdkType): boolean {
  * when isExactName is true (set by the tsp exact() function on @clientName), the name
  * (with any provided suffix appended verbatim) is honored as-authored apart from the
  * first character, whose casing must still obey Go's export rules: unexported/parameter
- * identifiers (lowerFirst, or access "internal") are lower-cased while exported ones are
- * upper-cased. otherwise the name (with any provided suffix appended) is canonicalized via
- * naming.ensureNameCase(), with lowerFirst optionally lowercasing the first character
- * for unexported/parameter identifiers.
+ * identifiers (lowerFirst, or access "internal" when lowerFirst is undefined) are lower-cased
+ * while exported ones are upper-cased. otherwise the name (with any provided suffix appended)
+ * is canonicalized via naming.ensureNameCase(), with lowerFirst optionally lowercasing the
+ * first character for unexported/parameter identifiers.
  */
 export function getEffectiveName(
   src: { name: string; isExactName?: boolean; access?: tcgc.AccessFlags },
@@ -240,7 +240,7 @@ export function getEffectiveName(
   if (src.isExactName) {
     // exact names are honored as-authored, but Go's export rules still dictate
     // the first character's casing.
-    if (lowerFirst || src.access === "internal") {
+    if (lowerFirst ?? src.access === "internal") {
       return naming.uncapitalize(name);
     }
     // NOTE: for exact names, we don't want to use naming.ensureNameCase() because it will
