@@ -17,7 +17,7 @@ import {
   type Type,
   type Union,
 } from "@typespec/compiler";
-import type { HttpOperation } from "@typespec/http";
+import type { Authentication, HttpAuth, HttpOperation } from "@typespec/http";
 import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
@@ -349,6 +349,16 @@ function validateOperationNamesInClients(context: SdkContext) {
 }
 
 async function exportTCGCOutput(context: SdkContext) {
+  const serializeAuthScheme = (auth: HttpAuth) => {
+    const { model, ...rest } = auth;
+    return rest;
+  };
+  const serializeAuthentication = (authentication: Authentication) => ({
+    options: authentication.options.map((option) => ({
+      schemes: option.schemes.map(serializeAuthScheme),
+    })),
+  });
+
   await emitFile(context.program, {
     path: resolvePath(context.emitContext.emitterOutputDir, "tcgc-output.yaml"),
     content: stringify(
@@ -357,7 +367,15 @@ async function exportTCGCOutput(context: SdkContext) {
         if (typeof k === "string" && k.startsWith("__")) {
           return undefined; // skip keys starting with "__" from the output
         }
-        if (k === "scheme") {
+        if (
+          k === "authentication" &&
+          typeof v === "object" &&
+          v !== null &&
+          Array.isArray(v.options)
+        ) {
+          return serializeAuthentication(v);
+        }
+        if (k === "scheme" && typeof v === "object" && v !== null && "model" in v) {
           const { model, ...rest } = v;
           return rest; // remove credential schema's model property
         }

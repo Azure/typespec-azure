@@ -54,6 +54,7 @@ jobs:
     env:
       TYPESPEC_VS_CI_BUILD: true
       TYPESPEC_SKIP_WEBSITE_BUILD: true
+      NODE_OPTIONS: --max-old-space-size=12288
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -64,16 +65,31 @@ jobs:
         with:
           node-version: 24.15.0
 
+      - uses: ./.github/actions/setup-python
+
+      - uses: ./.github/actions/setup-java
+
+      - uses: ./.github/actions/setup-go
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+
       - name: Install dependencies
         run: pnpm install
 
       - name: Build
         run: pnpm -r --filter "@azure-tools/typespec-benchmark..." build
 
+      - name: Install C# emitter from npm
+        if: ${{ inputs.backfill_from == '' }}
+        run: node packages/benchmark/scripts/setup-csharp.ts
+
       - name: Run backfill
         if: ${{ inputs.backfill_from != '' }}
         run: |
-          node --max-old-space-size=6144 packages/benchmark/dist/src/cli.js backfill \
+          node packages/benchmark/dist/src/cli.js backfill \
             --from ${{ inputs.backfill_from }} \
             --specs-dir ${{ inputs.specs-dir }} \
             --iterations ${{ inputs.iterations }} \
@@ -84,7 +100,7 @@ jobs:
       - name: Run benchmarks
         if: ${{ inputs.backfill_from == '' }}
         run: |
-          node --max-old-space-size=6144 packages/benchmark/dist/src/cli.js run \
+          node packages/benchmark/dist/src/cli.js run \
             --specs-dir ${{ inputs.specs-dir }} \
             --iterations ${{ inputs.iterations }} \
             --warmup ${{ inputs.warmup }} \

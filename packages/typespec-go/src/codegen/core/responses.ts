@@ -82,7 +82,7 @@ function generateMarshaller(
     text += `${helpers.comment(`MarshalJSON implements the json.Marshaller interface for type ${respEnv.name}.`, "// ", undefined, helpers.commentLength)}\n`;
     text += `func (${receiver} ${respEnv.name}) MarshalJSON() ([]byte, error) {\n`;
     // TODO: this doesn't include any headers. however, LROs with header responses are currently broken :(
-    text += `${indent.get()}return json.Marshal(${receiver}.${go.getTypeDeclaration(respEnv.result.interface, respEnv.method.receiver.type.pkg)})\n}\n\n`;
+    text += `${indent.get()}return json.Marshal(${receiver}.${go.getTypeDeclaration(respEnv.result.type, respEnv.method.receiver.type.pkg)})\n}\n\n`;
   }
   return text;
 }
@@ -122,7 +122,7 @@ function generateUnmarshaller(
 
   // add a custom unmarshaller to the response envelope
   if (polymorphicRes) {
-    const type = polymorphicRes.interface.name;
+    const type = polymorphicRes.type.name;
     unmarshaller += `${indent.get()}res, err := unmarshal${type}(data)\n`;
     unmarshaller += `${indent.get()}if err != nil {\n`;
     indent.push();
@@ -169,12 +169,11 @@ function emit(
     let first = true;
 
     if (respEnv.result) {
-      const respType = go.getResultType(respEnv.result);
-      imports.addForType(respType);
+      imports.addForType(respEnv.result.type);
       if (respEnv.result.kind === "modelResult" || respEnv.result.kind === "polymorphicResult") {
         // anonymously embedded type always goes first
         text += helpers.formatDocComment(respEnv.result.docs);
-        text += `${indent.get()}${go.getTypeDeclaration(respType, respEnv.method.receiver.type.pkg)}\n`;
+        text += `${indent.get()}${go.getTypeDeclaration(respEnv.result.type, respEnv.method.receiver.type.pkg)}\n`;
         first = false;
       } else {
         let tag = "";
@@ -185,7 +184,7 @@ function emit(
 
         fields.push({
           docs: respEnv.result.docs,
-          field: `${indent.get()}${respEnv.result.fieldName} ${go.getTypeDeclaration(respType, respEnv.method.receiver.type.pkg)}${tag}\n`,
+          field: `${indent.get()}${respEnv.result.fieldName} ${go.getTypeDeclaration(respEnv.result.type, respEnv.method.receiver.type.pkg)}${tag}\n`,
         });
       }
     }

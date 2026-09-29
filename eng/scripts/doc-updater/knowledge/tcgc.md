@@ -135,6 +135,7 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 ## Common Mistakes to Avoid
 
 - Don't copy @param descriptions between decorators — @clientApiVersions had @apiVersion's description.
+- Model-reference arguments are converted to SDK types only for `@clientOption`. For other decorators captured through `additionalDecorators`, TCGC reports `unsupported-generic-decorator-arg-type` and records the argument as `undefined`.
 - The 03client.mdx file had a typo "@clientLocaton" (missing 'i') — fixed to "@clientLocation".
 - In mockapi.ts files, query parameters use `query:` not `params:` in the request object.
 - The guideline.md previously said `encode` is set only when `@encode` exists — this was inaccurate since encode can also be set contextually (e.g., multipart).
@@ -188,6 +189,18 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - `@apiVersion(false)` prevents a parameter from matching to a client API version parameter, keeping it on the method.
 - Body model properties named "apiVersion" are NOT treated as API version params — only HTTP metadata params (header/query/path/cookie) and server URL template parameters (from `@server`) are matched by name.
 - Server URL template parameters (declared in `@server` decorator's parameter model) named `apiVersion`/`api-version` are recognized as API version params, even with plain `string` type in versioned services.
+
+## Legacy API-Version Overrides
+
+- `@Azure.Core.Legacy.overrideApiVersion` changes an operation API-version parameter's `clientDefaultValue` without changing client `apiVersions` metadata.
+- Override lookup follows the operation's declaration scope and source-operation chain. Moving an operation with `@clientLocation` does not make it inherit the destination client's override.
+- The Spector scenario under `azure/core/api-version-override` verifies the overridden wire query value. Detailed inheritance and metadata behavior remain unit-test concerns.
+
+## SDK Method Naming Rules
+
+- `get-operation-name` checks the common TCGC SDK name of concrete GET operations and requires a `get` or `list` prefix. It honors unscoped `@clientName`, ignores emitter-scoped overrides and OpenAPI operation IDs, and skips template declarations/artifacts and non-GET operations.
+- `use-create-for-put` checks concrete PUT endpoints and requires the common TCGC SDK name to start with `create`, case-insensitively. It uses the same common-name resolution, applies without requiring ARM provider metadata, and is disabled by default in the `client-sdk` ruleset.
+- Linter-only naming rules do not alter the generated client graph or wire behavior, so their unit tests and generated rule reference pages are the appropriate coverage; do not add Spector carrier scenarios for them.
 
 ## isExactName Property (May 2026)
 
