@@ -34,21 +34,21 @@ export const operationIdNounConflictingModelNamesRule = createRule({
       root: () => {
         const [services] = getAllHttpServices(context.program);
         for (const service of services) {
-          const modelNames = new Set<string>();
+          const schemaNames = new Set<string>();
           const visited = new Set<Type>();
           for (const httpOperation of service.operations) {
-            collectModels(
+            collectSchemas(
               httpOperation.operation.parameters,
               service.namespace,
               tcgcContext,
-              modelNames,
+              schemaNames,
               visited,
             );
-            collectModels(
+            collectSchemas(
               httpOperation.operation.returnType,
               service.namespace,
               tcgcContext,
-              modelNames,
+              schemaNames,
               visited,
             );
           }
@@ -56,7 +56,7 @@ export const operationIdNounConflictingModelNamesRule = createRule({
           for (const httpOperation of service.operations) {
             const operation = httpOperation.operation;
             const noun = getOperationGroup(context.program, tcgcContext, operation);
-            if (noun && modelNames.has(noun)) {
+            if (noun && schemaNames.has(noun)) {
               context.reportDiagnostic({ target: operation, format: { noun } });
             }
           }
@@ -73,29 +73,36 @@ function getOperationGroup(
 ): string | undefined {
   const location = getClientLocation(tcgcContext, operation);
   if (location) {
-    if (typeof location === "string") return capitalize(location);
+    if (typeof location === "string") return getOperationIdNoun(location);
     if (
       location.kind === "Namespace" &&
       (isGlobalNamespace(program, location) || isService(program, location))
     ) {
       return undefined;
     }
-    return capitalize(getClientName(tcgcContext, location));
+    return getOperationIdNoun(getClientName(tcgcContext, location));
   }
 
-  if (operation.interface) return capitalize(getClientName(tcgcContext, operation.interface));
+  if (operation.interface) {
+    return getOperationIdNoun(getClientName(tcgcContext, operation.interface));
+  }
   const namespace = operation.namespace;
   if (!namespace || isGlobalNamespace(program, namespace) || isService(program, namespace)) {
     return undefined;
   }
-  return capitalize(getClientName(tcgcContext, namespace));
+  return getOperationIdNoun(getClientName(tcgcContext, namespace));
 }
 
 function getClientName(tcgcContext: TCGCContext, type: Interface | Namespace): string {
   return getClientNameOverride(tcgcContext, type) ?? type.name;
 }
 
-function collectModels(
+function getOperationIdNoun(groupName: string): string | undefined {
+  const noun = groupName.split("_", 1)[0];
+  return noun ? capitalize(noun) : undefined;
+}
+
+function collectSchemas(
   type: Type,
   service: Namespace,
   tcgcContext: TCGCContext,
@@ -110,20 +117,26 @@ function collectModels(
       if (type.name && type.namespace === service && !isArmCommonType(type)) {
         names.add(getClientNameOverride(tcgcContext, type) ?? type.name);
       }
-      if (type.baseModel) collectModels(type.baseModel, service, tcgcContext, names, visited);
-      if (type.indexer) collectModels(type.indexer.value, service, tcgcContext, names, visited);
+      if (type.baseModel) collectSchemas(type.baseModel, service, tcgcContext, names, visited);
+      if (type.indexer) collectSchemas(type.indexer.value, service, tcgcContext, names, visited);
       for (const property of type.properties.values()) {
-        collectModels(property.type, service, tcgcContext, names, visited);
+        collectSchemas(property.type, service, tcgcContext, names, visited);
       }
       break;
+    case "Scalar":
+    case "Enum":
     case "Union":
+      if (type.name && type.namespace === service && !isArmCommonType(type)) {
+        names.add(getClientNameOverride(tcgcContext, type) ?? type.name);
+      }
+      if (type.kind !== "Union") break;
       for (const variant of type.variants.values()) {
-        collectModels(variant.type, service, tcgcContext, names, visited);
+        collectSchemas(variant.type, service, tcgcContext, names, visited);
       }
       break;
     case "Tuple":
       for (const value of type.values) {
-        collectModels(value, service, tcgcContext, names, visited);
+        collectSchemas(value, service, tcgcContext, names, visited);
       }
       break;
   }

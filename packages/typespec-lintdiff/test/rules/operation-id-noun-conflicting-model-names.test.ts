@@ -105,6 +105,37 @@ describe("operation-id-noun-conflicting-model-names", () => {
       .toEmitDiagnostics([diagnostic]);
   });
 
+  it("uses the first operation ID segment of an underscored client location", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        model Widget { id: string; }
+        interface Widgets {
+          @get @route("/widgets") op read(): Widget;
+        }
+        @@clientLocation(Widgets.read, "Widget_Admin", "!javascript");
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
+  it("uses the first operation ID segment of an underscored interface name", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        model Widget { id: string; }
+        interface Widget_Admin {
+          @get @route("/widgets") op read(): Widget;
+        }
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
   it("uses the client name override of an operation's interface", async () => {
     await (
       await tester()
@@ -208,6 +239,57 @@ describe("operation-id-noun-conflicting-model-names", () => {
           }
         }
         @@clientName(Example.Widget, "widget", "javascript");
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
+  it("reports a named scalar definition colliding with an operation group", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        scalar Widget extends string;
+        namespace Operations {
+          interface Widget {
+            @get @route("/widgets") op read(): Example.Widget;
+          }
+        }
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
+  it("reports a named enum definition colliding with an operation group", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        enum Widget { one }
+        namespace Operations {
+          interface Widget {
+            @get @route("/widgets") op read(): Example.Widget;
+          }
+        }
+      `,
+      )
+      .toEmitDiagnostics([diagnostic]);
+  });
+
+  it("reports a named union definition colliding with an operation group", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `${header}
+        union Widget { "one", "two" }
+        namespace Operations {
+          interface Widget {
+            @get @route("/widgets") op read(): Example.Widget;
+          }
+        }
       `,
       )
       .toEmitDiagnostics([diagnostic]);

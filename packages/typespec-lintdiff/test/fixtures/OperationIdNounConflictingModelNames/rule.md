@@ -18,17 +18,20 @@ tspLints:
 
 Use distinct names for operation groups and service models. An interface named
 `Widget` with an operation returning the service's `Widget` model can create a
-generated client/model name conflict. Name the operation group `Widgets` instead.
-The rule checks reachable models from the service's HTTP operations; an unused
-model declaration or a namespaced model with a distinct qualified name does
+generated client/schema name conflict. The same conflict can occur with a
+reachable named scalar, enum, or union. Name the operation group `Widgets`
+instead. The rule checks reachable schema types from the service's HTTP
+operations; an unused declaration or a type in a distinct nested namespace does
 not create a conflict. A direct service operation does not use the service's
 name as an operation group unless an explicit client location supplies one.
 The rule honors the effective AutoRest-scoped `@clientLocation` for operations
-and `@clientName` for interfaces, namespaces, and service models. In
-particular, a model renamed to a different OpenAPI definition name should not
-conflict merely because its authored TypeSpec name matches the group.
-ARM common-type models are excluded as group-name candidates; service-local
-models referenced by their properties remain eligible.
+and `@clientName` for interfaces, namespaces, and service schema types. Because
+the validator checks the operation ID segment before the first underscore, a
+group such as `Widget_Admin` is compared as `Widget`. In particular, a schema
+renamed to a different OpenAPI definition name should not conflict merely
+because its authored TypeSpec name matches the group. ARM common types are
+excluded as group-name candidates; service-local models referenced by their
+properties remain eligible.
 
 The check uses supported TypeSpec SDK naming metadata rather than OpenAPI
 operation ID overrides. Azure's `no-openapi` rule already discourages
