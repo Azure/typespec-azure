@@ -222,6 +222,8 @@ Keep an ordered ledger with one entry per parsed queue entry:
   from worker attempts, review rounds and source-repair cycles
 - native-test timeout-diagnosis usage (at most one per task across all phases
   and cycles), eligibility evidence, concurrency change and full-scope results
+- setup-hook recovery usage (one timed diagnostic and at most one evidence-backed
+  hook-only corrective run per task), measurements, restoration and full-scope results
 - coordinator-owned local reserve usage (three total per task) and native
   baseline-comparison usage (one per task), eligibility decisions, same-owner
   handoffs and required rerun results; preserve these across every phase/cycle
@@ -462,7 +464,7 @@ side-effect safety; they are not worker restarts or external-operation retries.
 It must not report a terminal blocker merely because its own draft needs a safe,
 understood correction and budget remains. Preserve all failed-attempt evidence;
 do not restart the worker, consume a source-repair cycle, or weaken validation.
-Except for the narrowly eligible native-test timeout diagnosis below,
+Except for the narrowly eligible native-test timeout and setup-hook recovery below,
 external/indeterminate operational failures, unknown causes, exhausted budgets
 and confirmed immutable promotion-source defects retain their existing
 stop/handoff behavior.
@@ -473,8 +475,8 @@ Keep the task running during its nonterminal handoff. This queue invocation
 authorizes the coordinator, not the worker, to allocate up to three reserve
 attempts across the entire rule task. Continue the same owner without restarting
 its phase or review pair; retain ordinary counters and all failed attempts.
-Local-recovery and native-comparison handoffs are explicit exceptions to the
-otherwise restricted same-worker follow-ups. In app-session mode, continue the
+Local-recovery, native-comparison and setup-hook handoffs are explicit exceptions
+to the otherwise restricted same-worker follow-ups. In app-session mode, continue the
 recorded phase owner instead. Do not create a replacement worker or a fresh
 review invocation for either handoff. Pass both task-wide counters and the
 coordinator's exact decision in every continuation/cycle handoff.
@@ -508,6 +510,19 @@ rule task, granted by the coordinator to the same owner without user input.
 Keep the task running during `native-comparison-handoff`. Ineligible or exhausted
 recovery still stops; a subsequent understood draft defect uses its own remaining
 correction allowance, never a fresh timeout allowance.
+
+### Setup-hook timeout recovery
+
+Apply the shared [bounded setup-hook timeout recovery](../shared/recovery-context.md#bounded-setup-hook-timeout-recovery)
+only to eligible required native test runs with setup/beforeEach hook timeouts.
+This queue invocation owns one timed diagnostic and at most one measured
+hook-only corrective run per rule task, across phases, reviews and repair cycles.
+The outer queue records eligibility and each debit before continuing the same
+phase owner or fix agent; the owner returns `setup-hook-recovery-handoff` with
+commands stopped and the original evidence instead of independently rerunning
+the failed test. Keep the task running while the coordinator decides. An
+ineligible or exhausted handoff follows the normal stop policy. Do not spend
+the separate per-test timeout allowance on a hook failure.
 
 ### Explicitly authorized bounded resumption
 
@@ -628,6 +643,8 @@ fresh repair worker. It is an orchestration contract, not a new public CLI flag:
   repair reasons; do not overwrite earlier results when a later cycle fails
 - task-wide native-test timeout-diagnosis allowance and usage, including failed
   and passing evidence; no phase or source-repair cycle receives a new allowance
+- task-wide setup-hook diagnostic and corrective-run usage, measurements,
+  restored probes and scoped validation profile
 - source defect evidence: discovery phase, exact source paths and locations,
   source SHA, expected versus actual behavior, reproducer or regression case,
   technical explanation of why this is a source defect rather than promotion
@@ -735,6 +752,9 @@ one session to execute both publication phases.
 > For an eligible completed native-test timeout-only failure, report the evidence
 > and inherited task-wide allowance to the outer queue for the single diagnostic
 > rerun. Do not consume it independently or treat it as a new worker/cycle.
+> For a setup-hook timeout, return the shared `setup-hook-recovery-handoff`
+> instead; only a coordinator grant authorizes the timed diagnostic and any
+> subsequently measured hook-only correction. Preserve all failure evidence.
 > Do not stop merely on the first build/test failure in your own draft or a
 > safely correctable invocation mistake. Confirm command semantics and side
 > effects, preserve the intended scope and count the correction. Do stop

@@ -48,8 +48,8 @@ covers both. It is not a repository-wide timeout default.
 
 - Historical passing output is supporting evidence, not authorization to
   override today's configuration. Record whether a setting comes from current
-  checked-in configuration, an applicable bounded recovery below, or an exact
-  user-approved exception.
+  checked-in configuration, the queue-owned bounded setup-hook recovery below,
+  or an exact user-approved exception.
 - Preserve test population, skips, assertions and ordinary timeout. Different
   compiler/package worktrees require distinct profiles; never copy the source
   package's settings blindly into promotion.
@@ -59,8 +59,51 @@ covers both. It is not a repository-wide timeout default.
   decision, not a silent fallback to defaults or a larger timeout.
 - A profile does not authorize retrying a failed check. Preserve any finite
   one-rerun authorization separately; reusing a setting is not renewing that
-  attempt allowance. The existing timeout-diagnosis policy still excludes hook
-  failures from its automatic per-test diagnostic rerun.
+  attempt allowance. Hook failures remain excluded from the per-test diagnostic
+  rerun; the separate queue-owned setup-hook procedure below has its own limit.
+
+## Bounded setup-hook timeout recovery
+
+For a queue-owned rule task, allow **one instrumented diagnostic run and, only
+when it proves the cause, one corrective required-test run** across all phases,
+reviews and source-repair cycles. This allowance is separate from per-test
+timeout diagnosis, local draft corrections and native baseline comparison.
+Standalone skills do not inherit it. Record both counters and the failed
+attempts in the task ledger before dispatching the same idle phase owner or
+review fix agent; do not restart a worker or review pair.
+
+1. Require a naturally completed **required native test run** whose only
+   failures are runner-reported setup/beforeEach hook timeouts. Preserve the
+   exact command, output, test IDs, skips, hook limit, ordinary test limit,
+   worktree/diff and process quiescence. Assertions, compiler errors, mixed
+   failures, crashes, hangs, or unknown side effects are ineligible.
+2. Before spending the diagnostic allowance, verify the installed runner's
+   actual hook-timeout setting and choose a bounded timing probe for the
+   failing setup path. Run the **same test selection and limits once**, logging
+   setup stages and full output outside tracked source. Reversible probes in
+   ignored build output require recorded pre-edit content identity and exact
+   restoration before any correction; never commit them. If instrumentation
+   changes the tests, dependencies, or assertions, or cannot be restored and
+   verified safely, stop. A warm passing run alone does not prove the cause.
+3. Continue only if timings establish that cumulative setup work exceeds the
+   effective hook limit, without evidence of a task-caused setup defect. Record the
+   measured stages and select the narrowest supported **hook-only** adjustment
+   justified by those timings, capped at 30,000 ms. Prefer a single hook over a
+   package-wide setting. Do not change the ordinary test timeout, test IDs,
+   skips, fixtures, production rule, or required gate. If a defensible limit
+   within the cap cannot be established, stop without a corrective run.
+4. Record the scoped validation profile and consume the corrective allowance
+   **before** running the original required selection once with only that
+   hook adjustment. A tracked hook change also invalidates affected formatting,
+   lint and test evidence; complete those required checks. Verify the same
+   population/skips, all tests passing, probe restoration, and clean intended
+   diff before publication. Preserve the initial and diagnostic failures. If
+   the run fails or its scope changes unexpectedly, stop rather than repeat it.
+
+This procedure does not authorize a global 30-second default, a second
+instrumented attempt, automatic retry of optional suites, or declaring other
+hook failures environmental. Previously stopped tasks do not gain a fresh
+allowance retroactively; an explicit task resumption retains its old counters.
 
 ## Validation gates and supplemental checks
 
@@ -300,5 +343,6 @@ source-repair protocol, never a promotion-only semantic fix.
 | Required suite retains only per-test timeouts after reduced concurrency                                | Consider the single baseline-comparison allowance; no timeout increase.                                     |
 | Baseline passes but draft focused run fails, or restored runtime cannot be verified                    | Stop comparison; no full rerun or success claim.                                                            |
 | Both focused runs pass but full scope fails or changes test IDs/skips                                  | Required gate remains blocked; no second comparison.                                                        |
-| Required hook timeout, permission denial or indeterminate push                                         | Neither local reserve nor native comparison applies.                                                        |
+| Required native suite fails only setup hooks                                                           | Consider the separate bounded setup-hook recovery; neither local reserve nor native comparison applies.     |
+| Permission denial or indeterminate push                                                                | No timeout or local recovery allowance applies.                                                             |
 | Owner/phase changes or a historical task reloads newer skills                                          | Preserve counters; no replenishment or retroactive recovery grant.                                          |
