@@ -1,6 +1,6 @@
+import { isArmProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 import { createRule } from "@typespec/compiler";
 import { getHttpOperation, type HttpStatusCodeRange } from "@typespec/http";
-import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 
 const allowedResponseCodes = new Set<number | "*">([200, 202, "*"]);
 
@@ -12,13 +12,16 @@ export const getResponseCodesRule = createRule({
   messages: {
     default:
       "GET operations must include a 200 response and may only use 202 and default as additional response codes.",
-    empty:
-      "GET operations must declare at least one response and include a 200 response.",
+    empty: "GET operations must declare at least one response and include a 200 response.",
   },
   create(context) {
     return {
       operation: (operation) => {
-        if (resolveProviderNamespace(context.program, operation.namespace) === undefined) {
+        let namespace = operation.namespace;
+        while (namespace && !isArmProviderNamespace(context.program, namespace)) {
+          namespace = namespace.namespace;
+        }
+        if (!namespace) {
           return;
         }
 
@@ -51,7 +54,5 @@ export const getResponseCodesRule = createRule({
 });
 
 function isAllowedResponseCode(statusCode: number | "*" | HttpStatusCodeRange): boolean {
-  return typeof statusCode === "number"
-    ? allowedResponseCodes.has(statusCode)
-    : statusCode === "*";
+  return typeof statusCode === "number" ? allowedResponseCodes.has(statusCode) : statusCode === "*";
 }
