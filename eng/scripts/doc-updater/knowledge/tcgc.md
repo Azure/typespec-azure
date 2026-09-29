@@ -196,6 +196,11 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - Override lookup follows the operation's declaration scope and source-operation chain. Moving an operation with `@clientLocation` does not make it inherit the destination client's override.
 - The Spector scenario under `azure/core/api-version-override` verifies the overridden wire query value. Detailed inheritance and metadata behavior remain unit-test concerns.
 
+## Human Feedback Lessons (September 2026)
+
+- A plain `@override` operation controls the generated method parameters, but its declared return type is ignored. Response replacement must use `replaceResponseWithVoid` or `replaceResponseWithBytes`, which preserve the original HTTP response metadata. Keep this distinction explicit in generated decorator documentation.
+- For `@Azure.Core.Legacy.overrideApiVersion`, use Spector only for the observable overridden query value. Keep declaration-scope inheritance, source-operation traversal, and unchanged client version metadata in unit tests.
+
 ## SDK Method Naming Rules
 
 - `get-operation-name` checks the common TCGC SDK name of concrete GET operations and requires a `get` or `list` prefix. It honors unscoped `@clientName`, ignores emitter-scoped overrides and OpenAPI operation IDs, and skips template declarations/artifacts and non-GET operations.
@@ -345,3 +350,11 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 ## @operationGroup doc comment (Aug 2026)
 
 - The `@deprecated` JSDoc tag on `@operationGroup` in `lib/decorators.tsp` was changed to plain prose ("Deprecated: use `@client` instead.") because the leading `@deprecated` tag was breaking the generated reference doc layout. Reference docs regenerate to the same info; no manual reference edit.
+
+## SdkClientType.authentication (September 2026)
+
+- `SdkClientType.authentication?: Authentication` exposes the HTTP authentication requirements declared on the client's service. `authentication.options` preserves OR alternatives, and `option.schemes` preserves schemes that must be used together (AND).
+- `NoAuth` remains an explicit scheme both as an alternative and when used alone. This does not make the projected `SdkCredentialParameter` optional; the credential parameter remains required and carries the `noAuth` credential variant.
+- The value is `undefined` when there is no associated service or no service authentication. Multi-service clients use the first service, matching existing endpoint and credential metadata behavior.
+- `tcgc-output.yaml` preserves authentication option/scheme grouping but strips each `HttpAuth.model` compiler reference. An operation-level `@useAuth` does not replace the client-level service authentication metadata.
+- This is emitter-consumed type-graph metadata with no new generated SDK or wire behavior. Document it in `guideline.md`; do not add a Spector carrier scenario.
