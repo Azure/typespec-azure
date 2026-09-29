@@ -684,6 +684,13 @@ to the queue before a terminal stop. Only its recorded grant permits the bounded
 baseline/draft comparison and full rerun; standalone promotion gains no allowance.
 This exception does not apply to the broad build or lintdiff corpus.
 
+For a required native run failing only setup/beforeEach hooks, queued promotion
+returns the shared [setup-hook recovery handoff](../shared/recovery-context.md#bounded-setup-hook-timeout-recovery)
+to the coordinator before a terminal stop. Only its recorded task-wide grant
+permits one timed diagnostic and, if measured setup justifies it, one scoped
+hook-only corrective run. Do not use the per-test timeout allowance or infer a
+package-wide 30-second default; standalone promotion has no automatic grant.
+
 Do not manually build the website package or its dependency closure during local
 promotion validation. The website build script honors
 `TYPESPEC_SKIP_WEBSITE_BUILD=true`, matching the general CI build jobs. CI's

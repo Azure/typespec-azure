@@ -133,7 +133,8 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
 - Stop immediately on an unverified review request, indeterminate collector
   failure, push failure, uncertain finding, or required validation/corpus failure that
   does not qualify for [bounded draft correction](#bounded-draft-correction)
-  or [bounded native-test timeout diagnosis](#bounded-native-test-timeout-diagnosis).
+  or [bounded native-test timeout diagnosis](#bounded-native-test-timeout-diagnosis),
+  or a queue-granted [setup-hook recovery](../shared/recovery-context.md#bounded-setup-hook-timeout-recovery).
   Apply the shared gate disposition to supplemental validation; a task defect
   discovered there still blocks. Its optional status never excuses a regression.
   The only recovery paths are those procedures and the separately
@@ -239,6 +240,8 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
      diff identity and rerun results for the backlog pass or current round
    - native-test timeout-diagnosis allowance owner, usage, eligibility evidence,
      unchanged test population/timeouts, concurrency change and rerun result
+   - queue-owned setup-hook diagnostic/corrective allowances, measured stages,
+     probe restoration and scoped hook profile, when applicable
    - publication handoff identity and the parent's approval or rejection
    - pushed fix commit SHA
    - processed review-thread IDs and their final resolution state
@@ -596,7 +599,9 @@ classification or publication gate.
 
 On a command failure, preserve the evidence and apply the predeclared
 [gate disposition](../shared/recovery-context.md#validation-gates-and-supplemental-checks)
-before considering bounded draft correction or native-test timeout diagnosis.
+before considering bounded draft correction, native-test timeout diagnosis,
+or queue-owned setup-hook recovery. A fix agent returns the setup-hook handoff
+to the parent; it must not spend that allowance or raise a hook limit itself.
 A disclosed supplemental promotion limitation does not automatically block this
 loop or authorize a rerun. Never stage, commit or push a draft with a failed
 required gate or task defect. A passing narrower command does not erase a
@@ -652,8 +657,8 @@ Standalone review does not receive that reserve.
    Return `ready-for-publication` only when the final draft satisfies the complete
    required scope. The parent independently verifies that every prior failure
    is accounted for and no failed required check remains unresolved.
-6. Except for the queue reserve above or an eligible native-test timeout
-   diagnosis below, stop on an
+6. Except for the queue reserve above, an eligible native-test timeout
+   diagnosis below, or a coordinator-granted setup-hook recovery, stop on an
    unknown cause, unsafe/out-of-scope correction, exhausted budget,
    or an external/indeterminate operational failure (such as credentials, network,
    dependency/tool availability, harness/emitter crash, or publication failure).
@@ -711,6 +716,13 @@ review requests, pushes, PR creation, email retries, or publication of a failing
 draft. The parent verifies eligibility and all failure/recovery evidence before
 approving publication.
 
+For queue-owned required runs failing **only** setup hooks, return the shared
+[setup-hook recovery handoff](../shared/recovery-context.md#bounded-setup-hook-timeout-recovery)
+to the outer queue before a terminal stop. It owns the separate task-wide
+allowance; no review round or fix agent receives a fresh one. Standalone review
+has no automatic setup-hook allowance. This does not make hook failures
+eligible for the per-test reduced-concurrency diagnostic above.
+
 ### Linter source changes
 
 In standard PR mode, run the corpus procedure only when a valid fix changes
@@ -720,8 +732,9 @@ production linter-rule code changes, follow the current linter-source validation
 and corpus procedure in `/develop-lintdiff-rule` in full. Treat that skill as
 the source of truth for setup, commands, evidence updates, analysis, and
 generated-output cleanup. Record every required validation or corpus failure;
-continue only for an eligible bounded draft correction or native-test timeout
-diagnosis. The timeout exception never applies to corpus runs.
+continue only for an eligible bounded draft correction, native-test timeout
+diagnosis, or queue-granted setup-hook recovery. Timeout exceptions never apply
+to corpus runs.
 
 In promotion PR mode, do not run `/develop-lintdiff-rule`, the lintdiff fixture
 harness, or corpus validation. Follow the current targeted validation procedure
@@ -734,7 +747,8 @@ production rule edit is permitted only when it is a verified
 `promotion-adaptation-issue` that preserves the immutable source semantics.
 Record every required promotion validation failure; continue only for an
 eligible bounded draft correction that preserves the pinned source semantics
-or bounded native-test timeout diagnosis, otherwise stop the loop.
+or bounded native-test timeout diagnosis or queue-granted setup-hook recovery,
+otherwise stop the loop.
 
 ### Parent publication gate
 
