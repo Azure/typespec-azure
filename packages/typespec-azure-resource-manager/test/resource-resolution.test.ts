@@ -873,7 +873,7 @@ interface Children {
     const requests: Array<{
       kind: string;
       defaultName: string;
-      typeName: string;
+      typeName?: string;
       resourceModel?: string;
       resourceType?: string;
       resourceInstancePath?: string;
@@ -883,7 +883,7 @@ interface Children {
         requests.push({
           kind: request.kind,
           defaultName: request.defaultName,
-          typeName: String(request.type.name),
+          typeName: request.type?.name,
           resourceModel: request.resourceModel?.name,
           resourceType: request.resourceType,
           resourceInstancePath: request.resourceInstancePath,
@@ -914,7 +914,16 @@ interface Children {
       (x) => x.resourceType.types.join("/") === "parents",
     );
     ok(syntheticParent);
-    expect(syntheticParent.resourceName).toBe("Parent");
+    expect(syntheticParent.resourceName).toBe("ClientParent");
+    expect(requests).toContainEqual({
+      kind: "resource",
+      defaultName: "Parent",
+      typeName: undefined,
+      resourceModel: undefined,
+      resourceType: "Microsoft.ContosoProviderHub/parents",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}",
+    });
 
     expect(requests).toContainEqual({
       kind: "resource",
@@ -955,6 +964,296 @@ interface Children {
       resourceModelName: "Child",
     });
   }, 30_000);
+
+  it("customizes one extension resource occurrence by instance path", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+model Employee is ExtensionResource<{}> {
+  ...ResourceNameParameter<Employee>;
+}
+
+interface EmployeeOperations<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+  get is Extension.Read<Scope, Employee>;
+}
+
+@armResourceOperations
+interface Tenants extends EmployeeOperations<Extension.Tenant> {}
+
+@armResourceOperations
+interface Subscriptions extends EmployeeOperations<Extension.Subscription> {}
+`);
+
+    const subscriptionPath =
+      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}";
+    const provider = resolveArmResources(program, {
+      nameResolver: ({ kind, resourceInstancePath }) =>
+        kind === "resource" && resourceInstancePath === subscriptionPath
+          ? "SubscriptionEmployee"
+          : undefined,
+    });
+
+    const tenant = provider.resources?.find(
+      (resource) =>
+        resource.resourceInstancePath ===
+        "/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    );
+    const subscription = provider.resources?.find(
+      (resource) => resource.resourceInstancePath === subscriptionPath,
+    );
+    ok(tenant);
+    ok(subscription);
+    expect(tenant.type).toBe(subscription.type);
+    expect(tenant.resourceName).toBe("TenantEmployee");
+    expect(subscription.resourceName).toBe("SubscriptionEmployee");
+    expect(subscription.operations.lifecycle.read?.[0]).toMatchObject({
+      resourceName: "SubscriptionEmployee",
+      resourceModelName: "SubscriptionEmployee",
+    });
+    expect(tenant.resourceType).toEqual(subscription.resourceType);
+  });
+
+  it("customizes one standard private endpoint resource occurrence by instance path", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+model Employee is TrackedResource<{}> {
+  ...ResourceNameParameter<Employee>;
+}
+
+@parentResource(Employee)
+model Dependent is ProxyResource<{}> {
+  ...ResourceNameParameter<Dependent>;
+}
+
+model PrivateEndpointConnection is PrivateEndpointConnectionResource;
+alias PrivateEndpointOperations = PrivateEndpoints<PrivateEndpointConnection>;
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  getPrivateEndpointConnection is PrivateEndpointOperations.Read<Employee>;
+}
+
+@armResourceOperations
+interface Dependents {
+  get is ArmResourceRead<Dependent>;
+  getPrivateEndpointConnection is PrivateEndpointOperations.Read<Dependent>;
+}
+`);
+
+    const dependentConnectionPath =
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateEndpointConnections/{privateEndpointConnectionName}";
+    const provider = resolveArmResources(program, {
+      nameResolver: ({ kind, resourceInstancePath }) =>
+        kind === "resource" && resourceInstancePath === dependentConnectionPath
+          ? "DependentConnection"
+          : undefined,
+    });
+
+    const connections = provider.resources?.filter(
+      (resource) => resource.type.name === "PrivateEndpointConnection",
+    );
+    expect(connections).toHaveLength(2);
+    const employeeConnection = connections?.find(
+      (resource) => resource.resourceName === "EmployeePrivateEndpointConnection",
+    );
+    const dependentConnection = connections?.find(
+      (resource) => resource.resourceInstancePath === dependentConnectionPath,
+    );
+    ok(employeeConnection);
+    ok(dependentConnection);
+    expect(employeeConnection.type).toBe(dependentConnection.type);
+    expect(dependentConnection.resourceName).toBe("DependentConnection");
+    expect(dependentConnection.operations.lifecycle.read?.[0]).toMatchObject({
+      resourceName: "DependentConnection",
+      resourceModelName: "DependentConnection",
+    });
+    expect(employeeConnection.resourceInstancePath).not.toBe(dependentConnectionPath);
+  });
+
+  it("customizes one legacy private endpoint resource occurrence by instance path", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+model Employee is TrackedResource<{}> {
+  ...ResourceNameParameter<Employee>;
+}
+
+@parentResource(Employee)
+model Dependent is ProxyResource<{}> {
+  ...ResourceNameParameter<Dependent>;
+}
+
+model PrivateEndpointConnection is PrivateEndpointConnectionResource;
+alias PrivateEndpointOperations = PrivateEndpoints<PrivateEndpointConnection>;
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  getPrivateEndpointConnection is PrivateEndpointOperations.Read<Employee>;
+}
+
+@armResourceOperations
+interface Dependents {
+  get is ArmResourceRead<Dependent>;
+  getPrivateEndpointConnection is PrivateEndpointOperations.Read<Dependent>;
+  createOrUpdatePrivateEndpointConnection is Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceAsync<
+    Dependent,
+    PrivateEndpointConnection,
+    OptionalRequestBody = true
+  >;
+  updatePrivateEndpointConnection is Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchAsync<
+    Dependent,
+    PrivateEndpointConnection,
+    PatchModel = void
+  >;
+  listPrivateEndpointConnections is Azure.ResourceManager.Legacy.PrivateEndpoints.ListSinglePageByParent<
+    Dependent,
+    PrivateEndpointConnection
+  >;
+}
+`);
+
+    const dependentConnectionPath =
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateEndpointConnections/{privateEndpointConnectionName}";
+    const provider = resolveArmResources(program, {
+      nameResolver: ({ kind, resourceInstancePath }) =>
+        kind === "resource" && resourceInstancePath === dependentConnectionPath
+          ? "LegacyDependentConnection"
+          : undefined,
+    });
+
+    const connections = provider.resources?.filter(
+      (resource) => resource.type.name === "PrivateEndpointConnection",
+    );
+    expect(connections?.length).toBeGreaterThanOrEqual(2);
+    const employeeConnection = connections?.find(
+      (resource) => resource.resourceName === "EmployeePrivateEndpointConnection",
+    );
+    const dependentConnections = connections?.filter(
+      (resource) => resource.resourceInstancePath === dependentConnectionPath,
+    );
+    ok(employeeConnection);
+    expect(dependentConnections?.length).toBeGreaterThan(0);
+    for (const dependentConnection of dependentConnections ?? []) {
+      expect(employeeConnection.type).toBe(dependentConnection.type);
+      expect(dependentConnection.resourceName).toBe("LegacyDependentConnection");
+    }
+    expect(
+      dependentConnections?.find(
+        (resource) => resource.operations.lifecycle.createOrUpdate !== undefined,
+      )?.operations.lifecycle.createOrUpdate?.[0],
+    ).toMatchObject({
+      resourceName: "LegacyDependentConnection",
+      resourceModelName: "LegacyDependentConnection",
+    });
+    expect(
+      dependentConnections?.find((resource) => resource.operations.lifecycle.update !== undefined)
+        ?.operations.lifecycle.update?.[0],
+    ).toMatchObject({
+      resourceName: "LegacyDependentConnection",
+      resourceModelName: "LegacyDependentConnection",
+    });
+    expect(
+      dependentConnections?.find((resource) => resource.operations.lists.length > 0)?.operations
+        .lists[0],
+    ).toMatchObject({
+      resourceName: "LegacyDependentConnection",
+      resourceModelName: "LegacyDependentConnection",
+    });
+  });
+
+  it("customizes synthetic virtual resources by default name and instance path", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+@resourceGroupResource
+@armVirtualResource
+model Division {
+  @path
+  @segment("divisions")
+  @key
+  divisionId: string;
+}
+
+@parentResource(Division)
+@armVirtualResource
+model Group {
+  @path
+  @segment("groups")
+  @key
+  groupId: string;
+}
+
+@parentResource(Group)
+model Employee is TrackedResource<{}> {
+  ...ResourceNameParameter<Employee>;
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+}
+`);
+
+    const requests: Array<{
+      defaultName: string;
+      resourceInstancePath?: string;
+      typeName?: string;
+    }> = [];
+    const divisionPath =
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/divisions/{divisionId}";
+    const provider = resolveArmResources(program, {
+      nameResolver: ({ kind, defaultName, resourceInstancePath, type }) => {
+        if (kind !== "resource") return undefined;
+        requests.push({ defaultName, resourceInstancePath, typeName: type?.name });
+        if (defaultName === "Group") return "BusinessGroup";
+        if (resourceInstancePath === divisionPath) return "BusinessDivision";
+        return undefined;
+      },
+    });
+
+    const division = provider.resources?.find(
+      (resource) => resource.resourceType.types.join("/") === "divisions",
+    );
+    const group = provider.resources?.find(
+      (resource) => resource.resourceType.types.join("/") === "divisions/groups",
+    );
+    const employee = provider.resources?.find(
+      (resource) => resource.resourceType.types.join("/") === "divisions/groups/employees",
+    );
+    ok(division);
+    ok(group);
+    ok(employee);
+    expect(division.resourceName).toBe("BusinessDivision");
+    expect(group.resourceName).toBe("BusinessGroup");
+    expect(employee.resourceName).toBe("Employee");
+    expect(group.parent).toBe(division);
+    expect(employee.parent).toBe(group);
+    expect(requests).toContainEqual({
+      defaultName: "Division",
+      resourceInstancePath: divisionPath,
+      typeName: undefined,
+    });
+    expect(requests).toContainEqual({
+      defaultName: "Group",
+      resourceInstancePath: `${divisionPath}/groups/{groupId}`,
+      typeName: undefined,
+    });
+  });
 
   it("customizes every operation category without changing wire metadata", async () => {
     const { program } = await Tester.compile(`
@@ -1132,14 +1431,14 @@ interface ExtensionWidgets {
     );
     ok(orphanChild);
     ok(orphanChild.parent);
-    expect(orphanChild.parent.resourceName).toBe("OrphanParent");
+    expect(orphanChild.parent.resourceName).toBe("ClientOrphanParent");
     expect(named.resources).toContain(orphanChild.parent);
 
     const extensionWidget = named.resources?.find((x) => x.type.name === "ExtensionWidget");
     ok(extensionWidget);
     expect(typeof extensionWidget.scope).toBe("object");
     ok(typeof extensionWidget.scope === "object");
-    expect(extensionWidget.scope.resourceName).toBe("VirtualMachine");
+    expect(extensionWidget.scope.resourceName).toBe("ClientVirtualMachine");
     expect(named.resources).toContain(extensionWidget.scope);
     expect(extensionWidget.scope).not.toBe(
       original.resources?.find((x) => x.type.name === "ExtensionWidget")?.scope,
