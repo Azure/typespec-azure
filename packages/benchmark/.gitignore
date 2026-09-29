@@ -2,3 +2,4 @@ dist/
 tsp-output/
 node_modules/
 .external/
+.emitters/

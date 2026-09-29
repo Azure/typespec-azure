@@ -647,7 +647,7 @@ function emitPagerDefinition(
   text += `${indent.get()}Fetcher: func(ctx context.Context, page *${method.returns.name}) (${method.returns.name}, error) {\n`;
   indent.push();
   if (options["generate-fakes"]) {
-    text += `${indent.get()}ctx = context.WithValue(ctx, runtime.CtxAPINameKey{}, "${method.receiver.type.name}.${helpers.fixUpMethodName(method)}")\n`;
+    text += `${indent.get()}ctx = context.WithValue(ctx, runtime.CtxAPINameKey{}, "${method.receiver.type.name}.${method.name}")\n`;
   }
 
   let nextLinkParam: string | undefined;
@@ -739,10 +739,7 @@ function generateOperation(
 ): string {
   const params = getAPIParametersSig(method, imports);
   const returns = generateReturnsInfo(method, "op");
-  let methodName = method.name;
-  if (method.kind === "pageableMethod") {
-    methodName = helpers.fixUpMethodName(method);
-  }
+  const methodName = go.isLROMethod(method) ? method.naming.operationMethod : method.name;
   let text = "";
   const respErrDoc = genRespErrorDoc(method);
   if (method.docs.summary || method.docs.description) {
@@ -754,9 +751,7 @@ function generateOperation(
     text += `// ${methodName} -\n`;
   }
   text += respErrDoc;
-  if (go.isLROMethod(method)) {
-    methodName = method.naming.internalMethod;
-  } else {
+  if (!go.isLROMethod(method)) {
     for (const param of helpers.getMethodParameters(method)) {
       text += helpers.formatCommentAsBulletItem(param.name, param.docs);
     }
@@ -769,7 +764,7 @@ function generateOperation(
     return text;
   }
   text += `${indent.get()}var err error\n`;
-  let operationName = `"${method.receiver.type.name}.${helpers.fixUpMethodName(method)}"`;
+  let operationName = `"${method.receiver.type.name}.${method.name}"`;
   if (options["generate-fakes"] && options["inject-spans"]) {
     text += `${indent.get()}const operationName = ${operationName}\n`;
     operationName = "operationName";
@@ -927,7 +922,7 @@ function generateLROBeginMethod(
   imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
   let text = "";
   if (method.docs.summary || method.docs.description) {
-    text += helpers.formatDocCommentWithPrefix(helpers.fixUpMethodName(method), method.docs);
+    text += helpers.formatDocCommentWithPrefix(method.name, method.docs);
     text += genRespErrorDoc(method);
   }
   const zeroResp = getZeroReturnValue(method, false);
@@ -935,7 +930,7 @@ function generateLROBeginMethod(
   for (const param of methodParams) {
     text += helpers.formatCommentAsBulletItem(param.name, param.docs);
   }
-  text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${helpers.fixUpMethodName(method)}(${params}) (${returns.join(", ")}) {\n`;
+  text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${method.name}(${params}) (${returns.join(", ")}) {\n`;
   let pollerType = "nil";
   let pollerTypeParam = `[${method.returns.name}]`;
   if (method.kind === "lroPageableMethod") {
@@ -951,7 +946,7 @@ function generateLROBeginMethod(
 
   // creating the poller from response branch
 
-  const opName = method.naming.internalMethod;
+  const opName = method.naming.operationMethod;
   text += `${indent.get()}resp, err := client.${opName}(${helpers.getCreateRequestParameters(method)})\n`;
   text += `${indent.get()}if err != nil {\n`;
   text += `${indent.push().get()}return ${zeroResp}, err\n`;

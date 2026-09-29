@@ -82,17 +82,15 @@ export function generatePolymorphicHelpers(pkg: go.FakePackage | go.PackageConte
     for (const respEnv of pkg.responseEnvelopes) {
       switch (respEnv.result?.kind) {
         case "monomorphicResult":
-          switch (respEnv.result.monomorphicType.kind) {
+          switch (respEnv.result.type.kind) {
             case "map":
-              trackDiscriminator(respEnv.result.monomorphicType.valueType);
-              break;
             case "slice":
-              trackDiscriminator(respEnv.result.monomorphicType.elementType);
+              trackDiscriminator(respEnv.result.type.itemType);
               break;
           }
           break;
         case "polymorphicResult":
-          trackDiscriminator(respEnv.result.interface);
+          trackDiscriminator(respEnv.result.type);
           break;
       }
     }
