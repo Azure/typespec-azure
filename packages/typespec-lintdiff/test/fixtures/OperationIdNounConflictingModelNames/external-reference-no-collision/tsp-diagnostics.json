@@ -5,6 +5,11 @@
     "message": "Azure services should use the versioning library to define versions for their services. Add the '@versioned' decorator to the service namespace."
   },
   {
+    "code": "tsp-lintdiff-local-linter/no-operation-group-name-conflict",
+    "severity": "warning",
+    "message": "Operation group 'Widget' conflicts with type 'Widget'. Rename the group, for example by using a plural name."
+  },
+  {
     "code": "@azure-tools/typespec-azure-core/auth-required",
     "severity": "warning",
     "message": "Provide an authentication scheme using the `@useAuth` decorator. See: https://azure.github.io/typespec-azure/docs/reference/azure-style-guide#security-definitions"

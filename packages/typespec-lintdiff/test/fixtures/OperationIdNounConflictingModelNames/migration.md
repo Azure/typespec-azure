@@ -1,537 +1,733 @@
-# OperationIdNounConflictingModelNames migration
+# OperationIdNounConflictingModelNames: native operation-group guideline
 
 ## Result and gap summary
 
-In the full 468-project ARM corpus at specs commit
-`f6b53f105b95da05276530a0754a1c71b4f16397`, 462 projects are assessable
-(six failed). Swagger reports **487 diagnostics / 55 projects**; TypeSpec
-reports **502 / 56 assessable projects** (516 / 58 raw, including 14 from
-failed projects). **54 projects overlap**, one is validator-only
-(FileShares: eight explicit `@operationId` findings), and two are
-TypeSpec-only (ConfidentialLedger: eight older-version findings;
-ServiceFabricManagedClusters: two explicit lowercase IDs). Remaining
-per-project deficits total nine, surpluses 24; individual operation matches
-are not established. Earlier supported naming and ARM-common-type fixes
-removed proven false positives and detected ApiManagement's
-`Operation_ListByTags` and PostgreSQL's named scalar. Source repair cycle 1
-fixes friendly-named and inline template instances, verified by emitted
-Swagger fixtures. Development review round 1 also excludes legacy external-reference
-models while retaining their emitted children, matching observed AutoRest output;
-the full corpus has **no net count change**. These counts
-show **partial native coverage, not functional equivalence**. Explicit
-OpenAPI overrides remain an intentional native-contract limit; unexplained
-per-operation differences remain uncertain (see
-[gap evidence](#arm-common-type-false-positive-and-remaining-non-equivalence)).
+**Native redesign and review fixes complete; independent precommit review passed; GitHub review pending.**
+The final 468-project run has 462 assessable projects: **487 Swagger findings in
+55 projects versus 131 native findings in 58**, with 54-project overlap.
+Swagger reports per operation, including 362 repeated project/prefix labels.
+Native reports once per common SDK group. Three serialized-only labels disappear;
+nine native-only labels comprise three historical-version findings, three
+referenced types absent from local Swagger definitions, one common group override,
+and two exact-case differences.
+The unused-sibling fix removes DevOpsInfrastructure `Sku` and DataFactory
+`PrivateEndpointConnection` false positives. All unmatched labels and one-sided
+projects are explained. Six compiler-failed projects are excluded.
+Latest-version attribution covers unmatched findings; it is not a projected rerun
+of the native rule.
+**No further rule update is required for these gaps.** The approved native
+guideline is deliberately **not functionally equivalent** to the Swagger rule.
 
 ## Native rule contract
 
-### Required changes and decision
+`no-operation-group-name-conflict` belongs in client-generator-core because its
+subject is common SDK client APIs. Within each root client, compare every subclient
+group's complete common SDK name with named types reachable from the parameters
+and return types of that client's operations. Names are case-sensitive. Common
+client names and client locations apply; exclusively emitter/language-scoped
+overrides do not. TCGC stores a negated scope's default under `AllScopes`, so the
+common fallback of `!javascript` applies without selecting JavaScript or any
+other language. This is the existing supported metadata contract, not a
+rule-owned interpretation of decorator syntax.
+Root methods, even `Widget_Read`, do not create a group.
 
-The current draft adds
-`src/rules/operation-id-noun-conflicting-model-names.ts`, registers it in
-`src/linter.ts`, and adds violating/compliant fixtures, snapshots and native
-tests for authored and supported effective names. Round 1 review corrections
-also cover the first operation-ID segment of underscored groups and reachable
-named scalars, enums, and supported unions. Round 2 corrections restrict
-definition reachability to HTTP request and response bodies, recognize
-underscored effective names on direct or service-located operations, traverse
-derived response models, and use schema-neutral diagnostics. The root service
-namespace false positive and schema `@clientName` false positives were
-corrected with native regressions. An ARM common-type false positive was
-corrected using the exported `isArmCommonType` predicate. Explicit operation-ID
-differences remain accepted source-contract limits; no emitter call or guessed
-OpenAPI name belongs in this rule. Source repair cycle 1 resolves supported
-`@friendlyName` template model/union instance names through TCGC's
-`getLibraryName`, and skips unnamed concrete template instances that remain
-inline. The latter must not be treated as definitions even if their template
-declaration has the same name as an operation group. Functional equality is
-**not** established. Development review round 1 additionally excludes a model
-decorated with `@Azure.ResourceManager.Legacy.externalTypeRef` before recording
-its name because AutoRest emits the configured external `$ref` instead of a
-local definition for that model. Emitted fixture evidence disproved the review
-suggestion to stop recursion: service-local property models still become local
-definitions and remain traversed.
+Groups come from supported `listClients`, `listSubClients` and
+`listOperationsInClient` traversal, including explicit clients, interface and
+namespace groups, virtual string locations and typed relocations. An explicitly
+named `@client` participates under that name; common `@clientName` overrides it.
+Parent groups also participate when only their subgroups contain methods.
+Different root clients are separate comparison populations.
 
-Within each HTTP service, compare the effective AutoRest-scoped client location
-or client name of an interface operation group (or a nested, non-service
-namespace when it has no interface), using the segment before its first
-underscore, with the effective client names of _reachable_ locally defined
-models, scalars, enums, and unions directly declared in that service namespace.
-ARM common types use external definitions and are not local name candidates
-even if copied into the service namespace; their child types are still
-traversed for local definitions. Legacy external-reference models are different:
-AutoRest does not emit the decorated model as a local definition, but it does
-emit reachable service-local child models; the native traversal excludes only
-the decorated model's own name.
-For a direct service operation, or an operation explicitly relocated to the
-service/global namespace, use the effective operation name only when it
-contains the underscore required by the validator. Honor relevant
-`@clientName` overrides on operations, interfaces, namespaces, and schema
-types, while ignoring overrides scoped exclusively to other emitters.
-Collect schema types reachable through single HTTP request and response bodies,
-including nested properties, base and derived models, indexers, tuples and
-union variants, with cycle-safe traversal. Do not treat query, path, request
-header, response header, status-code, multipart, or file metadata as emitted
-definitions. Report one warning per colliding HTTP operation, on that operation.
-Do not report an unused type, a differently qualified nested type, or a type
-from another service. The shared HTTP service API provides the operation
-population; the compiler type graph and supported SDK naming metadata provide
-schema identity and effective name. The compiler's `isTemplateInstance` and
-`getFriendlyName` distinguish a named concrete template instance from an
-inline one. The supported TCGC `getLibraryName` resolves friendly names and
-client-name overrides, unlike a declaration-name lookup. Scalars and enums
-still use their supported `@clientName` overrides; attaching `@friendlyName`
-to a scalar or enum violates the official Azure Core `friendly-name` lint and
-is not required for the native supported-shape contract. The sibling
-`operation-id-noun-verb` rule instead inspects an emitted-style ID through
-`@typespec/openapi`; that is unsuitable for this native rule.
+The compiler's supported `navigateType` visits each parameter/return graph,
+including unions, scalars, enums and tuples. The model listener follows properties,
+indexer values, and base names/members without expanding a base's other subtypes.
+A directly referenced model with `@discriminator` includes the alternatives
+resolved by `getDiscriminatedUnionFromInheritance`. Invalid discriminator graphs
+are already diagnosed by the compiler and are not interpreted as valid alternatives.
+Named user models, scalars, enums and unions are candidates regardless of their
+declaration namespace. Shared or imported types participate when referenced.
+Compiler standard types, unnamed anonymous shapes and unused declarations do not
+contribute candidate names. Named children of anonymous shapes still participate.
+The shared TCGC `getLibraryName` supplies common overrides, friendly names and
+concrete template names. No generated-reference, inlining, ARM common-type or
+legacy external-reference predicates remain.
 
-The Swagger function
-`@microsoft.azure/openapi-validator-rulesets/dist/spectral/functions/operation-id-noun-conflicting-model-names.js`
-receives each `paths` or `x-ms-paths` operation ID, takes its case-sensitive
-prefix before `_`, and checks whether the resolved Swagger document's
-`definitions` has an exact matching key. It reports at the operation ID.
-It does not check source reachability or whether the ID was authored using a
-discouraged override. The native rule checks the authoring semantics, not a
-reconstruction of generated names.
+One diagnostic is reported per conflicting group, not per method, model
+occurrence or matching declaration. A declared group targets its interface or
+namespace; virtual/merged groups without a declaration target their first
+operation. Distinct groups sharing the same spelling each receive a warning.
+Compiler traversal and discriminator resolution are reused; the model listener
+owns the inheritance reachability boundary. A per-client visited set avoids
+cycles and repeated collection without confusing an inherited base with a later
+direct API reference to that base.
 
-### Supported-shape and emission matrix
+The model listener checks the supported `isInScope` API before following each
+property, including inherited properties and operation parameters. Language-only
+members therefore cannot introduce candidate types into the common API.
+An `EnumMember` reference contributes its owning enum's common name. For a
+`UnionVariant`, the public `getClientType` classification determines whether the
+common SDK retains an enum owner. The rule adds that owner's name without walking
+its other alternatives; otherwise only the selected variant value is followed.
+This also handles enum members nested inside non-enum union variants. A subsequent
+reference to the whole union still visits its alternatives normally. The rule
+does not reproduce SDK enum-flattening or nullable-wrapper decisions.
+Classification uses a separate non-mutating common-scope TCGC context: the SDK
+helper constructs every alternative and allocates template names, which must not
+change names collected from the reachable API. No classification SDK object or
+naming cache is shared with client traversal or `getLibraryName`.
 
-| Authored TypeSpec shape                                                               | Supported?                                | Native check / selected Swagger field                                                                                                         | Swagger result            | Native result                                        | Evidence                                                                                                                                     |
-| ------------------------------------------------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Example.Widget` returned by `Operations.Widget.get`                                  | Yes; no OpenAPI override                  | HTTP operation group `Widget` and reachable model `Widget`; emitted `operationId: Widget_Get`, definition `Widget`                            | Warn                      | Warn on operation                                    | `noun-conflicts-model/main.tsp`, `output.json`, validator and TypeSpec snapshots                                                             |
-| `Widget` returned by `Widgets.get`                                                    | Yes                                       | Interface `Widgets` differs from reachable model `Widget`; emitted `operationId: Widgets_Get`, definition `Widget`                            | No warning                | No warning                                           | `noun-does-not-conflict/main.tsp` and snapshots                                                                                              |
-| `ApiContracts.listByTags` with `@@clientLocation(..., "Operation", "!javascript")`    | Yes                                       | AutoRest-scoped location is `Operation`, not authored interface `ApiContracts`; Swagger has `Operation_ListByTags` and definition `Operation` | Warn                      | Warn on operation                                    | ApiManagement selected Swagger, back-compatible.tsp, full corpus, and scoped native regression                                               |
-| `@@clientLocation(read, "Widget_Admin", "!javascript")` with schema `Widget`          | Yes                                       | Emitted `operationId: Widget_Admin_Read`; the validator compares the first segment `Widget`                                                   | Warn                      | Warn on operation                                    | Native regression plus AutoRest source and focused emission reproduction                                                                     |
-| Direct `Widget_read` operation, including when relocated to the service namespace     | Yes                                       | Emitted operation ID retains the effective operation name; its first segment is `Widget`                                                      | Warn                      | Warn on operation                                    | Native regressions plus `resolveOperationId` source                                                                                          |
-| Named scalar, enum, or string-literal union `Widget` returned by group `Widget`       | Yes                                       | Each supported named type is referenced through an emitted `definitions.Widget` entry                                                         | Warn                      | Warn on operation                                    | Native regressions plus focused AutoRest emission reproduction                                                                               |
-| Scalar `Widget` used only as a query parameter or response header                     | Yes                                       | OpenAPI v2 parameter/header schemas are inline and do not add `definitions.Widget`                                                            | No warning                | No warning                                           | Native negative regressions plus `getSimpleParameterSchema`/`getResponseHeader` source                                                       |
-| `Widget extends Base` while group `Widget` returns `Base`                             | Yes                                       | Emitting `Base` schedules eligible derived model `Widget` as a definition                                                                     | Warn                      | Warn on operation                                    | Native regression plus AutoRest derived-model test and `getSchemaForModel` source                                                            |
-| Template declaration `Widget<T> extends Base` while group `Widget` returns `Base`     | Yes                                       | Template declarations are not concrete emitted definitions                                                                                    | No warning                | No warning                                           | Native negative regression plus `includeDerivedModel` source                                                                                 |
-| `@friendlyName("Widget", T) model Wrapper<T>` returned as `Wrapper<Item>` by `Widget` | Yes, named concrete template instance     | Emitted `definitions.Widget` and `operationId: Widget_Read`; SDK library name also resolves to `Widget`                                       | Warn                      | Warn on operation                                    | `friendly-template-collision` fixture, native regression, actual AutoRest/validator snapshots                                                |
-| `model Widget<T>` returned as `Widget<Item>` by group `Widget`                        | Yes, unnamed concrete template instance   | The instance is inline; emitted definitions include `Item` but not `Widget`                                                                   | No warning                | No warning                                           | `inline-template-no-collision` fixture, native regression, actual AutoRest/validator snapshots                                               |
-| `@friendlyName("Widgets", T) model Widget<T>` returned as `Widget<Item>` by `Widget`  | Yes, named concrete template instance     | The effective name is `Widgets`, not `Widget`                                                                                                 | No warning                | No warning                                           | Native negative regression, compiler `getFriendlyName` and TCGC `getLibraryName`                                                             |
-| `@friendlyName("Gizmo", T) union Choice<T>` returned as `Choice<"one">` by `Gizmo`    | Yes, open string-literal union            | Emitted `definitions.Gizmo` and `operationId: Gizmo_Read`; SDK library name resolves to `Gizmo`                                               | Warn                      | Warn on operation                                    | `friendly-template-collision` fixture, native regression, actual AutoRest/validator snapshots                                                |
-| Unnamed `union Gizmo<T>` instantiated as `Gizmo<"one">` by `Gizmo`                    | Yes, open string-literal union            | Inline concrete union does not contribute a `Gizmo` definition                                                                                | No warning                | No warning                                           | `inline-template-no-collision` fixture and native negative regression                                                                        |
-| `@friendlyName` on a scalar or enum                                                   | No; Azure Core `friendly-name` rejects it | Not required to establish supported schema names                                                                                              | Not assessed              | No new check                                         | `packages/typespec-azure-core/src/rules/friendly-name.ts`, `test/rules/friendly-name.test.ts`; named scalar/enum `@clientName` controls pass |
-| Response property `@visibility(Lifecycle.Create) hidden: Hidden`                      | Yes                                       | AutoRest retains it with `x-ms-mutability: ["create"]` and emits `definitions.Hidden`, including when unreachable types are omitted           | Warn if group is `Hidden` | Warn on operation                                    | Focused AutoRest emission reproduction; visibility filtering would incorrectly drop an emitted definition                                    |
-| `Widget` model with `@@clientName(Widget, "widget")` and group `Widget`               | Yes                                       | Effective model definition `widget` is distinct from operation group `Widget`                                                                 | No warning                | No warning                                           | ResourceHealth selected Swagger has lowercased `event`/`events` definitions; native model-override regression                                |
-| `PrivateEndpointConnection is PrivateEndpointConnectionResource` and a matching group | Yes                                       | ARM common-type model uses an external definition, not a local `PrivateEndpointConnection` definition                                         | No warning                | No warning                                           | ApiManagement selected Swagger, `isArmCommonType` and native real-inheritance regression                                                     |
-| `@Legacy.externalTypeRef(...) model Widget { child: Child }` with matching groups     | Yes                                       | AutoRest omits local `Widget` but emits `definitions.Child`; only the `Child` group conflicts                                                 | Warn for `Child` only     | Warn on the `Child` operation only                   | `external-reference-no-collision` fixture output plus native regression; emitted output corrected the review's proposed recursion guard      |
-| `Models.Widget` returned by interface `Widget`                                        | Yes                                       | Qualified definition `Models.Widget` is distinct from interface group `Widget`                                                                | No warning                | No warning                                           | Native unit test for nested model; emitter branch verified during fixture TDD                                                                |
-| Unreferenced model `Widget` and interface `Widget`                                    | Yes                                       | No reachable definition for `Widget`                                                                                                          | No warning                | No warning                                           | Native unit test for unused declaration                                                                                                      |
-| Direct `Example.read` operation and service model `Example`                           | Yes                                       | Service name is not a generated operation-group noun; the validator requires an underscored ID                                                | No warning                | No warning                                           | Native service-root regression; real `Microsoft.ConfidentialLedger.checkNameAvailability` emits `CheckNameAvailability`                      |
-| Explicit `@operationId("FileShare_GetUsageData")` on another group                    | Discouraged by official `no-openapi` rule | Swagger selects explicit ID and may define `FileShare`; no allowed native OpenAPI operation-ID API is used                                    | May warn                  | Intentional parity gap; do not reconstruct overrides | FileShares selected corpus, authored `fileshares.tsp`, `packages/typespec-azure-core/src/rules/no-openapi.ts`                                |
+### API prior art and the common-scope enhancement
 
-The effective model name comes from supported client naming metadata, not a parsed OpenAPI reference. This
-contract does not promise identical counts for repeated emitted Swagger files,
-unsupported emitter-only model transformations, older API versions, or explicit OpenAPI overrides.
+The official `get-operation-name` rule uses a non-mutating TCGC context and
+`getLibraryName(..., AllScopes)` rather than an emitter's naming domain.
+The current client traversal API, however, had no equivalent common-scope option:
+`getClientLocation` and client cache construction implicitly selected the
+context's emitter. Reconstructing the hierarchy in this rule would duplicate
+supported client logic.
 
-## Coverage report reconciliation
+An optional typed `scope` on `createTCGCContext` now supplies the default scope
+for metadata lookup, client hierarchy, relocation and operation inclusion.
+`AllScopes` selects common metadata, **not every language**. A helper's explicit
+scope takes precedence; omitting the context option preserves existing emitter
+selection. The emitter identity remains unchanged. The rule uses
+`@azure-tools/typespec-client-generator-core`, `mutateNamespace: false`, and
+`scope: AllScopes`; it neither creates a fake emitter identity nor calls an emitter.
+Public context tests exercise common versus C# naming/relocation and an explicit
+language scope independent of emitter identity.
 
-| Report                                                                              | Scope                                                          | Validator projects |     TypeSpec projects |                           Overlap | Raw Swagger / TypeSpec diagnostics |
-| ----------------------------------------------------------------------------------- | -------------------------------------------------------------- | -----------------: | --------------------: | --------------------------------: | ---------------------------------: |
-| [`coverage_old.md`](../../../docs/coverage_old.md)                                  | Earlier external snapshot; 450 compiled projects, 210 rules    |                 53 | 0 locally; 0 official | Not available in aggregate report |                      Not available |
-| [`coverage-breakdown.md`](../../../specs/coverage-breakdown.md) checked-in baseline | Production baseline before this rule was enabled               |                 55 |                     0 |                        0 projects |                            487 / 0 |
-| Excluded local post-fix report                                                      | Full local run; generated corpus output intentionally excluded |                 55 |                    56 |                       54 projects |   487 / 502 on assessable projects |
+The source branch's official Core/ARM implementations, linter registrations and
+ARM guideline inventory contain no existing check for this native group/type
+collision. This remains a native gap; the old Swagger mapping is historical only.
 
-The external gist copy in `coverage_old.md` supplies no generated-at timestamp
-or generator revision; its checked-in content hash is
-`6db4ed646b91d307af1aa6d856633c9d1080bf0abb4c1e26153de725f320c934`.
-The corpus dataset was generated on `2026-08-06T08:03:27.940Z` by
-`test/harness/spec-dataset.ts` at TypeSpec repository base
-`deb8c8d4fbdd7d962e5b2ff4fd6e4b9c2cb3b168`; the final TypeSpec
-analysis was generated on `2026-09-29T22:20:52.763Z` using development review
-round 1's external-reference draft. The older gist's source project revision is not recorded
-there; its denominator and rule count cannot be equated to this run.
+## Intentional migration differences
 
-The 53/55 difference reflects distinct report populations (450 versus 462
-compiled projects), not a proven pair of newly affected services. The external
-report has no project list; subtracting its aggregates cannot identify the
-two projects. The baseline 487/0 gap reflected an absent implementation; the
-first authored-name-only draft also reported 487/0 after fixing its root
-service-namespace false positives. Its three initial TypeSpec-only projects
-were caused by treating direct service operations as though the service name
-were their operation group. The corrected full rerun removed those three.
-Scoped client locations and model/client names are separately supported by
-the current correction; their measured full-corpus population is reported
-below rather than conflated with the older report.
+| Authored shape                                                | Native result                                   | Historical Swagger result / reason               | Evidence                                                              |
+| ------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------- |
+| Interface `Widget` returns model `Widget`                     | One group warning                               | Prefix/definition warning                        | `noun-conflicts-model`; native target/multiplicity tests              |
+| Plural `Widgets` group returns `Widget`                       | No warning                                      | No conflict                                      | `noun-does-not-conflict`; actual doc snippets tested                  |
+| Root `Widget_Read` returns `Widget`                           | No group, no warning                            | Prefix may conflict                              | Native root-operation regression; previous algorithm split root names |
+| `Widget_Admin` or lowercase `widget` group with `Widget` type | No warning                                      | A prefix/casing-based approximation could differ | Full-name and case-sensitive native tests                             |
+| Common group/type overrides                                   | Compare common names                            | Selected AutoRest metadata may differ            | Common positive/negative overrides; four scoped controls              |
+| String or typed client relocation                             | Compare actual common group                     | Serialized grouping may differ by emitter        | Native common/scoped relocation tests; context tests                  |
+| Concrete friendly-named templates                             | Compare supported common names                  | Named definitions can coincide                   | `friendly-template-collision`                                         |
+| `Gizmo<"one">` without a friendly name                        | Warn for common name `Gizmo`                    | Inlined union creates no conflicting definition  | `inline-template-no-collision` emitted fixture                        |
+| `Widget<Item>` without a friendly name                        | Compare common name `WidgetItem`, not `Widget`  | Inlined model creates no conflicting definition  | Same fixture; supported TCGC naming, not a custom template rule       |
+| Legacy external-reference `Widget`                            | Warn for native named type                      | No local definition                              | `external-reference-no-collision` emitted fixture                     |
+| Named query/header type                                       | Participate in native API                       | May not create a Swagger definition              | Native parameter/header tests                                         |
+| Shared or nested named type                                   | Participate when referenced                     | Serialized qualified naming can differ           | Native shared/nested tests                                            |
+| Several methods in one group                                  | One warning on group                            | One warning per serialized operation             | Native exact target/count tests                                       |
+| Anonymous response with named child                           | Child participates, anonymous shape has no name | Emission naming is not the native policy         | Native anonymous/recursive graph tests                                |
+| Another root client's types or unused declarations            | Not part of this client's API                   | Swagger population may differ                    | Native root-client isolation tests                                    |
 
-## Reproduction commands
+Fixtures deliberately retain their original historical directory names. Their
+`expect.json` violation flag describes the **validator** expectation. Two
+validator-clean fixtures now have mapped native diagnostics; this is documented
+contract divergence, not a reason to suppress native warnings or change the input.
+All fixture snapshots are produced by the existing comparison harness.
 
-All commands below run from the repository root with the pinned specs checkout
-at
-`C:\dev\worktrees\azure-rest-api-specs-lintdiff-operation-id-noun-conflicting-model-names`.
-The focused fixture command uses
-`LINTDIFF_COMMON_TYPES=C:\dev\worktrees\azure-rest-api-specs-lintdiff-operation-id-noun-conflicting-model-names\specification\common-types`;
-`LINTDIFF_VALIDATOR_ROOT=C:\dev\worktrees\azure-openapi-validator-lintdiff-shared`
-selects validator source commit
-`6243cb01c16c7535cd3b8df6f45fbeb3c095ed7f`.
+## Validation and corpus provenance
 
-```powershell
-mise exec -- pnpm -r --filter "tsp-lintdiff-local-linter..." build
-mise exec -- pnpm --dir packages/typespec-lintdiff exec vitest run test/rules/operation-id-noun-conflicting-model-names.test.ts
-$env:LINTDIFF_COMMON_TYPES="C:\dev\worktrees\azure-rest-api-specs-lintdiff-operation-id-noun-conflicting-model-names\specification\common-types"
-$env:LINTDIFF_VALIDATOR_ROOT="C:\dev\worktrees\azure-openapi-validator-lintdiff-shared"
-mise exec -- pnpm --dir packages/typespec-lintdiff validate --rule OperationIdNounConflictingModelNames
-mise exec -- pnpm --dir packages/typespec-lintdiff test -- --run --reporter=dot
-mise exec -- pnpm --dir packages/typespec-lintdiff specs:typespec --specs-repo C:\dev\worktrees\azure-rest-api-specs-lintdiff-operation-id-noun-conflicting-model-names --filter Microsoft.ApiManagement --concurrency 6
-mise exec -- pnpm --dir packages/typespec-lintdiff specs:typespec --specs-repo C:\dev\worktrees\azure-rest-api-specs-lintdiff-operation-id-noun-conflicting-model-names --concurrency 6
-mise exec -- pnpm --dir packages/typespec-lintdiff specs:coverage --specs-repo C:\dev\worktrees\azure-rest-api-specs-lintdiff-operation-id-noun-conflicting-model-names
-```
+- Source worktree: `lintdiff-operation-id-noun-conflicting-model-names`.
+- Original source head: `e16db1ab337fd7022789c7437d10ee722b70480d`.
+- Fetched development base: `deb8c8d4fbdd7d962e5b2ff4fd6e4b9c2cb3b168`.
+- Specs pin: `f6b53f105b95da05276530a0754a1c71b4f16397`.
+- Native unit tests load no emitter or OpenAPI library.
+- Focused rule tests: 59 passed; TCGC context tests: nine passed.
+- Complete lintdiff package suite: 20 files / 521 tests passed, including the
+  rule regressions and four harness test files.
+- All five historical comparison fixtures pass strict snapshot validation. Two
+  validator-clean cases intentionally produce native diagnostics under the new
+  guideline; their snapshots preserve that difference.
+- Initial full TCGC suite: 94 files, 1,361 tests; four per-test timeouts,
+  1,355 passed, two skipped. The coordinator authorized exactly one diagnostic
+  rerun with `--maxWorkers=1`: all 94 files passed, with 1,359 passed and two
+  skipped tests. Assertions, dependencies and timeout limits were unchanged.
+  This is a recovered timeout, not proof of an environmental cause.
+  That passing evidence remains applicable: all six changed TCGC source/test
+  hashes and all four original configuration/lockfile fingerprints match.
+- The added regressions initially reproduced three native false positives:
+  unused siblings, shared-base cross-client leakage, and inherited-discriminator
+  expansion. All now pass, alongside direct-reference and recursive-polymorphism
+  positive controls. An intermediate build caught missing required empty
+  `NavigationOptions` arguments; that build failure and its mechanical correction
+  are retained in the execution evidence.
+- Representative corpus: the literal `DevOpsInfrastructure` selector processed
+  its one expected project successfully, with zero target-rule diagnostics.
+- Full corpus: all 468 projects processed, generated
+  `2026-09-30T07:50:11.898Z`, with 462 assessable and six failed projects.
+  The earlier `2026-09-30T04:04:54.744Z` run contained the two false positives;
+  its 133 assessable findings are superseded, not silently overwritten.
+- The independent-review member-owner, scope and classification-isolation
+  corrections leave all 131 assessable diagnostic records identical to the
+  `2026-09-30T05:26:24.913Z` and `2026-09-30T06:50:16.598Z` runs.
+  The raw totals and six failure identities/compiler-code sets are unchanged.
+  All nine unmatched labels retain identical selected API versions and
+  byte-identical projected HTTP graphs, revalidating the causal attribution
+  below. The new defects are proved and fixed by the native regression suite;
+  corpus equality alone did not reveal them.
+- Scoped formatting, TypeScript lint, both package builds and post-format strict
+  fixture validation passed before the documentation-only investigation update.
 
-The final two commands regenerate the local `specs` reports and rule shards
-used for the counts in this note. Those generated artifacts are validation
-evidence and are restored to the checked-in baseline before publication.
+## Current corpus evidence and limitations
 
-## Fixture and native test evidence
+The retained Swagger inputs select the dataset's latest API version. Native
+linting visits the unprojected source program and may include older declarations.
+The rule is evaluated in production mode, not staging mode. Failed projects are
+excluded from both sides of the assessable comparison.
 
-The violation fixture uses an operation in `Operations.Widget` returning the
-reachable service model `TestService.Widget`. The checked-in Swagger snapshot
-contains `"operationId": "Widget_Get"` and the `"Widget"` definition; the
-validator and native linter each report once. The plural `Widgets` fixture
-is validator-clean and native-clean. Two additional violation diagnoses in
-the friendly-template fixture target the emitted definition names `Widget`
-and `Gizmo`; the inline-template fixture has no such definitions or
-diagnostics, despite its authored template names matching the operation
-groups. Native tests exercise body-only
-reachability, query/header exclusions, base and eligible derived models,
-template-declaration exclusion, unused/nested/recursive models, direct
-underscored operation names, scoped string/typed client locations, client names
-on operations, groups, and schema types, and controls scoped only to another
-emitter. All **five** fixture cases (two violation, three reviewed-ambient
-compliance) and all **41** focused native tests pass (all **503** tests
-in the native rule suite also pass). The native suite covers direct service
-operation non-conflict and conflict, including actual emitted Swagger noun
-gaps. Other fixture diagnostics are explicitly reviewed ambient warnings, not
-evidence of this rule's behavior.
+| Population or identity                     |        Swagger |         Native |
+| ------------------------------------------ | -------------: | -------------: |
+| Raw diagnostics, including failed projects |            649 |            137 |
+| Assessable diagnostics                     |            487 |            131 |
+| Assessable affected projects               |             55 |             58 |
+| Same-project overlap                       |             54 |             54 |
+| One-sided projects                         |              1 |              4 |
+| Project + Swagger file + JSON path         |            487 | Not comparable |
+| Project + JSON path                        |            487 | Not comparable |
+| Project + source location                  | Not comparable |            131 |
 
-## Systematic review of the original 55 validator-only projects
+Across affected projects, ten have equal diagnostic counts, 44 are
+validator-higher and five are native-higher. The positive validator excess totals
+362; the positive native excess totals six. The 487 Swagger operation findings
+have 125 distinct project/prefix labels; the 131 native findings have 131 distinct
+project/group-name labels. Label arithmetic is `125 - 3 + 9 = 131`, but this is
+descriptive, not a common semantic identity or an equivalence proof.
 
-Before the metadata correction, **all 55** assessable validator-positive
-projects were native-negative. An inventory of the actual copied TypeSpec
-sources found `@clientLocation` in **53/55** projects, `@clientName` in
-**54/55**, and `@operationId` in **21/55**. Searching each project's validator
-message nouns for an exact literal in an authored `@clientLocation` found
-**52/55** projects; the three exceptions demonstrate distinct authoring
-patterns, not a common cause: StackHCIVM has an inline
-`@Azure.ClientGenerator.Core.clientName("HybridIdentityMetadata")` on its
-operation interface; DesktopVirtualization renames interface
-`AppAttachPackages` to `AppAttachPackage` via `@@clientName`; FileShares
-authors `@operationId("FileShareSnapshot_Get")` and other explicit IDs. These
-project-level string scans are **only triage**: a file may have unrelated
-decorators or versions; matching literals do not prove the particular
-validator-reported operation or definition was emitted from them.
+The complete validator-only project is
+`specification/fileshares/resource-manager/Microsoft.FileShares/FileShares`
+(selected `2026-06-01`, eight findings). Its explicit singular serialized
+prefixes `FileShare` and `FileShareSnapshot` differ from plural authored groups.
 
-The effective naming APIs in `get-in-operation-name.ts` provide a supported
-native path for scoped locations and client names, with a test for a location
-typed as an interface and a control for a decorator scoped only to JavaScript.
-The official `no-openapi` rule discourages explicit `@operationId`, and the
-development contract prohibits adding an `@typespec/openapi` operation-ID
-dependency to this production rule. FileShares remains a documented
-validator-only shape rather than an invented metadata accessor or an
-unproven claim of full parity. The final corpus comparison below determines
-how much of the original 55-project population actually overlaps.
+The complete native-only project list is:
 
-## Full-corpus comparison
+- `specification/confidentialledger/resource-manager/Microsoft.ConfidentialLedger/ConfidentialLedger`:
+  `ManagedCCF`, one finding; selected `2026-05-22-preview`. The model and interface
+  were removed at `v2026_02_23`, so this finding is older-version-only.
+- `specification/containerservice/resource-manager/Microsoft.ContainerService/aks`:
+  `OperationStatusResult`, one finding; selected `2026-05-02-preview`.
+  `AgentPools.getByAgentPool` was added at that version and relocated through
+  supported client metadata. It returns the shared ARM `OperationStatusResult`;
+  the selected Swagger has matching operations but no local definition.
+- `specification/hybridaks/resource-manager/Microsoft.HybridContainerService/HybridContainerService`:
+  `HybridIdentityMetadata`, one finding; selected `2026-04-01-preview`.
+  `client.tsp` applies `@clientName(..., "HybridIdentityMetadata", "!autorest")`.
+  Its common fallback applies to this native rule; the excluded AutoRest scope
+  retains different grouping. The selected Swagger contains the model definition
+  but no operation with that prefix.
+- `specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters`:
+  `ManagedAzResiliencyStatus` and `ManagedMaintenanceWindowStatus`, two findings;
+  selected `2026-05-01-preview`. Explicit serialized identifiers start with
+  lowercase `managedAzResiliencyStatus` and `managedMaintenanceWindowStatus`,
+  unlike the native groups and matching capitalized types.
 
-The final run analyzed all 468 source projects; six failed TypeSpec analysis and
-are excluded from _both_ sides of the observed overlap. The Swagger shard
-contains 649 raw findings across 57 projects before filtering. The excluded
-Network project contributes 161 findings and ServiceLinker contributes one:
-649 - 162 = **487** assessable validator diagnostics in **55** projects.
-The exact raw identity `(project, swagger file, JSON path)` has 487 distinct
-values; removing the file from that identity still has 487. The TypeSpec
-shard has **516 raw** findings in 58 projects, including 13 from excluded
-Network and one from excluded ServiceLinker: **502 comparable** native
-diagnostics at 502 distinct `(project, source file, line, column, message)`
-identities in **56** projects. Project-level overlap is 54; FileShares is
-the one validator-only project (eight warnings), while ConfidentialLedger
-(eight) and ServiceFabricManagedClusters (two) are TypeSpec-only projects.
-Adding positive project-count differences yields **9** validator surplus
-diagnostics and adding negative differences yields **24** native surplus
-diagnostics (net -15). These cardinality sums are not a line-by-line
-operation match: ApiManagement previously had seven native diagnostics
-for one Swagger warning; after excluding its six ARM common-model
-warnings, only `Operation_ListByTags` remains and agrees with Swagger.
-Of the original 55 validator-only projects, **54** now have
-some native overlap; do not claim the other 54 have complete per-operation
-coverage.
-The six unsuccessful TypeSpec projects are:
+Additional label differences in overlapping projects include ApiManagement,
+ContainerApps and Batch. ContainerApps' `AppResiliency` was removed
+at `v2026_01_01`; Batch certificate methods were removed at `v2025_06_01`.
+ApiManagement's common `PrivateEndpointConnection` location is stored as the
+fallback of `!javascript`, and its native model aliases
+`PrivateEndpointConnectionResource`; the selected Swagger has no local
+`PrivateEndpointConnection` definition. SecuritySolutionsAPI instead uses common
+`SecuritySolutionsReferenceData` grouping with lowercase
+`securitySolutionsReferenceData` model/serialized prefix, so native exact
+case-sensitive names do not collide.
 
-- `specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices`
-- `specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups`
-- `specification/network/resource-manager/Microsoft.Network/Network/Network` (161 validator findings, 13 raw native findings excluded from comparison)
-- `specification/quota/resource-manager/Microsoft.Quota/Quota`
-- `specification/resources/resource-manager/Microsoft.Resources/deployments`
-- `specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker` (one validator finding and one raw native finding, both excluded)
+### Selected-version attribution of every unmatched native label
 
-The validator corpus retains the dataset's selected latest API version, whereas
-ordinary TypeSpec diagnostics can include older API versions. For instance,
-`ConfidentialLedger/ManagedCCF.tsp` removes `ManagedCCF` in
-`v2026_02_23`, while the selected Swagger is `2026-05-22-preview` and
-contains neither `ManagedCCF` definition nor matching operation ID. Its eight
-native warnings may therefore belong to the older version, not a true
-selected-version defect. The remaining native/validator differences cannot
-be inferred solely from project-level totals.
+| Project / selected API version                      | Native-only label                | Explanation                                                                             |
+| --------------------------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------- |
+| ApiManagement / `2025-09-01-preview`                | `PrivateEndpointConnection`      | Referenced native alias; external common-type definition                                |
+| ContainerApps / `2026-01-01`                        | `AppResiliency`                  | Model and group removed at `v2026_01_01`                                                |
+| Batch / `2025-06-01`                                | `Certificate`                    | All six group operations removed at `v2025_06_01`                                       |
+| Batch / `2025-06-01`                                | `NetworkSecurityPerimeter`       | Reachable common type within the NSP configuration                                      |
+| ConfidentialLedger / `2026-05-22-preview`           | `ManagedCCF`                     | Model and group removed at `v2026_02_23`                                                |
+| AKS / `2026-05-02-preview`                          | `OperationStatusResult`          | Referenced shared type; operation added at the selected version                         |
+| HybridContainerService / `2026-04-01-preview`       | `HybridIdentityMetadata`         | Common fallback of a `!autorest` name override                                          |
+| ServiceFabricManagedClusters / `2026-05-01-preview` | `ManagedAzResiliencyStatus`      | Common model override matches the interface; explicit serialized prefix differs in case |
+| ServiceFabricManagedClusters / `2026-05-01-preview` | `ManagedMaintenanceWindowStatus` | Same exact-case difference                                                              |
 
-### Gap example: emitted operation group differs from authored interface
+Source versioning decorators establish the three historical-only findings.
+The runner's actual selected-version HTTP semantic graphs corroborate absence of
+those operations and presence of all six other unmatched-label operations.
+For interface diagnostic targets, the interface itself is not an HTTP graph node:
+the check uses its verified operation target, not absence of the interface's
+source location. This prevents incorrectly dropping the HybridAKS and ServiceFabric
+findings. The graphs are comparison evidence only; the production rule never
+reads them or performs unsafe version mutation.
 
-- **Classification:** previously validator-only; now project-level overlap
-- **Status:** covered by scoped client-location metadata
-- **Project/API version:** `specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement` / `2025-09-01-preview`
-- **Source:** `typespec/ApiContract.tsp`, `typespec/models.tsp`
+Removing these three proven historical findings gives **128 source-attributed
+native findings in 57 projects**. The latest-version one-sided investigation
+therefore has one validator-only project (FileShares) and three native-only
+projects (AKS, HybridContainerService, ServiceFabricManagedClusters).
+This is explicitly a manual attribution of unmatched findings, not a claim that
+the entire native rule was rerun on every projected program. Raw counts remain
+131 assessable / 137 total. No one-sided project or unmatched label is left
+unclassified, and none requires restoring serialized-prefix behavior.
 
-**TypeSpec source**
+## Code-backed gap examples
 
-```text
-@armResourceOperations
-interface ApiContracts {
-  @get
-  @action("operationsByTags")
-  @list
-  listByTags is ApiContractOps.ActionSync<
-    ApiContract,
-    void,
-    ArmResponse<TagResourceCollection>,
-    Parameters = {
-```
+These are excerpts from the pinned specs and retained Swagger, not production
+rule logic or recommended native authoring workarounds.
 
-In `models.tsp`:
+### Native review corrections: member ownership and common property scope
 
-```typespec
-model Operation {
-  name?: string;
+These are native correctness defects, not intentional Swagger differences.
+Both examples use ordinary generic HTTP authoring with `using TypeSpec.Http;`,
+`using Azure.ClientGenerator.Core;` and `@service namespace Example;`.
+
+```tsp
+enum Widget {
+  one,
+  two,
 }
-```
-
-**Emitted OpenAPI or validator behavior**
-
-```json
-{
-  "operationId": "Operation_ListByTags",
-  "definitions": {
-    "Operation": { "type": "object" }
+model Response {
+  value: Widget.one;
+}
+namespace Groups {
+  interface Widget {
+    @get read(): Response;
   }
 }
 ```
 
-| Engine            | Observed result                                                                                                                                                                                                                         |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Swagger validator | One warning on `paths./subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/operationsByTags.get.operationId`: noun `Operation` matches a definition. |
-| TypeSpec lint     | Warning: AutoRest-scoped `@@clientLocation(ApiContracts.listByTags, "Operation", "!javascript")` supplies the effective noun even though authored interface `ApiContracts` does not match model `Operation`.                            |
+The compiler's walker skips direct `EnumMember` references. The common SDK
+property instead has an enum-value type owned by `Widget`, so the group requires
+one warning. An enum-like `union Widget { one: "one", two: "two" }` has the same
+ownership requirement. The corrected rule retains these owners in parameters,
+direct responses and nested properties. For a selected non-enum union variant,
+it follows only the selected value; it does not visit unrelated alternatives.
+Nullable union variants are not mistakenly treated as enum-owned references.
 
-**Explanation:** `typespec/back-compatible.tsp:336` supplies a supported
-client-location override for this operation. The native rule now resolves it
-using TCGC metadata scoped to AutoRest, without invoking the emitter. The
-other old one-sided projects do not thereby become equivalent by assumption.
+```tsp
+model Widget {
+  id: string;
+}
+model Response {
+  @scope("csharp")
+  value: Widget;
 
-**Disposition:** Covered at the project level; the project may still have
-additional native warnings without matching definitions in its selected
-Swagger. Continue distinguishing valid native overlap from false positives.
-
-### Gap example: direct service name is not the operation noun
-
-- **Classification:** TypeSpec-only in the first draft run, resolved in the final run
-- **Status:** fixed
-- **Project/API version:** `specification/confidentialledger/resource-manager/Microsoft.ConfidentialLedger/ConfidentialLedger` / `2026-05-22-preview`
-- **Source:** `typespec/routes.tsp:17`, service model `ConfidentialLedger`
-
-**TypeSpec source**
-
-```typespec
-namespace Microsoft.ConfidentialLedger;
-@autoRoute
-op checkNameAvailability is ArmProviderActionSync<
-  Request = Azure.ResourceManager.CommonTypes.CheckNameAvailabilityRequest,
-  Response = Azure.ResourceManager.CommonTypes.CheckNameAvailabilityResponse,
-  Scope = SubscriptionActionScope,
-  Parameters = {}
->;
+  id: string;
+}
+namespace Groups {
+  interface Widget {
+    @get read(): Response;
+  }
+}
 ```
 
-**Emitted OpenAPI or validator behavior**
+Here `isInScope` is false for `value` under common metadata selection, and the
+common SDK response exposes only `id`. The previous property walk incorrectly
+reported a collision. The corrected walk applies the supported scope predicate
+to own/inherited properties and operation parameters before following their
+types. Common and negated-scope fallback members still participate.
+
+The member-owner and scope expansion initially had 49 cases. Its red run reproduced 13
+missing-owner or overbroad-scope assertions; all now pass, including selected
+alternative isolation and later whole-union reference controls. The first
+corrected build and the complete 511-test lintdiff suite passed in that draft.
+The subsequent full corpus has no added or removed target-rule diagnostic
+records, so these supported native shapes add test coverage without changing
+the observed corpus populations.
+
+### Classification must not allocate reachable names
+
+Independent follow-up found that owner classification, although not adding
+unselected types to the candidate set, allocated their names in the same TCGC
+context used by reachable types:
+
+```tsp
+model Box<T> {
+  value: T;
+}
+union Choice {
+  unused: Box<int32>,
+  selected: Box<string>,
+}
+namespace Groups {
+  interface Box {
+    @get read(): Choice.selected;
+  }
+}
+```
+
+The selected type's common name is `Box`. Classifying the whole union first
+reserved `Box` for the unreachable integer alternative and renamed the reachable
+string alternative to `Box1`, hiding the conflict. Reordering the alternatives
+changed the diagnostic without changing the reachable API.
+
+The SDK has no equivalent side-effect-free public classifier that also handles
+its enum-flattening and nullable-wrapper policy. The rule therefore retains the
+public classifier in a separate common-scope context with namespace mutation
+disabled. Only its `kind` is consumed; all collected names, client/group
+traversal and scope checks use the original context. The SDK's name, referenced
+type, property, version and client caches are context-owned. Client construction
+clones decorator-owned records rather than mutating shared program metadata;
+SDK model construction changes new SDK objects, not compiler model properties.
+
+Ten regressions cover both alternative orders, direct/nested selected template
+types, an unrelated nested template, a later operation and a different root
+client. Every case requires exactly one diagnostic on the authored `Box`
+interface. Seven failed before isolation; all 59 focused tests and the complete
+521-test package suite now pass. A public-API probe additionally verifies both
+orders with default and explicit clients: compiler type graphs, diagnostics,
+namespace identity and client metadata stay unchanged, while separate naming
+contexts preserve `Box` and enum/nullable classifications remain correct.
+
+### Per-operation versus per-group multiplicity
+
+- **Classification/status:** count-only, intentional.
+- **Project/version:** Marketplace / `2025-01-01`.
+- **Source:** `Marketplace/back-compatible.tsp` and `PrivateStore.tsp`.
+
+```tsp
+@@clientLocation(PrivateStores.get, "PrivateStore");
+@@clientLocation(PrivateStores.createOrUpdate, "PrivateStore");
+```
+
+`PrivateStore` is a named `ProxyResource<PrivateStoreProperties>`. The retained
+GET operation includes:
 
 ```json
-{ "operationId": "CheckNameAvailability" }
+{
+  "operationId": "PrivateStore_Get",
+  "responses": {
+    "200": { "schema": { "$ref": "#/definitions/PrivateStore" } }
+  }
+}
 ```
 
-| Engine            | Observed result                                                                                                 |
-| ----------------- | --------------------------------------------------------------------------------------------------------------- |
-| Swagger validator | No warning: the emitted ID has no `_`.                                                                          |
-| TypeSpec lint     | First draft warned about service name `ConfidentialLedger` versus model of the same name; final draft does not. |
+| Engine  | Observed result                                |
+| ------- | ---------------------------------------------- |
+| Swagger | 25 `PrivateStore_*` operation findings         |
+| Native  | One warning on the actual `PrivateStore` group |
 
-**Explanation:** The service namespace identifies the service, not an
-operation group for a directly declared operation. Two further initial
-TypeSpec-only projects, ElasticSan and Peering, had the same direct-service
-namespace predicate; that particular root-service false positive was removed,
-although other TypeSpec-only projects have separate causes.
+**Disposition:** retain the native group diagnostic unit. The largest
+validator-higher projects show the same multiplicity: Automation 120/26,
+Batch 35/8, MachineLearningServices 29/4, Marketplace 25/1, AzureLargeInstance
+15/2, Billing 14/2, SQL 20/8 and Storage 15/3 (Swagger/native).
+Batch's two additional native labels are separately explained in the attribution
+table; they are not misclassified as duplicate operations.
 
-**Disposition:** Fixed by excluding direct service namespace fallback, with
-the red/green native regression; no older-version explanation was needed.
+### Serialized names are not native groups
 
-### ARM common-type false positive and remaining non-equivalence
+- **Classification/status:** validator-only, intentional.
+- **Project/version:** FileShares / `2026-06-01`.
+- **Source:** `FileShares/fileshares.tsp`; other interface methods omitted.
 
-- **ARM common-type false positive, corrected:** ApiManagement's
-  `typespec/PrivateEndpointConnection.tsp` declares
-  `model PrivateEndpointConnection is PrivateEndpointConnectionResource`.
-  Six previous native warnings used group `PrivateEndpointConnection`, but
-  selected `2025-09-01-preview/openapi.json` references the externally
-  supplied `common-types/.../privatelinks.json` instead of defining
-  `PrivateEndpointConnection` locally. The supported ARM
-  `isArmCommonType(model)` predicate is true for this model and false for
-  ApiManagement's genuine local `Operation` model. The rule now excludes
-  ARM common models from the local candidate set **without stopping graph
-  traversal of their children**. Native regressions cover this exact
-  inheritance pattern, a positive local `Operation`, and a local child
-  reachable through a common model. The full-corpus rerun removes exactly
-  these six ApiManagement warnings while retaining `Operation_ListByTags`.
-  Comparing all native source identities to the archived pre-correction
-  corpus finds **six removed and zero added diagnostics**.
-- **Explicit operation IDs:** FileShares has eight validator-only warnings
-  and uses `@operationId("FileShareSnapshot_Get")`,
-  `@operationId("FileShare_GetUsageData")`, and related IDs in
-  `typespec/fileshares.tsp`. Conversely, ServiceFabricManagedClusters has
-  two native-only warnings for authored interfaces
-  `ManagedAzResiliencyStatus` and `ManagedMaintenanceWindowStatus`;
-  `typespec/ManagedCluster.tsp` explicitly uses lowercase
-  `@operationId("managedAzResiliencyStatus_Get")` and
-  `@operationId("managedMaintenanceWindowStatus_Get")`, and the selected
-  Swagger has no IDs with the uppercase model-name prefixes. Accessing
-  explicit OpenAPI operation-ID metadata through `@typespec/openapi` is
-  disallowed for this new rule; the official `no-openapi` lint discourages
-  these overrides, but the latter are suppressed for compatibility.
-- **Selected-version mismatch:** ConfidentialLedger's eight native-only
-  `ManagedCCF` warnings are on a model/interface marked
-  `@removed(Versions.v2026_02_23)`; selected Swagger
-  `2026-05-22-preview` has neither its definition nor operation IDs. The
-  corpus runs the native lint across authored versions, not just the
-  selected latest version.
+```tsp
+interface FileShareSnapshots {
+  @operationId("FileShareSnapshot_Get")
+  getFileShareSnapshot is ArmResourceRead<FileShareSnapshot, BaseParameters<FileShareSnapshot>>;
+}
+```
 
-Two overlapping projects had one more validator finding than native in the
-earlier run. Named scalar support resolves PostgreSQL's
-`PrivateDnsZoneSuffix` finding: the source returns the service-local scalar,
-the selected Swagger has `operationId: PrivateDnsZoneSuffix_Get` and a
-`PrivateDnsZoneSuffix` definition, and the final corpus adds exactly that one
-native warning. SecuritySolutionsAPI retains one more validator finding than
-native without a proven per-operation mapping; that deficit requires evidence
-before calling it a source defect.
-The explicit-ID differences are accepted contract limitations, not evidence
-that project-level overlap proves full operation-level parity.
+The selected Swagger records `"operationId": "FileShareSnapshot_Get"` and
+defines `FileShareSnapshot`. Five such snapshot operations and three
+`FileShare_*` operations produce eight validator warnings.
 
-### Supported template-instance naming and inline boundaries
+| Engine  | Observed result                                                 |
+| ------- | --------------------------------------------------------------- |
+| Swagger | Eight findings on singular serialized prefixes                  |
+| Native  | Zero; plural authored groups do not collide with singular types |
 
-The first promotion review exposed two source-rule failures on the pinned
-development commit `55134f69ab2bb7c67c3075a306c605deab94b748`
-([model finding](https://github.com/Azure/typespec-azure/pull/5591#discussion_r4137628831),
-[other schema types](https://github.com/Azure/typespec-azure/pull/5591#discussion_r4137628899)).
-Before this repair, `getClientNameOverride(...) ?? type.name` compared the
-template's declaration name and ignored a concrete instance's
-`@friendlyName`. Its apparent support for a `Widget<T>` instance also
-reported a collision when AutoRest emitted that instance inline. These
-are supported authoring inputs, not Swagger-only edge cases.
+**Disposition:** do not read operation identifiers, split names, or infer groups
+from root methods. The native `Widget_Read` regression independently proves that
+an underscored root operation does not invent a `Widget` group.
 
-The two new comparison fixtures independently compile TypeSpec, emit
-Swagger, run the actual validator and check native diagnostics:
+### Case-sensitive common names
 
-- `friendly-template-collision`: `Wrapper<Item>` has
-  `@friendlyName("Widget", T)` and the open-string union `Choice<"one">`
-  has `@friendlyName("Gizmo", T)`. Swagger has `definitions.Widget` and
-  `definitions.Gizmo` with `Widget_Read`/`Gizmo_Read` operation IDs; the
-  validator and native rule each issue two warnings. Both names also match
-  the TCGC library-name result. The union includes the base `string` arm
-  to avoid Azure Core's `no-closed-literal-union` diagnostic; an
-  object-and-string union was rejected by AutoRest and discarded from
-  supported fixture evidence.
-- `inline-template-no-collision`: `Widget<Item>` and open-string
-  `Gizmo<"one">` without friendly names are both emitted inline.
-  The selected Swagger definitions contain `Item` but neither `Widget`
-  nor `Gizmo`, despite matching authored template declaration names and
-  group names. Neither engine issues this rule's diagnostic. Native
-  tests also confirm that a friendly name that _removes_ a raw-name
-  collision yields no warning, and that `@clientName` overrides on
-  named scalars, enums and unions retain their prior behavior.
+- **Classification/status:** one validator-only label and two native-only
+  labels, intentional.
+- **Projects/versions:** SecuritySolutionsAPI / `2020-01-01`;
+  ServiceFabricManagedClusters / `2026-05-01-preview`.
+- **Source:** SecuritySolutionsAPI `back-compatible.tsp`, `models.tsp`,
+  `routes.tsp`; ServiceFabric `back-compat.tsp`, `ManagedCluster.tsp`.
 
-The official Azure Core `friendly-name` rule rejects `@friendlyName` on
-scalars and enums; their ordinary named and client-renamed supported
-cases remain covered, without adding implementation branches for
-rejected forms. In the production rule, `getFriendlyName` and
-`isTemplateInstance` are public compiler metadata checks; TCGC's
-`getLibraryName` supplies the effective SDK name. AutoRest's
-`shouldInline` and Swagger definitions were used only to verify
-fixtures and **are not imported or simulated in production**.
+SecuritySolutionsAPI relocates methods into common group
+`SecuritySolutionsReferenceData`, while its model is named
+`securitySolutionsReferenceData` and the selected operation identifier is
+`securitySolutionsReferenceData_List`. That produces one Swagger finding but
+no native collision for this label.
 
-### Original validator-only project set
+ServiceFabric demonstrates the reverse direction:
 
-All 55 projects below had a validator finding and no native finding in the
-previous authored-name-only analysis. In the final naming-metadata run, **54
-overlap at the project level**; only FileShares remains validator-only. They
-are **not** assumed to share the sampled ApiManagement cause:
+```tsp
+@@clientName(ManagedAzResiliencyStatusContent, "ManagedAzResiliencyStatus");
+```
 
-- `specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement`
-- `specification/app/resource-manager/Microsoft.App/ContainerApps`
-- `specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/ComponentLinkedStorageAccountApi`
-- `specification/authorization/resource-manager/Microsoft.Authorization/Authorization/AccessReview`
-- `specification/authorization/resource-manager/Microsoft.Authorization/Authorization/ProviderOperations`
-- `specification/automation/Automation.Management`
-- `specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto`
-- `specification/azurelargeinstance/resource-manager/Microsoft.AzureLargeInstance/AzureLargeInstance`
-- `specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI`
-- `specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCIVM`
-- `specification/batch/resource-manager/Microsoft.Batch/Batch`
-- `specification/billing/resource-manager/Microsoft.Billing/Billing`
-- `specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits`
-- `specification/cdn/resource-manager/Microsoft.Cdn/Cdn`
-- `specification/cognitiveservices/CognitiveServices.Management`
-- `specification/compute/resource-manager/Microsoft.Compute/Compute/Compute`
-- `specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk`
-- `specification/consumption/resource-manager/Microsoft.Consumption/Consumption`
-- `specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge`
-- `specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory`
-- `specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization`
-- `specification/developerhub/resource-manager/Microsoft.DevHub/DeveloperHub`
-- `specification/dns/resource-manager/Microsoft.Network/Dns`
-- `specification/domainservices/resource-manager/Microsoft.AAD/DomainServices`
-- `specification/eventhub/resource-manager/Microsoft.EventHub/Eventhub`
-- `specification/fileshares/resource-manager/Microsoft.FileShares/FileShares`
-- `specification/hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules`
-- `specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute`
-- `specification/hybridkubernetes/resource-manager/Microsoft.Kubernetes/HybridKubernetes`
-- `specification/iothub/resource-manager/Microsoft.Devices/IoTHub`
-- `specification/machinelearningservices/MachineLearningServices.Management`
-- `specification/management/resource-manager/Microsoft.Management/ManagementGroups`
-- `specification/marketplace/resource-manager/Microsoft.Marketplace/Marketplace`
-- `specification/monitor/resource-manager/Microsoft.Insights/Insights/DiagnosticsSettings`
-- `specification/monitor/resource-manager/Microsoft.Insights/Insights/ServiceDiagnosticsSettingsApi`
-- `specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights`
-- `specification/policyinsights/resource-manager/Microsoft.PolicyInsights/PolicyInsights/PolicyInsightsApi`
-- `specification/postgresql/DBforPostgreSQL.Management`
-- `specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices`
-- `specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup`
-- `specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery`
-- `specification/redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/OpenShiftClusters`
-- `specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise`
-- `specification/resources/resource-manager/Microsoft.Resources/resources`
-- `specification/security/resource-manager/Microsoft.Security/Security/ApplicationsAPI`
-- `specification/security/resource-manager/Microsoft.Security/Security/SecuritySolutionsAPI`
-- `specification/security/resource-manager/Microsoft.Security/Security/SqlVulnerabilityAssessmentsAPI`
-- `specification/securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights`
-- `specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus`
-- `specification/sql/resource-manager/Microsoft.Sql/SQL`
-- `specification/storage/Storage.Management`
-- `specification/storageactions/resource-manager/Microsoft.StorageActions/StorageActions`
-- `specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache`
-- `specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync`
-- `specification/web/resource-manager/Microsoft.Web/AppService`
+Its interface is `ManagedAzResiliencyStatus`, but the operation explicitly has
+`@operationId("managedAzResiliencyStatus_Get")`. The retained Swagger has that
+lowercase-initial identifier and a capitalized `ManagedAzResiliencyStatus`
+definition.
 
-**Final TypeSpec-only projects:** ConfidentialLedger (eight warnings on an
-older removed resource) and ServiceFabricManagedClusters (two warnings where
-explicit lowercase `@operationId` overrides the inferred group).
-**Same-project overlap:** 54; not proof of individual operation equivalence.
-The rule fixes valid authored shapes demonstrated by the fixture, focused
-native regressions, and ApiManagement. The remaining evidence-backed contract
-gap is explicit `@operationId`, which the official `no-openapi` rule discourages
-and this native implementation intentionally does not reconstruct. Corpus
-cardinality differences also remain only project-level evidence, so functional
-equality is not established. Do not represent this migration as fully
-equivalent.
+| Engine  | Observed result                                                          |
+| ------- | ------------------------------------------------------------------------ |
+| Swagger | No ServiceFabric match: exact prefix case differs from definition        |
+| Native  | One warning for this group, and one for `ManagedMaintenanceWindowStatus` |
+
+**Disposition:** compare exact common names, without guessed capitalization.
+
+### Referenced native types without local Swagger definitions
+
+- **Classification/status:** native-only labels, intentional.
+- **Projects/versions:** ApiManagement / `2025-09-01-preview`, AKS /
+  `2026-05-02-preview`, Batch / `2025-06-01`.
+- **Source:** ApiManagement `PrivateEndpointConnection.tsp` and
+  `back-compatible.tsp`.
+
+```tsp
+model PrivateEndpointConnection is PrivateEndpointConnectionResource;
+alias PrivateEndpointOperations = PrivateEndpoints<PrivateEndpointConnection>;
+```
+
+Common location metadata assigns the methods to `PrivateEndpointConnection`
+(the supported fallback of `!javascript`). The selected Swagger instead uses:
+
+```json
+{
+  "operationId": "PrivateEndpointConnection_GetByName",
+  "responses": {
+    "200": {
+      "schema": {
+        "$ref": "../../../../../../../../../common-types/resource-management/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+      }
+    }
+  }
+}
+```
+
+| Engine  | Observed result                                                      |
+| ------- | -------------------------------------------------------------------- |
+| Swagger | No matching local definition, hence no finding for this prefix       |
+| Native  | One collision: the referenced named type belongs to the client's API |
+
+AKS similarly returns `ArmResponse<Azure.ResourceManager.CommonTypes.OperationStatusResult>`
+through a selected-version operation relocated to `OperationStatusResult`.
+Batch's NSP configuration has `networkSecurityPerimeter?: NetworkSecurityPerimeter`,
+and common metadata groups its operations under that name. Both selected Swagger
+responses reference shared common-type files rather than local definitions.
+**Disposition:** preserve native reference reachability; do not exempt common or
+external-reference types, and do not parse references in production.
+
+### Common metadata differs from AutoRest-scoped metadata
+
+- **Classification/status:** native-only, intentional.
+- **Project/version:** HybridContainerService / `2026-04-01-preview`.
+- **Source:** `HybridContainerService/client.tsp`.
+
+```tsp
+@@Azure.ClientGenerator.Core.clientName(
+  HybridIdentityMetadataOperationGroup,
+  "HybridIdentityMetadata",
+  "!autorest"
+);
+```
+
+The common fallback names the real interface `HybridIdentityMetadata`, matching
+its response model. The selected Swagger contains:
+
+```json
+{
+  "operationId": "HybridIdentityMetadataOperationGroup_Get",
+  "responses": {
+    "200": { "schema": { "$ref": "#/definitions/HybridIdentityMetadata" } }
+  }
+}
+```
+
+| Engine  | Observed result                                     |
+| ------- | --------------------------------------------------- |
+| Swagger | No conflict with the longer serialized group prefix |
+| Native  | One conflict under the common SDK group name        |
+
+**Disposition:** honor supported common selection without impersonating an emitter.
+
+### Historical declarations absent from the selected version
+
+- **Classification/status:** native-only label, API-version population mismatch.
+- **Project/version:** ContainerApps / selected `2026-01-01`.
+- **Source:** `ContainerApps/AppResiliency.tsp`; the same removal annotation
+  applies to its model and interface.
+
+```tsp
+@removed(Versions.v2026_01_01)
+@armResourceOperations
+@tag("AppResiliency")
+interface AppResiliencies {
+  // Operations omitted.
+}
+```
+
+The native source program retains this historical group. The actual projected
+HTTP graph for `2026-01-01` excludes its `get` operation, and selected Swagger has
+neither its operations nor its model definition.
+
+| Engine                   | Observed result                             |
+| ------------------------ | ------------------------------------------- |
+| Selected-version Swagger | No finding: the group is absent             |
+| Unprojected native lint  | One valid source-level historical collision |
+
+**Disposition:** account for this finding, Batch `Certificate`, and
+ConfidentialLedger `ManagedCCF` in comparison evidence, not production suppressions.
+
+### Named template types are not governed by schema inlining
+
+- **Classification/status:** native-only fixture finding, intentional.
+- **Fixture/version:** `inline-template-no-collision` / `2024-01-01`.
+- **Source:** its `main.tsp`, with documentation annotations omitted.
+
+```tsp
+union Gizmo<T> {
+  item: T,
+  empty: "empty",
+  other: string,
+}
+```
+
+The real `Gizmo` interface returns `TestService.Gizmo<"one">`. The retained
+`Gizmo_Get` response is an inline string schema with `enum: ["one", "empty"]`
+and `x-ms-enum.name: "Gizmo"`; its definitions contain only `Item`.
+
+| Engine  | Observed result                                             |
+| ------- | ----------------------------------------------------------- |
+| Swagger | No `Gizmo` definition, so zero findings                     |
+| Native  | One group collision with the supported common template name |
+
+**Disposition:** keep the SDK naming helper and remove inlining approximations.
+The accompanying `Widget<Item>` has common name `WidgetItem`, so the group
+`Widget` is compliant by native naming, not an inlining exemption.
+
+### Native reachability defect: an unused sibling is not an API type
+
+- **Classification:** native false positive.
+- **Status:** fixed, with negative and positive native regressions.
+- **Source:** the replaced unrestricted `visitDerivedTypes: true` traversal in
+  `src/rules/no-operation-group-name-conflict.ts`.
+
+This valid source should not warn:
+
+```tsp
+using TypeSpec.Http;
+@service
+namespace Example;
+model Base {
+  id: string;
+}
+model Used extends Base {}
+model Unused extends Base {}
+namespace Groups {
+  interface Unused {
+    @get read(): Example.Used;
+  }
+}
+```
+
+Before the fix, the diagnostic was
+`Operation group 'Unused' conflicts with type 'Unused'. Rename the group, for example by using a plural name.`
+Traversal ascends from `Used` to `Base`, then visits `Base`'s unrelated derived
+model `Unused`. A per-client visited set prevents repeats but does not establish
+API reachability. The corrected rule produces no warning for this source.
+
+The pinned DevOpsInfrastructure source demonstrated the same problem. Native
+compiler inspection reports zero compiler errors and this candidate path:
+
+```text
+Pools.get
+  -> ArmResponse<Pool>
+  -> Pool
+  -> Azure.ResourceManager.CommonTypes.TrackedResource
+  -> Azure.ResourceManager.CommonTypes.ResourceModelWithAllowedPropertySet
+  -> Azure.ResourceManager.CommonTypes.Sku
+```
+
+The common library declares:
+
+```tsp
+model ResourceModelWithAllowedPropertySet extends TrackedResource {
+  // Other permitted resource-envelope properties omitted.
+  sku?: Sku;
+}
+```
+
+`ResourceModelWithAllowedPropertySet` is a sibling of the actual resource, not
+the resource returned by this API. This produced the spurious collision with
+the real `Sku` interface. Excluding ARM common types by decorator or namespace
+would hide the symptom rather than repair native reachability and is not an
+acceptable fix.
+
+DataFactory had the same defect, with a separately verified zero-error native
+compile and path:
+
+```text
+Factories.get -> ArmResponse<Factory> -> Factory -> CommonTypes.ProxyResource
+  -> CommonTypes.Resource -> CommonTypes.PrivateEndpointConnection
+```
+
+Its actual resource is `PrivateEndpointConnectionResource` with
+`RemotePrivateEndpointConnection` properties; the unrelated common resource was
+only reached as a sibling through `Resource`.
+
+**Required changes, completed:** explicit base/member traversal, supported
+discriminator alternatives, unused-shared-base negative/direct-reference positive
+regressions, cross-root isolation, and recursive/intermediate polymorphic cases.
+The final corpus removes exactly these two findings, adds none, and preserves all
+other native findings. No emitter, validator, suppression, or normalization change
+was made.
+
+### Compile-failure population
+
+All six failures are preserved in the corpus metadata and raw compiler logs:
+
+| Project suffix                                   | Compiler error                     |
+| ------------------------------------------------ | ---------------------------------- |
+| `Microsoft.Devices/DeviceProvisioningServices`   | `@typespec/http/duplicate-body`    |
+| `Microsoft.Insights/Insights/TenantActionGroups` | `@typespec/http/missing-uri-param` |
+| `Microsoft.Network/Network/Network`              | `@typespec/http/missing-uri-param` |
+| `Microsoft.Quota/Quota`                          | `@typespec/http/missing-uri-param` |
+| `Microsoft.Resources/deployments`                | `@typespec/http/duplicate-body`    |
+| `Microsoft.ServiceLinker/ServiceLinker`          | `@typespec/http/duplicate-body`    |
+
+These projects contribute 162 raw Swagger findings and six raw native findings
+outside the assessable population. They are not silently counted as compliant.
+No unrelated compiler or specification fix was attempted.
+
+### Historical reports are not current native evidence
+
+`docs/coverage_old.md` describes 450 compiled projects and 210 validator rules,
+with 53 validator projects and zero local or official credit for this rule.
+The pre-run canonical `specs/coverage-breakdown.md` records 55 validator projects,
+487 diagnostics and zero mapped native diagnostics. The new run above uses the
+same pinned specs input as this task but a different local rule/mapping.
+Historical aggregate-only report data cannot identify missing individual
+projects or establish equivalence.
+
+| Report / row kind                      | Validator projects | Local native projects | Official credit | Observed overlap | Diagnostics                   |
+| -------------------------------------- | -----------------: | --------------------: | --------------: | ---------------: | ----------------------------- |
+| `coverage_old.md`, `lint`              |                 53 |                     0 |               0 |     Not supplied | Not supplied                  |
+| Pre-run canonical production row       |                 55 |                     0 |               0 |                0 | 487 Swagger / 0 mapped native |
+| Final native production row, `partial` |                 55 |                    58 |               0 |               54 | 487 Swagger / 131 native      |
+
+The external snapshot has no source revision, generation timestamp, or per-project
+inputs: the precise identities of its two-project difference cannot be reconstructed.
+Its credit definition also includes official/no-action mappings; the canonical
+report instead measures observed same-project overlap. No such official credit
+exists in this rule's row, so that definition difference does not explain its
+53-versus-55 population change.
+The preserved dataset was generated `2026-08-06T08:03:27.940Z`; the pre-run
+comparison was generated `2026-08-10T09:38:18.108Z`, with 462 of 468 projects.
+Both files were inspected at source HEAD `e16db1ab337fd7022789c7437d10ee722b70480d`;
+their historical generator commit is not recorded. The new run uses the unchanged
+`test/harness/typespec-results.ts` at that HEAD plus the unpublished rule draft.
+Its source/runtime fingerprints, raw results and complete cleanup archives are
+retained in the task evidence. Readme suppressions were not applied to the retained
+Swagger dataset; existing TypeSpec source suppressions remain unchanged.
+
+The previous source contract's 502 diagnostics in 56 assessable projects
+(516 raw diagnostics) are superseded AutoRest-oriented results. They must not be
+presented as measurements of the new guideline. The native contract and the
+reachability, member-owner and scope defects are covered by passing regressions; Swagger functional
+equivalence is deliberately not claimed.
+
+The approved source redesign is cycle 2, not another attempt to recover Swagger
+count parity. Prior source/promotion reviews do not review this replacement.
+Publication requires a clean complete-diff follow-up, then a fresh development PR
+review before promotion may consume the new source.

@@ -24,9 +24,9 @@ import { missingXmsErrorResponseRule } from "./rules/missing-xms-error-response.
 import { mutabilityWithReadOnlyRule } from "./rules/mutability-with-read-only.js";
 import { nestedResourcesMustHaveListOperationRule } from "./rules/nested-resources-must-have-list-operation.js";
 import { noErrorCodeResponsesRule } from "./rules/no-error-code-responses.js";
+import { noOperationGroupNameConflictRule } from "./rules/no-operation-group-name-conflict.js";
 import { noUnsafePatchBodyPropertiesRule } from "./rules/no-unsafe-patch-body-properties.js";
 import { nonApplicationJsonTypeRule } from "./rules/non-application-json-type.js";
-import { operationIdNounConflictingModelNamesRule } from "./rules/operation-id-noun-conflicting-model-names.js";
 import { operationIdNounVerbRule } from "./rules/operation-id-noun-verb.js";
 import { pageableRequires200ResponseRule } from "./rules/pageable-requires-200-response.js";
 import { paginationResponseRule } from "./rules/pagination-response.js";
@@ -98,7 +98,7 @@ const rules = [
   nonApplicationJsonTypeRule,
   noErrorCodeResponsesRule,
   operationIdNounVerbRule,
-  operationIdNounConflictingModelNamesRule,
+  noOperationGroupNameConflictRule,
   patchInOperationNameRule,
   pageableRequires200ResponseRule,
   parametersSchemaAsTypeObjectRule,
@@ -167,7 +167,7 @@ const enabledRules = {
   [`tsp-lintdiff-local-linter/${nonApplicationJsonTypeRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${noErrorCodeResponsesRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${operationIdNounVerbRule.name}`]: true,
-  [`tsp-lintdiff-local-linter/${operationIdNounConflictingModelNamesRule.name}`]: true,
+  [`tsp-lintdiff-local-linter/${noOperationGroupNameConflictRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${patchInOperationNameRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${pageableRequires200ResponseRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${parametersSchemaAsTypeObjectRule.name}`]: true,
