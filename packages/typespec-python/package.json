@@ -79,7 +79,6 @@
     "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@types/node": "catalog:",
     "@types/semver": "catalog:",
-    "@types/yargs": "catalog:",
     "@typespec/compiler": "workspace:^",
     "@typespec/events": "workspace:^",
     "@typespec/http": "workspace:^",
@@ -93,10 +92,8 @@
     "@typespec/tspd": "workspace:^",
     "@typespec/versioning": "workspace:^",
     "@typespec/xml": "workspace:^",
-    "c8": "catalog:",
     "picocolors": "catalog:",
     "rimraf": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "catalog:"
+    "typescript": "catalog:"
   }
 }

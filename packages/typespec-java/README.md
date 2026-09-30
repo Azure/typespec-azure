@@ -15,6 +15,12 @@ TypeSpec library for emitting Java client from the TypeSpec REST protocol bindin
 npm install @azure-tools/typespec-java
 ```
 
+## Building from source
+
+`pnpm build:emitter` copies the shared emitter implementation from `core/packages/http-client-java/emitter` before compiling it. `core-commit.json` selects the upstream commit; the copied implementation is not tracked in this package.
+
+The copied sources import `@autorest/codemodel` and `@azure-tools/codegen` at runtime. Both remain required dependencies even though those imports are absent from this package's tracked TypeScript sources.
+
 ## Usage
 
 ### Initialize TypeSpec Project

@@ -55,7 +55,6 @@
     "@azure/abort-controller": "catalog:",
     "@azure/core-auth": "catalog:",
     "@azure/core-lro": "catalog:",
-    "@azure/core-paging": "catalog:",
     "@azure/core-rest-pipeline": "catalog:",
     "@azure/core-util": "catalog:",
     "@azure/logger": "catalog:",

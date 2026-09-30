@@ -60,9 +60,6 @@ catalogs:
     '@azure/core-lro':
       specifier: ^3.4.0
       version: 3.4.1
-    '@azure/core-paging':
-      specifier: ^1.7.0
-      version: 1.7.0
     '@azure/core-rest-pipeline':
       specifier: ^1.25.0
       version: 1.25.0
@@ -3665,9 +3662,6 @@ importers:
       '@vitest/ui':
         specifier: 'catalog:'
         version: 5.0.0(vitest@5.0.0)
-      change-case:
-        specifier: 'catalog:'
-        version: 5.4.4
       rimraf:
         specifier: 'catalog:'
         version: 6.1.3
@@ -4012,9 +4006,6 @@ importers:
       '@types/semver':
         specifier: 'catalog:'
         version: 7.8.0
-      '@types/yargs':
-        specifier: 'catalog:'
-        version: 17.0.35
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../../core/packages/compiler
@@ -4054,9 +4045,6 @@ importers:
       '@typespec/xml':
         specifier: workspace:^
         version: link:../../core/packages/xml
-      c8:
-        specifier: 'catalog:'
-        version: 12.0.0
       picocolors:
         specifier: 'catalog:'
         version: 1.1.1
@@ -4066,9 +4054,6 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
-      vitest:
-        specifier: 'catalog:'
-        version: 5.0.0(@types/node@26.5.0)(@vitest/coverage-v8@5.0.0)(@vitest/ui@5.0.0)(happy-dom@20.11.6)(jsdom@25.0.1)(vite@8.2.2(@types/node@26.5.0)(esbuild@0.28.2)(tsx@4.23.13)(yaml@2.9.0))
 
   packages/typespec-ts:
     dependencies:
@@ -4118,9 +4103,6 @@ importers:
       '@azure/core-lro':
         specifier: 'catalog:'
         version: 3.4.1
-      '@azure/core-paging':
-        specifier: 'catalog:'
-        version: 1.7.0
       '@azure/core-rest-pipeline':
         specifier: 'catalog:'
         version: 1.25.0
@@ -7068,15 +7050,6 @@ packages:
       rollup:
         optional: true
 
-  '@rushstack/node-core-library@5.24.0':
-    resolution: {integrity: sha512-g/Z47ZwARn/VkTnHcyJslrR26erRf1G5JbqPlfGZGBCrOcrEt8fTQXXDVhUDDNl/g/v3TXI1dNiAAT5FEks8BA==}
-    engines: {node: '>=20.9.0'}
-    peerDependencies:
-      '@types/node': '*'
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-
   '@rushstack/node-core-library@5.24.1':
     resolution: {integrity: sha512-ZlOrzv92MwnsCXA45qWfDj4L/kTasKghXezu+M2WmdtkbnXyPnZSCovfeBZx1Yc5qm+LkElbLw6IeSSWZDhZUg==}
     engines: {node: '>=20.9.0'}
@@ -7097,15 +7070,6 @@ packages:
   '@rushstack/rig-package@0.7.3':
     resolution: {integrity: sha512-aAA518n6wxxjCfnTAOjQnm7ngNE0FVHxHAw2pxKlIhxrMn0XQjGcXKF0oKWpjBgJOmsaJpVob/v+zr3zxgPWuA==}
 
-  '@rushstack/terminal@0.24.3':
-    resolution: {integrity: sha512-KxphDhPGC4xDrKg8O4yrWCEpPMi87aJc1iycXqMVh1dLgV0M34hiH9ZTgWjBRmcrT/OIHoOeWf48npcQFzgp+g==}
-    engines: {node: '>=20.9.0'}
-    peerDependencies:
-      '@types/node': '*'
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-
   '@rushstack/terminal@0.24.4':
     resolution: {integrity: sha512-3fRBWK0IMY293lBx5ycgit1DTMUi+nhOjALHlrIad9hQsqzM9Ak+XdBI1gJ/tZPxW+LraeAc4SsmMdcOflBmAQ==}
     engines: {node: '>=20.9.0'}
@@ -7114,10 +7078,6 @@ packages:
     peerDependenciesMeta:
       '@types/node':
         optional: true
-
-  '@rushstack/ts-command-line@5.3.13':
-    resolution: {integrity: sha512-+jNbxhh8CkrZYxMk9X3GRYM2+Myr1xCCj+eHbJ9Vp+PCdNHS0TUl5QQFT6UbM/aTFRCzs5jiBTKYzBRpe5uYbQ==}
-    engines: {node: '>=20.9.0'}
 
   '@rushstack/ts-command-line@5.3.14':
     resolution: {integrity: sha512-lT2JKZk2dukBMp4GFOh4RaDfVzpZehGgQOGpzpSliUn317NgEmOOCXyd7/d0eU46HHsbRxizP83GAm39s0lAlg==}
@@ -15604,19 +15564,6 @@ snapshots:
       estree-walker: 2.0.2
       picomatch: 4.0.7
 
-  '@rushstack/node-core-library@5.24.0(@types/node@26.5.0)':
-    dependencies:
-      ajv: 8.20.0
-      ajv-draft-04: 1.0.0(ajv@8.20.0)
-      ajv-formats: 3.0.1(ajv@8.20.0)
-      fs-extra: 11.3.6
-      import-lazy: 4.0.0
-      jju: 1.4.0
-      resolve: 1.22.12
-      semver: 7.7.4
-    optionalDependencies:
-      '@types/node': 26.5.0
-
   '@rushstack/node-core-library@5.24.1(@types/node@26.5.0)':
     dependencies:
       ajv: 8.20.0
@@ -15639,14 +15586,6 @@ snapshots:
       jju: 1.4.0
       resolve: 1.22.12
 
-  '@rushstack/terminal@0.24.3(@types/node@26.5.0)':
-    dependencies:
-      '@rushstack/node-core-library': 5.24.0(@types/node@26.5.0)
-      '@rushstack/problem-matcher': 0.2.1(@types/node@26.5.0)
-      supports-color: 8.1.1
-    optionalDependencies:
-      '@types/node': 26.5.0
-
   '@rushstack/terminal@0.24.4(@types/node@26.5.0)':
     dependencies:
       '@rushstack/node-core-library': 5.24.1(@types/node@26.5.0)
@@ -15654,15 +15593,6 @@ snapshots:
       supports-color: 8.1.1
     optionalDependencies:
       '@types/node': 26.5.0
-
-  '@rushstack/ts-command-line@5.3.13(@types/node@26.5.0)':
-    dependencies:
-      '@rushstack/terminal': 0.24.3(@types/node@26.5.0)
-      '@types/argparse': 1.0.38
-      argparse: 1.0.10
-      string-argv: 0.3.2
-    transitivePeerDependencies:
-      - '@types/node'
 
   '@rushstack/ts-command-line@5.3.14(@types/node@26.5.0)':
     dependencies:
