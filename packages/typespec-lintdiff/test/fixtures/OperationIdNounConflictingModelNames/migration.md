@@ -168,6 +168,58 @@ All fixture snapshots are produced by the existing comparison harness.
 - Scoped formatting, TypeScript lint, both package builds and post-format strict
   fixture validation passed before the documentation-only investigation update.
 
+### Reproduction commands
+
+The final commands below were run from the TypeSpec Azure repository root
+`C:\dev\worktrees\lintdiff-operation-id-noun-conflicting-model-names`, using the
+repository-pinned tools through `mise`. The specs checkout was pinned at
+`f6b53f105b95da05276530a0754a1c71b4f16397`.
+
+```powershell
+mise exec -- pnpm --dir packages\typespec-client-generator-core test test\context.test.ts
+mise exec -- pnpm --dir packages\typespec-lintdiff test test\rules\no-operation-group-name-conflict.test.ts
+mise exec -- pnpm --dir packages\typespec-lintdiff test
+mise exec -- pnpm --dir packages\typespec-lintdiff validate --rule OperationIdNounConflictingModelNames
+mise exec -- pnpm --dir packages\typespec-lintdiff specs:typespec --specs-repo C:\dev\worktrees\azure-rest-api-specs-lintdiff-operation-id-noun-conflicting-model-names --filter DevOpsInfrastructure --concurrency 6
+mise exec -- pnpm --dir packages\typespec-lintdiff specs:typespec --specs-repo C:\dev\worktrees\azure-rest-api-specs-lintdiff-operation-id-noun-conflicting-model-names --concurrency 6
+```
+
+The focused rule command produced 59 passing tests, the TCGC context command
+produced nine, and the complete lintdiff command produced 521 across 20 files.
+The strict fixture command selected all five
+`OperationIdNounConflictingModelNames` cases; it did not use a snapshot-update
+option. Its external inputs are not vendored. After checking out
+`Azure/azure-openapi-validator` at
+`6243cb01c16c7535cd3b8df6f45fbeb3c095ed7f` and the specs repository at the pin
+above, a reproducible PowerShell setup is:
+
+```powershell
+$env:LINTDIFF_VALIDATOR_ROOT = "C:\dev\worktrees\azure-openapi-validator-lintdiff-shared"
+$env:LINTDIFF_COMMON_TYPES = "C:\dev\worktrees\azure-rest-api-specs-lintdiff-operation-id-noun-conflicting-model-names\specification\common-types"
+mise exec -- pnpm --dir packages\typespec-lintdiff validate --rule OperationIdNounConflictingModelNames
+```
+
+The representative corpus command uses a case-sensitive literal selector and
+selected exactly the one `DevOpsInfrastructure` project. The second command has
+no filter or limit and processed all 468 projects with concurrency six. Both
+commands build and link the local lintdiff package into the isolated specs
+checkout and write generated data under `packages\typespec-lintdiff\specs`;
+those generated artifacts were inspected and then restored rather than
+committed.
+
+`specs:coverage` was **not rerun** for the final native validation, so no new
+coverage-report execution is claimed. The Swagger side of the comparison is the
+retained historical snapshot, while the commands above produced the new native
+run. To regenerate the checked reporting views from those prepared inputs after
+running the full `specs:typespec` command, use:
+
+```powershell
+mise exec -- pnpm --dir packages\typespec-lintdiff specs:coverage --specs-repo C:\dev\worktrees\azure-rest-api-specs-lintdiff-operation-id-noun-conflicting-model-names
+```
+
+That last command is the supported reproduction procedure, not evidence that it
+was executed as part of the final run.
+
 ## Current corpus evidence and limitations
 
 The retained Swagger inputs select the dataset's latest API version. Native
