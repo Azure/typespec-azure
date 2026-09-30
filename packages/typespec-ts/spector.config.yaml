@@ -109,7 +109,7 @@ specs:
   client/overload: true
   azure/client-generator-core/override: true
   # Only voidResponse is covered; bytesResponse returns a parsed object instead of raw bytes.
-  # Tracking: https://github.com/Azure/typespec-azure/issues/5313
+  # Tracking: https://github.com/Azure/typespec-azure/issues/5596
   azure/client-generator-core/response-replacement: true
   azure/client-generator-core/alternate-type: true
   azure/versioning/previewVersion: true
