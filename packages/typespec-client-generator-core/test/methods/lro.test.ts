@@ -1,4 +1,4 @@
-import { FinalStateValue } from "@azure-tools/typespec-azure-core";
+import { FinalStateValue, getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { assert, describe, it } from "vitest";
 import { type SdkClientType, type SdkHttpOperation, UsageFlags } from "../../src/interfaces.js";
@@ -16,6 +16,88 @@ import {
 function hasFlag<T extends number>(value: T, flag: T): boolean {
   return (value & flag) !== 0;
 }
+
+it("preserves the resource PUT job result, envelope, and extraction path independently", async () => {
+  const { program } = await AzureCoreTester.compile(`
+    @service namespace TestService;
+    model Result { value: string; }
+    @resource("jobs")
+    model Job {
+      @key id: string;
+      @lroStatus status: "Running" | "Succeeded" | "Failed" | "Canceled";
+      @lroResult result: Result;
+    }
+    @route("/jobs/{id}/status")
+    @get op poll(@path id: string): Job;
+    @pollingOperation(poll)
+    @createsOrReplacesResource(Job)
+    @route("/jobs/{id}")
+    @put op start(@path id: string): Job;
+  `);
+  const context = await createSdkContextForTester(program);
+  const method = context.sdkPackage.clients[0].methods.find((m) => m.name === "start");
+  ok(method);
+  strictEqual(method.kind, "lro");
+  const raw = method.lroMetadata.__raw;
+  const legacy = getLroMetadata(program, raw.operation);
+  ok(legacy);
+  deepStrictEqual(raw, legacy);
+  strictEqual(raw.finalStateVia, FinalStateValue.originalUri);
+  strictEqual(raw.finalStep?.kind, "pollingSuccessProperty");
+  strictEqual(raw.finalResult, raw.pollingInfo.responseModel);
+  strictEqual(raw.finalEnvelopeResult, raw.pollingInfo.responseModel);
+  strictEqual(raw.finalResultPath, "result");
+  const finalResponse = method.lroMetadata.finalResponse;
+  ok(finalResponse);
+  strictEqual(finalResponse.result, finalResponse.envelopeResult);
+  strictEqual(finalResponse.result.kind, "model");
+  strictEqual(finalResponse.result.name, "Job");
+  strictEqual(finalResponse.resultSegments?.length, 1);
+  strictEqual(finalResponse.resultSegments[0].name, "result");
+  strictEqual(finalResponse.resultSegments[0].type.kind, "model");
+  strictEqual(finalResponse.resultSegments[0].type.name, "Result");
+  strictEqual(method.response.type, finalResponse.result);
+  ok("__raw_lro_metadata" in method);
+  strictEqual(method.__raw_lro_metadata, raw);
+});
+
+it("preserves a required final operation and its parameter bindings in SDK metadata", async () => {
+  const { program } = await AzureCoreTester.compile(`
+    @service namespace TestService;
+    model Widget { value: string; }
+    model Status { @lroStatus status: "Succeeded" | "Failed" | "Canceled"; }
+    @route("/widgets/{id}") @get op read(@path id: string): Widget;
+    @route("/operations/{operationId}") @get op poll(@path operationId: string): Status;
+    @finalOperation(read, { id: RequestParameter<"id"> })
+    @pollingOperation(poll, { operationId: ResponseProperty<"operationId"> })
+    @route("/widgets/{id}") @put op start(@path id: string): {
+      @statusCode statusCode: 202;
+      @header operationId: string;
+    };
+  `);
+  const context = await createSdkContextForTester(program);
+  const method = context.sdkPackage.clients[0].methods.find((m) => m.name === "start");
+  ok(method);
+  strictEqual(method.kind, "lro");
+  const metadata = method.lroMetadata;
+  strictEqual(metadata.finalStateVia, FinalStateValue.originalUri);
+  strictEqual(metadata.finalStep?.kind, "finalOperationReference");
+  strictEqual(metadata.finalStep.target.operation.verb, "get");
+  strictEqual(metadata.finalStep.target.operation.path, "/widgets/{id}");
+  strictEqual(metadata.__raw.finalStep?.kind, "finalOperationReference");
+  const parameter = metadata.finalStep.target.parameters?.get("id");
+  ok(parameter);
+  const rawParameter = metadata.__raw.finalStep.target.parameters?.get("id");
+  ok(rawParameter);
+  strictEqual(parameter.source.__raw, rawParameter.source);
+  strictEqual(parameter.target.__raw, rawParameter.target);
+  strictEqual(metadata.statusMonitorStep?.kind, "nextOperationReference");
+  strictEqual(metadata.statusMonitorStep.target.operation.path, "/operations/{operationId}");
+  strictEqual(metadata.finalResponse?.result.kind, "model");
+  strictEqual(metadata.finalResponse.result.name, "Widget");
+  strictEqual(metadata.finalResponse.result, metadata.finalResponse.envelopeResult);
+  strictEqual(metadata.finalResponse.resultSegments, undefined);
+});
 
 const LroVersionedServiceTester = AzureCoreTester.wrap(
   (x) => `

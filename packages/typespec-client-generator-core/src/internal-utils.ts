@@ -1,7 +1,6 @@
 import {
   FinalStateValue,
   getEffectiveApiVersionOverride,
-  getLroMetadata,
   isPreviewVersion,
   type LroMetadata,
 } from "@azure-tools/typespec-azure-core";
@@ -88,6 +87,7 @@ import type {
   TCGCContext,
 } from "./interfaces.js";
 import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js";
+import { getNativeLroMetadata } from "./lro-metadata.js";
 import { getSdkBasicServiceMethod } from "./methods.js";
 import {
   getCrossLanguageDefinitionId,
@@ -1319,7 +1319,7 @@ export function findEntriesWithTarget<TSource extends Type, TTarget>(
  * Retrieves Long Running Operation (LRO) metadata for a given operation.
  *
  * This function serves as a wrapper that:
- * 1. First tries to get LRO metadata using the `getLroMetadata` function from the Azure Core library
+ * 1. Selects the native client result from Azure Core's LRO protocol facts
  * 2. If unavailable or undefined, it would check for the existence of a `getMarkAsLro` function
  *    and return a mock LRO metadata object if the operation is marked as LRO
  *
@@ -1332,7 +1332,7 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): LroMetadata | undefined {
-  const lroMetaData = getLroMetadata(context.program, operation);
+  const lroMetaData = getNativeLroMetadata(context.program, operation);
   if (lroMetaData) {
     return lroMetaData;
   }
