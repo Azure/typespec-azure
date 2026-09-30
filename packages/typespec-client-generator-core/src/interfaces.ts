@@ -25,7 +25,7 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
-import type { ContextNode } from "./internal-utils.js";
+import type { AllScopes, ContextNode } from "./internal-utils.js";
 
 // Types for TCGC lib
 
@@ -35,6 +35,8 @@ export interface TCGCContext {
   program: Program;
   diagnostics: readonly Diagnostic[];
   emitterName: string;
+  /** Explicit metadata scope; omitted contexts retain emitter-specific selection. */
+  readonly scope?: string | typeof AllScopes;
   arm?: boolean;
 
   generateProtocolMethods?: boolean;
