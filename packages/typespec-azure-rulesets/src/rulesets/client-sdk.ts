@@ -7,7 +7,7 @@ export default {
     "@azure-tools/typespec-client-generator-core/csharp-no-url-suffix": true,
     "@azure-tools/typespec-client-generator-core/csharp-model-suffix": true,
     "@azure-tools/typespec-client-generator-core/get-operation-name": false,
-    "@azure-tools/typespec-client-generator-core/no-operation-id-model-name-conflict": false,
+    "@azure-tools/typespec-client-generator-core/no-operation-group-name-conflict": false,
   },
   disable: {
     "@azure-tools/typespec-client-generator-core/use-create-for-put":

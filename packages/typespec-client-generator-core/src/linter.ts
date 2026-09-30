@@ -3,7 +3,7 @@ import { csharpModelSuffixRule } from "./rules/csharp-model-suffix.js";
 import { csharpNoUrlSuffixRule } from "./rules/csharp-no-url-suffix.js";
 import { csharpUseStandardAcronymsRule } from "./rules/csharp-use-standard-acronyms.js";
 import { getOperationNameRule } from "./rules/get-operation-name.rule.js";
-import { noOperationIdModelNameConflictRule } from "./rules/no-operation-id-model-name-conflict.js";
+import { noOperationGroupNameConflictRule } from "./rules/no-operation-group-name-conflict.rule.js";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
 import { useCreateForPutRule } from "./rules/use-create-for-put.js";
@@ -16,7 +16,7 @@ const rules = [
   csharpModelSuffixRule,
   csharpUseStandardAcronymsRule,
   getOperationNameRule,
-  noOperationIdModelNameConflictRule,
+  noOperationGroupNameConflictRule,
 ];
 
 const csharpRules = [
