@@ -11,7 +11,7 @@ const acceptedAzureAcronyms = ["AI", "VM", "OS", "IP", "CPU", "GPU", "LRO"];
 
 export type CasingStyle = "camelCase" | "PascalCase" | "snake_case" | false;
 
-export type CasingStyleOptions = {
+export interface CasingStyleOptions {
   model?: CasingStyle;
   modelProperty?: CasingStyle;
   operation?: CasingStyle;
@@ -23,7 +23,7 @@ export type CasingStyleOptions = {
   enum?: CasingStyle;
   enumMember?: CasingStyle;
   scalar?: CasingStyle;
-};
+}
 
 const defaultOptions: Required<CasingStyleOptions> = {
   model: "PascalCase",
