@@ -91,7 +91,15 @@ License information for the generated client code.
 
 **Type:** `string`
 
-Specifies the directory where the emitter will look for example files. If the flag isn’t set, the emitter defaults to using an `examples` directory located at the project root.
+Specifies the directory for legacy JSON example files and disables unified YAML discovery. When unset, TCGC looks for `examples.yaml` or `examples/*.yaml` at the project root, falling back to legacy JSON files in `examples` when no unified files are present.
+
+Without an explicit `examples-dir`, TCGC first looks for unified examples in `examples.yaml` and `examples/*.yaml` or `examples/*.yml` at the project root. If any are present, they replace legacy JSON examples for that service; formats are not merged per operation. Setting `examples-dir` explicitly keeps legacy JSON loading, even when YAML files are present.
+
+Unified examples use the shared examples package for validation, `since`/title lineage selection, placeholder substitution, and conversion to the existing HTTP example model. Selection uses the service's full TypeSpec version order and the SDK's selected API version, like the AutoRest integration. With `api-version: all`, examples use the last package version, as legacy examples do. Unversioned services support base examples without `since` or `{api-version}`.
+
+For multi-service packages, each service's files are discovered under `<project-root>/<service-name>/`, matching the existing JSON directory convention. Operation keys are derived from AutoRest operation IDs (for example, `Widgets_Get` maps to `Widgets.get`), with existing naming and source-operation fallbacks retained. A supplied `$namespace` must match the service's full TypeSpec namespace.
+
+Language emitters continue to receive `SdkHttpOperationExample` values with a normalized legacy-shaped `rawExample`. For unified examples, `filePath` points to the YAML source relative to the project root; no intermediate JSON files are written. Invalid unified input reports `example-loading` diagnostics and skips that service's examples rather than silently falling back to JSON.
 
 ### `namespace`
 
