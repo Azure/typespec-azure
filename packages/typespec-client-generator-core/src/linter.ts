@@ -6,6 +6,7 @@ import { getOperationNameRule } from "./rules/get-operation-name.rule.js";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
 import { useCreateForPutRule } from "./rules/use-create-for-put.js";
+import { validTcgcScopesRule } from "./rules/valid-tcgc-scopes.js";
 
 const rules = [
   useCreateForPutRule,
@@ -15,6 +16,7 @@ const rules = [
   csharpModelSuffixRule,
   csharpUseStandardAcronymsRule,
   getOperationNameRule,
+  validTcgcScopesRule,
 ];
 
 const csharpRules = [

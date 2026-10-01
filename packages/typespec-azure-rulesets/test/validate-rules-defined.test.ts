@@ -65,6 +65,13 @@ describe("expect all rules to be defined", () => {
     );
   });
 
+  it("validates TCGC scopes in all Azure rulesets", () => {
+    const ruleName = "@azure-tools/typespec-client-generator-core/valid-tcgc-scopes";
+    for (const rulesetName of ["data-plane", "resource-manager", "client-sdk"] as const) {
+      ok($linter.ruleSets?.[rulesetName]?.enable?.[ruleName]);
+    }
+  });
+
   it("keeps PUT SDK naming guidance opt-in", () => {
     const ruleName = "@azure-tools/typespec-client-generator-core/use-create-for-put";
     ok($linter.ruleSets?.["client-sdk"].disable?.[ruleName]);
