@@ -1,6 +1,7 @@
 import { ok } from "assert";
 import { describe, expect, it } from "vitest";
 import type { ArmOperationKind, ArmResourceOperation } from "../src/operations.js";
+import { listArmResources } from "../src/private.decorators.js";
 import {
   isResourceOperationMatch,
   parseArmResourceInstancePath,
@@ -4422,6 +4423,153 @@ namespace Microsoft.Resources {
       });
     },
   );
+
+  it("collects operation information for customAzureResource-based converted resources", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+@armProviderNamespace
+@service(#{ title: "NetworkManagementClient" })
+@versioned(Versions)
+namespace Microsoft.Network;
+
+enum Versions {
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2024_01_01: "2024-01-01",
+}
+
+@Azure.ResourceManager.Legacy.customAzureResource(#{ isAzureResource: true })
+model CustomResourceBase {}
+
+model ApplicationGateway extends CustomResourceBase {
+  @visibility(Lifecycle.Read)
+  @path
+  @key("applicationGatewayName")
+  @segment("applicationGateways")
+  name: string;
+
+  properties?: ApplicationGatewayProperties;
+}
+
+model ApplicationGatewayProperties {}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+alias ApplicationGatewayOps = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...ResourceGroupParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+  },
+  {
+    @path
+    @key("applicationGatewayName")
+    @segment("applicationGateways")
+    applicationGatewayName: string;
+  }
+>;
+
+@armResourceOperations(#{ omitTags: true })
+interface ApplicationGateways {
+  get is ApplicationGatewayOps.Read<ApplicationGateway>;
+  createOrUpdate is ApplicationGatewayOps.CreateOrUpdateSync<ApplicationGateway>;
+  update is ApplicationGatewayOps.CustomPatchSync<ApplicationGateway, ApplicationGateway>;
+  delete is ApplicationGatewayOps.DeleteSync<ApplicationGateway>;
+  listByResourceGroup is ApplicationGatewayOps.List<ApplicationGateway>;
+}
+`);
+    expect(listArmResources(program)).toHaveLength(1);
+
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    ok(provider.resources);
+    expect(provider.resources).toHaveLength(1);
+
+    const resource = provider.resources[0];
+    ok(resource);
+    expect(resource).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.Network",
+      type: expect.anything(),
+    });
+
+    checkResolvedOperations(resource, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            {
+              operationGroup: "ApplicationGateways",
+              name: "createOrUpdate",
+              kind: "createOrUpdate",
+            },
+          ],
+          delete: [{ operationGroup: "ApplicationGateways", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "ApplicationGateways", name: "get", kind: "read" }],
+          update: [{ operationGroup: "ApplicationGateways", name: "update", kind: "update" }],
+        },
+        lists: [
+          {
+            operationGroup: "ApplicationGateways",
+            name: "listByResourceGroup",
+            kind: "list",
+          },
+        ],
+      },
+      resourceType: {
+        provider: "Microsoft.Network",
+        types: ["applicationGateways"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}",
+      resourceName: "ApplicationGateways",
+    });
+  }, 30_000);
+
+  it("does not collect resources for customAzureResource when isAzureResource is false", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+@armProviderNamespace
+@service(#{ title: "NetworkManagementClient" })
+@versioned(Versions)
+namespace Microsoft.Network;
+
+enum Versions {
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2024_01_01: "2024-01-01",
+}
+
+@Azure.ResourceManager.Legacy.customAzureResource(#{ isAzureResource: false })
+model CustomResourceBase {}
+
+model ApplicationGateway extends CustomResourceBase {
+  @visibility(Lifecycle.Read)
+  @path
+  @key("applicationGatewayName")
+  @segment("applicationGateways")
+  name: string;
+
+  properties?: ApplicationGatewayProperties;
+}
+
+model ApplicationGatewayProperties {}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@armResourceOperations(#{ omitTags: true })
+interface ApplicationGateways {
+  get is ArmResourceRead<ApplicationGateway>;
+}
+`);
+    expect(listArmResources(program)).toHaveLength(0);
+
+    const provider = resolveArmResources(program);
+    expect(provider.resources).toHaveLength(0);
+  });
 
   it.each(["default", "current"])(
     "provides singleton information for @singleton('%s') decorated resources",

@@ -357,6 +357,13 @@ export function isCustomAzureResource(program: Program, target: Model): boolean 
   return false;
 }
 
+export function isCustomAzureResourceMarkedAzure(program: Program, target: Model): boolean {
+  const resourceOptions = getCustomResourceOptions(program, target);
+  if (resourceOptions) return resourceOptions.isAzureResource === true;
+  if (target.baseModel) return isCustomAzureResourceMarkedAzure(program, target.baseModel);
+  return false;
+}
+
 function getArmResourceItemPath(operations: ArmResourceOperations): string | undefined {
   const returnPath =
     operations.lifecycle.read?.path ||
