@@ -298,7 +298,7 @@ function generateConstructors(
     ): string {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
       let bodyText = `${indent.get()}if options == nil {\n`;
-      bodyText += `${indent.push().get()}options = &${optionsTypeName}{}\n`;
+      bodyText += `${indent.push().get()}options = ${optionsTypeName}{}\n`;
       bodyText += `${indent.pop().get()}}\n`;
       let apiVersionConfig = "";
       // check if there's an api version parameter
@@ -309,6 +309,13 @@ function generateConstructors(
         | go.URIParameter
         | undefined;
       for (const param of consolidatedCtorParams) {
+        // emit empty path param checks
+        if (param.kind === "pathScalarParam") {
+          if (!param.isApiVersion) {
+            bodyText += helpers.emitEmptyPathParamCheck(param, "ctor", imports, indent);
+          }
+        }
+
         switch (param.kind) {
           case "headerScalarParam":
           case "pathScalarParam":
@@ -403,7 +410,7 @@ function generateConstructors(
               const tokenPolicy = `\n${indent.get()}PerCall: []policy.Policy{\n${indent.get()}runtime.NewBearerTokenPolicy(credential, []string{c.Audience + "${helpers.splitScope(credentialParam.type.scopes[0]).scope}"}, ${tokenPolicyOpts}),\n${indent.get()}},\n`;
               indent.pop(); // back to level 1
               prolog = emitProlog(
-                go.getTypeDeclaration(clientOptions, client.pkg),
+                go.getTypeDeclaration(clientOptions, client.pkg, true),
                 true,
                 tokenPolicy,
               );
@@ -411,14 +418,23 @@ function generateConstructors(
             }
             case "armClientOptions":
               // this is the ARM case
+              prolog = "";
               imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/arm");
-              prolog = `${indent.get()}cl, err := arm.NewClient(moduleName, moduleVersion, credential, options)\n`;
+              for (const param of consolidatedCtorParams) {
+                // emit empty path param checks
+                if (param.kind === "pathScalarParam") {
+                  if (!param.isApiVersion) {
+                    prolog += helpers.emitEmptyPathParamCheck(param, "ctor", imports, indent);
+                  }
+                }
+              }
+              prolog += `${indent.get()}cl, err := arm.NewClient(moduleName, moduleVersion, credential, options)\n`;
               break;
           }
           break;
       }
     } else {
-      prolog = emitProlog(go.getTypeDeclaration(clientOptions, client.pkg), false);
+      prolog = emitProlog(go.getTypeDeclaration(clientOptions, client.pkg, true), false);
     }
 
     // add client options last
@@ -440,22 +456,31 @@ function generateConstructors(
     ctorText += `${indent.push().get()}return nil, err\n`;
     ctorText += `${indent.pop().get()}}\n`;
 
-    // handle any client-side defaults
+    const emitClientSideDefaults = function (param: go.ClientParameter): void {
+      if (go.isClientSideDefault(param.style)) {
+        let name: string;
+        if (go.isAPIVersionParameter(param)) {
+          name = "APIVersion";
+        } else {
+          name = naming.ensureNameCase(param.name);
+        }
+        ctorText += `${indent.get()}${param.name} := ${helpers.formatLiteralValue(param.style.defaultValue, false)}\n`;
+        ctorText += `${indent.get()}if options.${name} != ${helpers.zeroValue(param)} {\n`;
+        ctorText += `${indent.push().get()}${param.name} = options.${name}\n`;
+        ctorText += `${indent.pop().get()}}\n`;
+      }
+    };
+
+    // handle any client-side defaults in the client options
     if (clientOptions.kind === "clientOptions") {
       for (const param of clientOptions.parameters) {
-        if (go.isClientSideDefault(param.style)) {
-          let name: string;
-          if (go.isAPIVersionParameter(param)) {
-            name = "APIVersion";
-          } else {
-            name = naming.ensureNameCase(param.name);
-          }
-          ctorText += `${indent.get()}${param.name} := ${helpers.formatLiteralValue(param.style.defaultValue, false)}\n`;
-          ctorText += `${indent.get()}if options.${name} != ${helpers.zeroValue(param)} {\n`;
-          ctorText += `${indent.push().get()}${param.name} = ${helpers.star(param.byValue)}options.${name}\n`;
-          ctorText += `${indent.pop().get()}}\n`;
-        }
+        emitClientSideDefaults(param);
       }
+    }
+
+    // construct any remaining client-side default param values
+    for (const param of client.parameters) {
+      emitClientSideDefaults(param);
     }
 
     // construct the supplemental path and join it to the endpoint
@@ -621,8 +646,8 @@ function emitPagerDefinition(
   // BEGIN Fetcher func
   text += `${indent.get()}Fetcher: func(ctx context.Context, page *${method.returns.name}) (${method.returns.name}, error) {\n`;
   indent.push();
-  if (options.generateFakes) {
-    text += `${indent.get()}ctx = context.WithValue(ctx, runtime.CtxAPINameKey{}, "${method.receiver.type.name}.${helpers.fixUpMethodName(method)}")\n`;
+  if (options["generate-fakes"]) {
+    text += `${indent.get()}ctx = context.WithValue(ctx, runtime.CtxAPINameKey{}, "${method.receiver.type.name}.${method.name}")\n`;
   }
 
   let nextLinkParam: string | undefined;
@@ -688,7 +713,7 @@ function emitPagerDefinition(
   text += `${indent.pop().get()}},\n`;
   // END Fetcher func
 
-  if (options.injectSpans) {
+  if (options["inject-spans"]) {
     text += `${indent.get()}Tracer: client.internal.Tracer(),\n`;
   }
   text += `${indent.pop().get()}})\n`;
@@ -714,10 +739,7 @@ function generateOperation(
 ): string {
   const params = getAPIParametersSig(method, imports);
   const returns = generateReturnsInfo(method, "op");
-  let methodName = method.name;
-  if (method.kind === "pageableMethod") {
-    methodName = helpers.fixUpMethodName(method);
-  }
+  const methodName = go.isLROMethod(method) ? method.naming.operationMethod : method.name;
   let text = "";
   const respErrDoc = genRespErrorDoc(method);
   if (method.docs.summary || method.docs.description) {
@@ -729,9 +751,7 @@ function generateOperation(
     text += `// ${methodName} -\n`;
   }
   text += respErrDoc;
-  if (go.isLROMethod(method)) {
-    methodName = method.naming.internalMethod;
-  } else {
+  if (!go.isLROMethod(method)) {
     for (const param of helpers.getMethodParameters(method)) {
       text += helpers.formatCommentAsBulletItem(param.name, param.docs);
     }
@@ -744,15 +764,15 @@ function generateOperation(
     return text;
   }
   text += `${indent.get()}var err error\n`;
-  let operationName = `"${method.receiver.type.name}.${helpers.fixUpMethodName(method)}"`;
-  if (options.generateFakes && options.injectSpans) {
+  let operationName = `"${method.receiver.type.name}.${method.name}"`;
+  if (options["generate-fakes"] && options["inject-spans"]) {
     text += `${indent.get()}const operationName = ${operationName}\n`;
     operationName = "operationName";
   }
-  if (options.generateFakes) {
+  if (options["generate-fakes"]) {
     text += `${indent.get()}ctx = context.WithValue(ctx, runtime.CtxAPINameKey{}, ${operationName})\n`;
   }
-  if (options.injectSpans) {
+  if (options["inject-spans"]) {
     text += `${indent.get()}ctx, endSpan := runtime.StartSpan(ctx, ${operationName}, client.internal.Tracer(), nil)\n`;
     text += `${indent.get()}defer func() { endSpan(err) }()\n`;
   }
@@ -902,7 +922,7 @@ function generateLROBeginMethod(
   imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
   let text = "";
   if (method.docs.summary || method.docs.description) {
-    text += helpers.formatDocCommentWithPrefix(helpers.fixUpMethodName(method), method.docs);
+    text += helpers.formatDocCommentWithPrefix(method.name, method.docs);
     text += genRespErrorDoc(method);
   }
   const zeroResp = getZeroReturnValue(method, false);
@@ -910,7 +930,7 @@ function generateLROBeginMethod(
   for (const param of methodParams) {
     text += helpers.formatCommentAsBulletItem(param.name, param.docs);
   }
-  text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${helpers.fixUpMethodName(method)}(${params}) (${returns.join(", ")}) {\n`;
+  text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${method.name}(${params}) (${returns.join(", ")}) {\n`;
   let pollerType = "nil";
   let pollerTypeParam = `[${method.returns.name}]`;
   if (method.kind === "lroPageableMethod") {
@@ -926,7 +946,7 @@ function generateLROBeginMethod(
 
   // creating the poller from response branch
 
-  const opName = method.naming.internalMethod;
+  const opName = method.naming.operationMethod;
   text += `${indent.get()}resp, err := client.${opName}(${helpers.getCreateRequestParameters(method)})\n`;
   text += `${indent.get()}if err != nil {\n`;
   text += `${indent.push().get()}return ${zeroResp}, err\n`;
@@ -955,7 +975,7 @@ function generateLROBeginMethod(
   }
 
   text += `${indent.get()}poller, err := runtime.NewPoller`;
-  if (finalStateVia === "" && pollerType === "nil" && !options.injectSpans) {
+  if (finalStateVia === "" && pollerType === "nil" && !options["inject-spans"]) {
     // the generic type param is redundant when it's also specified in the
     // options struct so we only include it when there's no options.
     text += pollerTypeParam;
@@ -964,7 +984,7 @@ function generateLROBeginMethod(
   if (
     finalStateVia === "" &&
     pollerType === "nil" &&
-    !options.injectSpans &&
+    !options["inject-spans"] &&
     !method.operationLocationResultPath
   ) {
     // no options
@@ -982,7 +1002,7 @@ function generateLROBeginMethod(
     if (pollerType !== "nil") {
       text += `${indent.get()}Response: ${pollerType},\n`;
     }
-    if (options.injectSpans) {
+    if (options["inject-spans"]) {
       text += `${indent.get()}Tracer: client.internal.Tracer(),\n`;
     }
     indent.pop();
@@ -996,11 +1016,11 @@ function generateLROBeginMethod(
   // creating the poller from resume token branch
 
   text += `${indent.get()}return runtime.NewPollerFromResumeToken`;
-  if (pollerType === "nil" && !options.injectSpans) {
+  if (pollerType === "nil" && !options["inject-spans"]) {
     text += pollerTypeParam;
   }
   text += "(options.ResumeToken, client.internal.Pipeline(), ";
-  if (pollerType === "nil" && !options.injectSpans) {
+  if (pollerType === "nil" && !options["inject-spans"]) {
     text += "nil)\n";
   } else {
     indent.push();
@@ -1008,7 +1028,7 @@ function generateLROBeginMethod(
     if (pollerType !== "nil") {
       text += `${indent.get()}Response: ${pollerType},\n`;
     }
-    if (options.injectSpans) {
+    if (options["inject-spans"]) {
       text += `${indent.get()}Tracer: client.internal.Tracer(),\n`;
     }
     indent.pop();

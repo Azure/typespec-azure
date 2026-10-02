@@ -4,12 +4,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { beforeEach, describe, it } from "vitest";
 
-// TODO: reinstate import and delete below placeholder once tests are working
-// import { MultiPartClient } from "./generated/payload/multipart/src/index.js";
-declare type MultiPartClient = any;
-declare const MultiPartClient: any;
+import { MultiPartClient } from "./generated/payload/multipart/src/index.js";
 
-describe.skip("Multipart Client", () => {
+describe("Multipart Client", () => {
   let client: MultiPartClient;
 
   const root = resolvePath(fileURLToPath(import.meta.url), "../../../temp");
@@ -20,6 +17,9 @@ describe.skip("Multipart Client", () => {
     client = new MultiPartClient({
       endpoint: "http://localhost:3002",
       allowInsecureConnection: true,
+      retryOptions: {
+        maxRetries: 0,
+      },
     });
   });
 
@@ -69,10 +69,13 @@ describe.skip("Multipart Client", () => {
     });
   });
 
-  // TODO not supported
-  it.skip("anonymous model", async () => {
-    // @ts-expect-error - not supported yet
-    await client.formData.anonymousModel(fs.createReadStream(imgPath));
+  it("anonymous model", async () => {
+    await client.formData.anonymousModel({
+      profileImage: {
+        contents: fs.createReadStream(imgPath),
+        filename: "test.jpg",
+      },
+    });
   });
 
   it("binary array parts", async () => {
@@ -165,9 +168,7 @@ describe.skip("Multipart Client", () => {
       });
     });
 
-    // TODO fix the serialization
-    it.skip("non-string (float value)", async () => {
-      // the generation is correct now, but the serialization is not
+    it("non-string (float value)", async () => {
       await client.formData.httpParts.nonString.float({ temperature: 0.5 });
     });
 
@@ -205,6 +206,35 @@ describe.skip("Multipart Client", () => {
             contentType: "application/octet-stream",
           },
         });
+      });
+    });
+  });
+
+  describe("using File", () => {
+    it("uploads a file array", async () => {
+      await client.formData.file.uploadFileArray({
+        files: [
+          { contents: fs.createReadStream(pngPath), filename: "image.png" },
+          { contents: fs.createReadStream(pngPath), filename: "image.png" },
+        ],
+      });
+    });
+
+    it("uploads a file with a required filename", async () => {
+      await client.formData.file.uploadFileRequiredFilename({
+        file: {
+          contents: fs.createReadStream(pngPath),
+          filename: "image.png",
+        },
+      });
+    });
+
+    it("uploads a file with a specific content type", async () => {
+      await client.formData.file.uploadFileSpecificContentType({
+        file: {
+          contents: fs.createReadStream(pngPath),
+          filename: "image.png",
+        },
       });
     });
   });

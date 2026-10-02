@@ -1,16 +1,16 @@
 import { assert, beforeEach, describe, it } from "vitest";
 
-// TODO: reinstate import and delete below placeholder once tests are working
-// import { RenamedOperationClient } from "./generated/client/structure/renamed-operation/src/index.js";
-declare type RenamedOperationClient = any;
-declare const RenamedOperationClient: any;
+import { RenamedOperationClient } from "./generated/client/structure/renamed-operation/src/index.js";
 
-describe.skip("Client Structure Renamed-Operation Rest Client", () => {
+describe("Client Structure Renamed-Operation Rest Client", () => {
   let client: RenamedOperationClient;
 
   beforeEach(() => {
     client = new RenamedOperationClient("http://localhost:3002", "renamed-operation", {
       allowInsecureConnection: true,
+      retryOptions: {
+        maxRetries: 0,
+      },
     });
   });
 
@@ -20,7 +20,7 @@ describe.skip("Client Structure Renamed-Operation Rest Client", () => {
   });
 
   it("should call operation two correctly", async () => {
-    const result = await client.renamedTwo();
+    const result = await client.group.renamedTwo();
     assert.strictEqual(result, undefined);
   });
 
@@ -30,7 +30,7 @@ describe.skip("Client Structure Renamed-Operation Rest Client", () => {
   });
 
   it("should call operation four correctly", async () => {
-    const result = await client.renamedFour();
+    const result = await client.group.renamedFour();
     assert.strictEqual(result, undefined);
   });
 
@@ -40,7 +40,7 @@ describe.skip("Client Structure Renamed-Operation Rest Client", () => {
   });
 
   it("should call operation six correctly", async () => {
-    const result = await client.renamedSix();
+    const result = await client.group.renamedSix();
     assert.strictEqual(result, undefined);
   });
 });

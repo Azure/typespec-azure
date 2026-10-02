@@ -353,7 +353,7 @@ op GetOperationStatus<
 op ResourceOperation<
   Resource extends TypeSpec.Reflection.Model,
   Parameters extends TypeSpec.Reflection.Model,
-  Response,  // No constraint here on purpose, some responses are unions
+  Response, // No constraint here on purpose, some responses are unions
   Traits extends TypeSpec.Reflection.Model = {},
   ErrorResponse = Azure.Core.Foundations.ErrorResponse
 > is Operation<Foundations.ItemKeysOf<Resource> & Parameters, Response, Traits, ErrorResponse>;

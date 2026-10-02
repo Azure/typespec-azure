@@ -102,7 +102,7 @@ namespace ModelInOperation {
     }
     ```
     """)
-  @global.Azure.ClientGenerator.Core.convenientAPI(false)
+  @global.Azure.ClientGenerator.Core.convenientAPI(false, "java,csharp")
   @route("/orphanModelSerializable")
   @put
   op orphanModelSerializable(@body body: unknown): NoContentResponse;
@@ -133,7 +133,7 @@ model OrphanModel {
 namespace NamespaceUsage {
   @route("/namespaceModelSerializable")
   @put
-  @global.Azure.ClientGenerator.Core.convenientAPI(false)
+  @global.Azure.ClientGenerator.Core.convenientAPI(false, "java,csharp")
   @doc("""
     Serialize the 'NamespaceModel' as request body.
     

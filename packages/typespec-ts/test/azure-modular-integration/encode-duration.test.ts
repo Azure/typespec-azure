@@ -55,7 +55,7 @@ describe("EncodeDurationClient Rest Client", () => {
       await client.query.int32MillisecondsArray([36000, 47000]);
     });
 
-    it.skip(`should get float Seconds Larger Unit`, async () => {
+    it(`should get float Seconds Larger Unit`, async () => {
       await client.query.floatSecondsLargerUnit(150.0);
     });
 
@@ -63,12 +63,26 @@ describe("EncodeDurationClient Rest Client", () => {
       await client.query.int32SecondsLargerUnit(120);
     });
 
-    it.skip(`should get float Milliseconds Larger Unit`, async () => {
+    it(`should get float Milliseconds Larger Unit`, async () => {
       await client.query.floatMillisecondsLargerUnit(210000.0);
     });
 
     it(`should get int32 Milliseconds Larger Unit`, async () => {
       await client.query.int32MillisecondsLargerUnit(180000);
+    });
+  });
+
+  describe("lossy", () => {
+    // Skipped: fractional seconds are sent unchanged for an integer wire encoding.
+    // Tracking: https://github.com/Azure/typespec-azure/issues/5297
+    it.skip("should encode fractional seconds as an integer", async () => {
+      await client.lossy.intSeconds(36.25);
+    });
+
+    // Skipped: fractional milliseconds are sent unchanged for an integer wire encoding.
+    // Tracking: https://github.com/Azure/typespec-azure/issues/5297
+    it.skip("should encode fractional milliseconds as an integer", async () => {
+      await client.lossy.intMilliseconds(36250.25);
     });
   });
 
@@ -199,7 +213,7 @@ describe("EncodeDurationClient Rest Client", () => {
       await client.header.int32MillisecondsArray([36000, 47000]);
     });
 
-    it.skip(`should get float Seconds Larger Unit`, async () => {
+    it(`should get float Seconds Larger Unit`, async () => {
       await client.header.floatSecondsLargerUnit(150.0);
     });
 
@@ -207,7 +221,7 @@ describe("EncodeDurationClient Rest Client", () => {
       await client.header.int32SecondsLargerUnit(120);
     });
 
-    it.skip(`should get float Milliseconds Larger Unit`, async () => {
+    it(`should get float Milliseconds Larger Unit`, async () => {
       await client.header.floatMillisecondsLargerUnit(210000.0);
     });
 

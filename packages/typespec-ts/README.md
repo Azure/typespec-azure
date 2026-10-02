@@ -250,3 +250,9 @@ When set to true, TypeSpec `unknown` type will be translated to `Record<string, 
 **Type:** `boolean`
 
 When set to true, generates React Native build targets (tsconfig, warp target, package.json exports). Defaults to `false`.
+
+### `experimental-split-models-by-visibility`
+
+**Type:** `boolean`
+
+Whether to project request-body models to their write visibility (e.g. WidgetCreate/WidgetCreateOrUpdate) so read-only properties do not leak into input types. Defaults to false

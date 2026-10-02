@@ -10,6 +10,8 @@ export default mergeConfig(
         "core/packages/*/vitest.config.ts",
         "packages/*/vitest.config.mts",
         "core/packages/*/vitest.config.mts",
+        "!packages/typespec-ts/vitest.config.ts",
+        "packages/typespec-ts/vitest.config.repo.ts",
         "eng/vitest.config.ts",
       ],
     },

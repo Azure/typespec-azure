@@ -22,7 +22,7 @@ export function createResponseHandler(
   indent: helpers.Indentation,
 ): string {
   const name = method.naming.responseMethod;
-  let text = `${helpers.comment(name, "// ")} handles the ${method.name} response.\n`;
+  let text = `${helpers.comment(name, "// ")} handles the ${go.isLROMethod(method) || go.isPageableMethod(method) ? method.naming.operationMethod : method.name} response.\n`;
   text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${name}(resp *http.Response, successCodes ...int) (${method.returns.name}, error) {\n`;
 
   const resultVarName = "result";
@@ -80,7 +80,7 @@ export function createResponseHandler(
       case "modelResult":
         text += generateResponseUnmarshaller(
           method,
-          result.modelType,
+          result.type,
           result.format,
           `${resultVarName}.${helpers.getResultFieldName(method)}`,
           imports,
@@ -90,12 +90,12 @@ export function createResponseHandler(
       case "monomorphicResult":
         let target = `${resultVarName}.${helpers.getResultFieldName(method)}`;
         // when unmarshalling a wrapped XML array, unmarshal into the response envelope
-        if (result.format === "XML" && result.monomorphicType.kind === "slice") {
+        if (result.format === "XML" && result.type.kind === "slice") {
           target = resultVarName;
         }
         text += generateResponseUnmarshaller(
           method,
-          result.monomorphicType,
+          result.type,
           result.format,
           target,
           imports,
@@ -105,7 +105,7 @@ export function createResponseHandler(
       case "polymorphicResult":
         text += generateResponseUnmarshaller(
           method,
-          result.interface,
+          result.type,
           result.format,
           resultVarName,
           imports,
@@ -141,15 +141,12 @@ function generateResponseUnmarshaller(
     unmarshallerText += `${indent.pop().get()}}\n`;
     unmarshallerText += `${indent.get()}${unmarshalTarget} = (*time.Time)(aux)\n`;
     return unmarshallerText;
-  } else if (isArrayOfDateTime(type)) {
+  } else if (go.isSlice(type, "time")) {
     // unmarshalling arrays of date/time is a little more involved
-    const timeInfo = isArrayOfDateTime(type);
-    let elementPtr = "*";
-    if (timeInfo?.elemByVal) {
-      elementPtr = "";
-    }
+    const timeType = go.unwrapPtr(type.itemType);
+    const elementPtr = type.itemType.kind === "ptr" ? "*" : "";
     imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-    unmarshallerText += `${indent.get()}var aux []${elementPtr}datetime.${timeInfo?.format}\n`;
+    unmarshallerText += `${indent.get()}var aux []${elementPtr}datetime.${timeType.format}\n`;
     unmarshallerText += `${indent.get()}if err := runtime.UnmarshalAs${format}(resp, &aux); err != nil {\n`;
     unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
     unmarshallerText += `${indent.pop().get()}}\n`;
@@ -159,10 +156,10 @@ function generateResponseUnmarshaller(
     unmarshallerText += `${indent.pop().get()}}\n`;
     unmarshallerText += `${indent.get()}${unmarshalTarget} = cp\n`;
     return unmarshallerText;
-  } else if (helpers.isMapOfDateTime(type)) {
-    const timeInfo = helpers.isMapOfDateTime(type);
+  } else if (go.isMap(type, "time")) {
+    const timeType = type.itemType.ptrType;
     imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-    unmarshallerText += `${indent.get()}aux := map[string]*datetime.${timeInfo?.format}{}\n`;
+    unmarshallerText += `${indent.get()}aux := map[string]*datetime.${timeType.format}{}\n`;
     unmarshallerText += `${indent.get()}if err := runtime.UnmarshalAs${format}(resp, &aux); err != nil {\n`;
     unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
     unmarshallerText += `${indent.pop().get()}}\n`;
@@ -191,10 +188,17 @@ function generateResponseUnmarshaller(
     unmarshallerText += `${indent.push().get()}return ${zeroValue}, err\n`;
     unmarshallerText += `${indent.pop().get()}}\n`;
     let resultVar: string;
+    type = go.unwrapPtr(type);
     switch (type.kind) {
       case "scalar":
         resultVar = "parsedBody";
-        unmarshallerText += emitScalarParsing(type, "string(body)", resultVar, imports, indent);
+        unmarshallerText += helpers.emitScalarParsing(
+          type,
+          "string(body)",
+          resultVar,
+          imports,
+          indent,
+        );
         unmarshallerText += `${indent.get()}${helpers.buildErrCheck(indent, "err", zeroValue)}\n`;
         break;
       case "string":
@@ -247,17 +251,18 @@ function formatHeaderResponseValue(
   indent.push();
   let name = naming.uncapitalize(headerResp.fieldName);
   let byRef = "&";
-  switch (headerResp.type.kind) {
+  const headerRespType = go.unwrapPtr(headerResp.type);
+  switch (headerRespType.kind) {
     case "constant":
     case "etag":
-      text += `${indent.get()}${respObj}.${headerResp.fieldName} = (*${go.getTypeDeclaration(headerResp.type, method.receiver.type.pkg)})(&val)\n`;
+      text += `${indent.get()}${respObj}.${headerResp.fieldName} = (${go.getTypeDeclaration(headerResp.type, method.receiver.type.pkg)})(&val)\n`;
       indent.pop();
       text += `${indent.get()}}\n`;
       return text;
     case "encodedBytes":
       // a base-64 encoded value in string format
       imports.add("encoding/base64");
-      text += `${indent.get()}${name}, err := base64.${helpers.formatBytesEncoding(headerResp.type.encoding)}Encoding.DecodeString(val)\n`;
+      text += `${indent.get()}${name}, err := base64.${helpers.formatBytesEncoding(headerRespType.encoding)}Encoding.DecodeString(val)\n`;
       byRef = "";
       break;
     case "literal":
@@ -266,35 +271,20 @@ function formatHeaderResponseValue(
       text += `${indent.get()}}\n`;
       return text;
     case "scalar":
-      text += emitScalarParsing(headerResp.type, "val", name, imports, indent);
+      text += helpers.emitScalarParsing(headerRespType, "val", name, imports, indent);
       break;
     case "string":
       text += `${indent.get()}${respObj}.${headerResp.fieldName} = &val\n`;
       text += `${indent.pop().get()}}\n`;
       return text;
     case "time":
-      imports.add("time");
-      switch (headerResp.type.format) {
-        case "RFC1123":
-        case "RFC3339":
-        case "RFC7231":
-          text += `${indent.get()}${name}, err := time.Parse(${headerResp.type.format === "RFC3339" ? helpers.RFC3339Format : helpers.RFC1123Format}, val)\n`;
-          break;
-        case "PlainDate":
-          text += `${indent.get()}${name}, err := time.Parse(${helpers.plainDateFormat}, val)\n`;
-          break;
-        case "PlainTime":
-          text += `${indent.get()}${name}, err := time.Parse(${helpers.plainTimeFormat}, val)\n`;
-          break;
-        case "Unix":
-          imports.add("strconv");
-          imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
-          text += `${indent.get()}sec, err := strconv.ParseInt(val, 10, 64)\n`;
-          name = "to.Ptr(time.Unix(sec, 0))";
-          byRef = "";
-          break;
-        default:
-          headerResp.type.format satisfies never;
+      if (headerRespType.format === "Unix") {
+        imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
+        text += helpers.emitTimeParsing("val", headerRespType, "sec", imports, indent);
+        name = "to.Ptr(time.Unix(sec, 0))";
+        byRef = "";
+      } else {
+        text += helpers.emitTimeParsing("val", headerRespType, name, imports, indent);
       }
   }
 
@@ -305,61 +295,4 @@ function formatHeaderResponseValue(
   text += `${indent.get()}${respObj}.${headerResp.fieldName} = ${byRef}${name}\n`;
   text += `${indent.pop().get()}}\n`;
   return text;
-}
-
-/**
- * emits the code for parsing scalar types from a string.
- * note that the parsing error result is placed into a
- * local var named "err".
- *
- * @param scalar the type of scalar to parse
- * @param src the source var that contains the scalar in string format
- * @param dst the destination var that contains the result
- * @param imports the import manager currently in scope
- * @param indent the indentation helper currently in scope
- * @returns the scalar parsing code
- */
-function emitScalarParsing(
-  scalar: go.Scalar,
-  src: string,
-  dst: string,
-  imports: ImportManager,
-  indent: helpers.Indentation,
-): string {
-  imports.add("strconv");
-  switch (scalar.type) {
-    case "bool":
-      return `${indent.get()}${dst}, err := strconv.ParseBool(${src})\n`;
-    case "float32":
-      return (
-        `${indent.get()}${dst}32, err := strconv.ParseFloat(${src}, 32)\n` +
-        `${indent.get()}${dst} := float32(${dst}32)\n`
-      );
-    case "float64":
-      return `${indent.get()}${dst}, err := strconv.ParseFloat(${src}, 64)\n`;
-    case "int32":
-      return (
-        `${indent.get()}${dst}32, err := strconv.ParseInt(${src}, 10, 32)\n` +
-        `${indent.get()}${dst} := int32(${dst}32)\n`
-      );
-    case "int64":
-      return `${indent.get()}${dst}, err := strconv.ParseInt(${src}, 10, 64)\n`;
-    default:
-      throw new CodegenError("InternalError", `unhandled scalar type ${scalar.type}`);
-  }
-}
-
-function isArrayOfDateTime(
-  paramType: go.WireType,
-): { format: go.TimeFormat; elemByVal: boolean } | undefined {
-  if (paramType.kind !== "slice") {
-    return undefined;
-  }
-  if (paramType.elementType.kind !== "time") {
-    return undefined;
-  }
-  return {
-    format: paramType.elementType.format,
-    elemByVal: paramType.elementTypeByValue,
-  };
 }

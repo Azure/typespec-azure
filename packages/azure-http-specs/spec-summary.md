@@ -1372,6 +1372,29 @@ Expected call:
 
 - HEAD /azure/client-generator-core/response-as-bool/exists/not-exists -> 404 (returns false)
 
+### Azure_ClientGenerator_Core_ResponseReplacement_bytesResponse
+
+- Endpoint: `get /azure/client-generator-core/response-replacement/bytes`
+
+Verify that `replaceResponseWithBytes` exposes the raw response bytes from the generated method
+while preserving the JSON service response on the wire.
+Expected response:
+
+- Status: 200
+- Content-Type: application/json
+- Body: {"name":"widget"}
+
+### Azure_ClientGenerator_Core_ResponseReplacement_voidResponse
+
+- Endpoint: `post /azure/client-generator-core/response-replacement/void`
+
+Verify that `replaceResponseWithVoid` removes the generated method response while preserving the
+service response on the wire.
+Expected response:
+
+- Status: 200
+- Body: {"name":"widget"}
+
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 
 - Endpoints:
@@ -1393,6 +1416,14 @@ All models within the namespace (including nested sub-namespaces) inherit the us
 'NamespaceModel' and 'NestedNamespaceModel' are orphan models that should be generated
 because their parent namespace has @usage(Usage.input | Usage.json) applied.
 The 'namespaceModelSerializable' operation verifies that models from the namespace can be serialized.
+
+### Azure_Core_ApiVersionOverride_LegacyClient_get
+
+- Endpoint: `get /azure/core/api-version-override/legacy`
+
+Verifies that an API-version override on a child client replaces the default service API version.
+The client call takes no API-version argument and must send the overridden query parameter
+`api-version=2022-10-01` instead of the service version `2025-01-01`.
 
 ### Azure_Core_Basic_createOrReplace
 

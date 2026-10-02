@@ -21,7 +21,7 @@ describe("@clientOption diagnostics", () => {
     });
   });
 
-  it("should emit both client-option and client-option-requires-scope warnings when scope is missing", async () => {
+  it("should emit both client-option and decorator-requires-scope warnings when scope is missing", async () => {
     const diagnostics = await SimpleTester.diagnose(`
       @service
       namespace MyService;
@@ -37,7 +37,7 @@ describe("@clientOption diagnostics", () => {
         code: "@azure-tools/typespec-client-generator-core/client-option",
       },
       {
-        code: "@azure-tools/typespec-client-generator-core/client-option-requires-scope",
+        code: "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
       },
     ]);
   });
@@ -53,7 +53,7 @@ describe("@clientOption diagnostics", () => {
       }
     `);
 
-    // Should only have the client-option warning, not client-option-requires-scope
+    // Should only have the client-option warning, not decorator-requires-scope
     strictEqual(diagnostics.length, 1);
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/client-option",
@@ -81,7 +81,7 @@ describe("@clientOption diagnostics", () => {
       namespace MyService;
 
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
-      #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope"
+      #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope"
       @clientOption("enableFeatureFoo", true)
       model Test {
         id: string;
@@ -191,6 +191,63 @@ describe("@clientOption with getClientOptions getter", () => {
     const numberValue = getClientOptions(sdkModelNumber, "numberOption");
     strictEqual(numberValue, 42);
     strictEqual(typeof numberValue, "number");
+  });
+
+  it("should support a model reference as the value", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      model ComposedOptions {
+        a: string;
+      }
+
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("composes", ComposedOptions, "csharp")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModel, "SDK model should exist");
+
+    const value = getClientOptions(sdkModel, "composes") as { kind?: string; name?: string };
+    strictEqual(value?.kind, "model");
+    strictEqual(value?.name, "ComposedOptions");
+  });
+
+  it("should preserve customizations, such as @alternateType, on a model reference value", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      @alternateType(string, "csharp")
+      model AlternateOptions {
+        a: string;
+      }
+
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("composes", AlternateOptions, "csharp")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModel, "SDK model should exist");
+
+    const value = getClientOptions(sdkModel, "composes") as { kind?: string };
+    strictEqual(value?.kind, "string");
+    // @alternateType(string) replaces the referenced model with the builtin `string` type
   });
 
   it("should return client option value for operation", async () => {
@@ -312,7 +369,7 @@ describe("@clientOption with getClientOptions getter", () => {
   it("should handle option without scope argument", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
-      #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope"
+      #suppress "@azure-tools/typespec-client-generator-core/decorator-requires-scope"
       @clientOption("noScopeOption", 123)
       @test
       model Test {

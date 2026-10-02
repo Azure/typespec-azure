@@ -8,6 +8,7 @@ export interface SdkContext extends TCGCSdkContext {
   generationPathDetail?: GenerationDirDetail;
   hasApiVersionInClient?: boolean;
   allServiceNamespaces?: Namespace[];
+  commonServiceNamespace?: string[];
 }
 
 export interface GenerationDirDetail {

@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.72.0
+
+### Bug Fixes
+
+- [#5383](https://github.com/Azure/typespec-azure/pull/5383) Do not emit empty legacy feature files, apply `version-enum-strategy` to feature enums, and return the configured enum from the ARM feature-file accessor.
+- [#5340](https://github.com/Azure/typespec-azure/pull/5340) Sanitize spec-provided service names and versions used in output and example paths so they cannot escape their configured directories.
+
+
 ## 0.71.0
 
 No changes, version bump only.

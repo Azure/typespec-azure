@@ -141,6 +141,91 @@ describe("Azure ARM Operation Templates", () => {
       assert.equal(items[1]?.properties?.productId, "product2");
       assert.equal(items[1]?.properties?.provisioningState, "Succeeded");
     });
+
+    it("should handle long-running operation with paging and a request body", async () => {
+      const result = client.lroPaging.postPagingLroWithBody("test-rg", "default", {
+        vnetId: "vnet1",
+      });
+
+      const items = [];
+      for await (const product of result) {
+        items.push(product);
+      }
+
+      assert.strictEqual(items.length, 2);
+      assert.strictEqual(items[0]?.name, "product1");
+      assert.strictEqual(items[1]?.name, "product2");
+    });
+  });
+
+  describe("Additional ARM Operation Templates", () => {
+    it("should complete a GET long-running operation", async () => {
+      const scope = `subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/${RESOURCE_GROUP_EXPECTED}`;
+      const result = await client.lro.getLro(scope, "report1");
+
+      assert.strictEqual(result.name, "report1");
+      assert.strictEqual(result.properties?.provisioningState, "Succeeded");
+    });
+
+    it("should page through a POST action", async () => {
+      const result = client.paging.postActionPaging(RESOURCE_GROUP_EXPECTED, "monitor1", {
+        body: { filter: "status eq 'active'" },
+      });
+      const items = [];
+      for await (const item of result) {
+        items.push(item);
+      }
+
+      assert.deepStrictEqual(items, [
+        {
+          id: "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1",
+          sendingMetrics: true,
+        },
+        {
+          id: "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm2",
+          sendingMetrics: false,
+        },
+      ]);
+    });
+
+    it("should treat a marked operation as pageable", async () => {
+      const result = client.paging.markAsPageable(RESOURCE_GROUP_EXPECTED, "monitor1");
+      const items = [];
+      for await (const item of result) {
+        items.push(item);
+      }
+
+      assert.deepStrictEqual(
+        items.map((item) => item.name),
+        ["collection1", "collection2"],
+      );
+    });
+
+    it("should use a legacy custom route", async () => {
+      const result = await client.legacy.routedGet(RESOURCE_GROUP_EXPECTED, "default", "memory");
+
+      assert.deepStrictEqual(result, { name: "memory", status: "healthy" });
+    });
+
+    it("should create or replace with an optional body", async () => {
+      const withoutBody = await client.legacy.createOrReplaceOptionalBody(
+        RESOURCE_GROUP_EXPECTED,
+        "default",
+      );
+      assert.strictEqual(withoutBody.properties?.configValue, "default-value");
+
+      const withBody = await client.legacy.createOrReplaceOptionalBody(
+        RESOURCE_GROUP_EXPECTED,
+        "default",
+        {
+          resource: {
+            location: "eastus",
+            properties: { configValue: "custom-value" },
+          },
+        },
+      );
+      assert.strictEqual(withBody.properties?.configValue, "custom-value");
+    });
   });
 
   describe("Optional Body Operations", () => {

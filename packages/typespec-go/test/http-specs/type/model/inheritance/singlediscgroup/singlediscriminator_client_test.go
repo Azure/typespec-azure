@@ -47,6 +47,18 @@ func TestSingleDiscriminatorClientGetModel(t *testing.T) {
 	}, resp.BirdClassification)
 }
 
+func TestSingleDiscriminatorClientGetNoSubtypesModel(t *testing.T) {
+	client, err := singlediscgroup.NewSingleDiscriminatorClientWithNoCredential("http://localhost:3000", nil)
+	require.NoError(t, err)
+	resp, err := client.GetNoSubtypesModel(context.Background(), nil)
+	require.NoError(t, err)
+	require.NotNil(t, resp.FishClassification)
+	require.Equal(t, &singlediscgroup.Fish{
+		Kind: to.Ptr("salmon"),
+		Size: to.Ptr[int32](10),
+	}, resp.FishClassification)
+}
+
 func TestSingleDiscriminatorClientGetRecursiveModel(t *testing.T) {
 	client, err := singlediscgroup.NewSingleDiscriminatorClientWithNoCredential("http://localhost:3000", nil)
 	require.NoError(t, err)
@@ -93,6 +105,17 @@ func TestSingleDiscriminatorClientPutModel(t *testing.T) {
 	resp, err := client.PutModel(context.Background(), &singlediscgroup.Sparrow{
 		Kind:     to.Ptr("sparrow"),
 		Wingspan: to.Ptr[int32](1),
+	}, nil)
+	require.NoError(t, err)
+	require.Zero(t, resp)
+}
+
+func TestSingleDiscriminatorClientPutNoSubtypesModel(t *testing.T) {
+	client, err := singlediscgroup.NewSingleDiscriminatorClientWithNoCredential("http://localhost:3000", nil)
+	require.NoError(t, err)
+	resp, err := client.PutNoSubtypesModel(context.Background(), &singlediscgroup.Fish{
+		Kind: to.Ptr("salmon"),
+		Size: to.Ptr[int32](10),
 	}, nil)
 	require.NoError(t, err)
 	require.Zero(t, resp)

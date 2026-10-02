@@ -81,6 +81,13 @@ function getGenerationOptions(typeSpecFile: string): string[] {
       `${emitterName}.generate-async-methods=true`,
       `${emitterName}.enable-sync-stack=false`,
     );
+  } else if (/tsp\/protocol-api-sync-over-async\.tsp$/.test(normalized)) {
+    options.push(`${emitterName}.enable-sync-stack=false`);
+  } else if (/tsp\/(max-overload-model|request-headers)\.tsp$/.test(normalized)) {
+    options.push(`${emitterName}.max-overload=model`);
+    if (/tsp\/max-overload-model\.tsp$/.test(normalized)) {
+      options.push(`${emitterName}.advanced-versioning=true`);
+    }
   } else if (/tsp\/subclient\.tsp$/.test(normalized)) {
     options.push(
       `${emitterName}.enable-subclient=true`,
@@ -110,7 +117,7 @@ async function compile(typeSpecFile: string, options: string[], timeout: number)
   const command = `pnpm ${arguments_.join(" ")}`;
   const start = performance.now();
   const result = await execa("pnpm", arguments_, {
-    cwd: emitterTestsRoot,
+    cwd: packageRoot,
     reject: false,
     timeout,
   });

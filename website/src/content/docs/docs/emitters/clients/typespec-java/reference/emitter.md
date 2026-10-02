@@ -182,11 +182,17 @@ Specify headers that emitter will ignore.
 
 When set to `true`, the generated SDK uses `getter` method to access child clients. Default value is `false`.
 
+### `max-overload`
+
+**Type:** `"model"`
+
+When set to `model`, generate the maximum set of model-based convenience method overloads for Azure clients.
+
 ### `api-version`
 
 **Type:** `string | object`
 
-Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace's full name to its desired version; services not listed default to their latest version.
+Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace to its desired version. Nested namespaces must be represented as nested objects in `tspconfig.yaml`; services not listed default to their latest version.
 
 **Options:**
 

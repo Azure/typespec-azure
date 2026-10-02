@@ -38,6 +38,7 @@ export type WireType =
   | Model
   | MultipartContent
   | PolymorphicModel
+  | Ptr
   | RawJSON
   | ReadCloser
   | ReadSeekCloser
@@ -45,7 +46,8 @@ export type WireType =
   | Slice
   | SliceArray
   | String
-  | Time;
+  | Time
+  | UnionStruct;
 
 /** defines a type within the Go type system */
 export type Type = SdkType | WireType;
@@ -61,7 +63,7 @@ export interface ArmClientOptions extends QualifiedType {
 }
 
 /** a const type definition used for enums */
-export interface Constant {
+export interface Constant<T extends ConstantType = ConstantType> {
   kind: "constant";
 
   /** the const type name */
@@ -74,7 +76,7 @@ export interface Constant {
   pkg: PackageContent;
 
   /** the underlying type of the const */
-  type: ConstantType;
+  type: T;
 
   /** the possible values for this const */
   values: Array<ConstantValue>;
@@ -182,18 +184,29 @@ export interface Literal<T extends LiteralType = LiteralType> {
 export type LiteralType = Constant | ConstantDef | EncodedBytes | Scalar | String | Time;
 
 /** a Go map type. note that the key is always a string */
-export interface Map {
+export interface Map<T extends MapValueType = MapValueType> {
   kind: "map";
 
-  /** the type of values in the map */
-  valueType: MapValueType;
-
-  /** indicates if the map's value type is pointer-to-type or not */
-  valueTypeByValue: boolean;
+  /**
+   * the type of values in the map.
+   * note that the type is always pointer-to-type
+   * unless the type is implicitly nil-able.
+   */
+  itemType: T;
 }
 
 /** the set of map value types */
-export type MapValueType = WireType;
+export type MapValueType =
+  | Any
+  | EncodedBytes
+  | Interface
+  | Map
+  | Ptr<Exclude<PtrType, ETag | Literal>>
+  | RawJSON
+  | ReadCloser
+  | ReadSeekCloser
+  | Slice
+  | SliceArray;
 
 /** a field within a model */
 export interface ModelField extends StructField {
@@ -209,8 +222,8 @@ export interface ModelField extends StructField {
   /** the value to send over the wire if one isn't specified */
   defaultValue?: Literal;
 
-  /** any XML metadata */
-  xml?: XMLInfo;
+  /** contains XML-specific serde info */
+  xmlKind?: XMLKind;
 }
 
 /** additional settings for a model type */
@@ -268,17 +281,38 @@ export interface PolymorphicModel extends ModelBase {
   discriminatorValue?: Literal;
 }
 
+/** defines possible Ptr types */
+export type PtrType =
+  | Constant
+  | ETag
+  | Literal
+  | Model
+  | MultipartContent
+  | PolymorphicModel
+  | Scalar
+  | String
+  | Time
+  | UnionStruct;
+
+/** a pointer to some type */
+export interface Ptr<T extends PtrType = PtrType> {
+  kind: "ptr";
+
+  /** the type being pointed to */
+  ptrType: T;
+}
+
 /** a byte slice containing raw JSON */
 export interface RawJSON {
   kind: "rawJSON";
 }
 
 /** a Go scalar type */
-export interface Scalar {
+export interface Scalar<T extends ScalarType = ScalarType> {
   kind: "scalar";
 
   /** the type of scalar */
-  type: ScalarType;
+  type: T;
 
   /** indicates the value is sent/received as a string */
   encodeAsString: boolean;
@@ -311,38 +345,57 @@ export type ScalarType =
   | "uint64";
 
 /** a Go slice */
-export interface Slice {
+export interface Slice<T extends SliceElementType = SliceElementType> {
   kind: "slice";
 
   /** the element type for this slice */
-  elementType: SliceElementType;
+  itemType: T;
 
-  /** indicates if the slice's element type is pointer-to-type or not */
-  elementTypeByValue: boolean;
+  /** the XML name for the elements */
+  xmlName?: string;
 }
+
+/** the set of slice element types */
+export type SliceElementType =
+  | Any
+  | Constant
+  | EncodedBytes
+  | Interface
+  | Literal<Constant | Scalar | String>
+  | Map
+  | Model
+  | MultipartContent
+  | PolymorphicModel
+  | Ptr<Exclude<PtrType, ETag | Literal>>
+  | RawJSON
+  | ReadCloser
+  | ReadSeekCloser
+  | Scalar
+  | Slice
+  | SliceArray
+  | String
+  | Time
+  | UnionStruct;
 
 /** specialized slice type for arrays represented as delimited strings */
 export interface SliceArray {
   kind: "sliceArray";
 
   /** the element type for this slice */
-  elementType: SliceArrayElementType;
-
-  /** indicates if the slice's element type is pointer-to-type or not */
-  elementTypeByValue: boolean;
+  itemType: SliceArrayElementType;
 
   /** the delimiter used to separate elements */
   delimiter: SliceArrayDelimiter;
 }
 
 /** the set of slice array delimiters */
-export type SliceArrayDelimiter = "comma" | "space" | "pipe" | "newline";
+export type SliceArrayDelimiter = "comma" | "newline" | "pipe" | "space";
 
 /** the supported element types for arrays represented as delimited strings */
-export type SliceArrayElementType = String | Constant;
+export type SliceArrayElementType = SliceArrayElementWireType | Ptr<SliceArrayElementWireType>;
 
-/** the set of slice element types */
-export type SliceElementType = WireType;
+/** the set of slice array wire types */
+export type SliceArrayElementWireType = Constant | String;
 
 /** a Go string */
 export interface String {
@@ -364,9 +417,6 @@ export interface StructField {
 
   /** the field's underlying type */
   type: Type;
-
-  /** indicates if the field is pointer-to-type or not */
-  byValue: boolean;
 }
 
 /** a time.Time type from the standard library with a format specifier */
@@ -396,6 +446,32 @@ export interface TokenCredential extends QualifiedType {
   scopes: Array<string>;
 }
 
+/** a single variant within a union */
+export interface UnionField extends StructField {
+  /** the variant's underlying type */
+  type: UnionVariantType;
+}
+
+/** a Go struct modeling a non-discriminated union where exactly one field is set */
+export interface UnionStruct extends StructBase {
+  kind: "unionStruct";
+
+  /** the variant fields of the union. exactly one is populated at runtime */
+  fields: Array<UnionField>;
+}
+
+/**
+ * the subset of WireType kinds that can appear as a variant within a non-discriminated union.
+ * pointer-capable variants are stored pointer-to-type.
+ */
+export type UnionVariantType = Map | Slice | Ptr<UnionVariantPtrType>;
+
+/** the pointer-capable wire types that can be a union variant */
+export type UnionVariantPtrType = Constant | Literal | Model | Scalar | String;
+
+/** the wire types accepted as a union variant, prior to pointer-wrapping */
+export type UnionVariantWireType = Map | Slice | UnionVariantPtrType;
+
 /** bit flags indicating how a model/polymorphic type is used */
 export enum UsageFlags {
   /** the type is unreferenced */
@@ -408,27 +484,8 @@ export enum UsageFlags {
   Output = 2,
 }
 
-/** metadata used for XML serde */
-export interface XMLInfo {
-  /** element name to use instead of the default name */
-  name?: string;
-
-  /**
-   * name propagated to the generated wrapper type.
-   * this is used solely in method bodies to generate
-   * a "type wrapper struct" with the specified name.
-   */
-  wrapper?: string;
-
-  /** slices only. this is the name of the wrapped type */
-  wraps?: string;
-
-  /** value is an XML attribute */
-  attribute: boolean;
-
-  /** value is raw text */
-  text: boolean;
-}
+/** XMLKind contains info used for generating XML-specific serde */
+export type XMLKind = "attribute" | "text" | "unwrappedList";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // helpers
@@ -465,9 +522,24 @@ export function getLiteralTypeDeclaration(literal: LiteralType): string {
  *
  * @param type the type for which to emit the declaration
  * @param scope the scope in which the type declaration is emitted
+ * @param instance emit the type declaration used for defining an instance instead of a type.
+ * only useful for Ptr types so "&" is emitted instead of "*". the default is false.
  * @returns the Go type declaration
  */
-export function getTypeDeclaration(type: Client | Type, scope: PackageType): string {
+export function getTypeDeclaration(
+  type: Client | Type,
+  scope: PackageType,
+  instance: boolean = false,
+): string {
+  // client/method options are always emitted as pointer-to-type thus aren't wrapped in a go.Ptr
+  const byRef =
+    type.kind === "armClientOptions" ||
+    type.kind === "clientOptions" ||
+    (type.kind === "paramGroup" && !type.required)
+      ? instance
+        ? "&"
+        : "*"
+      : "";
   switch (type.kind) {
     case "any":
     case "string":
@@ -480,7 +552,8 @@ export function getTypeDeclaration(type: Client | Type, scope: PackageType): str
     case "model":
     case "paramGroup":
     case "polymorphicModel":
-    case "responseEnvelope": {
+    case "responseEnvelope":
+    case "unionStruct": {
       let pkg: PackageType;
       const typeName = type.kind === "paramGroup" ? type.groupName : type.name;
       switch (type.kind) {
@@ -496,9 +569,9 @@ export function getTypeDeclaration(type: Client | Type, scope: PackageType): str
       if (pkg !== scope) {
         // type is being referenced from a different package
         // then where it's defined, so add its package prefix
-        return `${getPackageName(pkg)}.${typeName}`;
+        return `${byRef}${getPackageName(pkg)}.${typeName}`;
       }
-      return typeName;
+      return `${byRef}${typeName}`;
     }
     case "constantDef":
       return type.literal.type.kind;
@@ -508,16 +581,14 @@ export function getTypeDeclaration(type: Client | Type, scope: PackageType): str
     case "literal":
       return getTypeDeclaration(type.type, scope);
     case "map":
-      return (
-        `map[string]${type.valueTypeByValue ? "" : "*"}` + getTypeDeclaration(type.valueType, scope)
-      );
+      return `map[string]${getTypeDeclaration(type.itemType, scope)}`;
+    case "ptr":
+      return `${instance ? "&" : "*"}${getTypeDeclaration(type.ptrType, scope)}`;
     case "scalar":
       return type.type;
     case "slice":
     case "sliceArray":
-      return (
-        `[]${type.elementTypeByValue ? "" : "*"}` + getTypeDeclaration(type.elementType, scope)
-      );
+      return `[]${getTypeDeclaration(type.itemType, scope)}`;
     case "time":
       return "time.Time";
     case "armClientOptions":
@@ -527,8 +598,37 @@ export function getTypeDeclaration(type: Client | Type, scope: PackageType): str
     case "readSeekCloser":
     case "tokenCredential":
       // strip module to just the leaf package as required
-      return `${path.basename(type.module)}.${type.name}`;
+      return `${byRef}${path.basename(type.module)}.${type.name}`;
   }
+}
+
+/**
+ * returns the XML name for the provided type or undefined
+ *
+ * @param type the type to inspect for XMLInfo
+ * @returns the XMLInfo or undefined
+ */
+export function hasXMLName(type: WireType): string | undefined {
+  if ("xmlName" in type) {
+    return type.xmlName;
+  }
+  return undefined;
+}
+
+/** narrows the field to the model's JSON additional properties bucket, whose type is always a map */
+export function isAdditionalProperties(field: ModelField): field is ModelField & { type: Map } {
+  return field.annotations.isAdditionalProperties;
+}
+
+/** narrows type to a constant with one of the specified underlying types (any constant when no types are given) */
+export function isConstant<T extends ConstantType = ConstantType>(
+  type: WireType,
+  ...kinds: Array<T>
+): type is Constant<T> {
+  if (type.kind !== "constant") {
+    return false;
+  }
+  return kinds.length === 0 || (kinds as Array<ConstantType>).includes(type.type);
 }
 
 /** narrows type to a LiteralType within the conditional block */
@@ -545,15 +645,108 @@ export function isLiteralValueType(type: WireType): type is LiteralType {
   }
 }
 
+/** the inner (pointed-to) types allowed as a map value */
+type MapPtrType = Extract<MapValueType, Ptr> extends Ptr<infer U> ? U : never;
+
+/** narrows type to a map with one of the specified value type kinds (any map when no kinds are given) */
+export function isMap<T extends MapValueType["kind"] | MapPtrType["kind"] = MapValueType["kind"]>(
+  type: WireType,
+  ...kinds: Array<T>
+): type is Map<
+  | Extract<MapValueType, { kind: T }>
+  | (Extract<MapPtrType, { kind: T }> extends never ? never : Ptr<Extract<MapPtrType, { kind: T }>>)
+> {
+  if (type.kind !== "map") {
+    return false;
+  }
+  return (
+    kinds.length === 0 ||
+    (kinds as Array<string>).includes(type.itemType.kind) ||
+    (kinds as Array<string>).includes(unwrapPtr(type.itemType).kind)
+  );
+}
+
+/** narrows type to a ptr with one of the specified underlying types (any ptr when no types are given) */
+export function isPtr<T extends PtrType["kind"] = PtrType["kind"]>(
+  type: WireType,
+  ...kinds: Array<T>
+): type is Ptr<Extract<PtrType, { kind: T }>> {
+  if (type.kind !== "ptr") {
+    return false;
+  }
+  return kinds.length === 0 || (kinds as Array<string>).includes(type.ptrType.kind);
+}
+
+/** narrows type to a scalar with one of the specified underlying types (any scalar when no types are given) */
+export function isScalar<T extends ScalarType = ScalarType>(
+  type: WireType,
+  ...kinds: Array<T>
+): type is Scalar<T> {
+  if (type.kind !== "scalar") {
+    return false;
+  }
+  return kinds.length === 0 || (kinds as Array<ScalarType>).includes(type.type);
+}
+
+type SlicePtrType = Extract<SliceElementType, Ptr> extends Ptr<infer U> ? U : never;
+
+/** narrows type to a slice with one of the specified element type kinds (any slice when no kinds are given) */
+export function isSlice<
+  T extends SliceElementType["kind"] | SlicePtrType["kind"] = SliceElementType["kind"],
+>(
+  type: WireType,
+  ...kinds: Array<T>
+): type is Slice<
+  | Extract<SliceElementType, { kind: T }>
+  | (Extract<SlicePtrType, { kind: T }> extends never
+      ? never
+      : Ptr<Extract<SlicePtrType, { kind: T }>>)
+> {
+  if (type.kind !== "slice") {
+    return false;
+  }
+  return (
+    kinds.length === 0 ||
+    (kinds as Array<string>).includes(type.itemType.kind) ||
+    (kinds as Array<string>).includes(unwrapPtr(type.itemType).kind)
+  );
+}
+
+/** narrows type to a union variant wire type (prior to pointer-wrapping) within the conditional block */
+export function isUnionVariantType(type: Exclude<WireType, Ptr>): type is UnionVariantWireType {
+  switch (type.kind) {
+    case "constant":
+    case "literal":
+    case "map":
+    case "model":
+    case "scalar":
+    case "slice":
+    case "string":
+      return true;
+    default:
+      return false;
+  }
+}
+
+/** the result of unwrapping a Ptr from T, distributing over unions */
+type UnwrappedPtr<T> = T extends Ptr<infer U> ? U : Exclude<T, Ptr>;
+
+/** unwraps type from a Ptr type, else returns type */
+export function unwrapPtr<T extends WireType>(type: T): UnwrappedPtr<T> {
+  if (type.kind === "ptr") {
+    return type.ptrType as UnwrappedPtr<T>;
+  }
+  return type as UnwrappedPtr<T>;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // exported base types
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 export class StructField implements StructField {
-  constructor(name: string, type: Type, byValue: boolean) {
+  constructor(name: string, type: Type) {
     this.name = name;
     this.type = type;
-    this.byValue = byValue;
     this.docs = {};
   }
 }
@@ -602,8 +795,11 @@ interface ModelBase extends StructBase {
   /** usage flags for this model */
   usage: UsageFlags;
 
-  /** any XML metadata */
-  xml?: XMLInfo;
+  /**
+   * the name of the type over the wire if it's
+   * different from the type's name.
+   */
+  xmlName?: string;
 }
 
 class StructBase implements StructBase {
@@ -640,8 +836,8 @@ export class ArmClientOptions extends QualifiedType implements ArmClientOptions 
   }
 }
 
-export class Constant implements Constant {
-  constructor(pkg: PackageContent, name: string, type: ConstantType, valuesFuncName: string) {
+export class Constant<T extends ConstantType = ConstantType> implements Constant<T> {
+  constructor(pkg: PackageContent, name: string, type: T, valuesFuncName: string) {
     this.kind = "constant";
     this.name = name;
     this.pkg = pkg;
@@ -706,11 +902,10 @@ export class Literal<T> implements Literal<T> {
   }
 }
 
-export class Map implements Map {
-  constructor(valueType: MapValueType, valueTypeByValue: boolean) {
+export class Map<T extends MapValueType = MapValueType> implements Map<T> {
+  constructor(itemType: T) {
     this.kind = "map";
-    this.valueType = valueType;
-    this.valueTypeByValue = valueTypeByValue;
+    this.itemType = itemType;
   }
 }
 
@@ -725,11 +920,10 @@ export class ModelField extends StructField implements ModelField {
   constructor(
     name: string,
     type: WireType,
-    byValue: boolean,
     serializedName: string,
     annotations: ModelFieldAnnotations,
   ) {
-    super(name, type, byValue);
+    super(name, type);
     this.serializedName = serializedName;
     this.annotations = annotations;
   }
@@ -780,6 +974,13 @@ export class PolymorphicModel extends ModelBase implements PolymorphicModel {
   }
 }
 
+export class Ptr<T extends PtrType = PtrType> implements Ptr<T> {
+  constructor(ptrType: T) {
+    this.kind = "ptr";
+    this.ptrType = ptrType;
+  }
+}
+
 export class RawJSON implements RawJSON {
   constructor() {
     this.kind = "rawJSON";
@@ -800,31 +1001,25 @@ export class ReadSeekCloser extends QualifiedType implements ReadSeekCloser {
   }
 }
 
-export class Scalar implements Scalar {
-  constructor(type: ScalarType, encodeAsString: boolean) {
+export class Scalar<T extends ScalarType = ScalarType> implements Scalar<T> {
+  constructor(type: T, encodeAsString: boolean) {
     this.kind = "scalar";
     this.type = type;
     this.encodeAsString = encodeAsString;
   }
 }
 
-export class Slice implements Slice {
-  constructor(elementType: SliceElementType, elementTypeByValue: boolean) {
+export class Slice<T extends SliceElementType = SliceElementType> implements Slice<T> {
+  constructor(itemType: T) {
     this.kind = "slice";
-    this.elementType = elementType;
-    this.elementTypeByValue = elementTypeByValue;
+    this.itemType = itemType;
   }
 }
 
 export class SliceArray implements SliceArray {
-  constructor(
-    elementType: SliceArrayElementType,
-    elementTypeByValue: boolean,
-    delimiter: SliceArrayDelimiter,
-  ) {
+  constructor(itemType: SliceArrayElementType, delimiter: SliceArrayDelimiter) {
     this.kind = "sliceArray";
-    this.elementType = elementType;
-    this.elementTypeByValue = elementTypeByValue;
+    this.itemType = itemType;
     this.delimiter = delimiter;
   }
 }
@@ -842,6 +1037,20 @@ export class Struct extends StructBase implements Struct {
   }
 }
 
+export class UnionField extends StructField implements UnionField {
+  constructor(name: string, type: UnionVariantType) {
+    super(name, type);
+  }
+}
+
+export class UnionStruct extends StructBase implements UnionStruct {
+  constructor(pkg: PackageContent, name: string) {
+    super(pkg, name);
+    this.kind = "unionStruct";
+    this.fields = new Array<UnionField>();
+  }
+}
+
 export class Time extends QualifiedType implements Time {
   constructor(format: TimeFormat, utc: boolean) {
     super("Time", "time");
@@ -856,12 +1065,5 @@ export class TokenCredential extends QualifiedType implements TokenCredential {
     super("TokenCredential", "github.com/Azure/azure-sdk-for-go/sdk/azcore");
     this.kind = "tokenCredential";
     this.scopes = scopes;
-  }
-}
-
-export class XMLInfo implements XMLInfo {
-  constructor() {
-    this.attribute = false;
-    this.text = false;
   }
 }

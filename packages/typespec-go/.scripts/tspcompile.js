@@ -174,7 +174,6 @@ function generate(moduleName, input, outputDir, perTestOptions) {
   const fixedOptions = [outputKind, `emitter-output-dir=${fullOutputDir}`, "file-prefix=zz_"];
 
   // these options _can_ be changed per test
-  // TODO: disabled examples by default https://github.com/Azure/autorest.go/issues/1441
   const defaultOptions = [
     "generate-fakes=true",
     "inject-spans=true",
