@@ -62,9 +62,11 @@ Avoid suppressing on properties; use the configured API casing convention instea
 
 ## Options
 
-> **Note:** Do not use custom casing options for regular Azure services. Keep the default
-> Azure casing conventions. Custom options are intended only for existing APIs that must
-> preserve different naming conventions.
+:::caution
+Do not use custom casing options for regular Azure services. Keep the default
+Azure casing conventions. Custom options are intended only for existing APIs that must
+preserve different naming conventions.
+:::
 
 Enable this rule with `true` to keep the existing Azure casing conventions, or provide a flat
 options object under `linter.enable` in `tspconfig.yaml`. Each category accepts `camelCase`,
