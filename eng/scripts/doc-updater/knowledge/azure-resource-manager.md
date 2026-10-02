@@ -155,3 +155,24 @@ The former multi-purpose `arm-resource-operation` checks are represented by thre
 ## Resource Identity Resolution
 
 Concrete ARM resource identities are seeded only by registered read or createOrUpdate operations with valid ARM resource instance paths. List, action, update, delete, and check-existence operations can attach to an existing resolved resource but do not create resource identities by themselves.
+
+## ARM Operation Query and Payload Rules
+
+- Collection GET operations may use only `api-version` and case-sensitive `$filter` query parameters. Do not recommend `ArmTopParameter`, `ArmSkipParameter`, `order-by`, continuation tokens, or other custom query parameters for collection GET examples.
+- Point GET, PUT, PATCH, and DELETE operations may use only `api-version`.
+- POST operations may use only `api-version`; put request-specific input in a plain request-body model.
+- ARM request bodies must be plain models without indexers. Primitive, union, array, and record request bodies are rejected; bodyless and multipart operations are allowed.
+- ARM request and response bodies must resolve to `application/json`. In particular, `ArmResponse<string>` resolves to a non-JSON scalar response; wrap scalar values in a response model.
+- Collection GET responses should use standard ARM list templates. Custom list operations need `@list`, `@pageItems`, `@nextLink`, and an envelope containing only `value` and `nextLink`.
+
+## Long-Running Operation Results
+
+LRO final-result metadata must match operation semantics: PUT and PATCH return the resource, DELETE returns `void`, and POST actions use their response type (or `void` for no-content actions). Standard async templates configure these defaults. When overriding `LroHeaders`, preserve the matching `FinalResult`.
+
+## Feature File Versions
+
+`ArmFeatureFileOptions.version` optionally selects the API version used for clients generated from that feature file. Empty or whitespace-only values are invalid. This property exists only on the current `Azure.ResourceManager.featureFileOptions`; do not document it on deprecated `Legacy.featureOptions`. Feature files remain restricted to approved brownfield migrations.
+
+## Documentation Sample Links
+
+When linking to a canonical sample from an ARM guide, prefer its published documentation URL under `https://azure.github.io/typespec-azure/docs/samples/resource-manager/` instead of the GitHub source-tree URL.
