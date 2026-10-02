@@ -1,6 +1,70 @@
 Validate names follow the [TypeSpec Style guide](https://typespec.io/docs/handbook/style-guide)
 
+## Impact
+
+- **Area:** API, SDK
+
+On properties, inconsistent casing can hurt API usability; use the casing convention for
+your API. On other declarations emitters substitute the correct casing for their language.
+
+## LintDiff Equivalent
+
+This rule corresponds to the LintDiff rule [DefinitionsPropertiesNamesCamelCase](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r3016) (partial - covers the serious property-casing violation).
+
+The following examples use the default options.
+
+#### ❌ Incorrect
+
+```tsp
+model pet {}
+model pet_food {}
+```
+
+```tsp
+model Pet {
+  Name: string;
+}
+```
+
+```tsp
+op CreatePet(): void;
+```
+
+```tsp
+interface petStores {}
+```
+
+#### ✅ Correct
+
+```tsp
+model Pet {}
+model PetFood {}
+```
+
+```tsp
+model Pet {
+  name: string;
+}
+```
+
+```tsp
+op createPet(): void;
+```
+
+```tsp
+interface PetStores {}
+```
+
+## Suppression
+
+Suppression is acceptable on non-property declarations, where the effect is cosmetic.
+Avoid suppressing on properties; use the configured API casing convention instead.
+
 ## Options
+
+> **Note:** Do not use custom casing options for regular Azure services. Keep the default
+> Azure casing conventions. Custom options are intended only for existing APIs that must
+> preserve different naming conventions.
 
 Enable this rule with `true` to keep the existing Azure casing conventions, or provide a flat
 options object under `linter.enable` in `tspconfig.yaml`. Each category accepts `camelCase`,
@@ -93,63 +157,3 @@ by the compiler's linter navigation, such as when instantiated.
   a leading digit are not allowed. For example, `_name`, `name_`, `first__name`,
   `firstName`, and `2_names` are invalid. The legacy camelCase exemptions do not apply,
   so `_` and `$name` are also invalid.
-
-## Impact
-
-- **Area:** API, SDK
-
-On properties, inconsistent casing can hurt API usability; use the casing convention for
-your API. On other declarations emitters substitute the correct casing for their language.
-
-## LintDiff Equivalent
-
-This rule corresponds to the LintDiff rule [DefinitionsPropertiesNamesCamelCase](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r3016) (partial - covers the serious property-casing violation).
-
-The following examples use the default options.
-
-#### ❌ Incorrect
-
-```tsp
-model pet {}
-model pet_food {}
-```
-
-```tsp
-model Pet {
-  Name: string;
-}
-```
-
-```tsp
-op CreatePet(): void;
-```
-
-```tsp
-interface petStores {}
-```
-
-#### ✅ Correct
-
-```tsp
-model Pet {}
-model PetFood {}
-```
-
-```tsp
-model Pet {
-  name: string;
-}
-```
-
-```tsp
-op createPet(): void;
-```
-
-```tsp
-interface PetStores {}
-```
-
-## Suppression
-
-Suppression is acceptable on non-property declarations, where the effect is cosmetic.
-Avoid suppressing on properties; use the configured API casing convention instead.
