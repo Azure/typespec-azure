@@ -29,6 +29,11 @@ The Python CI setup action uses the Python and uv versions declared in
 action. `pnpm deps check` reports version drift as part of the CI consistency
 checks.
 
+Workspace builds use the TypeScript version in core's dependency catalog. The
+workspace also loads core's pnpm hook so TypeDoc and Astro's checker retain their
+private JavaScript compiler API dependencies while package compilation uses
+native TypeScript 7.
+
 # Testing a change in repo azure-rest-api-specs
 
 If you are proposing a change that is likely to impact existing specs, it's

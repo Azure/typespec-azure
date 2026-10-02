@@ -5,8 +5,7 @@ import * as fs from "fs/promises";
 import { createRequire } from "module";
 import { tmpdir } from "os";
 import { dirname, join as joinPath } from "path";
-import type { CompilerOptions } from "typescript";
-import { createProgram } from "typescript";
+import { Project, type CompilerOptions } from "ts-morph";
 import { fileURLToPath } from "url";
 import { createTaskLogger } from "./logger.js";
 import { runCommand } from "./run-command.js";
@@ -181,20 +180,16 @@ async function runTypespecHelper(env: GenEnv): Promise<void> {
 
   async function emitDeclarationFiles(): Promise<void> {
     const logger = env.logger();
-    const program = createProgram({
-      options: tsconfig().compilerOptions,
-      rootNames: [joinPath(outputPath(), "src/index.ts")],
+    const project = new Project({
+      compilerOptions: tsconfig().compilerOptions,
     });
+    project.addSourceFileAtPath(joinPath(outputPath(), "src/index.ts"));
 
-    // side effect: loads source files into memory
-    // nothing will be emitted if this is omitted
-    program.getSourceFiles();
-
-    const { diagnostics } = program.emit();
+    const diagnostics = (await project.emit()).getDiagnostics();
 
     if (diagnostics.length) {
       logger.log(`Compiler diagnostics for ${outputPath()}`);
-      diagnostics.forEach((diagnostic) => logger.log(diagnostic.messageText));
+      diagnostics.forEach((diagnostic) => logger.log(diagnostic.getMessageText()));
     }
   }
 
