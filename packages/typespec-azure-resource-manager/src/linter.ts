@@ -41,6 +41,7 @@ import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
+import { patchPropertiesCorrespondToPutRule } from "./rules/patch-properties-correspond-to-put.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { secretProprule } from "./rules/secret-prop.js";
@@ -98,6 +99,7 @@ const rules = [
   operationsInterfaceMissingRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
+  patchPropertiesCorrespondToPutRule,
   resourceNameRule,
   retryAfterRule,
   unsupportedTypeRule,
