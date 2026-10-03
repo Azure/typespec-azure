@@ -23,6 +23,7 @@ import { noOpenapiClientExtensionsRule } from "./rules/no-openapi-client-extensi
 import { noOpenAPIRule } from "./rules/no-openapi.js";
 import { noPrivateUsage } from "./rules/no-private-usage.js";
 import { noQueryExplodeRule } from "./rules/no-query-explode.js";
+import { noRedundantSummaryRule } from "./rules/no-redundant-summary.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRouteParameterNameMismatchRule } from "./rules/no-route-parameter-name-mismatch.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
@@ -67,6 +68,7 @@ const rules = [
   noOpenAPIRule,
   noUnnamedTypesRule,
   noHeaderExplodeRule,
+  noRedundantSummaryRule,
   preventFormatRule,
   noMultipleDiscriminatorRule,
   preventRestLibraryInterfaces,

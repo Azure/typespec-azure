@@ -72,4 +72,11 @@ describe("expect all rules to be defined", () => {
       ok(!$linter.ruleSets?.[rulesetName].enable?.[ruleName]);
     }
   });
+
+  it("keeps redundant summary guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/no-redundant-summary";
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+    }
+  });
 });
