@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-ts"
 ---
 
-Support TypeScript 7 workspace builds by using ts-morph's bundled compiler API for integration-test declaration baselines.
+Use native TypeScript 7 for workspace builds while retaining the TypeScript 6 JavaScript compiler API through a compatibility alias for tooling and integration-test declaration generation.
