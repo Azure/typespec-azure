@@ -1,0 +1,337 @@
+import { Tester } from "#test/tester.js";
+import { getSourceLocation } from "@typespec/compiler";
+import {
+  createLinterRuleTester,
+  expectDiagnostics,
+  type LinterRuleTester,
+  type TesterInstance,
+} from "@typespec/compiler/testing";
+import { readFileSync } from "node:fs";
+import { beforeEach, expect, it, vi } from "vitest";
+import { noRepeatedPathInfoRule } from "../../src/rules/no-repeated-path-info.js";
+
+vi.mock("@azure-tools/typespec-autorest", () => {
+  throw new Error("Native lint must not load the AutoRest emitter.");
+});
+vi.mock("@azure-tools/typespec-client-generator-core", () => {
+  throw new Error("Native lint must not load TCGC.");
+});
+
+let runner: TesterInstance;
+let tester: LinterRuleTester;
+
+beforeEach(async () => {
+  runner = await Tester.createInstance();
+  tester = createLinterRuleTester(
+    runner,
+    noRepeatedPathInfoRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+});
+
+function diagnostic(name = "widgetName") {
+  return {
+    code: "@azure-tools/typespec-azure-resource-manager/no-repeated-path-info",
+    severity: "warning" as const,
+    message: `Request body property '${name}' repeats information already carried in the path or query.`,
+  };
+}
+
+function armResource(properties: string, parameters?: string) {
+  return `
+    @armProviderNamespace
+    namespace Microsoft.Contoso;
+
+    model Widget is TrackedResource<WidgetProperties> {
+      @key("widgetName") @segment("widgets") @path name: string;
+    }
+    model WidgetProperties { ${properties} }
+
+    @armResourceOperations
+    interface Widgets {
+      createOrUpdate is ArmResourceCreateOrReplaceSync<Widget${parameters === undefined ? "" : `, Parameters = ${parameters}`}>;
+    }
+  `;
+}
+
+it("compiles the published incorrect and correct examples with the rule enabled", async () => {
+  const documentation = readFileSync(
+    new URL("../../src/rules/no-repeated-path-info.md", import.meta.url),
+    "utf8",
+  );
+  const incorrect = documentation
+    .split("## ❌ Incorrect")[1]
+    ?.split("## ✅ Correct")[0]
+    ?.match(/```tsp\s*([\s\S]*?)```/)?.[1];
+  const correct = documentation
+    .split("## ✅ Correct")[1]
+    ?.split("## Suppression")[0]
+    ?.match(/```tsp\s*([\s\S]*?)```/)?.[1];
+  expect(incorrect).toBeDefined();
+  expect(correct).toBeDefined();
+
+  const [, diagnostics] = await runner.compileAndDiagnose(incorrect!, {
+    compilerOptions: {
+      linterRuleSet: {
+        enable: {
+          "@azure-tools/typespec-azure-resource-manager/no-repeated-path-info": true,
+        },
+      },
+    },
+  });
+  expectDiagnostics(diagnostics, [diagnostic()]);
+  const location = getSourceLocation(diagnostics[0].target);
+  expect(location.file.text.slice(location.pos, location.end)).toContain("widgetName?: string");
+
+  await tester.expect(correct!).toBeValid();
+});
+
+const operation = `
+  @put @route("/widgets/{widgetName}")
+  op create(@path widgetName: string, @body body: { properties: Properties }): void;
+`;
+
+it("reports a path name repeated in ARM PUT resource properties", async () => {
+  await tester.expect(armResource("widgetName?: string;")).toEmitDiagnostics([diagnostic()]);
+});
+
+it.each(["widgetName", "identity"])(
+  "distinguishes envelope duplication from URI duplication with @key(%s)",
+  async (parameterName) => {
+    const [{ widgetName, identity }, diagnostics] = await runner.compileAndDiagnose(
+      `
+        @armProviderNamespace
+        namespace Microsoft.Contoso;
+
+        model Widget is TrackedResource<WidgetProperties> {
+          @key("${parameterName}") @segment("widgets") @path name: string;
+          ...ManagedServiceIdentityProperty;
+        }
+        model WidgetProperties {
+          /*widgetName*/widgetName?: string;
+          /*identity*/identity?: string;
+        }
+        @armResourceOperations
+        interface Widgets {
+          createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+        }
+      `,
+      {
+        compilerOptions: {
+          linterRuleSet: {
+            enable: {
+              "@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property": true,
+              "@azure-tools/typespec-azure-resource-manager/no-repeated-path-info": true,
+            },
+          },
+        },
+      },
+    );
+    const envelopeLocation = getSourceLocation(identity);
+    const uriLocation = getSourceLocation(parameterName === "widgetName" ? widgetName : identity);
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property",
+        severity: "warning",
+        message:
+          'Duplicate property "identity" found in the resource envelope and resource properties.  Please do not duplicate envelope properties in resource properties.',
+        pos: envelopeLocation.pos,
+        end: envelopeLocation.end,
+      },
+      {
+        ...diagnostic(parameterName),
+        pos: uriLocation.pos,
+        end: uriLocation.end,
+      },
+    ]);
+  },
+);
+
+it("targets the repeated authored property, including inherited properties", async () => {
+  await tester
+    .expect(
+      `
+      ${operation}
+      model Base { /*repeated*/widgetName?: string; }
+      model Properties extends Base {}
+    `,
+    )
+    .toEmitDiagnostics(({ repeated }) => ({
+      ...diagnostic(),
+      pos: getSourceLocation(repeated).pos,
+      end: getSourceLocation(repeated).end,
+    }));
+});
+
+it("reports a query name repeated in ARM PUT resource properties", async () => {
+  await tester
+    .expect(armResource("mode?: string;", "{ @query mode?: string; }"))
+    .toEmitDiagnostics([diagnostic("mode")]);
+});
+
+it("reports each repeated ARM path name", async () => {
+  await tester
+    .expect(armResource("widgetName?: string; resourceGroupName?: string;"))
+    .toEmitDiagnostics([diagnostic(), diagnostic("resourceGroupName")]);
+});
+
+it("reports a repeated tenant resource path name", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.Contoso;
+      @tenantResource
+      model TenantConfig is ProxyResource<{ configName?: string; setting?: string; }> {
+        @key("configName") @segment("configurations") @path name: string;
+      }
+      @armResourceOperations
+      interface TenantConfigs {
+        createOrUpdate is ArmResourceCreateOrReplaceSync<
+          TenantConfig, BaseParameters = Foundations.TenantBaseParameters
+        >;
+      }
+    `,
+    )
+    .toEmitDiagnostics([diagnostic("configName")]);
+});
+
+it("allows ARM PUT properties with no repeated names", async () => {
+  await tester.expect(armResource("description?: string; sku?: string;")).toBeValid();
+});
+
+it("ignores repeated top-level body properties", async () => {
+  await tester
+    .expect(
+      `
+      @put @route("/widgets/{widgetName}")
+      op create(@path widgetName: string,
+        @body body: { widgetName?: string; properties: { description?: string } }): void;
+    `,
+    )
+    .toBeValid();
+});
+
+it("ignores repeated properties in PATCH bodies", async () => {
+  await tester
+    .expect(
+      `
+      @patch @route("/widgets/{widgetName}")
+      op update(@path widgetName: string,
+        @body body: { properties: { widgetName?: string } }): void;
+    `,
+    )
+    .toBeValid();
+});
+
+it("allows a JSON alias that alone repeats a path name", async () => {
+  await tester
+    .expect(armResource('@encodedName("application/json", "widgetName") otherName?: string;'))
+    .toBeValid();
+});
+
+it("reports an authored name even when its JSON alias differs", async () => {
+  await tester
+    .expect(armResource('@encodedName("application/json", "otherName") widgetName?: string;'))
+    .toEmitDiagnostics([diagnostic()]);
+});
+
+it("uses supported HTTP parameter names rather than parameter source identifiers", async () => {
+  await tester
+    .expect(
+      `
+      model Properties { wirePath?: string; wireQuery?: string; pathSource?: string; }
+      @put @route("/widgets/{wirePath}")
+      op create(@path("wirePath") pathSource: string, @query("wireQuery") querySource: string,
+        @body body: { properties: Properties }): void;
+    `,
+    )
+    .toEmitDiagnostics([diagnostic("wirePath"), diagnostic("wireQuery")]);
+});
+
+it("does not recurse into cycles or shared sibling models", async () => {
+  await tester
+    .expect(
+      `
+      ${operation}
+      model Nested { widgetName?: string; parent?: Properties; }
+      model Properties { self?: Properties; first?: Nested; second?: Nested; }
+    `,
+    )
+    .toBeValid();
+});
+
+it("reports a shared declaration once per PUT operation at the same source target", async () => {
+  await tester
+    .expect(
+      `
+      ${operation}
+      model Properties { /*repeated*/widgetName?: string; }
+      @put @route("/other/{widgetName}")
+      op other(@path widgetName: string, @body body: { properties: Properties }): void;
+    `,
+    )
+    .toEmitDiagnostics(({ repeated }) =>
+      [1, 2].map(() => ({
+        ...diagnostic(),
+        pos: getSourceLocation(repeated).pos,
+        end: getSourceLocation(repeated).end,
+      })),
+    );
+});
+
+it("reports project-imported properties at their imported declaration", async () => {
+  const importedTester = createLinterRuleTester(
+    await Tester.import("./models.tsp").createInstance(),
+    noRepeatedPathInfoRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+  await importedTester
+    .expect({
+      "main.tsp": operation,
+      "models.tsp": "model Properties { /*repeated*/widgetName?: string; }",
+    })
+    .toEmitDiagnostics(({ repeated }) => ({
+      ...diagnostic(),
+      pos: getSourceLocation(repeated).pos,
+      end: getSourceLocation(repeated).end,
+    }));
+});
+
+it("ignores missing bodies, non-model bodies, and missing or non-model properties bags", async () => {
+  await tester
+    .expect(
+      `
+      @put @route("/none/{widgetName}")
+      op noBody(@path widgetName: string): void;
+      @put @route("/string/{widgetName}")
+      op stringBody(@path widgetName: string, @body body: string): void;
+      @put @route("/missing/{widgetName}")
+      op missingBag(@path widgetName: string, @body body: { description?: string }): void;
+      @put @route("/scalar/{widgetName}")
+      op scalarBag(@path widgetName: string, @body body: { properties: string }): void;
+    `,
+    )
+    .toBeValid();
+});
+
+it("skips template sources but checks their concrete aliases", async () => {
+  await tester
+    .expect(
+      `
+      model Properties { widgetName?: string; }
+      @put op Template<T>(@path widgetName: string, @body body: { properties: T }): void;
+      interface Templates<T> {
+        @put op create(@path widgetName: string, @body body: { properties: T }): void;
+      }
+      @route("/widgets/{widgetName}") op create is Template<Properties>;
+    `,
+    )
+    .toEmitDiagnostics([diagnostic()]);
+});
+
+it("checks ordinary project namespaces without provider metadata", async () => {
+  await tester
+    .expect(`namespace Contoso; ${operation} model Properties { widgetName?: string; }`)
+    .toEmitDiagnostics([diagnostic()]);
+});
