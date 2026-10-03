@@ -27,6 +27,7 @@ export interface SdkTesterOptions extends BrandedSdkEmitterOptionsInterface {
  * Simple base tester. Loads the core libraries needed for TCGC testing.
  */
 export const SimpleBaseTester = createTester(resolvePath(import.meta.dirname, ".."), {
+  features: ["union-extends", "declaration-expressions"],
   libraries: [
     "@typespec/http",
     "@typespec/openapi",
