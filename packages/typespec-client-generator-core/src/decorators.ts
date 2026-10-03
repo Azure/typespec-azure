@@ -2150,9 +2150,10 @@ export function getClientDefaultValue(
 export function isInScope(context: TCGCContext, entity: Operation | ModelProperty): boolean {
   const scopes = getScopedDecoratorData(context, scopeKey, entity);
   const negationScopes = getScopedDecoratorData(context, negationScopesKey, entity);
+  const scope = context.scope ?? context.emitterName;
 
   if (scopes !== undefined) {
-    if (scopes.includes(context.emitterName)) {
+    if (scopes.includes(scope)) {
       return true;
     }
 
@@ -2161,7 +2162,7 @@ export function isInScope(context: TCGCContext, entity: Operation | ModelPropert
     }
   }
 
-  if (negationScopes !== undefined && negationScopes.includes(context.emitterName)) {
+  if (negationScopes !== undefined && negationScopes.includes(scope)) {
     return false;
   }
   return true;
