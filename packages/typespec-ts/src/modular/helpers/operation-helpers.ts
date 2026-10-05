@@ -1282,16 +1282,91 @@ function getStructuredStreamOperationFunction(
     clientType,
   );
   const { name, fixme = [] } = getOperationName(operation, context, method[0]);
-  const getStreamResponseRef = resolveReference(StreamingHelpers.getStreamResponse);
 
   const paramNames = new Set(parameters.map((p) => p.name));
   const resultVarName = generateLocallyUniqueName("result", paramNames);
   const parameterList = parameters.map((p) => p.name).join(", ");
+  const statements: string[] = [];
 
-  const statements: string[] = [
-    `const ${resultVarName} = await ${getStreamResponseRef}(_${name}Send(${parameterList}));`,
-    `return _${name}Deserialize(${resultVarName});`,
-  ];
+  if (info.kind === "jsonl") {
+    const getStreamResponseRef = resolveReference(StreamingHelpers.getStreamResponse);
+    statements.push(
+      `const ${resultVarName} = await ${getStreamResponseRef}(_${name}Send(${parameterList}));`,
+      `return _${name}Deserialize(${resultVarName});`,
+    );
+  } else {
+    const optionalParamName = getOptionalParamsName(parameters);
+    const reconnectOptionNames = getSseReconnectOptionNames(operation);
+    const descriptorVarName = generateLocallyUniqueName("descriptors", paramNames);
+    const headerVarName = generateLocallyUniqueName("headers", paramNames);
+    const attemptOptionsVarName = generateLocallyUniqueName("attemptOptions", paramNames);
+    const eventStreamVarName = generateLocallyUniqueName("eventStream", paramNames);
+    const getSseResponseRef = resolveReference(SseStreamingHelpers.getSseResponse);
+    const parseSseErrorResponseRef = resolveReference(SseStreamingHelpers.parseSseErrorResponse);
+    const isTerminalSseEventRef = resolveReference(SseStreamingHelpers.isTerminalSseEvent);
+    const descriptorRef = resolveReference(SseStreamingHelpers.SseEventDescriptor);
+    const createReconnectingSseStreamRef = resolveReference(
+      AzureCoreDependencies["createReconnectingSseStream"],
+    );
+    const createRestErrorRef = resolveReference(useDependencies().createRestError);
+    const attemptParameterList = parameters
+      .map((parameter) =>
+        parameter.name === optionalParamName ? attemptOptionsVarName : parameter.name,
+      )
+      .join(", ");
+    const descriptors = buildSseDescriptors(info);
+
+    statements.push(
+      `const ${descriptorVarName}: ${descriptorRef}<${buildStreamReturnType(info)}> [] = [${descriptors}];`,
+    );
+    statements.push(`const ${eventStreamVarName} = await ${createReconnectingSseStreamRef}(
+      async ({ abortSignal, lastEventId }) => {
+        const ${headerVarName} = { ...${optionalParamName}.requestOptions?.headers };
+        for (const headerName of Object.keys(${headerVarName})) {
+          if (headerName.toLowerCase() === "last-event-id") {
+            delete ${headerVarName}[headerName];
+          }
+        }
+        if (lastEventId !== undefined) {
+          ${headerVarName}["Last-Event-ID"] = lastEventId;
+        }
+        const ${attemptOptionsVarName} = {
+          ...${optionalParamName},
+          abortSignal,
+          requestOptions: {
+            ...${optionalParamName}.requestOptions,
+            headers: ${headerVarName},
+          },
+        };
+        return ${getSseResponseRef}(_${name}Send(${attemptParameterList}));
+      },
+      {
+        abortSignal: ${optionalParamName}.abortSignal,
+        lastEventId: ${optionalParamName}.${reconnectOptionNames.lastEventId},
+        retryDelayInMs: ${optionalParamName}.${reconnectOptionNames.retryDelayInMs},
+        maxRetries: ${optionalParamName}.${reconnectOptionNames.maxRetries},
+        validateResponse: async (${resultVarName}) => {
+          if (${resultVarName}.status === "204") {
+            return "stop";
+          }
+          const expectedStatuses = ${getExpectedStatuses(operation)};
+          if (!expectedStatuses.includes(${resultVarName}.status)) {
+            ${resultVarName} = await ${parseSseErrorResponseRef}(${resultVarName});
+            ${getExceptionThrowStatement(context, method)}
+          }
+          const contentType = Object.entries(${resultVarName}.headers)
+            .find(([name]) => name.toLowerCase() === "content-type")?.[1]
+            ?.split(";", 1)[0].trim().toLowerCase();
+          if (contentType !== "text/event-stream" || !${resultVarName}.body) {
+            throw ${createRestErrorRef}(${resultVarName});
+          }
+          return "accept";
+        },
+        isTerminalEvent: (event) => ${isTerminalSseEventRef}(event, ${descriptorVarName}),
+      },
+    );`);
+    statements.push(`return _${name}Deserialize(${eventStreamVarName}, ${descriptorVarName});`);
+  }
 
   return {
     kind: StructureKind.Function,
@@ -1320,6 +1395,55 @@ function buildStreamReturnType(info: StructuredStreamInfo): string {
     .join(" | ");
 }
 
+export function getSseReconnectOptionNames(method: ServiceOperation): {
+  lastEventId: string;
+  retryDelayInMs: string;
+  maxRetries: string;
+} {
+  const usedNames = new Set(
+    method.parameters
+      .filter((parameter) => !parameter.onClient)
+      .map((parameter) => normalizeName(parameter.name, NameType.Property)),
+  );
+  const lastEventId = generateLocallyUniqueName("lastEventId", usedNames);
+  usedNames.add(lastEventId);
+  const retryDelayInMs = generateLocallyUniqueName("retryDelayInMs", usedNames);
+  usedNames.add(retryDelayInMs);
+  const maxRetries = generateLocallyUniqueName("maxRetries", usedNames);
+  return { lastEventId, retryDelayInMs, maxRetries };
+}
+
+function buildSseDescriptors(info: StructuredStreamInfo): string {
+  const useEventEnvelope = info.namedEventTypes !== undefined;
+  return (info.events ?? [])
+    .map((event) => {
+      const parts: string[] = [];
+      if (event.eventName !== undefined) {
+        parts.push(`eventName: ${JSON.stringify(event.eventName)}`);
+      }
+      parts.push(`isTerminal: ${event.isTerminal}`);
+      if (event.terminalValue !== undefined) {
+        parts.push(`terminalValue: ${JSON.stringify(event.terminalValue)}`);
+      }
+      const payloadExpression = event.deserializerName
+        ? `${event.deserializerName}(data)`
+        : event.identityDeserialize
+          ? "data"
+          : undefined;
+      if (payloadExpression !== undefined) {
+        const yielded = useEventEnvelope
+          ? `({ event: ${JSON.stringify(event.eventName)}, data: ${payloadExpression} })`
+          : payloadExpression;
+        parts.push(`deserialize: (data) => ${yielded}`);
+      }
+      if (event.contentType !== undefined) {
+        parts.push(`contentType: ${JSON.stringify(event.contentType)}`);
+      }
+      return `{ ${parts.join(", ")} }`;
+    })
+    .join(", ");
+}
+
 /**
  * Builds the private deserialize function for a structured JSONL/SSE streaming operation. It
  * validates the response status (reusing the standard error handling) and returns an
@@ -1332,62 +1456,47 @@ function getStructuredStreamDeserializeFunction(
 ): OptionalKind<FunctionDeclarationStructure> {
   const operation = method[1];
   const { name } = getOperationName(operation, context, method[0]);
-  const streamResponseRef = resolveReference(StreamingHelpers.StreamResponse);
 
   const statements: string[] = [];
-  statements.push(`const expectedStatuses = ${getExpectedStatuses(operation)};`);
-  statements.push(
-    `if(!expectedStatuses.includes(result.status)){`,
-    `${getExceptionThrowStatement(context, method)}`,
-    "}",
-  );
 
   if (info.kind === "jsonl") {
+    const streamResponseRef = resolveReference(StreamingHelpers.StreamResponse);
+    statements.push(`const expectedStatuses = ${getExpectedStatuses(operation)};`);
+    statements.push(
+      `if(!expectedStatuses.includes(result.status)){`,
+      `${getExceptionThrowStatement(context, method)}`,
+      "}",
+    );
     const readJsonlStreamRef = resolveReference(StreamingHelpers.readJsonlStream);
     const deserializeCallback = info.itemDeserializerName
       ? `(e) => ${info.itemDeserializerName}(e)`
       : `(e) => e`;
     statements.push(`return ${readJsonlStreamRef}(result.body, ${deserializeCallback});`);
-  } else {
-    const readSseStreamRef = resolveReference(SseStreamingHelpers.readSseStream);
-    const useEventEnvelope = info.namedEventTypes !== undefined;
-    const descriptors = (info.events ?? [])
-      .map((event) => {
-        const parts: string[] = [];
-        if (event.eventName !== undefined) {
-          parts.push(`eventName: ${JSON.stringify(event.eventName)}`);
-        }
-        parts.push(`isTerminal: ${event.isTerminal}`);
-        if (event.terminalValue !== undefined) {
-          parts.push(`terminalValue: ${JSON.stringify(event.terminalValue)}`);
-        }
-        const payloadExpression = event.deserializerName
-          ? `${event.deserializerName}(data)`
-          : event.identityDeserialize
-            ? "data"
-            : undefined;
-        if (payloadExpression !== undefined) {
-          // When the operation declares the `{ event, data }` envelope, the reader must yield
-          // that same shape so the runtime value matches the declared return type.
-          const yielded = useEventEnvelope
-            ? `({ event: ${JSON.stringify(event.eventName)}, data: ${payloadExpression} })`
-            : payloadExpression;
-          parts.push(`deserialize: (data) => ${yielded}`);
-        }
-        if (event.contentType !== undefined) {
-          parts.push(`contentType: ${JSON.stringify(event.contentType)}`);
-        }
-        return `{ ${parts.join(", ")} }`;
-      })
-      .join(", ");
-    statements.push(`return ${readSseStreamRef}(result.body, [${descriptors}]);`);
+    return {
+      isAsync: true,
+      isExported: true,
+      name: `_${name}Deserialize`,
+      parameters: [{ name: "result", type: streamResponseRef }],
+      returnType: `Promise<AsyncIterable<${buildStreamReturnType(info)}>>`,
+      statements,
+    };
   }
 
+  const readSseStreamRef = resolveReference(SseStreamingHelpers.readSseStream);
+  const eventMessageRef = resolveReference(AzureCoreDependencies["EventMessage"]);
+  const descriptorRef = resolveReference(SseStreamingHelpers.SseEventDescriptor);
+  statements.push(`return ${readSseStreamRef}(events, descriptors);`);
   return {
     isAsync: true,
     isExported: true,
     name: `_${name}Deserialize`,
-    parameters: [{ name: "result", type: streamResponseRef }],
+    parameters: [
+      { name: "events", type: `AsyncIterable<${eventMessageRef}>` },
+      {
+        name: "descriptors",
+        type: `${descriptorRef}<${buildStreamReturnType(info)}>[]`,
+      },
+    ],
     returnType: `Promise<AsyncIterable<${buildStreamReturnType(info)}>>`,
     statements,
   };

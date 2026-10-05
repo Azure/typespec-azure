@@ -217,10 +217,15 @@ export const AzureCoreDependencies: CoreDependencies = {
     module: "@azure/core-rest-pipeline",
     name: "NodeReadableStream",
   },
-  createSseStream: {
+  createReconnectingSseStream: {
     kind: "externalDependency",
     module: "@azure/core-sse",
-    name: "createSseStream",
+    name: "createReconnectingSseStream",
+  },
+  EventMessage: {
+    kind: "externalDependency",
+    module: "@azure/core-sse",
+    name: "EventMessage",
   },
 };
 

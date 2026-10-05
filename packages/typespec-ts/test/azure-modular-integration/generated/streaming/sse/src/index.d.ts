@@ -26,6 +26,9 @@ export declare interface NamedOperations {
 }
 
 export declare interface NamedReceiveOptionalParams extends OperationOptions {
+    lastEventId?: string;
+    retryDelayInMs?: number;
+    maxRetries?: number;
 }
 
 export declare type NamedReceiveResponse = {
@@ -66,6 +69,9 @@ export declare interface RetrieveOperations {
 }
 
 export declare interface RetrieveStreamOptionalParams extends OperationOptions {
+    lastEventId?: string;
+    retryDelayInMs?: number;
+    maxRetries?: number;
 }
 
 export declare type RetrieveStreamResponse = {
@@ -92,6 +98,9 @@ export declare interface UnnamedOperations {
 }
 
 export declare interface UnnamedReceiveOptionalParams extends OperationOptions {
+    lastEventId?: string;
+    retryDelayInMs?: number;
+    maxRetries?: number;
 }
 
 export declare type UnnamedReceiveResponse = {
