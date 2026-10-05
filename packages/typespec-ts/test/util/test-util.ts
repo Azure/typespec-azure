@@ -107,7 +107,7 @@ const REST_USAGE =
 const VERSIONING_USAGE =
   /@(versioned|added|removedFrom|removed|renamedFrom|madeOptional|madeRequired|typeChangedFrom|returnTypeChangedFrom|useDependency)\b|\bVersions\b|\bVersioning\./;
 const XML_USAGE = /\bXml\b|@unwrapped\b|@attribute\b/;
-const STREAMS_USAGE = /\bJsonlStream\b|\bHttp\.Streams\b/;
+const STREAMS_USAGE = /\bJsonlStream\b|\b(?:Http|TypeSpec)\.Streams\b|@streamOf\b/;
 const SSE_USAGE = /\bSSEStream\b|@events\b|@terminalEvent\b|\bSSE\b|\bEvents\./;
 /**
  * Usage detectors for the heavy Azure libraries that dominate
@@ -224,7 +224,7 @@ import "@typespec/http";
 ${needRest ? 'import "@typespec/rest";' : ""}
 ${needVersioning ? 'import "@typespec/versioning";' : ""}
 ${needXml ? 'import "@typespec/xml";' : ""}
-${needStreams ? 'import "@typespec/http/streams";' : ""}
+${needStreams ? 'import "@typespec/http/streams";\nimport "@typespec/streams";' : ""}
 ${needSse ? 'import "@typespec/sse";\nimport "@typespec/events";' : ""}
 ${needTCGC ? 'import "@azure-tools/typespec-client-generator-core";' : ""} 
 ${needAzureCore ? 'import "@azure-tools/typespec-azure-core";' : ""} 
@@ -234,7 +234,7 @@ using Http;
 ${needRest ? "using Rest;" : ""}
 ${needVersioning ? "using Versioning;" : ""}
 ${needXml ? "using Xml;" : ""}
-${needStreams ? "using Http.Streams;" : ""}
+${needStreams ? "using Http.Streams;\nusing TypeSpec.Streams;" : ""}
 ${needSse ? "using SSE;\nusing Events;" : ""}
 ${needTCGC ? "using Azure.ClientGenerator.Core;" : ""}
 ${needAzureCore ? "using Azure.Core;" : ""}

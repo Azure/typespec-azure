@@ -303,12 +303,12 @@ describe("structured-stream generation gates", () => {
     timeout,
   );
 
-  it(
-    "emits no structured-stream helpers for a custom stream without a MIME header",
-    async () => {
+  it.each(["@TypeSpec.Streams.streamOf(Info)", "@streamOf(Info)"])(
+    "emits no structured-stream helpers for a custom stream without a MIME header using %s",
+    async (decorator) => {
       const files = await emitModularFromTypeSpec(`
-        ${eventSpec}
-        @TypeSpec.Streams.streamOf(MessageEvents)
+        model Info { desc: string; }
+        ${decorator}
         model CustomStream {
           @body body: bytes;
         }
