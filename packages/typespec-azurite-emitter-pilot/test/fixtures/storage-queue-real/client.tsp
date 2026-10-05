@@ -119,15 +119,39 @@ model SignedIdentifiersGo is Array<SignedIdentifier>;
 @@clientName(Service.getQueues, "ListQueuesSegment", "go");
 @@clientName(UserDelegationKey.signedOid, "SignedOID", "go");
 @@clientName(UserDelegationKey.signedTid, "SignedTID", "go");
-@@clientName(UserDelegationKey.signedDelegatedUserTid, "SignedDelegatedUserTenantID", "go");
+@@clientName(
+  UserDelegationKey.signedDelegatedUserTid,
+  "SignedDelegatedUserTenantID",
+  "go"
+);
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
-@@clientOption(Queue.peekMessages, "monomorphicResponseFieldName", "Messages", "go");
+@@clientOption(
+  Queue.peekMessages,
+  "monomorphicResponseFieldName",
+  "Messages",
+  "go"
+);
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
-@@clientOption(Queue.receiveMessages, "monomorphicResponseFieldName", "Messages", "go");
+@@clientOption(
+  Queue.receiveMessages,
+  "monomorphicResponseFieldName",
+  "Messages",
+  "go"
+);
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
-@@clientOption(Queue.sendMessage, "monomorphicResponseFieldName", "Messages", "go");
+@@clientOption(
+  Queue.sendMessage,
+  "monomorphicResponseFieldName",
+  "Messages",
+  "go"
+);
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
-@@clientOption(Queue.sendMessage, "responseEnvelopeName", "MessagesClientEnqueueResponse", "go");
+@@clientOption(
+  Queue.sendMessage,
+  "responseEnvelopeName",
+  "MessagesClientEnqueueResponse",
+  "go"
+);
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
 @@clientOption(
   Queue.receiveMessages,
@@ -136,13 +160,33 @@ model SignedIdentifiersGo is Array<SignedIdentifier>;
   "go"
 );
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
-@@clientOption(Queue.updateMessage, "responseEnvelopeName", "MessageIDClientUpdateResponse", "go");
+@@clientOption(
+  Queue.updateMessage,
+  "responseEnvelopeName",
+  "MessageIDClientUpdateResponse",
+  "go"
+);
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
-@@clientOption(Queue.deleteMessage, "responseEnvelopeName", "MessageIDClientDeleteResponse", "go");
+@@clientOption(
+  Queue.deleteMessage,
+  "responseEnvelopeName",
+  "MessageIDClientDeleteResponse",
+  "go"
+);
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
-@@clientOption(Queue.peekMessages, "responseEnvelopeName", "MessagesClientPeekResponse", "go");
+@@clientOption(
+  Queue.peekMessages,
+  "responseEnvelopeName",
+  "MessagesClientPeekResponse",
+  "go"
+);
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
-@@clientOption(Queue.clear, "responseEnvelopeName", "MessagesClientClearResponse", "go");
+@@clientOption(
+  Queue.clear,
+  "responseEnvelopeName",
+  "MessagesClientClearResponse",
+  "go"
+);
 
 // JavaScript SDK renames - based on azure-sdk-for-js storage-queue swagger README
 
@@ -154,8 +198,16 @@ model SignedIdentifiersGo is Array<SignedIdentifier>;
 @@clientName(PeekedMessage.expirationTime, "expiresOn", "javascript");
 @@clientName(ReceivedMessage.timeNextVisible, "nextVisibleOn", "javascript");
 @@clientName(SentMessage.timeNextVisible, "nextVisibleOn", "javascript");
-@@clientName(TimeNextVisibleResponseHeader.timeNextVisible, "nextVisibleOn", "javascript");
-@@clientName(TimeNextVisibleResponseHeaderPrivate.timeNextVisible, "nextVisibleOn", "javascript");
+@@clientName(
+  TimeNextVisibleResponseHeader.timeNextVisible,
+  "nextVisibleOn",
+  "javascript"
+);
+@@clientName(
+  TimeNextVisibleResponseHeaderPrivate.timeNextVisible,
+  "nextVisibleOn",
+  "javascript"
+);
 @@alternateType(AccessPolicy.start, string, "javascript, python");
 @@alternateType(AccessPolicy.expiry, string, "javascript, python");
 @@clientName(AccessPolicy.start, "startsOn", "javascript");
@@ -167,7 +219,11 @@ model SignedIdentifiersGo is Array<SignedIdentifier>;
 @@alternateType(UserDelegationKey.signedExpiry, string, "javascript");
 @@clientName(UserDelegationKey.signedStart, "signedStartsOn", "javascript");
 @@clientName(UserDelegationKey.signedExpiry, "signedExpiresOn", "javascript");
-@@clientName(QueueServiceProperties.logging, "queueAnalyticsLogging", "javascript");
+@@clientName(
+  QueueServiceProperties.logging,
+  "queueAnalyticsLogging",
+  "javascript"
+);
 @@clientName(Logging.delete, "deleteProperty", "javascript");
 @@clientName(GeoReplication.lastSyncTime, "lastSyncOn", "javascript");
 @@clientName(ListQueuesResponse.maxResults, "maxPageSize", "javascript");
@@ -183,7 +239,12 @@ model SignedIdentifiersGo is Array<SignedIdentifier>;
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
 @@clientOption(Error, "restErrorCodeHeader", "x-ms-error-code", "javascript");
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
-@@clientOption(MetadataHeaders.metadata, "headerCollectionPrefix", "x-ms-meta", "javascript");
+@@clientOption(
+  MetadataHeaders.metadata,
+  "headerCollectionPrefix",
+  "x-ms-meta",
+  "javascript"
+);
 
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
 @@clientOption(Storage.Queues, "includeRootSlash", false, "python,javascript");
@@ -295,6 +356,11 @@ op setMetadataRequiredMetadataQueue is StorageOperationNoBody<
 @@clientLocation(Queue.deleteMessage, "MessageIdRestClient", "csharp");
 
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
-@@clientOption(MetadataHeaders.metadata, "collectionHeaderPrefix", "x-ms-meta-", "csharp");
+@@clientOption(
+  MetadataHeaders.metadata,
+  "collectionHeaderPrefix",
+  "x-ms-meta-",
+  "csharp"
+);
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
 @@clientOption(Storage.Queues, "omitSlashFromEmptyRoute", true, "csharp");

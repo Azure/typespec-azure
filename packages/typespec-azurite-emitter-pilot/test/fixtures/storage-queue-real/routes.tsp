@@ -120,7 +120,10 @@ interface Service {
   #suppress "@azure-tools/typespec-azure-core/operation-missing-api-version" "Existing API. Storage API version parameter pre-dates current guidance."
   @get
   @route("?restype=service&comp=properties")
-  getProperties is StorageOperationResponseBody<TimeoutParameter, QueueServiceProperties>;
+  getProperties is StorageOperationResponseBody<
+    TimeoutParameter,
+    QueueServiceProperties
+  >;
 
   /**
    * Retrieves statistics related to replication for the Queue service. It is only available on the secondary

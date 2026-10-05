@@ -17,6 +17,24 @@ sake; emulator-specific behavior is layered on top via a separate overlay file, 
 `azurite.tsp` in this same directory). If the upstream spec changes, re-copy these four files
 verbatim and update the commit hash above; do not patch them in place.
 
+**Verified byte-for-byte identical to the cited source commit** (re-confirmed after discovering
+that an earlier `pnpm format` run had reflowed `routes.tsp`/`client.tsp` — see the
+`.prettierignore` entry for this directory added to prevent recurrence):
+
+```bash
+$ SRC=/path/to/azure-rest-api-specs/specification/storage/data-plane/QueueStorage
+$ diff -q main.tsp "$SRC/main.tsp"      # no output -> identical
+$ diff -q models.tsp "$SRC/models.tsp"  # no output -> identical
+$ diff -q routes.tsp "$SRC/routes.tsp"  # no output -> identical
+$ diff -q client.tsp "$SRC/client.tsp"  # no output -> identical
+```
+
+All four commands produced no output (i.e. `diff -q` found zero differences) when last checked.
+Because this repo's root Prettier config would otherwise reformat `.tsp` files on `pnpm format`,
+`packages/typespec-azurite-emitter-pilot/test/fixtures/storage-queue-real/*.tsp` is listed in the
+repo root's `.prettierignore`, mirroring the existing precedent for `typespec-java`'s
+upstream-synced fixtures in that same file.
+
 Omitted from this fixture (present in the real `QueueStorage` directory but not needed for a
 `tsp compile` of this slice): `examples/`, `readme.md`, `service.yaml`, `suppressions.yaml`,
 `tspconfig.yaml` — those are AutoRest/spec-repo tooling config, not part of the TypeSpec surface
