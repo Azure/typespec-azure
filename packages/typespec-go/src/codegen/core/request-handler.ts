@@ -37,7 +37,7 @@ export function createRequestHandler(
   }
 
   const returns = ["*policy.Request", "error"];
-  let text = `${helpers.comment(name, "// ")} creates the ${method.name} request.\n`;
+  let text = `${helpers.comment(name, "// ")} creates the ${method.kind !== "nextPageMethod" && (go.isLROMethod(method)  || go.isPageableMethod(method)) ? method.naming.operationMethod : method.name} request.\n`;
   text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${name}(${helpers.getCreateRequestParametersSig(method)}) (${returns.join(", ")}) {\n`;
 
   // BEGIN create request
@@ -115,24 +115,27 @@ export function createRequestHandler(
       if (pp.style === "literal") {
         // literals are always scalar types and require no empty checks
         paramValue = helpers.formatParamValue(pp, imports, indent);
-      } else if (pp.location === "client") {
-        // required/optional client params have already been resolved
-        // in the constructor, so we can just use the client param value here.
-        // NOTE: we must check this before style === "required"
+      } else if (pp.location === "client" && pp.kind === "pathScalarParam" && pp.isApiVersion) {
+        // path API version params have already been resolved in the constructor
+        // and will never be a factory method param so we can just use the value
         paramValue = helpers.getParamName(pp);
-      } else if (pp.style === "required") {
+      } else if (pp.style === "required" || pp.location === "client") {
         // NOTE: we include client params here since they behave
         // like required params (i.e. not grouped).
 
         // emit check to ensure path param isn't an empty string
+        // NOTE: we _must_ include the empty path param check for client
+        // path params even though they were already validated in the
+        // ctor. this is to handle the case of client accessor methods
+        // that take a path param since we can't validate it there as those
+        // methods don't return an error
         if (pp.kind === "pathScalarParam") {
           // we only need to do this for params that have an underlying type of string
           if (
-            (pp.type.kind === "string" ||
-              (pp.type.kind === "constant" && pp.type.type === "string")) &&
+            (pp.type.kind === "string" || go.isConstant(pp.type, "string")) &&
             !pp.omitEmptyStringCheck
           ) {
-            text += helpers.emitEmptyPathParamCheck(pp, imports, indent)
+            text += helpers.emitEmptyPathParamCheck(pp, "method", imports, indent);
           }
         }
 
@@ -157,7 +160,10 @@ export function createRequestHandler(
         text += emitParamGroupCheck(pp, indent);
         text += `${indent.push().get()}${defaultValue} = ${helpers.getParamName(pp)}\n`;
         text += `${indent.pop().get()}}\n`;
-        paramValue = helpers.formatValue(defaultValue, pp.type, imports);
+        // we've created a local var with the underlying type of the
+        // optional param, so we must unwrap before assigning the value
+        // to prevent attempting to dereference it.
+        paramValue = helpers.formatValue(defaultValue, go.unwrapPtr(pp.type), imports);
       } else {
         // param isn't required, so emit a local var with
         // the correct default value, then populate it with
@@ -249,9 +255,9 @@ export function createRequestHandler(
         // emit a type conversion for the qv based on the array's element type
         let queryVal: string;
         const arrayQP = qp.type;
-        switch (arrayQP.elementType.kind) {
+        switch (arrayQP.itemType.kind) {
           case "constant":
-            switch (arrayQP.elementType.type) {
+            switch (arrayQP.itemType.type) {
               case "string":
                 queryVal = "string(qv)";
                 break;
@@ -469,24 +475,20 @@ function emitBody(
         text += `${indent.get()}type wrapper struct {\n`;
         indent.push();
         let tagName: string;
-        if (bodyParam.xml?.wrapper) {
-          tagName = bodyParam.xml.wrapper;
+        if (bodyParam.xmlWrapper) {
+          tagName = bodyParam.xmlWrapper;
         } else {
           tagName = go.getTypeDeclaration(bodyParam.type, method.receiver.type.pkg);
         }
         text += `${indent.get()}XMLName xml.Name \`xml:"${tagName}"\`\n`;
         const fieldName = naming.capitalize(bodyParam.name);
-        let tag = go.getTypeDeclaration(bodyParam.type.elementType, method.receiver.type.pkg);
-        if (bodyParam.type.elementType.kind === "model" && bodyParam.type.elementType.xml?.name) {
-          tag = bodyParam.type.elementType.xml.name;
+        let tag = go.getTypeDeclaration(go.unwrapPtr(bodyParam.type.itemType), method.receiver.type.pkg);
+        if (bodyParam.type.itemType.kind === "model" && bodyParam.type.itemType.xmlName) {
+          tag = bodyParam.type.itemType.xmlName;
         }
         text += `${indent.get()}${fieldName} *${go.getTypeDeclaration(bodyParam.type, method.receiver.type.pkg)} \`xml:"${tag}"\`\n`;
         text += `${indent.pop().get()}}\n`;
-        let addr = "&";
-        if (!go.isRequiredParameter(bodyParam.style) && !bodyParam.byValue) {
-          addr = "";
-        }
-        body = `wrapper{${fieldName}: ${addr}${body}}`;
+        body = `wrapper{${fieldName}: &${body}}`;
       } else if (bodyParam.type.kind === "time") {
         // utc datetimes are normalized to UTC before serialization. non-RFC3339
         // formats are wrapped in the internal time type; RFC3339 relies on the
@@ -498,43 +500,43 @@ function emitBody(
         } else {
           body = bodyVal;
         }
-      } else if (isArrayOfDateTimeForMarshalling(bodyParam.type)) {
-        const timeInfo = isArrayOfDateTimeForMarshalling(bodyParam.type);
-        let elementPtr = "*";
-        if (timeInfo?.elemByVal) {
-          elementPtr = "";
-        }
+      } else if (
+        go.isSlice(bodyParam.type, "time") &&
+        isSliceOfTimeForMarshalling(bodyParam.type)
+      ) {
+        const timeType = go.unwrapPtr(bodyParam.type.itemType);
+        const elementPtr = bodyParam.type.itemType.kind === "ptr" ? "*" : "";
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-        text += `${indent.get()}aux := make([]${elementPtr}datetime.${timeInfo?.format}, len(${body}))\n`;
+        text += `${indent.get()}aux := make([]${elementPtr}datetime.${timeType.format}, len(${body}))\n`;
         text += `${indent.get()}for i := 0; i < len(${body}); i++ {\n`;
-        if (timeInfo?.utc && elementPtr === "*") {
+        if (timeType.utc && elementPtr === "*") {
           text += `${indent.push().get()}if ${body}[i] != nil {\n`;
           text += `${indent.push().get()}utcTime := ${body}[i].UTC()\n`;
-          text += `${indent.get()}aux[i] = (*datetime.${timeInfo?.format})(&utcTime)\n`;
+          text += `${indent.get()}aux[i] = (*datetime.${timeType.format})(&utcTime)\n`;
           text += `${indent.pop().get()}}\n`;
           indent.pop();
         } else {
-          const utcCall = timeInfo?.utc ? ".UTC()" : "";
-          text += `${indent.push().get()}aux[i] = (${elementPtr}datetime.${timeInfo?.format})(${body}[i]${utcCall})\n`;
+          const utcCall = timeType.utc ? ".UTC()" : "";
+          text += `${indent.push().get()}aux[i] = (${elementPtr}datetime.${timeType.format})(${body}[i]${utcCall})\n`;
           indent.pop();
         }
         text += `${indent.get()}}\n`;
         body = "aux";
-      } else if (helpers.isMapOfDateTime(bodyParam.type)) {
-        const timeInfo = helpers.isMapOfDateTime(bodyParam.type);
+      } else if (go.isMap(bodyParam.type, "time")) {
+        const timeType = bodyParam.type.itemType.ptrType;
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-        text += `${indent.get()}aux := map[string]*datetime.${timeInfo?.format}{}\n`;
+        text += `${indent.get()}aux := map[string]*datetime.${timeType.format}{}\n`;
         text += `${indent.get()}for k, v := range ${body} {\n`;
-        if (timeInfo?.utc) {
+        if (timeType.utc) {
           text += `${indent.push().get()}if v != nil {\n`;
           text += `${indent.push().get()}utcTime := v.UTC()\n`;
-          text += `${indent.get()}aux[k] = (*datetime.${timeInfo?.format})(&utcTime)\n`;
+          text += `${indent.get()}aux[k] = (*datetime.${timeType.format})(&utcTime)\n`;
           text += `${indent.pop().get()}} else {\n`;
           text += `${indent.push().get()}aux[k] = nil\n`;
           text += `${indent.pop().get()}}\n`;
           indent.pop();
         } else {
-          text += `${indent.push().get()}aux[k] = (*datetime.${timeInfo?.format})(v)\n`;
+          text += `${indent.push().get()}aux[k] = (*datetime.${timeType.format})(v)\n`;
           indent.pop();
         }
         text += `${indent.get()}}\n`;
@@ -546,7 +548,10 @@ function emitBody(
         imports.add("bytes");
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming");
         setBody = `req.SetBody(streaming.NopCloser(bytes.NewReader(${body})), "application/${bodyParam.bodyFormat.toLowerCase()}")`;
+      } else if (bodyParam.type.kind === "readSeekCloser") {
+        setBody = `req.SetBody(${body}, "application/${bodyParam.bodyFormat.toLowerCase()}")`;
       }
+
       if (go.isRequiredParameter(bodyParam.style) || go.isLiteralParameter(bodyParam.style)) {
         text += emitSetBodyWithErrCheck(setBody, indent, contentType);
       } else {
@@ -579,8 +584,9 @@ function emitBody(
     } else if (bodyParam.bodyFormat === "Text") {
       imports.add("strings");
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming");
+      const body = helpers.formatParamValue(bodyParam, imports, indent);
       if (go.isRequiredParameter(bodyParam.style)) {
-        text += `${indent.get()}body := streaming.NopCloser(strings.NewReader(${bodyParam.name}))\n`;
+        text += `${indent.get()}body := streaming.NopCloser(strings.NewReader(${body}))\n`;
         text += emitSetBodyWithErrCheck(
           `req.SetBody(body, ${getContentTypeValue(method, bodyParam.contentType)})`,
           indent,
@@ -589,7 +595,7 @@ function emitBody(
       } else {
         text += emitParamGroupCheck(bodyParam, indent);
         indent.push();
-        text += `${indent.get()}body := streaming.NopCloser(strings.NewReader(${helpers.getParamName(bodyParam)}))\n`;
+        text += `${indent.get()}body := streaming.NopCloser(strings.NewReader(${body}))\n`;
         text += emitSetBodyWithErrCheck(
           `req.SetBody(body, ${getContentTypeValue(method, bodyParam.contentType)})`,
           indent,
@@ -607,7 +613,7 @@ function emitBody(
     text += `${indent.get()}body := struct {\n`;
     indent.push();
     for (const partialBodyParam of partialBodyParams) {
-      text += `${indent.get()}${naming.capitalize(partialBodyParam.serializedName)} ${helpers.star(partialBodyParam.byValue)}${go.getTypeDeclaration(partialBodyParam.type, method.receiver.type.pkg)} \`${partialBodyParam.format.toLowerCase()}:"${partialBodyParam.serializedName}"\`\n`;
+      text += `${indent.get()}${naming.capitalize(partialBodyParam.serializedName)} ${go.getTypeDeclaration(partialBodyParam.type, method.receiver.type.pkg)} \`${partialBodyParam.format.toLowerCase()}:"${partialBodyParam.serializedName}"\`\n`;
     }
     indent.pop();
     text += `${indent.get()}}{\n`;
@@ -628,7 +634,7 @@ function emitBody(
         text += `${indent.pop().get()}}\n`;
       }
     }
-    // TODO: spread params are JSON only https://github.com/Azure/autorest.go/issues/1455
+    // TODO: spread params are JSON only https://github.com/Azure/typespec-azure/issues/4949
     text += `${indent.get()}req.Raw().Header["Content-Type"] = []string{"application/json"}\n`;
     text += `${indent.get()}if err := runtime.MarshalAsJSON(req, body); err != nil {\n`;
     text += `${indent.push().get()}return nil, err\n`;
@@ -744,9 +750,12 @@ function emitClientSideDefault(
       break;
   }
 
+  // we've created a local var with the underlying type of the
+  // optional param, so we must unwrap before assigning the value
+  // to prevent attempting to dereference it.
   const setterFormatText = setterFormat(
     `"${serializedName}"`,
-    helpers.formatValue(defaultVar, param.type, imports),
+    helpers.formatValue(defaultVar, go.unwrapPtr(param.type), imports),
   );
   text += setterFormatText;
   // setterFormat can return the empty string in some cases.
@@ -978,45 +987,33 @@ function getContentTypeValue(
 }
 
 /**
- * returns info for custom marshaling of slices of time.Time.
- * returns undefined if the type isn't a slice of time.Time or
- * if no custom marshaling is required.
+ * returns true if the given slice of time.Time requires custom marshalling.
  *
- * @param paramType the type to inspect
- * @returns custom marshaling info or undefined
+ * the caller narrows to go.Slice<go.Time> (via go.isSlice) before calling this; this only
+ * decides marshalling based on the element's TimeFormat/utc. keep it a plain boolean rather
+ * than widening the param back to go.WireType and returning a `type is go.Slice<go.Time>`
+ * predicate: a false result (e.g. RFC3339 non-utc, which uses the default marshaller) does
+ * not mean the value isn't a slice of time.Time, so a predicate would unsoundly narrow those
+ * out of any later slice-of-time checks.
+ *
+ * @param type the slice of time.Time to inspect
+ * @returns true if the slice needs custom marshalling
  */
-function isArrayOfDateTimeForMarshalling(
-  paramType: go.WireType,
-): { format: go.TimeFormat; elemByVal: boolean; utc: boolean } | undefined {
-  if (paramType.kind !== "slice") {
-    return undefined;
-  }
-  if (paramType.elementType.kind !== "time") {
-    return undefined;
-  }
-  switch (paramType.elementType.format) {
+function isSliceOfTimeForMarshalling(type: go.Slice<go.Ptr<go.Time> | go.Time>): boolean {
+  const elementType = go.unwrapPtr(type.itemType);
+  switch (elementType.format) {
     case "PlainDate":
     case "RFC1123":
     case "RFC7231":
     case "PlainTime":
     case "Unix":
-      return {
-        format: paramType.elementType.format,
-        elemByVal: paramType.elementTypeByValue,
-        utc: paramType.elementType.utc,
-      };
+      return true;
     case "RFC3339":
       // RFC3339 normally uses the default time.Time marshaller, but utc slices
       // must be normalized to UTC, which requires building the wrapper slice.
-      if (paramType.elementType.utc) {
-        return {
-          format: "RFC3339",
-          elemByVal: paramType.elementTypeByValue,
-          utc: true,
-        };
-      }
-      return undefined;
+      return elementType.utc;
     default:
-      return undefined;
+      return false;
   }
+  return false;
 }

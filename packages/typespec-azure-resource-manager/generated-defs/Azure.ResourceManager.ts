@@ -24,6 +24,7 @@ export interface ArmFeatureFileOptions {
   readonly description: string;
   readonly title?: string;
   readonly termsOfService?: string;
+  readonly version?: string;
 }
 
 /**

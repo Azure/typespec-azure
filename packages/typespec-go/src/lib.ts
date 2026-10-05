@@ -9,6 +9,7 @@ export interface GoEmitterOptions {
   "azcore-version"?: string;
   "containing-module"?: string;
   "disallow-unknown-fields"?: boolean;
+  "emit-content-type-header"?: boolean;
   "file-prefix"?: string;
   "generate-fakes"?: boolean;
   "go-generate"?: string;
@@ -50,6 +51,12 @@ const EmitterOptionsSchema: JSONSchemaType<GoEmitterOptions> = {
       nullable: true,
       description:
         "When true, unmarshalers will return an error when an unknown field is encountered in the payload. The default is false.",
+    },
+    "emit-content-type-header": {
+      type: "boolean",
+      nullable: true,
+      description:
+        "Includes the Content-Type header in response envelopes for modeled responses. The default is false.",
     },
     "file-prefix": {
       type: "string",
@@ -144,7 +151,7 @@ const libDef = {
     InternalError: {
       severity: "error",
       messages: {
-        default: paramMessage`The emitter encountered an internal error during preprocessing. Please open an issue at https://github.com/Azure/autorest.go/issues and include the complete error message.\n${"stack"}`,
+        default: paramMessage`The emitter encountered an internal error during preprocessing. Please open an issue at https://github.com/Azure/typespec-azure/issues and include the complete error message.\n${"stack"}`,
       },
     },
     InvalidArgument: {

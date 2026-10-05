@@ -40,6 +40,20 @@ func TestRemovedClientModelV3V2(t *testing.T) {
 	require.Equal(t, removedgroup.ModelV3{ID: to.Ptr("123"), EnumProp: to.Ptr(removedgroup.EnumV3EnumMemberV1)}, resp.ModelV3)
 }
 
+func TestRemovedClientV2(t *testing.T) {
+	client, err := removedClient("v2")
+	require.NoError(t, err)
+
+	body := removedgroup.ModelV2{
+		Prop:      to.Ptr("foo"),
+		EnumProp:  to.Ptr(removedgroup.EnumV2EnumMemberV2),
+		UnionProp: &removedgroup.UnionV2{String: to.Ptr("bar")},
+	}
+	resp, err := client.V2(context.Background(), body, nil)
+	require.NoError(t, err)
+	require.Equal(t, body, resp.ModelV2)
+}
+
 func removedClient(apiVersion string) (*removedgroup.RemovedClient, error) {
 	options := &removedgroup.RemovedClientOptions{}
 	options.APIVersion = apiVersion

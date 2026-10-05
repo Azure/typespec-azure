@@ -1,5 +1,57 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.47.1
+
+### Bug Fixes
+
+- Sync core to commit `057557b68`. Includes fixes for casting null parameters in generated samples and
+  tests ([microsoft/typespec#11967](https://github.com/microsoft/typespec/pull/11967)), redundant casts
+  in generated XML serializers ([microsoft/typespec#11982](https://github.com/microsoft/typespec/pull/11982)),
+  and generated Java path-length limits
+  ([microsoft/typespec#11983](https://github.com/microsoft/typespec/pull/11983)).
+
+
+## 0.47.0
+
+### Features
+
+- Update TypeSpec dependencies to their September minor versions. Includes behavior changes from upstream libraries such as TCGC ([microsoft/typespec#11936](https://github.com/microsoft/typespec/pull/11936)).
+
+
+## 0.46.4
+
+### Features
+
+- Support collection prefixes for request headers in generated Java clients.
+
+### Bug Fixes
+
+- Avoid duplicate inherited discriminator fields in generated Java models.
+
+
+## 0.46.3
+
+### Features
+
+- Sync core to microsoft/typespec commit `890cad64c`. Support collection header prefixes for
+  map-valued response headers and document the Java emitter and client options (core,
+  [microsoft/typespec#11860](https://github.com/microsoft/typespec/pull/11860)).
+
+
+## 0.46.2
+
+### Bug Fixes
+
+- Sync core to microsoft/typespec commit `a32575719`. Add model maximum overloads to Java clients and preserve internal protocol method names (core [#11803](https://github.com/microsoft/typespec/pull/11803)).
+
+
+## 0.46.1
+
+### Bug Fixes
+
+- Sync core to microsoft/typespec commit `5b9cd21d2`. Includes fixes for management `remove-model` generation (core [#11698](https://github.com/microsoft/typespec/pull/11698)), Javadocs containing `*/` (core [#11766](https://github.com/microsoft/typespec/pull/11766)), and response headers following a constant header (core [#11793](https://github.com/microsoft/typespec/pull/11793)).
+
+
 ## 0.46.0
 
 ### Features

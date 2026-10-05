@@ -200,6 +200,9 @@ func (client *ConfigurationsClient) GetContent(ctx context.Context, apiVersion s
 // getContentCreateRequest creates the GetContent request.
 func (client *ConfigurationsClient) getContentCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, configurationName string, _ *ConfigurationsClientGetContentOptions) (*policy.Request, error) {
 	urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/configurations/{configurationName}"
+	if client.subscriptionID == "" {
+		return nil, errors.New("parameter subscriptionID cannot be empty")
+	}
 	urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
 	if resourceGroupName == "" {
 		return nil, errors.New("parameter resourceGroupName cannot be empty")
@@ -254,6 +257,9 @@ func (client *ConfigurationsClient) GetStreamingContent(ctx context.Context, api
 // getStreamingContentCreateRequest creates the GetStreamingContent request.
 func (client *ConfigurationsClient) getStreamingContentCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, configurationName string, _ *ConfigurationsClientGetStreamingContentOptions) (*policy.Request, error) {
 	urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/configurations/{configurationName}/content"
+	if client.subscriptionID == "" {
+		return nil, errors.New("parameter subscriptionID cannot be empty")
+	}
 	urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
 	if resourceGroupName == "" {
 		return nil, errors.New("parameter resourceGroupName cannot be empty")
@@ -310,6 +316,9 @@ func (client *ConfigurationsClient) GetTextContent(ctx context.Context, apiVersi
 // getTextContentCreateRequest creates the GetTextContent request.
 func (client *ConfigurationsClient) getTextContentCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, configurationName string, _ *ConfigurationsClientGetTextContentOptions) (*policy.Request, error) {
 	urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/configurations/{configurationName}/textContent"
+	if client.subscriptionID == "" {
+		return nil, errors.New("parameter subscriptionID cannot be empty")
+	}
 	urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
 	if resourceGroupName == "" {
 		return nil, errors.New("parameter resourceGroupName cannot be empty")
@@ -370,6 +379,9 @@ func (client *ConfigurationsClient) PutStreamingContent(ctx context.Context, api
 // putStreamingContentCreateRequest creates the PutStreamingContent request.
 func (client *ConfigurationsClient) putStreamingContentCreateRequest(ctx context.Context, apiVersion string, resourceGroupName string, configurationName string, body io.ReadSeekCloser, _ *ConfigurationsClientPutStreamingContentOptions) (*policy.Request, error) {
 	urlPath := "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/configurations/{configurationName}/putContent"
+	if client.subscriptionID == "" {
+		return nil, errors.New("parameter subscriptionID cannot be empty")
+	}
 	urlPath = strings.ReplaceAll(urlPath, "{subscriptionId}", url.PathEscape(client.subscriptionID))
 	if resourceGroupName == "" {
 		return nil, errors.New("parameter resourceGroupName cannot be empty")

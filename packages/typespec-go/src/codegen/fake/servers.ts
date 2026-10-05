@@ -116,7 +116,7 @@ export function generateServers(pkg: go.FakePackage, target: go.CodeModelType): 
           break;
       }
 
-      const operationName = helpers.fixUpMethodName(method);
+      const operationName = method.name;
       content += `${indent.get()}// ${operationName} is the fake for method ${client.name}.${operationName}\n`;
       const successCodes = new Array<string>();
       if (method.returns.result?.kind === "anyResult") {
@@ -180,11 +180,11 @@ export function generateServers(pkg: go.FakePackage, target: go.CodeModelType): 
               respType = `azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]`;
             }
             requiredHelpers.tracker = true;
-            content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))}: newTracker[azfake.PollerResponder[${respType}]](),\n`;
+            content += `${indent.get()}${naming.uncapitalize(method.name)}: newTracker[azfake.PollerResponder[${respType}]](),\n`;
             break;
           case "pageableMethod":
             requiredHelpers.tracker = true;
-            content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))}: newTracker[azfake.PagerResponder[${respType}]](),\n`;
+            content += `${indent.get()}${naming.uncapitalize(method.name)}: newTracker[azfake.PagerResponder[${respType}]](),\n`;
             break;
         }
       }
@@ -218,11 +218,11 @@ export function generateServers(pkg: go.FakePackage, target: go.CodeModelType): 
             respType = `azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]`;
           }
           requiredHelpers.tracker = true;
-          content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))} *tracker[azfake.PollerResponder[${respType}]]\n`;
+          content += `${indent.get()}${naming.uncapitalize(method.name)} *tracker[azfake.PollerResponder[${respType}]]\n`;
           break;
         case "pageableMethod":
           requiredHelpers.tracker = true;
-          content += `${indent.get()}${naming.uncapitalize(helpers.fixUpMethodName(method))} *tracker[azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]]\n`;
+          content += `${indent.get()}${naming.uncapitalize(method.name)} *tracker[azfake.PagerResponder[${go.getTypeDeclaration(method.returns, pkg)}]]\n`;
           break;
       }
     }
@@ -399,9 +399,8 @@ function generateServerTransportMethodDispatch(
   content += `${indent.get()}switch method {\n`;
 
   for (const method of finalMethods) {
-    const operationName = helpers.fixUpMethodName(method);
-    content += `${indent.get()}case "${client.name}.${operationName}":\n`;
-    content += `${indent.push().get()}res.resp, res.err = ${receiverName}.dispatch${operationName}(req)\n`;
+    content += `${indent.get()}case "${client.name}.${method.name}":\n`;
+    content += `${indent.push().get()}res.resp, res.err = ${receiverName}.dispatch${method.name}(req)\n`;
     indent.pop();
   }
 
@@ -453,9 +452,9 @@ function generateServerTransportMethods(
 
   let content = "";
   for (const method of finalMethods) {
-    content += `func (${receiverName} *${serverTransport}) dispatch${helpers.fixUpMethodName(method)}(req *http.Request) (*http.Response, error) {\n`;
-    content += `${indent.get()}if ${receiverName}.srv.${helpers.fixUpMethodName(method)} == nil {\n`;
-    content += `${indent.push().get()}return nil, &nonRetriableError{errors.New("fake for method ${helpers.fixUpMethodName(method)} not implemented")}\n`;
+    content += `func (${receiverName} *${serverTransport}) dispatch${method.name}(req *http.Request) (*http.Response, error) {\n`;
+    content += `${indent.get()}if ${receiverName}.srv.${method.name} == nil {\n`;
+    content += `${indent.push().get()}return nil, &nonRetriableError{errors.New("fake for method ${method.name} not implemented")}\n`;
     content += `${indent.pop().get()}}\n`;
 
     switch (method.kind) {
@@ -482,10 +481,10 @@ function generateServerTransportMethods(
           content += `${indent.get()}ContentType: req.Header.Get("Content-Type"),\n`;
           content += `${indent.pop().get()}})\n`;
         } else if (method.returns.result.kind === "monomorphicResult") {
-          if (method.returns.result.monomorphicType.kind === "encodedBytes") {
-            const encoding = method.returns.result.monomorphicType.encoding;
+          if (method.returns.result.type.kind === "encodedBytes") {
+            const encoding = method.returns.result.type.encoding;
             content += `${indent.get()}resp, err := server.MarshalResponseAsByteArray(respContent, server.GetResponse(respr).${getResultFieldName(method.returns.result)}, runtime.Base64${encoding}Format, req)\n`;
-          } else if (method.returns.result.monomorphicType.kind === "rawJSON") {
+          } else if (method.returns.result.type.kind === "rawJSON") {
             imports.add("bytes");
             imports.add("io");
             content += `${indent.get()}resp, err := server.NewResponse(respContent, req, &server.ResponseOptions{\n`;
@@ -497,44 +496,47 @@ function generateServerTransportMethods(
             let contentToMarshal: string;
             const respField = getResultFieldName(method.returns.result);
             const getResponseField = `server.GetResponse(respr).${respField}`;
-            switch (method.returns.result.monomorphicType.kind) {
-              case "scalar": {
-                imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
-                // create a local var that will hold the string-formatted scalar
-                contentToMarshal = `formatted${respField}`;
-                content += `${indent.get()}var ${contentToMarshal} *string\n`;
-                const localVar = naming.uncapitalize(respField);
-                const resultType = method.returns.result.monomorphicType;
-                // if value := server.GetResponse(respr).Value; value != nil {...format as string...}
-                content += `${indent.get()}${helpers.buildIfBlock(indent, {
-                  condition: `${localVar} := ${getResponseField}; ${localVar} != nil`,
-                  body: (indent) =>
-                    `${indent.get()}${contentToMarshal} = to.Ptr(${helpers.formatValue(localVar, resultType, imports, true)})\n`,
-                })}\n`;
-                break;
+            if (go.isPtr(method.returns.result.type, "scalar", "string")) {
+              switch (method.returns.result.type.ptrType.kind) {
+                case "scalar": {
+                  imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/to");
+                  // create a local var that will hold the string-formatted scalar
+                  contentToMarshal = `formatted${respField}`;
+                  content += `${indent.get()}var ${contentToMarshal} *string\n`;
+                  const localVar = naming.uncapitalize(respField);
+                  // we want the wrapped type so formatValue will deref it
+                  const monomorphicType = method.returns.result.type;
+                  // if value := server.GetResponse(respr).Value; value != nil {...format as string...}
+                  content += `${indent.get()}${helpers.buildIfBlock(indent, {
+                    condition: `${localVar} := ${getResponseField}; ${localVar} != nil`,
+                    body: (indent) =>
+                      `${indent.get()}${contentToMarshal} = to.Ptr(${helpers.formatValue(localVar, monomorphicType, imports)})\n`,
+                  })}\n`;
+                  break;
+                }
+                case "string":
+                  contentToMarshal = getResponseField;
+                  break;
               }
-              case "string":
-                contentToMarshal = getResponseField;
-                break;
-              default:
-                throw new CodegenError(
-                  "UnsupportedTsp",
-                  `unsupported text return kind ${method.returns.result.monomorphicType.kind} for method ${method.receiver.type.name}.${method.name}`,
-                );
+            } else {
+              throw new CodegenError(
+                "UnsupportedTsp",
+                `unsupported text return kind ${method.returns.result.type.kind} for method ${method.receiver.type.name}.${method.name}`,
+              );
             }
             content += `${indent.get()}resp, err := server.MarshalResponseAsText(respContent, ${contentToMarshal}, req)\n`;
           } else {
             let respField = `.${getResultFieldName(method.returns.result)}`;
             if (
               method.returns.result.format === "XML" &&
-              method.returns.result.monomorphicType.kind === "slice"
+              method.returns.result.type.kind === "slice"
             ) {
               respField = "";
             }
             let responseField = `server.GetResponse(respr)${respField}`;
-            if (method.returns.result.monomorphicType.kind === "time") {
+            if (go.isPtr(method.returns.result.type, "time")) {
               imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-              responseField = `(*datetime.${method.returns.result.monomorphicType.format})(${responseField})`;
+              responseField = `(*datetime.${method.returns.result.type.ptrType.format})(${responseField})`;
             }
             content += `${indent.get()}resp, err := server.MarshalResponseAs${method.returns.result.format}(respContent, ${responseField}, req)\n`;
           }
@@ -561,7 +563,7 @@ function generateServerTransportMethods(
             content += `${indent.pop().get()}}\n`;
           } else {
             content += `${indent.get()}if val := server.GetResponse(respr).${header.fieldName}; val != nil {\n`;
-            content += `${indent.push().get()}resp.Header.Set("${helpers.canonicalizeHeaderName(header.headerName)}", ${helpers.formatValue("val", header.type, imports, true)})\n`;
+            content += `${indent.push().get()}resp.Header.Set("${helpers.canonicalizeHeaderName(header.headerName)}", ${helpers.formatValue("val", header.type, imports)})\n`;
             content += `${indent.pop().get()}}\n`;
           }
         }
@@ -601,7 +603,8 @@ function dispatchForOperationBody(
 ): string {
   const methodParamGroups = helpers.getMethodParamGroups(method);
   const numPathParams = methodParamGroups.pathParams.filter(
-    (each: go.PathParameter) => !go.isLiteralParameter(each.style),
+    (each: go.PathParameter) =>
+      !go.isLiteralParameter(each.style) && !go.isAPIVersionParameter(each),
   ).length;
   let content = "";
   if (numPathParams > 0) {
@@ -657,10 +660,11 @@ function dispatchForOperationBody(
               content += `${indent.get()}req.Body.Close()\n`;
               break;
             default: {
-              let bodyTypeName = go.getTypeDeclaration(bodyParam.type, pkg);
-              if (bodyParam.type.kind === "time") {
+              const bodyParamType = go.unwrapPtr(bodyParam.type);
+              let bodyTypeName = go.getTypeDeclaration(bodyParamType, pkg);
+              if (bodyParamType.kind === "time") {
                 imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-                bodyTypeName = `datetime.${bodyParam.type.format}`;
+                bodyTypeName = `datetime.${bodyParamType.format}`;
               }
               content += `${indent.get()}body, err := server.UnmarshalRequestAs${bodyParam.bodyFormat}[${bodyTypeName}](req)\n`;
               content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
@@ -671,8 +675,7 @@ function dispatchForOperationBody(
       case "Text":
         if (bodyParam && !go.isLiteralParameter(bodyParam.style)) {
           imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/fake", "azfake");
-          content += `${indent.get()}body, err := server.UnmarshalRequestAsText(req)\n`;
-          content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+          content += emitTextBodyUnmarshal(pkg, bodyParam, imports, indent);
         }
         break;
     }
@@ -816,14 +819,14 @@ function dispatchForOperationBody(
           caseContent += `${indent.get()}${paramVar}.Filename = ${filename}\n`;
         }
       } else if (type.kind === "slice") {
-        if (type.elementType.kind === "readSeekCloser") {
+        if (type.itemType.kind === "readSeekCloser") {
           imports.add("bytes");
           imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming");
           assignedValue = `append(${paramVar}, streaming.NopCloser(bytes.NewReader(content)))`;
         } else {
           throw new CodegenError(
             "InternalError",
-            `unhandled multipart parameter array element kind ${type.elementType.kind}`,
+            `unhandled multipart parameter array element kind ${type.itemType.kind}`,
           );
         }
       } else if (type.kind === "encodedBytes") {
@@ -852,14 +855,20 @@ function dispatchForOperationBody(
           content += emitCase(
             field.serializedName,
             `${param.name}.${field.name}`,
-            field.type,
-            field.byValue,
+            go.unwrapPtr(field.type),
+            field.type.kind !== "ptr",
           );
         }
       } else {
-        // for this case we've emitted local vars of the underlying
-        // type which is why we pass true for param destIsByValue
-        content += emitCase(param.name, param.name, param.type, true);
+        // optional params are wrapped in a pointer; the local var is declared
+        // as the pointer type, so dispatch on the unwrapped type and let
+        // emitCase wrap the value in to.Ptr when the destination is by-ref.
+        content += emitCase(
+          param.name,
+          param.name,
+          go.unwrapPtr(param.type),
+          !go.isPtr(param.type),
+        );
       }
     }
 
@@ -900,7 +909,7 @@ function dispatchForOperationBody(
     content += `${indent.get()}type partialBodyParams struct {\n`;
     indent.push();
     for (const partialBodyParam of partialBodyParams) {
-      content += `${indent.get()}${naming.capitalize(partialBodyParam.name)} ${helpers.star(partialBodyParam.byValue)}${go.getTypeDeclaration(partialBodyParam.type, pkg)} \`json:"${partialBodyParam.serializedName}"\`\n`;
+      content += `${indent.get()}${naming.capitalize(partialBodyParam.name)} ${go.getTypeDeclaration(partialBodyParam.type, pkg)} \`json:"${partialBodyParam.serializedName}"\`\n`;
     }
     content += `${indent.pop().get()}}\n`;
     content += `${indent.get()}body, err := server.UnmarshalRequestAs${partialBodyParams[0].format}[partialBodyParams](req)\n`;
@@ -914,11 +923,11 @@ function dispatchForOperationBody(
   for (const partialBodyParam of partialBodyParams) {
     result.params.set(
       partialBodyParam.name,
-      `${helpers.star(partialBodyParam.byValue)}body.${naming.capitalize(partialBodyParam.name)}`,
+      `${helpers.deref(partialBodyParam.type)}body.${naming.capitalize(partialBodyParam.name)}`,
     );
   }
 
-  const apiCall = `:= ${receiverName}.srv.${helpers.fixUpMethodName(method)}(${populateApiParams(pkg, method, result.params, imports)})`;
+  const apiCall = `:= ${receiverName}.srv.${method.name}(${populateApiParams(pkg, method, result.params, imports)})`;
   if (method.kind === "pageableMethod") {
     content += `resp ${apiCall}\n`;
     return content;
@@ -926,6 +935,81 @@ function dispatchForOperationBody(
   content += `${indent.get()}respr, errRespr ${apiCall}\n`;
   content += `${indent.get()}if respErr := server.GetError(errRespr, req); respErr != nil {\n`;
   content += `${indent.push().get()}return nil, respErr\n${indent.pop().get()}}\n`;
+  return content;
+}
+
+function emitTextBodyUnmarshal(
+  pkg: go.FakePackage,
+  bodyParam: go.BodyParameter,
+  imports: ImportManager,
+  indent: helpers.Indentation,
+): string {
+  const bodyParamType = go.unwrapPtr(bodyParam.type);
+
+  // we pass the unwrapped param type since we'll be declaring
+  // a local of the underlying type and we don't want it to be
+  // pointer-to-type
+  const typeName = go.getTypeDeclaration(bodyParamType, pkg);
+  const optional = !go.isRequiredParameter(bodyParam.style);
+
+  let content = "";
+  if (optional) {
+    imports.addForType(bodyParam.type);
+    content += `${indent.get()}var body ${typeName}\n`;
+    content += `${indent.get()}if req.Body != nil {\n`;
+    indent.push();
+  }
+
+  content += `${indent.get()}bodyRaw, err := server.UnmarshalRequestAsText(req)\n`;
+  content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
+
+  const assignOrDecl = optional ? "=" : ":=";
+
+  switch (bodyParamType.kind) {
+    case "string":
+      content += `${indent.get()}body ${assignOrDecl} bodyRaw\n`;
+      break;
+    case "constant":
+      imports.addForType(bodyParam.type);
+      if (bodyParamType.type === "string") {
+        content += `${indent.get()}body ${assignOrDecl} ${typeName}(bodyRaw)\n`;
+      } else {
+        content += helpers.emitScalarParsing(
+          bodyParamType,
+          "bodyRaw",
+          "bodyParsed",
+          imports,
+          indent,
+        );
+        content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
+        content += `${indent.get()}body ${assignOrDecl} ${typeName}(bodyParsed)\n`;
+      }
+      break;
+    case "scalar":
+      content += helpers.emitScalarParsing(
+        bodyParamType,
+        "bodyRaw",
+        optional ? "bodyParsed" : "body",
+        imports,
+        indent,
+      );
+      content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
+      if (optional) {
+        content += `${indent.get()}body = bodyParsed\n`;
+      }
+      break;
+    case "time":
+      content += helpers.emitTimeParsing("bodyRaw", bodyParamType, "bodyParsed", imports, indent);
+      content += `${indent.get()}${helpers.buildErrCheck(indent, "err", "nil")}\n`;
+      content += `${indent.get()}body ${assignOrDecl} bodyParsed\n`;
+      break;
+    default:
+      throw new CodegenError("InternalError", `unhandled text body type ${bodyParam.type.kind}`);
+  }
+
+  if (optional) {
+    content += `${indent.pop().get()}}\n`;
+  }
   return content;
 }
 
@@ -965,9 +1049,8 @@ function dispatchForLROBody(
   imports: ImportManager,
   indent: helpers.Indentation,
 ): string {
-  const operationName = helpers.fixUpMethodName(method);
-  const localVarName = naming.uncapitalize(operationName);
-  const operationStateMachine = `${receiverName}.${naming.uncapitalize(operationName)}`;
+  const localVarName = naming.uncapitalize(method.name);
+  const operationStateMachine = `${receiverName}.${naming.uncapitalize(method.name)}`;
   let content = `${indent.get()}${localVarName} := ${operationStateMachine}.get(req)\n`;
   content += `${indent.get()}if ${localVarName} == nil {\n`;
   content += dispatchForOperationBody(pkg, receiverName, method, imports, indent);
@@ -1012,9 +1095,8 @@ function dispatchForPagerBody(
   imports: ImportManager,
   indent: helpers.Indentation,
 ): string {
-  const operationName = helpers.fixUpMethodName(method);
-  const localVarName = naming.uncapitalize(operationName);
-  const operationStateMachine = `${receiverName}.${naming.uncapitalize(operationName)}`;
+  const localVarName = naming.uncapitalize(method.name);
+  const operationStateMachine = `${receiverName}.${naming.uncapitalize(method.name)}`;
   let content = `${indent.get()}${localVarName} := ${operationStateMachine}.get(req)\n`;
   content += `${indent.get()}if ${localVarName} == nil {\n`;
   content += dispatchForOperationBody(pkg, receiverName, method, imports, indent);
@@ -1064,7 +1146,15 @@ function createPathParamsRegex(method: go.MethodType, pathParams: Array<go.PathP
   urlPath = urlPath.replace(/([.$*+()])/g, "\\$1");
   for (const param of pathParams) {
     const toReplace = `{${param.pathSegment}}`;
-    let replaceWith = `(?P<${sanitizeRegexpCaptureGroupName(param.pathSegment)}>[!#&$-;=?-\\[\\]_a-zA-Z0-9~%@]+)`;
+    // most path params are URL encoded by the client, so their values never
+    // contain a path delimiter and the capture must exclude '/' to avoid
+    // consuming subsequent path segments. however, skip-encoding params
+    // (allowReserved, e.g. ARM scopes/resource IDs such as {+scope}) are
+    // inserted unescaped and can span multiple path segments, so their
+    // captures must also admit '/'.
+    // NOTE: Use "$$" because "$&" and "$'" are special replacement patterns.
+    const pathDelimiter = param.isEncoded ? "" : "/";
+    let replaceWith = `(?P<${sanitizeRegexpCaptureGroupName(param.pathSegment)}>[a-zA-Z0-9._~%!$$&'()*+,;=:@${pathDelimiter}-]+)`;
     if (param.style === "optional" || param.style === "flag") {
       replaceWith += "?";
     }
@@ -1166,37 +1256,51 @@ function parseHeaderPathQueryParams(
     // contains the unescaped value.
     let paramValue = getRawParamValue(param);
 
-    // path params are escaped, so we need to unescape them first.
+    // optional params are pointer-wrapped; dispatch on the unwrapped type.
+    const paramType = go.unwrapPtr(param.type);
+
+    // encoded path params are escaped, so we need to unescape them first.
+    // non-encoded path params are already in their final form (the client
+    // skips url.PathEscape for them), so they're passed through verbatim.
     if (go.isPathParameter(param)) {
-      imports.add("net/url");
       let paramVar = createLocalVariableName(param, "Unescaped");
-      if (
-        go.isRequiredParameter(param.style) &&
-        param.type.kind === "constant" &&
-        param.type.type === "string"
-      ) {
+      if (go.isRequiredParameter(param.style) && go.isConstant(param.type, "string")) {
         // for string-based enums, we perform the conversion as part of unescaping
-        requiredHelpers.parseWithCast = true;
         paramVar = createLocalVariableName(param, "Param");
-        content += `${indent.get()}${paramVar}, err := parseWithCast(${paramValue}, func (v string) (${go.getTypeDeclaration(param.type, pkg)}, error) {\n`;
-        content += `${indent.push().get()}p, unescapeErr := url.PathUnescape(v)\n`;
-        content += `${indent.get()}if unescapeErr != nil {\n${indent.push().get()}return "", unescapeErr\n${indent.pop().get()}}\n`;
-        content += `${indent.get()}return ${go.getTypeDeclaration(param.type, pkg)}(p), nil\n${indent.pop().get()}})\n`;
+        if (param.isEncoded) {
+          imports.add("net/url");
+          requiredHelpers.parseWithCast = true;
+          content += `${indent.get()}${paramVar}, err := parseWithCast(${paramValue}, func (v string) (${go.getTypeDeclaration(param.type, pkg)}, error) {\n`;
+          content += `${indent.push().get()}p, unescapeErr := url.PathUnescape(v)\n`;
+          content += `${indent.get()}if unescapeErr != nil {\n${indent.push().get()}return "", unescapeErr\n${indent.pop().get()}}\n`;
+          content += `${indent.get()}return ${go.getTypeDeclaration(param.type, pkg)}(p), nil\n${indent.pop().get()}})\n`;
+          content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+        } else {
+          content += `${indent.get()}${paramVar} := ${go.getTypeDeclaration(param.type, pkg)}(${paramValue})\n`;
+        }
+        paramValue = paramVar;
       } else {
-        if (
+        const isStringParam =
           go.isRequiredParameter(param.style) &&
-          (param.type.kind === "string" ||
-            (param.type.kind === "slice" && param.type.elementType.kind === "string"))
-        ) {
+          (param.type.kind === "string" || go.isSlice(param.type, "string"));
+        if (isStringParam) {
           // by convention, if the value is in its "final form" (i.e. no parsing required)
           // then its var is to have the "Param" suffix. the only case is string, everything
           // else requires some amount of parsing/conversion.
           paramVar = createLocalVariableName(param, "Param");
         }
-        content += `${indent.get()}${paramVar}, err := url.PathUnescape(${paramValue})\n`;
+        if (param.isEncoded) {
+          imports.add("net/url");
+          content += `${indent.get()}${paramVar}, err := url.PathUnescape(${paramValue})\n`;
+          content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
+          paramValue = paramVar;
+        } else if (isStringParam) {
+          content += `${indent.get()}${paramVar} := ${paramValue}\n`;
+          paramValue = paramVar;
+        }
+        // otherwise (non-encoded, non-string) the raw matched value is passed
+        // directly to the parsing code below.
       }
-      content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
-      paramValue = paramVar;
     }
 
     // parse params as required
@@ -1205,8 +1309,9 @@ function parseHeaderPathQueryParams(
       param.kind === "pathCollectionParam" ||
       param.kind === "queryCollectionParam"
     ) {
+      const elementType = go.unwrapPtr(param.type.itemType);
       // any element type other than string will require some form of conversion/parsing
-      if (param.type.elementType.kind !== "string") {
+      if (elementType.kind !== "string") {
         if (param.collectionFormat !== "multi") {
           requiredHelpers.splitHelper = true;
           const elementsParam = createLocalVariableName(param, "Elements");
@@ -1216,25 +1321,22 @@ function parseHeaderPathQueryParams(
 
         const paramVar = createLocalVariableName(param, "Param");
         let elementFormat: go.ScalarType | go.TimeFormat | go.BytesEncoding | "string";
-        switch (param.type.elementType.kind) {
+        switch (elementType.kind) {
           case "constant":
           case "scalar":
-            elementFormat = param.type.elementType.type;
+            elementFormat = elementType.type;
             break;
           case "encodedBytes":
-            elementFormat = param.type.elementType.encoding;
+            elementFormat = elementType.encoding;
             break;
           case "time":
-            elementFormat = param.type.elementType.format;
+            elementFormat = elementType.format;
             break;
           default:
-            throw new CodegenError(
-              "InternalError",
-              `unhandled element kind ${param.type.elementType.kind}`,
-            );
+            throw new CodegenError("InternalError", `unhandled element kind ${elementType.kind}`);
         }
 
-        const toType = go.getTypeDeclaration(param.type.elementType, pkg);
+        const toType = go.getTypeDeclaration(param.type.itemType, pkg);
         content += `${indent.get()}${paramVar} := make([]${toType}, len(${paramValue}))\n`;
         content += `${indent.get()}for i := 0; i < len(${paramValue}); i++ {\n`;
         indent.push();
@@ -1298,7 +1400,7 @@ function parseHeaderPathQueryParams(
         requiredHelpers.splitHelper = true;
         content += `${indent.get()}${createLocalVariableName(param, "Param")} := splitHelper(${paramValue}, "${helpers.getDelimiterForCollectionFormat(param.collectionFormat)}")\n`;
       }
-    } else if (param.type.kind === "scalar" && param.type.type === "bool") {
+    } else if (go.isScalar(paramType, "bool")) {
       imports.add("strconv");
       let from = `strconv.ParseBool(${paramValue})`;
       if (!go.isRequiredParameter(param.style)) {
@@ -1307,11 +1409,11 @@ function parseHeaderPathQueryParams(
       }
       content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := ${from}\n`;
       content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
-    } else if (param.type.kind === "encodedBytes") {
+    } else if (paramType.kind === "encodedBytes") {
       imports.add("encoding/base64");
-      content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := base64.${param.type.encoding}Encoding.DecodeString(${paramValue})\n`;
+      content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := base64.${paramType.encoding}Encoding.DecodeString(${paramValue})\n`;
       content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
-    } else if (param.type.kind === "time") {
+    } else if (paramType.kind === "time") {
       const formatMap: Record<string, string> = {
         PlainDate: helpers.plainDateFormat,
         PlainTime: helpers.plainTimeFormat,
@@ -1320,8 +1422,8 @@ function parseHeaderPathQueryParams(
         RFC7231: helpers.RFC1123Format,
       };
       imports.add("time");
-      if (param.type.format in formatMap) {
-        const format = formatMap[param.type.format];
+      if (paramType.format in formatMap) {
+        const format = formatMap[paramType.format];
         let from = `time.Parse(${format}, ${paramValue})`;
         if (!go.isRequiredParameter(param.style)) {
           requiredHelpers.parseOptional = true;
@@ -1346,13 +1448,7 @@ function parseHeaderPathQueryParams(
         content += `${indent.get()}return time.Unix(p, 0), nil\n${indent.pop().get()}})\n`;
         content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
       }
-    } else if (
-      param.type.kind === "scalar" &&
-      (param.type.type === "float32" ||
-        param.type.type === "float64" ||
-        param.type.type === "int32" ||
-        param.type.type === "int64")
-    ) {
+    } else if (go.isScalar(paramType, "float32", "float64", "int32", "int64")) {
       let parser: string;
       if (!go.isRequiredParameter(param.style)) {
         requiredHelpers.parseOptional = true;
@@ -1362,20 +1458,20 @@ function parseHeaderPathQueryParams(
         parser = "parseWithCast";
       }
       if (
-        param.type.type === "float32" ||
-        param.type.type === "int32" ||
+        paramType.type === "float32" ||
+        paramType.type === "int32" ||
         !go.isRequiredParameter(param.style)
       ) {
-        content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := ${parser}(${paramValue}, func(v string) (${param.type.type}, error) {\n`;
-        content += `${indent.push().get()}p, parseErr := ${emitNumericConversion("v", param.type.type)}\n`;
+        content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := ${parser}(${paramValue}, func(v string) (${paramType.type}, error) {\n`;
+        content += `${indent.push().get()}p, parseErr := ${emitNumericConversion("v", paramType.type)}\n`;
         content += `${indent.get()}if parseErr != nil {\n${indent.push().get()}return 0, parseErr\n${indent.pop().get()}}\n`;
         let result = "p";
-        if (param.type.type === "float32" || param.type.type === "int32") {
-          result = `${param.type.type}(${result})`;
+        if (paramType.type === "float32" || paramType.type === "int32") {
+          result = `${paramType.type}(${result})`;
         }
         content += `${indent.get()}return ${result}, nil\n${indent.pop().get()}})\n`;
       } else {
-        content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := ${emitNumericConversion(paramValue, param.type.type)}\n`;
+        content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := ${emitNumericConversion(paramValue, paramType.type)}\n`;
       }
       content += `${indent.get()}if err != nil {\n${indent.push().get()}return nil, err\n${indent.pop().get()}}\n`;
     } else if (param.kind === "headerMapParam") {
@@ -1390,7 +1486,7 @@ function parseHeaderPathQueryParams(
       content += `${indent.push().get()}if ${localVar} == nil {\n${indent.push().get()}${localVar} = map[string]*string{}\n${indent.pop().get()}}\n`;
       content += `${indent.get()}${localVar}[hh[len("${headerPrefix}"):]] = to.Ptr(getHeaderValue(req.Header, hh))\n`;
       content += `${indent.pop().get()}}\n${indent.pop().get()}}\n`;
-    } else if (param.type.kind === "constant" && param.type.type !== "string") {
+    } else if (go.isConstant(paramType, "bool", "float32", "float64", "int32", "int64")) {
       let parseHelper: string;
       if (!go.isRequiredParameter(param.style)) {
         requiredHelpers.parseOptional = true;
@@ -1401,16 +1497,16 @@ function parseHeaderPathQueryParams(
       }
       let parse: string;
       let zeroValue: string;
-      if (param.type.type === "bool") {
+      if (paramType.type === "bool") {
         imports.add("strconv");
         parse = "strconv.ParseBool(v)";
         zeroValue = "false";
       } else {
         // emitNumericConversion adds the necessary import of strconv
-        parse = emitNumericConversion("v", param.type.type);
+        parse = emitNumericConversion("v", paramType.type);
         zeroValue = "0";
       }
-      const toConstType = go.getTypeDeclaration(param.type, pkg);
+      const toConstType = go.getTypeDeclaration(paramType, pkg);
       content += `${indent.get()}${createLocalVariableName(param, "Param")}, err := ${parseHelper}(${paramValue}, func(v string) (${toConstType}, error) {\n`;
       content += `${indent.push().get()}p, parseErr := ${parse}\n`;
       content += `${indent.get()}if parseErr != nil {\n${indent.push().get()}return ${zeroValue}, parseErr\n${indent.pop().get()}}\n`;
@@ -1419,9 +1515,9 @@ function parseHeaderPathQueryParams(
     } else if (!go.isRequiredParameter(param.style)) {
       // we check this last as it's a superset of the previous conditions
       requiredHelpers.getOptional = true;
-      if (param.type.kind === "constant" || param.type.kind === "etag") {
-        imports.addForType(param.type);
-        paramValue = `${go.getTypeDeclaration(param.type, pkg)}(${paramValue})`;
+      if (paramType.kind === "constant" || paramType.kind === "etag") {
+        imports.addForType(paramType);
+        paramValue = `${go.getTypeDeclaration(paramType, pkg)}(${paramValue})`;
       }
       content += `${indent.get()}${createLocalVariableName(param, "Param")} := getOptional(${paramValue})\n`;
     }
@@ -1441,7 +1537,7 @@ function parseHeaderPathQueryParams(
       }
       content += `${indent.get()}}\n`;
     } else {
-      content += `${indent.get()}var ${naming.uncapitalize(paramGroup.name)} *${go.getTypeDeclaration(paramGroup, pkg)}\n`;
+      content += `${indent.get()}var ${naming.uncapitalize(paramGroup.name)} ${go.getTypeDeclaration(paramGroup, pkg)}\n`;
       const params = paramGroups.get(paramGroup);
       const paramNilCheck = new Array<string>();
       if (params) {
@@ -1452,6 +1548,8 @@ function parseHeaderPathQueryParams(
           } else if (param.kind === "bodyParam") {
             if (param.bodyFormat === "binary") {
               imports.add("io");
+              paramNilCheck.push("req.Body != nil");
+            } else if (param.bodyFormat === "Text") {
               paramNilCheck.push("req.Body != nil");
             } else {
               imports.add("reflect");
@@ -1466,13 +1564,13 @@ function parseHeaderPathQueryParams(
         }
       }
       content += `${indent.get()}if ${paramNilCheck.join(" || ")} {\n`;
-      content += `${indent.push().get()}${naming.uncapitalize(paramGroup.name)} = &${go.getTypeDeclaration(paramGroup, pkg)}{\n`;
+      content += `${indent.push().get()}${naming.uncapitalize(paramGroup.name)} = ${go.getTypeDeclaration(paramGroup, pkg, true)}{\n`;
       if (params) {
         indent.push();
         for (const param of params) {
           let byRef = "&";
           if (
-            param.byValue ||
+            param.type.kind !== "ptr" ||
             (!go.isRequiredParameter(param.style) &&
               param.kind !== "bodyParam" &&
               !go.isFormBodyParameter(param) &&
@@ -1615,7 +1713,8 @@ function getFinalParamValue(
     (param.kind === "bodyParam" ||
       go.isFormBodyParameter(param) ||
       param.kind === "multipartFormBodyParam") &&
-    param.type.kind === "time"
+    go.unwrapPtr(param.type).kind === "time" &&
+    (param.kind !== "bodyParam" || param.bodyFormat !== "Text")
   ) {
     // time types in the body have been unmarshalled into our time helpers thus require a cast to time.Time
     return `time.Time(${paramValue})`;
@@ -1628,14 +1727,13 @@ function getFinalParamValue(
     ) {
       // for required params that are collections of strings, we split them inline.
       // not necessary for optional params as they're already in slice format.
-      if (param.collectionFormat !== "multi" && param.type.elementType.kind === "string") {
+      if (param.collectionFormat !== "multi" && param.type.itemType.kind === "string") {
         requiredHelpers.splitHelper = true;
         return `splitHelper(${paramValue}, "${helpers.getDelimiterForCollectionFormat(param.collectionFormat)}")`;
       }
     } else if (
       (go.isHeaderParameter(param) || go.isQueryParameter(param)) &&
-      param.type.kind === "constant" &&
-      param.type.type === "string"
+      go.isConstant(param.type, "string")
     ) {
       // query params from req.URL.Query() are already decoded, so like headers we cast required, string-based enums inline
       return `${go.getTypeDeclaration(param.type, pkg)}(${paramValue})`;
@@ -1709,12 +1807,9 @@ function getResultFieldName(
     go.AnyResult | go.BinaryResult | go.MonomorphicResult | go.PolymorphicResult | go.ModelResult,
 ): string {
   switch (result.kind) {
-    case "anyResult":
-      return result.fieldName;
     case "modelResult":
-      return result.modelType.name;
     case "polymorphicResult":
-      return result.interface.name;
+      return result.type.name;
     default:
       return result.fieldName;
   }

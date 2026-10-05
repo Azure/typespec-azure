@@ -22,6 +22,7 @@ import type {
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
+  type Authentication,
   type HttpAuth,
   type HttpOperation,
   type HttpOperationResponse,
@@ -34,6 +35,12 @@ import type { ContextNode } from "./internal-utils.js";
 // Types for TCGC lib
 
 type SourceKind = "RequestParameter" | "RequestBody" | "ResponseBody";
+
+export type ApiVersionConfig = string | ApiVersionServiceMap;
+
+export interface ApiVersionServiceMap {
+  [namespaceSegment: string]: string | ApiVersionServiceMap;
+}
 
 export interface TCGCContext {
   program: Program;
@@ -224,6 +231,8 @@ export interface SdkClientType<
   summary?: string;
   /** Client initialization way. */
   clientInitialization: SdkClientInitializationType;
+  /** HTTP authentication requirements declared on the service. */
+  authentication?: Authentication;
   /** Methods of the client. */
   methods: SdkMethod<TServiceOperation>[];
   /** API versions supported for current type. */
@@ -1420,6 +1429,14 @@ export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> ext
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
 
 export type LanguageScopes = "dotnet" | "java" | "python" | "javascript" | "go" | string;
+
+/**
+ * A typed options bag accepted by scoped TCGC decorators, mirroring the `.tsp` `DecoratorOptions`
+ * model. Decorator-specific options bags can extend this to add their own settings.
+ */
+export interface DecoratorOptions {
+  scope?: LanguageScopes;
+}
 
 interface SdkExampleBase {
   kind: string;

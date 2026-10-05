@@ -21,6 +21,9 @@ Performance benchmarking tool for TypeSpec Azure compilation. Tracks compilation
 # Build the benchmark package (and its dependencies)
 pnpm -r --filter "@azure-tools/typespec-benchmark..." build
 
+# Install the Azure C# emitter from npm for this benchmark job/session
+node packages/benchmark/scripts/setup-csharp.ts
+
 # Run all benchmark specs (5 iterations + 1 warmup by default)
 node packages/benchmark/dist/src/cli.js run --output results.json
 
@@ -78,6 +81,41 @@ Located in `specs/`:
 | `azure-arm-resource-manager` | ARM resource provider with tracked, proxy resources and multiple resource types |
 | `azure-full`                 | Comprehensive data-plane service with many models, resources, and operations    |
 
+### Emitter coverage
+
+All built-in specs run AutoRest, OpenAPI3, Azure Python, generic JavaScript,
+Azure TypeScript, Azure Java, Azure Go, Azure C#, and standalone TCGC. The Azure
+services (`compute`, `network`, and `web`) run the same set **except OpenAPI3**:
+the service corpus contains Azure-specific routes that OpenAPI3 cannot represent.
+For example, Compute has a route with a query string.
+
+Network also temporarily excludes Azure TypeScript (`@azure-tools/typespec-ts`):
+its `P2sVpnGateways` and `P2SVpnGateways` client groups normalize to the same
+generated file path and crash the emitter. Generic JavaScript remains enabled.
+These exceptions are explicit in the coverage tests, not silent runtime skips.
+
+These are **full-generation** benchmarks, including downstream generators and Go
+post-generation tools, not just intermediate code-model generation. Install the
+repo's Go, Java/Maven, Python/uv tools and .NET SDK 10.0.x before running. Locally,
+use `mise exec --` for commands when mise is not activated in your shell.
+
+All workspace emitters and TypeSpec/TCGC libraries run from this checkout.
+`setup-csharp.ts` installs `@azure-typespec/http-client-csharp@latest` and its
+published backend into the ignored `.emitters/` directory and links the Azure
+emitter into the benchmark's `node_modules`. It disables npm peer installation
+and verifies that TypeSpec/TCGC peers resolve to this workspace. Re-run setup to
+refresh C#; it never changes the workspace manifest or lockfile.
+
+The `latest` npm tag may point to a prerelease. Each result records the exact
+Azure and base C# versions in `externalEmitterVersions`, because that dependency
+can change independently of the benchmarked commit. Installation happens before
+timing begins. Missing tools, unresolved emitters, and missing/invalid emitter
+timings fail the run rather than silently reducing coverage.
+
+The dashboard discovers emitters from result metrics; new emitter series start
+with the first run that includes them. Existing history is not backfilled or
+rewritten. Its missing emitter samples remain gaps, not zero-duration samples.
+
 ## CI integration
 
 Benchmarks run **on push to `main`** (via `benchmark.yml` and `benchmark-external.yml`, each instantiating the reusable `benchmark-run.yml`). Each run stores its results to the `benchmark-data` branch via the `store-results` CLI command — the built-in specs under `results/` and the external specs under `external-results/`. Changes are monitored on the [benchmarks dashboard](https://typespec.io/benchmarks); benchmarks do not run on pull requests.
@@ -91,6 +129,10 @@ Results are stored on the `benchmark-data` orphan branch:
 - `results/history.json` — aggregated history for the website
 
 ### Backfill historical data
+
+The historical backfill command's package restoration predates the expanded
+client-emitter matrix. It does not provision the full client set or npm C#;
+the full-generation coverage above applies to normal runs only.
 
 To backfill benchmark results for past commits:
 
@@ -168,20 +210,31 @@ Each external spec is **one directory** under `external-spec/` (the directory na
 - `checkoutPath` (optional) — directory to sparse-checkout, when the spec imports sibling folders (e.g. `../common`). Defaults to `path`.
 - `name` (optional) — overrides the benchmark name (defaults to the directory name).
 
-`external-spec/web/tspconfig.yaml` selects what to measure — e.g. TCGC plus the ARM ruleset:
+`external-spec/web/tspconfig.yaml` selects what to measure: the client emitters,
+AutoRest, and standalone TCGC, plus the ARM ruleset. The checked-in config also
+supplies package names and namespaces for each language:
 
 ```yaml
 emit:
+  - "@azure-tools/typespec-autorest"
+  - "@azure-tools/typespec-python"
+  - "@typespec/http-client-js"
+  - "@azure-tools/typespec-ts"
+  - "@azure-tools/typespec-java"
+  - "@azure-tools/typespec-go"
+  - "@azure-typespec/http-client-csharp"
   - "@azure-tools/typespec-client-generator-core"
 linter:
   extends:
     - "@azure-tools/typespec-azure-rulesets/resource-manager"
 ```
 
-Run the external specs (fewer iterations, since they are heavy):
+Run the external specs (fewer iterations and a larger Node heap, since they are
+heavy). CI also sets this heap limit through `NODE_OPTIONS` so the isolated
+iteration processes inherit it:
 
 ```bash
-node packages/benchmark/dist/src/cli.js run \
+NODE_OPTIONS=--max-old-space-size=12288 node packages/benchmark/dist/src/cli.js run \
   --specs-dir packages/benchmark/external-spec \
   --warmup 0 --iterations 1 \
   --output external.json

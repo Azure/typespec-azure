@@ -16,4 +16,8 @@ describe("Parameters Query Client", () => {
   it("should post with constant query parameter", async () => {
     await client.constant.post();
   });
+
+  it("should send a dollar-sign query parameter", async () => {
+    await client.specialChar.dollarSign("status eq 'active'");
+  });
 });

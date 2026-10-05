@@ -1,8 +1,298 @@
-import { expectDiagnostics, t } from "@typespec/compiler/testing";
-import { ok, strictEqual } from "assert";
+import { setTypeSpecNamespace } from "@typespec/compiler";
+import { expectDiagnostics, mockFile, t } from "@typespec/compiler/testing";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { getAccess } from "../../src/decorators.js";
+import { getAccess, getClientNameOverride, getClientOptionValue } from "../../src/decorators.js";
+import { getSdkModel } from "../../src/types.js";
 import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
+
+describe("Azure.ClientGenerator.Core.DecoratorOptions", () => {
+  it("accepts the legacy plain-string scope argument", async () => {
+    const { program, func } = await SimpleTester.compile(t.code`
+      @clientName("RenamedFunc", "csharp")
+      op ${t.op("func")}(): void;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(getClientNameOverride(context, func), "RenamedFunc");
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(getClientNameOverride(pythonContext, func), undefined);
+  });
+
+  it("scoped decorators still apply to all emitters by default", async () => {
+    const { program, func } = await SimpleTester.compile(t.code`
+      @access(Access.internal, "!csharp")
+      op ${t.op("func")}(): void;
+    `);
+
+    const contextCsharp = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(getAccess(contextCsharp, func), "public");
+
+    const contextPython = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(getAccess(contextPython, func), "internal");
+  });
+
+  it("accepts a typed DecoratorOptions bag in place of the legacy plain-string scope", async () => {
+    const { program, func } = await SimpleTester.compile(t.code`
+      @clientName("RenamedFunc", #{ scope: "csharp" })
+      op ${t.op("func")}(): void;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(getClientNameOverride(context, func), "RenamedFunc");
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(getClientNameOverride(pythonContext, func), undefined);
+  });
+
+  it("treats the legacy string scope and the equivalent DecoratorOptions bag as equivalent", async () => {
+    const { program, legacyFunc, optionsFunc } = await SimpleTester.compile(t.code`
+      @route("/legacy")
+      @access(Access.internal, "!(csharp, java)")
+      op ${t.op("legacyFunc")}(): void;
+
+      @route("/options")
+      @access(Access.internal, #{ scope: "!(csharp, java)" })
+      op ${t.op("optionsFunc")}(): void;
+    `);
+
+    for (const emitterName of ["@azure-tools/typespec-csharp", "@azure-tools/typespec-python"]) {
+      const context = await createSdkContextForTester(program, { emitterName });
+      strictEqual(getAccess(context, legacyFunc), getAccess(context, optionsFunc));
+    }
+  });
+
+  it("supports grouped and negated scopes through the DecoratorOptions bag", async () => {
+    const { program, func } = await SimpleTester.compile(t.code`
+      @access(Access.internal, #{ scope: "!(csharp, java)" })
+      op ${t.op("func")}(): void;
+    `);
+
+    const contextCsharp = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(getAccess(contextCsharp, func), "public");
+
+    const contextPython = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(getAccess(contextPython, func), "internal");
+  });
+
+  it("treats the legacy string scope and the equivalent DecoratorOptions bag as equivalent for @usage", async () => {
+    const { program, LegacyModel, OptionsModel } = await SimpleTester.compile(t.code`
+      @usage(Usage.input, "csharp,python")
+      model ${t.model("LegacyModel")} {}
+
+      @usage(Usage.input, #{ scope: "csharp,python" })
+      model ${t.model("OptionsModel")} {}
+    `);
+
+    for (const emitterName of [
+      "@azure-tools/typespec-csharp",
+      "@azure-tools/typespec-python",
+      "@azure-tools/typespec-java",
+    ]) {
+      const context = await createSdkContextForTester(program, { emitterName });
+      const sdkModelLegacy = getSdkModel(context, LegacyModel);
+      const sdkModelOptions = getSdkModel(context, OptionsModel);
+      strictEqual(sdkModelLegacy.usage, sdkModelOptions.usage);
+    }
+  });
+
+  it("supports comma-separated positive scopes through the DecoratorOptions bag for multiple decorators on the same target", async () => {
+    const { program, func } = await SimpleTester.compile(t.code`
+      @clientName("RenamedFunc", #{ scope: "csharp,python" })
+      @access(Access.internal, #{ scope: "csharp,python" })
+      op ${t.op("func")}(): void;
+    `);
+
+    for (const emitterName of ["@azure-tools/typespec-csharp", "@azure-tools/typespec-python"]) {
+      const context = await createSdkContextForTester(program, { emitterName });
+      strictEqual(getClientNameOverride(context, func), "RenamedFunc");
+      strictEqual(getAccess(context, func), "internal");
+    }
+
+    const javaContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+    strictEqual(getClientNameOverride(javaContext, func), undefined);
+    strictEqual(getAccess(javaContext, func), "public");
+  });
+});
+
+describe("@clientOption scope requirement", () => {
+  it("reports decorator-requires-scope for an empty DecoratorOptions bag", async () => {
+    const [{ program, UseOption }, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
+      @clientOption("x", "y", #{})
+      model ${t.model("UseOption")} {}
+    `);
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/client-option",
+        severity: "warning",
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/decorator-requires-scope",
+        severity: "warning",
+      },
+    ]);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(getClientOptionValue(context, UseOption, "x"), undefined);
+  });
+
+  it("materializes an SDK package when a referenced model carries a DecoratorOptions bag scope", async () => {
+    // Regression: the options-bag scope on @clientOption must be normalized to its plain-string
+    // form before decorator arguments are materialized. Otherwise the model is run through
+    // getDecoratorArgValue and later handed to the string-only isScopeApplicable, crashing with
+    // "scope.match is not a function" once the model is referenced by an operation.
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option" "test"
+      @clientOption("flag", true, #{ scope: "python" })
+      model Payload {
+        id: string;
+      }
+
+      op get(): Payload;
+    `);
+
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    ok(pythonContext.sdkPackage.models.find((x) => x.name === "Payload"));
+
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    ok(csharpContext.sdkPackage.models.find((x) => x.name === "Payload"));
+  });
+
+  it("preserves a custom decorator's type-level string scope argument", async () => {
+    // Regression: the `scope` argument special-casing must only fire for the marshalled forms of
+    // the built-in scope argument (a legacy plain string or a `DecoratorOptions` bag). A custom,
+    // allowlisted decorator that declares a *type-level* `scope: string` parameter surfaces its
+    // argument here as a compiler string-literal type. That must flow through the normal
+    // `getDecoratorArgValue` conversion so its value ("python") is preserved. If it were forced
+    // through `normalizeScope` instead it would become `scope: undefined`, which both loses the
+    // value and defeats emitter-scope filtering (the decorator would then be emitted for every
+    // emitter rather than just the matching one).
+    function $scopedMarker(): void {}
+    setTypeSpecNamespace("Custom", $scopedMarker);
+
+    const { program } = await SimpleTester.files({
+      "scoped-marker.js": mockFile.js({ $scopedMarker }),
+    }).import("./scoped-marker.js").compile(`
+        namespace Custom {
+          extern dec scopedMarker(target: unknown, scope: string);
+        }
+
+        @service(#{ title: "Test Service" })
+        namespace TestService {
+          @Custom.scopedMarker("python")
+          model Widget {
+            id: string;
+          }
+
+          op get(): Widget;
+        }
+      `);
+
+    const allowList = ["Custom\\.@scopedMarker"];
+
+    const pythonContext = await createSdkContextForTester(
+      program,
+      { emitterName: "@azure-tools/typespec-python" },
+      { additionalDecorators: allowList },
+    );
+    const pythonWidget = pythonContext.sdkPackage.models.find((x) => x.name === "Widget");
+    ok(pythonWidget);
+    deepStrictEqual(pythonWidget.decorators, [
+      { name: "Custom.@scopedMarker", arguments: { scope: "python" } },
+    ]);
+
+    const csharpContext = await createSdkContextForTester(
+      program,
+      { emitterName: "@azure-tools/typespec-csharp" },
+      { additionalDecorators: allowList },
+    );
+    const csharpWidget = csharpContext.sdkPackage.models.find((x) => x.name === "Widget");
+    ok(csharpWidget);
+    // `scope: "python"` does not apply to the C# emitter, so the decorator is filtered out.
+    deepStrictEqual(csharpWidget.decorators, []);
+  });
+
+  it("preserves the full options bag on a custom decorator's marshalled scope argument", async () => {
+    // Regression: when a custom, allowlisted decorator declares a `valueof` options bag as its
+    // `scope` argument, the marshalled value must be exposed in full instead of being collapsed to
+    // just the scope string. This proves additional (future) `DecoratorOptions`-style fields are not
+    // dropped, while the scope string is still used to filter by emitter.
+    function $scopedMarker(): void {}
+    setTypeSpecNamespace("Custom", $scopedMarker);
+
+    const { program } = await SimpleTester.files({
+      "scoped-marker.js": mockFile.js({ $scopedMarker }),
+    }).import("./scoped-marker.js").compile(`
+        namespace Custom {
+          model MarkerScope {
+            scope: string;
+            label: string;
+          }
+          extern dec scopedMarker(target: unknown, scope: valueof MarkerScope);
+        }
+
+        @service(#{ title: "Test Service" })
+        namespace TestService {
+          @Custom.scopedMarker(#{ scope: "python", label: "hello" })
+          model Widget {
+            id: string;
+          }
+
+          op get(): Widget;
+        }
+      `);
+
+    const allowList = ["Custom\\.@scopedMarker"];
+
+    const pythonContext = await createSdkContextForTester(
+      program,
+      { emitterName: "@azure-tools/typespec-python" },
+      { additionalDecorators: allowList },
+    );
+    const pythonWidget = pythonContext.sdkPackage.models.find((x) => x.name === "Widget");
+    ok(pythonWidget);
+    // The whole bag is preserved (including `label`), not collapsed to `scope: "python"`.
+    deepStrictEqual(pythonWidget.decorators, [
+      { name: "Custom.@scopedMarker", arguments: { scope: { scope: "python", label: "hello" } } },
+    ]);
+
+    const csharpContext = await createSdkContextForTester(
+      program,
+      { emitterName: "@azure-tools/typespec-csharp" },
+      { additionalDecorators: allowList },
+    );
+    const csharpWidget = csharpContext.sdkPackage.models.find((x) => x.name === "Widget");
+    ok(csharpWidget);
+    // `scope: "python"` still filters the decorator out for the C# emitter.
+    deepStrictEqual(csharpWidget.decorators, []);
+  });
+});
 
 it("emitter with same scope as decorator", async () => {
   const { program, func } = await SimpleTester.compile(t.code`

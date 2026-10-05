@@ -35,9 +35,6 @@ export interface Parameter {
 
   /** the parameter's type */
   type: type.Type;
-
-  /** indicates if the param is pointer-to-type or not */
-  byValue: boolean;
 }
 
 /** a method's receiver parameter */
@@ -65,10 +62,9 @@ export class Method<TReceiver, TReturns> implements Method<TReceiver, TReturns> 
 }
 
 export class Parameter implements Parameter {
-  constructor(name: string, type: type.Type, byValue: boolean) {
+  constructor(name: string, type: type.Type) {
     this.name = name;
     this.type = type;
-    this.byValue = byValue;
     this.docs = {};
   }
 }

@@ -34,8 +34,11 @@ specs:
   "azure/client-generator-core/hierarchy-building": true
   "azure/client-generator-core/next-link-verb": true
   "azure/client-generator-core/override": true
+  # Disabled until all language emitters support response replacement.
+  "azure/client-generator-core/response-replacement": false
   "azure/client-generator-core/response-as-bool": true
   "azure/client-generator-core/usage": true
+  "azure/core/api-version-override": true
   "azure/core/basic": true
   "azure/core/lro/rpc": true
   "azure/core/lro/standard": true
@@ -110,7 +113,6 @@ specs:
   "special-headers/repeatability": true
   special-words: true
   "streaming/jsonl": true
-  "streaming/sse": true
   "type/array": true
   "type/dictionary": true
   "type/enum/extensible": true
@@ -136,6 +138,7 @@ specs:
   "versioning/renamedFrom": true
   "versioning/returnTypeChangedFrom": true
   "versioning/typeChangedFrom": true
+  "streaming/sse": true
 
   # --- Tracked skips ---
   # multi-file upload not yet supported by the Python emitter

@@ -13,6 +13,7 @@ import {
   type Program,
   reportDeprecated,
   resolvePath,
+  sanitizePathSegment,
   type Service,
 } from "@typespec/compiler";
 import {
@@ -519,10 +520,10 @@ export function resolveOutputFile(
     "azure-resource-provider-folder": azureResourceProviderFolder,
     "service-name":
       multipleServices || azureResourceProviderFolder
-        ? getNamespaceFullName(service.type)
+        ? sanitizePathSegment(getNamespaceFullName(service.type))
         : undefined,
     "version-status": version && (version.includes("preview") ? "preview" : "stable"),
-    version,
+    version: version && sanitizePathSegment(version),
     feature,
   });
 

@@ -159,6 +159,18 @@ describe("unit tests for resource manager helpers", () => {
         },
       },
       {
+        title: "singleton resource path with non-default literal name",
+        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/current",
+        expected: {
+          resourceType: {
+            provider: "Microsoft.Test",
+            types: ["foos"],
+          },
+          resourceInstancePath:
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/current",
+        },
+      },
+      {
         title: "resource group resource path",
         path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}",
         expected: {
@@ -4521,9 +4533,73 @@ interface Employees {
 
     const employee = provider.resources!.find((r) => r.type.name === "Employee");
     ok(employee);
+    expect(employee.resourceType).toEqual({
+      provider: "Microsoft.ContosoProviderHub",
+      types: ["employees"],
+    });
+    expect(employee.resourceInstancePath).toEqual(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/salaried",
+    );
     expect(employee.singleton).toBeDefined();
     expect(employee.singleton!.keyValue).toEqual(["salaried", "hourly"]);
   });
+
+  it("resolves resource type for nested singleton resources with non-default literal names", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.RecoveryServices;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model VaultResource is TrackedResource<VaultProperties> {
+  ...ResourceNameParameter<
+    Resource = VaultResource,
+    KeyName = "vaultName",
+    SegmentName = "vaults",
+    NamePattern = ""
+  >;
+}
+
+model VaultProperties {}
+
+model BackupResourceConfig {}
+
+@singleton("vaultstorageconfig")
+@parentResource(VaultResource)
+model BackupResourceConfigResource is ProxyResource<BackupResourceConfig> {
+  ...ResourceNameParameter<
+    Resource = BackupResourceConfigResource,
+    KeyName = "backupstorageconfig",
+    SegmentName = "backupstorageconfig",
+    NamePattern = ""
+  >;
+}
+
+@armResourceOperations
+interface BackupResourceStorageConfigs {
+  get is ArmResourceRead<BackupResourceConfigResource>;
+  createOrUpdate is ArmResourceCreateOrReplaceSync<BackupResourceConfigResource>;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+
+    const storageConfig = provider.resources!.find(
+      (r) => r.type.name === "BackupResourceConfigResource",
+    );
+    ok(storageConfig);
+    expect(storageConfig.resourceType).toEqual({
+      provider: "Microsoft.RecoveryServices",
+      types: ["vaults", "backupstorageconfig"],
+    });
+    expect(storageConfig.resourceInstancePath).toEqual(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupstorageconfig/vaultstorageconfig",
+    );
+    expect(storageConfig.singleton).toEqual({ keyValue: "vaultstorageconfig" });
+  }, 30_000);
 
   it("does not create resource entry for non-prefix child resource list", async () => {
     const { program } = await Tester.compile(`

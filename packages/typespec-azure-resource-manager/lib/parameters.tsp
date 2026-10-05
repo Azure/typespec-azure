@@ -99,12 +99,9 @@ model ResourceGroupLocationResource is ArmLocationResource<"ResourceGroup">;
 @friendlyName("Location")
 @armVirtualResource
 @resourceBaseType(BaseType)
-model ArmLocationResource<BaseType extends
-  | "Tenant"
-  | "Subscription"
-  | "ResourceGroup"
-  | "Location"
-  | "Extension" = never> {
+model ArmLocationResource<
+  BaseType extends "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension" = never
+> {
   ...LocationResourceParameter;
 }
 

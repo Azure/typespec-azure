@@ -382,8 +382,7 @@ describe("Azure Arm Resources Rest Client", () => {
 
   // extension tracked resource
   // TODO: fix - tenant scope (empty resourceUri) now produces a double-slash URL ("//providers/...")
-  // that the test server rejects with 404, after https://github.com/Azure/azure-sdk-for-js/pull/37302
-  // removed slash normalization from ts-http-runtime's buildRequestUrl.
+  // See https://github.com/Azure/typespec-azure/issues/5314.
   it.skip("should get ExtensionsResources ", async () => {
     const resourceGroupResult = await client.extensionsResources.get(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`,
@@ -413,9 +412,6 @@ describe("Azure Arm Resources Rest Client", () => {
     assert.deepStrictEqual<ExtensionsResource>(resourceResult, validResourceExtensionsResource);
   });
 
-  // TODO: fix - tenant scope (empty resourceUri) now produces a double-slash URL ("//providers/...")
-  // that the test server rejects with 404, after https://github.com/Azure/azure-sdk-for-js/pull/37302
-  // removed slash normalization from ts-http-runtime's buildRequestUrl.
   it.skip("should createOrUpdate ExtensionsResources ", async () => {
     const resourceGroupResult = await client.extensionsResources.createOrUpdate(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`,
@@ -464,9 +460,6 @@ describe("Azure Arm Resources Rest Client", () => {
     assert.deepStrictEqual<ExtensionsResource>(resourceResult, validResourceExtensionsResource);
   });
 
-  // TODO: fix - tenant scope (empty resourceUri) now produces a double-slash URL ("//providers/...")
-  // that the test server rejects with 404, after https://github.com/Azure/azure-sdk-for-js/pull/37302
-  // removed slash normalization from ts-http-runtime's buildRequestUrl.
   it.skip("should update ExtensionsResources ", async () => {
     const resourceGroupResult = await client.extensionsResources.update(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`,
@@ -533,9 +526,6 @@ describe("Azure Arm Resources Rest Client", () => {
     });
   });
 
-  // TODO: fix - tenant scope (empty resourceUri) now produces a double-slash URL ("//providers/...")
-  // that the test server rejects with 404, after https://github.com/Azure/azure-sdk-for-js/pull/37302
-  // removed slash normalization from ts-http-runtime's buildRequestUrl.
   it.skip("should delete ExtensionsResources ", async () => {
     const resourceGroupResult = await client.extensionsResources.delete(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`,
@@ -559,9 +549,6 @@ describe("Azure Arm Resources Rest Client", () => {
     assert.isUndefined(resourceResult);
   });
 
-  // TODO: fix - tenant scope (empty resourceUri) now produces a double-slash URL ("//providers/...")
-  // that the test server rejects with 404, after https://github.com/Azure/azure-sdk-for-js/pull/37302
-  // removed slash normalization from ts-http-runtime's buildRequestUrl.
   it.skip("should list ExtensionsResources ", async () => {
     const resourceGroupResult = await client.extensionsResources.listByScope(
       `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`,

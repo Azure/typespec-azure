@@ -75,4 +75,13 @@ describe("SingleDiscriminatorClient Rest Client", () => {
     const result = await client.getLegacyModel();
     assert.deepEqual(result, { size: 20, kind: "t-rex" });
   });
+
+  it("should get a discriminated model with no subtypes", async () => {
+    const result = await client.getNoSubtypesModel();
+    assert.deepEqual(result, { kind: "salmon", size: 10 });
+  });
+
+  it("should put a discriminated model with no subtypes", async () => {
+    await client.putNoSubtypesModel({ kind: "salmon", size: 10 });
+  });
 });

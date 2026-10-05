@@ -1,4 +1,4 @@
-import { assert, describe, it } from "vitest";
+import { afterAll, assert, describe, expect, it } from "vitest";
 
 import { Diagnostic } from "@typespec/compiler";
 import { ok } from "assert";
@@ -6,9 +6,15 @@ import {
   emitModularModelsFromTypeSpec,
   emitModularOperationsFromTypeSpec,
 } from "../util/emit-util.js";
-import { compileTypeSpecFor, createDpgContextTestHelper } from "../util/test-util.js";
+import {
+  clearCompileCache,
+  compileTypeSpecFor,
+  createDpgContextTestHelper,
+} from "../util/test-util.js";
 
 describe("Diagnostic reporting tests", () => {
+  afterAll(clearCompileCache);
+
   it("should not crash when emitter encounters error conditions", async () => {
     // This test verifies that the main files compile and load without syntax errors
     // The actual diagnostic behavior is tested implicitly through other unit tests
@@ -190,5 +196,62 @@ describe("Diagnostic reporting tests", () => {
         'The property "properties" in "NestedFlattenModel" has multiple consecutive flatten operations. Flatten transitions are not supported so consecutive transitions will be ignored.',
       );
     }
+  });
+
+  it("warns once when an invalid exact declaration name is emitted", async () => {
+    const [{ normalizeModelName }, { getClientHierarchyMap }, { getMethodHierarchiesMap }] =
+      await Promise.all([
+        import("../../src/modular/emit-models.js"),
+        import("../../src/utils/client-utils.js"),
+        import("../../src/utils/operation-util.js"),
+      ]);
+    const { program } = await compileTypeSpecFor(`
+      #suppress "experimental-feature" "exact name test"
+      @clientName(exact("invalid-name"))
+      @route("/test")
+      @get
+      op test(
+        #suppress "experimental-feature" "exact name test"
+        @clientName(exact("invalid-param"))
+        @query param: string,
+      ): void;
+
+      #suppress "experimental-feature" "exact name test"
+      @clientName(exact("123operation"))
+      @route("/numeric")
+      @get
+      op numericOperation(): void;
+
+      #suppress "experimental-feature" "exact name test"
+      @clientName(exact("class"))
+      model InvalidModel {}
+
+      @route("/model")
+      @post
+      op useInvalidModel(@body body: InvalidModel): void;
+
+      #suppress "experimental-feature" "exact name test"
+      @@clientName(Azure.TypeScript.Testing, exact("invalid-client"));
+    `);
+    const context = await createDpgContextTestHelper(program);
+
+    expect(
+      program.diagnostics.filter((x) => x.code === "@azure-tools/typespec-ts/invalid-exact-name"),
+    ).toHaveLength(0);
+
+    for (const [, client] of getClientHierarchyMap(context)) {
+      getMethodHierarchiesMap(context, client);
+      getMethodHierarchiesMap(context, client);
+    }
+    for (const model of context.sdkPackage.models) {
+      normalizeModelName(context, model);
+      normalizeModelName(context, model);
+    }
+
+    const warnings = program.diagnostics.filter(
+      (diagnostic) => diagnostic.code === "@azure-tools/typespec-ts/invalid-exact-name",
+    );
+    expect(warnings).toHaveLength(5);
+    expect(warnings.every((diagnostic) => diagnostic.severity === "warning")).toBe(true);
   });
 });

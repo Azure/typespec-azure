@@ -35,7 +35,13 @@ import { refkey } from "../../framework/refkey.js";
 import { reportDiagnostic } from "../../lib.js";
 import type { SdkContext } from "../../utils/interfaces.js";
 import { isAzureCoreErrorType } from "../../utils/model-utils.js";
-import { NameType, normalizeName } from "../../utils/name-utils.js";
+import {
+  formatOptionalPropertyAccess,
+  formatPropertyAccess,
+  NameType,
+  normalizeSdkName,
+  normalizeSdkPropertyName,
+} from "../../utils/name-utils.js";
 import {
   getCollectionFormatFromArrayEncoding,
   getCollectionFormatHelper,
@@ -996,22 +1002,21 @@ export function getOperationFunction(
       responseHeaders.length > 0
         ? buildHeaderOnlyResponseType(context, responseHeaders)
         : "Record<string, unknown>";
+    const emptyBodyType = hasResponseBody && response.optional ? "void" : "undefined";
+    const emptyResponseType =
+      responseHeaders.length > 0
+        ? `${headersType} & ${storageCompatInfoRef}<${emptyBodyType}, ${headersType}>`
+        : `${storageCompatInfoRef}<${emptyBodyType}, ${headersType}>`;
     if (!hasResponseBody) {
-      if (responseHeaders.length > 0) {
-        // Void with headers — headers at top level + StorageCompatResponseInfo
-        finalReturnType = `${headersType} & ${storageCompatInfoRef}<undefined, ${headersType}>`;
-      } else {
-        // Void without headers — just StorageCompatResponseInfo
-        finalReturnType = `${storageCompatInfoRef}<undefined, ${headersType}>`;
-      }
+      finalReturnType = emptyResponseType;
     } else {
-      if (responseHeaders.length > 0) {
-        // Body with headers — headers + body + StorageCompatResponseInfo at top level
-        finalReturnType = `${headersType} & ${bodyType} & ${storageCompatInfoRef}<${bodyType}, ${headersType}>`;
-      } else {
-        // Body without headers — body + StorageCompatResponseInfo
-        finalReturnType = `${bodyType} & ${storageCompatInfoRef}<${bodyType}, ${headersType}>`;
-      }
+      const bodyResponseType =
+        responseHeaders.length > 0
+          ? `${headersType} & ${bodyType} & ${storageCompatInfoRef}<${bodyType}, ${headersType}>`
+          : `${bodyType} & ${storageCompatInfoRef}<${bodyType}, ${headersType}>`;
+      finalReturnType = response.optional
+        ? `${bodyResponseType} | ${emptyResponseType}`
+        : bodyResponseType;
     }
   }
 
@@ -1864,7 +1869,7 @@ export function getOperationOptionsName(
     includeGroupName && operation.name.indexOf("_") === -1
       ? getClassicalLayerPrefix(prefixes, NameType.Interface)
       : "";
-  const optionName = `${prefix}${normalizeName(operation.name, NameType.Interface)}OptionalParams`;
+  const optionName = `${prefix}${normalizeSdkName(operation, NameType.Interface)}OptionalParams`;
   return optionName;
 }
 
@@ -2154,17 +2159,19 @@ function isContentType(param: SdkHttpParameter): boolean {
 
 function getContentTypeValue(param: SdkHttpParameter, optionalParamName: string = "options") {
   const defaultValue = param.clientDefaultValue;
+  const optionAccessor = formatPropertyAccess(
+    optionalParamName,
+    normalizeSdkName(param, NameType.Parameter),
+  );
   // allow customers to customize the content type if it's guessed by tcgc.
   if (isConstant(param.type)) {
     return `contentType: ${getConstantValue(param.type)}`;
   }
   if (defaultValue) {
-    return `contentType: ${optionalParamName}.${param.name} as any ?? "${defaultValue}"`;
+    return `contentType: ${optionAccessor} as any ?? "${defaultValue}"`;
   } else {
     return `contentType: ${
-      !param.optional
-        ? normalizeName(param.name, NameType.Property)
-        : `${optionalParamName}.` + param.name + " as any"
+      !param.optional ? normalizeSdkName(param, NameType.Property) : `${optionAccessor} as any`
     }`;
   }
 }
@@ -2383,10 +2390,11 @@ function getParamAccessor(param: SdkHttpParameter, optionalParamName: string = "
   if (param.onClient) {
     return `${clientPrefix}${getClientParameterName(param)}`;
   }
+  const parameterName = normalizeSdkName(param, NameType.Parameter, { shouldGuard: true });
   if (getEffectiveOptional(param)) {
-    return `${optionalParamName}?.${param.name}`;
+    return formatOptionalPropertyAccess(optionalParamName, parameterName);
   }
-  return param.name;
+  return parameterName;
 }
 
 /**
@@ -2412,25 +2420,29 @@ function getMethodParamExpr(
     return undefined;
   }
 
-  const parts: string[] = [];
+  let expression = "";
   for (let i = 0; i < path.length; i++) {
     const segment = path[i]!;
     if (i === 0) {
       // Normalize names for client-level segments to match the context interface property names
       const segmentName = segment.onClient
         ? getClientParameterName(segment as SdkMethodParameter)
-        : segment.name;
+        : normalizeSdkName(segment, NameType.Parameter, { shouldGuard: true });
       if (segment.optional && !segment.onClient) {
         // If the first segment is optional and not on the client, we need to start with the optionalParamName
-        parts.push(`${optionalParamName}?.`);
+        expression = formatOptionalPropertyAccess(optionalParamName, segmentName);
+      } else {
+        expression = segmentName;
       }
-      parts.push(segmentName);
     } else {
       const needsOptionalChain = path[i - 1]!.optional;
-      parts.push(`${needsOptionalChain ? "?." : "."}${segment.name}`);
+      const segmentName = normalizeSdkPropertyName(segment);
+      expression = needsOptionalChain
+        ? formatOptionalPropertyAccess(expression, segmentName)
+        : formatPropertyAccess(expression, segmentName);
     }
   }
-  return parts.join("");
+  return expression;
 }
 
 function getPathParamExpr(
@@ -3156,14 +3168,14 @@ export function getPropertyFullName(
 ) {
   const normalizedPropertyName =
     propertyPath === ""
-      ? normalizeName(property.name, NameType.Parameter, true)
-      : normalizeModelPropertyName(context, property).replace(/^"/g, "").replace(/"$/g, "");
+      ? normalizeSdkName(property, NameType.Parameter, { shouldGuard: true })
+      : normalizeModelPropertyName(context, property);
 
   let fullName = normalizedPropertyName;
   if (propertyPath === "" && property.optional) {
     fullName = `options?.${normalizedPropertyName}`;
   } else if (propertyPath) {
-    fullName = `${propertyPath}["${normalizedPropertyName}"]`;
+    fullName = `${propertyPath}[${normalizedPropertyName}]`;
   }
 
   return fullName;
@@ -3360,7 +3372,7 @@ export function getOperationResponseTypeName(method: [string[], ServiceOperation
   const prefix = !operation.name.includes("_")
     ? getClassicalLayerPrefix(prefixes, NameType.Interface)
     : "";
-  return `${prefix}${normalizeName(operation.name, NameType.Interface)}Response`;
+  return `${prefix}${normalizeSdkName(operation, NameType.Interface)}Response`;
 }
 
 /**

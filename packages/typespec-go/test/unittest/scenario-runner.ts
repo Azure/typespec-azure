@@ -193,7 +193,7 @@ export async function emitGoFor(
     { filePrefix },
   );
   await emitter.emit("tsp");
-  if (codeModel.options.generateExamples) {
+  if (codeModel.options["generate-samples"]) {
     await emitter.emitExamples();
   }
 

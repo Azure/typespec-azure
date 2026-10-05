@@ -469,6 +469,101 @@ it("multiple services without versioning", async () => {
   strictEqual(biMethod.operation.examples[0].name, "Test operation from ServiceB");
 });
 
+it("multiple nested services use configured api versions to find examples", async () => {
+  const instance = await SimpleBaseTester.createInstance();
+  instance.fs.addTypeSpecFile(
+    "./Network/examples/v1/NetworkOperations_get.json",
+    JSON.stringify({
+      operationId: "NetworkOperations_get",
+      title: "Network v1",
+      responses: { "200": { body: "network-v1" } },
+    }),
+  );
+  instance.fs.addTypeSpecFile(
+    "./Network/examples/v2/NetworkOperations_get.json",
+    JSON.stringify({
+      operationId: "NetworkOperations_get",
+      title: "Network v2",
+      responses: { "200": { body: "network-v2" } },
+    }),
+  );
+  instance.fs.addTypeSpecFile(
+    "./Compute/examples/v1/ComputeOperations_get.json",
+    JSON.stringify({
+      operationId: "ComputeOperations_get",
+      title: "Compute v1",
+      responses: { "200": { body: "compute-v1" } },
+    }),
+  );
+  instance.fs.addTypeSpecFile(
+    "./Compute/examples/v2/ComputeOperations_get.json",
+    JSON.stringify({
+      operationId: "ComputeOperations_get",
+      title: "Compute v2",
+      responses: { "200": { body: "compute-v2" } },
+    }),
+  );
+
+  const { program } = await instance.compile(
+    createClientCustomizationInput(
+      `
+      @service
+      @versioned(Microsoft.Network.Versions)
+      namespace Microsoft.Network {
+        enum Versions {
+          v1,
+          v2,
+        }
+        interface NetworkOperations {
+          op get(): string;
+        }
+      }
+
+      @service
+      @versioned(Microsoft.Compute.Versions)
+      namespace Microsoft.Compute {
+        enum Versions {
+          v1,
+          v2,
+        }
+        interface ComputeOperations {
+          op get(): string;
+        }
+      }
+    `,
+      `
+      @client({
+        name: "CombinedClient",
+        service: [Microsoft.Network, Microsoft.Compute],
+        autoMergeService: true,
+      })
+      namespace Combined;
+    `,
+    ),
+  );
+  const context = await createSdkContextForTester(program, {
+    "api-version": {
+      Microsoft: {
+        Network: "v1",
+        Compute: "v1",
+      },
+    },
+  });
+
+  const client = context.sdkPackage.clients[0];
+  const networkClient = client.children?.find((child) => child.name === "NetworkOperations");
+  ok(networkClient);
+  const networkMethod = networkClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
+  strictEqual(networkMethod.operation.examples?.[0].filePath, "v1/NetworkOperations_get.json");
+  strictEqual(networkMethod.operation.examples?.[0].name, "Network v1");
+
+  const computeClient = client.children?.find((child) => child.name === "ComputeOperations");
+  ok(computeClient);
+  const computeMethod = computeClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
+  strictEqual(computeMethod.operation.examples?.[0].filePath, "v1/ComputeOperations_get.json");
+  strictEqual(computeMethod.operation.examples?.[0].name, "Compute v1");
+});
+
 it("multiple services without examples", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(

@@ -45,6 +45,25 @@ options:
     api-version: "2023-11-01"
 ```
 
+### Java client options
+
+The Java emitter supports these `@clientOption` values from
+`@azure-tools/typespec-client-generator-core`:
+
+| Option                   | Target                                           | Value    | Behavior                                                                                                          |
+| ------------------------ | ------------------------------------------------ | -------- | ----------------------------------------------------------------------------------------------------------------- |
+| `clientRequired`         | Operation parameter or model property            | `true`   | Treats an optional TypeSpec property as required in the generated client API.                                     |
+| `responseHeadersAsModel` | Operation with response headers and no body      | `true`   | Returns the response headers as a strongly typed model from the convenience method.                               |
+| `collectionHeaderPrefix` | Dictionary-valued response header model property | `string` | Deserializes response headers with the configured prefix into the dictionary while removing the prefix from keys. |
+
+Specify `"java"` as the language scope:
+
+```typespec
+@@clientOption(ReadOptions.filter, "clientRequired", true, "java");
+@@clientOption(ResponseHeaderOp.getResourceMetadata, "responseHeadersAsModel", true, "java");
+@@clientOption(MetadataHeaders.metadata, "collectionHeaderPrefix", "x-ms-meta-", "java");
+```
+
 ## Emitter usage
 
 1. Via the command line
@@ -225,11 +244,17 @@ Specify headers that emitter will ignore.
 
 When set to `true`, the generated SDK uses `getter` method to access child clients. Default value is `false`.
 
+### `max-overload`
+
+**Type:** `"model"`
+
+When set to `model`, generate the maximum set of model-based convenience method overloads for Azure clients.
+
 ### `api-version`
 
 **Type:** `string | object`
 
-Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace's full name to its desired version; services not listed default to their latest version.
+Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`. For multi-service packages, provide a map from each service namespace to its desired version. Nested namespaces must be represented as nested objects in `tspconfig.yaml`; services not listed default to their latest version.
 
 **Options:**
 

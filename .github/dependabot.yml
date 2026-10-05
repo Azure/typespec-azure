@@ -9,7 +9,8 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    labels: [] # conflict with our labels in labels.ts
+    labels:
+      - auto-merge
     # The `core` submodule points at our own repo(microsoft/typespec), so the default 3 day
     # supply-chain cooldown only delays us. Opt out of it.
     cooldown:
@@ -23,6 +24,10 @@ updates:
     exclude-paths:
       - ".github/workflows/*.lock.{yaml,yml}"
     labels: [] # conflict with our labels in labels.ts
+    # Give the community time to detect and report compromised action releases
+    # before they are proposed as updates here.
+    cooldown:
+      default-days: 7
     groups:
       actions:
         patterns:

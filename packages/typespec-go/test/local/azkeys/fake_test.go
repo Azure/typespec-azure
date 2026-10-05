@@ -15,6 +15,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	azfake "github.com/Azure/azure-sdk-for-go/sdk/azcore/fake"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
 	"github.com/stretchr/testify/require"
 )
 
@@ -45,6 +46,60 @@ func TestFakeBackupKey(t *testing.T) {
 	require.NoError(t, err)
 	testSerde(t, &resp)
 	require.Equal(t, fakeKeyBlob, resp.Value)
+}
+
+func TestFakeServerTransportPathParameterRegex(t *testing.T) {
+	t.Run("AcceptsPathSegmentCharacters", func(t *testing.T) {
+		const fakeKeyName = "azAZ09._~%!$&'()*+,;=:@-"
+		const escapedPath = "/keys/azAZ09._~%25!$&'()*+,;=:@-/backup"
+		server := fake.Server{
+			BackupKey: func(_ context.Context, keyName string, _ *azkeys.BackupKeyOptions) (resp azfake.Responder[azkeys.BackupKeyResponse], errResp azfake.ErrorResponder) {
+				if keyName != fakeKeyName {
+					errResp.SetError(fmt.Errorf("bad fake key name %s", keyName))
+					return
+				}
+				resp.SetResponse(http.StatusOK, azkeys.BackupKeyResponse{}, nil)
+				return
+			},
+		}
+
+		transport := fake.NewServerTransport(&server)
+
+		// Call transport.Do() directly to avoid the client escaping the key name.
+		ctx := context.WithValue(context.Background(), runtime.CtxAPINameKey{}, "Client.BackupKey")
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://fake.vault.azure.net"+escapedPath, nil)
+		require.NoError(t, err)
+		require.Equal(t, escapedPath, req.URL.EscapedPath())
+
+		resp, err := transport.Do(req)
+		require.NoError(t, err)
+		require.NoError(t, resp.Body.Close())
+	})
+
+	t.Run("RejectsPathDelimiter", func(t *testing.T) {
+		const escapedPath = "/keys/key/name/backup"
+		var called bool
+		server := fake.Server{
+			BackupKey: func(_ context.Context, _ string, _ *azkeys.BackupKeyOptions) (resp azfake.Responder[azkeys.BackupKeyResponse], errResp azfake.ErrorResponder) {
+				called = true
+				resp.SetResponse(http.StatusOK, azkeys.BackupKeyResponse{}, nil)
+				return
+			},
+		}
+
+		transport := fake.NewServerTransport(&server)
+
+		// Call transport.Do() directly to avoid the client escaping the key name.
+		ctx := context.WithValue(context.Background(), runtime.CtxAPINameKey{}, "Client.BackupKey")
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://fake.vault.azure.net"+escapedPath, nil)
+		require.NoError(t, err)
+		require.Equal(t, escapedPath, req.URL.EscapedPath())
+
+		resp, err := transport.Do(req)
+		require.ErrorContains(t, err, "failed to parse path")
+		require.Nil(t, resp)
+		require.False(t, called)
+	})
 }
 
 type serdeModel interface {

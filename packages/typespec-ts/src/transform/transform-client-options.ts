@@ -57,6 +57,8 @@ function extractClientOptions(
   const ignoreNullableOnOptional = getIgnoreNullableOnOptional(emitterOptions);
   const wrapNonModelReturn = getWrapNonModelReturn(emitterOptions);
   const isMultiService = (dpgContext.allServiceNamespaces?.length ?? 0) > 1;
+  const experimentalSplitModelsByVisibility =
+    emitterOptions["experimental-split-models-by-visibility"] === true;
 
   return {
     ...credentialInfo,
@@ -85,6 +87,7 @@ function extractClientOptions(
     enableStorageCompat,
     treatUnknownAsRecord,
     generateReactNativeTarget,
+    experimentalSplitModelsByVisibility,
   };
 }
 

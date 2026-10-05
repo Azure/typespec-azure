@@ -7,5 +7,5 @@
 /docs/howtos/DataPlane*/ @lmazuel @m-nash @iscai-msft @xirzec
 
 /packages/typespec-python @iscai-msft @msyyc @tadelesh @l0lawrence @ChenxiJiang333 @kashifkhan @xirzec
-/packages/typespec-java @weidongxu-microsoft @haolingdong-msft @XiaofeiCao @alzimmermsft @jsquire
+/packages/typespec-java @weidongxu-microsoft @haolingdong-msft @XiaofeiCao @alzimmermsft @jsquire @JoshLove-msft
 /packages/typespec-go @jhendrixMSFT @HeathS @xirzec @lirenhe

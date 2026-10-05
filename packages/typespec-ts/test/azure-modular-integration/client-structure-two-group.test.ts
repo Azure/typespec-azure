@@ -1,46 +1,46 @@
 import { assert, beforeEach, describe, it } from "vitest";
 
-// TODO: reinstate import and delete below placeholder once tests are working
-// import { TwoOperationGroupClient } from "./generated/client/structure/two-operation-group/src/index.js";
-declare type TwoOperationGroupClient = any;
-declare const TwoOperationGroupClient: any;
+import { TwoOperationGroupClient } from "./generated/client/structure/two-operation-group/src/index.js";
 
-describe.skip("Client Structure Two-Operation-Group Rest Client", () => {
+describe("Client Structure Two-Operation-Group Rest Client", () => {
   let client: TwoOperationGroupClient;
 
   beforeEach(() => {
     client = new TwoOperationGroupClient("http://localhost:3002", "two-operation-group", {
       allowInsecureConnection: true,
+      retryOptions: {
+        maxRetries: 0,
+      },
     });
   });
 
   it("should call operation one correctly", async () => {
-    const result = await client.one();
+    const result = await client.group1.one();
     assert.strictEqual(result, undefined);
   });
 
   it("should call operation two correctly", async () => {
-    const result = await client.two();
+    const result = await client.group2.two();
     assert.strictEqual(result, undefined);
   });
 
   it("should call operation three correctly", async () => {
-    const result = await client.three();
+    const result = await client.group1.three();
     assert.strictEqual(result, undefined);
   });
 
   it("should call operation four correctly", async () => {
-    const result = await client.four();
+    const result = await client.group1.four();
     assert.strictEqual(result, undefined);
   });
 
   it("should call operation five correctly", async () => {
-    const result = await client.five();
+    const result = await client.group2.five();
     assert.strictEqual(result, undefined);
   });
 
   it("should call operation six correctly", async () => {
-    const result = await client.six();
+    const result = await client.group2.six();
     assert.strictEqual(result, undefined);
   });
 });

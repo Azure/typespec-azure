@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.72.0
+
+### Features
+
+- [#5265](https://github.com/Azure/typespec-azure/pull/5265) Add the `no-boolean` lint rule that recommends descriptive extensible enums instead of boolean API shapes when semantic values matter.
+
+
 ## 0.71.0
 
 ### Features

@@ -53,7 +53,7 @@ import {
 } from "./media-types.js";
 import { isByteOrByteUnion } from "./model-utils.js";
 import { getLroLogicalResponseName, getResponseTypeName } from "./name-constructors.js";
-import { NameType, normalizeName } from "./name-utils.js";
+import { NameType, normalizeName, normalizeSdkName, reportInvalidExactName } from "./name-utils.js";
 import { getOperationNamespaceInterfaceName } from "./namespace-utils.js";
 
 // Sorts the responses by status code
@@ -645,9 +645,10 @@ export function getMethodHierarchiesMap(
     const operationOrGroup = method[1];
 
     if (operationOrGroup.kind === "client") {
-      operationOrGroup.methods.forEach((m) =>
-        methodQueue.push([[...prefixes, operationOrGroup.name], m]),
-      );
+      const hierarchyName = operationOrGroup.isExactName
+        ? `$DO_NOT_NORMALIZE$${operationOrGroup.name}`
+        : operationOrGroup.name;
+      operationOrGroup.methods.forEach((m) => methodQueue.push([[...prefixes, hierarchyName], m]));
       const nonIndependentChildren = operationOrGroup.children?.filter((child) => {
         return (
           !(child.clientInitialization.initializedBy & InitializedByFlags.Individually) &&
@@ -656,10 +657,26 @@ export function getMethodHierarchiesMap(
       });
       if (nonIndependentChildren && nonIndependentChildren.length > 0) {
         nonIndependentChildren.forEach((child) =>
-          methodQueue.push([[...prefixes, operationOrGroup.name], child]),
+          methodQueue.push([[...prefixes, hierarchyName], child]),
         );
       }
     } else {
+      reportInvalidExactName(
+        context.program,
+        operationOrGroup,
+        NameType.Method,
+        "operation",
+        operationOrGroup.__raw ?? NoTarget,
+      );
+      for (const parameter of operationOrGroup.parameters) {
+        reportInvalidExactName(
+          context.program,
+          parameter,
+          NameType.Parameter,
+          "parameter",
+          parameter.__raw ?? NoTarget,
+        );
+      }
       const prefixKey =
         context.emitterOptions?.hierarchyClient || context.emitterOptions?.enableOperationGroup
           ? prefixes.join("/")
@@ -736,18 +753,14 @@ function resolveParameterNameConflict(
   // subsequent calls (e.g. emitNonModelResponseTypes then buildApiOptions both call
   // getMethodHierarchiesMap on the same TCGC object) always normalize from the
   // original, not from the already-mutated value.
-  const paramName = normalizeName(
-    p.name,
-    NameType.Parameter,
-    true,
-    undefined,
-    undefined,
-    p.oriName,
-  );
+  const paramName = normalizeSdkName(p, NameType.Parameter, {
+    shouldGuard: true,
+    nameOverride: p.oriName ?? p.name,
+  });
   if (!p.oriName) {
     p.oriName = p.name;
   }
-  if (paramName === operationOrGroup.name) {
+  if (!p.isExactName && paramName === operationOrGroup.name) {
     p.name = `${paramName}Parameter`;
   } else {
     p.name = paramName;

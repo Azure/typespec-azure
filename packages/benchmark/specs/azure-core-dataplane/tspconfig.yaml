@@ -5,6 +5,9 @@ emit:
   - "@typespec/http-client-js"
   - "@azure-tools/typespec-ts"
   - "@azure-tools/typespec-java"
+  - "@azure-tools/typespec-go"
+  - "@azure-typespec/http-client-csharp"
+  - "@azure-tools/typespec-client-generator-core"
 options:
   "@azure-tools/typespec-autorest":
     output-file: "{emitter-output-dir}/{service-name}/{version}/openapi.json"
@@ -18,6 +21,10 @@ options:
     namespace: "com.contoso.benchmarkwidgets"
     generate-samples: false
     generate-tests: false
+  "@azure-tools/typespec-go":
+    module: "example.com/benchmark/widgets"
+  "@azure-typespec/http-client-csharp":
+    namespace: "Contoso.BenchmarkWidgets"
 linter:
   extends:
     - "@azure-tools/typespec-azure-rulesets/data-plane"

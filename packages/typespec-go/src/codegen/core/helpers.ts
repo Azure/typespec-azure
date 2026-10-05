@@ -91,13 +91,19 @@ export function canonicalizeHeaderName(name: string): string {
  * emits code to verify that a path parameter is not empty
  *
  * @param param the path parameter to check
+ * @param paramIn where the path parameter check is being emitted
  * @param imports the import manager currently in scope
  * @param indent the indentation helper currently in scope
  * @returns the code to check the path parameter for emptiness
  */
-export function emitEmptyPathParamCheck(param: go.PathParameter, imports: ImportManager, indent: Indentation): string {
+export function emitEmptyPathParamCheck(
+  param: go.PathParameter,
+  paramIn: "ctor" | "method",
+  imports: ImportManager,
+  indent: Indentation,
+): string {
   imports.add("errors");
-  let text = `${indent.get()}if ${param.name} == "" {\n`;
+  let text = `${indent.get()}if ${paramIn === "ctor" ? param.name : getParamName(param)} == "" {\n`;
   text += `${indent.push().get()}return nil, errors.New("parameter ${param.name} cannot be empty")\n`;
   text += `${indent.pop().get()}}\n`;
   return text;
@@ -115,25 +121,16 @@ export function formatParameterTypeName(
   param: go.ClientOptionsType | go.ClientParameter | go.ParameterGroup,
 ): string {
   let typeName: string;
-  let required: boolean;
   switch (param.kind) {
     case "armClientOptions":
-      typeName = go.getTypeDeclaration(param, scope);
-      required = false;
-      break;
     case "clientOptions":
-      typeName = go.getTypeDeclaration(param, scope);
-      required = false;
-      break;
     case "paramGroup":
       typeName = go.getTypeDeclaration(param, scope);
-      required = param.required;
       break;
     default:
       typeName = go.getTypeDeclaration(param.type, scope);
-      required = param.byValue;
   }
-  return required ? typeName : `*${typeName}`;
+  return typeName;
 }
 
 // sorts parameters by their required state, ordering required before optional
@@ -327,37 +324,10 @@ export function getParamName(param: go.MethodParameter): string {
   if (param.location === "client") {
     paramName = `client.${paramName}`;
   }
-  // client parameters with default values aren't emitted as pointer-to-type
-  if (
-    !go.isRequiredParameter(param.style) &&
-    !(param.location === "client" && go.isClientSideDefault(param.style)) &&
-    !param.byValue
-  ) {
+  if (param.type.kind === "ptr") {
     paramName = `*${paramName}`;
   }
   return paramName;
-}
-
-export function fixUpMethodName(method: go.MethodType): string {
-  switch (method.kind) {
-    case "lroMethod":
-    case "lroPageableMethod":
-      return `Begin${method.name}`;
-    case "pageableMethod": {
-      let N = "N";
-      let name = method.name;
-      if (method.name[0] !== method.name[0].toUpperCase()) {
-        // the method isn't exported; don't export the pager ctor
-        N = "n";
-        // ensure correct casing of the emitted function name e.g.,
-        // "listThings" -> "newListThingsPager"
-        name = name[0].toUpperCase() + name.substring(1);
-      }
-      return `${N}ew${name}Pager`;
-    }
-    case "method":
-      return method.name;
-  }
 }
 
 // converts the Go code model encoding type to the type name in the standard library
@@ -400,13 +370,14 @@ export function formatParamValue(
         return content;
       };
 
-      switch (param.type.elementType.kind) {
+      const unwrappedElement = go.unwrapPtr(param.type.itemType);
+      switch (unwrappedElement.kind) {
         case "encodedBytes":
           imports.add("encoding/base64");
           imports.add("strings");
           return emitConvertOver(
             param.name,
-            `base64.${formatBytesEncoding(param.type.elementType.encoding)}Encoding.EncodeToString(${param.name}[i])`,
+            `base64.${formatBytesEncoding(unwrappedElement.encoding)}Encoding.EncodeToString(${param.name}[i])`,
           );
         case "string":
           imports.add("strings");
@@ -414,12 +385,10 @@ export function formatParamValue(
         case "time": {
           imports.add("strings");
           imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-          const elemVal = param.type.elementType.utc
-            ? `${param.name}[i].UTC()`
-            : `${param.name}[i]`;
+          const elemVal = unwrappedElement.utc ? `${param.name}[i].UTC()` : `${param.name}[i]`;
           return emitConvertOver(
             param.name,
-            `datetime.${param.type.elementType.format}(${elemVal}).String()`,
+            `datetime.${unwrappedElement.format}(${elemVal}).String()`,
           );
         }
         default:
@@ -430,7 +399,9 @@ export function formatParamValue(
     }
   }
 
-  return formatValue(paramName, param.type, imports);
+  // when we called getParamName it includes any dereference for a Ptr
+  // parameter, so we unwrap it here else we end up with a double deref
+  return formatValue(paramName, go.unwrapPtr(param.type), imports);
 }
 
 /**
@@ -472,35 +443,97 @@ export function getMediaFormat(
   return `${marshaller}(${param}${format})`;
 }
 
-export function isMapOfDateTime(
-  paramType: go.WireType,
-): { format: go.TimeFormat; utc: boolean } | undefined {
-  if (paramType.kind !== "map") {
-    return undefined;
+/**
+ * Emits the code for parsing scalar types from a string.
+ * The parsing error result is placed into a local var named "err".
+ *
+ * @param scalar the type of scalar to parse
+ * @param src the source var that contains the scalar in string format
+ * @param dst the destination var that contains the result
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @returns the scalar parsing code
+ */
+export function emitScalarParsing(
+  scalar: go.Scalar | go.Constant,
+  src: string,
+  dst: string,
+  imports: ImportManager,
+  indent: Indentation,
+): string {
+  imports.add("strconv");
+  switch (scalar.type) {
+    case "bool":
+      return `${indent.get()}${dst}, err := strconv.ParseBool(${src})\n`;
+    case "float32":
+      return (
+        `${indent.get()}${dst}32, err := strconv.ParseFloat(${src}, 32)\n` +
+        `${indent.get()}${dst} := float32(${dst}32)\n`
+      );
+    case "float64":
+      return `${indent.get()}${dst}, err := strconv.ParseFloat(${src}, 64)\n`;
+    case "int32":
+      return (
+        `${indent.get()}${dst}32, err := strconv.ParseInt(${src}, 10, 32)\n` +
+        `${indent.get()}${dst} := int32(${dst}32)\n`
+      );
+    case "int64":
+      return `${indent.get()}${dst}, err := strconv.ParseInt(${src}, 10, 64)\n`;
+    default:
+      throw new CodegenError("InternalError", `unhandled scalar type ${scalar.type}`);
   }
-  if (paramType.valueType.kind !== "time") {
-    return undefined;
-  }
-  return { format: paramType.valueType.format, utc: paramType.valueType.utc };
 }
 
-export function formatValue(
-  paramName: string,
-  type: go.WireType,
+/**
+ * emits the code for parsing a time.Time from the specified variable.
+ * note that the emitted code does not include the error check after parsing.
+ *
+ * @param srcVar the name of the variable that contains the value to parse
+ * @param time the modeled time associated with srcVar
+ * @param dstVar the name of the variable to contain the parsed value
+ * @param imports the import manager currently in scope
+ * @param indent the indentation helper currently in scope
+ * @returns the time parsing code
+ */
+export function emitTimeParsing(
+  srcVar: string,
+  time: go.Time,
+  dstVar: string,
   imports: ImportManager,
-  deref?: boolean,
+  indent: Indentation,
 ): string {
+  imports.add("time");
+  let text: string;
+  switch (time.format) {
+    case "RFC1123":
+    case "RFC3339":
+    case "RFC7231":
+      text = `${indent.get()}${dstVar}, err := time.Parse(${time.format === "RFC3339" ? RFC3339Format : RFC1123Format}, ${srcVar})\n`;
+      break;
+    case "PlainDate":
+      text = `${indent.get()}${dstVar}, err := time.Parse(${plainDateFormat}, ${srcVar})\n`;
+      break;
+    case "PlainTime":
+      text = `${indent.get()}${dstVar}, err := time.Parse(${plainTimeFormat}, ${srcVar})\n`;
+      break;
+    case "Unix":
+      imports.add("strconv");
+      text = `${indent.get()}${dstVar}, err := strconv.ParseInt(${srcVar}, 10, 64)\n`;
+      break;
+  }
+  return text;
+}
+
+export function formatValue(paramName: string, type: go.WireType, imports: ImportManager): string {
   // callers don't have enough context to know if paramName needs to be
   // dereferenced so we track that here when specified. note that not all
   // cases will require paramName to be dereferenced.
-  let star = "";
-  if (deref === true) {
-    star = "*";
-  }
+  const star = deref(type);
 
-  switch (type.kind) {
+  const unwrappedType = go.unwrapPtr(type);
+  switch (unwrappedType.kind) {
     case "constant":
-      if (type.type === "string") {
+      if (unwrappedType.type === "string") {
         return `string(${star}${paramName})`;
       }
       imports.add("fmt");
@@ -508,19 +541,19 @@ export function formatValue(
     case "encodedBytes":
       // a base-64 encoded value in string format
       imports.add("encoding/base64");
-      return `base64.${formatBytesEncoding(type.encoding)}Encoding.EncodeToString(${paramName})`;
+      return `base64.${formatBytesEncoding(unwrappedType.encoding)}Encoding.EncodeToString(${paramName})`;
     case "etag":
       return `string(${star}${paramName})`;
     case "literal":
       // cannot use formatLiteralValue() since all values are treated as strings
-      switch (type.type.kind) {
+      switch (unwrappedType.type.kind) {
         case "constantDef":
-          return type.type.name;
+          return unwrappedType.type.name;
         default:
-          return `"${type.literal}"`;
+          return `"${unwrappedType.literal}"`;
       }
     case "scalar":
-      switch (type.type) {
+      switch (unwrappedType.type) {
         case "bool":
           imports.add("strconv");
           return `strconv.FormatBool(${star}${paramName})`;
@@ -537,12 +570,12 @@ export function formatValue(
           imports.add("strconv");
           return `strconv.FormatInt(${star}${paramName}, 10)`;
         default:
-          throw new CodegenError("InternalError", `unhandled scalar type ${type.type}`);
+          throw new CodegenError("InternalError", `unhandled scalar type ${unwrappedType.type}`);
       }
     case "time": {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
-      const timeVal = type.utc ? `(${star}${paramName}).UTC()` : `${star}${paramName}`;
-      return `datetime.${type.format}(${timeVal}).String()`;
+      const timeVal = unwrappedType.utc ? `(${star}${paramName}).UTC()` : `${star}${paramName}`;
+      return `datetime.${unwrappedType.format}(${timeVal}).String()`;
     }
     default:
       return `${star}${paramName}`;
@@ -608,9 +641,8 @@ export function getResultFieldName(method: go.MethodType): string {
     case "monomorphicResult":
       return result.fieldName;
     case "modelResult":
-      return result.modelType.name;
     case "polymorphicResult":
-      return result.interface.name;
+      return result.type.name;
   }
 }
 
@@ -937,22 +969,18 @@ export function getBitSizeForNumber(
 export function recursiveUnwrapMapSlice(item: go.WireType): go.WireType {
   switch (item.kind) {
     case "map":
-      return recursiveUnwrapMapSlice(item.valueType);
     case "slice":
-      return recursiveUnwrapMapSlice(item.elementType);
+      return recursiveUnwrapMapSlice(item.itemType);
+    case "ptr":
+      return recursiveUnwrapMapSlice(item.ptrType);
     default:
       return item;
   }
 }
 
-/**
- * returns a * character when byValue is false
- *
- * @param byValue indicates if the type is passed by value
- * @returns a * or the empty string
- */
-export function star(byValue: boolean): string {
-  return byValue ? "" : "*";
+/** returns a * character when needing to dereference */
+export function deref(type: go.WireType): "*" | "" {
+  return type.kind === "ptr" ? "*" : "";
 }
 
 /**
@@ -1051,15 +1079,13 @@ export function getSerDeFormat(
           }
           break;
         case "modelResult":
-          recursiveWalkModelFields(resultType.modelType, resultType.format);
+        case "polymorphicResult":
+          recursiveWalkModelFields(resultType.type, resultType.format);
           break;
         case "monomorphicResult":
           if (resultType.format === "JSON" || resultType.format === "XML") {
-            recursiveWalkModelFields(resultType.monomorphicType, resultType.format);
+            recursiveWalkModelFields(resultType.type, resultType.format);
           }
-          break;
-        case "polymorphicResult":
-          recursiveWalkModelFields(resultType.interface, resultType.format);
           break;
       }
     }
@@ -1362,10 +1388,59 @@ export function buildErrCheck(indent: Indentation, errVar: string, returns?: str
  * @param body the body of the for block
  * @returns the text for the for block
  */
-export function buildForBlock(indent: Indentation, expression: string, body: (indent: Indentation) => string): string {
+export function buildForBlock(
+  indent: Indentation,
+  expression: string,
+  body: (indent: Indentation) => string,
+): string {
   let content = `for ${expression} {\n`;
   content += body(indent.push());
   content += `${indent.pop().get()}}\n`;
+  return content;
+}
+
+/** a case statement in a switch/case block */
+export interface caseStatement {
+  /** the case's expression */
+  expression: string;
+
+  /** the case's execution clause */
+  clause: (indent: Indentation) => string;
+}
+
+/** the default case in a switch/case block */
+export interface defaultCase {
+  /** the case's execution clause */
+  clause: (indent: Indentation) => string;
+}
+
+/**
+ * constructs a switch/case statement
+ *
+ * @param indent the current indentation helper in scope
+ * @param statement the statement to switch on
+ * @param cases one or more case statements
+ * @param def optional default case statement
+ * @returns the text for the switch/case statement
+ */
+export function buildSwitchCase(
+  indent: Indentation,
+  statement: string,
+  cases: Array<caseStatement>,
+  def?: defaultCase,
+): string {
+  let content = `switch ${statement} {\n`;
+  for (const cse of cases) {
+    content += `case ${cse.expression}:\n`;
+    content += cse.clause(indent.push());
+    indent.pop();
+  }
+  if (def) {
+    content += "default:\n";
+    content += def.clause(indent.push());
+    indent.pop();
+  }
+  content += "}\n";
   return content;
 }
 

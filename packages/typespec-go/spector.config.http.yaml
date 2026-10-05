@@ -7,6 +7,7 @@
 specs:
   "authentication/api-key": { options: { module: apikeygroup } }
   "authentication/http/custom": { options: { module: customgroup } }
+  "authentication/noauth/union": { options: { module: noauthgroup } }
   "authentication/oauth2": { options: { module: oauth2group } }
   "authentication/union": { options: { module: unionauthgroup } }
   "documentation": { options: { module: documentationgroup } }
@@ -28,7 +29,6 @@ specs:
   "payload/json-merge-patch": { options: { module: jmergepatchgroup } }
   "payload/media-type": { options: { module: mediatypegroup } }
   "payload/multipart": { options: { module: multipartgroup } }
-  # missing continuation-token support: https://github.com/Azure/autorest.go/issues/1494
   "payload/pageable": { options: { module: pageablegroup } }
   "payload/xml": { options: { module: xmlgroup, slice-elements-byval: true } }
   "serialization/encoded-name/json": { options: { module: jsongroup } }
@@ -37,12 +37,12 @@ specs:
   "server/path/single": { options: { module: singlegroup } }
   "server/versions/not-versioned": { options: { module: unversionedgroup } }
   "special-headers/conditional-request": { options: { module: condreqgroup } }
-  "special-headers/repeatability": { options: { module: repeatabilitygroup } }
   special-words: { options: { module: specialwordsgroup } }
   "type/array": { options: { module: arraygroup, slice-elements-byval: true } }
   "type/dictionary": { options: { module: dictionarygroup } }
   "type/enum/extensible": { options: { module: extensiblegroup } }
   "type/enum/fixed": { options: { module: fixedgroup } }
+  "type/file": { options: { module: filegroup } }
   "type/model/empty": { options: { module: emptygroup, single-client: true } }
   "type/model/inheritance/enum-discriminator": { options: { module: enumdiscgroup } }
   "type/model/inheritance/not-discriminated": { options: { module: nodiscgroup } }
@@ -51,33 +51,32 @@ specs:
   "type/model/inheritance/single-discriminator": { options: { module: singlediscgroup } }
   "type/model/usage": { options: { module: usagegroup } }
   "type/model/visibility": { options: { module: visibilitygroup } }
-  "type/property/nullable": { options: { module: nullablegroup } }
   "type/property/additional-properties": { options: { module: addlpropsgroup } }
-  # missing plain time support: https://github.com/Azure/autorest.go/issues/1732
+  "type/property/nullable": { options: { module: nullablegroup } }
   "type/property/optionality": { options: { module: optionalitygroup, slice-elements-byval: true } }
   "type/property/value-types": { options: { module: valuetypesgroup, slice-elements-byval: true } }
   "type/scalar": { options: { module: scalargroup, slice-elements-byval: true } }
+  "type/union": { options: { module: uniongroup, slice-elements-byval: true } }
+  "versioning/added": { options: { module: versioningaddedgroup, slice-elements-byval: true } }
   "versioning/madeOptional": { options: { module: madeoptionalgroup } }
   "versioning/removed": { options: { module: removedgroup } }
+  "versioning/renamedFrom":
+    { options: { module: versioningrenamedfromgroup, slice-elements-byval: true } }
   "versioning/returnTypeChangedFrom": { options: { module: rettypechangedfromgroup } }
   "versioning/typeChangedFrom": { options: { module: typechangedfromgroup } }
 
   # --- Not generated yet (tracked skips) ---
-  # TODO: https://github.com/Azure/autorest.go/issues/1606
+  # TODO: https://github.com/Azure/typespec-azure/issues/4946
   "response/status-code-range": false
-  # TODO: https://github.com/Azure/autorest.go/issues/1730
+  # TODO: https://github.com/Azure/typespec-azure/issues/4928
   routes: false
   # TODO: https://github.com/Azure/typespec-azure/issues/5226
   "server/versions/versioned": false
-  # TODO: https://github.com/Azure/autorest.go/issues/1594
+  # TODO: https://github.com/Azure/typespec-azure/issues/4957
+  "special-headers/repeatability": false
+  # TODO: https://github.com/Azure/typespec-azure/issues/4934
   "streaming/jsonl": false
   # not a real scenario
   "type/model/inheritance/nested-discriminator": false
-  # requires union support: https://github.com/Azure/typespec-azure/issues/4935
-  "type/union": false
-  # requires discriminated union support: https://github.com/Azure/typespec-azure/issues/4935
+  # requires union support (new discriminator style)
   "type/union/discriminated": false
-  # requires union support: https://github.com/Azure/typespec-azure/issues/4935
-  "versioning/added": false
-  # requires union support: https://github.com/Azure/typespec-azure/issues/4935
-  "versioning/renamedFrom": false

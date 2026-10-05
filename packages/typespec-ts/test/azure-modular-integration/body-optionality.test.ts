@@ -24,7 +24,8 @@ describe("Body Optionality Client", () => {
     assert.isUndefined(result);
   });
 
-  // TODO: fix - was broken by https://github.com/Azure/azure-sdk-for-js/pull/37181
+  // Skipped: the generated request sends Content-Type even when the optional body is omitted.
+  // Tracking: https://github.com/Azure/typespec-azure/issues/5293
   it.skip("should support optional-explicit omitted body", async () => {
     const result = await client.optionalExplicit.omit();
     assert.isUndefined(result);

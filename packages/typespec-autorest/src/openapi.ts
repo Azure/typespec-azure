@@ -5,18 +5,20 @@ import {
   extractLroStates,
   getArmResourceIdentifierConfig,
   getAsEmbeddingVector,
+  getEffectiveApiVersionOverride,
   getLroMetadata,
   getUnionAsEnum,
   hasUniqueItems,
 } from "@azure-tools/typespec-azure-core";
 import {
-  type ArmFeatureOptions,
+  type ArmFeatureFileOptions,
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
   getArmKeyIdentifiers,
   getCustomResourceOptions,
   getExternalTypeRef,
   getFeature,
+  getFeatureFileSet,
   getInlineAzureType,
   getResourceFeatureSet,
   isArmCommonType,
@@ -107,6 +109,7 @@ import {
   reportDeprecated,
   resolveEncodedName,
   resolvePath,
+  sanitizePathSegment,
   serializeValueAsJson,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
@@ -1607,7 +1610,7 @@ export async function getOpenAPIForService(
       if (
         options.versionEnumStrategy !== "include" &&
         type.kind === "Enum" &&
-        isVersionEnum(program, type)
+        (isVersionEnum(program, type) || isFeatureEnum(program, serviceNamespace, type))
       ) {
         return true;
       }
@@ -1621,6 +1624,10 @@ export async function getOpenAPIForService(
       return true;
     }
     return false;
+  }
+
+  function isFeatureEnum(program: Program, serviceNamespace: Namespace, enumObj: Enum): boolean {
+    return getFeatureFileSet(program, serviceNamespace) === enumObj;
   }
 
   function getSchemaForType(
@@ -2873,16 +2880,17 @@ function resolveExampleDir(
 ): string {
   const rawDir = examplesDirectory ?? resolvePath(projectRoot, "examples");
   const hasVersionInterpolation = rawDir.includes("{version}");
+  const sanitizedVersion = version && sanitizePathSegment(version);
 
   if (hasVersionInterpolation) {
     const versionStatus = version && (version.includes("preview") ? "preview" : "stable");
     return interpolatePath(rawDir, {
       "version-status": versionStatus,
-      version: version,
+      version: sanitizedVersion,
     });
   }
 
-  return version ? resolvePath(rawDir, version) : rawDir;
+  return sanitizedVersion ? resolvePath(rawDir, sanitizedVersion) : rawDir;
 }
 
 async function checkExamplesDirExists(host: CompilerHost, dir: string) {
@@ -3035,6 +3043,7 @@ export function createDefaultDocumentProxy(
   const definitions = new Map<string, OpenAPI2Schema>();
   const parameters: Map<string, [ModelProperty, OpenAPI2Parameter]> = new Map();
   const operationIds = new DuplicateTracker<string, Operation>();
+  const operations: HttpOperation[] = [];
   let examples: Map<string, Record<string, LoadedExample>> = new Map();
   let operationIdsWithExamples: Set<string> = new Set();
   return {
@@ -3066,6 +3075,7 @@ export function createDefaultDocumentProxy(
     },
 
     createOrGetEndpoint(op: HttpOperation, context: AutorestEmitterContext): OpenAPI2Operation {
+      operations.push(op);
       const pathItem = initPathItem(program, op, root);
       if (!pathItem[op.verb]) {
         pathItem[op.verb] = { parameters: [] };
@@ -3109,6 +3119,7 @@ export function createDefaultDocumentProxy(
     },
     resolveDocuments(context: AutorestEmitterContext) {
       reportDuplicateOperationIds(program, operationIds);
+      applyClientApiVersionOverride(root, operations, context, service.type);
       root.definitions = {};
       for (const [name, schema] of definitions) {
         root.definitions[name] = schema;
@@ -3158,8 +3169,9 @@ export function createDefaultDocumentProxy(
 interface OpenAPI2DocumentItem {
   document: OpenAPI2Document;
   operationExamples: Map<string, LoadedExample[]>;
+  operations: HttpOperation[];
   tags: Set<string>;
-  options: ArmFeatureOptions;
+  options: ArmFeatureFileOptions;
 }
 
 function createFeatureDocumentProxy(
@@ -3221,6 +3233,7 @@ function createFeatureDocumentProxy(
     createOrGetEndpoint(op: HttpOperation, context: AutorestEmitterContext): OpenAPI2Operation {
       const options = getFeature(program, op.operation);
       const item = root.get(options.featureName.toLowerCase())!;
+      item.operations.push(op);
       const pathItem = initPathItem(program, op, item.document);
       if (!pathItem[op.verb]) {
         pathItem[op.verb] = { parameters: [] };
@@ -3281,6 +3294,13 @@ function createFeatureDocumentProxy(
         reportDuplicateOperationIds(program, tracker);
       }
       for (const [featureName, featureItem] of root.entries()) {
+        applyClientApiVersionOverride(
+          featureItem.document,
+          featureItem.operations,
+          context,
+          service.type,
+          featureItem.options.version,
+        );
         const exampleIds = operationFeatures.get(featureName) || new Set<string>();
         const featureExamples = [...exampleIds]
           .filter((id) => operationIdsWithExamples.has(id))
@@ -3301,6 +3321,9 @@ function createFeatureDocumentProxy(
           featureItem.document.definitions![defName] = defSchema;
         }
         finalizeOpenApi2Document(featureItem.document, featureItem.tags);
+        if (!hasOpenApiContent(featureItem.document)) {
+          continue;
+        }
         docs.push({
           document: featureItem.document,
           operationExamples: featureExamples,
@@ -3359,6 +3382,15 @@ function createFeatureDocumentProxy(
   }
 }
 
+function hasOpenApiContent(document: OpenAPI2Document): boolean {
+  return (
+    Object.keys(document.paths).length > 0 ||
+    Object.keys(document["x-ms-paths"] ?? {}).length > 0 ||
+    Object.keys(document.parameters ?? {}).length > 0 ||
+    Object.keys(document.definitions ?? {}).length > 0
+  );
+}
+
 function reportDuplicateOperationIds(
   program: Program,
   duplicateTracker: DuplicateTracker<string, Operation>,
@@ -3377,15 +3409,51 @@ function reportDuplicateOperationIds(
 function initializeOpenAPIDocumentItem(
   program: Program,
   service: Service,
-  options: ArmFeatureOptions,
+  options: ArmFeatureFileOptions,
   version?: string,
 ): OpenAPI2DocumentItem {
   return {
     document: initializeOpenApi2Document(program, service, version),
     operationExamples: new Map<string, LoadedExample[]>(),
+    operations: [],
     tags: new Set<string>(),
     options,
   };
+}
+
+function applyClientApiVersionOverride(
+  document: OpenAPI2Document,
+  operations: HttpOperation[],
+  context: AutorestEmitterContext,
+  diagnosticTarget: Namespace,
+  explicitVersion?: string,
+): void {
+  if (explicitVersion !== undefined) {
+    document.info.version = explicitVersion;
+    return;
+  }
+  if (operations.length === 0) return;
+
+  const overrides = operations.map((operation) =>
+    getEffectiveApiVersionOverride(context.program, operation.operation),
+  );
+  if (overrides.every((value) => value === undefined)) return;
+
+  const first = overrides[0];
+  if (first !== undefined && overrides.every((value) => value === first)) {
+    document.info.version = first;
+    return;
+  }
+
+  const values = [...new Set(overrides.map((value) => value ?? "<none>"))];
+  reportDiagnostic(context.program, {
+    code: "inconsistent-client-api-version-override",
+    format: {
+      values: values.join(", "),
+      fallback: document.info.version,
+    },
+    target: diagnosticTarget,
+  });
 }
 
 function initializeOpenApi2Document(
