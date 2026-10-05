@@ -1,4 +1,5 @@
 export { buildServerModel, toPascalCase } from "./build-model.js";
+export { $decorators } from "./decorators.js";
 export { $onEmit } from "./emitter.js";
 export { $lib } from "./lib.js";
 export type {

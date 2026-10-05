@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src/**/*.ts", "test/**/*.ts", "package.json"],
-  "exclude": ["**/*.test.*"],
+  "include": ["src/**/*.ts", "test/**/*.ts", "generated-defs/**/*.ts", "package.json"],
+  "exclude": ["**/*.test.*", "**/*-test.ts"],
   "references": [
     { "path": "../../core/packages/compiler/tsconfig.build.json" },
     { "path": "../../core/packages/http/tsconfig.build.json" }

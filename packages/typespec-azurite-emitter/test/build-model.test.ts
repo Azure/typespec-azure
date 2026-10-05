@@ -203,4 +203,48 @@ describe("buildServerModel", () => {
     expect(names).toContain("GetProperties");
     expect(names.some((n) => n !== "GetProperties" && n.endsWith("GetProperties"))).toBe(true);
   });
+
+  it("applies @makeRequired from an azurite.tsp-style overlay to tighten an optional base-spec property", async () => {
+    // Models the real overlay use case: a base service TypeSpec the emitter doesn't own declares
+    // a property optional, and a separate azurite.tsp-style overlay file (not editing the base
+    // file) tightens it to required for the emulator, via `@@makeRequired` - our own decorator
+    // (see `lib/decorators.tsp`), not `@typespec/client-generator-core`'s `@override` (which only
+    // changes a client SDK's generated method signature, never the real `@typespec/http`
+    // operation/model graph this emitter - or any other service-contract-level consumer - walks).
+    const { program } = await ApiTester.compile({
+      "base.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace RequiredDemo;
+
+        model Options {
+          visibilityTimeout?: int32;
+        }
+
+        @route("/options")
+        @put
+        op setOptions(@body options: Options): void;
+      `,
+      "azurite.tsp": `
+        import "./base.tsp";
+        import "@azure-tools/typespec-azurite-emitter";
+
+        using RequiredDemo;
+        using Azurite;
+
+        @@makeRequired(RequiredDemo.Options.visibilityTimeout);
+      `,
+      "main.tsp": `
+        import "./base.tsp";
+        import "./azurite.tsp";
+      `,
+    });
+    const serverModel = buildServerModel(program);
+
+    const options = serverModel.models.find((m) => m.name === "Options")!;
+    const visibilityTimeout = options.properties.find((p) => p.name === "visibilityTimeout")!;
+    expect(visibilityTimeout.optional).toBe(false);
+  });
 });

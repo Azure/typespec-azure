@@ -3729,6 +3729,9 @@ importers:
       '@typespec/http':
         specifier: workspace:^
         version: link:../../core/packages/http
+      '@typespec/tspd':
+        specifier: workspace:^
+        version: link:../../core/packages/tspd
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: 5.0.0(vitest@5.0.0)

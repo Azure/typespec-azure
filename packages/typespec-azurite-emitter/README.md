@@ -181,6 +181,30 @@ Run with `pnpm test` from this package's directory (or `pnpm --filter
   at all (see below). Augment decorators demonstrate the same "separate overlay file layers
   changes onto an unchanged base file" structural pattern without pulling in TCGC machinery that
   this pilot doesn't otherwise need.
+- **`@makeRequired`: a small custom decorator for service-contract-level overlay changes.**
+  `@@override` was considered (and rejected) for the specific case of an `azurite.tsp` overlay
+  tightening an **optional base-spec property to required** for the emulator. TCGC's `@override`
+  (`packages/typespec-client-generator-core/src/decorators.ts`) only records state consumed by
+  `createSdkContext`'s client-method resolution — it never mutates the real `@typespec/http`
+  `Operation`/`Model` graph, so an emitter that walks `@typespec/http` directly (like this one)
+  would never see its effect. Instead, this package ships its own tiny decorator,
+  `@makeRequired(target: ModelProperty)` (declared in [`lib/decorators.tsp`](./lib/decorators.tsp),
+  implemented in [`src/decorators.ts`](./src/decorators.ts)), which directly sets
+  `target.optional = false` — the same pattern `@typespec/compiler`'s own stdlib
+  `$withOptionalProperties` uses in reverse. It's generated/wired up the same way TCGC generates
+  its own decorator signatures: `pnpm gen-extern-signature` (via `@typespec/tspd`'s
+  `gen-extern-signature` command) reads the `extern dec` declaration in `lib/decorators.tsp` and
+  produces the typed `MakeRequiredDecorator` signature plus a `$decorators["Azurite"]` shape check
+  into `generated-defs/Azurite.ts`/`Azurite.ts-test.ts`, so the hand-written implementation in
+  `src/decorators.ts` can't drift from the declared signature. Usage from an overlay:
+  ```tsp
+  import "@azure-tools/typespec-azurite-emitter";
+  using Azurite;
+
+  @@makeRequired(SomeModel.someOptionalProperty);
+  ```
+  See `test/build-model.test.ts`'s `"applies @makeRequired from an azurite.tsp-style overlay..."`
+  test for a full worked example.
 - **Enums and unions are intentionally simplified** to `string` and `unknown` respectively in the
   intermediate model, rather than full TS string-literal unions / discriminated unions.
 
