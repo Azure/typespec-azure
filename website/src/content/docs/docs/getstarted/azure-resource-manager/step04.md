@@ -18,6 +18,12 @@ model NotificationDetails {
   urgent: boolean;
 }
 
+/** The result of sending a notification */
+model NotificationResult {
+  /** The identifier for the sent notification */
+  notificationId: string;
+}
+
 @armResourceOperations
 interface Users {
   get is ArmResourceRead<User>;
@@ -53,10 +59,11 @@ In a custom operation, you define the operation parameters, responses, http verb
 
 ```typespec
 /** Send a notification to the user */
+@armResourceAction(User)
 @post
 @segment("notify")
 op NotifyUser(...ResourceInstanceParameters<User>, @body notification: NotificationDetails):
-  | ArmResponse<string>
+  | ArmResponse<NotificationResult>
   | ErrorResponse;
 ```
 
