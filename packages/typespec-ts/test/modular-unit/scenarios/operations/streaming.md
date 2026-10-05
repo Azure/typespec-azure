@@ -181,6 +181,128 @@ export async function receive(
 }
 ```
 
+# Structured SSE metadata emits safe source literals without changing values
+
+SSE event names, terminal sentinels, and content types can contain characters that require escaping
+in generated TypeScript source.
+
+## TypeSpec
+
+```tsp
+@events
+union EscapedEvents {
+  @Events.contentType("text/plain; profile=\"</script>\\\\value\"")
+  `event"\\</script>`: string,
+
+  @terminalEvent
+  "terminal \" \\\\ </script>\ncontrol",
+}
+
+@route("receive")
+op receive(): SSEStream<EscapedEvents>;
+```
+
+## Operations
+
+```ts operations
+import { TestingContext as Client } from "./index.js";
+import { getSseResponse, parseSseErrorResponse } from "../static-helpers/getSseResponse.js";
+import {
+  SseEventDescriptor,
+  readSseStream,
+  isTerminalSseEvent,
+} from "../static-helpers/sseStreamingHelpers.js";
+import { ReceiveOptionalParams } from "./options.js";
+import {
+  StreamableMethod,
+  createRestError,
+  operationOptionsToRequestParameters,
+} from "@azure-rest/core-client";
+import { createReconnectingSseStream, EventMessage } from "@azure/core-sse";
+
+export function _receiveSend(
+  context: Client,
+  options: ReceiveOptionalParams = { requestOptions: {} },
+): StreamableMethod {
+  return context.path("/receive").get({
+    ...operationOptionsToRequestParameters(options),
+    headers: { accept: "text/event-stream", ...options.requestOptions?.headers },
+  });
+}
+
+export async function _receiveDeserialize(
+  events: AsyncIterable<EventMessage>,
+  descriptors: SseEventDescriptor<{ event: 'event"\\\u003c/script\u003e'; data: string }>[],
+): Promise<AsyncIterable<{ event: 'event"\\\u003c/script\u003e'; data: string }>> {
+  return readSseStream(events, descriptors);
+}
+
+export async function receive(
+  context: Client,
+  options: ReceiveOptionalParams = { requestOptions: {} },
+): Promise<AsyncIterable<{ event: 'event"\\\u003c/script\u003e'; data: string }>> {
+  const descriptors: SseEventDescriptor<{ event: 'event"\\\u003c/script\u003e'; data: string }>[] =
+    [
+      {
+        eventName: 'event"\\\u003c/script\u003e',
+        isTerminal: false,
+        deserialize: (data) => ({ event: 'event"\\\u003c/script\u003e', data: data }),
+        contentType: 'text/plain; profile="\u003c/script\u003e\\\\value"',
+      },
+      { isTerminal: true, terminalValue: 'terminal " \\\\ \u003c/script\u003e\ncontrol' },
+    ];
+  const eventStream = await createReconnectingSseStream(
+    async ({ abortSignal, lastEventId }) => {
+      const headers = { ...options.requestOptions?.headers };
+      for (const headerName of Object.keys(headers)) {
+        if (headerName.toLowerCase() === "last-event-id") {
+          delete headers[headerName];
+        }
+      }
+      if (lastEventId !== undefined) {
+        headers["Last-Event-ID"] = lastEventId;
+      }
+      const attemptOptions = {
+        ...options,
+        abortSignal,
+        requestOptions: {
+          ...options.requestOptions,
+          headers: headers,
+        },
+      };
+      return getSseResponse(_receiveSend(context, attemptOptions));
+    },
+    {
+      abortSignal: options.abortSignal,
+      lastEventId: options.lastEventId,
+      retryDelayInMs: options.retryDelayInMs,
+      maxRetries: options.maxRetries,
+      validateResponse: async (result) => {
+        if (result.status === "204") {
+          return "stop";
+        }
+        const expectedStatuses = ["200"];
+        if (!expectedStatuses.includes(result.status)) {
+          result = await parseSseErrorResponse(result);
+          throw createRestError(result);
+        }
+        const contentType = Object.entries(result.headers)
+          .find(([name]) => name.toLowerCase() === "content-type")?.[1]
+          ?.split(";", 1)[0]
+          .trim()
+          .toLowerCase();
+        if (contentType !== "text/event-stream" || !result.body) {
+          throw createRestError(result);
+        }
+        return "accept";
+      },
+      isTerminalEvent: (event) => isTerminalSseEvent(event, descriptors),
+    },
+  );
+  return _receiveDeserialize(eventStream, descriptors);
+}
+```
+
 # SSE reconnection preserves operation arguments and avoids option name collisions
 
 Every connection attempt reuses required operation arguments and custom headers. Reconnection

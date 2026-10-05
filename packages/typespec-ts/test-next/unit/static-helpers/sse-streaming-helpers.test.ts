@@ -105,6 +105,25 @@ describe("SSE event mapping", () => {
     expect(isTerminalSseEvent({ id: "", event: "message", data: "{}" }, descriptors)).toBe(false);
   });
 
+  it("matches event names and sentinels containing source-sensitive characters", async () => {
+    const eventName = 'event"\\</script>\u2028';
+    const terminalValue = 'terminal"\\</script>\u2029';
+    const descriptors: SseEventDescriptor<any>[] = [
+      {
+        eventName,
+        isTerminal: false,
+        contentType: "text/plain",
+        deserialize: (data) => ({ event: eventName, data }),
+      },
+      { isTerminal: true, terminalValue },
+    ];
+
+    await expect(
+      collect(descriptors, events({ event: eventName, data: "value" })),
+    ).resolves.toEqual([{ event: eventName, data: "value" }]);
+    expect(isTerminalSseEvent({ id: "", event: "", data: terminalValue }, descriptors)).toBe(true);
+  });
+
   it("yields a typed named terminal event", async () => {
     const descriptors: SseEventDescriptor<any>[] = [
       {
