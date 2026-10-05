@@ -102,6 +102,13 @@ function renderMetadataConst(serverModel: ServerModel): string {
     `  readonly hasRequestBody: boolean;`,
     `  readonly requestBodyContentTypes: readonly string[];`,
     `  readonly responses: readonly OperationResponseMetadata[];`,
+    `  /** The TypeSpec \`interface\` that declared this operation (e.g. \`"Queue"\`, \`"Messages"\`),`,
+    `   * or \`undefined\` for an operation declared directly on the service namespace. A dispatcher`,
+    `   * can use this to classify/group operations by resource without guessing from \`name\` or`,
+    `   * \`path\` alone - see {@link ServerOperation.interfaceName} for why this is sometimes the`,
+    `   * only way to recover resource identity (a resource-identifying path segment can be a`,
+    `   * client-construction detail outside the operation's own HTTP route). */`,
+    `  readonly interfaceName?: string;`,
     `}`,
     "",
     `export const operations: readonly OperationMetadata[] = [`,
@@ -132,6 +139,9 @@ function renderMetadataConst(serverModel: ServerModel): string {
       );
     }
     lines.push(`    ],`);
+    if (op.interfaceName !== undefined) {
+      lines.push(`    interfaceName: ${JSON.stringify(op.interfaceName)},`);
+    }
     lines.push(`  },`);
   }
   lines.push(`];`, "");

@@ -34,6 +34,7 @@ const sampleServerModel: ServerModel = {
       verb: "put",
       path: "/{queueName}",
       doc: "Creates a queue.",
+      interfaceName: "Queue",
       parameters: [
         {
           name: "queueName",
@@ -147,6 +148,7 @@ describe("renderOperations", () => {
     expect(output).toContain(
       `{ statusCode: 201, headers: [{ name: "requestId", wireName: "x-ms-request-id" }] }`,
     );
+    expect(output).toContain(`interfaceName: "Queue"`);
   });
 });
 

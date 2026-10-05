@@ -70,6 +70,18 @@ export interface ServerOperation {
   readonly requestBody?: ServerRequestBody;
   readonly responses: ServerResponse[];
   readonly doc?: string;
+  /**
+   * The name of the TypeSpec `interface` that declared this operation (e.g. `"Queue"`,
+   * `"Messages"`), if any - `undefined` for operations declared directly on the service
+   * namespace. Consumers that need to group/classify operations by resource (e.g. a hand-written
+   * dispatcher distinguishing "queue-level" from "account-level" operations that otherwise share
+   * an identical HTTP path, because a resource-identifying path segment is a client-construction
+   * detail outside `@typespec/http`'s operation-level route - see the real Azure Storage Queue
+   * spec's `@server("{url}", ...)` pattern) should use this field instead of re-deriving the same
+   * classification from each operation's name, which doesn't generalize and isn't derived from
+   * anything the compiled program actually says.
+   */
+  readonly interfaceName?: string;
 }
 
 /** The full intermediate model for one compiled service, ready to be rendered. */

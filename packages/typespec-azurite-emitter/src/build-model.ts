@@ -168,6 +168,7 @@ function buildOperation(
     requestBody,
     responses,
     doc: getDocHelper(program, op.operation),
+    interfaceName: op.operation.interface?.name,
   };
 }
 

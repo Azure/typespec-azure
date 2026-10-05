@@ -75,6 +75,17 @@ into generated TypeScript.
   `{ approximateMessagesCount: 0 }`) into a real HTTP header (`x-ms-approximate-messages-count`)
   needs both names, not just the wire name. `OperationResponseMetadata.headers` is now
   `{ name, wireName }[]` instead of a bare `headerWireNames: string[]`.
+- **Route metadata had no way to classify operations by resource when the resource identifier
+  (e.g. `queueName`) is a client-construction detail, not an HTTP path/query parameter.** The
+  real Azure Storage Queue TypeSpec declares its base server URL as a fully dynamic client
+  parameter (`@server("{url}", ..., { url: url })`), so `queueName` never appears as an
+  `@route`/`@path` operation parameter — it's recovered only via the client's own
+  initialization, outside what `@typespec/http` exposes. Found while wiring the companion
+  Azure/Azurite end-to-end PR's dispatcher: without some resource-identifying signal, a consumer
+  is forced to hardcode a per-operation-name classification table. `ServerOperation`/
+  `OperationMetadata` now include an optional `interfaceName` field (the declaring TypeSpec
+  `interface`'s name, e.g. `"Queue"`), so a dispatcher can combine it with the operation's own
+  path shape to classify operations generically instead of by name.
 
 ## Real-spec validation
 

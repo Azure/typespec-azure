@@ -202,6 +202,12 @@ describe("buildServerModel", () => {
     expect(new Set(names).size).toBe(2);
     expect(names).toContain("GetProperties");
     expect(names.some((n) => n !== "GetProperties" && n.endsWith("GetProperties"))).toBe(true);
+
+    // Each operation's generated metadata should also carry which interface declared it, so a
+    // consumer (e.g. a dispatcher needing to classify operations by resource) doesn't have to
+    // guess resource identity from the operation name/path alone.
+    const interfaceNames = serverModel.operations.map((op) => op.interfaceName).sort();
+    expect(interfaceNames).toEqual(["A", "B"]);
   });
 
   it("applies @makeRequired from an azurite.tsp-style overlay to tighten an optional base-spec property", async () => {
