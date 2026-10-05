@@ -13,6 +13,7 @@ export type ServerTypeRef =
   | { kind: "unknown" }
   | { kind: "model"; name: string }
   | { kind: "array"; element: ServerTypeRef }
+  | { kind: "record"; element: ServerTypeRef }
   | { kind: "literal"; value: string | number | boolean };
 
 export interface ServerModelProperty {
@@ -77,4 +78,17 @@ export interface ServerModel {
   readonly operations: ServerOperation[];
   /** All named models transitively referenced by operation parameters/bodies/responses. */
   readonly models: ServerDataModel[];
+  /**
+   * Operations the transform phase could not represent and intentionally omitted from
+   * {@link ServerModel.operations}, each with a human-readable reason. Populated when running
+   * against specs exercising shapes this pilot's intermediate model doesn't (yet) cover — see
+   * `test/real-queue-spec.test.ts` and the package README's "real-spec compatibility" section
+   * for the concrete, evidence-based list this produces against the real Storage Queue spec.
+   */
+  readonly skippedOperations: readonly ServerSkippedOperation[];
+}
+
+export interface ServerSkippedOperation {
+  readonly name: string;
+  readonly reason: string;
 }

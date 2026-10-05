@@ -76,6 +76,71 @@ into generated TypeScript.
   needs both names, not just the wire name. `OperationResponseMetadata.headers` is now
   `{ name, wireName }[]` instead of a bare `headerWireNames: string[]`.
 
+## Real-spec compatibility: the unchanged Azure Storage Queue TypeSpec
+
+Beyond the toy `queue-pilot` fixture above, this pilot also vendors the **real, byte-for-byte
+unchanged** Azure Storage Queue TypeSpec from `azure-rest-api-specs` into
+[`test/fixtures/storage-queue-real/`](./test/fixtures/storage-queue-real) (see that directory's
+[`PROVENANCE.md`](./test/fixtures/storage-queue-real/PROVENANCE.md) for the exact source commit
+and what was omitted — examples, `readme.md`, `service.yaml`, etc. — none of which this emitter
+needs), plus a real [`azurite.tsp`](./test/fixtures/storage-queue-real/azurite.tsp) overlay
+demonstrating genuine, documented Azurite customizations cited from
+[`Azure/Azurite`'s `swagger/queue.md`](https://github.com/Azure/Azurite/blob/main/swagger/queue.md).
+This is the strongest evidence in this pilot that the transform-then-render architecture holds up
+against a real spec, not just an internally-consistent toy fixture — see
+[`test/real-queue-spec.test.ts`](./test/real-queue-spec.test.ts) for the tests backing every claim
+below.
+
+**Result: all 17 real Queue operations (`Service` + `Queue` interfaces) build and render with zero
+diagnostics and zero skipped operations**, after fixing three concrete gaps the toy fixture never
+exercised:
+
+1. **`Record<T>` dictionary properties.** `QueueItem.metadata` (a `Record<string>`) was being
+   routed through the generic named-model registration path and rendered as an empty
+   `interface Record {}` instead of `Record<string, string>`. Fixed by checking
+   `isRecordModelType` in `toTypeRef` before the generic-model fallback, and adding a
+   `{ kind: "record"; element: ServerTypeRef }` `ServerTypeRef` variant.
+2. **Anonymous-model identity collisions.** Every `StorageOperation*` template instantiation
+   contributes its own distinct anonymous TypeSpec `Model` object for its `{code, message}`-shaped
+   error response body. The toy fixture's error bodies all happened to be identical, so keying the
+   anonymous-model cache by `model.name` (empty string for all of them) silently coalesced them
+   into one shared entry — harmless by coincidence there, but a latent bug for genuinely different
+   anonymous shapes. Fixed by keying the cache by TypeSpec object identity
+   (`Map<Model, string>`) instead, each distinct anonymous model now getting its own
+   `AnonymousModelN` name.
+3. **Real operation-name collisions.** `Service.getProperties` and `Queue.getProperties` both
+   PascalCase to `GetProperties`, which produced a genuine `TS2300: Duplicate identifier` in the
+   generated `operations.ts`/`handlers.ts` (confirmed with a standalone `tsc --strict` check of the
+   rendered output). Fixed by qualifying a colliding operation's name with its containing
+   TypeSpec interface name (e.g. `QueueGetProperties`), falling back to a numeric suffix if that's
+   still not unique.
+
+**Overlay findings**, following Azurite's own documented `swagger/queue.md` changes:
+
+- ✅ **"Remove maximum limitation for `VisibilityTimeout`" (first use site, `sendMessage`) works.**
+  `sendMessage`'s `visibilityTimeout` parameter is spread in from the shared
+  `VisibilityTimeoutParameter` alias, which carries `@maxValue(604800)` in the real spec. A plain
+  `@@maxValue(Storage.Queues.VisibilityTimeoutParameter.visibilityTimeout, 2147483647)` in
+  `azurite.tsp` overrides it — `getMaxValue()` on the compiled program confirms the new value wins,
+  proving augment decorators can **relax**, not just add, a constraint from an unchanged shared
+  base spec. This is the core mechanism the real overlay design depends on.
+- ⚠️ **Same change, second use site (`updateMessage`'s own `visibilityTimeout`) is an open gap, not
+  silently papered over.** Azurite's note also covers `updateMessage`'s separately-declared,
+  required `visibilityTimeout` parameter (not spread from the shared alias). Targeting it via
+  `Storage.Queues.Queue.updateMessage::parameters.visibilityTimeout` fails with
+  `invalid-ref: Model doesn't have member visibilityTimeout`, because `updateMessage` is declared
+  as `op updateMessage is StorageOperationNoBody<{...}, {...}>` (a template instantiation), and the
+  `::parameters` reflection accessor appears to resolve against the template's own declared
+  parameter list rather than the fully-substituted operation members a dispatcher/handler actually
+  sees. `test/real-queue-spec.test.ts` has a test pinning down that this parameter's `@maxValue`
+  is still `604800` today, specifically so this gap can't silently regress-fixed without updating
+  this note. **Future work**: find the correct reflection syntax for templated/`is`-defined
+  operation parameters, or add a small first-class "parameter override" overlay decorator to this
+  emitter itself if TypeSpec's own reflection genuinely can't express it.
+- ✳️ **"Remove `required` section from `AccessPolicy`" is already moot.** The current vendored
+  `models.tsp`'s `AccessPolicy` model already declares `start`/`expiry`/`permission` as optional —
+  nothing to demonstrate or override here against this particular spec revision.
+
 ## Usage
 
 ```bash
@@ -104,6 +169,12 @@ options:
   files exist and contain the expected generated code.
 - `test/azurite-compat.test.ts` — structural fit-check against the real `Azure/Azurite` repo (see
   above), citing the specific files/behaviors compared against.
+- `test/real-queue-spec.test.ts` — builds and renders the real, unchanged Azure Storage Queue
+  TypeSpec plus its `azurite.tsp` overlay (see "Real-spec compatibility" above): asserts all 17
+  operations build with zero skips, the three concrete real-spec gaps stay fixed (`Record<T>`,
+  anonymous-model identity, operation-name collisions), the overlay's `@@maxValue` relaxation
+  takes effect, and the one open overlay gap (`updateMessage`'s own `visibilityTimeout`) stays
+  honestly pinned down rather than silently regressing.
 
 Run with `pnpm test` from this package's directory (or `pnpm --filter
 @azure-tools/typespec-azurite-emitter-pilot test` from the repo root).
@@ -152,17 +223,27 @@ Run with `pnpm test` from this package's directory (or `pnpm --filter
 
 ## Explicitly out of scope (left for the real Azurite collaboration)
 
-- **Full Azure Storage surface.** This pilot models a toy "Queue-like" service with 3 operations —
-  it does not attempt Blob, Queue, or Table surfaces, or anything close to their real size/shape.
-- **XML bodies.** Storage's Blob/Queue APIs are heavily XML-based; this pilot only exercises JSON.
+- **Full Azure Storage surface.** The real vendored fixture covers Queue only (17 operations);
+  Blob and Table are not attempted, nor is anything close to the real spec's full size (hundreds
+  of operations across all three services).
+- **XML bodies.** The real Queue spec's request/response bodies are XML-based and compile/build
+  cleanly through this pilot's transform phase, but the render phase still emits plain TS
+  interfaces — it does not yet generate XML (de)serialization code, so the generated artifacts
+  describe XML shapes without producing XML parsing/writing logic.
 - **TCGC integration.** The real migration will likely need to consume
-  `@azure-tools/typespec-client-generator-core` (e.g. for `@@override`-style client
-  customization, language-specific naming, or pulling in the real `@@clientName`/`@@access`
-  overlays). This pilot walks `@typespec/http` directly and does not use TCGC.
+  `@azure-tools/typespec-client-generator-core` more deeply (e.g. for `@@override`-style client
+  customization or language-specific naming beyond what this pilot's overlay uses). This pilot's
+  devDependencies include TCGC only because the real vendored spec transitively imports it (for
+  its `client.tsp`); the emitter itself still walks `@typespec/http` directly, not TCGC.
 - **Streaming request/response bodies.**
 - **Table-specific OData / batch-request behavior.**
 - **Enums and unions as first-class generated types** (see Design notes above).
-- **Multipart bodies, `@typespec/xml`, versioning, and pagination.**
+- **Multipart bodies and pagination.**
+- **The one documented overlay gap**: relaxing `updateMessage`'s own inline `visibilityTimeout`
+  parameter via augmentation (see "Real-spec compatibility" above) — needs either the correct
+  TypeSpec reflection syntax for templated/`is`-defined operations, or a small first-class
+  parameter-override decorator added to this emitter.
 - **A real Azurite-side consumer** of the generated route-metadata table (e.g. an actual request
   dispatcher) — `operations.ts`'s `operations` const is illustrative routing metadata, not a
-  wired-up router.
+  wired-up router (though the companion `Azure/Azurite` end-to-end PR wires the toy fixture's
+  generated output into a real hand-written dispatcher to validate the metadata shape).

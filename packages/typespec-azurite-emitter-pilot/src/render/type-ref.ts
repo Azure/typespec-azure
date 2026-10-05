@@ -15,6 +15,8 @@ export function renderTypeRef(type: ServerTypeRef): string {
       return type.name;
     case "array":
       return `${wrapIfUnion(renderTypeRef(type.element))}[]`;
+    case "record":
+      return `Record<string, ${renderTypeRef(type.element)}>`;
     case "literal":
       return typeof type.value === "string" ? JSON.stringify(type.value) : String(type.value);
   }
@@ -37,6 +39,9 @@ export function collectModelRefs(type: ServerTypeRef, into: Set<string>): void {
       into.add(type.name);
       return;
     case "array":
+      collectModelRefs(type.element, into);
+      return;
+    case "record":
       collectModelRefs(type.element, into);
       return;
     default:

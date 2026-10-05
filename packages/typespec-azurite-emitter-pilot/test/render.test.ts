@@ -62,6 +62,7 @@ const sampleServerModel: ServerModel = {
       ],
     },
   ],
+  skippedOperations: [],
 };
 
 describe("renderTypeRef", () => {
