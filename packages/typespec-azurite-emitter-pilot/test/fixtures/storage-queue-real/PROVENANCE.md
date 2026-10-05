@@ -4,7 +4,7 @@ The four `.tsp` files in this directory (`main.tsp`, `models.tsp`, `routes.tsp`,
 **vendored verbatim, byte-for-byte unchanged**, from the real Azure Storage Queue TypeSpec:
 
 - Source repository: https://github.com/Azure/azure-rest-api-specs (copied from a local checkout
-  at `iscai-msft/azure-rest-api-specs`, which tracks that upstream)
+  of a personal fork that tracks that upstream)
 - Path: `specification/storage/data-plane/QueueStorage/{main,models,routes,client}.tsp`
 - Commit: `85d7676f040b7a29c22517db77a0ac0fd6b8e496` (local checkout `HEAD` at copy time; verify
   this hash directly against `azure-rest-api-specs` main if you need to confirm currency)

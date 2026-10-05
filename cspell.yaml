@@ -40,6 +40,11 @@ ignorePaths:
   - packages/typespec-java/emitter-tests/src/**
   # Developer/user docs ported verbatim from autorest.java's typespec-extension.
   - packages/typespec-java/docs/**
+  # Real Azure Storage Queue TypeSpec, vendored byte-for-byte verbatim from
+  # azure-rest-api-specs (see PROVENANCE.md); must not be hand-edited, including
+  # to satisfy spell-check, so it's excluded like the other upstream-sourced
+  # fixtures above.
+  - packages/typespec-azurite-emitter-pilot/test/fixtures/storage-queue-real/*.tsp
 useGitignore: true
 enableFiletypes:
   - tsp

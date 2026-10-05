@@ -268,7 +268,7 @@ function toTypeRef(
       // built-in indexer type, not a model with its own declared properties — found while
       // running this against the real Storage Queue spec's `QueueItem.metadata` property, which
       // this pilot originally mis-rendered as an empty `Record` interface (see README).
-      if (isRecordModelType(program, type)) {
+      if (isRecordModelType(type)) {
         return {
           kind: "record",
           element: toTypeRef(program, type.indexer.value, modelRegistry, anonymousModelNames),
