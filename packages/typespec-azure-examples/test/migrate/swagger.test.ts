@@ -1,3 +1,4 @@
+import { join, resolve } from "path";
 import { describe, expect, it } from "vitest";
 import type { SwaggerDocument } from "../../src/migrate/swagger-types.js";
 import {
@@ -34,10 +35,24 @@ describe("namespaceFromPaths", () => {
 });
 
 describe("resolveRefPath", () => {
+  const specDir = resolve("specs");
+  const swaggerFile = join(specDir, "foo.json");
+
   it("resolves relative refs against the swagger file and strips fragments", () => {
-    expect(resolveRefPath("/specs/foo.json", "./examples/Get.json#/x")).toBe(
-      "/specs/examples/Get.json",
+    expect(resolveRefPath(swaggerFile, "./examples/Get.json#/x")).toBe(
+      join(specDir, "examples", "Get.json"),
     );
+  });
+
+  it("resolves parent-directory refs", () => {
+    expect(resolveRefPath(join(specDir, "nested", "foo.json"), "../examples/Get.json")).toBe(
+      join(specDir, "examples", "Get.json"),
+    );
+  });
+
+  it("preserves absolute refs and strips fragments", () => {
+    const exampleFile = join(specDir, "examples", "Get.json");
+    expect(resolveRefPath(swaggerFile, `${exampleFile}#/x`)).toBe(exampleFile);
   });
 });
 

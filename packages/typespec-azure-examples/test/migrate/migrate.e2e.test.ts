@@ -117,8 +117,8 @@ describe("migrate (end-to-end)", () => {
     // The unofficial version is not reported and never surfaces as a `since` value.
     expect(result.versions).toEqual(versionOrder);
     const doc = parse(result.files[0].content);
-    const sinces = doc["Things.create"].map((v: { since?: string }) => v.since);
-    expect(sinces).not.toContain("2025-07-15-preview");
+    const sinceVersions = doc["Things.create"].map((v: { since?: string }) => v.since);
+    expect(sinceVersions).not.toContain("2025-07-15-preview");
     expect(doc["Things.create"]).toHaveLength(2);
 
     // Output still validates against the authoritative version list.
