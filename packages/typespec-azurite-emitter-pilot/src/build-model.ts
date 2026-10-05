@@ -83,9 +83,7 @@ export function toPascalCase(name: string): string {
  *
  * Operations the transform phase can't represent (because they exercise a TypeSpec/HTTP shape
  * this pilot's intermediate model doesn't cover) are skipped rather than aborting the whole
- * build — see `skippedOperations` on the returned {@link ServerModel}, and the "real-spec
- * compatibility" section of this package's README for the concrete gap list this produces
- * against the real, unchanged Storage Queue TypeSpec.
+ * build — see `skippedOperations` on the returned {@link ServerModel}.
  */
 export function buildServerModel(program: Program): ServerModel {
   const [services] = getAllHttpServices(program);
@@ -93,11 +91,9 @@ export function buildServerModel(program: Program): ServerModel {
   const modelRegistry = new Map<string, ServerDataModel>();
   // Anonymous TypeSpec models (e.g. inline `{ ... }` response/error bodies) have no `name`, so
   // they can't be keyed by name the way named models are. Tracking them by object identity
-  // (rather than by the shared empty-string/placeholder name) avoids two *different* anonymous
-  // shapes silently colliding into one cached entry — see the README's "AnonymousModel identity"
-  // gap note, found while running this against the real Storage Queue spec (which has 17
-  // operations that all happen to share one identical anonymous error-response shape, which
-  // made the pre-fix bug easy to miss on this spec in particular but still real).
+  // (rather than by a shared empty-string/placeholder name) avoids two *different* anonymous
+  // shapes silently colliding into one cached entry: a spec with multiple distinct anonymous
+  // response bodies would otherwise collapse them all into one `AnonymousModel` entry.
   const anonymousModelNames = new Map<Model, string>();
 
   const operations: ServerOperation[] = [];
@@ -106,14 +102,14 @@ export function buildServerModel(program: Program): ServerModel {
   for (const op of service?.operations ?? []) {
     try {
       const built = buildOperation(program, op, modelRegistry, anonymousModelNames);
-      // Real Storage Queue finding: both the `Service` and `Queue` TypeSpec interfaces declare
-      // a `getProperties` operation, which previously collided on one `GetProperties` generated
-      // TS symbol (`TS2300: Duplicate identifier`) once both interfaces' operations landed in
-      // the same flat models.ts/operations.ts/handlers.ts output. Qualifying by the containing
-      // TypeSpec interface name (when present, and only when needed to disambiguate) keeps
-      // names close to the operation's own name while still being collision-free, similar in
-      // spirit to how Azurite's own generated code keeps `IServiceHandler`/`IQueueHandler` as
-      // separate interfaces rather than one flat method bag.
+      // Two different TypeSpec interfaces can each declare an operation that PascalCases to
+      // the same generated TS identifier (e.g. two `getProperties` operations on different
+      // interfaces both becoming `GetProperties`), which would otherwise produce a genuine
+      // `TS2300: Duplicate identifier` in the generated models.ts/operations.ts/handlers.ts.
+      // Qualifying a colliding name with its containing TypeSpec interface name (when present)
+      // keeps names close to the operation's own name while staying collision-free, similar in
+      // spirit to keeping separate `I<Interface>Handler` interfaces rather than one flat method
+      // bag.
       let qualifiedName = built.name;
       if (usedOperationNames.has(qualifiedName)) {
         const interfaceName = op.operation.interface?.name;
@@ -264,10 +260,10 @@ function toTypeRef(
           element: toTypeRef(program, type.indexer.value, modelRegistry, anonymousModelNames),
         };
       }
-      // `Record<T>` (e.g. the queue/blob `metadata: Record<string>` dictionary pattern) is a
-      // built-in indexer type, not a model with its own declared properties — found while
-      // running this against the real Storage Queue spec's `QueueItem.metadata` property, which
-      // this pilot originally mis-rendered as an empty `Record` interface (see README).
+      // `Record<T>` (e.g. a `metadata: Record<string>` dictionary property) is a built-in
+      // indexer type, not a model with its own declared properties — without this check it
+      // would fall through to generic model registration and render as an empty interface
+      // instead of `Record<string, X>`.
       if (isRecordModelType(type)) {
         return {
           kind: "record",

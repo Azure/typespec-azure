@@ -119,4 +119,88 @@ describe("buildServerModel", () => {
     const publicAccess = queueMetadata.properties.find((p) => p.name === "publicAccess")!;
     expect(publicAccess.doc).toContain("Azurite note: public access is always treated");
   });
+
+  it("expands a Record<string> dictionary property to a record type ref instead of an empty named model", async () => {
+    const { program } = await ApiTester.compile({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace RecordDemo;
+
+        model Item {
+          tags: Record<string>;
+        }
+
+        @route("/items")
+        @get
+        op getItem(): Item;
+      `,
+    });
+    const serverModel = buildServerModel(program);
+
+    const item = serverModel.models.find((m) => m.name === "Item")!;
+    const tags = item.properties.find((p) => p.name === "tags")!;
+    expect(tags.type).toMatchObject({ kind: "record", element: { kind: "string" } });
+  });
+
+  it("gives distinct anonymous models distinct names instead of collapsing them by shared empty name", async () => {
+    // Two operations whose inline error-response bodies have genuinely different shapes. Keying
+    // the anonymous-model cache by name (empty string for both) would incorrectly coalesce them
+    // into one shared registry entry; keying by TypeSpec object identity keeps them distinct.
+    const { program } = await ApiTester.compile({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace AnonymousDemo;
+
+        @route("/a")
+        @get
+        op getA(): { @statusCode statusCode: 200; code: string };
+
+        @route("/b")
+        @get
+        op getB(): { @statusCode statusCode: 200; message: string };
+      `,
+    });
+    const serverModel = buildServerModel(program);
+
+    const anonymousModels = serverModel.models.filter((m) => m.name.startsWith("AnonymousModel"));
+    expect(anonymousModels.length).toBeGreaterThanOrEqual(2);
+    expect(new Set(anonymousModels.map((m) => m.name)).size).toBe(anonymousModels.length);
+  });
+
+  it("disambiguates operation names that collide across different TypeSpec interfaces", async () => {
+    // Two different interfaces each declaring a `getProperties` operation both PascalCase to
+    // `GetProperties`, which would otherwise be a duplicate generated TS identifier.
+    const { program } = await ApiTester.compile({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace CollisionDemo;
+
+        @route("/a")
+        interface A {
+          @get getProperties(): string;
+        }
+
+        @route("/b")
+        interface B {
+          @get getProperties(): string;
+        }
+      `,
+    });
+    const serverModel = buildServerModel(program);
+
+    const names = serverModel.operations.map((op) => op.name);
+    expect(names).toHaveLength(2);
+    expect(new Set(names).size).toBe(2);
+    expect(names).toContain("GetProperties");
+    expect(names.some((n) => n !== "GetProperties" && n.endsWith("GetProperties"))).toBe(true);
+  });
 });

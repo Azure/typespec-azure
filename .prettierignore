@@ -86,10 +86,3 @@ packages/typespec-java/emitter-tests/
 packages/typespec-java/src/**
 !packages/typespec-java/src/options.ts
 packages/typespec-java/test/
-
-# Vendored, byte-for-byte copy of the real Azure Storage Queue TypeSpec from
-# azure-rest-api-specs (see PROVENANCE.md in this directory) -- must never be
-# reformatted, as its exact unchanged bytes are the proof point for the
-# Azurite-emitter-pilot proposal's "no edits to existing Storage TypeSpec"
-# constraint.
-packages/typespec-azurite-emitter-pilot/test/fixtures/storage-queue-real/*.tsp

@@ -81,9 +81,9 @@ export interface ServerModel {
   /**
    * Operations the transform phase could not represent and intentionally omitted from
    * {@link ServerModel.operations}, each with a human-readable reason. Populated when running
-   * against specs exercising shapes this pilot's intermediate model doesn't (yet) cover — see
-   * `test/real-queue-spec.test.ts` and the package README's "real-spec compatibility" section
-   * for the concrete, evidence-based list this produces against the real Storage Queue spec.
+   * against specs exercising shapes this pilot's intermediate model doesn't (yet) cover, so
+   * callers can report gaps honestly instead of crashing or silently dropping operations — see
+   * `test/build-model.test.ts` for coverage of this field.
    */
   readonly skippedOperations: readonly ServerSkippedOperation[];
 }
