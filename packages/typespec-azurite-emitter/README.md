@@ -1,4 +1,4 @@
-# @azure-tools/typespec-azurite-emitter-pilot
+# @azure-tools/typespec-azurite-emitter
 
 **This is a pilot/prototype, not a production emitter.** It exists to prove out, end to end, an
 architecture for replacing Azurite's (the Azure Storage emulator's) AutoRest-based server code
@@ -111,16 +111,16 @@ exercising the fixes the real spec required.
 ## Usage
 
 ```bash
-tsp compile . --emit @azure-tools/typespec-azurite-emitter-pilot
+tsp compile . --emit @azure-tools/typespec-azurite-emitter
 ```
 
 or in `tspconfig.yaml`:
 
 ```yaml
 emit:
-  - "@azure-tools/typespec-azurite-emitter-pilot"
+  - "@azure-tools/typespec-azurite-emitter"
 options:
-  "@azure-tools/typespec-azurite-emitter-pilot":
+  "@azure-tools/typespec-azurite-emitter":
     outputDir: "." # optional, relative to the emitter output dir
 ```
 
@@ -140,7 +140,7 @@ options:
   above), citing the specific files/behaviors compared against.
 
 Run with `pnpm test` from this package's directory (or `pnpm --filter
-@azure-tools/typespec-azurite-emitter-pilot test` from the repo root).
+@azure-tools/typespec-azurite-emitter test` from the repo root).
 
 ## Design notes / decisions made for this pilot
 

@@ -1,15 +1,14 @@
 {
-  "name": "@azure-tools/typespec-azurite-emitter-pilot",
+  "name": "@azure-tools/typespec-azurite-emitter",
   "version": "0.1.0",
-  "description": "Pilot/prototype TypeSpec emitter generating Azurite server artifacts (models, route metadata, handler interfaces) without AutoRest.",
+  "description": "TypeSpec emitter generating Azurite server artifacts (models, route metadata, handler interfaces) without AutoRest.",
   "type": "module",
   "license": "MIT",
   "author": "Microsoft Corporation",
   "keywords": [
     "typespec",
     "emitter",
-    "azurite",
-    "pilot"
+    "azurite"
   ],
   "repository": {
     "type": "git",

@@ -2,7 +2,7 @@ import { createTypeSpecLibrary } from "@typespec/compiler";
 import { azuritePilotEmitterOptionsSchema } from "./options.js";
 
 export const $lib = createTypeSpecLibrary({
-  name: "@azure-tools/typespec-azurite-emitter-pilot",
+  name: "@azure-tools/typespec-azurite-emitter",
   diagnostics: {
     "no-service-found": {
       severity: "warning",
