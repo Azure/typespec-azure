@@ -155,3 +155,21 @@ The former multi-purpose `arm-resource-operation` checks are represented by thre
 ## Resource Identity Resolution
 
 Concrete ARM resource identities are seeded only by registered read or createOrUpdate operations with valid ARM resource instance paths. List, action, update, delete, and check-existence operations can attach to an existing resolved resource but do not create resource identities by themselves.
+
+## ARM Request and Response Rules
+
+- `no-query-in-collection` allows only `api-version` and case-sensitive `$filter` on collection GET operations.
+- `no-query-in-point-op` allows only `api-version` on point GET, PUT, PATCH, and DELETE operations.
+- `no-query-in-post` allows only `api-version` on POST operations; other inputs belong in the request body.
+- `list-operation-missing-pageable` requires collection GET operations to use TypeSpec paging metadata with a continuation link.
+- `list-response-envelope` requires collection GET response models to contain exactly `value` and `nextLink`.
+- `use-application-json-content-type` requires `application/json` request and response bodies in ARM provider namespaces.
+- `use-model-request-body` requires non-multipart request bodies to use plain models without indexers.
+- `no-tenant-level-apis` reports ARM PUT routes beginning with `/providers`, except the `/operations` endpoint.
+- `lro-response-mismatch` validates that PUT and PATCH final results match the resource type, DELETE final results are `void`, and POST final results match successful response bodies.
+
+The `lro-response-mismatch` implementation has a detailed adjacent Markdown file but no `docs` association in its TypeScript rule definition. Consequently, `pnpm regen-docs` generates only its short description. Fixing the association requires an edit under `packages/typespec-azure-resource-manager/src/rules/`.
+
+## Relationship Documentation Feedback
+
+Use the defaults from `...ResourceNameParameter<RelationshipModel>` unless the API truly requires custom key, segment, or pattern values. Link to canonical samples through the published samples site (`https://azure.github.io/typespec-azure/docs/samples/...`) rather than the repository source tree.
