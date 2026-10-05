@@ -11,6 +11,8 @@ configuration:
       - description: Approve and auto-merge Dependabot core submodule updates
         if:
           - payloadType: Pull_Request
+          - isAction:
+              action: Opened
           - hasLabel:
               label: auto-merge
           - targetsBranch:
