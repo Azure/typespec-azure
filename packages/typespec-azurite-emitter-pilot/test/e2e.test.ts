@@ -37,6 +37,19 @@ describe("end-to-end emit", () => {
     expect(operationsFile).toContain(`location: "path"`);
   });
 
+  it("imports referenced model types into operations.ts so the file compiles standalone", async () => {
+    // Regression test for a real compile error found when the generated artifacts were dropped
+    // into Azurite's own repo and built with its `tsc` (see the companion Azure/Azurite PR):
+    // operations.ts referenced body/header model types (e.g. QueueMetadata) without importing
+    // them from models.ts, so `tsc` failed with `TS2304: Cannot find name`.
+    const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
+    const operationsFile = findOutput(outputs, "operations.ts");
+
+    expect(operationsFile).toMatch(
+      /import type \{[^}]*QueueMetadata[^}]*\} from "\.\/models\.js";/,
+    );
+  });
+
   it("generates handlers.ts with a method per operation", async () => {
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const handlersFile = findOutput(outputs, "handlers.ts");

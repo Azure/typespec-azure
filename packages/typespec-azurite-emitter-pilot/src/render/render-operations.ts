@@ -1,5 +1,27 @@
 import type { ServerModel, ServerOperation, ServerResponse } from "../model.js";
-import { renderFileHeader, renderTypeRef } from "./type-ref.js";
+import { collectModelRefs, renderFileHeader, renderTypeRef } from "./type-ref.js";
+
+/** Collects every `models.ts`-defined type name referenced anywhere in `serverModel`'s operations. */
+function collectReferencedModelNames(serverModel: ServerModel): string[] {
+  const names = new Set<string>();
+  for (const op of serverModel.operations) {
+    for (const param of op.parameters) {
+      collectModelRefs(param.type, names);
+    }
+    if (op.requestBody) {
+      collectModelRefs(op.requestBody.type, names);
+    }
+    for (const response of op.responses) {
+      for (const header of response.headers) {
+        collectModelRefs(header.type, names);
+      }
+      if (response.body) {
+        collectModelRefs(response.body.type, names);
+      }
+    }
+  }
+  return [...names].sort();
+}
 
 function renderParametersInterface(op: ServerOperation): string {
   const lines = [`export interface ${op.name}Parameters {`];
@@ -112,6 +134,10 @@ function renderMetadataConst(serverModel: ServerModel): string {
  */
 export function renderOperations(serverModel: ServerModel): string {
   const parts: string[] = [renderFileHeader()];
+  const referencedModels = collectReferencedModelNames(serverModel);
+  if (referencedModels.length > 0) {
+    parts.push(`import type { ${referencedModels.join(", ")} } from "./models.js";`, "");
+  }
   for (const op of serverModel.operations) {
     if (op.doc) {
       parts.push(`/** ${op.doc} */`);
