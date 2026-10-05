@@ -130,9 +130,12 @@ describe("renderOperations", () => {
     expect(output).toContain(`name: "CreateQueue"`);
     expect(output).toContain(`verb: "put"`);
     expect(output).toContain(`path: "/{queueName}"`);
-    expect(output).toContain(`{ name: "queueName", wireName: "queueName", location: "path" }`);
+    expect(output).toContain(
+      `{ name: "queueName", wireName: "queueName", location: "path", required: true }`,
+    );
     expect(output).toContain("hasRequestBody: true");
     expect(output).toContain(`requestBodyContentTypes: ["application/json"]`);
+    expect(output).toContain(`{ statusCode: 201, headerWireNames: ["x-ms-request-id"] }`);
   });
 });
 
@@ -146,9 +149,13 @@ describe("renderHandlers", () => {
     expect(output).toContain(`} from "./operations.js";`);
   });
 
-  it("declares one camelCase method per operation returning a Promise", () => {
+  it("declares a placeholder Context type mirroring Azurite's generated Context object", () => {
+    expect(output).toContain("export interface Context {");
+  });
+
+  it("declares one camelCase method per operation taking params + context and returning a Promise", () => {
     expect(output).toContain(
-      "createQueue(params: CreateQueueParameters): Promise<CreateQueueResponse>;",
+      "createQueue(params: CreateQueueParameters, context: Context): Promise<CreateQueueResponse>;",
     );
   });
 });

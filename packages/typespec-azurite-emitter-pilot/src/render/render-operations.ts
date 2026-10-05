@@ -41,13 +41,27 @@ function renderResponseType(op: ServerOperation): string {
   return lines.join("\n");
 }
 
-/** Runtime route-binding metadata consumed by a (hypothetical) Azurite dispatcher. */
+/**
+ * Runtime route-binding metadata consumed by a dispatcher. Mirrors the information Azurite's
+ * real generated dispatcher (`src/queue/generated/middleware/dispatch.middleware.ts`) reads off
+ * its AutoRest-generated `msRest.OperationSpec`s: HTTP method, URL path template, and for each
+ * parameter the wire name, location, and whether it is required (Azurite's dispatcher uses
+ * `required` parameters to disambiguate between operations that share a path/verb, e.g. a
+ * `SetMetadata` request vs. a plain `Create` request - see `isRequestAgainstOperation` in that
+ * file).
+ */
 function renderMetadataConst(serverModel: ServerModel): string {
   const lines = [
     `export interface OperationParameterBinding {`,
     `  readonly name: string;`,
     `  readonly wireName: string;`,
     `  readonly location: "path" | "query" | "header";`,
+    `  readonly required: boolean;`,
+    `}`,
+    "",
+    `export interface OperationResponseMetadata {`,
+    `  readonly statusCode: number | "*";`,
+    `  readonly headerWireNames: readonly string[];`,
     `}`,
     "",
     `export interface OperationMetadata {`,
@@ -57,6 +71,7 @@ function renderMetadataConst(serverModel: ServerModel): string {
     `  readonly parameters: readonly OperationParameterBinding[];`,
     `  readonly hasRequestBody: boolean;`,
     `  readonly requestBodyContentTypes: readonly string[];`,
+    `  readonly responses: readonly OperationResponseMetadata[];`,
     `}`,
     "",
     `export const operations: readonly OperationMetadata[] = [`,
@@ -69,7 +84,7 @@ function renderMetadataConst(serverModel: ServerModel): string {
     lines.push(`    parameters: [`);
     for (const param of op.parameters) {
       lines.push(
-        `      { name: ${JSON.stringify(param.name)}, wireName: ${JSON.stringify(param.wireName)}, location: ${JSON.stringify(param.location)} },`,
+        `      { name: ${JSON.stringify(param.name)}, wireName: ${JSON.stringify(param.wireName)}, location: ${JSON.stringify(param.location)}, required: ${!param.optional} },`,
       );
     }
     lines.push(`    ],`);
@@ -77,6 +92,13 @@ function renderMetadataConst(serverModel: ServerModel): string {
     lines.push(
       `    requestBodyContentTypes: ${JSON.stringify(op.requestBody?.contentTypes ?? [])},`,
     );
+    lines.push(`    responses: [`);
+    for (const response of op.responses) {
+      lines.push(
+        `      { statusCode: ${JSON.stringify(response.statusCode)}, headerWireNames: ${JSON.stringify(response.headers.map((h) => h.wireName))} },`,
+      );
+    }
+    lines.push(`    ],`);
     lines.push(`  },`);
   }
   lines.push(`];`, "");

@@ -41,6 +41,32 @@ into generated TypeScript.
 - **Representative HTTP shapes**: query-string parameters (`listMessages`), a JSON request body
   (`createQueue`), and a custom response header (`getQueueProperties`'s
   `x-ms-approximate-messages-count`).
+- **Structural fit against the real Azure/Azurite repo.** [`test/azurite-compat.test.ts`](./test/azurite-compat.test.ts)
+  compares our generated artifacts against Azurite's actual (AutoRest-generated) equivalents,
+  fetched from `Azure/Azurite`'s `main` branch:
+  `src/queue/generated/handlers/IQueueHandler.ts`,
+  `src/queue/generated/middleware/dispatch.middleware.ts`,
+  `src/queue/generated/artifacts/{parameters,specifications,operation}.ts`, and
+  `src/queue/generated/Context.ts`. It asserts our `handlers.ts`/`operations.ts` carry the same
+  _categories_ of information Azurite's real dispatcher/handler boundary relies on (HTTP
+  method+path template, per-parameter wire name/location/required-ness, per-status-code response
+  headers, a trailing per-request context argument on handler methods) — see that test file's
+  header comment for the exact citations. Comparing against the real repo surfaced two concrete
+  gaps versus our first draft, both closed in this pilot (see below) rather than left silent.
+
+## Gaps found (and closed) while comparing against the real Azurite repo
+
+- **Handler methods were missing a trailing context argument.** Azurite's real handler methods
+  (e.g. `IQueueHandler.create`) take `(options, context)`, not just `options` — the `context`
+  carries per-request state (matched operation, raw request/response). `handlers.ts` now
+  generates a minimal placeholder `Context` type and every method takes
+  `(params: XParameters, context: Context)`.
+- **Route metadata was missing `required`/per-status response info.** Azurite's dispatcher
+  (`dispatch.middleware.ts`) disambiguates between operations sharing a path/verb using which
+  query/header parameters are _required_, and its `OperationSpec.responses` are keyed by status
+  code with a header mapper per status. `operations.ts`'s `OperationParameterBinding` now
+  includes `required`, and `OperationMetadata` now includes a `responses` array with
+  `statusCode`/`headerWireNames` per response.
 
 ## Usage
 
@@ -68,6 +94,8 @@ options:
 - `test/e2e.test.ts` — a true end-to-end test: compiles the fixture (base + azurite overlay) with
   the emitter via `@typespec/compiler/testing`'s `createTester`, and asserts all three generated
   files exist and contain the expected generated code.
+- `test/azurite-compat.test.ts` — structural fit-check against the real `Azure/Azurite` repo (see
+  above), citing the specific files/behaviors compared against.
 
 Run with `pnpm test` from this package's directory (or `pnpm --filter
 @azure-tools/typespec-azurite-emitter-pilot test` from the repo root).

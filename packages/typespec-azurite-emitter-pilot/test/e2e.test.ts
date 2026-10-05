@@ -43,13 +43,13 @@ describe("end-to-end emit", () => {
 
     expect(handlersFile).toContain("export interface IServiceHandler {");
     expect(handlersFile).toContain(
-      "createQueue(params: CreateQueueParameters): Promise<CreateQueueResponse>;",
+      "createQueue(params: CreateQueueParameters, context: Context): Promise<CreateQueueResponse>;",
     );
     expect(handlersFile).toContain(
-      "getQueueProperties(params: GetQueuePropertiesParameters): Promise<GetQueuePropertiesResponse>;",
+      "getQueueProperties(params: GetQueuePropertiesParameters, context: Context): Promise<GetQueuePropertiesResponse>;",
     );
     expect(handlersFile).toContain(
-      "listMessages(params: ListMessagesParameters): Promise<ListMessagesResponse>;",
+      "listMessages(params: ListMessagesParameters, context: Context): Promise<ListMessagesResponse>;",
     );
   });
 
