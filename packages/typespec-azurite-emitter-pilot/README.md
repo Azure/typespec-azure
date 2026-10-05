@@ -51,8 +51,10 @@ into generated TypeScript.
   _categories_ of information Azurite's real dispatcher/handler boundary relies on (HTTP
   method+path template, per-parameter wire name/location/required-ness, per-status-code response
   headers, a trailing per-request context argument on handler methods) — see that test file's
-  header comment for the exact citations. Comparing against the real repo surfaced two concrete
-  gaps versus our first draft, both closed in this pilot (see below) rather than left silent.
+  header comment for the exact citations. Comparing against the real repo, and later wiring a
+  real hand-written Express dispatcher against the generated metadata for the companion
+  Azure/Azurite end-to-end PR, surfaced three concrete gaps versus our first draft, all closed in
+  this pilot (see below) rather than left silent.
 
 ## Gaps found (and closed) while comparing against the real Azurite repo
 
@@ -66,7 +68,13 @@ into generated TypeScript.
   query/header parameters are _required_, and its `OperationSpec.responses` are keyed by status
   code with a header mapper per status. `operations.ts`'s `OperationParameterBinding` now
   includes `required`, and `OperationMetadata` now includes a `responses` array with
-  `statusCode`/`headerWireNames` per response.
+  `statusCode`/`headers` (name + wire name) per response.
+- **Response header metadata was missing the TS property name.** Found while wiring a real
+  hand-written Express dispatcher against this metadata for the companion Azure/Azurite
+  end-to-end PR: a dispatcher translating a handler's typed result (e.g.
+  `{ approximateMessagesCount: 0 }`) into a real HTTP header (`x-ms-approximate-messages-count`)
+  needs both names, not just the wire name. `OperationResponseMetadata.headers` is now
+  `{ name, wireName }[]` instead of a bare `headerWireNames: string[]`.
 
 ## Usage
 
