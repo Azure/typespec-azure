@@ -23,10 +23,10 @@ that an earlier `pnpm format` run had reflowed `routes.tsp`/`client.tsp` — see
 
 ```bash
 $ SRC=/path/to/azure-rest-api-specs/specification/storage/data-plane/QueueStorage
-$ diff -q main.tsp "$SRC/main.tsp"      # no output -> identical
-$ diff -q models.tsp "$SRC/models.tsp"  # no output -> identical
-$ diff -q routes.tsp "$SRC/routes.tsp"  # no output -> identical
-$ diff -q client.tsp "$SRC/client.tsp"  # no output -> identical
+$ diff -q main.tsp "$SRC/main.tsp"     # no output -> identical
+$ diff -q models.tsp "$SRC/models.tsp" # no output -> identical
+$ diff -q routes.tsp "$SRC/routes.tsp" # no output -> identical
+$ diff -q client.tsp "$SRC/client.tsp" # no output -> identical
 ```
 
 All four commands produced no output (i.e. `diff -q` found zero differences) when last checked.
