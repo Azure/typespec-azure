@@ -182,7 +182,7 @@ The following TypeSpec linting rules enforce ARM conventions that are not explic
 
 | TypeSpec Rule                                                                                           | Description                                                                                        |
 | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `arm/arm-common-types-version`                                                                          | Requires specifying the ARM common-types version using `@armCommonTypesVersion`.                   |
+| `arm/arm-common-types-version`                                                                          | Requires explicitly selecting the latest ARM common-types version using `@armCommonTypesVersion`.  |
 | [`arm/arm-no-record`](/docs/libraries/azure-resource-manager/rules/arm-no-record)                       | Prevents use of `Record` types for ARM resources, which produce `additionalProperties` in OpenAPI. |
 | `arm/arm-resource-duplicate-property`                                                                   | Warns about duplicate properties in resource definitions.                                          |
 | `arm/arm-resource-interface-requires-decorator`                                                         | Requires `@armResourceOperations` decorator on resource interfaces.                                |

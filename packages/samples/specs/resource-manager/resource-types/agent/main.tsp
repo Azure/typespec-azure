@@ -20,7 +20,7 @@ namespace Microsoft.ContosoAgent;
 /** Contoso Agent API versions */
 enum Versions {
   /** 2026-04-01 version */
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v6)
   `2026-04-01`,
 }
 
