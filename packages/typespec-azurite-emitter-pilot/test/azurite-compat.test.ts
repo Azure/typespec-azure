@@ -102,10 +102,12 @@ describe("structural fit against Azure/Azurite's real generated artifacts", () =
 
     // CreateQueue: 201 response carrying the custom x-ms-request-id header, analogous to
     // queueCreateOperationSpec.responses[201].headersMapper in Azurite's specifications.ts.
-    expect(operationsFile).toContain(`{ statusCode: 201, headerWireNames: ["x-ms-request-id"] }`);
+    expect(operationsFile).toContain(
+      `{ statusCode: 201, headers: [{ name: "requestId", wireName: "x-ms-request-id" }] }`,
+    );
     // GetQueueProperties: 200 response carrying the custom approximate-messages-count header.
     expect(operationsFile).toContain(
-      `{ statusCode: 200, headerWireNames: ["x-ms-approximate-messages-count"] }`,
+      `{ statusCode: 200, headers: [{ name: "approximateMessagesCount", wireName: "x-ms-approximate-messages-count" }] }`,
     );
   });
 

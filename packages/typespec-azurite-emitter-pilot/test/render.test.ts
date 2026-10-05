@@ -143,7 +143,9 @@ describe("renderOperations", () => {
     );
     expect(output).toContain("hasRequestBody: true");
     expect(output).toContain(`requestBodyContentTypes: ["application/json"]`);
-    expect(output).toContain(`{ statusCode: 201, headerWireNames: ["x-ms-request-id"] }`);
+    expect(output).toContain(
+      `{ statusCode: 201, headers: [{ name: "requestId", wireName: "x-ms-request-id" }] }`,
+    );
   });
 });
 

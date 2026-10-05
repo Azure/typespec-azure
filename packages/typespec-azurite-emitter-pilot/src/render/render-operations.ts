@@ -70,7 +70,10 @@ function renderResponseType(op: ServerOperation): string {
  * parameter the wire name, location, and whether it is required (Azurite's dispatcher uses
  * `required` parameters to disambiguate between operations that share a path/verb, e.g. a
  * `SetMetadata` request vs. a plain `Create` request - see `isRequestAgainstOperation` in that
- * file).
+ * file). Response headers carry both the TS property name (matching the `XxxResponse` type's
+ * `headers` object keys) and the wire name, so a dispatcher can translate a handler's typed
+ * result back into real HTTP response headers - a gap found and closed while wiring a real
+ * end-to-end dispatcher against this metadata for the companion Azure/Azurite pilot PR.
  */
 function renderMetadataConst(serverModel: ServerModel): string {
   const lines = [
@@ -81,9 +84,14 @@ function renderMetadataConst(serverModel: ServerModel): string {
     `  readonly required: boolean;`,
     `}`,
     "",
+    `export interface OperationResponseHeaderBinding {`,
+    `  readonly name: string;`,
+    `  readonly wireName: string;`,
+    `}`,
+    "",
     `export interface OperationResponseMetadata {`,
     `  readonly statusCode: number | "*";`,
-    `  readonly headerWireNames: readonly string[];`,
+    `  readonly headers: readonly OperationResponseHeaderBinding[];`,
     `}`,
     "",
     `export interface OperationMetadata {`,
@@ -116,8 +124,11 @@ function renderMetadataConst(serverModel: ServerModel): string {
     );
     lines.push(`    responses: [`);
     for (const response of op.responses) {
+      const headerEntries = response.headers
+        .map((h) => `{ name: ${JSON.stringify(h.name)}, wireName: ${JSON.stringify(h.wireName)} }`)
+        .join(", ");
       lines.push(
-        `      { statusCode: ${JSON.stringify(response.statusCode)}, headerWireNames: ${JSON.stringify(response.headers.map((h) => h.wireName))} },`,
+        `      { statusCode: ${JSON.stringify(response.statusCode)}, headers: [${headerEntries}] },`,
       );
     }
     lines.push(`    ],`);
