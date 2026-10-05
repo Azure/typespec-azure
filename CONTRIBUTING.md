@@ -506,11 +506,12 @@ Process labels
 
 Misc labels
 
-| Name                | Color   | Description                                        |
-| ------------------- | ------- | -------------------------------------------------- |
-| `good first issue`  | #7057ff | Good for newcomers                                 |
-| `int:azure-specs`   | #0e8a16 | Run integration tests against azure-rest-api-specs |
-| `agentic-workflows` | #000000 | Issues/PR created by github agentic workflows      |
+| Name                | Color   | Description                                                      |
+| ------------------- | ------- | ---------------------------------------------------------------- |
+| `good first issue`  | #7057ff | Good for newcomers                                               |
+| `int:azure-specs`   | #0e8a16 | Run integration tests against azure-rest-api-specs               |
+| `agentic-workflows` | #000000 | Issues/PR created by github agentic workflows                    |
+| `auto-merge`        | #0e8a16 | Automatically merge the pull request after all requirements pass |
 
 #### external
 

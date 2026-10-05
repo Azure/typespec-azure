@@ -20,7 +20,7 @@ configuration:
               issueAuthor: true
         then:
           - approvePullRequest:
-              comment: ":shipit:"
+              comment: "Approved automatically for a Dependabot core update."
           - enableAutoMerge:
               mergeMethod: Squash
 
