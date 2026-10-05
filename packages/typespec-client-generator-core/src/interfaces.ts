@@ -946,7 +946,8 @@ export interface SdkSseEventMetadata {
   isTerminalEvent: boolean;
   /**
    * Whether `type` describes an event envelope wrapping a separate `@data` payload.
-   * When `false`, `type` and `payloadType` (and their content types) are the same.
+   * When `false`, `type` and `payloadType` are the same; `payloadContentType` additionally
+   * includes inferred defaults.
    */
   isEventEnvelope: boolean;
   /** The event type. Represents the event envelope when `isEventEnvelope` is `true`. */
@@ -955,7 +956,12 @@ export interface SdkSseEventMetadata {
   contentType?: string;
   /** The type of the event payload. Matches `type` when `isEventEnvelope` is `false`. */
   payloadType: SdkType;
-  /** The content type of the event payload. Matches `contentType` when `isEventEnvelope` is `false`. */
+  /**
+   * The effective content type of the event payload. Explicit event or `@data` property content
+   * types take precedence over the payload type's `@mediaTypeHint`, then model/scalar defaults
+   * (`application/json`/`text/plain`). Literals without a content type or hint remain undefined.
+   * The envelope's content type does not override a separate `@data` payload's format.
+   */
   payloadContentType?: string;
 }
 

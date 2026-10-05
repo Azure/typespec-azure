@@ -107,7 +107,9 @@ export async function* readSseStream<T>(
     }
 
     if (descriptor.terminalValue !== undefined) {
-      // Core already stopped the transport for this control sentinel; do not expose it as data.
+      if (descriptor.isTerminal) {
+        return;
+      }
       continue;
     }
 
@@ -126,6 +128,9 @@ export async function* readSseStream<T>(
         payload = event.data;
       }
       yield descriptor.deserialize(payload);
+    }
+    if (descriptor.isTerminal) {
+      return;
     }
   }
 }

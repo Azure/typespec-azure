@@ -63,6 +63,58 @@ const namedWithSentinel: SseEventDescriptor<any>[] = [
 ];
 
 describe("SSE event mapping", () => {
+  it.each(["typed", "sentinel"] as const)(
+    "cuts off a synthetic source after a %s terminal and closes its iterator",
+    async (kind) => {
+      const closed = vi.fn();
+      const trailing = vi.fn();
+      const source = (async function* () {
+        try {
+          yield { id: "", event: "delta", data: "hello" };
+          yield { id: "", event: "done", data: kind === "typed" ? "finished" : "[DONE]" };
+          trailing();
+          yield { id: "", event: "delta", data: "too late" };
+        } finally {
+          closed();
+        }
+      })();
+      const descriptors: SseEventDescriptor<string>[] = [
+        { eventName: "delta", isTerminal: false, contentType: "text/plain", deserialize: (x) => x },
+        {
+          eventName: "done",
+          isTerminal: true,
+          contentType: "text/plain",
+          ...(kind === "typed" ? { deserialize: (x: string) => x } : { terminalValue: "[DONE]" }),
+        },
+      ];
+      await expect(collect(descriptors, source)).resolves.toEqual(
+        kind === "typed" ? ["hello", "finished"] : ["hello"],
+      );
+      expect(trailing).not.toHaveBeenCalled();
+      expect(closed).toHaveBeenCalledOnce();
+    },
+  );
+
+  it("does not stop for an unrelated named sentinel or a nonterminal constant", async () => {
+    const descriptors: SseEventDescriptor<string>[] = [
+      { eventName: "done", isTerminal: true, terminalValue: "[DONE]" },
+      { eventName: "control", isTerminal: false, terminalValue: "skip" },
+      { isTerminal: false, contentType: "text/plain", deserialize: (x) => x },
+    ];
+    await expect(
+      collect(
+        descriptors,
+        events(
+          { event: "unrelated", data: "[DONE]" },
+          { event: "control", data: "skip" },
+          { data: "hello" },
+          { event: "done", data: "[DONE]" },
+          { data: "too late" },
+        ),
+      ),
+    ).resolves.toEqual(["hello"]);
+  });
+
   it("yields deserialized payloads for unnamed events", async () => {
     const items = await collect(
       unnamedWithSentinel,

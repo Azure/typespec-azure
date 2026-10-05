@@ -3,6 +3,8 @@
 An operation returning `JsonlStream<T>` generates a `Promise<AsyncIterable<T>>` whose body is decoded
 lazily as JSON Lines. This is the default behavior.
 
+Unexpected HTTP statuses buffer the streamed error body before ordinary modeled error handling.
+
 ## TypeSpec
 
 ```tsp
@@ -54,8 +56,179 @@ export async function receive(
   context: Client,
   options: ReceiveOptionalParams = { requestOptions: {} },
 ): Promise<AsyncIterable<Info>> {
-  const result = await getStreamResponse(_receiveSend(context, options));
+  const result = await getStreamResponse(_receiveSend(context, options), ["200"]);
   return _receiveDeserialize(result);
+}
+```
+
+# Structured SSE payload MIME inference preserves payload-only envelopes
+
+Unannotated scalar payloads use text, models use JSON, and explicit content types or media-type
+hints override those defaults. An `@data` event deserializes only its payload, never its envelope.
+
+## TypeSpec
+
+```tsp
+@mediaTypeHint("application/json")
+scalar JsonText extends string;
+
+model Payload {
+  @encodedName("application/json", "wire_value")
+  value: string;
+}
+
+@events
+union PayloadEvents {
+  progress: string,
+  object: Payload,
+
+  @Events.contentType("application/json")
+  quoted: string,
+
+  hinted: JsonText,
+
+  @Events.contentType("application/json")
+  scalarEnvelope: {
+    @data contents: string,
+  },
+
+  @Events.contentType("text/plain")
+  modelEnvelope: {
+    @data contents: Payload,
+  },
+
+  @Events.contentType("text/plain")
+  propertyOverride: {
+    @data @Events.contentType("application/json") contents: string,
+  },
+
+  @terminalEvent
+  "[DONE]",
+}
+
+@route("receive")
+op receive(): SSEStream<PayloadEvents>;
+```
+
+## Operations
+
+```ts operations function receive
+export async function receive(
+  context: Client,
+  options: ReceiveOptionalParams = { requestOptions: {} },
+): Promise<
+  AsyncIterable<
+    | { event: "progress"; data: string }
+    | { event: "object"; data: Payload }
+    | { event: "quoted"; data: string }
+    | { event: "hinted"; data: string }
+    | { event: "scalarEnvelope"; data: string }
+    | { event: "modelEnvelope"; data: Payload }
+    | { event: "propertyOverride"; data: string }
+  >
+> {
+  const descriptors: SseEventDescriptor<
+    | { event: "progress"; data: string }
+    | { event: "object"; data: Payload }
+    | { event: "quoted"; data: string }
+    | { event: "hinted"; data: string }
+    | { event: "scalarEnvelope"; data: string }
+    | { event: "modelEnvelope"; data: Payload }
+    | { event: "propertyOverride"; data: string }
+  >[] = [
+    {
+      eventName: "progress",
+      isTerminal: false,
+      deserialize: (data) => ({ event: "progress", data: data }),
+      contentType: "text/plain",
+    },
+    {
+      eventName: "object",
+      isTerminal: false,
+      deserialize: (data) => ({ event: "object", data: payloadDeserializer(data) }),
+      contentType: "application/json",
+    },
+    {
+      eventName: "quoted",
+      isTerminal: false,
+      deserialize: (data) => ({ event: "quoted", data: data }),
+      contentType: "application/json",
+    },
+    {
+      eventName: "hinted",
+      isTerminal: false,
+      deserialize: (data) => ({ event: "hinted", data: data }),
+      contentType: "application/json",
+    },
+    {
+      eventName: "scalarEnvelope",
+      isTerminal: false,
+      deserialize: (data) => ({ event: "scalarEnvelope", data: data }),
+      contentType: "text/plain",
+    },
+    {
+      eventName: "modelEnvelope",
+      isTerminal: false,
+      deserialize: (data) => ({ event: "modelEnvelope", data: payloadDeserializer(data) }),
+      contentType: "application/json",
+    },
+    {
+      eventName: "propertyOverride",
+      isTerminal: false,
+      deserialize: (data) => ({ event: "propertyOverride", data: data }),
+      contentType: "application/json",
+    },
+    { isTerminal: true, terminalValue: "[DONE]" },
+  ];
+  const eventStream = await createReconnectingSseStream(
+    async ({ abortSignal, lastEventId }) => {
+      const headers = { ...options.requestOptions?.headers };
+      for (const headerName of Object.keys(headers)) {
+        if (headerName.toLowerCase() === "last-event-id") {
+          delete headers[headerName];
+        }
+      }
+      if (lastEventId !== undefined) {
+        headers["Last-Event-ID"] = lastEventId;
+      }
+      const attemptOptions = {
+        ...options,
+        abortSignal,
+        requestOptions: {
+          ...options.requestOptions,
+          headers: headers,
+        },
+      };
+      return getSseResponse(_receiveSend(context, attemptOptions));
+    },
+    {
+      abortSignal: options.abortSignal,
+      lastEventId: options.lastEventId,
+      retryDelayInMs: options.retryDelayInMs,
+      maxRetries: options.maxRetries,
+      validateResponse: async (result) => {
+        if (result.status === "204") {
+          return "stop";
+        }
+        const expectedStatuses = ["200"];
+        if (!expectedStatuses.includes(result.status)) {
+          result = await parseSseErrorResponse(result);
+          throw createRestError(result);
+        }
+        const contentType = Object.entries(result.headers)
+          .find(([name]) => name.toLowerCase() === "content-type")?.[1]
+          ?.split(";", 1)[0]
+          .trim()
+          .toLowerCase();
+        if (contentType !== "text/event-stream" || !result.body) {
+          throw createRestError(result);
+        }
+        return "accept";
+      },
+      isTerminalEvent: (event) => isTerminalSseEvent(event, descriptors),
+    },
+  );
+  return _receiveDeserialize(eventStream, descriptors);
 }
 ```
 
