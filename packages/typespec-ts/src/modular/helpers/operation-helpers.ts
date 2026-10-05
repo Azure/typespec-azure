@@ -39,6 +39,7 @@ import {
   formatOptionalPropertyAccess,
   formatPropertyAccess,
   NameType,
+  normalizeName,
   normalizeSdkName,
   normalizeSdkPropertyName,
 } from "../../utils/name-utils.js";
@@ -99,6 +100,7 @@ import {
   getClassicalLayerPrefix,
   getOperationName,
 } from "./naming-helpers.js";
+import { getStructuredStreamKind } from "./structured-stream-helpers.js";
 import { getNullableValidType, isSpreadBodyParameter, isTypeNullable } from "./type-helpers.js";
 
 /**
@@ -1176,27 +1178,15 @@ export function getStructuredStreamInfo(
   context: SdkContext,
   operation: ServiceOperation,
 ): StructuredStreamInfo | undefined {
-  if (
-    isPagingOnlyOperation(operation) ||
-    isLroOnlyOperation(operation) ||
-    isLroAndPagingOperation(operation)
-  ) {
+  const kind = getStructuredStreamKind(operation);
+  if (!kind) {
     return undefined;
   }
   const response = operation.response;
-  const streamMetadata = response.streamMetadata;
-  if (!streamMetadata) {
-    return undefined;
-  }
-
-  // Validate content type to distinguish between JSONL and SSE streams.
-  // Only process recognized structured streaming content types.
-  const contentTypes = streamMetadata.contentTypes ?? [];
-  const hasJsonlContentType = contentTypes.some((ct) => ct.includes("jsonl"));
-  const hasSseContentType = contentTypes.some((ct) => ct.includes("event-stream"));
+  const streamMetadata = response.streamMetadata!;
 
   const sseMetadata = response.sseMetadata;
-  if (sseMetadata && hasSseContentType) {
+  if (sseMetadata && kind === "sse") {
     const events: StructuredStreamEvent[] = [];
     const payloadTypeExpressions: string[] = [];
     const namedEventTypes: Record<string, string> = {};
@@ -1250,15 +1240,7 @@ export function getStructuredStreamInfo(
     return result;
   }
 
-  // Not SSE; check for JSONL if content type matches.
-  if (!hasJsonlContentType) {
-    return undefined;
-  }
-
   const streamType = streamMetadata.streamType;
-  if (streamType.kind !== "model" && streamType.kind !== "union") {
-    return undefined;
-  }
   const deserializerName = buildModelDeserializer(context, streamType, {
     nameOnly: true,
     skipDiscriminatedUnionSuffix: false,
@@ -1297,7 +1279,7 @@ function getStructuredStreamOperationFunction(
   if (info.kind === "jsonl") {
     const getStreamResponseRef = resolveReference(StreamingHelpers.getStreamResponse);
     statements.push(
-      `const ${resultVarName} = await ${getStreamResponseRef}(_${name}Send(${parameterList}));`,
+      `const ${resultVarName} = await ${getStreamResponseRef}(_${name}Send(${parameterList}), ${getExpectedStatuses(operation)});`,
       `return _${name}Deserialize(${resultVarName});`,
     );
   } else {
@@ -1514,25 +1496,13 @@ function getStructuredStreamDeserializeFunction(
 /**
  * Returns true when the package contains at least one SSE (`text/event-stream`) streaming
  * operation. Used to add the `@azure/core-sse` runtime dependency to the generated package
- * only when it is actually needed. Mirrors the SSE gating of {@link getStructuredStreamInfo}
- * (paging/LRO exclusions and the `streamMetadata` + `sseMetadata` requirement) so the
- * dependency is not injected for operations that never generate SSE streaming.
+ * only when the shared structured-stream classification selects SSE.
  */
 export function packageHasSseStreaming(context: SdkContext): boolean {
   for (const client of context.sdkPackage.clients) {
     for (const rawMethod of getAllOperationsFromClient(client)) {
       const method = rawMethod as ServiceOperation;
-      if (
-        isPagingOnlyOperation(method) ||
-        isLroOnlyOperation(method) ||
-        isLroAndPagingOperation(method)
-      ) {
-        continue;
-      }
-      // Mirror getStructuredStreamInfo's SSE gating: an SSE stream requires both
-      // streamMetadata and sseMetadata on the response. This keeps the @azure/core-sse
-      // dependency from being injected for operations that never generate SSE streaming.
-      if (method.response?.streamMetadata && method.response?.sseMetadata) {
+      if (getStructuredStreamKind(method) === "sse") {
         return true;
       }
     }
@@ -1542,34 +1512,18 @@ export function packageHasSseStreaming(context: SdkContext): boolean {
 
 /**
  * Returns true when the package contains at least one structured streaming operation (JSONL or
- * SSE), i.e. an operation whose response carries `streamMetadata` with a structured (model/union)
- * `streamType` and/or `sseMetadata`. Used to load the streaming static helpers into the generated
+ * SSE). Used to load the streaming static helpers into the generated
  * package only when they are actually needed.
  *
  * This is a side-effect-free metadata check (it does not build deserializers), so it is safe to
  * call during helper loading, before the binder and serializers are wired up. It mirrors the
- * gating conditions of {@link getStructuredStreamInfo}.
+ * shared classification used by code generation, including MIME and paging/LRO exclusions.
  */
 export function packageHasStructuredStreaming(context: SdkContext): boolean {
   for (const client of context.sdkPackage.clients) {
     for (const rawMethod of getAllOperationsFromClient(client)) {
       const method = rawMethod as ServiceOperation;
-      if (
-        isPagingOnlyOperation(method) ||
-        isLroOnlyOperation(method) ||
-        isLroAndPagingOperation(method)
-      ) {
-        continue;
-      }
-      const streamMetadata = method.response?.streamMetadata;
-      if (!streamMetadata) {
-        continue;
-      }
-      if (method.response?.sseMetadata) {
-        return true;
-      }
-      const streamType = streamMetadata.streamType;
-      if (streamType.kind === "model" || streamType.kind === "union") {
+      if (getStructuredStreamKind(method) !== undefined) {
         return true;
       }
     }

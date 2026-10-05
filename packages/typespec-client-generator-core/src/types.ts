@@ -12,7 +12,6 @@ import {
   type Namespace,
   type NumericLiteral,
   type Operation,
-  type Program,
   type Scalar,
   type StringLiteral,
   type Tuple,
@@ -23,7 +22,6 @@ import {
   getDiscriminator,
   getEncode,
   getLifecycleVisibilityEnum,
-  getMediaTypeHint,
   getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
@@ -131,7 +129,12 @@ import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
 import { getSdkHttpParameter } from "./http.js";
-import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-types.js";
+import {
+  inferEventContentType,
+  isMediaTypeJson,
+  isMediaTypeTextPlain,
+  isMediaTypeXml,
+} from "./media-types.js";
 
 /**
  * Push a naming context node onto the stack. The stack is read by getGeneratedName/getCrossLanguageDefinitionId
@@ -1548,21 +1551,6 @@ interface PropagationOptions {
 }
 
 /**
- * Infers the default content type for an event type, mirroring the HTTP lib behavior:
- * - Models → "application/json"
- * - Scalars → "text/plain"
- * - Literals/constants → undefined (no serialization needed)
- */
-function inferEventContentType(program: Program, type: Type): string | undefined {
-  // Use @mediaTypeHint if explicitly set on the type, otherwise fall back to kind-based default
-  const hint = getMediaTypeHint(program, type);
-  if (hint) return hint;
-  if (type.kind === "Model") return "application/json";
-  if (type.kind === "Scalar") return "text/plain";
-  return undefined;
-}
-
-/**
  * Propagates `UsageFlags.Json` and serialization options to individual SSE event `type` and
  * `payloadType` based on their per-event content type. When no explicit content type is set,
  * infers a default using the same logic as the HTTP lib (model → application/json,
@@ -1889,6 +1877,9 @@ function updateTypesFromOperation(
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkStreamType));
       if (requestStreamMeta.contentTypes.some((x) => isMediaTypeJson(x))) {
         diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkStreamType));
+        diagnostics.pipe(
+          updateSerializationOptions(context, sdkStreamType, requestStreamMeta.contentTypes),
+        );
       }
       const access = getAccessOverride(context, operation) ?? "public";
       diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
@@ -2022,6 +2013,9 @@ function updateTypesFromOperation(
           diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkStreamType));
           if (responseStreamMeta.contentTypes.some((x) => isMediaTypeJson(x))) {
             diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkStreamType));
+            diagnostics.pipe(
+              updateSerializationOptions(context, sdkStreamType, responseStreamMeta.contentTypes),
+            );
           }
           const access = getAccessOverride(context, operation) ?? "public";
           diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));

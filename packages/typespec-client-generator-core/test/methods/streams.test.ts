@@ -144,6 +144,26 @@ describe("stream request", () => {
 });
 
 describe("stream response", () => {
+  it("preserves per-item JSON serialization names for streamed requests and responses", async () => {
+    const { program } = await StreamsTesterWithBuiltInService.compile(`
+      model Item {
+        @encodedName("application/json", "wire_value")
+        value: string;
+      }
+      op exchange(stream: JsonlStream<Item>): JsonlStream<Item>;
+    `);
+    const context = await createSdkContextForTester(program);
+    const method = getServiceMethodOfClient(context.sdkPackage);
+    for (const metadata of [
+      method.operation.bodyParam?.streamMetadata,
+      method.response.streamMetadata,
+    ]) {
+      ok(metadata && metadata.streamType.kind === "model");
+      ok(metadata.streamType.serializationOptions.json);
+      strictEqual(metadata.streamType.properties[0].serializationOptions.json?.name, "wire_value");
+    }
+  });
+
   it("http stream response", async () => {
     const { program } = await StreamsTesterWithBuiltInService.compile(
       `

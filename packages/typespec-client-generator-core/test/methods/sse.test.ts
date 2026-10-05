@@ -88,6 +88,74 @@ describe("sse request", () => {
 });
 
 describe("sse response", () => {
+  it("resolves payload MIME independently of envelopes with the same usage inference", async () => {
+    const { program } = await StreamsTesterWithBuiltInService.compile(`
+      @mediaTypeHint("application/json")
+      scalar JsonText extends string;
+
+      model Payload { value: string; }
+
+      @Events.events
+      union MimeEvents {
+        progress: string,
+        object: Payload,
+        @Events.contentType("application/json")
+        quoted: string,
+        hinted: JsonText,
+        @Events.contentType("text/plain")
+        explicit: JsonText,
+        @Events.contentType("application/json")
+        scalarEnvelope: { @Events.data contents: string },
+        @Events.contentType("text/plain")
+        modelEnvelope: { @Events.data contents: Payload },
+        @Events.contentType("text/plain")
+        propertyOverride: {
+          @Events.data @Events.contentType("application/json") contents: string
+        },
+        @terminalEvent
+        "[DONE]",
+      }
+      op receive(): SSEStream<MimeEvents>;
+      op send(stream: SSEStream<MimeEvents>): void;
+    `);
+    const context = await createSdkContextForTester(program);
+    const client = context.sdkPackage.clients[0];
+    const receive = client.methods.find((method) => method.name === "receive");
+    const send = client.methods.find((method) => method.name === "send");
+    ok(receive && receive.kind === "basic");
+    ok(send && send.kind === "basic");
+    const response = receive.response.sseMetadata;
+    const request = send.operation.bodyParam?.sseMetadata;
+    ok(response && request);
+    const expected = [
+      "text/plain",
+      "application/json",
+      "application/json",
+      "application/json",
+      "text/plain",
+      "text/plain",
+      "application/json",
+      "application/json",
+      undefined,
+    ];
+    deepStrictEqual(
+      response.events.map((event) => event.payloadContentType),
+      expected,
+    );
+    deepStrictEqual(
+      request.events.map((event) => event.payloadContentType),
+      expected,
+    );
+    strictEqual(response.events[5].contentType, "application/json");
+    strictEqual(response.events[5].payloadType.kind, "string");
+    strictEqual(response.events[6].contentType, "text/plain");
+    const modelPayload = response.events[6].payloadType;
+    ok(modelPayload.kind === "model");
+    ok(modelPayload.serializationOptions.json);
+    ok(modelPayload.usage & UsageFlags.Json);
+    strictEqual(response.events[8].payloadType.kind, "constant");
+  });
+
   it("sse response with heterogeneous events and terminal event", async () => {
     const { program } = await StreamsTesterWithBuiltInService.compile(
       `

@@ -33,6 +33,7 @@ import {
 } from "../utils/operation-util.js";
 import { getDocsFromDescription } from "./helpers/docs-helpers.js";
 import { getOperationName } from "./helpers/naming-helpers.js";
+import { getStructuredStreamKind } from "./helpers/structured-stream-helpers.js";
 import type { OperationPathAndDeserDetails } from "./interfaces.js";
 import { getTypeExpression } from "./type-expressions/get-type-expression.js";
 
@@ -175,7 +176,7 @@ export function buildOperationOptions(
   if (isDualFormat) {
     additionalOptions.push(contentTypeOption);
   }
-  if (operation.response?.streamMetadata && operation.response?.sseMetadata) {
+  if (getStructuredStreamKind(operation) === "sse") {
     const optionNames = getSseReconnectOptionNames(operation);
     additionalOptions.push(
       {
