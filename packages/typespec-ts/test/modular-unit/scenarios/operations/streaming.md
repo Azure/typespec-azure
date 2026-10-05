@@ -49,6 +49,7 @@ export async function _receiveDeserialize(result: StreamResponse): Promise<Async
 
   return readJsonlStream(result.body, (e) => infoDeserializer(e));
 }
+
 export async function receive(
   context: Client,
   options: ReceiveOptionalParams = { requestOptions: {} },
@@ -86,14 +87,19 @@ op receive(): SSEStream<UnnamedEvents>;
 ```ts operations
 import { TestingContext as Client } from "./index.js";
 import { Info, infoDeserializer } from "../models/models.js";
-import { readSseStream } from "../static-helpers/sseStreamingHelpers.js";
-import { StreamResponse, getStreamResponse } from "../static-helpers/streamingHelpers.js";
+import { getSseResponse, parseSseErrorResponse } from "../static-helpers/getSseResponse.js";
+import {
+  SseEventDescriptor,
+  readSseStream,
+  isTerminalSseEvent,
+} from "../static-helpers/sseStreamingHelpers.js";
 import { ReceiveOptionalParams } from "./options.js";
 import {
   StreamableMethod,
   createRestError,
   operationOptionsToRequestParameters,
 } from "@azure-rest/core-client";
+import { createReconnectingSseStream, EventMessage } from "@azure/core-sse";
 
 export function _receiveSend(
   context: Client,
@@ -105,26 +111,217 @@ export function _receiveSend(
   });
 }
 
-export async function _receiveDeserialize(result: StreamResponse): Promise<AsyncIterable<Info>> {
-  const expectedStatuses = ["200"];
-  if (!expectedStatuses.includes(result.status)) {
-    throw createRestError(result);
-  }
+export async function _receiveDeserialize(
+  events: AsyncIterable<EventMessage>,
+  descriptors: SseEventDescriptor<Info>[],
+): Promise<AsyncIterable<Info>> {
+  return readSseStream(events, descriptors);
+}
 
-  return readSseStream(result.body, [
+export async function receive(
+  context: Client,
+  options: ReceiveOptionalParams = { requestOptions: {} },
+): Promise<AsyncIterable<Info>> {
+  const descriptors: SseEventDescriptor<Info>[] = [
     {
       isTerminal: false,
       deserialize: (data) => infoDeserializer(data),
       contentType: "application/json",
     },
-  ]);
+  ];
+  const eventStream = await createReconnectingSseStream(
+    async ({ abortSignal, lastEventId }) => {
+      const headers = { ...options.requestOptions?.headers };
+      for (const headerName of Object.keys(headers)) {
+        if (headerName.toLowerCase() === "last-event-id") {
+          delete headers[headerName];
+        }
+      }
+      if (lastEventId !== undefined) {
+        headers["Last-Event-ID"] = lastEventId;
+      }
+      const attemptOptions = {
+        ...options,
+        abortSignal,
+        requestOptions: {
+          ...options.requestOptions,
+          headers: headers,
+        },
+      };
+      return getSseResponse(_receiveSend(context, attemptOptions));
+    },
+    {
+      abortSignal: options.abortSignal,
+      lastEventId: options.lastEventId,
+      retryDelayInMs: options.retryDelayInMs,
+      maxRetries: options.maxRetries,
+      validateResponse: async (result) => {
+        if (result.status === "204") {
+          return "stop";
+        }
+        const expectedStatuses = ["200"];
+        if (!expectedStatuses.includes(result.status)) {
+          result = await parseSseErrorResponse(result);
+          throw createRestError(result);
+        }
+        const contentType = Object.entries(result.headers)
+          .find(([name]) => name.toLowerCase() === "content-type")?.[1]
+          ?.split(";", 1)[0]
+          .trim()
+          .toLowerCase();
+        if (contentType !== "text/event-stream" || !result.body) {
+          throw createRestError(result);
+        }
+        return "accept";
+      },
+      isTerminalEvent: (event) => isTerminalSseEvent(event, descriptors),
+    },
+  );
+  return _receiveDeserialize(eventStream, descriptors);
 }
+```
+
+# SSE reconnection preserves operation arguments and avoids option name collisions
+
+Every connection attempt reuses required operation arguments and custom headers. Reconnection
+controls are renamed when a service operation already defines an option with the same name.
+
+## TypeSpec
+
+```tsp
+model Info {
+  desc: string;
+}
+
+@events
+union UnnamedEvents {
+  @Events.contentType("application/json")
+  Info,
+}
+
+@route("receive/{id}")
+op receive(
+  @path id: string,
+  @header customHeader: string,
+  @query lastEventId?: string,
+): SSEStream<UnnamedEvents>;
+```
+
+## Operations
+
+```ts operations
+import { TestingContext as Client } from "./index.js";
+import { Info, infoDeserializer } from "../models/models.js";
+import { getSseResponse, parseSseErrorResponse } from "../static-helpers/getSseResponse.js";
+import {
+  SseEventDescriptor,
+  readSseStream,
+  isTerminalSseEvent,
+} from "../static-helpers/sseStreamingHelpers.js";
+import { expandUrlTemplate } from "../static-helpers/urlTemplate.js";
+import { ReceiveOptionalParams } from "./options.js";
+import {
+  StreamableMethod,
+  createRestError,
+  operationOptionsToRequestParameters,
+} from "@azure-rest/core-client";
+import { createReconnectingSseStream, EventMessage } from "@azure/core-sse";
+
+export function _receiveSend(
+  context: Client,
+  id: string,
+  customHeader: string,
+  options: ReceiveOptionalParams = { requestOptions: {} },
+): StreamableMethod {
+  const path = expandUrlTemplate(
+    "/receive/{id}{?lastEventId}",
+    {
+      id: id,
+      lastEventId: options?.lastEventId,
+    },
+    {
+      allowReserved: options?.requestOptions?.skipUrlEncoding,
+    },
+  );
+  return context.path(path).get({
+    ...operationOptionsToRequestParameters(options),
+    headers: {
+      "custom-header": customHeader,
+      accept: "text/event-stream",
+      ...options.requestOptions?.headers,
+    },
+  });
+}
+
+export async function _receiveDeserialize(
+  events: AsyncIterable<EventMessage>,
+  descriptors: SseEventDescriptor<Info>[],
+): Promise<AsyncIterable<Info>> {
+  return readSseStream(events, descriptors);
+}
+
 export async function receive(
   context: Client,
+  id: string,
+  customHeader: string,
   options: ReceiveOptionalParams = { requestOptions: {} },
 ): Promise<AsyncIterable<Info>> {
-  const result = await getStreamResponse(_receiveSend(context, options));
-  return _receiveDeserialize(result);
+  const descriptors: SseEventDescriptor<Info>[] = [
+    {
+      isTerminal: false,
+      deserialize: (data) => infoDeserializer(data),
+      contentType: "application/json",
+    },
+  ];
+  const eventStream = await createReconnectingSseStream(
+    async ({ abortSignal, lastEventId }) => {
+      const headers = { ...options.requestOptions?.headers };
+      for (const headerName of Object.keys(headers)) {
+        if (headerName.toLowerCase() === "last-event-id") {
+          delete headers[headerName];
+        }
+      }
+      if (lastEventId !== undefined) {
+        headers["Last-Event-ID"] = lastEventId;
+      }
+      const attemptOptions = {
+        ...options,
+        abortSignal,
+        requestOptions: {
+          ...options.requestOptions,
+          headers: headers,
+        },
+      };
+      return getSseResponse(_receiveSend(context, id, customHeader, attemptOptions));
+    },
+    {
+      abortSignal: options.abortSignal,
+      lastEventId: options.lastEventId_1,
+      retryDelayInMs: options.retryDelayInMs,
+      maxRetries: options.maxRetries,
+      validateResponse: async (result) => {
+        if (result.status === "204") {
+          return "stop";
+        }
+        const expectedStatuses = ["200"];
+        if (!expectedStatuses.includes(result.status)) {
+          result = await parseSseErrorResponse(result);
+          throw createRestError(result);
+        }
+        const contentType = Object.entries(result.headers)
+          .find(([name]) => name.toLowerCase() === "content-type")?.[1]
+          ?.split(";", 1)[0]
+          .trim()
+          .toLowerCase();
+        if (contentType !== "text/event-stream" || !result.body) {
+          throw createRestError(result);
+        }
+        return "accept";
+      },
+      isTerminalEvent: (event) => isTerminalSseEvent(event, descriptors),
+    },
+  );
+  return _receiveDeserialize(eventStream, descriptors);
 }
 ```
 
@@ -173,14 +370,19 @@ import {
   ResponseDelta,
   responseDeltaDeserializer,
 } from "../models/models.js";
-import { readSseStream } from "../static-helpers/sseStreamingHelpers.js";
-import { StreamResponse, getStreamResponse } from "../static-helpers/streamingHelpers.js";
+import { getSseResponse, parseSseErrorResponse } from "../static-helpers/getSseResponse.js";
+import {
+  SseEventDescriptor,
+  readSseStream,
+  isTerminalSseEvent,
+} from "../static-helpers/sseStreamingHelpers.js";
 import { ReceiveOptionalParams } from "./options.js";
 import {
   StreamableMethod,
   createRestError,
   operationOptionsToRequestParameters,
 } from "@azure-rest/core-client";
+import { createReconnectingSseStream, EventMessage } from "@azure/core-sse";
 
 export function _receiveSend(
   context: Client,
@@ -193,19 +395,33 @@ export function _receiveSend(
 }
 
 export async function _receiveDeserialize(
-  result: StreamResponse,
+  events: AsyncIterable<EventMessage>,
+  descriptors: SseEventDescriptor<
+    | { event: "responseCreated"; data: ResponseCreated }
+    | { event: "responseDelta"; data: ResponseDelta }
+  >[],
 ): Promise<
   AsyncIterable<
     | { event: "responseCreated"; data: ResponseCreated }
     | { event: "responseDelta"; data: ResponseDelta }
   >
 > {
-  const expectedStatuses = ["200"];
-  if (!expectedStatuses.includes(result.status)) {
-    throw createRestError(result);
-  }
+  return readSseStream(events, descriptors);
+}
 
-  return readSseStream(result.body, [
+export async function receive(
+  context: Client,
+  options: ReceiveOptionalParams = { requestOptions: {} },
+): Promise<
+  AsyncIterable<
+    | { event: "responseCreated"; data: ResponseCreated }
+    | { event: "responseDelta"; data: ResponseDelta }
+  >
+> {
+  const descriptors: SseEventDescriptor<
+    | { event: "responseCreated"; data: ResponseCreated }
+    | { event: "responseDelta"; data: ResponseDelta }
+  >[] = [
     {
       eventName: "responseCreated",
       isTerminal: false,
@@ -222,19 +438,56 @@ export async function _receiveDeserialize(
       contentType: "application/json",
     },
     { isTerminal: true, terminalValue: "[DONE]" },
-  ]);
-}
-export async function receive(
-  context: Client,
-  options: ReceiveOptionalParams = { requestOptions: {} },
-): Promise<
-  AsyncIterable<
-    | { event: "responseCreated"; data: ResponseCreated }
-    | { event: "responseDelta"; data: ResponseDelta }
-  >
-> {
-  const result = await getStreamResponse(_receiveSend(context, options));
-  return _receiveDeserialize(result);
+  ];
+  const eventStream = await createReconnectingSseStream(
+    async ({ abortSignal, lastEventId }) => {
+      const headers = { ...options.requestOptions?.headers };
+      for (const headerName of Object.keys(headers)) {
+        if (headerName.toLowerCase() === "last-event-id") {
+          delete headers[headerName];
+        }
+      }
+      if (lastEventId !== undefined) {
+        headers["Last-Event-ID"] = lastEventId;
+      }
+      const attemptOptions = {
+        ...options,
+        abortSignal,
+        requestOptions: {
+          ...options.requestOptions,
+          headers: headers,
+        },
+      };
+      return getSseResponse(_receiveSend(context, attemptOptions));
+    },
+    {
+      abortSignal: options.abortSignal,
+      lastEventId: options.lastEventId,
+      retryDelayInMs: options.retryDelayInMs,
+      maxRetries: options.maxRetries,
+      validateResponse: async (result) => {
+        if (result.status === "204") {
+          return "stop";
+        }
+        const expectedStatuses = ["200"];
+        if (!expectedStatuses.includes(result.status)) {
+          result = await parseSseErrorResponse(result);
+          throw createRestError(result);
+        }
+        const contentType = Object.entries(result.headers)
+          .find(([name]) => name.toLowerCase() === "content-type")?.[1]
+          ?.split(";", 1)[0]
+          .trim()
+          .toLowerCase();
+        if (contentType !== "text/event-stream" || !result.body) {
+          throw createRestError(result);
+        }
+        return "accept";
+      },
+      isTerminalEvent: (event) => isTerminalSseEvent(event, descriptors),
+    },
+  );
+  return _receiveDeserialize(eventStream, descriptors);
 }
 ```
 
@@ -271,14 +524,19 @@ op receive(): SSEStream<MixedEvents>;
 ```ts operations
 import { TestingContext as Client } from "./index.js";
 import { ResponseCreated, responseCreatedDeserializer } from "../models/models.js";
-import { readSseStream } from "../static-helpers/sseStreamingHelpers.js";
-import { StreamResponse, getStreamResponse } from "../static-helpers/streamingHelpers.js";
+import { getSseResponse, parseSseErrorResponse } from "../static-helpers/getSseResponse.js";
+import {
+  SseEventDescriptor,
+  readSseStream,
+  isTerminalSseEvent,
+} from "../static-helpers/sseStreamingHelpers.js";
 import { ReceiveOptionalParams } from "./options.js";
 import {
   StreamableMethod,
   createRestError,
   operationOptionsToRequestParameters,
 } from "@azure-rest/core-client";
+import { createReconnectingSseStream, EventMessage } from "@azure/core-sse";
 
 export function _receiveSend(
   context: Client,
@@ -291,16 +549,25 @@ export function _receiveSend(
 }
 
 export async function _receiveDeserialize(
-  result: StreamResponse,
+  events: AsyncIterable<EventMessage>,
+  descriptors: SseEventDescriptor<
+    { event: "created"; data: ResponseCreated } | { event: "progress"; data: string }
+  >[],
 ): Promise<
   AsyncIterable<{ event: "created"; data: ResponseCreated } | { event: "progress"; data: string }>
 > {
-  const expectedStatuses = ["200"];
-  if (!expectedStatuses.includes(result.status)) {
-    throw createRestError(result);
-  }
+  return readSseStream(events, descriptors);
+}
 
-  return readSseStream(result.body, [
+export async function receive(
+  context: Client,
+  options: ReceiveOptionalParams = { requestOptions: {} },
+): Promise<
+  AsyncIterable<{ event: "created"; data: ResponseCreated } | { event: "progress"; data: string }>
+> {
+  const descriptors: SseEventDescriptor<
+    { event: "created"; data: ResponseCreated } | { event: "progress"; data: string }
+  >[] = [
     {
       eventName: "created",
       isTerminal: true,
@@ -313,16 +580,55 @@ export async function _receiveDeserialize(
       deserialize: (data) => ({ event: "progress", data: data }),
       contentType: "text/plain",
     },
-  ]);
-}
-
-export async function receive(
-  context: Client,
-  options: ReceiveOptionalParams = { requestOptions: {} },
-): Promise<
-  AsyncIterable<{ event: "created"; data: ResponseCreated } | { event: "progress"; data: string }>
-> {
-  const result = await getStreamResponse(_receiveSend(context, options));
-  return _receiveDeserialize(result);
+  ];
+  const eventStream = await createReconnectingSseStream(
+    async ({ abortSignal, lastEventId }) => {
+      const headers = { ...options.requestOptions?.headers };
+      for (const headerName of Object.keys(headers)) {
+        if (headerName.toLowerCase() === "last-event-id") {
+          delete headers[headerName];
+        }
+      }
+      if (lastEventId !== undefined) {
+        headers["Last-Event-ID"] = lastEventId;
+      }
+      const attemptOptions = {
+        ...options,
+        abortSignal,
+        requestOptions: {
+          ...options.requestOptions,
+          headers: headers,
+        },
+      };
+      return getSseResponse(_receiveSend(context, attemptOptions));
+    },
+    {
+      abortSignal: options.abortSignal,
+      lastEventId: options.lastEventId,
+      retryDelayInMs: options.retryDelayInMs,
+      maxRetries: options.maxRetries,
+      validateResponse: async (result) => {
+        if (result.status === "204") {
+          return "stop";
+        }
+        const expectedStatuses = ["200"];
+        if (!expectedStatuses.includes(result.status)) {
+          result = await parseSseErrorResponse(result);
+          throw createRestError(result);
+        }
+        const contentType = Object.entries(result.headers)
+          .find(([name]) => name.toLowerCase() === "content-type")?.[1]
+          ?.split(";", 1)[0]
+          .trim()
+          .toLowerCase();
+        if (contentType !== "text/event-stream" || !result.body) {
+          throw createRestError(result);
+        }
+        return "accept";
+      },
+      isTerminalEvent: (event) => isTerminalSseEvent(event, descriptors),
+    },
+  );
+  return _receiveDeserialize(eventStream, descriptors);
 }
 ```
