@@ -35,6 +35,7 @@ import { noOverridePropsRule } from "./rules/no-override-props.js";
 import { noQueryInCollectionRule } from "./rules/no-query-in-collection.js";
 import { noQueryInPointOpRule } from "./rules/no-query-in-point-op.js";
 import { noQueryInPostRule } from "./rules/no-query-in-post.js";
+import { noRepeatedPathInfoRule } from "./rules/no-repeated-path-info.js";
 import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
@@ -95,6 +96,7 @@ const rules = [
   missingXmsIdentifiersRule,
   noResponseBodyRule,
   noQueryInPostRule,
+  noRepeatedPathInfoRule,
   operationsInterfaceMissingRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
