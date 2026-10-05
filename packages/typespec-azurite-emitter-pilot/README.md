@@ -1,0 +1,104 @@
+# @azure-tools/typespec-azurite-emitter-pilot
+
+**This is a pilot/prototype, not a production emitter.** It exists to prove out, end to end, an
+architecture for replacing Azurite's (the Azure Storage emulator's) AutoRest-based server code
+generation with a TypeSpec emitter that Azurite owns.
+
+## Background
+
+Azurite currently copies the Storage Swagger, patches it, and runs AutoRest with a custom
+C#-based server generator to produce handler interfaces, models, mappers, and routing metadata
+that its hand-written runtime consumes. AutoRest generation is deprecated. The proposed
+replacement is an Azurite-owned TypeSpec emitter that imports the **existing, unchanged** Azure
+Storage TypeSpec plus a new `azurite.tsp` overlay describing emulator-specific adaptations.
+
+This package demonstrates that pattern on a minimal, self-contained fixture, modeled structurally
+on the [GraphQL emitter](https://github.com/microsoft/typespec/tree/main/packages/graphql) in
+microsoft/typespec: a **transform** phase that walks `@typespec/http` metadata into an
+emitter-owned intermediate "server model", followed by a **render** phase that turns that model
+into generated TypeScript.
+
+## What it demonstrates
+
+- **Transform-then-render architecture.** [`src/build-model.ts`](./src/build-model.ts) walks the
+  compiled program's `HttpService`/`HttpOperation`s (via `@typespec/http`'s `getAllHttpServices`)
+  and TypeSpec `Model`/`Scalar`/`Enum` types into a small, emitter-owned intermediate
+  representation ([`src/model.ts`](./src/model.ts)) that is fully decoupled from `@typespec/http`'s
+  exact shapes. [`src/render/`](./src/render) turns that model into TypeScript source via plain
+  string templates (no Alloy/JSX — see [Design notes](#design-notes)).
+- **Three generated artifacts per service**, analogous to Azurite's existing generated-code
+  boundary:
+  - `models.ts` — a TS interface per request/response data model.
+  - `operations.ts` — per-operation parameter/response TS types plus a runtime route-binding
+    metadata table (verb, path, parameter locations, request body content types).
+  - `handlers.ts` — one `IServiceHandler` interface with a method per operation, which a server
+    implementor (Azurite) fills in with real emulator behavior.
+- **The overlay pattern.** [`test/fixtures/queue-pilot/azurite.tsp`](./test/fixtures/queue-pilot/azurite.tsp)
+  imports the unchanged [`base.tsp`](./test/fixtures/queue-pilot/base.tsp) fixture and layers
+  emulator-specific documentation onto it using plain core augment decorators (`@@doc`), without
+  modifying the base file. The end-to-end test confirms the overlay's documentation flows through
+  into the generated output.
+- **Representative HTTP shapes**: query-string parameters (`listMessages`), a JSON request body
+  (`createQueue`), and a custom response header (`getQueueProperties`'s
+  `x-ms-approximate-messages-count`).
+
+## Usage
+
+```bash
+tsp compile . --emit @azure-tools/typespec-azurite-emitter-pilot
+```
+
+or in `tspconfig.yaml`:
+
+```yaml
+emit:
+  - "@azure-tools/typespec-azurite-emitter-pilot"
+options:
+  "@azure-tools/typespec-azurite-emitter-pilot":
+    outputDir: "." # optional, relative to the emitter output dir
+```
+
+## Tests
+
+- `test/build-model.test.ts` — unit tests for the transform phase: given the compiled fixture
+  program, asserts the intermediate server model has the right operations, parameter bindings,
+  request/response bodies, headers, and referenced models (including overlay-applied docs).
+- `test/render.test.ts` — assertion-based tests for the render phase against a hand-built
+  `ServerModel`, independent of the TypeSpec compiler.
+- `test/e2e.test.ts` — a true end-to-end test: compiles the fixture (base + azurite overlay) with
+  the emitter via `@typespec/compiler/testing`'s `createTester`, and asserts all three generated
+  files exist and contain the expected generated code.
+
+Run with `pnpm test` from this package's directory (or `pnpm --filter
+@azure-tools/typespec-azurite-emitter-pilot test` from the repo root).
+
+## Design notes / decisions made for this pilot
+
+- **Plain TypeScript string templates instead of Alloy/JSX.** The GraphQL emitter renders with
+  Alloy. For this pilot, plain string emission was faster to get working and test, and the
+  transform/render phase split is preserved regardless of rendering technology — adopting
+  Alloy for the real emitter is a reasonable follow-up, not a blocker.
+- **Overlay mechanism: core augment decorators (`@@doc`), not TCGC's `@@override`.** `@@override`
+  is designed for customizing generated **client** shapes; this pilot emitter doesn't consume TCGC
+  at all (see below). Augment decorators demonstrate the same "separate overlay file layers
+  changes onto an unchanged base file" structural pattern without pulling in TCGC machinery that
+  this pilot doesn't otherwise need.
+- **Enums and unions are intentionally simplified** to `string` and `unknown` respectively in the
+  intermediate model, rather than full TS string-literal unions / discriminated unions.
+
+## Explicitly out of scope (left for the real Azurite collaboration)
+
+- **Full Azure Storage surface.** This pilot models a toy "Queue-like" service with 3 operations —
+  it does not attempt Blob, Queue, or Table surfaces, or anything close to their real size/shape.
+- **XML bodies.** Storage's Blob/Queue APIs are heavily XML-based; this pilot only exercises JSON.
+- **TCGC integration.** The real migration will likely need to consume
+  `@azure-tools/typespec-client-generator-core` (e.g. for `@@override`-style client
+  customization, language-specific naming, or pulling in the real `@@clientName`/`@@access`
+  overlays). This pilot walks `@typespec/http` directly and does not use TCGC.
+- **Streaming request/response bodies.**
+- **Table-specific OData / batch-request behavior.**
+- **Enums and unions as first-class generated types** (see Design notes above).
+- **Multipart bodies, `@typespec/xml`, versioning, and pagination.**
+- **A real Azurite-side consumer** of the generated route-metadata table (e.g. an actual request
+  dispatcher) — `operations.ts`'s `operations` const is illustrative routing metadata, not a
+  wired-up router.
