@@ -110,10 +110,38 @@ Run with `pnpm test` from this package's directory (or `pnpm --filter
 
 ## Design notes / decisions made for this pilot
 
-- **Plain TypeScript string templates instead of Alloy/JSX.** The GraphQL emitter renders with
-  Alloy. For this pilot, plain string emission was faster to get working and test, and the
-  transform/render phase split is preserved regardless of rendering technology — adopting
-  Alloy for the real emitter is a reasonable follow-up, not a blocker.
+- **Plain TypeScript string templates instead of Alloy/JSX.** This was checked against both
+  real examples the task pointed at, not just asserted:
+  - `@typespec/graphql`'s `src/emitter.tsx` (microsoft/typespec) does **not** actually render
+    TypeScript with Alloy. It renders a `graphql.GraphQLSchema` object via the domain-specific
+    `@pinterest/alloy-graphql` renderer, then serializes it to SDL text with `graphql`'s own
+    `printSchema()`. Its `@alloy-js/core`/`@alloy-js/typescript` dependencies exist for a
+    different reason (its `.tsp` extern-signature generation plumbing), not for printing the
+    `.graphql` output file this emitter actually produces.
+  - `@typespec/http-client-js` (core/packages/http-client-js) **is** a real Alloy/TSX-based
+    TypeScript emitter, and its components (`src/components/models.tsx`,
+    `client-operation.tsx`, etc.) are where Alloy's value actually shows up: `refkey`/
+    `<ts.Reference>`-based cross-file symbol resolution (so declarations can reference each
+    other without hand-rolled import tracking), `<ts.PackageDirectory>` / `<SourceDirectory>`
+    for a multi-directory package layout, and deep integration with TCGC's type system via
+    `@typespec/emitter-framework`'s `TypeExpression`/`useTsp()` to render arbitrary TypeSpec
+    model/union/enum shapes.
+  - This pilot's output is 3 flat files (`models.ts`, `operations.ts`, `handlers.ts`) built from
+    a small custom intermediate "server model" — not TCGC types — with no nested directory
+    structure and (at this toy scale) no import-collision risk requiring symbol management.
+    The concrete things Alloy buys `http-client-js` (multi-file package scaffolding, automatic
+    import/reference resolution across an arbitrarily large declaration graph, TCGC type
+    rendering) aren't exercised at this pilot's scale; the hand-rolled `collectModelRefs`
+    import-collection helper in `src/render/type-ref.ts` is the one place Alloy's `refkey`
+    system would most cleanly replace bespoke code.
+  - **Recommendation for the real collaboration**: once this emitter covers the real multi-
+    hundred-operation Storage surface (Blob/Queue/Table, likely split across multiple output
+    files/directories per service), revisit Alloy/`@typespec/emitter-framework` for the render
+    phase — that's the point where its symbol/import management and directory scaffolding stop
+    being optional nice-to-haves and start saving real hand-rolled code, the same way
+    `http-client-js` uses it. The transform/render phase split already in place here is
+    render-technology-agnostic, so adopting Alloy later only touches `src/render/**`, not
+    `src/build-model.ts`/`src/model.ts`.
 - **Overlay mechanism: core augment decorators (`@@doc`), not TCGC's `@@override`.** `@@override`
   is designed for customizing generated **client** shapes; this pilot emitter doesn't consume TCGC
   at all (see below). Augment decorators demonstrate the same "separate overlay file layers
