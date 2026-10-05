@@ -268,6 +268,21 @@ export const StreamingHelpers = {
 } as const;
 
 export const SseStreamingHelpers = {
+  SseResponse: {
+    kind: "typeAlias",
+    name: "SseResponse",
+    location: "getSseResponse.ts",
+  },
+  getSseResponse: {
+    kind: "function",
+    name: "getSseResponse",
+    location: "getSseResponse.ts",
+  },
+  parseSseErrorResponse: {
+    kind: "function",
+    name: "parseSseErrorResponse",
+    location: "getSseResponse.ts",
+  },
   SseEventDescriptor: {
     kind: "interface",
     name: "SseEventDescriptor",
@@ -276,6 +291,11 @@ export const SseStreamingHelpers = {
   readSseStream: {
     kind: "function",
     name: "readSseStream",
+    location: "sseStreamingHelpers.ts",
+  },
+  isTerminalSseEvent: {
+    kind: "function",
+    name: "isTerminalSseEvent",
     location: "sseStreamingHelpers.ts",
   },
 } as const;

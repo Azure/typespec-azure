@@ -1,4 +1,4 @@
-import { createSseStream } from "@azure/core-sse";
+import type { EventMessage } from "@azure/core-sse";
 
 /**
  * Describes how to handle a single Server-Sent Event variant when decoding an
@@ -39,6 +39,48 @@ function isJsonContentType(contentType: string | undefined): boolean {
   return contentType === undefined || /\bjson\b/i.test(contentType);
 }
 
+function resolveDescriptor<T>(
+  event: EventMessage,
+  descriptors: SseEventDescriptor<T>[],
+): SseEventDescriptor<T> | undefined {
+  if (event.event) {
+    return (
+      descriptors.find(
+        (descriptor) =>
+          descriptor.eventName === event.event &&
+          descriptor.terminalValue !== undefined &&
+          descriptor.terminalValue === event.data,
+      ) ??
+      descriptors.find(
+        (descriptor) =>
+          descriptor.eventName === event.event && descriptor.terminalValue === undefined,
+      )
+    );
+  }
+  return (
+    descriptors.find(
+      (descriptor) =>
+        descriptor.eventName === undefined &&
+        descriptor.terminalValue !== undefined &&
+        descriptor.terminalValue === event.data,
+    ) ??
+    descriptors.find(
+      (descriptor) => descriptor.eventName === undefined && descriptor.terminalValue === undefined,
+    )
+  );
+}
+
+export function isTerminalSseEvent<T>(
+  event: EventMessage,
+  descriptors: SseEventDescriptor<T>[],
+): boolean {
+  const descriptor = resolveDescriptor(event, descriptors);
+  return (
+    descriptor?.isTerminal === true &&
+    (descriptor.terminalValue === undefined || descriptor.terminalValue === event.data)
+  );
+}
+
 /**
  * Decodes a Server-Sent Events (SSE, `text/event-stream`) response body, dispatching each
  * event to the matching {@link SseEventDescriptor} by its `event:` name and yielding the
@@ -51,44 +93,21 @@ function isJsonContentType(contentType: string | undefined): boolean {
  *
  * Events whose `event:` name matches no descriptor are ignored rather than being decoded by the
  * unnamed descriptor, so an unrecognized event can never be deserialized as the wrong type.
+ * Payload mapping starts when the returned iterable is consumed. The reconnecting source may
+ * establish connections and parse raw events before a consumer requests the next typed payload.
  */
 export async function* readSseStream<T>(
-  body: AsyncIterable<Uint8Array | string> | undefined,
+  events: AsyncIterable<EventMessage>,
   descriptors: SseEventDescriptor<T>[],
 ): AsyncIterable<T> {
-  if (!body) {
-    return;
-  }
-  const named = new Map<string, SseEventDescriptor<T>>();
-  const unnamedTerminals: SseEventDescriptor<T>[] = [];
-  let unnamed: SseEventDescriptor<T> | undefined;
-  for (const descriptor of descriptors) {
-    if (descriptor.eventName !== undefined) {
-      named.set(descriptor.eventName, descriptor);
-    } else if (descriptor.terminalValue !== undefined) {
-      // A sentinel terminal shares the unnamed `message` event with the payload descriptor, so it
-      // is matched on its `data` value before falling back to the unnamed payload handler.
-      unnamedTerminals.push(descriptor);
-    } else {
-      unnamed = descriptor;
-    }
-  }
-
-  const stream = createSseStream(body as any);
-  for await (const event of stream) {
-    // `@azure/core-sse` reports unnamed (`message`) events with an empty `event` field.
-    const descriptor = event.event
-      ? named.get(event.event)
-      : (unnamedTerminals.find((candidate) => candidate.terminalValue === event.data) ?? unnamed);
+  for await (const event of events) {
+    const descriptor = resolveDescriptor(event, descriptors);
     if (!descriptor) {
       continue;
     }
 
     if (descriptor.terminalValue !== undefined) {
-      // Constant sentinels are transport control messages rather than application payloads.
-      if (descriptor.terminalValue === event.data) {
-        return;
-      }
+      // Core already stopped the transport for this control sentinel; do not expose it as data.
       continue;
     }
 
@@ -107,11 +126,6 @@ export async function* readSseStream<T>(
         payload = event.data;
       }
       yield descriptor.deserialize(payload);
-    }
-
-    // Typed terminal payloads are application data, so yield them before disconnecting.
-    if (descriptor.isTerminal) {
-      return;
     }
   }
 }
