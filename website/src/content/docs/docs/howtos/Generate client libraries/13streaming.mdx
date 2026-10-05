@@ -192,7 +192,9 @@ op chat(
 
 ### Event envelopes
 
-When your SSE event wraps a separate payload, use `@Events.data` on the payload property to distinguish the envelope from its content. Emitters expose both the envelope type and the unwrapped payload type through `sseMetadata`.
+When your SSE event wraps a separate payload, use `@Events.data` on the payload property to distinguish the envelope from its content. Emitters expose both the envelope type and the unwrapped payload type through `sseMetadata`. The wire `data:` field contains only the `@data` property's value, not the entire envelope.
+
+The payload format is determined by its explicit event or `@data` property content type, then its type's `@mediaTypeHint`. Without either, models default to `application/json` and scalars to `text/plain`. An envelope's content type does not override a separate payload's format.
 
 <ClientTabs>
 

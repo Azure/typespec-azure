@@ -1,6 +1,2 @@
-export {
-  ensureStreamStatus,
-  getStreamResponse,
-  readJsonlStream,
-} from "./streamingHelpers-browser.mjs";
+export { getStreamResponse, readJsonlStream } from "./streamingHelpers-browser.mjs";
 export type { StreamResponse } from "./streamingHelpers-browser.mjs";

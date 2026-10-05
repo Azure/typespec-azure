@@ -52,6 +52,7 @@ catalog:
   "@azure/core-lro": ^3.4.0
   "@azure/core-paging": ^1.7.0
   "@azure/core-rest-pipeline": ^1.25.0
+  "@azure/core-sse": ^2.5.0
   "@azure/core-util": ^1.14.0
   "@azure/identity": ^4.13.2
   "@azure/logger": ^1.4.0

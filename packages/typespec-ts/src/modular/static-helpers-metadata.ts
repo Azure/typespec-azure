@@ -255,11 +255,6 @@ export const StreamingHelpers = {
     name: "getStreamResponse",
     location: "streamingHelpers.ts",
   },
-  ensureStreamStatus: {
-    kind: "function",
-    name: "ensureStreamStatus",
-    location: "streamingHelpers.ts",
-  },
   readJsonlStream: {
     kind: "function",
     name: "readJsonlStream",
