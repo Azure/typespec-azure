@@ -1283,77 +1283,42 @@ function getStructuredStreamOperationFunction(
       `return _${name}Deserialize(${resultVarName});`,
     );
   } else {
-    const optionalParamName = getOptionalParamsName(parameters);
-    const reconnectOptionNames = getSseReconnectOptionNames(operation);
+    const responseVarName = generateLocallyUniqueName("response", paramNames);
+    const expectedStatusesVarName = generateLocallyUniqueName("expectedStatuses", paramNames);
+    const contentTypeVarName = generateLocallyUniqueName("contentType", paramNames);
     const descriptorVarName = generateLocallyUniqueName("descriptors", paramNames);
-    const headerVarName = generateLocallyUniqueName("headers", paramNames);
-    const attemptOptionsVarName = generateLocallyUniqueName("attemptOptions", paramNames);
     const eventStreamVarName = generateLocallyUniqueName("eventStream", paramNames);
     const getSseResponseRef = resolveReference(SseStreamingHelpers.getSseResponse);
     const parseSseErrorResponseRef = resolveReference(SseStreamingHelpers.parseSseErrorResponse);
-    const isTerminalSseEventRef = resolveReference(SseStreamingHelpers.isTerminalSseEvent);
+    const cancelSseResponseRef = resolveReference(SseStreamingHelpers.cancelSseResponse);
     const descriptorRef = resolveReference(SseStreamingHelpers.SseEventDescriptor);
-    const createReconnectingSseStreamRef = resolveReference(
-      AzureCoreDependencies["createReconnectingSseStream"],
-    );
+    const createSseStreamRef = resolveReference(AzureCoreDependencies["createSseStream"]);
     const createRestErrorRef = resolveReference(useDependencies().createRestError);
-    const attemptParameterList = parameters
-      .map((parameter) =>
-        parameter.name === optionalParamName ? attemptOptionsVarName : parameter.name,
-      )
-      .join(", ");
     const descriptors = buildSseDescriptors(info);
 
     statements.push(
+      `const ${responseVarName} = await ${getSseResponseRef}(_${name}Send(${parameterList}));`,
+      `const ${expectedStatusesVarName} = ${getExpectedStatuses(operation)};`,
+      `if (!${expectedStatusesVarName}.includes(${responseVarName}.status)) {
+        const result = await ${parseSseErrorResponseRef}(${responseVarName});
+        ${getExceptionThrowStatement(context, method)}
+      }`,
+      `const ${contentTypeVarName} = Object.entries(${responseVarName}.headers)
+        .find(([name]) => name.toLowerCase() === "content-type")?.[1]
+        ?.split(";", 1)[0].trim().toLowerCase();`,
+      `if (${contentTypeVarName} !== "text/event-stream" || !${responseVarName}.body) {
+        const error = ${createRestErrorRef}(${responseVarName});
+        try {
+          await ${cancelSseResponseRef}(${responseVarName});
+        } catch (cleanupError) {
+          throw new AggregateError([error, cleanupError], "Unable to cancel invalid SSE response.", { cause: error });
+        }
+        throw error;
+      }`,
       `const ${descriptorVarName}: ${descriptorRef}<${buildStreamReturnType(info)}> [] = [${descriptors}];`,
+      `const ${eventStreamVarName} = ${createSseStreamRef}(${responseVarName}.body);`,
+      `return _${name}Deserialize(${eventStreamVarName}, ${descriptorVarName});`,
     );
-    statements.push(`const ${eventStreamVarName} = await ${createReconnectingSseStreamRef}(
-      async ({ abortSignal, lastEventId }) => {
-        const ${headerVarName} = { ...${optionalParamName}.requestOptions?.headers };
-        for (const headerName of Object.keys(${headerVarName})) {
-          if (headerName.toLowerCase() === "last-event-id") {
-            delete ${headerVarName}[headerName];
-          }
-        }
-        if (lastEventId !== undefined) {
-          ${headerVarName}["Last-Event-ID"] = lastEventId;
-        }
-        const ${attemptOptionsVarName} = {
-          ...${optionalParamName},
-          abortSignal,
-          requestOptions: {
-            ...${optionalParamName}.requestOptions,
-            headers: ${headerVarName},
-          },
-        };
-        return ${getSseResponseRef}(_${name}Send(${attemptParameterList}));
-      },
-      {
-        abortSignal: ${optionalParamName}.abortSignal,
-        lastEventId: ${optionalParamName}.${reconnectOptionNames.lastEventId},
-        retryDelayInMs: ${optionalParamName}.${reconnectOptionNames.retryDelayInMs},
-        maxRetries: ${optionalParamName}.${reconnectOptionNames.maxRetries},
-        validateResponse: async (${resultVarName}) => {
-          if (${resultVarName}.status === "204") {
-            return "stop";
-          }
-          const expectedStatuses = ${getExpectedStatuses(operation)};
-          if (!expectedStatuses.includes(${resultVarName}.status)) {
-            ${resultVarName} = await ${parseSseErrorResponseRef}(${resultVarName});
-            ${getExceptionThrowStatement(context, method)}
-          }
-          const contentType = Object.entries(${resultVarName}.headers)
-            .find(([name]) => name.toLowerCase() === "content-type")?.[1]
-            ?.split(";", 1)[0].trim().toLowerCase();
-          if (contentType !== "text/event-stream" || !${resultVarName}.body) {
-            throw ${createRestErrorRef}(${resultVarName});
-          }
-          return "accept";
-        },
-        isTerminalEvent: (event) => ${isTerminalSseEventRef}(event, ${descriptorVarName}),
-      },
-    );`);
-    statements.push(`return _${name}Deserialize(${eventStreamVarName}, ${descriptorVarName});`);
   }
 
   return {
@@ -1384,24 +1349,6 @@ function buildStreamReturnType(info: StructuredStreamInfo): string {
         `{ event: ${toTypeScriptStringLiteral(eventName)}; data: ${dataType} }`,
     )
     .join(" | ");
-}
-
-export function getSseReconnectOptionNames(method: ServiceOperation): {
-  lastEventId: string;
-  retryDelayInMs: string;
-  maxRetries: string;
-} {
-  const usedNames = new Set(
-    method.parameters
-      .filter((parameter) => !parameter.onClient)
-      .map((parameter) => normalizeName(parameter.name, NameType.Property)),
-  );
-  const lastEventId = generateLocallyUniqueName("lastEventId", usedNames);
-  usedNames.add(lastEventId);
-  const retryDelayInMs = generateLocallyUniqueName("retryDelayInMs", usedNames);
-  usedNames.add(retryDelayInMs);
-  const maxRetries = generateLocallyUniqueName("maxRetries", usedNames);
-  return { lastEventId, retryDelayInMs, maxRetries };
 }
 
 function buildSseDescriptors(info: StructuredStreamInfo): string {

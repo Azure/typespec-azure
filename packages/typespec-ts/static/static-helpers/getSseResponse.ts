@@ -1,12 +1,16 @@
 import { PathUncheckedResponse, StreamableMethod } from "@azure-rest/core-client";
-import type { SseStream } from "@azure/core-sse";
+import type { NodeJSReadableStream } from "@azure/core-sse";
 
 export type SseResponse = PathUncheckedResponse & {
-  body?: SseStream;
+  body?: NodeJSReadableStream;
 };
 
 export async function getSseResponse(streamableMethod: StreamableMethod): Promise<SseResponse> {
   return (await streamableMethod.asNodeStream()) as SseResponse;
+}
+
+export async function cancelSseResponse(response: SseResponse): Promise<void> {
+  response.body?.destroy();
 }
 
 export async function parseSseErrorResponse(response: SseResponse): Promise<PathUncheckedResponse> {

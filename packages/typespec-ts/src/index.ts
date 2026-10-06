@@ -459,7 +459,7 @@ export async function $onEmit(context: EmitContext) {
         }
         // Add @azure/core-sse if structured SSE streaming is used
         if (packageHasSseStreaming(dpgContext)) {
-          dependencies["@azure/core-sse"] = "^2.5.0";
+          dependencies["@azure/core-sse"] = "^2.4.0";
         }
         modularPackageInfo = {
           ...modularPackageInfo,
@@ -515,7 +515,7 @@ export async function $onEmit(context: EmitContext) {
         additionalDependencies["fast-xml-parser"] = "^4.5.0";
       }
       if (packageHasSseStreaming(dpgContext)) {
-        additionalDependencies["@azure/core-sse"] = "^2.5.0";
+        additionalDependencies["@azure/core-sse"] = "^2.4.0";
       }
       const modularPackageInfo = {
         exports: getModuleExports(context, modularEmitterOptions),

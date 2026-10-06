@@ -1,12 +1,15 @@
 import { PathUncheckedResponse, StreamableMethod } from "@azure-rest/core-client";
-import type { SseStream } from "@azure/core-sse";
 
 export type SseResponse = PathUncheckedResponse & {
-  body?: SseStream;
+  body?: ReadableStream<Uint8Array>;
 };
 
 export async function getSseResponse(streamableMethod: StreamableMethod): Promise<SseResponse> {
   return (await streamableMethod.asBrowserStream()) as SseResponse;
+}
+
+export async function cancelSseResponse(response: SseResponse): Promise<void> {
+  await response.body?.cancel();
 }
 
 export async function parseSseErrorResponse(response: SseResponse): Promise<PathUncheckedResponse> {
@@ -14,7 +17,7 @@ export async function parseSseErrorResponse(response: SseResponse): Promise<Path
     return response;
   }
 
-  const reader = (response.body as ReadableStream<Uint8Array>).getReader();
+  const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let body = "";
   try {

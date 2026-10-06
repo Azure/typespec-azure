@@ -36,9 +36,6 @@ export declare interface DataOperations {
 }
 
 export declare interface DataWithEnvelopeOptionalParams extends OperationOptions {
-    lastEventId?: string;
-    retryDelayInMs?: number;
-    maxRetries?: number;
 }
 
 export declare type DataWithEnvelopeResponse = {
@@ -47,9 +44,6 @@ export declare type DataWithEnvelopeResponse = {
 };
 
 export declare interface DataWithoutEnvelopeOptionalParams extends OperationOptions {
-    lastEventId?: string;
-    retryDelayInMs?: number;
-    maxRetries?: number;
 }
 
 export declare type DataWithoutEnvelopeResponse = {
@@ -78,9 +72,6 @@ export declare interface NamedOperations {
 }
 
 export declare interface NamedReceiveOptionalParams extends OperationOptions {
-    lastEventId?: string;
-    retryDelayInMs?: number;
-    maxRetries?: number;
 }
 
 export declare type NamedReceiveResponse = {
@@ -95,9 +86,6 @@ export declare interface PartialResult {
 export declare type ProtocolEvents = ProtocolInfo;
 
 export declare interface ProtocolIdOptionalParams extends OperationOptions {
-    lastEventId?: string;
-    retryDelayInMs?: number;
-    maxRetries?: number;
 }
 
 export declare type ProtocolIdResponse = {
@@ -110,9 +98,6 @@ export declare interface ProtocolInfo {
 }
 
 export declare interface ProtocolInvalidIdOptionalParams extends OperationOptions {
-    lastEventId?: string;
-    retryDelayInMs?: number;
-    maxRetries?: number;
 }
 
 export declare type ProtocolInvalidIdResponse = {
@@ -121,9 +106,6 @@ export declare type ProtocolInvalidIdResponse = {
 };
 
 export declare interface ProtocolInvalidRetryOptionalParams extends OperationOptions {
-    lastEventId?: string;
-    retryDelayInMs?: number;
-    maxRetries?: number;
 }
 
 export declare type ProtocolInvalidRetryResponse = {
@@ -155,9 +137,6 @@ export declare interface ProtocolOperations {
 }
 
 export declare interface ProtocolReconnectOptionalParams extends OperationOptions {
-    lastEventId?: string;
-    retryDelayInMs?: number;
-    maxRetries?: number;
 }
 
 export declare type ProtocolReconnectResponse = {
@@ -166,9 +145,6 @@ export declare type ProtocolReconnectResponse = {
 };
 
 export declare interface ProtocolRetryOptionalParams extends OperationOptions {
-    lastEventId?: string;
-    retryDelayInMs?: number;
-    maxRetries?: number;
 }
 
 export declare type ProtocolRetryResponse = {
@@ -205,9 +181,6 @@ export declare interface RetrieveOperations {
 }
 
 export declare interface RetrieveStreamOptionalParams extends OperationOptions {
-    lastEventId?: string;
-    retryDelayInMs?: number;
-    maxRetries?: number;
 }
 
 export declare type RetrieveStreamResponse = {
@@ -236,9 +209,6 @@ export declare interface UnnamedOperations {
 }
 
 export declare interface UnnamedReceiveOptionalParams extends OperationOptions {
-    lastEventId?: string;
-    retryDelayInMs?: number;
-    maxRetries?: number;
 }
 
 export declare type UnnamedReceiveResponse = {
