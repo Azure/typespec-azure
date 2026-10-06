@@ -221,22 +221,18 @@ describe("renderHandlers", () => {
 describe("renderSerialization", () => {
   const output = renderSerialization(sampleServerModel);
 
-  it("renders an ms-rest OperationSpec for operations with no response body", () => {
-    expect(output).toContain(`import * as msRest from "@azure/ms-rest-js";`);
-    expect(output).toContain(`const DeleteQueueOperationSpec: msRest.OperationSpec = {`);
-    expect(output).toContain(`httpMethod: "DELETE"`);
-    expect(output).toContain(`path: "{queueName}"`);
-    expect(output).toContain(`headersMapper: {`);
-    expect(output).toContain(`serializedName: "x-ms-request-id"`);
+  it("renders direct request/response serialization helpers for operations with no response body", () => {
+    expect(output).not.toContain(`@azure/ms-rest-js`);
+    expect(output).toContain(`export async function deserializeRequest`);
+    expect(output).toContain(`export function serializeResponse`);
+    expect(output).toContain(`["DeleteQueue", {`);
+    expect(output).toContain(`wireName: "x-ms-request-id"`);
   });
 
-  it("exports a name-keyed operation spec map for Azurite runtime lookup", () => {
+  it("exports a name-keyed operation map for Azurite runtime lookup", () => {
     expect(output).toContain(
-      `export const serializationOperationSpecs: ReadonlyMap<string, msRest.OperationSpec> = new Map([`,
+      `export const serializationOperations: ReadonlyMap<string, SerializationOperation> = new Map([`,
     );
-    expect(output).toContain(`["DeleteQueue", DeleteQueueOperationSpec]`);
-    expect(output).toContain(
-      `export function getSerializationOperationSpec(name: string): msRest.OperationSpec | undefined {`,
-    );
+    expect(output).toContain(`export function hasGeneratedSerialization(name: string): boolean {`);
   });
 });

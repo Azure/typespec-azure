@@ -11,8 +11,8 @@ The package demonstrates a small but reusable emitter structure:
    - `models.ts` — data-model interfaces.
    - `operations.ts` — request/response types plus route metadata.
    - `handlers.ts` — handler interface methods with `(params, context)` signatures.
-   - `serialization.ts` — ms-rest-compatible operation specs for the initial no-body Queue
-     serializer/deserializer slice.
+   - `serialization.ts` — generated request deserializer and response serializer functions for
+     the initial no-body Queue slice.
 
 ## Usage
 
@@ -64,7 +64,7 @@ Queue visibility-timeout maximum in the overlay:
 - `test/e2e.test.ts` compiles the fixture through the emitter and checks the generated files.
 - `test/azurite-compat.test.ts` checks that generated handler and route-metadata shapes contain
   what Azurite's Queue runtime needs to wire dispatch, handlers, and the first
-  serializer/deserializer specs.
+  serializer/deserializer functions.
 
 Run:
 
@@ -79,7 +79,7 @@ pnpm --filter @azure-tools/typespec-azurite-emitter lint
 This package is intentionally small. It covers the artifact shape and emitter architecture needed
 for a Queue handoff, not a full Storage implementation. The companion Azurite PR validates the
 generated Queue files against Azurite's real runtime. It now includes a first
-serializer/deserializer step for no-body Queue operations by generating ms-rest-compatible
-operation specs that Azurite's existing helpers can consume. Full XML body mapper generation,
-Blob, Table/OData, streaming, multipart bodies, versioning, pagination, and richer enum/union
-rendering are future work.
+serializer/deserializer step for no-body Queue operations by generating direct helper functions
+instead of AutoRest-style mapper tables. Full XML body serialization, Blob, Table/OData,
+streaming, multipart bodies, versioning, pagination, and richer enum/union rendering are future
+work.

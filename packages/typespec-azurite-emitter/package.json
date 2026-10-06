@@ -1,7 +1,7 @@
 {
   "name": "@azure-tools/typespec-azurite-emitter",
   "version": "0.1.0",
-  "description": "TypeSpec emitter generating Azurite server artifacts (models, route metadata, serialization specs, handler interfaces).",
+  "description": "TypeSpec emitter generating Azurite server artifacts (models, route metadata, serialization helpers, handler interfaces).",
   "type": "module",
   "license": "MIT",
   "author": "Microsoft Corporation",

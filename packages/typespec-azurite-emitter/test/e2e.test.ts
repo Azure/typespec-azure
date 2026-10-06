@@ -69,15 +69,15 @@ describe("end-to-end emit", () => {
     );
   });
 
-  it("generates serialization.ts with Azurite-compatible operation specs for the no-body slice", async () => {
+  it("generates serialization.ts with direct Azurite serialization helpers for the no-body slice", async () => {
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const serializationFile = findOutput(outputs, "serialization.ts");
 
-    expect(serializationFile).toContain(`import * as msRest from "@azure/ms-rest-js";`);
-    expect(serializationFile).toContain(`DeleteQueueOperationSpec`);
-    expect(serializationFile).toContain(`httpMethod: "DELETE"`);
-    expect(serializationFile).toContain(`serializedName: "x-ms-request-id"`);
-    expect(serializationFile).toContain(`getSerializationOperationSpec`);
+    expect(serializationFile).not.toContain(`@azure/ms-rest-js`);
+    expect(serializationFile).toContain(`export async function deserializeRequest`);
+    expect(serializationFile).toContain(`export function serializeResponse`);
+    expect(serializationFile).toContain(`["DeleteQueue", {`);
+    expect(serializationFile).toContain(`wireName: "x-ms-request-id"`);
   });
 });
 
