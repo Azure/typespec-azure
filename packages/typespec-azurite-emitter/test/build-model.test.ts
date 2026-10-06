@@ -150,6 +150,52 @@ describe("buildServerModel", () => {
     expect(serverModel.operations.some((op) => op.name === "CreateQueue")).toBe(false);
   });
 
+  it("uses TCGC @clientName overrides for named model, property, parameter, and header shapes", async () => {
+    const { program } = await ApiTester.compile({
+      "main.tsp": `
+        import "@typespec/http";
+        import "@azure-tools/typespec-client-generator-core";
+        using Http;
+        using Azure.ClientGenerator.Core;
+
+        @service
+        namespace NamingDemo;
+
+        @clientName("GeneratedItem")
+        model Item {
+          @clientName("clientValue")
+          value: string;
+        }
+
+        @route("/items/{itemId}")
+        @get
+        op getItem(
+          @clientName("clientItemId")
+          @path
+          itemId: string,
+        ): {
+          @statusCode statusCode: 200;
+
+          @clientName("clientRequestId")
+          @header("x-ms-request-id")
+          requestId: string;
+
+          @body body: Item;
+        };
+      `,
+    });
+    const serverModel = buildServerModel(program);
+
+    const item = serverModel.models.find((m) => m.name === "GeneratedItem")!;
+    expect(item).toBeDefined();
+    expect(item.properties[0].name).toBe("clientValue");
+
+    const getItem = serverModel.operations.find((op) => op.name === "GetItem")!;
+    expect(getItem.parameters[0].name).toBe("clientItemId");
+    expect(getItem.responses[0].headers[0].name).toBe("clientRequestId");
+    expect(getItem.responses[0].body?.type).toEqual({ kind: "model", name: "GeneratedItem" });
+  });
+
   it("expands a Record<string> dictionary property to a record type ref instead of an empty named model", async () => {
     const { program } = await ApiTester.compile({
       "main.tsp": `

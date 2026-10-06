@@ -1,6 +1,7 @@
 import {
   createTCGCContext,
   getClientNameOverride,
+  type TCGCContext,
 } from "@azure-tools/typespec-client-generator-core";
 import { type Model, type ModelProperty, type Program, type Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
@@ -66,7 +67,7 @@ export function buildServerModel(program: Program): ServerModel {
   }
 
   return {
-    serviceName: service?.namespace.name ?? "Service",
+    serviceName: service ? getName(program, service.namespace, service.namespace.name) : "Service",
     operations,
     models: [...modelRegistry.values()],
     skippedOperations,
@@ -120,14 +121,26 @@ function getOperationName(
   op: HttpOperation,
   usedOperationNames: ReadonlySet<string>,
 ): string {
-  const tcgcContext = createTCGCContext(program, "@azure-tools/typespec-azurite-emitter");
-  const baseName =
-    getClientNameOverride(tcgcContext, op.operation) ?? toPascalCase(op.operation.name);
+  const baseName = getName(program, op.operation, toPascalCase(op.operation.name));
   const qualifiedName =
     usedOperationNames.has(baseName) && op.operation.interface?.name
       ? `${toPascalCase(op.operation.interface.name)}${baseName}`
       : baseName;
   return disambiguate(qualifiedName, usedOperationNames);
+}
+
+const tcgcContextCache = new WeakMap<Program, TCGCContext>();
+
+function getTcgcContext(program: Program): TCGCContext {
+  const existing = tcgcContextCache.get(program);
+  if (existing) return existing;
+  const context = createTCGCContext(program, "@azure-tools/typespec-azurite-emitter");
+  tcgcContextCache.set(program, context);
+  return context;
+}
+
+function getName(program: Program, target: Type, fallbackName: string): string {
+  return getClientNameOverride(getTcgcContext(program), target) ?? fallbackName;
 }
 
 function splitRoutePath(path: string): {
@@ -164,7 +177,7 @@ function buildParameter(
   const location: ServerParameterLocation =
     param.type === "cookie" ? "header" : (param.type as ServerParameterLocation);
   return {
-    name: param.param.name,
+    name: getName(program, param.param, param.param.name),
     wireName: param.name,
     location,
     type: toTypeRef(program, param.param.type, modelRegistry, anonymousModelNames),
@@ -194,7 +207,7 @@ function buildResponse(
   const headers: ServerResponseHeader[] = [];
   for (const [headerWireName, prop] of Object.entries(content?.headers ?? {})) {
     headers.push({
-      name: prop.name,
+      name: getName(program, prop, prop.name),
       wireName: headerWireName,
       type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
       optional: prop.optional,
@@ -284,7 +297,7 @@ function registerModel(
   anonymousModelNames: Map<Model, string>,
 ): ServerTypeRef {
   const tk = $(program);
-  const name = resolveModelName(model, modelRegistry, anonymousModelNames);
+  const name = resolveModelName(program, model, modelRegistry, anonymousModelNames);
   if (!modelRegistry.has(name)) {
     // Insert a placeholder first to guard against infinite recursion on cyclic models.
     modelRegistry.set(name, { name, properties: [] });
@@ -304,11 +317,12 @@ function registerModel(
  * comment).
  */
 function resolveModelName(
+  program: Program,
   model: Model,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): string {
-  if (model.name) return model.name;
+  if (model.name) return getName(program, model, model.name);
   const existing = anonymousModelNames.get(model);
   if (existing) return existing;
   let candidate =
@@ -327,7 +341,7 @@ function buildModelProperty(
   anonymousModelNames: Map<Model, string>,
 ): ServerModelProperty {
   return {
-    name: prop.name,
+    name: getName(program, prop, prop.name),
     type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
     optional: prop.optional,
     doc: getDocHelper(program, prop),
