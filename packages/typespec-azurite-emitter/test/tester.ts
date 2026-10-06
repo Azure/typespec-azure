@@ -4,7 +4,11 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 export const ApiTester = createTester(resolvePath(import.meta.dirname, ".."), {
-  libraries: ["@typespec/http", "@azure-tools/typespec-azurite-emitter"],
+  libraries: [
+    "@typespec/http",
+    "@azure-tools/typespec-client-generator-core",
+    "@azure-tools/typespec-azurite-emitter",
+  ],
 });
 
 export const EmitterTester = ApiTester.emit("@azure-tools/typespec-azurite-emitter", {});

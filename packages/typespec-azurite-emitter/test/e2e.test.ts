@@ -32,7 +32,7 @@ describe("end-to-end emit", () => {
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const operationsFile = findOutput(outputs, "operations.ts");
 
-    expect(operationsFile).toContain(`name: "CreateQueue"`);
+    expect(operationsFile).toContain(`name: "Queue_Create"`);
     expect(operationsFile).toContain(`verb: "put"`);
     expect(operationsFile).toContain(`name: "ListMessages"`);
     expect(operationsFile).toContain(`verb: "get"`);
@@ -56,7 +56,7 @@ describe("end-to-end emit", () => {
 
     expect(handlersFile).toContain("export interface IServiceHandler {");
     expect(handlersFile).toContain(
-      "createQueue(params: CreateQueueParameters, context: Context): Promise<CreateQueueResponse>;",
+      "queue_Create(params: Queue_CreateParameters, context: Context): Promise<Queue_CreateResponse>;",
     );
     expect(handlersFile).toContain(
       "getQueueProperties(params: GetQueuePropertiesParameters, context: Context): Promise<GetQueuePropertiesResponse>;",

@@ -3720,6 +3720,9 @@ importers:
 
   packages/typespec-azurite-emitter:
     devDependencies:
+      '@azure-tools/typespec-client-generator-core':
+        specifier: workspace:^
+        version: link:../typespec-client-generator-core
       '@types/node':
         specifier: 'catalog:'
         version: 26.5.0

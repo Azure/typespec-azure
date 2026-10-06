@@ -10,7 +10,7 @@ describe("structural fit against Azure/Azurite's real generated artifacts", () =
     //   create(options: Models.QueueCreateOptionalParams, context: Context): Promise<Models.QueueCreateResponse>;
     // from https://github.com/Azure/Azurite/blob/main/src/queue/generated/handlers/IQueueHandler.ts
     expect(handlersFile).toMatch(
-      /createQueue\(params: CreateQueueParameters, context: Context\): Promise<CreateQueueResponse>;/,
+      /queue_Create\(params: Queue_CreateParameters, context: Context\): Promise<Queue_CreateResponse>;/,
     );
     // Every operation follows the same (params, context) => Promise<Response> shape.
     const methodSignatures = [
@@ -30,7 +30,7 @@ describe("structural fit against Azure/Azurite's real generated artifacts", () =
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const operationsFile = findOutput(outputs, "operations.ts");
 
-    expect(operationsFile).toContain(`name: "CreateQueue"`);
+    expect(operationsFile).toContain(`name: "Queue_Create"`);
     expect(operationsFile).toContain(`verb: "put"`);
     expect(operationsFile).toContain(`path: "/{queueName}"`);
 

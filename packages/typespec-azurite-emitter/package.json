@@ -47,10 +47,12 @@
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default"
   },
   "peerDependencies": {
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^"
   },
   "devDependencies": {
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@types/node": "catalog:",
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",

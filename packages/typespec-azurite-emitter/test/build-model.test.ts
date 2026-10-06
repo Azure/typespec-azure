@@ -20,9 +20,14 @@ describe("buildServerModel", () => {
     const serverModel = buildServerModel(program);
 
     const names = serverModel.operations.map((op) => op.name).sort();
-    expect(names).toEqual(["CreateQueue", "GetQueueProperties", "ListMessages", "SetAccessPolicy"]);
+    expect(names).toEqual([
+      "GetQueueProperties",
+      "ListMessages",
+      "Queue_Create",
+      "SetAccessPolicy",
+    ]);
 
-    const createQueue = serverModel.operations.find((op) => op.name === "CreateQueue")!;
+    const createQueue = serverModel.operations.find((op) => op.name === "Queue_Create")!;
     expect(createQueue.verb).toBe("put");
     expect(createQueue.path).toBe("/{queueName}");
     expect(createQueue.rawPath).toBe("/{queueName}");
@@ -57,7 +62,7 @@ describe("buildServerModel", () => {
     const { program } = await ApiTester.compile(loadQueuePilotFixture());
     const serverModel = buildServerModel(program);
 
-    const createQueue = serverModel.operations.find((op) => op.name === "CreateQueue")!;
+    const createQueue = serverModel.operations.find((op) => op.name === "Queue_Create")!;
     expect(createQueue.requestBody).toMatchObject({
       type: { kind: "model", name: "QueueMetadata" },
       contentTypes: ["application/json"],
@@ -68,7 +73,7 @@ describe("buildServerModel", () => {
     const { program } = await ApiTester.compile(loadQueuePilotFixture());
     const serverModel = buildServerModel(program);
 
-    const createQueue = serverModel.operations.find((op) => op.name === "CreateQueue")!;
+    const createQueue = serverModel.operations.find((op) => op.name === "Queue_Create")!;
     expect(createQueue.responses).toHaveLength(1);
     expect(createQueue.responses[0].statusCode).toBe(201);
     expect(createQueue.responses[0].headers).toEqual([
@@ -135,6 +140,14 @@ describe("buildServerModel", () => {
       (p) => p.param.name === "visibilityTimeout",
     )!;
     expect($(program).type.maxValue(visibilityTimeout.param)).toBe(2147483647);
+  });
+
+  it("uses TCGC @clientName operation overrides when present", async () => {
+    const { program } = await ApiTester.compile(loadQueuePilotFixture());
+    const serverModel = buildServerModel(program);
+
+    expect(serverModel.operations.some((op) => op.name === "Queue_Create")).toBe(true);
+    expect(serverModel.operations.some((op) => op.name === "CreateQueue")).toBe(false);
   });
 
   it("expands a Record<string> dictionary property to a record type ref instead of an empty named model", async () => {
