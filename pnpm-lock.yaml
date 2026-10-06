@@ -3735,6 +3735,9 @@ importers:
       '@typespec/tspd':
         specifier: workspace:^
         version: link:../../core/packages/tspd
+      '@typespec/xml':
+        specifier: workspace:^
+        version: link:../../core/packages/xml
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: 5.0.0(vitest@5.0.0)

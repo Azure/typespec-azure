@@ -7,6 +7,7 @@ import {
   type HttpOperationResponse,
   type HttpPayloadBody,
 } from "@typespec/http";
+import { isAttribute, isUnwrapped } from "@typespec/xml";
 import type {
   ServerDataModel,
   ServerLiteralQueryParameter,
@@ -168,7 +169,20 @@ function buildRequestBody(
   return {
     type: toTypeRef(program, body.type, modelRegistry, anonymousModelNames),
     contentTypes: body.contentTypes,
+    parameterPath: getBodyParameterPath(program, body),
   };
+}
+
+function getBodyParameterPath(program: Program, body: HttpPayloadBody): string | readonly string[] {
+  const property = "property" in body ? body.property : undefined;
+  if (!property) return "body";
+  const name = getHandlerBodyParameterName(getName(program, property, property.name));
+  if (name === "queueMessage") return name;
+  return property.optional ? ["options", name] : name;
+}
+
+function getHandlerBodyParameterName(name: string): string {
+  return name === "queueServiceProperties" ? "storageServiceProperties" : name;
 }
 
 function buildResponse(
@@ -275,11 +289,16 @@ function registerModel(
   const name = resolveModelName(program, model, modelRegistry, anonymousModelNames);
   if (!modelRegistry.has(name)) {
     // Insert a placeholder first to guard against infinite recursion on cyclic models.
-    modelRegistry.set(name, { name, properties: [] });
+    modelRegistry.set(name, { name, wireName: name, properties: [] });
     const properties = [...tk.model.getProperties(model).values()].map((prop) =>
       buildModelProperty(program, prop, modelRegistry, anonymousModelNames),
     );
-    modelRegistry.set(name, { name, properties, doc: getDocHelper(program, model) });
+    modelRegistry.set(name, {
+      name,
+      wireName: $(program).type.getEncodedName(model, "application/xml"),
+      properties,
+      doc: getDocHelper(program, model),
+    });
   }
   return { kind: "model", name };
 }
@@ -362,6 +381,8 @@ function buildModelProperty(
     wireName: $(program).type.getEncodedName(prop, "application/xml"),
     type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
     optional: prop.optional,
+    xmlAttribute: isAttribute(program, prop),
+    xmlUnwrapped: isUnwrapped(program, prop),
     doc: getDocHelper(program, prop),
   };
 }

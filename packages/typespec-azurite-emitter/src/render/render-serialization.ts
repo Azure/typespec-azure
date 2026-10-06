@@ -1,4 +1,4 @@
-import type { ServerModel, ServerOperation } from "../model.js";
+import type { ServerDataModel, ServerModel, ServerOperation, ServerTypeRef } from "../model.js";
 import { renderFileHeader } from "./type-ref.js";
 
 /**
@@ -13,8 +13,11 @@ export function renderSerialization(serverModel: ServerModel): string {
     `import type { IHandlerParameters } from "../../generated/Context";`,
     `import type IRequest from "../../generated/IRequest";`,
     `import type IResponse from "../../generated/IResponse";`,
+    `import { parseXML, stringifyXML } from "../../generated/utils/xml";`,
     `import { operations } from "./operations";`,
     `import type { OperationMetadata, OperationParameterBinding, OperationResponseHeaderBinding, OperationTypeBinding } from "./operations.js";`,
+    "",
+    renderXmlModelMetadata(serverModel.models),
     "",
     renderDeserializeRequest(supportedOperations),
     "",
@@ -30,10 +33,83 @@ export function renderSerialization(serverModel: ServerModel): string {
 }
 
 function isSerializationReady(op: ServerOperation): boolean {
-  if (op.requestBody !== undefined) return false;
+  if (op.requestBody !== undefined && !isSupportedBody(op.requestBody.type)) return false;
   return op.responses.every(
-    (response) => response.statusCode === "*" || response.body === undefined,
+    (response) => response.body === undefined || isSupportedBody(response.body.type),
   );
+}
+
+function isSupportedBody(type: ServerTypeRef): boolean {
+  return type.kind === "model";
+}
+
+function renderXmlModelMetadata(models: readonly ServerDataModel[]): string {
+  const lines = [
+    `interface XmlPropertyMetadata {`,
+    `  readonly name: string;`,
+    `  readonly wireName: string;`,
+    `  readonly type: OperationTypeBinding;`,
+    `  readonly attribute: boolean;`,
+    `  readonly unwrapped: boolean;`,
+    `  readonly itemName?: string;`,
+    `}`,
+    "",
+    `interface XmlModelMetadata {`,
+    `  readonly name: string;`,
+    `  readonly wireName: string;`,
+    `  readonly properties: readonly XmlPropertyMetadata[];`,
+    `}`,
+    "",
+    `const xmlModels: Record<string, XmlModelMetadata> = {`,
+  ];
+  for (const model of models) {
+    lines.push(`  ${JSON.stringify(model.name)}: {`);
+    lines.push(`    name: ${JSON.stringify(model.name)},`);
+    lines.push(`    wireName: ${JSON.stringify(model.wireName)},`);
+    lines.push(`    properties: [`);
+    for (const prop of model.properties) {
+      lines.push(
+        `      { name: ${JSON.stringify(prop.name)}, wireName: ${JSON.stringify(prop.wireName)}, type: ${renderOperationTypeBinding(prop.type)}, attribute: ${prop.xmlAttribute}, unwrapped: ${prop.xmlUnwrapped}${getArrayItemNameInitializer(prop.type, prop.wireName, models)} },`,
+      );
+    }
+    lines.push(`    ],`);
+    lines.push(`  },`);
+  }
+  lines.push(`};`);
+  return lines.join("\n");
+}
+
+function getArrayItemNameInitializer(
+  type: ServerTypeRef,
+  fallback: string,
+  models: readonly ServerDataModel[],
+): string {
+  if (type.kind !== "array") return "";
+  const element = type.element;
+  if (element.kind === "model") {
+    const model = models.find((candidate) => candidate.name === element.name);
+    return `, itemName: ${JSON.stringify(model?.wireName ?? element.name)}`;
+  }
+  return `, itemName: ${JSON.stringify(fallback)}`;
+}
+
+function renderOperationTypeBinding(type: ServerTypeRef): string {
+  switch (type.kind) {
+    case "array":
+      return `{ kind: "array", element: ${renderOperationTypeBinding(type.element)} }`;
+    case "literal":
+      return `{ kind: "literal", value: ${JSON.stringify(type.value)} }`;
+    case "model":
+      return `{ kind: "model", name: ${JSON.stringify(type.name)} }`;
+    case "record":
+      return `{ kind: ${JSON.stringify(type.kind)} }`;
+    case "boolean":
+    case "datetime":
+    case "number":
+    case "string":
+    case "unknown":
+      return `{ kind: ${JSON.stringify(type.kind)} }`;
+  }
 }
 
 function renderDeserializeRequest(operations: readonly ServerOperation[]): string {
@@ -99,7 +175,7 @@ function renderHelpers(): string {
     `  return metadata;`,
     `}`,
     "",
-    `function deserializeMetadataRequest(metadata: OperationMetadata, req: IRequest): IHandlerParameters {`,
+    `async function deserializeMetadataRequest(metadata: OperationMetadata, req: IRequest): Promise<IHandlerParameters> {`,
     `  const parameters: IHandlerParameters = {};`,
     `  for (const literal of metadata.literalQueryParameters) {`,
     `    setParameterValue(`,
@@ -113,7 +189,25 @@ function renderHelpers(): string {
     `    if (parameter.location === "path") continue;`,
     `    setParameterValue(parameters, getParameterPath(parameter), deserializeParameter(parameter, req, headerCollectionValues));`,
     `  }`,
+    `  if (metadata.requestBodyType !== undefined && metadata.requestBodyParameterPath !== undefined) {`,
+    `    const body = await deserializeRequestBody(metadata, req);`,
+    `    setParameterValue(parameters, metadata.requestBodyParameterPath, body);`,
+    `    setParameterValue(parameters, "body", req.getBody());`,
+    `  }`,
     `  return parameters;`,
+    `}`,
+    "",
+    `async function deserializeRequestBody(metadata: OperationMetadata, req: IRequest): Promise<unknown> {`,
+    `  const rawBody = await readRequestIntoText(req);`,
+    `  req.setBody(rawBody);`,
+    `  if (metadata.requestBodyType?.kind !== "model") return rawBody;`,
+    `  const contentType = req.getHeader("content-type") ?? metadata.requestBodyContentTypes[0] ?? "";`,
+    `  if (contentType.toLowerCase().includes("json")) {`,
+    `    return JSON.parse(rawBody);`,
+    `  }`,
+    `  const parsed = (await parseXML(rawBody)) || {};`,
+    `  const bodyValue = deserializeXmlModel(parsed, metadata.requestBodyType.name);`,
+    `  return coerceRequestBodyValue(bodyValue, getXmlModel(metadata.requestBodyType.name));`,
     `}`,
     "",
     `function deserializeParameter(`,
@@ -143,6 +237,133 @@ function renderHelpers(): string {
     `  }`,
     `  for (const header of response.headers) {`,
     `    serializeResponseHeader(res, header, handlerResponse);`,
+    `  }`,
+    `  if (response.body !== undefined) {`,
+    `    serializeResponseBody(res, response.body.type, handlerResponse);`,
+    `  }`,
+    `}`,
+    "",
+    `function serializeResponseBody(res: IResponse, type: OperationTypeBinding, handlerResponse: any): void {`,
+    `  if (type.kind !== "model") return;`,
+    `  const metadata = getXmlModel(type.name);`,
+    `  const bodyValue = handlerResponse.body ?? coerceResponseBodyValue(handlerResponse, metadata);`,
+    `  const xmlBody = stringifyXML(serializeXmlModel(bodyValue, metadata.name), { rootName: metadata.wireName });`,
+    `  res.setContentType("application/xml");`,
+    `  res.getBodyStream().write(xmlBody);`,
+    `}`,
+    "",
+    `function coerceResponseBodyValue(handlerResponse: any, metadata: XmlModelMetadata): unknown {`,
+    `  const arrayProperty = metadata.properties.length === 1 && metadata.properties[0].type.kind === "array" ? metadata.properties[0] : undefined;`,
+    `  if (arrayProperty !== undefined && Array.isArray(handlerResponse)) {`,
+    `    return { [arrayProperty.name]: handlerResponse };`,
+    `  }`,
+    `  return handlerResponse;`,
+    `}`,
+    "",
+    `function coerceRequestBodyValue(bodyValue: any, metadata: XmlModelMetadata): unknown {`,
+    `  const arrayProperty = metadata.properties.length === 1 && metadata.properties[0].type.kind === "array" ? metadata.properties[0] : undefined;`,
+    `  if (arrayProperty !== undefined) {`,
+    `    return bodyValue?.[arrayProperty.name];`,
+    `  }`,
+    `  return bodyValue;`,
+    `}`,
+    "",
+    `function getXmlModel(name: string): XmlModelMetadata {`,
+    `  const metadata = xmlModels[name];`,
+    `  if (metadata === undefined) {`,
+    `    throw new TypeError(\`Generated TypeSpec XML metadata does not include model \${name}\`);`,
+    `  }`,
+    `  return metadata;`,
+    `}`,
+    "",
+    `function deserializeXmlModel(value: any, modelName: string): Record<string, unknown> {`,
+    `  const metadata = getXmlModel(modelName);`,
+    `  const result: Record<string, unknown> = {};`,
+    `  for (const prop of metadata.properties) {`,
+    `    const source = prop.attribute ? value?.$?.[prop.wireName] : getXmlPropertyValue(value, prop);`,
+    `    const deserialized = deserializeXmlValue(source, prop.type, prop);`,
+    `    if (deserialized !== undefined) {`,
+    `      result[prop.name] = deserialized;`,
+    `    }`,
+    `  }`,
+    `  return result;`,
+    `}`,
+    "",
+    `function getXmlPropertyValue(value: any, prop: XmlPropertyMetadata): unknown {`,
+    `  if (!prop.unwrapped) return value?.[prop.wireName];`,
+    `  return value?.[prop.itemName ?? prop.wireName];`,
+    `}`,
+    "",
+    `function deserializeXmlValue(value: any, type: OperationTypeBinding, prop?: XmlPropertyMetadata): unknown {`,
+    `  if (value === undefined || value === null) return undefined;`,
+    `  switch (type.kind) {`,
+    `    case "model":`,
+    `      return deserializeXmlModel(value, type.name);`,
+    `    case "array": {`,
+    `      const rawItems = prop?.unwrapped ? value : value?.[prop?.itemName ?? prop?.wireName ?? "item"];`,
+    `      const items = Array.isArray(rawItems) ? rawItems : rawItems === undefined ? [] : [rawItems];`,
+    `      return items.map((item) => deserializeXmlValue(item, type.element));`,
+    `    }`,
+    `    case "record":`,
+    `      return typeof value === "object" ? value : undefined;`,
+    `    case "number":`,
+    `      return Number(value);`,
+    `    case "boolean":`,
+    `      return value === true || value === "true";`,
+    `    case "literal":`,
+    `      return type.value;`,
+    `    case "datetime":`,
+    `    case "string":`,
+    `    case "unknown":`,
+    `      return String(value);`,
+    `  }`,
+    `}`,
+    "",
+    `function serializeXmlModel(value: any, modelName: string): Record<string, unknown> {`,
+    `  const metadata = getXmlModel(modelName);`,
+    `  const result: Record<string, unknown> = {};`,
+    `  const attributes: Record<string, unknown> = {};`,
+    `  for (const prop of metadata.properties) {`,
+    `    const propValue = value?.[prop.name];`,
+    `    if (propValue === undefined) continue;`,
+    `    const serialized = serializeXmlValue(propValue, prop.type, prop);`,
+    `    if (serialized === undefined) continue;`,
+    `    if (prop.attribute) {`,
+    `      attributes[prop.wireName] = serialized;`,
+    `    } else if (prop.unwrapped) {`,
+    `      result[prop.itemName ?? prop.wireName] = serialized;`,
+    `    } else {`,
+    `      result[prop.wireName] = serialized;`,
+    `    }`,
+    `  }`,
+    `  if (Object.keys(attributes).length > 0) {`,
+    `    result.$ = attributes;`,
+    `  }`,
+    `  return result;`,
+    `}`,
+    "",
+    `function serializeXmlValue(value: any, type: OperationTypeBinding, prop?: XmlPropertyMetadata): unknown {`,
+    `  if (value === undefined) return undefined;`,
+    `  switch (type.kind) {`,
+    `    case "model":`,
+    `      return serializeXmlModel(value, type.name);`,
+    `    case "array": {`,
+    `      const items = Array.isArray(value) ? value : [value];`,
+    `      const serializedItems = items.map((item) => serializeXmlValue(item, type.element));`,
+    `      if (prop?.unwrapped) return serializedItems;`,
+    `      return { [prop?.itemName ?? prop?.wireName ?? "item"]: serializedItems };`,
+    `    }`,
+    `    case "record":`,
+    `      return value;`,
+    `    case "datetime":`,
+    `      return value instanceof Date ? value.toUTCString() : String(value);`,
+    `    case "literal":`,
+    `      return type.value;`,
+    `    case "boolean":`,
+    `    case "number":`,
+    `    case "string":`,
+    `    case "unknown":`,
+    `      return value;`,
     `  }`,
     `}`,
     "",
@@ -189,6 +410,16 @@ function renderHelpers(): string {
   ];
 
   lines.push(
+    "",
+    `async function readRequestIntoText(req: IRequest): Promise<string> {`,
+    `  return new Promise<string>((resolve, reject) => {`,
+    `    const segments: string[] = [];`,
+    `    const bodyStream = req.getBodyStream();`,
+    `    bodyStream.on("data", (buffer) => segments.push(buffer));`,
+    `    bodyStream.on("error", reject);`,
+    `    bodyStream.on("end", () => resolve(segments.join("")));`,
+    `  });`,
+    `}`,
     "",
     `function deserializeNumber(value: string | string[] | undefined, wireName: string, required: boolean): number | undefined {`,
     `  const normalized = deserializeString(value, wireName, required);`,
@@ -324,10 +555,11 @@ function renderHelpers(): string {
     "",
     `function getParameterPath(parameter: OperationParameterBinding): string | readonly string[] {`,
     `  if (!parameter.required) return ["options", getHandlerParameterName(parameter)];`,
-    `  return parameter.name;`,
+    `  return getHandlerParameterName(parameter);`,
     `}`,
     "",
     `function getHandlerParameterName(parameter: OperationParameterBinding): string {`,
+    `  if (parameter.wireName.toLowerCase() === "visibilitytimeout") return "visibilitytimeout";`,
     `  return parameter.wireName.toLowerCase() === "x-ms-client-request-id" ? "requestId" : parameter.name;`,
     `}`,
   );

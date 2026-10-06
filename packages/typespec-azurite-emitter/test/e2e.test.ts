@@ -69,7 +69,7 @@ describe("end-to-end emit", () => {
     );
   });
 
-  it("generates serialization.ts with direct Azurite serialization helpers for the no-body slice", async () => {
+  it("generates serialization.ts with direct Azurite serialization helpers", async () => {
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const serializationFile = findOutput(outputs, "serialization.ts");
 

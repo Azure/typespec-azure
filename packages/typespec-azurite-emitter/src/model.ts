@@ -14,12 +14,15 @@ export interface ServerModelProperty {
   readonly wireName: string;
   readonly type: ServerTypeRef;
   readonly optional: boolean;
+  readonly xmlAttribute: boolean;
+  readonly xmlUnwrapped: boolean;
   readonly doc?: string;
 }
 
 /** A named data model (request/response body shape) referenced by one or more operations. */
 export interface ServerDataModel {
   readonly name: string;
+  readonly wireName: string;
   readonly properties: ServerModelProperty[];
   readonly doc?: string;
 }
@@ -38,6 +41,7 @@ export interface ServerOperationParameter {
 export interface ServerRequestBody {
   readonly type: ServerTypeRef;
   readonly contentTypes: readonly string[];
+  readonly parameterPath: string | readonly string[];
 }
 
 export interface ServerResponseHeader {

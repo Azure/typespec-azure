@@ -62,7 +62,7 @@ describe("structural fit against Azure/Azurite's real generated artifacts", () =
       `{ statusCode: 201, headers: [{ name: "requestId", wireName: "x-ms-request-id", type: { kind: "string" } }] }`,
     );
     expect(operationsFile).toContain(
-      `{ statusCode: 200, headers: [{ name: "approximateMessagesCount", wireName: "x-ms-approximate-messages-count", type: { kind: "number" } }] }`,
+      `{ statusCode: 200, headers: [{ name: "approximateMessagesCount", wireName: "x-ms-approximate-messages-count", type: { kind: "number" } }], body: { type: { kind: "model", name: "QueueProperties" } } }`,
     );
   });
 

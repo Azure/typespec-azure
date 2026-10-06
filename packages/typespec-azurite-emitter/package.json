@@ -49,13 +49,15 @@
   "peerDependencies": {
     "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@typespec/compiler": "workspace:^",
-    "@typespec/http": "workspace:^"
+    "@typespec/http": "workspace:^",
+    "@typespec/xml": "workspace:^"
   },
   "devDependencies": {
     "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@types/node": "catalog:",
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",
+    "@typespec/xml": "workspace:^",
     "@typespec/tspd": "workspace:^",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",

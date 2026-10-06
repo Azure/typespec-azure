@@ -66,7 +66,8 @@ function renderResponseType(op: ServerOperation): string {
 function renderMetadataConst(serverModel: ServerModel): string {
   const lines = [
     `export type OperationTypeBinding =`,
-    `  | { readonly kind: "string" | "number" | "boolean" | "datetime" | "model" | "record" | "unknown" }`,
+    `  | { readonly kind: "string" | "number" | "boolean" | "datetime" | "record" | "unknown" }`,
+    `  | { readonly kind: "model"; readonly name: string }`,
     `  | { readonly kind: "literal"; readonly value: string | number | boolean }`,
     `  | { readonly kind: "array"; readonly element: OperationTypeBinding };`,
     "",
@@ -87,6 +88,7 @@ function renderMetadataConst(serverModel: ServerModel): string {
     `export interface OperationResponseMetadata {`,
     `  readonly statusCode: number | "*";`,
     `  readonly headers: readonly OperationResponseHeaderBinding[];`,
+    `  readonly body?: { readonly type: OperationTypeBinding };`,
     `}`,
     "",
     `export interface OperationLiteralQueryParameter {`,
@@ -105,6 +107,8 @@ function renderMetadataConst(serverModel: ServerModel): string {
     `  readonly parameters: readonly OperationParameterBinding[];`,
     `  readonly hasRequestBody: boolean;`,
     `  readonly requestBodyContentTypes: readonly string[];`,
+    `  readonly requestBodyParameterPath?: string | readonly string[];`,
+    `  readonly requestBodyType?: OperationTypeBinding;`,
     `  readonly responses: readonly OperationResponseMetadata[];`,
     `  readonly interfaceName?: string;`,
     `}`,
@@ -139,6 +143,12 @@ function renderMetadataConst(serverModel: ServerModel): string {
     lines.push(
       `    requestBodyContentTypes: ${JSON.stringify(op.requestBody?.contentTypes ?? [])},`,
     );
+    if (op.requestBody) {
+      lines.push(
+        `    requestBodyParameterPath: ${renderParameterPath(op.requestBody.parameterPath)},`,
+      );
+      lines.push(`    requestBodyType: ${renderOperationTypeBinding(op.requestBody.type)},`);
+    }
     lines.push(`    responses: [`);
     for (const response of op.responses) {
       const headerEntries = response.headers
@@ -147,9 +157,18 @@ function renderMetadataConst(serverModel: ServerModel): string {
             `{ name: ${JSON.stringify(h.name)}, wireName: ${JSON.stringify(h.wireName)}, type: ${renderOperationTypeBinding(h.type)} }`,
         )
         .join(", ");
+      const bodyEntry = response.body
+        ? `, body: { type: ${renderOperationTypeBinding(response.body.type)} }`
+        : "";
       lines.push(
-        `      { statusCode: ${JSON.stringify(response.statusCode)}, headers: [${headerEntries}] },`,
+        `      { statusCode: ${JSON.stringify(response.statusCode)}, headers: [${headerEntries}]${bodyEntry} },`,
       );
+    }
+
+    function renderParameterPath(parameterPath: string | readonly string[]): string {
+      return typeof parameterPath === "string"
+        ? JSON.stringify(parameterPath)
+        : `[${parameterPath.map((path) => JSON.stringify(path)).join(", ")}]`;
     }
     lines.push(`    ],`);
     if (op.interfaceName !== undefined) {
@@ -168,6 +187,7 @@ function renderOperationTypeBinding(type: ServerTypeRef): string {
     case "literal":
       return `{ kind: "literal", value: ${JSON.stringify(type.value)} }`;
     case "model":
+      return `{ kind: "model", name: ${JSON.stringify(type.name)} }`;
     case "record":
       return `{ kind: ${JSON.stringify(type.kind)} }`;
     case "boolean":

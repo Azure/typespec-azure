@@ -11,6 +11,7 @@ const sampleServerModel: ServerModel = {
   models: [
     {
       name: "QueueMetadata",
+      wireName: "QueueMetadata",
       doc: "Queue metadata.",
       properties: [
         {
@@ -18,6 +19,8 @@ const sampleServerModel: ServerModel = {
           wireName: "Description",
           type: { kind: "string" },
           optional: true,
+          xmlAttribute: false,
+          xmlUnwrapped: false,
           doc: "A description.",
         },
         {
@@ -25,18 +28,30 @@ const sampleServerModel: ServerModel = {
           wireName: "PublicAccess",
           type: { kind: "boolean" },
           optional: true,
+          xmlAttribute: false,
+          xmlUnwrapped: false,
         },
       ],
     },
     {
       name: "QueueMessage",
+      wireName: "QueueMessage",
       properties: [
-        { name: "messageId", wireName: "MessageId", type: { kind: "string" }, optional: false },
+        {
+          name: "messageId",
+          wireName: "MessageId",
+          type: { kind: "string" },
+          optional: false,
+          xmlAttribute: false,
+          xmlUnwrapped: false,
+        },
         {
           name: "tags",
           wireName: "Tags",
           type: { kind: "array", element: { kind: "string" } },
           optional: true,
+          xmlAttribute: false,
+          xmlUnwrapped: false,
         },
       ],
     },
@@ -62,6 +77,7 @@ const sampleServerModel: ServerModel = {
       requestBody: {
         type: { kind: "model", name: "QueueMetadata" },
         contentTypes: ["application/json"],
+        parameterPath: "body",
       },
       responses: [
         {
@@ -221,7 +237,7 @@ describe("renderHandlers", () => {
 describe("renderSerialization", () => {
   const output = renderSerialization(sampleServerModel);
 
-  it("renders direct request/response serialization helpers for operations with no response body", () => {
+  it("renders direct request/response serialization helpers with shared metadata helpers", () => {
     expect(output).not.toContain(`@azure/ms-rest-js`);
     expect(output).toContain(`export async function deserializeRequest`);
     expect(output).toContain(`export function serializeResponse`);
