@@ -4,6 +4,10 @@ packages:
   - "@azure-tools/typespec-ts"
 ---
 
-Generate structured JSONL and SSE streaming operations by default. A JSONL or SSE stream response now returns `Promise<AsyncIterable<T>>` of deserialized items/events instead of the previous raw binary `Uint8Array` body. An operation returning `JsonlStream<T>` lazily decodes JSON Lines into `AsyncIterable<T>`, and an operation returning `SSEStream<T>` returns an `AsyncIterable` of the event payload types, dispatching each Server-Sent Event by its `event:` name, deserializing each payload, and stopping at the TypeSpec terminal event.
+Generate structured JSONL and SSE streaming operations as `Promise<AsyncIterable<T>>` of deserialized items/events instead of raw binary `Uint8Array` bodies. Connection and modeled HTTP error validation are eager; payload deserialization is lazy. Generate streaming helpers only for supported MIME types and non-paging, non-LRO operations.
 
-SSE operations use the published `@azure/core-sse` `createSseStream` API for a single HTTP response, without automatic reconnection, event-ID resumption, or retry-delay handling. Connection and HTTP error validation remain eager while typed event deserialization is lazy. Ordinary operation options, headers, and caller cancellation are preserved.
+SSE uses the published `@azure/core-sse` `createSseStream` API for one native HTTP response, without automatic reconnection, event-ID resumption, or retry-delay handling. Preserve ordinary operation options, headers, and caller cancellation. Dispatch named events as typed `{ event, data }` unions, infer payload-specific content types, yield typed terminal events, and suppress constant terminal sentinels.
+
+JSONL decodes lines incrementally, flushes UTF-8 decoding at EOF, and cancels browser readers on early exit or decoding failures. Per-item deserialization uses existing TCGC serialization metadata.
+
+Recognize standalone `TypeSpec.Streams` decorators in the shared test compiler and cover custom streams without incidental SSE imports.
