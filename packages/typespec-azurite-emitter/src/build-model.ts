@@ -53,15 +53,10 @@ export function buildServerModel(program: Program): ServerModel {
   const usedOperationNames = new Set<string>();
   for (const op of service?.operations ?? []) {
     try {
-      const built = buildOperation(program, op, modelRegistry, anonymousModelNames);
-      let qualifiedName = built.name;
-      if (usedOperationNames.has(qualifiedName)) {
-        const interfaceName = op.operation.interface?.name;
-        qualifiedName = interfaceName ? `${toPascalCase(interfaceName)}${built.name}` : built.name;
-      }
-      qualifiedName = disambiguate(qualifiedName, usedOperationNames);
-      usedOperationNames.add(qualifiedName);
-      operations.push(qualifiedName === built.name ? built : { ...built, name: qualifiedName });
+      const operationName = getOperationName(program, op, usedOperationNames);
+      const built = buildOperation(program, operationName, op, modelRegistry, anonymousModelNames);
+      usedOperationNames.add(operationName);
+      operations.push(built);
     } catch (error) {
       skippedOperations.push({
         name: toPascalCase(op.operation.name),
@@ -88,6 +83,7 @@ function disambiguate(name: string, used: ReadonlySet<string>): string {
 
 function buildOperation(
   program: Program,
+  name: string,
   op: HttpOperation,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
@@ -106,7 +102,7 @@ function buildOperation(
   const route = splitRoutePath(op.path);
 
   return {
-    name: getOperationName(program, op),
+    name,
     verb: op.verb,
     rawPath: op.path,
     path: route.path,
@@ -119,9 +115,19 @@ function buildOperation(
   };
 }
 
-function getOperationName(program: Program, op: HttpOperation): string {
+function getOperationName(
+  program: Program,
+  op: HttpOperation,
+  usedOperationNames: ReadonlySet<string>,
+): string {
   const tcgcContext = createTCGCContext(program, "@azure-tools/typespec-azurite-emitter");
-  return getClientNameOverride(tcgcContext, op.operation) ?? toPascalCase(op.operation.name);
+  const baseName =
+    getClientNameOverride(tcgcContext, op.operation) ?? toPascalCase(op.operation.name);
+  const qualifiedName =
+    usedOperationNames.has(baseName) && op.operation.interface?.name
+      ? `${toPascalCase(op.operation.interface.name)}${baseName}`
+      : baseName;
+  return disambiguate(qualifiedName, usedOperationNames);
 }
 
 function splitRoutePath(path: string): {
