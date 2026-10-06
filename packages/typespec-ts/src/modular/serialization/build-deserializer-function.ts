@@ -205,7 +205,10 @@ function buildPolymorphicDeserializer(
   });
 
   // Use wire format name for the switch since item is raw JSON from the service
-  const discriminatorWireName = getPropertySerializedName(type.discriminatorProperty);
+  const discriminatorWireName = getPropertySerializedName(
+    type.discriminatorProperty,
+    context.program,
+  );
   statements.push(`
       switch (item["${discriminatorWireName}"]) {
        ${cases.join("\n")}
@@ -281,7 +284,7 @@ function buildDiscriminatedUnionDeserializer(
   }
   // Use wire format name for the switch since item is raw JSON from the service
   const discriminatorWireName = type.discriminatorProperty
-    ? getPropertySerializedName(type.discriminatorProperty)
+    ? getPropertySerializedName(type.discriminatorProperty, context.program)
     : "unknown";
   output.push(`
     switch (item["${discriminatorWireName}"]) {

@@ -76,12 +76,7 @@ import {
   isSubscriptionId,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import {
-  inferEventContentType,
-  isMediaTypeJson,
-  isMediaTypeTextPlain,
-  isMediaTypeXml,
-} from "./media-types.js";
+import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -170,8 +165,7 @@ function buildSdkSseMetadata(
     payloadType: diagnostics.pipe(
       getClientTypeWithDiagnostics(context, event.payloadType, operation),
     ),
-    payloadContentType:
-      event.payloadContentType ?? inferEventContentType(context.program, event.payloadType),
+    payloadContentType: event.payloadContentType,
   }));
   return diagnostics.wrap({ events });
 }

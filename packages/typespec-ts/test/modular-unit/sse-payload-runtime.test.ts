@@ -1,6 +1,6 @@
 import { Readable } from "node:stream";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { clearContexts } from "../../src/context-manager.js";
+import { clearContexts, useContext } from "../../src/context-manager.js";
 import { emitModularOperationsFromTypeSpec } from "../util/emit-util.js";
 import { createGeneratedRuntime } from "../util/generated-runtime.js";
 import { clearCompileCache } from "../util/test-util.js";
@@ -21,6 +21,7 @@ interface GeneratedOperations {
 describe("generated SSE payload formats", () => {
   let operations: GeneratedOperations;
   let browserOperations: GeneratedOperations;
+  let payloadContentTypes: (string | undefined)[] | undefined;
 
   beforeAll(async () => {
     const files = await emitModularOperationsFromTypeSpec(
@@ -73,6 +74,13 @@ describe("generated SSE payload formats", () => {
       { "include-headers-in-response": true, needTCGC: true },
     );
     expect(files).toHaveLength(1);
+    for (const method of useContext("emitContext").tcgcContext.sdkPackage.clients[0].methods) {
+      if (method.kind === "basic" && method.name === "receive") {
+        payloadContentTypes = method.response.sseMetadata?.events.map(
+          (event) => event.payloadContentType,
+        );
+      }
+    }
     const file = files![0]!;
     const sources = file
       .getProject()
@@ -136,6 +144,20 @@ describe("generated SSE payload formats", () => {
     }
     return result;
   }
+
+  it("infers payload formats without modifying TCGC's explicit SSE metadata", () => {
+    expect(payloadContentTypes).toEqual([
+      undefined,
+      undefined,
+      "application/json",
+      undefined,
+      "text/plain",
+      undefined,
+      undefined,
+      "application/json",
+      undefined,
+    ]);
+  });
 
   it("decodes inferred, explicit, hinted and @data payload-only wire formats through real core", async () => {
     const frames = [
