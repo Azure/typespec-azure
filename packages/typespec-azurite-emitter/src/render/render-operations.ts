@@ -1,4 +1,4 @@
-import type { ServerModel, ServerOperation, ServerResponse } from "../model.js";
+import type { ServerModel, ServerOperation, ServerResponse, ServerTypeRef } from "../model.js";
 import { collectModelRefs, renderFileHeader, renderTypeRef } from "./type-ref.js";
 
 /** Collects every `models.ts`-defined type name referenced anywhere in `serverModel`'s operations. */
@@ -65,16 +65,23 @@ function renderResponseType(op: ServerOperation): string {
 
 function renderMetadataConst(serverModel: ServerModel): string {
   const lines = [
+    `export type OperationTypeBinding =`,
+    `  | { readonly kind: "string" | "number" | "boolean" | "datetime" | "model" | "record" | "unknown" }`,
+    `  | { readonly kind: "literal"; readonly value: string | number | boolean }`,
+    `  | { readonly kind: "array"; readonly element: OperationTypeBinding };`,
+    "",
     `export interface OperationParameterBinding {`,
     `  readonly name: string;`,
     `  readonly wireName: string;`,
     `  readonly location: "path" | "query" | "header";`,
     `  readonly required: boolean;`,
+    `  readonly type: OperationTypeBinding;`,
     `}`,
     "",
     `export interface OperationResponseHeaderBinding {`,
     `  readonly name: string;`,
     `  readonly wireName: string;`,
+    `  readonly type: OperationTypeBinding;`,
     `}`,
     "",
     `export interface OperationResponseMetadata {`,
@@ -124,7 +131,7 @@ function renderMetadataConst(serverModel: ServerModel): string {
     lines.push(`    parameters: [`);
     for (const param of op.parameters) {
       lines.push(
-        `      { name: ${JSON.stringify(param.name)}, wireName: ${JSON.stringify(param.wireName)}, location: ${JSON.stringify(param.location)}, required: ${!param.optional} },`,
+        `      { name: ${JSON.stringify(param.name)}, wireName: ${JSON.stringify(param.wireName)}, location: ${JSON.stringify(param.location)}, required: ${!param.optional}, type: ${renderOperationTypeBinding(param.type)} },`,
       );
     }
     lines.push(`    ],`);
@@ -135,7 +142,10 @@ function renderMetadataConst(serverModel: ServerModel): string {
     lines.push(`    responses: [`);
     for (const response of op.responses) {
       const headerEntries = response.headers
-        .map((h) => `{ name: ${JSON.stringify(h.name)}, wireName: ${JSON.stringify(h.wireName)} }`)
+        .map(
+          (h) =>
+            `{ name: ${JSON.stringify(h.name)}, wireName: ${JSON.stringify(h.wireName)}, type: ${renderOperationTypeBinding(h.type)} }`,
+        )
         .join(", ");
       lines.push(
         `      { statusCode: ${JSON.stringify(response.statusCode)}, headers: [${headerEntries}] },`,
@@ -149,6 +159,24 @@ function renderMetadataConst(serverModel: ServerModel): string {
   }
   lines.push(`];`, "");
   return lines.join("\n");
+}
+
+function renderOperationTypeBinding(type: ServerTypeRef): string {
+  switch (type.kind) {
+    case "array":
+      return `{ kind: "array", element: ${renderOperationTypeBinding(type.element)} }`;
+    case "literal":
+      return `{ kind: "literal", value: ${JSON.stringify(type.value)} }`;
+    case "model":
+    case "record":
+      return `{ kind: ${JSON.stringify(type.kind)} }`;
+    case "boolean":
+    case "datetime":
+    case "number":
+    case "string":
+    case "unknown":
+      return `{ kind: ${JSON.stringify(type.kind)} }`;
+  }
 }
 
 /**

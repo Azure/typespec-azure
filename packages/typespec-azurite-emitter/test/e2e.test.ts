@@ -76,9 +76,13 @@ describe("end-to-end emit", () => {
     expect(serializationFile).not.toContain(`@azure/ms-rest-js`);
     expect(serializationFile).toContain(`export async function deserializeRequest`);
     expect(serializationFile).toContain(`export function serializeResponse`);
-    expect(serializationFile).toContain(`function deserializeDeleteQueueRequest(req: IRequest)`);
-    expect(serializationFile).toContain(`function serializeDeleteQueueResponse`);
-    expect(serializationFile).toContain(`setHeader(res, "x-ms-request-id"`);
+    expect(serializationFile).not.toContain(
+      `function deserializeDeleteQueueRequest(req: IRequest)`,
+    );
+    expect(serializationFile).not.toContain(`function serializeDeleteQueueResponse`);
+    expect(serializationFile).toContain(`function deserializeMetadataRequest`);
+    expect(serializationFile).toContain(`function serializeMetadataResponse`);
+    expect(serializationFile).toContain(`setHeader(res, header.wireName`);
   });
 });
 

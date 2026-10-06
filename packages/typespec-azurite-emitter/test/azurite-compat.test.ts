@@ -44,13 +44,13 @@ describe("structural fit against Azure/Azurite's real generated artifacts", () =
     const operationsFile = findOutput(outputs, "operations.ts");
 
     expect(operationsFile).toContain(
-      `{ name: "numOfMessages", wireName: "numOfMessages", location: "query", required: false }`,
+      `{ name: "numOfMessages", wireName: "numOfMessages", location: "query", required: false, type: { kind: "number" } }`,
     );
     expect(operationsFile).toContain(
-      `{ name: "visibilityTimeout", wireName: "visibilityTimeout", location: "query", required: false }`,
+      `{ name: "visibilityTimeout", wireName: "visibilityTimeout", location: "query", required: false, type: { kind: "number" } }`,
     );
     expect(operationsFile).toContain(
-      `{ name: "queueName", wireName: "queueName", location: "path", required: true }`,
+      `{ name: "queueName", wireName: "queueName", location: "path", required: true, type: { kind: "string" } }`,
     );
   });
 
@@ -59,10 +59,10 @@ describe("structural fit against Azure/Azurite's real generated artifacts", () =
     const operationsFile = findOutput(outputs, "operations.ts");
 
     expect(operationsFile).toContain(
-      `{ statusCode: 201, headers: [{ name: "requestId", wireName: "x-ms-request-id" }] }`,
+      `{ statusCode: 201, headers: [{ name: "requestId", wireName: "x-ms-request-id", type: { kind: "string" } }] }`,
     );
     expect(operationsFile).toContain(
-      `{ statusCode: 200, headers: [{ name: "approximateMessagesCount", wireName: "x-ms-approximate-messages-count" }] }`,
+      `{ statusCode: 200, headers: [{ name: "approximateMessagesCount", wireName: "x-ms-approximate-messages-count", type: { kind: "number" } }] }`,
     );
   });
 

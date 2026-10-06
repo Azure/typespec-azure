@@ -186,12 +186,12 @@ describe("renderOperations", () => {
     expect(output).toContain(`requiredQueryParameters: []`);
     expect(output).toContain(`requiredHeaderParameters: []`);
     expect(output).toContain(
-      `{ name: "queueName", wireName: "queueName", location: "path", required: true }`,
+      `{ name: "queueName", wireName: "queueName", location: "path", required: true, type: { kind: "string" } }`,
     );
     expect(output).toContain("hasRequestBody: true");
     expect(output).toContain(`requestBodyContentTypes: ["application/json"]`);
     expect(output).toContain(
-      `{ statusCode: 201, headers: [{ name: "requestId", wireName: "x-ms-request-id" }] }`,
+      `{ statusCode: 201, headers: [{ name: "requestId", wireName: "x-ms-request-id", type: { kind: "string" } }] }`,
     );
     expect(output).toContain(`interfaceName: "Queue"`);
   });
@@ -225,15 +225,19 @@ describe("renderSerialization", () => {
     expect(output).not.toContain(`@azure/ms-rest-js`);
     expect(output).toContain(`export async function deserializeRequest`);
     expect(output).toContain(`export function serializeResponse`);
-    expect(output).toContain(`function deserializeDeleteQueueRequest(req: IRequest)`);
-    expect(output).toContain(`function serializeDeleteQueueResponse`);
-    expect(output).toContain(`setHeader(res, "x-ms-request-id"`);
+    expect(output).not.toContain(`function deserializeDeleteQueueRequest(req: IRequest)`);
+    expect(output).not.toContain(`function serializeDeleteQueueResponse`);
+    expect(output).toContain(`function deserializeMetadataRequest`);
+    expect(output).toContain(`function serializeMetadataResponse`);
+    expect(output).toContain(`setHeader(res, header.wireName`);
   });
 
   it("uses switch-based entrypoints instead of a generated operation map", () => {
     expect(output).not.toContain(`serializationOperations`);
     expect(output).toContain(`case "DeleteQueue":`);
-    expect(output).toContain(`return deserializeDeleteQueueRequest(req);`);
+    expect(output).toContain(
+      `return deserializeMetadataRequest(getGeneratedOperation(name), req);`,
+    );
     expect(output).toContain(`export function hasGeneratedSerialization(name: string): boolean {`);
   });
 });
