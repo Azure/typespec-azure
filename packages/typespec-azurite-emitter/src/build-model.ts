@@ -1,5 +1,5 @@
 import { type Model, type ModelProperty, type Program, type Type } from "@typespec/compiler";
-import { $, type Typekit } from "@typespec/compiler/typekit";
+import { $ } from "@typespec/compiler/typekit";
 import {
   getAllHttpServices,
   type HttpOperation,
@@ -38,7 +38,6 @@ export function toPascalCase(name: string): string {
  * `skippedOperations`.
  */
 export function buildServerModel(program: Program): ServerModel {
-  const tk = $(program);
   const [services] = getAllHttpServices(program);
   const service = services[0];
   const modelRegistry = new Map<string, ServerDataModel>();
@@ -49,7 +48,7 @@ export function buildServerModel(program: Program): ServerModel {
   const usedOperationNames = new Set<string>();
   for (const op of service?.operations ?? []) {
     try {
-      const built = buildOperation(tk, op, modelRegistry, anonymousModelNames);
+      const built = buildOperation(program, op, modelRegistry, anonymousModelNames);
       let qualifiedName = built.name;
       if (usedOperationNames.has(qualifiedName)) {
         const interfaceName = op.operation.interface?.name;
@@ -83,21 +82,21 @@ function disambiguate(name: string, used: ReadonlySet<string>): string {
 }
 
 function buildOperation(
-  tk: Typekit,
+  program: Program,
   op: HttpOperation,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): ServerOperation {
   const parameters = op.parameters.parameters.map((p) =>
-    buildParameter(tk, p, modelRegistry, anonymousModelNames),
+    buildParameter(program, p, modelRegistry, anonymousModelNames),
   );
 
   const requestBody = op.parameters.body
-    ? buildRequestBody(tk, op.parameters.body, modelRegistry, anonymousModelNames)
+    ? buildRequestBody(program, op.parameters.body, modelRegistry, anonymousModelNames)
     : undefined;
 
   const responses = op.responses.map((r) =>
-    buildResponse(tk, r, modelRegistry, anonymousModelNames),
+    buildResponse(program, r, modelRegistry, anonymousModelNames),
   );
 
   return {
@@ -107,13 +106,13 @@ function buildOperation(
     parameters,
     requestBody,
     responses,
-    doc: getDocHelper(tk, op.operation),
+    doc: getDocHelper(program, op.operation),
     interfaceName: op.operation.interface?.name,
   };
 }
 
 function buildParameter(
-  tk: Typekit,
+  program: Program,
   param: HttpOperationParameter,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
@@ -124,25 +123,25 @@ function buildParameter(
     name: param.param.name,
     wireName: param.name,
     location,
-    type: toTypeRef(tk, param.param.type, modelRegistry, anonymousModelNames),
+    type: toTypeRef(program, param.param.type, modelRegistry, anonymousModelNames),
     optional: param.param.optional,
   };
 }
 
 function buildRequestBody(
-  tk: Typekit,
+  program: Program,
   body: HttpPayloadBody,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): ServerRequestBody {
   return {
-    type: toTypeRef(tk, body.type, modelRegistry, anonymousModelNames),
+    type: toTypeRef(program, body.type, modelRegistry, anonymousModelNames),
     contentTypes: body.contentTypes,
   };
 }
 
 function buildResponse(
-  tk: Typekit,
+  program: Program,
   response: HttpOperationResponse,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
@@ -153,7 +152,7 @@ function buildResponse(
     headers.push({
       name: prop.name,
       wireName: headerWireName,
-      type: toTypeRef(tk, prop.type, modelRegistry, anonymousModelNames),
+      type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
       optional: prop.optional,
     });
   }
@@ -162,7 +161,7 @@ function buildResponse(
     statusCode: typeof response.statusCodes === "number" ? response.statusCodes : "*",
     headers,
     body: content?.body
-      ? buildRequestBody(tk, content.body, modelRegistry, anonymousModelNames)
+      ? buildRequestBody(program, content.body, modelRegistry, anonymousModelNames)
       : undefined,
   };
 }
@@ -172,11 +171,12 @@ function buildResponse(
  * into `modelRegistry` (recursively) the first time it is seen.
  */
 function toTypeRef(
-  tk: Typekit,
+  program: Program,
   type: Type,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): ServerTypeRef {
+  const tk = $(program);
   switch (type.kind) {
     case "Scalar":
       if (tk.scalar.extendsNumeric(type)) return { kind: "number" };
@@ -204,21 +204,26 @@ function toTypeRef(
       if (tk.array.is(type)) {
         return {
           kind: "array",
-          element: toTypeRef(tk, tk.array.getElementType(type), modelRegistry, anonymousModelNames),
+          element: toTypeRef(
+            program,
+            tk.array.getElementType(type),
+            modelRegistry,
+            anonymousModelNames,
+          ),
         };
       }
       if (tk.record.is(type)) {
         return {
           kind: "record",
           element: toTypeRef(
-            tk,
+            program,
             tk.record.getElementType(type),
             modelRegistry,
             anonymousModelNames,
           ),
         };
       }
-      return registerModel(tk, type, modelRegistry, anonymousModelNames);
+      return registerModel(program, type, modelRegistry, anonymousModelNames);
     }
     case "Union": {
       return { kind: "unknown" };
@@ -229,19 +234,20 @@ function toTypeRef(
 }
 
 function registerModel(
-  tk: Typekit,
+  program: Program,
   model: Model,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): ServerTypeRef {
+  const tk = $(program);
   const name = resolveModelName(model, modelRegistry, anonymousModelNames);
   if (!modelRegistry.has(name)) {
     // Insert a placeholder first to guard against infinite recursion on cyclic models.
     modelRegistry.set(name, { name, properties: [] });
     const properties = [...tk.model.getProperties(model).values()].map((prop) =>
-      buildModelProperty(tk, prop, modelRegistry, anonymousModelNames),
+      buildModelProperty(program, prop, modelRegistry, anonymousModelNames),
     );
-    modelRegistry.set(name, { name, properties, doc: getDocHelper(tk, model) });
+    modelRegistry.set(name, { name, properties, doc: getDocHelper(program, model) });
   }
   return { kind: "model", name };
 }
@@ -271,19 +277,19 @@ function resolveModelName(
 }
 
 function buildModelProperty(
-  tk: Typekit,
+  program: Program,
   prop: ModelProperty,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): ServerModelProperty {
   return {
     name: prop.name,
-    type: toTypeRef(tk, prop.type, modelRegistry, anonymousModelNames),
+    type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
     optional: prop.optional,
-    doc: getDocHelper(tk, prop),
+    doc: getDocHelper(program, prop),
   };
 }
 
-function getDocHelper(tk: Typekit, target: Type): string | undefined {
-  return tk.type.getDoc(target);
+function getDocHelper(program: Program, target: Type): string | undefined {
+  return $(program).type.getDoc(target);
 }
