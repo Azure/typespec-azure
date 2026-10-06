@@ -1,7 +1,6 @@
 import {
   createTCGCContext,
   getClientNameOverride,
-  type TCGCContext,
 } from "@azure-tools/typespec-client-generator-core";
 import { type Model, type ModelProperty, type Program, type Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
@@ -48,14 +47,13 @@ export function buildServerModel(program: Program): ServerModel {
   const service = services[0];
   const modelRegistry = new Map<string, ServerDataModel>();
   const anonymousModelNames = new Map<Model, string>();
-  const tcgcContext = createTCGCContext(program, "@azure-tools/typespec-azurite-emitter");
 
   const operations: ServerOperation[] = [];
   const skippedOperations: ServerSkippedOperation[] = [];
   const usedOperationNames = new Set<string>();
   for (const op of service?.operations ?? []) {
     try {
-      const built = buildOperation(program, tcgcContext, op, modelRegistry, anonymousModelNames);
+      const built = buildOperation(program, op, modelRegistry, anonymousModelNames);
       let qualifiedName = built.name;
       if (usedOperationNames.has(qualifiedName)) {
         const interfaceName = op.operation.interface?.name;
@@ -90,7 +88,6 @@ function disambiguate(name: string, used: ReadonlySet<string>): string {
 
 function buildOperation(
   program: Program,
-  tcgcContext: TCGCContext,
   op: HttpOperation,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
@@ -109,7 +106,7 @@ function buildOperation(
   const route = splitRoutePath(op.path);
 
   return {
-    name: getClientNameOverride(tcgcContext, op.operation) ?? toPascalCase(op.operation.name),
+    name: getOperationName(program, op),
     verb: op.verb,
     rawPath: op.path,
     path: route.path,
@@ -120,6 +117,11 @@ function buildOperation(
     doc: getDocHelper(program, op.operation),
     interfaceName: op.operation.interface?.name,
   };
+}
+
+function getOperationName(program: Program, op: HttpOperation): string {
+  const tcgcContext = createTCGCContext(program, "@azure-tools/typespec-azurite-emitter");
+  return getClientNameOverride(tcgcContext, op.operation) ?? toPascalCase(op.operation.name);
 }
 
 function splitRoutePath(path: string): {
