@@ -1,6 +1,6 @@
 import { assert, beforeEach, describe, it } from "vitest";
 
-import { Info, SseClient } from "./generated/streaming/sse/src/index.js";
+import { SseClient } from "./generated/streaming/sse/src/index.js";
 
 async function collect<T>(iter: AsyncIterable<T>): Promise<T[]> {
   const out: T[] = [];
@@ -23,9 +23,6 @@ async function take<T>(iter: AsyncIterable<T>, count: number): Promise<T[]> {
 
 interface ProtocolOperations {
   reconnect(options?: {
-    lastEventId?: string;
-    retryDelayInMs?: number;
-    maxRetries?: number;
     requestOptions?: { headers?: Record<string, string> };
   }): Promise<AsyncIterable<unknown>>;
   id(): Promise<AsyncIterable<unknown>>;
@@ -71,9 +68,7 @@ describe("SSE Streaming Client", () => {
   });
 
   it("should stream unnamed (message) events as an AsyncIterable", async () => {
-    // This fixture closes at EOF without a terminal event, so stop after its three modeled events
-    // rather than asking the reconnecting transport to treat EOF as successful completion.
-    const events = await take<Info>(await client.unnamed.receive(), 3);
+    const events = await collect(await client.unnamed.receive());
     assert.deepEqual(
       events.map((e) => e.desc),
       ["one", "two", "three"],
@@ -145,13 +140,13 @@ describe("SSE Streaming Client", () => {
       assert.deepEqual(events, [{ event: "message", data: { message: "hello" } }]);
     });
 
-    it("should reconnect automatically with the retained Last-Event-ID", async () => {
-      const events = await take(await protocol.reconnect({ retryDelayInMs: 0 }), 2);
-
-      assert.deepEqual(events, [
-        { event: "message", data: { message: "hello" } },
-        { event: "message", data: { message: "world" } },
-      ]);
+    it("should finish at EOF and resume only through an explicit caller request", async () => {
+      const first = await collect(await protocol.reconnect());
+      assert.deepEqual(first, [{ event: "message", data: { message: "hello" } }]);
+      const second = await collect(
+        await protocol.reconnect({ requestOptions: { headers: { "Last-Event-ID": "event-1" } } }),
+      );
+      assert.deepEqual(second, [{ event: "message", data: { message: "world" } }]);
     });
   });
 });

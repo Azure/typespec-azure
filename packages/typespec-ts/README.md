@@ -2,6 +2,26 @@
 
 A TypeSpec emitter for TypeScript
 
+## Structured streaming
+
+JSONL and SSE operations return `Promise<AsyncIterable<T>>`. HTTP connection and error validation
+happen when the operation is called; typed payload deserialization happens during iteration.
+
+SSE uses the published `@azure/core-sse` `createSseStream` API to read a single native HTTP response.
+EOF ends the iterable. The emitter does not reconnect after EOF or transport errors, resume event
+IDs, honor SSE retry delays, or add reconnect-specific operation options. Ordinary request headers
+and the caller's abort signal are forwarded to the HTTP client unchanged.
+
+Named SSE events preserve their `{ event, data }` discriminated union. The mapper stops at
+TypeSpec-defined terminal events, yielding typed terminal payloads and suppressing constant control
+sentinels. JSONL remains independent of `@azure/core-sse`.
+
+**Published core-sse 2.4.0 limitation:** stopping a native browser SSE response early, including at a
+terminal event, can reject with `ReadableStream is locked` and leave the response uncanceled. This
+is reproducible with `createSseStream` alone. The emitter does not suppress that cleanup error or
+replace the native stream with a custom adapter. Reading a browser response to natural EOF is
+supported; browser callers should account for the upstream early-exit limitation.
+
 ## Install
 
 ```bash

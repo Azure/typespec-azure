@@ -278,6 +278,11 @@ export const SseStreamingHelpers = {
     name: "parseSseErrorResponse",
     location: "getSseResponse.ts",
   },
+  cancelSseResponse: {
+    kind: "function",
+    name: "cancelSseResponse",
+    location: "getSseResponse.ts",
+  },
   SseEventDescriptor: {
     kind: "interface",
     name: "SseEventDescriptor",
@@ -286,11 +291,6 @@ export const SseStreamingHelpers = {
   readSseStream: {
     kind: "function",
     name: "readSseStream",
-    location: "sseStreamingHelpers.ts",
-  },
-  isTerminalSseEvent: {
-    kind: "function",
-    name: "isTerminalSseEvent",
     location: "sseStreamingHelpers.ts",
   },
 } as const;
