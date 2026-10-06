@@ -9,10 +9,14 @@ const encoder = new TextEncoder();
 interface RuntimeOperations {
   receive(context: unknown): Promise<AsyncIterable<{ value: string; timestamp: Date }>>;
   receiveXml(context: unknown): Promise<AsyncIterable<{ value: string; timestamp: Date }>>;
+  receivePolymorphic(
+    context: unknown,
+  ): Promise<AsyncIterable<{ kind: "info"; value: string; timestamp: Date }>>;
 }
 
 let sources: Map<string, string>;
 let operationPath: string;
+let jsonlSerializationOptions: unknown[] | undefined;
 
 function loadGeneratedOperations(platform: "Node" | "browser"): RuntimeOperations {
   return createGeneratedRuntime(sources, {
@@ -32,6 +36,16 @@ beforeAll(async () => {
   const files = await emitModularOperationsFromTypeSpec(
     `
     model Info {
+      @encodedName("application/json", "wire_value") value: string;
+      timestamp: utcDateTime;
+    }
+
+    @discriminator("kind")
+    model PolymorphicInfo {
+      @encodedName("application/json", "wire_kind") kind: string;
+    }
+    model InfoVariant extends PolymorphicInfo {
+      @encodedName("application/json", "wire_kind") kind: "info";
       @encodedName("application/json", "wire_value") value: string;
       timestamp: utcDateTime;
     }
@@ -56,10 +70,23 @@ beforeAll(async () => {
 
     @get @route("/receiveXml")
     op receiveXml(): JsonlStream<Info> | StorageError;
+
+    @get @route("/receivePolymorphic")
+    op receivePolymorphic(): JsonlStream<PolymorphicInfo>;
   `,
     { "include-headers-in-response": true, needTCGC: true },
   );
   expect(files).toBeDefined();
+  for (const method of useContext("emitContext").tcgcContext.sdkPackage.clients[0].methods) {
+    if (method.kind === "basic" && method.name === "receive") {
+      const streamType = method.response.streamMetadata?.streamType;
+      if (streamType?.kind === "model") {
+        jsonlSerializationOptions = streamType.properties.map(
+          (property) => property.serializationOptions.json,
+        );
+      }
+    }
+  }
   operationPath = files![0]!.getFilePath();
   sources = new Map(
     useContext("outputProject")
@@ -114,6 +141,19 @@ describe.each(["Node", "browser"] as const)("generated %s JSONL operation runtim
     const context = { path: vi.fn(() => ({ get })) };
     return { context, method, get, body, read, close };
   }
+
+  it("resolves encoded item names without adding JSON serialization options to TCGC models", () => {
+    expect(jsonlSerializationOptions).toEqual([undefined, undefined]);
+  });
+
+  it("deserializes encoded JSONL discriminator and derived property names", async () => {
+    const fixture = transport("200", { "content-type": "application/jsonl" }, [
+      '{"wire_kind":"info","wire_value":"derived","timestamp":"2026-10-06T00:00:00Z"}\n',
+    ]);
+    expect(
+      await collect(await loadGeneratedOperations(platform).receivePolymorphic(fixture.context)),
+    ).toEqual([{ kind: "info", value: "derived", timestamp: new Date("2026-10-06T00:00:00Z") }]);
+  });
 
   it("uses the real generated operation and model mapper with lazy split UTF-8 decoding", async () => {
     const bytes = encoder.encode(

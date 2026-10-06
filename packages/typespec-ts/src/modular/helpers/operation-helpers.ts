@@ -16,9 +16,10 @@ import {
   type SdkModelType,
   type SdkPagingServiceMethod,
   type SdkServiceResponseHeader,
+  type SdkSseEventMetadata,
   type SdkType,
 } from "@azure-tools/typespec-client-generator-core";
-import { NoTarget, type Program } from "@typespec/compiler";
+import { getMediaTypeHint, NoTarget, type Program, resolveEncodedName } from "@typespec/compiler";
 import { isHeader, isMetadata } from "@typespec/http";
 import {
   type FunctionDeclarationStructure,
@@ -1162,6 +1163,31 @@ interface StructuredStreamInfo {
   namedEventTypes?: Record<string, string>;
 }
 
+function getSsePayloadContentType(
+  context: SdkContext,
+  event: SdkSseEventMetadata,
+): string | undefined {
+  if (event.payloadContentType !== undefined) {
+    return event.payloadContentType;
+  }
+  // Infer from the payload itself; an envelope's format does not apply to its @data property.
+  const type = event.payloadType.__raw;
+  if (!type) {
+    return undefined;
+  }
+  const hint = getMediaTypeHint(context.program, type);
+  if (hint) {
+    return hint;
+  }
+  if (type.kind === "Model") {
+    return "application/json";
+  }
+  if (type.kind === "Scalar") {
+    return "text/plain";
+  }
+  return undefined;
+}
+
 /**
  * Resolves structured JSONL/SSE streaming metadata for an operation, or `undefined` when the
  * operation is not a structured stream.
@@ -1214,8 +1240,9 @@ export function getStructuredStreamInfo(
           // raw payload via an identity deserializer instead of dropping it.
           event.identityDeserialize = true;
         }
-        if (sseEvent.payloadContentType !== undefined) {
-          event.contentType = sseEvent.payloadContentType;
+        const contentType = getSsePayloadContentType(context, sseEvent);
+        if (contentType !== undefined) {
+          event.contentType = contentType;
         }
         const payloadType = getTypeExpression(context, sseEvent.payloadType);
         payloadTypeExpressions.push(payloadType);
@@ -2484,7 +2511,7 @@ export function getSerializationExpression(
       propertyFullName,
       !property.optional,
       getEncodeForModelProperty(context, property),
-      getPropertySerializedName(property),
+      getPropertySerializedName(property, context.program),
       propertyPath === "" ? true : false,
     );
     return `${baseExpr}${defaultValueSuffix}`;
@@ -2514,7 +2541,7 @@ export function getRequestModelProperties(
     }
     const property = getPropertyWithOverrides(prop, overrides);
     props.push([
-      getPropertySerializedName(property)!,
+      getPropertySerializedName(property, context.program)!,
       getSerializationExpression(context, property, propertyPath, enableFlatten),
     ]);
   }
@@ -2543,11 +2570,18 @@ export function getRequestModelMapping(
   ).map(([name, value]) => `"${name}": ${value}`);
 }
 
-export function getPropertySerializedName(property: SdkHttpParameter | SdkModelPropertyType) {
+export function getPropertySerializedName(
+  property: SdkHttpParameter | SdkModelPropertyType,
+  program?: Program,
+) {
+  if (property.kind !== "property") {
+    return property.serializedName ?? property.name;
+  }
   return (
-    (property.kind === "property"
-      ? property.serializationOptions.json?.name
-      : property.serializedName) ?? property.name
+    property.serializationOptions.json?.name ??
+    (program && property.__raw
+      ? resolveEncodedName(program, property.__raw, "application/json")
+      : property.name)
   );
 }
 
@@ -2579,7 +2613,7 @@ export function getResponseMapping(
     }
     const property = getPropertyWithOverrides(prop, overrides);
     const dot = propertyPath.endsWith("?") ? "." : "";
-    const serializedName = getPropertySerializedName(property);
+    const serializedName = getPropertySerializedName(property, context.program);
     const restValue = `${propertyPath ? `${propertyPath}${dot}` : `${dot}`}["${serializedName}"]`;
 
     const nullOrUndefinedPrefix =
