@@ -21,10 +21,6 @@ export async function $onEmit(context: EmitContext<AzuritePilotEmitterOptions>):
 
   const serverModel = buildServerModel(program);
 
-  if (program.compilerOptions.dryRun) {
-    return;
-  }
-
   const baseDir = resolvePath(context.emitterOutputDir, options.outputDir);
 
   await emitFile(program, {
