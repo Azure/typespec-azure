@@ -1,8 +1,3 @@
-import {
-  createTCGCContext,
-  getClientNameOverride,
-  type TCGCContext,
-} from "@azure-tools/typespec-client-generator-core";
 import { type Model, type ModelProperty, type Program, type Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import {
@@ -26,14 +21,7 @@ import type {
   ServerSkippedOperation,
   ServerTypeRef,
 } from "./model.js";
-
-/**
- * Converts the operation name (e.g. `listQueues`) to a stable PascalCase symbol name
- * (e.g. `ListQueues`) used for generated TypeScript identifiers.
- */
-export function toPascalCase(name: string): string {
-  return name.length === 0 ? name : name[0].toUpperCase() + name.slice(1);
-}
+import { getName, getPascalName } from "./utils.js";
 
 /**
  * Builds the intermediate {@link ServerModel} for the (single) HTTP service found in the
@@ -60,7 +48,7 @@ export function buildServerModel(program: Program): ServerModel {
       operations.push(built);
     } catch (error) {
       skippedOperations.push({
-        name: toPascalCase(op.operation.name),
+        name: getPascalName(op.operation.name),
         reason: error instanceof Error ? error.message : String(error),
       });
     }
@@ -121,26 +109,12 @@ function getOperationName(
   op: HttpOperation,
   usedOperationNames: ReadonlySet<string>,
 ): string {
-  const baseName = getName(program, op.operation, toPascalCase(op.operation.name));
+  const baseName = getName(program, op.operation, getPascalName(op.operation.name));
   const qualifiedName =
     usedOperationNames.has(baseName) && op.operation.interface?.name
-      ? `${toPascalCase(op.operation.interface.name)}${baseName}`
+      ? `${getPascalName(op.operation.interface.name)}${baseName}`
       : baseName;
   return disambiguate(qualifiedName, usedOperationNames);
-}
-
-const tcgcContextCache = new WeakMap<Program, TCGCContext>();
-
-function getTcgcContext(program: Program): TCGCContext {
-  const existing = tcgcContextCache.get(program);
-  if (existing) return existing;
-  const context = createTCGCContext(program, "@azure-tools/typespec-azurite-emitter");
-  tcgcContextCache.set(program, context);
-  return context;
-}
-
-function getName(program: Program, target: Type, fallbackName: string): string {
-  return getClientNameOverride(getTcgcContext(program), target) ?? fallbackName;
 }
 
 function splitRoutePath(path: string): {

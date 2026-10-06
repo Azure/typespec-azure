@@ -1,16 +1,17 @@
 import { $ } from "@typespec/compiler/typekit";
 import { getAllHttpServices } from "@typespec/http";
 import { describe, expect, it } from "vitest";
-import { buildServerModel, toPascalCase } from "../src/build-model.js";
+import { buildServerModel } from "../src/build-model.js";
+import { getPascalName } from "../src/utils.js";
 import { ApiTester, loadQueuePilotFixture } from "./tester.js";
 
-describe("toPascalCase", () => {
+describe("getPascalName", () => {
   it("upper-cases the first letter", () => {
-    expect(toPascalCase("listMessages")).toBe("ListMessages");
+    expect(getPascalName("listMessages")).toBe("ListMessages");
   });
 
   it("handles empty strings", () => {
-    expect(toPascalCase("")).toBe("");
+    expect(getPascalName("")).toBe("");
   });
 });
 
