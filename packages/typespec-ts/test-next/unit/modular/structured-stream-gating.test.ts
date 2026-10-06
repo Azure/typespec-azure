@@ -222,21 +222,23 @@ function expectNoSse(files: Record<string, string>) {
 
 describe("structured-stream generation gates", () => {
   it(
-    "emits the dependency, helper files, and public reconnect options for genuine SSE",
+    "emits the published one-shot API and helpers without public reconnect options for genuine SSE",
     async () => {
       const files = await emitModularFromTypeSpec(`
         ${eventSpec}
         @route("/receive")
         op receive(): SSEStream<MessageEvents>;
       `);
-      expect(JSON.parse(files["package.json"]!).dependencies).toHaveProperty("@azure/core-sse");
+      expect(JSON.parse(files["package.json"]!).dependencies["@azure/core-sse"]).toBe("^2.4.0");
       expect(files).toHaveProperty("src/static-helpers/getSseResponse.ts");
       expect(files).toHaveProperty("src/static-helpers/sseStreamingHelpers.ts");
       expect(files).not.toHaveProperty("src/static-helpers/streamingHelpers.ts");
-      expect(files["src/api/operations.ts"]).toContain("createReconnectingSseStream");
+      expect(files["src/api/operations.ts"]).toContain("createSseStream(response.body)");
+      expect(files["src/api/operations.ts"]).not.toContain("createReconnectingSseStream");
+      expect(files["src/api/operations.ts"]).not.toContain("Last-Event-ID");
       expect(files["src/api/operations.ts"]).toContain("Promise<AsyncIterable<Info>>");
       for (const option of reconnectOptions) {
-        expect(files["src/api/options.ts"]).toContain(`${option}?:`);
+        expect(files["src/api/options.ts"]).not.toContain(`${option}?:`);
       }
     },
     timeout,

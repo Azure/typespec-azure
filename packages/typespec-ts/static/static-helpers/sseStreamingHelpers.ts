@@ -70,17 +70,6 @@ function resolveDescriptor<T>(
   );
 }
 
-export function isTerminalSseEvent<T>(
-  event: EventMessage,
-  descriptors: SseEventDescriptor<T>[],
-): boolean {
-  const descriptor = resolveDescriptor(event, descriptors);
-  return (
-    descriptor?.isTerminal === true &&
-    (descriptor.terminalValue === undefined || descriptor.terminalValue === event.data)
-  );
-}
-
 /**
  * Decodes a Server-Sent Events (SSE, `text/event-stream`) response body, dispatching each
  * event to the matching {@link SseEventDescriptor} by its `event:` name and yielding the
@@ -93,8 +82,8 @@ export function isTerminalSseEvent<T>(
  *
  * Events whose `event:` name matches no descriptor are ignored rather than being decoded by the
  * unnamed descriptor, so an unrecognized event can never be deserialized as the wrong type.
- * Payload mapping starts when the returned iterable is consumed. The reconnecting source may
- * establish connections and parse raw events before a consumer requests the next typed payload.
+ * Payload mapping starts when the returned iterable is consumed. The one-connection source
+ * parses raw SSE events but does not reconnect, resume event IDs, or apply retry delays.
  */
 export async function* readSseStream<T>(
   events: AsyncIterable<EventMessage>,

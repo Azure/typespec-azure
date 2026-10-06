@@ -7,7 +7,6 @@ import {
   getOperationFunction,
   getOperationOptionsName,
   getSendPrivateFunction,
-  getSseReconnectOptionNames,
   isLroAndPagingOperation,
   isLroOnlyOperation,
 } from "./helpers/operation-helpers.js";
@@ -33,7 +32,6 @@ import {
 } from "../utils/operation-util.js";
 import { getDocsFromDescription } from "./helpers/docs-helpers.js";
 import { getOperationName } from "./helpers/naming-helpers.js";
-import { getStructuredStreamKind } from "./helpers/structured-stream-helpers.js";
 import type { OperationPathAndDeserDetails } from "./interfaces.js";
 import { getTypeExpression } from "./type-expressions/get-type-expression.js";
 
@@ -176,30 +174,6 @@ export function buildOperationOptions(
   if (isDualFormat) {
     additionalOptions.push(contentTypeOption);
   }
-  if (getStructuredStreamKind(operation) === "sse") {
-    const optionNames = getSseReconnectOptionNames(operation);
-    additionalOptions.push(
-      {
-        name: optionNames.lastEventId,
-        type: "string",
-        hasQuestionToken: true,
-        docs: ["The last SSE event ID to use when establishing the initial connection."],
-      },
-      {
-        name: optionNames.retryDelayInMs,
-        type: "number",
-        hasQuestionToken: true,
-        docs: ["The initial delay, in milliseconds, between SSE reconnection attempts."],
-      },
-      {
-        name: optionNames.maxRetries,
-        type: "number",
-        hasQuestionToken: true,
-        docs: ["The maximum number of SSE reconnection requests."],
-      },
-    );
-  }
-
   const operationOptionsInterface: InterfaceDeclarationStructure = {
     kind: StructureKind.Interface,
     name,
