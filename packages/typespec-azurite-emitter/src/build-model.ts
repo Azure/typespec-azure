@@ -191,9 +191,10 @@ function buildResponse(
   return {
     statusCode: typeof response.statusCodes === "number" ? response.statusCodes : "*",
     headers,
-    body: content?.body
-      ? buildRequestBody(program, content.body, modelRegistry, anonymousModelNames)
-      : undefined,
+    body:
+      content?.body && response.statusCodes !== "*"
+        ? buildRequestBody(program, content.body, modelRegistry, anonymousModelNames)
+        : undefined,
   };
 }
 
@@ -297,6 +298,13 @@ function resolveModelName(
   anonymousModelNames: Map<Model, string>,
 ): string {
   if (model.name) return getName(program, model, model.name);
+  const existingNamedModel = findStructurallyEquivalentNamedModel(
+    program,
+    model,
+    modelRegistry,
+    anonymousModelNames,
+  );
+  if (existingNamedModel) return existingNamedModel;
   const existing = anonymousModelNames.get(model);
   if (existing) return existing;
   let candidate =
@@ -306,6 +314,41 @@ function resolveModelName(
   }
   anonymousModelNames.set(model, candidate);
   return candidate;
+}
+
+function findStructurallyEquivalentNamedModel(
+  program: Program,
+  model: Model,
+  modelRegistry: Map<string, ServerDataModel>,
+  anonymousModelNames: Map<Model, string>,
+): string | undefined {
+  const tk = $(program);
+  const anonymousProperties = [...tk.model.getProperties(model).values()];
+  for (const candidate of modelRegistry.values()) {
+    if (candidate.name.startsWith("AnonymousModel")) continue;
+    if (candidate.properties.length !== anonymousProperties.length) continue;
+    const candidateProperties = new Map(candidate.properties.map((prop) => [prop.name, prop]));
+    let matches = true;
+    for (const prop of anonymousProperties) {
+      const name = getName(program, prop, prop.name);
+      const candidateProp = candidateProperties.get(name);
+      if (
+        candidateProp === undefined ||
+        candidateProp.optional !== prop.optional ||
+        candidateProp.wireName !== $(program).type.getEncodedName(prop, "application/xml")
+      ) {
+        matches = false;
+        break;
+      }
+      const typeRef = toTypeRef(program, prop.type, modelRegistry, anonymousModelNames);
+      if (JSON.stringify(candidateProp.type) !== JSON.stringify(typeRef)) {
+        matches = false;
+        break;
+      }
+    }
+    if (matches) return candidate.name;
+  }
+  return undefined;
 }
 
 function buildModelProperty(

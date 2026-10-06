@@ -251,6 +251,69 @@ describe("buildServerModel", () => {
     expect(new Set(anonymousModels.map((m) => m.name)).size).toBe(anonymousModels.length);
   });
 
+  it("does not register default error bodies as handler response models", async () => {
+    const { program } = await ApiTester.compile({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace ErrorDemo;
+
+        @error
+        model StorageError {
+          @header("x-ms-error-code")
+          errorCode?: string;
+          code?: string;
+          message?: string;
+        }
+
+        @route("/items")
+        @get
+        op getItem(): {
+          @statusCode statusCode: 200;
+          @body body: string;
+        } | StorageError;
+      `,
+    });
+    const serverModel = buildServerModel(program);
+
+    const getItem = serverModel.operations.find((op) => op.name === "GetItem")!;
+    const defaultResponse = getItem.responses.find((response) => response.statusCode === "*")!;
+    expect(defaultResponse.body).toBeUndefined();
+    expect(serverModel.models.some((model) => model.name.startsWith("AnonymousModel"))).toBe(false);
+  });
+
+  it("reuses an already-registered named model for an equivalent anonymous model expression", async () => {
+    const { program } = await ApiTester.compile({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace AnonymousReuseDemo;
+
+        model Item {
+          value: string;
+        }
+
+        @route("/items")
+        @post
+        op createItem(@body body: Item): {
+          @statusCode statusCode: 200;
+          @body body: {
+            value: string;
+          };
+        };
+      `,
+    });
+    const serverModel = buildServerModel(program);
+
+    const createItem = serverModel.operations.find((op) => op.name === "CreateItem")!;
+    expect(createItem.responses[0].body?.type).toEqual({ kind: "model", name: "Item" });
+    expect(serverModel.models.map((model) => model.name)).toEqual(["Item"]);
+  });
+
   it("disambiguates operation names that collide across different TypeSpec interfaces", async () => {
     // Two different interfaces each declaring a `getProperties` operation both PascalCase to
     // `GetProperties`, which would otherwise be a duplicate generated TS identifier.
