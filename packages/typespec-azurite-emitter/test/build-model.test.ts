@@ -137,19 +137,6 @@ describe("buildServerModel", () => {
     expect($(program).type.maxValue(visibilityTimeout.param)).toBe(2147483647);
   });
 
-  it("captures Azurite overlay dispatch metadata", async () => {
-    const { program } = await ApiTester.compile(loadQueuePilotFixture());
-    const serverModel = buildServerModel(program);
-
-    const setAccessPolicy = serverModel.operations.find((op) => op.name === "SetAccessPolicy")!;
-    expect(setAccessPolicy.operationEnumName).toBe("Queue_SetAccessPolicy");
-    expect(setAccessPolicy.dispatchPattern).toBe("/queue");
-
-    const listMessages = serverModel.operations.find((op) => op.name === "ListMessages")!;
-    expect(listMessages.operationEnumName).toBe("Messages_List");
-    expect(listMessages.dispatchPattern).toBe("/queue/messages");
-  });
-
   it("expands a Record<string> dictionary property to a record type ref instead of an empty named model", async () => {
     const { program } = await ApiTester.compile({
       "main.tsp": `

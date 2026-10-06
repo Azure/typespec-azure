@@ -60,8 +60,6 @@ export interface ServerOperation {
   /** The route path without literal query constraints. */
   readonly path: string;
   readonly literalQueryParameters: readonly ServerLiteralQueryParameter[];
-  readonly dispatchPattern?: string;
-  readonly operationEnumName?: string;
   readonly parameters: ServerOperationParameter[];
   readonly requestBody?: ServerRequestBody;
   readonly responses: ServerResponse[];

@@ -7,7 +7,6 @@ import {
   type HttpOperationResponse,
   type HttpPayloadBody,
 } from "@typespec/http";
-import { getDispatchPattern, getOperationEnumName } from "./decorators.js";
 import type {
   ServerDataModel,
   ServerLiteralQueryParameter,
@@ -108,8 +107,6 @@ function buildOperation(
     rawPath: op.path,
     path: route.path,
     literalQueryParameters: route.literalQueryParameters,
-    dispatchPattern: getDispatchPattern(program, op.operation),
-    operationEnumName: getOperationEnumName(program, op.operation),
     parameters,
     requestBody,
     responses,

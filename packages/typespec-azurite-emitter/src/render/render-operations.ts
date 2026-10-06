@@ -99,8 +99,6 @@ function renderMetadataConst(serverModel: ServerModel): string {
     `  readonly hasRequestBody: boolean;`,
     `  readonly requestBodyContentTypes: readonly string[];`,
     `  readonly responses: readonly OperationResponseMetadata[];`,
-    `  readonly dispatchPattern?: string;`,
-    `  readonly operationEnumName?: string;`,
     `  readonly interfaceName?: string;`,
     `}`,
     "",
@@ -146,12 +144,6 @@ function renderMetadataConst(serverModel: ServerModel): string {
     lines.push(`    ],`);
     if (op.interfaceName !== undefined) {
       lines.push(`    interfaceName: ${JSON.stringify(op.interfaceName)},`);
-    }
-    if (op.dispatchPattern !== undefined) {
-      lines.push(`    dispatchPattern: ${JSON.stringify(op.dispatchPattern)},`);
-    }
-    if (op.operationEnumName !== undefined) {
-      lines.push(`    operationEnumName: ${JSON.stringify(op.operationEnumName)},`);
     }
     lines.push(`  },`);
   }
