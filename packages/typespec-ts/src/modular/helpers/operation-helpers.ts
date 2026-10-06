@@ -19,7 +19,7 @@ import {
   type SdkSseEventMetadata,
   type SdkType,
 } from "@azure-tools/typespec-client-generator-core";
-import { getMediaTypeHint, NoTarget, type Program, resolveEncodedName } from "@typespec/compiler";
+import { getMediaTypeHint, NoTarget, type Program } from "@typespec/compiler";
 import { isHeader, isMetadata } from "@typespec/http";
 import {
   type FunctionDeclarationStructure,
@@ -2511,7 +2511,7 @@ export function getSerializationExpression(
       propertyFullName,
       !property.optional,
       getEncodeForModelProperty(context, property),
-      getPropertySerializedName(property, context.program),
+      getPropertySerializedName(property),
       propertyPath === "" ? true : false,
     );
     return `${baseExpr}${defaultValueSuffix}`;
@@ -2541,7 +2541,7 @@ export function getRequestModelProperties(
     }
     const property = getPropertyWithOverrides(prop, overrides);
     props.push([
-      getPropertySerializedName(property, context.program)!,
+      getPropertySerializedName(property)!,
       getSerializationExpression(context, property, propertyPath, enableFlatten),
     ]);
   }
@@ -2570,18 +2570,11 @@ export function getRequestModelMapping(
   ).map(([name, value]) => `"${name}": ${value}`);
 }
 
-export function getPropertySerializedName(
-  property: SdkHttpParameter | SdkModelPropertyType,
-  program?: Program,
-) {
-  if (property.kind !== "property") {
-    return property.serializedName ?? property.name;
-  }
+export function getPropertySerializedName(property: SdkHttpParameter | SdkModelPropertyType) {
   return (
-    property.serializationOptions.json?.name ??
-    (program && property.__raw
-      ? resolveEncodedName(program, property.__raw, "application/json")
-      : property.name)
+    (property.kind === "property"
+      ? property.serializationOptions.json?.name
+      : property.serializedName) ?? property.name
   );
 }
 
@@ -2613,7 +2606,7 @@ export function getResponseMapping(
     }
     const property = getPropertyWithOverrides(prop, overrides);
     const dot = propertyPath.endsWith("?") ? "." : "";
-    const serializedName = getPropertySerializedName(property, context.program);
+    const serializedName = getPropertySerializedName(property);
     const restValue = `${propertyPath ? `${propertyPath}${dot}` : `${dot}`}["${serializedName}"]`;
 
     const nullOrUndefinedPrefix =
