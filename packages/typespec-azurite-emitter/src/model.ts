@@ -55,13 +55,24 @@ export interface ServerResponse {
 export interface ServerOperation {
   readonly name: string;
   readonly verb: "get" | "put" | "post" | "patch" | "delete" | "head";
+  /** The full HTTP path as reported by TypeSpec, including literal query constraints. */
+  readonly rawPath: string;
+  /** The route path without literal query constraints. */
   readonly path: string;
+  readonly literalQueryParameters: readonly ServerLiteralQueryParameter[];
+  readonly dispatchPattern?: string;
+  readonly operationEnumName?: string;
   readonly parameters: ServerOperationParameter[];
   readonly requestBody?: ServerRequestBody;
   readonly responses: ServerResponse[];
   readonly doc?: string;
   /** TypeSpec interface declaring the operation, when available. */
   readonly interfaceName?: string;
+}
+
+export interface ServerLiteralQueryParameter {
+  readonly name: string;
+  readonly value: string;
 }
 
 export interface ServerModel {

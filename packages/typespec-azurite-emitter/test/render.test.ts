@@ -32,7 +32,11 @@ const sampleServerModel: ServerModel = {
     {
       name: "CreateQueue",
       verb: "put",
+      rawPath: "/{queueName}",
       path: "/{queueName}",
+      literalQueryParameters: [],
+      dispatchPattern: "/queue",
+      operationEnumName: "Queue_Create",
       doc: "Creates a queue.",
       interfaceName: "Queue",
       parameters: [
@@ -135,7 +139,11 @@ describe("renderOperations", () => {
     expect(output).toContain("export const operations: readonly OperationMetadata[] = [");
     expect(output).toContain(`name: "CreateQueue"`);
     expect(output).toContain(`verb: "put"`);
+    expect(output).toContain(`rawPath: "/{queueName}"`);
     expect(output).toContain(`path: "/{queueName}"`);
+    expect(output).toContain(`literalQueryParameters: []`);
+    expect(output).toContain(`requiredQueryParameters: []`);
+    expect(output).toContain(`requiredHeaderParameters: []`);
     expect(output).toContain(
       `{ name: "queueName", wireName: "queueName", location: "path", required: true }`,
     );
@@ -145,6 +153,8 @@ describe("renderOperations", () => {
       `{ statusCode: 201, headers: [{ name: "requestId", wireName: "x-ms-request-id" }] }`,
     );
     expect(output).toContain(`interfaceName: "Queue"`);
+    expect(output).toContain(`dispatchPattern: "/queue"`);
+    expect(output).toContain(`operationEnumName: "Queue_Create"`);
   });
 });
 

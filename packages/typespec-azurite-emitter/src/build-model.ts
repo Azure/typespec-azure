@@ -7,8 +7,10 @@ import {
   type HttpOperationResponse,
   type HttpPayloadBody,
 } from "@typespec/http";
+import { getDispatchPattern, getOperationEnumName } from "./decorators.js";
 import type {
   ServerDataModel,
+  ServerLiteralQueryParameter,
   ServerModel,
   ServerModelProperty,
   ServerOperation,
@@ -98,17 +100,47 @@ function buildOperation(
   const responses = op.responses.map((r) =>
     buildResponse(program, r, modelRegistry, anonymousModelNames),
   );
+  const route = splitRoutePath(op.path);
 
   return {
     name: toPascalCase(op.operation.name),
     verb: op.verb,
-    path: op.path,
+    rawPath: op.path,
+    path: route.path,
+    literalQueryParameters: route.literalQueryParameters,
+    dispatchPattern: getDispatchPattern(program, op.operation),
+    operationEnumName: getOperationEnumName(program, op.operation),
     parameters,
     requestBody,
     responses,
     doc: getDocHelper(program, op.operation),
     interfaceName: op.operation.interface?.name,
   };
+}
+
+function splitRoutePath(path: string): {
+  path: string;
+  literalQueryParameters: ServerLiteralQueryParameter[];
+} {
+  const queryStart = path.indexOf("?");
+  if (queryStart === -1) {
+    return { path, literalQueryParameters: [] };
+  }
+
+  const routePath = path.slice(0, queryStart);
+  const query = path.slice(queryStart + 1);
+  const literalQueryParameters = query
+    .split("&")
+    .filter(Boolean)
+    .map((part) => {
+      const [rawName, rawValue = ""] = part.split("=");
+      return {
+        name: decodeURIComponent(rawName),
+        value: decodeURIComponent(rawValue),
+      };
+    });
+
+  return { path: routePath, literalQueryParameters };
 }
 
 function buildParameter(

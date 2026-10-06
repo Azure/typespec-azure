@@ -25,10 +25,16 @@ describe("buildServerModel", () => {
     const createQueue = serverModel.operations.find((op) => op.name === "CreateQueue")!;
     expect(createQueue.verb).toBe("put");
     expect(createQueue.path).toBe("/{queueName}");
+    expect(createQueue.rawPath).toBe("/{queueName}");
 
     const listMessages = serverModel.operations.find((op) => op.name === "ListMessages")!;
     expect(listMessages.verb).toBe("get");
     expect(listMessages.path).toBe("/{queueName}/messages");
+
+    const setAccessPolicy = serverModel.operations.find((op) => op.name === "SetAccessPolicy")!;
+    expect(setAccessPolicy.rawPath).toBe("/{queueName}?comp=acl");
+    expect(setAccessPolicy.path).toBe("/{queueName}");
+    expect(setAccessPolicy.literalQueryParameters).toEqual([{ name: "comp", value: "acl" }]);
   });
 
   it("captures path and query parameters with their wire names and optionality", async () => {
@@ -129,6 +135,19 @@ describe("buildServerModel", () => {
       (p) => p.param.name === "visibilityTimeout",
     )!;
     expect($(program).type.maxValue(visibilityTimeout.param)).toBe(2147483647);
+  });
+
+  it("captures Azurite overlay dispatch metadata", async () => {
+    const { program } = await ApiTester.compile(loadQueuePilotFixture());
+    const serverModel = buildServerModel(program);
+
+    const setAccessPolicy = serverModel.operations.find((op) => op.name === "SetAccessPolicy")!;
+    expect(setAccessPolicy.operationEnumName).toBe("Queue_SetAccessPolicy");
+    expect(setAccessPolicy.dispatchPattern).toBe("/queue");
+
+    const listMessages = serverModel.operations.find((op) => op.name === "ListMessages")!;
+    expect(listMessages.operationEnumName).toBe("Messages_List");
+    expect(listMessages.dispatchPattern).toBe("/queue/messages");
   });
 
   it("expands a Record<string> dictionary property to a record type ref instead of an empty named model", async () => {

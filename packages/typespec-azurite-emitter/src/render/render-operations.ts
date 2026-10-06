@@ -82,14 +82,25 @@ function renderMetadataConst(serverModel: ServerModel): string {
     `  readonly headers: readonly OperationResponseHeaderBinding[];`,
     `}`,
     "",
+    `export interface OperationLiteralQueryParameter {`,
+    `  readonly name: string;`,
+    `  readonly value: string;`,
+    `}`,
+    "",
     `export interface OperationMetadata {`,
     `  readonly name: string;`,
     `  readonly verb: string;`,
+    `  readonly rawPath: string;`,
     `  readonly path: string;`,
+    `  readonly literalQueryParameters: readonly OperationLiteralQueryParameter[];`,
+    `  readonly requiredQueryParameters: readonly string[];`,
+    `  readonly requiredHeaderParameters: readonly string[];`,
     `  readonly parameters: readonly OperationParameterBinding[];`,
     `  readonly hasRequestBody: boolean;`,
     `  readonly requestBodyContentTypes: readonly string[];`,
     `  readonly responses: readonly OperationResponseMetadata[];`,
+    `  readonly dispatchPattern?: string;`,
+    `  readonly operationEnumName?: string;`,
     `  readonly interfaceName?: string;`,
     `}`,
     "",
@@ -99,7 +110,19 @@ function renderMetadataConst(serverModel: ServerModel): string {
     lines.push(`  {`);
     lines.push(`    name: ${JSON.stringify(op.name)},`);
     lines.push(`    verb: ${JSON.stringify(op.verb)},`);
+    lines.push(`    rawPath: ${JSON.stringify(op.rawPath)},`);
     lines.push(`    path: ${JSON.stringify(op.path)},`);
+    lines.push(`    literalQueryParameters: ${JSON.stringify(op.literalQueryParameters)},`);
+    lines.push(
+      `    requiredQueryParameters: ${JSON.stringify(
+        op.parameters.filter((p) => p.location === "query" && !p.optional).map((p) => p.wireName),
+      )},`,
+    );
+    lines.push(
+      `    requiredHeaderParameters: ${JSON.stringify(
+        op.parameters.filter((p) => p.location === "header" && !p.optional).map((p) => p.wireName),
+      )},`,
+    );
     lines.push(`    parameters: [`);
     for (const param of op.parameters) {
       lines.push(
@@ -123,6 +146,12 @@ function renderMetadataConst(serverModel: ServerModel): string {
     lines.push(`    ],`);
     if (op.interfaceName !== undefined) {
       lines.push(`    interfaceName: ${JSON.stringify(op.interfaceName)},`);
+    }
+    if (op.dispatchPattern !== undefined) {
+      lines.push(`    dispatchPattern: ${JSON.stringify(op.dispatchPattern)},`);
+    }
+    if (op.operationEnumName !== undefined) {
+      lines.push(`    operationEnumName: ${JSON.stringify(op.operationEnumName)},`);
     }
     lines.push(`  },`);
   }
