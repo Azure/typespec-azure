@@ -174,6 +174,7 @@ export function buildOperationOptions(
   if (isDualFormat) {
     additionalOptions.push(contentTypeOption);
   }
+
   const operationOptionsInterface: InterfaceDeclarationStructure = {
     kind: StructureKind.Interface,
     name,

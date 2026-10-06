@@ -36,17 +36,17 @@ beforeAll(async () => {
   const files = await emitModularOperationsFromTypeSpec(
     `
     model Info {
-      @encodedName("application/json", "wire_value") value: string;
+      value: string;
       timestamp: utcDateTime;
     }
 
     @discriminator("kind")
     model PolymorphicInfo {
-      @encodedName("application/json", "wire_kind") kind: string;
+      kind: string;
     }
     model InfoVariant extends PolymorphicInfo {
-      @encodedName("application/json", "wire_kind") kind: "info";
-      @encodedName("application/json", "wire_value") value: string;
+      kind: "info";
+      value: string;
       timestamp: utcDateTime;
     }
 
@@ -142,13 +142,13 @@ describe.each(["Node", "browser"] as const)("generated %s JSONL operation runtim
     return { context, method, get, body, read, close };
   }
 
-  it("resolves encoded item names without adding JSON serialization options to TCGC models", () => {
+  it("uses existing TCGC metadata without synthesizing JSON serialization options", () => {
     expect(jsonlSerializationOptions).toEqual([undefined, undefined]);
   });
 
-  it("deserializes encoded JSONL discriminator and derived property names", async () => {
+  it("deserializes JSONL discriminators and derived properties with default wire names", async () => {
     const fixture = transport("200", { "content-type": "application/jsonl" }, [
-      '{"wire_kind":"info","wire_value":"derived","timestamp":"2026-10-06T00:00:00Z"}\n',
+      '{"kind":"info","value":"derived","timestamp":"2026-10-06T00:00:00Z"}\n',
     ]);
     expect(
       await collect(await loadGeneratedOperations(platform).receivePolymorphic(fixture.context)),
@@ -157,8 +157,8 @@ describe.each(["Node", "browser"] as const)("generated %s JSONL operation runtim
 
   it("uses the real generated operation and model mapper with lazy split UTF-8 decoding", async () => {
     const bytes = encoder.encode(
-      '\r\n\n{"wire_value":"café 🌍","timestamp":"2026-10-05T00:00:00Z"}\r\n \r\n' +
-        '{"wire_value":"last","timestamp":"2026-10-06T00:00:00Z"}',
+      '\r\n\n{"value":"café 🌍","timestamp":"2026-10-05T00:00:00Z"}\r\n \r\n' +
+        '{"value":"last","timestamp":"2026-10-06T00:00:00Z"}',
     );
     const fixture = transport(
       "200",
@@ -264,7 +264,7 @@ describe.each(["Node", "browser"] as const)("generated %s JSONL operation runtim
     const fixture = transport(
       "200",
       { "content-type": "application/jsonl" },
-      ['{"wire_value":"one","timestamp":"2026-10-05T00:00:00Z"}\n', "invalid\n"],
+      ['{"value":"one","timestamp":"2026-10-05T00:00:00Z"}\n', "invalid\n"],
       cancel,
     );
     for await (const value of await loadGeneratedOperations(platform).receive(fixture.context)) {
