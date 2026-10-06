@@ -2,15 +2,29 @@ import "@typespec/http";
 
 using Http;
 
-/**
- * Minimal, self-contained "Queue-like" service used as a pilot fixture.
- *
- * This deliberately does NOT model real Azure Storage Queue - it only reproduces the
- * representative HTTP shapes (query-string routing, JSON request/response bodies, and
- * custom response headers) that the Azurite emitter pilot needs to prove out.
- */
 @service(#{ title: "Queue Pilot Service" })
 namespace QueuePilot {
+  alias VisibilityTimeoutParameter = {
+    @maxValue(604800)
+    @query
+    visibilityTimeout?: int32;
+  };
+
+  model AccessPolicy {
+    start: utcDateTime;
+    expiry: utcDateTime;
+    permission: string;
+  }
+
+  model SignedIdentifier {
+    id: string;
+    accessPolicy: AccessPolicy;
+  }
+
+  model SignedIdentifiers {
+    items: SignedIdentifier[];
+  }
+
   model QueueMetadata {
     /** Arbitrary emulator-defined metadata values for the queue. */
     description?: string;
@@ -59,9 +73,15 @@ namespace QueuePilot {
   op listMessages(
     @path queueName: string,
     @query numOfMessages?: int32,
-    @query visibilityTimeout?: int32,
+    ...VisibilityTimeoutParameter,
   ): {
     @statusCode statusCode: 200;
     @body messages: QueueMessageList;
+  };
+
+  @route("/{queueName}?comp=acl")
+  @put
+  op setAccessPolicy(@path queueName: string, @body queueAcl: SignedIdentifiers): {
+    @statusCode statusCode: 204;
   };
 }

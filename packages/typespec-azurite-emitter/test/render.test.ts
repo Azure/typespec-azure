@@ -115,11 +115,7 @@ describe("renderModels", () => {
 describe("renderOperations", () => {
   const output = renderOperations(sampleServerModel);
 
-  it("imports model types referenced in bodies/headers from models.ts (regression: a real Azurite `tsc` build caught these missing)", () => {
-    // Running the pilot emitter's output through Azurite's own `tsc` build (while preparing the
-    // companion end-to-end PR against Azure/Azurite) surfaced `TS2304: Cannot find name` errors
-    // for every model type used as a request/response body, because `operations.ts` referenced
-    // them without importing from `models.ts`. This guards against regressing that fix.
+  it("imports model types referenced in bodies/headers from models.ts", () => {
     expect(output).toContain(`import type { QueueMetadata } from "./models.js";`);
   });
 

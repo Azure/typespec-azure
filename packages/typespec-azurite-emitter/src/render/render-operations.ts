@@ -63,18 +63,6 @@ function renderResponseType(op: ServerOperation): string {
   return lines.join("\n");
 }
 
-/**
- * Runtime route-binding metadata consumed by a dispatcher. Mirrors the information Azurite's
- * real generated dispatcher (`src/queue/generated/middleware/dispatch.middleware.ts`) reads off
- * its AutoRest-generated `msRest.OperationSpec`s: HTTP method, URL path template, and for each
- * parameter the wire name, location, and whether it is required (Azurite's dispatcher uses
- * `required` parameters to disambiguate between operations that share a path/verb, e.g. a
- * `SetMetadata` request vs. a plain `Create` request - see `isRequestAgainstOperation` in that
- * file). Response headers carry both the TS property name (matching the `XxxResponse` type's
- * `headers` object keys) and the wire name, so a dispatcher can translate a handler's typed
- * result back into real HTTP response headers - a gap found and closed while wiring a real
- * end-to-end dispatcher against this metadata for the companion Azure/Azurite pilot PR.
- */
 function renderMetadataConst(serverModel: ServerModel): string {
   const lines = [
     `export interface OperationParameterBinding {`,
@@ -102,12 +90,6 @@ function renderMetadataConst(serverModel: ServerModel): string {
     `  readonly hasRequestBody: boolean;`,
     `  readonly requestBodyContentTypes: readonly string[];`,
     `  readonly responses: readonly OperationResponseMetadata[];`,
-    `  /** The TypeSpec \`interface\` that declared this operation (e.g. \`"Queue"\`, \`"Messages"\`),`,
-    `   * or \`undefined\` for an operation declared directly on the service namespace. A dispatcher`,
-    `   * can use this to classify/group operations by resource without guessing from \`name\` or`,
-    `   * \`path\` alone - see {@link ServerOperation.interfaceName} for why this is sometimes the`,
-    `   * only way to recover resource identity (a resource-identifying path segment can be a`,
-    `   * client-construction detail outside the operation's own HTTP route). */`,
     `  readonly interfaceName?: string;`,
     `}`,
     "",

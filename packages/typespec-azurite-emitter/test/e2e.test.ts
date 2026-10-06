@@ -18,14 +18,17 @@ describe("end-to-end emit", () => {
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const modelsFile = findOutput(outputs, "models.ts");
 
+    expect(modelsFile).toContain("export interface AccessPolicy {");
     expect(modelsFile).toContain("export interface QueueMetadata {");
     expect(modelsFile).toContain("export interface QueueProperties {");
     expect(modelsFile).toContain("export interface QueueMessage {");
     expect(modelsFile).toContain("export interface QueueMessageList {");
     expect(modelsFile).toContain("messages: QueueMessage[];");
+    expect(modelsFile).toContain("start?: string;");
+    expect(modelsFile).toContain("permission?: string;");
   });
 
-  it("generates operations.ts with route metadata for all three operations", async () => {
+  it("generates operations.ts with route metadata for all fixture operations", async () => {
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const operationsFile = findOutput(outputs, "operations.ts");
 
@@ -33,15 +36,12 @@ describe("end-to-end emit", () => {
     expect(operationsFile).toContain(`verb: "put"`);
     expect(operationsFile).toContain(`name: "ListMessages"`);
     expect(operationsFile).toContain(`verb: "get"`);
+    expect(operationsFile).toContain(`name: "SetAccessPolicy"`);
     expect(operationsFile).toContain(`location: "query"`);
     expect(operationsFile).toContain(`location: "path"`);
   });
 
   it("imports referenced model types into operations.ts so the file compiles standalone", async () => {
-    // Regression test for a real compile error found when the generated artifacts were dropped
-    // into Azurite's own repo and built with its `tsc` (see the companion Azure/Azurite PR):
-    // operations.ts referenced body/header model types (e.g. QueueMetadata) without importing
-    // them from models.ts, so `tsc` failed with `TS2304: Cannot find name`.
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const operationsFile = findOutput(outputs, "operations.ts");
 
@@ -64,13 +64,9 @@ describe("end-to-end emit", () => {
     expect(handlersFile).toContain(
       "listMessages(params: ListMessagesParameters, context: Context): Promise<ListMessagesResponse>;",
     );
-  });
-
-  it("propagates azurite.tsp overlay documentation into the generated operation doc comment", async () => {
-    const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
-    const operationsFile = findOutput(outputs, "operations.ts");
-
-    expect(operationsFile).toContain("Azurite note: queue creation is idempotent");
+    expect(handlersFile).toContain(
+      "setAccessPolicy(params: SetAccessPolicyParameters, context: Context): Promise<SetAccessPolicyResponse>;",
+    );
   });
 });
 

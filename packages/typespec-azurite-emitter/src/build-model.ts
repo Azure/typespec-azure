@@ -1,13 +1,5 @@
-import {
-  getDoc,
-  isArrayModelType,
-  isRecordModelType,
-  type Model,
-  type ModelProperty,
-  type Program,
-  type Scalar,
-  type Type,
-} from "@typespec/compiler";
+import { type Model, type ModelProperty, type Program, type Type } from "@typespec/compiler";
+import { $, type Typekit } from "@typespec/compiler/typekit";
 import {
   getAllHttpServices,
   type HttpOperation,
@@ -29,45 +21,6 @@ import type {
   ServerTypeRef,
 } from "./model.js";
 
-/** Numeric TypeSpec scalar names that map to the TS `number` type. */
-const NUMERIC_SCALARS = new Set([
-  "int8",
-  "int16",
-  "int32",
-  "int64",
-  "integer",
-  "safeint",
-  "uint8",
-  "uint16",
-  "uint32",
-  "uint64",
-  "float",
-  "float32",
-  "float64",
-  "decimal",
-  "decimal128",
-  "numeric",
-]);
-
-/** Scalar names that derive from `string` (e.g. `url`, `uuid`) and should map to TS `string`. */
-function isStringLikeScalar(scalar: Scalar): boolean {
-  let current: Scalar | undefined = scalar;
-  while (current) {
-    if (current.name === "string") return true;
-    current = current.baseScalar;
-  }
-  return false;
-}
-
-function isNumericLikeScalar(scalar: Scalar): boolean {
-  let current: Scalar | undefined = scalar;
-  while (current) {
-    if (NUMERIC_SCALARS.has(current.name)) return true;
-    current = current.baseScalar;
-  }
-  return false;
-}
-
 /**
  * Converts the operation name (e.g. `listQueues`) to a stable PascalCase symbol name
  * (e.g. `ListQueues`) used for generated TypeScript identifiers.
@@ -81,19 +34,14 @@ export function toPascalCase(name: string): string {
  * compiled program. This is the "transform" phase: it walks `@typespec/http` metadata and
  * TypeSpec model types and produces a simplified, render-ready representation.
  *
- * Operations the transform phase can't represent (because they exercise a TypeSpec/HTTP shape
- * this pilot's intermediate model doesn't cover) are skipped rather than aborting the whole
- * build — see `skippedOperations` on the returned {@link ServerModel}.
+ * Operations the transform phase can't represent are skipped with a reason in
+ * `skippedOperations`.
  */
 export function buildServerModel(program: Program): ServerModel {
+  const tk = $(program);
   const [services] = getAllHttpServices(program);
   const service = services[0];
   const modelRegistry = new Map<string, ServerDataModel>();
-  // Anonymous TypeSpec models (e.g. inline `{ ... }` response/error bodies) have no `name`, so
-  // they can't be keyed by name the way named models are. Tracking them by object identity
-  // (rather than by a shared empty-string/placeholder name) avoids two *different* anonymous
-  // shapes silently colliding into one cached entry: a spec with multiple distinct anonymous
-  // response bodies would otherwise collapse them all into one `AnonymousModel` entry.
   const anonymousModelNames = new Map<Model, string>();
 
   const operations: ServerOperation[] = [];
@@ -101,15 +49,7 @@ export function buildServerModel(program: Program): ServerModel {
   const usedOperationNames = new Set<string>();
   for (const op of service?.operations ?? []) {
     try {
-      const built = buildOperation(program, op, modelRegistry, anonymousModelNames);
-      // Two different TypeSpec interfaces can each declare an operation that PascalCases to
-      // the same generated TS identifier (e.g. two `getProperties` operations on different
-      // interfaces both becoming `GetProperties`), which would otherwise produce a genuine
-      // `TS2300: Duplicate identifier` in the generated models.ts/operations.ts/handlers.ts.
-      // Qualifying a colliding name with its containing TypeSpec interface name (when present)
-      // keeps names close to the operation's own name while staying collision-free, similar in
-      // spirit to keeping separate `I<Interface>Handler` interfaces rather than one flat method
-      // bag.
+      const built = buildOperation(tk, op, modelRegistry, anonymousModelNames);
       let qualifiedName = built.name;
       if (usedOperationNames.has(qualifiedName)) {
         const interfaceName = op.operation.interface?.name;
@@ -143,21 +83,21 @@ function disambiguate(name: string, used: ReadonlySet<string>): string {
 }
 
 function buildOperation(
-  program: Program,
+  tk: Typekit,
   op: HttpOperation,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): ServerOperation {
   const parameters = op.parameters.parameters.map((p) =>
-    buildParameter(program, p, modelRegistry, anonymousModelNames),
+    buildParameter(tk, p, modelRegistry, anonymousModelNames),
   );
 
   const requestBody = op.parameters.body
-    ? buildRequestBody(program, op.parameters.body, modelRegistry, anonymousModelNames)
+    ? buildRequestBody(tk, op.parameters.body, modelRegistry, anonymousModelNames)
     : undefined;
 
   const responses = op.responses.map((r) =>
-    buildResponse(program, r, modelRegistry, anonymousModelNames),
+    buildResponse(tk, r, modelRegistry, anonymousModelNames),
   );
 
   return {
@@ -167,13 +107,13 @@ function buildOperation(
     parameters,
     requestBody,
     responses,
-    doc: getDocHelper(program, op.operation),
+    doc: getDocHelper(tk, op.operation),
     interfaceName: op.operation.interface?.name,
   };
 }
 
 function buildParameter(
-  program: Program,
+  tk: Typekit,
   param: HttpOperationParameter,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
@@ -184,25 +124,25 @@ function buildParameter(
     name: param.param.name,
     wireName: param.name,
     location,
-    type: toTypeRef(program, param.param.type, modelRegistry, anonymousModelNames),
+    type: toTypeRef(tk, param.param.type, modelRegistry, anonymousModelNames),
     optional: param.param.optional,
   };
 }
 
 function buildRequestBody(
-  program: Program,
+  tk: Typekit,
   body: HttpPayloadBody,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): ServerRequestBody {
   return {
-    type: toTypeRef(program, body.type, modelRegistry, anonymousModelNames),
+    type: toTypeRef(tk, body.type, modelRegistry, anonymousModelNames),
     contentTypes: body.contentTypes,
   };
 }
 
 function buildResponse(
-  program: Program,
+  tk: Typekit,
   response: HttpOperationResponse,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
@@ -213,7 +153,7 @@ function buildResponse(
     headers.push({
       name: prop.name,
       wireName: headerWireName,
-      type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
+      type: toTypeRef(tk, prop.type, modelRegistry, anonymousModelNames),
       optional: prop.optional,
     });
   }
@@ -222,7 +162,7 @@ function buildResponse(
     statusCode: typeof response.statusCodes === "number" ? response.statusCodes : "*",
     headers,
     body: content?.body
-      ? buildRequestBody(program, content.body, modelRegistry, anonymousModelNames)
+      ? buildRequestBody(tk, content.body, modelRegistry, anonymousModelNames)
       : undefined,
   };
 }
@@ -232,16 +172,24 @@ function buildResponse(
  * into `modelRegistry` (recursively) the first time it is seen.
  */
 function toTypeRef(
-  program: Program,
+  tk: Typekit,
   type: Type,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): ServerTypeRef {
   switch (type.kind) {
     case "Scalar":
-      if (isNumericLikeScalar(type)) return { kind: "number" };
-      if (isStringLikeScalar(type)) return { kind: "string" };
-      if (type.name === "boolean") return { kind: "boolean" };
+      if (tk.scalar.extendsNumeric(type)) return { kind: "number" };
+      if (tk.scalar.extendsString(type)) return { kind: "string" };
+      if (
+        tk.scalar.extendsUtcDateTime(type) ||
+        tk.scalar.extendsOffsetDateTime(type) ||
+        tk.scalar.extendsPlainDate(type) ||
+        tk.scalar.extendsPlainTime(type)
+      ) {
+        return { kind: "string" };
+      }
+      if (tk.scalar.extendsBoolean(type)) return { kind: "boolean" };
       return { kind: "unknown" };
     case "Boolean":
       return { kind: "literal", value: type.value };
@@ -250,31 +198,29 @@ function toTypeRef(
     case "Number":
       return { kind: "literal", value: type.numericValue.asNumber() ?? 0 };
     case "Enum": {
-      // Pilot simplification: enums are rendered as `string` in generated TypeScript.
-      // A follow-up could render them as proper TS string-literal unions.
       return { kind: "string" };
     }
     case "Model": {
-      if (isArrayModelType(type)) {
+      if (tk.array.is(type)) {
         return {
           kind: "array",
-          element: toTypeRef(program, type.indexer.value, modelRegistry, anonymousModelNames),
+          element: toTypeRef(tk, tk.array.getElementType(type), modelRegistry, anonymousModelNames),
         };
       }
-      // `Record<T>` (e.g. a `metadata: Record<string>` dictionary property) is a built-in
-      // indexer type, not a model with its own declared properties — without this check it
-      // would fall through to generic model registration and render as an empty interface
-      // instead of `Record<string, X>`.
-      if (isRecordModelType(type)) {
+      if (tk.record.is(type)) {
         return {
           kind: "record",
-          element: toTypeRef(program, type.indexer.value, modelRegistry, anonymousModelNames),
+          element: toTypeRef(
+            tk,
+            tk.record.getElementType(type),
+            modelRegistry,
+            anonymousModelNames,
+          ),
         };
       }
-      return registerModel(program, type, modelRegistry, anonymousModelNames);
+      return registerModel(tk, type, modelRegistry, anonymousModelNames);
     }
     case "Union": {
-      // Pilot simplification: unions collapse to `unknown`.
       return { kind: "unknown" };
     }
     default:
@@ -283,7 +229,7 @@ function toTypeRef(
 }
 
 function registerModel(
-  program: Program,
+  tk: Typekit,
   model: Model,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
@@ -292,10 +238,10 @@ function registerModel(
   if (!modelRegistry.has(name)) {
     // Insert a placeholder first to guard against infinite recursion on cyclic models.
     modelRegistry.set(name, { name, properties: [] });
-    const properties = [...model.properties.values()].map((prop) =>
-      buildModelProperty(program, prop, modelRegistry, anonymousModelNames),
+    const properties = [...tk.model.getProperties(model).values()].map((prop) =>
+      buildModelProperty(tk, prop, modelRegistry, anonymousModelNames),
     );
-    modelRegistry.set(name, { name, properties, doc: getDocHelper(program, model) });
+    modelRegistry.set(name, { name, properties, doc: getDocHelper(tk, model) });
   }
   return { kind: "model", name };
 }
@@ -325,19 +271,19 @@ function resolveModelName(
 }
 
 function buildModelProperty(
-  program: Program,
+  tk: Typekit,
   prop: ModelProperty,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): ServerModelProperty {
   return {
     name: prop.name,
-    type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
+    type: toTypeRef(tk, prop.type, modelRegistry, anonymousModelNames),
     optional: prop.optional,
-    doc: getDocHelper(program, prop),
+    doc: getDocHelper(tk, prop),
   };
 }
 
-function getDocHelper(program: Program, target: Type): string | undefined {
-  return getDoc(program, target);
+function getDocHelper(tk: Typekit, target: Type): string | undefined {
+  return tk.type.getDoc(target);
 }

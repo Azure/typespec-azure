@@ -15,12 +15,6 @@ function readFixture(name: string): string {
   return readFileSync(join(FIXTURE_DIR, name), "utf-8");
 }
 
-/**
- * Loads the "queue-pilot" fixture (base service + azurite overlay) as a file map ready to
- * pass to a Tester's `compile`/`emit`. The synthetic `main.tsp` entry imports both the
- * unchanged base service definition and the azurite overlay, mirroring how a real
- * `tspconfig.yaml` entry point would combine them.
- */
 export function loadQueuePilotFixture(): Record<string, string> {
   return {
     "main.tsp": `import "./base.tsp";\nimport "./azurite.tsp";\n`,

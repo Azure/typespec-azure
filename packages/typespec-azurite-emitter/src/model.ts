@@ -1,11 +1,3 @@
-/**
- * The "server model" is this emitter's intermediate representation (analogous to the
- * GraphQL emitter's type-graph). It is built once from the compiled TypeSpec program by
- * {@link buildServerModel} and is intentionally decoupled from `@typespec/http`'s exact
- * shapes so that the render phase never has to deal with TypeSpec `Type`s directly.
- */
-
-/** Primitive/ground shapes we are willing to represent in generated TypeScript. */
 export type ServerTypeRef =
   | { kind: "string" }
   | { kind: "number" }
@@ -61,42 +53,21 @@ export interface ServerResponse {
 }
 
 export interface ServerOperation {
-  /** PascalCase operation name used to derive generated symbol names. */
   readonly name: string;
   readonly verb: "get" | "put" | "post" | "patch" | "delete" | "head";
-  /** The resolved route path, e.g. `/{queueName}`. */
   readonly path: string;
   readonly parameters: ServerOperationParameter[];
   readonly requestBody?: ServerRequestBody;
   readonly responses: ServerResponse[];
   readonly doc?: string;
-  /**
-   * The name of the TypeSpec `interface` that declared this operation (e.g. `"Queue"`,
-   * `"Messages"`), if any - `undefined` for operations declared directly on the service
-   * namespace. Consumers that need to group/classify operations by resource (e.g. a hand-written
-   * dispatcher distinguishing "queue-level" from "account-level" operations that otherwise share
-   * an identical HTTP path, because a resource-identifying path segment is a client-construction
-   * detail outside `@typespec/http`'s operation-level route - see the real Azure Storage Queue
-   * spec's `@server("{url}", ...)` pattern) should use this field instead of re-deriving the same
-   * classification from each operation's name, which doesn't generalize and isn't derived from
-   * anything the compiled program actually says.
-   */
+  /** TypeSpec interface declaring the operation, when available. */
   readonly interfaceName?: string;
 }
 
-/** The full intermediate model for one compiled service, ready to be rendered. */
 export interface ServerModel {
   readonly serviceName: string;
   readonly operations: ServerOperation[];
-  /** All named models transitively referenced by operation parameters/bodies/responses. */
   readonly models: ServerDataModel[];
-  /**
-   * Operations the transform phase could not represent and intentionally omitted from
-   * {@link ServerModel.operations}, each with a human-readable reason. Populated when running
-   * against specs exercising shapes this pilot's intermediate model doesn't (yet) cover, so
-   * callers can report gaps honestly instead of crashing or silently dropping operations — see
-   * `test/build-model.test.ts` for coverage of this field.
-   */
   readonly skippedOperations: readonly ServerSkippedOperation[];
 }
 

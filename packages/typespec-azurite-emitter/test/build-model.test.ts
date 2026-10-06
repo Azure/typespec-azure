@@ -1,3 +1,5 @@
+import { $ } from "@typespec/compiler/typekit";
+import { getAllHttpServices } from "@typespec/http";
 import { describe, expect, it } from "vitest";
 import { buildServerModel, toPascalCase } from "../src/build-model.js";
 import { ApiTester, loadQueuePilotFixture } from "./tester.js";
@@ -18,7 +20,7 @@ describe("buildServerModel", () => {
     const serverModel = buildServerModel(program);
 
     const names = serverModel.operations.map((op) => op.name).sort();
-    expect(names).toEqual(["CreateQueue", "GetQueueProperties", "ListMessages"]);
+    expect(names).toEqual(["CreateQueue", "GetQueueProperties", "ListMessages", "SetAccessPolicy"]);
 
     const createQueue = serverModel.operations.find((op) => op.name === "CreateQueue")!;
     expect(createQueue.verb).toBe("put");
@@ -85,10 +87,13 @@ describe("buildServerModel", () => {
 
     const modelNames = serverModel.models.map((m) => m.name).sort();
     expect(modelNames).toEqual([
+      "AccessPolicy",
       "QueueMessage",
       "QueueMessageList",
       "QueueMetadata",
       "QueueProperties",
+      "SignedIdentifier",
+      "SignedIdentifiers",
     ]);
 
     const queueMetadata = serverModel.models.find((m) => m.name === "QueueMetadata")!;
@@ -108,16 +113,22 @@ describe("buildServerModel", () => {
     });
   });
 
-  it("applies overlay documentation added via augment decorators in azurite.tsp", async () => {
+  it("applies azurite.tsp overlay changes for Queue swagger customizations", async () => {
     const { program } = await ApiTester.compile(loadQueuePilotFixture());
     const serverModel = buildServerModel(program);
 
-    const createQueue = serverModel.operations.find((op) => op.name === "CreateQueue")!;
-    expect(createQueue.doc).toContain("Azurite note: queue creation is idempotent");
+    const accessPolicy = serverModel.models.find((m) => m.name === "AccessPolicy")!;
+    const accessPolicyProps = Object.fromEntries(accessPolicy.properties.map((p) => [p.name, p]));
+    expect(accessPolicyProps.start).toMatchObject({ optional: true });
+    expect(accessPolicyProps.expiry).toMatchObject({ optional: true });
+    expect(accessPolicyProps.permission).toMatchObject({ optional: true });
 
-    const queueMetadata = serverModel.models.find((m) => m.name === "QueueMetadata")!;
-    const publicAccess = queueMetadata.properties.find((p) => p.name === "publicAccess")!;
-    expect(publicAccess.doc).toContain("Azurite note: public access is always treated");
+    const [services] = getAllHttpServices(program);
+    const listMessages = services[0].operations.find((op) => op.operation.name === "listMessages")!;
+    const visibilityTimeout = listMessages.parameters.parameters.find(
+      (p) => p.param.name === "visibilityTimeout",
+    )!;
+    expect($(program).type.maxValue(visibilityTimeout.param)).toBe(2147483647);
   });
 
   it("expands a Record<string> dictionary property to a record type ref instead of an empty named model", async () => {
@@ -210,13 +221,7 @@ describe("buildServerModel", () => {
     expect(interfaceNames).toEqual(["A", "B"]);
   });
 
-  it("applies @makeRequired from an azurite.tsp-style overlay to tighten an optional base-spec property", async () => {
-    // Models the real overlay use case: a base service TypeSpec the emitter doesn't own declares
-    // a property optional, and a separate azurite.tsp-style overlay file (not editing the base
-    // file) tightens it to required for the emulator, via `@@makeRequired` - our own decorator
-    // (see `lib/decorators.tsp`), not `@typespec/client-generator-core`'s `@override` (which only
-    // changes a client SDK's generated method signature, never the real `@typespec/http`
-    // operation/model graph this emitter - or any other service-contract-level consumer - walks).
+  it("applies @makeOptional from an azurite.tsp-style overlay to relax a required base-spec property", async () => {
     const { program } = await ApiTester.compile({
       "base.tsp": `
         import "@typespec/http";
@@ -226,7 +231,7 @@ describe("buildServerModel", () => {
         namespace RequiredDemo;
 
         model Options {
-          visibilityTimeout?: int32;
+          visibilityTimeout: int32;
         }
 
         @route("/options")
@@ -240,7 +245,7 @@ describe("buildServerModel", () => {
         using RequiredDemo;
         using Azurite;
 
-        @@makeRequired(RequiredDemo.Options.visibilityTimeout);
+        @@makeOptional(RequiredDemo.Options.visibilityTimeout);
       `,
       "main.tsp": `
         import "./base.tsp";
@@ -251,6 +256,6 @@ describe("buildServerModel", () => {
 
     const options = serverModel.models.find((m) => m.name === "Options")!;
     const visibilityTimeout = options.properties.find((p) => p.name === "visibilityTimeout")!;
-    expect(visibilityTimeout.optional).toBe(false);
+    expect(visibilityTimeout.optional).toBe(true);
   });
 });
