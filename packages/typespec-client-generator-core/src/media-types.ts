@@ -1,16 +1,3 @@
-import { getMediaTypeHint, type Program, type Type } from "@typespec/compiler";
-
-/**
- * Infers an event's serialization format when no event/property content type is specified.
- */
-export function inferEventContentType(program: Program, type: Type): string | undefined {
-  const hint = getMediaTypeHint(program, type);
-  if (hint) return hint;
-  if (type.kind === "Model") return "application/json";
-  if (type.kind === "Scalar") return "text/plain";
-  return undefined;
-}
-
 const json = "json";
 const xml = "xml";
 const application = "application";

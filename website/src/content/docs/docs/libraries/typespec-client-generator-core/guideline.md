@@ -203,11 +203,9 @@ For server-sent event (SSE, `text/event-stream`) streams specifically, TCGC addi
 
 - `eventType`: the SSE `event:` field name (from the named union variant); `undefined` for unnamed variants, which are `message` events with no `event:` field.
 - `isTerminalEvent`: whether receiving this event terminates the stream (from `@terminalEvent`), so the client should disconnect.
-- `isEventEnvelope`: whether `type` describes an envelope wrapping a separate `@data` payload. When `false`, `type`/`payloadType` are identical.
+- `isEventEnvelope`: whether `type` describes an envelope wrapping a separate `@data` payload. When `false`, `type`/`payloadType` (and their content types) are identical.
 - `type` / `contentType`: the event type and its content type (the envelope when `isEventEnvelope` is `true`).
-- `payloadType` / `payloadContentType`: the event payload type and its effective content type. An explicit variant or `@data` property content type takes precedence over the payload type's `@mediaTypeHint`, followed by `application/json` for models and `text/plain` for scalars. Literals without an explicit format or hint remain unspecified. An envelope's content type does not override a separate `@data` payload's format.
-
-When `@data` is present, the wire SSE `data:` field contains only that property's payload, not the entire envelope. Emitters deserialize `payloadType` using `payloadContentType`.
+- `payloadType` / `payloadContentType`: the event payload type and its content type.
 
 ### Type
 
