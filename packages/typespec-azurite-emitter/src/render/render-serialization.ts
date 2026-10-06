@@ -9,8 +9,8 @@ import { renderFileHeader } from "./type-ref.js";
 
 /**
  * Renders direct Azurite request/response serialization helpers for the first Queue slice.
- * The generated surface mirrors TypeSpec TS' current direction: generated functions plus
- * small helpers instead of AutoRest-style OperationSpec/Mapper tables.
+ * The generated surface mirrors TypeSpec TS' current direction: operation-specific functions
+ * plus small helpers instead of AutoRest-style OperationSpec/Mapper tables.
  */
 export function renderSerialization(serverModel: ServerModel): string {
   const supportedOperations = serverModel.operations.filter(isSerializationReady);
@@ -20,216 +20,20 @@ export function renderSerialization(serverModel: ServerModel): string {
     `import type IRequest from "../../generated/IRequest";`,
     `import type IResponse from "../../generated/IResponse";`,
     "",
-    `type ParameterPath = string | readonly string[];`,
-    `type PrimitiveTypeKind = "string" | "number" | "boolean" | "datetime" | "unknown";`,
-    `type SerializationTypeRef =`,
-    `  | { readonly kind: PrimitiveTypeKind }`,
-    `  | { readonly kind: "array"; readonly element: SerializationTypeRef }`,
-    `  | { readonly kind: "record"; readonly element: SerializationTypeRef }`,
-    `  | { readonly kind: "literal"; readonly value: string | number | boolean };`,
+    renderDeserializeRequest(supportedOperations),
     "",
-    `interface SerializationParameter {`,
-    `  readonly parameterPath: ParameterPath;`,
-    `  readonly wireName: string;`,
-    `  readonly type: SerializationTypeRef;`,
-    `  readonly required: boolean;`,
-    `  readonly collectionFormat?: ",";`,
-    `  readonly headerCollectionPrefix?: string;`,
-    `}`,
+    renderSerializeResponse(supportedOperations),
     "",
-    `interface SerializationResponseHeader {`,
-    `  readonly name: string;`,
-    `  readonly wireName: string;`,
-    `  readonly type: SerializationTypeRef;`,
-    `  readonly headerCollectionPrefix?: string;`,
-    `}`,
+    renderHasGeneratedSerialization(supportedOperations),
     "",
-    `interface SerializationResponse {`,
-    `  readonly statusCode: number | "*";`,
-    `  readonly headers: readonly SerializationResponseHeader[];`,
-    `}`,
-    "",
-    `interface SerializationOperation {`,
-    `  readonly name: string;`,
-    `  readonly queryParameters: readonly SerializationParameter[];`,
-    `  readonly headerParameters: readonly SerializationParameter[];`,
-    `  readonly responses: readonly SerializationResponse[];`,
-    `}`,
-    "",
-    `export const serializationOperations: ReadonlyMap<string, SerializationOperation> = new Map([`,
   ];
 
   for (const op of supportedOperations) {
-    lines.push(`  [${JSON.stringify(op.name)}, ${renderOperationMetadata(op)}],`);
+    lines.push(renderOperationDeserializer(op), "");
+    lines.push(renderOperationSerializer(op), "");
   }
-  lines.push(`]);`, "");
 
-  lines.push(
-    `export async function deserializeRequest(name: string, req: IRequest): Promise<IHandlerParameters | undefined> {`,
-  );
-  lines.push(`  const operation = serializationOperations.get(name);`);
-  lines.push(`  if (operation === undefined) return undefined;`);
-  lines.push(`  const parameters: IHandlerParameters = {};`);
-  lines.push(`  for (const parameter of operation.queryParameters) {`);
-  lines.push(
-    `    const value = deserializeParameterValue(parameter, req.getQuery(parameter.wireName));`,
-  );
-  lines.push(`    setParameterValue(parameters, parameter.parameterPath, value);`);
-  lines.push(`  }`);
-  lines.push(`  const headers = req.getHeaders();`);
-  lines.push(`  for (const parameter of operation.headerParameters) {`);
-  lines.push(`    if (parameter.headerCollectionPrefix !== undefined) {`);
-  lines.push(`      const dictionary: Record<string, string | string[]> = {};`);
-  lines.push(`      for (const [headerName, headerValue] of Object.entries(headers)) {`);
-  lines.push(
-    `        if (headerName.toLowerCase().startsWith(parameter.headerCollectionPrefix.toLowerCase()) && headerValue !== undefined) {`,
-  );
-  lines.push(
-    `          dictionary[headerName.substring(parameter.headerCollectionPrefix.length)] = headerValue;`,
-  );
-  lines.push(`        }`);
-  lines.push(`      }`);
-  lines.push(`      setParameterValue(parameters, parameter.parameterPath, dictionary);`);
-  lines.push(`    } else {`);
-  lines.push(
-    `      const value = deserializeParameterValue(parameter, req.getHeader(parameter.wireName));`,
-  );
-  lines.push(`      setParameterValue(parameters, parameter.parameterPath, value);`);
-  lines.push(`    }`);
-  lines.push(`  }`);
-  lines.push(`  return parameters;`);
-  lines.push(`}`, "");
-
-  lines.push(
-    `export function serializeResponse(name: string, res: IResponse, handlerResponse: any): boolean {`,
-  );
-  lines.push(`  const operation = serializationOperations.get(name);`);
-  lines.push(`  if (operation === undefined) return false;`);
-  lines.push(`  const statusCode = handlerResponse.statusCode;`);
-  lines.push(`  res.setStatusCode(statusCode);`);
-  lines.push(
-    `  const response = operation.responses.find((candidate) => candidate.statusCode === statusCode) ?? operation.responses.find((candidate) => candidate.statusCode === "*");`,
-  );
-  lines.push(`  if (response === undefined) {`);
-  lines.push(
-    `    throw new TypeError(\`Generated TypeSpec serializer for \${name} does not include response status code \${statusCode}\`);`,
-  );
-  lines.push(`  }`);
-  lines.push(`  for (const header of response.headers) {`);
-  lines.push(`    const value = handlerResponse[header.name];`);
-  lines.push(`    if (header.headerCollectionPrefix !== undefined) {`);
-  lines.push(`      if (value !== undefined) {`);
-  lines.push(`        for (const [suffix, itemValue] of Object.entries(value)) {`);
-  lines.push(`          if (itemValue !== undefined) {`);
-  lines.push(
-    `            res.setHeader(\`\${header.headerCollectionPrefix}\${suffix}\`, serializeValue(header.type, itemValue));`,
-  );
-  lines.push(`          }`);
-  lines.push(`        }`);
-  lines.push(`      }`);
-  lines.push(`    } else if (value !== undefined) {`);
-  lines.push(`      res.setHeader(header.wireName, serializeValue(header.type, value));`);
-  lines.push(`    }`);
-  lines.push(`  }`);
-  lines.push(`  return true;`);
-  lines.push(`}`, "");
-
-  lines.push(`export function hasGeneratedSerialization(name: string): boolean {`);
-  lines.push(`  return serializationOperations.has(name);`);
-  lines.push(`}`, "");
-
-  lines.push(`function deserializeParameterValue(`);
-  lines.push(`  parameter: SerializationParameter,`);
-  lines.push(`  rawValue: string | string[] | undefined,`);
-  lines.push(`): unknown {`);
-  lines.push(`  if (parameter.required && rawValue === undefined) {`);
-  lines.push(
-    `    throw new TypeError(\`Required parameter \${parameter.wireName} was not provided\`);`,
-  );
-  lines.push(`  }`);
-  lines.push(`  if (rawValue === undefined) return undefined;`);
-  lines.push(`  const normalizedValue = Array.isArray(rawValue) ? rawValue.join(",") : rawValue;`);
-  lines.push(`  if (parameter.type.kind === "literal") {`);
-  lines.push(`    const value = deserializeValue(parameter.type, normalizedValue);`);
-  lines.push(`    if (value !== parameter.type.value) {`);
-  lines.push(
-    `      throw new TypeError(\`Parameter \${parameter.wireName} expected \${parameter.type.value} but received \${normalizedValue}\`);`,
-  );
-  lines.push(`    }`);
-  lines.push(`    return value;`);
-  lines.push(`  }`);
-  lines.push(
-    `  if (parameter.collectionFormat !== undefined && parameter.type.kind === "array") {`,
-  );
-  lines.push(`    const elementType = parameter.type.element;`);
-  lines.push(
-    `    return normalizedValue.split(parameter.collectionFormat).map((item: string) => deserializeValue(elementType, item));`,
-  );
-  lines.push(`  }`);
-  lines.push(`  return deserializeValue(parameter.type, normalizedValue);`);
-  lines.push(`}`, "");
-
-  lines.push(`function deserializeValue(type: SerializationTypeRef, value: string): unknown {`);
-  lines.push(`  switch (type.kind) {`);
-  lines.push(`    case "number":`);
-  lines.push(`      return Number(value);`);
-  lines.push(`    case "boolean":`);
-  lines.push(`      return value === "true" ? true : value === "false" ? false : value;`);
-  lines.push(`    case "datetime":`);
-  lines.push(`    case "string":`);
-  lines.push(`    case "unknown":`);
-  lines.push(`      return value;`);
-  lines.push(`    case "literal":`);
-  lines.push(`      return type.value;`);
-  lines.push(`    case "array":`);
-  lines.push(`      return value.split(",").map((item) => deserializeValue(type.element, item));`);
-  lines.push(`    case "record":`);
-  lines.push(`      return value;`);
-  lines.push(`  }`);
-  lines.push(`}`, "");
-
-  lines.push(
-    `function serializeValue(type: SerializationTypeRef, value: any): string | number | boolean {`,
-  );
-  lines.push(`  switch (type.kind) {`);
-  lines.push(`    case "number":`);
-  lines.push(`    case "boolean":`);
-  lines.push(`      return value;`);
-  lines.push(`    case "datetime":`);
-  lines.push(`      return value instanceof Date ? value.toUTCString() : String(value);`);
-  lines.push(`    case "literal":`);
-  lines.push(`      return type.value;`);
-  lines.push(`    case "array":`);
-  lines.push(
-    `      return value.map((item: any) => serializeValue(type.element, item)).join(",");`,
-  );
-  lines.push(`    case "record":`);
-  lines.push(`    case "string":`);
-  lines.push(`    case "unknown":`);
-  lines.push(`      return String(value);`);
-  lines.push(`  }`);
-  lines.push(`}`, "");
-
-  lines.push(`function setParameterValue(`);
-  lines.push(`  parameters: IHandlerParameters,`);
-  lines.push(`  parameterPath: ParameterPath,`);
-  lines.push(`  parameterValue: unknown,`);
-  lines.push(`): void {`);
-  lines.push(`  if (typeof parameterPath === "string") {`);
-  lines.push(`    parameters[parameterPath] = parameterValue;`);
-  lines.push(`    return;`);
-  lines.push(`  }`);
-  lines.push(`  let leafParent = parameters;`);
-  lines.push(`  for (let i = 0; i < parameterPath.length - 1; i++) {`);
-  lines.push(`    const currentPropertyName = parameterPath[i];`);
-  lines.push(`    if (!leafParent[currentPropertyName]) {`);
-  lines.push(`      leafParent[currentPropertyName] = {};`);
-  lines.push(`    }`);
-  lines.push(`    leafParent = leafParent[currentPropertyName];`);
-  lines.push(`  }`);
-  lines.push(`  leafParent[parameterPath[parameterPath.length - 1]] = parameterValue;`);
-  lines.push(`}`, "");
-
+  lines.push(renderHelpers(supportedOperations), "");
   return lines.join("\n");
 }
 
@@ -240,105 +44,471 @@ function isSerializationReady(op: ServerOperation): boolean {
   );
 }
 
-function renderOperationMetadata(op: ServerOperation): string {
-  const queryParameters = [
-    ...op.literalQueryParameters.map((literal) =>
-      renderParameterMetadata({
-        parameterPath: literal.name,
-        wireName: literal.name,
-        type: { kind: "literal", value: literal.value },
-        required: true,
-      }),
-    ),
-    ...op.parameters
-      .filter((p) => p.location === "query")
-      .map((param) =>
-        renderParameterMetadata({
-          parameterPath: getParameterPath(param),
-          wireName: param.wireName,
-          type: param.type,
-          required: !param.optional,
-        }),
+function renderDeserializeRequest(operations: readonly ServerOperation[]): string {
+  const lines = [
+    `export async function deserializeRequest(name: string, req: IRequest): Promise<IHandlerParameters | undefined> {`,
+    `  switch (name) {`,
+  ];
+  for (const op of operations) {
+    lines.push(`    case ${JSON.stringify(op.name)}:`);
+    lines.push(`      return deserialize${getFunctionSuffix(op)}Request(req);`);
+  }
+  lines.push(`    default:`);
+  lines.push(`      return undefined;`);
+  lines.push(`  }`);
+  lines.push(`}`);
+  return lines.join("\n");
+}
+
+function renderSerializeResponse(operations: readonly ServerOperation[]): string {
+  const lines = [
+    `export function serializeResponse(name: string, res: IResponse, handlerResponse: any): boolean {`,
+    `  switch (name) {`,
+  ];
+  for (const op of operations) {
+    lines.push(`    case ${JSON.stringify(op.name)}:`);
+    lines.push(`      serialize${getFunctionSuffix(op)}Response(res, handlerResponse);`);
+    lines.push(`      return true;`);
+  }
+  lines.push(`    default:`);
+  lines.push(`      return false;`);
+  lines.push(`  }`);
+  lines.push(`}`);
+  return lines.join("\n");
+}
+
+function renderHasGeneratedSerialization(operations: readonly ServerOperation[]): string {
+  const lines = [
+    `export function hasGeneratedSerialization(name: string): boolean {`,
+    `  switch (name) {`,
+  ];
+  for (const op of operations) {
+    lines.push(`    case ${JSON.stringify(op.name)}:`);
+  }
+  if (operations.length > 0) {
+    lines.push(`      return true;`);
+  }
+  lines.push(`    default:`);
+  lines.push(`      return false;`);
+  lines.push(`  }`);
+  lines.push(`}`);
+  return lines.join("\n");
+}
+
+function renderOperationDeserializer(op: ServerOperation): string {
+  const lines = [
+    `function deserialize${getFunctionSuffix(op)}Request(req: IRequest): IHandlerParameters {`,
+    `  const parameters: IHandlerParameters = {};`,
+  ];
+
+  for (const literal of op.literalQueryParameters) {
+    lines.push(
+      ...renderSetParameterValue(
+        literal.name,
+        renderDeserializeValue(
+          { kind: "literal", value: literal.value },
+          `req.getQuery(${JSON.stringify(literal.name)})`,
+          literal.name,
+          true,
+        ),
       ),
-  ];
-  const headerParameters = op.parameters
-    .filter((p) => p.location === "header")
-    .map((param) =>
-      renderParameterMetadata({
-        parameterPath: getParameterPath(param),
-        wireName: param.wireName,
-        type: param.type,
-        required: !param.optional,
-      }),
     );
-  const responses = op.responses.map(
-    (response) =>
-      `{ statusCode: ${JSON.stringify(response.statusCode)}, headers: [${response.headers
-        .map(renderHeaderMetadata)
-        .join(", ")}] }`,
-  );
+  }
 
-  return `{
-    name: ${JSON.stringify(op.name)},
-    queryParameters: [${queryParameters.join(", ")}],
-    headerParameters: [${headerParameters.join(", ")}],
-    responses: [${responses.join(", ")}],
-  }`;
+  for (const param of op.parameters.filter((p) => p.location === "query")) {
+    lines.push(
+      ...renderSetParameterValue(
+        getParameterPath(param),
+        renderDeserializeValue(
+          param.type,
+          `req.getQuery(${JSON.stringify(param.wireName)})`,
+          param.wireName,
+          !param.optional,
+        ),
+      ),
+    );
+  }
+
+  const headerParameters = op.parameters.filter((p) => p.location === "header");
+  if (headerParameters.some((p) => getHeaderCollectionPrefix(p.wireName) !== undefined)) {
+    lines.push(`  const headers = req.getHeaders();`);
+  }
+
+  for (const param of headerParameters) {
+    const headerCollectionPrefix = getHeaderCollectionPrefix(param.wireName);
+    if (headerCollectionPrefix !== undefined) {
+      lines.push(
+        ...renderSetParameterValue(
+          getParameterPath(param),
+          `getHeaderCollection(headers, ${JSON.stringify(headerCollectionPrefix)})`,
+        ),
+      );
+    } else {
+      lines.push(
+        ...renderSetParameterValue(
+          getParameterPath(param),
+          renderDeserializeValue(
+            param.type,
+            `req.getHeader(${JSON.stringify(param.wireName)})`,
+            param.wireName,
+            !param.optional,
+          ),
+        ),
+      );
+    }
+  }
+
+  lines.push(`  return parameters;`);
+  lines.push(`}`);
+  return lines.join("\n");
 }
 
-function renderParameterMetadata(input: {
-  parameterPath: string | readonly string[];
-  wireName: string;
-  type: ServerTypeRef;
-  required: boolean;
-}): string {
-  const properties = [
-    `parameterPath: ${JSON.stringify(input.parameterPath)}`,
-    `wireName: ${JSON.stringify(input.wireName)}`,
-    `type: ${renderSerializationTypeRef(input.type)}`,
-    `required: ${input.required}`,
+function renderOperationSerializer(op: ServerOperation): string {
+  const lines = [
+    `function serialize${getFunctionSuffix(op)}Response(res: IResponse, handlerResponse: any): void {`,
+    `  const statusCode = handlerResponse.statusCode;`,
+    `  res.setStatusCode(statusCode);`,
+    `  switch (statusCode) {`,
   ];
-  const collectionFormat = getCollectionFormat(input.type);
-  if (collectionFormat !== undefined) {
-    properties.push(`collectionFormat: ${JSON.stringify(collectionFormat)}`);
+
+  const defaultResponse = op.responses.find((response) => response.statusCode === "*");
+  for (const response of op.responses.filter((r) => r.statusCode !== "*")) {
+    lines.push(`    case ${response.statusCode}:`);
+    lines.push(...indent(renderResponseHeaders(response.headers), 6));
+    lines.push(`      return;`);
   }
-  const headerCollectionPrefix = getHeaderCollectionPrefix(input.wireName);
-  if (headerCollectionPrefix !== undefined) {
-    properties.push(`headerCollectionPrefix: ${JSON.stringify(headerCollectionPrefix)}`);
+  if (defaultResponse) {
+    lines.push(`    default:`);
+    lines.push(...indent(renderResponseHeaders(defaultResponse.headers), 6));
+    lines.push(`      return;`);
+  } else {
+    lines.push(`    default:`);
+    lines.push(
+      `      throw new TypeError(\`Generated TypeSpec serializer for ${op.name} does not include response status code \${statusCode}\`);`,
+    );
   }
-  return `{ ${properties.join(", ")} }`;
+
+  lines.push(`  }`);
+  lines.push(`}`);
+  return lines.join("\n");
 }
 
-function renderHeaderMetadata(header: ServerResponseHeader): string {
-  const properties = [
-    `name: ${JSON.stringify(header.name)}`,
-    `wireName: ${JSON.stringify(header.wireName)}`,
-    `type: ${renderSerializationTypeRef(header.type)}`,
-  ];
-  const headerCollectionPrefix = getHeaderCollectionPrefix(header.wireName);
-  if (headerCollectionPrefix !== undefined) {
-    properties.push(`headerCollectionPrefix: ${JSON.stringify(headerCollectionPrefix)}`);
+function renderResponseHeaders(headers: readonly ServerResponseHeader[]): string[] {
+  const lines: string[] = [];
+  for (const header of headers) {
+    const headerCollectionPrefix = getHeaderCollectionPrefix(header.wireName);
+    if (headerCollectionPrefix !== undefined) {
+      lines.push(
+        `setHeaderCollection(res, ${JSON.stringify(headerCollectionPrefix)}, handlerResponse[${JSON.stringify(
+          header.name,
+        )}]);`,
+      );
+    } else {
+      lines.push(
+        `setHeader(res, ${JSON.stringify(header.wireName)}, ${renderSerializeValue(
+          header.type,
+          `handlerResponse[${JSON.stringify(header.name)}]`,
+        )});`,
+      );
+    }
   }
-  return `{ ${properties.join(", ")} }`;
+  return lines;
 }
 
-function renderSerializationTypeRef(type: ServerTypeRef): string {
+function renderDeserializeValue(
+  type: ServerTypeRef,
+  valueExpression: string,
+  wireName: string,
+  required: boolean,
+): string {
   switch (type.kind) {
-    case "array":
-      return `{ kind: "array", element: ${renderSerializationTypeRef(type.element)} }`;
-    case "record":
-      return `{ kind: "record", element: ${renderSerializationTypeRef(type.element)} }`;
-    case "literal":
-      return `{ kind: "literal", value: ${JSON.stringify(type.value)} }`;
-    case "model":
-      return `{ kind: "unknown" }`;
     case "number":
+      return `deserializeNumber(${valueExpression}, ${JSON.stringify(wireName)}, ${required})`;
     case "boolean":
+      return `deserializeBoolean(${valueExpression}, ${JSON.stringify(wireName)}, ${required})`;
+    case "literal":
+      return `deserializeLiteral(${valueExpression}, ${JSON.stringify(type.value)}, ${JSON.stringify(
+        wireName,
+      )}, ${required})`;
+    case "array":
+      return `deserializeArray(${valueExpression}, ${JSON.stringify(wireName)}, ${required}, (item) => ${renderDeserializeArrayItem(
+        type.element,
+        "item",
+      )})`;
     case "datetime":
+    case "model":
+    case "record":
     case "string":
     case "unknown":
-      return `{ kind: ${JSON.stringify(type.kind)} }`;
+      return `deserializeString(${valueExpression}, ${JSON.stringify(wireName)}, ${required})`;
   }
+}
+
+function renderSetParameterValue(
+  parameterPath: string | readonly string[],
+  valueExpression: string,
+): string[] {
+  return [
+    `  setParameterValue(`,
+    `    parameters,`,
+    `    ${renderParameterPath(parameterPath)},`,
+    `    ${valueExpression},`,
+    `  );`,
+  ];
+}
+
+function renderParameterPath(parameterPath: string | readonly string[]): string {
+  return typeof parameterPath === "string"
+    ? JSON.stringify(parameterPath)
+    : `[${parameterPath.map((path) => JSON.stringify(path)).join(", ")}]`;
+}
+
+function renderDeserializeArrayItem(type: ServerTypeRef, itemExpression: string): string {
+  switch (type.kind) {
+    case "number":
+      return `Number(${itemExpression})`;
+    case "boolean":
+      return `${itemExpression} === "true" ? true : ${itemExpression} === "false" ? false : ${itemExpression}`;
+    case "literal":
+      return JSON.stringify(type.value);
+    case "array":
+      return `${itemExpression}.split(",").map((nestedItem) => ${renderDeserializeArrayItem(
+        type.element,
+        "nestedItem",
+      )})`;
+    case "datetime":
+    case "model":
+    case "record":
+    case "string":
+    case "unknown":
+      return itemExpression;
+  }
+}
+
+function renderSerializeValue(type: ServerTypeRef, valueExpression: string): string {
+  switch (type.kind) {
+    case "datetime":
+      return `serializeDateTime(${valueExpression})`;
+    case "array":
+      return `${valueExpression}?.map((item: any) => ${renderSerializeValue(type.element, "item")}).join(",")`;
+    case "literal":
+      return JSON.stringify(type.value);
+    case "boolean":
+    case "number":
+    case "model":
+    case "record":
+    case "string":
+    case "unknown":
+      return valueExpression;
+  }
+}
+
+function renderHelpers(operations: readonly ServerOperation[]): string {
+  const helpers = getRequiredHelpers(operations);
+  const lines = [
+    `function deserializeString(value: string | string[] | undefined, wireName: string, required: boolean): string | undefined {`,
+    `  const normalized = normalizeValue(value);`,
+    `  if (required && normalized === undefined) {`,
+    `    throw new TypeError(\`Required parameter \${wireName} was not provided\`);`,
+    `  }`,
+    `  return normalized;`,
+    `}`,
+  ];
+
+  if (helpers.deserializeNumber) {
+    lines.push(
+      "",
+      `function deserializeNumber(value: string | string[] | undefined, wireName: string, required: boolean): number | undefined {`,
+      `  const normalized = deserializeString(value, wireName, required);`,
+      `  return normalized === undefined ? undefined : Number(normalized);`,
+      `}`,
+    );
+  }
+
+  if (helpers.deserializeBoolean) {
+    lines.push(
+      "",
+      `function deserializeBoolean(value: string | string[] | undefined, wireName: string, required: boolean): boolean | string | undefined {`,
+      `  const normalized = deserializeString(value, wireName, required);`,
+      `  if (normalized === undefined) return undefined;`,
+      `  return normalized === "true" ? true : normalized === "false" ? false : normalized;`,
+      `}`,
+    );
+  }
+
+  if (helpers.deserializeLiteral) {
+    lines.push(
+      "",
+      `function deserializeLiteral(`,
+      `  value: string | string[] | undefined,`,
+      `  expected: string | number | boolean,`,
+      `  wireName: string,`,
+      `  required: boolean,`,
+      `): string | number | boolean | undefined {`,
+      `  const normalized = deserializeString(value, wireName, required);`,
+      `  if (normalized === undefined) return undefined;`,
+      `  if (String(expected) !== normalized) {`,
+      `    throw new TypeError(\`Parameter \${wireName} expected \${expected} but received \${normalized}\`);`,
+      `  }`,
+      `  return expected;`,
+      `}`,
+    );
+  }
+
+  if (helpers.deserializeArray) {
+    lines.push(
+      "",
+      `function deserializeArray<T>(`,
+      `  value: string | string[] | undefined,`,
+      `  wireName: string,`,
+      `  required: boolean,`,
+      `  itemDeserializer: (item: string) => T,`,
+      `): T[] | undefined {`,
+      `  const normalized = deserializeString(value, wireName, required);`,
+      `  return normalized === undefined ? undefined : normalized.split(",").map(itemDeserializer);`,
+      `}`,
+    );
+  }
+
+  lines.push(
+    "",
+    `function normalizeValue(value: string | string[] | undefined): string | undefined {`,
+    `  return Array.isArray(value) ? value.join(",") : value;`,
+    `}`,
+  );
+
+  if (helpers.getHeaderCollection) {
+    lines.push(
+      "",
+      `function getHeaderCollection(`,
+      `  headers: Record<string, string | string[] | undefined>,`,
+      `  prefix: string,`,
+      `): Record<string, string | string[]> {`,
+      `  const values: Record<string, string | string[]> = {};`,
+      `  for (const [headerName, headerValue] of Object.entries(headers)) {`,
+      `    if (headerName.toLowerCase().startsWith(prefix.toLowerCase()) && headerValue !== undefined) {`,
+      `      values[headerName.substring(prefix.length)] = headerValue;`,
+      `    }`,
+      `  }`,
+      `  return values;`,
+      `}`,
+    );
+  }
+
+  lines.push(
+    "",
+    `function setHeader(res: IResponse, name: string, value: string | number | boolean | undefined): void {`,
+    `  if (value !== undefined) {`,
+    `    res.setHeader(name, value);`,
+    `  }`,
+    `}`,
+  );
+
+  if (helpers.setHeaderCollection) {
+    lines.push(
+      "",
+      `function setHeaderCollection(res: IResponse, prefix: string, value: Record<string, unknown> | undefined): void {`,
+      `  if (value === undefined) return;`,
+      `  for (const [suffix, itemValue] of Object.entries(value)) {`,
+      `    if (itemValue !== undefined) {`,
+      `      res.setHeader(\`\${prefix}\${suffix}\`, String(itemValue));`,
+      `    }`,
+      `  }`,
+      `}`,
+    );
+  }
+
+  if (helpers.serializeDateTime) {
+    lines.push(
+      "",
+      `function serializeDateTime(value: unknown): string | undefined {`,
+      `  if (value === undefined) return undefined;`,
+      `  return value instanceof Date ? value.toUTCString() : String(value);`,
+      `}`,
+    );
+  }
+
+  lines.push(
+    "",
+    `function setParameterValue(`,
+    `  parameters: IHandlerParameters,`,
+    `  parameterPath: string | readonly string[],`,
+    `  parameterValue: unknown,`,
+    `): void {`,
+    `  if (typeof parameterPath === "string") {`,
+    `    parameters[parameterPath] = parameterValue;`,
+    `    return;`,
+    `  }`,
+    `  let leafParent = parameters;`,
+    `  for (let i = 0; i < parameterPath.length - 1; i++) {`,
+    `    const currentPropertyName = parameterPath[i];`,
+    `    if (!leafParent[currentPropertyName]) {`,
+    `      leafParent[currentPropertyName] = {};`,
+    `    }`,
+    `    leafParent = leafParent[currentPropertyName];`,
+    `  }`,
+    `  leafParent[parameterPath[parameterPath.length - 1]] = parameterValue;`,
+    `}`,
+  );
+
+  return lines.join("\n");
+}
+
+function getRequiredHelpers(operations: readonly ServerOperation[]): {
+  deserializeNumber: boolean;
+  deserializeBoolean: boolean;
+  deserializeLiteral: boolean;
+  deserializeArray: boolean;
+  getHeaderCollection: boolean;
+  setHeaderCollection: boolean;
+  serializeDateTime: boolean;
+} {
+  const parameterTypes: ServerTypeRef[] = [];
+  const responseHeaders: ServerResponseHeader[] = [];
+  let getHeaderCollection = false;
+  let setHeaderCollection = false;
+
+  for (const op of operations) {
+    parameterTypes.push(
+      ...op.literalQueryParameters.map((p) => ({ kind: "literal" as const, value: p.value })),
+    );
+    for (const param of op.parameters.filter(
+      (p) => p.location === "query" || p.location === "header",
+    )) {
+      parameterTypes.push(param.type);
+      if (param.location === "header" && getHeaderCollectionPrefix(param.wireName) !== undefined) {
+        getHeaderCollection = true;
+      }
+    }
+    for (const response of op.responses) {
+      responseHeaders.push(...response.headers);
+      if (
+        response.headers.some((header) => getHeaderCollectionPrefix(header.wireName) !== undefined)
+      ) {
+        setHeaderCollection = true;
+      }
+    }
+  }
+
+  return {
+    deserializeNumber: parameterTypes.some((type) => containsTypeKind(type, "number")),
+    deserializeBoolean: parameterTypes.some((type) => containsTypeKind(type, "boolean")),
+    deserializeLiteral: parameterTypes.some((type) => type.kind === "literal"),
+    deserializeArray: parameterTypes.some((type) => type.kind === "array"),
+    getHeaderCollection,
+    setHeaderCollection,
+    serializeDateTime: responseHeaders.some((header) => containsTypeKind(header.type, "datetime")),
+  };
+}
+
+function containsTypeKind(type: ServerTypeRef, kind: ServerTypeRef["kind"]): boolean {
+  if (type.kind === kind) return true;
+  if (type.kind === "array" || type.kind === "record") return containsTypeKind(type.element, kind);
+  return false;
+}
+
+function getFunctionSuffix(op: ServerOperation): string {
+  return op.name.replace(/[^A-Za-z0-9_$]/g, "_");
 }
 
 function getParameterPath(param: ServerOperationParameter): string | readonly string[] {
@@ -354,6 +524,7 @@ function getHeaderCollectionPrefix(wireName: string): string | undefined {
   return wireName.toLowerCase() === "x-ms-meta" ? "x-ms-meta-" : undefined;
 }
 
-function getCollectionFormat(type: ServerTypeRef): "," | undefined {
-  return type.kind === "array" ? "," : undefined;
+function indent(lines: readonly string[], spaces: number): string[] {
+  const prefix = " ".repeat(spaces);
+  return lines.map((line) => `${prefix}${line}`);
 }
