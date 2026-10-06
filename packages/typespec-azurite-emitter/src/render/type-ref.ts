@@ -9,6 +9,8 @@ export function renderTypeRef(type: ServerTypeRef): string {
       return "number";
     case "boolean":
       return "boolean";
+    case "datetime":
+      return "string";
     case "unknown":
       return "unknown";
     case "model":

@@ -3,6 +3,7 @@ import type { ServerModel } from "../src/model.js";
 import { renderHandlers } from "../src/render/render-handlers.js";
 import { renderModels } from "../src/render/render-models.js";
 import { renderOperations } from "../src/render/render-operations.js";
+import { renderSerialization } from "../src/render/render-serialization.js";
 import { renderTypeRef } from "../src/render/type-ref.js";
 
 const sampleServerModel: ServerModel = {
@@ -12,16 +13,28 @@ const sampleServerModel: ServerModel = {
       name: "QueueMetadata",
       doc: "Queue metadata.",
       properties: [
-        { name: "description", type: { kind: "string" }, optional: true, doc: "A description." },
-        { name: "publicAccess", type: { kind: "boolean" }, optional: true },
+        {
+          name: "description",
+          wireName: "Description",
+          type: { kind: "string" },
+          optional: true,
+          doc: "A description.",
+        },
+        {
+          name: "publicAccess",
+          wireName: "PublicAccess",
+          type: { kind: "boolean" },
+          optional: true,
+        },
       ],
     },
     {
       name: "QueueMessage",
       properties: [
-        { name: "messageId", type: { kind: "string" }, optional: false },
+        { name: "messageId", wireName: "MessageId", type: { kind: "string" }, optional: false },
         {
           name: "tags",
+          wireName: "Tags",
           type: { kind: "array", element: { kind: "string" } },
           optional: true,
         },
@@ -53,6 +66,36 @@ const sampleServerModel: ServerModel = {
       responses: [
         {
           statusCode: 201,
+          headers: [
+            {
+              name: "requestId",
+              wireName: "x-ms-request-id",
+              type: { kind: "string" },
+              optional: false,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: "DeleteQueue",
+      verb: "delete",
+      rawPath: "/{queueName}",
+      path: "/{queueName}",
+      literalQueryParameters: [],
+      interfaceName: "Queue",
+      parameters: [
+        {
+          name: "queueName",
+          wireName: "queueName",
+          location: "path",
+          type: { kind: "string" },
+          optional: false,
+        },
+      ],
+      responses: [
+        {
+          statusCode: 204,
           headers: [
             {
               name: "requestId",
@@ -171,6 +214,29 @@ describe("renderHandlers", () => {
   it("declares one camelCase method per operation taking params + context and returning a Promise", () => {
     expect(output).toContain(
       "createQueue(params: CreateQueueParameters, context: Context): Promise<CreateQueueResponse>;",
+    );
+  });
+});
+
+describe("renderSerialization", () => {
+  const output = renderSerialization(sampleServerModel);
+
+  it("renders an ms-rest OperationSpec for operations with no response body", () => {
+    expect(output).toContain(`import * as msRest from "@azure/ms-rest-js";`);
+    expect(output).toContain(`const DeleteQueueOperationSpec: msRest.OperationSpec = {`);
+    expect(output).toContain(`httpMethod: "DELETE"`);
+    expect(output).toContain(`path: "{queueName}"`);
+    expect(output).toContain(`headersMapper: {`);
+    expect(output).toContain(`serializedName: "x-ms-request-id"`);
+  });
+
+  it("exports a name-keyed operation spec map for Azurite runtime lookup", () => {
+    expect(output).toContain(
+      `export const serializationOperationSpecs: ReadonlyMap<string, msRest.OperationSpec> = new Map([`,
+    );
+    expect(output).toContain(`["DeleteQueue", DeleteQueueOperationSpec]`);
+    expect(output).toContain(
+      `export function getSerializationOperationSpec(name: string): msRest.OperationSpec | undefined {`,
     );
   });
 });

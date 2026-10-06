@@ -68,6 +68,13 @@ namespace QueuePilot {
     @body properties: QueueProperties;
   };
 
+  @route("/{queueName}")
+  @delete
+  op deleteQueue(@path queueName: string): {
+    @statusCode statusCode: 204;
+    @header("x-ms-request-id") requestId: string;
+  };
+
   @route("/{queueName}/messages")
   @get
   op listMessages(

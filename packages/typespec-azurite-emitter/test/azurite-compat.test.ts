@@ -16,7 +16,7 @@ describe("structural fit against Azure/Azurite's real generated artifacts", () =
     const methodSignatures = [
       ...handlersFile.matchAll(/^\s*\w+\(params: \w+, context: Context\): Promise<\w+>;/gm),
     ];
-    expect(methodSignatures).toHaveLength(4);
+    expect(methodSignatures).toHaveLength(5);
   });
 
   it("declares a trailing Context type, mirroring Azurite's generated per-request Context object", async () => {

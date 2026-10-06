@@ -2,6 +2,7 @@ export type ServerTypeRef =
   | { kind: "string" }
   | { kind: "number" }
   | { kind: "boolean" }
+  | { kind: "datetime" }
   | { kind: "unknown" }
   | { kind: "model"; name: string }
   | { kind: "array"; element: ServerTypeRef }
@@ -10,6 +11,7 @@ export type ServerTypeRef =
 
 export interface ServerModelProperty {
   readonly name: string;
+  readonly wireName: string;
   readonly type: ServerTypeRef;
   readonly optional: boolean;
   readonly doc?: string;

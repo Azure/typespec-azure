@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { EmitterTester, loadQueuePilotFixture } from "./tester.js";
 
 describe("end-to-end emit", () => {
-  it("compiles the queue-pilot fixture (base + azurite overlay) without diagnostics and emits all three artifacts", async () => {
+  it("compiles the queue-pilot fixture (base + azurite overlay) without diagnostics and emits all artifacts", async () => {
     const [{ outputs }, diagnostics] =
       await EmitterTester.compileAndDiagnose(loadQueuePilotFixture());
 
@@ -11,7 +11,7 @@ describe("end-to-end emit", () => {
     const fileNames = Object.keys(outputs)
       .map((path) => path.split("/").pop())
       .sort();
-    expect(fileNames).toEqual(["handlers.ts", "models.ts", "operations.ts"]);
+    expect(fileNames).toEqual(["handlers.ts", "models.ts", "operations.ts", "serialization.ts"]);
   });
 
   it("generates models.ts with all referenced data models", async () => {
@@ -67,6 +67,17 @@ describe("end-to-end emit", () => {
     expect(handlersFile).toContain(
       "setAccessPolicy(params: SetAccessPolicyParameters, context: Context): Promise<SetAccessPolicyResponse>;",
     );
+  });
+
+  it("generates serialization.ts with Azurite-compatible operation specs for the no-body slice", async () => {
+    const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
+    const serializationFile = findOutput(outputs, "serialization.ts");
+
+    expect(serializationFile).toContain(`import * as msRest from "@azure/ms-rest-js";`);
+    expect(serializationFile).toContain(`DeleteQueueOperationSpec`);
+    expect(serializationFile).toContain(`httpMethod: "DELETE"`);
+    expect(serializationFile).toContain(`serializedName: "x-ms-request-id"`);
+    expect(serializationFile).toContain(`getSerializationOperationSpec`);
   });
 });
 

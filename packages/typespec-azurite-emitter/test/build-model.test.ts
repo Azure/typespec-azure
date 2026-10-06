@@ -22,6 +22,7 @@ describe("buildServerModel", () => {
 
     const names = serverModel.operations.map((op) => op.name).sort();
     expect(names).toEqual([
+      "DeleteQueue",
       "GetQueueProperties",
       "ListMessages",
       "Queue_Create",

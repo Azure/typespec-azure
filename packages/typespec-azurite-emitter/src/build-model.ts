@@ -218,7 +218,7 @@ function toTypeRef(
         tk.scalar.extendsPlainDate(type) ||
         tk.scalar.extendsPlainTime(type)
       ) {
-        return { kind: "string" };
+        return { kind: "datetime" };
       }
       if (tk.scalar.extendsBoolean(type)) return { kind: "boolean" };
       return { kind: "unknown" };
@@ -316,6 +316,7 @@ function buildModelProperty(
 ): ServerModelProperty {
   return {
     name: getName(program, prop, prop.name),
+    wireName: $(program).type.getEncodedName(prop, "application/xml"),
     type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
     optional: prop.optional,
     doc: getDocHelper(program, prop),

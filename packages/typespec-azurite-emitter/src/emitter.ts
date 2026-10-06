@@ -4,7 +4,12 @@ import { buildServerModel } from "./build-model.js";
 import { reportDiagnostic } from "./lib.js";
 import type { AzuritePilotEmitterOptions } from "./options.js";
 import { normalizeOptions } from "./options.js";
-import { renderHandlers, renderModels, renderOperations } from "./render/index.js";
+import {
+  renderHandlers,
+  renderModels,
+  renderOperations,
+  renderSerialization,
+} from "./render/index.js";
 
 /**
  * Emitter entry point: builds the intermediate server model (transform phase) and renders
@@ -34,5 +39,9 @@ export async function $onEmit(context: EmitContext<AzuritePilotEmitterOptions>):
   await emitFile(program, {
     path: resolvePath(baseDir, "handlers.ts"),
     content: renderHandlers(serverModel),
+  });
+  await emitFile(program, {
+    path: resolvePath(baseDir, "serialization.ts"),
+    content: renderSerialization(serverModel),
   });
 }
