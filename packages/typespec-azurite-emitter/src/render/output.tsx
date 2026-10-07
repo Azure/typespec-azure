@@ -7,10 +7,14 @@ import { renderModels } from "./render-models.js";
 import { renderOperations } from "./render-operations.js";
 import { renderSerialization } from "./render-serialization.js";
 
-export function AzuriteEmitterOutput(props: { serverModel: ServerModel; program: Program }) {
+export function AzuriteEmitterOutput(props: {
+  serverModel: ServerModel;
+  program: Program;
+  runtimeImport: string;
+}) {
   return (
     <AzuriteOutput program={props.program}>
-      <AzuriteOutputFiles serverModel={props.serverModel} />
+      <AzuriteOutputFiles serverModel={props.serverModel} runtimeImport={props.runtimeImport} />
     </AzuriteOutput>
   );
 }
@@ -23,13 +27,13 @@ function AzuriteOutput(props: { children: Children; program: Program }) {
   );
 }
 
-function AzuriteOutputFiles(props: { serverModel: ServerModel }) {
+function AzuriteOutputFiles(props: { serverModel: ServerModel; runtimeImport: string }) {
   return (
     <>
       {renderModels(props.serverModel)}
-      {renderOperations(props.serverModel)}
+      {renderOperations(props.serverModel, props.runtimeImport)}
       {renderHandlers(props.serverModel)}
-      {renderSerialization(props.serverModel)}
+      {renderSerialization(props.serverModel, props.runtimeImport)}
     </>
   );
 }

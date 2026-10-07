@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EmitterTester, loadQueuePilotFixture } from "./tester.js";
+import { ApiTester, EmitterTester, loadQueuePilotFixture } from "./tester.js";
 
 describe("end-to-end emit", () => {
   it("compiles the queue-pilot fixture (base + azurite overlay) without diagnostics and emits all artifacts", async () => {
@@ -75,6 +75,7 @@ describe("end-to-end emit", () => {
     expect(operationsFile).toContain(`name: "SetAccessPolicy"`);
     expect(operationsFile).toContain(`location: "query"`);
     expect(operationsFile).toContain(`location: "path"`);
+    expect(operationsFile).toContain(`from "../runtime/serializationRuntime.js";`);
   });
 
   it("imports referenced model types into operations.ts so the file compiles standalone", async () => {
@@ -105,45 +106,50 @@ describe("end-to-end emit", () => {
     );
   });
 
-  it("generates serialization.ts with direct Azurite serialization helpers", async () => {
+  it("generates thin serialization.ts binding to the Azurite runtime", async () => {
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const serializationFile = findOutput(outputs, "serialization.ts");
 
     expect(serializationFile).not.toContain(`@azure/ms-rest-js`);
-    expect(serializationFile).toContain(`export async function deserializeRequest`);
-    expect(serializationFile).toContain(`export function serializeResponse`);
+    expect(serializationFile).toContain(`createSerializationRuntime`);
+    expect(serializationFile).toContain(`import { operations } from "./operations";`);
+    expect(serializationFile).toContain(`from "../runtime/serializationRuntime.js";`);
+    expect(serializationFile).toContain(
+      `const runtime = createSerializationRuntime({ operations, xmlModels });`,
+    );
+    expect(serializationFile).toContain(
+      `export const deserializeRequest = runtime.deserializeRequest;`,
+    );
+    expect(serializationFile).toContain(
+      `export const serializeResponse = runtime.serializeResponse;`,
+    );
+    expect(serializationFile).toContain(
+      `export const hasGeneratedSerialization = runtime.hasGeneratedSerialization;`,
+    );
+    expect(serializationFile).toContain(`const xmlModels: Record<string, XmlModelMetadata>`);
     expect(serializationFile).not.toContain(
       `function deserializeDeleteQueueRequest(req: IRequest)`,
     );
     expect(serializationFile).not.toContain(`function serializeDeleteQueueResponse`);
-    expect(serializationFile).toContain(`function deserializeMetadataRequest`);
-    expect(serializationFile).toContain(`function serializeMetadataResponse`);
-    expect(serializationFile).toContain(
-      `setHeader(res, header.wireName, serializeValue(header.type, handlerResponse.headers?.[header.name]))`,
-    );
-    expect(serializationFile).toContain(`import type Context from "../../generated/Context";`);
-    expect(serializationFile).toContain(`import type { IHandlerParameters }`);
-    expect(serializationFile).toMatch(
-      /export async function deserializeRequest\(\s*name: string,\s*req: IRequest,\s*context: Context,/,
-    );
-    expect(serializationFile).toContain(`const metadata = getGeneratedOperation(name);`);
-    expect(serializationFile).toContain(
-      `return metadata === undefined ? undefined : deserializeMetadataRequest(metadata, req, context);`,
-    );
-    expect(serializationFile).toContain(`const generatedOperationNames = new Set<string>`);
+    expect(serializationFile).not.toContain(`function deserializeMetadataRequest`);
+    expect(serializationFile).not.toContain(`function serializeMetadataResponse`);
+    expect(serializationFile).not.toContain(`function deserializePathParameter`);
+    expect(serializationFile).not.toContain(`function serializeXmlModel`);
+    expect(serializationFile).not.toContain(`function deserializeXmlModel`);
+    expect(serializationFile).not.toContain(`function setHeaderCollection`);
     expect(serializationFile).not.toContain(`switch (name)`);
-    expect(serializationFile).toContain(`function deserializePathParameter`);
-    expect(serializationFile).toContain(`getContextPathParameter(context, parameter)`);
-    expect(serializationFile).not.toContain(`if (parameter.location === "path") continue`);
-    expect(serializationFile).toContain(`return parameter.name;`);
-    expect(serializationFile).not.toContain(
-      `return ["options", getHandlerParameterName(parameter)]`,
-    );
-    expect(serializationFile).not.toContain(`handlerResponse[header.name]`);
-    expect(serializationFile).not.toContain(`handlerResponse.body ??`);
-    expect(serializationFile).not.toContain(`setParameterValue(parameters, "body", req.getBody())`);
-    expect(serializationFile).not.toContain(`function coerceRequestBodyValue`);
-    expect(serializationFile).not.toContain(`function coerceResponseBodyValue`);
+    expect(serializationFile).not.toContain(`Context`);
+    expect(serializationFile).not.toContain(`IHandlerParameters`);
+  });
+
+  it("honors the configurable runtime import path in generated artifacts", async () => {
+    const customEmitterTester = ApiTester.emit("@azure-tools/typespec-azurite-emitter", {
+      runtimeImport: "../custom/runtime.js",
+    });
+    const { outputs } = await customEmitterTester.compile(loadQueuePilotFixture());
+
+    expect(findOutput(outputs, "operations.ts")).toContain(`from "../custom/runtime.js";`);
+    expect(findOutput(outputs, "serialization.ts")).toContain(`from "../custom/runtime.js";`);
   });
 });
 

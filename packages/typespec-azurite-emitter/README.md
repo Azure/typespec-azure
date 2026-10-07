@@ -11,8 +11,8 @@ The package demonstrates a small but reusable emitter structure:
    - `models.ts` — data-model interfaces.
    - `operations.ts` — request/response types plus route metadata.
    - `handlers.ts` — handler interface methods with `(params, context)` signatures.
-   - `serialization.ts` — generated request deserializer and response serializer functions,
-     including XML body helpers for Queue models.
+   - `serialization.ts` — a thin binding that supplies XML model metadata to Azurite's shared
+     serialization runtime.
 
 ## Usage
 
@@ -28,6 +28,7 @@ emit:
 options:
   "@azure-tools/typespec-azurite-emitter":
     outputDir: "." # optional, relative to the emitter output dir
+    runtimeImport: "../runtime/serializationRuntime.js" # optional, as emitted in generated TS
 ```
 
 ## Azurite overlays
@@ -93,6 +94,17 @@ and passes the handler result to the generated serializer. That bridge must:
    `<Operation>Response` union. Response headers are read from `handlerResponse.headers` while
    wire-name mapping remains in generated response metadata; the bridge must not flatten response
    headers before serialization.
+
+Stable request deserialization, primitive conversion, XML body conversion, response serialization,
+header collection handling, and generated-operation lookup live in an Azurite-owned handwritten
+runtime imported by generated artifacts. The runtime module path is controlled by `runtimeImport`
+and defaults to `../runtime/serializationRuntime.js` from the generated directory. That module must
+export invariant metadata types (`OperationMetadata`, `OperationTypeBinding`,
+`XmlModelMetadata`, and related binding types) plus
+`createSerializationRuntime({ operations, xmlModels })`, which returns
+`deserializeRequest`, `serializeResponse`, and `hasGeneratedSerialization`. Header collections are
+described generically with `collectionPrefix` metadata (for example `x-ms-meta-`), not with
+Queue-specific runtime special cases.
 
 Middleware/handler invocation code is intentionally not emitted by this package in the pilot: that
 code is Azurite-owned integration logic, varies by storage service, and must compose with

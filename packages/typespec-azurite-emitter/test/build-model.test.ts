@@ -2,6 +2,7 @@ import { $ } from "@typespec/compiler/typekit";
 import { getAllHttpServices } from "@typespec/http";
 import { describe, expect, it } from "vitest";
 import { buildServerModel } from "../src/build-model.js";
+import { operationMetadataValue } from "../src/render/render-operations.js";
 import { ApiTester, loadQueuePilotFixture } from "./tester.js";
 
 describe("buildServerModel", () => {
@@ -104,6 +105,7 @@ describe("buildServerModel", () => {
     const serverModel = buildServerModel(program);
 
     const create = serverModel.operations[0];
+    const metadata = operationMetadataValue(create);
     expect(create.parameters[0].type).toEqual({
       kind: "record",
       element: {
@@ -112,6 +114,8 @@ describe("buildServerModel", () => {
       },
     });
     expect(create.responses[0].headers[0].type).toEqual(create.parameters[0].type);
+    expect(metadata.parameters[0].collectionPrefix).toBe("x-ms-meta-");
+    expect(metadata.responses[0].headers[0].collectionPrefix).toBe("x-ms-meta-");
   });
 
   it("registers transitively referenced models with their properties", async () => {
