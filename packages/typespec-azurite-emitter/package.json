@@ -48,7 +48,8 @@
   },
   "dependencies": {
     "@alloy-js/core": "catalog:",
-    "@alloy-js/typescript": "catalog:"
+    "@alloy-js/typescript": "catalog:",
+    "@typespec/emitter-framework": "workspace:^"
   },
   "peerDependencies": {
     "@azure-tools/typespec-client-generator-core": "workspace:^",

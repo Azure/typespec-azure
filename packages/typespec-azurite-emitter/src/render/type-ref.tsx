@@ -1,3 +1,7 @@
+import { code, type Children } from "@alloy-js/core";
+import * as ts from "@alloy-js/typescript";
+import type { Type } from "@typespec/compiler";
+import { TypeExpression } from "@typespec/emitter-framework/typescript";
 import type { ServerTypeRef } from "../model.js";
 
 /** Renders a {@link ServerTypeRef} as a TypeScript type expression. */
@@ -21,6 +25,47 @@ export function renderTypeRef(type: ServerTypeRef): string {
       return `Record<string, ${renderTypeRef(type.element)}>`;
     case "literal":
       return typeof type.value === "string" ? JSON.stringify(type.value) : String(type.value);
+  }
+}
+
+export interface TypeRefProps {
+  type: ServerTypeRef;
+  sourceType?: Type;
+}
+
+/**
+ * Renders the transformed server-model type as TypeScript.
+ *
+ * TypeSpec emitter-framework's `TypeExpression` is used when the original TypeSpec type maps
+ * exactly to the Azurite server-model type. We intentionally keep the server-model renderer for
+ * model references and datetime-like wire values because Azurite applies TCGC names and treats
+ * date/time payload values as strings.
+ */
+export function TypeRef(props: TypeRefProps): Children {
+  if (props.sourceType && canUseTypeSpecTypeExpression(props.type, props.sourceType)) {
+    return <TypeExpression type={props.sourceType} />;
+  }
+
+  if (props.type.kind === "literal") {
+    return <ts.ValueExpression jsValue={props.type.value} />;
+  }
+
+  return code`${renderTypeRef(props.type)}`;
+}
+
+function canUseTypeSpecTypeExpression(type: ServerTypeRef, sourceType: Type): boolean {
+  switch (type.kind) {
+    case "string":
+    case "number":
+    case "boolean":
+      return sourceType.kind === "Scalar" || sourceType.kind === "Intrinsic";
+    case "record":
+      return (
+        sourceType.kind === "Model" &&
+        canUseTypeSpecTypeExpression(type.element, sourceType.indexer!.value)
+      );
+    default:
+      return false;
   }
 }
 

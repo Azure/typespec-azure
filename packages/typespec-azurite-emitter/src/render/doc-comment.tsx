@@ -1,4 +1,4 @@
-import { code } from "@alloy-js/core";
+import * as ts from "@alloy-js/typescript";
 
 export interface DocCommentProps {
   doc: string | undefined;
@@ -9,7 +9,7 @@ export function DocComment(props: DocCommentProps) {
 
   return (
     <>
-      {code`/** ${props.doc} */`}
+      <ts.JSDocComment>{props.doc}</ts.JSDocComment>
       <hbr />
     </>
   );

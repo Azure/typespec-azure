@@ -151,13 +151,17 @@ function buildParameter(
 ): ServerOperationParameter {
   const location: ServerParameterLocation =
     param.type === "cookie" ? "header" : (param.type as ServerParameterLocation);
-  return {
-    name: getName(program, param.param, param.param.name),
-    wireName: param.name,
-    location,
-    type: toTypeRef(program, param.param.type, modelRegistry, anonymousModelNames),
-    optional: param.param.optional,
-  };
+  return withSource(
+    {
+      name: getName(program, param.param, param.param.name),
+      wireName: param.name,
+      location,
+      type: toTypeRef(program, param.param.type, modelRegistry, anonymousModelNames),
+      optional: param.param.optional,
+    },
+    "sourceProperty",
+    param.param,
+  );
 }
 
 function buildRequestBody(
@@ -166,11 +170,15 @@ function buildRequestBody(
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): ServerRequestBody {
-  return {
-    type: toTypeRef(program, body.type, modelRegistry, anonymousModelNames),
-    contentTypes: body.contentTypes,
-    parameterPath: getBodyParameterPath(program, body),
-  };
+  return withSource(
+    {
+      type: toTypeRef(program, body.type, modelRegistry, anonymousModelNames),
+      contentTypes: body.contentTypes,
+      parameterPath: getBodyParameterPath(program, body),
+    },
+    "sourceType",
+    body.type,
+  );
 }
 
 function getBodyParameterPath(program: Program, body: HttpPayloadBody): string | readonly string[] {
@@ -194,12 +202,18 @@ function buildResponse(
   const content = response.responses[0];
   const headers: ServerResponseHeader[] = [];
   for (const [headerWireName, prop] of Object.entries(content?.headers ?? {})) {
-    headers.push({
-      name: getName(program, prop, prop.name),
-      wireName: headerWireName,
-      type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
-      optional: prop.optional,
-    });
+    headers.push(
+      withSource(
+        {
+          name: getName(program, prop, prop.name),
+          wireName: headerWireName,
+          type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
+          optional: prop.optional,
+        },
+        "sourceProperty",
+        prop,
+      ),
+    );
   }
 
   return {
@@ -293,12 +307,19 @@ function registerModel(
     const properties = [...tk.model.getProperties(model).values()].map((prop) =>
       buildModelProperty(program, prop, modelRegistry, anonymousModelNames),
     );
-    modelRegistry.set(name, {
+    modelRegistry.set(
       name,
-      wireName: $(program).type.getEncodedName(model, "application/xml"),
-      properties,
-      doc: getDocHelper(program, model),
-    });
+      withSource(
+        {
+          name,
+          wireName: $(program).type.getEncodedName(model, "application/xml"),
+          properties,
+          doc: getDocHelper(program, model),
+        },
+        "sourceModel",
+        model,
+      ),
+    );
   }
   return { kind: "model", name };
 }
@@ -376,17 +397,35 @@ function buildModelProperty(
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): ServerModelProperty {
-  return {
-    name: getName(program, prop, prop.name),
-    wireName: $(program).type.getEncodedName(prop, "application/xml"),
-    type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
-    optional: prop.optional,
-    xmlAttribute: isAttribute(program, prop),
-    xmlUnwrapped: isUnwrapped(program, prop),
-    doc: getDocHelper(program, prop),
-  };
+  return withSource(
+    {
+      name: getName(program, prop, prop.name),
+      wireName: $(program).type.getEncodedName(prop, "application/xml"),
+      type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
+      optional: prop.optional,
+      xmlAttribute: isAttribute(program, prop),
+      xmlUnwrapped: isUnwrapped(program, prop),
+      doc: getDocHelper(program, prop),
+    },
+    "sourceProperty",
+    prop,
+  );
 }
 
 function getDocHelper(program: Program, target: Type): string | undefined {
   return $(program).type.getDoc(target);
+}
+
+function withSource<T extends object, K extends string, V>(
+  value: T,
+  key: K,
+  source: V,
+): T & { readonly [P in K]?: V } {
+  Object.defineProperty(value, key, {
+    configurable: false,
+    enumerable: false,
+    value: source,
+    writable: false,
+  });
+  return value;
 }

@@ -29,7 +29,11 @@ export async function $onEmit(context: EmitContext<AzuritePilotEmitterOptions>):
   const serverModel = buildServerModel(program);
 
   const baseDir = resolvePath(context.emitterOutputDir, options.outputDir);
-  await writeOutput(program, <AzuriteEmitterOutput serverModel={serverModel} />, baseDir);
+  await writeOutput(
+    program,
+    <AzuriteEmitterOutput serverModel={serverModel} program={program} />,
+    baseDir,
+  );
 }
 
 async function writeOutput(program: Program, rootComponent: Children, emitterOutputDir: string) {

@@ -1,8 +1,7 @@
 import { code, For } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { ServerModel } from "../model.js";
-import { DocComment } from "./doc-comment.js";
-import { renderFileHeader, renderTypeRef } from "./type-ref.js";
+import { renderFileHeader, TypeRef } from "./type-ref.js";
 
 /**
  * Renders the `models.ts` artifact: one TypeScript interface per named data model
@@ -14,24 +13,18 @@ export function renderModels(serverModel: ServerModel) {
       {code`${renderFileHeader()}`}
       <For each={serverModel.models} hardline>
         {(model) => (
-          <>
-            <DocComment doc={model.doc} />
-            {code`export interface ${model.name} {`}
-            <hbr />
-            <indent>
-              <For each={model.properties}>
-                {(prop) => (
-                  <>
-                    <DocComment doc={prop.doc} />
-                    {code`${prop.name}${prop.optional ? "?" : ""}: ${renderTypeRef(prop.type)};`}
-                    <hbr />
-                  </>
-                )}
-              </For>
-            </indent>
-            {code`}`}
-            <hbr />
-          </>
+          <ts.InterfaceDeclaration export name={model.name} doc={model.doc}>
+            <For each={model.properties} semicolon line enderPunctuation>
+              {(prop) => (
+                <ts.InterfaceMember
+                  name={prop.name}
+                  optional={prop.optional}
+                  doc={prop.doc}
+                  type={<TypeRef type={prop.type} sourceType={prop.sourceProperty?.type} />}
+                />
+              )}
+            </For>
+          </ts.InterfaceDeclaration>
         )}
       </For>
     </ts.SourceFile>

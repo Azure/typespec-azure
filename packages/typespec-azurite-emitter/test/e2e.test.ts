@@ -28,6 +28,42 @@ describe("end-to-end emit", () => {
     expect(modelsFile).toContain("permission?: string;");
   });
 
+  it("renders TypeSpec-derived model members with reusable type components for required, optional, array, record, and referenced properties", async () => {
+    const { outputs } = await EmitterTester.compile({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace ComponentRenderingDemo;
+
+        model Child {
+          value: string;
+        }
+
+        model Parent {
+          requiredName: string;
+          optionalTags?: string[];
+          metadata?: Record<string>;
+          child: Child;
+        }
+
+        @route("/parents")
+        @get
+        op getParent(): {
+          @statusCode statusCode: 200;
+          @body body: Parent;
+        };
+      `,
+    });
+    const modelsFile = findOutput(outputs, "models.ts");
+
+    expect(modelsFile).toContain("requiredName: string;");
+    expect(modelsFile).toContain("optionalTags?: string[];");
+    expect(modelsFile).toContain("metadata?: Record<string, string>;");
+    expect(modelsFile).toContain("child: Child;");
+  });
+
   it("generates operations.ts with route metadata for all fixture operations", async () => {
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const operationsFile = findOutput(outputs, "operations.ts");
@@ -55,17 +91,17 @@ describe("end-to-end emit", () => {
     const handlersFile = findOutput(outputs, "handlers.ts");
 
     expect(handlersFile).toContain("export interface IServiceHandler {");
-    expect(handlersFile).toContain(
-      "queue_Create(params: Queue_CreateParameters, context: Context): Promise<Queue_CreateResponse>;",
+    expect(handlersFile).toMatch(
+      /queue_Create\(\s*params: Queue_CreateParameters,\s*context: Context,\s*\): Promise<Queue_CreateResponse>;/,
     );
-    expect(handlersFile).toContain(
-      "getQueueProperties(params: GetQueuePropertiesParameters, context: Context): Promise<GetQueuePropertiesResponse>;",
+    expect(handlersFile).toMatch(
+      /getQueueProperties\(\s*params: GetQueuePropertiesParameters,\s*context: Context,\s*\): Promise<GetQueuePropertiesResponse>;/,
     );
-    expect(handlersFile).toContain(
-      "listMessages(params: ListMessagesParameters, context: Context): Promise<ListMessagesResponse>;",
+    expect(handlersFile).toMatch(
+      /listMessages\(\s*params: ListMessagesParameters,\s*context: Context,\s*\): Promise<ListMessagesResponse>;/,
     );
-    expect(handlersFile).toContain(
-      "setAccessPolicy(params: SetAccessPolicyParameters, context: Context): Promise<SetAccessPolicyResponse>;",
+    expect(handlersFile).toMatch(
+      /setAccessPolicy\(\s*params: SetAccessPolicyParameters,\s*context: Context,\s*\): Promise<SetAccessPolicyResponse>;/,
     );
   });
 

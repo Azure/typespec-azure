@@ -10,11 +10,13 @@ describe("structural fit against Azure/Azurite's real generated artifacts", () =
     //   create(options: Models.QueueCreateOptionalParams, context: Context): Promise<Models.QueueCreateResponse>;
     // from https://github.com/Azure/Azurite/blob/main/src/queue/generated/handlers/IQueueHandler.ts
     expect(handlersFile).toMatch(
-      /queue_Create\(params: Queue_CreateParameters, context: Context\): Promise<Queue_CreateResponse>;/,
+      /queue_Create\(\s*params: Queue_CreateParameters,\s*context: Context,\s*\): Promise<Queue_CreateResponse>;/,
     );
     // Every operation follows the same (params, context) => Promise<Response> shape.
     const methodSignatures = [
-      ...handlersFile.matchAll(/^\s*\w+\(params: \w+, context: Context\): Promise<\w+>;/gm),
+      ...handlersFile.matchAll(
+        /^\s*\w+\(\s*params: \w+,\s*context: Context,\s*\): Promise<\w+>;/gm,
+      ),
     ];
     expect(methodSignatures).toHaveLength(5);
   });
@@ -43,14 +45,14 @@ describe("structural fit against Azure/Azurite's real generated artifacts", () =
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const operationsFile = findOutput(outputs, "operations.ts");
 
-    expect(operationsFile).toContain(
-      `{ name: "numOfMessages", wireName: "numOfMessages", location: "query", required: false, type: { kind: "number" } }`,
+    expect(operationsFile).toMatch(
+      /name: "numOfMessages",\s*wireName: "numOfMessages",\s*location: "query",\s*required: false,\s*type: \{\s*kind: "number"/,
     );
-    expect(operationsFile).toContain(
-      `{ name: "visibilityTimeout", wireName: "visibilityTimeout", location: "query", required: false, type: { kind: "number" } }`,
+    expect(operationsFile).toMatch(
+      /name: "visibilityTimeout",\s*wireName: "visibilityTimeout",\s*location: "query",\s*required: false,\s*type: \{\s*kind: "number"/,
     );
-    expect(operationsFile).toContain(
-      `{ name: "queueName", wireName: "queueName", location: "path", required: true, type: { kind: "string" } }`,
+    expect(operationsFile).toMatch(
+      /name: "queueName",\s*wireName: "queueName",\s*location: "path",\s*required: true,\s*type: \{\s*kind: "string"/,
     );
   });
 
@@ -58,11 +60,11 @@ describe("structural fit against Azure/Azurite's real generated artifacts", () =
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const operationsFile = findOutput(outputs, "operations.ts");
 
-    expect(operationsFile).toContain(
-      `{ statusCode: 201, headers: [{ name: "requestId", wireName: "x-ms-request-id", type: { kind: "string" } }] }`,
+    expect(operationsFile).toMatch(
+      /statusCode: 201,\s*headers: \[\s*\{\s*name: "requestId",\s*wireName: "x-ms-request-id",\s*type: \{\s*kind: "string"/,
     );
-    expect(operationsFile).toContain(
-      `{ statusCode: 200, headers: [{ name: "approximateMessagesCount", wireName: "x-ms-approximate-messages-count", type: { kind: "number" } }], body: { type: { kind: "model", name: "QueueProperties" } } }`,
+    expect(operationsFile).toMatch(
+      /statusCode: 200,\s*headers: \[\s*\{\s*name: "approximateMessagesCount",\s*wireName: "x-ms-approximate-messages-count",\s*type: \{\s*kind: "number"[\s\S]*body: \{\s*type: \{\s*kind: "model",\s*name: "QueueProperties"/,
     );
   });
 
@@ -70,7 +72,7 @@ describe("structural fit against Azure/Azurite's real generated artifacts", () =
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const operationsFile = findOutput(outputs, "operations.ts");
 
-    expect(operationsFile).toContain(`requestBodyContentTypes: ["application/json"]`);
+    expect(operationsFile).toMatch(/requestBodyContentTypes: \[\s*"application\/json"\s*\]/);
   });
 });
 

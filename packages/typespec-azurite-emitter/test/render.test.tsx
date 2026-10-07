@@ -1,4 +1,4 @@
-import { code, render, SourceDirectory, type Children } from "@alloy-js/core";
+import { code, Output, render, SourceDirectory, type Children } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import { describe, expect, it } from "vitest";
 import type { ServerModel } from "../src/model.js";
@@ -10,12 +10,31 @@ import { renderSerialization } from "../src/render/render-serialization.js";
 import { renderTypeRef } from "../src/render/type-ref.js";
 
 function renderSourceFile(component: Children): string {
-  const output = render(<SourceDirectory path=".">{component}</SourceDirectory>);
-  const file = output.contents.find((entry) => entry.kind === "file");
+  const output = render(
+    <Output>
+      <SourceDirectory path=".">{component}</SourceDirectory>
+    </Output>,
+  );
+  const file = findRenderedFile(output);
   if (file === undefined || !("contents" in file)) {
     throw new Error("Expected Alloy render output to contain one source file.");
   }
   return file.contents;
+}
+
+function findRenderedFile(output: { contents?: unknown[] }): { contents: string } | undefined {
+  for (const entry of output.contents ?? []) {
+    if (typeof entry === "object" && entry !== null && "kind" in entry) {
+      if (entry.kind === "file" && "contents" in entry && typeof entry.contents === "string") {
+        return entry as { contents: string };
+      }
+      if ("contents" in entry && Array.isArray(entry.contents)) {
+        const found = findRenderedFile(entry as { contents: unknown[] });
+        if (found) return found;
+      }
+    }
+  }
+  return undefined;
 }
 
 const sampleServerModel: ServerModel = {
@@ -174,7 +193,7 @@ describe("DocComment", () => {
       </ts.SourceFile>,
     );
 
-    expect(output).toContain("/** Queue metadata. */\nexport interface QueueMetadata {}");
+    expect(output).toContain("/**\n * Queue metadata.\n */\nexport interface QueueMetadata {}");
   });
 
   it("renders nothing when docs are absent", () => {
@@ -199,7 +218,7 @@ describe("renderModels", () => {
   });
 
   it("marks optional properties with `?` and renders doc comments", () => {
-    expect(output).toContain("/** A description. */");
+    expect(output).toContain("  /**\n   * A description.\n   */");
     expect(output).toContain("description?: string;");
     expect(output).toContain("publicAccess?: boolean;");
   });
@@ -239,12 +258,23 @@ describe("renderOperations", () => {
     expect(output).toContain(`requiredQueryParameters: []`);
     expect(output).toContain(`requiredHeaderParameters: []`);
     expect(output).toContain(
-      `{ name: "queueName", wireName: "queueName", location: "path", required: true, type: { kind: "string" } }`,
+      `name: "queueName",
+        wireName: "queueName",
+        location: "path",
+        required: true,
+        type: {
+          kind: "string",`,
     );
     expect(output).toContain("hasRequestBody: true");
-    expect(output).toContain(`requestBodyContentTypes: ["application/json"]`);
+    expect(output).toMatch(/requestBodyContentTypes: \[\s*"application\/json"\s*\]/);
     expect(output).toContain(
-      `{ statusCode: 201, headers: [{ name: "requestId", wireName: "x-ms-request-id", type: { kind: "string" } }] }`,
+      `statusCode: 201,
+        headers: [
+          {
+            name: "requestId",
+            wireName: "x-ms-request-id",
+            type: {
+              kind: "string",`,
     );
     expect(output).toContain(`interfaceName: "Queue"`);
   });
@@ -265,8 +295,8 @@ describe("renderHandlers", () => {
   });
 
   it("declares one camelCase method per operation taking params + context and returning a Promise", () => {
-    expect(output).toContain(
-      "createQueue(params: CreateQueueParameters, context: Context): Promise<CreateQueueResponse>;",
+    expect(output).toMatch(
+      /createQueue\(\s*params: CreateQueueParameters,\s*context: Context,\s*\): Promise<CreateQueueResponse>;/,
     );
   });
 });

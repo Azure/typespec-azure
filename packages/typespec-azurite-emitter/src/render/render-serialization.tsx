@@ -1,6 +1,7 @@
 import { code, For, Show } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { ServerDataModel, ServerModel, ServerOperation, ServerTypeRef } from "../model.js";
+import { ObjectProperties, OperationTypeBindingExpression } from "./render-operations.js";
 import { renderFileHeader } from "./type-ref.js";
 
 /**
@@ -65,69 +66,73 @@ function XmlModelMetadata(props: { models: readonly ServerDataModel[] }) {
           readonly properties: readonly XmlPropertyMetadata[];
         }
 
-        const xmlModels: Record<string, XmlModelMetadata> = {
+        const xmlModels: Record<string, XmlModelMetadata> =
       `}
-      <indent>
-        <For each={props.models}>
+      <ts.ObjectExpression>
+        <For each={props.models} comma line>
           {(model) => (
-            <>
-              {code`${JSON.stringify(model.name)}: {`}
-              <indent>
-                {code`
-                  name: ${JSON.stringify(model.name)},
-                  wireName: ${JSON.stringify(model.wireName)},
-                  properties: [
-                `}
-                <indent>
-                  <For each={model.properties}>
-                    {(prop) =>
-                      code`{ name: ${JSON.stringify(prop.name)}, wireName: ${JSON.stringify(prop.wireName)}, type: ${renderOperationTypeBinding(prop.type)}, attribute: ${prop.xmlAttribute ? "true" : "false"}, unwrapped: ${prop.xmlUnwrapped ? "true" : "false"}${getArrayItemNameInitializer(prop.type, prop.wireName, props.models)} },`
-                    }
-                  </For>
-                </indent>
-                {code`],`}
-              </indent>
-              {code`},`}
-            </>
+            <ts.ObjectProperty name={model.name}>
+              <ts.ObjectExpression>
+                <ObjectProperties
+                  properties={[
+                    { name: "name", jsValue: model.name },
+                    { name: "wireName", jsValue: model.wireName },
+                    {
+                      name: "properties",
+                      value: (
+                        <ts.ArrayExpression>
+                          <For each={model.properties} comma line>
+                            {(prop) => <XmlPropertyMetadata prop={prop} models={props.models} />}
+                          </For>
+                        </ts.ArrayExpression>
+                      ),
+                    },
+                  ]}
+                />
+              </ts.ObjectExpression>
+            </ts.ObjectProperty>
           )}
         </For>
-      </indent>
-      {code`};`}
+      </ts.ObjectExpression>
+      {code`;`}
     </>
   );
 }
 
-function getArrayItemNameInitializer(
+function XmlPropertyMetadata(props: {
+  prop: ServerDataModel["properties"][number];
+  models: readonly ServerDataModel[];
+}) {
+  const prop = props.prop;
+  const itemName = getArrayItemName(prop.type, prop.wireName, props.models);
+  return (
+    <ts.ObjectExpression>
+      <ObjectProperties
+        properties={[
+          { name: "name", jsValue: prop.name },
+          { name: "wireName", jsValue: prop.wireName },
+          { name: "type", value: <OperationTypeBindingExpression type={prop.type} /> },
+          { name: "attribute", jsValue: prop.xmlAttribute },
+          { name: "unwrapped", jsValue: prop.xmlUnwrapped },
+          ...(itemName === undefined ? [] : [{ name: "itemName", jsValue: itemName }]),
+        ]}
+      />
+    </ts.ObjectExpression>
+  );
+}
+
+function getArrayItemName(
   type: ServerTypeRef,
   fallback: string,
   models: readonly ServerDataModel[],
-): string {
-  if (type.kind !== "array") return "";
+): string | undefined {
+  if (type.kind !== "array") return undefined;
   const element = type.element;
   if (element.kind === "model") {
     const model = models.find((candidate) => candidate.name === element.name);
-    return `, itemName: ${JSON.stringify(model?.wireName ?? element.name)}`;
+    return model?.wireName ?? element.name;
   }
-  return `, itemName: ${JSON.stringify(fallback)}`;
-}
-
-function renderOperationTypeBinding(type: ServerTypeRef): string {
-  switch (type.kind) {
-    case "array":
-      return `{ kind: "array", element: ${renderOperationTypeBinding(type.element)} }`;
-    case "literal":
-      return `{ kind: "literal", value: ${JSON.stringify(type.value)} }`;
-    case "model":
-      return `{ kind: "model", name: ${JSON.stringify(type.name)} }`;
-    case "record":
-      return `{ kind: ${JSON.stringify(type.kind)} }`;
-    case "boolean":
-    case "datetime":
-    case "number":
-    case "string":
-    case "unknown":
-      return `{ kind: ${JSON.stringify(type.kind)} }`;
-  }
+  return fallback;
 }
 
 function DeserializeRequest(props: { operations: readonly ServerOperation[] }) {
