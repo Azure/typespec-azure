@@ -56,7 +56,6 @@ import {
   KnownCollectionFormat,
   type ServiceOperation,
 } from "../../utils/operation-util.js";
-import { toTypeScriptStringLiteral } from "../../utils/string-literal.js";
 import { AzureCoreDependencies, AzurePollingDependencies } from "../external-dependencies.js";
 import {
   buildModelDeserializer,
@@ -1371,10 +1370,7 @@ function buildStreamReturnType(info: StructuredStreamInfo): string {
     return info.itemType;
   }
   return Object.entries(info.namedEventTypes)
-    .map(
-      ([eventName, dataType]) =>
-        `{ event: ${toTypeScriptStringLiteral(eventName)}; data: ${dataType} }`,
-    )
+    .map(([eventName, dataType]) => `{ event: ${JSON.stringify(eventName)}; data: ${dataType} }`)
     .join(" | ");
 }
 
@@ -1384,11 +1380,11 @@ function buildSseDescriptors(info: StructuredStreamInfo): string {
     .map((event) => {
       const parts: string[] = [];
       if (event.eventName !== undefined) {
-        parts.push(`eventName: ${toTypeScriptStringLiteral(event.eventName)}`);
+        parts.push(`eventName: ${JSON.stringify(event.eventName)}`);
       }
       parts.push(`isTerminal: ${event.isTerminal}`);
       if (event.terminalValue !== undefined) {
-        parts.push(`terminalValue: ${toTypeScriptStringLiteral(event.terminalValue)}`);
+        parts.push(`terminalValue: ${JSON.stringify(event.terminalValue)}`);
       }
       const payloadExpression = event.deserializerName
         ? `${event.deserializerName}(data)`
@@ -1397,12 +1393,12 @@ function buildSseDescriptors(info: StructuredStreamInfo): string {
           : undefined;
       if (payloadExpression !== undefined) {
         const yielded = useEventEnvelope
-          ? `({ event: ${toTypeScriptStringLiteral(event.eventName!)}, data: ${payloadExpression} })`
+          ? `({ event: ${JSON.stringify(event.eventName!)}, data: ${payloadExpression} })`
           : payloadExpression;
         parts.push(`deserialize: (data) => ${yielded}`);
       }
       if (event.contentType !== undefined) {
-        parts.push(`contentType: ${toTypeScriptStringLiteral(event.contentType)}`);
+        parts.push(`contentType: ${JSON.stringify(event.contentType)}`);
       }
       return `{ ${parts.join(", ")} }`;
     })
