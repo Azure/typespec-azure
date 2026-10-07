@@ -74,6 +74,7 @@
     }
   },
   "dependencies": {
+    "@azure-tools/typespec-azure-examples": "workspace:^",
     "yaml": "catalog:"
   },
   "devDependencies": {

@@ -255,9 +255,9 @@ export function createRequestHandler(
         // emit a type conversion for the qv based on the array's element type
         let queryVal: string;
         const arrayQP = qp.type;
-        switch (arrayQP.elementType.kind) {
+        switch (arrayQP.itemType.kind) {
           case "constant":
-            switch (arrayQP.elementType.type) {
+            switch (arrayQP.itemType.type) {
               case "string":
                 queryVal = "string(qv)";
                 break;
@@ -482,9 +482,9 @@ function emitBody(
         }
         text += `${indent.get()}XMLName xml.Name \`xml:"${tagName}"\`\n`;
         const fieldName = naming.capitalize(bodyParam.name);
-        let tag = go.getTypeDeclaration(go.unwrapPtr(bodyParam.type.elementType), method.receiver.type.pkg);
-        if (bodyParam.type.elementType.kind === "model" && bodyParam.type.elementType.xmlName) {
-          tag = bodyParam.type.elementType.xmlName;
+        let tag = go.getTypeDeclaration(go.unwrapPtr(bodyParam.type.itemType), method.receiver.type.pkg);
+        if (bodyParam.type.itemType.kind === "model" && bodyParam.type.itemType.xmlName) {
+          tag = bodyParam.type.itemType.xmlName;
         }
         text += `${indent.get()}${fieldName} *${go.getTypeDeclaration(bodyParam.type, method.receiver.type.pkg)} \`xml:"${tag}"\`\n`;
         text += `${indent.pop().get()}}\n`;
@@ -504,8 +504,8 @@ function emitBody(
         go.isSlice(bodyParam.type, "time") &&
         isSliceOfTimeForMarshalling(bodyParam.type)
       ) {
-        const timeType = go.unwrapPtr(bodyParam.type.elementType);
-        const elementPtr = bodyParam.type.elementType.kind === "ptr" ? "*" : "";
+        const timeType = go.unwrapPtr(bodyParam.type.itemType);
+        const elementPtr = bodyParam.type.itemType.kind === "ptr" ? "*" : "";
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
         text += `${indent.get()}aux := make([]${elementPtr}datetime.${timeType.format}, len(${body}))\n`;
         text += `${indent.get()}for i := 0; i < len(${body}); i++ {\n`;
@@ -523,7 +523,7 @@ function emitBody(
         text += `${indent.get()}}\n`;
         body = "aux";
       } else if (go.isMap(bodyParam.type, "time")) {
-        const timeType = bodyParam.type.valueType.ptrType;
+        const timeType = bodyParam.type.itemType.ptrType;
         imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime/datetime");
         text += `${indent.get()}aux := map[string]*datetime.${timeType.format}{}\n`;
         text += `${indent.get()}for k, v := range ${body} {\n`;
@@ -1000,7 +1000,7 @@ function getContentTypeValue(
  * @returns true if the slice needs custom marshalling
  */
 function isSliceOfTimeForMarshalling(type: go.Slice<go.Ptr<go.Time> | go.Time>): boolean {
-  const elementType = go.unwrapPtr(type.elementType);
+  const elementType = go.unwrapPtr(type.itemType);
   switch (elementType.format) {
     case "PlainDate":
     case "RFC1123":

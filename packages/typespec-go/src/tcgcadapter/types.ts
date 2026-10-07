@@ -257,7 +257,6 @@ export class TypeAdapter {
           case "constantDef":
           case "constantValue":
           case "etag":
-          case "literal":
             throw new AdapterError(
               "UnsupportedTsp",
               `unsupported kind ${elementType.kind} for slice element type`,
@@ -265,11 +264,25 @@ export class TypeAdapter {
             );
         }
 
-        arrayType = new go.Slice(
-          !myElementTypeByValue && helpers.isPtrType(elementType)
-            ? this.getPtrType(elementType)
-            : elementType,
-        );
+        let sliceElementType: go.SliceElementType;
+        if (elementType.kind === "literal") {
+          if (!helpers.isSliceElementLiteral(elementType)) {
+            throw new AdapterError(
+              "UnsupportedTsp",
+              `unsupported literal kind ${elementType.type.kind} for slice element type`,
+              type.valueType.__raw?.node,
+            );
+          }
+          // literals are always encoded by value
+          sliceElementType = elementType;
+        } else {
+          sliceElementType =
+            !myElementTypeByValue && helpers.isPtrType(elementType)
+              ? this.getPtrType(elementType)
+              : elementType;
+        }
+
+        arrayType = new go.Slice(sliceElementType);
         arrayType.xmlName = xmlItemsName;
         this.types.set(keyName, arrayType);
         return arrayType;
@@ -1340,6 +1353,8 @@ function recursiveKeyName(
   switch (obj.kind) {
     case "array":
       return recursiveKeyName(`${root}-array`, obj.valueType, substituteDiscriminator);
+    case "constant":
+      return recursiveKeyName(`${root}-constant`, obj.valueType, substituteDiscriminator);
     case "enum":
       return `${root}-${obj.name}`;
     case "enumvalue":
@@ -1383,11 +1398,11 @@ function recursiveVariantFieldName(type: go.WireType): string {
     case "literal":
       return `Literal${recursiveVariantFieldName(type.type)}`;
     case "map":
-      return `MapOf${recursiveVariantFieldName(type.valueType)}`;
+      return `MapOf${recursiveVariantFieldName(type.itemType)}`;
     case "ptr":
       return recursiveVariantFieldName(type.ptrType);
     case "slice":
-      return `SliceOf${recursiveVariantFieldName(type.elementType)}`;
+      return `SliceOf${recursiveVariantFieldName(type.itemType)}`;
     case "scalar":
       return naming.capitalize(type.type);
     default:

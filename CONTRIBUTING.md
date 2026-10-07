@@ -29,6 +29,15 @@ The Python CI setup action uses the Python and uv versions declared in
 action. `pnpm deps check` reports version drift as part of the CI consistency
 checks.
 
+Workspace builds use native TypeScript 7 through the root `typescript-native`
+dependency, which provides `tsc` to package scripts. The `typescript` catalog entry
+aliases `@typescript/typescript6` for tools that require the JavaScript compiler
+API, and provides the separate `tsc6` command. Package manifests keep using
+`"typescript": "catalog:"`; no pnpm hook is needed. Tools and editor integrations
+that load the `typescript` package see TypeScript 6. A workspace package extension
+also gives Alloy's CLI native TypeScript because it resolves `typescript/bin/tsc`
+directly.
+
 # Testing a change in repo azure-rest-api-specs
 
 If you are proposing a change that is likely to impact existing specs, it's
@@ -506,11 +515,12 @@ Process labels
 
 Misc labels
 
-| Name                | Color   | Description                                        |
-| ------------------- | ------- | -------------------------------------------------- |
-| `good first issue`  | #7057ff | Good for newcomers                                 |
-| `int:azure-specs`   | #0e8a16 | Run integration tests against azure-rest-api-specs |
-| `agentic-workflows` | #000000 | Issues/PR created by github agentic workflows      |
+| Name                | Color   | Description                                                      |
+| ------------------- | ------- | ---------------------------------------------------------------- |
+| `good first issue`  | #7057ff | Good for newcomers                                               |
+| `int:azure-specs`   | #0e8a16 | Run integration tests against azure-rest-api-specs               |
+| `agentic-workflows` | #000000 | Issues/PR created by github agentic workflows                    |
+| `auto-merge`        | #0e8a16 | Automatically merge the pull request after all requirements pass |
 
 #### external
 

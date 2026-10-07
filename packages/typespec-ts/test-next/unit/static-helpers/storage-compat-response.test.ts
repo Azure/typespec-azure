@@ -157,6 +157,24 @@ describe("addStorageCompatResponse", () => {
     expect(result._response.parsedBody.name).toBe("test");
     expect(result._response.parsedHeaders.requestId).toBe("abc");
   });
+
+  it("should type-check with an optional response body", () => {
+    const rawResponse = createMockFullOperationResponse(204);
+    const parsedBody: { name: string } | void =
+      rawResponse.status === 200 ? { name: "test" } : undefined;
+    const parsedHeaders = { requestId: "abc" };
+
+    const result:
+      | ({ requestId: string } & { name: string } & StorageCompatResponseInfo<
+            { name: string },
+            { requestId: string }
+          >)
+      | ({ requestId: string } & StorageCompatResponseInfo<void, { requestId: string }>) =
+      addStorageCompatResponse(rawResponse, parsedBody, parsedHeaders);
+
+    expect(result._response.parsedBody).toBeUndefined();
+    expect(result.requestId).toBe("abc");
+  });
 });
 
 describe("createStorageCompatOnResponse", () => {
