@@ -59,7 +59,6 @@
   ],
   "peerDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:^",
-    "@azure-tools/typespec-azure-examples": "workspace:^",
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@typespec/compiler": "workspace:^",
@@ -75,6 +74,7 @@
     }
   },
   "dependencies": {
+    "@azure-tools/typespec-azure-examples": "workspace:^",
     "yaml": "catalog:"
   },
   "devDependencies": {

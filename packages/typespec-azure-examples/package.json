@@ -19,11 +19,19 @@
     "examples"
   ],
   "type": "module",
-  "main": "dist/src/index.js",
+  "main": "dist/src/node.js",
   "exports": {
     ".": {
+      "node": {
+        "types": "./dist/src/node.d.ts",
+        "default": "./dist/src/node.js"
+      },
       "types": "./dist/src/index.d.ts",
       "default": "./dist/src/index.js"
+    },
+    "./node": {
+      "types": "./dist/src/node.d.ts",
+      "default": "./dist/src/node.js"
     }
   },
   "bin": {
@@ -64,6 +72,7 @@
     "@typespec/compiler": "workspace:^",
     "@typespec/json-schema": "workspace:^",
     "@vitest/coverage-v8": "catalog:",
+    "esbuild": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
