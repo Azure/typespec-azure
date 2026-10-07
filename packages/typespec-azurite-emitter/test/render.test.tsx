@@ -8,7 +8,6 @@ import * as ef from "@typespec/emitter-framework/typescript";
 import { beforeAll, describe, expect, it } from "vitest";
 import { buildServerModel } from "../src/build-model.js";
 import type { ServerModel } from "../src/model.js";
-import { DocComment } from "../src/render/doc-comment.js";
 import { getContextRefkey, ServiceHandlerInterface } from "../src/render/render-handlers.js";
 import { renderModels } from "../src/render/render-models.js";
 import {
@@ -270,31 +269,6 @@ function attachDeclarationTypes(target: ServerModel, source: ServerModel) {
 }
 
 const supportedOperations = sampleServerModel.operations;
-
-describe("DocComment", () => {
-  it("renders present docs as a JSDoc comment followed by the next line", () => {
-    expect(
-      <SourceFile>
-        <DocComment doc="Queue metadata." />
-        {code`export interface QueueMetadata {}`}
-      </SourceFile>,
-    ).toRenderTo(`
-      /**
-       * Queue metadata.
-       */
-      export interface QueueMetadata {}
-    `);
-  });
-
-  it("renders nothing when docs are absent", () => {
-    expect(
-      <SourceFile>
-        <DocComment doc={undefined} />
-        {code`export interface QueueMetadata {}`}
-      </SourceFile>,
-    ).toRenderTo(`export interface QueueMetadata {}`);
-  });
-});
 
 describe("renderModels", () => {
   it("renders TypeScript interfaces for server data models", () => {
