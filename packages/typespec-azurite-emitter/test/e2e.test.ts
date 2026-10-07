@@ -11,7 +11,13 @@ describe("end-to-end emit", () => {
     const fileNames = Object.keys(outputs)
       .map((path) => path.split("/").pop())
       .sort();
-    expect(fileNames).toEqual(["handlers.ts", "models.ts", "operations.ts", "serialization.ts"]);
+    expect(fileNames).toEqual([
+      "handlers.ts",
+      "metadata.ts",
+      "models.ts",
+      "operations.ts",
+      "serialization.ts",
+    ]);
   });
 
   it("generates models.ts with all referenced data models", async () => {
@@ -64,19 +70,25 @@ describe("end-to-end emit", () => {
     expect(modelsFile).toContain("child: Child;");
   });
 
-  it("generates operations.ts with route metadata for all fixture operations", async () => {
+  it("generates metadata.ts with route metadata for all fixture operations", async () => {
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
+    const metadataFile = findOutput(outputs, "metadata.ts");
     const operationsFile = findOutput(outputs, "operations.ts");
 
-    expect(operationsFile).toContain(`defineOperations([`);
-    expect(operationsFile).toContain(`"Queue_Create"`);
-    expect(operationsFile).toContain(`"put"`);
-    expect(operationsFile).toContain(`"ListMessages"`);
-    expect(operationsFile).toContain(`"get"`);
-    expect(operationsFile).toContain(`"SetAccessPolicy"`);
-    expect(operationsFile).toContain(`"query"`);
-    expect(operationsFile).toContain(`"path"`);
-    expect(operationsFile).toContain(`from "../runtime/serializationRuntime";`);
+    expect(metadataFile).toContain(`defineServiceMetadata({`);
+    expect(metadataFile).toContain(`"Queue_Create"`);
+    expect(metadataFile).toContain(`"put"`);
+    expect(metadataFile).toContain(`"ListMessages"`);
+    expect(metadataFile).toContain(`"get"`);
+    expect(metadataFile).toContain(`"SetAccessPolicy"`);
+    expect(metadataFile).toContain(`"query"`);
+    expect(metadataFile).toContain(`"path"`);
+    expect(metadataFile).toContain(`from "../runtime/serializationRuntime";`);
+    expect(metadataFile).toContain(
+      `export const operations: readonly OperationMetadata[] = serviceMetadata.operations;`,
+    );
+    expect(operationsFile).not.toContain(`defineOperations`);
+    expect(operationsFile).not.toContain(`"Queue_Create"`);
   });
 
   it("imports referenced model types into operations.ts so the file compiles standalone", async () => {
@@ -113,10 +125,10 @@ describe("end-to-end emit", () => {
 
     expect(serializationFile).not.toContain(`@azure/ms-rest-js`);
     expect(serializationFile).toContain(`createSerializationRuntime`);
-    expect(serializationFile).toContain(`import { operations } from "./operations";`);
+    expect(serializationFile).toContain(`import { serviceMetadata } from "./metadata";`);
     expect(serializationFile).toContain(`from "../runtime/serializationRuntime";`);
     expect(serializationFile).toContain(
-      `const runtime = createSerializationRuntime({ operations, xmlModels });`,
+      `const runtime = createSerializationRuntime(serviceMetadata);`,
     );
     expect(serializationFile).toContain(
       `export const deserializeRequest = runtime.deserializeRequest;`,
@@ -127,7 +139,8 @@ describe("end-to-end emit", () => {
     expect(serializationFile).toContain(
       `export const hasGeneratedSerialization = runtime.hasGeneratedSerialization;`,
     );
-    expect(serializationFile).toContain(`const xmlModels: Record<string, XmlModelMetadata>`);
+    expect(serializationFile).not.toContain(`defineServiceMetadata`);
+    expect(serializationFile).not.toContain(`xmlModels`);
     expect(serializationFile).not.toContain(
       `function deserializeDeleteQueueRequest(req: IRequest)`,
     );
@@ -149,7 +162,8 @@ describe("end-to-end emit", () => {
     });
     const { outputs } = await customEmitterTester.compile(loadQueuePilotFixture());
 
-    expect(findOutput(outputs, "operations.ts")).toContain(`from "../custom/runtime.js";`);
+    expect(findOutput(outputs, "metadata.ts")).toContain(`from "../custom/runtime.js";`);
+    expect(findOutput(outputs, "operations.ts")).not.toContain(`../custom/runtime.js`);
     expect(findOutput(outputs, "serialization.ts")).toContain(`from "../custom/runtime.js";`);
   });
 });

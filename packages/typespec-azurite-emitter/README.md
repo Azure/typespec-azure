@@ -9,10 +9,12 @@ The package demonstrates a small but reusable emitter structure:
    emitter-owned server model.
 2. `src/render/` writes TypeScript files from that model:
    - `models.ts` — data-model interfaces.
-   - `operations.ts` — request/response types plus route metadata.
+   - `operations.ts` — request/response types.
+   - `metadata.ts` — the single generated runtime manifest containing compact HTTP operation
+     descriptors and XML model wire descriptors.
    - `handlers.ts` — handler interface methods with `(params, context)` signatures.
-   - `serialization.ts` — a thin binding that supplies XML model metadata to Azurite's shared
-     serialization runtime.
+   - `serialization.ts` — a tiny binding from `metadata.ts` to Azurite's shared serialization
+     runtime.
 
 ## Usage
 
@@ -100,11 +102,12 @@ header collection handling, and generated-operation lookup live in an Azurite-ow
 runtime imported by generated artifacts. The runtime module path is controlled by `runtimeImport`
 and defaults to `../runtime/serializationRuntime` from the generated directory. That module must
 export invariant metadata types (`OperationMetadata`, `OperationTypeBinding`,
-`XmlModelMetadata`, and related binding types), compact descriptor helpers (`defineOperations`,
-`defineXmlModels`), and `createSerializationRuntime({ operations, xmlModels })`, which returns
-`deserializeRequest`, `serializeResponse`, and `hasGeneratedSerialization`. Header collections are
-described generically with `collectionPrefix` metadata (for example `x-ms-meta-`), not with
-Queue-specific runtime special cases.
+`XmlModelMetadata`, and related binding types), compact descriptor types, `defineServiceMetadata`,
+and `createSerializationRuntime(serviceMetadata)`, which returns `deserializeRequest`,
+`serializeResponse`, and `hasGeneratedSerialization`. Header collections are described generically
+with `collectionPrefix` metadata (for example `x-ms-meta-`), not with Queue-specific runtime
+special cases. `metadata.ts` may export `operations` as a compatibility alias, but it references
+`serviceMetadata.operations` and does not duplicate descriptor data.
 
 Middleware/handler invocation code is intentionally not emitted by this package in the pilot: that
 code is Azurite-owned integration logic, varies by storage service, and must compose with
