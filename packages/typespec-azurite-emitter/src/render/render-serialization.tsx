@@ -1,7 +1,14 @@
 import { Block, code, For, List } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { ServerDataModel, ServerModel, ServerOperation, ServerTypeRef } from "../model.js";
-import { ObjectProperties, OperationTypeBindingExpression } from "./render-operations.js";
+import {
+  getOperationMetadataRefkey,
+  getOperationParameterBindingRefkey,
+  getOperationResponseHeaderBindingRefkey,
+  getOperationTypeBindingRefkey,
+  ObjectProperties,
+  OperationTypeBindingExpression,
+} from "./render-operations.js";
 import { renderFileHeader } from "./type-ref.js";
 
 /**
@@ -20,7 +27,6 @@ export function renderSerialization(serverModel: ServerModel) {
         import type IResponse from "../../generated/IResponse";
         import { parseXML, stringifyXML } from "../../generated/utils/xml";
         import { operations } from "./operations";
-        import type { OperationMetadata, OperationParameterBinding, OperationResponseHeaderBinding, OperationTypeBinding } from "./operations.js";
       `}
 
       <XmlModelMetadata models={serverModel.models} />
@@ -246,7 +252,7 @@ function SerializationSwitchCase(props: {
 
 function HelperFunctions() {
   return code`
-    function getGeneratedOperation(name: string): OperationMetadata {
+    function getGeneratedOperation(name: string): ${(<ts.Reference refkey={getOperationMetadataRefkey()} type />)} {
       const metadata = operations.find((operation) => operation.name === name);
       if (metadata === undefined) {
         throw new TypeError("Generated TypeSpec serialization metadata does not include operation " + name);
@@ -254,7 +260,7 @@ function HelperFunctions() {
       return metadata;
     }
 
-    async function deserializeMetadataRequest(metadata: OperationMetadata, req: IRequest): Promise<IHandlerParameters> {
+    async function deserializeMetadataRequest(metadata: ${(<ts.Reference refkey={getOperationMetadataRefkey()} type />)}, req: IRequest): Promise<IHandlerParameters> {
       const parameters: IHandlerParameters = {};
       for (const literal of metadata.literalQueryParameters) {
         setParameterValue(
@@ -276,7 +282,7 @@ function HelperFunctions() {
       return parameters;
     }
 
-    async function deserializeRequestBody(metadata: OperationMetadata, req: IRequest): Promise<unknown> {
+    async function deserializeRequestBody(metadata: ${(<ts.Reference refkey={getOperationMetadataRefkey()} type />)}, req: IRequest): Promise<unknown> {
       const rawBody = await readRequestIntoText(req);
       req.setBody(rawBody);
       if (metadata.requestBodyType?.kind !== "model") return rawBody;
@@ -290,7 +296,7 @@ function HelperFunctions() {
     }
 
     function deserializeParameter(
-      parameter: OperationParameterBinding,
+      parameter: ${(<ts.Reference refkey={getOperationParameterBindingRefkey()} type />)},
       req: IRequest,
       headerCollectionValues: Map<string, Record<string, string | string[]>>,
     ): unknown {
@@ -307,7 +313,7 @@ function HelperFunctions() {
       return deserializeValue(parameter.type, req.getHeader(parameter.wireName), parameter.wireName, parameter.required);
     }
 
-    function serializeMetadataResponse(metadata: OperationMetadata, res: IResponse, handlerResponse: any): void {
+    function serializeMetadataResponse(metadata: ${(<ts.Reference refkey={getOperationMetadataRefkey()} type />)}, res: IResponse, handlerResponse: any): void {
       const statusCode = handlerResponse.statusCode;
       res.setStatusCode(statusCode);
       const response = metadata.responses.find((candidate) => candidate.statusCode === statusCode) ?? metadata.responses.find((candidate) => candidate.statusCode === "*");
@@ -322,7 +328,7 @@ function HelperFunctions() {
       }
     }
 
-    function serializeResponseBody(res: IResponse, type: OperationTypeBinding, handlerResponse: any): void {
+    function serializeResponseBody(res: IResponse, type: ${(<ts.Reference refkey={getOperationTypeBindingRefkey()} type />)}, handlerResponse: any): void {
       if (type.kind !== "model") return;
       const metadata = getXmlModel(type.name);
       const bodyValue = handlerResponse.body ?? coerceResponseBodyValue(handlerResponse, metadata);
@@ -373,7 +379,7 @@ function HelperFunctions() {
       return value?.[prop.itemName ?? prop.wireName];
     }
 
-    function deserializeXmlValue(value: any, type: OperationTypeBinding, prop?: XmlPropertyMetadata): unknown {
+    function deserializeXmlValue(value: any, type: ${(<ts.Reference refkey={getOperationTypeBindingRefkey()} type />)}, prop?: XmlPropertyMetadata): unknown {
       if (value === undefined || value === null) return undefined;
       switch (type.kind) {
         case "model":
@@ -421,7 +427,7 @@ function HelperFunctions() {
       return result;
     }
 
-    function serializeXmlValue(value: any, type: OperationTypeBinding, prop?: XmlPropertyMetadata): unknown {
+    function serializeXmlValue(value: any, type: ${(<ts.Reference refkey={getOperationTypeBindingRefkey()} type />)}, prop?: XmlPropertyMetadata): unknown {
       if (value === undefined) return undefined;
       switch (type.kind) {
         case "model":
@@ -446,7 +452,7 @@ function HelperFunctions() {
       }
     }
 
-    function serializeResponseHeader(res: IResponse, header: OperationResponseHeaderBinding, handlerResponse: any): void {
+    function serializeResponseHeader(res: IResponse, header: ${(<ts.Reference refkey={getOperationResponseHeaderBindingRefkey()} type />)}, handlerResponse: any): void {
       const headerCollectionPrefix = getHeaderCollectionPrefix(header.wireName);
       if (headerCollectionPrefix !== undefined) {
         setHeaderCollection(res, headerCollectionPrefix, handlerResponse[header.name]);
@@ -456,7 +462,7 @@ function HelperFunctions() {
     }
 
     function deserializeValue(
-      type: OperationTypeBinding,
+      type: ${(<ts.Reference refkey={getOperationTypeBindingRefkey()} type />)},
       value: string | string[] | undefined,
       wireName: string,
       required: boolean,
@@ -532,7 +538,7 @@ function HelperFunctions() {
       return normalized === undefined ? undefined : normalized.split(",").map(itemDeserializer);
     }
 
-    function deserializeArrayItem(type: OperationTypeBinding, value: string): unknown {
+    function deserializeArrayItem(type: ${(<ts.Reference refkey={getOperationTypeBindingRefkey()} type />)}, value: string): unknown {
       switch (type.kind) {
         case "number":
           return Number(value);
@@ -572,7 +578,7 @@ function HelperFunctions() {
       return values;
     }
 
-    function serializeValue(type: OperationTypeBinding, value: unknown): string | number | boolean | undefined {
+    function serializeValue(type: ${(<ts.Reference refkey={getOperationTypeBindingRefkey()} type />)}, value: unknown): string | number | boolean | undefined {
       if (value === undefined) return undefined;
       switch (type.kind) {
         case "datetime":
@@ -626,12 +632,12 @@ function HelperFunctions() {
       leafParent[parameterPath[parameterPath.length - 1]] = parameterValue;
     }
 
-    function getParameterPath(parameter: OperationParameterBinding): string | readonly string[] {
+    function getParameterPath(parameter: ${(<ts.Reference refkey={getOperationParameterBindingRefkey()} type />)}): string | readonly string[] {
       if (!parameter.required) return ["options", getHandlerParameterName(parameter)];
       return getHandlerParameterName(parameter);
     }
 
-    function getHandlerParameterName(parameter: OperationParameterBinding): string {
+    function getHandlerParameterName(parameter: ${(<ts.Reference refkey={getOperationParameterBindingRefkey()} type />)}): string {
       if (parameter.wireName.toLowerCase() === "visibilitytimeout") return "visibilitytimeout";
       return parameter.wireName.toLowerCase() === "x-ms-client-request-id" ? "requestId" : parameter.name;
     }

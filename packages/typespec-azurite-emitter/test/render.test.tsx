@@ -6,9 +6,10 @@ import type { Program } from "@typespec/compiler";
 import { Output } from "@typespec/emitter-framework";
 import * as ef from "@typespec/emitter-framework/typescript";
 import { beforeAll, describe, expect, it } from "vitest";
+import { buildServerModel } from "../src/build-model.js";
 import type { ServerModel } from "../src/model.js";
 import { DocComment } from "../src/render/doc-comment.js";
-import { ServiceHandlerInterface } from "../src/render/render-handlers.js";
+import { getContextRefkey, ServiceHandlerInterface } from "../src/render/render-handlers.js";
 import { renderModels } from "../src/render/render-models.js";
 import {
   getOperationParametersRefkey,
@@ -22,7 +23,6 @@ import {
   SerializeResponse,
   XmlModelMetadata,
 } from "../src/render/render-serialization.js";
-import { renderTypeRef, TypeRef } from "../src/render/type-ref.js";
 import { ApiTester } from "./tester.js";
 
 let testProgram: Program;
@@ -35,9 +35,46 @@ beforeAll(async () => {
 
       @service
       namespace RenderTest;
+
+      @doc("Queue metadata.")
+      model QueueMetadata {
+        @doc("A description.")
+        description?: string;
+        publicAccess?: boolean;
+      }
+
+      model QueueMessage {
+        messageId: string;
+        tags?: string[];
+      }
+
+      @route("/{queueName}")
+      interface Queue {
+        @doc("Creates a queue.")
+        @put
+        op CreateQueue(@path queueName: string, @body body: string): {
+          @statusCode statusCode: 201;
+          @header("x-ms-request-id") requestId: string;
+        };
+
+        @delete
+        op DeleteQueue(@path queueName: string): {
+          @statusCode statusCode: 204;
+          @header("x-ms-request-id") requestId: string;
+          @body body: QueueMessage;
+        };
+
+        @get
+        @route("/metadata")
+        op GetMetadata(@path queueName: string): {
+          @statusCode statusCode: 200;
+          @body body: QueueMetadata;
+        };
+      }
     `,
   });
   testProgram = program;
+  attachDeclarationTypes(sampleServerModel, buildServerModel(program));
 });
 
 function Wrapper(props: { children: Children }) {
@@ -121,7 +158,7 @@ const sampleServerModel: ServerModel = {
         },
       ],
       requestBody: {
-        type: { kind: "model", name: "QueueMetadata" },
+        type: { kind: "string" },
         contentTypes: ["application/json"],
         parameterPath: "body",
       },
@@ -173,36 +210,66 @@ const sampleServerModel: ServerModel = {
   skippedOperations: [],
 };
 
-const supportedOperations = sampleServerModel.operations;
+function attachDeclarationTypes(target: ServerModel, source: ServerModel) {
+  for (const targetModel of target.models) {
+    const sourceModel = source.models.find((model) => model.name === targetModel.name);
+    if (sourceModel?.declarationModel) {
+      Object.defineProperty(targetModel, "declarationModel", {
+        value: sourceModel.declarationModel,
+        enumerable: false,
+      });
+    }
+  }
 
-describe("renderTypeRef", () => {
-  it("renders primitive, model, array, and literal ServerTypeRef values", () => {
-    expect(renderTypeRef({ kind: "string" })).toBe("string");
-    expect(renderTypeRef({ kind: "number" })).toBe("number");
-    expect(renderTypeRef({ kind: "boolean" })).toBe("boolean");
-    expect(renderTypeRef({ kind: "unknown" })).toBe("unknown");
-    expect(renderTypeRef({ kind: "model", name: "QueueMetadata" })).toBe("QueueMetadata");
-    expect(renderTypeRef({ kind: "array", element: { kind: "string" } })).toBe("string[]");
-    expect(renderTypeRef({ kind: "array", element: { kind: "model", name: "QueueMessage" } })).toBe(
-      "QueueMessage[]",
+  for (const targetOperation of target.operations) {
+    const sourceOperation = source.operations.find(
+      (operation) => operation.name === targetOperation.name,
     );
-    expect(renderTypeRef({ kind: "literal", value: "foo" })).toBe(`"foo"`);
-    expect(renderTypeRef({ kind: "literal", value: 42 })).toBe("42");
-    expect(renderTypeRef({ kind: "literal", value: true })).toBe("true");
-  });
-});
+    if (!sourceOperation) continue;
+    for (const targetParameter of targetOperation.parameters) {
+      const sourceParameter = sourceOperation.parameters.find(
+        (parameter) => parameter.name === targetParameter.name,
+      );
+      if (sourceParameter?.declarationType) {
+        Object.defineProperty(targetParameter, "declarationType", {
+          value: sourceParameter.declarationType,
+          enumerable: false,
+        });
+      }
+    }
+    if (targetOperation.requestBody && sourceOperation.requestBody?.declarationType) {
+      Object.defineProperty(targetOperation.requestBody, "declarationType", {
+        value: sourceOperation.requestBody.declarationType,
+        enumerable: false,
+      });
+    }
+    for (const targetResponse of targetOperation.responses) {
+      const sourceResponse = sourceOperation.responses.find(
+        (response) => response.statusCode === targetResponse.statusCode,
+      );
+      if (!sourceResponse) continue;
+      for (const targetHeader of targetResponse.headers) {
+        const sourceHeader = sourceResponse.headers.find(
+          (header) => header.name === targetHeader.name,
+        );
+        if (sourceHeader?.declarationType) {
+          Object.defineProperty(targetHeader, "declarationType", {
+            value: sourceHeader.declarationType,
+            enumerable: false,
+          });
+        }
+      }
+      if (targetResponse.body && sourceResponse.body?.declarationType) {
+        Object.defineProperty(targetResponse.body, "declarationType", {
+          value: sourceResponse.body.declarationType,
+          enumerable: false,
+        });
+      }
+    }
+  }
+}
 
-describe("TypeRef", () => {
-  it("renders transformed server types as Alloy components", () => {
-    expect(
-      <SourceFile>
-        <TypeRef type={{ kind: "array", element: { kind: "model", name: "QueueMessage" } }} />
-        {code` | `}
-        <TypeRef type={{ kind: "literal", value: "foo" }} />
-      </SourceFile>,
-    ).toRenderTo(`QueueMessage[] | "foo"`);
-  });
-});
+const supportedOperations = sampleServerModel.operations;
 
 describe("DocComment", () => {
   it("renders present docs as a JSDoc comment followed by the next line", () => {
@@ -246,7 +313,7 @@ describe("renderModels", () => {
       }
       export interface QueueMessage {
         messageId: string;
-        tags?: string[];
+        tags?: Array<string>;
       }
     `);
   });
@@ -262,7 +329,7 @@ describe("renderOperations", () => {
        */
       export interface CreateQueueParameters {
         queueName: string;
-        body: QueueMetadata;
+        body: string;
 
       }
       export type CreateQueueResponse =
@@ -373,8 +440,7 @@ describe("renderOperations", () => {
           requestBodyContentTypes: ["application/json"],
           requestBodyParameterPath: "body",
           requestBodyType: {
-            kind: "model",
-            name: "QueueMetadata",
+            kind: "string",
           },
           responses: [
             {
@@ -429,7 +495,7 @@ describe("renderOperations", () => {
           ],
           interfaceName: "Queue"
         }
-      ];
+      ]
     `);
   });
 
@@ -483,7 +549,7 @@ describe("ServiceHandlerInterface", () => {
           </ts.TypeDeclaration>
         </ts.SourceFile>
         <ts.SourceFile path="handlers.ts">
-          <ef.InterfaceDeclaration export name="Context">
+          <ef.InterfaceDeclaration export name="Context" refkey={getContextRefkey()}>
             <ts.InterfaceMember readonly name="contextId" type={code`string`} />
             {code`;`}
           </ef.InterfaceDeclaration>

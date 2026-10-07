@@ -2,7 +2,7 @@ import { code, For } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import * as ef from "@typespec/emitter-framework/typescript";
 import type { ServerDataModel, ServerModel } from "../model.js";
-import { renderFileHeader, TypeRef } from "./type-ref.js";
+import { renderFileHeader } from "./type-ref.js";
 
 /**
  * Renders the `models.ts` artifact: one TypeScript interface per named data model
@@ -21,28 +21,9 @@ export function renderModels(serverModel: ServerModel) {
 
 function ModelDeclaration(props: { model: ServerDataModel }) {
   const model = props.model;
-  if (model.declarationModel) {
-    return <ef.InterfaceDeclaration export type={model.declarationModel} name={model.name} />;
+  if (!model.declarationModel) {
+    throw new Error(`Model ${model.name} is missing its derived TypeSpec declaration model.`);
   }
 
-  return (
-    <ef.InterfaceDeclaration export name={model.name} doc={model.doc}>
-      <For each={model.properties} semicolon line enderPunctuation>
-        {(prop) => (
-          <ts.InterfaceMember
-            name={prop.name}
-            optional={prop.optional}
-            doc={prop.doc}
-            type={
-              <TypeRef
-                type={prop.type}
-                sourceType={prop.sourceProperty?.type}
-                declarationType={prop.declarationProperty?.type}
-              />
-            }
-          />
-        )}
-      </For>
-    </ef.InterfaceDeclaration>
-  );
+  return <ef.InterfaceDeclaration export type={model.declarationModel} name={model.name} />;
 }

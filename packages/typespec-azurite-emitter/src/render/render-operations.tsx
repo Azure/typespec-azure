@@ -1,8 +1,10 @@
 import { code, For, refkey, Show, type Children, type Refkey } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
+import type { Type } from "@typespec/compiler";
 import * as ef from "@typespec/emitter-framework/typescript";
+import { TypeExpression } from "@typespec/emitter-framework/typescript";
 import type { ServerModel, ServerOperation, ServerResponse, ServerTypeRef } from "../model.js";
-import { renderFileHeader, TypeRef } from "./type-ref.js";
+import { renderFileHeader } from "./type-ref.js";
 
 export function getOperationParametersRefkey(operation: ServerOperation): Refkey {
   return refkey(operation.name, "parameters");
@@ -10,6 +12,33 @@ export function getOperationParametersRefkey(operation: ServerOperation): Refkey
 
 export function getOperationResponseRefkey(operation: ServerOperation): Refkey {
   return refkey(operation.name, "response");
+}
+
+export function getOperationTypeBindingRefkey(): Refkey {
+  return refkey("operation-type-binding");
+}
+
+export function getOperationMetadataRefkey(): Refkey {
+  return refkey("operation-metadata");
+}
+
+export function getOperationsRefkey(): Refkey {
+  return refkey("operations");
+}
+
+export function getOperationParameterBindingRefkey(): Refkey {
+  return refkey("operation-parameter-binding");
+}
+
+export function getOperationResponseHeaderBindingRefkey(): Refkey {
+  return refkey("operation-response-header-binding");
+}
+
+function requireDeclarationType(type: Type | undefined, context: string): Type {
+  if (!type) {
+    throw new Error(`${context} is missing its derived TypeSpec declaration type.`);
+  }
+  return type;
 }
 
 function ParametersInterface(props: { operation: ServerOperation }) {
@@ -29,10 +58,11 @@ function ParametersInterface(props: { operation: ServerOperation }) {
                 name={param.name}
                 optional={param.optional}
                 type={
-                  <TypeRef
-                    type={param.type}
-                    sourceType={param.sourceProperty?.type}
-                    declarationType={param.declarationType}
+                  <TypeExpression
+                    type={requireDeclarationType(
+                      param.declarationType,
+                      `Parameter ${op.name}.${param.name}`,
+                    )}
                   />
                 }
               />
@@ -47,10 +77,11 @@ function ParametersInterface(props: { operation: ServerOperation }) {
               <ts.InterfaceMember
                 name="body"
                 type={
-                  <TypeRef
-                    type={op.requestBody!.type}
-                    sourceType={op.requestBody!.sourceType}
-                    declarationType={op.requestBody!.declarationType}
+                  <TypeExpression
+                    type={requireDeclarationType(
+                      op.requestBody!.declarationType,
+                      `Request body for ${op.name}`,
+                    )}
                   />
                 }
               />
@@ -88,10 +119,11 @@ function ResponseHeaders(props: { response: ServerResponse }) {
             name={header.name}
             optional={header.optional}
             type={
-              <TypeRef
-                type={header.type}
-                sourceType={header.sourceProperty?.type}
-                declarationType={header.declarationType}
+              <TypeExpression
+                type={requireDeclarationType(
+                  header.declarationType,
+                  `Response header ${header.name}`,
+                )}
               />
             }
           />
@@ -124,10 +156,8 @@ function responseInterfaceMembers(response: ServerResponse): Children[] {
       <ts.InterfaceMember
         name="body"
         type={
-          <TypeRef
-            type={response.body.type}
-            sourceType={response.body.sourceType}
-            declarationType={response.body.declarationType}
+          <TypeExpression
+            type={requireDeclarationType(response.body.declarationType, "Response body")}
           />
         }
       />,
@@ -162,29 +192,54 @@ function MetadataDefinitions() {
     <>
       <OperationTypeBindingDeclaration />
       <hbr />
-      <ef.InterfaceDeclaration export name="OperationParameterBinding">
+      <ef.InterfaceDeclaration
+        export
+        name="OperationParameterBinding"
+        refkey={getOperationParameterBindingRefkey()}
+      >
         <ReadonlyMember name="name" type={code`string`} />
         <ReadonlyMember name="wireName" type={code`string`} />
         <ReadonlyMember name="location" type={code`"path" | "query" | "header"`} />
         <ReadonlyMember name="required" type={code`boolean`} />
-        <ReadonlyMember name="type" type={code`OperationTypeBinding`} />
+        <ReadonlyMember
+          name="type"
+          type={<ts.Reference refkey={getOperationTypeBindingRefkey()} type />}
+        />
       </ef.InterfaceDeclaration>
       <hbr />
-      <ef.InterfaceDeclaration export name="OperationResponseHeaderBinding">
+      <ef.InterfaceDeclaration
+        export
+        name="OperationResponseHeaderBinding"
+        refkey={getOperationResponseHeaderBindingRefkey()}
+      >
         <ReadonlyMember name="name" type={code`string`} />
         <ReadonlyMember name="wireName" type={code`string`} />
-        <ReadonlyMember name="type" type={code`OperationTypeBinding`} />
+        <ReadonlyMember
+          name="type"
+          type={<ts.Reference refkey={getOperationTypeBindingRefkey()} type />}
+        />
       </ef.InterfaceDeclaration>
       <hbr />
       <ef.InterfaceDeclaration export name="OperationResponseMetadata">
         <ReadonlyMember name="statusCode" type={code`number | "*"`} />
-        <ReadonlyMember name="headers" type={code`readonly OperationResponseHeaderBinding[]`} />
+        <ReadonlyMember
+          name="headers"
+          type={
+            <>
+              readonly <ts.Reference refkey={getOperationResponseHeaderBindingRefkey()} type />
+              []
+            </>
+          }
+        />
         <ReadonlyMember
           name="body"
           optional
           type={
             <ts.InterfaceExpression>
-              <ReadonlyMember name="type" type={code`OperationTypeBinding`} />
+              <ReadonlyMember
+                name="type"
+                type={<ts.Reference refkey={getOperationTypeBindingRefkey()} type />}
+              />
             </ts.InterfaceExpression>
           }
         />
@@ -195,7 +250,11 @@ function MetadataDefinitions() {
         <ReadonlyMember name="value" type={code`string`} />
       </ef.InterfaceDeclaration>
       <hbr />
-      <ef.InterfaceDeclaration export name="OperationMetadata">
+      <ef.InterfaceDeclaration
+        export
+        name="OperationMetadata"
+        refkey={getOperationMetadataRefkey()}
+      >
         <ReadonlyMember name="name" type={code`string`} />
         <ReadonlyMember name="verb" type={code`string`} />
         <ReadonlyMember name="rawPath" type={code`string`} />
@@ -206,7 +265,15 @@ function MetadataDefinitions() {
         />
         <ReadonlyMember name="requiredQueryParameters" type={code`readonly string[]`} />
         <ReadonlyMember name="requiredHeaderParameters" type={code`readonly string[]`} />
-        <ReadonlyMember name="parameters" type={code`readonly OperationParameterBinding[]`} />
+        <ReadonlyMember
+          name="parameters"
+          type={
+            <>
+              readonly <ts.Reference refkey={getOperationParameterBindingRefkey()} type />
+              []
+            </>
+          }
+        />
         <ReadonlyMember name="hasRequestBody" type={code`boolean`} />
         <ReadonlyMember name="requestBodyContentTypes" type={code`readonly string[]`} />
         <ReadonlyMember
@@ -214,7 +281,11 @@ function MetadataDefinitions() {
           optional
           type={code`string | readonly string[]`}
         />
-        <ReadonlyMember name="requestBodyType" optional type={code`OperationTypeBinding`} />
+        <ReadonlyMember
+          name="requestBodyType"
+          optional
+          type={<ts.Reference refkey={getOperationTypeBindingRefkey()} type />}
+        />
         <ReadonlyMember name="responses" type={code`readonly OperationResponseMetadata[]`} />
         <ReadonlyMember name="interfaceName" optional type={code`string`} />
       </ef.InterfaceDeclaration>
@@ -225,7 +296,7 @@ function MetadataDefinitions() {
 
 function OperationTypeBindingDeclaration() {
   return (
-    <ef.TypeDeclaration export name="OperationTypeBinding">
+    <ef.TypeDeclaration export name="OperationTypeBinding" refkey={getOperationTypeBindingRefkey()}>
       <hbr />
       <indent>
         {code`| `}
@@ -251,7 +322,10 @@ function OperationTypeBindingDeclaration() {
         {code`| `}
         <ts.InterfaceExpression>
           <ReadonlyMember name="kind" type={code`"array"`} />
-          <ReadonlyMember name="element" type={code`OperationTypeBinding`} />
+          <ReadonlyMember
+            name="element"
+            type={<ts.Reference refkey={getOperationTypeBindingRefkey()} type />}
+          />
         </ts.InterfaceExpression>
       </indent>
     </ef.TypeDeclaration>
@@ -301,15 +375,25 @@ export function ObjectProperties(props: { properties: readonly ObjectPropertyDes
 
 function OperationsMetadata(props: { operations: readonly ServerOperation[] }) {
   return (
-    <>
-      {code`export const operations: readonly OperationMetadata[] = `}
-      <ts.ArrayExpression>
-        <For each={props.operations} comma line>
-          {(operation) => <OperationMetadata operation={operation} />}
-        </For>
-      </ts.ArrayExpression>
-      {code`;`}
-    </>
+    <ts.VarDeclaration
+      export
+      const
+      name="operations"
+      refkey={getOperationsRefkey()}
+      type={
+        <>
+          readonly <ts.Reference refkey={getOperationMetadataRefkey()} type />
+          []
+        </>
+      }
+      initializer={
+        <ts.ArrayExpression>
+          <For each={props.operations} comma line>
+            {(operation) => <OperationMetadata operation={operation} />}
+          </For>
+        </ts.ArrayExpression>
+      }
+    />
   );
 }
 
