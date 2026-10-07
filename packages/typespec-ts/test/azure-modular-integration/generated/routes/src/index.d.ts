@@ -209,7 +209,11 @@ export declare interface QueryParametersOperations {
 export declare interface QueryParametersQueryContinuationExplodeArrayOptionalParams extends OperationOptions {
 }
 
+export declare interface QueryParametersQueryContinuationExplodeModelOptionalParams extends OperationOptions {
+}
+
 export declare interface QueryParametersQueryContinuationExplodeOperations {
+    model: (param: ExpandParameters, options?: QueryParametersQueryContinuationExplodeModelOptionalParams) => Promise<void>;
     record: (param: Record<string, number>, options?: QueryParametersQueryContinuationExplodeRecordOptionalParams) => Promise<void>;
     array: (param: string[], options?: QueryParametersQueryContinuationExplodeArrayOptionalParams) => Promise<void>;
     primitive: (param: string, options?: QueryParametersQueryContinuationExplodePrimitiveOptionalParams) => Promise<void>;
@@ -229,7 +233,11 @@ export declare interface QueryParametersQueryContinuationOperations {
 export declare interface QueryParametersQueryContinuationStandardArrayOptionalParams extends OperationOptions {
 }
 
+export declare interface QueryParametersQueryContinuationStandardModelOptionalParams extends OperationOptions {
+}
+
 export declare interface QueryParametersQueryContinuationStandardOperations {
+    model: (param: ExpandParameters, options?: QueryParametersQueryContinuationStandardModelOptionalParams) => Promise<void>;
     record: (param: Record<string, number>, options?: QueryParametersQueryContinuationStandardRecordOptionalParams) => Promise<void>;
     array: (param: string[], options?: QueryParametersQueryContinuationStandardArrayOptionalParams) => Promise<void>;
     primitive: (param: string, options?: QueryParametersQueryContinuationStandardPrimitiveOptionalParams) => Promise<void>;
@@ -268,7 +276,11 @@ export declare interface QueryParametersQueryExpansionOperations {
 export declare interface QueryParametersQueryExpansionStandardArrayOptionalParams extends OperationOptions {
 }
 
+export declare interface QueryParametersQueryExpansionStandardModelOptionalParams extends OperationOptions {
+}
+
 export declare interface QueryParametersQueryExpansionStandardOperations {
+    model: (param: ExpandParameters, options?: QueryParametersQueryExpansionStandardModelOptionalParams) => Promise<void>;
     record: (param: Record<string, number>, options?: QueryParametersQueryExpansionStandardRecordOptionalParams) => Promise<void>;
     array: (param: string[], options?: QueryParametersQueryExpansionStandardArrayOptionalParams) => Promise<void>;
     primitive: (param: string, options?: QueryParametersQueryExpansionStandardPrimitiveOptionalParams) => Promise<void>;
