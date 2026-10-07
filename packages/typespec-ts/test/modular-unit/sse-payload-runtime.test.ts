@@ -7,7 +7,7 @@ import { clearCompileCache } from "../util/test-util.js";
 
 interface EventPayload {
   event: string;
-  data: string | { value: string };
+  data: string | number | boolean | { value: string };
 }
 
 interface GeneratedOperations {
@@ -16,6 +16,13 @@ interface GeneratedOperations {
     options?: { abortSignal?: AbortSignal; requestOptions?: { headers?: Record<string, string> } },
   ): Promise<AsyncIterable<EventPayload>>;
   receiveXml(context: unknown): Promise<AsyncIterable<EventPayload>>;
+  receiveJsonTerminal(context: unknown): Promise<AsyncIterable<EventPayload>>;
+  receiveMessageTerminal(context: unknown): Promise<AsyncIterable<EventPayload>>;
+  receiveUnnamedTerminal(context: unknown): Promise<AsyncIterable<string | { value: string }>>;
+  receiveModelTerminal(context: unknown): Promise<AsyncIterable<EventPayload>>;
+  receiveNumericTerminal(context: unknown): Promise<AsyncIterable<EventPayload>>;
+  receiveBooleanTerminal(context: unknown): Promise<AsyncIterable<EventPayload>>;
+  receiveOnlyTerminal(context: unknown): Promise<AsyncIterable<"[DONE]">>;
 }
 
 describe("generated SSE payload formats", () => {
@@ -70,6 +77,53 @@ describe("generated SSE payload formats", () => {
 
       @route("receiveXml")
       op receiveXml(): SSEStream<PayloadEvents> | StorageError;
+
+      @events
+      union JsonTerminalEvents {
+        @Events.contentType("application/json")
+        @terminalEvent
+        complete: "finished",
+      }
+      @route("receiveJsonTerminal")
+      op receiveJsonTerminal(): SSEStream<JsonTerminalEvents>;
+
+      @events
+      union MessageTerminalEvents {
+        message: Payload,
+        @terminalEvent
+        "[DONE]",
+      }
+      @route("receiveMessageTerminal")
+      op receiveMessageTerminal(): SSEStream<MessageTerminalEvents>;
+
+      @events
+      union UnnamedTerminalEvents {
+        Payload,
+        @terminalEvent
+        "[DONE]",
+      }
+      @route("receiveUnnamedTerminal")
+      op receiveUnnamedTerminal(): SSEStream<UnnamedTerminalEvents>;
+
+      @events
+      union ModelTerminalEvents { @terminalEvent complete: Payload }
+      @route("receiveModelTerminal")
+      op receiveModelTerminal(): SSEStream<ModelTerminalEvents>;
+
+      @events
+      union NumericTerminalEvents { @terminalEvent complete: 42 }
+      @route("receiveNumericTerminal")
+      op receiveNumericTerminal(): SSEStream<NumericTerminalEvents>;
+
+      @events
+      union BooleanTerminalEvents { @terminalEvent complete: false }
+      @route("receiveBooleanTerminal")
+      op receiveBooleanTerminal(): SSEStream<BooleanTerminalEvents>;
+
+      @events
+      union OnlyTerminalEvents { @terminalEvent "[DONE]" }
+      @route("receiveOnlyTerminal")
+      op receiveOnlyTerminal(): SSEStream<OnlyTerminalEvents>;
     `,
       { "include-headers-in-response": true, needTCGC: true },
     );
@@ -185,9 +239,71 @@ describe("generated SSE payload formats", () => {
       { event: "scalarEnvelope", data: "payload only" },
       { event: "modelEnvelope", data: { value: "wrapped model" } },
       { event: "propertyOverride", data: "property format" },
+      { event: "message", data: "[DONE]" },
     ]);
     expect(fixture.nodeBody.destroyed).toBe(true);
     expect(fixture.send).toHaveBeenCalledOnce();
+  });
+
+  it("yields a JSON-encoded constant terminal and ignores trailing events", async () => {
+    const fixture = transport(
+      "Node",
+      'event: complete\ndata: "finished"\n\nevent: complete\ndata: "finished"\n\n',
+      "200",
+      undefined,
+      true,
+    );
+    expect(await collect(await operations.receiveJsonTerminal(fixture.context))).toEqual([
+      { event: "complete", data: "finished" },
+    ]);
+    expect(fixture.nodeBody.destroyed).toBe(true);
+  });
+
+  it("preserves message payloads alongside an unnamed terminal with the same output event name", async () => {
+    const fixture = transport(
+      "Node",
+      'event: message\ndata: {"wire_value":"hello"}\n\ndata: [DONE]\n\n',
+    );
+    expect(await collect(await operations.receiveMessageTerminal(fixture.context))).toEqual([
+      { event: "message", data: { value: "hello" } },
+      { event: "message", data: "[DONE]" },
+    ]);
+  });
+
+  it("keeps unnamed streams payload-only while yielding their terminal constant", async () => {
+    const fixture = transport("Node", 'data: {"wire_value":"hello"}\n\ndata: [DONE]\n\n');
+    const values: (string | { value: string })[] = [];
+    for await (const value of await operations.receiveUnnamedTerminal(fixture.context)) {
+      values.push(value);
+    }
+    expect(values).toEqual([{ value: "hello" }, "[DONE]"]);
+  });
+
+  it.each([
+    ["receiveModelTerminal", '{"wire_value":"finished"}', { value: "finished" }],
+    ["receiveNumericTerminal", "42", 42],
+    ["receiveBooleanTerminal", "false", false],
+  ] as const)("yields the typed terminal payload for %s", async (operation, data, value) => {
+    const fixture = transport(
+      "Node",
+      `event: complete\ndata: ${data}\n\nevent: complete\ndata: ${data}\n\n`,
+      "200",
+      undefined,
+      true,
+    );
+    expect(await collect(await operations[operation](fixture.context))).toEqual([
+      { event: "complete", data: value },
+    ]);
+    expect(fixture.nodeBody.destroyed).toBe(true);
+  });
+
+  it("yields a raw constant when an unnamed stream contains only a terminal", async () => {
+    const fixture = transport("Node", "data: [DONE]\n\n");
+    const values: "[DONE]"[] = [];
+    for await (const value of await operations.receiveOnlyTerminal(fixture.context)) {
+      values.push(value);
+    }
+    expect(values).toEqual(["[DONE]"]);
   });
 
   it.each(["Node", "browser"] as const)(
@@ -324,7 +440,12 @@ describe("generated SSE payload formats", () => {
   it("preserves the published core-sse browser terminal cleanup error rather than suppressing it", async () => {
     const fixture = transport("browser", "data: [DONE]\n\n", "200", undefined, true);
     const stream = await browserOperations.receive(fixture.context);
-    await expect(collect(stream)).rejects.toThrow("ReadableStream is locked");
+    const iterator = stream[Symbol.asyncIterator]();
+    await expect(iterator.next()).resolves.toEqual({
+      done: false,
+      value: { event: "message", data: "[DONE]" },
+    });
+    await expect(iterator.next()).rejects.toThrow("ReadableStream is locked");
     expect(fixture.cancel).not.toHaveBeenCalled();
     expect(fixture.send).toHaveBeenCalledOnce();
   });

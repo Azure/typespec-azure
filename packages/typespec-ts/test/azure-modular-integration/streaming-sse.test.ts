@@ -46,11 +46,12 @@ describe("SSE Streaming Client", () => {
     const events = await collect(await client.named.receive());
 
     // Named events keep their `event:` name alongside the payload, so callers can narrow
-    // without a cast. Terminal `data: [DONE]` is consumed by the reader and never yielded.
+    // without a cast. The unnamed terminal uses the default `message` event name.
     assert.deepEqual(events, [
       { event: "responseCreated", data: { id: "resp_1" } },
       { event: "responseDelta", data: { delta: "Hello" } },
       { event: "responseDelta", data: { delta: " world" } },
+      { event: "message", data: "[DONE]" },
     ]);
 
     // The discriminant narrows `data` to the matching payload type with no cast.
@@ -70,6 +71,7 @@ describe("SSE Streaming Client", () => {
       { event: "partialResult", data: { text: "partial one" } },
       { event: "partialResult", data: { text: "partial two" } },
       { event: "finalResult", data: { references: ["doc1", "doc2"] } },
+      { event: "message", data: "[DONE]" },
     ]);
   });
 

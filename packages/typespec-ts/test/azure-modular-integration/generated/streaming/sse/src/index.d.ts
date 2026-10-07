@@ -68,6 +68,9 @@ export declare interface NamedOperations {
     } | {
         event: "responseDelta";
         data: ResponseDelta;
+    } | {
+        event: "message";
+        data: "[DONE]";
     }>>;
 }
 
@@ -177,6 +180,9 @@ export declare interface RetrieveOperations {
     } | {
         event: "finalResult";
         data: FinalResult;
+    } | {
+        event: "message";
+        data: "[DONE]";
     }>>;
 }
 

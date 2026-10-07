@@ -11,8 +11,7 @@ export interface SseEventDescriptor<T> {
    */
   eventName?: string;
   /**
-   * Whether receiving this event terminates the stream. Typed terminal payloads are yielded before
-   * termination; constant terminal sentinels are consumed internally.
+   * Whether receiving this event terminates the stream after yielding its payload.
    */
   isTerminal: boolean;
   /**
@@ -29,10 +28,10 @@ export interface SseEventDescriptor<T> {
   contentType?: string;
   /**
    * Deserializes the event's `data` payload into the target type. The input is the JSON-parsed
-   * value for JSON payloads, or the raw `data` string otherwise. Omitted for constant terminal
-   * sentinels, whose payloads are never yielded.
+   * value for JSON payloads, or the raw `data` string otherwise. Matched constant terminal values
+   * are passed through as raw strings so their generated deserializers can return the typed constant.
    */
-  deserialize?: (data: any) => T;
+  deserialize: (data: any) => T;
 }
 
 function isJsonContentType(contentType: string | undefined): boolean {
@@ -75,8 +74,7 @@ function resolveDescriptor<T>(
  * event to the matching {@link SseEventDescriptor} by its `event:` name and yielding the
  * deserialized payload.
  *
- * Terminal events end the stream. Typed terminal payloads are yielded before disconnecting;
- * constant `terminalValue` sentinels are consumed internally. A sentinel is only compared against
+ * All terminal payloads are yielded before disconnecting. A constant sentinel is only compared against
  * events with the same `event:` name, so an unrelated event carrying the same `data` cannot end
  * the stream.
  *
@@ -95,29 +93,20 @@ export async function* readSseStream<T>(
       continue;
     }
 
-    if (descriptor.terminalValue !== undefined) {
-      if (descriptor.isTerminal) {
-        return;
+    let payload: unknown;
+    if (descriptor.terminalValue !== undefined || !isJsonContentType(descriptor.contentType)) {
+      payload = event.data;
+    } else {
+      try {
+        payload = JSON.parse(event.data);
+      } catch (error) {
+        const eventName = event.event || "message";
+        throw new Error(`Unable to deserialize event "${eventName}".`, {
+          cause: error,
+        });
       }
-      continue;
     }
-
-    if (descriptor.deserialize) {
-      let payload: unknown;
-      if (isJsonContentType(descriptor.contentType)) {
-        try {
-          payload = JSON.parse(event.data);
-        } catch (error) {
-          const eventName = event.event || "message";
-          throw new Error(`Unable to deserialize event "${eventName}".`, {
-            cause: error,
-          });
-        }
-      } else {
-        payload = event.data;
-      }
-      yield descriptor.deserialize(payload);
-    }
+    yield descriptor.deserialize(payload);
     if (descriptor.isTerminal) {
       return;
     }

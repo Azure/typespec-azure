@@ -1137,13 +1137,7 @@ interface StructuredStreamEvent {
   isTerminal: boolean;
   terminalValue?: string;
   contentType?: string;
-  deserializerName?: string;
-  /**
-   * True for a payload variant whose payload type needs no model deserializer (e.g. a
-   * primitive/scalar/enum). The raw JSON-parsed value (or raw `data` string for non-JSON content)
-   * is yielded as-is via an identity deserializer.
-   */
-  identityDeserialize?: boolean;
+  deserializeExpression: string;
 }
 
 /**
@@ -1157,9 +1151,9 @@ interface StructuredStreamInfo {
   /**
    * Maps SSE event names to their payload types, producing the discriminated union
    * `{ event: "name1"; data: Type1 } | { event: "name2"; data: Type2 }`. Present only when every
-   * yielded event of the stream is named, so the envelope is never partially applied.
+   * non-terminal event is named; unnamed terminals use the default `message` event name.
    */
-  namedEventTypes?: Record<string, string>;
+  namedEventTypes?: Map<string, string>;
 }
 
 function getSsePayloadContentType(
@@ -1214,42 +1208,46 @@ export function getStructuredStreamInfo(
   if (sseMetadata && kind === "sse") {
     const events: StructuredStreamEvent[] = [];
     const payloadTypeExpressions: string[] = [];
-    const namedEventTypes: Record<string, string> = {};
+    const namedEventTypes = new Map<string, string>();
     let everyPayloadEventIsNamed = true;
+    let hasNamedEvent = false;
     for (const sseEvent of sseMetadata.events) {
+      hasNamedEvent ||= sseEvent.eventType !== undefined;
       const event: StructuredStreamEvent = {
         eventName: sseEvent.eventType,
         isTerminal: sseEvent.isTerminalEvent,
+        deserializeExpression: "data",
       };
-      if (sseEvent.isTerminalEvent && sseEvent.payloadType.kind === "constant") {
-        // A constant terminal payload is a control sentinel (for example `[DONE]`). It is consumed
-        // by the reader, so it needs no deserializer and contributes no type to the item union.
-        event.terminalValue = String(sseEvent.payloadType.value);
+      const contentType = getSsePayloadContentType(context, sseEvent);
+      event.contentType = contentType;
+      if (sseEvent.payloadType.kind === "constant") {
+        event.deserializeExpression = JSON.stringify(sseEvent.payloadType.value);
+        if (sseEvent.isTerminalEvent) {
+          event.terminalValue =
+            contentType !== undefined && /\bjson\b/i.test(contentType)
+              ? event.deserializeExpression
+              : String(sseEvent.payloadType.value);
+        }
       } else {
-        // Typed terminal payloads are application data: deserialize and yield them before the
-        // reader terminates so final response and error models are not lost.
         const deserializerName = buildModelDeserializer(context, sseEvent.payloadType, {
           nameOnly: true,
           skipDiscriminatedUnionSuffix: false,
         });
         if (typeof deserializerName === "string") {
-          event.deserializerName = deserializerName;
-        } else {
-          // A payload whose type needs no model deserializer (primitive/scalar/enum). Yield the
-          // raw payload via an identity deserializer instead of dropping it.
-          event.identityDeserialize = true;
+          event.deserializeExpression = `${deserializerName}(data)`;
         }
-        const contentType = getSsePayloadContentType(context, sseEvent);
-        if (contentType !== undefined) {
-          event.contentType = contentType;
-        }
-        const payloadType = getTypeExpression(context, sseEvent.payloadType);
-        payloadTypeExpressions.push(payloadType);
-        if (sseEvent.eventType === undefined) {
-          everyPayloadEventIsNamed = false;
-        } else {
-          namedEventTypes[sseEvent.eventType] = payloadType;
-        }
+      }
+      const payloadType = getTypeExpression(context, sseEvent.payloadType);
+      payloadTypeExpressions.push(payloadType);
+      const eventName = sseEvent.eventType ?? (sseEvent.isTerminalEvent ? "message" : undefined);
+      if (eventName === undefined) {
+        everyPayloadEventIsNamed = false;
+      } else {
+        const existingType = namedEventTypes.get(eventName);
+        namedEventTypes.set(
+          eventName,
+          existingType ? `${existingType} | ${payloadType}` : payloadType,
+        );
       }
       events.push(event);
     }
@@ -1258,9 +1256,8 @@ export function getStructuredStreamInfo(
         ? Array.from(new Set(payloadTypeExpressions)).join(" | ")
         : getTypeExpression(context, streamMetadata.streamType);
     const result: StructuredStreamInfo = { kind: "sse", itemType, events };
-    // Only emit the `{ event, data }` envelope when every yielded event carries a name, so the
-    // declared union always matches what the reader yields at runtime.
-    if (everyPayloadEventIsNamed && Object.keys(namedEventTypes).length > 0) {
+    // Preserve payload-only unnamed streams; named streams give unnamed terminals the default name.
+    if (everyPayloadEventIsNamed && hasNamedEvent) {
       result.namedEventTypes = namedEventTypes;
     }
     return result;
@@ -1369,7 +1366,7 @@ function buildStreamReturnType(info: StructuredStreamInfo): string {
   if (!info.namedEventTypes) {
     return info.itemType;
   }
-  return Object.entries(info.namedEventTypes)
+  return Array.from(info.namedEventTypes)
     .map(([eventName, dataType]) => `{ event: ${JSON.stringify(eventName)}; data: ${dataType} }`)
     .join(" | ");
 }
@@ -1386,17 +1383,10 @@ function buildSseDescriptors(info: StructuredStreamInfo): string {
       if (event.terminalValue !== undefined) {
         parts.push(`terminalValue: ${JSON.stringify(event.terminalValue)}`);
       }
-      const payloadExpression = event.deserializerName
-        ? `${event.deserializerName}(data)`
-        : event.identityDeserialize
-          ? "data"
-          : undefined;
-      if (payloadExpression !== undefined) {
-        const yielded = useEventEnvelope
-          ? `({ event: ${JSON.stringify(event.eventName!)}, data: ${payloadExpression} })`
-          : payloadExpression;
-        parts.push(`deserialize: (data) => ${yielded}`);
-      }
+      const yielded = useEventEnvelope
+        ? `({ event: ${JSON.stringify(event.eventName ?? "message")}, data: ${event.deserializeExpression} })`
+        : event.deserializeExpression;
+      parts.push(`deserialize: (data) => ${yielded}`);
       if (event.contentType !== undefined) {
         parts.push(`contentType: ${JSON.stringify(event.contentType)}`);
       }
