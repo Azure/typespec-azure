@@ -32,6 +32,19 @@ import type {
 } from "./model.js";
 import { getName, getPascalName } from "./utils.js";
 
+interface TypeMetadata {
+  readonly runtime: ServerTypeRef;
+  readonly declaration: Type;
+}
+
+type BuiltOperationParameter = ServerOperationParameter & { readonly declarationType: Type };
+type BuiltRequestBody = ServerRequestBody & { readonly declarationType: Type };
+type BuiltResponseHeader = ServerResponseHeader & { readonly declarationType: Type };
+type BuiltResponse = Omit<ServerResponse, "headers" | "body"> & {
+  readonly headers: BuiltResponseHeader[];
+  readonly body?: BuiltRequestBody;
+};
+
 /**
  * Builds the intermediate {@link ServerModel} for the (single) HTTP service found in the
  * compiled program. This is the "transform" phase: it walks `@typespec/http` metadata and
@@ -99,28 +112,22 @@ function buildOperation(
   );
   const route = splitRoutePath(op.path);
   const doc = getDocHelper(program, op.operation);
-  const operation = {
+  const operation: ServerOperation = {
     name,
     verb: op.verb,
     rawPath: op.path,
     path: route.path,
     literalQueryParameters: route.literalQueryParameters,
-    parameters,
-    requestBody,
-    responses,
+    parameters: parameters.map(stripParameter),
+    parametersModel: createOperationParametersModel(program, name, parameters, requestBody, doc),
+    requestBody: requestBody && stripRequestBody(requestBody),
+    responses: responses.map(stripResponse),
+    responseUnion: createOperationResponseUnion(program, name, responses),
     doc,
     interfaceName: op.operation.interface?.name,
   };
 
-  return withSource(
-    withSource(
-      operation,
-      "parametersModel",
-      createOperationParametersModel(program, name, parameters, requestBody, doc),
-    ),
-    "responseUnion",
-    createOperationResponseUnion(program, name, responses),
-  );
+  return operation;
 }
 
 function getOperationName(
@@ -166,24 +173,18 @@ function buildParameter(
   param: HttpOperationParameter,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
-): ServerOperationParameter {
+): BuiltOperationParameter {
   const location: ServerParameterLocation =
     param.type === "cookie" ? "header" : (param.type as ServerParameterLocation);
-  return withSource(
-    withSource(
-      {
-        name: getName(program, param.param, param.param.name),
-        wireName: param.name,
-        location,
-        type: toTypeRef(program, param.param.type, modelRegistry, anonymousModelNames),
-        optional: param.param.optional,
-      },
-      "declarationType",
-      toDeclarationType(program, param.param.type, modelRegistry, anonymousModelNames),
-    ),
-    "sourceProperty",
-    param.param,
-  );
+  const type = getTypeMetadata(program, param.param.type, modelRegistry, anonymousModelNames);
+  return {
+    name: getName(program, param.param, param.param.name),
+    wireName: param.name,
+    location,
+    type: type.runtime,
+    declarationType: type.declaration,
+    optional: param.param.optional,
+  };
 }
 
 function buildRequestBody(
@@ -191,20 +192,14 @@ function buildRequestBody(
   body: HttpPayloadBody,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
-): ServerRequestBody {
-  return withSource(
-    withSource(
-      {
-        type: toTypeRef(program, body.type, modelRegistry, anonymousModelNames),
-        contentTypes: body.contentTypes,
-        parameterPath: getBodyParameterPath(program, body),
-      },
-      "declarationType",
-      toDeclarationType(program, body.type, modelRegistry, anonymousModelNames),
-    ),
-    "sourceType",
-    body.type,
-  );
+): BuiltRequestBody {
+  const type = getTypeMetadata(program, body.type, modelRegistry, anonymousModelNames);
+  return {
+    type: type.runtime,
+    declarationType: type.declaration,
+    contentTypes: body.contentTypes,
+    parameterPath: getBodyParameterPath(program, body),
+  };
 }
 
 function getBodyParameterPath(program: Program, body: HttpPayloadBody): string | readonly string[] {
@@ -224,26 +219,18 @@ function buildResponse(
   response: HttpOperationResponse,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
-): ServerResponse {
+): BuiltResponse {
   const content = response.responses[0];
-  const headers: ServerResponseHeader[] = [];
+  const headers: BuiltResponseHeader[] = [];
   for (const [headerWireName, prop] of Object.entries(content?.headers ?? {})) {
-    headers.push(
-      withSource(
-        withSource(
-          {
-            name: getName(program, prop, prop.name),
-            wireName: headerWireName,
-            type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
-            optional: prop.optional,
-          },
-          "declarationType",
-          toDeclarationType(program, prop.type, modelRegistry, anonymousModelNames),
-        ),
-        "sourceProperty",
-        prop,
-      ),
-    );
+    const type = getTypeMetadata(program, prop.type, modelRegistry, anonymousModelNames);
+    headers.push({
+      name: getName(program, prop, prop.name),
+      wireName: headerWireName,
+      type: type.runtime,
+      declarationType: type.declaration,
+      optional: prop.optional,
+    });
   }
 
   return {
@@ -256,70 +243,100 @@ function buildResponse(
   };
 }
 
-/**
- * Converts a TypeSpec {@link Type} into a {@link ServerTypeRef}, registering any named model
- * into `modelRegistry` (recursively) the first time it is seen.
- */
-function toTypeRef(
+function stripParameter(parameter: BuiltOperationParameter): ServerOperationParameter {
+  const { declarationType, ...serverParameter } = parameter;
+  return serverParameter;
+}
+
+function stripRequestBody(body: BuiltRequestBody): ServerRequestBody {
+  const { declarationType, ...serverBody } = body;
+  return serverBody;
+}
+
+function stripResponse(response: BuiltResponse): ServerResponse {
+  return {
+    ...response,
+    headers: response.headers.map(stripResponseHeader),
+    body: response.body && stripRequestBody(response.body),
+  };
+}
+
+function stripResponseHeader(header: BuiltResponseHeader): ServerResponseHeader {
+  const { declarationType, ...serverHeader } = header;
+  return serverHeader;
+}
+
+function getTypeMetadata(
   program: Program,
   type: Type,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
-): ServerTypeRef {
+): TypeMetadata {
   const tk = $(program);
   switch (type.kind) {
     case "Scalar":
-      if (tk.scalar.extendsNumeric(type)) return { kind: "number" };
-      if (tk.scalar.extendsString(type)) return { kind: "string" };
+      if (tk.scalar.extendsNumeric(type)) return { runtime: { kind: "number" }, declaration: type };
+      if (tk.scalar.extendsString(type)) return { runtime: { kind: "string" }, declaration: type };
       if (
         tk.scalar.extendsUtcDateTime(type) ||
         tk.scalar.extendsOffsetDateTime(type) ||
         tk.scalar.extendsPlainDate(type) ||
         tk.scalar.extendsPlainTime(type)
       ) {
-        return { kind: "datetime" };
+        return { runtime: { kind: "datetime" }, declaration: tk.builtin.string };
       }
-      if (tk.scalar.extendsBoolean(type)) return { kind: "boolean" };
-      return { kind: "unknown" };
+      if (tk.scalar.extendsBoolean(type))
+        return { runtime: { kind: "boolean" }, declaration: type };
+      return { runtime: { kind: "unknown" }, declaration: type };
     case "Boolean":
-      return { kind: "literal", value: type.value };
+      return { runtime: { kind: "literal", value: type.value }, declaration: type };
     case "String":
-      return { kind: "literal", value: type.value };
+      return { runtime: { kind: "literal", value: type.value }, declaration: type };
     case "Number":
-      return { kind: "literal", value: type.numericValue.asNumber() ?? 0 };
+      return {
+        runtime: { kind: "literal", value: type.numericValue.asNumber() ?? 0 },
+        declaration: type,
+      };
     case "Enum": {
-      return { kind: "string" };
+      return { runtime: { kind: "string" }, declaration: tk.builtin.string };
     }
     case "Model": {
       if (tk.array.is(type)) {
+        const element = getTypeMetadata(
+          program,
+          tk.array.getElementType(type),
+          modelRegistry,
+          anonymousModelNames,
+        );
         return {
-          kind: "array",
-          element: toTypeRef(
-            program,
-            tk.array.getElementType(type),
-            modelRegistry,
-            anonymousModelNames,
-          ),
+          runtime: { kind: "array", element: element.runtime },
+          declaration: tk.array.create(element.declaration),
         };
       }
       if (tk.record.is(type)) {
+        const element = getTypeMetadata(
+          program,
+          tk.record.getElementType(type),
+          modelRegistry,
+          anonymousModelNames,
+        );
         return {
-          kind: "record",
-          element: toTypeRef(
-            program,
-            tk.record.getElementType(type),
-            modelRegistry,
-            anonymousModelNames,
-          ),
+          runtime: { kind: "record", element: element.runtime },
+          declaration: tk.record.create(element.declaration),
         };
       }
-      return registerModel(program, type, modelRegistry, anonymousModelNames);
+      const runtime = registerModel(program, type, modelRegistry, anonymousModelNames);
+      return {
+        runtime,
+        declaration:
+          runtime.kind === "model" ? modelRegistry.get(runtime.name)!.declarationModel : type,
+      };
     }
     case "Union": {
-      return { kind: "unknown" };
+      return { runtime: { kind: "unknown" }, declaration: tk.intrinsic.any };
     }
     default:
-      return { kind: "unknown" };
+      return { runtime: { kind: "unknown" }, declaration: type };
   }
 }
 
@@ -334,36 +351,17 @@ function registerModel(
   if (!modelRegistry.has(name)) {
     const declarationModel = createDeclarationModel(program, name, model);
     // Insert a placeholder first to guard against infinite recursion on cyclic models.
-    modelRegistry.set(
-      name,
-      withSource({ name, wireName: name, properties: [] }, "declarationModel", declarationModel),
-    );
+    modelRegistry.set(name, { name, wireName: name, properties: [], declarationModel });
     const properties = [...tk.model.getProperties(model).values()].map((prop) =>
       buildModelProperty(program, prop, declarationModel, modelRegistry, anonymousModelNames),
     );
-    declarationModel.properties.clear();
-    for (const prop of properties) {
-      if (prop.declarationProperty) {
-        declarationModel.properties.set(prop.declarationProperty.name, prop.declarationProperty);
-      }
-    }
-    modelRegistry.set(
+    modelRegistry.set(name, {
       name,
-      withSource(
-        withSource(
-          {
-            name,
-            wireName: $(program).type.getEncodedName(model, "application/xml"),
-            properties,
-            doc: getDocHelper(program, model),
-          },
-          "declarationModel",
-          declarationModel,
-        ),
-        "sourceModel",
-        model,
-      ),
-    );
+      wireName: $(program).type.getEncodedName(model, "application/xml"),
+      properties,
+      declarationModel,
+      doc: getDocHelper(program, model),
+    });
   }
   return { kind: "model", name };
 }
@@ -424,7 +422,12 @@ function findStructurallyEquivalentNamedModel(
         matches = false;
         break;
       }
-      const typeRef = toTypeRef(program, prop.type, modelRegistry, anonymousModelNames);
+      const typeRef = getTypeMetadata(
+        program,
+        prop.type,
+        modelRegistry,
+        anonymousModelNames,
+      ).runtime;
       if (JSON.stringify(candidateProp.type) !== JSON.stringify(typeRef)) {
         matches = false;
         break;
@@ -442,83 +445,17 @@ function buildModelProperty(
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): ServerModelProperty {
-  const declarationProperty = createDeclarationProperty(
-    program,
-    prop,
-    declarationModel,
-    modelRegistry,
-    anonymousModelNames,
-  );
-  return withSource(
-    withSource(
-      {
-        name: getName(program, prop, prop.name),
-        wireName: $(program).type.getEncodedName(prop, "application/xml"),
-        type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
-        declarationProperty,
-        optional: prop.optional,
-        xmlAttribute: isAttribute(program, prop),
-        xmlUnwrapped: isUnwrapped(program, prop),
-        doc: getDocHelper(program, prop),
-      },
-      "declarationProperty",
-      declarationProperty,
-    ),
-    "sourceProperty",
-    prop,
-  );
-}
-
-function toDeclarationType(
-  program: Program,
-  type: Type,
-  modelRegistry: Map<string, ServerDataModel>,
-  anonymousModelNames: Map<Model, string>,
-): Type {
-  const tk = $(program);
-  switch (type.kind) {
-    case "Scalar":
-      if (
-        tk.scalar.extendsUtcDateTime(type) ||
-        tk.scalar.extendsOffsetDateTime(type) ||
-        tk.scalar.extendsPlainDate(type) ||
-        tk.scalar.extendsPlainTime(type)
-      ) {
-        return tk.builtin.string;
-      }
-      return type;
-    case "Enum":
-      return tk.builtin.string;
-    case "Model":
-      if (tk.array.is(type)) {
-        return tk.array.create(
-          toDeclarationType(
-            program,
-            tk.array.getElementType(type),
-            modelRegistry,
-            anonymousModelNames,
-          ),
-        );
-      }
-      if (tk.record.is(type)) {
-        return tk.record.create(
-          toDeclarationType(
-            program,
-            tk.record.getElementType(type),
-            modelRegistry,
-            anonymousModelNames,
-          ),
-        );
-      }
-      const modelRef = registerModel(program, type, modelRegistry, anonymousModelNames);
-      return modelRef.kind === "model"
-        ? (modelRegistry.get(modelRef.name)?.declarationModel ?? type)
-        : type;
-    case "Union":
-      return tk.intrinsic.any;
-    default:
-      return type;
-  }
+  const type = getTypeMetadata(program, prop.type, modelRegistry, anonymousModelNames);
+  createDeclarationProperty(program, prop, declarationModel, type);
+  return {
+    name: getName(program, prop, prop.name),
+    wireName: $(program).type.getEncodedName(prop, "application/xml"),
+    type: type.runtime,
+    optional: prop.optional,
+    xmlAttribute: isAttribute(program, prop),
+    xmlUnwrapped: isUnwrapped(program, prop),
+    doc: getDocHelper(program, prop),
+  };
 }
 
 function createDeclarationModel(program: Program, name: string, sourceModel: Model): Model {
@@ -534,28 +471,28 @@ function createDeclarationModel(program: Program, name: string, sourceModel: Mod
 
 function createDeclarationProperty(
   program: Program,
-  sourceProperty: ModelProperty,
+  source: ModelProperty,
   declarationModel: Model,
-  modelRegistry: Map<string, ServerDataModel>,
-  anonymousModelNames: Map<Model, string>,
+  type: TypeMetadata,
 ): ModelProperty {
   const tk = $(program);
   const property = tk.modelProperty.create({
-    name: getName(program, sourceProperty, sourceProperty.name),
-    type: toDeclarationType(program, sourceProperty.type, modelRegistry, anonymousModelNames),
-    optional: sourceProperty.optional,
-    defaultValue: sourceProperty.defaultValue,
+    name: getName(program, source, source.name),
+    type: type.declaration,
+    optional: source.optional,
+    defaultValue: source.defaultValue,
   });
   property.model = declarationModel;
-  applyDoc(program, property, getDocHelper(program, sourceProperty));
+  declarationModel.properties.set(property.name, property);
+  applyDoc(program, property, getDocHelper(program, source));
   return property;
 }
 
 function createOperationParametersModel(
   program: Program,
   operationName: string,
-  parameters: readonly ServerOperationParameter[],
-  requestBody: ServerRequestBody | undefined,
+  parameters: readonly BuiltOperationParameter[],
+  requestBody: BuiltRequestBody | undefined,
   doc: string | undefined,
 ): Model {
   const tk = $(program);
@@ -569,7 +506,7 @@ function createOperationParametersModel(
   for (const parameter of parameters) {
     const property = tk.modelProperty.create({
       name: parameter.name,
-      type: parameter.declarationType!,
+      type: parameter.declarationType,
       optional: parameter.optional,
     });
     property.model = model;
@@ -579,7 +516,7 @@ function createOperationParametersModel(
   if (requestBody !== undefined) {
     const property = tk.modelProperty.create({
       name: "body",
-      type: requestBody.declarationType!,
+      type: requestBody.declarationType,
       optional: false,
     });
     property.model = model;
@@ -592,7 +529,7 @@ function createOperationParametersModel(
 function createOperationResponseUnion(
   program: Program,
   operationName: string,
-  responses: readonly ServerResponse[],
+  responses: readonly BuiltResponse[],
 ) {
   const tk = $(program);
   return tk.union.create({
@@ -607,7 +544,7 @@ function createOperationResponseUnion(
   });
 }
 
-function createOperationResponseModel(program: Program, response: ServerResponse): Model {
+function createOperationResponseModel(program: Program, response: BuiltResponse): Model {
   const tk = $(program);
   const model = tk.model.create({
     properties: {},
@@ -638,7 +575,7 @@ function createOperationResponseModel(program: Program, response: ServerResponse
   if (response.body !== undefined) {
     const bodyProperty = tk.modelProperty.create({
       name: "body",
-      type: response.body.declarationType!,
+      type: response.body.declarationType,
       optional: false,
     });
     bodyProperty.model = model;
@@ -650,7 +587,7 @@ function createOperationResponseModel(program: Program, response: ServerResponse
 
 function createResponseHeadersModel(
   program: Program,
-  headers: readonly ServerResponseHeader[],
+  headers: readonly BuiltResponseHeader[],
 ): Model {
   const tk = $(program);
   const model = tk.model.create({
@@ -661,7 +598,7 @@ function createResponseHeadersModel(
   for (const header of headers) {
     const property = tk.modelProperty.create({
       name: header.name,
-      type: header.declarationType!,
+      type: header.declarationType,
       optional: header.optional,
     });
     property.model = model;
@@ -673,23 +610,11 @@ function createResponseHeadersModel(
 
 function applyDoc(program: Program, target: Type, doc: string | undefined): void {
   if (!doc) return;
+  // Typekit can read docs but does not expose a public setter; use the public @doc
+  // decorator so emitter-framework typed declarations can infer copied docs.
   $doc({ program } as DecoratorContext, target, doc);
 }
 
 function getDocHelper(program: Program, target: Type): string | undefined {
   return $(program).type.getDoc(target);
-}
-
-function withSource<T extends object, K extends string, V>(
-  value: T,
-  key: K,
-  source: V,
-): T & { readonly [P in K]: V } {
-  Object.defineProperty(value, key, {
-    configurable: false,
-    enumerable: false,
-    value: source,
-    writable: false,
-  });
-  return value as T & { readonly [P in K]: V };
 }

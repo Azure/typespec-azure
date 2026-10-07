@@ -25,6 +25,8 @@ import {
 import { ApiTester } from "./tester.js";
 
 let testProgram: Program;
+let sampleServerModel: ServerModel;
+let supportedOperations: ServerModel["operations"];
 
 beforeAll(async () => {
   const { program } = await ApiTester.compile({
@@ -79,7 +81,17 @@ beforeAll(async () => {
     `,
   });
   testProgram = program;
-  attachDeclarationTypes(sampleServerModel, buildServerModel(program));
+  const builtModel = buildServerModel(program);
+  sampleServerModel = {
+    ...builtModel,
+    models: builtModel.models.filter((model) =>
+      ["QueueMetadata", "QueueMessage"].includes(model.name),
+    ),
+    operations: builtModel.operations.filter((operation) =>
+      ["CreateQueue", "DeleteQueue"].includes(operation.name),
+    ),
+  };
+  supportedOperations = sampleServerModel.operations;
 });
 
 function Wrapper(props: { children: Children }) {
@@ -93,196 +105,6 @@ function SourceFile(props: { children: Children }) {
     </Wrapper>
   );
 }
-
-const sampleServerModel: ServerModel = {
-  serviceName: "QueuePilot",
-  models: [
-    {
-      name: "QueueMetadata",
-      wireName: "QueueMetadata",
-      doc: "Queue metadata.",
-      properties: [
-        {
-          name: "description",
-          wireName: "Description",
-          type: { kind: "string" },
-          optional: true,
-          xmlAttribute: false,
-          xmlUnwrapped: false,
-          doc: "A description.",
-        },
-        {
-          name: "publicAccess",
-          wireName: "PublicAccess",
-          type: { kind: "boolean" },
-          optional: true,
-          xmlAttribute: false,
-          xmlUnwrapped: false,
-        },
-      ],
-    },
-    {
-      name: "QueueMessage",
-      wireName: "QueueMessage",
-      properties: [
-        {
-          name: "messageId",
-          wireName: "MessageId",
-          type: { kind: "string" },
-          optional: false,
-          xmlAttribute: false,
-          xmlUnwrapped: false,
-        },
-        {
-          name: "tags",
-          wireName: "Tags",
-          type: { kind: "array", element: { kind: "string" } },
-          optional: true,
-          xmlAttribute: false,
-          xmlUnwrapped: false,
-        },
-      ],
-    },
-  ],
-  operations: [
-    {
-      name: "CreateQueue",
-      verb: "put",
-      rawPath: "/{queueName}",
-      path: "/{queueName}",
-      literalQueryParameters: [],
-      doc: "Creates a queue.",
-      interfaceName: "Queue",
-      parameters: [
-        {
-          name: "queueName",
-          wireName: "queueName",
-          location: "path",
-          type: { kind: "string" },
-          optional: false,
-        },
-      ],
-      requestBody: {
-        type: { kind: "string" },
-        contentTypes: ["application/json"],
-        parameterPath: "body",
-      },
-      responses: [
-        {
-          statusCode: 201,
-          headers: [
-            {
-              name: "requestId",
-              wireName: "x-ms-request-id",
-              type: { kind: "string" },
-              optional: false,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      name: "DeleteQueue",
-      verb: "delete",
-      rawPath: "/{queueName}",
-      path: "/{queueName}",
-      literalQueryParameters: [],
-      interfaceName: "Queue",
-      parameters: [
-        {
-          name: "queueName",
-          wireName: "queueName",
-          location: "path",
-          type: { kind: "string" },
-          optional: false,
-        },
-      ],
-      responses: [
-        {
-          statusCode: 204,
-          headers: [
-            {
-              name: "requestId",
-              wireName: "x-ms-request-id",
-              type: { kind: "string" },
-              optional: false,
-            },
-          ],
-        },
-      ],
-    },
-  ],
-  skippedOperations: [],
-};
-
-function attachDeclarationTypes(target: ServerModel, source: ServerModel) {
-  for (const targetModel of target.models) {
-    const sourceModel = source.models.find((model) => model.name === targetModel.name);
-    if (sourceModel?.declarationModel) {
-      Object.defineProperty(targetModel, "declarationModel", {
-        value: sourceModel.declarationModel,
-        enumerable: false,
-      });
-    }
-  }
-
-  for (const targetOperation of target.operations) {
-    const sourceOperation = source.operations.find(
-      (operation) => operation.name === targetOperation.name,
-    );
-    if (!sourceOperation) continue;
-    Object.defineProperty(targetOperation, "parametersModel", {
-      value: sourceOperation.parametersModel,
-      enumerable: false,
-    });
-    Object.defineProperty(targetOperation, "responseUnion", {
-      value: sourceOperation.responseUnion,
-      enumerable: false,
-    });
-    for (const targetParameter of targetOperation.parameters) {
-      const sourceParameter = sourceOperation.parameters.find(
-        (parameter) => parameter.name === targetParameter.name,
-      );
-      if (sourceParameter?.declarationType) {
-        Object.defineProperty(targetParameter, "declarationType", {
-          value: sourceParameter.declarationType,
-          enumerable: false,
-        });
-      }
-    }
-    if (targetOperation.requestBody && sourceOperation.requestBody?.declarationType) {
-      Object.defineProperty(targetOperation.requestBody, "declarationType", {
-        value: sourceOperation.requestBody.declarationType,
-        enumerable: false,
-      });
-    }
-    for (const targetResponse of targetOperation.responses) {
-      const sourceResponse = sourceOperation.responses.find(
-        (response) => response.statusCode === targetResponse.statusCode,
-      );
-      if (!sourceResponse) continue;
-      for (const targetHeader of targetResponse.headers) {
-        const sourceHeader = sourceResponse.headers.find(
-          (header) => header.name === targetHeader.name,
-        );
-        if (sourceHeader?.declarationType) {
-          Object.defineProperty(targetHeader, "declarationType", {
-            value: sourceHeader.declarationType,
-            enumerable: false,
-          });
-        }
-      }
-      if (targetResponse.body && sourceResponse.body?.declarationType) {
-        Object.defineProperty(targetResponse.body, "declarationType", {
-          value: sourceResponse.body.declarationType,
-          enumerable: false,
-        });
-      }
-    }
-  }
-}
-
-const supportedOperations = sampleServerModel.operations;
 
 describe("renderModels", () => {
   it("renders TypeScript interfaces for server data models", () => {
@@ -407,7 +229,7 @@ describe("renderOperations", () => {
             }
           ],
           hasRequestBody: true,
-          requestBodyContentTypes: ["application/json"],
+          requestBodyContentTypes: ["text/plain"],
           requestBodyParameterPath: "body",
           requestBodyType: {
             kind: "string",
@@ -495,7 +317,7 @@ describe("renderOperations", () => {
           }
         ],
         hasRequestBody: true,
-        requestBodyContentTypes: ["application/json"],
+        requestBodyContentTypes: ["text/plain"],
         requestBodyParameterPath: "body",
         requestBodyType: {
           kind: "string",
@@ -628,7 +450,7 @@ describe("renderSerialization components", () => {
           properties: [
             {
               name: "description",
-              wireName: "Description",
+              wireName: "description",
               type: {
                 kind: "string",
               },
@@ -637,7 +459,7 @@ describe("renderSerialization components", () => {
             },
             {
               name: "publicAccess",
-              wireName: "PublicAccess",
+              wireName: "publicAccess",
               type: {
                 kind: "boolean",
               },
@@ -652,7 +474,7 @@ describe("renderSerialization components", () => {
           properties: [
             {
               name: "messageId",
-              wireName: "MessageId",
+              wireName: "messageId",
               type: {
                 kind: "string",
               },
@@ -661,7 +483,7 @@ describe("renderSerialization components", () => {
             },
             {
               name: "tags",
-              wireName: "Tags",
+              wireName: "tags",
               type: {
                 kind: "array",
                 element: {
@@ -670,7 +492,7 @@ describe("renderSerialization components", () => {
               },
               attribute: false,
               unwrapped: false,
-              itemName: "Tags",
+              itemName: "tags",
             }
           ],
         },

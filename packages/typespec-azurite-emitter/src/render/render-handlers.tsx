@@ -2,8 +2,8 @@ import { code, For } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import * as ef from "@typespec/emitter-framework/typescript";
 import type { ServerModel } from "../model.js";
+import { renderFileHeader } from "./file-header.js";
 import { contextRefkey, operationParametersRefkey, operationResponseRefkey } from "./refkeys.js";
-import { renderFileHeader } from "./type-ref.js";
 
 export function renderHandlers(serverModel: ServerModel) {
   return (

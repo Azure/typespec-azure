@@ -1,6 +1,7 @@
 import { Block, code, For, List } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { ServerDataModel, ServerModel, ServerOperation, ServerTypeRef } from "../model.js";
+import { renderFileHeader } from "./file-header.js";
 import {
   operationMetadataRefkey,
   operationParameterBindingRefkey,
@@ -8,7 +9,6 @@ import {
   operationTypeBindingRefkey,
 } from "./refkeys.js";
 import { operationTypeBindingValue } from "./render-operations.js";
-import { renderFileHeader } from "./type-ref.js";
 
 /**
  * Renders Azurite request/response serialization helpers for the first Queue slice.
