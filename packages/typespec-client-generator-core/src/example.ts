@@ -258,7 +258,7 @@ export async function handleClientExamples(
         for (const honorRenaming of [true, false]) {
           const operationId = resolveOperationId(exampleMatchingContext, operation, honorRenaming);
           if (unified) {
-            const entries = unified.byOperation.get(deriveOperationKey(operationId).toLowerCase());
+            const entries = unified.byOperation.get(deriveOperationKey(operationId));
             if (entries && method.operation.kind === "http") {
               loaded = diagnostics.pipe(
                 materializeUnifiedExamples(
@@ -295,6 +295,7 @@ function materializeUnifiedExamples(
 ): [Record<string, LoadedExample>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const normalized = new Map<string, LoadedExample>();
+  const usedTitles = new Set<string>();
   const apiVersionParameter = operation.parameters.find((parameter) => parameter.isApiVersionParam);
   for (const { example, relativePath } of entries) {
     const data = materializeLegacyExample(example, {
@@ -310,18 +311,21 @@ function materializeUnifiedExamples(
     if (apiVersionParameter && apiVersion) {
       data.parameters[apiVersionParameter.serializedName] ??= apiVersion;
     }
-    if (normalized.has(data.title)) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "duplicate-example-file",
-          format: { filename: relativePath, operationId, title: data.title },
-          target: NoTarget,
-        }),
-      );
-    }
-    normalized.set(data.title, { relativePath, data });
+    const title = uniqueExampleTitle(data.title, usedTitles);
+    normalized.set(title, { relativePath, data });
   }
   return diagnostics.wrap(Object.fromEntries(normalized));
+}
+
+// Match AutoRest's unified-example behavior so title collisions preserve every lineage.
+function uniqueExampleTitle(title: string, used: Set<string>): string {
+  let name = title;
+  let index = 2;
+  while (used.has(name)) {
+    name = `${title}_${index++}`;
+  }
+  used.add(name);
+  return name;
 }
 
 function handleMethodExamples<TServiceOperation extends SdkServiceOperation>(

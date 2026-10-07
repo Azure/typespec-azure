@@ -415,7 +415,7 @@ Widgets.get:
     strictEqual(loaded.filePath, "examples.yaml");
   });
 
-  it("detects title collisions after legacy normalization", async () => {
+  it("preserves title collisions after legacy normalization like AutoRest", async () => {
     const instance = await SimpleTester.createInstance();
     instance.fs.addTypeSpecFile(
       "examples.yaml",
@@ -427,9 +427,32 @@ Widgets.get:
     );
     const { program } = await instance.compile(simpleSpec);
     const context = await createSdkContextForTester(program);
-    expectDiagnostics(context.diagnostics, {
-      code: "@azure-tools/typespec-client-generator-core/duplicate-example-file",
-    });
+    expectDiagnostics(context.diagnostics, []);
+    const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
+      .examples!;
+    deepStrictEqual(
+      loaded.map((item) => item.name),
+      ["Widgets_get", "Widgets_get_2"],
+    );
+    deepStrictEqual(
+      loaded.map((item) => item.rawExample.title),
+      ["Widgets_get", "Widgets_get"],
+    );
+  });
+
+  it("matches unified operation keys with the same casing as AutoRest", async () => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile(
+      "examples.yaml",
+      simpleExample.replace("Widgets.get", "widgets.get"),
+    );
+    const { program } = await instance.compile(simpleSpec);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    strictEqual(
+      httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation.examples,
+      undefined,
+    );
   });
 
   it("rejects operations split across files using shared placement validation", async () => {

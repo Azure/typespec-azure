@@ -161,7 +161,7 @@ export async function loadUnifiedExamples(
     }
   }
   for (const example of resolved.examples) {
-    const key = example.operation.toLowerCase();
+    const key = example.operation;
     const entries = result.byOperation.get(key) ?? [];
     entries.push({ example, relativePath: sources.get(example.operation)! });
     result.byOperation.set(key, entries);
