@@ -30,3 +30,4 @@ Available ruleSets:
 | [`@azure-tools/typespec-client-generator-core/csharp-model-suffix`](../rules/csharp-model-suffix.md)                   | Model names should use recommended suffixes for C# SDKs.                                        |
 | [`@azure-tools/typespec-client-generator-core/csharp-use-standard-acronyms`](../rules/csharp-use-standard-acronyms.md) | C# SDK names should use standard acronym casing.                                                |
 | [`@azure-tools/typespec-client-generator-core/get-operation-name`](../rules/get-operation-name.md)                     | GET SDK method names should use 'Get' or 'List' as the verb prefix.                             |
+| [`@azure-tools/typespec-client-generator-core/no-service-ns-in-client`](../rules/no-service-ns-in-client.md)           | Prevent client.tsp from redefining the service namespace.                                       |
