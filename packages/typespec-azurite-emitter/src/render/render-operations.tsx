@@ -10,7 +10,7 @@ import type {
   ServerResponseHeader,
   ServerTypeRef,
 } from "../model.js";
-import { renderFileHeader } from "./file-header.js";
+import { GENERATED_FILE_HEADER } from "./file-header.js";
 import {
   operationMetadataRefkey,
   operationParameterBindingRefkey,
@@ -405,7 +405,7 @@ function useModelExpression(properties: Record<string, Type>): Model {
 export function renderOperations(serverModel: ServerModel) {
   return (
     <ts.SourceFile path="operations.ts">
-      {code`${renderFileHeader()}`}
+      {code`${GENERATED_FILE_HEADER}`}
       <For each={serverModel.operations} hardline>
         {(op) => (
           <>

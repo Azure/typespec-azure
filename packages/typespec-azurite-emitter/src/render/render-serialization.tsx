@@ -1,7 +1,7 @@
 import { code } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { ServerDataModel, ServerModel, ServerOperation, ServerTypeRef } from "../model.js";
-import { renderFileHeader } from "./file-header.js";
+import { GENERATED_FILE_HEADER } from "./file-header.js";
 import {
   operationMetadataRefkey,
   operationParameterBindingRefkey,
@@ -20,7 +20,7 @@ export function renderSerialization(serverModel: ServerModel) {
   return (
     <ts.SourceFile path="serialization.ts">
       {code`
-        ${renderFileHeader()}
+        ${GENERATED_FILE_HEADER}
         import type Context from "../../generated/Context";
         import type { IHandlerParameters } from "../../generated/Context";
         import type IRequest from "../../generated/IRequest";

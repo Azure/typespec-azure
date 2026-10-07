@@ -2,13 +2,13 @@ import { code, For } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import * as ef from "@typespec/emitter-framework/typescript";
 import type { ServerModel } from "../model.js";
-import { renderFileHeader } from "./file-header.js";
+import { GENERATED_FILE_HEADER } from "./file-header.js";
 import { contextRefkey, operationParametersRefkey, operationResponseRefkey } from "./refkeys.js";
 
 export function renderHandlers(serverModel: ServerModel) {
   return (
     <ts.SourceFile path="handlers.ts">
-      {code`${renderFileHeader()}`}
+      {code`${GENERATED_FILE_HEADER}`}
       <ef.InterfaceDeclaration export name="Context" refkey={contextRefkey}>
         <ts.InterfaceMember readonly name="contextId" type={code`string`} />
         {code`;`}
