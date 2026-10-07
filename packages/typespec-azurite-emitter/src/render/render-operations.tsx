@@ -3,16 +3,22 @@ import * as ts from "@alloy-js/typescript";
 import * as ef from "@typespec/emitter-framework/typescript";
 import type { ServerModel } from "../model.js";
 import { GENERATED_FILE_HEADER } from "./file-header.js";
-import { operationParametersRefkey, operationResponseRefkey } from "./refkeys.js";
+import {
+  operationMetadataRefkey,
+  operationParametersRefkey,
+  operationResponseRefkey,
+} from "./refkeys.js";
+import { operationDescriptorValue, operationMetadataConstName } from "./render-metadata.js";
 
 /**
- * Renders the `operations.ts` artifact: per-operation request/response TypeScript declarations.
- * Runtime HTTP/XML metadata is emitted once in `metadata.ts`.
+ * Renders the `operations.ts` artifact: per-operation request/response TypeScript declarations
+ * with colocated compact HTTP operation descriptors.
  */
 export function renderOperations(serverModel: ServerModel) {
   return (
     <ts.SourceFile path="operations.ts">
       {code`${GENERATED_FILE_HEADER}`}
+      {code`import { defineOperation } from "../runtime/serializationRuntime";`}
       <hbr />
       <For each={serverModel.operations} hardline>
         {(op) => (
@@ -29,6 +35,19 @@ export function renderOperations(serverModel: ServerModel) {
               type={op.responseUnion}
               name={`${op.typeName}Response`}
               refkey={operationResponseRefkey(op)}
+            />
+            <hbr />
+            <ts.VarDeclaration
+              export
+              const
+              name={operationMetadataConstName(op)}
+              refkey={operationMetadataRefkey(op)}
+              initializer={
+                <>
+                  defineOperation(
+                  <ts.ValueExpression jsValue={operationDescriptorValue(op)} />)
+                </>
+              }
             />
             <hbr />
           </>

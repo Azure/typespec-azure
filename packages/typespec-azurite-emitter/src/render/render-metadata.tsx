@@ -22,7 +22,7 @@ export type OperationTypeDescriptor =
   | readonly ["record", OperationTypeDescriptor]
   | readonly ["union", readonly OperationTypeDescriptor[]];
 
-type OperationParameterDescriptor = readonly [
+export type OperationParameterDescriptor = readonly [
   name: string,
   wireName: string,
   location: "path" | "query" | "header",
@@ -31,26 +31,26 @@ type OperationParameterDescriptor = readonly [
   collectionPrefix?: string,
 ];
 
-type OperationResponseHeaderDescriptor = readonly [
+export type OperationResponseHeaderDescriptor = readonly [
   name: string,
   wireName: string,
   type: OperationTypeDescriptor,
   collectionPrefix?: string,
 ];
 
-type OperationResponseDescriptor = readonly [
+export type OperationResponseDescriptor = readonly [
   statusCode: number | "*",
   headers?: readonly OperationResponseHeaderDescriptor[],
   bodyType?: OperationTypeDescriptor,
 ];
 
-type OperationRequestBodyDescriptor = readonly [
+export type OperationRequestBodyDescriptor = readonly [
   type: OperationTypeDescriptor,
   contentTypes: readonly string[],
   parameterPath?: string | readonly string[],
 ];
 
-type OperationDescriptor = readonly [
+export type OperationDescriptor = readonly [
   name: string,
   verb: string,
   rawPath: string,
@@ -60,27 +60,35 @@ type OperationDescriptor = readonly [
   interfaceName?: string,
 ];
 
-type XmlPropertyDescriptor = readonly [
+export type XmlPropertyDescriptor = readonly [
   name: string,
   wireName: string,
   type: OperationTypeDescriptor,
   mode?: "attribute" | "unwrapped",
   itemName?: string,
+  required?: true,
 ];
 
-type XmlModelDescriptorMap = Record<
-  string,
-  readonly [wireName: string, properties: readonly XmlPropertyDescriptor[]]
->;
+export type XmlModelDescriptor = readonly [
+  wireName: string,
+  properties: readonly XmlPropertyDescriptor[],
+];
+
+export type NamedXmlModelDescriptor = readonly [name: string, descriptor: XmlModelDescriptor];
 
 /**
  * Renders the service-specific runtime metadata manifest. This is the single generated source of
  * truth for HTTP operation bindings and XML wire metadata.
  */
 export function renderMetadata(serverModel: ServerModel, runtimeImport: string) {
+  const modelMetadataNames = serverModel.models.map(modelXmlMetadataConstName);
+  const operationMetadataNames = serverModel.operations.map(operationMetadataConstName);
   return (
     <ts.SourceFile path="metadata.ts">
       {code`
+        import { ${modelMetadataNames.join(", ")} } from "./models";
+        import { ${operationMetadataNames.join(", ")} } from "./operations";
+
         ${GENERATED_FILE_HEADER}
         export type { OperationMetadata, ServiceMetadata } from ${JSON.stringify(runtimeImport)};
         import {
@@ -89,23 +97,15 @@ export function renderMetadata(serverModel: ServerModel, runtimeImport: string) 
           type ServiceMetadata,
         } from ${JSON.stringify(runtimeImport)};
 
-        export const serviceMetadata: ServiceMetadata = defineServiceMetadata(
-      `}
-      <ts.ValueExpression jsValue={serviceMetadataDescriptorValue(serverModel)} />
-      {code`
-        );
+        export const serviceMetadata: ServiceMetadata = defineServiceMetadata({
+          operations: [${operationMetadataNames.join(", ")}],
+          xmlModels: [${modelMetadataNames.join(", ")}],
+        });
 
         export const operations: readonly OperationMetadata[] = serviceMetadata.operations;
       `}
     </ts.SourceFile>
   );
-}
-
-function serviceMetadataDescriptorValue(serverModel: ServerModel) {
-  return {
-    operations: serverModel.operations.map(operationDescriptorValue),
-    xmlModels: xmlModelsValue(serverModel.models),
-  };
 }
 
 export function operationDescriptorValue(op: ServerOperation): OperationDescriptor {
@@ -118,6 +118,10 @@ export function operationDescriptorValue(op: ServerOperation): OperationDescript
     op.responses.map(responseDescriptorValue),
     op.interfaceName,
   ]);
+}
+
+export function operationMetadataConstName(op: ServerOperation): string {
+  return `${op.typeName}Metadata`;
 }
 
 function requestBodyDescriptorValue(requestBody: NonNullable<ServerOperation["requestBody"]>) {
@@ -177,16 +181,18 @@ export function operationTypeDescriptorValue(type: ServerTypeRef): OperationType
   }
 }
 
-function xmlModelsValue(models: readonly ServerDataModel[]) {
-  return Object.fromEntries(
-    models.map((model) => [
-      model.name,
-      [model.wireName, model.properties.map((prop) => xmlPropertyMetadataValue(prop, models))],
-    ]),
-  ) as XmlModelDescriptorMap;
+export function xmlModelDescriptorValue(
+  model: ServerDataModel,
+  models: readonly ServerDataModel[],
+): XmlModelDescriptor {
+  return [model.wireName, model.properties.map((prop) => xmlPropertyMetadataValue(prop, models))];
 }
 
-function xmlPropertyMetadataValue(
+export function modelXmlMetadataConstName(model: ServerDataModel): string {
+  return `${model.name}XmlMetadata`;
+}
+
+export function xmlPropertyMetadataValue(
   prop: ServerDataModel["properties"][number],
   models: readonly ServerDataModel[],
 ) {
@@ -197,6 +203,7 @@ function xmlPropertyMetadataValue(
     operationTypeDescriptorValue(prop.type),
     prop.xmlAttribute ? "attribute" : prop.xmlUnwrapped ? "unwrapped" : undefined,
     itemName,
+    prop.optional ? undefined : true,
   ]) as unknown as XmlPropertyDescriptor;
 }
 

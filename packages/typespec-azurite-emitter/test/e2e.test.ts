@@ -76,19 +76,40 @@ describe("end-to-end emit", () => {
     const operationsFile = findOutput(outputs, "operations.ts");
 
     expect(metadataFile).toContain(`defineServiceMetadata({`);
-    expect(metadataFile).toContain(`"Queue_Create"`);
-    expect(metadataFile).toContain(`"put"`);
-    expect(metadataFile).toContain(`"ListMessages"`);
-    expect(metadataFile).toContain(`"get"`);
-    expect(metadataFile).toContain(`"SetAccessPolicy"`);
-    expect(metadataFile).toContain(`"query"`);
-    expect(metadataFile).toContain(`"path"`);
+    expect(operationsFile).toContain(`export const QueueCreateMetadata = defineOperation([`);
+    expect(operationsFile).toContain(`"Queue_Create"`);
+    expect(operationsFile).toContain(`"put"`);
+    expect(operationsFile).toContain(`"ListMessages"`);
+    expect(operationsFile).toContain(`"get"`);
+    expect(operationsFile).toContain(`"SetAccessPolicy"`);
+    expect(operationsFile).toContain(`"query"`);
+    expect(operationsFile).toContain(`"path"`);
     expect(metadataFile).toContain(`from "../runtime/serializationRuntime";`);
+    expect(metadataFile).toContain(`QueueCreateMetadata`);
+    expect(metadataFile).toContain(`QueueMetadataXmlMetadata`);
     expect(metadataFile).toContain(
       `export const operations: readonly OperationMetadata[] = serviceMetadata.operations;`,
     );
     expect(operationsFile).not.toContain(`defineOperations`);
-    expect(operationsFile).not.toContain(`"Queue_Create"`);
+    expect(metadataFile).not.toContain(`"Queue_Create"`);
+  });
+
+  it("generates XML model metadata with requiredness for required TypeSpec properties", async () => {
+    const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
+    const modelsFile = findOutput(outputs, "models.ts");
+
+    expect(modelsFile).toMatch(
+      /SignedIdentifierXmlMetadata[\s\S]*\["id", "id", "string", undefined, undefined, true\]/,
+    );
+    expect(modelsFile).toMatch(
+      /SignedIdentifierXmlMetadata[\s\S]*"accessPolicy"[\s\S]*"accessPolicy"[\s\S]*\["model", "AccessPolicy"\][\s\S]*undefined,[\s\S]*undefined,[\s\S]*true/,
+    );
+    expect(modelsFile).toMatch(
+      /AccessPolicyXmlMetadata[\s\S]*\["start", "start", "datetime"\][\s\S]*\["expiry", "expiry", "datetime"\][\s\S]*\["permission", "permission", "string"\]/,
+    );
+    expect(modelsFile).not.toMatch(
+      /AccessPolicyXmlMetadata[\s\S]*\["start", "start", "datetime", undefined, undefined, true\]/,
+    );
   });
 
   it("imports referenced model types into operations.ts so the file compiles standalone", async () => {

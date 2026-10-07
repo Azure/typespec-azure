@@ -11,3 +11,11 @@ export function operationParametersRefkey(operation: ServerOperation) {
 export function operationResponseRefkey(operation: ServerOperation) {
   return refkey(operation, "response");
 }
+
+export function operationMetadataRefkey(operation: ServerOperation) {
+  return refkey(operation, "metadata");
+}
+
+export function modelXmlMetadataRefkey(model: { readonly name: string }) {
+  return refkey(model, "xml-metadata");
+}

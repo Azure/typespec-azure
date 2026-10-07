@@ -8,10 +8,10 @@ The package demonstrates a small but reusable emitter structure:
 1. `src/build-model.ts` reads `@typespec/http` operations and TypeSpec models into an
    emitter-owned server model.
 2. `src/render/` writes TypeScript files from that model:
-   - `models.ts` — data-model interfaces.
-   - `operations.ts` — request/response types.
-   - `metadata.ts` — the single generated runtime manifest containing compact HTTP operation
-     descriptors and XML model wire descriptors.
+   - `models.ts` — data-model interfaces plus colocated compact XML model descriptors.
+   - `operations.ts` — request/response types plus colocated compact HTTP operation descriptors.
+   - `metadata.ts` — a small service manifest that references the colocated descriptors without
+     duplicating the mapping graph.
    - `handlers.ts` — handler interface methods with `(params, context)` signatures.
    - `serialization.ts` — a tiny binding from `metadata.ts` to Azurite's shared serialization
      runtime.
@@ -102,12 +102,16 @@ header collection handling, and generated-operation lookup live in an Azurite-ow
 runtime imported by generated artifacts. The runtime module path is controlled by `runtimeImport`
 and defaults to `../runtime/serializationRuntime` from the generated directory. That module must
 export invariant metadata types (`OperationMetadata`, `OperationTypeBinding`,
-`XmlModelMetadata`, and related binding types), compact descriptor types, `defineServiceMetadata`,
-and `createSerializationRuntime(serviceMetadata)`, which returns `deserializeRequest`,
-`serializeResponse`, and `hasGeneratedSerialization`. Header collections are described generically
-with `collectionPrefix` metadata (for example `x-ms-meta-`), not with Queue-specific runtime
-special cases. `metadata.ts` may export `operations` as a compatibility alias, but it references
-`serviceMetadata.operations` and does not duplicate descriptor data.
+`XmlModelMetadata`, and related binding types), compact descriptor helpers (`defineOperation`,
+`defineXmlModel`, `defineServiceMetadata`), and `createSerializationRuntime(serviceMetadata)`,
+which returns `deserializeRequest`, `serializeResponse`, and `hasGeneratedSerialization`. This
+follows the same persistence principle as `http-client-js`: TypeScript interfaces are erased, so
+wire knowledge is emitted as runtime values next to the declaration it describes. Header
+collections are described generically with `collectionPrefix` metadata (for example
+`x-ms-meta-`), not with Queue-specific runtime special cases. XML property descriptors also carry
+requiredness so malformed bodies can be rejected by the runtime. `metadata.ts` may export
+`operations` as a compatibility alias, but it references `serviceMetadata.operations` and does not
+duplicate descriptor data.
 
 Middleware/handler invocation code is intentionally not emitted by this package in the pilot: that
 code is Azurite-owned integration logic, varies by storage service, and must compose with
