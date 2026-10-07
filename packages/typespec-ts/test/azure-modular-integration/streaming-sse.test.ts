@@ -21,39 +21,6 @@ async function take<T>(iter: AsyncIterable<T>, count: number): Promise<T[]> {
   return out;
 }
 
-interface ProtocolOperations {
-  reconnect(options?: {
-    requestOptions?: { headers?: Record<string, string> };
-  }): Promise<AsyncIterable<unknown>>;
-  id(): Promise<AsyncIterable<unknown>>;
-  invalidId(): Promise<AsyncIterable<unknown>>;
-  retry(): Promise<AsyncIterable<unknown>>;
-  invalidRetry(): Promise<AsyncIterable<unknown>>;
-}
-
-interface DataOperations {
-  withEnvelope(): Promise<AsyncIterable<unknown>>;
-  withoutEnvelope(): Promise<AsyncIterable<unknown>>;
-}
-
-interface ProtocolClient {
-  protocol?: ProtocolOperations;
-  data?: DataOperations;
-}
-
-function getProtocolClient(client: SseClient): ProtocolClient {
-  return client as SseClient & ProtocolClient;
-}
-
-const generatedProtocolClient = getProtocolClient(
-  new SseClient({
-    endpoint: "http://localhost:3002",
-    allowInsecureConnection: true,
-  }),
-);
-const supportsProtocolScenarios =
-  generatedProtocolClient.protocol !== undefined && generatedProtocolClient.data !== undefined;
-
 describe("SSE Streaming Client", () => {
   let client: SseClient;
 
@@ -106,21 +73,21 @@ describe("SSE Streaming Client", () => {
     ]);
   });
 
-  // These scenarios are introduced by microsoft/typespec#11613. Keep them skipped until the
-  // pinned http-specs package includes the corresponding generated operation group and routes.
-  describe.skipIf(!supportsProtocolScenarios)("SSE protocol scenarios", () => {
-    let protocol: ProtocolOperations;
-    let data: DataOperations;
+  describe("SSE protocol scenarios", () => {
+    let protocol: SseClient["protocol"];
+    let data: SseClient["data"];
 
     beforeEach(() => {
-      ({ protocol, data } = getProtocolClient(client) as Required<ProtocolClient>);
+      ({ protocol, data } = client);
     });
 
-    it("should stream events with and without an explicit @data payload", async () => {
-      const withEnvelope = await take(await data.withEnvelope(), 1);
-      const withoutEnvelope = await take(await data.withoutEnvelope(), 1);
-
+    it("should stream only the explicit @data payload", async () => {
+      const withEnvelope = await collect(await data.withEnvelope());
       assert.deepEqual(withEnvelope, [{ event: "withEnvelope", data: "hello" }]);
+    });
+
+    it("should stream the full model without an explicit @data payload", async () => {
+      const withoutEnvelope = await collect(await data.withoutEnvelope());
       assert.deepEqual(withoutEnvelope, [
         {
           event: "withoutEnvelope",
