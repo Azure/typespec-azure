@@ -1,5 +1,9 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.73.0
+
+No changes, version bump only.
+
 ## 0.72.0
 
 ### Features

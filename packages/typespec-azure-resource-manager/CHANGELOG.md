@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.73.0
+
+### Features
+
+- [#5176](https://github.com/Azure/typespec-azure/pull/5176) Add a `version` option to `@featureFileOptions` for overriding the generated client API version.
+- [#5361](https://github.com/Azure/typespec-azure/pull/5361) Add the `use-model-request-body` ARM lint rule, an idiomatic TypeSpec migration of the Swagger `ParametersSchemaAsTypeObject` validator rule.
+
+
 ## 0.72.0
 
 ### Features
