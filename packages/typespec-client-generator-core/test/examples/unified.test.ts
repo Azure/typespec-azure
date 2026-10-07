@@ -280,6 +280,26 @@ Widgets.get:
     );
   });
 
+  it("falls back to legacy JSON when unified examples are absent", async () => {
+    const instance = await SimpleTester.createInstance();
+    instance.fs.addTypeSpecFile(
+      "examples/get.json",
+      JSON.stringify({
+        operationId: "Widgets_get",
+        title: "Legacy",
+        responses: { "200": { body: "legacy" } },
+      }),
+    );
+    const { program } = await instance.compile(simpleSpec);
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics(context.diagnostics, []);
+    const loaded = httpMethod(context.sdkPackage.clients[0].children![0].methods[0]).operation
+      .examples![0];
+    strictEqual(loaded.name, "Legacy");
+    strictEqual(loaded.filePath, "get.json");
+    strictEqual(loaded.responses[0].bodyValue?.value, "legacy");
+  });
+
   it("honors operationId and language-independent client customization", async () => {
     const instance = await SimpleBaseTester.createInstance();
     instance.fs.addTypeSpecFile(
