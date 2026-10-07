@@ -1,38 +1,18 @@
-import { code, For, refkey, Show, type Children, type Refkey } from "@alloy-js/core";
+import { code, For, Show, type Children } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { Type } from "@typespec/compiler";
 import * as ef from "@typespec/emitter-framework/typescript";
 import { TypeExpression } from "@typespec/emitter-framework/typescript";
 import type { ServerModel, ServerOperation, ServerResponse, ServerTypeRef } from "../model.js";
+import {
+  operationMetadataRefkey,
+  operationParameterBindingRefkey,
+  operationParametersRefkey,
+  operationResponseHeaderBindingRefkey,
+  operationResponseRefkey,
+  operationTypeBindingRefkey,
+} from "./refkeys.js";
 import { renderFileHeader } from "./type-ref.js";
-
-export function getOperationParametersRefkey(operation: ServerOperation): Refkey {
-  return refkey(operation.name, "parameters");
-}
-
-export function getOperationResponseRefkey(operation: ServerOperation): Refkey {
-  return refkey(operation.name, "response");
-}
-
-export function getOperationTypeBindingRefkey(): Refkey {
-  return refkey("operation-type-binding");
-}
-
-export function getOperationMetadataRefkey(): Refkey {
-  return refkey("operation-metadata");
-}
-
-export function getOperationsRefkey(): Refkey {
-  return refkey("operations");
-}
-
-export function getOperationParameterBindingRefkey(): Refkey {
-  return refkey("operation-parameter-binding");
-}
-
-export function getOperationResponseHeaderBindingRefkey(): Refkey {
-  return refkey("operation-response-header-binding");
-}
 
 function requireDeclarationType(type: Type | undefined, context: string): Type {
   if (!type) {
@@ -49,7 +29,7 @@ function ParametersInterface(props: { operation: ServerOperation }) {
         export
         name={`${op.name}Parameters`}
         doc={op.doc}
-        refkey={getOperationParametersRefkey(op)}
+        refkey={operationParametersRefkey(op)}
       >
         <For each={op.parameters}>
           {(param) => (
@@ -170,11 +150,7 @@ function ResponseType(props: { operation: ServerOperation }) {
   const op = props.operation;
   return (
     <>
-      <ef.TypeDeclaration
-        export
-        name={`${op.name}Response`}
-        refkey={getOperationResponseRefkey(op)}
-      >
+      <ef.TypeDeclaration export name={`${op.name}Response`} refkey={operationResponseRefkey(op)}>
         <hbr />
         <indent>
           <For each={op.responses} line>
@@ -195,7 +171,7 @@ function MetadataDefinitions() {
       <ef.InterfaceDeclaration
         export
         name="OperationParameterBinding"
-        refkey={getOperationParameterBindingRefkey()}
+        refkey={operationParameterBindingRefkey}
       >
         <ReadonlyMember name="name" type={code`string`} />
         <ReadonlyMember name="wireName" type={code`string`} />
@@ -203,20 +179,20 @@ function MetadataDefinitions() {
         <ReadonlyMember name="required" type={code`boolean`} />
         <ReadonlyMember
           name="type"
-          type={<ts.Reference refkey={getOperationTypeBindingRefkey()} type />}
+          type={<ts.Reference refkey={operationTypeBindingRefkey} type />}
         />
       </ef.InterfaceDeclaration>
       <hbr />
       <ef.InterfaceDeclaration
         export
         name="OperationResponseHeaderBinding"
-        refkey={getOperationResponseHeaderBindingRefkey()}
+        refkey={operationResponseHeaderBindingRefkey}
       >
         <ReadonlyMember name="name" type={code`string`} />
         <ReadonlyMember name="wireName" type={code`string`} />
         <ReadonlyMember
           name="type"
-          type={<ts.Reference refkey={getOperationTypeBindingRefkey()} type />}
+          type={<ts.Reference refkey={operationTypeBindingRefkey} type />}
         />
       </ef.InterfaceDeclaration>
       <hbr />
@@ -226,7 +202,7 @@ function MetadataDefinitions() {
           name="headers"
           type={
             <>
-              readonly <ts.Reference refkey={getOperationResponseHeaderBindingRefkey()} type />
+              readonly <ts.Reference refkey={operationResponseHeaderBindingRefkey} type />
               []
             </>
           }
@@ -238,7 +214,7 @@ function MetadataDefinitions() {
             <ts.InterfaceExpression>
               <ReadonlyMember
                 name="type"
-                type={<ts.Reference refkey={getOperationTypeBindingRefkey()} type />}
+                type={<ts.Reference refkey={operationTypeBindingRefkey} type />}
               />
             </ts.InterfaceExpression>
           }
@@ -250,11 +226,7 @@ function MetadataDefinitions() {
         <ReadonlyMember name="value" type={code`string`} />
       </ef.InterfaceDeclaration>
       <hbr />
-      <ef.InterfaceDeclaration
-        export
-        name="OperationMetadata"
-        refkey={getOperationMetadataRefkey()}
-      >
+      <ef.InterfaceDeclaration export name="OperationMetadata" refkey={operationMetadataRefkey}>
         <ReadonlyMember name="name" type={code`string`} />
         <ReadonlyMember name="verb" type={code`string`} />
         <ReadonlyMember name="rawPath" type={code`string`} />
@@ -269,7 +241,7 @@ function MetadataDefinitions() {
           name="parameters"
           type={
             <>
-              readonly <ts.Reference refkey={getOperationParameterBindingRefkey()} type />
+              readonly <ts.Reference refkey={operationParameterBindingRefkey} type />
               []
             </>
           }
@@ -284,7 +256,7 @@ function MetadataDefinitions() {
         <ReadonlyMember
           name="requestBodyType"
           optional
-          type={<ts.Reference refkey={getOperationTypeBindingRefkey()} type />}
+          type={<ts.Reference refkey={operationTypeBindingRefkey} type />}
         />
         <ReadonlyMember name="responses" type={code`readonly OperationResponseMetadata[]`} />
         <ReadonlyMember name="interfaceName" optional type={code`string`} />
@@ -296,7 +268,7 @@ function MetadataDefinitions() {
 
 function OperationTypeBindingDeclaration() {
   return (
-    <ef.TypeDeclaration export name="OperationTypeBinding" refkey={getOperationTypeBindingRefkey()}>
+    <ef.TypeDeclaration export name="OperationTypeBinding" refkey={operationTypeBindingRefkey}>
       <hbr />
       <indent>
         {code`| `}
@@ -324,7 +296,7 @@ function OperationTypeBindingDeclaration() {
           <ReadonlyMember name="kind" type={code`"array"`} />
           <ReadonlyMember
             name="element"
-            type={<ts.Reference refkey={getOperationTypeBindingRefkey()} type />}
+            type={<ts.Reference refkey={operationTypeBindingRefkey} type />}
           />
         </ts.InterfaceExpression>
       </indent>
@@ -379,10 +351,9 @@ function OperationsMetadata(props: { operations: readonly ServerOperation[] }) {
       export
       const
       name="operations"
-      refkey={getOperationsRefkey()}
       type={
         <>
-          readonly <ts.Reference refkey={getOperationMetadataRefkey()} type />
+          readonly <ts.Reference refkey={operationMetadataRefkey} type />
           []
         </>
       }

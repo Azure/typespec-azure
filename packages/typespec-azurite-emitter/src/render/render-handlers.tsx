@@ -1,19 +1,15 @@
-import { code, For, refkey, type Refkey } from "@alloy-js/core";
+import { code, For } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import * as ef from "@typespec/emitter-framework/typescript";
 import type { ServerModel } from "../model.js";
-import { getOperationParametersRefkey, getOperationResponseRefkey } from "./render-operations.js";
+import { contextRefkey, operationParametersRefkey, operationResponseRefkey } from "./refkeys.js";
 import { renderFileHeader } from "./type-ref.js";
-
-export function getContextRefkey(): Refkey {
-  return refkey("context");
-}
 
 export function renderHandlers(serverModel: ServerModel) {
   return (
     <ts.SourceFile path="handlers.ts">
       {code`${renderFileHeader()}`}
-      <ef.InterfaceDeclaration export name="Context" refkey={getContextRefkey()}>
+      <ef.InterfaceDeclaration export name="Context" refkey={contextRefkey}>
         <ts.InterfaceMember readonly name="contextId" type={code`string`} />
         {code`;`}
       </ef.InterfaceDeclaration>
@@ -36,14 +32,14 @@ export function ServiceHandlerInterface(props: { serverModel: ServerModel }) {
               parameters={[
                 {
                   name: "params",
-                  type: <ts.Reference refkey={getOperationParametersRefkey(op)} type />,
+                  type: <ts.Reference refkey={operationParametersRefkey(op)} type />,
                 },
-                { name: "context", type: <ts.Reference refkey={getContextRefkey()} type /> },
+                { name: "context", type: <ts.Reference refkey={contextRefkey} type /> },
               ]}
               returnType={
                 <>
                   Promise&lt;
-                  <ts.Reference refkey={getOperationResponseRefkey(op)} type />
+                  <ts.Reference refkey={operationResponseRefkey(op)} type />
                   &gt;
                 </>
               }

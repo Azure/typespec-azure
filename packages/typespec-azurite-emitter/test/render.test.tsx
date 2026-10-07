@@ -8,11 +8,14 @@ import * as ef from "@typespec/emitter-framework/typescript";
 import { beforeAll, describe, expect, it } from "vitest";
 import { buildServerModel } from "../src/build-model.js";
 import type { ServerModel } from "../src/model.js";
-import { getContextRefkey, ServiceHandlerInterface } from "../src/render/render-handlers.js";
+import {
+  contextRefkey,
+  operationParametersRefkey,
+  operationResponseRefkey,
+} from "../src/render/refkeys.js";
+import { ServiceHandlerInterface } from "../src/render/render-handlers.js";
 import { renderModels } from "../src/render/render-models.js";
 import {
-  getOperationParametersRefkey,
-  getOperationResponseRefkey,
   OperationTypeBindingExpression,
   renderOperations,
 } from "../src/render/render-operations.js";
@@ -500,30 +503,30 @@ describe("ServiceHandlerInterface", () => {
           <ts.InterfaceDeclaration
             export
             name="CreateQueueParameters"
-            refkey={getOperationParametersRefkey(sampleServerModel.operations[0])}
+            refkey={operationParametersRefkey(sampleServerModel.operations[0])}
           />
           <ts.TypeDeclaration
             export
             name="CreateQueueResponse"
-            refkey={getOperationResponseRefkey(sampleServerModel.operations[0])}
+            refkey={operationResponseRefkey(sampleServerModel.operations[0])}
           >
             {code`{ statusCode: 201 }`}
           </ts.TypeDeclaration>
           <ts.InterfaceDeclaration
             export
             name="DeleteQueueParameters"
-            refkey={getOperationParametersRefkey(sampleServerModel.operations[1])}
+            refkey={operationParametersRefkey(sampleServerModel.operations[1])}
           />
           <ts.TypeDeclaration
             export
             name="DeleteQueueResponse"
-            refkey={getOperationResponseRefkey(sampleServerModel.operations[1])}
+            refkey={operationResponseRefkey(sampleServerModel.operations[1])}
           >
             {code`{ statusCode: 204 }`}
           </ts.TypeDeclaration>
         </ts.SourceFile>
         <ts.SourceFile path="handlers.ts">
-          <ef.InterfaceDeclaration export name="Context" refkey={getContextRefkey()}>
+          <ef.InterfaceDeclaration export name="Context" refkey={contextRefkey}>
             <ts.InterfaceMember readonly name="contextId" type={code`string`} />
             {code`;`}
           </ef.InterfaceDeclaration>
