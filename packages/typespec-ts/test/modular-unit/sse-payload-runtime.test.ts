@@ -7,7 +7,7 @@ import { clearCompileCache } from "../util/test-util.js";
 
 interface EventPayload {
   event: string;
-  data: string | number | boolean | { value: string };
+  data: string | number | boolean | Date | Uint8Array | { value: string };
 }
 
 interface GeneratedOperations {
@@ -23,11 +23,15 @@ interface GeneratedOperations {
   receiveNumericTerminal(context: unknown): Promise<AsyncIterable<EventPayload>>;
   receiveBooleanTerminal(context: unknown): Promise<AsyncIterable<EventPayload>>;
   receiveOnlyTerminal(context: unknown): Promise<AsyncIterable<"[DONE]">>;
+  receiveScalars(context: unknown): Promise<AsyncIterable<EventPayload>>;
+  receiveScalarTerminal(context: unknown): Promise<AsyncIterable<EventPayload>>;
+  receiveUnnamedScalar(context: unknown): Promise<AsyncIterable<number>>;
 }
 
 describe("generated SSE payload formats", () => {
   let operations: GeneratedOperations;
   let browserOperations: GeneratedOperations;
+  let reactNativeOperations: GeneratedOperations;
   let payloadContentTypes: (string | undefined)[] | undefined;
 
   beforeAll(async () => {
@@ -124,6 +128,53 @@ describe("generated SSE payload formats", () => {
       union OnlyTerminalEvents { @terminalEvent "[DONE]" }
       @route("receiveOnlyTerminal")
       op receiveOnlyTerminal(): SSEStream<OnlyTerminalEvents>;
+
+      @mediaTypeHint("application/json")
+      scalar JsonInt extends int32;
+      @encode(string)
+      scalar StringInt extends int32;
+      @encode("unixTimestamp", int64)
+      scalar UnixTime extends utcDateTime;
+      @encode("base64url")
+      scalar UrlBytes extends bytes;
+      @encode("seconds", float64)
+      scalar Seconds extends duration;
+      enum NumericChoice { one: 1, two: 2 }
+
+      @events
+      union ScalarEvents {
+        progress: int32,
+        ratio: float64,
+        flag: boolean,
+        @Events.contentType("text/plain")
+        explicit: int32,
+        @Events.contentType("application/json")
+        jsonFlag: boolean,
+        hinted: JsonInt,
+        @Events.contentType("application/json")
+        encoded: StringInt,
+        @Events.contentType("text/plain")
+        choice: NumericChoice,
+        envelope: { @data contents: int32 },
+        timestamp: utcDateTime,
+        unix: UnixTime,
+        day: plainDate,
+        binary: bytes,
+        urlBinary: UrlBytes,
+        duration: Seconds,
+      }
+      @route("receiveScalars")
+      op receiveScalars(): SSEStream<ScalarEvents>;
+
+      @events
+      union ScalarTerminalEvents { @terminalEvent complete: boolean }
+      @route("receiveScalarTerminal")
+      op receiveScalarTerminal(): SSEStream<ScalarTerminalEvents>;
+
+      @events
+      union UnnamedScalarEvents { int32 }
+      @route("receiveUnnamedScalar")
+      op receiveUnnamedScalar(): SSEStream<UnnamedScalarEvents>;
     `,
       { "include-headers-in-response": true, needTCGC: true },
     );
@@ -145,6 +196,9 @@ describe("generated SSE payload formats", () => {
     );
     browserOperations = createGeneratedRuntime(sources, {
       platform: "browser",
+    }).loadModule<GeneratedOperations>(file.getFilePath());
+    reactNativeOperations = createGeneratedRuntime(sources, {
+      platform: "react-native",
     }).loadModule<GeneratedOperations>(file.getFilePath());
   });
 
@@ -211,6 +265,108 @@ describe("generated SSE payload formats", () => {
       "application/json",
       undefined,
     ]);
+  });
+
+  it.each(["Node", "browser", "react-native"] as const)(
+    "decodes real scalar types and encodings on %s without changing payload MIME",
+    async (platform) => {
+      const frames = [
+        ["progress", "42"],
+        ["ratio", "1.25"],
+        ["flag", "false"],
+        ["explicit", "-7"],
+        ["jsonFlag", "true"],
+        ["jsonFlag", "false"],
+        ["hinted", "17"],
+        ["encoded", '"64"'],
+        ["choice", "2"],
+        ["envelope", "9"],
+        ["timestamp", "2024-01-02T03:04:05Z"],
+        ["unix", "1704164645"],
+        ["day", "2024-01-02"],
+        ["binary", "SGVsbG8="],
+        ["urlBinary", "-_8"],
+        ["duration", "1.5"],
+      ]
+        .map(([event, data]) => `event: ${event}\ndata: ${data}\n\n`)
+        .join("");
+      const fixture = transport(platform === "Node" ? "Node" : "browser", frames);
+      const runtime =
+        platform === "Node"
+          ? operations
+          : platform === "browser"
+            ? browserOperations
+            : reactNativeOperations;
+      const items = await collect(await runtime.receiveScalars(fixture.context));
+      expect(items).toEqual([
+        { event: "progress", data: 42 },
+        { event: "ratio", data: 1.25 },
+        { event: "flag", data: false },
+        { event: "explicit", data: -7 },
+        { event: "jsonFlag", data: true },
+        { event: "jsonFlag", data: false },
+        { event: "hinted", data: 17 },
+        { event: "encoded", data: 64 },
+        { event: "choice", data: 2 },
+        { event: "envelope", data: 9 },
+        { event: "timestamp", data: new Date("2024-01-02T03:04:05Z") },
+        { event: "unix", data: new Date("2024-01-02T03:04:05Z") },
+        { event: "day", data: new Date("2024-01-02") },
+        { event: "binary", data: expect.any(Uint8Array) },
+        { event: "urlBinary", data: expect.any(Uint8Array) },
+        { event: "duration", data: 1.5 },
+      ]);
+      expect(
+        items.flatMap((item) =>
+          item.data instanceof Uint8Array ? [{ event: item.event, bytes: [...item.data] }] : [],
+        ),
+      ).toEqual([
+        { event: "binary", bytes: [72, 101, 108, 108, 111] },
+        { event: "urlBinary", bytes: [251, 255] },
+      ]);
+    },
+  );
+
+  it("yields a scalar boolean terminal before stopping, not a literal constant", async () => {
+    const fixture = transport(
+      "Node",
+      "event: complete\ndata: false\n\nevent: complete\ndata: true\n\n",
+      "200",
+      undefined,
+      true,
+    );
+    expect(await collect(await operations.receiveScalarTerminal(fixture.context))).toEqual([
+      { event: "complete", data: false },
+    ]);
+    expect(fixture.nodeBody.destroyed).toBe(true);
+  });
+
+  it("decodes unnamed scalar payloads without adding an event envelope", async () => {
+    const fixture = transport("Node", "data: 0\n\ndata: -42\n\n");
+    const values: number[] = [];
+    for await (const value of await operations.receiveUnnamedScalar(fixture.context)) {
+      values.push(value);
+    }
+    expect(values).toEqual([0, -42]);
+  });
+
+  it.each([
+    ["progress", "not-a-number", NaN],
+    ["progress", "", 0],
+    ["progress", "1e999", Infinity],
+    ["flag", "not-a-boolean", false],
+  ])("matches response-header coercion for %s payload %j", async (event, data, expected) => {
+    const fixture = transport("Node", `event: ${event}\ndata: ${data}\n\n`, "200", undefined, true);
+    const iterator = (await operations.receiveScalars(fixture.context))[Symbol.asyncIterator]();
+    try {
+      await expect(iterator.next()).resolves.toEqual({
+        done: false,
+        value: { event, data: expected },
+      });
+    } finally {
+      await iterator.return?.();
+    }
+    expect(fixture.nodeBody.destroyed).toBe(true);
   });
 
   it("decodes inferred, explicit, hinted and @data payload-only wire formats through real core", async () => {

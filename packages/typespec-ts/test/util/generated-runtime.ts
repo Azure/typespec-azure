@@ -5,12 +5,12 @@ import { ModuleKind, ScriptTarget, transpileModule } from "typescript";
 const requireDependency = createRequire(import.meta.url);
 
 export interface GeneratedRuntimeOptions {
-  platform?: "node" | "browser";
+  platform?: "node" | "browser" | "react-native";
 }
 
 /**
  * Executes real emitted TypeScript modules in memory, resolving external dependencies normally.
- * Browser mode selects emitted browser variants where available.
+ * Platform modes select emitted browser or React Native variants where available.
  */
 export function createGeneratedRuntime(
   sources: Iterable<readonly [string, string]>,
@@ -21,10 +21,15 @@ export function createGeneratedRuntime(
 
   function loadModule<T = Record<string, unknown>>(filePath: string, selectPlatform = true): T {
     const browserPath = filePath.replace(/\.ts$/, "-browser.mts");
+    const reactNativePath = filePath.replace(/\.ts$/, "-react-native.mts");
     const sourcePath =
-      selectPlatform && options.platform === "browser" && sourceMap.has(browserPath)
-        ? browserPath
-        : filePath;
+      selectPlatform && options.platform === "react-native" && sourceMap.has(reactNativePath)
+        ? reactNativePath
+        : selectPlatform &&
+            (options.platform === "browser" || options.platform === "react-native") &&
+            sourceMap.has(browserPath)
+          ? browserPath
+          : filePath;
     const cached = modules.get(sourcePath);
     if (cached) {
       return cached.exports as T;

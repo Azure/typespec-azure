@@ -4,7 +4,7 @@ packages:
   - "@azure-tools/typespec-ts"
 ---
 
-Generate structured JSONL and SSE streaming operations as `Promise<AsyncIterable<T>>` of deserialized items/events instead of raw binary `Uint8Array` bodies. Connection and modeled HTTP error validation are eager; payload deserialization is lazy. Generate streaming helpers only for supported MIME types and non-paging, non-LRO operations.
+Generate structured JSONL and SSE streaming operations as `Promise<AsyncIterable<T>>` of deserialized items/events instead of raw binary `Uint8Array` bodies. Connection and modeled HTTP error validation are eager; payload deserialization is lazy. Generate streaming helpers only for supported MIME types and non-paging, non-LRO operations. Deserialize scalar SSE payloads into their declared client types.
 
 SSE uses the published `@azure/core-sse` `createSseStream` API.
 
