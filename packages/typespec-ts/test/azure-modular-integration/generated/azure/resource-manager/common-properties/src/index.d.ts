@@ -23,7 +23,7 @@ export declare interface ArmResourceIdentifierResource extends TrackedResource {
 }
 
 export declare interface ArmResourceIdentifierResourceProperties {
-    readonly provisioningState: ResourceProvisioningState;
+    readonly provisioningState?: ResourceProvisioningState;
     simpleArmId: string;
     armIdWithType: string;
     armIdWithTypeAndScope: string;
@@ -73,7 +73,7 @@ export declare interface ConfidentialResource extends TrackedResource {
 }
 
 export declare interface ConfidentialResourceProperties {
-    readonly provisioningState: string;
+    readonly provisioningState?: string;
     username: string;
 }
 
@@ -156,7 +156,7 @@ export declare interface ManagedIdentityTrackedResource extends TrackedResource 
 }
 
 export declare interface ManagedIdentityTrackedResourceProperties {
-    readonly provisioningState: string;
+    readonly provisioningState?: string;
 }
 
 export declare interface ManagedIdentityUpdateWithUserAssignedAndSystemAssignedOptionalParams extends OperationOptions {
