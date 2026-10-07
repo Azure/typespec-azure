@@ -513,12 +513,13 @@ describe("renderSerialization components", () => {
       export async function deserializeRequest(
         name: string,
         req: IRequest,
+        context: Context,
       ): Promise<IHandlerParameters | undefined> {
         switch (name) {
           case "CreateQueue":
-            return deserializeMetadataRequest(getGeneratedOperation(name), req);
+            return deserializeMetadataRequest(getGeneratedOperation(name), req, context);
           case "DeleteQueue":
-            return deserializeMetadataRequest(getGeneratedOperation(name), req);
+            return deserializeMetadataRequest(getGeneratedOperation(name), req, context);
           default:
             return undefined;
         }

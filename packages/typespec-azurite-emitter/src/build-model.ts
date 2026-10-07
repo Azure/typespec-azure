@@ -198,20 +198,8 @@ function buildRequestBody(
     type: type.runtime,
     declarationType: type.declaration,
     contentTypes: body.contentTypes,
-    parameterPath: getBodyParameterPath(program, body),
+    parameterPath: "body",
   };
-}
-
-function getBodyParameterPath(program: Program, body: HttpPayloadBody): string | readonly string[] {
-  const property = "property" in body ? body.property : undefined;
-  if (!property) return "body";
-  const name = getHandlerBodyParameterName(getName(program, property, property.name));
-  if (name === "queueMessage") return name;
-  return property.optional ? ["options", name] : name;
-}
-
-function getHandlerBodyParameterName(name: string): string {
-  return name === "queueServiceProperties" ? "storageServiceProperties" : name;
 }
 
 function buildResponse(

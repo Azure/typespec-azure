@@ -21,6 +21,7 @@ export function renderSerialization(serverModel: ServerModel) {
     <ts.SourceFile path="serialization.ts">
       {code`
         ${renderFileHeader()}
+        import type Context from "../../generated/Context";
         import type { IHandlerParameters } from "../../generated/Context";
         import type IRequest from "../../generated/IRequest";
         import type IResponse from "../../generated/IResponse";
@@ -136,6 +137,7 @@ export function DeserializeRequest(props: { operations: readonly ServerOperation
       parameters={[
         { name: "name", type: code`string` },
         { name: "req", type: code`IRequest` },
+        { name: "context", type: code`Context` },
       ]}
       returnType={code`IHandlerParameters | undefined`}
     >
@@ -207,7 +209,7 @@ function SerializationSwitchCase(props: {
           {code`case ${JSON.stringify(props.operation.name)}:`}
           <indent>
             <hbr />
-            {code`return deserializeMetadataRequest(getGeneratedOperation(name), req);`}
+            {code`return deserializeMetadataRequest(getGeneratedOperation(name), req, context);`}
           </indent>
         </>
       );
@@ -246,26 +248,51 @@ function HelperFunctions() {
       return metadata;
     }
 
-    async function deserializeMetadataRequest(metadata: ${(<ts.Reference refkey={operationMetadataRefkey} type />)}, req: IRequest): Promise<IHandlerParameters> {
+    async function deserializeMetadataRequest(metadata: ${(<ts.Reference refkey={operationMetadataRefkey} type />)}, req: IRequest, context: Context): Promise<IHandlerParameters> {
       const parameters: IHandlerParameters = {};
-      for (const literal of metadata.literalQueryParameters) {
-        setParameterValue(
-          parameters,
-          literal.name,
-          deserializeLiteral(req.getQuery(literal.name), literal.value, literal.name, true),
-        );
-      }
       const headerCollectionValues = new Map<string, Record<string, string | string[]>>();
       for (const parameter of metadata.parameters) {
-        if (parameter.location === "path") continue;
+        if (parameter.location === "path") {
+          setParameterValue(parameters, getParameterPath(parameter), deserializePathParameter(parameter, context));
+          continue;
+        }
         setParameterValue(parameters, getParameterPath(parameter), deserializeParameter(parameter, req, headerCollectionValues));
       }
       if (metadata.requestBodyType !== undefined && metadata.requestBodyParameterPath !== undefined) {
         const body = await deserializeRequestBody(metadata, req);
         setParameterValue(parameters, metadata.requestBodyParameterPath, body);
-        setParameterValue(parameters, "body", req.getBody());
       }
       return parameters;
+    }
+
+    function deserializePathParameter(
+      parameter: ${(<ts.Reference refkey={operationParameterBindingRefkey} type />)},
+      context: Context,
+    ): unknown {
+      return deserializeValue(
+        parameter.type,
+        getContextPathParameter(context, parameter),
+        parameter.wireName,
+        parameter.required,
+      );
+    }
+
+    function getContextPathParameter(
+      context: Context,
+      parameter: ${(<ts.Reference refkey={operationParameterBindingRefkey} type />)},
+    ): string | string[] | undefined {
+      const value = getContextValue(context, parameter.name) ?? getContextValue(context, parameter.wireName);
+      if (value === undefined && parameter.required) {
+        throw new TypeError("Required path parameter " + parameter.wireName + " was not provided by dispatch context");
+      }
+      return value;
+    }
+
+    function getContextValue(context: Context, name: string): string | string[] | undefined {
+      const source = context as unknown as Record<string, unknown>;
+      const value = source[name] ?? (source.context as Record<string, unknown> | undefined)?.[name];
+      if (value === undefined || value === null) return undefined;
+      return typeof value === "string" || Array.isArray(value) ? value as string | string[] : String(value);
     }
 
     async function deserializeRequestBody(metadata: ${(<ts.Reference refkey={operationMetadataRefkey} type />)}, req: IRequest): Promise<unknown> {
@@ -277,14 +304,13 @@ function HelperFunctions() {
         return JSON.parse(rawBody);
       }
       const parsed = (await parseXML(rawBody)) || {};
-      const bodyValue = deserializeXmlModel(parsed, metadata.requestBodyType.name);
-      return coerceRequestBodyValue(bodyValue, getXmlModel(metadata.requestBodyType.name));
+      return deserializeXmlModel(parsed, metadata.requestBodyType.name);
     }
 
     function deserializeParameter(
       parameter: ${(<ts.Reference refkey={operationParameterBindingRefkey} type />)},
       req: IRequest,
-      headerCollectionValues: Map<string, Record<string, string | string[]>>,
+      headerCollectionValues: Map<string, Record<string, string | string[]> | undefined>,
     ): unknown {
       if (parameter.location === "query") {
         return deserializeValue(parameter.type, req.getQuery(parameter.wireName), parameter.wireName, parameter.required);
@@ -317,26 +343,10 @@ function HelperFunctions() {
     function serializeResponseBody(res: IResponse, type: ${(<ts.Reference refkey={operationTypeBindingRefkey} type />)}, handlerResponse: any): void {
       if (type.kind !== "model") return;
       const metadata = getXmlModel(type.name);
-      const bodyValue = handlerResponse.body ?? coerceResponseBodyValue(handlerResponse, metadata);
+      const bodyValue = handlerResponse.body;
       const xmlBody = stringifyXML(serializeXmlModel(bodyValue, metadata.name), { rootName: metadata.wireName });
       res.setContentType("application/xml");
       res.getBodyStream().write(xmlBody);
-    }
-
-    function coerceResponseBodyValue(handlerResponse: any, metadata: XmlModelMetadata): unknown {
-      const arrayProperty = metadata.properties.length === 1 && metadata.properties[0].type.kind === "array" ? metadata.properties[0] : undefined;
-      if (arrayProperty !== undefined && Array.isArray(handlerResponse)) {
-        return { [arrayProperty.name]: handlerResponse };
-      }
-      return handlerResponse;
-    }
-
-    function coerceRequestBodyValue(bodyValue: any, metadata: XmlModelMetadata): unknown {
-      const arrayProperty = metadata.properties.length === 1 && metadata.properties[0].type.kind === "array" ? metadata.properties[0] : undefined;
-      if (arrayProperty !== undefined) {
-        return bodyValue?.[arrayProperty.name];
-      }
-      return bodyValue;
     }
 
     function getXmlModel(name: string): XmlModelMetadata {
@@ -441,10 +451,10 @@ function HelperFunctions() {
     function serializeResponseHeader(res: IResponse, header: ${(<ts.Reference refkey={operationResponseHeaderBindingRefkey} type />)}, handlerResponse: any): void {
       const headerCollectionPrefix = getHeaderCollectionPrefix(header.wireName);
       if (headerCollectionPrefix !== undefined) {
-        setHeaderCollection(res, headerCollectionPrefix, handlerResponse[header.name]);
+        setHeaderCollection(res, headerCollectionPrefix, handlerResponse.headers?.[header.name]);
         return;
       }
-      setHeader(res, header.wireName, serializeValue(header.type, handlerResponse[header.name]));
+      setHeader(res, header.wireName, serializeValue(header.type, handlerResponse.headers?.[header.name]));
     }
 
     function deserializeValue(
@@ -554,14 +564,14 @@ function HelperFunctions() {
     function getHeaderCollection(
       headers: Record<string, string | string[] | undefined>,
       prefix: string,
-    ): Record<string, string | string[]> {
+    ): Record<string, string | string[]> | undefined {
       const values: Record<string, string | string[]> = {};
       for (const [headerName, headerValue] of Object.entries(headers)) {
         if (headerName.toLowerCase().startsWith(prefix.toLowerCase()) && headerValue !== undefined) {
           values[headerName.substring(prefix.length)] = headerValue;
         }
       }
-      return values;
+      return Object.keys(values).length === 0 ? undefined : values;
     }
 
     function serializeValue(type: ${(<ts.Reference refkey={operationTypeBindingRefkey} type />)}, value: unknown): string | number | boolean | undefined {
@@ -603,6 +613,7 @@ function HelperFunctions() {
       parameterPath: string | readonly string[],
       parameterValue: unknown,
     ): void {
+      if (parameterValue === undefined) return;
       if (typeof parameterPath === "string") {
         parameters[parameterPath] = parameterValue;
         return;
@@ -618,14 +629,8 @@ function HelperFunctions() {
       leafParent[parameterPath[parameterPath.length - 1]] = parameterValue;
     }
 
-    function getParameterPath(parameter: ${(<ts.Reference refkey={operationParameterBindingRefkey} type />)}): string | readonly string[] {
-      if (!parameter.required) return ["options", getHandlerParameterName(parameter)];
-      return getHandlerParameterName(parameter);
-    }
-
-    function getHandlerParameterName(parameter: ${(<ts.Reference refkey={operationParameterBindingRefkey} type />)}): string {
-      if (parameter.wireName.toLowerCase() === "visibilitytimeout") return "visibilitytimeout";
-      return parameter.wireName.toLowerCase() === "x-ms-client-request-id" ? "requestId" : parameter.name;
+    function getParameterPath(parameter: ${(<ts.Reference refkey={operationParameterBindingRefkey} type />)}): string {
+      return parameter.name;
     }
   `;
 }

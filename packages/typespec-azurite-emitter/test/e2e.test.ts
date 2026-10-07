@@ -118,7 +118,29 @@ describe("end-to-end emit", () => {
     expect(serializationFile).not.toContain(`function serializeDeleteQueueResponse`);
     expect(serializationFile).toContain(`function deserializeMetadataRequest`);
     expect(serializationFile).toContain(`function serializeMetadataResponse`);
-    expect(serializationFile).toContain(`setHeader(res, header.wireName`);
+    expect(serializationFile).toContain(
+      `setHeader(res, header.wireName, serializeValue(header.type, handlerResponse.headers?.[header.name]))`,
+    );
+    expect(serializationFile).toContain(`import type Context from "../../generated/Context";`);
+    expect(serializationFile).toContain(`import type { IHandlerParameters }`);
+    expect(serializationFile).toMatch(
+      /export async function deserializeRequest\(\s*name: string,\s*req: IRequest,\s*context: Context,/,
+    );
+    expect(serializationFile).toContain(
+      `deserializeMetadataRequest(getGeneratedOperation(name), req, context)`,
+    );
+    expect(serializationFile).toContain(`function deserializePathParameter`);
+    expect(serializationFile).toContain(`getContextPathParameter(context, parameter)`);
+    expect(serializationFile).not.toContain(`if (parameter.location === "path") continue`);
+    expect(serializationFile).toContain(`return parameter.name;`);
+    expect(serializationFile).not.toContain(
+      `return ["options", getHandlerParameterName(parameter)]`,
+    );
+    expect(serializationFile).not.toContain(`handlerResponse[header.name]`);
+    expect(serializationFile).not.toContain(`handlerResponse.body ??`);
+    expect(serializationFile).not.toContain(`setParameterValue(parameters, "body", req.getBody())`);
+    expect(serializationFile).not.toContain(`function coerceRequestBodyValue`);
+    expect(serializationFile).not.toContain(`function coerceResponseBodyValue`);
   });
 });
 

@@ -73,6 +73,31 @@ pnpm --filter @azure-tools/typespec-azurite-emitter build
 pnpm --filter @azure-tools/typespec-azurite-emitter lint
 ```
 
+## Azurite bridge contract
+
+The emitter generates TypeSpec-derived artifacts only. Azurite still owns the runtime bridge that
+selects a generated operation, calls the generated deserializer, invokes the handwritten handler,
+and passes the handler result to the generated serializer. That bridge must:
+
+1. Run Azurite's storage-context middleware before generated deserialization so route values are
+   available on the generated `Context` object.
+2. Call `deserializeRequest(operationName, req, context)`, where `context` exposes path parameter
+   values by generated parameter name (for Queue today, `messageId`). The generated deserializer
+   returns the exact generated `<Operation>Parameters` shape: parameter properties are flat, the
+   request body is assigned to `body`, and query/header/path values use the same type conversion
+   rules.
+3. Invoke the generated handler interface as `(params, context) => Promise<Response>` with that
+   parameters object directly; the bridge must select the handler method but must not reshape the
+   request payload.
+4. Call `serializeResponse(operationName, res, handlerResponse)` with the exact generated
+   `<Operation>Response` union. Response headers are read from `handlerResponse.headers` while
+   wire-name mapping remains in generated response metadata; the bridge must not flatten response
+   headers before serialization.
+
+Middleware/handler invocation code is intentionally not emitted by this package in the pilot: that
+code is Azurite-owned integration logic, varies by storage service, and must compose with
+Azurite's existing authentication, dispatch, error, and handler middleware.
+
 ## Current scope
 
 This package is intentionally small. It covers the artifact shape and emitter architecture needed
