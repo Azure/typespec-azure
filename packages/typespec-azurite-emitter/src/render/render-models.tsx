@@ -1,6 +1,7 @@
-import { code, For, Show } from "@alloy-js/core";
+import { code, For } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { ServerModel } from "../model.js";
+import { DocComment } from "./doc-comment.js";
 import { renderFileHeader, renderTypeRef } from "./type-ref.js";
 
 /**
@@ -14,28 +15,14 @@ export function renderModels(serverModel: ServerModel) {
       <For each={serverModel.models} hardline>
         {(model) => (
           <>
-            <Show when={model.doc !== undefined}>
-              {() => (
-                <>
-                  {code`/** ${model.doc} */`}
-                  <hbr />
-                </>
-              )}
-            </Show>
+            <DocComment doc={model.doc} />
             {code`export interface ${model.name} {`}
             <hbr />
             <indent>
               <For each={model.properties}>
                 {(prop) => (
                   <>
-                    <Show when={prop.doc !== undefined}>
-                      {() => (
-                        <>
-                          {code`/** ${prop.doc} */`}
-                          <hbr />
-                        </>
-                      )}
-                    </Show>
+                    <DocComment doc={prop.doc} />
                     {code`${prop.name}${prop.optional ? "?" : ""}: ${renderTypeRef(prop.type)};`}
                     <hbr />
                   </>

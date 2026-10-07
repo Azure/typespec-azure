@@ -1,6 +1,7 @@
-import { code, For, Show } from "@alloy-js/core";
+import { code, For } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { ServerModel } from "../model.js";
+import { DocComment } from "./doc-comment.js";
 import { renderFileHeader } from "./type-ref.js";
 
 export function renderHandlers(serverModel: ServerModel) {
@@ -43,8 +44,7 @@ export function renderHandlers(serverModel: ServerModel) {
             const methodName = op.name[0].toLowerCase() + op.name.slice(1);
             return (
               <>
-                <Show when={op.doc !== undefined}>{() => code`/** ${op.doc} */`}</Show>
-                <Show when={op.doc !== undefined}>{() => <hbr />}</Show>
+                <DocComment doc={op.doc} />
                 {code`${methodName}(params: ${op.name}Parameters, context: Context): Promise<${op.name}Response>;`}
                 <hbr />
               </>

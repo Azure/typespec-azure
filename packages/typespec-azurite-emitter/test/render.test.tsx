@@ -1,6 +1,8 @@
-import { render, SourceDirectory, type Children } from "@alloy-js/core";
+import { code, render, SourceDirectory, type Children } from "@alloy-js/core";
+import * as ts from "@alloy-js/typescript";
 import { describe, expect, it } from "vitest";
 import type { ServerModel } from "../src/model.js";
+import { DocComment } from "../src/render/doc-comment.js";
 import { renderHandlers } from "../src/render/render-handlers.js";
 import { renderModels } from "../src/render/render-models.js";
 import { renderOperations } from "../src/render/render-operations.js";
@@ -160,6 +162,31 @@ describe("renderTypeRef", () => {
     expect(renderTypeRef({ kind: "literal", value: "foo" })).toBe(`"foo"`);
     expect(renderTypeRef({ kind: "literal", value: 42 })).toBe("42");
     expect(renderTypeRef({ kind: "literal", value: true })).toBe("true");
+  });
+});
+
+describe("DocComment", () => {
+  it("renders present docs as a JSDoc comment followed by the next line", () => {
+    const output = renderSourceFile(
+      <ts.SourceFile path="doc.ts">
+        <DocComment doc="Queue metadata." />
+        {code`export interface QueueMetadata {}`}
+      </ts.SourceFile>,
+    );
+
+    expect(output).toContain("/** Queue metadata. */\nexport interface QueueMetadata {}");
+  });
+
+  it("renders nothing when docs are absent", () => {
+    const output = renderSourceFile(
+      <ts.SourceFile path="doc.ts">
+        <DocComment doc={undefined} />
+        {code`export interface QueueMetadata {}`}
+      </ts.SourceFile>,
+    );
+
+    expect(output).not.toContain("/**");
+    expect(output).toContain("export interface QueueMetadata {}");
   });
 });
 

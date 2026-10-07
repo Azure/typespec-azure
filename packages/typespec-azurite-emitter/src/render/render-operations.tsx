@@ -1,6 +1,7 @@
 import { code, For, Show } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { ServerModel, ServerOperation, ServerResponse, ServerTypeRef } from "../model.js";
+import { DocComment } from "./doc-comment.js";
 import { collectModelRefs, renderFileHeader, renderTypeRef } from "./type-ref.js";
 
 /** Collects every `models.ts`-defined type name referenced anywhere in `serverModel`'s operations. */
@@ -29,8 +30,7 @@ function ParametersInterface(props: { operation: ServerOperation }) {
   const op = props.operation;
   return (
     <>
-      <Show when={op.doc !== undefined}>{() => code`/** ${op.doc} */`}</Show>
-      <Show when={op.doc !== undefined}>{() => <hbr />}</Show>
+      <DocComment doc={op.doc} />
       {code`export interface ${op.name}Parameters {`}
       <hbr />
       <indent>
