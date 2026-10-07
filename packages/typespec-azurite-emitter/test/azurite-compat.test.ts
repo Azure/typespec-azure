@@ -10,7 +10,7 @@ describe("structural fit against Azure/Azurite's real generated artifacts", () =
     //   create(options: Models.QueueCreateOptionalParams, context: Context): Promise<Models.QueueCreateResponse>;
     // from https://github.com/Azure/Azurite/blob/main/src/queue/generated/handlers/IQueueHandler.ts
     expect(handlersFile).toMatch(
-      /queue_Create\(\s*params: Queue_CreateParameters,\s*context: Context,\s*\): Promise<Queue_CreateResponse>;/,
+      /queue_Create\(\s*params: QueueCreateParameters,\s*context: Context,\s*\): Promise<QueueCreateResponse>;/,
     );
     // Every operation follows the same (params, context) => Promise<Response> shape.
     const methodSignatures = [

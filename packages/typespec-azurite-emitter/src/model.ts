@@ -9,6 +9,7 @@ export type ServerTypeRef =
   | { kind: "model"; name: string }
   | { kind: "array"; element: ServerTypeRef }
   | { kind: "record"; element: ServerTypeRef }
+  | { kind: "union"; variants: readonly ServerTypeRef[] }
   | { kind: "literal"; value: string | number | boolean };
 
 export interface ServerModelProperty {
@@ -62,7 +63,10 @@ export interface ServerResponse {
 }
 
 export interface ServerOperation {
+  /** Runtime operation name used in generated metadata and dispatcher lookup. */
   readonly name: string;
+  /** TypeScript declaration stem for operation-specific generated types. */
+  readonly typeName: string;
   readonly verb: "get" | "put" | "post" | "patch" | "delete" | "head";
   /** The full HTTP path as reported by TypeSpec, including literal query constraints. */
   readonly rawPath: string;

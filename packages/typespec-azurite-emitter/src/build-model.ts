@@ -1,3 +1,4 @@
+import * as ts from "@alloy-js/typescript";
 import {
   $doc,
   type DecoratorContext,
@@ -30,7 +31,13 @@ import type {
   ServerSkippedOperation,
   ServerTypeRef,
 } from "./model.js";
-import { getName, getPascalName } from "./utils.js";
+import { getName } from "./utils.js";
+
+const tsNamePolicy = ts.createTSNamePolicy();
+
+function getTypeName(name: string): string {
+  return tsNamePolicy.getName(name, "type");
+}
 
 interface TypeMetadata {
   readonly runtime: ServerTypeRef;
@@ -62,15 +69,25 @@ export function buildServerModel(program: Program): ServerModel {
   const operations: ServerOperation[] = [];
   const skippedOperations: ServerSkippedOperation[] = [];
   const usedOperationNames = new Set<string>();
+  const usedOperationTypeNames = new Set<string>();
   for (const op of service?.operations ?? []) {
     try {
       const operationName = getOperationName(program, op, usedOperationNames);
-      const built = buildOperation(program, operationName, op, modelRegistry, anonymousModelNames);
+      const operationTypeName = getOperationTypeName(operationName, op, usedOperationTypeNames);
+      const built = buildOperation(
+        program,
+        operationName,
+        operationTypeName,
+        op,
+        modelRegistry,
+        anonymousModelNames,
+      );
       usedOperationNames.add(operationName);
+      usedOperationTypeNames.add(operationTypeName);
       operations.push(built);
     } catch (error) {
       skippedOperations.push({
-        name: getPascalName(op.operation.name),
+        name: getName(program, op.operation, getTypeName(op.operation.name)),
         reason: error instanceof Error ? error.message : String(error),
       });
     }
@@ -95,6 +112,7 @@ function disambiguate(name: string, used: ReadonlySet<string>): string {
 function buildOperation(
   program: Program,
   name: string,
+  typeName: string,
   op: HttpOperation,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
@@ -114,15 +132,22 @@ function buildOperation(
   const doc = getDocHelper(program, op.operation);
   const operation: ServerOperation = {
     name,
+    typeName,
     verb: op.verb,
     rawPath: op.path,
     path: route.path,
     literalQueryParameters: route.literalQueryParameters,
     parameters: parameters.map(stripParameter),
-    parametersModel: createOperationParametersModel(program, name, parameters, requestBody, doc),
+    parametersModel: createOperationParametersModel(
+      program,
+      typeName,
+      parameters,
+      requestBody,
+      doc,
+    ),
     requestBody: requestBody && stripRequestBody(requestBody),
     responses: responses.map(stripResponse),
-    responseUnion: createOperationResponseUnion(program, name, responses),
+    responseUnion: createOperationResponseUnion(program, typeName, responses),
     doc,
     interfaceName: op.operation.interface?.name,
   };
@@ -135,12 +160,25 @@ function getOperationName(
   op: HttpOperation,
   usedOperationNames: ReadonlySet<string>,
 ): string {
-  const baseName = getName(program, op.operation, getPascalName(op.operation.name));
+  const baseName = getName(program, op.operation, getTypeName(op.operation.name));
   const qualifiedName =
     usedOperationNames.has(baseName) && op.operation.interface?.name
-      ? `${getPascalName(op.operation.interface.name)}${baseName}`
+      ? `${getTypeName(op.operation.interface.name)}${baseName}`
       : baseName;
   return disambiguate(qualifiedName, usedOperationNames);
+}
+
+function getOperationTypeName(
+  operationName: string,
+  op: HttpOperation,
+  usedOperationTypeNames: ReadonlySet<string>,
+): string {
+  const baseName = getTypeName(operationName);
+  const qualifiedName =
+    usedOperationTypeNames.has(baseName) && op.operation.interface?.name
+      ? `${getTypeName(op.operation.interface.name)}${baseName}`
+      : baseName;
+  return disambiguate(qualifiedName, usedOperationTypeNames);
 }
 
 function splitRoutePath(path: string): {
@@ -176,7 +214,9 @@ function buildParameter(
 ): BuiltOperationParameter {
   const location: ServerParameterLocation =
     param.type === "cookie" ? "header" : (param.type as ServerParameterLocation);
-  const type = getTypeMetadata(program, param.param.type, modelRegistry, anonymousModelNames);
+  const type = isHeaderCollection(param.name)
+    ? getHeaderCollectionTypeMetadata(program)
+    : getTypeMetadata(program, param.param.type, modelRegistry, anonymousModelNames);
   return {
     name: getName(program, param.param, param.param.name),
     wireName: param.name,
@@ -211,7 +251,9 @@ function buildResponse(
   const content = response.responses[0];
   const headers: BuiltResponseHeader[] = [];
   for (const [headerWireName, prop] of Object.entries(content?.headers ?? {})) {
-    const type = getTypeMetadata(program, prop.type, modelRegistry, anonymousModelNames);
+    const type = isHeaderCollection(headerWireName)
+      ? getHeaderCollectionTypeMetadata(program)
+      : getTypeMetadata(program, prop.type, modelRegistry, anonymousModelNames);
     headers.push({
       name: getName(program, prop, prop.name),
       wireName: headerWireName,
@@ -220,7 +262,6 @@ function buildResponse(
       optional: prop.optional,
     });
   }
-
   return {
     statusCode: typeof response.statusCodes === "number" ? response.statusCodes : "*",
     headers,
@@ -228,6 +269,25 @@ function buildResponse(
       content?.body && response.statusCodes !== "*"
         ? buildRequestBody(program, content.body, modelRegistry, anonymousModelNames)
         : undefined,
+  };
+}
+
+function isHeaderCollection(wireName: string): boolean {
+  return wireName.toLowerCase() === "x-ms-meta";
+}
+
+function getHeaderCollectionTypeMetadata(program: Program): TypeMetadata {
+  const tk = $(program);
+  const value = tk.union.create([tk.builtin.string, tk.array.create(tk.builtin.string)]);
+  return {
+    runtime: {
+      kind: "record",
+      element: {
+        kind: "union",
+        variants: [{ kind: "string" }, { kind: "array", element: { kind: "string" } }],
+      },
+    },
+    declaration: tk.record.create(value),
   };
 }
 
@@ -367,7 +427,7 @@ function resolveModelName(
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): string {
-  if (model.name) return getName(program, model, model.name);
+  if (model.name) return getName(program, model, getTypeName(model.name));
   const existingNamedModel = findStructurallyEquivalentNamedModel(
     program,
     model,

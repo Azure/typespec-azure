@@ -15,10 +15,6 @@ function getTcgcContext(program: Program): TCGCContext {
   return context;
 }
 
-export function getPascalName(name: string): string {
-  return name.length === 0 ? name : name[0].toUpperCase() + name.slice(1);
-}
-
 export function getName(program: Program, target: Type, fallbackName: string): string {
   return getClientNameOverride(getTcgcContext(program), target) ?? fallbackName;
 }

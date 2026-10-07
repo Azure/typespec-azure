@@ -2,18 +2,7 @@ import { $ } from "@typespec/compiler/typekit";
 import { getAllHttpServices } from "@typespec/http";
 import { describe, expect, it } from "vitest";
 import { buildServerModel } from "../src/build-model.js";
-import { getPascalName } from "../src/utils.js";
 import { ApiTester, loadQueuePilotFixture } from "./tester.js";
-
-describe("getPascalName", () => {
-  it("upper-cases the first letter", () => {
-    expect(getPascalName("listMessages")).toBe("ListMessages");
-  });
-
-  it("handles empty strings", () => {
-    expect(getPascalName("")).toBe("");
-  });
-});
 
 describe("buildServerModel", () => {
   it("builds one operation per HTTP operation with the right verb and path", async () => {
@@ -30,6 +19,7 @@ describe("buildServerModel", () => {
     ]);
 
     const createQueue = serverModel.operations.find((op) => op.name === "Queue_Create")!;
+    expect(createQueue.typeName).toBe("QueueCreate");
     expect(createQueue.verb).toBe("put");
     expect(createQueue.path).toBe("/{queueName}");
     expect(createQueue.rawPath).toBe("/{queueName}");
@@ -92,6 +82,36 @@ describe("buildServerModel", () => {
       type: { kind: "number" },
     });
     expect(response.body).toMatchObject({ type: { kind: "model", name: "QueueProperties" } });
+  });
+
+  it("types x-ms-meta header collections as string-or-string-array records", async () => {
+    const { program } = await ApiTester.compile({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace HeaderCollectionDemo;
+
+        @route("/queues")
+        @put
+        op create(@header("x-ms-meta") metadata?: string): {
+          @statusCode statusCode: 201;
+          @header("x-ms-meta") metadata?: string;
+        };
+      `,
+    });
+    const serverModel = buildServerModel(program);
+
+    const create = serverModel.operations[0];
+    expect(create.parameters[0].type).toEqual({
+      kind: "record",
+      element: {
+        kind: "union",
+        variants: [{ kind: "string" }, { kind: "array", element: { kind: "string" } }],
+      },
+    });
+    expect(create.responses[0].headers[0].type).toEqual(create.parameters[0].type);
   });
 
   it("registers transitively referenced models with their properties", async () => {
@@ -314,9 +334,9 @@ describe("buildServerModel", () => {
     expect(serverModel.models.map((model) => model.name)).toEqual(["Item"]);
   });
 
-  it("disambiguates operation names that collide across different TypeSpec interfaces", async () => {
-    // Two different interfaces each declaring a `getProperties` operation both PascalCase to
-    // `GetProperties`, which would otherwise be a duplicate generated TS identifier.
+  it("uses TypeScript name policy and disambiguates operation names that collide across interfaces", async () => {
+    // Two different interfaces each declaring a `get_url` operation both normalize to
+    // `GetUrl`, which would otherwise be a duplicate generated TS identifier.
     const { program } = await ApiTester.compile({
       "main.tsp": `
         import "@typespec/http";
@@ -327,28 +347,30 @@ describe("buildServerModel", () => {
 
         @route("/a")
         interface A {
-          @get getProperties(): string;
+          @get get_url(): string;
         }
 
         @route("/b")
-        interface B {
-          @get getProperties(): string;
+        interface XML_queue {
+          @get get_url(): string;
         }
       `,
     });
     const serverModel = buildServerModel(program);
 
     const names = serverModel.operations.map((op) => op.name);
+    const typeNames = serverModel.operations.map((op) => op.typeName);
     expect(names).toHaveLength(2);
     expect(new Set(names).size).toBe(2);
-    expect(names).toContain("GetProperties");
-    expect(names.some((n) => n !== "GetProperties" && n.endsWith("GetProperties"))).toBe(true);
+    expect(names).toContain("GetUrl");
+    expect(names).toContain("XmlQueueGetUrl");
+    expect(typeNames).toEqual(names);
 
     // Each operation's generated metadata should also carry which interface declared it, so a
     // consumer (e.g. a dispatcher needing to classify operations by resource) doesn't have to
     // guess resource identity from the operation name/path alone.
     const interfaceNames = serverModel.operations.map((op) => op.interfaceName).sort();
-    expect(interfaceNames).toEqual(["A", "B"]);
+    expect(interfaceNames).toEqual(["A", "XML_queue"]);
   });
 
   it("applies @makeOptional from an azurite.tsp-style overlay to relax a required base-spec property", async () => {

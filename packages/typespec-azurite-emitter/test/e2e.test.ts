@@ -92,7 +92,7 @@ describe("end-to-end emit", () => {
 
     expect(handlersFile).toContain("export interface IServiceHandler {");
     expect(handlersFile).toMatch(
-      /queue_Create\(\s*params: Queue_CreateParameters,\s*context: Context,\s*\): Promise<Queue_CreateResponse>;/,
+      /queue_Create\(\s*params: QueueCreateParameters,\s*context: Context,\s*\): Promise<QueueCreateResponse>;/,
     );
     expect(handlersFile).toMatch(
       /getQueueProperties\(\s*params: GetQueuePropertiesParameters,\s*context: Context,\s*\): Promise<GetQueuePropertiesResponse>;/,
@@ -126,9 +126,12 @@ describe("end-to-end emit", () => {
     expect(serializationFile).toMatch(
       /export async function deserializeRequest\(\s*name: string,\s*req: IRequest,\s*context: Context,/,
     );
+    expect(serializationFile).toContain(`const metadata = getGeneratedOperation(name);`);
     expect(serializationFile).toContain(
-      `deserializeMetadataRequest(getGeneratedOperation(name), req, context)`,
+      `return metadata === undefined ? undefined : deserializeMetadataRequest(metadata, req, context);`,
     );
+    expect(serializationFile).toContain(`const generatedOperationNames = new Set<string>`);
+    expect(serializationFile).not.toContain(`switch (name)`);
     expect(serializationFile).toContain(`function deserializePathParameter`);
     expect(serializationFile).toContain(`getContextPathParameter(context, parameter)`);
     expect(serializationFile).not.toContain(`if (parameter.location === "path") continue`);

@@ -1,4 +1,4 @@
-import { Block, code, For, List } from "@alloy-js/core";
+import { code } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { ServerDataModel, ServerModel, ServerOperation, ServerTypeRef } from "../model.js";
 import { renderFileHeader } from "./file-header.js";
@@ -37,7 +37,8 @@ export function renderSerialization(serverModel: ServerModel) {
 
       <HasGeneratedSerialization operations={supportedOperations} />
 
-      <HelperFunctions />
+      <hbr />
+      <HelperFunctions operations={supportedOperations} />
     </ts.SourceFile>
   );
 }
@@ -141,7 +142,10 @@ export function DeserializeRequest(props: { operations: readonly ServerOperation
       ]}
       returnType={code`IHandlerParameters | undefined`}
     >
-      <SerializationSwitch operations={props.operations} kind="deserialize" />
+      {code`
+        const metadata = getGeneratedOperation(name);
+        return metadata === undefined ? undefined : deserializeMetadataRequest(metadata, req, context);
+      `}
     </ts.FunctionDeclaration>
   );
 }
@@ -158,7 +162,12 @@ export function SerializeResponse(props: { operations: readonly ServerOperation[
       ]}
       returnType={code`boolean`}
     >
-      <SerializationSwitch operations={props.operations} kind="serialize" />
+      {code`
+        const metadata = getGeneratedOperation(name);
+        if (metadata === undefined) return false;
+        serializeMetadataResponse(metadata, res, handlerResponse);
+        return true;
+      `}
     </ts.FunctionDeclaration>
   );
 }
@@ -171,81 +180,18 @@ export function HasGeneratedSerialization(props: { operations: readonly ServerOp
       parameters={[{ name: "name", type: code`string` }]}
       returnType={code`boolean`}
     >
-      <SerializationSwitch operations={props.operations} kind="has" />
+      {code`return generatedOperationNames.has(name);`}
     </ts.FunctionDeclaration>
   );
 }
 
-function SerializationSwitch(props: {
-  operations: readonly ServerOperation[];
-  kind: "deserialize" | "serialize" | "has";
-}) {
-  return (
-    <Block opener="switch (name) {" closer="}">
-      <List hardline>
-        <For each={props.operations}>
-          {(op) => <SerializationSwitchCase operation={op} kind={props.kind} />}
-        </For>
-        <>
-          {code`default:`}
-          <indent>
-            <hbr />
-            {props.kind === "deserialize" ? code`return undefined;` : code`return false;`}
-          </indent>
-        </>
-      </List>
-    </Block>
-  );
-}
-
-function SerializationSwitchCase(props: {
-  operation: ServerOperation;
-  kind: "deserialize" | "serialize" | "has";
-}) {
-  switch (props.kind) {
-    case "deserialize":
-      return (
-        <>
-          {code`case ${JSON.stringify(props.operation.name)}:`}
-          <indent>
-            <hbr />
-            {code`return deserializeMetadataRequest(getGeneratedOperation(name), req, context);`}
-          </indent>
-        </>
-      );
-    case "serialize":
-      return (
-        <>
-          {code`case ${JSON.stringify(props.operation.name)}:`}
-          <indent>
-            <hbr />
-            {code`serializeMetadataResponse(getGeneratedOperation(name), res, handlerResponse);`}
-            <hbr />
-            {code`return true;`}
-          </indent>
-        </>
-      );
-    case "has":
-      return (
-        <>
-          {code`case ${JSON.stringify(props.operation.name)}:`}
-          <indent>
-            <hbr />
-            {code`return true;`}
-          </indent>
-        </>
-      );
-  }
-}
-
-function HelperFunctions() {
+function HelperFunctions(props: { operations: readonly ServerOperation[] }) {
   return code`
-    function getGeneratedOperation(name: string): ${(<ts.Reference refkey={operationMetadataRefkey} type />)} {
-      const metadata = operations.find((operation) => operation.name === name);
-      if (metadata === undefined) {
-        throw new TypeError("Generated TypeSpec serialization metadata does not include operation " + name);
-      }
-      return metadata;
+    const generatedOperationNames = new Set<string>(${(<ts.ValueExpression jsValue={props.operations.map((op) => op.name)} />)});
+
+    function getGeneratedOperation(name: string): ${(<ts.Reference refkey={operationMetadataRefkey} type />)} | undefined {
+      if (!generatedOperationNames.has(name)) return undefined;
+      return operations.find((operation) => operation.name === name);
     }
 
     async function deserializeMetadataRequest(metadata: ${(<ts.Reference refkey={operationMetadataRefkey} type />)}, req: IRequest, context: Context): Promise<IHandlerParameters> {
@@ -476,6 +422,7 @@ function HelperFunctions() {
         case "model":
         case "record":
         case "string":
+        case "union":
         case "unknown":
           return deserializeString(value, wireName, required);
       }
@@ -548,6 +495,7 @@ function HelperFunctions() {
         case "model":
         case "record":
         case "string":
+        case "union":
         case "unknown":
           return value;
       }
@@ -588,6 +536,7 @@ function HelperFunctions() {
         case "model":
         case "record":
         case "string":
+        case "union":
         case "unknown":
           return value as string | number | boolean;
       }

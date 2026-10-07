@@ -158,7 +158,7 @@ describe("renderOperations", () => {
         };
       };
       export type OperationTypeBinding = {
-        kind: "string" | "number" | "boolean" | "datetime" | "record" | "unknown";
+        kind: "string" | "number" | "boolean" | "datetime" | "unknown";
       } | {
         kind: "model";
         name: string;
@@ -168,6 +168,12 @@ describe("renderOperations", () => {
       } | {
         kind: "array";
         element: OperationTypeBinding;
+      } | {
+        kind: "record";
+        element: OperationTypeBinding;
+      } | {
+        kind: "union";
+        variants: Array<OperationTypeBinding>;
       };
       export interface OperationParameterBinding {
         readonly name: string;
@@ -500,7 +506,7 @@ describe("renderSerialization components", () => {
     `);
   });
 
-  it("renders serialization entrypoint declarations with operation switch cases", () => {
+  it("renders serialization entrypoint declarations with metadata lookups", () => {
     expect(
       <SourceFile>
         <DeserializeRequest operations={supportedOperations} />
@@ -515,40 +521,21 @@ describe("renderSerialization components", () => {
         req: IRequest,
         context: Context,
       ): Promise<IHandlerParameters | undefined> {
-        switch (name) {
-          case "CreateQueue":
-            return deserializeMetadataRequest(getGeneratedOperation(name), req, context);
-          case "DeleteQueue":
-            return deserializeMetadataRequest(getGeneratedOperation(name), req, context);
-          default:
-            return undefined;
-        }
+        const metadata = getGeneratedOperation(name);
+        return metadata === undefined ? undefined : deserializeMetadataRequest(metadata, req, context);
       }
       export function serializeResponse(
         name: string,
         res: IResponse,
         handlerResponse: any,
       ): boolean {
-        switch (name) {
-          case "CreateQueue":
-            serializeMetadataResponse(getGeneratedOperation(name), res, handlerResponse);
-            return true;
-          case "DeleteQueue":
-            serializeMetadataResponse(getGeneratedOperation(name), res, handlerResponse);
-            return true;
-          default:
-            return false;
-        }
+        const metadata = getGeneratedOperation(name);
+        if (metadata === undefined) return false;
+        serializeMetadataResponse(metadata, res, handlerResponse);
+        return true;
       }
       export function hasGeneratedSerialization(name: string): boolean {
-        switch (name) {
-          case "CreateQueue":
-            return true;
-          case "DeleteQueue":
-            return true;
-          default:
-            return false;
-        }
+        return generatedOperationNames.has(name);
       }
     `);
   });

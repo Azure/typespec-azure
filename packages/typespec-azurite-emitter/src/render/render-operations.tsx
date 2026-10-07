@@ -30,10 +30,12 @@ export interface OperationTypeBindingValue {
     | "unknown"
     | "model"
     | "literal"
-    | "array";
+    | "array"
+    | "union";
   readonly name?: string;
   readonly value?: string | number | boolean;
   readonly element?: OperationTypeBindingValue;
+  readonly variants?: readonly OperationTypeBindingValue[];
 }
 
 export interface OperationMetadataValue {
@@ -308,6 +310,9 @@ export function operationTypeBindingValue(type: ServerTypeRef): OperationTypeBin
     case "model":
       return { kind: "model", name: type.name };
     case "record":
+      return { kind: "record", element: operationTypeBindingValue(type.element) };
+    case "union":
+      return { kind: "union", variants: type.variants.map(operationTypeBindingValue) };
     case "boolean":
     case "datetime":
     case "number":
@@ -337,7 +342,6 @@ function useOperationTypeBindingUnion(): Union {
         number: "number",
         boolean: "boolean",
         datetime: "datetime",
-        record: "record",
         unknown: "unknown",
       },
     }),
@@ -354,12 +358,22 @@ function useOperationTypeBindingUnion(): Union {
     kind: $.literal.createString("array"),
     element: union,
   });
+  const record = useModelExpression({
+    kind: $.literal.createString("record"),
+    element: union,
+  });
+  const unionExpression = useModelExpression({
+    kind: $.literal.createString("union"),
+    variants: $.array.create(union),
+  });
 
   for (const variant of [
     $.unionVariant.create({ name: "primitive", type: primitive, union }),
     $.unionVariant.create({ name: "model", type: model, union }),
     $.unionVariant.create({ name: "literal", type: literal, union }),
     $.unionVariant.create({ name: "array", type: array, union }),
+    $.unionVariant.create({ name: "record", type: record, union }),
+    $.unionVariant.create({ name: "union", type: unionExpression, union }),
   ]) {
     union.variants.set(variant.name, variant);
   }
@@ -398,14 +412,14 @@ export function renderOperations(serverModel: ServerModel) {
             <ef.InterfaceDeclaration
               export
               type={op.parametersModel}
-              name={`${op.name}Parameters`}
+              name={`${op.typeName}Parameters`}
               refkey={operationParametersRefkey(op)}
             />
             <hbr />
             <ef.TypeDeclaration
               export
               type={op.responseUnion}
-              name={`${op.name}Response`}
+              name={`${op.typeName}Response`}
               refkey={operationResponseRefkey(op)}
             />
             <hbr />
