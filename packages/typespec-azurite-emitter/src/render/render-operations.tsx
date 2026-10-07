@@ -71,36 +71,6 @@ interface OperationResponseMetadataValue {
   };
 }
 
-function ParametersInterface(props: { operation: ServerOperation }) {
-  const op = props.operation;
-  return (
-    <>
-      <ef.InterfaceDeclaration
-        export
-        type={op.parametersModel}
-        name={`${op.name}Parameters`}
-        refkey={operationParametersRefkey(op)}
-      />
-      <hbr />
-    </>
-  );
-}
-
-function ResponseType(props: { operation: ServerOperation }) {
-  const op = props.operation;
-  return (
-    <>
-      <ef.TypeDeclaration
-        export
-        type={op.responseUnion}
-        name={`${op.name}Response`}
-        refkey={operationResponseRefkey(op)}
-      />
-      <hbr />
-    </>
-  );
-}
-
 function MetadataDefinitions() {
   return (
     <>
@@ -277,23 +247,6 @@ function operationMetadataMembers(): Children[] {
   ];
 }
 
-function OperationsMetadata(props: { operations: readonly ServerOperation[] }) {
-  return (
-    <ts.VarDeclaration
-      export
-      const
-      name="operations"
-      type={
-        <>
-          readonly <ts.Reference refkey={operationMetadataRefkey} type />
-          []
-        </>
-      }
-      initializer={<ts.ValueExpression jsValue={props.operations.map(operationMetadataValue)} />}
-    />
-  );
-}
-
 export function operationMetadataValue(op: ServerOperation): OperationMetadataValue {
   return withoutUndefined({
     name: op.name,
@@ -442,13 +395,38 @@ export function renderOperations(serverModel: ServerModel) {
       <For each={serverModel.operations} hardline>
         {(op) => (
           <>
-            <ParametersInterface operation={op} />
-            <ResponseType operation={op} />
+            <ef.InterfaceDeclaration
+              export
+              type={op.parametersModel}
+              name={`${op.name}Parameters`}
+              refkey={operationParametersRefkey(op)}
+            />
+            <hbr />
+            <ef.TypeDeclaration
+              export
+              type={op.responseUnion}
+              name={`${op.name}Response`}
+              refkey={operationResponseRefkey(op)}
+            />
+            <hbr />
           </>
         )}
       </For>
       <MetadataDefinitions />
-      <OperationsMetadata operations={serverModel.operations} />
+      <ts.VarDeclaration
+        export
+        const
+        name="operations"
+        type={
+          <>
+            readonly <ts.Reference refkey={operationMetadataRefkey} type />
+            []
+          </>
+        }
+        initializer={
+          <ts.ValueExpression jsValue={serverModel.operations.map(operationMetadataValue)} />
+        }
+      />
     </ts.SourceFile>
   );
 }
