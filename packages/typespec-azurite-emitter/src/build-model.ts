@@ -98,8 +98,8 @@ function buildOperation(
     buildResponse(program, r, modelRegistry, anonymousModelNames),
   );
   const route = splitRoutePath(op.path);
-
-  return {
+  const doc = getDocHelper(program, op.operation);
+  const operation = {
     name,
     verb: op.verb,
     rawPath: op.path,
@@ -108,9 +108,19 @@ function buildOperation(
     parameters,
     requestBody,
     responses,
-    doc: getDocHelper(program, op.operation),
+    doc,
     interfaceName: op.operation.interface?.name,
   };
+
+  return withSource(
+    withSource(
+      operation,
+      "parametersModel",
+      createOperationParametersModel(program, name, parameters, requestBody, doc),
+    ),
+    "responseUnion",
+    createOperationResponseUnion(program, name, responses),
+  );
 }
 
 function getOperationName(
@@ -541,6 +551,126 @@ function createDeclarationProperty(
   return property;
 }
 
+function createOperationParametersModel(
+  program: Program,
+  operationName: string,
+  parameters: readonly ServerOperationParameter[],
+  requestBody: ServerRequestBody | undefined,
+  doc: string | undefined,
+): Model {
+  const tk = $(program);
+  const model = tk.model.create({
+    name: `${operationName}Parameters`,
+    properties: {},
+    expression: false,
+  });
+  applyDoc(program, model, doc);
+
+  for (const parameter of parameters) {
+    const property = tk.modelProperty.create({
+      name: parameter.name,
+      type: parameter.declarationType!,
+      optional: parameter.optional,
+    });
+    property.model = model;
+    model.properties.set(property.name, property);
+  }
+
+  if (requestBody !== undefined) {
+    const property = tk.modelProperty.create({
+      name: "body",
+      type: requestBody.declarationType!,
+      optional: false,
+    });
+    property.model = model;
+    model.properties.set(property.name, property);
+  }
+
+  return model;
+}
+
+function createOperationResponseUnion(
+  program: Program,
+  operationName: string,
+  responses: readonly ServerResponse[],
+) {
+  const tk = $(program);
+  return tk.union.create({
+    name: `${operationName}Response`,
+    expression: false,
+    variants: responses.map((response, index) =>
+      tk.unionVariant.create({
+        name: `response${index}`,
+        type: createOperationResponseModel(program, response),
+      }),
+    ),
+  });
+}
+
+function createOperationResponseModel(program: Program, response: ServerResponse): Model {
+  const tk = $(program);
+  const model = tk.model.create({
+    properties: {},
+    expression: true,
+  });
+
+  const statusCodeProperty = tk.modelProperty.create({
+    name: "statusCode",
+    type:
+      response.statusCode === "*"
+        ? tk.builtin.float64
+        : tk.literal.createNumeric(response.statusCode),
+    optional: false,
+  });
+  statusCodeProperty.model = model;
+  model.properties.set(statusCodeProperty.name, statusCodeProperty);
+
+  if (response.headers.length > 0) {
+    const headersProperty = tk.modelProperty.create({
+      name: "headers",
+      type: createResponseHeadersModel(program, response.headers),
+      optional: false,
+    });
+    headersProperty.model = model;
+    model.properties.set(headersProperty.name, headersProperty);
+  }
+
+  if (response.body !== undefined) {
+    const bodyProperty = tk.modelProperty.create({
+      name: "body",
+      type: response.body.declarationType!,
+      optional: false,
+    });
+    bodyProperty.model = model;
+    model.properties.set(bodyProperty.name, bodyProperty);
+  }
+
+  return model;
+}
+
+function createResponseHeadersModel(
+  program: Program,
+  headers: readonly ServerResponseHeader[],
+): Model {
+  const tk = $(program);
+  const model = tk.model.create({
+    properties: {},
+    expression: true,
+  });
+
+  for (const header of headers) {
+    const property = tk.modelProperty.create({
+      name: header.name,
+      type: header.declarationType!,
+      optional: header.optional,
+    });
+    property.model = model;
+    model.properties.set(property.name, property);
+  }
+
+  return model;
+}
+
 function applyDoc(program: Program, target: Type, doc: string | undefined): void {
   if (!doc) return;
   $doc({ program } as DecoratorContext, target, doc);
@@ -554,12 +684,12 @@ function withSource<T extends object, K extends string, V>(
   value: T,
   key: K,
   source: V,
-): T & { readonly [P in K]?: V } {
+): T & { readonly [P in K]: V } {
   Object.defineProperty(value, key, {
     configurable: false,
     enumerable: false,
     value: source,
     writable: false,
   });
-  return value;
+  return value as T & { readonly [P in K]: V };
 }

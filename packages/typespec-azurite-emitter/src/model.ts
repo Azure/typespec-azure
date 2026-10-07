@@ -1,4 +1,4 @@
-import type { Model, ModelProperty, Type } from "@typespec/compiler";
+import type { Model, ModelProperty, Type, Union } from "@typespec/compiler";
 
 export type ServerTypeRef =
   | { kind: "string" }
@@ -79,8 +79,10 @@ export interface ServerOperation {
   readonly path: string;
   readonly literalQueryParameters: readonly ServerLiteralQueryParameter[];
   readonly parameters: ServerOperationParameter[];
+  readonly parametersModel: Model;
   readonly requestBody?: ServerRequestBody;
   readonly responses: ServerResponse[];
+  readonly responseUnion: Union;
   readonly doc?: string;
   /** TypeSpec interface declaring the operation, when available. */
   readonly interfaceName?: string;

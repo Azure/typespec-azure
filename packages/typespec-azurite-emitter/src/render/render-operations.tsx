@@ -1,9 +1,15 @@
-import { code, For, Show, type Children } from "@alloy-js/core";
+import { code, For, type Children } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
-import type { Type } from "@typespec/compiler";
+import type { Model, Type, Union } from "@typespec/compiler";
+import { useTsp } from "@typespec/emitter-framework";
 import * as ef from "@typespec/emitter-framework/typescript";
-import { TypeExpression } from "@typespec/emitter-framework/typescript";
-import type { ServerModel, ServerOperation, ServerResponse, ServerTypeRef } from "../model.js";
+import type {
+  ServerModel,
+  ServerOperation,
+  ServerResponse,
+  ServerResponseHeader,
+  ServerTypeRef,
+} from "../model.js";
 import {
   operationMetadataRefkey,
   operationParameterBindingRefkey,
@@ -14,11 +20,55 @@ import {
 } from "./refkeys.js";
 import { renderFileHeader } from "./type-ref.js";
 
-function requireDeclarationType(type: Type | undefined, context: string): Type {
-  if (!type) {
-    throw new Error(`${context} is missing its derived TypeSpec declaration type.`);
-  }
-  return type;
+export interface OperationTypeBindingValue {
+  readonly kind:
+    | "string"
+    | "number"
+    | "boolean"
+    | "datetime"
+    | "record"
+    | "unknown"
+    | "model"
+    | "literal"
+    | "array";
+  readonly name?: string;
+  readonly value?: string | number | boolean;
+  readonly element?: OperationTypeBindingValue;
+}
+
+export interface OperationMetadataValue {
+  readonly name: string;
+  readonly verb: string;
+  readonly rawPath: string;
+  readonly path: string;
+  readonly literalQueryParameters: readonly { readonly name: string; readonly value: string }[];
+  readonly requiredQueryParameters: readonly string[];
+  readonly requiredHeaderParameters: readonly string[];
+  readonly parameters: readonly {
+    readonly name: string;
+    readonly wireName: string;
+    readonly location: "path" | "query" | "header";
+    readonly required: boolean;
+    readonly type: OperationTypeBindingValue;
+  }[];
+  readonly hasRequestBody: boolean;
+  readonly requestBodyContentTypes: readonly string[];
+  readonly requestBodyParameterPath?: string | readonly string[];
+  readonly requestBodyType?: OperationTypeBindingValue;
+  readonly responses: readonly OperationResponseMetadataValue[];
+  readonly interfaceName?: string;
+}
+
+interface OperationResponseMetadataValue {
+  readonly statusCode: number | "*";
+  readonly headers: readonly {
+    readonly name: string;
+    readonly wireName: string;
+    readonly type: OperationTypeBindingValue;
+  }[];
+  readonly body?: {
+    readonly type: OperationTypeBindingValue;
+  };
 }
 
 function ParametersInterface(props: { operation: ServerOperation }) {
@@ -27,137 +77,25 @@ function ParametersInterface(props: { operation: ServerOperation }) {
     <>
       <ef.InterfaceDeclaration
         export
+        type={op.parametersModel}
         name={`${op.name}Parameters`}
-        doc={op.doc}
         refkey={operationParametersRefkey(op)}
-      >
-        <For each={op.parameters}>
-          {(param) => (
-            <>
-              <ts.InterfaceMember
-                name={param.name}
-                optional={param.optional}
-                type={
-                  <TypeExpression
-                    type={requireDeclarationType(
-                      param.declarationType,
-                      `Parameter ${op.name}.${param.name}`,
-                    )}
-                  />
-                }
-              />
-              {code`;`}
-              <hbr />
-            </>
-          )}
-        </For>
-        <Show when={op.requestBody !== undefined}>
-          {() => (
-            <>
-              <ts.InterfaceMember
-                name="body"
-                type={
-                  <TypeExpression
-                    type={requireDeclarationType(
-                      op.requestBody!.declarationType,
-                      `Request body for ${op.name}`,
-                    )}
-                  />
-                }
-              />
-              {code`;`}
-              <hbr />
-            </>
-          )}
-        </Show>
-      </ef.InterfaceDeclaration>
+      />
       <hbr />
     </>
   );
-}
-
-function ResponseVariant(props: { response: ServerResponse }) {
-  const response = props.response;
-  return (
-    <>
-      {code`| `}
-      <ts.InterfaceExpression>
-        <For each={responseInterfaceMembers(response)} semicolon line enderPunctuation>
-          {(member) => member}
-        </For>
-      </ts.InterfaceExpression>
-    </>
-  );
-}
-
-function ResponseHeaders(props: { response: ServerResponse }) {
-  return (
-    <ts.InterfaceExpression>
-      <For each={props.response.headers} semicolon line enderPunctuation>
-        {(header) => (
-          <ts.InterfaceMember
-            name={header.name}
-            optional={header.optional}
-            type={
-              <TypeExpression
-                type={requireDeclarationType(
-                  header.declarationType,
-                  `Response header ${header.name}`,
-                )}
-              />
-            }
-          />
-        )}
-      </For>
-    </ts.InterfaceExpression>
-  );
-}
-
-function responseInterfaceMembers(response: ServerResponse): Children[] {
-  const members: Children[] = [
-    <ts.InterfaceMember
-      name="statusCode"
-      type={
-        response.statusCode === "*" ? (
-          code`number`
-        ) : (
-          <ts.ValueExpression jsValue={response.statusCode} />
-        )
-      }
-    />,
-  ];
-  if (response.headers.length > 0) {
-    members.push(
-      <ts.InterfaceMember name="headers" type={<ResponseHeaders response={response} />} />,
-    );
-  }
-  if (response.body !== undefined) {
-    members.push(
-      <ts.InterfaceMember
-        name="body"
-        type={
-          <TypeExpression
-            type={requireDeclarationType(response.body.declarationType, "Response body")}
-          />
-        }
-      />,
-    );
-  }
-  return members;
 }
 
 function ResponseType(props: { operation: ServerOperation }) {
   const op = props.operation;
   return (
     <>
-      <ef.TypeDeclaration export name={`${op.name}Response`} refkey={operationResponseRefkey(op)}>
-        <hbr />
-        <indent>
-          <For each={op.responses} line>
-            {(response) => <ResponseVariant response={response} />}
-          </For>
-        </indent>
-      </ef.TypeDeclaration>
+      <ef.TypeDeclaration
+        export
+        type={op.responseUnion}
+        name={`${op.name}Response`}
+        refkey={operationResponseRefkey(op)}
+      />
       <hbr />
     </>
   );
@@ -173,14 +111,9 @@ function MetadataDefinitions() {
         name="OperationParameterBinding"
         refkey={operationParameterBindingRefkey}
       >
-        <ReadonlyMember name="name" type={code`string`} />
-        <ReadonlyMember name="wireName" type={code`string`} />
-        <ReadonlyMember name="location" type={code`"path" | "query" | "header"`} />
-        <ReadonlyMember name="required" type={code`boolean`} />
-        <ReadonlyMember
-          name="type"
-          type={<ts.Reference refkey={operationTypeBindingRefkey} type />}
-        />
+        <For each={operationParameterBindingMembers()} semicolon line enderPunctuation>
+          {(member) => member}
+        </For>
       </ef.InterfaceDeclaration>
       <hbr />
       <ef.InterfaceDeclaration
@@ -188,78 +121,27 @@ function MetadataDefinitions() {
         name="OperationResponseHeaderBinding"
         refkey={operationResponseHeaderBindingRefkey}
       >
-        <ReadonlyMember name="name" type={code`string`} />
-        <ReadonlyMember name="wireName" type={code`string`} />
-        <ReadonlyMember
-          name="type"
-          type={<ts.Reference refkey={operationTypeBindingRefkey} type />}
-        />
+        <For each={operationResponseHeaderBindingMembers()} semicolon line enderPunctuation>
+          {(member) => member}
+        </For>
       </ef.InterfaceDeclaration>
       <hbr />
       <ef.InterfaceDeclaration export name="OperationResponseMetadata">
-        <ReadonlyMember name="statusCode" type={code`number | "*"`} />
-        <ReadonlyMember
-          name="headers"
-          type={
-            <>
-              readonly <ts.Reference refkey={operationResponseHeaderBindingRefkey} type />
-              []
-            </>
-          }
-        />
-        <ReadonlyMember
-          name="body"
-          optional
-          type={
-            <ts.InterfaceExpression>
-              <ReadonlyMember
-                name="type"
-                type={<ts.Reference refkey={operationTypeBindingRefkey} type />}
-              />
-            </ts.InterfaceExpression>
-          }
-        />
+        <For each={operationResponseMetadataMembers()} semicolon line enderPunctuation>
+          {(member) => member}
+        </For>
       </ef.InterfaceDeclaration>
       <hbr />
       <ef.InterfaceDeclaration export name="OperationLiteralQueryParameter">
-        <ReadonlyMember name="name" type={code`string`} />
-        <ReadonlyMember name="value" type={code`string`} />
+        <For each={operationLiteralQueryParameterMembers()} semicolon line enderPunctuation>
+          {(member) => member}
+        </For>
       </ef.InterfaceDeclaration>
       <hbr />
       <ef.InterfaceDeclaration export name="OperationMetadata" refkey={operationMetadataRefkey}>
-        <ReadonlyMember name="name" type={code`string`} />
-        <ReadonlyMember name="verb" type={code`string`} />
-        <ReadonlyMember name="rawPath" type={code`string`} />
-        <ReadonlyMember name="path" type={code`string`} />
-        <ReadonlyMember
-          name="literalQueryParameters"
-          type={code`readonly OperationLiteralQueryParameter[]`}
-        />
-        <ReadonlyMember name="requiredQueryParameters" type={code`readonly string[]`} />
-        <ReadonlyMember name="requiredHeaderParameters" type={code`readonly string[]`} />
-        <ReadonlyMember
-          name="parameters"
-          type={
-            <>
-              readonly <ts.Reference refkey={operationParameterBindingRefkey} type />
-              []
-            </>
-          }
-        />
-        <ReadonlyMember name="hasRequestBody" type={code`boolean`} />
-        <ReadonlyMember name="requestBodyContentTypes" type={code`readonly string[]`} />
-        <ReadonlyMember
-          name="requestBodyParameterPath"
-          optional
-          type={code`string | readonly string[]`}
-        />
-        <ReadonlyMember
-          name="requestBodyType"
-          optional
-          type={<ts.Reference refkey={operationTypeBindingRefkey} type />}
-        />
-        <ReadonlyMember name="responses" type={code`readonly OperationResponseMetadata[]`} />
-        <ReadonlyMember name="interfaceName" optional type={code`string`} />
+        <For each={operationMetadataMembers()} semicolon line enderPunctuation>
+          {(member) => member}
+        </For>
       </ef.InterfaceDeclaration>
       <hbr />
     </>
@@ -268,81 +150,131 @@ function MetadataDefinitions() {
 
 function OperationTypeBindingDeclaration() {
   return (
-    <ef.TypeDeclaration export name="OperationTypeBinding" refkey={operationTypeBindingRefkey}>
-      <hbr />
-      <indent>
-        {code`| `}
-        <ts.InterfaceExpression>
-          <ReadonlyMember
-            name="kind"
-            type={code`"string" | "number" | "boolean" | "datetime" | "record" | "unknown"`}
-          />
-        </ts.InterfaceExpression>
-        <hbr />
-        {code`| `}
-        <ts.InterfaceExpression>
-          <ReadonlyMember name="kind" type={code`"model"`} />
-          <ReadonlyMember name="name" type={code`string`} />
-        </ts.InterfaceExpression>
-        <hbr />
-        {code`| `}
-        <ts.InterfaceExpression>
-          <ReadonlyMember name="kind" type={code`"literal"`} />
-          <ReadonlyMember name="value" type={code`string | number | boolean`} />
-        </ts.InterfaceExpression>
-        <hbr />
-        {code`| `}
-        <ts.InterfaceExpression>
-          <ReadonlyMember name="kind" type={code`"array"`} />
-          <ReadonlyMember
-            name="element"
-            type={<ts.Reference refkey={operationTypeBindingRefkey} type />}
-          />
-        </ts.InterfaceExpression>
-      </indent>
-    </ef.TypeDeclaration>
+    <ef.TypeDeclaration
+      export
+      type={useOperationTypeBindingUnion()}
+      name="OperationTypeBinding"
+      refkey={operationTypeBindingRefkey}
+    />
   );
 }
 
-function ReadonlyMember(props: {
-  name: string;
-  type: Children;
-  optional?: boolean;
-  doc?: Children;
-}) {
-  return (
-    <>
-      <ts.InterfaceMember
-        readonly
-        name={props.name}
-        optional={props.optional}
-        doc={props.doc}
-        type={props.type}
-      />
-      {code`;`}
-      <hbr />
-    </>
-  );
+function operationParameterBindingMembers(): Children[] {
+  return [
+    <ts.InterfaceMember readonly name="name" type={code`string`} />,
+    <ts.InterfaceMember readonly name="wireName" type={code`string`} />,
+    <ts.InterfaceMember readonly name="location" type={code`"path" | "query" | "header"`} />,
+    <ts.InterfaceMember readonly name="required" type={code`boolean`} />,
+    <ts.InterfaceMember
+      readonly
+      name="type"
+      type={<ts.Reference refkey={operationTypeBindingRefkey} type />}
+    />,
+  ];
 }
 
-export interface ObjectPropertyDescriptor {
-  name: string;
-  value?: Children;
-  jsValue?: unknown;
+function operationResponseHeaderBindingMembers(): Children[] {
+  return [
+    <ts.InterfaceMember readonly name="name" type={code`string`} />,
+    <ts.InterfaceMember readonly name="wireName" type={code`string`} />,
+    <ts.InterfaceMember
+      readonly
+      name="type"
+      type={<ts.Reference refkey={operationTypeBindingRefkey} type />}
+    />,
+  ];
 }
 
-export function ObjectProperties(props: { properties: readonly ObjectPropertyDescriptor[] }) {
-  return (
-    <For each={props.properties} comma line>
-      {(property) =>
-        "value" in property ? (
-          <ts.ObjectProperty name={property.name}>{property.value}</ts.ObjectProperty>
-        ) : (
-          <ts.ObjectProperty name={property.name} jsValue={property.jsValue} />
-        )
+function operationResponseMetadataMembers(): Children[] {
+  return [
+    <ts.InterfaceMember readonly name="statusCode" type={code`number | "*"`} />,
+    <ts.InterfaceMember
+      readonly
+      name="headers"
+      type={
+        <>
+          readonly <ts.Reference refkey={operationResponseHeaderBindingRefkey} type />
+          []
+        </>
       }
-    </For>
-  );
+    />,
+    <ts.InterfaceMember
+      readonly
+      name="body"
+      optional
+      type={
+        <ts.InterfaceExpression>
+          <For
+            each={[
+              <ts.InterfaceMember
+                readonly
+                name="type"
+                type={<ts.Reference refkey={operationTypeBindingRefkey} type />}
+              />,
+            ]}
+            semicolon
+            line
+            enderPunctuation
+          >
+            {(member) => member}
+          </For>
+        </ts.InterfaceExpression>
+      }
+    />,
+  ];
+}
+
+function operationLiteralQueryParameterMembers(): Children[] {
+  return [
+    <ts.InterfaceMember readonly name="name" type={code`string`} />,
+    <ts.InterfaceMember readonly name="value" type={code`string`} />,
+  ];
+}
+
+function operationMetadataMembers(): Children[] {
+  return [
+    <ts.InterfaceMember readonly name="name" type={code`string`} />,
+    <ts.InterfaceMember readonly name="verb" type={code`string`} />,
+    <ts.InterfaceMember readonly name="rawPath" type={code`string`} />,
+    <ts.InterfaceMember readonly name="path" type={code`string`} />,
+    <ts.InterfaceMember
+      readonly
+      name="literalQueryParameters"
+      type={code`readonly OperationLiteralQueryParameter[]`}
+    />,
+    <ts.InterfaceMember readonly name="requiredQueryParameters" type={code`readonly string[]`} />,
+    <ts.InterfaceMember readonly name="requiredHeaderParameters" type={code`readonly string[]`} />,
+    <ts.InterfaceMember
+      readonly
+      name="parameters"
+      type={
+        <>
+          readonly <ts.Reference refkey={operationParameterBindingRefkey} type />
+          []
+        </>
+      }
+    />,
+    <ts.InterfaceMember readonly name="hasRequestBody" type={code`boolean`} />,
+    <ts.InterfaceMember readonly name="requestBodyContentTypes" type={code`readonly string[]`} />,
+    <ts.InterfaceMember
+      readonly
+      name="requestBodyParameterPath"
+      optional
+      type={code`string | readonly string[]`}
+    />,
+    <ts.InterfaceMember
+      readonly
+      name="requestBodyType"
+      optional
+      type={<ts.Reference refkey={operationTypeBindingRefkey} type />}
+    />,
+    <ts.InterfaceMember
+      readonly
+      name="responses"
+      type={code`readonly OperationResponseMetadata[]`}
+    />,
+    <ts.InterfaceMember readonly name="interfaceName" optional type={code`string`} />,
+  ];
 }
 
 function OperationsMetadata(props: { operations: readonly ServerOperation[] }) {
@@ -357,183 +289,145 @@ function OperationsMetadata(props: { operations: readonly ServerOperation[] }) {
           []
         </>
       }
-      initializer={
-        <ts.ArrayExpression>
-          <For each={props.operations} comma line>
-            {(operation) => <OperationMetadata operation={operation} />}
-          </For>
-        </ts.ArrayExpression>
-      }
+      initializer={<ts.ValueExpression jsValue={props.operations.map(operationMetadataValue)} />}
     />
   );
 }
 
-function OperationMetadata(props: { operation: ServerOperation }) {
-  const op = props.operation;
-  const properties: ObjectPropertyDescriptor[] = [
-    { name: "name", jsValue: op.name },
-    { name: "verb", jsValue: op.verb },
-    { name: "rawPath", jsValue: op.rawPath },
-    { name: "path", jsValue: op.path },
-    {
-      name: "literalQueryParameters",
-      value: (
-        <ts.ArrayExpression>
-          <For each={op.literalQueryParameters} comma line>
-            {(literal) => (
-              <ts.ObjectExpression jsValue={{ name: literal.name, value: literal.value }} />
-            )}
-          </For>
-        </ts.ArrayExpression>
-      ),
-    },
-    {
-      name: "requiredQueryParameters",
-      jsValue: op.parameters
-        .filter((p) => p.location === "query" && !p.optional)
-        .map((p) => p.wireName),
-    },
-    {
-      name: "requiredHeaderParameters",
-      jsValue: op.parameters
-        .filter((p) => p.location === "header" && !p.optional)
-        .map((p) => p.wireName),
-    },
-    {
-      name: "parameters",
-      value: (
-        <ts.ArrayExpression>
-          <For each={op.parameters} comma line>
-            {(param) => <ParameterMetadata parameter={param} />}
-          </For>
-        </ts.ArrayExpression>
-      ),
-    },
-    { name: "hasRequestBody", jsValue: op.requestBody !== undefined },
-    { name: "requestBodyContentTypes", jsValue: op.requestBody?.contentTypes ?? [] },
-  ];
-
-  if (op.requestBody !== undefined) {
-    properties.push(
-      { name: "requestBodyParameterPath", jsValue: op.requestBody.parameterPath },
-      {
-        name: "requestBodyType",
-        value: <OperationTypeBindingExpression type={op.requestBody.type} />,
-      },
-    );
-  }
-
-  properties.push({
-    name: "responses",
-    value: (
-      <ts.ArrayExpression>
-        <For each={op.responses} comma line>
-          {(response) => <ResponseMetadata response={response} />}
-        </For>
-      </ts.ArrayExpression>
-    ),
-  });
-
-  if (op.interfaceName !== undefined) {
-    properties.push({ name: "interfaceName", jsValue: op.interfaceName });
-  }
-
-  return (
-    <ts.ObjectExpression>
-      <ObjectProperties properties={properties} />
-    </ts.ObjectExpression>
-  );
+export function operationMetadataValue(op: ServerOperation): OperationMetadataValue {
+  return withoutUndefined({
+    name: op.name,
+    verb: op.verb,
+    rawPath: op.rawPath,
+    path: op.path,
+    literalQueryParameters: op.literalQueryParameters.map((literal) => ({
+      name: literal.name,
+      value: literal.value,
+    })),
+    requiredQueryParameters: op.parameters
+      .filter((p) => p.location === "query" && !p.optional)
+      .map((p) => p.wireName),
+    requiredHeaderParameters: op.parameters
+      .filter((p) => p.location === "header" && !p.optional)
+      .map((p) => p.wireName),
+    parameters: op.parameters.map((param) => ({
+      name: param.name,
+      wireName: param.wireName,
+      location: param.location,
+      required: !param.optional,
+      type: operationTypeBindingValue(param.type),
+    })),
+    hasRequestBody: op.requestBody !== undefined,
+    requestBodyContentTypes: op.requestBody?.contentTypes ?? [],
+    requestBodyParameterPath: op.requestBody?.parameterPath,
+    requestBodyType:
+      op.requestBody === undefined ? undefined : operationTypeBindingValue(op.requestBody.type),
+    responses: op.responses.map(responseMetadataValue),
+    interfaceName: op.interfaceName,
+  }) as OperationMetadataValue;
 }
 
-function ParameterMetadata(props: { parameter: ServerOperation["parameters"][number] }) {
-  const param = props.parameter;
-  return (
-    <ts.ObjectExpression>
-      <ObjectProperties
-        properties={[
-          { name: "name", jsValue: param.name },
-          { name: "wireName", jsValue: param.wireName },
-          { name: "location", jsValue: param.location },
-          { name: "required", jsValue: !param.optional },
-          { name: "type", value: <OperationTypeBindingExpression type={param.type} /> },
-        ]}
-      />
-    </ts.ObjectExpression>
-  );
+function responseMetadataValue(response: ServerResponse): OperationResponseMetadataValue {
+  return withoutUndefined({
+    statusCode: response.statusCode,
+    headers: response.headers.map(responseHeaderMetadataValue),
+    body:
+      response.body === undefined
+        ? undefined
+        : { type: operationTypeBindingValue(response.body.type) },
+  }) as OperationResponseMetadataValue;
 }
 
-function ResponseMetadata(props: { response: ServerResponse }) {
-  const response = props.response;
-  const properties: ObjectPropertyDescriptor[] = [
-    { name: "statusCode", jsValue: response.statusCode },
-    {
-      name: "headers",
-      value: (
-        <ts.ArrayExpression>
-          <For each={response.headers} comma line>
-            {(header) => (
-              <ts.ObjectExpression>
-                <ObjectProperties
-                  properties={[
-                    { name: "name", jsValue: header.name },
-                    { name: "wireName", jsValue: header.wireName },
-                    { name: "type", value: <OperationTypeBindingExpression type={header.type} /> },
-                  ]}
-                />
-              </ts.ObjectExpression>
-            )}
-          </For>
-        </ts.ArrayExpression>
-      ),
-    },
-  ];
-  if (response.body !== undefined) {
-    properties.push({
-      name: "body",
-      value: (
-        <ts.ObjectExpression>
-          <ObjectProperties
-            properties={[
-              { name: "type", value: <OperationTypeBindingExpression type={response.body.type} /> },
-            ]}
-          />
-        </ts.ObjectExpression>
-      ),
-    });
-  }
-  return (
-    <ts.ObjectExpression>
-      <ObjectProperties properties={properties} />
-    </ts.ObjectExpression>
-  );
+function responseHeaderMetadataValue(header: ServerResponseHeader) {
+  return {
+    name: header.name,
+    wireName: header.wireName,
+    type: operationTypeBindingValue(header.type),
+  };
 }
 
-export function OperationTypeBindingExpression(props: { type: ServerTypeRef }) {
-  const type = props.type;
+export function operationTypeBindingValue(type: ServerTypeRef): OperationTypeBindingValue {
   switch (type.kind) {
     case "array":
-      return (
-        <ts.ObjectExpression>
-          <ObjectProperties
-            properties={[
-              { name: "kind", jsValue: "array" },
-              { name: "element", value: <OperationTypeBindingExpression type={type.element} /> },
-            ]}
-          />
-        </ts.ObjectExpression>
-      );
+      return { kind: "array", element: operationTypeBindingValue(type.element) };
     case "literal":
-      return <ts.ObjectExpression jsValue={{ kind: "literal", value: type.value }} />;
+      return { kind: "literal", value: type.value };
     case "model":
-      return <ts.ObjectExpression jsValue={{ kind: "model", name: type.name }} />;
+      return { kind: "model", name: type.name };
     case "record":
     case "boolean":
     case "datetime":
     case "number":
     case "string":
     case "unknown":
-      return <ts.ObjectExpression jsValue={{ kind: type.kind }} />;
+      return { kind: type.kind };
   }
+}
+
+function withoutUndefined<T extends Record<string, unknown>>(value: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(value).filter(([, item]) => item !== undefined),
+  ) as Partial<T>;
+}
+
+function useOperationTypeBindingUnion(): Union {
+  const { $ } = useTsp();
+  const union = $.union.create({
+    name: "OperationTypeBinding",
+    expression: false,
+  });
+
+  const primitive = useModelExpression({
+    kind: $.union.create({
+      variants: {
+        string: "string",
+        number: "number",
+        boolean: "boolean",
+        datetime: "datetime",
+        record: "record",
+        unknown: "unknown",
+      },
+    }),
+  });
+  const model = useModelExpression({
+    kind: $.literal.createString("model"),
+    name: $.builtin.string,
+  });
+  const literal = useModelExpression({
+    kind: $.literal.createString("literal"),
+    value: $.union.create([$.builtin.string, $.builtin.float64, $.builtin.boolean]),
+  });
+  const array = useModelExpression({
+    kind: $.literal.createString("array"),
+    element: union,
+  });
+
+  for (const variant of [
+    $.unionVariant.create({ name: "primitive", type: primitive, union }),
+    $.unionVariant.create({ name: "model", type: model, union }),
+    $.unionVariant.create({ name: "literal", type: literal, union }),
+    $.unionVariant.create({ name: "array", type: array, union }),
+  ]) {
+    union.variants.set(variant.name, variant);
+  }
+
+  return union;
+}
+
+function useModelExpression(properties: Record<string, Type>): Model {
+  const { $ } = useTsp();
+  const model = $.model.create({
+    properties: {},
+    expression: true,
+  });
+
+  for (const [name, type] of Object.entries(properties)) {
+    const property = $.modelProperty.create({ name, type });
+    property.model = model;
+    model.properties.set(name, property);
+  }
+
+  return model;
 }
 
 /**

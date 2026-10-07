@@ -7,7 +7,7 @@ import {
   operationResponseHeaderBindingRefkey,
   operationTypeBindingRefkey,
 } from "./refkeys.js";
-import { ObjectProperties, OperationTypeBindingExpression } from "./render-operations.js";
+import { operationTypeBindingValue } from "./render-operations.js";
 import { renderFileHeader } from "./type-ref.js";
 
 /**
@@ -73,57 +73,44 @@ export function XmlModelMetadata(props: { models: readonly ServerDataModel[] }) 
 
         const xmlModels: Record<string, XmlModelMetadata> =
       `}
-      <ts.ObjectExpression>
-        <For each={props.models} comma line>
-          {(model) => (
-            <ts.ObjectProperty name={model.name}>
-              <ts.ObjectExpression>
-                <ObjectProperties
-                  properties={[
-                    { name: "name", jsValue: model.name },
-                    { name: "wireName", jsValue: model.wireName },
-                    {
-                      name: "properties",
-                      value: (
-                        <ts.ArrayExpression>
-                          <For each={model.properties} comma line>
-                            {(prop) => <XmlPropertyMetadata prop={prop} models={props.models} />}
-                          </For>
-                        </ts.ArrayExpression>
-                      ),
-                    },
-                  ]}
-                />
-              </ts.ObjectExpression>
-            </ts.ObjectProperty>
-          )}
-        </For>
-      </ts.ObjectExpression>
+      <ts.ValueExpression jsValue={xmlModelsValue(props.models)} />
       {code`;`}
     </>
   );
 }
 
-function XmlPropertyMetadata(props: {
-  prop: ServerDataModel["properties"][number];
-  models: readonly ServerDataModel[];
-}) {
-  const prop = props.prop;
-  const itemName = getArrayItemName(prop.type, prop.wireName, props.models);
-  return (
-    <ts.ObjectExpression>
-      <ObjectProperties
-        properties={[
-          { name: "name", jsValue: prop.name },
-          { name: "wireName", jsValue: prop.wireName },
-          { name: "type", value: <OperationTypeBindingExpression type={prop.type} /> },
-          { name: "attribute", jsValue: prop.xmlAttribute },
-          { name: "unwrapped", jsValue: prop.xmlUnwrapped },
-          ...(itemName === undefined ? [] : [{ name: "itemName", jsValue: itemName }]),
-        ]}
-      />
-    </ts.ObjectExpression>
+function xmlModelsValue(models: readonly ServerDataModel[]) {
+  return Object.fromEntries(
+    models.map((model) => [
+      model.name,
+      {
+        name: model.name,
+        wireName: model.wireName,
+        properties: model.properties.map((prop) => xmlPropertyMetadataValue(prop, models)),
+      },
+    ]),
   );
+}
+
+function xmlPropertyMetadataValue(
+  prop: ServerDataModel["properties"][number],
+  models: readonly ServerDataModel[],
+) {
+  const itemName = getArrayItemName(prop.type, prop.wireName, models);
+  return withoutUndefined({
+    name: prop.name,
+    wireName: prop.wireName,
+    type: operationTypeBindingValue(prop.type),
+    attribute: prop.xmlAttribute,
+    unwrapped: prop.xmlUnwrapped,
+    itemName,
+  });
+}
+
+function withoutUndefined<T extends Record<string, unknown>>(value: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(value).filter(([, item]) => item !== undefined),
+  ) as Partial<T>;
 }
 
 function getArrayItemName(

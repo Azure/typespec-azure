@@ -15,10 +15,7 @@ import {
 } from "../src/render/refkeys.js";
 import { ServiceHandlerInterface } from "../src/render/render-handlers.js";
 import { renderModels } from "../src/render/render-models.js";
-import {
-  OperationTypeBindingExpression,
-  renderOperations,
-} from "../src/render/render-operations.js";
+import { operationMetadataValue, renderOperations } from "../src/render/render-operations.js";
 import {
   DeserializeRequest,
   HasGeneratedSerialization,
@@ -63,7 +60,6 @@ beforeAll(async () => {
         op DeleteQueue(@path queueName: string): {
           @statusCode statusCode: 204;
           @header("x-ms-request-id") requestId: string;
-          @body body: QueueMessage;
         };
 
         @get
@@ -71,6 +67,13 @@ beforeAll(async () => {
         op GetMetadata(@path queueName: string): {
           @statusCode statusCode: 200;
           @body body: QueueMetadata;
+        };
+
+        @get
+        @route("/message")
+        op GetMessage(@path queueName: string): {
+          @statusCode statusCode: 200;
+          @body body: QueueMessage;
         };
       }
     `,
@@ -228,6 +231,14 @@ function attachDeclarationTypes(target: ServerModel, source: ServerModel) {
       (operation) => operation.name === targetOperation.name,
     );
     if (!sourceOperation) continue;
+    Object.defineProperty(targetOperation, "parametersModel", {
+      value: sourceOperation.parametersModel,
+      enumerable: false,
+    });
+    Object.defineProperty(targetOperation, "responseUnion", {
+      value: sourceOperation.responseUnion,
+      enumerable: false,
+    });
     for (const targetParameter of targetOperation.parameters) {
       const sourceParameter = sourceOperation.parameters.find(
         (parameter) => parameter.name === targetParameter.name,
@@ -307,74 +318,57 @@ describe("renderOperations", () => {
       export interface CreateQueueParameters {
         queueName: string;
         body: string;
-
       }
-      export type CreateQueueResponse =
-      | {
-          statusCode: 201;
-          headers: {
-            requestId: string;
-          };
+      export type CreateQueueResponse = {
+        statusCode: 201;
+        headers: {
+          requestId: string;
         };
+      };
 
       export interface DeleteQueueParameters {
         queueName: string;
-
       }
-      export type DeleteQueueResponse =
-      | {
-          statusCode: 204;
-          headers: {
-            requestId: string;
-          };
+      export type DeleteQueueResponse = {
+        statusCode: 204;
+        headers: {
+          requestId: string;
         };
-      export type OperationTypeBinding =
-      | {
-          readonly kind: "string" | "number" | "boolean" | "datetime" | "record" | "unknown";
-
-        }
-        | {
-          readonly kind: "model";
-          readonly name: string;
-
-        }
-        | {
-          readonly kind: "literal";
-          readonly value: string | number | boolean;
-
-        }
-        | {
-          readonly kind: "array";
-          readonly element: OperationTypeBinding;
-
-        };
+      };
+      export type OperationTypeBinding = {
+        kind: "string" | "number" | "boolean" | "datetime" | "record" | "unknown";
+      } | {
+        kind: "model";
+        name: string;
+      } | {
+        kind: "literal";
+        value: string | number | boolean;
+      } | {
+        kind: "array";
+        element: OperationTypeBinding;
+      };
       export interface OperationParameterBinding {
         readonly name: string;
         readonly wireName: string;
         readonly location: "path" | "query" | "header";
         readonly required: boolean;
         readonly type: OperationTypeBinding;
-
       }
       export interface OperationResponseHeaderBinding {
         readonly name: string;
         readonly wireName: string;
         readonly type: OperationTypeBinding;
-
       }
       export interface OperationResponseMetadata {
         readonly statusCode: number | "*";
         readonly headers: readonly OperationResponseHeaderBinding[];
         readonly body?: {
           readonly type: OperationTypeBinding;
-
         };
-
       }
       export interface OperationLiteralQueryParameter {
         readonly name: string;
         readonly value: string;
-
       }
       export interface OperationMetadata {
         readonly name: string;
@@ -391,7 +385,6 @@ describe("renderOperations", () => {
         readonly requestBodyType?: OperationTypeBinding;
         readonly responses: readonly OperationResponseMetadata[];
         readonly interfaceName?: string;
-
       }
       export const operations: readonly OperationMetadata[] = [
         {
@@ -410,7 +403,7 @@ describe("renderOperations", () => {
               required: true,
               type: {
                 kind: "string",
-              }
+              },
             }
           ],
           hasRequestBody: true,
@@ -428,12 +421,12 @@ describe("renderOperations", () => {
                   wireName: "x-ms-request-id",
                   type: {
                     kind: "string",
-                  }
+                  },
                 }
-              ]
+              ],
             }
           ],
-          interfaceName: "Queue"
+          interfaceName: "Queue",
         },
         {
           name: "DeleteQueue",
@@ -451,7 +444,7 @@ describe("renderOperations", () => {
               required: true,
               type: {
                 kind: "string",
-              }
+              },
             }
           ],
           hasRequestBody: false,
@@ -465,31 +458,63 @@ describe("renderOperations", () => {
                   wireName: "x-ms-request-id",
                   type: {
                     kind: "string",
-                  }
+                  },
                 }
-              ]
+              ],
             }
           ],
-          interfaceName: "Queue"
+          interfaceName: "Queue",
         }
       ]
     `);
   });
 
-  it("renders operation type binding object literals", () => {
+  it("renders operation metadata values with Alloy recursive value expressions", () => {
     expect(
       <SourceFile>
-        <OperationTypeBindingExpression
-          type={{ kind: "array", element: { kind: "model", name: "QueueMessage" } }}
-        />
+        <ts.ValueExpression jsValue={operationMetadataValue(sampleServerModel.operations[0])} />
       </SourceFile>,
     ).toRenderTo(`
       {
-        kind: "array",
-        element: {
-          kind: "model",
-          name: "QueueMessage",
-        }
+        name: "CreateQueue",
+        verb: "put",
+        rawPath: "/{queueName}",
+        path: "/{queueName}",
+        literalQueryParameters: [],
+        requiredQueryParameters: [],
+        requiredHeaderParameters: [],
+        parameters: [
+          {
+            name: "queueName",
+            wireName: "queueName",
+            location: "path",
+            required: true,
+            type: {
+              kind: "string",
+            },
+          }
+        ],
+        hasRequestBody: true,
+        requestBodyContentTypes: ["application/json"],
+        requestBodyParameterPath: "body",
+        requestBodyType: {
+          kind: "string",
+        },
+        responses: [
+          {
+            statusCode: 201,
+            headers: [
+              {
+                name: "requestId",
+                wireName: "x-ms-request-id",
+                type: {
+                  kind: "string",
+                },
+              }
+            ],
+          }
+        ],
+        interfaceName: "Queue",
       }
     `);
   });
@@ -608,7 +633,7 @@ describe("renderSerialization components", () => {
                 kind: "string",
               },
               attribute: false,
-              unwrapped: false
+              unwrapped: false,
             },
             {
               name: "publicAccess",
@@ -617,9 +642,9 @@ describe("renderSerialization components", () => {
                 kind: "boolean",
               },
               attribute: false,
-              unwrapped: false
+              unwrapped: false,
             }
-          ]
+          ],
         },
         QueueMessage: {
           name: "QueueMessage",
@@ -632,7 +657,7 @@ describe("renderSerialization components", () => {
                 kind: "string",
               },
               attribute: false,
-              unwrapped: false
+              unwrapped: false,
             },
             {
               name: "tags",
@@ -641,14 +666,14 @@ describe("renderSerialization components", () => {
                 kind: "array",
                 element: {
                   kind: "string",
-                }
+                },
               },
               attribute: false,
               unwrapped: false,
-              itemName: "Tags"
+              itemName: "Tags",
             }
-          ]
-        }
+          ],
+        },
       };
     `);
   });
