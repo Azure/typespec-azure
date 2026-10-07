@@ -54,7 +54,7 @@ async function collect<T>(
 
 const unnamedWithSentinel: SseEventDescriptor<any>[] = [
   { isTerminal: false, deserialize: (data) => data, contentType: "application/json" },
-  { isTerminal: true, terminalValue: "[DONE]" },
+  { isTerminal: true, terminalValue: "[DONE]", deserialize: () => "[DONE]" },
 ];
 
 const namedWithSentinel: SseEventDescriptor<any>[] = [
@@ -64,7 +64,11 @@ const namedWithSentinel: SseEventDescriptor<any>[] = [
     deserialize: (data) => ({ event: "delta", data }),
     contentType: "application/json",
   },
-  { isTerminal: true, terminalValue: "[DONE]" },
+  {
+    isTerminal: true,
+    terminalValue: "[DONE]",
+    deserialize: () => ({ event: "message", data: "[DONE]" }),
+  },
 ];
 
 describe("SSE event mapping", () => {
@@ -89,11 +93,12 @@ describe("SSE event mapping", () => {
           eventName: "done",
           isTerminal: true,
           contentType: "text/plain",
-          ...(kind === "typed" ? { deserialize: (x: string) => x } : { terminalValue: "[DONE]" }),
+          deserialize: (x) => x,
+          ...(kind === "sentinel" ? { terminalValue: "[DONE]" } : {}),
         },
       ];
       await expect(collect(descriptors, source)).resolves.toEqual(
-        kind === "typed" ? ["hello", "finished"] : ["hello"],
+        kind === "typed" ? ["hello", "finished"] : ["hello", "[DONE]"],
       );
       expect(trailing).not.toHaveBeenCalled();
       expect(closed).toHaveBeenCalledOnce();
@@ -102,8 +107,8 @@ describe("SSE event mapping", () => {
 
   it("does not stop for an unrelated named sentinel or a nonterminal constant", async () => {
     const descriptors: SseEventDescriptor<string>[] = [
-      { eventName: "done", isTerminal: true, terminalValue: "[DONE]" },
-      { eventName: "control", isTerminal: false, terminalValue: "skip" },
+      { eventName: "done", isTerminal: true, terminalValue: "[DONE]", deserialize: (x) => x },
+      { eventName: "control", isTerminal: false, terminalValue: "skip", deserialize: (x) => x },
       { isTerminal: false, contentType: "text/plain", deserialize: (x) => x },
     ];
     await expect(
@@ -117,7 +122,7 @@ describe("SSE event mapping", () => {
           { data: "too late" },
         ),
       ),
-    ).resolves.toEqual(["hello"]);
+    ).resolves.toEqual(["skip", "hello", "[DONE]"]);
   });
 
   it("yields deserialized payloads for unnamed events", async () => {
@@ -128,18 +133,21 @@ describe("SSE event mapping", () => {
     expect(items).toEqual([{ id: "a" }, { id: "b" }]);
   });
 
-  it("suppresses a constant terminal sentinel", async () => {
+  it("yields a constant terminal sentinel before stopping", async () => {
     const items = await collect(
       namedWithSentinel,
       events({ event: "delta", data: '{"id":"a"}' }, { data: "[DONE]" }),
     );
-    expect(items).toEqual([{ event: "delta", data: { id: "a" } }]);
+    expect(items).toEqual([
+      { event: "delta", data: { id: "a" } },
+      { event: "message", data: "[DONE]" },
+    ]);
   });
 
   it("matches terminal events by exact named or unnamed dispatch", async () => {
     await expect(
       collect(namedWithSentinel, events({ data: "[DONE]" }, { event: "delta", data: "{}" })),
-    ).resolves.toEqual([]);
+    ).resolves.toEqual([{ event: "message", data: "[DONE]" }]);
     await expect(
       collect(
         namedWithSentinel,
@@ -159,6 +167,7 @@ describe("SSE event mapping", () => {
         eventName: "message",
         isTerminal: true,
         terminalValue: "[DONE]",
+        deserialize: () => "[DONE]",
       },
     ];
     await expect(
@@ -170,7 +179,7 @@ describe("SSE event mapping", () => {
           { event: "message", data: "{}" },
         ),
       ),
-    ).resolves.toEqual([{}]);
+    ).resolves.toEqual([{}, "[DONE]"]);
   });
 
   it("matches event names and sentinels containing source-sensitive characters", async () => {
@@ -183,7 +192,7 @@ describe("SSE event mapping", () => {
         contentType: "text/plain",
         deserialize: (data) => ({ event: eventName, data }),
       },
-      { isTerminal: true, terminalValue },
+      { isTerminal: true, terminalValue, deserialize: (data) => ({ event: "message", data }) },
     ];
 
     await expect(
@@ -195,7 +204,10 @@ describe("SSE event mapping", () => {
           { event: eventName, data: "too late" },
         ),
       ),
-    ).resolves.toEqual([{ event: eventName, data: "value" }]);
+    ).resolves.toEqual([
+      { event: eventName, data: "value" },
+      { event: "message", data: terminalValue },
+    ]);
   });
 
   it("yields a typed named terminal event", async () => {
@@ -308,10 +320,10 @@ describe("single-connection SSE mapping", () => {
     await expect(collect(unnamedWithSentinel, stream)).resolves.toEqual([{ id: "a" }, { id: "b" }]);
   });
 
-  it("closes the native Node body when the mapper consumes a terminal sentinel", async () => {
+  it("closes the native Node body after yielding a terminal sentinel", async () => {
     const body = nodeSseBody("data: [DONE]\n\n", true);
     const stream = createSseStream(body);
-    await expect(collect(unnamedWithSentinel, stream)).resolves.toEqual([]);
+    await expect(collect(unnamedWithSentinel, stream)).resolves.toEqual(["[DONE]"]);
     expect(body.destroyed).toBe(true);
   });
 

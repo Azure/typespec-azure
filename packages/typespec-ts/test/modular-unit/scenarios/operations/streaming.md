@@ -125,6 +125,7 @@ export async function receive(
     | { event: "scalarEnvelope"; data: string }
     | { event: "modelEnvelope"; data: Payload }
     | { event: "propertyOverride"; data: string }
+    | { event: "message"; data: "[DONE]" }
   >
 > {
   const response = await getSseResponse(_receiveSend(context, options));
@@ -159,6 +160,7 @@ export async function receive(
     | { event: "scalarEnvelope"; data: string }
     | { event: "modelEnvelope"; data: Payload }
     | { event: "propertyOverride"; data: string }
+    | { event: "message"; data: "[DONE]" }
   >[] = [
     {
       eventName: "progress",
@@ -202,7 +204,11 @@ export async function receive(
       deserialize: (data) => ({ event: "propertyOverride", data: data }),
       contentType: "application/json",
     },
-    { isTerminal: true, terminalValue: "[DONE]" },
+    {
+      isTerminal: true,
+      terminalValue: "[DONE]",
+      deserialize: () => ({ event: "message", data: "[DONE]" }),
+    },
   ];
   const eventStream = createSseStream(response.body);
   return _receiveDeserialize(eventStream, descriptors);
@@ -442,9 +448,9 @@ export async function receive(
 # Structured streaming generates a named SSE operation with terminal event dispatch
 
 An operation returning `SSEStream<T>` for a `@events` union with multiple named variants and a
-`@terminalEvent` generates a `Promise<AsyncIterable<...>>` of the non-terminal payload types,
-dispatching each event by its `event:` name and stopping at the terminal event. This is the default
-behavior.
+`@terminalEvent` generates a `Promise<AsyncIterable<...>>` including terminal payload types,
+dispatching each event by its `event:` name and stopping after yielding the terminal event.
+Unnamed terminals use the default `message` event name in the discriminated union.
 
 ## TypeSpec
 
@@ -513,11 +519,13 @@ export async function _receiveDeserialize(
   descriptors: SseEventDescriptor<
     | { event: "responseCreated"; data: ResponseCreated }
     | { event: "responseDelta"; data: ResponseDelta }
+    | { event: "message"; data: "[DONE]" }
   >[],
 ): Promise<
   AsyncIterable<
     | { event: "responseCreated"; data: ResponseCreated }
     | { event: "responseDelta"; data: ResponseDelta }
+    | { event: "message"; data: "[DONE]" }
   >
 > {
   return readSseStream(events, descriptors);
@@ -530,6 +538,7 @@ export async function receive(
   AsyncIterable<
     | { event: "responseCreated"; data: ResponseCreated }
     | { event: "responseDelta"; data: ResponseDelta }
+    | { event: "message"; data: "[DONE]" }
   >
 > {
   const response = await getSseResponse(_receiveSend(context, options));
@@ -559,6 +568,7 @@ export async function receive(
   const descriptors: SseEventDescriptor<
     | { event: "responseCreated"; data: ResponseCreated }
     | { event: "responseDelta"; data: ResponseDelta }
+    | { event: "message"; data: "[DONE]" }
   >[] = [
     {
       eventName: "responseCreated",
@@ -575,7 +585,12 @@ export async function receive(
       deserialize: (data) => ({ event: "responseDelta", data: responseDeltaDeserializer(data) }),
       contentType: "application/json",
     },
-    { isTerminal: true, terminalValue: "[DONE]" },
+    {
+      isTerminal: true,
+      terminalValue: "[DONE]",
+      deserialize: () => ({ event: "message", data: "[DONE]" }),
+      contentType: "text/plain",
+    },
   ];
   const eventStream = createSseStream(response.body);
   return _receiveDeserialize(eventStream, descriptors);
