@@ -1,5 +1,6 @@
 import { code, For, Show, type Children } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
+import * as ef from "@typespec/emitter-framework/typescript";
 import type { ServerModel, ServerOperation, ServerResponse, ServerTypeRef } from "../model.js";
 import { collectModelRefs, renderFileHeader, TypeRef } from "./type-ref.js";
 
@@ -29,7 +30,7 @@ function ParametersInterface(props: { operation: ServerOperation }) {
   const op = props.operation;
   return (
     <>
-      <ts.InterfaceDeclaration export name={`${op.name}Parameters`} doc={op.doc}>
+      <ef.InterfaceDeclaration export name={`${op.name}Parameters`} doc={op.doc}>
         <For each={op.parameters}>
           {(param) => (
             <>
@@ -57,7 +58,7 @@ function ParametersInterface(props: { operation: ServerOperation }) {
             </>
           )}
         </Show>
-      </ts.InterfaceDeclaration>
+      </ef.InterfaceDeclaration>
       <hbr />
     </>
   );
@@ -126,14 +127,14 @@ function ResponseType(props: { operation: ServerOperation }) {
   const op = props.operation;
   return (
     <>
-      <ts.TypeDeclaration export name={`${op.name}Response`}>
+      <ef.TypeDeclaration export name={`${op.name}Response`}>
         <hbr />
         <indent>
           <For each={op.responses} line>
             {(response) => <ResponseVariant response={response} />}
           </For>
         </indent>
-      </ts.TypeDeclaration>
+      </ef.TypeDeclaration>
       <hbr />
     </>
   );
@@ -144,21 +145,21 @@ function MetadataDefinitions() {
     <>
       <OperationTypeBindingDeclaration />
       <hbr />
-      <ts.InterfaceDeclaration export name="OperationParameterBinding">
+      <ef.InterfaceDeclaration export name="OperationParameterBinding">
         <ReadonlyMember name="name" type={code`string`} />
         <ReadonlyMember name="wireName" type={code`string`} />
         <ReadonlyMember name="location" type={code`"path" | "query" | "header"`} />
         <ReadonlyMember name="required" type={code`boolean`} />
         <ReadonlyMember name="type" type={code`OperationTypeBinding`} />
-      </ts.InterfaceDeclaration>
+      </ef.InterfaceDeclaration>
       <hbr />
-      <ts.InterfaceDeclaration export name="OperationResponseHeaderBinding">
+      <ef.InterfaceDeclaration export name="OperationResponseHeaderBinding">
         <ReadonlyMember name="name" type={code`string`} />
         <ReadonlyMember name="wireName" type={code`string`} />
         <ReadonlyMember name="type" type={code`OperationTypeBinding`} />
-      </ts.InterfaceDeclaration>
+      </ef.InterfaceDeclaration>
       <hbr />
-      <ts.InterfaceDeclaration export name="OperationResponseMetadata">
+      <ef.InterfaceDeclaration export name="OperationResponseMetadata">
         <ReadonlyMember name="statusCode" type={code`number | "*"`} />
         <ReadonlyMember name="headers" type={code`readonly OperationResponseHeaderBinding[]`} />
         <ReadonlyMember
@@ -170,14 +171,14 @@ function MetadataDefinitions() {
             </ts.InterfaceExpression>
           }
         />
-      </ts.InterfaceDeclaration>
+      </ef.InterfaceDeclaration>
       <hbr />
-      <ts.InterfaceDeclaration export name="OperationLiteralQueryParameter">
+      <ef.InterfaceDeclaration export name="OperationLiteralQueryParameter">
         <ReadonlyMember name="name" type={code`string`} />
         <ReadonlyMember name="value" type={code`string`} />
-      </ts.InterfaceDeclaration>
+      </ef.InterfaceDeclaration>
       <hbr />
-      <ts.InterfaceDeclaration export name="OperationMetadata">
+      <ef.InterfaceDeclaration export name="OperationMetadata">
         <ReadonlyMember name="name" type={code`string`} />
         <ReadonlyMember name="verb" type={code`string`} />
         <ReadonlyMember name="rawPath" type={code`string`} />
@@ -199,7 +200,7 @@ function MetadataDefinitions() {
         <ReadonlyMember name="requestBodyType" optional type={code`OperationTypeBinding`} />
         <ReadonlyMember name="responses" type={code`readonly OperationResponseMetadata[]`} />
         <ReadonlyMember name="interfaceName" optional type={code`string`} />
-      </ts.InterfaceDeclaration>
+      </ef.InterfaceDeclaration>
       <hbr />
     </>
   );
@@ -207,7 +208,7 @@ function MetadataDefinitions() {
 
 function OperationTypeBindingDeclaration() {
   return (
-    <ts.TypeDeclaration export name="OperationTypeBinding">
+    <ef.TypeDeclaration export name="OperationTypeBinding">
       <hbr />
       <indent>
         {code`| `}
@@ -236,7 +237,7 @@ function OperationTypeBindingDeclaration() {
           <ReadonlyMember name="element" type={code`OperationTypeBinding`} />
         </ts.InterfaceExpression>
       </indent>
-    </ts.TypeDeclaration>
+    </ef.TypeDeclaration>
   );
 }
 

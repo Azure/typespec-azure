@@ -1,5 +1,6 @@
 import { code, For } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
+import * as ef from "@typespec/emitter-framework/typescript";
 import type { ServerModel } from "../model.js";
 import { renderFileHeader } from "./type-ref.js";
 
@@ -29,12 +30,12 @@ export function renderHandlers(serverModel: ServerModel) {
       </indent>
       {code`} from "./operations.js";`}
       <hbr />
-      <ts.InterfaceDeclaration export name="Context">
+      <ef.InterfaceDeclaration export name="Context">
         <ts.InterfaceMember readonly name="contextId" type={code`string`} />
         {code`;`}
-      </ts.InterfaceDeclaration>
+      </ef.InterfaceDeclaration>
       <hbr />
-      <ts.InterfaceDeclaration export name="IServiceHandler">
+      <ef.InterfaceDeclaration export name="IServiceHandler">
         <For each={serverModel.operations} semicolon line enderPunctuation>
           {(op) => {
             const methodName = op.name[0].toLowerCase() + op.name.slice(1);
@@ -51,7 +52,7 @@ export function renderHandlers(serverModel: ServerModel) {
             );
           }}
         </For>
-      </ts.InterfaceDeclaration>
+      </ef.InterfaceDeclaration>
     </ts.SourceFile>
   );
 }

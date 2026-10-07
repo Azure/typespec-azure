@@ -1,6 +1,8 @@
-import { code, Output, render, SourceDirectory, type Children } from "@alloy-js/core";
+import { code, render, SourceDirectory, type Children } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
-import { describe, expect, it } from "vitest";
+import type { Program } from "@typespec/compiler";
+import { Output } from "@typespec/emitter-framework";
+import { beforeAll, describe, expect, it } from "vitest";
 import type { ServerModel } from "../src/model.js";
 import { DocComment } from "../src/render/doc-comment.js";
 import { renderHandlers } from "../src/render/render-handlers.js";
@@ -8,10 +10,26 @@ import { renderModels } from "../src/render/render-models.js";
 import { renderOperations } from "../src/render/render-operations.js";
 import { renderSerialization } from "../src/render/render-serialization.js";
 import { renderTypeRef } from "../src/render/type-ref.js";
+import { ApiTester } from "./tester.js";
+
+let testProgram: Program;
+
+beforeAll(async () => {
+  const { program } = await ApiTester.compile({
+    "main.tsp": `
+      import "@typespec/http";
+      using Http;
+
+      @service
+      namespace RenderTest;
+    `,
+  });
+  testProgram = program;
+});
 
 function renderSourceFile(component: Children): string {
   const output = render(
-    <Output>
+    <Output program={testProgram}>
       <SourceDirectory path=".">{component}</SourceDirectory>
     </Output>,
   );
@@ -210,7 +228,11 @@ describe("DocComment", () => {
 });
 
 describe("renderModels", () => {
-  const output = renderSourceFile(renderModels(sampleServerModel));
+  let output: string;
+
+  beforeAll(() => {
+    output = renderSourceFile(renderModels(sampleServerModel));
+  });
 
   it("declares an exported interface per model", () => {
     expect(output).toContain("export interface QueueMetadata {");
@@ -230,7 +252,11 @@ describe("renderModels", () => {
 });
 
 describe("renderOperations", () => {
-  const output = renderSourceFile(renderOperations(sampleServerModel));
+  let output: string;
+
+  beforeAll(() => {
+    output = renderSourceFile(renderOperations(sampleServerModel));
+  });
 
   it("imports model types referenced in bodies/headers from models.ts", () => {
     expect(output).toContain(`import type { QueueMetadata } from "./models.js";`);
@@ -281,7 +307,11 @@ describe("renderOperations", () => {
 });
 
 describe("renderHandlers", () => {
-  const output = renderSourceFile(renderHandlers(sampleServerModel));
+  let output: string;
+
+  beforeAll(() => {
+    output = renderSourceFile(renderHandlers(sampleServerModel));
+  });
 
   it("imports the generated parameter/response types", () => {
     expect(output).toContain(`import type {`);
@@ -302,7 +332,11 @@ describe("renderHandlers", () => {
 });
 
 describe("renderSerialization", () => {
-  const output = renderSourceFile(renderSerialization(sampleServerModel));
+  let output: string;
+
+  beforeAll(() => {
+    output = renderSourceFile(renderSerialization(sampleServerModel));
+  });
 
   it("renders direct request/response serialization helpers with shared metadata helpers", () => {
     expect(output).not.toContain(`@azure/ms-rest-js`);

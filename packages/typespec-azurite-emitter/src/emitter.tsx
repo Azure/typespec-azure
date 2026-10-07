@@ -1,11 +1,5 @@
-import { renderAsync, type Children, type OutputDirectory } from "@alloy-js/core";
-import {
-  emitFile,
-  NoTarget,
-  resolvePath,
-  type EmitContext,
-  type Program,
-} from "@typespec/compiler";
+import { NoTarget, resolvePath, type EmitContext } from "@typespec/compiler";
+import { writeOutput } from "@typespec/emitter-framework";
 import { getAllHttpServices } from "@typespec/http";
 import { buildServerModel } from "./build-model.js";
 import { reportDiagnostic } from "./lib.js";
@@ -34,28 +28,4 @@ export async function $onEmit(context: EmitContext<AzuritePilotEmitterOptions>):
     <AzuriteEmitterOutput serverModel={serverModel} program={program} />,
     baseDir,
   );
-}
-
-async function writeOutput(program: Program, rootComponent: Children, emitterOutputDir: string) {
-  const tree = await renderAsync(rootComponent);
-  await writeOutputDirectory(program, tree, emitterOutputDir);
-}
-
-async function writeOutputDirectory(
-  program: Program,
-  dir: OutputDirectory,
-  emitterOutputDir: string,
-) {
-  for (const sub of dir.contents) {
-    if ("contents" in sub) {
-      if (Array.isArray(sub.contents)) {
-        await writeOutputDirectory(program, sub as OutputDirectory, emitterOutputDir);
-      } else {
-        await emitFile(program, {
-          content: sub.contents as string,
-          path: resolvePath(emitterOutputDir, sub.path),
-        });
-      }
-    }
-  }
 }

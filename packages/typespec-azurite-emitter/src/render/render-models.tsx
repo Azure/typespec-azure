@@ -1,5 +1,6 @@
 import { code, For } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
+import * as ef from "@typespec/emitter-framework/typescript";
 import type { ServerModel } from "../model.js";
 import { renderFileHeader, TypeRef } from "./type-ref.js";
 
@@ -13,7 +14,7 @@ export function renderModels(serverModel: ServerModel) {
       {code`${renderFileHeader()}`}
       <For each={serverModel.models} hardline>
         {(model) => (
-          <ts.InterfaceDeclaration export name={model.name} doc={model.doc}>
+          <ef.InterfaceDeclaration export name={model.name} doc={model.doc}>
             <For each={model.properties} semicolon line enderPunctuation>
               {(prop) => (
                 <ts.InterfaceMember
@@ -24,7 +25,7 @@ export function renderModels(serverModel: ServerModel) {
                 />
               )}
             </For>
-          </ts.InterfaceDeclaration>
+          </ef.InterfaceDeclaration>
         )}
       </For>
     </ts.SourceFile>

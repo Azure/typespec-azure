@@ -1,4 +1,4 @@
-import { code, For, Show } from "@alloy-js/core";
+import { code, For } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { ServerDataModel, ServerModel, ServerOperation, ServerTypeRef } from "../model.js";
 import { ObjectProperties, OperationTypeBindingExpression } from "./render-operations.js";
@@ -137,64 +137,89 @@ function getArrayItemName(
 
 function DeserializeRequest(props: { operations: readonly ServerOperation[] }) {
   return (
-    <>
-      {code`export async function deserializeRequest(name: string, req: IRequest): Promise<IHandlerParameters | undefined> {`}
-      <indent>
-        {code`switch (name) {`}
-        <indent>
-          <For each={props.operations}>
-            {(op) => code`case ${JSON.stringify(op.name)}:
-              return deserializeMetadataRequest(getGeneratedOperation(name), req);`}
-          </For>
-          {code`default:
-            return undefined;`}
-        </indent>
-        {code`}`}
-      </indent>
-      {code`}`}
-    </>
+    <ts.FunctionDeclaration
+      export
+      async
+      name="deserializeRequest"
+      parameters={[
+        { name: "name", type: code`string` },
+        { name: "req", type: code`IRequest` },
+      ]}
+      returnType={code`Promise<IHandlerParameters | undefined>`}
+    >
+      <SerializationSwitch operations={props.operations} kind="deserialize" />
+    </ts.FunctionDeclaration>
   );
 }
 
 function SerializeResponse(props: { operations: readonly ServerOperation[] }) {
   return (
+    <ts.FunctionDeclaration
+      export
+      name="serializeResponse"
+      parameters={[
+        { name: "name", type: code`string` },
+        { name: "res", type: code`IResponse` },
+        { name: "handlerResponse", type: code`any` },
+      ]}
+      returnType={code`boolean`}
+    >
+      <SerializationSwitch operations={props.operations} kind="serialize" />
+    </ts.FunctionDeclaration>
+  );
+}
+
+function HasGeneratedSerialization(props: { operations: readonly ServerOperation[] }) {
+  return (
+    <ts.FunctionDeclaration
+      export
+      name="hasGeneratedSerialization"
+      parameters={[{ name: "name", type: code`string` }]}
+      returnType={code`boolean`}
+    >
+      <SerializationSwitch operations={props.operations} kind="has" />
+    </ts.FunctionDeclaration>
+  );
+}
+
+function SerializationSwitch(props: {
+  operations: readonly ServerOperation[];
+  kind: "deserialize" | "serialize" | "has";
+}) {
+  return (
     <>
-      {code`export function serializeResponse(name: string, res: IResponse, handlerResponse: any): boolean {`}
+      {code`switch (name) {`}
       <indent>
-        {code`switch (name) {`}
-        <indent>
-          <For each={props.operations}>
-            {(op) => code`case ${JSON.stringify(op.name)}:
-              serializeMetadataResponse(getGeneratedOperation(name), res, handlerResponse);
-              return true;`}
-          </For>
-          {code`default:
-            return false;`}
-        </indent>
-        {code`}`}
+        <For each={props.operations}>
+          {(op) => <SerializationSwitchCase operation={op} kind={props.kind} />}
+        </For>
+        {props.kind === "deserialize"
+          ? code`default:
+              return undefined;`
+          : code`default:
+              return false;`}
       </indent>
       {code`}`}
     </>
   );
 }
 
-function HasGeneratedSerialization(props: { operations: readonly ServerOperation[] }) {
-  return (
-    <>
-      {code`export function hasGeneratedSerialization(name: string): boolean {`}
-      <indent>
-        {code`switch (name) {`}
-        <indent>
-          <For each={props.operations}>{(op) => code`case ${JSON.stringify(op.name)}:`}</For>
-          <Show when={props.operations.length > 0}>{() => code`return true;`}</Show>
-          {code`default:
-            return false;`}
-        </indent>
-        {code`}`}
-      </indent>
-      {code`}`}
-    </>
-  );
+function SerializationSwitchCase(props: {
+  operation: ServerOperation;
+  kind: "deserialize" | "serialize" | "has";
+}) {
+  switch (props.kind) {
+    case "deserialize":
+      return code`case ${JSON.stringify(props.operation.name)}:
+        return deserializeMetadataRequest(getGeneratedOperation(name), req);`;
+    case "serialize":
+      return code`case ${JSON.stringify(props.operation.name)}:
+        serializeMetadataResponse(getGeneratedOperation(name), res, handlerResponse);
+        return true;`;
+    case "has":
+      return code`case ${JSON.stringify(props.operation.name)}:
+        return true;`;
+  }
 }
 
 function HelperFunctions() {
