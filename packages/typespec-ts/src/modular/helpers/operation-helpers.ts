@@ -101,7 +101,12 @@ import {
   getOperationName,
 } from "./naming-helpers.js";
 import { getStructuredStreamKind } from "./structured-stream-helpers.js";
-import { getNullableValidType, isSpreadBodyParameter, isTypeNullable } from "./type-helpers.js";
+import {
+  getNullableValidType,
+  isNumericTypeKind,
+  isSpreadBodyParameter,
+  isTypeNullable,
+} from "./type-helpers.js";
 
 /**
  * Checks whether a header should be skipped during serialization/deserialization.
@@ -1181,6 +1186,31 @@ function getSsePayloadContentType(
   return undefined;
 }
 
+function getSseScalarDeserializeExpression(context: SdkContext, type: SdkType): string {
+  if (type.kind === "nullable") {
+    return `data === null ? null : ${getSseScalarDeserializeExpression(context, type.type)}`;
+  }
+  if (type.kind === "enum" || type.kind === "enumvalue") {
+    return getSseScalarDeserializeExpression(context, type.valueType);
+  }
+  if (type.kind === "duration") {
+    return getSseScalarDeserializeExpression(context, type.wireType);
+  }
+  if (isNumericTypeKind(type.kind) || type.kind === "boolean") {
+    return deserializeResponseHeadersValue(
+      context,
+      type,
+      type.kind === "boolean" ? "String(data)" : "data",
+      true,
+      getEncodeForType(type),
+    );
+  }
+  if (type.kind === "utcDateTime" || type.kind === "plainDate" || type.kind === "bytes") {
+    return deserializeResponseValue(context, type, "data", true, getEncodeForType(type));
+  }
+  return "data";
+}
+
 /**
  * Resolves structured JSONL/SSE streaming metadata for an operation, or `undefined` when the
  * operation is not a structured stream.
@@ -1235,6 +1265,11 @@ export function getStructuredStreamInfo(
         });
         if (typeof deserializerName === "string") {
           event.deserializeExpression = `${deserializerName}(data)`;
+        } else {
+          event.deserializeExpression = getSseScalarDeserializeExpression(
+            context,
+            sseEvent.payloadType,
+          );
         }
       }
       const payloadType = getTypeExpression(context, sseEvent.payloadType);
