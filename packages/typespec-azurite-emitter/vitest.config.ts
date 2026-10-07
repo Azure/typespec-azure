@@ -16,6 +16,7 @@ export default mergeConfig(
       dedupe: ["@alloy-js/core"],
     },
     test: {
+      setupFiles: ["./test/vitest.setup.ts"],
       testTimeout: 30000,
     },
   }),

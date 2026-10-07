@@ -1,43 +1,40 @@
-import { code, For, Show, type Children } from "@alloy-js/core";
+import { code, For, refkey, Show, type Children, type Refkey } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import * as ef from "@typespec/emitter-framework/typescript";
 import type { ServerModel, ServerOperation, ServerResponse, ServerTypeRef } from "../model.js";
-import { collectModelRefs, renderFileHeader, TypeRef } from "./type-ref.js";
+import { renderFileHeader, TypeRef } from "./type-ref.js";
 
-/** Collects every `models.ts`-defined type name referenced anywhere in `serverModel`'s operations. */
-function collectReferencedModelNames(serverModel: ServerModel): string[] {
-  const names = new Set<string>();
-  for (const op of serverModel.operations) {
-    for (const param of op.parameters) {
-      collectModelRefs(param.type, names);
-    }
-    if (op.requestBody) {
-      collectModelRefs(op.requestBody.type, names);
-    }
-    for (const response of op.responses) {
-      for (const header of response.headers) {
-        collectModelRefs(header.type, names);
-      }
-      if (response.body) {
-        collectModelRefs(response.body.type, names);
-      }
-    }
-  }
-  return [...names].sort();
+export function getOperationParametersRefkey(operation: ServerOperation): Refkey {
+  return refkey(operation.name, "parameters");
+}
+
+export function getOperationResponseRefkey(operation: ServerOperation): Refkey {
+  return refkey(operation.name, "response");
 }
 
 function ParametersInterface(props: { operation: ServerOperation }) {
   const op = props.operation;
   return (
     <>
-      <ef.InterfaceDeclaration export name={`${op.name}Parameters`} doc={op.doc}>
+      <ef.InterfaceDeclaration
+        export
+        name={`${op.name}Parameters`}
+        doc={op.doc}
+        refkey={getOperationParametersRefkey(op)}
+      >
         <For each={op.parameters}>
           {(param) => (
             <>
               <ts.InterfaceMember
                 name={param.name}
                 optional={param.optional}
-                type={<TypeRef type={param.type} sourceType={param.sourceProperty?.type} />}
+                type={
+                  <TypeRef
+                    type={param.type}
+                    sourceType={param.sourceProperty?.type}
+                    declarationType={param.declarationType}
+                  />
+                }
               />
               {code`;`}
               <hbr />
@@ -50,7 +47,11 @@ function ParametersInterface(props: { operation: ServerOperation }) {
               <ts.InterfaceMember
                 name="body"
                 type={
-                  <TypeRef type={op.requestBody!.type} sourceType={op.requestBody!.sourceType} />
+                  <TypeRef
+                    type={op.requestBody!.type}
+                    sourceType={op.requestBody!.sourceType}
+                    declarationType={op.requestBody!.declarationType}
+                  />
                 }
               />
               {code`;`}
@@ -86,7 +87,13 @@ function ResponseHeaders(props: { response: ServerResponse }) {
           <ts.InterfaceMember
             name={header.name}
             optional={header.optional}
-            type={<TypeRef type={header.type} sourceType={header.sourceProperty?.type} />}
+            type={
+              <TypeRef
+                type={header.type}
+                sourceType={header.sourceProperty?.type}
+                declarationType={header.declarationType}
+              />
+            }
           />
         )}
       </For>
@@ -116,7 +123,13 @@ function responseInterfaceMembers(response: ServerResponse): Children[] {
     members.push(
       <ts.InterfaceMember
         name="body"
-        type={<TypeRef type={response.body.type} sourceType={response.body.sourceType} />}
+        type={
+          <TypeRef
+            type={response.body.type}
+            sourceType={response.body.sourceType}
+            declarationType={response.body.declarationType}
+          />
+        }
       />,
     );
   }
@@ -127,7 +140,11 @@ function ResponseType(props: { operation: ServerOperation }) {
   const op = props.operation;
   return (
     <>
-      <ef.TypeDeclaration export name={`${op.name}Response`}>
+      <ef.TypeDeclaration
+        export
+        name={`${op.name}Response`}
+        refkey={getOperationResponseRefkey(op)}
+      >
         <hbr />
         <indent>
           <For each={op.responses} line>
@@ -470,18 +487,9 @@ export function OperationTypeBindingExpression(props: { type: ServerTypeRef }) {
  * `parameters.ts`/`operation.ts` generated boundary.
  */
 export function renderOperations(serverModel: ServerModel) {
-  const referencedModels = collectReferencedModelNames(serverModel);
   return (
     <ts.SourceFile path="operations.ts">
       {code`${renderFileHeader()}`}
-      <Show when={referencedModels.length > 0}>
-        {() => (
-          <>
-            {code`import type { ${referencedModels.join(", ")} } from "./models.js";`}
-            <hbr />
-          </>
-        )}
-      </Show>
       <For each={serverModel.operations} hardline>
         {(op) => (
           <>

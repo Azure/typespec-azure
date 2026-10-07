@@ -1,15 +1,28 @@
-import { code, render, SourceDirectory, type Children } from "@alloy-js/core";
+import type { Children } from "@alloy-js/core";
+import { code } from "@alloy-js/core";
+import { d } from "@alloy-js/core/testing";
 import * as ts from "@alloy-js/typescript";
 import type { Program } from "@typespec/compiler";
 import { Output } from "@typespec/emitter-framework";
+import * as ef from "@typespec/emitter-framework/typescript";
 import { beforeAll, describe, expect, it } from "vitest";
 import type { ServerModel } from "../src/model.js";
 import { DocComment } from "../src/render/doc-comment.js";
-import { renderHandlers } from "../src/render/render-handlers.js";
+import { ServiceHandlerInterface } from "../src/render/render-handlers.js";
 import { renderModels } from "../src/render/render-models.js";
-import { renderOperations } from "../src/render/render-operations.js";
-import { renderSerialization } from "../src/render/render-serialization.js";
-import { renderTypeRef } from "../src/render/type-ref.js";
+import {
+  getOperationParametersRefkey,
+  getOperationResponseRefkey,
+  OperationTypeBindingExpression,
+  renderOperations,
+} from "../src/render/render-operations.js";
+import {
+  DeserializeRequest,
+  HasGeneratedSerialization,
+  SerializeResponse,
+  XmlModelMetadata,
+} from "../src/render/render-serialization.js";
+import { renderTypeRef, TypeRef } from "../src/render/type-ref.js";
 import { ApiTester } from "./tester.js";
 
 let testProgram: Program;
@@ -27,32 +40,16 @@ beforeAll(async () => {
   testProgram = program;
 });
 
-function renderSourceFile(component: Children): string {
-  const output = render(
-    <Output program={testProgram}>
-      <SourceDirectory path=".">{component}</SourceDirectory>
-    </Output>,
-  );
-  const file = findRenderedFile(output);
-  if (file === undefined || !("contents" in file)) {
-    throw new Error("Expected Alloy render output to contain one source file.");
-  }
-  return file.contents;
+function Wrapper(props: { children: Children }) {
+  return <Output program={testProgram}>{props.children}</Output>;
 }
 
-function findRenderedFile(output: { contents?: unknown[] }): { contents: string } | undefined {
-  for (const entry of output.contents ?? []) {
-    if (typeof entry === "object" && entry !== null && "kind" in entry) {
-      if (entry.kind === "file" && "contents" in entry && typeof entry.contents === "string") {
-        return entry as { contents: string };
-      }
-      if ("contents" in entry && Array.isArray(entry.contents)) {
-        const found = findRenderedFile(entry as { contents: unknown[] });
-        if (found) return found;
-      }
-    }
-  }
-  return undefined;
+function SourceFile(props: { children: Children }) {
+  return (
+    <Wrapper>
+      <ts.SourceFile path="test.ts">{props.children}</ts.SourceFile>
+    </Wrapper>
+  );
 }
 
 const sampleServerModel: ServerModel = {
@@ -176,185 +173,492 @@ const sampleServerModel: ServerModel = {
   skippedOperations: [],
 };
 
+const supportedOperations = sampleServerModel.operations;
+
 describe("renderTypeRef", () => {
-  it("renders primitives", () => {
+  it("renders primitive, model, array, and literal ServerTypeRef values", () => {
     expect(renderTypeRef({ kind: "string" })).toBe("string");
     expect(renderTypeRef({ kind: "number" })).toBe("number");
     expect(renderTypeRef({ kind: "boolean" })).toBe("boolean");
     expect(renderTypeRef({ kind: "unknown" })).toBe("unknown");
-  });
-
-  it("renders model references by name", () => {
     expect(renderTypeRef({ kind: "model", name: "QueueMetadata" })).toBe("QueueMetadata");
-  });
-
-  it("renders arrays", () => {
     expect(renderTypeRef({ kind: "array", element: { kind: "string" } })).toBe("string[]");
     expect(renderTypeRef({ kind: "array", element: { kind: "model", name: "QueueMessage" } })).toBe(
       "QueueMessage[]",
     );
-  });
-
-  it("renders literals", () => {
     expect(renderTypeRef({ kind: "literal", value: "foo" })).toBe(`"foo"`);
     expect(renderTypeRef({ kind: "literal", value: 42 })).toBe("42");
     expect(renderTypeRef({ kind: "literal", value: true })).toBe("true");
   });
 });
 
+describe("TypeRef", () => {
+  it("renders transformed server types as Alloy components", () => {
+    expect(
+      <SourceFile>
+        <TypeRef type={{ kind: "array", element: { kind: "model", name: "QueueMessage" } }} />
+        {code` | `}
+        <TypeRef type={{ kind: "literal", value: "foo" }} />
+      </SourceFile>,
+    ).toRenderTo(`QueueMessage[] | "foo"`);
+  });
+});
+
 describe("DocComment", () => {
   it("renders present docs as a JSDoc comment followed by the next line", () => {
-    const output = renderSourceFile(
-      <ts.SourceFile path="doc.ts">
+    expect(
+      <SourceFile>
         <DocComment doc="Queue metadata." />
         {code`export interface QueueMetadata {}`}
-      </ts.SourceFile>,
-    );
-
-    expect(output).toContain("/**\n * Queue metadata.\n */\nexport interface QueueMetadata {}");
+      </SourceFile>,
+    ).toRenderTo(`
+      /**
+       * Queue metadata.
+       */
+      export interface QueueMetadata {}
+    `);
   });
 
   it("renders nothing when docs are absent", () => {
-    const output = renderSourceFile(
-      <ts.SourceFile path="doc.ts">
+    expect(
+      <SourceFile>
         <DocComment doc={undefined} />
         {code`export interface QueueMetadata {}`}
-      </ts.SourceFile>,
-    );
-
-    expect(output).not.toContain("/**");
-    expect(output).toContain("export interface QueueMetadata {}");
+      </SourceFile>,
+    ).toRenderTo(`export interface QueueMetadata {}`);
   });
 });
 
 describe("renderModels", () => {
-  let output: string;
-
-  beforeAll(() => {
-    output = renderSourceFile(renderModels(sampleServerModel));
-  });
-
-  it("declares an exported interface per model", () => {
-    expect(output).toContain("export interface QueueMetadata {");
-    expect(output).toContain("export interface QueueMessage {");
-  });
-
-  it("marks optional properties with `?` and renders doc comments", () => {
-    expect(output).toContain("  /**\n   * A description.\n   */");
-    expect(output).toContain("description?: string;");
-    expect(output).toContain("publicAccess?: boolean;");
-  });
-
-  it("requires non-optional properties and renders array types", () => {
-    expect(output).toContain("messageId: string;");
-    expect(output).toContain("tags?: string[];");
+  it("renders TypeScript interfaces for server data models", () => {
+    expect(<Wrapper>{renderModels(sampleServerModel)}</Wrapper>).toRenderTo(`
+      // This file was automatically generated by @azure-tools/typespec-azurite-emitter.
+      // Do not edit this file manually; re-run \`tsp compile\` to regenerate it.
+      /**
+       * Queue metadata.
+       */
+      export interface QueueMetadata {
+        /**
+         * A description.
+         */
+        description?: string;
+        publicAccess?: boolean;
+      }
+      export interface QueueMessage {
+        messageId: string;
+        tags?: string[];
+      }
+    `);
   });
 });
 
 describe("renderOperations", () => {
-  let output: string;
+  it("renders operation declarations and metadata", () => {
+    expect(<Wrapper>{renderOperations(sampleServerModel)}</Wrapper>).toRenderTo(`
+      // This file was automatically generated by @azure-tools/typespec-azurite-emitter.
+      // Do not edit this file manually; re-run \`tsp compile\` to regenerate it.
+      /**
+       * Creates a queue.
+       */
+      export interface CreateQueueParameters {
+        queueName: string;
+        body: QueueMetadata;
 
-  beforeAll(() => {
-    output = renderSourceFile(renderOperations(sampleServerModel));
+      }
+      export type CreateQueueResponse =
+      | {
+          statusCode: 201;
+          headers: {
+            requestId: string;
+          };
+        };
+
+      export interface DeleteQueueParameters {
+        queueName: string;
+
+      }
+      export type DeleteQueueResponse =
+      | {
+          statusCode: 204;
+          headers: {
+            requestId: string;
+          };
+        };
+      export type OperationTypeBinding =
+      | {
+          readonly kind: "string" | "number" | "boolean" | "datetime" | "record" | "unknown";
+
+        }
+        | {
+          readonly kind: "model";
+          readonly name: string;
+
+        }
+        | {
+          readonly kind: "literal";
+          readonly value: string | number | boolean;
+
+        }
+        | {
+          readonly kind: "array";
+          readonly element: OperationTypeBinding;
+
+        };
+      export interface OperationParameterBinding {
+        readonly name: string;
+        readonly wireName: string;
+        readonly location: "path" | "query" | "header";
+        readonly required: boolean;
+        readonly type: OperationTypeBinding;
+
+      }
+      export interface OperationResponseHeaderBinding {
+        readonly name: string;
+        readonly wireName: string;
+        readonly type: OperationTypeBinding;
+
+      }
+      export interface OperationResponseMetadata {
+        readonly statusCode: number | "*";
+        readonly headers: readonly OperationResponseHeaderBinding[];
+        readonly body?: {
+          readonly type: OperationTypeBinding;
+
+        };
+
+      }
+      export interface OperationLiteralQueryParameter {
+        readonly name: string;
+        readonly value: string;
+
+      }
+      export interface OperationMetadata {
+        readonly name: string;
+        readonly verb: string;
+        readonly rawPath: string;
+        readonly path: string;
+        readonly literalQueryParameters: readonly OperationLiteralQueryParameter[];
+        readonly requiredQueryParameters: readonly string[];
+        readonly requiredHeaderParameters: readonly string[];
+        readonly parameters: readonly OperationParameterBinding[];
+        readonly hasRequestBody: boolean;
+        readonly requestBodyContentTypes: readonly string[];
+        readonly requestBodyParameterPath?: string | readonly string[];
+        readonly requestBodyType?: OperationTypeBinding;
+        readonly responses: readonly OperationResponseMetadata[];
+        readonly interfaceName?: string;
+
+      }
+      export const operations: readonly OperationMetadata[] = [
+        {
+          name: "CreateQueue",
+          verb: "put",
+          rawPath: "/{queueName}",
+          path: "/{queueName}",
+          literalQueryParameters: [],
+          requiredQueryParameters: [],
+          requiredHeaderParameters: [],
+          parameters: [
+            {
+              name: "queueName",
+              wireName: "queueName",
+              location: "path",
+              required: true,
+              type: {
+                kind: "string",
+              }
+            }
+          ],
+          hasRequestBody: true,
+          requestBodyContentTypes: ["application/json"],
+          requestBodyParameterPath: "body",
+          requestBodyType: {
+            kind: "model",
+            name: "QueueMetadata",
+          },
+          responses: [
+            {
+              statusCode: 201,
+              headers: [
+                {
+                  name: "requestId",
+                  wireName: "x-ms-request-id",
+                  type: {
+                    kind: "string",
+                  }
+                }
+              ]
+            }
+          ],
+          interfaceName: "Queue"
+        },
+        {
+          name: "DeleteQueue",
+          verb: "delete",
+          rawPath: "/{queueName}",
+          path: "/{queueName}",
+          literalQueryParameters: [],
+          requiredQueryParameters: [],
+          requiredHeaderParameters: [],
+          parameters: [
+            {
+              name: "queueName",
+              wireName: "queueName",
+              location: "path",
+              required: true,
+              type: {
+                kind: "string",
+              }
+            }
+          ],
+          hasRequestBody: false,
+          requestBodyContentTypes: [],
+          responses: [
+            {
+              statusCode: 204,
+              headers: [
+                {
+                  name: "requestId",
+                  wireName: "x-ms-request-id",
+                  type: {
+                    kind: "string",
+                  }
+                }
+              ]
+            }
+          ],
+          interfaceName: "Queue"
+        }
+      ];
+    `);
   });
 
-  it("imports model types referenced in bodies/headers from models.ts", () => {
-    expect(output).toContain(`import type { QueueMetadata } from "./models.js";`);
-  });
-
-  it("renders a parameters interface per operation including body", () => {
-    expect(output).toContain("export interface CreateQueueParameters {");
-    expect(output).toContain("queueName: string;");
-    expect(output).toContain("body: QueueMetadata;");
-  });
-
-  it("renders a discriminated response union including headers", () => {
-    expect(output).toContain("export type CreateQueueResponse =");
-    expect(output).toContain("statusCode: 201;");
-    expect(output).toContain("requestId: string;");
-  });
-
-  it("renders runtime route metadata with parameter bindings", () => {
-    expect(output).toContain("export const operations: readonly OperationMetadata[] = [");
-    expect(output).toContain(`name: "CreateQueue"`);
-    expect(output).toContain(`verb: "put"`);
-    expect(output).toContain(`rawPath: "/{queueName}"`);
-    expect(output).toContain(`path: "/{queueName}"`);
-    expect(output).toContain(`literalQueryParameters: []`);
-    expect(output).toContain(`requiredQueryParameters: []`);
-    expect(output).toContain(`requiredHeaderParameters: []`);
-    expect(output).toContain(
-      `name: "queueName",
-        wireName: "queueName",
-        location: "path",
-        required: true,
-        type: {
-          kind: "string",`,
-    );
-    expect(output).toContain("hasRequestBody: true");
-    expect(output).toMatch(/requestBodyContentTypes: \[\s*"application\/json"\s*\]/);
-    expect(output).toContain(
-      `statusCode: 201,
-        headers: [
-          {
-            name: "requestId",
-            wireName: "x-ms-request-id",
-            type: {
-              kind: "string",`,
-    );
-    expect(output).toContain(`interfaceName: "Queue"`);
+  it("renders operation type binding object literals", () => {
+    expect(
+      <SourceFile>
+        <OperationTypeBindingExpression
+          type={{ kind: "array", element: { kind: "model", name: "QueueMessage" } }}
+        />
+      </SourceFile>,
+    ).toRenderTo(`
+      {
+        kind: "array",
+        element: {
+          kind: "model",
+          name: "QueueMessage",
+        }
+      }
+    `);
   });
 });
 
-describe("renderHandlers", () => {
-  let output: string;
+describe("ServiceHandlerInterface", () => {
+  it("renders handler methods with automatic cross-file imports from refkeys", () => {
+    expect(
+      <Wrapper>
+        <ts.SourceFile path="operations.ts">
+          <ts.InterfaceDeclaration
+            export
+            name="CreateQueueParameters"
+            refkey={getOperationParametersRefkey(sampleServerModel.operations[0])}
+          />
+          <ts.TypeDeclaration
+            export
+            name="CreateQueueResponse"
+            refkey={getOperationResponseRefkey(sampleServerModel.operations[0])}
+          >
+            {code`{ statusCode: 201 }`}
+          </ts.TypeDeclaration>
+          <ts.InterfaceDeclaration
+            export
+            name="DeleteQueueParameters"
+            refkey={getOperationParametersRefkey(sampleServerModel.operations[1])}
+          />
+          <ts.TypeDeclaration
+            export
+            name="DeleteQueueResponse"
+            refkey={getOperationResponseRefkey(sampleServerModel.operations[1])}
+          >
+            {code`{ statusCode: 204 }`}
+          </ts.TypeDeclaration>
+        </ts.SourceFile>
+        <ts.SourceFile path="handlers.ts">
+          <ef.InterfaceDeclaration export name="Context">
+            <ts.InterfaceMember readonly name="contextId" type={code`string`} />
+            {code`;`}
+          </ef.InterfaceDeclaration>
+          <hbr />
+          <ServiceHandlerInterface serverModel={sampleServerModel} />
+        </ts.SourceFile>
+      </Wrapper>,
+    ).toRenderTo({
+      "operations.ts": d`
+              export interface CreateQueueParameters {
 
-  beforeAll(() => {
-    output = renderSourceFile(renderHandlers(sampleServerModel));
-  });
+              }export type CreateQueueResponse = { statusCode: 201 };export interface DeleteQueueParameters {
 
-  it("imports the generated parameter/response types", () => {
-    expect(output).toContain(`import type {`);
-    expect(output).toContain("CreateQueueParameters,");
-    expect(output).toContain("CreateQueueResponse,");
-    expect(output).toContain(`} from "./operations.js";`);
-  });
+              }export type DeleteQueueResponse = { statusCode: 204 };
+            `,
+      "handlers.ts": d`
+              import type {
+                CreateQueueParameters,
+                CreateQueueResponse,
+                DeleteQueueParameters,
+                DeleteQueueResponse,
+              } from "./operations.js";
 
-  it("declares a placeholder Context type mirroring Azurite's generated Context object", () => {
-    expect(output).toContain("export interface Context {");
-  });
-
-  it("declares one camelCase method per operation taking params + context and returning a Promise", () => {
-    expect(output).toMatch(
-      /createQueue\(\s*params: CreateQueueParameters,\s*context: Context,\s*\): Promise<CreateQueueResponse>;/,
-    );
+              export interface Context {
+                readonly contextId: string;
+              }
+              export interface IServiceHandler {
+                /**
+                 * Creates a queue.
+                 *
+                 * @param {CreateQueueParameters} params
+                 * @param {Context} context
+                 */
+                createQueue(
+                  params: CreateQueueParameters,
+                  context: Context,
+                ): Promise<CreateQueueResponse>;
+                deleteQueue(
+                  params: DeleteQueueParameters,
+                  context: Context,
+                ): Promise<DeleteQueueResponse>;
+              }
+            `,
+    });
   });
 });
 
-describe("renderSerialization", () => {
-  let output: string;
+describe("renderSerialization components", () => {
+  it("renders XML model metadata from Alloy object/value components", () => {
+    expect(
+      <SourceFile>
+        <XmlModelMetadata models={sampleServerModel.models} />
+      </SourceFile>,
+    ).toRenderTo(`
+      interface XmlPropertyMetadata {
+        readonly name: string;
+        readonly wireName: string;
+        readonly type: OperationTypeBinding;
+        readonly attribute: boolean;
+        readonly unwrapped: boolean;
+        readonly itemName?: string;
+      }
 
-  beforeAll(() => {
-    output = renderSourceFile(renderSerialization(sampleServerModel));
+      interface XmlModelMetadata {
+        readonly name: string;
+        readonly wireName: string;
+        readonly properties: readonly XmlPropertyMetadata[];
+      }
+
+      const xmlModels: Record<string, XmlModelMetadata> ={
+        QueueMetadata: {
+          name: "QueueMetadata",
+          wireName: "QueueMetadata",
+          properties: [
+            {
+              name: "description",
+              wireName: "Description",
+              type: {
+                kind: "string",
+              },
+              attribute: false,
+              unwrapped: false
+            },
+            {
+              name: "publicAccess",
+              wireName: "PublicAccess",
+              type: {
+                kind: "boolean",
+              },
+              attribute: false,
+              unwrapped: false
+            }
+          ]
+        },
+        QueueMessage: {
+          name: "QueueMessage",
+          wireName: "QueueMessage",
+          properties: [
+            {
+              name: "messageId",
+              wireName: "MessageId",
+              type: {
+                kind: "string",
+              },
+              attribute: false,
+              unwrapped: false
+            },
+            {
+              name: "tags",
+              wireName: "Tags",
+              type: {
+                kind: "array",
+                element: {
+                  kind: "string",
+                }
+              },
+              attribute: false,
+              unwrapped: false,
+              itemName: "Tags"
+            }
+          ]
+        }
+      };
+    `);
   });
 
-  it("renders direct request/response serialization helpers with shared metadata helpers", () => {
-    expect(output).not.toContain(`@azure/ms-rest-js`);
-    expect(output).toContain(`export async function deserializeRequest`);
-    expect(output).toContain(`export function serializeResponse`);
-    expect(output).not.toContain(`function deserializeDeleteQueueRequest(req: IRequest)`);
-    expect(output).not.toContain(`function serializeDeleteQueueResponse`);
-    expect(output).toContain(`function deserializeMetadataRequest`);
-    expect(output).toContain(`function serializeMetadataResponse`);
-    expect(output).toContain(`setHeader(res, header.wireName`);
-  });
-
-  it("uses switch-based entrypoints instead of a generated operation map", () => {
-    expect(output).not.toContain(`serializationOperations`);
-    expect(output).toContain(`case "DeleteQueue":`);
-    expect(output).toContain(
-      `return deserializeMetadataRequest(getGeneratedOperation(name), req);`,
-    );
-    expect(output).toContain(`export function hasGeneratedSerialization(name: string): boolean {`);
+  it("renders serialization entrypoint declarations with operation switch cases", () => {
+    expect(
+      <SourceFile>
+        <DeserializeRequest operations={supportedOperations} />
+        <hbr />
+        <SerializeResponse operations={supportedOperations} />
+        <hbr />
+        <HasGeneratedSerialization operations={supportedOperations} />
+      </SourceFile>,
+    ).toRenderTo(`
+      export async function deserializeRequest(
+        name: string,
+        req: IRequest,
+      ): Promise<IHandlerParameters | undefined> {
+        switch (name) {
+          case "CreateQueue":
+            return deserializeMetadataRequest(getGeneratedOperation(name), req);
+          case "DeleteQueue":
+            return deserializeMetadataRequest(getGeneratedOperation(name), req);
+          default:
+            return undefined;
+        }
+      }
+      export function serializeResponse(
+        name: string,
+        res: IResponse,
+        handlerResponse: any,
+      ): boolean {
+        switch (name) {
+          case "CreateQueue":
+            serializeMetadataResponse(getGeneratedOperation(name), res, handlerResponse);
+            return true;
+          case "DeleteQueue":
+            serializeMetadataResponse(getGeneratedOperation(name), res, handlerResponse);
+            return true;
+          default:
+            return false;
+        }
+      }
+      export function hasGeneratedSerialization(name: string): boolean {
+        switch (name) {
+          case "CreateQueue":
+            return true;
+          case "DeleteQueue":
+            return true;
+          default:
+            return false;
+        }
+      }
+    `);
   });
 });

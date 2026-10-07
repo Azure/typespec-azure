@@ -1,4 +1,11 @@
-import { type Model, type ModelProperty, type Program, type Type } from "@typespec/compiler";
+import {
+  $doc,
+  type DecoratorContext,
+  type Model,
+  type ModelProperty,
+  type Program,
+  type Type,
+} from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import {
   getAllHttpServices,
@@ -7,6 +14,7 @@ import {
   type HttpOperationResponse,
   type HttpPayloadBody,
 } from "@typespec/http";
+import "@typespec/http/experimental/typekit";
 import { isAttribute, isUnwrapped } from "@typespec/xml";
 import type {
   ServerDataModel,
@@ -152,13 +160,17 @@ function buildParameter(
   const location: ServerParameterLocation =
     param.type === "cookie" ? "header" : (param.type as ServerParameterLocation);
   return withSource(
-    {
-      name: getName(program, param.param, param.param.name),
-      wireName: param.name,
-      location,
-      type: toTypeRef(program, param.param.type, modelRegistry, anonymousModelNames),
-      optional: param.param.optional,
-    },
+    withSource(
+      {
+        name: getName(program, param.param, param.param.name),
+        wireName: param.name,
+        location,
+        type: toTypeRef(program, param.param.type, modelRegistry, anonymousModelNames),
+        optional: param.param.optional,
+      },
+      "declarationType",
+      toDeclarationType(program, param.param.type, modelRegistry, anonymousModelNames),
+    ),
     "sourceProperty",
     param.param,
   );
@@ -171,11 +183,15 @@ function buildRequestBody(
   anonymousModelNames: Map<Model, string>,
 ): ServerRequestBody {
   return withSource(
-    {
-      type: toTypeRef(program, body.type, modelRegistry, anonymousModelNames),
-      contentTypes: body.contentTypes,
-      parameterPath: getBodyParameterPath(program, body),
-    },
+    withSource(
+      {
+        type: toTypeRef(program, body.type, modelRegistry, anonymousModelNames),
+        contentTypes: body.contentTypes,
+        parameterPath: getBodyParameterPath(program, body),
+      },
+      "declarationType",
+      toDeclarationType(program, body.type, modelRegistry, anonymousModelNames),
+    ),
     "sourceType",
     body.type,
   );
@@ -204,12 +220,16 @@ function buildResponse(
   for (const [headerWireName, prop] of Object.entries(content?.headers ?? {})) {
     headers.push(
       withSource(
-        {
-          name: getName(program, prop, prop.name),
-          wireName: headerWireName,
-          type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
-          optional: prop.optional,
-        },
+        withSource(
+          {
+            name: getName(program, prop, prop.name),
+            wireName: headerWireName,
+            type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
+            optional: prop.optional,
+          },
+          "declarationType",
+          toDeclarationType(program, prop.type, modelRegistry, anonymousModelNames),
+        ),
         "sourceProperty",
         prop,
       ),
@@ -302,20 +322,34 @@ function registerModel(
   const tk = $(program);
   const name = resolveModelName(program, model, modelRegistry, anonymousModelNames);
   if (!modelRegistry.has(name)) {
+    const declarationModel = createDeclarationModel(program, name, model);
     // Insert a placeholder first to guard against infinite recursion on cyclic models.
-    modelRegistry.set(name, { name, wireName: name, properties: [] });
-    const properties = [...tk.model.getProperties(model).values()].map((prop) =>
-      buildModelProperty(program, prop, modelRegistry, anonymousModelNames),
+    modelRegistry.set(
+      name,
+      withSource({ name, wireName: name, properties: [] }, "declarationModel", declarationModel),
     );
+    const properties = [...tk.model.getProperties(model).values()].map((prop) =>
+      buildModelProperty(program, prop, declarationModel, modelRegistry, anonymousModelNames),
+    );
+    declarationModel.properties.clear();
+    for (const prop of properties) {
+      if (prop.declarationProperty) {
+        declarationModel.properties.set(prop.declarationProperty.name, prop.declarationProperty);
+      }
+    }
     modelRegistry.set(
       name,
       withSource(
-        {
-          name,
-          wireName: $(program).type.getEncodedName(model, "application/xml"),
-          properties,
-          doc: getDocHelper(program, model),
-        },
+        withSource(
+          {
+            name,
+            wireName: $(program).type.getEncodedName(model, "application/xml"),
+            properties,
+            doc: getDocHelper(program, model),
+          },
+          "declarationModel",
+          declarationModel,
+        ),
         "sourceModel",
         model,
       ),
@@ -394,22 +428,122 @@ function findStructurallyEquivalentNamedModel(
 function buildModelProperty(
   program: Program,
   prop: ModelProperty,
+  declarationModel: Model,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): ServerModelProperty {
+  const declarationProperty = createDeclarationProperty(
+    program,
+    prop,
+    declarationModel,
+    modelRegistry,
+    anonymousModelNames,
+  );
   return withSource(
-    {
-      name: getName(program, prop, prop.name),
-      wireName: $(program).type.getEncodedName(prop, "application/xml"),
-      type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
-      optional: prop.optional,
-      xmlAttribute: isAttribute(program, prop),
-      xmlUnwrapped: isUnwrapped(program, prop),
-      doc: getDocHelper(program, prop),
-    },
+    withSource(
+      {
+        name: getName(program, prop, prop.name),
+        wireName: $(program).type.getEncodedName(prop, "application/xml"),
+        type: toTypeRef(program, prop.type, modelRegistry, anonymousModelNames),
+        declarationProperty,
+        optional: prop.optional,
+        xmlAttribute: isAttribute(program, prop),
+        xmlUnwrapped: isUnwrapped(program, prop),
+        doc: getDocHelper(program, prop),
+      },
+      "declarationProperty",
+      declarationProperty,
+    ),
     "sourceProperty",
     prop,
   );
+}
+
+function toDeclarationType(
+  program: Program,
+  type: Type,
+  modelRegistry: Map<string, ServerDataModel>,
+  anonymousModelNames: Map<Model, string>,
+): Type {
+  const tk = $(program);
+  switch (type.kind) {
+    case "Scalar":
+      if (
+        tk.scalar.extendsUtcDateTime(type) ||
+        tk.scalar.extendsOffsetDateTime(type) ||
+        tk.scalar.extendsPlainDate(type) ||
+        tk.scalar.extendsPlainTime(type)
+      ) {
+        return tk.builtin.string;
+      }
+      return type;
+    case "Enum":
+      return tk.builtin.string;
+    case "Model":
+      if (tk.array.is(type)) {
+        return tk.array.create(
+          toDeclarationType(
+            program,
+            tk.array.getElementType(type),
+            modelRegistry,
+            anonymousModelNames,
+          ),
+        );
+      }
+      if (tk.record.is(type)) {
+        return tk.record.create(
+          toDeclarationType(
+            program,
+            tk.record.getElementType(type),
+            modelRegistry,
+            anonymousModelNames,
+          ),
+        );
+      }
+      const modelRef = registerModel(program, type, modelRegistry, anonymousModelNames);
+      return modelRef.kind === "model"
+        ? (modelRegistry.get(modelRef.name)?.declarationModel ?? type)
+        : type;
+    case "Union":
+      return tk.intrinsic.any;
+    default:
+      return type;
+  }
+}
+
+function createDeclarationModel(program: Program, name: string, sourceModel: Model): Model {
+  const tk = $(program);
+  const model = tk.model.create({
+    name,
+    properties: {},
+    expression: false,
+  });
+  applyDoc(program, model, getDocHelper(program, sourceModel));
+  return model;
+}
+
+function createDeclarationProperty(
+  program: Program,
+  sourceProperty: ModelProperty,
+  declarationModel: Model,
+  modelRegistry: Map<string, ServerDataModel>,
+  anonymousModelNames: Map<Model, string>,
+): ModelProperty {
+  const tk = $(program);
+  const property = tk.modelProperty.create({
+    name: getName(program, sourceProperty, sourceProperty.name),
+    type: toDeclarationType(program, sourceProperty.type, modelRegistry, anonymousModelNames),
+    optional: sourceProperty.optional,
+    defaultValue: sourceProperty.defaultValue,
+  });
+  property.model = declarationModel;
+  applyDoc(program, property, getDocHelper(program, sourceProperty));
+  return property;
+}
+
+function applyDoc(program: Program, target: Type, doc: string | undefined): void {
+  if (!doc) return;
+  $doc({ program } as DecoratorContext, target, doc);
 }
 
 function getDocHelper(program: Program, target: Type): string | undefined {

@@ -16,6 +16,7 @@ export interface ServerModelProperty {
   readonly wireName: string;
   readonly type: ServerTypeRef;
   readonly sourceProperty?: ModelProperty;
+  readonly declarationProperty?: ModelProperty;
   readonly optional: boolean;
   readonly xmlAttribute: boolean;
   readonly xmlUnwrapped: boolean;
@@ -28,6 +29,7 @@ export interface ServerDataModel {
   readonly wireName: string;
   readonly properties: ServerModelProperty[];
   readonly sourceModel?: Model;
+  readonly declarationModel?: Model;
   readonly doc?: string;
 }
 
@@ -40,12 +42,14 @@ export interface ServerOperationParameter {
   readonly location: ServerParameterLocation;
   readonly type: ServerTypeRef;
   readonly sourceProperty?: ModelProperty;
+  readonly declarationType?: Type;
   readonly optional: boolean;
 }
 
 export interface ServerRequestBody {
   readonly type: ServerTypeRef;
   readonly sourceType?: Type;
+  readonly declarationType?: Type;
   readonly contentTypes: readonly string[];
   readonly parameterPath: string | readonly string[];
 }
@@ -55,6 +59,7 @@ export interface ServerResponseHeader {
   readonly wireName: string;
   readonly type: ServerTypeRef;
   readonly sourceProperty?: ModelProperty;
+  readonly declarationType?: Type;
   readonly optional: boolean;
 }
 

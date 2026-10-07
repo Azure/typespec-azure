@@ -1,4 +1,4 @@
-import { code, For } from "@alloy-js/core";
+import { Block, code, For, List } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { ServerDataModel, ServerModel, ServerOperation, ServerTypeRef } from "../model.js";
 import { ObjectProperties, OperationTypeBindingExpression } from "./render-operations.js";
@@ -47,7 +47,7 @@ function isSupportedBody(type: ServerTypeRef): boolean {
   return type.kind === "model";
 }
 
-function XmlModelMetadata(props: { models: readonly ServerDataModel[] }) {
+export function XmlModelMetadata(props: { models: readonly ServerDataModel[] }) {
   return (
     <>
       {code`
@@ -135,7 +135,7 @@ function getArrayItemName(
   return fallback;
 }
 
-function DeserializeRequest(props: { operations: readonly ServerOperation[] }) {
+export function DeserializeRequest(props: { operations: readonly ServerOperation[] }) {
   return (
     <ts.FunctionDeclaration
       export
@@ -145,14 +145,14 @@ function DeserializeRequest(props: { operations: readonly ServerOperation[] }) {
         { name: "name", type: code`string` },
         { name: "req", type: code`IRequest` },
       ]}
-      returnType={code`Promise<IHandlerParameters | undefined>`}
+      returnType={code`IHandlerParameters | undefined`}
     >
       <SerializationSwitch operations={props.operations} kind="deserialize" />
     </ts.FunctionDeclaration>
   );
 }
 
-function SerializeResponse(props: { operations: readonly ServerOperation[] }) {
+export function SerializeResponse(props: { operations: readonly ServerOperation[] }) {
   return (
     <ts.FunctionDeclaration
       export
@@ -169,7 +169,7 @@ function SerializeResponse(props: { operations: readonly ServerOperation[] }) {
   );
 }
 
-function HasGeneratedSerialization(props: { operations: readonly ServerOperation[] }) {
+export function HasGeneratedSerialization(props: { operations: readonly ServerOperation[] }) {
   return (
     <ts.FunctionDeclaration
       export
@@ -187,20 +187,20 @@ function SerializationSwitch(props: {
   kind: "deserialize" | "serialize" | "has";
 }) {
   return (
-    <>
-      {code`switch (name) {`}
-      <indent>
+    <Block opener="switch (name) {" closer="}">
+      <List hardline>
         <For each={props.operations}>
           {(op) => <SerializationSwitchCase operation={op} kind={props.kind} />}
         </For>
-        {props.kind === "deserialize"
-          ? code`default:
-              return undefined;`
-          : code`default:
-              return false;`}
-      </indent>
-      {code`}`}
-    </>
+        <>
+          {code`default:`}
+          <indent>
+            <hbr />
+            {props.kind === "deserialize" ? code`return undefined;` : code`return false;`}
+          </indent>
+        </>
+      </List>
+    </Block>
   );
 }
 
@@ -210,15 +210,37 @@ function SerializationSwitchCase(props: {
 }) {
   switch (props.kind) {
     case "deserialize":
-      return code`case ${JSON.stringify(props.operation.name)}:
-        return deserializeMetadataRequest(getGeneratedOperation(name), req);`;
+      return (
+        <>
+          {code`case ${JSON.stringify(props.operation.name)}:`}
+          <indent>
+            <hbr />
+            {code`return deserializeMetadataRequest(getGeneratedOperation(name), req);`}
+          </indent>
+        </>
+      );
     case "serialize":
-      return code`case ${JSON.stringify(props.operation.name)}:
-        serializeMetadataResponse(getGeneratedOperation(name), res, handlerResponse);
-        return true;`;
+      return (
+        <>
+          {code`case ${JSON.stringify(props.operation.name)}:`}
+          <indent>
+            <hbr />
+            {code`serializeMetadataResponse(getGeneratedOperation(name), res, handlerResponse);`}
+            <hbr />
+            {code`return true;`}
+          </indent>
+        </>
+      );
     case "has":
-      return code`case ${JSON.stringify(props.operation.name)}:
-        return true;`;
+      return (
+        <>
+          {code`case ${JSON.stringify(props.operation.name)}:`}
+          <indent>
+            <hbr />
+            {code`return true;`}
+          </indent>
+        </>
+      );
   }
 }
 

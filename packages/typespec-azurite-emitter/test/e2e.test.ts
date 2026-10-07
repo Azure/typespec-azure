@@ -23,7 +23,7 @@ describe("end-to-end emit", () => {
     expect(modelsFile).toContain("export interface QueueProperties {");
     expect(modelsFile).toContain("export interface QueueMessage {");
     expect(modelsFile).toContain("export interface QueueMessageList {");
-    expect(modelsFile).toContain("messages: QueueMessage[];");
+    expect(modelsFile).toContain("messages: Array<QueueMessage>;");
     expect(modelsFile).toContain("start?: string;");
     expect(modelsFile).toContain("permission?: string;");
   });
@@ -59,7 +59,7 @@ describe("end-to-end emit", () => {
     const modelsFile = findOutput(outputs, "models.ts");
 
     expect(modelsFile).toContain("requiredName: string;");
-    expect(modelsFile).toContain("optionalTags?: string[];");
+    expect(modelsFile).toContain("optionalTags?: Array<string>;");
     expect(modelsFile).toContain("metadata?: Record<string, string>;");
     expect(modelsFile).toContain("child: Child;");
   });
