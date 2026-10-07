@@ -141,14 +141,31 @@ Options: `--api-version <v>` (required), `--out <dir>`.
 
 ## API
 
+The package's default entrypoint is browser-compatible. It provides the JSON Schema and in-memory
+parsing, validation, resolution, and materialization helpers without Node.js globals or polyfills:
+
+```ts
+import {
+  loadExampleFile,
+  validateExampleFiles,
+  resolveExampleFiles,
+} from "@azure-tools/typespec-azure-examples";
+
+const file = loadExampleFile("examples.yaml", yamlContent);
+const diagnostics = validateExampleFiles([file]);
+const { examples } = resolveExampleFiles([file], "2024-06-01", ["2024-06-01"]);
+```
+
+Filesystem discovery, migration, and terminal diagnostic formatting require Node.js. They are
+available from the explicit `/node` entrypoint; Node.js also automatically selects this entrypoint
+for imports from the package root, preserving existing Node.js usage. The CLI commands are unchanged.
+
 ```ts
 import {
   validateExamplesDir,
-  validateExampleFiles,
-  loadExampleFile,
   migrate,
   resolveExamplesDir,
-} from "@azure-tools/typespec-azure-examples";
+} from "@azure-tools/typespec-azure-examples/node";
 
 const { diagnostics } = await validateExamplesDir("path/to/service");
 

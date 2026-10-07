@@ -1,9 +1,8 @@
 /**
  * `@azure-tools/typespec-azure-examples` — tooling for the Azure unified examples format
- * (`examples.yaml`). This entrypoint exposes the JSON Schema and the programmatic validation API
- * used by the `tsp-examples validate` command.
+ * (`examples.yaml`). This entrypoint exposes browser-compatible parsing, validation, resolution,
+ * and materialization APIs. Filesystem and CLI helpers are exposed by the Node.js entrypoint.
  */
-export { discoverExampleFiles, validateExamplesDir, type ValidateDirResult } from "./discover.js";
 export { materializeLegacyExample, type LegacyExample } from "./legacy.js";
 export {
   isQuotedScalar,
@@ -14,10 +13,36 @@ export {
   type LoadedExampleFile,
   type Position,
 } from "./loader.js";
-export * from "./migrate/index.js";
+export {
+  buildLineages,
+  type BuildLineagesOptions,
+  type CollectedExample,
+} from "./migrate/dedup.js";
+export {
+  buildExamplesObject,
+  planFiles,
+  serializeExamplesYaml,
+  type EmittedFile,
+  type OperationEntry,
+} from "./migrate/emit.js";
+export type { MigratedRequest, MigratedResponse, MigratedVariant } from "./migrate/model.js";
+export { normalizeApiVersion, normalizeApiVersions } from "./migrate/normalize.js";
+export { deriveOperationKey, interfaceOf } from "./migrate/operation-key.js";
+export { transformExample } from "./migrate/transform.js";
+export {
+  comparatorFromOrder,
+  defaultCompareVersions,
+  earliestVersion,
+  latestVersion,
+} from "./migrate/version-order.js";
 export { defaultLegacyExampleFilename, slugify, stripJsonExtension } from "./naming.js";
-export { formatDiagnostics, formatSummary } from "./reporter.js";
-export * from "./resolve/index.js";
+export { substituteApiVersion } from "./resolve/materialize.js";
+export {
+  resolveExampleFiles,
+  type ResolveResult,
+  type ResolvedExample,
+} from "./resolve/resolve.js";
+export { selectApplicable, type HasSince } from "./resolve/select.js";
 export { checkFilePlacement, checkSemantics, type SemanticContext } from "./rules.js";
 export { ExamplesYamlSchema } from "./schema.js";
 export type {
