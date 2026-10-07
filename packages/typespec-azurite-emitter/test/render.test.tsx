@@ -1,3 +1,4 @@
+import { render, SourceDirectory, type Children } from "@alloy-js/core";
 import { describe, expect, it } from "vitest";
 import type { ServerModel } from "../src/model.js";
 import { renderHandlers } from "../src/render/render-handlers.js";
@@ -5,6 +6,15 @@ import { renderModels } from "../src/render/render-models.js";
 import { renderOperations } from "../src/render/render-operations.js";
 import { renderSerialization } from "../src/render/render-serialization.js";
 import { renderTypeRef } from "../src/render/type-ref.js";
+
+function renderSourceFile(component: Children): string {
+  const output = render(<SourceDirectory path=".">{component}</SourceDirectory>);
+  const file = output.contents.find((entry) => entry.kind === "file");
+  if (file === undefined || !("contents" in file)) {
+    throw new Error("Expected Alloy render output to contain one source file.");
+  }
+  return file.contents;
+}
 
 const sampleServerModel: ServerModel = {
   serviceName: "QueuePilot",
@@ -154,7 +164,7 @@ describe("renderTypeRef", () => {
 });
 
 describe("renderModels", () => {
-  const output = renderModels(sampleServerModel);
+  const output = renderSourceFile(renderModels(sampleServerModel));
 
   it("declares an exported interface per model", () => {
     expect(output).toContain("export interface QueueMetadata {");
@@ -174,7 +184,7 @@ describe("renderModels", () => {
 });
 
 describe("renderOperations", () => {
-  const output = renderOperations(sampleServerModel);
+  const output = renderSourceFile(renderOperations(sampleServerModel));
 
   it("imports model types referenced in bodies/headers from models.ts", () => {
     expect(output).toContain(`import type { QueueMetadata } from "./models.js";`);
@@ -214,7 +224,7 @@ describe("renderOperations", () => {
 });
 
 describe("renderHandlers", () => {
-  const output = renderHandlers(sampleServerModel);
+  const output = renderSourceFile(renderHandlers(sampleServerModel));
 
   it("imports the generated parameter/response types", () => {
     expect(output).toContain(`import type {`);
@@ -235,7 +245,7 @@ describe("renderHandlers", () => {
 });
 
 describe("renderSerialization", () => {
-  const output = renderSerialization(sampleServerModel);
+  const output = renderSourceFile(renderSerialization(sampleServerModel));
 
   it("renders direct request/response serialization helpers with shared metadata helpers", () => {
     expect(output).not.toContain(`@azure/ms-rest-js`);

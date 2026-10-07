@@ -3719,7 +3719,20 @@ importers:
         version: 5.0.0(@types/node@26.5.0)(@vitest/coverage-v8@5.0.0)(@vitest/ui@5.0.0)(happy-dom@20.11.6)(jsdom@25.0.1)(vite@8.2.2(@types/node@26.5.0)(esbuild@0.28.2)(tsx@4.23.13)(yaml@2.9.0))
 
   packages/typespec-azurite-emitter:
+    dependencies:
+      '@alloy-js/core':
+        specifier: 'catalog:'
+        version: 0.25.0
+      '@alloy-js/typescript':
+        specifier: 'catalog:'
+        version: 0.25.0
     devDependencies:
+      '@alloy-js/cli':
+        specifier: 'catalog:'
+        version: 0.25.0
+      '@alloy-js/rollup-plugin':
+        specifier: 'catalog:'
+        version: 0.2.0(@babel/core@8.0.1)(@types/babel__core@7.20.5)
       '@azure-tools/typespec-client-generator-core':
         specifier: workspace:^
         version: link:../typespec-client-generator-core

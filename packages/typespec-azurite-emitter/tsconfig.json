@@ -9,6 +9,10 @@
     "outDir": "dist",
     "rootDir": ".",
     "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo",
+    "jsx": "preserve",
+    "jsxImportSource": "@alloy-js/core",
     "verbatimModuleSyntax": true
-  }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "generated-defs/**/*.ts"],
+  "exclude": ["test", "vitest.config.ts"]
 }

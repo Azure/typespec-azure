@@ -35,8 +35,8 @@
     }
   },
   "scripts": {
-    "build": "pnpm gen-extern-signature && tsc -p tsconfig.build.json",
-    "watch": "tsc -p tsconfig.build.json --watch",
+    "build": "pnpm gen-extern-signature && alloy build",
+    "watch": "alloy build --watch",
     "clean": "rimraf ./dist ./temp",
     "gen-extern-signature": "tspd --enable-experimental gen-extern-signature .",
     "lint": "oxlint . --deny-warnings",
@@ -46,6 +46,10 @@
     "test:ui": "vitest --ui",
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default"
   },
+  "dependencies": {
+    "@alloy-js/core": "catalog:",
+    "@alloy-js/typescript": "catalog:"
+  },
   "peerDependencies": {
     "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@typespec/compiler": "workspace:^",
@@ -53,6 +57,8 @@
     "@typespec/xml": "workspace:^"
   },
   "devDependencies": {
+    "@alloy-js/cli": "catalog:",
+    "@alloy-js/rollup-plugin": "catalog:",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@types/node": "catalog:",
     "@typespec/compiler": "workspace:^",
