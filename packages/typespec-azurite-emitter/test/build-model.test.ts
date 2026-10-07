@@ -3,7 +3,7 @@ import { getAllHttpServices } from "@typespec/http";
 import { describe, expect, it } from "vitest";
 import { buildServerModel } from "../src/build-model.js";
 import { operationDescriptorValue } from "../src/render/render-metadata.js";
-import { ApiTester, loadQueuePilotFixture } from "./tester.js";
+import { ApiTester, loadQueuePilotFixture, readFixture } from "./tester.js";
 
 describe("buildServerModel", () => {
   it("builds one operation per HTTP operation with the right verb and path", async () => {
@@ -51,7 +51,7 @@ describe("buildServerModel", () => {
     expect(byName.visibilityTimeout).toMatchObject({
       location: "query",
       optional: true,
-      type: { kind: "number", constraints: { min: 0, max: 604800 } },
+      type: { kind: "number", constraints: { min: 0, max: 2147483647 } },
     });
   });
 
@@ -169,7 +169,26 @@ describe("buildServerModel", () => {
     const visibilityTimeout = listMessages.parameters.parameters.find(
       (p) => p.param.name === "visibilityTimeout",
     )!;
-    expect($(program).type.maxValue(visibilityTimeout.param)).toBe(604800);
+    expect($(program).type.maxValue(visibilityTimeout.param)).toBe(2147483647);
+  });
+
+  it("preserves the shared visibility timeout max when no Azurite overlay overrides it", async () => {
+    const { program } = await ApiTester.compile({
+      "main.tsp": `
+        import "./base.tsp";
+      `,
+      "base.tsp": readFixture("base.tsp"),
+    });
+
+    const serverModel = buildServerModel(program);
+    const listMessages = serverModel.operations.find((op) => op.name === "ListMessages")!;
+    const visibilityTimeout = listMessages.parameters.find(
+      (parameter) => parameter.name === "visibilityTimeout",
+    )!;
+    expect(visibilityTimeout.type).toMatchObject({
+      kind: "number",
+      constraints: { min: 0, max: 604800 },
+    });
   });
 
   it("uses TCGC @clientName operation overrides when present", async () => {

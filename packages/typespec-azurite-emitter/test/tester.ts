@@ -15,7 +15,7 @@ export const EmitterTester = ApiTester.emit("@azure-tools/typespec-azurite-emitt
 
 const FIXTURE_DIR = join(import.meta.dirname, "fixtures", "queue-pilot");
 
-function readFixture(name: string): string {
+export function readFixture(name: string): string {
   return readFileSync(join(FIXTURE_DIR, name), "utf-8");
 }
 
