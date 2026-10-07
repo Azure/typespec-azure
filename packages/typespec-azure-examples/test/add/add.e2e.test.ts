@@ -3,7 +3,7 @@ import { tmpdir } from "os";
 import { join } from "path";
 import { afterAll, describe, expect, it } from "vitest";
 import { parse } from "yaml";
-import { add } from "../../src/add/index.js";
+import { add } from "../../src/node.js";
 
 /**
  * `service.json` for one version. `extraCreateProp` lets a later version change the create body so

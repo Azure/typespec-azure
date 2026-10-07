@@ -179,12 +179,13 @@ const diagnostics = validateExampleFiles([file]);
 const { examples } = resolveExampleFiles([file], "2024-06-01", ["2024-06-01"]);
 ```
 
-Filesystem discovery, migration, and terminal diagnostic formatting require Node.js. They are
+Filesystem discovery, migration, example authoring, and terminal diagnostic formatting require Node.js. They are
 available from the explicit `/node` entrypoint; Node.js also automatically selects this entrypoint
 for imports from the package root, preserving existing Node.js usage. The CLI commands are unchanged.
 
 ```ts
 import {
+  add,
   validateExamplesDir,
   migrate,
   resolveExamplesDir,
@@ -195,4 +196,6 @@ const { diagnostics } = await validateExamplesDir("path/to/service");
 const { files } = await migrate("path/to/specs", { namespace: "Microsoft.EventGrid" });
 
 const { examples } = await resolveExamplesDir("path/to/service", "2024-06-01");
+
+const result = await add("path/to/service");
 ```
