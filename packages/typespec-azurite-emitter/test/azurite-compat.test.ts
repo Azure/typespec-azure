@@ -32,39 +32,33 @@ describe("structural fit against Azure/Azurite's real generated artifacts", () =
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const operationsFile = findOutput(outputs, "operations.ts");
 
-    expect(operationsFile).toContain(`name: "Queue_Create"`);
-    expect(operationsFile).toContain(`verb: "put"`);
-    expect(operationsFile).toContain(`path: "/{queueName}"`);
+    expect(operationsFile).toContain(`"Queue_Create"`);
+    expect(operationsFile).toContain(`"put"`);
+    expect(operationsFile).toContain(`"/{queueName}"`);
 
-    expect(operationsFile).toContain(`name: "ListMessages"`);
-    expect(operationsFile).toContain(`verb: "get"`);
-    expect(operationsFile).toContain(`path: "/{queueName}/messages"`);
+    expect(operationsFile).toContain(`"ListMessages"`);
+    expect(operationsFile).toContain(`"get"`);
+    expect(operationsFile).toContain(`"/{queueName}/messages"`);
   });
 
   it("route metadata marks each parameter's wire name, location, and whether it is required - the exact fields dispatch.middleware.ts's isRequestAgainstOperation reads off spec.queryParameters/headerParameters", async () => {
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const operationsFile = findOutput(outputs, "operations.ts");
 
+    expect(operationsFile).toMatch(/\["numOfMessages", "numOfMessages", "query", "number"\]/);
     expect(operationsFile).toMatch(
-      /name: "numOfMessages",\s*wireName: "numOfMessages",\s*location: "query",\s*required: false,\s*type: \{\s*kind: "number"/,
+      /\["visibilityTimeout", "visibilityTimeout", "query", "number"\]/,
     );
-    expect(operationsFile).toMatch(
-      /name: "visibilityTimeout",\s*wireName: "visibilityTimeout",\s*location: "query",\s*required: false,\s*type: \{\s*kind: "number"/,
-    );
-    expect(operationsFile).toMatch(
-      /name: "queueName",\s*wireName: "queueName",\s*location: "path",\s*required: true,\s*type: \{\s*kind: "string"/,
-    );
+    expect(operationsFile).toMatch(/\["queueName", "queueName", "path", "string", true\]/);
   });
 
   it("response metadata is keyed by status code with header wire names, like specifications.ts's per-status headersMapper (e.g. QueueCreateOperationSpec's 201 response)", async () => {
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const operationsFile = findOutput(outputs, "operations.ts");
 
+    expect(operationsFile).toMatch(/\[201, \[\["requestId", "x-ms-request-id", "string"\]\]\]/);
     expect(operationsFile).toMatch(
-      /statusCode: 201,\s*headers: \[\s*\{\s*name: "requestId",\s*wireName: "x-ms-request-id",\s*type: \{\s*kind: "string"/,
-    );
-    expect(operationsFile).toMatch(
-      /statusCode: 200,\s*headers: \[\s*\{\s*name: "approximateMessagesCount",\s*wireName: "x-ms-approximate-messages-count",\s*type: \{\s*kind: "number"[\s\S]*body: \{\s*type: \{\s*kind: "model",\s*name: "QueueProperties"/,
+      /\[\s*200,[\s\S]*"approximateMessagesCount",[\s\S]*"x-ms-approximate-messages-count",[\s\S]*"number"[\s\S]*\["model", "QueueProperties"\]/,
     );
   });
 
@@ -72,7 +66,7 @@ describe("structural fit against Azure/Azurite's real generated artifacts", () =
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const operationsFile = findOutput(outputs, "operations.ts");
 
-    expect(operationsFile).toMatch(/requestBodyContentTypes: \[\s*"application\/json"\s*\]/);
+    expect(operationsFile).toContain(`[["model", "QueueMetadata"], ["application/json"]]`);
   });
 });
 

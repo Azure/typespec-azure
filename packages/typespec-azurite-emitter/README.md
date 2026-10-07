@@ -28,7 +28,7 @@ emit:
 options:
   "@azure-tools/typespec-azurite-emitter":
     outputDir: "." # optional, relative to the emitter output dir
-    runtimeImport: "../runtime/serializationRuntime.js" # optional, as emitted in generated TS
+    runtimeImport: "../runtime/serializationRuntime" # optional, as emitted in generated TS
 ```
 
 ## Azurite overlays
@@ -98,10 +98,10 @@ and passes the handler result to the generated serializer. That bridge must:
 Stable request deserialization, primitive conversion, XML body conversion, response serialization,
 header collection handling, and generated-operation lookup live in an Azurite-owned handwritten
 runtime imported by generated artifacts. The runtime module path is controlled by `runtimeImport`
-and defaults to `../runtime/serializationRuntime.js` from the generated directory. That module must
+and defaults to `../runtime/serializationRuntime` from the generated directory. That module must
 export invariant metadata types (`OperationMetadata`, `OperationTypeBinding`,
-`XmlModelMetadata`, and related binding types) plus
-`createSerializationRuntime({ operations, xmlModels })`, which returns
+`XmlModelMetadata`, and related binding types), compact descriptor helpers (`defineOperations`,
+`defineXmlModels`), and `createSerializationRuntime({ operations, xmlModels })`, which returns
 `deserializeRequest`, `serializeResponse`, and `hasGeneratedSerialization`. Header collections are
 described generically with `collectionPrefix` metadata (for example `x-ms-meta-`), not with
 Queue-specific runtime special cases.

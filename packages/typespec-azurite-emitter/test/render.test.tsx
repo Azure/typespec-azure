@@ -131,11 +131,13 @@ describe("renderOperations", () => {
         OperationLiteralQueryParameter,
         OperationMetadata,
         OperationParameterBinding,
+        OperationDescriptor,
         OperationResponseHeaderBinding,
         OperationResponseMetadata,
         OperationTypeBinding,
-      } from "../runtime/serializationRuntime.js";
-      import type { OperationMetadata } from "../runtime/serializationRuntime.js";
+      } from "../runtime/serializationRuntime";
+      import { defineOperations } from "../runtime/serializationRuntime";
+      import type { OperationMetadata } from "../runtime/serializationRuntime";
       /**
        * Creates a queue.
        */
@@ -159,86 +161,26 @@ describe("renderOperations", () => {
           requestId: string;
         };
       };
-      export const operations: readonly OperationMetadata[] = [
-        {
-          name: "CreateQueue",
-          verb: "put",
-          rawPath: "/{queueName}",
-          path: "/{queueName}",
-          literalQueryParameters: [],
-          requiredQueryParameters: [],
-          requiredHeaderParameters: [],
-          parameters: [
-            {
-              name: "queueName",
-              wireName: "queueName",
-              location: "path",
-              required: true,
-              type: {
-                kind: "string",
-              },
-            }
-          ],
-          hasRequestBody: true,
-          requestBodyContentTypes: ["text/plain"],
-          requestBodyParameterPath: "body",
-          requestBodyType: {
-            kind: "string",
-          },
-          responses: [
-            {
-              statusCode: 201,
-              headers: [
-                {
-                  name: "requestId",
-                  wireName: "x-ms-request-id",
-                  type: {
-                    kind: "string",
-                  },
-                }
-              ],
-            }
-          ],
-          interfaceName: "Queue",
-        },
-        {
-          name: "DeleteQueue",
-          verb: "delete",
-          rawPath: "/{queueName}",
-          path: "/{queueName}",
-          literalQueryParameters: [],
-          requiredQueryParameters: [],
-          requiredHeaderParameters: [],
-          parameters: [
-            {
-              name: "queueName",
-              wireName: "queueName",
-              location: "path",
-              required: true,
-              type: {
-                kind: "string",
-              },
-            }
-          ],
-          hasRequestBody: false,
-          requestBodyContentTypes: [],
-          responses: [
-            {
-              statusCode: 204,
-              headers: [
-                {
-                  name: "requestId",
-                  wireName: "x-ms-request-id",
-                  type: {
-                    kind: "string",
-                  },
-                }
-              ],
-            }
-          ],
-          interfaceName: "Queue",
-        }
-      ]
+      export const operations: readonly OperationMetadata[] = defineOperations([
+        [
+          "CreateQueue",
+          "put",
+          "/{queueName}",
+          [["queueName", "queueName", "path", "string", true]],
+          ["string", ["text/plain"]],
+          [[201, [["requestId", "x-ms-request-id", "string"]]]],
+          "Queue"
+        ],
+        [
+          "DeleteQueue",
+          "delete",
+          "/{queueName}",
+          [["queueName", "queueName", "path", "string", true]],
+          undefined,
+          [[204, [["requestId", "x-ms-request-id", "string"]]]],
+          "Queue"
+        ]
+      ])
     `);
   });
 
@@ -379,60 +321,22 @@ describe("renderSerialization components", () => {
         <XmlModelMetadata models={sampleServerModel.models} />
       </SourceFile>,
     ).toRenderTo(`
-      const xmlModels: Record<string, XmlModelMetadata> ={
-        QueueMetadata: {
-          name: "QueueMetadata",
-          wireName: "QueueMetadata",
-          properties: [
-            {
-              name: "description",
-              wireName: "description",
-              type: {
-                kind: "string",
-              },
-              attribute: false,
-              unwrapped: false,
-            },
-            {
-              name: "publicAccess",
-              wireName: "publicAccess",
-              type: {
-                kind: "boolean",
-              },
-              attribute: false,
-              unwrapped: false,
-            }
-          ],
-        },
-        QueueMessage: {
-          name: "QueueMessage",
-          wireName: "QueueMessage",
-          properties: [
-            {
-              name: "messageId",
-              wireName: "messageId",
-              type: {
-                kind: "string",
-              },
-              attribute: false,
-              unwrapped: false,
-            },
-            {
-              name: "tags",
-              wireName: "tags",
-              type: {
-                kind: "array",
-                element: {
-                  kind: "string",
-                },
-              },
-              attribute: false,
-              unwrapped: false,
-              itemName: "tags",
-            }
-          ],
-        },
-      };
+      const xmlModels: Record<string, XmlModelMetadata> = defineXmlModels({
+        QueueMetadata: [
+          "QueueMetadata",
+          [
+            ["description", "description", "string"],
+            ["publicAccess", "publicAccess", "boolean"]
+          ]
+        ],
+        QueueMessage: [
+          "QueueMessage",
+          [
+            ["messageId", "messageId", "string"],
+            ["tags", "tags", ["array", "string"], undefined, "tags"]
+          ]
+        ],
+      });
     `);
   });
 
@@ -447,63 +351,26 @@ describe("renderSerialization components", () => {
 
       import {
         createSerializationRuntime,
+        defineXmlModels,
         type XmlModelMetadata,
       } from "../runtime/serializationRuntime.js";
       import { operations } from "./operations";
-      const xmlModels: Record<string, XmlModelMetadata> ={
-        QueueMetadata: {
-          name: "QueueMetadata",
-          wireName: "QueueMetadata",
-          properties: [
-            {
-              name: "description",
-              wireName: "description",
-              type: {
-                kind: "string",
-              },
-              attribute: false,
-              unwrapped: false,
-            },
-            {
-              name: "publicAccess",
-              wireName: "publicAccess",
-              type: {
-                kind: "boolean",
-              },
-              attribute: false,
-              unwrapped: false,
-            }
-          ],
-        },
-        QueueMessage: {
-          name: "QueueMessage",
-          wireName: "QueueMessage",
-          properties: [
-            {
-              name: "messageId",
-              wireName: "messageId",
-              type: {
-                kind: "string",
-              },
-              attribute: false,
-              unwrapped: false,
-            },
-            {
-              name: "tags",
-              wireName: "tags",
-              type: {
-                kind: "array",
-                element: {
-                  kind: "string",
-                },
-              },
-              attribute: false,
-              unwrapped: false,
-              itemName: "tags",
-            }
-          ],
-        },
-      };
+      const xmlModels: Record<string, XmlModelMetadata> = defineXmlModels({
+        QueueMetadata: [
+          "QueueMetadata",
+          [
+            ["description", "description", "string"],
+            ["publicAccess", "publicAccess", "boolean"]
+          ]
+        ],
+        QueueMessage: [
+          "QueueMessage",
+          [
+            ["messageId", "messageId", "string"],
+            ["tags", "tags", ["array", "string"], undefined, "tags"]
+          ]
+        ],
+      });
       const runtime = createSerializationRuntime({ operations, xmlModels });
 
       export const deserializeRequest = runtime.deserializeRequest;

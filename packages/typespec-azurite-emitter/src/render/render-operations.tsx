@@ -11,23 +11,17 @@ import type {
 import { GENERATED_FILE_HEADER } from "./file-header.js";
 import { operationParametersRefkey, operationResponseRefkey } from "./refkeys.js";
 
-export interface OperationTypeBindingValue {
-  readonly kind:
-    | "string"
-    | "number"
-    | "boolean"
-    | "datetime"
-    | "record"
-    | "unknown"
-    | "model"
-    | "literal"
-    | "array"
-    | "union";
-  readonly name?: string;
-  readonly value?: string | number | boolean;
-  readonly element?: OperationTypeBindingValue;
-  readonly variants?: readonly OperationTypeBindingValue[];
-}
+export type OperationTypeDescriptor =
+  | "string"
+  | "number"
+  | "boolean"
+  | "datetime"
+  | "unknown"
+  | readonly ["model", string]
+  | readonly ["literal", string | number | boolean]
+  | readonly ["array", OperationTypeDescriptor]
+  | readonly ["record", OperationTypeDescriptor]
+  | readonly ["union", readonly OperationTypeDescriptor[]];
 
 export interface OperationMetadataValue {
   readonly name: string;
@@ -52,6 +46,62 @@ export interface OperationMetadataValue {
   readonly responses: readonly OperationResponseMetadataValue[];
   readonly interfaceName?: string;
 }
+
+export interface OperationTypeBindingValue {
+  readonly kind:
+    | "string"
+    | "number"
+    | "boolean"
+    | "datetime"
+    | "record"
+    | "unknown"
+    | "model"
+    | "literal"
+    | "array"
+    | "union";
+  readonly name?: string;
+  readonly value?: string | number | boolean;
+  readonly element?: OperationTypeBindingValue;
+  readonly variants?: readonly OperationTypeBindingValue[];
+}
+
+type OperationParameterDescriptor = readonly [
+  name: string,
+  wireName: string,
+  location: "path" | "query" | "header",
+  type: OperationTypeDescriptor,
+  required?: true,
+  collectionPrefix?: string,
+];
+
+type OperationResponseHeaderDescriptor = readonly [
+  name: string,
+  wireName: string,
+  type: OperationTypeDescriptor,
+  collectionPrefix?: string,
+];
+
+type OperationResponseDescriptor = readonly [
+  statusCode: number | "*",
+  headers?: readonly OperationResponseHeaderDescriptor[],
+  bodyType?: OperationTypeDescriptor,
+];
+
+type OperationRequestBodyDescriptor = readonly [
+  type: OperationTypeDescriptor,
+  contentTypes: readonly string[],
+  parameterPath?: string | readonly string[],
+];
+
+type OperationDescriptor = readonly [
+  name: string,
+  verb: string,
+  rawPath: string,
+  parameters: readonly OperationParameterDescriptor[],
+  requestBody: OperationRequestBodyDescriptor | undefined,
+  responses: readonly OperationResponseDescriptor[],
+  interfaceName?: string,
+];
 
 interface OperationResponseMetadataValue {
   readonly statusCode: number | "*";
@@ -100,6 +150,87 @@ export function operationMetadataValue(op: ServerOperation): OperationMetadataVa
     responses: op.responses.map(responseMetadataValue),
     interfaceName: op.interfaceName,
   }) as OperationMetadataValue;
+}
+
+export function operationDescriptorValue(op: ServerOperation): OperationDescriptor {
+  return withoutTrailingUndefined([
+    op.name,
+    op.verb,
+    op.rawPath,
+    op.parameters.map(parameterDescriptorValue),
+    op.requestBody === undefined ? undefined : requestBodyDescriptorValue(op.requestBody),
+    op.responses.map(responseDescriptorValue),
+    op.interfaceName,
+  ]);
+}
+
+function requestBodyDescriptorValue(requestBody: NonNullable<ServerOperation["requestBody"]>) {
+  return withoutTrailingUndefined([
+    operationTypeDescriptorValue(requestBody.type),
+    requestBody.contentTypes,
+    isDefaultBodyPath(requestBody.parameterPath) ? undefined : requestBody.parameterPath,
+  ]) as unknown as OperationRequestBodyDescriptor;
+}
+
+function parameterDescriptorValue(parameter: ServerOperation["parameters"][number]) {
+  return withoutTrailingUndefined([
+    parameter.name,
+    parameter.wireName,
+    parameter.location,
+    operationTypeDescriptorValue(parameter.type),
+    parameter.optional ? undefined : true,
+    getHeaderCollectionPrefix(parameter.wireName),
+  ]) as unknown as OperationParameterDescriptor;
+}
+
+function responseDescriptorValue(response: ServerResponse): OperationResponseDescriptor {
+  return withoutTrailingUndefined([
+    response.statusCode,
+    response.headers.length === 0 ? undefined : response.headers.map(responseHeaderDescriptorValue),
+    response.body === undefined ? undefined : operationTypeDescriptorValue(response.body.type),
+  ]);
+}
+
+function responseHeaderDescriptorValue(header: ServerResponseHeader) {
+  return withoutTrailingUndefined([
+    header.name,
+    header.wireName,
+    operationTypeDescriptorValue(header.type),
+    getHeaderCollectionPrefix(header.wireName),
+  ]) as unknown as OperationResponseHeaderDescriptor;
+}
+
+export function operationTypeDescriptorValue(type: ServerTypeRef): OperationTypeDescriptor {
+  switch (type.kind) {
+    case "array":
+      return ["array", operationTypeDescriptorValue(type.element)];
+    case "literal":
+      return ["literal", type.value];
+    case "model":
+      return ["model", type.name];
+    case "record":
+      return ["record", operationTypeDescriptorValue(type.element)];
+    case "union":
+      return ["union", type.variants.map(operationTypeDescriptorValue)];
+    case "boolean":
+    case "datetime":
+    case "number":
+    case "string":
+    case "unknown":
+      return type.kind;
+  }
+}
+
+function isDefaultBodyPath(path: string | readonly string[]): boolean {
+  return path === "body";
+}
+
+function withoutTrailingUndefined<T extends readonly unknown[]>(items: T): T {
+  const trimmed = [...items];
+  while (trimmed.length > 0 && trimmed[trimmed.length - 1] === undefined) {
+    trimmed.pop();
+  }
+  return trimmed as unknown as T;
 }
 
 function responseMetadataValue(response: ServerResponse): OperationResponseMetadataValue {
@@ -160,7 +291,7 @@ function withoutUndefined<T extends Record<string, unknown>>(value: T): Partial<
  */
 export function renderOperations(
   serverModel: ServerModel,
-  runtimeImport = "../runtime/serializationRuntime.js",
+  runtimeImport = "../runtime/serializationRuntime",
 ) {
   return (
     <ts.SourceFile path="operations.ts">
@@ -170,10 +301,12 @@ export function renderOperations(
           OperationLiteralQueryParameter,
           OperationMetadata,
           OperationParameterBinding,
+          OperationDescriptor,
           OperationResponseHeaderBinding,
           OperationResponseMetadata,
           OperationTypeBinding,
         } from ${JSON.stringify(runtimeImport)};
+        import { defineOperations } from ${JSON.stringify(runtimeImport)};
         import type { OperationMetadata } from ${JSON.stringify(runtimeImport)};
       `}
       <hbr />
@@ -203,7 +336,10 @@ export function renderOperations(
         name="operations"
         type={code`readonly OperationMetadata[]`}
         initializer={
-          <ts.ValueExpression jsValue={serverModel.operations.map(operationMetadataValue)} />
+          <>
+            defineOperations(
+            <ts.ValueExpression jsValue={serverModel.operations.map(operationDescriptorValue)} />)
+          </>
         }
       />
     </ts.SourceFile>

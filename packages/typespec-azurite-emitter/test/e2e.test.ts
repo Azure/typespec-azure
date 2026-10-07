@@ -68,14 +68,15 @@ describe("end-to-end emit", () => {
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const operationsFile = findOutput(outputs, "operations.ts");
 
-    expect(operationsFile).toContain(`name: "Queue_Create"`);
-    expect(operationsFile).toContain(`verb: "put"`);
-    expect(operationsFile).toContain(`name: "ListMessages"`);
-    expect(operationsFile).toContain(`verb: "get"`);
-    expect(operationsFile).toContain(`name: "SetAccessPolicy"`);
-    expect(operationsFile).toContain(`location: "query"`);
-    expect(operationsFile).toContain(`location: "path"`);
-    expect(operationsFile).toContain(`from "../runtime/serializationRuntime.js";`);
+    expect(operationsFile).toContain(`defineOperations([`);
+    expect(operationsFile).toContain(`"Queue_Create"`);
+    expect(operationsFile).toContain(`"put"`);
+    expect(operationsFile).toContain(`"ListMessages"`);
+    expect(operationsFile).toContain(`"get"`);
+    expect(operationsFile).toContain(`"SetAccessPolicy"`);
+    expect(operationsFile).toContain(`"query"`);
+    expect(operationsFile).toContain(`"path"`);
+    expect(operationsFile).toContain(`from "../runtime/serializationRuntime";`);
   });
 
   it("imports referenced model types into operations.ts so the file compiles standalone", async () => {
@@ -113,7 +114,7 @@ describe("end-to-end emit", () => {
     expect(serializationFile).not.toContain(`@azure/ms-rest-js`);
     expect(serializationFile).toContain(`createSerializationRuntime`);
     expect(serializationFile).toContain(`import { operations } from "./operations";`);
-    expect(serializationFile).toContain(`from "../runtime/serializationRuntime.js";`);
+    expect(serializationFile).toContain(`from "../runtime/serializationRuntime";`);
     expect(serializationFile).toContain(
       `const runtime = createSerializationRuntime({ operations, xmlModels });`,
     );

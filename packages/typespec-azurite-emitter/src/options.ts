@@ -32,6 +32,6 @@ export function normalizeOptions(
 ): NormalizedAzuritePilotEmitterOptions {
   return {
     outputDir: rawOptions?.outputDir?.trim() || ".",
-    runtimeImport: rawOptions?.runtimeImport?.trim() || "../runtime/serializationRuntime.js",
+    runtimeImport: rawOptions?.runtimeImport?.trim() || "../runtime/serializationRuntime",
   };
 }
