@@ -10,11 +10,11 @@ import { modelXmlMetadataConstName, xmlModelDescriptorValue } from "./render-met
  * Renders the `models.ts` artifact: one TypeScript interface per named data model
  * referenced by the service's operations (request/response bodies).
  */
-export function renderModels(serverModel: ServerModel) {
+export function renderModels(serverModel: ServerModel, runtimeImport: string) {
   return (
     <ts.SourceFile path="models.ts">
       {code`${GENERATED_FILE_HEADER}`}
-      {code`import { defineXmlModel } from "../runtime/serializationRuntime";`}
+      {code`import { defineXmlModel } from ${JSON.stringify(runtimeImport)};`}
       <hbr />
       <For each={serverModel.models} hardline>
         {(model) => (

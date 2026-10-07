@@ -6,7 +6,8 @@ compiled HTTP service plus an `azurite.tsp` overlay.
 The package demonstrates a small but reusable emitter structure:
 
 1. `src/build-model.ts` reads `@typespec/http` operations and TypeSpec models into an
-   emitter-owned server model.
+   emitter-owned server model. Unsupported wire shapes are reported as emitter diagnostics rather
+   than rendered as `unknown` or substituted defaults.
 2. `src/render/` writes TypeScript files from that model:
    - `models.ts` — data-model interfaces plus colocated compact XML model descriptors.
    - `operations.ts` — request/response types plus colocated compact HTTP operation descriptors.
@@ -51,12 +52,16 @@ using Storage.Queues;
 @@makeOptional(Storage.Queues.AccessPolicy.permission);
 ```
 
-Core TypeSpec augment decorators can be used for ordinary constraints, for example relaxing the
-Queue visibility-timeout maximum in the overlay:
+Core TypeSpec augment decorators can be used for ordinary constraints when emulator semantics
+intentionally differ from the shared source:
 
 ```tsp
-@@maxValue(Storage.Queues.VisibilityTimeoutParameter.visibilityTimeout, 2147483647);
+@@minValue(Storage.Queues.CustomParameter.value, 0);
 ```
+
+The emitter requires exactly one HTTP service. HTTP-library diagnostics and unsupported operation
+shapes (for example arbitrary unions or scalars without a known wire representation) are surfaced
+as diagnostics and prevent incomplete generated artifacts from being written.
 
 ## Tests
 
@@ -109,9 +114,10 @@ follows the same persistence principle as `http-client-js`: TypeScript interface
 wire knowledge is emitted as runtime values next to the declaration it describes. Header
 collections are described generically with `collectionPrefix` metadata (for example
 `x-ms-meta-`), not with Queue-specific runtime special cases. XML property descriptors also carry
-requiredness so malformed bodies can be rejected by the runtime. `metadata.ts` may export
-`operations` as a compatibility alias, but it references `serviceMetadata.operations` and does not
-duplicate descriptor data.
+requiredness and sparse numeric constraints (`min`, `max`, `minExclusive`, `maxExclusive`) so
+malformed bodies and numeric path/query/header values can be rejected by the runtime before they
+reach handlers or persistence. `metadata.ts` may export `operations` as a compatibility alias, but
+it references `serviceMetadata.operations` and does not duplicate descriptor data.
 
 Middleware/handler invocation code is intentionally not emitted by this package in the pilot: that
 code is Azurite-owned integration logic, varies by storage service, and must compose with

@@ -22,6 +22,7 @@ import type {
   ServerLiteralQueryParameter,
   ServerModel,
   ServerModelProperty,
+  ServerNumericConstraints,
   ServerOperation,
   ServerOperationParameter,
   ServerParameterLocation,
@@ -60,9 +61,10 @@ type BuiltResponse = Omit<ServerResponse, "headers" | "body"> & {
  * Operations the transform phase can't represent are skipped with a reason in
  * `skippedOperations`.
  */
-export function buildServerModel(program: Program): ServerModel {
-  const [services] = getAllHttpServices(program);
-  const service = services[0];
+export function buildServerModel(
+  program: Program,
+  service = getAllHttpServices(program)[0][0],
+): ServerModel {
   const modelRegistry = new Map<string, ServerDataModel>();
   const anonymousModelNames = new Map<Model, string>();
 
@@ -89,6 +91,7 @@ export function buildServerModel(program: Program): ServerModel {
       skippedOperations.push({
         name: getName(program, op.operation, getTypeName(op.operation.name)),
         reason: error instanceof Error ? error.message : String(error),
+        target: op.operation,
       });
     }
   }
@@ -216,7 +219,7 @@ function buildParameter(
     param.type === "cookie" ? "header" : (param.type as ServerParameterLocation);
   const type = isHeaderCollection(param.name)
     ? getHeaderCollectionTypeMetadata(program)
-    : getTypeMetadata(program, param.param.type, modelRegistry, anonymousModelNames);
+    : getTypeMetadata(program, param.param.type, modelRegistry, anonymousModelNames, param.param);
   return {
     name: getName(program, param.param, param.param.name),
     wireName: param.name,
@@ -233,7 +236,13 @@ function buildRequestBody(
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): BuiltRequestBody {
-  const type = getTypeMetadata(program, body.type, modelRegistry, anonymousModelNames);
+  const type = getTypeMetadata(
+    program,
+    body.type,
+    modelRegistry,
+    anonymousModelNames,
+    body.property ?? body.type,
+  );
   return {
     type: type.runtime,
     declarationType: type.declaration,
@@ -253,7 +262,7 @@ function buildResponse(
   for (const [headerWireName, prop] of Object.entries(content?.headers ?? {})) {
     const type = isHeaderCollection(headerWireName)
       ? getHeaderCollectionTypeMetadata(program)
-      : getTypeMetadata(program, prop.type, modelRegistry, anonymousModelNames);
+      : getTypeMetadata(program, prop.type, modelRegistry, anonymousModelNames, prop);
     headers.push({
       name: getName(program, prop, prop.name),
       wireName: headerWireName,
@@ -319,11 +328,17 @@ function getTypeMetadata(
   type: Type,
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
+  constraintTarget: Type = type,
 ): TypeMetadata {
   const tk = $(program);
   switch (type.kind) {
     case "Scalar":
-      if (tk.scalar.extendsNumeric(type)) return { runtime: { kind: "number" }, declaration: type };
+      const scalarName = type.name || "<anonymous>";
+      if (tk.scalar.extendsNumeric(type))
+        return {
+          runtime: numericTypeRef(program, constraintTarget),
+          declaration: type,
+        };
       if (tk.scalar.extendsString(type)) return { runtime: { kind: "string" }, declaration: type };
       if (
         tk.scalar.extendsUtcDateTime(type) ||
@@ -335,17 +350,29 @@ function getTypeMetadata(
       }
       if (tk.scalar.extendsBoolean(type))
         return { runtime: { kind: "boolean" }, declaration: type };
-      return { runtime: { kind: "unknown" }, declaration: type };
+      throw new Error(`unsupported scalar ${scalarName}`);
     case "Boolean":
       return { runtime: { kind: "literal", value: type.value }, declaration: type };
     case "String":
       return { runtime: { kind: "literal", value: type.value }, declaration: type };
-    case "Number":
+    case "Number": {
+      let value: number | null | undefined;
+      try {
+        value = type.numericValue.asNumber();
+      } catch {
+        value = undefined;
+      }
+      if (value === undefined || value === null || !Number.isFinite(value)) {
+        throw new Error("numeric literal cannot be represented as a JavaScript number");
+      }
       return {
-        runtime: { kind: "literal", value: type.numericValue.asNumber() ?? 0 },
+        runtime: { kind: "literal", value },
         declaration: type,
       };
+    }
     case "Enum": {
+      // TypeSpec string enums are represented on the wire as strings; generated TypeScript
+      // declarations keep them as string because Azurite handlers do not need enum objects.
       return { runtime: { kind: "string" }, declaration: tk.builtin.string };
     }
     case "Model": {
@@ -381,10 +408,14 @@ function getTypeMetadata(
       };
     }
     case "Union": {
-      return { runtime: { kind: "unknown" }, declaration: tk.intrinsic.any };
+      const variants = [...type.variants.values()].map(
+        (variant) =>
+          getTypeMetadata(program, variant.type, modelRegistry, anonymousModelNames).runtime,
+      );
+      return { runtime: { kind: "union", variants }, declaration: tk.intrinsic.any };
     }
     default:
-      return { runtime: { kind: "unknown" }, declaration: type };
+      throw new Error(`unsupported TypeSpec type kind ${type.kind}`);
   }
 }
 
@@ -493,7 +524,7 @@ function buildModelProperty(
   modelRegistry: Map<string, ServerDataModel>,
   anonymousModelNames: Map<Model, string>,
 ): ServerModelProperty {
-  const type = getTypeMetadata(program, prop.type, modelRegistry, anonymousModelNames);
+  const type = getTypeMetadata(program, prop.type, modelRegistry, anonymousModelNames, prop);
   createDeclarationProperty(program, prop, declarationModel, type);
   return {
     name: getName(program, prop, prop.name),
@@ -665,4 +696,50 @@ function applyDoc(program: Program, target: Type, doc: string | undefined): void
 
 function getDocHelper(program: Program, target: Type): string | undefined {
   return $(program).type.getDoc(target);
+}
+
+function numericTypeRef(program: Program, target: Type): ServerTypeRef {
+  const constraints = getNumericConstraints(program, target);
+  return constraints === undefined ? { kind: "number" } : { kind: "number", constraints };
+}
+
+function getNumericConstraints(
+  program: Program,
+  target: Type,
+): ServerNumericConstraints | undefined {
+  const tk = $(program);
+  const targets = getNumericConstraintTargets(target);
+  const constraints: ServerNumericConstraints = {
+    min: maxDefined(targets.map((candidate) => tk.type.minValue(candidate))),
+    max: minDefined(targets.map((candidate) => tk.type.maxValue(candidate))),
+    minExclusive: maxDefined(targets.map((candidate) => tk.type.minValueExclusive(candidate))),
+    maxExclusive: minDefined(targets.map((candidate) => tk.type.maxValueExclusive(candidate))),
+  };
+  return Object.values(constraints).some((value) => value !== undefined) ? constraints : undefined;
+}
+
+function getNumericConstraintTargets(target: Type): Type[] {
+  const targets: Type[] = [];
+  for (let current: Type | undefined = target; current !== undefined;) {
+    targets.push(current);
+    if (current.kind === "ModelProperty") {
+      current = current.sourceProperty;
+    } else {
+      current = undefined;
+    }
+  }
+  if (target.kind === "ModelProperty") {
+    targets.push(target.type);
+  }
+  return targets;
+}
+
+function maxDefined(values: readonly (number | undefined)[]): number | undefined {
+  const defined = values.filter((value) => value !== undefined);
+  return defined.length === 0 ? undefined : Math.max(...defined);
+}
+
+function minDefined(values: readonly (number | undefined)[]): number | undefined {
+  const defined = values.filter((value) => value !== undefined);
+  return defined.length === 0 ? undefined : Math.min(...defined);
 }

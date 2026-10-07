@@ -5,6 +5,7 @@ using Http;
 @service(#{ title: "Queue Pilot Service" })
 namespace QueuePilot {
   alias VisibilityTimeoutParameter = {
+    @minValue(0)
     @maxValue(604800)
     @query
     visibilityTimeout?: int32;

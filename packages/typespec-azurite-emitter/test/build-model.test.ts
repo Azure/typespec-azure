@@ -48,7 +48,11 @@ describe("buildServerModel", () => {
       wireName: "numOfMessages",
       optional: true,
     });
-    expect(byName.visibilityTimeout).toMatchObject({ location: "query", optional: true });
+    expect(byName.visibilityTimeout).toMatchObject({
+      location: "query",
+      optional: true,
+      type: { kind: "number", constraints: { min: 0, max: 604800 } },
+    });
   });
 
   it("captures the request body type and content types", async () => {
@@ -165,7 +169,7 @@ describe("buildServerModel", () => {
     const visibilityTimeout = listMessages.parameters.parameters.find(
       (p) => p.param.name === "visibilityTimeout",
     )!;
-    expect($(program).type.maxValue(visibilityTimeout.param)).toBe(2147483647);
+    expect($(program).type.maxValue(visibilityTimeout.param)).toBe(604800);
   });
 
   it("uses TCGC @clientName operation overrides when present", async () => {

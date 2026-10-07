@@ -8,8 +8,6 @@ using Azure.ClientGenerator.Core;
 
 @@clientName(QueuePilot.createQueue, "Queue_Create");
 
-@@maxValue(QueuePilot.VisibilityTimeoutParameter.visibilityTimeout, 2147483647);
-
 @@makeOptional(QueuePilot.AccessPolicy.start);
 @@makeOptional(QueuePilot.AccessPolicy.expiry);
 @@makeOptional(QueuePilot.AccessPolicy.permission);

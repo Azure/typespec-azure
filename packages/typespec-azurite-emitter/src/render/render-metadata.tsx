@@ -3,6 +3,7 @@ import * as ts from "@alloy-js/typescript";
 import type {
   ServerDataModel,
   ServerModel,
+  ServerNumericConstraints,
   ServerOperation,
   ServerResponse,
   ServerResponseHeader,
@@ -12,15 +13,23 @@ import { GENERATED_FILE_HEADER } from "./file-header.js";
 
 export type OperationTypeDescriptor =
   | "string"
-  | "number"
   | "boolean"
   | "datetime"
   | "unknown"
+  | "number"
+  | readonly ["number", NumericConstraintDescriptor]
   | readonly ["model", string]
   | readonly ["literal", string | number | boolean]
   | readonly ["array", OperationTypeDescriptor]
   | readonly ["record", OperationTypeDescriptor]
   | readonly ["union", readonly OperationTypeDescriptor[]];
+
+export interface NumericConstraintDescriptor {
+  min?: number;
+  max?: number;
+  minExclusive?: number;
+  maxExclusive?: number;
+}
 
 export type OperationParameterDescriptor = readonly [
   name: string,
@@ -172,13 +181,27 @@ export function operationTypeDescriptorValue(type: ServerTypeRef): OperationType
       return ["record", operationTypeDescriptorValue(type.element)];
     case "union":
       return ["union", type.variants.map(operationTypeDescriptorValue)];
+    case "number":
+      return type.constraints === undefined
+        ? "number"
+        : ["number", numericConstraintDescriptorValue(type.constraints)];
     case "boolean":
     case "datetime":
-    case "number":
     case "string":
     case "unknown":
       return type.kind;
   }
+}
+
+function numericConstraintDescriptorValue(
+  constraints: ServerNumericConstraints,
+): NumericConstraintDescriptor {
+  return withoutUndefinedProperties({
+    min: constraints.min,
+    max: constraints.max,
+    minExclusive: constraints.minExclusive,
+    maxExclusive: constraints.maxExclusive,
+  });
 }
 
 export function xmlModelDescriptorValue(
@@ -221,6 +244,12 @@ function withoutTrailingUndefined<T extends readonly unknown[]>(items: T): T {
     trimmed.pop();
   }
   return trimmed as unknown as T;
+}
+
+function withoutUndefinedProperties<T extends Record<string, unknown>>(value: T): T {
+  return Object.fromEntries(
+    Object.entries(value).filter(([, propertyValue]) => propertyValue !== undefined),
+  ) as T;
 }
 
 function getArrayItemName(

@@ -31,8 +31,8 @@ function AzuriteOutput(props: { children: Children; program: Program }) {
 function AzuriteOutputFiles(props: { serverModel: ServerModel; runtimeImport: string }) {
   return (
     <>
-      {renderModels(props.serverModel)}
-      {renderOperations(props.serverModel)}
+      {renderModels(props.serverModel, props.runtimeImport)}
+      {renderOperations(props.serverModel, props.runtimeImport)}
       {renderMetadata(props.serverModel, props.runtimeImport)}
       {renderHandlers(props.serverModel)}
       {renderSerialization(props.serverModel, props.runtimeImport)}

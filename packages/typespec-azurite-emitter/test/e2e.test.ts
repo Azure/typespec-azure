@@ -112,6 +112,66 @@ describe("end-to-end emit", () => {
     );
   });
 
+  it("generates sparse numeric constraints for operation parameters and XML model properties", async () => {
+    const { outputs } = await EmitterTester.compile({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace NumericConstraintDemo;
+
+        model NumericBody {
+          @minValue(1)
+          days: int32;
+
+          @maxValueExclusive(60)
+          optionalLimit?: int32;
+
+          unconstrained?: int32;
+        }
+
+        @route("/items/{id}")
+        @put
+        op putItem(
+          @path
+          @minValueExclusive(0)
+          id: int32,
+
+          @query
+          @minValue(0)
+          timeout?: int32 = 30,
+
+          @header("x-count")
+          @maxValue(10)
+          count: int32,
+
+          @body body: NumericBody,
+        ): {
+          @statusCode statusCode: 200;
+
+          @header("x-retry-after")
+          @maxValue(120)
+          retryAfter: int32;
+
+          @body body: NumericBody;
+        };
+      `,
+    });
+    const operationsFile = findOutput(outputs, "operations.ts");
+    const modelsFile = findOutput(outputs, "models.ts");
+
+    expect(operationsFile).toMatch(/"id"[\s\S]*"path"[\s\S]*"number"[\s\S]*minExclusive: 0/);
+    expect(operationsFile).toMatch(/"timeout"[\s\S]*"query"[\s\S]*"number"[\s\S]*min: 0/);
+    expect(operationsFile).toMatch(/"count"[\s\S]*"header"[\s\S]*"number"[\s\S]*max: 10/);
+    expect(operationsFile).toMatch(
+      /"retryAfter"[\s\S]*"x-retry-after"[\s\S]*"number"[\s\S]*max: 120/,
+    );
+    expect(modelsFile).toMatch(/"days"[\s\S]*"number"[\s\S]*min: 1[\s\S]*true/);
+    expect(modelsFile).toMatch(/"optionalLimit"[\s\S]*"number"[\s\S]*maxExclusive: 60/);
+    expect(modelsFile).toContain(`["unconstrained", "unconstrained", "number"]`);
+  });
+
   it("imports referenced model types into operations.ts so the file compiles standalone", async () => {
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const operationsFile = findOutput(outputs, "operations.ts");
@@ -184,8 +244,148 @@ describe("end-to-end emit", () => {
     const { outputs } = await customEmitterTester.compile(loadQueuePilotFixture());
 
     expect(findOutput(outputs, "metadata.ts")).toContain(`from "../custom/runtime.js";`);
-    expect(findOutput(outputs, "operations.ts")).not.toContain(`../custom/runtime.js`);
+    expect(findOutput(outputs, "models.ts")).toContain(`from "../custom/runtime.js";`);
+    expect(findOutput(outputs, "operations.ts")).toContain(`from "../custom/runtime.js";`);
     expect(findOutput(outputs, "serialization.ts")).toContain(`from "../custom/runtime.js";`);
+  });
+});
+
+describe("emit diagnostics", () => {
+  it("documents compact union descriptor policy", async () => {
+    const [{ outputs }, diagnostics] = await EmitterTester.compileAndDiagnose({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace UnsupportedUnionDemo;
+
+        @route("/items")
+        @get
+        op get(@query value: string | int32): {
+          @statusCode statusCode: 204;
+        };
+      `,
+    });
+
+    expect(diagnostics).toEqual([]);
+    expect(findOutput(outputs, "operations.ts")).toContain(
+      `["value", "value", "query", ["union", ["string", "number"]], true]`,
+    );
+  });
+
+  it("reports unsupported scalar wire types", async () => {
+    const [, diagnostics] = await EmitterTester.compileAndDiagnose({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace UnsupportedScalarDemo;
+
+        scalar unsupported;
+
+        @route("/items")
+        @get
+        op get(@query value: unsupported): {
+          @statusCode statusCode: 204;
+        };
+      `,
+    });
+
+    expect(diagnostics.map((diagnostic) => diagnostic.code)).toContain(
+      "@azure-tools/typespec-azurite-emitter/skipped-operation",
+    );
+    expect(diagnostics[0]?.message).toContain("unsupported scalar unsupported");
+  });
+
+  it("reports unrepresentable numeric literals instead of substituting zero", async () => {
+    const [, diagnostics] = await EmitterTester.compileAndDiagnose({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace NumericLiteralDemo;
+
+        @route("/items")
+        @get
+        op get(): {
+          @statusCode statusCode: 200;
+          @header("x-huge") value: 1e10000;
+        };
+      `,
+    });
+
+    expect(diagnostics.map((diagnostic) => diagnostic.code)).toContain(
+      "@azure-tools/typespec-azurite-emitter/skipped-operation",
+    );
+    expect(diagnostics[0]?.message).toContain("cannot be represented as a JavaScript number");
+  });
+
+  it("reports multiple services", async () => {
+    const [, diagnostics] = await EmitterTester.compileAndDiagnose({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service namespace First {
+          @route("/first") @get op get(): { @statusCode statusCode: 204; };
+        }
+
+        @service namespace Second {
+          @route("/second") @get op get(): { @statusCode statusCode: 204; };
+        }
+      `,
+    });
+
+    expect(diagnostics.map((diagnostic) => diagnostic.code)).toContain(
+      "@azure-tools/typespec-azurite-emitter/multiple-services",
+    );
+  });
+
+  it("reports HTTP diagnostics before rendering", async () => {
+    const [{ outputs }, diagnostics] = await EmitterTester.compileAndDiagnose({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace HttpDiagnosticDemo {
+          @route("/same") @get op first(): { @statusCode statusCode: 204; };
+          @route("/same") @get op second(): { @statusCode statusCode: 204; };
+        }
+      `,
+    });
+
+    expect(diagnostics.some((diagnostic) => diagnostic.code.includes("duplicate"))).toBe(true);
+    expect(outputs).toEqual({});
+  });
+
+  it("documents enum-as-string wire policy", async () => {
+    const [{ outputs }, diagnostics] = await EmitterTester.compileAndDiagnose({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        enum Mode {
+          fast,
+          slow,
+        }
+
+        @service
+        namespace EnumDemo {
+          @route("/items") @get op get(@query mode: Mode): {
+            @statusCode statusCode: 204;
+          };
+        }
+      `,
+    });
+
+    expect(diagnostics).toEqual([]);
+    expect(findOutput(outputs, "operations.ts")).toContain(
+      `["mode", "mode", "query", "string", true]`,
+    );
   });
 });
 

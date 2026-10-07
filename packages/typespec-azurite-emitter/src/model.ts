@@ -1,8 +1,15 @@
-import type { Model, Union } from "@typespec/compiler";
+import type { DiagnosticTarget, Model, Union } from "@typespec/compiler";
+
+export interface ServerNumericConstraints {
+  readonly min?: number;
+  readonly max?: number;
+  readonly minExclusive?: number;
+  readonly maxExclusive?: number;
+}
 
 export type ServerTypeRef =
   | { kind: "string" }
-  | { kind: "number" }
+  | { kind: "number"; constraints?: ServerNumericConstraints }
   | { kind: "boolean" }
   | { kind: "datetime" }
   | { kind: "unknown" }
@@ -98,4 +105,5 @@ export interface ServerModel {
 export interface ServerSkippedOperation {
   readonly name: string;
   readonly reason: string;
+  readonly target: DiagnosticTarget;
 }

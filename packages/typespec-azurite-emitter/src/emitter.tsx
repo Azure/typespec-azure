@@ -15,12 +15,31 @@ export async function $onEmit(context: EmitContext<AzuritePilotEmitterOptions>):
   const options = normalizeOptions(context.options);
   const { program } = context;
 
-  const [services] = getAllHttpServices(program);
-  if (services.length === 0) {
+  const [services, httpDiagnostics] = getAllHttpServices(program);
+  if (httpDiagnostics.length > 0) {
+    program.reportDiagnostics(httpDiagnostics);
+    return;
+  }
+  if (services.length === 0 || services[0].operations.length === 0) {
     reportDiagnostic(program, { code: "no-service-found", target: NoTarget });
+    return;
+  }
+  if (services.length > 1) {
+    reportDiagnostic(program, { code: "multiple-services", target: NoTarget });
+    return;
   }
 
-  const serverModel = buildServerModel(program);
+  const serverModel = buildServerModel(program, services[0]);
+  if (serverModel.skippedOperations.length > 0) {
+    for (const skipped of serverModel.skippedOperations) {
+      reportDiagnostic(program, {
+        code: "skipped-operation",
+        format: { name: skipped.name, reason: skipped.reason },
+        target: skipped.target,
+      });
+    }
+    return;
+  }
 
   const baseDir = resolvePath(context.emitterOutputDir, options.outputDir);
   await writeOutput(

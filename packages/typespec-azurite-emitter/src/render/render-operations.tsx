@@ -14,11 +14,11 @@ import { operationDescriptorValue, operationMetadataConstName } from "./render-m
  * Renders the `operations.ts` artifact: per-operation request/response TypeScript declarations
  * with colocated compact HTTP operation descriptors.
  */
-export function renderOperations(serverModel: ServerModel) {
+export function renderOperations(serverModel: ServerModel, runtimeImport: string) {
   return (
     <ts.SourceFile path="operations.ts">
       {code`${GENERATED_FILE_HEADER}`}
-      {code`import { defineOperation } from "../runtime/serializationRuntime";`}
+      {code`import { defineOperation } from ${JSON.stringify(runtimeImport)};`}
       <hbr />
       <For each={serverModel.operations} hardline>
         {(op) => (

@@ -47,7 +47,7 @@ describe("structural fit against Azure/Azurite's real generated artifacts", () =
 
     expect(operationsFile).toMatch(/\["numOfMessages", "numOfMessages", "query", "number"\]/);
     expect(operationsFile).toMatch(
-      /\["visibilityTimeout", "visibilityTimeout", "query", "number"\]/,
+      /"visibilityTimeout"[\s\S]*"query"[\s\S]*"number"[\s\S]*min: 0[\s\S]*max: 604800/,
     );
     expect(operationsFile).toMatch(/\["queueName", "queueName", "path", "string", true\]/);
   });
