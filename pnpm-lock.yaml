@@ -3454,6 +3454,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: 5.0.0(vitest@5.0.0)
+      esbuild:
+        specifier: 'catalog:'
+        version: 0.28.2
       rimraf:
         specifier: 'catalog:'
         version: 6.1.3

@@ -7,7 +7,7 @@ import {
   materializeLegacyExample,
   migrate,
   resolveExampleFiles,
-} from "../../src/index.js";
+} from "../../src/node.js";
 
 /**
  * Round-trip proof on a real (small) service pulled from `azure-rest-api-specs`
