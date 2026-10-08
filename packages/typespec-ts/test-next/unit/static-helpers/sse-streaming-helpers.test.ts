@@ -119,6 +119,33 @@ describe("SSE event mapping", () => {
     ).resolves.toEqual(["[DONE]"]);
   });
 
+  it.each([false, true])(
+    "matches constant terminals before generic and discriminated payloads (%s)",
+    async (terminalFirst) => {
+      const terminalValue = '{"kind":"complete","result":"final"}';
+      const descriptors: SseEventDescriptor<unknown>[] = [
+        { isTerminal: false, deserialize: () => "generic" },
+        ...unnamedDiscriminated,
+        { isTerminal: true, terminalValue, deserialize: (data) => data },
+      ];
+      await expect(
+        collect(
+          terminalFirst ? descriptors.reverse() : descriptors,
+          events({ data: terminalValue }, { data: '{"kind":"progress"}' }),
+        ),
+      ).resolves.toEqual([terminalValue]);
+    },
+  );
+
+  it("does not parse payloads for unknown event names", async () => {
+    await expect(
+      collect(
+        unnamedDiscriminated,
+        events({ event: "unknown", data: "{bad" }, { data: '{"kind":"progress"}' }),
+      ),
+    ).resolves.toEqual([{ kind: "progress" }]);
+  });
+
   it("ignores unknown discriminator values rather than using an unrelated variant", async () => {
     await expect(
       collect(
@@ -332,6 +359,57 @@ describe("SSE event mapping", () => {
 });
 
 describe("single-connection SSE mapping", () => {
+  it("buffers split UTF-8 error bytes while preserving response metadata", async () => {
+    const headers = {
+      "Content-Type": "application/problem+json; charset=utf-8",
+      "x-ms-error-code": "HeaderCode",
+    };
+    const bytes = new TextEncoder().encode('{"message":"caf\u00e9 \u{1f30d}"}');
+    const response = await parseSseErrorResponse({
+      status: "400",
+      headers,
+      body: Readable.from(Array.from(bytes, (byte) => Uint8Array.of(byte))),
+    });
+    expect(response).toMatchObject({
+      status: "400",
+      body: { message: "caf\u00e9 \u{1f30d}" },
+    });
+    expect(response.headers).toBe(headers);
+  });
+
+  it("flushes incomplete UTF-8 at the end of a non-JSON error body", async () => {
+    const response = await parseSseErrorResponse({
+      status: "500",
+      headers: { "content-type": "text/plain" },
+      body: Readable.from([Buffer.from("error: "), Uint8Array.of(0xc3)]),
+    });
+    expect(response.body).toBe("error: \ufffd");
+  });
+
+  it("preserves absent and empty SSE error bodies", async () => {
+    const absent = { status: "400", headers: {} };
+    expect(await parseSseErrorResponse(absent)).toBe(absent);
+    expect(
+      await parseSseErrorResponse({
+        ...absent,
+        headers: { "content-type": "application/json" },
+        body: Readable.from([]),
+      }),
+    ).toMatchObject({ status: "400", body: undefined });
+  });
+
+  it("propagates a Node error-body read failure", async () => {
+    const failure = new Error("error body failed");
+    const body = Readable.from(
+      (async function* () {
+        yield Buffer.from("partial");
+        throw failure;
+      })(),
+    );
+    await expect(parseSseErrorResponse({ status: "500", headers: {}, body })).rejects.toBe(failure);
+    expect(body.destroyed).toBe(true);
+  });
+
   it("parses structured-suffix JSON error bodies", async () => {
     const response = await parseSseErrorResponse({
       status: "400",

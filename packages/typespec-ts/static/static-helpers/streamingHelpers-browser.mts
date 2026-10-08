@@ -32,91 +32,10 @@ async function closeJsonlIterator(
   }
 }
 
-/**
- * Converts a ReadableStream to an AsyncIterable.
- */
-function readableStreamToAsyncIterable(
+function isAsyncIterable(
   stream: ReadableStream<Uint8Array>,
-): AsyncIterable<Uint8Array> {
-  return {
-    [Symbol.asyncIterator]() {
-      const reader = stream.getReader();
-      let finished = false;
-      let reachedEof = false;
-      let cleanup: Promise<void> | undefined;
-      function close(): Promise<void> {
-        if (cleanup) {
-          return cleanup;
-        }
-        finished = true;
-        cleanup = (async () => {
-          let cancelFailed = false;
-          let cancelFailure: unknown;
-          try {
-            if (!reachedEof) {
-              await reader.cancel();
-            }
-          } catch (error) {
-            cancelFailed = true;
-            cancelFailure = error;
-          }
-          try {
-            reader.releaseLock();
-          } catch (error) {
-            if (cancelFailed) {
-              throw combineStreamErrors(
-                cancelFailure,
-                error,
-                "Stream cancellation and lock release failed.",
-              );
-            }
-            throw error;
-          }
-          if (cancelFailed) {
-            throw cancelFailure;
-          }
-        })();
-        return cleanup;
-      }
-      return {
-        async next(): Promise<IteratorResult<Uint8Array>> {
-          if (finished) {
-            return { done: true, value: undefined };
-          }
-          let result: ReadableStreamReadResult<Uint8Array>;
-          try {
-            result = await reader.read();
-          } catch (error) {
-            try {
-              await close();
-            } catch (cleanupError) {
-              if (cleanupError !== error) {
-                throw combineStreamErrors(
-                  error,
-                  cleanupError,
-                  "Stream reading and cleanup failed.",
-                );
-              }
-            }
-            throw error;
-          }
-          if (finished) {
-            return { done: true, value: undefined };
-          }
-          if (result.done) {
-            reachedEof = true;
-            await close();
-            return { done: true, value: undefined };
-          }
-          return { done: false, value: result.value };
-        },
-        async return() {
-          await close();
-          return { done: true, value: undefined };
-        },
-      };
-    },
-  };
+): stream is ReadableStream<Uint8Array> & AsyncIterable<Uint8Array> {
+  return typeof Reflect.get(stream, Symbol.asyncIterator) === "function";
 }
 
 /**
@@ -125,30 +44,44 @@ function readableStreamToAsyncIterable(
  * buffered or coerced into UTF-8 before it can be decoded. Non-success bodies are buffered
  * eagerly so generated operations can deserialize modeled errors before returning.
  *
- * Browser implementation: uses asBrowserStream() and converts ReadableStream to AsyncIterable.
+ * Browser implementation: uses the native ReadableStream async iterator.
  */
 export async function getStreamResponse(
   streamableMethod: StreamableMethod,
   expectedStatuses?: readonly string[],
 ): Promise<StreamResponse> {
   const response = await streamableMethod.asBrowserStream();
-  if (response.body === undefined) {
-    return response as unknown as StreamResponse;
+  const { body } = response;
+  if (body !== undefined && !isAsyncIterable(body)) {
+    const error = new TypeError("The browser response stream does not support async iteration.");
+    try {
+      await body.cancel();
+    } catch (cleanupError) {
+      throw combineStreamErrors(error, cleanupError, "Unsupported browser stream cleanup failed.");
+    }
+    throw error;
   }
-  const result = {
-    ...response,
-    body: readableStreamToAsyncIterable(response.body),
-  } as unknown as StreamResponse;
+  return getJsonlStreamResponse({ ...response, body }, expectedStatuses);
+}
+
+/**
+ * Leaves successful JSONL bodies lazy and buffers other responses for modeled error handling.
+ * Shared by the browser and React Native response helpers.
+ */
+export async function getJsonlStreamResponse(
+  result: StreamResponse,
+  expectedStatuses?: readonly string[],
+): Promise<StreamResponse> {
   const isSuccess = expectedStatuses
     ? expectedStatuses.includes(result.status)
     : Number(result.status) >= 200 && Number(result.status) < 300;
-  if (isSuccess) {
+  if (!result.body || isSuccess) {
     return result;
   }
 
   const decoder = new TextDecoder();
   let body = "";
-  for await (const chunk of result.body!) {
+  for await (const chunk of result.body) {
     body +=
       typeof chunk === "string"
         ? decoder.decode() + chunk
@@ -159,7 +92,7 @@ export async function getStreamResponse(
   const contentType = Object.entries(result.headers)
     .find(([name]) => name.toLowerCase() === "content-type")?.[1]
     ?.split(";", 1)[0]
-    .trim()
+    ?.trim()
     .toLowerCase();
   return {
     ...result,

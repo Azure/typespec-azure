@@ -1229,12 +1229,12 @@ export function getStructuredStreamInfo(
   context: SdkContext,
   operation: ServiceOperation,
 ): StructuredStreamInfo | undefined {
+  const response = operation.response;
+  const streamMetadata = response.streamMetadata;
   const kind = getStructuredStreamKind(operation);
-  if (!kind) {
+  if (!kind || !streamMetadata) {
     return undefined;
   }
-  const response = operation.response;
-  const streamMetadata = response.streamMetadata!;
 
   const sseMetadata = response.sseMetadata;
   if (sseMetadata && kind === "sse") {

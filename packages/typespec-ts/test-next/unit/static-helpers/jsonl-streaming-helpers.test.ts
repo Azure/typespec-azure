@@ -6,6 +6,10 @@ import {
   readJsonlStream as readBrowserJsonlStream,
 } from "../../../static/static-helpers/streamingHelpers-browser.mjs";
 import {
+  getStreamResponse as getReactNativeStreamResponse,
+  readJsonlStream as readReactNativeJsonlStream,
+} from "../../../static/static-helpers/streamingHelpers-react-native.mjs";
+import {
   getStreamResponse,
   readJsonlStream,
 } from "../../../static/static-helpers/streamingHelpers.js";
@@ -24,13 +28,17 @@ async function collect<T>(source: AsyncIterable<T>): Promise<T[]> {
   return values;
 }
 
-function nativeBody(values: Uint8Array[], cancel?: () => void | Promise<void>) {
+function nativeBody(
+  values: Uint8Array[],
+  cancel?: () => void | Promise<void>,
+  close = cancel === undefined,
+) {
   return new ReadableStream<Uint8Array>({
     start(controller) {
       for (const value of values) {
         controller.enqueue(value);
       }
-      if (!cancel) {
+      if (close) {
         controller.close();
       }
     },
@@ -38,9 +46,15 @@ function nativeBody(values: Uint8Array[], cancel?: () => void | Promise<void>) {
   });
 }
 
+function readerOnlyBody(body: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
+  Object.defineProperty(body, Symbol.asyncIterator, { value: undefined });
+  return body;
+}
+
 describe.each([
   ["Node", readJsonlStream],
   ["browser", readBrowserJsonlStream],
+  ["React Native", readReactNativeJsonlStream],
 ] as const)("%s JSONL decoding", (_, decode) => {
   it("decodes lazily and maps each model exactly once", async () => {
     const read = vi.fn();
@@ -146,6 +160,7 @@ describe.each([
 describe.each([
   ["Node", getStreamResponse],
   ["browser", getBrowserStreamResponse],
+  ["React Native", getReactNativeStreamResponse],
 ] as const)("%s JSONL HTTP response", (platform, getResponse) => {
   function method(
     status: string,
@@ -166,6 +181,9 @@ describe.each([
           : nativeBody(
               values.map((value) => (typeof value === "string" ? encoder.encode(value) : value)),
             );
+    if (platform === "React Native" && body instanceof ReadableStream) {
+      readerOnlyBody(body);
+    }
     const response = { status, headers, body };
     return {
       response,
@@ -181,9 +199,10 @@ describe.each([
     const fixture = method(status, {}, ["malformed\n"]);
     const result = await getResponse(fixture.streamable);
     expect(fixture.read).not.toHaveBeenCalled();
-    if (platform === "browser") {
+    if (platform !== "Node") {
       expect((fixture.response.body as ReadableStream<Uint8Array>).locked).toBe(false);
-    } else {
+    }
+    if (platform !== "React Native") {
       expect(result.body).toBe(fixture.response.body);
     }
   });
@@ -192,9 +211,10 @@ describe.each([
     const fixture = method("304", {}, ["malformed\n"]);
     const result = await getResponse(fixture.streamable, ["304"]);
     expect(fixture.read).not.toHaveBeenCalled();
-    if (platform === "browser") {
+    if (platform !== "Node") {
       expect((fixture.response.body as ReadableStream<Uint8Array>).locked).toBe(false);
-    } else {
+    }
+    if (platform !== "React Native") {
       expect(result.body).toBe(fixture.response.body);
     }
   });
@@ -295,25 +315,18 @@ describe("Node JSONL stream cleanup", () => {
   });
 });
 
-describe("browser JSONL native reader cleanup", () => {
+describe.each([
+  ["browser", getBrowserStreamResponse],
+  ["React Native", getReactNativeStreamResponse],
+] as const)("%s JSONL stream cleanup", (platform, getResponse) => {
   async function response(body: ReadableStream<Uint8Array>) {
-    return getBrowserStreamResponse({
+    if (platform === "React Native") {
+      readerOnlyBody(body);
+    }
+    return getResponse({
       asBrowserStream: async () => ({ status: "200", headers: {}, body }),
     } as StreamableMethod);
   }
-
-  it("cancels a pending read promptly when the adapter is closed", async () => {
-    const cancel = vi.fn();
-    const body = nativeBody([], cancel);
-    const result = await response(body);
-    const iterator = result.body![Symbol.asyncIterator]();
-    const pending = iterator.next();
-    expect(body.locked).toBe(true);
-    await expect(iterator.return!()).resolves.toMatchObject({ done: true });
-    await expect(pending).resolves.toMatchObject({ done: true });
-    expect(cancel).toHaveBeenCalledOnce();
-    expect(body.locked).toBe(false);
-  });
 
   it.each(["break", "parse", "mapper"])("cancels and releases the lock on %s", async (exit) => {
     const cancel = vi.fn();
@@ -340,24 +353,13 @@ describe("browser JSONL native reader cleanup", () => {
   });
 
   it("releases the lock without cancellation on natural EOF", async () => {
-    const body = nativeBody([encoder.encode("{}\n{}")]);
     const cancel = vi.fn();
-    const getReader = body.getReader.bind(body);
-    vi.spyOn(body, "getReader").mockImplementation(() => {
-      const current = getReader();
-      const nativeCancel = current.cancel.bind(current);
-      vi.spyOn(current, "cancel").mockImplementation((reason) => {
-        cancel(reason);
-        return nativeCancel(reason);
-      });
-      return current;
-    });
+    const body = nativeBody([encoder.encode("{}\n{}")], cancel, true);
     const result = await response(body);
     expect(await collect(readBrowserJsonlStream(result.body, (v) => v))).toEqual([{}, {}]);
     expect(cancel).not.toHaveBeenCalled();
     expect(body.locked).toBe(false);
   });
-
   it("surfaces cancellation failure on consumer break and still releases the lock", async () => {
     const error = new Error("cancel failed");
     const body = nativeBody([encoder.encode("{}\n")], () => Promise.reject(error));
@@ -397,6 +399,27 @@ describe("browser JSONL native reader cleanup", () => {
     });
     const result = await response(body);
     await expect(collect(readBrowserJsonlStream(result.body, (v) => v))).rejects.toBe(error);
+    expect(body.locked).toBe(false);
+  });
+});
+
+describe("React Native JSONL reader adapter", () => {
+  async function response(body: ReadableStream<Uint8Array>) {
+    return getReactNativeStreamResponse({
+      asBrowserStream: async () => ({ status: "200", headers: {}, body: readerOnlyBody(body) }),
+    } as StreamableMethod);
+  }
+
+  it("cancels a pending read promptly when the adapter is closed", async () => {
+    const cancel = vi.fn();
+    const body = nativeBody([], cancel);
+    const result = await response(body);
+    const iterator = result.body![Symbol.asyncIterator]();
+    const pending = iterator.next();
+    expect(body.locked).toBe(true);
+    await expect(iterator.return!()).resolves.toMatchObject({ done: true });
+    await expect(pending).resolves.toMatchObject({ done: true });
+    expect(cancel).toHaveBeenCalledOnce();
     expect(body.locked).toBe(false);
   });
 
@@ -446,6 +469,33 @@ describe("browser JSONL native reader cleanup", () => {
     const result = await response(body);
     await expect(collect(readBrowserJsonlStream(result.body, (v) => v))).rejects.toBe(error);
     expect(cancel).not.toHaveBeenCalled();
+    expect(body.locked).toBe(false);
+  });
+});
+
+describe("browser JSONL native iteration support", () => {
+  it("rejects a reader-only response and cancels its body instead of adapting it", async () => {
+    const cancel = vi.fn();
+    const body = readerOnlyBody(nativeBody([], cancel));
+    await expect(
+      getBrowserStreamResponse({
+        asBrowserStream: async () => ({ status: "200", headers: {}, body }),
+      } as StreamableMethod),
+    ).rejects.toThrow("does not support async iteration");
+    expect(cancel).toHaveBeenCalledOnce();
+    expect(body.locked).toBe(false);
+  });
+
+  it("reports unsupported iteration and cancellation failure together", async () => {
+    const cancelError = new Error("cancel failed");
+    const body = readerOnlyBody(nativeBody([], () => Promise.reject(cancelError)));
+    await expect(
+      getBrowserStreamResponse({
+        asBrowserStream: async () => ({ status: "200", headers: {}, body }),
+      } as StreamableMethod),
+    ).rejects.toMatchObject({
+      errors: [expect.any(TypeError), cancelError],
+    });
     expect(body.locked).toBe(false);
   });
 });
