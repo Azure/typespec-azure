@@ -1,5 +1,15 @@
 # Release History
 
+## 0.17.5
+
+### Bug Fixes
+
+- [#5583](https://github.com/Azure/typespec-azure/pull/5583) Allow arrays of literal values to use their underlying Go element types.
+- [#5501](https://github.com/Azure/typespec-azure/pull/5501) Fixed some cases where Http.File type wasn't properly being adapted.
+- [#5549](https://github.com/Azure/typespec-azure/pull/5549) Fix naming for internal LRO methods and supporting types.
+- [#5466](https://github.com/Azure/typespec-azure/pull/5466) Fix marshalling of arrays with nested models with different XML names.
+
+
 ## 0.17.4
 
 ### Bug Fixes

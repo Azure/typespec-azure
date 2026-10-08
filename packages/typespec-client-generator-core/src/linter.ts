@@ -7,6 +7,7 @@ import { noOperationGroupNameConflictRule } from "./rules/no-operation-group-nam
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
 import { useCreateForPutRule } from "./rules/use-create-for-put.js";
+import { useUnionHierarchyRule } from "./rules/use-union-hierarchy.js";
 
 const rules = [
   useCreateForPutRule,
@@ -17,6 +18,7 @@ const rules = [
   csharpUseStandardAcronymsRule,
   getOperationNameRule,
   noOperationGroupNameConflictRule,
+  useUnionHierarchyRule,
 ];
 
 const csharpRules = [

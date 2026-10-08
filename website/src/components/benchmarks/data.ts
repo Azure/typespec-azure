@@ -72,7 +72,7 @@ function withinRange(entries: HistoryEntry[], range: TimeRange): HistoryEntry[] 
   if (range === "all") return entries;
   const days = range === "30d" ? 30 : 90;
   const cutoff = Date.now() - days * DAY_MS;
-  return entries.filter((e) => new Date(e.timestamp).getTime() >= cutoff);
+  return entries.filter((e) => new Date(e.commitTimestamp ?? e.timestamp).getTime() >= cutoff);
 }
 
 /** Read the metric bag a spec selection refers to. `all` means the averaged bag. */
@@ -90,7 +90,11 @@ function metricsFor(entry: HistoryEntry, spec: string): Record<string, number> {
  */
 export function buildMetricView(data: HistoryData, spec: string, range: TimeRange): MetricView {
   const entries = withinRange(data.entries, range);
-  const points: ChartPoint[] = entries.map((e) => ({ commit: e.commit, timestamp: e.timestamp }));
+  const points: ChartPoint[] = entries.map((e) => ({
+    commit: e.commit,
+    timestamp: e.commitTimestamp ?? e.timestamp,
+    measurementMode: e.measurementMode,
+  }));
 
   const labels = new Set<string>();
   for (const entry of entries) {
@@ -121,7 +125,11 @@ export function buildComparisonView(
   range: TimeRange,
 ): MetricView {
   const entries = withinRange(data.entries, range);
-  const points: ChartPoint[] = entries.map((e) => ({ commit: e.commit, timestamp: e.timestamp }));
+  const points: ChartPoint[] = entries.map((e) => ({
+    commit: e.commit,
+    timestamp: e.commitTimestamp ?? e.timestamp,
+    measurementMode: e.measurementMode,
+  }));
 
   const values: Record<string, (number | null)[]> = {};
   for (const spec of specNames) {
@@ -166,36 +174,42 @@ const FALLBACK_BASELINE_SAMPLES = 10;
  * Comparing against the immediately previous commit made every number swing on
  * run-to-run jitter, so the baseline is a median over a trailing window
  * instead. If that window is too sparse to be meaningful it widens to a fixed
- * number of preceding runs.
+ * number of preceding runs. Only runs using the same measurement method are comparable.
  */
 export function trailingBaseline(values: (number | null)[], points: ChartPoint[]): number | null {
-  if (values.length < 2) return null;
+  const latestIndex = lastValueIndex(values);
+  if (latestIndex < 1) return null;
 
-  const latestTime = new Date(points[points.length - 1].timestamp).getTime();
+  const latestTime = new Date(points[latestIndex].timestamp).getTime();
+  const mode = points[latestIndex].measurementMode;
   const cutoff = latestTime - BASELINE_DAYS * DAY_MS;
 
   const windowed: number[] = [];
-  for (let i = 0; i < values.length - 1; i++) {
+  for (let i = 0; i < latestIndex; i++) {
     const value = values[i];
-    if (value === null) continue;
+    if (value === null || points[i].measurementMode !== mode) continue;
     if (new Date(points[i].timestamp).getTime() >= cutoff) windowed.push(value);
   }
   if (windowed.length >= MIN_BASELINE_SAMPLES) return median(windowed);
 
   const recent: number[] = [];
-  for (let i = values.length - 2; i >= 0 && recent.length < FALLBACK_BASELINE_SAMPLES; i--) {
+  for (let i = latestIndex - 1; i >= 0 && recent.length < FALLBACK_BASELINE_SAMPLES; i--) {
     const value = values[i];
-    if (value !== null) recent.push(value);
+    if (value !== null && points[i].measurementMode === mode) recent.push(value);
   }
   return median(recent);
 }
 
 /** Last non-null value in a column. */
 export function latestValue(values: (number | null)[]): number | null {
+  return values[lastValueIndex(values)] ?? null;
+}
+
+function lastValueIndex(values: (number | null)[]): number {
   for (let i = values.length - 1; i >= 0; i--) {
-    if (values[i] !== null) return values[i];
+    if (values[i] !== null) return i;
   }
-  return null;
+  return -1;
 }
 
 /**

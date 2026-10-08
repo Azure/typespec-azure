@@ -1,5 +1,15 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.73.0
+
+### Features
+
+- [#5176](https://github.com/Azure/typespec-azure/pull/5176) Override operation API-version parameter defaults from `Azure.Core.Legacy.overrideApiVersion`.
+- [#5364](https://github.com/Azure/typespec-azure/pull/5364) Add the `get-operation-name` rule for GET SDK method names.
+- [#5520](https://github.com/Azure/typespec-azure/pull/5520) Expose service-level HTTP authentication requirements on SDK clients while preserving the existing credential parameter projection.
+- [#5457](https://github.com/Azure/typespec-azure/pull/5457) Add the `use-create-for-put` linter rule to require a `create` prefix on ARM PUT SDK method names, honoring unscoped `@clientName` overrides.
+
+
 ## 0.72.1
 
 ### Bug Fixes

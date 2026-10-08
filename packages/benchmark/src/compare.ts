@@ -114,6 +114,11 @@ export function compareBenchmarks(
   current: BenchmarkResult,
   options: CompareOptions = {},
 ): ComparisonResult[] {
+  if (baseline.measurementMode !== current.measurementMode) {
+    throw new Error(
+      `Cannot compare incompatible measurement methods: ${baseline.measurementMode ?? "legacy combined"} and ${current.measurementMode ?? "legacy combined"}.`,
+    );
+  }
   const results: ComparisonResult[] = [];
   const allSpecs = new Set([...Object.keys(baseline.specs), ...Object.keys(current.specs)]);
 
