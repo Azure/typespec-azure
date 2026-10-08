@@ -8,6 +8,7 @@
     {
       "code": "tsp-lintdiff-local-linter/operation-id-noun-verb",
       "count": 1
-    }
+    },
+    "tsp-lintdiff-local-linter/xms-pageable-for-list-calls"
   ]
 }

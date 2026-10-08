@@ -5,24 +5,24 @@
     "message": "Use the latest ARM common-types version 'v6' instead of 'v5'."
   },
   {
-    "code": "tsp-lintdiff-local-linter/consistent-patch-properties",
+    "code": "tsp-lintdiff-local-linter/patch-properties-correspond-to-put-properties",
     "severity": "warning",
-    "message": "The property 'properties.mode' in the request body either does not appear in the resource model or is nested at the wrong level."
+    "message": "The property 'mode' in the PATCH body does not correspond to a property in the PUT body."
   },
   {
-    "code": "tsp-lintdiff-local-linter/consistent-patch-properties",
+    "code": "tsp-lintdiff-local-linter/patch-properties-correspond-to-put-properties",
     "severity": "warning",
-    "message": "The property 'properties.enabled' in the request body either does not appear in the resource model or is nested at the wrong level."
+    "message": "The property 'enabled' in the PATCH body does not correspond to a property in the PUT body."
   },
   {
-    "code": "tsp-lintdiff-local-linter/consistent-patch-properties",
+    "code": "tsp-lintdiff-local-linter/patch-properties-correspond-to-put-properties",
     "severity": "warning",
-    "message": "The property 'properties.count' in the request body either does not appear in the resource model or is nested at the wrong level."
+    "message": "The property 'count' in the PATCH body does not correspond to a property in the PUT body."
   },
   {
-    "code": "tsp-lintdiff-local-linter/consistent-patch-properties",
+    "code": "tsp-lintdiff-local-linter/patch-properties-correspond-to-put-properties",
     "severity": "warning",
-    "message": "The property 'properties.label' in the request body either does not appear in the resource model or is nested at the wrong level."
+    "message": "The property 'label' in the PATCH body does not correspond to a property in the PUT body."
   },
   {
     "code": "tsp-lintdiff-local-linter/top-level-resources-list-by-resource-group",
@@ -90,24 +90,44 @@
     "message": "Path parameter should specify a maximum length (maxLength)."
   },
   {
-    "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
+    "code": "tsp-lintdiff-local-linter/no-unsafe-patch-body-properties",
     "severity": "warning",
     "message": "Properties of a PATCH request body must not have default value, property:properties.mode."
   },
   {
-    "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
+    "code": "tsp-lintdiff-local-linter/no-unsafe-patch-body-properties",
+    "severity": "warning",
+    "message": "The property 'properties.mode' in the request body either does not appear in the resource model or is nested at the wrong level."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/no-unsafe-patch-body-properties",
     "severity": "warning",
     "message": "Properties of a PATCH request body must not have default value, property:properties.enabled."
   },
   {
-    "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
+    "code": "tsp-lintdiff-local-linter/no-unsafe-patch-body-properties",
+    "severity": "warning",
+    "message": "The property 'properties.enabled' in the request body either does not appear in the resource model or is nested at the wrong level."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/no-unsafe-patch-body-properties",
     "severity": "warning",
     "message": "Properties of a PATCH request body must not have default value, property:properties.count."
   },
   {
-    "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
+    "code": "tsp-lintdiff-local-linter/no-unsafe-patch-body-properties",
+    "severity": "warning",
+    "message": "The property 'properties.count' in the request body either does not appear in the resource model or is nested at the wrong level."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/no-unsafe-patch-body-properties",
     "severity": "warning",
     "message": "Properties of a PATCH request body must not have default value, property:properties.label."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/no-unsafe-patch-body-properties",
+    "severity": "warning",
+    "message": "The property 'properties.label' in the request body either does not appear in the resource model or is nested at the wrong level."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",

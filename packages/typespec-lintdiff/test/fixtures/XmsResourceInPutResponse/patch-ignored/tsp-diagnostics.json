@@ -5,14 +5,14 @@
     "message": "Use the latest ARM common-types version 'v6' instead of 'v3'."
   },
   {
-    "code": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+    "code": "tsp-lintdiff-local-linter/no-unsafe-patch-body-properties",
     "severity": "warning",
-    "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
+    "message": "PATCH request body property 'name' is immutable and must be excluded from PATCH input."
   },
   {
-    "code": "tsp-lintdiff-local-linter/unsupported-patch-properties",
+    "code": "tsp-lintdiff-local-linter/no-unsafe-patch-body-properties",
     "severity": "warning",
-    "message": "PATCH request body property 'type' is not patchable and should be removed or made read-only/immutable."
+    "message": "PATCH request body property 'type' is immutable and must be excluded from PATCH input."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",

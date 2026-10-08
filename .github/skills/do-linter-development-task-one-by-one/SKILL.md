@@ -67,7 +67,7 @@ flowchart TD
     Promote -->|Confirmed source defect only| Handoff["Persist defect evidence and worktree state<br/>Finish worker and nested-agent activity"]
     PromoReview -->|Confirmed source defect only| Handoff
     Handoff --> Budget{"Fewer than 3 repair cycles started?"}
-    Budget -->|Yes| Repair["Increment repair count<br/>Carry evidence and reuse existing PRs/worktrees"]
+    Budget -->|Yes| Repair["Verify repair lifecycle and authorization<br/>Increment existing count; preserve history/worktrees"]
     Repair --> Worker
     Budget -->|No| Cap["Partially-succeeded<br/>Source-repair cap exhausted"]
 
@@ -145,6 +145,12 @@ for queue invocation. In app-session mode the queue can discover the owner
 from each exact TypeSpec worktree path even when no binding metadata was pasted.
 Do not relax malformed-line rejection to accept arbitrary handoff prose.
 
+Keep explicit task authorizations in a separate
+[recovery context](../shared/recovery-context.md), never in the strict worker
+command. In particular, post-merge source repair is opt-in, not implied by a
+generic queue invocation. Preserve approved validation settings and exact
+existing-fork exceptions across phases without repeatedly requesting approval.
+
 Validate the complete queue before preparation or launching the first subagent. Record malformed
 lines as failed tasks and continue with every valid command. Compare rule IDs
 case-insensitively after normalizing them to a stable key while preserving their
@@ -214,12 +220,24 @@ Keep an ordered ledger with one entry per parsed queue entry:
   waiting phase, handoff artifact, and review invocation/agent IDs
 - local draft-correction counts, causal evidence and rerun results, separate
   from worker attempts, review rounds and source-repair cycles
+- native-test timeout-diagnosis usage (at most one per task across all phases
+  and cycles), eligibility evidence, concurrency change and full-scope results
+- setup-hook recovery usage (one timed diagnostic and at most one evidence-backed
+  hook-only corrective run per task), measurements, restoration and full-scope results
+- coordinator-owned local reserve usage (three total per task) and native
+  baseline-comparison usage (one per task), eligibility decisions, same-owner
+  handoffs and required rerun results; preserve these across every phase/cycle
+- predeclared required/supplemental validation plan, authority and per-command
+  disposition; disclosed limitations and read-only blocker-reconciliation decisions
 - publication attempt/error identities, exact base/head tuple and SHA, absence
   query evidence, and the separate one-correction publication budget
 - original readiness/status/quiescence deadlines, last genuine progress,
   status-request identity and evidence that previous task activity stopped
 - explicit recovery authorizations, including the user message, named failure,
   additional attempt allowance and usage, and any legacy-worktree adoption binding
+- recovery-context artifact/content identity, scoped validation profiles,
+  `legacy_fork_update`, `post_merge_source_repair`, `active_source_pr`, and
+  append-only `source_pr_history` for an authorized publication rollover
 - blocker or failure, when applicable
 
 Update the ledger after every phase handoff and worker result so a later failure
@@ -246,7 +264,9 @@ task; keep later tasks pending until its work is terminal and quiescent.
 Compatibility input reuses its exact development/specs paths and adds/verifies
 the promotion resource; it never silently replaces an unbound legacy checkout.
 Preparation is not repeated for repair cycles: revalidate the retained manifest
-and repair only invalidated layers. Record setup failures and preserve resources.
+and repair only invalidated layers. An opted-in post-merge transition requires
+a new source-creation binding, not a new dependency installation or new task.
+Record setup failures and preserve resources.
 
 For session-bound publication, follow
 [app-session execution](app-session-execution.md#queue-execution) rather than
@@ -261,7 +281,8 @@ For each successfully prepared command, in input order:
 1. Launch exactly one fresh top-level general-purpose subagent per cycle. Do not
    reuse a worker from a prior task or cycle. Follow-up messages to the same
    idle worker are allowed only for capability coordination or continuation
-   after an outer-owned review in this cycle.
+   after an outer-owned review, an approved bounded resumption, or a verified
+   read-only blocker reconciliation in this cycle. None starts a fresh cycle.
 2. Give it the complete worker prompt below, including the original command and
    parsed TypeSpec worktree, cycle number, and cycle handoff when resuming.
 3. Wait for that subagent to finish before launching another top-level subagent.
@@ -271,6 +292,10 @@ For each successfully prepared command, in input order:
    inferring success from worker prose.
    For `review-handoff`, complete the outer-owned review protocol below before
    resuming the same worker or declaring the task terminal.
+   Before accepting any terminal blocker, apply the shared
+   [read-only reconciliation](../shared/recovery-context.md#read-only-blocker-reconciliation).
+   A `policy-reconciliation-handoff` remains nonterminal while this one
+   adjudication runs; it does not authorize another command attempt.
 5. For `source-repair-required`, apply the bounded source-repair loop below.
    Launch a fresh worker for the same task only after the prior worker is
    terminal and its nested agents and commands have stopped doing work.
@@ -315,13 +340,19 @@ initialization.
   work and report an orchestration capability blocker, not a source-rule defect.
   Do not substitute synchronous reviewers or reuse agents from earlier loops.
 
-For `outer` mode:
+Separately preflight the independent local precommit review required by development
+and promotion. When that review requires same-reviewer follow-up, select an owner
+with persistent launch and messaging before the initial review; a synchronous
+reviewer's returned ID or idle status is not evidence of follow-up capability.
+If the worker has only synchronous launch support, hand the unpublished diff and
+validation evidence to the outer agent before launching the local reviewer.
+The selected owner must verify actual follow-up delivery and retain that reviewer
+through any material corrections. Keep the worker idle while the outer reviewer
+is active, and coordinate corrections without concurrent worktree mutation.
+Complete local review and its validation gates before publication.
 
-Outer ownership applies only to the post-publication GitHub review-and-fix loop.
-It does not waive the development or promotion skill's independent local
-precommit review. Complete that local review and its validation gates before
-publication; if the worker cannot arrange it, hand the unpublished diff and
-evidence to the outer agent for that review before requesting publication.
+For `outer` mode, the following protocol governs the separate post-publication
+GitHub review-and-fix loop; it does not replace local precommit review:
 
 1. The worker completes development, records the canonical PR, pushed SHA,
    applicable validation evidence and exact worktree state, then returns
@@ -392,8 +423,12 @@ failure and correction in the ledger, then launch one fresh worker with the
 corrected prompt. Never reuse the failed worker.
 
 Do not restart workers automatically for dependency, build, validation, corpus,
-review, network, credential, push or GitHub failures. This does not prohibit an
-eligible in-place draft correction below or the shared
+review, network, credential, push or GitHub failures. First apply the recorded
+[validation gate levels](../shared/recovery-context.md#validation-gates-and-supplemental-checks):
+continuing after a disclosed supplemental limitation is not a worker restart
+or command retry. This does not prohibit an
+eligible in-place draft correction, the single
+[native-test timeout diagnosis](#native-test-timeout-diagnosis) below, or the shared
 [single evidenced publication-configuration correction](app-session-execution.md#publication-recovery).
 That exception requires positive exact-PR absence and a specific proven defect,
 uses only the required creation tool, and never restarts a worker or retries
@@ -429,9 +464,65 @@ side-effect safety; they are not worker restarts or external-operation retries.
 It must not report a terminal blocker merely because its own draft needs a safe,
 understood correction and budget remains. Preserve all failed-attempt evidence;
 do not restart the worker, consume a source-repair cycle, or weaken validation.
-External/indeterminate operational failures, unknown causes, exhausted budgets
+Except for the narrowly eligible native-test timeout and setup-hook recovery below,
+external/indeterminate operational failures, unknown causes, exhausted budgets
 and confirmed immutable promotion-source defects retain their existing
 stop/handoff behavior.
+
+Before treating an exhausted local allowance as terminal, apply the shared
+[coordinator-owned local recovery reserve](../shared/recovery-context.md#coordinator-owned-local-recovery-reserve).
+Keep the task running during its nonterminal handoff. This queue invocation
+authorizes the coordinator, not the worker, to allocate up to three reserve
+attempts across the entire rule task. Continue the same owner without restarting
+its phase or review pair; retain ordinary counters and all failed attempts.
+Local-recovery, native-comparison and setup-hook handoffs are explicit exceptions
+to the otherwise restricted same-worker follow-ups. In app-session mode, continue the
+recorded phase owner instead. Do not create a replacement worker or a fresh
+review invocation for either handoff. Pass both task-wide counters and the
+coordinator's exact decision in every continuation/cycle handoff.
+
+### Native-test timeout diagnosis
+
+Select the applicable [validation profile](../shared/recovery-context.md#reusable-validation-profiles)
+before the initial test run and carry it across handoffs. An existing approved
+hook setting is not a new diagnostic allowance. Do not silently revert it to
+defaults, expand its scope, or increase it after a failure.
+
+Apply the review skill's
+[bounded native-test timeout diagnosis](../loop-for-fix-and-review/SKILL.md#bounded-native-test-timeout-diagnosis)
+to completed native unit-test runs with only per-test timeout failures.
+The queue invocation authorizes at most one such diagnostic rerun per task,
+shared across development, promotion, nested reviews, and source-repair cycles.
+The outer queue verifies eligibility and records usage before dispatching the
+same phase owner or fix agent; it does not restart a worker. Preserve the
+original failure, test population, skip set, and configured timeouts.
+If the owner cannot obtain approval within its current turn, return a
+nonterminal `timeout-diagnosis-handoff` with all commands stopped and the
+eligibility evidence. Keep the task `running` while the outer queue evaluates
+and dispatches this allowance; a rejected handoff returns to the normal stop
+policy. This same-owner continuation does not consume an orchestration retry.
+
+This is not permission to retry a corpus, build, hung command, assertion failure,
+or external operation. After the diagnostic is used, only the shared
+[bounded native baseline comparison](../shared/recovery-context.md#bounded-native-baseline-comparison)
+may authorize a further timeout investigation and full rerun: one allowance per
+rule task, granted by the coordinator to the same owner without user input.
+Keep the task running during `native-comparison-handoff`. Ineligible or exhausted
+recovery still stops; a subsequent understood draft defect uses its own remaining
+correction allowance, never a fresh timeout allowance.
+
+### Setup-hook timeout recovery
+
+Apply the shared [bounded setup-hook timeout recovery](../shared/recovery-context.md#bounded-setup-hook-timeout-recovery)
+only to eligible required native test runs with setup/beforeEach hook timeouts.
+This queue invocation owns one timed diagnostic and at most one measured
+hook-only corrective run per rule task, across phases, reviews and repair cycles.
+The outer queue records eligibility and each debit before continuing the same
+phase owner or fix agent; the owner returns `setup-hook-recovery-handoff` with
+commands stopped and the original evidence instead of independently rerunning
+the failed test. Keep the task running while the coordinator decides. An
+ineligible or exhausted handoff follows the normal stop policy. Do not spend
+the separate per-test timeout allowance on a hook failure.
 
 ### Explicitly authorized bounded resumption
 
@@ -487,7 +578,11 @@ agent to repair the source in place.
    source-repair cycles have already started, stop as `partially-succeeded` with
    `source-repair-cap-exhausted` and the remaining defect. There is no fourth
    repair cycle, including for a newly discovered defect.
-3. Otherwise increment the repair count and launch a fresh top-level worker with
+3. Otherwise verify the recorded source PR lifecycle before dispatch. Reuse an
+   OPEN source PR. For MERGED source PRs, require and complete the shared
+   [opt-in transition](../shared/recovery-context.md#opt-in-post-merge-source-repair);
+   without that authorization stop. CLOSED-without-merge remains a blocker.
+   Increment the existing repair count when launching a fresh top-level worker with
    the original command verbatim plus the complete cycle handoff as context, not
    extra command-line flags. This authorized reuse is within the same queue
    entry; it does not relax duplicate-input rejection.
@@ -496,7 +591,9 @@ agent to repair the source in place.
    after the new development head has a clean review. Retaining session
    ownership is required and does not authorize reusing review subagents.
 4. Restart at `/develop-lintdiff-rule`, not at promotion. Reuse the original
-   TypeSpec/specs worktrees, source branch, and development PR. Preserve commits
+   TypeSpec/specs worktrees and the active source publication binding. Reuse the
+   source branch/PR when OPEN; only the authorized post-merge transition may
+   introduce a successor branch/PR, retaining the predecessor in history. Preserve commits
    and add focused repair commits. Re-establish evidence, add regression
    coverage, complete required validation and migration evidence, then run a new
    development review loop. No prior clean review covers a changed source head.
@@ -508,9 +605,11 @@ agent to repair the source in place.
    promotion review loop. Do not merge or cherry-pick the entire development
    branch into the promotion branch.
 6. Repeat only for another confirmed source defect. Never close or replace an
-   existing PR, force-push, reset, or rebase to manufacture a fresh cycle. If a
-   recorded PR is closed/merged, its branch identity changed, or its head/worktree
-   state no longer matches the handoff, stop and report the blocker.
+   existing PR, force-push, reset, or rebase to manufacture a fresh cycle. A
+   merged-source successor is allowed only under the opt-in transition; it
+   never resets budgets or replaces historical results. A closed-without-merge
+   source PR, closed/merged promotion PR, unexplained branch identity change,
+   or head/worktree mismatch still stops the task.
 
 Keep development PRs on their existing
 `feature/lintdiff-migration-new` target. Promotion follows its skill's canonical
@@ -525,6 +624,9 @@ fresh repair worker. It is an orchestration contract, not a new public CLI flag:
 
 - queue ownership marker `lintdiff-development-queue`, task number, exact rule
   ID, original command, cycle number, and source-repair count
+- recovery context/content identity, acknowledged authorizations and validation
+  profiles, active source PR and predecessor history; include the verified
+  new-creation binding when an opted-in merged-source successor is needed
 - execution backend, phase dispatch ID and phase scope, both verified publication
   bindings, coordinator session ID, readiness manifest and instruction-version
   paths/hashes acknowledged by the owner
@@ -539,6 +641,10 @@ fresh repair worker. It is an orchestration contract, not a new public CLI flag:
   and existing promotion adaptations that must be preserved on refresh
 - all completed phase outcomes, review-round counts, reviewed SHAs, and previous
   repair reasons; do not overwrite earlier results when a later cycle fails
+- task-wide native-test timeout-diagnosis allowance and usage, including failed
+  and passing evidence; no phase or source-repair cycle receives a new allowance
+- task-wide setup-hook diagnostic and corrective-run usage, measurements,
+  restored probes and scoped validation profile
 - source defect evidence: discovery phase, exact source paths and locations,
   source SHA, expected versus actual behavior, reproducer or regression case,
   technical explanation of why this is a source defect rather than promotion
@@ -643,13 +749,29 @@ one session to execute both publication phases.
 > For agent-introduced draft or validation-command errors, apply the local
 > draft-correction policy above. Record the causal evidence and attempt count, correct eligible failures
 > in place, and rerun the failed required command plus affected remaining checks.
+> For an eligible completed native-test timeout-only failure, report the evidence
+> and inherited task-wide allowance to the outer queue for the single diagnostic
+> rerun. Do not consume it independently or treat it as a new worker/cycle.
+> For a setup-hook timeout, return the shared `setup-hook-recovery-handoff`
+> instead; only a coordinator grant authorizes the timed diagnostic and any
+> subsequently measured hook-only correction. Preserve all failure evidence.
 > Do not stop merely on the first build/test failure in your own draft or a
 > safely correctable invocation mistake. Confirm command semantics and side
 > effects, preserve the intended scope and count the correction. Do stop
-> on ineligible failures or exhausted budget, and never publish a failing draft.
+> on ineligible required-check failures or when a needed correction has exhausted
+> its recovery budget, and never
+> publish a draft with a failed required gate or task defect. Record required
+> versus supplemental commands before execution and follow the shared
+> validation-disposition contract; do not turn an optional broad failure into
+> a required gate. If policy application is unclear, return
+> `policy-reconciliation-handoff` with all commands stopped and exact evidence,
+> rather than requesting another retry or declaring a terminal failure yourself.
 >
 > The queue has already prepared all three worktrees and publication bindings.
 > Read and verify the preparation manifest and supplied instruction versions.
+> Acknowledge the task-scoped recovery context before commands. Reuse exact
+> applicable fork-update permissions and validation profiles; do not infer new
+> authorization, reset counters, or independently roll over a merged source PR.
 > Do not recreate worktrees, rerun dispatcher mode or repeat passing dependency
 > setup. The development skill revalidates the prepared state and may repair only
 > invalidated layers under the shared preparation contract. Never pull, reset,
@@ -661,7 +783,8 @@ one session to execute both publication phases.
 > `<original-command>`
 >
 > Follow `/develop-lintdiff-rule` through draft pull-request creation, or update
-> the existing development PR during source repair. Pass the repair evidence and
+> the active development PR during source repair (or create the explicitly
+> authorized post-merge successor). Pass the repair evidence and
 > existing PR identity as invocation context without changing the original command.
 > Do not stop after implementation, validation, commit, or push. Capture the canonical
 > development PR URL and pushed head. Pass the shared post-run policy's queue ownership
@@ -761,6 +884,9 @@ Do not describe a task as fully successful merely because it created one or both
 PRs. A later failed repair does not erase the earlier PR or clean review history,
 but that history cannot establish success for newer, unreviewed heads. Report a
 required-validation blocker even if the promotion skill returned a draft PR.
+Disclosed supplemental limitations do not alone change `succeeded` to
+`partially-succeeded`; include them in the result without claiming full-suite
+success. Required-check failures and task defects still block success.
 
 ## Final result
 
@@ -882,16 +1008,17 @@ Capture concrete suggestions for improving future queue runs, especially:
   Do not apply orchestration retry after development begins or reinterpret
   operational failures as source defects.
 - Never exceed the separate three-attempt draft-correction budget for its
-  phase/backlog/round scope automatically, reset it by relaunching agents, or hide
-  failed checks. Additional attempts require the separate explicit authorization
-  and ledger in [bounded resumption](#explicitly-authorized-bounded-resumption).
+  phase/backlog/round scope without a recorded coordinator grant from the shared
+  task-wide reserve. Never reset counters by relaunching agents or hide failed
+  checks. Beyond the finite reserve/comparison allowances, retain the explicit
+  authorization and ledger in [bounded resumption](#explicitly-authorized-bounded-resumption).
 - Never promote without clean development review, or report success without
   clean promotion review against the final source provenance.
-- Require every development, promotion, and skill-update source branch to live
-  in `Azure/typespec-azure`, not a personal fork. Verify the actual PR head
-  repository as well as its base. Missing canonical push access is a blocker,
-  not permission to use a fork; legacy fork-backed PRs require explicit
-  user-authorized migration under the shared publication preflight.
+- Require new development/promotion heads and skill-update heads to live in
+  `Azure/typespec-azure`. Only an exact explicit `legacy_fork_update`
+  authorization permits retaining an existing fork-backed rule PR. Verify the
+  actual head and base; missing canonical access never permits a fork fallback.
+  The exception does not authorize successor fork PRs or skill-update fork PRs.
 - Never let promotion or its review mutate the source; return evidence to the
   outer queue for a fresh repair worker.
 - Never run a slash command as a PowerShell or shell executable.

@@ -30,6 +30,36 @@
     "message": "Error payloads of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload."
   },
   {
+    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
+    "severity": "warning",
+    "message": "Operation 'old' defines disallowed response status '400'. Use only 200, 201, 202, 204, or default responses."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
+    "severity": "warning",
+    "message": "Operation 'standard' defines disallowed response status '400'. Use only 200, 201, 202, 204, or default responses."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
+    "severity": "warning",
+    "message": "Operation 'wrong' defines disallowed response status '400'. Use only 200, 201, 202, 204, or default responses."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
+    "severity": "warning",
+    "message": "Operation 'legacy' defines disallowed response status '400'. Use only 200, 201, 202, 204, or default responses."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
+    "severity": "warning",
+    "message": "Operation 'localError' defines disallowed response status '400'. Use only 200, 201, 202, 204, or default responses."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
+    "severity": "warning",
+    "message": "Operation 'overriddenStandard' defines disallowed response status '400'. Use only 200, 201, 202, 204, or default responses."
+  },
+  {
     "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
     "severity": "warning",
     "message": "Arm namespace ExternalReferences is missing the Operations interface. Add \"interface Operations extends Azure.ResourceManager.Operations {}\"."
@@ -190,11 +220,6 @@
     "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
   },
   {
-    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
-    "severity": "warning",
-    "message": "Operation 'old' defines explicit error status code '400'. Remove it and use the default response for errors instead."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
@@ -218,11 +243,6 @@
     "code": "tsp-lintdiff-local-linter/missing-xms-error-response",
     "severity": "warning",
     "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
-    "severity": "warning",
-    "message": "Operation 'Lro' defines explicit error status code '400'. Remove it and use the default response for errors instead."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
@@ -260,11 +280,6 @@
     "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
   },
   {
-    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
-    "severity": "warning",
-    "message": "Operation 'standard' defines explicit error status code '400'. Remove it and use the default response for errors instead."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
@@ -288,11 +303,6 @@
     "code": "tsp-lintdiff-local-linter/missing-xms-error-response",
     "severity": "warning",
     "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
-    "severity": "warning",
-    "message": "Operation 'Lro' defines explicit error status code '400'. Remove it and use the default response for errors instead."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
@@ -330,11 +340,6 @@
     "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
   },
   {
-    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
-    "severity": "warning",
-    "message": "Operation 'wrong' defines explicit error status code '400'. Remove it and use the default response for errors instead."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
@@ -358,11 +363,6 @@
     "code": "tsp-lintdiff-local-linter/missing-xms-error-response",
     "severity": "warning",
     "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
-    "severity": "warning",
-    "message": "Operation 'Lro' defines explicit error status code '400'. Remove it and use the default response for errors instead."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
@@ -400,11 +400,6 @@
     "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
   },
   {
-    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
-    "severity": "warning",
-    "message": "Operation 'legacy' defines explicit error status code '400'. Remove it and use the default response for errors instead."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
@@ -428,11 +423,6 @@
     "code": "tsp-lintdiff-local-linter/missing-xms-error-response",
     "severity": "warning",
     "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
-    "severity": "warning",
-    "message": "Operation 'Lro' defines explicit error status code '400'. Remove it and use the default response for errors instead."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
@@ -470,11 +460,6 @@
     "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
   },
   {
-    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
-    "severity": "warning",
-    "message": "Operation 'localError' defines explicit error status code '400'. Remove it and use the default response for errors instead."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
@@ -498,11 +483,6 @@
     "code": "tsp-lintdiff-local-linter/missing-xms-error-response",
     "severity": "warning",
     "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
-    "severity": "warning",
-    "message": "Operation 'Lro' defines explicit error status code '400'. Remove it and use the default response for errors instead."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
@@ -540,11 +520,6 @@
     "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
   },
   {
-    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
-    "severity": "warning",
-    "message": "Operation 'overriddenStandard' defines explicit error status code '400'. Remove it and use the default response for errors instead."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/post-operation-id-contains-url-verb",
     "severity": "warning",
     "message": "POST operation 'overriddenStandard' should contain the action verb 'overridden-standard' from the route path. Consider updating the operation name."
@@ -573,11 +548,6 @@
     "code": "tsp-lintdiff-local-linter/missing-xms-error-response",
     "severity": "warning",
     "message": "ARM POST response 400 must be marked with @error so the emitter generates `x-ms-error-response: true`."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/no-error-code-responses",
-    "severity": "warning",
-    "message": "Operation 'Lro' defines explicit error status code '400'. Remove it and use the default response for errors instead."
   },
   {
     "code": "tsp-lintdiff-local-linter/xms-examples-required",

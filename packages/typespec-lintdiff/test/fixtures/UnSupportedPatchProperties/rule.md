@@ -2,8 +2,8 @@
 validatorRuleId: UnSupportedPatchProperties
 engine: spectral
 tspLints:
-  - tsp-lintdiff-local-linter/unsupported-patch-properties
-coverageKind: lint
+  - tsp-lintdiff-local-linter/no-unsafe-patch-body-properties
+coverageKind: partial
 projectionScope: http-reachable
 ---
 
@@ -12,6 +12,18 @@ projectionScope: http-reachable
 **Severity:** error
 
 **Applies to:** Resource Manager (ARM)
+
+## Consolidated native contract
+
+This legacy rule maps to the shared
+[`no-unsafe-patch-body-properties`](../../../src/rules/no-unsafe-patch-body-properties.md)
+implementation. The linked contract supersedes the historical description below.
+Immutable paths are checked only in effective PATCH input, without canonical Read
+schema reuse. Explicit overrides exposing immutable input are diagnosed even when
+their visibility omits Update. Comparison snapshots contain all categories of the
+combined diagnostic ID; their counts do not establish one-rule Swagger equivalence.
+
+## Historical immutable-rule evidence
 
 PATCH body must not contain writable top-level `id`, `name`, `type`, or
 `location` properties. Its `properties` bag must not contain a writable

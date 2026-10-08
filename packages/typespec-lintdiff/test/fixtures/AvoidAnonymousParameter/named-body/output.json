@@ -1,0 +1,90 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "2024-01-01",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "api-key",
+      "in": "header"
+    }
+  },
+  "tags": [],
+  "paths": {
+    "/widgets": {
+      "post": {
+        "operationId": "CreateWidget",
+        "description": "Create a widget.",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "The service API version.",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "apiVersion"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "The widget to create.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Widget": {
+      "type": "object",
+      "description": "A widget sent to the service.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The user-visible widget label."
+        },
+        "color": {
+          "type": "string",
+          "description": "The display color of the widget."
+        }
+      },
+      "required": [
+        "name",
+        "color"
+      ]
+    }
+  },
+  "parameters": {}
+}

@@ -65,7 +65,7 @@
     "message": "Path parameter should specify a maximum length (maxLength)."
   },
   {
-    "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
+    "code": "tsp-lintdiff-local-linter/no-unsafe-patch-body-properties",
     "severity": "warning",
     "message": "Properties of a PATCH request body must not be required, property:properties.requiredProp."
   },

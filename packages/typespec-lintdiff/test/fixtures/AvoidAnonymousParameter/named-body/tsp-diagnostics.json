@@ -1,0 +1,17 @@
+[
+  {
+    "code": "tsp-lintdiff-local-linter/security-definition-description",
+    "severity": "warning",
+    "message": "Security definition should have a description."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/post-operation-id-contains-url-verb",
+    "severity": "warning",
+    "message": "POST operation 'createWidget' should contain the action verb 'widgets' from the route path. Consider updating the operation name."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  }
+]

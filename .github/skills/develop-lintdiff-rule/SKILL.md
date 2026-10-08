@@ -209,21 +209,27 @@ the original worker command is unchanged. Repair context is supplied separately;
 do not add public flags or run the slash command as a shell executable. Initial
 cycle `0` uses ordinary worker development and does not require an existing PR.
 
-- Reuse the exact supplied TypeSpec/specs worktrees, rule branch, and development
-  PR. Verify the recorded repository/base/head identities and pushed SHA before
-  editing. A closed/merged PR, changed remote head, or unexplained local changes
-  is a blocker; do not create a replacement PR or overwrite newer work.
+- Reuse the exact supplied TypeSpec/specs worktrees and active publication
+  binding. Verify the recorded repository/base/head identities and pushed SHA
+  before editing. Normally reuse the OPEN rule branch/PR. A merged source PR
+  permits a successor only after the outer queue completes the explicitly
+  [opted-in post-merge transition](../shared/recovery-context.md#opt-in-post-merge-source-repair)
+  and supplies its new-creation binding and predecessor history. Never infer
+  that authorization or recreate the old remote branch. A closed-without-merge
+  PR, unexplained remote head, or unexplained local changes remains a blocker.
 - Re-run worker setup, eligibility and coverage gates, evidence gathering, and
   the full required development workflow. The existing open development PR is
-  not a reason to skip repair. A closed/merged recorded PR still blocks this
-  queue repair mode; the separately authorized post-merge lifecycle is not an
-  automatic queue restart. Coverage stop conditions still apply.
+  not a reason to skip repair. Without the explicit post-merge transition,
+  closed/merged source PRs still block queue repair. Coverage stop conditions
+  apply equally to authorized successor repairs.
 - Use the handoff's source-defect evidence and acceptance criteria to scope the
   repair. Preserve earlier commits, add regression coverage, refresh
   `migration.md`, and append focused repair commits only after required
   validation and independent review. Do not reset, rebase, or force-push.
-- Refresh the same development PR's description and return its canonical URL
-  and verified pushed head SHA. Do not close it or attempt duplicate creation.
+- Refresh the active development PR's description and return its canonical URL
+  and verified pushed head SHA. Create a successor only under the supplied
+  post-merge new-creation binding, linking the predecessor and defect; otherwise
+  do not close the PR or attempt duplicate creation.
   The queue runs a new review loop before promotion can consume the repaired head.
 - Do not edit the promotion worktree or launch promotion from this skill.
   Append milestones to the queue's shared log and return evidence-backed process
@@ -312,6 +318,25 @@ The top-level worker works only in the supplied typespec-azure worktree.
   workflow.
 - Do not require equal raw Swagger and TypeSpec diagnostic counts.
 
+Record the [native rule contract](../typespec-lint-discovery/SKILL.md#native-rule-contract)
+in the existing rule evidence before editing. Use the portable
+[implementation checkpoints](../typespec-lint-implement/SKILL.md#implementation-checkpoints)
+and [contract-driven coverage](../typespec-lint-validate/SKILL.md#contract-driven-coverage)
+within this workflow's required fixture/build/corpus steps; they do not replace
+those steps or relax the native boundary below. Include the selected semantic
+layer/API, a sibling-rule comparison, the diagnostic unit/target, and test
+evidence for custom complexity. Keep intentional parity differences separate
+from unresolved gaps.
+
+Apply the [rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary)
+to native unit tests. Keep framework-only migration evidence in the fixture or
+comparison harness rather than duplicating it in each rule suite.
+
+Apply the [native rule documentation contract](../typespec-lint-implement/SKILL.md#native-rule-documentation)
+to the user-facing explanation and examples in `rule.md`. Keep emitted-reference
+comparisons and legacy validator mechanics in a dedicated migration section,
+`migration.md`, and the PR description, rather than teaching them as native usage.
+
 #### Native TypeSpec implementation boundary
 
 Prefer idiomatic TypeSpec validation. Preserve Swagger parity only where it
@@ -361,8 +386,12 @@ internal transitive dependencies; do not use wrappers or private state to access
 prohibited functionality. Research and comparison fixtures may still use the
 prohibited libraries to demonstrate Swagger divergence. Native tests may
 register transitive libraries required by the test host, but must exercise the
-rule through supported native semantics rather than TCGC, OpenAPI decorators,
-or unsafe mutation.
+rule through supported native semantics rather than OpenAPI decorators or
+unsafe mutation. ARM-destination rule tests must not rely on TCGC to implement
+the check. A rule whose contract genuinely concerns SDK APIs belongs in TCGC,
+where supported SDK-name resolution and common/scoped override tests are
+appropriate; this does not authorize a TCGC dependency in ARM or waive the
+worker's eligibility gate.
 
 Removing a prohibited dependency can change the diagnostic population. Record
 the native contract and explicit differences for SDK scope, legacy markers,
@@ -491,6 +520,15 @@ When evidence requires a rule update:
 - update snapshots and fixture `rule.md`
 - update the rule's `migration.md`
 
+When comparing effective HTTP model identity, inspect the supported compiler/HTTP
+API before adding special cases. Cover headers and status codes inside the named
+model, outside its spread, and split across both, with added-payload negative
+controls. When the rule excludes metadata from identity, apply equivalent
+filtering on both sides of the comparison. Run the
+focused matrix and an independent semantic review before an expensive full
+corpus run when correcting a model-identity regression; this does not replace
+the final complete-diff review.
+
 Do not change Swagger validator code, emitters, or unrelated TypeSpec rules.
 
 #### ARM applicability without redundant namespace guards
@@ -513,10 +551,11 @@ neighboring rules in the intended official destination.
   applicability predicate. `resolveProviderNamespace(program, namespace)` searches
   that namespace and its descendants, not its ancestors; it does not establish
   whether an operation is inside an ARM provider.
-- Document the intended promotion adaptation in `rule.md`. Native ARM tests should
-  cover ordinary and nested namespaces without an unnecessary provider decorator
-  when the selected official ruleset is the applicability boundary. Filtering
-  library declarations and non-endpoint templates is a separate concern.
+- Document the intended promotion adaptation in `rule.md`. A minimal native ARM
+  case without a provider decorator can prove removal of an unnecessary guard
+  when the selected official ruleset is the applicability boundary. Add nested
+  namespaces only for rule-owned namespace logic; do not require library or
+  template-filtering tests for framework behavior.
 
 ### 3. Run focused validation
 
@@ -525,6 +564,18 @@ because those commands can load compiled package output. Rebuild after changing
 production TypeScript or diagnostic messages before rerunning validation. Then
 run the narrowest existing fixture tests and package lint commands that cover
 the changed rule. Fix failures before running the corpus.
+
+The fixture harness can enable multiple lint rules and compare the complete
+diagnostic snapshot. Before publication, search existing fixture diagnostics and
+ambient expectations for the changed rule ID/message, including fixtures owned
+by other rules. Also inspect fixtures exercising newly included/excluded shapes;
+an absent old diagnostic is not proof that a fixture is unaffected. Validate
+every affected group, not only the named rule's group.
+Reconcile only explained changes using the harness snapshot writer and strict
+reruns; preserve its exact encoding/newlines (including LF on Windows), and
+inspect the full generated diff. Never bulk-accept unrelated diagnostics. If
+current-target drift appears, record fetched versus integrated target SHAs and
+use the existing synchronization/recovery contract; fetching alone is not merging.
 
 ### 4. Run the existing corpus analysis
 
@@ -540,6 +591,9 @@ Pass the runner options directly as shown. Do not insert an additional `--`
 after `specs:typespec`; in this repository that separator is forwarded to the
 runner and rejected as an unknown argument.
 
+Before the first representative/full run, capture a baseline using the
+[manifest-based cleanup helper](corpus-cleanup.md). Keep its evidence outside
+the repository. Do not capture an already-modified corpus as a clean baseline.
 The command runs all local rules and rewrites canonical TypeSpec results and
 coverage files in this development worktree. Use the refreshed rule row and
 rule shard to verify project overlap, validator-only projects, TypeSpec-only
@@ -674,8 +728,13 @@ Do not commit it.
 Before preparing the PR:
 
 1. Confirm `migration.md` contains the latest corpus evidence.
-2. Restore all generated changes under
-   `packages/typespec-lintdiff/specs`.
+2. After verifying corpus writers have stopped, use the
+   [manifest-based cleanup helper](corpus-cleanup.md) to archive and plan all
+   generated changes under `packages/typespec-lintdiff/specs`, including shards
+   for other rules. Inspect the complete plan and approve its exact digest
+   before apply. Unknown paths or changed hashes stop cleanup; never broaden an
+   ad-hoc deletion allowlist, use blanket restore/clean, or discard preexisting
+   files. Retain the baseline, generated evidence and apply journal externally.
 3. Confirm the remaining diff contains only the production TypeSpec rule,
    directly related fixtures, snapshots, tests, and migration note, plus any
    explicit package manifest and lockfile repair required for the fixture
@@ -695,6 +754,9 @@ After restoring generated corpus data and removing temporary fixture links:
    `rule.md`, `migration.md`, and any directly changed tests. On PowerShell,
    append each command result to the same array; do not create a nested array
    whose entries become space-joined formatter arguments.
+   Derive this list from the actual reviewed diff, deduplicate it and verify
+   membership, existence and supported extensions. Record the count for evidence,
+   not as a guessed fixed-number assertion that can prevent formatting.
 2. Run Prettier with those explicit paths only. Do not include harness-owned
    `output.json`, `tsp-diagnostics.json`, or `validator-diagnostics.json`
    snapshots, and never use `prettier --write .`.
@@ -718,6 +780,17 @@ validation scoped to the change.
 Before committing or creating the PR, the main agent must assign the complete
 rule-related diff to a separate code-review subagent.
 
+Select an owner that can retain the reviewer for the same-agent follow-up below.
+When the runtime distinguishes synchronous and persistent/background launches,
+use the persistent form and verify that the reviewer accepts a follow-up message
+before assigning the initial review. A returned agent ID or an idle status alone
+does not prove follow-up capability. In queue mode, a worker with only synchronous
+launch support must hand the unpublished diff and validation evidence to the
+outer coordinator before launching a local reviewer. The coordinator owns that
+reviewer and its follow-ups; the worker remains idle during review and resumes
+only for coordinated corrections. This routing does not waive review or permit
+publication before its findings are resolved.
+
 The reviewer must:
 
 - compare the rule branch against the freshly fetched
@@ -731,6 +804,17 @@ The reviewer must:
   usage, version/projection mistakes, unstable diagnostic targets, ineffective
   deduplication, and misleading diagnostics
 - verify that fixture evidence covers the implementation's important branches
+- verify the native contract and the linked implementation/coverage checkpoints:
+  check sibling naming and API choices, realistic template customizations,
+  necessary scope guards, exact diagnostic targets/counts, and concise messages
+  independently of Swagger parity
+- reject framework-only native unit tests; require a distinct rule-owned
+  predicate, target, or regression for each retained case
+- for custom model traversal implemented by the rule, cover relevant cycles,
+  shared siblings, shared models across operations, and diagnostic targets;
+  assert the intended diagnostic
+  unit/count and targeting, as described in the
+  [regression matrix](../shared/recovery-context.md#bounded-corrections-and-earlier-regressions)
 - verify that production rule imports and reachable helpers respect the native
   implementation boundary, native tests do not require an emitter, and any
   emitter-only divergence is documented rather than hidden by an adapter
@@ -760,6 +844,10 @@ After the review:
 2. Apply every finding that is technically correct and within the rule PR's
    scope.
 3. Record why any rejected finding does not apply.
+   Track the final disposition using the
+   [review adoption evidence](../loop-for-fix-and-review/SKILL.md#review-adoption-evidence)
+   contract; recheck earlier replies against the final head so an implemented
+   follow-up is not still reported as deferred, or a superseded fix as adopted.
 4. Rerun the affected focused tests, build, lint, and corpus validation when a
    review fix changes rule behavior.
 5. Request a follow-up review from the same subagent when changes materially
@@ -781,17 +869,19 @@ creating a draft PR.
    dependency repair identified above.
 4. For a new migration head, push the dedicated rule branch to canonical
    `Azure/typespec-azure`, while leaving the user-supplied target branch
-   untouched. For an existing canonical task PR, preserve its head branch.
-   A legacy fork-backed PR requires explicit user-authorized migration to
-   `Azure/typespec-azure` before proceeding. Use an explicit canonical
-   remote/refspec; never fall back to a fork or push the rule commit to the
-   target branch itself.
+   untouched. Preserve the exact head for existing task PRs; a fork head needs
+   the recorded [fork-update authorization](../shared/recovery-context.md#existing-fork-updates).
+   Use the verified explicit remote/refspec. That exception does not extend to
+   new successor PRs. Never fall back to a fork after a failed push or push the
+   rule commit to the target branch itself.
 5. Create the pull request in `Azure/typespec-azure` as a **draft**, with the
    recorded head repository/branch and user-supplied target branch as base. Do not mark
    it ready for review; the user decides when the migration evidence and rule
    behavior are ready for formal review.
    In queue-controlled source repair, verify and update the recorded open draft
-   PR instead of creating another one; retain its base and head branch.
+   PR instead of creating another one; retain its base and head branch. The only
+   exception is the outer-authorized post-merge successor with a verified
+   new-creation binding and preserved predecessor history.
    Honor the selected publication backend and environment tool requirements.
    For session-bound publication, only the owning session's main agent calls
    the required creation tool. Recheck the session binding immediately before
@@ -805,14 +895,26 @@ creating a draft PR.
    fallback authorizes that fallback.
    Never return an unrelated, closed, or merged PR as successful publication.
 6. Set the PR title to the exact stable pattern
-   `[Swagger Linter Migration] <ValidatorRuleId> (origin)`, replacing
-   `<ValidatorRuleId>` with the original Swagger validator rule ID. `(origin)`
-   denotes the source migration (as opposed to promotion), not the Git remote
-   or head repository. Record actual base/head identities separately.
-   For separately authorized post-merge source repair, use
-   `[Swagger Linter Repair] <ValidatorRuleId>` and link the original merged
-   migration plus the new defect scope. Preserve an existing OPEN task PR's
-   recorded title unless a correction is part of the request.
+   `[WIP][Swagger Linter Development] <ValidatorRuleId>`,
+   replacing `<ValidatorRuleId>` with the original Swagger validator rule ID.
+   For example:
+   `[WIP][Swagger Linter Development] XmsResourceInPutResponse`.
+   Keep both prefixes, without a space between them, to distinguish development
+   PRs from official promotion PRs. Do not append a summary, use the
+   promotion-style `->` mapping, or append the old `(origin)` suffix.
+   The `[WIP]` prefix does not replace the
+   requirement to create the PR as a draft.
+   Record the validator-to-local-TypeSpec mapping in the PR body, using the
+   source lintdiff rule's actual unqualified `createRule({ name })` value.
+   Do not substitute a proposed official name that will only be chosen during
+   promotion, and confirm the mapping matches the final implementation.
+   Do not append environment or execution labels such as `devbox` or `heavy`.
+   Record actual base/head identities separately.
+   For separately authorized or opted-in queue post-merge source repair, use
+   `[Swagger Linter Repair] <ValidatorRuleId> -> <LocalTypeSpecRuleName>` and link
+   the original merged migration plus the new defect scope. Preserve an existing
+   OPEN task PR's recorded title unless a correction is part of the request;
+   this convention alone does not authorize renaming existing PRs.
 7. Write the PR description as an engineering explanation, not only a change
    list. It must include:
    - **Original Swagger linter:** include both of these direct GitHub hyperlinks

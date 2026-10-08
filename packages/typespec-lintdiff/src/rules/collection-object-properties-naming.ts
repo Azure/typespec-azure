@@ -1,41 +1,36 @@
+import { getArmProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
 import {
   createRule,
+  getPagingOperation,
   getProperty,
   isArrayModelType,
-  paramMessage,
+  isList,
   type DiagnosticTarget,
   type Operation,
   type Type,
 } from "@typespec/compiler";
-import { getArmResourceOperationData } from "@azure-tools/typespec-azure-resource-manager";
 import { getHttpOperation } from "@typespec/http";
-import { getExtensions, resolveOperationId } from "@typespec/openapi";
-
-const listOperationIdPattern = /^.+_List[^_]*$/;
 
 export const collectionObjectPropertiesNamingRule = createRule({
   name: "collection-object-properties-naming",
-  description:
-    "ARM list operations with x-ms-pageable and upstream-compatible operationIds must return an object with a value array property.",
+  description: "Paged ARM list responses must have a value array property.",
   severity: "warning",
   messages: {
-    default:
-      paramMessage`Collection object returned by list operation '${"operationId"}' with 'x-ms-pageable' extension must declare a 'value' property of array type.`,
+    default: "Paged ARM list responses must declare a 'value' property of array type.",
   },
   create(context) {
     return {
       operation: (operation) => {
-        const armOperation = getArmResourceOperationData(context.program, operation);
-        if (armOperation?.kind !== "list") {
+        if (
+          !operation.namespace ||
+          !getArmProviderNamespace(context.program, operation.namespace) ||
+          !isList(context.program, operation)
+        ) {
           return;
         }
 
-        if (!getExtensions(context.program, operation).has("x-ms-pageable")) {
-          return;
-        }
-
-        const operationId = resolveOperationId(context.program, operation);
-        if (!listOperationIdPattern.test(operationId)) {
+        const [paging] = getPagingOperation(context.program, operation);
+        if (!paging?.output.nextLink) {
           return;
         }
 
@@ -57,9 +52,6 @@ export const collectionObjectPropertiesNamingRule = createRule({
 
             context.reportDiagnostic({
               target,
-              format: {
-                operationId,
-              },
             });
             return;
           }

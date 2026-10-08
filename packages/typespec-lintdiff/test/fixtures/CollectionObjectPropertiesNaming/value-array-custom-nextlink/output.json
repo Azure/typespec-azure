@@ -45,7 +45,7 @@
   "paths": {
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService": {
       "get": {
-        "operationId": "Widgets_List3",
+        "operationId": "Widgets_ListByResourceGroup",
         "tags": [
           "Widgets"
         ],

@@ -23,10 +23,6 @@
     },
     "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
     {
-      "code": "tsp-lintdiff-local-linter/avoid-anonymous-types",
-      "count": 2
-    },
-    {
       "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
       "count": 9
     },

@@ -90,16 +90,6 @@
     "message": "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models."
   },
   {
-    "code": "tsp-lintdiff-local-linter/avoid-anonymous-types",
-    "severity": "warning",
-    "message": "Operation response body should use a named model instead of an anonymous inline model expression."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/avoid-anonymous-types",
-    "severity": "warning",
-    "message": "Operation response body should use a named model instead of an anonymous inline model expression."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
     "severity": "warning",
     "message": "ARM PUT path '/anonymous-model' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
