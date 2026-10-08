@@ -650,6 +650,19 @@ export function getSdkUnionWithDiagnostics(
         }
       }
     }
+
+    const sdkUnionType =
+      retval?.kind === "union"
+        ? retval
+        : retval?.kind === "nullable" && retval.type.kind === "union"
+          ? retval.type
+          : undefined;
+    const baseType = (type as Union & { baseType?: Type }).baseType;
+    if (sdkUnionType && baseType) {
+      sdkUnionType.baseType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, baseType, operation),
+      );
+    }
   }
 
   return diagnostics.wrap(retval);

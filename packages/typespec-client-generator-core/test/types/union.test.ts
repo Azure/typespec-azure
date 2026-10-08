@@ -1,9 +1,17 @@
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import type { Type, Union } from "@typespec/compiler";
+import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { SdkArrayType, SdkMethodResponse, UsageFlags } from "../../src/interfaces.js";
 import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 import { getSdkTypeHelper } from "./utils.js";
+
+type UnionWithBaseType = Union & { baseType?: Type };
+
+function setUnionBaseType(union: Union, baseType: Type): void {
+  // The pinned compiler predates union `extends`, so model its type-graph field directly.
+  (union as UnionWithBaseType).baseType = baseType;
+}
 
 it("primitive union", async function () {
   const { program } = await SimpleTesterWithService.compile(
@@ -466,6 +474,65 @@ it("model with named union", async function () {
   deepStrictEqual(context.sdkPackage.unions[0], sdkType);
 });
 
+it("preserves an explicit union base type", async function () {
+  const { program, BaseModel, MyNamedUnion } = await SimpleTesterWithService.compile(t.code`
+    @usage(Usage.input | Usage.output)
+    model ${t.model("BaseModel")} {
+      name: string;
+    }
+    model Model1 extends BaseModel {
+      prop1: int32;
+    }
+    model Model2 extends BaseModel {
+      prop2: int32;
+    }
+    @usage(Usage.input | Usage.output)
+    union ${t.union("MyNamedUnion")} {
+      one: Model1,
+      two: Model2,
+    }
+  `);
+  setUnionBaseType(MyNamedUnion, BaseModel);
+
+  const context = await createSdkContextForTester(program);
+  const sdkType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
+  ok(sdkType);
+  strictEqual(sdkType.kind, "union");
+  ok(sdkType.baseType);
+  strictEqual(sdkType.baseType.kind, "model");
+  strictEqual(sdkType.baseType.name, "BaseModel");
+  strictEqual(
+    sdkType.baseType,
+    context.sdkPackage.models.find((x) => x.name === "BaseModel"),
+  );
+});
+
+it("does not infer a union base type from a common model ancestor", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    @usage(Usage.input | Usage.output)
+    model BaseModel {
+      name: string;
+    }
+    model Model1 extends BaseModel {
+      prop1: int32;
+    }
+    model Model2 extends BaseModel {
+      prop2: int32;
+    }
+    @usage(Usage.input | Usage.output)
+    union MyNamedUnion {
+      one: Model1,
+      two: Model2,
+    }
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const sdkType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
+  ok(sdkType);
+  strictEqual(sdkType.kind, "union");
+  strictEqual(sdkType.baseType, undefined);
+});
+
 it("model with nullable named union", async function () {
   const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
@@ -528,6 +595,47 @@ it("model with nullable named union", async function () {
   );
 
   deepStrictEqual(context.sdkPackage.unions[0], sdkType);
+});
+
+it("preserves an explicit union base type inside a nullable wrapper", async function () {
+  const { program, BaseConstraint, MyNamedUnion } = await SimpleTesterWithService.compile(t.code`
+    @usage(Usage.input | Usage.output)
+    model ${t.model("BaseModel")} {
+      name: string;
+    }
+    model Model1 extends BaseModel {
+      prop1: int32;
+    }
+    model Model2 extends BaseModel {
+      prop2: int32;
+    }
+    union ${t.union("BaseConstraint")} {
+      base: BaseModel,
+      null,
+    }
+    @usage(Usage.input | Usage.output)
+    union ${t.union("MyNamedUnion")} {
+      one: Model1,
+      two: Model2,
+      null,
+    }
+  `);
+  setUnionBaseType(MyNamedUnion, BaseConstraint);
+
+  const context = await createSdkContextForTester(program);
+  const nullableType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
+  ok(nullableType);
+  strictEqual(nullableType.kind, "nullable");
+  strictEqual(nullableType.type.kind, "union");
+  ok(nullableType.type.baseType);
+  strictEqual(nullableType.type.baseType.kind, "nullable");
+  strictEqual(nullableType.type.baseType.name, "BaseConstraint");
+  strictEqual(nullableType.type.baseType.type.kind, "model");
+  strictEqual(nullableType.type.baseType.type.name, "BaseModel");
+  strictEqual(
+    nullableType.type.baseType.type,
+    context.sdkPackage.models.find((x) => x.name === "BaseModel"),
+  );
 });
 
 it("model with nullable enum property", async function () {
