@@ -23,6 +23,7 @@ import { lroExtensionRule } from "./rules/lro-extension.js";
 import { missingXmsErrorResponseRule } from "./rules/missing-xms-error-response.js";
 import { mutabilityWithReadOnlyRule } from "./rules/mutability-with-read-only.js";
 import { nestedResourcesMustHaveListOperationRule } from "./rules/nested-resources-must-have-list-operation.js";
+import { noEmptyPostResponseRule } from "./rules/no-empty-post-response.js";
 import { noErrorCodeResponsesRule } from "./rules/no-error-code-responses.js";
 import { noOperationGroupNameConflictRule } from "./rules/no-operation-group-name-conflict.js";
 import { noUnsafePatchBodyPropertiesRule } from "./rules/no-unsafe-patch-body-properties.js";
@@ -97,6 +98,7 @@ const rules = [
   nestedResourcesMustHaveListOperationRule,
   nonApplicationJsonTypeRule,
   noErrorCodeResponsesRule,
+  noEmptyPostResponseRule,
   operationIdNounVerbRule,
   noOperationGroupNameConflictRule,
   patchInOperationNameRule,
@@ -208,7 +210,10 @@ export const $linter = defineLinter({
   rules,
   ruleSets: {
     all: {
-      enable: enabledRules,
+      enable: {
+        ...enabledRules,
+        "tsp-lintdiff-local-linter/no-empty-post-response": true,
+      },
     },
     recommended: {
       enable: enabledRules,
