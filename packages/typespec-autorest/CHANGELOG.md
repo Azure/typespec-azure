@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.73.0
+
+### Features
+
+- [#5176](https://github.com/Azure/typespec-azure/pull/5176) Honor inherited Azure Core API-version overrides in emitted OpenAPI documents and warn when a document has inconsistent overrides.
+- [#5465](https://github.com/Azure/typespec-azure/pull/5465) Add an `examples-format` option that lets the emitter read the unified `examples.yaml` format and materialize the legacy `x-ms-examples` files for the emitted API version. `"auto"` (default) uses `examples.yaml` when present and otherwise loads the legacy per-version JSON files. Materialized files follow the Azure naming convention (`<OperationId>.json`, keyed by `<OperationId>`) and honor the original file name and key when preserved in `examples.yaml`, so the rollout keeps the specs-repo diff minimal without changing downstream consumers.
+
+
 ## 0.72.0
 
 ### Bug Fixes
