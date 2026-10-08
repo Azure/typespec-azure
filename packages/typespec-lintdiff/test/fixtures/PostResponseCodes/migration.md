@@ -468,8 +468,14 @@ the successful population; the six failed projects are separately excluded above
 - Dataset: the existing 468 ARM projects; no per-rule runner added.
 - Representative selector: case-sensitive literal `ApiCenter.Management`,
   exactly one project, successful, 99 total diagnostics across all rules.
-- Full command: existing `specs:typespec` runner with `--concurrency 6`, the
-  isolated pinned specs checkout, and no filter/limit.
+- Full command, run from `C:\dev\worktrees\lintdiff-post-response-codes`:
+
+  ```powershell
+  mise exec -- pnpm --dir packages/typespec-lintdiff specs:typespec --specs-repo C:\dev\worktrees\azure-rest-api-specs-lintdiff-post-response-codes --concurrency 6
+  ```
+
+  This used the isolated pinned specs checkout with no filter or limit.
+
 - Existing validator findings are retained; validator readme suppressions were
   not applied. TypeSpec uses declared service configurations plus the explicit
   local comparison ruleset.
