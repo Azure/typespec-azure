@@ -138,4 +138,17 @@ describe("no-empty-post-response", () => {
         return [];
       });
   });
+
+  it("rejects an explicit void body in the synchronous ARM action response", async () => {
+    await tester
+      .expect(
+        `${header}
+        @armResourceOperations
+        interface Employees {
+          hire is ArmResourceActionSync<Employee, void, Response = { @statusCode _: 200; @body result: void; }>;
+        }
+      `,
+      )
+      .toEmitDiagnostics(({ program }) => expected(program));
+  });
 });

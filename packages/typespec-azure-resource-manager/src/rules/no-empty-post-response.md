@@ -1,7 +1,8 @@
 Synchronous ARM resource POST operations returning 200 must return a response body.
 Use a 204 response when the operation completes without a payload. Response headers
 are metadata, not a response body. An explicitly declared empty model payload is
-still a body.
+still a body, but an explicit `@body` of type `void` carries no payload and must
+also use 204.
 
 The rule reports one warning on an operation when any of its 200 response variants
 has no HTTP payload. It checks resource lifecycle and action operations, excluding
