@@ -15,21 +15,34 @@ enum Versions {
   v2024_01_01: "2024-01-01",
 }
 
-@doc("A widget resource")
-model Widget {
-  @doc("The widget name")
-  name: string;
+model Item {
+  id: string;
+}
+
+@friendlyName("Widget", T)
+model Wrapper<T> {
+  value: T;
+}
+
+@friendlyName("Gizmo", T)
+union Choice<T> {
+  item: T,
+  empty: "empty",
+  other: string,
 }
 
 namespace Operations {
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "test"
   interface Widget {
-    @route("/widgets/{name}")
-    @doc("Get a widget")
+    @route("/widgets")
     @get
-    get(
-      @path @doc("Widget name") name: string,
-      @query("api-version") @doc("API version") apiVersion: string,
-    ): TestService.Widget;
+    read(): TestService.Wrapper<TestService.Item>;
+  }
+
+  #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "test"
+  interface Gizmo {
+    @route("/gizmos")
+    @get
+    read(): TestService.Choice<"one">;
   }
 }

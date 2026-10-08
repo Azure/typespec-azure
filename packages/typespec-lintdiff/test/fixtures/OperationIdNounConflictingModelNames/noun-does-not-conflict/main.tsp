@@ -21,15 +21,13 @@ model Widget {
   name: string;
 }
 
-namespace Operations {
-  #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "test"
-  interface Widget {
-    @route("/widgets/{name}")
-    @doc("Get a widget")
-    @get
-    get(
-      @path @doc("Widget name") name: string,
-      @query("api-version") @doc("API version") apiVersion: string,
-    ): TestService.Widget;
-  }
+#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "test"
+interface Widgets {
+  @route("/widgets/{name}")
+  @doc("Get a widget")
+  @get
+  get(
+    @path @doc("Widget name") name: string,
+    @query("api-version") @doc("API version") apiVersion: string,
+  ): Widget;
 }
