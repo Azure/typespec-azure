@@ -16,6 +16,7 @@ import {
 import "@typespec/http/experimental/typekit";
 import { isAttribute, isUnwrapped } from "@typespec/xml";
 import type { AzuriteEmitterContext } from "./context.js";
+import { createDiagnostic } from "./lib.js";
 import type {
   ServerLiteralQueryParameter,
   ServerModel,
@@ -30,7 +31,7 @@ import type {
   ServerSkippedOperation,
   ServerTypeRef,
 } from "./model.js";
-import { getName } from "./utils.js";
+import { getName, hasNameOverride } from "./utils.js";
 
 const tsNamePolicy = ts.createTSNamePolicy();
 
@@ -51,6 +52,17 @@ type BuiltResponse = Omit<ServerResponse, "headers" | "body"> & {
   readonly body?: BuiltRequestBody;
 };
 
+interface OperationNamePlan {
+  readonly runtimeName: string;
+  readonly typeName: string;
+}
+
+interface OperationNameCandidate {
+  readonly op: HttpOperation;
+  readonly baseRuntimeName: string;
+  readonly explicitRuntimeName: boolean;
+}
+
 /**
  * Builds the intermediate {@link ServerModel} for the (single) HTTP service found in the
  * compiled program. This is the "transform" phase: it walks `@typespec/http` metadata and
@@ -65,15 +77,12 @@ export function buildServerModel(
 ): ServerModel {
   const operations: ServerOperation[] = [];
   const skippedOperations: ServerSkippedOperation[] = [];
-  const usedOperationNames = new Set<string>();
-  const usedOperationTypeNames = new Set<string>();
+  const operationNames = planOperationNames(context, service?.operations ?? []);
   for (const op of service?.operations ?? []) {
     try {
-      const operationName = getOperationName(context, op, usedOperationNames);
-      const operationTypeName = getOperationTypeName(operationName, op, usedOperationTypeNames);
-      const built = buildOperation(context, operationName, operationTypeName, op);
-      usedOperationNames.add(operationName);
-      usedOperationTypeNames.add(operationTypeName);
+      const names = operationNames.get(op);
+      if (names === undefined) continue;
+      const built = buildOperation(context, names.runtimeName, names.typeName, op);
       operations.push(built);
     } catch (error) {
       skippedOperations.push({
@@ -90,14 +99,6 @@ export function buildServerModel(
     models: [...context.modelRegistry.values()],
     skippedOperations,
   };
-}
-
-/** Appends a numeric suffix if `name` is still taken after interface-name qualification. */
-function disambiguate(name: string, used: ReadonlySet<string>): string {
-  if (!used.has(name)) return name;
-  let suffix = 2;
-  while (used.has(`${name}${suffix}`)) suffix++;
-  return `${name}${suffix}`;
 }
 
 function buildOperation(
@@ -140,30 +141,137 @@ function buildOperation(
   return operation;
 }
 
-function getOperationName(
+function planOperationNames(
   context: AzuriteEmitterContext,
-  op: HttpOperation,
-  usedOperationNames: ReadonlySet<string>,
-): string {
-  const baseName = getName(context, op.operation, getTypeName(op.operation.name));
-  const qualifiedName =
-    usedOperationNames.has(baseName) && op.operation.interface?.name
-      ? `${getTypeName(op.operation.interface.name)}${baseName}`
-      : baseName;
-  return disambiguate(qualifiedName, usedOperationNames);
+  operations: readonly HttpOperation[],
+): Map<HttpOperation, OperationNamePlan> {
+  const candidates = operations.map((op) => ({
+    op,
+    baseRuntimeName: getName(context, op.operation, getTypeName(op.operation.name)),
+    explicitRuntimeName: hasNameOverride(context, op.operation),
+  }));
+  const runtimeNames = resolveRuntimeOperationNames(context, candidates);
+  const typeNames = resolveOperationTypeNames(context, runtimeNames);
+  return new Map(
+    [...runtimeNames.entries()]
+      .filter(([op]) => typeNames.has(op))
+      .map(([op, runtimeName]) => [op, { runtimeName, typeName: typeNames.get(op)! }]),
+  );
 }
 
-function getOperationTypeName(
-  operationName: string,
-  op: HttpOperation,
-  usedOperationTypeNames: ReadonlySet<string>,
-): string {
-  const baseName = getTypeName(operationName);
-  const qualifiedName =
-    usedOperationTypeNames.has(baseName) && op.operation.interface?.name
-      ? `${getTypeName(op.operation.interface.name)}${baseName}`
-      : baseName;
-  return disambiguate(qualifiedName, usedOperationTypeNames);
+function resolveRuntimeOperationNames(
+  context: AzuriteEmitterContext,
+  candidates: readonly OperationNameCandidate[],
+): Map<HttpOperation, string> {
+  const resolved = new Map<HttpOperation, string>();
+  for (const group of groupBy(candidates, (candidate) => candidate.baseRuntimeName).values()) {
+    if (group.length === 1) {
+      resolved.set(group[0].op, group[0].baseRuntimeName);
+      continue;
+    }
+    if (group.some((candidate) => candidate.explicitRuntimeName)) {
+      reportNameCollision(
+        context,
+        group,
+        group[0].baseRuntimeName,
+        "duplicate explicit or effective runtime operation names are not qualified automatically",
+      );
+      continue;
+    }
+    const qualified = qualifyOperationNameGroup(context, group, group[0].baseRuntimeName);
+    for (const [op, name] of qualified) resolved.set(op, name);
+  }
+  return resolved;
+}
+
+function resolveOperationTypeNames(
+  context: AzuriteEmitterContext,
+  runtimeNames: ReadonlyMap<HttpOperation, string>,
+): Map<HttpOperation, string> {
+  const planned = new Map<HttpOperation, string>();
+  for (const group of groupBy([...runtimeNames.entries()], ([, name]) =>
+    getTypeName(name),
+  ).values()) {
+    if (group.length === 1) {
+      planned.set(group[0][0], getTypeName(group[0][1]));
+      continue;
+    }
+    const candidates = group.map(([op, runtimeName]) => ({
+      op,
+      baseRuntimeName: getTypeName(runtimeName),
+      explicitRuntimeName: false,
+    }));
+    const qualified = qualifyOperationNameGroup(context, candidates, getTypeName(group[0][1]));
+    for (const [op, name] of qualified) planned.set(op, name);
+  }
+  return planned;
+}
+
+function qualifyOperationNameGroup(
+  context: AzuriteEmitterContext,
+  group: readonly OperationNameCandidate[],
+  collidingName: string,
+): Map<HttpOperation, string> {
+  const qualified = new Map<HttpOperation, string>();
+  for (const candidate of group) {
+    const interfaceName = candidate.op.operation.interface?.name;
+    if (!interfaceName) {
+      reportNameCollision(
+        context,
+        [candidate],
+        collidingName,
+        "operation has no interface name available for deterministic qualification",
+      );
+      continue;
+    }
+    qualified.set(candidate.op, `${getTypeName(interfaceName)}${candidate.baseRuntimeName}`);
+  }
+  for (const duplicateGroup of groupBy([...qualified.entries()], ([, name]) => name).values()) {
+    if (duplicateGroup.length <= 1) continue;
+    reportNameCollision(
+      context,
+      duplicateGroup.map(([op]) => ({
+        op,
+        baseRuntimeName: duplicateGroup[0][1],
+        explicitRuntimeName: false,
+      })),
+      duplicateGroup[0][1],
+      "interface-qualified operation names still collide",
+    );
+    for (const [op] of duplicateGroup) qualified.delete(op);
+  }
+  return qualified;
+}
+
+function reportNameCollision(
+  context: AzuriteEmitterContext,
+  group: readonly OperationNameCandidate[],
+  name: string,
+  reason: string,
+): void {
+  for (const candidate of group) {
+    context.diagnostics.push(
+      createDiagnostic({
+        code: "operation-name-collision",
+        format: { name, reason },
+        target: candidate.op.operation,
+      }),
+    );
+  }
+}
+
+function groupBy<T, TKey>(items: Iterable<T>, keySelector: (item: T) => TKey): Map<TKey, T[]> {
+  const groups = new Map<TKey, T[]>();
+  for (const item of items) {
+    const key = keySelector(item);
+    const group = groups.get(key);
+    if (group) {
+      group.push(item);
+    } else {
+      groups.set(key, [item]);
+    }
+  }
+  return groups;
 }
 
 function splitRoutePath(path: string): {

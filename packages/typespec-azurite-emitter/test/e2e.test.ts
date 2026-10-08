@@ -308,6 +308,26 @@ describe("emit diagnostics", () => {
     );
   });
 
+  it("prevents output when operation names collide without deterministic qualification", async () => {
+    const [{ outputs }, diagnostics] = await EmitterTester.compileAndDiagnose({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace OperationCollisionDemo {
+          @route("/a") @get op get_url(): string;
+          @route("/b") @get op getUrl(): string;
+        }
+      `,
+    });
+
+    expect(diagnostics.map((diagnostic) => diagnostic.code)).toContain(
+      "@azure-tools/typespec-azurite-emitter/operation-name-collision",
+    );
+    expect(outputs).toEqual({});
+  });
+
   it("reports HTTP diagnostics before rendering", async () => {
     const [{ outputs }, diagnostics] = await EmitterTester.compileAndDiagnose({
       "main.tsp": `

@@ -471,9 +471,7 @@ describe("buildServerModel", () => {
     expect(serverModel.models.map((model) => model.name)).toEqual(["Item"]);
   });
 
-  it("uses TypeScript name policy and disambiguates operation names that collide across interfaces", async () => {
-    // Two different interfaces each declaring a `get_url` operation both normalize to
-    // `GetUrl`, which would otherwise be a duplicate generated TS identifier.
+  it("qualifies all colliding inferred runtime operation names across interfaces", async () => {
     const { program } = await ApiTester.compile({
       "main.tsp": `
         import "@typespec/http";
@@ -493,13 +491,14 @@ describe("buildServerModel", () => {
         }
       `,
     });
-    const serverModel = buildServerModel(createTestAzuriteContext(program));
+    const context = createTestAzuriteContext(program);
+    const serverModel = buildServerModel(context);
 
     const names = serverModel.operations.map((op) => op.name);
     const typeNames = serverModel.operations.map((op) => op.typeName);
+    expect(context.diagnostics).toEqual([]);
     expect(names).toHaveLength(2);
-    expect(new Set(names).size).toBe(2);
-    expect(names).toContain("GetUrl");
+    expect(names).toContain("AGetUrl");
     expect(names).toContain("XmlQueueGetUrl");
     expect(typeNames).toEqual(names);
 
@@ -508,6 +507,133 @@ describe("buildServerModel", () => {
     // guess resource identity from the operation name/path alone.
     const interfaceNames = serverModel.operations.map((op) => op.interfaceName).sort();
     expect(interfaceNames).toEqual(["A", "XML_queue"]);
+  });
+
+  it("diagnoses duplicate explicit runtime operation names instead of qualifying them", async () => {
+    const { program } = await ApiTester.compile({
+      "main.tsp": `
+        import "@typespec/http";
+        import "@azure-tools/typespec-client-generator-core";
+        using Http;
+        using Azure.ClientGenerator.Core;
+
+        @service
+        namespace ExplicitCollisionDemo;
+
+        @route("/a")
+        interface A {
+          @clientName("Same")
+          @get
+          getA(): string;
+        }
+
+        @route("/b")
+        interface B {
+          @clientName("Same")
+          @get
+          getB(): string;
+        }
+      `,
+    });
+    const context = createTestAzuriteContext(program);
+    const serverModel = buildServerModel(context);
+
+    expect(serverModel.operations).toEqual([]);
+    expect(context.diagnostics.map((diagnostic) => diagnostic.code)).toEqual([
+      "@azure-tools/typespec-azurite-emitter/operation-name-collision",
+      "@azure-tools/typespec-azurite-emitter/operation-name-collision",
+    ]);
+  });
+
+  it("qualifies TypeScript type names when distinct runtime names normalize to the same identifier", async () => {
+    const { program } = await ApiTester.compile({
+      "main.tsp": `
+        import "@typespec/http";
+        import "@azure-tools/typespec-client-generator-core";
+        using Http;
+        using Azure.ClientGenerator.Core;
+
+        @service
+        namespace TypeNameCollisionDemo;
+
+        @route("/a")
+        interface A {
+          @clientName("get_url")
+          @get
+          getA(): string;
+        }
+
+        @route("/b")
+        interface B {
+          @clientName("getUrl")
+          @get
+          getB(): string;
+        }
+      `,
+    });
+    const context = createTestAzuriteContext(program);
+    const serverModel = buildServerModel(context);
+
+    expect(context.diagnostics).toEqual([]);
+    expect(serverModel.operations.map((op) => op.name)).toEqual(["get_url", "getUrl"]);
+    expect(serverModel.operations.map((op) => op.typeName)).toEqual(["AGetUrl", "BGetUrl"]);
+  });
+
+  it("diagnoses same-interface operation name collisions that remain after qualification", async () => {
+    const { program } = await ApiTester.compile({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace SameInterfaceCollisionDemo;
+
+        @route("/items")
+        interface Items {
+          @route("/a")
+          @get
+          get_url(): string;
+
+          @route("/b")
+          @get
+          getUrl(): string;
+        }
+      `,
+    });
+    const context = createTestAzuriteContext(program);
+    const serverModel = buildServerModel(context);
+
+    expect(serverModel.operations).toEqual([]);
+    expect(context.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
+      "@azure-tools/typespec-azurite-emitter/operation-name-collision",
+    );
+  });
+
+  it("diagnoses namespace operation name collisions that cannot be interface-qualified", async () => {
+    const { program } = await ApiTester.compile({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace NoInterfaceCollisionDemo {
+          @route("/a")
+          @get
+          op get_url(): string;
+
+          @route("/b")
+          @get
+          op getUrl(): string;
+        }
+      `,
+    });
+    const context = createTestAzuriteContext(program);
+    const serverModel = buildServerModel(context);
+
+    expect(serverModel.operations).toEqual([]);
+    expect(context.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
+      "@azure-tools/typespec-azurite-emitter/operation-name-collision",
+    );
   });
 
   it("applies @makeOptional from an azurite.tsp-style overlay to relax a required base-spec property", async () => {

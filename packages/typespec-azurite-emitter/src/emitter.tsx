@@ -32,6 +32,10 @@ export async function $onEmit(context: EmitContext<AzuritePilotEmitterOptions>):
   }
 
   const serverModel = buildServerModel(azuriteContext, services[0]);
+  if (azuriteContext.diagnostics.length > 0) {
+    program.reportDiagnostics(azuriteContext.diagnostics);
+    return;
+  }
   if (serverModel.skippedOperations.length > 0) {
     for (const skipped of serverModel.skippedOperations) {
       reportDiagnostic(program, {

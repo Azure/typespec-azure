@@ -1,5 +1,5 @@
 import { createTCGCContext, type TCGCContext } from "@azure-tools/typespec-client-generator-core";
-import type { Model, Program } from "@typespec/compiler";
+import type { Diagnostic, Model, Program } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import type { ServerDataModel } from "./model.js";
 import type { NormalizedAzuritePilotEmitterOptions } from "./options.js";
@@ -11,6 +11,7 @@ export interface AzuriteEmitterContext {
   readonly options: NormalizedAzuritePilotEmitterOptions;
   readonly modelRegistry: Map<string, ServerDataModel>;
   readonly anonymousModelNamesByType: WeakMap<Model, string>;
+  readonly diagnostics: Diagnostic[];
   nextAnonymousModelId: number;
 }
 
@@ -25,6 +26,7 @@ export function createAzuriteEmitterContext(
     options,
     modelRegistry: new Map(),
     anonymousModelNamesByType: new WeakMap(),
+    diagnostics: [],
     nextAnonymousModelId: 1,
   };
 }

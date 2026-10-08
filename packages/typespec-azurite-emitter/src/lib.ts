@@ -30,6 +30,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Operation ${"name"} could not be emitted: ${"reason"}`,
       },
     },
+    "operation-name-collision": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Operation name collision for ${"name"}: ${"reason"}`,
+      },
+    },
   },
   emitter: {
     options: azuritePilotEmitterOptionsSchema,
