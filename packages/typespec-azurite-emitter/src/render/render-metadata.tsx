@@ -9,7 +9,8 @@ import type {
   ServerResponseHeader,
   ServerTypeRef,
 } from "../model.js";
-import { GENERATED_FILE_HEADER } from "./file-header.js";
+import { GeneratedSourceFile } from "./generated-source-file.js";
+import type { RuntimeSymbols } from "./runtime-symbols.js";
 
 export type OperationTypeDescriptor =
   | "string"
@@ -85,35 +86,33 @@ export type XmlModelDescriptor = readonly [
 
 export type NamedXmlModelDescriptor = readonly [name: string, descriptor: XmlModelDescriptor];
 
-/**
- * Renders the service-specific runtime metadata manifest. This is the single generated source of
- * truth for HTTP operation bindings and XML wire metadata.
- */
-export function renderMetadata(serverModel: ServerModel, runtimeImport: string) {
+/** Renders the service-level metadata aggregator without restating descriptor literals. */
+export function renderMetadata(
+  serverModel: ServerModel,
+  runtimeImport: string,
+  runtimeSymbols: RuntimeSymbols,
+) {
   const modelMetadataNames = serverModel.models.map(modelXmlMetadataConstName);
   const operationMetadataNames = serverModel.operations.map(operationMetadataConstName);
   return (
-    <ts.SourceFile path="metadata.ts">
+    <GeneratedSourceFile path="metadata.ts">
       {code`
         import { ${modelMetadataNames.join(", ")} } from "./models";
         import { ${operationMetadataNames.join(", ")} } from "./operations";
 
-        ${GENERATED_FILE_HEADER}
         export type { OperationMetadata, ServiceMetadata } from ${JSON.stringify(runtimeImport)};
-        import {
-          defineServiceMetadata,
-          type OperationMetadata,
-          type ServiceMetadata,
-        } from ${JSON.stringify(runtimeImport)};
-
-        export const serviceMetadata: ServiceMetadata = defineServiceMetadata({
-          operations: [${operationMetadataNames.join(", ")}],
-          xmlModels: [${modelMetadataNames.join(", ")}],
-        });
-
-        export const operations: readonly OperationMetadata[] = serviceMetadata.operations;
       `}
-    </ts.SourceFile>
+      <hbr />
+      {code`export const serviceMetadata: `}
+      <ts.Reference refkey={runtimeSymbols.ServiceMetadata} type />
+      {code` = `}
+      <ts.Reference refkey={runtimeSymbols.defineServiceMetadata} />
+      {code`({ operations: [${operationMetadataNames.join(", ")}], xmlModels: [${modelMetadataNames.join(", ")}] });
+
+      export const operations: readonly `}
+      <ts.Reference refkey={runtimeSymbols.OperationMetadata} type />
+      {code`[] = serviceMetadata.operations;`}
+    </GeneratedSourceFile>
   );
 }
 

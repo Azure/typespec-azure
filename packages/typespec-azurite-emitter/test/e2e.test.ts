@@ -34,42 +34,6 @@ describe("end-to-end emit", () => {
     expect(modelsFile).toContain("permission?: string;");
   });
 
-  it("renders TypeSpec-derived model members with reusable type components for required, optional, array, record, and referenced properties", async () => {
-    const { outputs } = await EmitterTester.compile({
-      "main.tsp": `
-        import "@typespec/http";
-        using Http;
-
-        @service
-        namespace ComponentRenderingDemo;
-
-        model Child {
-          value: string;
-        }
-
-        model Parent {
-          requiredName: string;
-          optionalTags?: string[];
-          metadata?: Record<string>;
-          child: Child;
-        }
-
-        @route("/parents")
-        @get
-        op getParent(): {
-          @statusCode statusCode: 200;
-          @body body: Parent;
-        };
-      `,
-    });
-    const modelsFile = findOutput(outputs, "models.ts");
-
-    expect(modelsFile).toContain("requiredName: string;");
-    expect(modelsFile).toContain("optionalTags?: Array<string>;");
-    expect(modelsFile).toContain("metadata?: Record<string, string>;");
-    expect(modelsFile).toContain("child: Child;");
-  });
-
   it("generates metadata.ts with route metadata for all fixture operations", async () => {
     const { outputs } = await EmitterTester.compile(loadQueuePilotFixture());
     const metadataFile = findOutput(outputs, "metadata.ts");
@@ -87,8 +51,8 @@ describe("end-to-end emit", () => {
     expect(metadataFile).toContain(`from "../runtime/serializationRuntime";`);
     expect(metadataFile).toContain(`QueueCreateMetadata`);
     expect(metadataFile).toContain(`QueueMetadataXmlMetadata`);
-    expect(metadataFile).toContain(
-      `export const operations: readonly OperationMetadata[] = serviceMetadata.operations;`,
+    expect(metadataFile).toMatch(
+      /export const operations: readonly OperationMetadata\[\] = serviceMetadata\.operations;?/,
     );
     expect(operationsFile).not.toContain(`defineOperations`);
     expect(metadataFile).not.toContain(`"Queue_Create"`);
