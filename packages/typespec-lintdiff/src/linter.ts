@@ -212,7 +212,7 @@ export const $linter = defineLinter({
     all: {
       enable: {
         ...enabledRules,
-        "tsp-lintdiff-local-linter/no-empty-post-response": true,
+        [`tsp-lintdiff-local-linter/${noEmptyPostResponseRule.name}`]: true,
       },
     },
     recommended: {
