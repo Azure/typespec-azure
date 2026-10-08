@@ -386,7 +386,10 @@ describe("validator and TypeSpec comparison", () => {
     );
     expect(mappings.get("AdditionalPropertiesObject")).toEqual(new Set());
     expect(mappings.get("PostResponseCodes")).toEqual(
-      new Set(["@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes"]),
+      new Set([
+        "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
+        "tsp-lintdiff-local-linter/no-empty-post-response",
+      ]),
     );
     expect(metadata.get("DeleteInOperationName")?.coverageKind).toBe("lint");
     expect(metadata.get("PostResponseCodes")?.tspLints).toEqual(mappings.get("PostResponseCodes"));
