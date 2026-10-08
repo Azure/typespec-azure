@@ -336,7 +336,7 @@ union UnnamedEvents {
 op receive(
   @path id: string,
   @header customHeader: string,
-  @query expectedStatuses: string,
+  @query statusFilter: string,
   @query contentType: string,
   @query lastEventId?: string,
 ): SSEStream<UnnamedEvents>;
@@ -366,15 +366,15 @@ export function _receiveSend(
   context: Client,
   id: string,
   customHeader: string,
-  expectedStatuses: string,
+  statusFilter: string,
   contentType: string,
   options: ReceiveOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
   const path = expandUrlTemplate(
-    "/receive/{id}{?expectedStatuses,contentType,lastEventId}",
+    "/receive/{id}{?statusFilter,contentType,lastEventId}",
     {
       id: id,
-      expectedStatuses: expectedStatuses,
+      statusFilter: statusFilter,
       contentType: contentType,
       lastEventId: options?.lastEventId,
     },
@@ -403,15 +403,15 @@ export async function receive(
   context: Client,
   id: string,
   customHeader: string,
-  expectedStatuses: string,
+  statusFilter: string,
   contentType: string,
   options: ReceiveOptionalParams = { requestOptions: {} },
 ): Promise<AsyncIterable<Info>> {
   const response = await getSseResponse(
-    _receiveSend(context, id, customHeader, expectedStatuses, contentType, options),
+    _receiveSend(context, id, customHeader, statusFilter, contentType, options),
   );
-  const expectedStatuses_1 = ["200"];
-  if (!expectedStatuses_1.includes(response.status)) {
+  const expectedStatuses = ["200"];
+  if (!expectedStatuses.includes(response.status)) {
     const result = await parseSseErrorResponse(response);
     throw createRestError(result);
   }

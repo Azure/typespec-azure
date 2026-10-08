@@ -46,19 +46,22 @@ function resolveDescriptor<T>(
   event: EventMessage,
   descriptors: SseEventDescriptor<T>[],
 ): { descriptor: SseEventDescriptor<T>; payload: unknown } | undefined {
-  const candidates = descriptors.filter((descriptor) =>
-    event.event ? descriptor.eventName === event.event : descriptor.eventName === undefined,
-  );
-  const terminal = candidates.find(
-    (descriptor) =>
-      descriptor.terminalValue !== undefined && descriptor.terminalValue === event.data,
-  );
-  if (terminal) {
-    return { descriptor: terminal, payload: event.data };
+  const discriminated: SseEventDescriptor<T>[] = [];
+  let fallback: SseEventDescriptor<T> | undefined;
+  for (const descriptor of descriptors) {
+    if (event.event ? descriptor.eventName !== event.event : descriptor.eventName !== undefined) {
+      continue;
+    }
+    if (descriptor.terminalValue !== undefined) {
+      if (descriptor.terminalValue === event.data) {
+        return { descriptor, payload: event.data };
+      }
+    } else if (descriptor.discriminator) {
+      discriminated.push(descriptor);
+    } else {
+      fallback ??= descriptor;
+    }
   }
-  const discriminated = candidates.filter(
-    (descriptor) => descriptor.terminalValue === undefined && descriptor.discriminator,
-  );
   let jsonPayload: unknown;
   if (discriminated.length > 0) {
     jsonPayload = parseJsonEvent(event);
@@ -76,15 +79,12 @@ function resolveDescriptor<T>(
       }
     }
   }
-  const descriptor = candidates.find(
-    (candidate) => candidate.terminalValue === undefined && !candidate.discriminator,
-  );
-  if (!descriptor) {
+  if (!fallback) {
     return undefined;
   }
   return {
-    descriptor,
-    payload: !isJsonContentType(descriptor.contentType)
+    descriptor: fallback,
+    payload: !isJsonContentType(fallback.contentType)
       ? event.data
       : discriminated.length > 0
         ? jsonPayload
