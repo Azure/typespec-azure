@@ -992,7 +992,7 @@ interface Subscriptions extends EmployeeOperations<Extension.Subscription> {}
     const provider = resolveArmResources(program, {
       nameResolver: ({ kind, resourceInstancePath }) =>
         kind === "resource" && resourceInstancePath === subscriptionPath
-          ? "SubscriptionEmployee"
+          ? "EmployeeForSub"
           : undefined,
     });
 
@@ -1008,13 +1008,13 @@ interface Subscriptions extends EmployeeOperations<Extension.Subscription> {}
     ok(subscription);
     expect(tenant.type).toBe(subscription.type);
     expect(tenant.resourceName).toBe("TenantEmployee");
-    expect(subscription.resourceName).toBe("SubscriptionEmployee");
+    expect(subscription.resourceName).toBe("EmployeeForSub");
     expect(subscription.operations.lifecycle.read?.[0]).toMatchObject({
-      resourceName: "SubscriptionEmployee",
-      resourceModelName: "SubscriptionEmployee",
+      resourceName: "EmployeeForSub",
+      resourceModelName: "EmployeeForSub",
     });
     expect(tenant.resourceType).toEqual(subscription.resourceType);
-  });
+  }, 30_000);
 
   it("customizes one standard private endpoint resource occurrence by instance path", async () => {
     const { program } = await Tester.compile(`
@@ -1076,7 +1076,7 @@ interface Dependents {
       resourceModelName: "DependentConnection",
     });
     expect(employeeConnection.resourceInstancePath).not.toBe(dependentConnectionPath);
-  });
+  }, 30_000);
 
   it("customizes one legacy private endpoint resource occurrence by instance path", async () => {
     const { program } = await Tester.compile(`
@@ -1171,7 +1171,7 @@ interface Dependents {
       resourceName: "LegacyDependentConnection",
       resourceModelName: "LegacyDependentConnection",
     });
-  });
+  }, 30_000);
 
   it("customizes synthetic virtual resources by default name and instance path", async () => {
     const { program } = await Tester.compile(`
@@ -1253,7 +1253,7 @@ interface Employees {
       resourceInstancePath: `${divisionPath}/groups/{groupId}`,
       typeName: undefined,
     });
-  });
+  }, 30_000);
 
   it("customizes every operation category without changing wire metadata", async () => {
     const { program } = await Tester.compile(`

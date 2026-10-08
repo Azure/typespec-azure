@@ -298,6 +298,8 @@ export interface ArmMetadataNameRequest {
    *
    * Resource type does not uniquely identify an occurrence because the same
    * type can be exposed at multiple scopes or beneath different parents.
+   * Parameter segments preserve their HTTP metadata names, such as
+   * `{subscriptionId}`; `{}` normalization is internal to identity comparison.
    */
   resourceInstancePath?: string;
 }
@@ -384,6 +386,9 @@ instance paths differ:
 
 The instance path is not derivable from the resource type string because scope, parent resource
 identifiers, and extension-resource targets are not encoded in the resource type.
+It preserves named HTTP path parameters such as `{subscriptionId}` and `{supportTicketName}`.
+The resolver canonicalizes variable segments to `{}` only internally when comparing resource
+identities; that normalized form is not returned in provider metadata or naming requests.
 
 The resolver does not enforce uniqueness after logical naming. A consumer can intentionally assign
 the same logical name to multiple resources or operations. Structural association and
