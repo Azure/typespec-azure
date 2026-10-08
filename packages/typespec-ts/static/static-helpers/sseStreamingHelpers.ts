@@ -21,6 +21,10 @@ export interface SseEventDescriptor<T> {
    */
   terminalValue?: string;
   /**
+   * Selects an unnamed JSON model variant using its wire discriminator property and values.
+   */
+  discriminator?: { propertyName: string; values: string[] };
+  /**
    * The content type of the event's `data` payload (e.g. `application/json`, `text/plain`).
    * JSON payloads are parsed before deserialization; non-JSON payloads are passed through as
    * the raw `data` string. Defaults to JSON when omitted.
@@ -41,32 +45,60 @@ function isJsonContentType(contentType: string | undefined): boolean {
 function resolveDescriptor<T>(
   event: EventMessage,
   descriptors: SseEventDescriptor<T>[],
-): SseEventDescriptor<T> | undefined {
-  if (event.event) {
-    return (
-      descriptors.find(
-        (descriptor) =>
-          descriptor.eventName === event.event &&
-          descriptor.terminalValue !== undefined &&
-          descriptor.terminalValue === event.data,
-      ) ??
-      descriptors.find(
-        (descriptor) =>
-          descriptor.eventName === event.event && descriptor.terminalValue === undefined,
-      )
-    );
-  }
-  return (
-    descriptors.find(
-      (descriptor) =>
-        descriptor.eventName === undefined &&
-        descriptor.terminalValue !== undefined &&
-        descriptor.terminalValue === event.data,
-    ) ??
-    descriptors.find(
-      (descriptor) => descriptor.eventName === undefined && descriptor.terminalValue === undefined,
-    )
+): { descriptor: SseEventDescriptor<T>; payload: unknown } | undefined {
+  const candidates = descriptors.filter((descriptor) =>
+    event.event ? descriptor.eventName === event.event : descriptor.eventName === undefined,
   );
+  const terminal = candidates.find(
+    (descriptor) =>
+      descriptor.terminalValue !== undefined && descriptor.terminalValue === event.data,
+  );
+  if (terminal) {
+    return { descriptor: terminal, payload: event.data };
+  }
+  const discriminated = candidates.filter(
+    (descriptor) => descriptor.terminalValue === undefined && descriptor.discriminator,
+  );
+  let jsonPayload: unknown;
+  if (discriminated.length > 0) {
+    jsonPayload = parseJsonEvent(event);
+    if (typeof jsonPayload === "object" && jsonPayload !== null && !Array.isArray(jsonPayload)) {
+      const payload = jsonPayload;
+      const descriptor = discriminated.find(({ discriminator }) => {
+        if (!discriminator) {
+          return false;
+        }
+        const value = Reflect.get(payload, discriminator.propertyName);
+        return typeof value === "string" && discriminator.values.includes(value);
+      });
+      if (descriptor) {
+        return { descriptor, payload };
+      }
+    }
+  }
+  const descriptor = candidates.find(
+    (candidate) => candidate.terminalValue === undefined && !candidate.discriminator,
+  );
+  if (!descriptor) {
+    return undefined;
+  }
+  return {
+    descriptor,
+    payload: !isJsonContentType(descriptor.contentType)
+      ? event.data
+      : discriminated.length > 0
+        ? jsonPayload
+        : parseJsonEvent(event),
+  };
+}
+
+function parseJsonEvent(event: EventMessage): unknown {
+  try {
+    return JSON.parse(event.data);
+  } catch (error) {
+    const eventName = event.event || "message";
+    throw new Error(`Unable to deserialize event "${eventName}".`, { cause: error });
+  }
 }
 
 /**
@@ -78,8 +110,8 @@ function resolveDescriptor<T>(
  * events with the same `event:` name, so an unrelated event carrying the same `data` cannot end
  * the stream.
  *
- * Events whose `event:` name matches no descriptor are ignored rather than being decoded by the
- * unnamed descriptor, so an unrecognized event can never be deserialized as the wrong type.
+ * Events whose name or payload discriminator matches no descriptor are ignored. A generic payload
+ * descriptor can handle unknown discriminator values without selecting an unrelated model variant.
  * Payload mapping starts when the returned iterable is consumed. The one-connection source
  * parses raw SSE events but does not reconnect, resume event IDs, or apply retry delays.
  */
@@ -88,24 +120,11 @@ export async function* readSseStream<T>(
   descriptors: SseEventDescriptor<T>[],
 ): AsyncIterable<T> {
   for await (const event of events) {
-    const descriptor = resolveDescriptor(event, descriptors);
-    if (!descriptor) {
+    const resolved = resolveDescriptor(event, descriptors);
+    if (!resolved) {
       continue;
     }
-
-    let payload: unknown;
-    if (descriptor.terminalValue !== undefined || !isJsonContentType(descriptor.contentType)) {
-      payload = event.data;
-    } else {
-      try {
-        payload = JSON.parse(event.data);
-      } catch (error) {
-        const eventName = event.event || "message";
-        throw new Error(`Unable to deserialize event "${eventName}".`, {
-          cause: error,
-        });
-      }
-    }
+    const { descriptor, payload } = resolved;
     yield descriptor.deserialize(payload);
     if (descriptor.isTerminal) {
       return;
