@@ -1,6 +1,6 @@
 import { Output as CoreOutput, SourceDirectory, type Children } from "@alloy-js/core";
-import type { Program } from "@typespec/compiler";
 import { Output as EmitterFrameworkOutput } from "@typespec/emitter-framework";
+import type { AzuriteEmitterContext } from "../context.js";
 import type { ServerModel } from "../model.js";
 import { renderHandlers } from "./render-handlers.js";
 import { renderMetadata } from "./render-metadata.js";
@@ -11,15 +11,14 @@ import { createRuntimeSymbols, type RuntimeSymbols } from "./runtime-symbols.js"
 
 export function AzuriteEmitterOutput(props: {
   serverModel: ServerModel;
-  program: Program;
-  runtimeImport: string;
+  context: AzuriteEmitterContext;
 }) {
-  const runtimeSymbols = createRuntimeSymbols(props.runtimeImport);
+  const runtimeSymbols = createRuntimeSymbols(props.context.options.runtimeImport);
   return (
-    <AzuriteOutput program={props.program} runtimeSymbols={runtimeSymbols}>
+    <AzuriteOutput context={props.context} runtimeSymbols={runtimeSymbols}>
       <AzuriteOutputFiles
         serverModel={props.serverModel}
-        runtimeImport={props.runtimeImport}
+        runtimeImport={props.context.options.runtimeImport}
         runtimeSymbols={runtimeSymbols}
       />
     </AzuriteOutput>
@@ -28,12 +27,12 @@ export function AzuriteEmitterOutput(props: {
 
 function AzuriteOutput(props: {
   children: Children;
-  program: Program;
+  context: AzuriteEmitterContext;
   runtimeSymbols?: RuntimeSymbols;
 }) {
   return (
     <EmitterFrameworkOutput
-      program={props.program}
+      program={props.context.program}
       externals={props.runtimeSymbols === undefined ? undefined : [props.runtimeSymbols]}
     >
       <SourceDirectory path=".">{props.children}</SourceDirectory>

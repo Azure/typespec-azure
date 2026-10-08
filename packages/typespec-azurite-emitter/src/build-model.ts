@@ -4,10 +4,8 @@ import {
   type DecoratorContext,
   type Model,
   type ModelProperty,
-  type Program,
   type Type,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/typekit";
 import {
   getAllHttpServices,
   type HttpOperation,
@@ -17,8 +15,8 @@ import {
 } from "@typespec/http";
 import "@typespec/http/experimental/typekit";
 import { isAttribute, isUnwrapped } from "@typespec/xml";
+import type { AzuriteEmitterContext } from "./context.js";
 import type {
-  ServerDataModel,
   ServerLiteralQueryParameter,
   ServerModel,
   ServerModelProperty,
@@ -53,22 +51,6 @@ type BuiltResponse = Omit<ServerResponse, "headers" | "body"> & {
   readonly body?: BuiltRequestBody;
 };
 
-interface BuildContext {
-  readonly program: Program;
-  readonly modelRegistry: Map<string, ServerDataModel>;
-  readonly anonymousModelNamesByType: WeakMap<Model, string>;
-  nextAnonymousModelId: number;
-}
-
-function createBuildContext(program: Program): BuildContext {
-  return {
-    program,
-    modelRegistry: new Map(),
-    anonymousModelNamesByType: new WeakMap(),
-    nextAnonymousModelId: 1,
-  };
-}
-
 /**
  * Builds the intermediate {@link ServerModel} for the (single) HTTP service found in the
  * compiled program. This is the "transform" phase: it walks `@typespec/http` metadata and
@@ -78,18 +60,16 @@ function createBuildContext(program: Program): BuildContext {
  * `skippedOperations`.
  */
 export function buildServerModel(
-  program: Program,
-  service = getAllHttpServices(program)[0][0],
+  context: AzuriteEmitterContext,
+  service = getAllHttpServices(context.program)[0][0],
 ): ServerModel {
-  const context = createBuildContext(program);
-
   const operations: ServerOperation[] = [];
   const skippedOperations: ServerSkippedOperation[] = [];
   const usedOperationNames = new Set<string>();
   const usedOperationTypeNames = new Set<string>();
   for (const op of service?.operations ?? []) {
     try {
-      const operationName = getOperationName(program, op, usedOperationNames);
+      const operationName = getOperationName(context, op, usedOperationNames);
       const operationTypeName = getOperationTypeName(operationName, op, usedOperationTypeNames);
       const built = buildOperation(context, operationName, operationTypeName, op);
       usedOperationNames.add(operationName);
@@ -97,7 +77,7 @@ export function buildServerModel(
       operations.push(built);
     } catch (error) {
       skippedOperations.push({
-        name: getName(program, op.operation, getTypeName(op.operation.name)),
+        name: getName(context, op.operation, getTypeName(op.operation.name)),
         reason: error instanceof Error ? error.message : String(error),
         target: op.operation,
       });
@@ -105,7 +85,7 @@ export function buildServerModel(
   }
 
   return {
-    serviceName: service ? getName(program, service.namespace, service.namespace.name) : "Service",
+    serviceName: service ? getName(context, service.namespace, service.namespace.name) : "Service",
     operations,
     models: [...context.modelRegistry.values()],
     skippedOperations,
@@ -121,7 +101,7 @@ function disambiguate(name: string, used: ReadonlySet<string>): string {
 }
 
 function buildOperation(
-  context: BuildContext,
+  context: AzuriteEmitterContext,
   name: string,
   typeName: string,
   op: HttpOperation,
@@ -134,7 +114,7 @@ function buildOperation(
 
   const responses = op.responses.map((r) => buildResponse(context, r));
   const route = splitRoutePath(op.path);
-  const doc = getDocHelper(context.program, op.operation);
+  const doc = getDocHelper(context, op.operation);
   const operation: ServerOperation = {
     name,
     typeName,
@@ -144,7 +124,7 @@ function buildOperation(
     literalQueryParameters: route.literalQueryParameters,
     parameters: parameters.map(stripParameter),
     parametersModel: createOperationParametersModel(
-      context.program,
+      context,
       typeName,
       parameters,
       requestBody,
@@ -152,7 +132,7 @@ function buildOperation(
     ),
     requestBody: requestBody && stripRequestBody(requestBody),
     responses: responses.map(stripResponse),
-    responseUnion: createOperationResponseUnion(context.program, typeName, responses),
+    responseUnion: createOperationResponseUnion(context, typeName, responses),
     doc,
     interfaceName: op.operation.interface?.name,
   };
@@ -161,11 +141,11 @@ function buildOperation(
 }
 
 function getOperationName(
-  program: Program,
+  context: AzuriteEmitterContext,
   op: HttpOperation,
   usedOperationNames: ReadonlySet<string>,
 ): string {
-  const baseName = getName(program, op.operation, getTypeName(op.operation.name));
+  const baseName = getName(context, op.operation, getTypeName(op.operation.name));
   const qualifiedName =
     usedOperationNames.has(baseName) && op.operation.interface?.name
       ? `${getTypeName(op.operation.interface.name)}${baseName}`
@@ -212,16 +192,16 @@ function splitRoutePath(path: string): {
 }
 
 function buildParameter(
-  context: BuildContext,
+  context: AzuriteEmitterContext,
   param: HttpOperationParameter,
 ): BuiltOperationParameter {
   const location: ServerParameterLocation =
     param.type === "cookie" ? "header" : (param.type as ServerParameterLocation);
   const type = isHeaderCollection(param.name)
-    ? getHeaderCollectionTypeMetadata(context.program)
+    ? getHeaderCollectionTypeMetadata(context)
     : getTypeMetadata(context, param.param.type, param.param);
   return {
-    name: getName(context.program, param.param, param.param.name),
+    name: getName(context, param.param, param.param.name),
     wireName: param.name,
     location,
     type: type.runtime,
@@ -230,7 +210,7 @@ function buildParameter(
   };
 }
 
-function buildRequestBody(context: BuildContext, body: HttpPayloadBody): BuiltRequestBody {
+function buildRequestBody(context: AzuriteEmitterContext, body: HttpPayloadBody): BuiltRequestBody {
   const type = getTypeMetadata(context, body.type, body.property ?? body.type);
   return {
     type: type.runtime,
@@ -240,15 +220,18 @@ function buildRequestBody(context: BuildContext, body: HttpPayloadBody): BuiltRe
   };
 }
 
-function buildResponse(context: BuildContext, response: HttpOperationResponse): BuiltResponse {
+function buildResponse(
+  context: AzuriteEmitterContext,
+  response: HttpOperationResponse,
+): BuiltResponse {
   const content = response.responses[0];
   const headers: BuiltResponseHeader[] = [];
   for (const [headerWireName, prop] of Object.entries(content?.headers ?? {})) {
     const type = isHeaderCollection(headerWireName)
-      ? getHeaderCollectionTypeMetadata(context.program)
+      ? getHeaderCollectionTypeMetadata(context)
       : getTypeMetadata(context, prop.type, prop);
     headers.push({
-      name: getName(context.program, prop, prop.name),
+      name: getName(context, prop, prop.name),
       wireName: headerWireName,
       type: type.runtime,
       declarationType: type.declaration,
@@ -269,8 +252,8 @@ function isHeaderCollection(wireName: string): boolean {
   return wireName.toLowerCase() === "x-ms-meta";
 }
 
-function getHeaderCollectionTypeMetadata(program: Program): TypeMetadata {
-  const tk = $(program);
+function getHeaderCollectionTypeMetadata(context: AzuriteEmitterContext): TypeMetadata {
+  const tk = context.tk;
   const value = tk.union.create([tk.builtin.string, tk.array.create(tk.builtin.string)]);
   return {
     runtime: {
@@ -308,17 +291,17 @@ function stripResponseHeader(header: BuiltResponseHeader): ServerResponseHeader 
 }
 
 function getTypeMetadata(
-  context: BuildContext,
+  context: AzuriteEmitterContext,
   type: Type,
   constraintTarget: Type = type,
 ): TypeMetadata {
-  const tk = $(context.program);
+  const tk = context.tk;
   switch (type.kind) {
     case "Scalar":
       const scalarName = type.name || "<anonymous>";
       if (tk.scalar.extendsNumeric(type))
         return {
-          runtime: numericTypeRef(context.program, constraintTarget),
+          runtime: numericTypeRef(context, constraintTarget),
           declaration: type,
         };
       if (tk.scalar.extendsString(type)) return { runtime: { kind: "string" }, declaration: type };
@@ -392,11 +375,11 @@ function getTypeMetadata(
   }
 }
 
-function registerModel(context: BuildContext, model: Model): ServerTypeRef {
-  const tk = $(context.program);
+function registerModel(context: AzuriteEmitterContext, model: Model): ServerTypeRef {
+  const tk = context.tk;
   const name = resolveModelName(context, model);
   if (!context.modelRegistry.has(name)) {
-    const declarationModel = createDeclarationModel(context.program, name, model);
+    const declarationModel = createDeclarationModel(context, name, model);
     // Insert a placeholder first to guard against infinite recursion on cyclic models.
     context.modelRegistry.set(name, { name, wireName: name, properties: [], declarationModel });
     const properties = [...tk.model.getProperties(model).values()].map((prop) =>
@@ -404,10 +387,10 @@ function registerModel(context: BuildContext, model: Model): ServerTypeRef {
     );
     context.modelRegistry.set(name, {
       name,
-      wireName: $(context.program).type.getEncodedName(model, "application/xml"),
+      wireName: context.tk.type.getEncodedName(model, "application/xml"),
       properties,
       declarationModel,
-      doc: getDocHelper(context.program, model),
+      doc: getDocHelper(context, model),
     });
   }
   return { kind: "model", name };
@@ -419,8 +402,8 @@ function registerModel(context: BuildContext, model: Model): ServerTypeRef {
  * keyed by *object identity* so that two structurally-different anonymous models never clobber
  * each other under the same cache key.
  */
-function resolveModelName(context: BuildContext, model: Model): string {
-  if (model.name) return getName(context.program, model, getTypeName(model.name));
+function resolveModelName(context: AzuriteEmitterContext, model: Model): string {
+  if (model.name) return getName(context, model, getTypeName(model.name));
   const existingNamedModel = findStructurallyEquivalentNamedModel(context, model);
   if (existingNamedModel) return existingNamedModel;
   // Anonymous TypeSpec models all have an empty name, so identity is the only stable cache key.
@@ -439,10 +422,10 @@ function anonymousModelName(id: number): string {
 }
 
 function findStructurallyEquivalentNamedModel(
-  context: BuildContext,
+  context: AzuriteEmitterContext,
   model: Model,
 ): string | undefined {
-  const tk = $(context.program);
+  const tk = context.tk;
   const anonymousProperties = [...tk.model.getProperties(model).values()];
   for (const candidate of context.modelRegistry.values()) {
     if (candidate.name.startsWith("AnonymousModel")) continue;
@@ -450,12 +433,12 @@ function findStructurallyEquivalentNamedModel(
     const candidateProperties = new Map(candidate.properties.map((prop) => [prop.name, prop]));
     let matches = true;
     for (const prop of anonymousProperties) {
-      const name = getName(context.program, prop, prop.name);
+      const name = getName(context, prop, prop.name);
       const candidateProp = candidateProperties.get(name);
       if (
         candidateProp === undefined ||
         candidateProp.optional !== prop.optional ||
-        candidateProp.wireName !== $(context.program).type.getEncodedName(prop, "application/xml")
+        candidateProp.wireName !== context.tk.type.getEncodedName(prop, "application/xml")
       ) {
         matches = false;
         break;
@@ -472,67 +455,71 @@ function findStructurallyEquivalentNamedModel(
 }
 
 function buildModelProperty(
-  context: BuildContext,
+  context: AzuriteEmitterContext,
   prop: ModelProperty,
   declarationModel: Model,
 ): ServerModelProperty {
   const type = getTypeMetadata(context, prop.type, prop);
-  createDeclarationProperty(context.program, prop, declarationModel, type);
+  createDeclarationProperty(context, prop, declarationModel, type);
   return {
-    name: getName(context.program, prop, prop.name),
-    wireName: $(context.program).type.getEncodedName(prop, "application/xml"),
+    name: getName(context, prop, prop.name),
+    wireName: context.tk.type.getEncodedName(prop, "application/xml"),
     type: type.runtime,
     optional: prop.optional,
     xmlAttribute: isAttribute(context.program, prop),
     xmlUnwrapped: isUnwrapped(context.program, prop),
-    doc: getDocHelper(context.program, prop),
+    doc: getDocHelper(context, prop),
   };
 }
 
-function createDeclarationModel(program: Program, name: string, sourceModel: Model): Model {
-  const tk = $(program);
+function createDeclarationModel(
+  context: AzuriteEmitterContext,
+  name: string,
+  sourceModel: Model,
+): Model {
+  const tk = context.tk;
   const model = tk.model.create({
     name,
     properties: {},
     expression: false,
   });
-  applyDoc(program, model, getDocHelper(program, sourceModel));
+  applyDoc(context, model, getDocHelper(context, sourceModel));
   return model;
 }
 
 function createDeclarationProperty(
-  program: Program,
+  context: AzuriteEmitterContext,
   source: ModelProperty,
   declarationModel: Model,
   type: TypeMetadata,
 ): ModelProperty {
-  const tk = $(program);
+  const tk = context.tk;
   const property = tk.modelProperty.create({
-    name: getName(program, source, source.name),
+    name: getName(context, source, source.name),
     type: type.declaration,
     optional: source.optional,
     defaultValue: source.defaultValue,
   });
   property.model = declarationModel;
   declarationModel.properties.set(property.name, property);
-  applyDoc(program, property, getDocHelper(program, source));
+  applyDoc(context, property, getDocHelper(context, source));
   return property;
 }
 
 function createOperationParametersModel(
-  program: Program,
+  context: AzuriteEmitterContext,
   operationName: string,
   parameters: readonly BuiltOperationParameter[],
   requestBody: BuiltRequestBody | undefined,
   doc: string | undefined,
 ): Model {
-  const tk = $(program);
+  const tk = context.tk;
   const model = tk.model.create({
     name: `${operationName}Parameters`,
     properties: {},
     expression: false,
   });
-  applyDoc(program, model, doc);
+  applyDoc(context, model, doc);
 
   for (const parameter of parameters) {
     const property = tk.modelProperty.create({
@@ -558,25 +545,28 @@ function createOperationParametersModel(
 }
 
 function createOperationResponseUnion(
-  program: Program,
+  context: AzuriteEmitterContext,
   operationName: string,
   responses: readonly BuiltResponse[],
 ) {
-  const tk = $(program);
+  const tk = context.tk;
   return tk.union.create({
     name: `${operationName}Response`,
     expression: false,
     variants: responses.map((response, index) =>
       tk.unionVariant.create({
         name: `response${index}`,
-        type: createOperationResponseModel(program, response),
+        type: createOperationResponseModel(context, response),
       }),
     ),
   });
 }
 
-function createOperationResponseModel(program: Program, response: BuiltResponse): Model {
-  const tk = $(program);
+function createOperationResponseModel(
+  context: AzuriteEmitterContext,
+  response: BuiltResponse,
+): Model {
+  const tk = context.tk;
   const model = tk.model.create({
     properties: {},
     expression: true,
@@ -596,7 +586,7 @@ function createOperationResponseModel(program: Program, response: BuiltResponse)
   if (response.headers.length > 0) {
     const headersProperty = tk.modelProperty.create({
       name: "headers",
-      type: createResponseHeadersModel(program, response.headers),
+      type: createResponseHeadersModel(context, response.headers),
       optional: false,
     });
     headersProperty.model = model;
@@ -617,10 +607,10 @@ function createOperationResponseModel(program: Program, response: BuiltResponse)
 }
 
 function createResponseHeadersModel(
-  program: Program,
+  context: AzuriteEmitterContext,
   headers: readonly BuiltResponseHeader[],
 ): Model {
-  const tk = $(program);
+  const tk = context.tk;
   const model = tk.model.create({
     properties: {},
     expression: true,
@@ -639,27 +629,27 @@ function createResponseHeadersModel(
   return model;
 }
 
-function applyDoc(program: Program, target: Type, doc: string | undefined): void {
+function applyDoc(context: AzuriteEmitterContext, target: Type, doc: string | undefined): void {
   if (!doc) return;
   // Typekit can read docs but does not expose a public setter; use the public @doc
   // decorator so emitter-framework typed declarations can infer copied docs.
-  $doc({ program } as DecoratorContext, target, doc);
+  $doc({ program: context.program } as DecoratorContext, target, doc);
 }
 
-function getDocHelper(program: Program, target: Type): string | undefined {
-  return $(program).type.getDoc(target);
+function getDocHelper(context: AzuriteEmitterContext, target: Type): string | undefined {
+  return context.tk.type.getDoc(target);
 }
 
-function numericTypeRef(program: Program, target: Type): ServerTypeRef {
-  const constraints = getNumericConstraints(program, target);
+function numericTypeRef(context: AzuriteEmitterContext, target: Type): ServerTypeRef {
+  const constraints = getNumericConstraints(context, target);
   return constraints === undefined ? { kind: "number" } : { kind: "number", constraints };
 }
 
 function getNumericConstraints(
-  program: Program,
+  context: AzuriteEmitterContext,
   target: Type,
 ): ServerNumericConstraints | undefined {
-  const tk = $(program);
+  const tk = context.tk;
   const targets = getNumericConstraintTargets(target);
   const constraints: ServerNumericConstraints = {
     min: maxDefined(targets.map((candidate) => tk.type.minValue(candidate))),

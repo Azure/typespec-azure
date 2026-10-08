@@ -22,7 +22,7 @@ import { renderModels } from "../src/render/render-models.js";
 import { renderOperations } from "../src/render/render-operations.js";
 import { renderSerialization } from "../src/render/render-serialization.js";
 import { createRuntimeSymbols } from "../src/render/runtime-symbols.js";
-import { ApiTester } from "./tester.js";
+import { ApiTester, createTestAzuriteContext } from "./tester.js";
 
 let testProgram: Program;
 let sampleServerModel: ServerModel;
@@ -84,7 +84,7 @@ beforeAll(async () => {
     `,
   });
   testProgram = program;
-  const builtModel = buildServerModel(program);
+  const builtModel = buildServerModel(createTestAzuriteContext(program));
   sampleServerModel = {
     ...builtModel,
     models: builtModel.models.filter((model) =>

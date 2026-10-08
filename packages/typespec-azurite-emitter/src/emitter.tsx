@@ -2,6 +2,7 @@ import { NoTarget, resolvePath, type EmitContext } from "@typespec/compiler";
 import { writeOutput } from "@typespec/emitter-framework";
 import { getAllHttpServices } from "@typespec/http";
 import { buildServerModel } from "./build-model.js";
+import { createAzuriteEmitterContext } from "./context.js";
 import { reportDiagnostic } from "./lib.js";
 import type { AzuritePilotEmitterOptions } from "./options.js";
 import { normalizeOptions } from "./options.js";
@@ -13,7 +14,8 @@ import { AzuriteEmitterOutput } from "./render/index.js";
  */
 export async function $onEmit(context: EmitContext<AzuritePilotEmitterOptions>): Promise<void> {
   const options = normalizeOptions(context.options);
-  const { program } = context;
+  const azuriteContext = createAzuriteEmitterContext(context.program, options);
+  const { program } = azuriteContext;
 
   const [services, httpDiagnostics] = getAllHttpServices(program);
   if (httpDiagnostics.length > 0) {
@@ -29,7 +31,7 @@ export async function $onEmit(context: EmitContext<AzuritePilotEmitterOptions>):
     return;
   }
 
-  const serverModel = buildServerModel(program, services[0]);
+  const serverModel = buildServerModel(azuriteContext, services[0]);
   if (serverModel.skippedOperations.length > 0) {
     for (const skipped of serverModel.skippedOperations) {
       reportDiagnostic(program, {
@@ -44,11 +46,7 @@ export async function $onEmit(context: EmitContext<AzuritePilotEmitterOptions>):
   const baseDir = resolvePath(context.emitterOutputDir, options.outputDir);
   await writeOutput(
     program,
-    <AzuriteEmitterOutput
-      serverModel={serverModel}
-      program={program}
-      runtimeImport={options.runtimeImport}
-    />,
+    <AzuriteEmitterOutput serverModel={serverModel} context={azuriteContext} />,
     baseDir,
   );
 }

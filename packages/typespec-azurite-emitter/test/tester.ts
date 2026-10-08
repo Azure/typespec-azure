@@ -1,7 +1,9 @@
-import { resolvePath } from "@typespec/compiler";
+import { resolvePath, type Program } from "@typespec/compiler";
 import { createTester } from "@typespec/compiler/testing";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { createAzuriteEmitterContext } from "../src/context.js";
+import { normalizeOptions } from "../src/options.js";
 
 export const ApiTester = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
@@ -25,4 +27,8 @@ export function loadQueuePilotFixture(): Record<string, string> {
     "base.tsp": readFixture("base.tsp"),
     "azurite.tsp": readFixture("azurite.tsp"),
   };
+}
+
+export function createTestAzuriteContext(program: Program) {
+  return createAzuriteEmitterContext(program, normalizeOptions({}));
 }
