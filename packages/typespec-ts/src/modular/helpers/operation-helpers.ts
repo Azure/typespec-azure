@@ -71,6 +71,7 @@ import {
   hasXmlSerialization,
 } from "../serialization/build-xml-serializer-function.js";
 import {
+  getAllDiscriminatedValues,
   getPropertyWithOverrides,
   isNormalUnion,
   isSpecialHandledUnion,
@@ -1141,6 +1142,7 @@ interface StructuredStreamEvent {
   eventName?: string;
   isTerminal: boolean;
   terminalValue?: string;
+  discriminator?: { propertyName: string; values: string[] };
   contentType?: string;
   deserializeExpression: string;
 }
@@ -1250,6 +1252,25 @@ export function getStructuredStreamInfo(
       };
       const contentType = getSsePayloadContentType(context, sseEvent);
       event.contentType = contentType;
+      if (
+        sseEvent.eventType === undefined &&
+        sseEvent.payloadType.kind === "model" &&
+        (contentType === undefined || /\bjson\b/i.test(contentType))
+      ) {
+        const property = getAllAncestors(sseEvent.payloadType).find(
+          (model): model is SdkModelType =>
+            model.kind === "model" && model.discriminatorProperty !== undefined,
+        )?.discriminatorProperty;
+        if (property) {
+          const values = getAllDiscriminatedValues(sseEvent.payloadType, property);
+          if (values.length > 0) {
+            event.discriminator = {
+              propertyName: getPropertySerializedName(property),
+              values,
+            };
+          }
+        }
+      }
       if (sseEvent.payloadType.kind === "constant") {
         event.deserializeExpression = JSON.stringify(sseEvent.payloadType.value);
         if (sseEvent.isTerminalEvent) {
@@ -1417,6 +1438,9 @@ function buildSseDescriptors(info: StructuredStreamInfo): string {
       parts.push(`isTerminal: ${event.isTerminal}`);
       if (event.terminalValue !== undefined) {
         parts.push(`terminalValue: ${JSON.stringify(event.terminalValue)}`);
+      }
+      if (event.discriminator) {
+        parts.push(`discriminator: ${JSON.stringify(event.discriminator)}`);
       }
       const yielded = useEventEnvelope
         ? `({ event: ${JSON.stringify(event.eventName ?? "message")}, data: ${event.deserializeExpression} })`

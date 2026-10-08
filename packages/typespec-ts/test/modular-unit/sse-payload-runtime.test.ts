@@ -435,6 +435,79 @@ describe("generated SSE payload formats", () => {
     expect(values).toEqual([{ value: "hello" }, "[DONE]"]);
   });
 
+  it.each(
+    ["kind", "event_kind"].flatMap((wireName) =>
+      [false, true].flatMap((terminalFirst) =>
+        [false, true].map((envelope) => ({ wireName, terminalFirst, envelope })),
+      ),
+    ),
+  )(
+    "dispatches unnamed SSE variants and stops after the terminal payload: %j",
+    async ({ wireName, terminalFirst, envelope }) => {
+      const encodedName =
+        wireName === "kind" ? "" : `@encodedName("application/json", "${wireName}")`;
+      const progress = envelope ? "ProgressEnvelope" : "Progress";
+      const completed = envelope ? "CompletedEnvelope" : "Completed";
+      const variants = terminalFirst
+        ? `@terminalEvent ${completed}, ${progress}`
+        : `${progress}, @terminalEvent ${completed}`;
+      const files = await emitModularOperationsFromTypeSpec(`
+      @discriminator("kind")
+      model StreamEvent { ${encodedName} kind: string; }
+
+      model Progress extends StreamEvent {
+        ${encodedName}
+        kind: "progress";
+        delta: string;
+      }
+      model Completed extends StreamEvent {
+        ${encodedName}
+        kind: "complete";
+        result: string;
+      }
+      model ProgressEnvelope { @data contents: Progress; }
+      model CompletedEnvelope { @data contents: Completed; }
+
+      @events
+      union StreamEvents { ${variants} }
+
+      @route("/receive")
+      op receive(): SSEStream<StreamEvents>;
+    `);
+
+      expect(files).toHaveLength(1);
+      const file = files![0]!;
+      const sources = file
+        .getProject()
+        .getSourceFiles()
+        .map((source) => [source.getFilePath(), source.getFullText()] as const);
+      const { receive } = createGeneratedRuntime(sources).loadModule<{
+        receive(context: unknown): Promise<AsyncIterable<unknown>>;
+      }>(file.getFilePath());
+
+      const fixture = transport(
+        "Node",
+        [
+          `data: {"${wireName}":"progress","delta":"hello"}\n\n`,
+          `data: {"${wireName}":"complete","result":"final"}\n\n`,
+          `data: {"${wireName}":"progress","delta":"after-terminal"}\n\n`,
+        ].join(""),
+        "200",
+        undefined,
+        true,
+      );
+      const actual: unknown[] = [];
+      for await (const item of await receive(fixture.context)) {
+        actual.push(item);
+      }
+      expect(actual).toEqual([
+        { kind: "progress", delta: "hello" },
+        { kind: "complete", result: "final" },
+      ]);
+      expect(fixture.nodeBody.destroyed).toBe(true);
+    },
+  );
+
   it.each([
     ["receiveModelTerminal", '{"wire_value":"finished"}', { value: "finished" }],
     ["receiveNumericTerminal", "42", 42],

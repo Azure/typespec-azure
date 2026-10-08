@@ -71,7 +71,82 @@ const namedWithSentinel: SseEventDescriptor<any>[] = [
   },
 ];
 
+const unnamedDiscriminated: SseEventDescriptor<unknown>[] = [
+  {
+    isTerminal: false,
+    discriminator: { propertyName: "kind", values: ["progress"] },
+    deserialize: (data) => data,
+  },
+  {
+    isTerminal: true,
+    discriminator: { propertyName: "kind", values: ["complete"] },
+    deserialize: (data) => data,
+  },
+];
+
 describe("SSE event mapping", () => {
+  it.each([false, true])(
+    "dispatches unnamed JSON variants independently of terminal order (%s)",
+    async (terminalFirst) => {
+      const descriptors = terminalFirst
+        ? [...unnamedDiscriminated].reverse()
+        : unnamedDiscriminated;
+      await expect(
+        collect(
+          descriptors,
+          events(
+            { data: '{"kind":"progress","delta":"hello"}' },
+            { data: '{"kind":"complete","result":"final"}' },
+            { data: '{"kind":"progress","delta":"ignored"}' },
+          ),
+        ),
+      ).resolves.toEqual([
+        { kind: "progress", delta: "hello" },
+        { kind: "complete", result: "final" },
+      ]);
+    },
+  );
+
+  it("matches constant terminals before parsing discriminated JSON variants", async () => {
+    await expect(
+      collect(
+        [
+          ...unnamedDiscriminated,
+          { isTerminal: true, terminalValue: "[DONE]", deserialize: () => "[DONE]" },
+        ],
+        events({ data: "[DONE]" }, { data: '{"kind":"progress"}' }),
+      ),
+    ).resolves.toEqual(["[DONE]"]);
+  });
+
+  it("ignores unknown discriminator values rather than using an unrelated variant", async () => {
+    await expect(
+      collect(
+        unnamedDiscriminated,
+        events({ data: '{"kind":"unknown"}' }, { data: '{"kind":"complete"}' }),
+      ),
+    ).resolves.toEqual([{ kind: "complete" }]);
+  });
+
+  it("selects a matching variant before a generic JSON fallback", async () => {
+    await expect(
+      collect(
+        [{ isTerminal: false, deserialize: (data) => data }, ...unnamedDiscriminated],
+        events(
+          { data: '{"kind":"unknown"}' },
+          { data: '{"kind":"complete","result":"final"}' },
+          { data: '{"kind":"progress"}' },
+        ),
+      ),
+    ).resolves.toEqual([{ kind: "unknown" }, { kind: "complete", result: "final" }]);
+  });
+
+  it("preserves malformed JSON errors during discriminator selection", async () => {
+    await expect(collect(unnamedDiscriminated, events({ data: "{bad" }))).rejects.toThrow(
+      'Unable to deserialize event "message".',
+    );
+  });
+
   it.each(["typed", "sentinel"] as const)(
     "cuts off a synthetic source after a %s terminal and closes its iterator",
     async (kind) => {
