@@ -1,5 +1,10 @@
 [
   {
+    "code": "tsp-lintdiff-local-linter/lro-extension",
+    "severity": "warning",
+    "message": "ARM operations returning 202 must have native polling metadata. Retain the async template's standard LRO headers."
+  },
+  {
     "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
     "severity": "warning",
     "message": "Arm namespace TestService is missing the Operations interface. Add \"interface Operations extends Azure.ResourceManager.Operations {}\"."
@@ -72,17 +77,12 @@
   {
     "code": "tsp-lintdiff-local-linter/list-in-operation-name",
     "severity": "warning",
-    "message": "Operation 'patchWidgets' returns a list/pageable response and should use method name starting with 'List'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/lro-extension",
-    "severity": "warning",
-    "message": "ARM PATCH operations with a 202 response must set `x-ms-long-running-operation` to `true`."
+    "message": "Operation 'patchWidgets' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
   },
   {
     "code": "tsp-lintdiff-local-linter/patch-in-operation-name",
     "severity": "warning",
-    "message": "'PATCH' operation 'patchWidgets' should use method name 'Update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+    "message": "'PATCH' operation 'patchWidgets' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
   },
   {
     "code": "tsp-lintdiff-local-linter/pageable-requires-200-response",

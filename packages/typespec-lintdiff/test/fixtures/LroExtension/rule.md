@@ -1,9 +1,14 @@
 ---
 validatorRuleId: LroExtension
 engine: spectral
-coverageKind: lint
+coverageKind: partial
 tspLints:
   - tsp-lintdiff-local-linter/lro-extension
+tspTemplateLints:
+  - "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes"
+  - "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes"
+  - "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes"
+tspRuleset: resource-manager
 ---
 
 # LroExtension
@@ -16,66 +21,128 @@ tspLints:
 
 ## Description
 
-Operations with a 202 response must specify `x-ms-long-running-operation: true`.
-GET operations are excluded from validation as GET will have 202 only if it is a polling action.
+ARM PATCH and provider/collection POST operations returning `202` must have native
+long-running-operation metadata. A plain HTTP `Location` header is not sufficient:
+the operation must describe how clients poll and obtain its final result.
 
-## Source-of-truth notes
+Use the standard asynchronous ARM templates without replacing their semantic LRO
+headers. When customizing `LroHeaders`, retain `ArmLroLocationHeader` (or other
+supported Azure Core polling metadata) rather than just a string-valued header.
 
-- Upstream defines `LroExtension` in `packages/rulesets/src/spectral/az-common.ts`
-  as an OAS2 Spectral truthy check over
-  `$.paths[*][put,patch,post,delete].responses[?(@property == '202')]^^`.
-- Because the rule uses Spectral's `truthy` function, both a missing property and
-  an explicit `x-ms-long-running-operation: false` are violations; only `true`
-  satisfies the rule.
-- GET is explicitly excluded by the selector. Upstream docs
-  (`docs/lro-extension.md`) and the `bad-lro-post.json` workflow fixture both
-  show the intended non-GET `202` sad path.
-- I could not find a dedicated upstream `LroExtension` unit test, but nearby
-  upstream tests still pin the same semantic boundary:
-  `XMSLongRunningOperationProperty` exercises missing vs `true`/`false`
-  extension values across PUT/PATCH/POST/DELETE, and `PostResponseCodes`
-  treats a `202` POST as async only when `x-ms-long-running-operation: true`
-  is present.
+### Incorrect customization
 
-## Semantic coverage notes
+Given a tracked resource `Widget`, this supported customization removes its
+polling semantics even though it still returns `202` and a `Location` header:
 
-- The upstream semantic matrix is:
-  - non-GET `202` response with missing `x-ms-long-running-operation` => violation
-  - non-GET `202` response with `x-ms-long-running-operation: false` => violation
-  - non-GET `202` response with `x-ms-long-running-operation: true` => compliant
-  - GET `202` response => ignored by selector
-  - non-GET responses without `202` => ignored by selector
-- The local violating and explicit-extension cases now use an ARM resource action
-  POST so this rule is exercised in the ARM/error slice instead of an ad hoc
-  data-plane repro.
-- The violating `202` POST still requires suppressing
-  `@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes`;
-  without that suppression, normal ARM authoring never reaches the missing-LRO
-  validator state.
-- The explicit `true`/`false` extension cases additionally require suppressing
-  `@azure-tools/typespec-azure-core/no-openapi`, so the truthy boundary is
-  reproducible locally but still not cleanly authorable.
-- `compliant-with-template` captures the authorable ARM success path: standard
-  async PATCH/DELETE templates emit `x-ms-long-running-operation: true`
-  automatically, while the same fixture's synchronous POST path stays outside
-  the selector because it has no `202` response.
-- The GET-excluded boundary remains documented rather than directly reproduced:
-  a meaningful ARM GET `202` repro would already be dominated by adjacent GET/LRO
-  constraints before this selector becomes the interesting signal.
+```tsp
+model PlainLocationHeaders {
+  ...Azure.Core.Foundations.RetryAfterHeader;
+  @header("Location") location?: string;
+}
 
-The local outcome is now a **defense-in-depth local lint**:
-`tsp-lintdiff-local-linter/lro-extension`.
+@armResourceOperations
+interface Widgets {
+  update is ArmCustomPatchAsync<Widget, Widget, LroHeaders = PlainLocationHeaders>;
+}
+```
 
-It is intentionally narrow: it warns when authors define a non-GET ARM
-operation with an explicit `202` response but do not make the operation
-long-running. That means the lint mostly matters after an author has already
-chosen to bypass normal template/response-code protections.
+### Correct customization
+
+```tsp
+@armResourceOperations
+interface Widgets {
+  update is ArmCustomPatchAsync<
+    Widget,
+    Widget,
+    LroHeaders = ArmLroLocationHeader<FinalResult = Widget> &
+      Azure.Core.Foundations.RetryAfterHeader
+  >;
+}
+```
+
+The same requirement applies to customized `ArmProviderActionSync` responses and
+`ArmProviderActionAsync` headers. The default `ArmProviderActionAsync` template
+already provides the necessary semantics.
+
+## Native rule contract
+
+- **Semantic layer:** compiler service discovery, HTTP service operations and
+  exact response status `202`, ARM `isArmCollectionAction`, and Azure Core
+  `getLroMetadata`. No emitter, OpenAPI-extension, SDK, or reference-string logic.
+- **Population:** PATCH operations and POST operations marked as ARM collection
+  actions, including provider-scoped actions. Resource-instance POST, PUT, and
+  DELETE are intentionally left to the existing official ARM status-code rules;
+  this rule does not duplicate their checks.
+- **Diagnostic unit/target:** one warning on the authored operation, regardless
+  of how many response alternatives contain `202` or how many parent/child
+  service traversals include it. Deduplication uses semantic operation identity,
+  not shared response types, so distinct operations remain distinct targets.
+  Template declarations are not independently diagnosed.
+- **Exemptions:** operations without exact `202`, other verbs, resource-instance
+  POST, and operations with native LRO metadata.
+- **Applicability infrastructure:** lintdiff enables mixed ARM/data-plane rules,
+  so service-root `getArmProviderNamespace` isolates ARM services before HTTP
+  traversal. This follows the sibling `lro-error-content` service traversal,
+  not its unrelated error-reference logic. Unlike `resolveProviderNamespace`
+  on an operation namespace, it also reaches nested namespaces. On promotion
+  to the ARM-only official library, remove this lintdiff-only service guard;
+  the selected official ARM ruleset provides the audience boundary.
+- **Versioning:** examine the semantic operations in the compiler program, not
+  emitted version snapshots. Corpus comparison separately attributes diagnostics
+  to the dataset-selected API version.
+
+## Supported-shape and parity matrix
+
+The maintained `@azure-tools/typespec-azure-rulesets/resource-manager` ruleset,
+without Core/all or ARM/all over-enablement, accepts all seven template cases
+below with zero diagnostics. Plain `Location` cases have no native LRO metadata;
+the semantic-header controls do. Provider actions are outside `getArmResources`
+and consequently outside the existing registered-resource POST response check.
+
+| Authored shape                                                       | Native metadata | Emitted LRO extension / validator | Native result |
+| -------------------------------------------------------------------- | --------------- | --------------------------------- | ------------- |
+| Default `ArmResourcePatchAsync`                                      | Present         | `true` / compliant                | Compliant     |
+| `ArmCustomPatchSync` with an accepted response and plain Location    | Absent          | Absent / violation                | Warning       |
+| `ArmCustomPatchAsync` with plain `LroHeaders`                        | Absent          | Absent / violation                | Warning       |
+| Same custom PATCH with semantic `ArmLroLocationHeader`               | Present         | `true` / compliant                | Compliant     |
+| `ArmProviderActionSync` with an accepted response and plain Location | Absent          | Absent / violation                | Warning       |
+| `ArmProviderActionAsync` with plain `LroHeaders`                     | Absent          | Absent / violation                | Warning       |
+| Default `ArmProviderActionAsync`                                     | Present         | `true` / compliant                | Compliant     |
+
+These are public template parameters documented in the ARM resource-operations
+and long-running-operations guides, not suppressions or arbitrary emitted
+overrides. Native tests exercise the rule without an emitter or TCGC.
+Comparison fixtures verify emitted fields independently.
+
+## Swagger migration boundary
+
+The original
+[linter code](https://github.com/Azure/azure-openapi-validator/blob/main/packages/rulesets/src/spectral/az-common.ts)
+and [linter documentation](https://github.com/Azure/azure-openapi-validator/blob/main/docs/lro-extension.md)
+select OAS2 PUT/PATCH/POST/DELETE operations with an explicit `202` response and
+require a truthy `x-ms-long-running-operation`. GET and non-202 operations are
+excluded. Native polling metadata, not an OpenAPI override, is this rule's
+contract.
+
+Registered resource POST/PUT/DELETE violations are already rejected by official
+status-code checks. Explicit legacy extension `true`/`false` authoring is rejected
+by `no-openapi` unless suppressed; it is not a native substitute for polling
+metadata. The old suppressed resource-action fixtures remain comparison-only
+evidence of those intentional exclusions. Catalog applicability is Both, but
+this migration covers the uncovered ARM semantics, not a new data-plane rule.
+See [migration evidence](./migration.md) for corpus populations and divergences.
 
 ## Test Cases
 
-| ID                       | Violation | Description |
-| ------------------------ | --------- | ----------- |
-| `missing-lro-for-202`    | true      | ARM resource-action POST returns `202` without `x-ms-long-running-operation`; requires `arm-post-operation-response-codes` suppression |
-| `false-lro-extension`    | true      | Same ARM POST with explicit `x-ms-long-running-operation: false`; also requires `no-openapi` suppression |
-| `with-lro-extension`     | false     | Same ARM POST with explicit `x-ms-long-running-operation: true`; also requires `no-openapi` suppression |
-| `compliant-with-template` | false    | Standard ARM async templates emit `x-ms-long-running-operation: true` without suppressions and also keep sync POSTs outside the selector |
+| ID                                  | Violation | Description                                                                                                                              |
+| ----------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `missing-lro-for-202`               | false     | Comparison-only registered resource POST; official status-code prerequisite suppressed; intentionally outside the new local contract     |
+| `false-lro-extension`               | false     | Comparison-only resource POST with a false emitted override; prerequisite and `no-openapi` suppressed                                    |
+| `with-lro-extension`                | false     | Same ARM POST with explicit `x-ms-long-running-operation: true`; also requires `no-openapi` suppression                                  |
+| `compliant-with-template`           | false     | Standard ARM async templates emit `x-ms-long-running-operation: true` without suppressions and also keep sync POSTs outside the selector |
+| `custom-patch-sync-plain-location`  | true      | Supported synchronous PATCH Response customization loses polling semantics                                                               |
+| `custom-patch-async-plain-location` | true      | Supported async PATCH LroHeaders customization loses polling semantics                                                                   |
+| `custom-patch-semantic-location`    | false     | Documented semantic-header PATCH customization                                                                                           |
+| `provider-sync-plain-location`      | true      | Supported provider POST Response customization loses polling semantics                                                                   |
+| `provider-async-plain-location`     | true      | Supported provider POST LroHeaders customization loses polling semantics                                                                 |
+| `provider-semantic-location`        | false     | Standard provider async template retains polling semantics                                                                               |

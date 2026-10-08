@@ -182,9 +182,9 @@ export const spectralTriage: Record<string, { tier: string; rationale: string }>
   "InvalidVerbUsed": { tier: "Infallible", rationale: "TypeSpec HTTP decorators only generate valid HTTP methods." },
   "LongRunningOperationsOptionsValidator": { tier: "Template-enforced", rationale: "ARM LRO templates set valid x-ms-long-running-operation-options; custom ops can set invalid values." },
   "LroExtension": {
-    tier: "Prerequisite-blocked",
+    tier: "Unconstrained",
     rationale:
-      "The ARM violating repro needs arm-post-operation-response-codes suppression, and explicit x-ms-long-running-operation authoring is blocked by no-openapi unless suppressed.",
+      "Official response-code rules cover registered resource POST/PUT/DELETE; supported custom PATCH and provider POST templates can return 202 with plain Location headers but no native LRO metadata.",
   },
   "LroLocationHeader": { tier: "Template-enforced", rationale: "ARM LRO templates include Location header; custom LROs can omit it." },
   "MutabilityWithReadOnly": {

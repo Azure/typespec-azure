@@ -85,11 +85,6 @@
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
   },
   {
-    "code": "tsp-lintdiff-local-linter/lro-extension",
-    "severity": "warning",
-    "message": "ARM POST operations with a 202 response must set `x-ms-long-running-operation` to `true`."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/operation-id-noun-verb",
     "severity": "warning",
     "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Widgets' should not appear after the underscore."

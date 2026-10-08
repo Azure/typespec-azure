@@ -30,10 +30,6 @@
       "count": 1
     },
     {
-      "code": "tsp-lintdiff-local-linter/lro-extension",
-      "count": 1
-    },
-    {
       "code": "tsp-lintdiff-local-linter/path-parameter-schema",
       "count": 7
     },
