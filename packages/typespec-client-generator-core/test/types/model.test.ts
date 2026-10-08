@@ -369,6 +369,81 @@ it("enum discriminator model", async () => {
   strictEqual(dog.discriminatorProperty, dogKindProperty);
 });
 
+it("enum discriminator model with encoded name", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    enum ShapeKind {
+      @encodedName("application/json", "round")
+      circle: "circle",
+
+      square: "square",
+    }
+
+    @discriminator("kind")
+    model Shape {
+      kind: ShapeKind;
+    }
+
+    model Circle extends Shape {
+      kind: ShapeKind.circle;
+      radius: int32;
+    }
+
+    model Square extends Shape {
+      kind: ShapeKind.square;
+      side: int32;
+    }
+
+    @get
+    op get(): Shape;
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  const shape = models.find((x) => x.name === "Shape");
+  const circle = models.find((x) => x.name === "Circle");
+  const square = models.find((x) => x.name === "Square");
+  ok(shape && circle && square);
+  strictEqual(circle.discriminatorValue, "round");
+  strictEqual(square.discriminatorValue, "square");
+  deepStrictEqual(Object.keys(shape.discriminatedSubtypes ?? {}).sort(), ["round", "square"]);
+  strictEqual(shape.discriminatedSubtypes?.["round"], circle);
+});
+
+it("int enum discriminator model with encoded names", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    enum PetKind {
+      @encodedName("application/json", "cat")
+      CAT: 1,
+
+      @encodedName("application/json", "dog")
+      DOG: 2,
+    }
+
+    @discriminator("kind")
+    model Pet {
+      kind: PetKind;
+    }
+
+    model Cat extends Pet {
+      kind: PetKind.CAT;
+    }
+
+    model Dog extends Pet {
+      kind: PetKind.DOG;
+    }
+
+    @get
+    op get(): Pet;
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  const pet = models.find((x) => x.name === "Pet");
+  const cat = models.find((x) => x.name === "Cat");
+  ok(pet && cat);
+  strictEqual(cat.discriminatorValue, "cat");
+  deepStrictEqual(Object.keys(pet.discriminatedSubtypes ?? {}).sort(), ["cat", "dog"]);
+  strictEqual(context.sdkPackage.enums[0].valueType.kind, "string");
+});
+
 it("anonymous model contains template", async () => {
   const { program } = await SimpleTesterWithService.compile(`
 

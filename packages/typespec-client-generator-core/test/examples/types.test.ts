@@ -142,6 +142,40 @@ it("SdkStringExample from enum", async () => {
   expectDiagnostics(context.diagnostics, []);
 });
 
+it("SdkStringExample from enum with encoded names", async () => {
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/getStringFromEncodedEnum.json",
+    `${__dirname}/example-types/getStringFromEncodedEnum.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      enum TestEnum {
+        @encodedName("application/json", "unknown")
+        UNSPECIFIED: 0,
+
+        @encodedName("application/json", "ready")
+        READY: 1,
+      }
+      op getStringFromEncodedEnum(): TestEnum;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  strictEqual(response.bodyValue?.kind, "string");
+  strictEqual(response.bodyValue?.value, "unknown");
+  strictEqual(response.bodyValue?.type.kind, "enum");
+
+  expectDiagnostics(context.diagnostics, []);
+});
+
 it("SdkStringExample from extensible enum", async () => {
   const instance = await SimpleTester.createInstance();
   await instance.fs.addRealTypeSpecFile(

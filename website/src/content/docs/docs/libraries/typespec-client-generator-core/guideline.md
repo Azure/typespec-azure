@@ -230,6 +230,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 **Enumeration Types:**
 
 - [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) and [`SdkEnumValueType`](../reference/js-api/interfaces/sdkenumvaluetype/) represent TCGC enumeration types. They are typically converted from TypeSpec [`Enum`](https://typespec.io/docs/language-basics/enums/) types or [`Union`](https://typespec.io/docs/language-basics/unions/) types (for extensible enumeration cases).
+- `SdkEnumValueType.value` is the value the member is serialized as: its `@encodedName` for `application/json` if it has one, otherwise its value, otherwise its name. Discriminator values and the default value of an endpoint template argument use the same value. Members of an api version enum keep their value.
 
 **Literal Types:**
 
