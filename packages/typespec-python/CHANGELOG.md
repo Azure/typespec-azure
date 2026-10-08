@@ -2,7 +2,7 @@
 
 ## 0.63.9
 
-- Bump @typespec/http-client-python to 0.38.0
+- Bump @typespec/http-client-python to 0.38.1
 
 ## 0.63.8
 
