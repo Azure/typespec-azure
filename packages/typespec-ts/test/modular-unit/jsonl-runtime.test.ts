@@ -5,6 +5,7 @@ import { createGeneratedRuntime } from "../util/generated-runtime.js";
 import { clearCompileCache } from "../util/test-util.js";
 
 const encoder = new TextEncoder();
+const platforms = ["Node", "browser", "react-native"] as const;
 
 interface RuntimeOperations {
   receive(context: unknown): Promise<AsyncIterable<{ value: string; timestamp: Date }>>;
@@ -18,9 +19,9 @@ let sources: Map<string, string>;
 let operationPath: string;
 let jsonlSerializationOptions: unknown[] | undefined;
 
-function loadGeneratedOperations(platform: "Node" | "browser"): RuntimeOperations {
+function loadGeneratedOperations(platform: "Node" | "browser" | "react-native"): RuntimeOperations {
   return createGeneratedRuntime(sources, {
-    platform: platform === "Node" ? "node" : "browser",
+    platform: platform === "Node" ? "node" : platform,
   }).loadModule<RuntimeOperations>(operationPath);
 }
 
@@ -100,7 +101,7 @@ afterAll(() => {
   clearContexts();
 });
 
-describe.each(["Node", "browser"] as const)("generated %s JSONL operation runtime", (platform) => {
+describe.each(platforms)("generated %s JSONL operation runtime", (platform) => {
   function transport(
     status: string,
     headers: Record<string, string>,
@@ -132,6 +133,9 @@ describe.each(["Node", "browser"] as const)("generated %s JSONL operation runtim
             },
             cancel,
           });
+    if (platform === "react-native") {
+      Object.defineProperty(body, Symbol.asyncIterator, { value: undefined });
+    }
     const response = { status, headers, body };
     const method = {
       asNodeStream: vi.fn(async () => response),
@@ -170,7 +174,7 @@ describe.each(["Node", "browser"] as const)("generated %s JSONL operation runtim
     expect(fixture.context.path).toHaveBeenCalledWith("/receive");
     expect(fixture.get.mock.calls[0][0].headers.accept).toBe("application/jsonl");
     expect(fixture.read).not.toHaveBeenCalled();
-    if (platform === "browser") {
+    if (platform !== "Node") {
       expect((fixture.body as ReadableStream<Uint8Array>).locked).toBe(false);
     }
     expect(await collect(result)).toEqual([

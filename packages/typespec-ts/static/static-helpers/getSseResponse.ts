@@ -1,5 +1,6 @@
 import { PathUncheckedResponse, StreamableMethod } from "@azure-rest/core-client";
 import type { NodeJSReadableStream } from "@azure/core-sse";
+import { text } from "node:stream/consumers";
 
 export type SseResponse = PathUncheckedResponse & {
   body?: NodeJSReadableStream;
@@ -18,12 +19,7 @@ export async function parseSseErrorResponse(response: SseResponse): Promise<Path
     return response;
   }
 
-  const decoder = new TextDecoder();
-  let body = "";
-  for await (const chunk of response.body) {
-    body += decoder.decode(chunk, { stream: true });
-  }
-  body += decoder.decode();
+  const body = await text(response.body);
 
   return {
     ...response,
@@ -32,7 +28,7 @@ export async function parseSseErrorResponse(response: SseResponse): Promise<Path
 }
 
 function parseErrorBody(body: string, contentType: string | undefined): unknown {
-  const mediaType = contentType?.split(";", 1)[0].trim().toLowerCase();
+  const mediaType = contentType?.split(";", 1)[0]?.trim().toLowerCase();
   return mediaType?.endsWith("/json") || mediaType?.endsWith("+json") ? JSON.parse(body) : body;
 }
 
