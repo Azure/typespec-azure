@@ -198,7 +198,10 @@ export interface ArmMetadataNameRequest {
   resourceModel?: Model;
   /** The canonical ARM resource type formatted as `${provider}/${types.join("/")}`. */
   resourceType?: string;
-  /** The instance path that distinguishes this resolved resource occurrence. */
+  /**
+   * The instance path that distinguishes this resolved resource occurrence.
+   * Path parameters retain their HTTP metadata names, for example `{subscriptionId}`.
+   */
   resourceInstancePath?: string;
 }
 
@@ -212,14 +215,14 @@ export type ArmMetadataNameResolver = (request: ArmMetadataNameRequest) => strin
 export interface ResourcePathInfo {
   /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
   resourceType: ResourceType;
-  /** The path to the instance of a resource */
+  /** The path to the resource instance, preserving named HTTP path parameters. */
   resourceInstancePath: string;
 }
 
 export interface ResolvedResourceInfo {
   /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
   resourceType: ResourceType;
-  /** The path to the instance of a resource */
+  /** The path to the resource instance, preserving named HTTP path parameters. */
   resourceInstancePath: string;
   /** The name of the resource at this instance path  */
   resourceName: string;
@@ -246,7 +249,7 @@ interface ResolvedResourceOperations {
   resourceNameIsExplicit?: boolean;
   /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
   resourceType: ResourceType;
-  /** The path to the instance of a resource */
+  /** The path to the resource instance, preserving named HTTP path parameters. */
   resourceInstancePath: string;
   /** The parent of this resource */
   parent?: ResolvedResource;
@@ -269,7 +272,7 @@ export interface ResolvedResource {
   resourceName: string;
   /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
   resourceType: ResourceType;
-  /** The path to the instance of a resource */
+  /** The path to the resource instance, preserving named HTTP path parameters. */
   resourceInstancePath: string;
   /** The parent of this resource */
   parent?: ResolvedResource;
