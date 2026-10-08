@@ -15,6 +15,7 @@ using TypeSpec.Versioning;
   }
 )
 @global.Azure.ClientGenerator.Core.clientNamespace("specs.azure.core.apiversionoverride", "python")
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.core.apiversionoverride", "java")
 namespace _Specs_.Azure.Core.ApiVersionOverride;
 
 @doc("The versions supported by the service.")
