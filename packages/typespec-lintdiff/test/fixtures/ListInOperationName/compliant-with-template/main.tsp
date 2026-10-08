@@ -1,7 +1,12 @@
 import "../../lib/imports.tsp";
-using TypeSpec.Http; using TypeSpec.Rest; using TypeSpec.Versioning; using Azure.ResourceManager;
+using TypeSpec.Http;
+using TypeSpec.Rest;
+using TypeSpec.Versioning;
+using Azure.ResourceManager;
 
-@armProviderNamespace @service(#{ title: "Test Service" }) @versioned(Versions)
+@armProviderNamespace
+@service(#{ title: "Test Service" })
+@versioned(Versions)
 @armCommonTypesVersion(CommonTypes.Versions.v5)
 namespace Microsoft.TestService;
 
@@ -11,7 +16,10 @@ enum Versions {
 }
 
 model Widget is TrackedResource<WidgetProperties> {
-  @key("widgetName") @segment("widgets") @doc("The name of the widget") @path
+  @key("widgetName")
+  @segment("widgets")
+  @doc("The name of the widget")
+  @path
   @pattern("^[a-zA-Z0-9_-]+$")
   name: string;
 }
@@ -19,7 +27,9 @@ model Widget is TrackedResource<WidgetProperties> {
 @doc("Widget resource properties.")
 model WidgetProperties {
   @doc("Description") description?: string;
-  @doc("Resource provisioning state") @visibility(Lifecycle.Read)
+
+  @doc("Resource provisioning state")
+  @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
 }
 
@@ -36,5 +46,7 @@ interface Widgets {
   @doc("Get all widget configs")
   @route("configs")
   @get
-  getAllConfigs(...ResourceInstanceParameters<Widget>): ArmResponse<ResourceListResult<Widget>> | ErrorResponse;
+  getAllConfigs(...ResourceInstanceParameters<Widget>):
+    | ArmResponse<ResourceListResult<Widget>>
+    | ErrorResponse;
 }
