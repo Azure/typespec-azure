@@ -118,6 +118,20 @@ describe("no-empty-post-response", () => {
       .toBeValid();
   });
 
+  it("rejects an explicit void body in the synchronous ARM action response", async () => {
+    const rule = await tester();
+    await rule
+      .expect(
+        `${header}
+        @armResourceOperations
+        interface Employees {
+          hire is ArmResourceActionSync<Employee, void, Response = { @statusCode _: 200; @body result: void; }>;
+        }
+      `,
+      )
+      .toEmitDiagnostics(({ program }) => expected(program));
+  });
+
   it("excludes a long-running POST with an otherwise offending bodyless 200 response", async () => {
     const rule = await tester();
     await rule

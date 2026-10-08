@@ -11,8 +11,11 @@ reachable in the selected versions and two belong to explicitly removed
 historical operations.
 
 The focused native fix catches synchronous resource POST 200 responses without
-a payload, previously accepted by the enabled official rules. It does not
-duplicate their status-code or async checks. Swagger also checks all provider
+a payload, including explicit `@body result: void` metadata missed before
+source-repair cycle 1. The 13-case native suite proves this correction; AutoRest
+rejects this fixture's void schema, so no Swagger parity is claimed for it.
+Corpus targets are unchanged from cycle 0. The check does not duplicate existing
+status-code or async checks. Swagger also checks all provider
 POSTs and serialized LRO response sets, outside this narrowly scoped check.
 The six baseline compile failures exclude 448 of 1,172 retained findings.
 Provider traversal, LRO representation, and unmatched operation correspondence
@@ -68,7 +71,11 @@ equivalence or diagnostic-count equality.
   variants share status 200. Target the authored operation rather than an
   emitted response object.
 - **Body:** HTTP payload presence, not whether a model has properties. Headers
-  do not count as a body; an explicit empty model body does.
+  do not count as a body; an explicit empty model body does. An explicit
+  `@body` of type `void` has HTTP body metadata but no payload; the compiler's
+  supported `isVoidType` predicate handles it alongside absent body metadata.
+  This follows the native `lro-response-mismatch` rule's void-body distinction,
+  without introducing emitter dependencies.
 - **Promotion:** ARM semantic ownership. Keep a separate disabled rule rather
   than silently adding a diagnostic to the enabled official POST rule.
 - **Activation:** the local `all` ruleset explicitly opts into the new check for
@@ -83,20 +90,21 @@ equivalence or diagnostic-count equality.
 HTTP payload presence answers the native question directly; the emitted-field
 column is comparison evidence, not production logic.
 
-| Authored shape                                                         | Validity / support                                                               | Native decision / emitted field                                          | Swagger expectation                                                                  | Focused evidence                                                                                           |
-| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| Template response `{ @statusCode _: 200; }`                            | Supported ARM customization; no compiler errors                                  | Body absent; emitted 200 schema absent                                   | Missing-schema diagnostic                                                            | `post-empty-200`, native template customization test                                                       |
-| 200 with headers only                                                  | Supported native response metadata                                               | Body absent; no payload                                                  | Missing-schema diagnostic expected                                                   | Native `headers are not a body` test; no extra emission simulation                                         |
-| 200 with an implicit model property                                    | Supported native payload                                                         | Body present                                                             | No missing-schema finding                                                            | Native implicit-model-body control                                                                         |
-| 200 with explicit scalar `@body`                                       | Supported HTTP payload; fixture also reports unrelated ARM content-type guidance | Body present; emitted schema is `{ "type": "string" }`                   | No finding for this rule                                                             | `post-body-200`, native scalar control                                                                     |
-| 200 with explicit empty model body                                     | Supported HTTP payload; body existence is distinct from model emptiness          | Body present                                                             | Missing-schema check does not require properties                                     | Native empty-model-payload control                                                                         |
-| 200 union with both payload and headers-only variants                  | Supported response union; no unrelated compiler warnings                         | At least one variant has no body; one operation warning                  | Serialized schema merge need not preserve variant distinction                        | Native mixed-variant regression; native contract intentionally takes precedence over merged representation |
-| 204 without a body                                                     | Supported template customization                                                 | No 200 body check; emitted 204 schema absent                             | Compliant                                                                            | `post-no-content-204`, exact documentation-example control                                                 |
-| 201 with a body                                                        | Supported authoring; official status rule warns                                  | New rule does not repeat status check                                    | Invalid synchronous status set                                                       | Existing `post-extra-201`; native no-duplication control                                                   |
-| `ArmResourceActionAsync<..., Response = OkResponse>` with bodyless 200 | Supported ARM async customization                                                | Excluded by LRO metadata despite matching the 200 missing-body predicate | A serialized bodyless 200 triggers the validator; legacy response parity is separate | Native LRO exclusion test asserts LRO metadata, bodyless 200, and no target diagnostic                     |
-| Bodyless 200 on DELETE                                                 | Outside POST contract                                                            | Excluded by verb                                                         | POST validator does not inspect it                                                   | Native verb control                                                                                        |
+| Authored shape                                                         | Validity / support                                                               | Native decision / emitted field                                          | Swagger expectation                                                                  | Focused evidence                                                                                                               |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Template response `{ @statusCode _: 200; }`                            | Supported ARM customization; no compiler errors                                  | Body absent; emitted 200 schema absent                                   | Missing-schema diagnostic                                                            | `post-empty-200`, native template customization test                                                                           |
+| Template response `{ @statusCode _: 200; @body result: void; }`        | Supported native ARM customization; AutoRest emission rejects the void schema    | Body metadata present, but void means no payload; one operation warning  | No emitted comparison: `@azure-tools/typespec-autorest/invalid-schema`               | `post-void-200` retains the emitter rejection and native warning; exact authored `hire` regression compiles without an emitter |
+| 200 with headers only                                                  | Supported native response metadata                                               | Body absent; no payload                                                  | Missing-schema diagnostic expected                                                   | Native `headers are not a body` test; no extra emission simulation                                                             |
+| 200 with an implicit model property                                    | Supported native payload                                                         | Body present                                                             | No missing-schema finding                                                            | Native implicit-model-body control                                                                                             |
+| 200 with explicit scalar `@body`                                       | Supported HTTP payload; fixture also reports unrelated ARM content-type guidance | Body present; emitted schema is `{ "type": "string" }`                   | No finding for this rule                                                             | `post-body-200`, native scalar control                                                                                         |
+| 200 with explicit empty model body                                     | Supported HTTP payload; body existence is distinct from model emptiness          | Body present                                                             | Missing-schema check does not require properties                                     | Native empty-model-payload control                                                                                             |
+| 200 union with both payload and headers-only variants                  | Supported response union; no unrelated compiler warnings                         | At least one variant has no body; one operation warning                  | Serialized schema merge need not preserve variant distinction                        | Native mixed-variant regression; native contract intentionally takes precedence over merged representation                     |
+| 204 without a body                                                     | Supported template customization                                                 | No 200 body check; emitted 204 schema absent                             | Compliant                                                                            | `post-no-content-204`, exact documentation-example control                                                                     |
+| 201 with a body                                                        | Supported authoring; official status rule warns                                  | New rule does not repeat status check                                    | Invalid synchronous status set                                                       | Existing `post-extra-201`; native no-duplication control                                                                       |
+| `ArmResourceActionAsync<..., Response = OkResponse>` with bodyless 200 | Supported ARM async customization                                                | Excluded by LRO metadata despite matching the 200 missing-body predicate | A serialized bodyless 200 triggers the validator; legacy response parity is separate | Native LRO exclusion test asserts LRO metadata, bodyless 200, and no target diagnostic                                         |
+| Bodyless 200 on DELETE                                                 | Outside POST contract                                                            | Excluded by verb                                                         | POST validator does not inspect it                                                   | Native verb control                                                                                                            |
 
-The native suite contains 12 tests and asserts the exact operation location for
+The native suite contains 13 tests and asserts the exact operation location for
 violations. It loads no emitter. The violating and corrected documentation
 snippets are exercised with the same template and response customization used
 in the published examples, adding only imports and an `Employee` resource.
@@ -108,24 +116,34 @@ and verifies that native LRO metadata is present and a 200 response variant has
 no HTTP body before asserting an empty target diagnostic set. This exercises
 the rule-owned LRO exclusion rather than passing merely because the operation
 has no 200 response. It replaces a no-content async control with only
-202/default responses; the suite remains 12 cases. Independent review confirmed
+202/default responses in cycle 0. Independent review confirmed
 that removing the LRO guard produces a warning for this supported bodyless-200
-control. The production predicate is unchanged.
+control. Source-repair cycle 1 additionally recognizes explicit void body
+metadata; the LRO exclusion and its control remain unchanged.
 
 ## Focused fixture evidence
 
-| Fixture               | Validator findings |    Target TypeSpec findings | Interpretation                                           |
-| --------------------- | -----------------: | --------------------------: | -------------------------------------------------------- |
-| `post-empty-200`      |                  1 |         1 new local warning | Previously uncovered synchronous 200 body requirement    |
-| `post-extra-201`      |                  1 | 1 existing official warning | Existing status-code coverage retained, no new duplicate |
-| `post-body-200`       |                  0 |                           0 | Payload presence is compliant                            |
-| `post-no-content-204` |                  0 |                           0 | Correct no-content status is compliant                   |
+| Fixture               |   Validator findings |    Target TypeSpec findings | Interpretation                                                     |
+| --------------------- | -------------------: | --------------------------: | ------------------------------------------------------------------ |
+| `post-empty-200`      |                    1 |         1 new local warning | Previously uncovered synchronous 200 body requirement              |
+| `post-void-200`       | Not run (no Swagger) |             1 local warning | Native-supported explicit void payload; emitter rejects the schema |
+| `post-extra-201`      |                    1 | 1 existing official warning | Existing status-code coverage retained, no new duplicate           |
+| `post-body-200`       |                    0 |                           0 | Payload presence is compliant                                      |
+| `post-no-content-204` |                    0 |                           0 | Correct no-content status is compliant                             |
 
 Both compliant fixtures have explicitly reviewed ambient warning expectations:
 common-types version, provisioning-state property, list operation, and example
 metadata. The scalar-body fixture additionally records ARM content-type guidance.
 These are unrelated to the POST response-body predicate, are not suppressed,
 and are not counted as evidence that the target rule fired.
+
+The full five-case fixture selection includes `post-void-200` as comparison
+limitation evidence, not as successful Swagger equivalence. The native-only
+13-case suite proves that this authored template customization compiles and
+reports exactly one warning on `hire`. In the fixture harness, AutoRest reports
+`@azure-tools/typespec-autorest/invalid-schema` ("Couldn't get schema for type
+void"), so no `output.json` or validator snapshot is fabricated. Its
+`tsp-diagnostics.json` records both the native warning and the emitter error.
 
 Adding the local mapping causes the harness to enable its explicit `all` ruleset
 for the existing 201 fixture too. Its updated diagnostic snapshot therefore
@@ -172,6 +190,33 @@ describes the actual synchronous requirement instead.
 
 **Disposition:** focused native fix, no duplicate status/async diagnostics.
 
+### Gap example: explicit void body metadata
+
+- **Classification:** native semantic miss; emitted comparison unavailable.
+- **Status:** fixed in source-repair cycle 1.
+- **Project/API version:** focused `Microsoft.TestService` / `2024-01-01`.
+- **Source:** `post-void-200/main.tsp`, `WidgetActions.reset`; native regression
+  uses the exact authored `Employees.hire` customization below.
+
+```tsp
+hire is ArmResourceActionSync<Employee, void, Response = { @statusCode _: 200; @body result: void; }>;
+```
+
+| Engine                      | Observed result                                                          |
+| --------------------------- | ------------------------------------------------------------------------ |
+| Previous local native rule  | Zero warnings: body metadata was present                                 |
+| Repaired native rule        | Exactly one warning on authored `hire`; native compilation succeeds      |
+| AutoRest fixture comparison | `invalid-schema` for void; no Swagger emitted and no validator execution |
+
+**Explanation:** body-metadata existence is not sufficient to establish an HTTP
+payload. Compiler `isVoidType(variant.body.type)` distinguishes void from actual
+payloads, including empty models. The rule does not call the emitter to decide
+the diagnostic. The emitter limitation does not negate supported native
+authoring, and cannot establish a Swagger count or parity claim.
+
+**Disposition:** repair the source predicate and retain empty-model, scalar,
+headers-only, 201, 204, and effective-bodyless-200 LRO controls.
+
 ### Gap example: report populations and identity
 
 - **Classification:** count-only/report-population mismatch.
@@ -195,7 +240,7 @@ The external report does not record its source/generator revision or publication
 date. The original checked-in report is schema 6, generated
 `2026-08-10T09:38:18.108Z`; the retained dataset was generated
 `2026-08-06T08:03:27.940Z`. The current schema-7 full analysis is generated
-`2026-10-08T05:47:38.543Z` and took 1,112,381 ms. The old successful population
+`2026-10-08T10:14:48.001Z` and took 1,143,309 ms. The old successful population
 and its six failed project identities match the current run.
 
 The current selected-population extraction establishes the 1,172-to-724
@@ -207,6 +252,13 @@ No diagnostic-level normalized equivalence metric is configured for this rule.
 These identities do not establish one-to-one correspondence with 82 authored
 TypeSpec operation warnings.
 
+The fresh cycle 1 extraction independently confirms **684** selected validator
+identities both with and without Swagger-file attribution, and **82** native
+source-file/line/column identities. Across the 112 affected projects, eight have
+equal raw counts, 104 have more validator findings, and none have more native
+warnings. The positive raw difference is 642, with zero negative difference.
+These are separate diagnostic domains, not a normalized-equivalence metric.
+
 The external report's 109 versus 112 projects remains unreconstructable without
 its missing provenance. Template/official mapping credit is not evidence that a
 warning fires on every supported customization.
@@ -214,7 +266,7 @@ warning fires on every supported customization.
 ## Corpus evidence
 
 The existing full runner completed naturally with exit 0 at
-`2026-10-08T05:47:38.543Z`, without retries or timeout overrides. It processed
+`2026-10-08T18:17:19.4888221+08:00`, without retries or timeout overrides. It processed
 all 468 projects: 462 successes and six baseline failures. Its 52,008 total
 diagnostics include other rules and failed compilations and are not this rule's
 comparison count.
@@ -230,6 +282,22 @@ comparison count.
 The mapping includes the local missing-body rule and the existing official POST
 status rule. Only the local rule fired in this corpus. The comparison's 31.25%
 project overlap is observational, not a semantic-equivalence percentage.
+
+### Source-repair cycle 1 corpus delta
+
+The required unfiltered 468-project rerun used the repaired production predicate,
+not the earlier corpus as its final result. Comparing every rule, severity,
+project, source file, line, column, and message in the new local-rule shard
+against cycle 0 establishes an identical diagnostic multiset: **zero added and
+zero removed targets**, still 82 warnings across 35 projects. The fresh mapped
+project sets also match: overlap 35, validator-only 77, TypeSpec-only zero.
+
+This does not show that void body metadata is compliant or that the new branch
+is unnecessary. The supported `hire` regression changes from zero to exactly
+one operation warning. The corpus adds no previously missed target for this
+shape. Shape coverage comes from that native regression; unchanged totals are
+only observational regression evidence. Provider/LRO correspondence remains
+partial, and the void fixture's emitter error prevents emitted comparison.
 
 ### Selected API versions and historical targets
 
@@ -252,6 +320,11 @@ targets leaves all 35 overlapping projects. There are no TypeSpec-only projects
 requiring further one-sided version attribution. The production rule retains
 both legitimate historical diagnostics; it is not altered to match Swagger's
 selected-version population.
+
+The selected-version attribution is retained from the prior per-target source
+and graph investigation because the specs pin, selected-version metadata, and
+all 82 exact diagnostic identities are unchanged. This reuses immutable
+attribution evidence, not old corpus output in place of the required fresh run.
 
 ### Real-service examples of the fixed native gap
 
@@ -332,6 +405,13 @@ silently counted as assessed projects.
 
 This baseline comparison is read-only corpus evidence, not a native-test timeout
 or baseline retry. No service source or suppressions were modified.
+
+The cycle 1 failure source/code/message occurrence multisets match cycle 0
+exactly for all six projects. Compared with the older schema-6 checked-in raw
+output, DeviceProvisioningServices and ServiceLinker each contain eight rather
+than twelve repeated duplicate-body error lines; their distinct error identities
+are identical. That multiplicity difference was already present in cycle 0 and
+is not a new compile failure or an effect of recognizing void response bodies.
 
 ### Same-project overlap (35 projects)
 

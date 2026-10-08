@@ -25,7 +25,8 @@ officialTspLints:
 Synchronous ARM resource POST actions returning 200 must return a response body.
 Use a 204 response when the action completes without a payload. Response headers
 are metadata, not a response body. An explicitly declared empty model payload is
-still a body.
+still a body, but an explicit `@body` of type `void` carries no payload and must
+also use 204.
 
 The focused `no-empty-post-response` rule checks only this missing-body case.
 Existing official rules continue checking status-code combinations, long-running
@@ -65,7 +66,8 @@ resource and imports and checks these exact response customizations.
 - **Audience:** ARM resource lifecycle/action operations resolved by
   `getArmResources`, matching the official POST status-code rule's ownership.
 - **API:** resolved `httpOperation.responses`; native `getLroMetadata` excludes
-  long-running operations. No schema emission or extension inspection.
+  long-running operations; compiler `isVoidType` identifies a body declaration
+  without a payload. No schema emission or extension inspection.
 - **Diagnostic:** one warning on the operation if any 200 response variant has
   no HTTP body. A mixed payload/metadata-only union must not throw.
 - **Exemptions:** other verbs/statuses and native LROs; provider actions are
@@ -96,9 +98,10 @@ See [migration evidence](migration.md) for populations and remaining limitations
 
 ## Test cases
 
-| ID                    | Intent     | Check                                         |
-| --------------------- | ---------- | --------------------------------------------- |
-| `post-extra-201`      | Violation  | Existing official status-set check            |
-| `post-empty-200`      | Violation  | Bodyless 200 through `Response` customization |
-| `post-body-200`       | Compliance | 200 with explicit scalar payload              |
-| `post-no-content-204` | Compliance | 204 without a payload                         |
+| ID                    | Intent     | Check                                               |
+| --------------------- | ---------- | --------------------------------------------------- |
+| `post-extra-201`      | Violation  | Existing official status-set check                  |
+| `post-empty-200`      | Violation  | Bodyless 200 through `Response` customization       |
+| `post-void-200`       | Violation  | Explicit void body through `Response` customization |
+| `post-body-200`       | Compliance | 200 with explicit scalar payload                    |
+| `post-no-content-204` | Compliance | 204 without a payload                               |

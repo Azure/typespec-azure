@@ -1,6 +1,6 @@
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { getArmResources } from "@azure-tools/typespec-azure-resource-manager";
-import { createRule } from "@typespec/compiler";
+import { createRule, isVoidType } from "@typespec/compiler";
 
 export const noEmptyPostResponseRule = createRule({
   name: "no-empty-post-response",
@@ -31,7 +31,9 @@ export const noEmptyPostResponseRule = createRule({
               operation.httpOperation.responses.some(
                 (response) =>
                   response.statusCodes === 200 &&
-                  response.responses.some((variant) => variant.body === undefined),
+                  response.responses.some(
+                    (variant) => variant.body === undefined || isVoidType(variant.body.type),
+                  ),
               )
             ) {
               context.reportDiagnostic({ target: operation.operation });
