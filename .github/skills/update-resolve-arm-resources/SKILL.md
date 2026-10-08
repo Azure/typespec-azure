@@ -183,7 +183,9 @@ Include both the ARM resource type string and instance path in resource naming r
 one model and one resource type can produce several resolved resource occurrences. For example,
 subscription-scoped and tenant-scoped resources can share the same resource type string while
 having different instance paths. Resource type alone does not encode scope, parent identifiers, or
-extension-resource targets.
+extension-resource targets. Public instance paths preserve named HTTP parameters such as
+`{subscriptionId}`. Canonical `{}` segments are only for internal identity comparison and must not
+replace parameter names in returned provider metadata or naming requests.
 
 Track synthetic parents internally and invoke the name resolver with `type: undefined`. Current
 synthetic parents reuse the child model in their stored `type` field, but that model is not an
