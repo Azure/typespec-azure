@@ -1,7 +1,13 @@
 import "../../lib/imports.tsp";
-using TypeSpec.Http; using TypeSpec.Rest; using TypeSpec.Versioning; using TypeSpec.OpenAPI; using Azure.ResourceManager;
+using TypeSpec.Http;
+using TypeSpec.Rest;
+using TypeSpec.Versioning;
+using TypeSpec.OpenAPI;
+using Azure.ResourceManager;
 
-@armProviderNamespace @service(#{ title: "Test Service" }) @versioned(Versions)
+@armProviderNamespace
+@service(#{ title: "Test Service" })
+@versioned(Versions)
 @armCommonTypesVersion(CommonTypes.Versions.v5)
 namespace Microsoft.TestService;
 
@@ -11,7 +17,10 @@ enum Versions {
 }
 
 model Widget is TrackedResource<WidgetProperties> {
-  @key("widgetName") @segment("widgets") @doc("The name of the widget") @path
+  @key("widgetName")
+  @segment("widgets")
+  @doc("The name of the widget")
+  @path
   @pattern("^[a-zA-Z0-9_-]+$")
   name: string;
 }
@@ -19,7 +28,9 @@ model Widget is TrackedResource<WidgetProperties> {
 @doc("Widget resource properties.")
 model WidgetProperties {
   @doc("Description") description?: string;
-  @doc("Resource provisioning state") @visibility(Lifecycle.Read)
+
+  @doc("Resource provisioning state")
+  @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
 }
 
@@ -44,6 +55,7 @@ interface Widgets {
   get is ArmResourceRead<Widget>;
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
   delete is ArmResourceDeleteWithoutOkAsync<Widget>;
+  restartNative is ArmResourceActionAsync<Widget, void, void, Error = CustomApiError>;
 
   #suppress "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes" "LRO POST needs 202 response"
   #suppress "@azure-tools/typespec-azure-core/no-openapi" "Need x-ms-long-running-operation to test non-standard error in LRO"
@@ -52,5 +64,8 @@ interface Widgets {
   @route("restart")
   @post
   @armResourceAction(Widget)
-  restart(...ResourceInstanceParameters<Widget>): ArmResponse<Widget> | Accepted202WithLocation | CustomApiError;
+  restart(...ResourceInstanceParameters<Widget>):
+    | ArmResponse<Widget>
+    | Accepted202WithLocation
+    | CustomApiError;
 }

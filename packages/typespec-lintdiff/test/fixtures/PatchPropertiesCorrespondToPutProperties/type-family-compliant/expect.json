@@ -1,0 +1,37 @@
+{
+  "violation": false,
+  "ambientDiagnostics": [
+    {
+      "code": "@azure-tools/typespec-autorest/union-unsupported",
+      "count": 2
+    },
+    {
+      "code": "@azure-tools/typespec-azure-core/no-nullable",
+      "count": 2
+    },
+    {
+      "code": "@azure-tools/typespec-azure-core/no-unnamed-types",
+      "count": 2
+    },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/arm-no-record",
+      "count": 2
+    },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
+      "count": 1
+    },
+    {
+      "code": "@azure-tools/typespec-azure-resource-manager/no-empty-model",
+      "count": 2
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "count": 7
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/xms-examples-required",
+      "count": 6
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+[
+  {
+    "code": "PatchPropertiesCorrespondToPutProperties",
+    "message": "Non empty patch body with an empty put body is not valid.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "parameters"
+    ],
+    "severity": 0
+  }
+]

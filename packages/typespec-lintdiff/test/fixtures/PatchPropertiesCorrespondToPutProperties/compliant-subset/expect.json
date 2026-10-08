@@ -1,0 +1,17 @@
+{
+  "violation": false,
+  "ambientDiagnostics": [
+    {
+      "code": "tsp-lintdiff-local-linter/description-must-not-be-node-name",
+      "count": 2
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/path-parameter-schema",
+      "count": 7
+    },
+    {
+      "code": "tsp-lintdiff-local-linter/xms-examples-required",
+      "count": 6
+    }
+  ]
+}

@@ -8,5 +8,10 @@
     "code": "@azure-tools/typespec-azure-core/no-openapi",
     "severity": "warning",
     "message": "Azure specs should not be using decorator \"$extension\" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-pageable-for-list-calls",
+    "severity": "warning",
+    "message": "This GET operation uses a collection route but does not emit `x-ms-pageable`. Use an ARM list operation template, or add `@list` and annotate the response with `@pageItems` and `@nextLink`."
   }
 ]

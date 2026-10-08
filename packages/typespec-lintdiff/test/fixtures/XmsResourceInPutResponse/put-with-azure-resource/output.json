@@ -40,6 +40,9 @@
   "tags": [
     {
       "name": "Operations"
+    },
+    {
+      "name": "Widgets"
     }
   ],
   "paths": {
@@ -74,10 +77,13 @@
         }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/customItems/{itemName}": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}": {
       "put": {
-        "operationId": "CreateCustomItem",
-        "description": "Create a custom item.",
+        "operationId": "Widgets_CreateOrUpdate",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Creates or replaces a widget.",
         "parameters": [
           {
             "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
@@ -89,27 +95,34 @@
             "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
-            "name": "itemName",
+            "name": "widgetName",
             "in": "path",
-            "description": "The item name.",
+            "description": "The name of the Widget",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
-            "name": "body",
+            "name": "resource",
             "in": "body",
-            "description": "The custom resource body.",
+            "description": "Resource create parameters.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/CustomResource"
+              "$ref": "#/definitions/Widget"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "The request has succeeded.",
+            "description": "Resource 'Widget' update operation succeeded",
             "schema": {
-              "$ref": "#/definitions/CustomResource"
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "201": {
+            "description": "Resource 'Widget' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/Widget"
             }
           },
           "default": {
@@ -123,24 +136,30 @@
     }
   },
   "definitions": {
-    "CustomResource": {
+    "Widget": {
       "type": "object",
-      "description": "A custom resource with x-ms-azure-resource enabled.",
+      "description": "A registered proxy resource.",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The resource name."
-        },
-        "type": {
-          "type": "string",
-          "description": "The resource type."
-        },
-        "data": {
-          "type": "string",
-          "description": "Custom data."
+        "properties": {
+          "$ref": "#/definitions/WidgetProperties",
+          "description": "The resource-specific properties for this resource."
         }
       },
-      "x-ms-azure-resource": true
+      "allOf": [
+        {
+          "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ProxyResource"
+        }
+      ]
+    },
+    "WidgetProperties": {
+      "type": "object",
+      "description": "Widget properties.",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "A display name."
+        }
+      }
     }
   },
   "parameters": {}

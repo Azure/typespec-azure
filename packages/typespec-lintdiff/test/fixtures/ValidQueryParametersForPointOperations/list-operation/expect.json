@@ -6,19 +6,11 @@
       "count": 1
     },
     {
-      "code": "tsp-lintdiff-local-linter/patch-body-parameters-schema",
-      "count": 1
-    },
-    {
       "code": "tsp-lintdiff-local-linter/path-parameter-schema",
       "count": 10
     },
     {
       "code": "tsp-lintdiff-local-linter/query-parameters-in-collection-get",
-      "count": 1
-    },
-    {
-      "code": "tsp-lintdiff-local-linter/unsupported-patch-properties",
       "count": 1
     },
     {

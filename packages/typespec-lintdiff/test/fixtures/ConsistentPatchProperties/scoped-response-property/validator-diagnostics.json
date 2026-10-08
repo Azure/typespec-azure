@@ -1,0 +1,15 @@
+[
+  {
+    "code": "ConsistentPatchProperties",
+    "message": "The property 'description' in the request body either not apppear in the resource model or has the wrong level.",
+    "path": [
+      "paths",
+      "/widgets",
+      "patch",
+      "parameters",
+      "0",
+      "schema"
+    ],
+    "severity": 0
+  }
+]

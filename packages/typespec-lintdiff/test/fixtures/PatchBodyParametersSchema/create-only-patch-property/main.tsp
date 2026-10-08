@@ -43,7 +43,7 @@ model WidgetPatchBody {
 
 @doc("Patch properties with a create-only property.")
 model WidgetPatchProperties {
-  @doc("Create-only property in patch body -- violates rule")
+  @doc("Create-only property excluded from native PATCH input but retained by schema sharing")
   @visibility(Lifecycle.Create)
   createOnly?: string;
 }

@@ -54,11 +54,16 @@ model WidgetPatchProperties {
 @doc("Accepted LRO polling response.")
 model Accepted202WithLocation {
   @doc("Status code")
-  @statusCode statusCode: 202;
+  @statusCode
+  statusCode: 202;
+
   @doc("Polling location")
-  @header("Location") location?: string;
+  @header("Location")
+  location?: string;
+
   @doc("Retry-after value")
-  @header("Retry-After") retryAfter?: int32;
+  @header("Retry-After")
+  retryAfter?: int32;
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}
@@ -73,7 +78,6 @@ interface Widgets {
 
   #suppress "@azure-tools/typespec-azure-core/no-openapi" "Need explicit LRO extensions for async PATCH."
   @extension("x-ms-long-running-operation", true)
-  #suppress "@azure-tools/typespec-azure-core/no-openapi" "Need explicit LRO final-state metadata for async PATCH."
   @extension("x-ms-long-running-operation-options", #{ `final-state-via`: "location" })
   @doc("Update a Widget with an async PATCH body that matches the GET resource model.")
   @patch

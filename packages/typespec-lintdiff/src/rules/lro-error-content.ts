@@ -1,60 +1,102 @@
-import { createRule, isErrorModel, type Model, type Type } from "@typespec/compiler";
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
-import { getHttpOperation, type HttpOperationResponse, type HttpStatusCodeRange } from "@typespec/http";
-import { getExtensions } from "@typespec/openapi";
-import { resolveProviderNamespace } from "@azure-tools/typespec-azure-resource-manager";
+import {
+  getArmCommonTypeOpenAPIRef,
+  getArmProviderNamespace,
+  getExternalTypeRef,
+  isArmCommonType,
+} from "@azure-tools/typespec-azure-resource-manager";
+import {
+  createRule,
+  isNullType,
+  listServices,
+  type Operation,
+  type Service,
+  type Type,
+} from "@typespec/compiler";
+import {
+  createMetadataInfo,
+  getHttpService,
+  Visibility,
+  type HttpStatusCodeRange,
+} from "@typespec/http";
+
+const standardErrorReference =
+  /.*\/common-types\/resource-management\/v(([1-9]\d+)|[2-9])\/types.json#\/definitions\/ErrorResponse/;
 
 export const lroErrorContentRule = createRule({
   name: "lro-error-content",
-  description:
-    "LRO operations must use the standard ARM ErrorResponse type for error responses, not custom error models.",
+  description: "Native ARM LRO error payloads must use the common-types v2 or later ErrorResponse.",
   severity: "warning",
   messages: {
     default:
-      "Error response content of long running operations must follow the standard error schema provided in the Azure common types. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error model.",
+      "Error payloads of long running operations must use the common-types v2 or later ErrorResponse. Use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload.",
   },
   create(context) {
+    const program = context.program;
+    const metadata = createMetadataInfo(program, { canonicalVisibility: Visibility.Read });
+    const reported = new Set<Operation | Operation["node"]>();
+
+    function isStandardError(type: Type, service: Service): boolean {
+      let reference = getExternalTypeRef(program, type);
+      if (
+        !reference &&
+        isArmCommonType(type) &&
+        (type.kind === "Model" ||
+          type.kind === "ModelProperty" ||
+          type.kind === "Enum" ||
+          type.kind === "Union")
+      ) {
+        reference = getArmCommonTypeOpenAPIRef(program, type, { service });
+      }
+      if (reference) {
+        return standardErrorReference.test(
+          reference.replaceAll("{arm-types-dir}", "/common-types/resource-management"),
+        );
+      }
+      // A nullable standard error still describes the standard error payload.
+      if (type.kind === "Union") {
+        const members = [...type.variants.values()]
+          .map((variant) => variant.type)
+          .filter((member) => !isNullType(member));
+        return members.length === 1 && isStandardError(members[0], service);
+      }
+      return false;
+    }
+
     return {
-      operation: (operation) => {
-        const namespace = operation.interface?.namespace ?? operation.namespace;
-        if (resolveProviderNamespace(context.program, namespace) === undefined) {
-          return;
-        }
-
-        // Check if this is an LRO operation
-        const lroMetadata = getLroMetadata(context.program, operation);
-        const extensions = getExtensions(context.program, operation);
-        const isLro =
-          lroMetadata !== undefined ||
-          extensions.get("x-ms-long-running-operation") === true;
-
-        if (!isLro) {
-          return;
-        }
-
-        const [httpOperation] = getHttpOperation(context.program, operation);
-
-        for (const response of httpOperation.responses) {
-          if (!isErrorResponse(response.statusCodes)) {
+      root() {
+        for (const service of listServices(program)) {
+          // Lintdiff runs mixed ARM/data-plane rules; remove this isolation on ARM promotion.
+          if (!getArmProviderNamespace(program, service.type)) {
             continue;
           }
-
-          // Check if the response body model traces to the standard ErrorResponse
-          for (const innerResponse of response.responses) {
-            if (innerResponse.body === undefined) {
+          const [httpService] = getHttpService(program, service.type);
+          for (const httpOperation of httpService.operations) {
+            const operation = httpOperation.operation;
+            const source = operation.node ?? operation;
+            if (
+              reported.has(source) ||
+              httpOperation.verb === "get" ||
+              getLroMetadata(program, operation) === undefined
+            ) {
               continue;
             }
-
-            const bodyType = innerResponse.body.type;
-            if (bodyType.kind !== "Model") {
-              continue;
-            }
-
-            if (!isStandardErrorResponse(bodyType)) {
-              context.reportDiagnostic({
-                target: operation,
-              });
-              return; // Report once per operation
+            const invalidBody = httpOperation.responses.some(
+              (response) =>
+                isErrorResponse(response.statusCodes) &&
+                response.responses.some(
+                  ({ body }) =>
+                    body !== undefined &&
+                    (body.bodyKind !== "single" ||
+                      !isStandardError(
+                        metadata.getEffectivePayloadType(body.type, Visibility.Read),
+                        service,
+                      )),
+                ),
+            );
+            if (invalidBody) {
+              context.reportDiagnostic({ target: operation });
+              reported.add(source);
             }
           }
         }
@@ -63,63 +105,11 @@ export const lroErrorContentRule = createRule({
   },
 });
 
-function isErrorResponse(statusCode: number | "*" | HttpStatusCodeRange): boolean {
-  if (statusCode === "*") {
-    return true; // default response is the error response
-  }
-  if (typeof statusCode === "number") {
-    return statusCode >= 400;
-  }
-  return statusCode.start >= 400;
-}
-
-/**
- * Check if a model is or extends the standard ARM ErrorResponse.
- * Walks the base model chain looking for a model named "ErrorResponse"
- * in a namespace starting with "Azure.ResourceManager".
- */
-function isStandardErrorResponse(model: Model): boolean {
-  let current: Model | undefined = model;
-  while (current !== undefined) {
-    if (isArmErrorResponseModel(current)) {
-      return true;
-    }
-    // Also check if the model IS an error model via @error decorator
-    // and has the right shape from ARM common types
-    current = current.baseModel;
-  }
-
-  // Check sourceModel chain (for `is` keyword usage)
-  current = model;
-  while (current !== undefined) {
-    if (isArmErrorResponseModel(current)) {
-      return true;
-    }
-    current = current.sourceModel;
-  }
-
-  return false;
-}
-
-function isArmErrorResponseModel(model: Model): boolean {
-  const ns = getFullNamespaceName(model);
+function isErrorResponse(status: number | "*" | HttpStatusCodeRange): boolean {
   return (
-    model.name === "ErrorResponse" &&
-    ns !== undefined &&
-    (ns.startsWith("Azure.ResourceManager") || ns.startsWith("Azure.Core"))
+    status === "*" ||
+    (typeof status === "number"
+      ? status >= 400 && status < 600
+      : status.start < 600 && status.end >= 400)
   );
-}
-
-function getFullNamespaceName(model: Model): string | undefined {
-  const ns = model.namespace;
-  if (ns === undefined) {
-    return undefined;
-  }
-  const parts: string[] = [];
-  let current = ns;
-  while (current !== undefined && current.name !== "") {
-    parts.unshift(current.name);
-    current = current.namespace!;
-  }
-  return parts.join(".");
 }

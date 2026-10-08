@@ -15,9 +15,19 @@
     "message": "Tags should not be specified in the properties bag for proxy resources. Consider using a Tracked resource instead.",
     "path": [
       "definitions",
-      "GadgetProperties",
+      "GadgetBaseProperties",
       "properties",
       "tags"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "TagsAreNotAllowedForProxyResources",
+    "message": "Tags should not be specified in the properties bag for proxy resources. Consider using a Tracked resource instead.",
+    "path": [
+      "definitions",
+      "GadgetProperties",
+      "properties"
     ],
     "severity": 0
   },

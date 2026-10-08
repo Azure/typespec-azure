@@ -1,0 +1,4 @@
+{
+  "violation": false,
+  "validatorDiagnostics": [{ "code": "ConsistentPatchProperties", "count": 1 }]
+}

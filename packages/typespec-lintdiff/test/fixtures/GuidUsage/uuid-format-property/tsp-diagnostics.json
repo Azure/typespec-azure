@@ -5,11 +5,6 @@
     "message": "Usage of Guid is not recommended. If GUIDs are absolutely required in your service, please get sign off from the Azure API review board."
   },
   {
-    "code": "tsp-lintdiff-local-linter/unsupported-patch-properties",
-    "severity": "warning",
-    "message": "PATCH request body property 'name' is not patchable and should be removed or made read-only/immutable."
-  },
-  {
     "code": "@azure-tools/typespec-azure-core/documentation-required",
     "severity": "warning",
     "message": "The Model named 'IdentifierProperties' should have a documentation or description, use doc comment /** */ to provide it."

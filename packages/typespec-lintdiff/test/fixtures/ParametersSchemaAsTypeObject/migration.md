@@ -1,6 +1,54 @@
 # ParametersSchemaAsTypeObject migration investigation
 
-## Conclusion
+## Result and gap summary
+
+**Historical results:** The full corpus generated at `2026-09-01T06:03:08.946Z`
+recorded 18 Swagger and 19 raw TypeSpec diagnostics across nine overlapping
+projects, with no one-sided projects among 462 successfully compiled projects.
+Conservative identities reduced both diagnostic counts to 18; six projects
+remained unassessed.
+
+**Current decision:** [Promotion review in PR #5361](https://github.com/Azure/typespec-azure/pull/5361)
+settled idiomatic TypeSpec validation as the acceptance criterion, not exact
+executable Swagger parity. The promoted `use-model-request-body` rule checks
+for a plain model without an indexer, with absent/synthetic `void` and multipart
+exemptions. Swagger parity is retained only where it naturally maps to that
+native contract.
+
+**Evidence boundary:** The counts and exact-emission parity conclusions below
+describe the earlier lintdiff implementation, not a rerun of the promoted rule.
+Intentional differences are documented rather than requiring emitter, format,
+or encoding simulation; universal Swagger equivalence is not claimed.
+
+## Current native migration guidance
+
+Validate TypeSpec semantics directly. Require tests demonstrating that any added
+complexity changes behavior for valid, supported, idiomatic TypeSpec. Otherwise
+omit that complexity and document the intentional parity gap. Distinguish these
+inputs from Swagger-only or emitter-invalid shapes and constructs already
+invalidated by TypeSpec or Azure rules.
+
+Do not reproduce AutoRest union normalization, inline/reference selection,
+schema replacement, or format/encoding handling merely to match the validator's
+selection of emitted `schema.type`. In particular, historical exemptions for
+`unknown`, unions, or schema-less scalars and enums do not define the promoted
+rule's plain-model contract. Emission of `{}` or an object schema is not itself
+a native compliance criterion.
+
+Corpus comparisons remain useful regression evidence. Preserve their population,
+compile failures, and count explanations, but record intentional differences
+against the native contract instead of treating every Swagger mismatch as a
+required rule repair. No production implementation is changed by this policy
+update.
+
+## Historical exact-emission parity investigation
+
+The remainder of this investigation preserves the earlier implementation's
+observations, fixtures, and corpus results. References to "now", "final",
+"fixed", and dispositions in this historical evidence describe that
+implementation at the recorded run, not current promotion requirements.
+
+### Historical conclusion
 
 The migrated TypeSpec rule required a further repair. The Swagger rule rejects every
 explicit request-body `schema.type` other than `object`. The former TypeSpec
@@ -33,7 +81,11 @@ reject its intended object-schema use cases, and no compiler or AutoRest API
 provides the referenced JSON schema type without external I/O. No such case
 appears in the aligned corpus; the equivalence conclusion excludes it.
 
-## Required TypeSpec changes
+### Historical implementation changes (not promotion requirements)
+
+The following changes were made or prescribed to pursue exact emitted-schema
+parity. They are retained as investigation history, not as required changes to
+the promoted native rule; the current guidance above supersedes them.
 
 1. Update `src/rules/parameters-schema-as-type-object.ts` to recognize arrays
    through model, base-model, and source-model ancestry.
@@ -91,7 +143,7 @@ appears in the aligned corpus; the equivalence conclusion excludes it.
 No emitter, validator, corpus-generator, or comparison-normalization changes
 are required.
 
-## Existing official coverage
+## Historical official coverage assessment
 
 Azure Core registers `request-body-problem`, which rejects only a raw `Array`
 request-body property. It does not cover other explicit primitive body schemas,
@@ -653,11 +705,15 @@ The seventeen-fixture suite covers five violating fixtures and twelve compliant 
 Ambient diagnostics from other rules are declared in each fixture snapshot and
 do not establish this rule's target identity.
 
-## Final statement
+## Current conclusion
 
-For the aligned successful-project population, every Swagger project is
-covered, there are no TypeSpec-only projects, the deduplicated identities are
-18 to 18, and focused fixtures cover the fixed semantic branches. The migrated
-TypeSpec rule is functionally equal to the implemented Swagger rule. The one
-raw TypeSpec count difference is a duplicate source record, not unresolved rule
-behavior.
+The historical aligned population had nine overlapping projects and 18-to-18
+deduplicated identities; the extra raw TypeSpec record was a duplicate source
+location. Those observations remain useful but do not establish the promoted
+rule's results or acceptance criteria.
+
+Promotion follows the idiomatic `use-model-request-body` contract: a plain model
+without an indexer, with absent/synthetic `void` and multipart exemptions.
+Maintain parity where it maps naturally to TypeSpec, and document intentional
+differences elsewhere. Exact AutoRest emission behavior, particularly for
+invalid or non-idiomatic constructs, is not the migration contract.

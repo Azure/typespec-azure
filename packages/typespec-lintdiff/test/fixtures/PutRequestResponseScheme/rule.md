@@ -26,11 +26,24 @@ validator violation.
   `200` response schema and falls back to `201` when no `200` response exists.
 - The local TypeSpec lint mirrors that data-plane behavior and intentionally
   skips ARM namespaces so it does not overlap `PutRequestResponseSchemeArm`.
+- The shared comparator matches unnamed union variants by native member types
+  rather than compiler-generated symbol identity, independent of their order.
+  Named variants still require matching names and types. Enum-member types
+  compare both labels and effective values. Direct enums use that same
+  comparison, including implicit string defaults, numeric zero, and empty
+  strings. Equal indexers still require equal named/inherited properties,
+  including optionality. Same-named scalars also require matching names through
+  their base chains rather than accepting incompatible underlying types.
+  The shared native
+  regression suite `test/rules/put-request-response-scheme.test.ts` covers
+  separate equivalent open unions, genuine differences, recursion, response
+  selection, and absent bodies for both consumers without importing an emitter.
 
 ## Test Cases
 
-| ID                        | Violation | Description                                                |
-| ------------------------- | --------- | ---------------------------------------------------------- |
-| `put-schema-match`        | false     | PUT request and `200` response use the same schema.        |
-| `put-schema-mismatch`     | true      | PUT request and `200` response use different schemas.      |
-| `put-schema-mismatch-201` | true      | PUT has no `200`; request body differs from the `201` body.|
+| ID                        | Violation | Description                                                   |
+| ------------------------- | --------- | ------------------------------------------------------------- |
+| `put-schema-match`        | false     | PUT request and `200` response use the same schema.           |
+| `no-request-body`         | false     | PUT has no emitted request body for the validator to compare. |
+| `put-schema-mismatch`     | true      | PUT request and `200` response use different schemas.         |
+| `put-schema-mismatch-201` | true      | PUT has no `200`; request body differs from the `201` body.   |

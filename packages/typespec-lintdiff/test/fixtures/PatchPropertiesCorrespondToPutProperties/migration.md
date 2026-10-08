@@ -1,0 +1,652 @@
+# PatchPropertiesCorrespondToPutProperties migration evidence
+
+## Result and gap summary
+
+Across 462 successfully compiled projects, the staging validator reports 1,374 diagnostics in 316 projects; reachability-filtered TypeSpec reports 100 in 43, all overlapping, leaving 273 validator-only projects. Raw TypeSpec reports 118 in 45: HTTP reachability removes 16 diagnostics, and excluding failed Quota removes two more. The dominant demonstrated gap is whole-schema deep comparison: Swagger rejects metadata differences while TypeSpec compares property presence. The latest repair removes repeated shared-model warnings across services; corpus diagnostic identities are unchanged. Added/removed availability is supported, but historical renames and type changes are not reconstructed; reachable targets can retain historical-only findings. Full Swagger equivalence is not established, and the 273-project remainder is not individually proven false positive. All six compiler failures match the accepted baseline, with fresh details retained. Same-endpoint overload Swagger comparison remains unavailable because AutoRest crashes.
+
+## Evidence provenance
+
+- External report: `packages/typespec-lintdiff/docs/coverage_old.md` (source gist linked in that file), 450 compiled projects and 210 validator rules. Its row reports 308 fired projects, 20 local-lint projects, 0 official-rule projects, and 6.5% coverage under a different snapshot/methodology.
+- Current dataset: azure-rest-api-specs commit `f6b53f105b95da05276530a0754a1c71b4f16397`, recorded in `packages/typespec-lintdiff/specs/_meta.json`.
+- Final TypeSpec run: generated timestamp `2026-09-15T06:35:48.804Z`, process completed `2026-09-15T06:38:37.1698665Z`, full scope, 468 attempted, 462 successful, 6 compile failures; runner duration 1,816,235 ms (30 minutes 16 seconds), wall time 30 minutes 20 seconds.
+- Representative preflight: literal `ProviderHub.Management` selected one successful project. The existing full runner then ran without a filter at concurrency six.
+- Raw project stdout/stderr, selected-version HTTP graphs, result summaries, rule shards, exact failure details, and population analysis were retained outside generated directories in the queue's `queue-run6-cycle1/corpus` evidence bundle before cleanup. Target diagnostic identity multisets and project sets match the preceding `queue-patch-run4` run exactly; unchanged corpus output does not by itself cover shared-model multi-service authoring.
+- Staging validator source: `packages/rulesets/src/spectral/functions/patch-properties-correspond-to-put-properties.ts` in azure-openapi-validator. The catalog marks this rule `stagingOnly: true`.
+- Generated `packages/typespec-lintdiff/specs` changes are validation evidence only and are excluded from this PR.
+
+## Existing official coverage
+
+The registered official ARM rule `arm-resource-patch` checks that a PATCH body exists and that top-level PATCH properties occur in the ARM resource model. Standard `ResourceUpdateModel` templates also derive PATCH shapes from resource properties. Coverage is partial: custom body shapes remain authorable, nested PUT/PATCH leaf correspondence is not compared, and the official rule does not pair request bodies by emitted HTTP path. RPC guideline coverage classifies standard PUT/PATCH semantics as template-enforced, not this complete cross-body check.
+
+## Implemented changes
+
+- Added and enabled `tsp-lintdiff-local-linter/patch-properties-correspond-to-put-properties`.
+- Grouped every PUT and PATCH operation in ARM HTTP services by emitted route, matching the Swagger path-item scope.
+- Evaluated operation/interface, explicit body parameter, and property added/removed metadata within each `resolveVersions` service/dependency resolution. This repairs the missed case where PUT removes a property while PATCH retains it. Inheritance, spreads, nested namespaces, and nonconcurrent operations have native regression coverage.
+- Deduplicated body errors by PATCH operation across versions, and missing properties by source target plus JSON name across versions and services. Shared PATCH models produce one warning per missing property rather than repeating it for each service; distinct targets remain separate. No unsafe graph mutation or emitter/OpenAPI/TCGC helper is used.
+- Ignored same-endpoint overload siblings before route pairing; a native regression test gives the base and overload operations distinct bodies.
+- Declared `projectionScope: http-reachable` so the comparison harness filters diagnostic locations against the dataset-selected API version's HTTP graph. This does not rerun the rule on that version or prove that a retained mismatch occurs in that version.
+- Reported missing, `void`, and property-free PATCH bodies, implementing the documented
+  at-least-one-property requirement that the Swagger implementation accidentally checks only at
+  the body-parameter-array level.
+- Flattened model-valued properties to leaves while treating scalars, arrays, records, multi-model unions, and empty models as leaf schemas, matching the validator traversal shape.
+- Included missing discriminator properties synthesized by AutoRest, including discriminators inherited from base models.
+- Preserved nested `allOf`-only wrappers as leaves because the validator descends only through a nested schema with direct `properties`.
+- Compared `@encodedName` JSON names rather than authored property identifiers.
+- Used supported request visibility and payload metadata, including lifecycle visibility sharing, without reading emitted schemas or extension overrides.
+- Kept the path-sensitive `consistent-patch-properties` rule separate because the two validator rules disagree about nesting.
+
+## Emission matrix
+
+| Authored shape                                            | Emission/traversal branch                           | Selected OpenAPI field         | Expected Swagger         | Expected TypeSpec | Fixture                               |
+| --------------------------------------------------------- | --------------------------------------------------- | ------------------------------ | ------------------------ | ----------------- | ------------------------------------- |
+| PATCH leaf absent from PUT                                | resolved nested `properties` recursion              | PATCH leaf name only           | violation                | violation         | `patch-extra-property`                |
+| Same authored name, different JSON names                  | `resolveEncodedName` / `x-ms-client-name`           | different property keys        | violation                | violation         | `encoded-name-mismatch`               |
+| Differently named inherited-only wrappers                 | nested `allOf` without direct `properties`          | wrapper property keys          | violation                | violation         | `allof-wrapper-name-mismatch`         |
+| PATCH subset of PUT                                       | ordinary model properties                           | matching leaf names            | clean                    | clean             | `compliant-subset`                    |
+| Same leaf at different levels                             | recursive helper discards containers                | matching leaf name             | clean                    | clean             | `different-nesting-compliant`         |
+| Different authored names, same JSON name                  | encoded property plus differing `x-ms-client-name`  | same key, unequal full schemas | false positive           | clean             | `encoded-name-compliant`              |
+| Same key/type, different documentation                    | emitted property `description`                      | same key, unequal full schemas | false positive           | clean             | `schema-value-validator-discrepancy`  |
+| No PATCH body / `void` body                               | Autorest omits body parameter                       | no PATCH body parameter        | violation                | violation         | `missing-patch-body`                  |
+| Empty PATCH body model                                    | emitted body schema has no leaf properties          | empty property set             | validator false negative | violation         | `empty-patch-model`                   |
+| No PUT body                                               | Autorest omits body parameter                       | no PUT body parameter          | violation                | violation         | `missing-put-body`                    |
+| PATCH declares an unauthored discriminator absent in PUT  | AutoRest synthesizes a direct property              | PATCH discriminator key only   | violation                | violation         | `synthesized-discriminator-mismatch`  |
+| PATCH inherits an unauthored discriminator absent in PUT  | inherited base schema contributes the property      | PATCH discriminator key only   | violation                | violation         | `inherited-synthesized-discriminator` |
+| PUT and PATCH use the same synthesized discriminator      | both bodies reference the same synthesized property | matching discriminator key     | clean                    | clean             | `synthesized-discriminator-compliant` |
+| Same-endpoint PUT/PATCH overloads with distinct bodies    | `isOverloadSameEndpoint` filters overload siblings  | unavailable: emission crashed  | unverified               | clean             | native rule test                      |
+| Scalar, array, record, union, nullable model, empty model | scalar/fallthrough and single-model-union branches  | corresponding leaf names       | clean                    | clean             | `type-family-compliant`               |
+
+For comparison research, the Autorest path is visible in `packages/typespec-autorest/src/openapi.ts`: `void` bodies are omitted, body models use request visibility transforms, and property metadata becomes Swagger fields. Production uses `resolveRequestVisibility`, `MetadataInfo.isTransformed`, `isPayloadProperty`, `resolveEncodedName`, and `getDiscriminator`; it does not call emission or inspect OpenAPI.
+
+### Validity and native shape coverage
+
+The matrix is not a claim that every emitted shape is supported ARM authoring. The scalar/array,
+ordinary model, inheritance, encoded-name, and discriminator rows exercise native payload semantics.
+The discriminator fixtures include concrete descendants with literal discriminators; they are not
+empty discriminator hierarchies. Missing bodies are deliberately violating operation shapes.
+The combined `type-family-compliant` fixture also contains out-of-contract shapes:
+`arm-no-record`, `no-nullable`, `no-empty-model`, `no-unnamed-types`, and AutoRest
+`union-unsupported` appear in its retained diagnostics. Its clean target-rule result does not
+establish valid ARM support for records, nullable models, empty models, or arbitrary model unions.
+No new special case was added to simulate those emitted shapes.
+
+Twelve emitter-free native cases cover shared and distinct PATCH models across services;
+overload selection; removed current PUT and historical PATCH
+properties; inherited and spread availability in nested namespaces; dependency version maps;
+nonconcurrent operations and interfaces; jointly added compliant properties; and removed explicit
+PUT/PATCH body parameters. Library registration includes transitive OpenAPI requirements, but the
+tests use no OpenAPI decorators, emitter, TCGC, or unsafe mutation.
+
+The shared-model regression first reproduced four diagnostics for two missing properties shared
+by two services, then required exactly two after moving property-deduplication state outside the
+service loop. A companion case retains four diagnostics when the services use distinct property
+targets with the same names. These native tests, rather than unchanged corpus counts, establish
+the cross-service deduplication behavior.
+
+### Historical-shape limitation
+
+Availability is read using supported `getAddedOnVersions`/`getRemovedOnVersions` metadata.
+`@renamedFrom` and `@typeChangedFrom` are not interpreted; routes, body types, and JSON names are
+read from the current semantic graph. Consequently this is not an all-version shape projection,
+and historical results can be inaccurate. The native test named “compares body properties in every
+declared service version” proves added/removed availability only. Extending that claim to renames
+or type changes would be unsupported. The mixed-runner provider guard is infrastructure, not part
+of the correspondence contract; an ARM-only promotion should remove it.
+
+The [native overload regression test](../../rules/patch-properties-correspond-to-put-properties.test.ts) covers only the linter's selection of base-operation bodies instead of same-endpoint overload bodies. The attempted Swagger-comparison fixture crashed in `@azure-tools/typespec-autorest` with `Duplicate route` before the validator could run and was removed. Native-only coverage is retained for this scenario; Swagger equivalence is unverified, not validator-clean.
+
+## Report reconciliation
+
+| Report                     | Mode/population                       | Validator projects | TypeSpec projects |             Overlap |      Validator-only | TypeSpec-only | Raw diagnostics              |
+| -------------------------- | ------------------------------------- | -----------------: | ----------------: | ------------------: | ------------------: | ------------: | ---------------------------- |
+| External `coverage_old.md` | older aggregate snapshot              |                308 |                20 | not reconstructable | not reconstructable |  not reported | not reported                 |
+| Final local report         | staging rule, 462 successful projects |                316 |                43 |                  43 |                 273 |             0 | validator 1374; TypeSpec 100 |
+
+The reports differ in snapshot/population (450 versus 468 source projects), staging execution,
+mapping (dedicated lint versus the older shared mapping), and aggregation identity. The older
+aggregate report cannot reconstruct unmatched project identities. The refreshed staging shard and
+the full TypeSpec run use the same pinned dataset; failed projects are excluded from both sides.
+The old 96/36 raw and 94/35 retained results describe the preceding implementation, not this one.
+The current raw result is 118/45; HTTP reachability retains 102/44, including two diagnostics in
+failed Quota (`GroupQuotasEntity.tsp:127` and `GroupQuotaSubscriptionId.tsp:98`). Excluding Quota
+leaves 100/43. Sixteen locations are absent from the selected HTTP graph: two in DeviceRegistry,
+twelve in ManagedNetworkFabric, and two in NetApp. This exclusion is graph reachability, not proof
+that each was a valid historical violation. No TypeSpec-only project remains after failure exclusion.
+
+The validator has 701 distinct project + Swagger file + JSON path identities, also 701 when the
+file component is omitted, versus 100 distinct TypeSpec project + file + line + column identities.
+These are not interchangeable: the validator reports several missing leaves at one PATCH-parameter
+path. Across the 316-project union, raw counts are equal in six projects, validator-higher in 309,
+and TypeSpec-higher in one; positive differences total 1,275 and negative differences total -1.
+The largest raw gaps are ManagedNetworkFabric (105 versus 2), AppService (53 versus 1),
+MachineLearningServices (51 versus 5), and NetApp (50 versus 6). These outlier counts guide
+investigation; they are not evidence that every unmatched finding has the same cause.
+
+## Code-backed gap examples
+
+### Gap example: staging validator deep-equality false positive
+
+- **Classification:** validator-only
+- **Status:** intentional
+- **Project/API version:** `specification/agricultureplatform/AgriculturePlatform.Management` / `2024-06-01-preview`
+- **Source:** standard `ResourceUpdateModel<AgriServiceResource, AgriServiceResourceProperties>` in `main.tsp`
+
+**TypeSpec source**
+
+```typespec
+update is ArmCustomPatchAsync<
+  AgriServiceResource,
+  Azure.ResourceManager.Foundations.ResourceUpdateModel<
+    AgriServiceResource,
+    AgriServiceResourceProperties
+  >
+>;
+```
+
+**Emitted OpenAPI or validator behavior**
+
+```json
+// PATCH nested managed-identity leaf
+{ "type": "string", "enum": ["None", "SystemAssigned", "UserAssigned", "SystemAssigned,UserAssigned"] }
+// PUT resource-envelope leaf with the same flattened name
+{ "type": "string", "readOnly": true }
+```
+
+| Engine            | Observed result                                                                          |
+| ----------------- | ---------------------------------------------------------------------------------------- |
+| Swagger validator | Reports `type` because it discards nesting and deep-compares the unequal schema objects. |
+| TypeSpec lint     | No diagnostic: `type` is present in both flattened request-body leaf-name sets.          |
+
+**Explanation:** The documented rule asks whether a property is present. The staging implementation instead uses `differenceWith(..., isEqual)` over one-key schema objects, so unrelated same-named leaves and harmless schema metadata differences become violations.
+
+**Disposition:** Intentional TypeSpec behavior; do not copy the staging validator defect.
+
+### Gap example: emitted client-name metadata
+
+- **Classification:** validator-only
+- **Status:** intentional
+- **Project/API version:** focused fixture / generated fixture Swagger
+- **Source:** `encoded-name-compliant/main.tsp`
+
+**TypeSpec source**
+
+```typespec
+@encodedName("application/json", "sharedName") putName?: string;
+@encodedName("application/json", "sharedName") patchName?: string;
+```
+
+**Emitted OpenAPI or validator behavior**
+
+```json
+"sharedName": { "type": "string", "x-ms-client-name": "putName" }
+"sharedName": { "type": "string", "x-ms-client-name": "patchName" }
+```
+
+| Engine            | Observed result                                               |
+| ----------------- | ------------------------------------------------------------- |
+| Swagger validator | Reports `sharedName` because `x-ms-client-name` differs.      |
+| TypeSpec lint     | No diagnostic because both properties emit the same JSON key. |
+
+**Disposition:** Reviewed validator discrepancy recorded in `expect.json`.
+
+### Gap example: emitted void PATCH body
+
+- **Classification:** count-only
+- **Status:** fixed
+- **Project/API version:** `specification/providerhub/ProviderHub.Management` / `2024-09-01`
+- **Source:** `ProviderMonitorSetting.tsp`
+
+**TypeSpec source**
+
+```typespec
+update is Azure.ResourceManager.Legacy.CustomPatchSync<
+  ProviderMonitorSetting,
+  PatchModel = void
+>;
+```
+
+**Emitted OpenAPI or validator behavior**
+
+```json
+"patch": { "parameters": [{ "in": "path" }] }
+```
+
+| Engine            | Observed result                                                                  |
+| ----------------- | -------------------------------------------------------------------------------- |
+| Swagger validator | Reports `Patch operations body cannot be empty.`                                 |
+| TypeSpec lint     | Reports the PATCH operation after explicitly treating `void` as an omitted body. |
+
+**Disposition:** Rule fix, proven by `missing-patch-body` and the filtered ProviderHub corpus rerun.
+
+### Gap example: availability versus historical shape
+
+- **Classification:** count-only
+- **Status:** unresolved
+- **Project/API version:** `specification/codesigning/resource-manager/Microsoft.CodeSigning/CodeSigning`; all-version source result retained by latest-version HTTP reachability
+- **Source:** `models.tsp:161-166`
+
+**TypeSpec source**
+
+```typespec
+@typeChangedFrom(Versions.v2024_09_30_preview, AccountSku)
+sku?: AccountSkuPatch;
+// The current replacement model is added in that version:
+@added(Versions.v2024_09_30_preview)
+```
+
+**Version population evidence:** the source diagnostic for `sku` survives the selected-version
+HTTP location filter. The rule does not substitute the historical `AccountSku` type before
+examining earlier versions. Location reachability therefore cannot establish the version in which
+this reported correspondence mismatch is real; no historical Swagger comparison is claimed.
+
+| Engine            | Observed result                                                              |
+| ----------------- | ---------------------------------------------------------------------------- |
+| Swagger validator | Evaluates the dataset's selected Swagger, not every historical source shape. |
+| TypeSpec lint     | Reports `sku` using current type shape with per-version availability.        |
+
+**Disposition:** Explicit historical-type limitation, not a proven current-version miss or proof of
+equivalence. The availability repair does not implement historical type projection.
+
+### Gap example: removed and renamed locations excluded by reachability
+
+- **Classification:** count-only
+- **Status:** population mismatch
+- **Project/API version:** `specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric` / `2025-07-15`
+- **Source:** `models/InternalNetwork.tsp:322-324`
+
+**TypeSpec source**
+
+```typespec
+@removed(Versions.v2025_07_15)
+@renamedFrom(Versions.v2025_07_15, "connectedIPv4Subnets")
+connectedIPv4SubnetsDeprecated?: ConnectedSubnetPatch[];
+```
+
+**Version population evidence:** this location is absent from the retained selected HTTP graph.
+The raw lint reports the current authored name `connectedIPv4SubnetsDeprecated`; it does not
+recover the historical name `connectedIPv4Subnets`. There is no selected-version Swagger property
+for this removed declaration to compare.
+
+| Engine            | Observed result                                                                    |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| Swagger validator | No occurrence of this removed declaration in selected `2025-07-15` Swagger.        |
+| TypeSpec lint     | Raw diagnostic exists; location filtering removes it from the reported comparison. |
+
+**Disposition:** Exclude the absent selected-version target, while retaining the raw diagnostic and
+explicitly not claiming correctness of its historical-name comparison.
+
+## Final project sets
+
+### Overlap (43)
+
+- `specification/apicenter/ApiCenter.Management`
+- `specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement`
+- `specification/applink/AppLink.Management`
+- `specification/automation/Automation.Management`
+- `specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI`
+- `specification/billingbenefits/resource-manager/Microsoft.BillingBenefits/BillingBenefits`
+- `specification/cdn/resource-manager/Microsoft.Cdn/EdgeActions`
+- `specification/certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration`
+- `specification/cloudhealth/resource-manager/Microsoft.CloudHealth/CloudHealth`
+- `specification/codesigning/resource-manager/Microsoft.CodeSigning/CodeSigning`
+- `specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeGallery`
+- `specification/containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance`
+- `specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks`
+- `specification/containerstorage/resource-manager/Microsoft.ContainerStorage/ContainerStorage`
+- `specification/databox/resource-manager/Microsoft.DataBox/DataBox`
+- `specification/datafactory/resource-manager/Microsoft.DataFactory/DataFactory`
+- `specification/desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization`
+- `specification/discovery/Discovery.Management`
+- `specification/dnsresolver/resource-manager/Microsoft.Network/DnsResolver`
+- `specification/domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration`
+- `specification/hybridconnectivity/HybridConnectivity.Management`
+- `specification/informatica/resource-manager/Informatica.DataManagement/Informatica`
+- `specification/keyvault/resource-manager/Microsoft.KeyVault/KeyVault`
+- `specification/kubernetesruntime/resource-manager/Microsoft.KubernetesRuntime/KubernetesRuntime`
+- `specification/machinelearningservices/MachineLearningServices.Management`
+- `specification/managednetworkfabric/resource-manager/Microsoft.ManagedNetworkFabric/ManagedNetworkFabric`
+- `specification/management/resource-manager/Microsoft.Management/ManagementGroups`
+- `specification/msi/resource-manager/Microsoft.ManagedIdentity/ManagedIdentity`
+- `specification/netapp/resource-manager/Microsoft.NetApp/NetApp`
+- `specification/networkcloud/resource-manager/Microsoft.NetworkCloud/NetworkCloud`
+- `specification/powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform`
+- `specification/providerhub/ProviderHub.Management`
+- `specification/recoveryservicesdatareplication/resource-manager/Microsoft.DataReplication/DataReplication`
+- `specification/recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery`
+- `specification/resources/resource-manager/Microsoft.Resources/deploymentScripts`
+- `specification/resources/resource-manager/Microsoft.Resources/resources`
+- `specification/servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric`
+- `specification/servicenetworking/resource-manager/Microsoft.ServiceNetworking/ServiceNetworking`
+- `specification/sphere/resource-manager/Microsoft.AzureSphere/AzureSphere`
+- `specification/sql/resource-manager/Microsoft.Sql/SQL`
+- `specification/storage/Storage.Management`
+- `specification/vmware/resource-manager/Microsoft.AVS/AVS`
+- `specification/web/resource-manager/Microsoft.Web/AppService`
+
+### Validator-only (273)
+
+- `specification/agricultureplatform/AgriculturePlatform.Management`
+- `specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertProcessingRules`
+- `specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/PrometheusRuleGroups`
+- `specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/TenantActivityLogAlerts`
+- `specification/app/resource-manager/Microsoft.App/ContainerApps`
+- `specification/app/resource-manager/Microsoft.App/SreAgent`
+- `specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration`
+- `specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbookTemplatesApi`
+- `specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/WorkbooksApi`
+- `specification/awsconnector/AccessAnalyzerAnalyzer.Management`
+- `specification/awsconnector/AcmCertificateSummary.Management`
+- `specification/awsconnector/ApiGatewayRestApi.Management`
+- `specification/awsconnector/ApiGatewayStage.Management`
+- `specification/awsconnector/AppSyncGraphqlApi.Management`
+- `specification/awsconnector/AutoScalingAutoScalingGroup.Management`
+- `specification/awsconnector/CloudFormationStack.Management`
+- `specification/awsconnector/CloudFormationStackSet.Management`
+- `specification/awsconnector/CloudFrontDistribution.Management`
+- `specification/awsconnector/CloudTrailTrail.Management`
+- `specification/awsconnector/CloudWatchAlarm.Management`
+- `specification/awsconnector/CodeBuildProject.Management`
+- `specification/awsconnector/CodeBuildSourceCredentialsInfo.Management`
+- `specification/awsconnector/ConfigServiceConfigurationRecorder.Management`
+- `specification/awsconnector/ConfigServiceConfigurationRecorderStatus.Management`
+- `specification/awsconnector/ConfigServiceDeliveryChannel.Management`
+- `specification/awsconnector/DatabaseMigrationServiceReplicationInstance.Management`
+- `specification/awsconnector/DaxCluster.Management`
+- `specification/awsconnector/DynamoDBContinuousBackupsDescription.Management`
+- `specification/awsconnector/DynamoDBTable.Management`
+- `specification/awsconnector/Ec2AccountAttribute.Management`
+- `specification/awsconnector/Ec2Address.Management`
+- `specification/awsconnector/Ec2FlowLog.Management`
+- `specification/awsconnector/Ec2Image.Management`
+- `specification/awsconnector/Ec2InstanceStatus.Management`
+- `specification/awsconnector/Ec2Ipam.Management`
+- `specification/awsconnector/Ec2KeyPair.Management`
+- `specification/awsconnector/Ec2NetworkAcl.Management`
+- `specification/awsconnector/Ec2NetworkInterface.Management`
+- `specification/awsconnector/Ec2RouteTable.Management`
+- `specification/awsconnector/Ec2SecurityGroup.Management`
+- `specification/awsconnector/Ec2Snapshot.Management`
+- `specification/awsconnector/Ec2Subnet.Management`
+- `specification/awsconnector/Ec2VPCEndpoint.Management`
+- `specification/awsconnector/Ec2VPCPeeringConnection.Management`
+- `specification/awsconnector/Ec2Volume.Management`
+- `specification/awsconnector/Ec2Vpc.Management`
+- `specification/awsconnector/EcrImageDetail.Management`
+- `specification/awsconnector/EcrRepository.Management`
+- `specification/awsconnector/EcsCluster.Management`
+- `specification/awsconnector/EcsService.Management`
+- `specification/awsconnector/EcsTaskDefinition.Management`
+- `specification/awsconnector/EfsFileSystem.Management`
+- `specification/awsconnector/EfsMountTarget.Management`
+- `specification/awsconnector/EksNodegroup.Management`
+- `specification/awsconnector/ElasticBeanstalkApplication.Management`
+- `specification/awsconnector/ElasticBeanstalkConfigurationTemplate.Management`
+- `specification/awsconnector/ElasticBeanstalkEnvironment.Management`
+- `specification/awsconnector/ElasticLoadBalancingV2Listener.Management`
+- `specification/awsconnector/ElasticLoadBalancingV2LoadBalancer.Management`
+- `specification/awsconnector/ElasticLoadBalancingV2TargetGroup.Management`
+- `specification/awsconnector/ElasticLoadBalancingv2TargetHealthDescription.Management`
+- `specification/awsconnector/EmrCluster.Management`
+- `specification/awsconnector/GuardDutyDetector.Management`
+- `specification/awsconnector/IamAccessKeyLastUsed.Management`
+- `specification/awsconnector/IamAccessKeyMetadata.Management`
+- `specification/awsconnector/IamGroup.Management`
+- `specification/awsconnector/IamInstanceProfile.Management`
+- `specification/awsconnector/IamMFADevice.Management`
+- `specification/awsconnector/IamPasswordPolicy.Management`
+- `specification/awsconnector/IamPolicyVersion.Management`
+- `specification/awsconnector/IamRole.Management`
+- `specification/awsconnector/IamServerCertificate.Management`
+- `specification/awsconnector/IamVirtualMFADevice.Management`
+- `specification/awsconnector/KmsAlias.Management`
+- `specification/awsconnector/KmsKey.Management`
+- `specification/awsconnector/LambdaFunction.Management`
+- `specification/awsconnector/LambdaFunctionCodeLocation.Management`
+- `specification/awsconnector/LightsailBucket.Management`
+- `specification/awsconnector/LightsailInstance.Management`
+- `specification/awsconnector/LogsLogGroup.Management`
+- `specification/awsconnector/LogsLogStream.Management`
+- `specification/awsconnector/LogsMetricFilter.Management`
+- `specification/awsconnector/LogsSubscriptionFilter.Management`
+- `specification/awsconnector/Macie2JobSummary.Management`
+- `specification/awsconnector/MacieAllowList.Management`
+- `specification/awsconnector/NetworkFirewallFirewall.Management`
+- `specification/awsconnector/NetworkFirewallFirewallPolicy.Management`
+- `specification/awsconnector/NetworkFirewallRuleGroup.Management`
+- `specification/awsconnector/OpenSearchDomainStatus.Management`
+- `specification/awsconnector/OrganizationsAccount.Management`
+- `specification/awsconnector/OrganizationsOrganization.Management`
+- `specification/awsconnector/RdsDBCluster.Management`
+- `specification/awsconnector/RdsDBInstance.Management`
+- `specification/awsconnector/RdsDBSnapshot.Management`
+- `specification/awsconnector/RdsDBSnapshotAttributesResult.Management`
+- `specification/awsconnector/RdsEventSubscription.Management`
+- `specification/awsconnector/RdsExportTask.Management`
+- `specification/awsconnector/RedshiftCluster.Management`
+- `specification/awsconnector/RedshiftClusterParameterGroup.Management`
+- `specification/awsconnector/Route53DomainsDomainSummary.Management`
+- `specification/awsconnector/Route53HostedZone.Management`
+- `specification/awsconnector/Route53ResourceRecordSet.Management`
+- `specification/awsconnector/S3AccessControlPolicy.Management`
+- `specification/awsconnector/S3AccessPoint.Management`
+- `specification/awsconnector/S3Bucket.Management`
+- `specification/awsconnector/S3BucketPolicy.Management`
+- `specification/awsconnector/S3ControlMultiRegionAccessPointPolicyDocument.Management`
+- `specification/awsconnector/SageMakerApp.Management`
+- `specification/awsconnector/SageMakerNotebookInstanceSummary.Management`
+- `specification/awsconnector/SecretsManagerResourcePolicy.Management`
+- `specification/awsconnector/SecretsManagerSecret.Management`
+- `specification/awsconnector/SnsSubscription.Management`
+- `specification/awsconnector/SnsTopic.Management`
+- `specification/awsconnector/SqsQueue.Management`
+- `specification/awsconnector/SsmInstanceInformation.Management`
+- `specification/awsconnector/SsmParameter.Management`
+- `specification/awsconnector/SsmResourceComplianceSummaryItem.Management`
+- `specification/awsconnector/WafWebACLSummary.Management`
+- `specification/awsconnector/Wafv2LoggingConfiguration.Management`
+- `specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto`
+- `specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData`
+- `specification/azuredatatransfer/resource-manager/Microsoft.AzureDataTransfer/AzureDataTransfer`
+- `specification/azuredependencymap/resource-manager/Microsoft.DependencyMap/DependencyMap`
+- `specification/azurefleet/resource-manager/Microsoft.AzureFleet/AzureFleet`
+- `specification/azurelargeinstance/resource-manager/Microsoft.AzureLargeInstance/AzureLargeInstance`
+- `specification/azureresiliencemanagement/resource-manager/Microsoft.AzureResilienceManagement/AzureResilienceManagement`
+- `specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCIVM`
+- `specification/cdn/resource-manager/Microsoft.Cdn/Cdn`
+- `specification/chaos/resource-manager/Microsoft.Chaos/Chaos`
+- `specification/communication/Communication.Management`
+- `specification/communitytraining/resource-manager/Microsoft.Community/Community`
+- `specification/compute/resource-manager/Microsoft.Compute/Bulkactions`
+- `specification/compute/resource-manager/Microsoft.Compute/Compute/Compute`
+- `specification/compute/resource-manager/Microsoft.Compute/Compute/ComputeDisk`
+- `specification/computeschedule/resource-manager/Microsoft.ComputeSchedule/ComputeSchedule`
+- `specification/confluent/resource-manager/Microsoft.Confluent/Confluent`
+- `specification/connectedcache/resource-manager/Microsoft.ConnectedCache/ConnectedCache`
+- `specification/containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry`
+- `specification/containerservice/resource-manager/Microsoft.ContainerService/aimanager`
+- `specification/containerservice/resource-manager/Microsoft.ContainerService/aks`
+- `specification/containerservice/resource-manager/Microsoft.ContainerService/fleet`
+- `specification/containerservice/resource-manager/Microsoft.ContainerService/nodecustomization`
+- `specification/containerservice/resource-manager/Microsoft.ContainerService/preparedimagespecification`
+- `specification/contosowidgetmanager/Contoso.Management`
+- `specification/cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB`
+- `specification/dashboard/resource-manager/Microsoft.Dashboard/Dashboard`
+- `specification/databasefleetmanager/resource-manager/Microsoft.DatabaseFleetManager/DatabaseFleetManager`
+- `specification/databasewatcher/resource-manager/Microsoft.DatabaseWatcher/DatabaseWatcher`
+- `specification/databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge`
+- `specification/databricks/resource-manager/Microsoft.Databricks/Databricks`
+- `specification/datadog/resource-manager/Microsoft.Datadog/Datadog`
+- `specification/datamigration/resource-manager/Microsoft.DataMigration/DataMigration`
+- `specification/dataprotection/resource-manager/Microsoft.DataProtection/DataProtection`
+- `specification/dell/resource-manager/Dell.Storage/DellStorage`
+- `specification/devcenter/resource-manager/Microsoft.DevCenter/DevCenter`
+- `specification/developerhub/resource-manager/Microsoft.DevHub/DeveloperHub`
+- `specification/deviceregistry/DeviceRegistry.Management`
+- `specification/devopsinfrastructure/resource-manager/Microsoft.DevOpsInfrastructure/DevOpsInfrastructure`
+- `specification/devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs`
+- `specification/dns/resource-manager/Microsoft.Network/Dns`
+- `specification/durabletask/resource-manager/Microsoft.DurableTask/DurableTask`
+- `specification/dynatrace/resource-manager/Dynatrace.Observability/DynatraceObservability`
+- `specification/edge/resource-manager/Microsoft.Edge/configurationmanager`
+- `specification/edge/resource-manager/Microsoft.Edge/configurations`
+- `specification/edge/resource-manager/Microsoft.Edge/disconnectedOperations`
+- `specification/edgeorder/resource-manager/Microsoft.EdgeOrder/EdgeOrder`
+- `specification/elastic/resource-manager/Microsoft.Elastic/Elastic`
+- `specification/elasticsan/resource-manager/Microsoft.ElasticSan/ElasticSan`
+- `specification/eventgrid/resource-manager/Microsoft.EventGrid/EventGrid`
+- `specification/ews/resource-manager/Microsoft.SecretSyncController/SecretSyncController`
+- `specification/extendedlocation/resource-manager/Microsoft.ExtendedLocation/CustomLocations`
+- `specification/fabric/resource-manager/Microsoft.Fabric/Fabric`
+- `specification/fileshares/resource-manager/Microsoft.FileShares/FileShares`
+- `specification/fist/resource-manager/Microsoft.IoTFirmwareDefense/IoTFirmwareDefense`
+- `specification/frontdoor/resource-manager/Microsoft.Network/FrontDoor`
+- `specification/github-network/GitHub.Network.Management`
+- `specification/hanaonazure/resource-manager/Microsoft.HanaOnAzure/HanaOnAzure`
+- `specification/hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules`
+- `specification/hdinsight/resource-manager/Microsoft.HDInsight/HDInsight`
+- `specification/healthbot/resource-manager/Microsoft.HealthBot/HealthBot`
+- `specification/healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis`
+- `specification/healthdataaiservices/HealthDataAIServices.Management`
+- `specification/horizondb/resource-manager/Microsoft.HorizonDb/HorizonDb`
+- `specification/hybridaks/resource-manager/Microsoft.HybridContainerService/HybridContainerService`
+- `specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute`
+- `specification/hybridkubernetes/resource-manager/Microsoft.Kubernetes/HybridKubernetes`
+- `specification/imagebuilder/resource-manager/Microsoft.VirtualMachineImages/ImageBuilder`
+- `specification/iothub/resource-manager/Microsoft.Devices/IoTHub`
+- `specification/iotoperations/resource-manager/Microsoft.IoTOperations/IoTOperations`
+- `specification/iotoperationsdataprocessor/IoTOperationsDataProcessor.Management`
+- `specification/iotoperationsmq/IoTOperationsMQ.Management`
+- `specification/iotoperationsorchestrator/IoTOperationsOrchestrator.Management`
+- `specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensions`
+- `specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/fluxConfigurations`
+- `specification/kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/privateLinkScopes`
+- `specification/liftrarize/resource-manager/ArizeAi.ObservabilityEval/ObservabilityEval`
+- `specification/liftrastronomer/resource-manager/Astronomer.Astro/AstronomerAstro`
+- `specification/liftrcommvault/Commvault.ContentStore.Management`
+- `specification/liftrhyperexecute/resource-manager/LambdaTest.HyperExecute/HyperExecute`
+- `specification/liftrmongodb/MongoDB.Atlas.Management`
+- `specification/liftrpinecone/resource-manager/Pinecone.VectorDb/PineconeVectorDb`
+- `specification/liftrqumulo/resource-manager/Qumulo.Storage/QumuloStorage`
+- `specification/liftrweightsandbiases/resource-manager/Microsoft.WeightsAndBiases/WeightsAndBiases`
+- `specification/loadtestservice/resource-manager/Microsoft.LoadTestService/loadtesting`
+- `specification/loadtestservice/resource-manager/Microsoft.LoadTestService/playwright`
+- `specification/logic/resource-manager/Microsoft.Logic/Logic`
+- `specification/manufacturingplatform/Manufacturingplatform.Management`
+- `specification/maps/resource-manager/Microsoft.Maps/Maps`
+- `specification/migrate/resource-manager/Microsoft.Migrate/AssessmentProjects`
+- `specification/migrate/resource-manager/Microsoft.OffAzure/OffAzure`
+- `specification/mission/resource-manager/Microsoft.Mission/Mission`
+- `specification/mongocluster/resource-manager/Microsoft.DocumentDB/MongoCluster`
+- `specification/monitor/resource-manager/Microsoft.Insights/Insights/ActionGroupsApi`
+- `specification/monitor/resource-manager/Microsoft.Insights/Insights/ActivityLogAlertsApi`
+- `specification/monitor/resource-manager/Microsoft.Insights/Insights/AutoScaleApi`
+- `specification/monitor/resource-manager/Microsoft.Insights/Insights/DataCollectionApi`
+- `specification/monitor/resource-manager/Microsoft.Insights/Insights/LogProfilesApi`
+- `specification/monitor/resource-manager/Microsoft.Insights/Insights/MetricAlertApi`
+- `specification/monitor/resource-manager/Microsoft.Insights/Insights/PrivateLinkScopesApi`
+- `specification/monitor/resource-manager/Microsoft.Insights/Insights/ScheduledQueryRuleApi`
+- `specification/monitoringservice/resource-manager/Microsoft.Monitor/Accounts`
+- `specification/monitoringservice/resource-manager/Microsoft.Monitor/Agents`
+- `specification/monitoringservice/resource-manager/Microsoft.Monitor/PipelineGroups`
+- `specification/mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers`
+- `specification/napster/Napster.CompanionAPI.Management`
+- `specification/newrelic/NewRelicObservability.Management`
+- `specification/nginx/resource-manager/Nginx.NginxPlus/NginxPlus`
+- `specification/notificationhubs/resource-manager/Microsoft.NotificationHubs/NotificationHubs`
+- `specification/onlineexperimentation/OnlineExperimentation.Management`
+- `specification/operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights`
+- `specification/oracle/resource-manager/Oracle.Database/OracleDatabase`
+- `specification/orbitalplanetarycomputer/Orbital.Management`
+- `specification/paloaltonetworks/resource-manager/PaloAltoNetworks.Cloudngfw/Cloudngfw`
+- `specification/peering/resource-manager/Microsoft.Peering/Peering`
+- `specification/playwrighttesting/PlaywrightTesting.Management`
+- `specification/portal/Dashboard.Management`
+- `specification/postgresql/DBforPostgreSQL.Management`
+- `specification/postgresqlhsc/resource-manager/Microsoft.DBforPostgreSQL/PostgresqlHsc`
+- `specification/powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated`
+- `specification/programenrollment/resource-manager/Microsoft.ProgramEnrollment/ProgramEnrollment`
+- `specification/programmableconnectivity/ProgrammableConnectivity.Management`
+- `specification/purestorage/resource-manager/PureStorage.Block/PureStorageBlock`
+- `specification/purview/resource-manager/Microsoft.Purview/Purview`
+- `specification/quantum/resource-manager/Microsoft.Quantum/Quantum`
+- `specification/recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices`
+- `specification/redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/OpenShiftClusters`
+- `specification/redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise`
+- `specification/relay/resource-manager/Microsoft.Relay/Relay`
+- `specification/resourceconnector/resource-manager/Microsoft.ResourceConnector/ResourceConnector`
+- `specification/resourcegraph/resource-manager/Microsoft.ResourceGraph/ResourceGraph/GraphQueryApi`
+- `specification/scvmm/ScVmm.Management`
+- `specification/search/resource-manager/Microsoft.Search/Search`
+- `specification/security/resource-manager/Microsoft.Security/Security/AutomationsAPI`
+- `specification/security/resource-manager/Microsoft.Security/Security/IoTSecurityAPI`
+- `specification/security/resource-manager/Microsoft.Security/Security/PrivateLinksAPI`
+- `specification/servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus`
+- `specification/servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters`
+- `specification/solutions/Solutions.Management`
+- `specification/sovereign/resource-manager/Microsoft.Sovereign/Sovereign`
+- `specification/splitio/SplitIO.Experimentation.Management`
+- `specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine`
+- `specification/standbypool/resource-manager/Microsoft.StandbyPool/StandbyPool`
+- `specification/storageactions/resource-manager/Microsoft.StorageActions/StorageActions`
+- `specification/storagecache/resource-manager/Microsoft.StorageCache/StorageCache`
+- `specification/storagediscovery/resource-manager/Microsoft.StorageDiscovery/StorageDiscovery`
+- `specification/storagemover/resource-manager/Microsoft.StorageMover/StorageMover`
+- `specification/storagesync/resource-manager/Microsoft.StorageSync/StorageSync`
+- `specification/support/resource-manager/Microsoft.Support/Support`
+- `specification/verifiedid/resource-manager/Microsoft.VerifiedId/VerifiedId`
+- `specification/widget/resource-manager/Microsoft.Widget/Widget`
+- `specification/workloads/Workloads.SAPDiscoverySite.Management`
+- `specification/workloads/Workloads.SAPMonitor.Management`
+- `specification/workloads/Workloads.SAPVirtualInstance.Management`
+
+### TypeSpec-only (0)
+
+- None.
+
+## Compile failures
+
+These six projects were excluded symmetrically from behavioral comparison:
+
+- `specification/deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices`
+- `specification/monitor/resource-manager/Microsoft.Insights/Insights/TenantActionGroups`
+- `specification/network/resource-manager/Microsoft.Network/Network/Network`
+- `specification/quota/resource-manager/Microsoft.Quota/Quota`
+- `specification/resources/resource-manager/Microsoft.Resources/deployments`
+- `specification/servicelinker/resource-manager/Microsoft.ServiceLinker/ServiceLinker`
+
+The new full run reproduced exactly this accepted baseline failure project set, with no new failed
+projects. Fresh stdout/stderr and complete failure summaries were archived before cleanup. Extracted
+error code/message sets exactly match the retained baseline: `@typespec/http/duplicate-body` in
+DeviceProvisioningServices, deployments, and ServiceLinker; `@typespec/http/missing-uri-param` in
+TenantActionGroups, Network, and Quota. The previous run's lost fresh details remain an historical
+evidence limitation, not a limitation of this newly retained run. No claim is made about this rule's
+correctness in the six excluded projects.
+
+## Focused validation
+
+Fourteen focused cases pass: eight intended-violation cases (seven covered and one documented
+validator false negative for an empty body model), four validator-clean compliance cases with
+reviewed ambient diagnostics, and two reviewed staging-validator false-positive discrepancies. The direct and inherited
+discriminator fixtures each emit and report exactly one PATCH-only `kind`; the control emits
+matching `kind` properties and is target-rule clean. Snapshots preserve the emitted Swagger and both
+diagnostic sets. Rebuilding the current dependency closure with TypeSpec compiler 1.14.0 also
+refreshed two ambient
+`consistent-patch-properties` entries: it removed the stale diagnostic from
+`encoded-name-compliant` and added the currently emitted diagnostic to `encoded-name-mismatch`.
+That neighboring rule's source is unchanged; neither snapshot change affects this target rule's
+expected diagnostic. The availability draft passed the package build, ten native cases, explicit
+source/test oxlint, and all fourteen comparison fixtures. Source/test content hashes were verified
+unchanged when reusing those results in this continuation. Both representative preflights and the
+full corpus rebuilt the same source successfully. Documentation-only edits do not change fixture
+frontmatter, expectations, or compiled rule behavior.
+
+## Remaining uncertainty
+
+The 273 validator-only projects prevent implementation-level equivalence. The corpus and fixtures
+demonstrate deep-equality/flattening discrepancies, but do not prove that every one of the 1,374
+staging diagnostics is false. Availability-aware pairing is implemented and tested; historical
+renames, type changes, and version attribution of shared diagnostic targets remain limited.
+The matrix includes explicitly unsupported ARM shapes and native-only overload coverage.
+Thus this is partial Swagger coverage, not a claim of universal functional or raw-count equivalence.
+No additional production change is justified solely to equalize these observed counts; unsupported
+historical-shape behavior must not be described as projected or silently treated as validated.

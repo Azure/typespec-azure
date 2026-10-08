@@ -13,11 +13,7 @@ export const summaryAndDescriptionMustNotBeSameRule = createRule({
         const summary = getSummary(context.program, operation);
         const description = getDoc(context.program, operation);
 
-        if (
-          summary === undefined ||
-          description === undefined ||
-          summary.trim() !== description.trim()
-        ) {
+        if (!summary || !description || summary.trim() !== description.trim()) {
           return;
         }
 

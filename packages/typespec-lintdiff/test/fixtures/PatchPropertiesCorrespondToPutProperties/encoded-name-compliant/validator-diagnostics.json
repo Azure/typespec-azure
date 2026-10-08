@@ -1,0 +1,13 @@
+[
+  {
+    "code": "PatchPropertiesCorrespondToPutProperties",
+    "message": "sharedName property in patch body is not present in the corresponding put body. A patch request body must only contain properties present in the corresponding put request body, and must contain at least one of the properties.",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}",
+      "patch",
+      "parameters"
+    ],
+    "severity": 0
+  }
+]

@@ -1,35 +1,31 @@
 import {
-  getResourceOperation,
-  isAzureResource,
-  resolveProviderNamespace,
+  getArmProviderNamespace,
+  getArmResource,
 } from "@azure-tools/typespec-azure-resource-manager";
 import { createRule, type Model, type ModelProperty } from "@typespec/compiler";
 import { getHttpOperation, type HttpOperationResponse } from "@typespec/http";
-import { getExtensions } from "@typespec/openapi";
 
 export const xmsResourceInPutResponseRule = createRule({
   name: "xms-resource-in-put-response",
   description:
-    "ARM PUT success responses must return an Azure resource model or a model with explicit x-ms-azure-resource metadata.",
+    "ARM PUT success responses must return a model with native Azure resource semantics.",
   severity: "warning",
   messages: {
-    default:
-      "PUT 200/201 response models should be Azure resources and must carry x-ms-azure-resource semantics.",
+    default: "PUT 200/201 resource response models must be registered as ARM resources.",
   },
   create(context) {
     return {
       operation: (operation) => {
         const namespace = operation.interface?.namespace ?? operation.namespace;
-        if (resolveProviderNamespace(context.program, namespace) === undefined) {
+        if (
+          namespace === undefined ||
+          getArmProviderNamespace(context.program, namespace) === undefined
+        ) {
           return;
         }
 
         const [httpOperation] = getHttpOperation(context.program, operation);
         if (httpOperation.verb !== "put") {
-          return;
-        }
-
-        if (getResourceOperation(context.program, operation) !== undefined) {
           return;
         }
 
@@ -42,10 +38,7 @@ export const xmsResourceInPutResponseRule = createRule({
           return;
         }
 
-        if (
-          isAzureResource(context.program, responseModel) ||
-          hasExplicitAzureResourceExtension(context.program, responseModel)
-        ) {
+        if (getArmResource(context.program, responseModel) !== undefined) {
           return;
         }
 
@@ -78,19 +71,6 @@ function getResponseModel(
   }
 
   return undefined;
-}
-
-function hasExplicitAzureResourceExtension(
-  program: Parameters<typeof getExtensions>[0],
-  model: Model,
-): boolean {
-  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
-    if (getExtensions(program, current).get("x-ms-azure-resource") === true) {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 function looksLikeManualResourceModel(model: Model): boolean {
