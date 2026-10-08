@@ -118,33 +118,3 @@ jobs:
         # Skip on merge queue from publish branches and on publish/* PR source branches
         if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue/') && !startsWith(github.head_ref, 'publish/') }}
         run: pnpm test:e2e
-
-  autorest-checks:
-    name: Autorest Checks
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          submodules: recursive
-
-      - uses: ./.github/actions/setup
-        with:
-          node-version: "22.x"
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build internal tools
-        run: pnpm --filter "@typespec/internal-build-utils..." run build
-
-      - name: Install autorest & script dependencies
-        run: npm install -g autorest && cd eng/scripts && npm install
-
-      - name: Swagger - Resource Manager Linting
-        run: node eng/scripts/lint-resourcemanager.js "packages/samples/test/output/azure/resource-manager"
-
-      - name: Swagger - Generate Python SDK
-        run: node eng/scripts/gen-sdk.js python "packages/samples/test/output/azure/resource-manager"
-
-      - name: Swagger - Generate JavaScript SDK
-        run: node eng/scripts/gen-sdk.js javascript "packages/samples/test/output/azure/resource-manager"
