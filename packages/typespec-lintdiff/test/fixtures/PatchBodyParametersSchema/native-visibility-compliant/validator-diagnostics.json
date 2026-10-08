@@ -1,0 +1,54 @@
+[
+  {
+    "code": "PatchBodyParametersSchema",
+    "message": "Properties of a PATCH request body must not have default value, property:id.",
+    "path": [
+      "paths",
+      "/defaults",
+      "patch",
+      "parameters",
+      "0",
+      "schema"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "PatchBodyParametersSchema",
+    "message": "Properties of a PATCH request body must not be required, property:id.",
+    "path": [
+      "paths",
+      "/defaults",
+      "patch",
+      "parameters",
+      "0",
+      "schema"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "PatchBodyParametersSchema",
+    "message": "Properties of a PATCH request body must not be required, property:id.",
+    "path": [
+      "paths",
+      "/widgets",
+      "patch",
+      "parameters",
+      "0",
+      "schema"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "PatchBodyParametersSchema",
+    "message": "Properties of a PATCH request body must not be x-ms-mutability: [\"create\"], property:createdBy.",
+    "path": [
+      "paths",
+      "/widgets",
+      "patch",
+      "parameters",
+      "0",
+      "schema"
+    ],
+    "severity": 0
+  }
+]

@@ -6,10 +6,6 @@
       "count": 1
     },
     {
-      "code": "tsp-lintdiff-local-linter/avoid-anonymous-types",
-      "count": 1
-    },
-    {
       "code": "tsp-lintdiff-local-linter/get-in-operation-name",
       "count": 1
     },
@@ -20,6 +16,7 @@
     {
       "code": "tsp-lintdiff-local-linter/operation-id-noun-verb",
       "count": 1
-    }
+    },
+    "tsp-lintdiff-local-linter/xms-pageable-for-list-calls"
   ]
 }

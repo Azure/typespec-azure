@@ -5,11 +5,6 @@
     "message": "Security definition should have a description."
   },
   {
-    "code": "tsp-lintdiff-local-linter/avoid-anonymous-types",
-    "severity": "warning",
-    "message": "Operation response body should use a named model instead of an anonymous inline model expression."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/path-parameter-schema",
     "severity": "warning",
     "message": "Path parameter should specify a maximum length (maxLength) and characters allowed (pattern)."

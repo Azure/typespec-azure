@@ -30,14 +30,20 @@ Use the [evidence checklist](./evidence-checklist.md) to make sure the intake is
    - `#suppress` directives
    - unrelated TypeSpec diagnostics that would already forbid the construct
    - template-enforced behavior
-4. Decide the strongest currently supported status hypothesis:
+4. Draft the [native rule contract](../typespec-lint-discovery/SKILL.md#native-rule-contract)
+   from that evidence. Separate the intended guideline from the Swagger
+   selector/emitted representation, and distinguish native violation coverage,
+   emitted-output equivalence, and diagnostic-count equivalence. Record a
+   supported TypeSpec example or rejection evidence for every material
+   difference; an unexplained mismatch is still unresolved, not intentional.
+5. Decide the strongest currently supported status hypothesis:
    - already covered
    - template-enforced
    - blocked by prerequisite diagnostics / suppression-dependent repro
    - partial
    - plausible gap
    - or test-quality issue
-5. End with a reusable intake summary that another skill or engineer can build on directly.
+6. End with a reusable intake summary that another skill or engineer can build on directly.
 
 ## Deliverable
 
@@ -47,6 +53,9 @@ Produce:
 - the upstream/source-of-truth evidence
 - the local repository evidence
 - suppression and prerequisite findings
+- the native contract, candidate ownership/API surface, and evidenced parity
+  differences or unresolved questions; do not invent emission-simulation work
+  solely to match Swagger artifacts or counts
 - the strongest current classification hypothesis
 - the recommended next skill, usually `/lintdiff-rule-migration-overseer` or `/typespec-lint-discovery`
 

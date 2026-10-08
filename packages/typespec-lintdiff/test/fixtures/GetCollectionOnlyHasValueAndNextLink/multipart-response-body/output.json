@@ -9,13 +9,21 @@
       }
     ]
   },
-  "schemes": ["https"],
+  "schemes": [
+    "https"
+  ],
   "host": "management.azure.com",
-  "produces": ["application/json"],
-  "consumes": ["application/json"],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
   "security": [
     {
-      "azure_auth": ["user_impersonation"]
+      "azure_auth": [
+        "user_impersonation"
+      ]
     }
   ],
   "securityDefinitions": {
@@ -41,7 +49,9 @@
     "/providers/Microsoft.TestService/operations": {
       "get": {
         "operationId": "Operations_List",
-        "tags": ["Operations"],
+        "tags": [
+          "Operations"
+        ],
         "description": "List the operations for the provider",
         "parameters": [
           {
@@ -70,9 +80,14 @@
     "/scope/providers/Microsoft.TestService/widgetArchives": {
       "get": {
         "operationId": "Widgets_DownloadWidgetArchives",
-        "tags": ["Widgets"],
+        "tags": [
+          "Widgets"
+        ],
         "description": "Download widget archives.",
-        "produces": ["multipart/form-data", "application/json"],
+        "produces": [
+          "multipart/form-data",
+          "application/json"
+        ],
         "parameters": [
           {
             "$ref": "../../../../../common-types/resource-management/v6/types.json#/parameters/ApiVersionParameter"

@@ -56,15 +56,16 @@ Edit `packages/<pkg>/test/rules/<rule-name>.test.ts`:
 1. Write tests for **valid code** that should produce no diagnostics (`.toBeValid()`)
 2. Write tests for **invalid code** that should produce specific diagnostics (`.toEmitDiagnostics()`)
 3. Create **equivalence classes** for the input and write tests covering at least one instance of each class:
-   - Group inputs by how the rule handles them (e.g., for a rule targeting `ModelProperty`):
-     - Simply defined properties
-     - Properties defined using `spread` or `is`
-     - Properties inherited from a base class
+   - Group inputs by the rule's predicate branches and supported target kinds,
+     not by compiler syntax that the rule handles identically.
    - Add boundary conditions specific to the rule logic (e.g., for a name-prefix rule):
      - Properties with the forbidden prefix
      - Properties with the prefix text in the middle or end of the name
      - Properties with names shorter than the prefix
-4. Always include at least one test verifying that **library types in `Azure.Core` and `Azure.ResourceManager` are not subject to the rule**
+4. Apply the [rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary).
+   Do not add library-exclusion, alias/template traversal, or inheritance tests
+   solely to re-prove framework behavior. Cover those forms only when they
+   exercise custom logic owned by the rule.
 
 Test API reference:
 
@@ -147,6 +148,10 @@ Edit `packages/<pkg>/src/rules/<rule-name>.md`:
 
 - Replace all placeholder text
 - Write a clear description of what the rule checks and why
+- Follow the [native rule documentation contract](../typespec-lint-implement/SKILL.md#native-rule-documentation):
+  explain native TypeSpec usage in the main text and examples; keep migration
+  history and validator comparisons in a dedicated migration section and the
+  PR description.
 - Provide realistic ❌ Incorrect and ✅ Correct examples using actual TypeSpec patterns
 - This file holds only the extended documentation body — the page title, rule id, and
   short description are generated from the rule definition. `tspd` renders the page at

@@ -3,7 +3,6 @@ import "../../lib/imports.tsp";
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.Versioning;
-using TypeSpec.OpenAPI;
 using Azure.ResourceManager;
 
 @armProviderNamespace
@@ -58,8 +57,7 @@ interface Widgets {
   @doc("List widgets by resource group")
   @get
   @armResourceList(Widget)
-  @operationId("Widgets_Fetch")
-  listByResourceGroup(
-    ...ResourceParentParameters<Widget>,
-  ): ArmResponse<WidgetListResult> | ErrorResponse;
+  listByResourceGroup(...ResourceParentParameters<Widget>):
+    | ArmResponse<WidgetListResult>
+    | ErrorResponse;
 }

@@ -131,11 +131,15 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
   round's valid fixes, then stop and report that the cap prevented another
   verification review.
 - Stop immediately on an unverified review request, indeterminate collector
-  failure, push failure, uncertain finding, or validation/corpus failure that
-  does not qualify for [bounded draft correction](#bounded-draft-correction).
-  The only recovery paths are that in-place correction and the separately
+  failure, push failure, uncertain finding, or required validation/corpus failure that
+  does not qualify for [bounded draft correction](#bounded-draft-correction)
+  or [bounded native-test timeout diagnosis](#bounded-native-test-timeout-diagnosis),
+  or a queue-granted [setup-hook recovery](../shared/recovery-context.md#bounded-setup-hook-timeout-recovery).
+  Apply the shared gate disposition to supplemental validation; a task defect
+  discovered there still blocks. Its optional status never excuses a regression.
+  The only recovery paths are those procedures and the separately
   bounded, parent-authorized [local collector recovery](#local-collector-recovery).
-  Neither permits erasing failed attempts or publishing unverified changes.
+  None permits erasing failed attempts or publishing unverified changes.
 
 ## Initialize
 
@@ -144,8 +148,10 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
    for existing PRs. Record the publication binding and retain the PR's head
    repository/owner and head branch for publication routing. For lintdiff
    development, promotion, and skill-update PRs, require the head repository
-   to be `Azure/typespec-azure`. A legacy fork-backed task PR must stop before
-   review side effects for explicit user-authorized migration outside this loop.
+   to be `Azure/typespec-azure`, except for the exact existing rule PR covered by
+   the shared [fork-update authorization](../shared/recovery-context.md#existing-fork-updates).
+   Consume and acknowledge its durable recovery context; do not repeatedly ask
+   for the same permission. Skill-only PRs are not covered by that exception.
    Do not retarget any PR head to a different remote as part of this loop.
    For queue-owned review, consume its prepared phase binding, readiness manifest
    and authoritative instruction paths/hashes. Enforce the inherited
@@ -224,16 +230,58 @@ queue's shared execution log; do not truncate it or create a skill-update PR.
      timestamp, and any reliability classification
    - comment IDs delivered to the fix subagent
    - validity decision for each comment
+   - final disposition and evidence under
+     [review adoption evidence](#review-adoption-evidence)
    - promotion finding category when applicable
    - planned validation scope, command results, and corpus applicability/results
+   - recovery-context identity, acknowledged authorization scopes and applicable
+     validation profiles; retain all inherited counters and failed attempts
    - draft-correction count, failure evidence, causal classification, corrective
      diff identity and rerun results for the backlog pass or current round
+   - native-test timeout-diagnosis allowance owner, usage, eligibility evidence,
+     unchanged test population/timeouts, concurrency change and rerun result
+   - queue-owned setup-hook diagnostic/corrective allowances, measured stages,
+     probe restoration and scoped hook profile, when applicable
    - publication handoff identity and the parent's approval or rejection
    - pushed fix commit SHA
    - processed review-thread IDs and their final resolution state
    - any local collector failure, its original evidence, recovery eligibility,
      the parent's one-time recollection authorization, fresh evidence identity,
      and final recovery approval or rejection
+
+## Review adoption evidence
+
+For each collected finding, retain the exact reviewer/comment permalink,
+request, author/agent reasoning, validity classification, and final disposition.
+Split compound requests when their outcomes differ. Link an implemented finding
+to the change commit, final file/line or test evidence, validation result, and
+verified pushed head. For historical analysis, use the merge revision instead.
+
+Use dispositions distinct from the finding-validity categories:
+
+- **Implemented:** the final revision contains the accepted behavior.
+- **Retained with rationale:** existing behavior was defended with evidence; do
+  not claim a new fix merely because the thread was answered.
+- **Declined:** evidence shows the requested change is invalid or inapplicable.
+- **Deferred:** record explicit scope/approval, tracking reference, and remaining
+  impact. A valid unresolved requirement still blocks clean completion.
+- **Superseded:** later analysis replaced an earlier fix or decision; link the
+  final outcome instead of counting both as adopted.
+- **Uncertain/blocked:** evidence or a required decision is missing; keep the
+  thread open and follow the existing stop conditions.
+
+Reconcile dispositions against the final head before publication handoff and
+the final report. An earlier "fixed" reply, approval, resolved thread, or stated
+deferral is not proof of the final implementation. Revalidate affected behavior
+when later edits supersede a fix. Distinguish reviewer feedback from author
+self-audits and other participants' policy decisions; do not infer preferences
+from an empty approval.
+
+This evidence contract does not broaden collection scope, request extra reviews,
+inspect suppressed comments, or authorize source repair. In this loop, apply it
+only to findings admitted by the existing collector/backlog rules. Dispositions
+do not override validity categories, clean-head gates, or the prohibition on
+resolving uncertain or unfixed source-defect threads.
 
 ## Local collector recovery
 
@@ -543,9 +591,20 @@ exit code, outcome, and output or durable log path, including failed attempts.
 Also record whether corpus validation is required, why, and its results when
 applicable.
 
-On a command failure, preserve the evidence and classify it using the bounded
-draft-correction policy below before deciding whether to stop. Never stage,
-commit or push a failing draft. A passing narrower command does not erase a
+Use the matching [validation profile](../shared/recovery-context.md#reusable-validation-profiles)
+from the task's recovery context. Reverify its configuration/dependency identity,
+preserve approved settings and separately bounded attempt usage, and do not
+silently fall back to default timeouts. A profile does not waive the failure
+classification or publication gate.
+
+On a command failure, preserve the evidence and apply the predeclared
+[gate disposition](../shared/recovery-context.md#validation-gates-and-supplemental-checks)
+before considering bounded draft correction, native-test timeout diagnosis,
+or queue-owned setup-hook recovery. A fix agent returns the setup-hook handoff
+to the parent; it must not spend that allowance or raise a hook limit itself.
+A disclosed supplemental promotion limitation does not automatically block this
+loop or authorize a rerun. Never stage, commit or push a draft with a failed
+required gate or task defect. A passing narrower command does not erase a
 failed required check. Do not retrospectively relabel a failed command as
 supplemental or self-waive it because its diagnostics appear unrelated.
 
@@ -561,6 +620,12 @@ retry allowance. The first failed validation triggers attempt 1; a new failure
 during its rerun consumes
 the next attempt. Do not reset this budget by changing commands, reclassifying
 findings, switching agents or restarting a phase.
+
+In queue mode, an exhausted ordinary allowance may use the shared
+[coordinator-owned local recovery reserve](../shared/recovery-context.md#coordinator-owned-local-recovery-reserve).
+Return its nonterminal handoff before a terminal budget stop; only the outer
+queue may debit the task-wide reserve and resume this same fix agent and round.
+Standalone review does not receive that reserve.
 
 1. Preserve the failed command, working directory, exit status, output, draft
    identity and planned validation scope. Establish a concrete causal link to
@@ -592,7 +657,9 @@ findings, switching agents or restarting a phase.
    Return `ready-for-publication` only when the final draft satisfies the complete
    required scope. The parent independently verifies that every prior failure
    is accounted for and no failed required check remains unresolved.
-6. Stop on an unknown cause, unsafe/out-of-scope correction, exhausted budget,
+6. Except for the queue reserve above, an eligible native-test timeout
+   diagnosis below, or a coordinator-granted setup-hook recovery, stop on an
+   unknown cause, unsafe/out-of-scope correction, exhausted budget,
    or an external/indeterminate operational failure (such as credentials, network,
    dependency/tool availability, harness/emitter crash, or publication failure).
    An agent-authored argument error rejected before work starts is not a
@@ -606,6 +673,56 @@ This budget is separate from the five review rounds, queue orchestration retry
 and queue source-repair cycles. The invocation authorizes eligible corrections;
 parent approval is still required for publication, not for each local correction.
 
+### Bounded native-test timeout diagnosis
+
+A completed native unit-test run whose only failures are test-runner-reported
+per-test timeouts may receive **one diagnostic rerun with reduced concurrency**.
+In queue mode, the outer queue owns one allowance for the entire task, shared
+across phases, review rounds, and source-repair cycles. Outside queue mode, the
+invoking standalone workflow owns one allowance across its nested reviews.
+Pass and preserve that ownership and usage in handoffs; a new agent, phase,
+review invocation, or resumption does not reset it.
+
+1. Preserve the original command, runner exit status and complete test summary,
+   timeout failures, test counts/skips, working tree identity, and output.
+   Require natural runner completion, no remaining child process, and known
+   task-owned side effects. Mixed assertion/compiler failures, setup/hook
+   timeouts, crashed workers, killed or hung commands, corpus/emitter failures,
+   dependency/network/auth errors, and uncertain completion are not eligible.
+2. Inspect the installed runner's documented concurrency option. Require that
+   concurrency can actually be reduced. Record and consume the allowance before
+   running; in queue mode the outer queue grants the worker this recorded allowance
+   without another user prompt. For Vitest, use a supported `--maxWorkers=1`
+   invocation. Keep the same test selection, assertions, skips, code, fixtures,
+   dependencies, and configured test/hook timeouts. Do not reinstall, raise
+   timeouts, add retries, or change production code for this diagnostic run.
+3. Run the original full validation scope once with only the concurrency change.
+   Verify that the discovered test population and skip set match. A focused
+   subset cannot substitute for this rerun. Preserve both attempts.
+4. If it passes, record a recovered timeout with unproven cause, not proof of
+   environmental contention, and complete the remaining required validation.
+   If it fails, do not repeat the diagnostic run. An understood defect in the
+   agent's draft may still use the existing bounded draft-correction allowance,
+   with concrete causal evidence and a full-scope passing rerun. An unexplained
+   timeout remains blocking unless the outer queue grants the shared
+   [bounded native baseline comparison](../shared/recovery-context.md#bounded-native-baseline-comparison).
+   Return its nonterminal handoff with commands stopped; the review pair stays
+   idle until that same-owner continuation. Standalone runs and ineligible
+   failures retain the stop. Source-semantic defects in
+   promotion still require the source-repair handoff.
+
+This allowance is separate from draft corrections and does not authorize
+review requests, pushes, PR creation, email retries, or publication of a failing
+draft. The parent verifies eligibility and all failure/recovery evidence before
+approving publication.
+
+For queue-owned required runs failing **only** setup hooks, return the shared
+[setup-hook recovery handoff](../shared/recovery-context.md#bounded-setup-hook-timeout-recovery)
+to the outer queue before a terminal stop. It owns the separate task-wide
+allowance; no review round or fix agent receives a fresh one. Standalone review
+has no automatic setup-hook allowance. This does not make hook failures
+eligible for the per-test reduced-concurrency diagnostic above.
+
 ### Linter source changes
 
 In standard PR mode, run the corpus procedure only when a valid fix changes
@@ -615,7 +732,9 @@ production linter-rule code changes, follow the current linter-source validation
 and corpus procedure in `/develop-lintdiff-rule` in full. Treat that skill as
 the source of truth for setup, commands, evidence updates, analysis, and
 generated-output cleanup. Record every required validation or corpus failure;
-continue only for an eligible bounded draft correction, otherwise stop the loop.
+continue only for an eligible bounded draft correction, native-test timeout
+diagnosis, or queue-granted setup-hook recovery. Timeout exceptions never apply
+to corpus runs.
 
 In promotion PR mode, do not run `/develop-lintdiff-rule`, the lintdiff fixture
 harness, or corpus validation. Follow the current targeted validation procedure
@@ -627,7 +746,8 @@ of truth for the exact current commands and generated-output checks. A
 production rule edit is permitted only when it is a verified
 `promotion-adaptation-issue` that preserves the immutable source semantics.
 Record every required promotion validation failure; continue only for an
-eligible bounded draft correction that preserves the pinned source semantics,
+eligible bounded draft correction that preserves the pinned source semantics
+or bounded native-test timeout diagnosis or queue-granted setup-hook recovery,
 otherwise stop the loop.
 
 ### Parent publication gate
@@ -640,8 +760,10 @@ After all required validation succeeds, return `ready-for-publication` with:
 - the validation scope and complete command/corpus evidence described above
 
 The parent independently inspects the proposed diff and evidence, confirms that
-the required scope is satisfied, all earlier failures have verified corrective
-evidence, and no unresolved failed check or blocker remains, and records its
+the required scope is satisfied, every earlier required failure has verified
+corrective evidence, and no unresolved required check or task defect remains.
+Independently verify the original gate classification and disclosed disposition
+of supplemental failures; no retroactive demotion is allowed. Record its
 decision in the ledger. Only then may it send explicit
 publication approval to the same persistent fix subagent, identifying the
 approved head SHA and change-content identity. This is an agent-to-agent gate,
@@ -699,10 +821,12 @@ For rounds 1 through 5:
 4. If the fix subagent returns `no-valid-comments`, reply with its rejection
    rationale, resolve the safely rejected threads, verify that no processed
    thread remains unresolved, and then end successfully.
-5. If it returns `uncertain-or-blocked` or a command failure that is ineligible
-   for correction or has exhausted its correction budget, stop and report the
+5. If it returns `uncertain-or-blocked` or a required command failure that is
+   ineligible for correction or has exhausted its correction budget, stop and report the
    blocker. Do not terminate solely because a ready-for-publication handoff
    retains a failed attempt followed by a verified eligible correction.
+   For supplemental failures, independently verify their predeclared scope and
+   disposition rather than making them required gates during this handoff.
    In queue-controlled promotion mode, return
    `source-repair-required` for a confirmed source defect with the complete
    evidence contract above; retain any separate operational failure rather than

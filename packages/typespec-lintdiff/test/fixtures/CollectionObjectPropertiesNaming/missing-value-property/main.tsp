@@ -3,7 +3,6 @@ import "../../lib/imports.tsp";
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.Versioning;
-using TypeSpec.OpenAPI;
 using Azure.ResourceManager;
 
 @armProviderNamespace
@@ -39,9 +38,11 @@ model WidgetProperties {
 @doc("Invalid pageable collection result without value.")
 model WidgetListResult {
   @doc("List of widgets")
+  @pageItems
   items: Widget[];
 
   @doc("Next link")
+  @nextLink
   nextLink?: string;
 }
 
@@ -54,10 +55,9 @@ interface Widgets {
 
   @doc("List widgets by resource group")
   @get
+  @list
   @armResourceList(Widget)
-  @operationId("Widgets_List")
-  @extension("x-ms-pageable", #{ nextLinkName: "nextLink" })
-  listByResourceGroup(
-    ...ResourceParentParameters<Widget>,
-  ): ArmResponse<WidgetListResult> | ErrorResponse;
+  listByResourceGroup(...ResourceParentParameters<Widget>):
+    | ArmResponse<WidgetListResult>
+    | ErrorResponse;
 }

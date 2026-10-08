@@ -1,7 +1,7 @@
 [
   {
     "code": "CollectionObjectPropertiesNaming",
-    "message": "Collection object returned by list operation 'Widgets_List' with 'x-ms-pageable' extension, has no property named 'value'.",
+    "message": "Collection object returned by list operation 'Widgets_ListByResourceGroup' with 'x-ms-pageable' extension, has no property named 'value'.",
     "path": [
       "paths",
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService",

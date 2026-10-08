@@ -7,7 +7,10 @@
     },
     "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
     "@azure-tools/typespec-azure-resource-manager/patch-envelope",
-    "tsp-lintdiff-local-linter/consistent-patch-properties",
+    {
+      "code": "tsp-lintdiff-local-linter/patch-properties-correspond-to-put-properties",
+      "count": 2
+    },
     "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used",
     {
       "code": "tsp-lintdiff-local-linter/path-parameter-schema",

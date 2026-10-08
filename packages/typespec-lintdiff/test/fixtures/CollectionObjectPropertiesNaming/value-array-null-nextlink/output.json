@@ -45,7 +45,7 @@
   "paths": {
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService": {
       "get": {
-        "operationId": "Widgets_List2",
+        "operationId": "Widgets_ListByResourceGroup",
         "tags": [
           "Widgets"
         ],
@@ -74,9 +74,6 @@
               "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ErrorResponse"
             }
           }
-        },
-        "x-ms-pageable": {
-          "nextLinkName": null
         }
       }
     },
@@ -382,7 +379,7 @@
     },
     "WidgetListResult": {
       "type": "object",
-      "description": "Valid pageable collection result with null nextLinkName.",
+      "description": "Valid list result without a next link.",
       "properties": {
         "value": {
           "type": "array",
