@@ -53,6 +53,22 @@ type BuiltResponse = Omit<ServerResponse, "headers" | "body"> & {
   readonly body?: BuiltRequestBody;
 };
 
+interface BuildContext {
+  readonly program: Program;
+  readonly modelRegistry: Map<string, ServerDataModel>;
+  readonly anonymousModelNamesByType: WeakMap<Model, string>;
+  nextAnonymousModelId: number;
+}
+
+function createBuildContext(program: Program): BuildContext {
+  return {
+    program,
+    modelRegistry: new Map(),
+    anonymousModelNamesByType: new WeakMap(),
+    nextAnonymousModelId: 1,
+  };
+}
+
 /**
  * Builds the intermediate {@link ServerModel} for the (single) HTTP service found in the
  * compiled program. This is the "transform" phase: it walks `@typespec/http` metadata and
@@ -65,8 +81,7 @@ export function buildServerModel(
   program: Program,
   service = getAllHttpServices(program)[0][0],
 ): ServerModel {
-  const modelRegistry = new Map<string, ServerDataModel>();
-  const anonymousModelNames = new Map<Model, string>();
+  const context = createBuildContext(program);
 
   const operations: ServerOperation[] = [];
   const skippedOperations: ServerSkippedOperation[] = [];
@@ -76,14 +91,7 @@ export function buildServerModel(
     try {
       const operationName = getOperationName(program, op, usedOperationNames);
       const operationTypeName = getOperationTypeName(operationName, op, usedOperationTypeNames);
-      const built = buildOperation(
-        program,
-        operationName,
-        operationTypeName,
-        op,
-        modelRegistry,
-        anonymousModelNames,
-      );
+      const built = buildOperation(context, operationName, operationTypeName, op);
       usedOperationNames.add(operationName);
       usedOperationTypeNames.add(operationTypeName);
       operations.push(built);
@@ -99,7 +107,7 @@ export function buildServerModel(
   return {
     serviceName: service ? getName(program, service.namespace, service.namespace.name) : "Service",
     operations,
-    models: [...modelRegistry.values()],
+    models: [...context.modelRegistry.values()],
     skippedOperations,
   };
 }
@@ -113,26 +121,20 @@ function disambiguate(name: string, used: ReadonlySet<string>): string {
 }
 
 function buildOperation(
-  program: Program,
+  context: BuildContext,
   name: string,
   typeName: string,
   op: HttpOperation,
-  modelRegistry: Map<string, ServerDataModel>,
-  anonymousModelNames: Map<Model, string>,
 ): ServerOperation {
-  const parameters = op.parameters.parameters.map((p) =>
-    buildParameter(program, p, modelRegistry, anonymousModelNames),
-  );
+  const parameters = op.parameters.parameters.map((p) => buildParameter(context, p));
 
   const requestBody = op.parameters.body
-    ? buildRequestBody(program, op.parameters.body, modelRegistry, anonymousModelNames)
+    ? buildRequestBody(context, op.parameters.body)
     : undefined;
 
-  const responses = op.responses.map((r) =>
-    buildResponse(program, r, modelRegistry, anonymousModelNames),
-  );
+  const responses = op.responses.map((r) => buildResponse(context, r));
   const route = splitRoutePath(op.path);
-  const doc = getDocHelper(program, op.operation);
+  const doc = getDocHelper(context.program, op.operation);
   const operation: ServerOperation = {
     name,
     typeName,
@@ -142,7 +144,7 @@ function buildOperation(
     literalQueryParameters: route.literalQueryParameters,
     parameters: parameters.map(stripParameter),
     parametersModel: createOperationParametersModel(
-      program,
+      context.program,
       typeName,
       parameters,
       requestBody,
@@ -150,7 +152,7 @@ function buildOperation(
     ),
     requestBody: requestBody && stripRequestBody(requestBody),
     responses: responses.map(stripResponse),
-    responseUnion: createOperationResponseUnion(program, typeName, responses),
+    responseUnion: createOperationResponseUnion(context.program, typeName, responses),
     doc,
     interfaceName: op.operation.interface?.name,
   };
@@ -210,18 +212,16 @@ function splitRoutePath(path: string): {
 }
 
 function buildParameter(
-  program: Program,
+  context: BuildContext,
   param: HttpOperationParameter,
-  modelRegistry: Map<string, ServerDataModel>,
-  anonymousModelNames: Map<Model, string>,
 ): BuiltOperationParameter {
   const location: ServerParameterLocation =
     param.type === "cookie" ? "header" : (param.type as ServerParameterLocation);
   const type = isHeaderCollection(param.name)
-    ? getHeaderCollectionTypeMetadata(program)
-    : getTypeMetadata(program, param.param.type, modelRegistry, anonymousModelNames, param.param);
+    ? getHeaderCollectionTypeMetadata(context.program)
+    : getTypeMetadata(context, param.param.type, param.param);
   return {
-    name: getName(program, param.param, param.param.name),
+    name: getName(context.program, param.param, param.param.name),
     wireName: param.name,
     location,
     type: type.runtime,
@@ -230,19 +230,8 @@ function buildParameter(
   };
 }
 
-function buildRequestBody(
-  program: Program,
-  body: HttpPayloadBody,
-  modelRegistry: Map<string, ServerDataModel>,
-  anonymousModelNames: Map<Model, string>,
-): BuiltRequestBody {
-  const type = getTypeMetadata(
-    program,
-    body.type,
-    modelRegistry,
-    anonymousModelNames,
-    body.property ?? body.type,
-  );
+function buildRequestBody(context: BuildContext, body: HttpPayloadBody): BuiltRequestBody {
+  const type = getTypeMetadata(context, body.type, body.property ?? body.type);
   return {
     type: type.runtime,
     declarationType: type.declaration,
@@ -251,20 +240,15 @@ function buildRequestBody(
   };
 }
 
-function buildResponse(
-  program: Program,
-  response: HttpOperationResponse,
-  modelRegistry: Map<string, ServerDataModel>,
-  anonymousModelNames: Map<Model, string>,
-): BuiltResponse {
+function buildResponse(context: BuildContext, response: HttpOperationResponse): BuiltResponse {
   const content = response.responses[0];
   const headers: BuiltResponseHeader[] = [];
   for (const [headerWireName, prop] of Object.entries(content?.headers ?? {})) {
     const type = isHeaderCollection(headerWireName)
-      ? getHeaderCollectionTypeMetadata(program)
-      : getTypeMetadata(program, prop.type, modelRegistry, anonymousModelNames, prop);
+      ? getHeaderCollectionTypeMetadata(context.program)
+      : getTypeMetadata(context, prop.type, prop);
     headers.push({
-      name: getName(program, prop, prop.name),
+      name: getName(context.program, prop, prop.name),
       wireName: headerWireName,
       type: type.runtime,
       declarationType: type.declaration,
@@ -276,7 +260,7 @@ function buildResponse(
     headers,
     body:
       content?.body && response.statusCodes !== "*"
-        ? buildRequestBody(program, content.body, modelRegistry, anonymousModelNames)
+        ? buildRequestBody(context, content.body)
         : undefined,
   };
 }
@@ -324,19 +308,17 @@ function stripResponseHeader(header: BuiltResponseHeader): ServerResponseHeader 
 }
 
 function getTypeMetadata(
-  program: Program,
+  context: BuildContext,
   type: Type,
-  modelRegistry: Map<string, ServerDataModel>,
-  anonymousModelNames: Map<Model, string>,
   constraintTarget: Type = type,
 ): TypeMetadata {
-  const tk = $(program);
+  const tk = $(context.program);
   switch (type.kind) {
     case "Scalar":
       const scalarName = type.name || "<anonymous>";
       if (tk.scalar.extendsNumeric(type))
         return {
-          runtime: numericTypeRef(program, constraintTarget),
+          runtime: numericTypeRef(context.program, constraintTarget),
           declaration: type,
         };
       if (tk.scalar.extendsString(type)) return { runtime: { kind: "string" }, declaration: type };
@@ -377,40 +359,31 @@ function getTypeMetadata(
     }
     case "Model": {
       if (tk.array.is(type)) {
-        const element = getTypeMetadata(
-          program,
-          tk.array.getElementType(type),
-          modelRegistry,
-          anonymousModelNames,
-        );
+        const element = getTypeMetadata(context, tk.array.getElementType(type));
         return {
           runtime: { kind: "array", element: element.runtime },
           declaration: tk.array.create(element.declaration),
         };
       }
       if (tk.record.is(type)) {
-        const element = getTypeMetadata(
-          program,
-          tk.record.getElementType(type),
-          modelRegistry,
-          anonymousModelNames,
-        );
+        const element = getTypeMetadata(context, tk.record.getElementType(type));
         return {
           runtime: { kind: "record", element: element.runtime },
           declaration: tk.record.create(element.declaration),
         };
       }
-      const runtime = registerModel(program, type, modelRegistry, anonymousModelNames);
+      const runtime = registerModel(context, type);
       return {
         runtime,
         declaration:
-          runtime.kind === "model" ? modelRegistry.get(runtime.name)!.declarationModel : type,
+          runtime.kind === "model"
+            ? context.modelRegistry.get(runtime.name)!.declarationModel
+            : type,
       };
     }
     case "Union": {
       const variants = [...type.variants.values()].map(
-        (variant) =>
-          getTypeMetadata(program, variant.type, modelRegistry, anonymousModelNames).runtime,
+        (variant) => getTypeMetadata(context, variant.type).runtime,
       );
       return { runtime: { kind: "union", variants }, declaration: tk.intrinsic.any };
     }
@@ -419,27 +392,22 @@ function getTypeMetadata(
   }
 }
 
-function registerModel(
-  program: Program,
-  model: Model,
-  modelRegistry: Map<string, ServerDataModel>,
-  anonymousModelNames: Map<Model, string>,
-): ServerTypeRef {
-  const tk = $(program);
-  const name = resolveModelName(program, model, modelRegistry, anonymousModelNames);
-  if (!modelRegistry.has(name)) {
-    const declarationModel = createDeclarationModel(program, name, model);
+function registerModel(context: BuildContext, model: Model): ServerTypeRef {
+  const tk = $(context.program);
+  const name = resolveModelName(context, model);
+  if (!context.modelRegistry.has(name)) {
+    const declarationModel = createDeclarationModel(context.program, name, model);
     // Insert a placeholder first to guard against infinite recursion on cyclic models.
-    modelRegistry.set(name, { name, wireName: name, properties: [], declarationModel });
+    context.modelRegistry.set(name, { name, wireName: name, properties: [], declarationModel });
     const properties = [...tk.model.getProperties(model).values()].map((prop) =>
-      buildModelProperty(program, prop, declarationModel, modelRegistry, anonymousModelNames),
+      buildModelProperty(context, prop, declarationModel),
     );
-    modelRegistry.set(name, {
+    context.modelRegistry.set(name, {
       name,
-      wireName: $(program).type.getEncodedName(model, "application/xml"),
+      wireName: $(context.program).type.getEncodedName(model, "application/xml"),
       properties,
       declarationModel,
-      doc: getDocHelper(program, model),
+      doc: getDocHelper(context.program, model),
     });
   }
   return { kind: "model", name };
@@ -449,64 +417,50 @@ function registerModel(
  * Resolves the generated TS type name for `model`. Named models use their TypeSpec name
  * directly; anonymous models (`model.name === ""`) get a stable, unique `AnonymousModelN` name
  * keyed by *object identity* so that two structurally-different anonymous models never clobber
- * each other under the same cache key (see {@link buildServerModel}'s `anonymousModelNames` doc
- * comment).
+ * each other under the same cache key.
  */
-function resolveModelName(
-  program: Program,
-  model: Model,
-  modelRegistry: Map<string, ServerDataModel>,
-  anonymousModelNames: Map<Model, string>,
-): string {
-  if (model.name) return getName(program, model, getTypeName(model.name));
-  const existingNamedModel = findStructurallyEquivalentNamedModel(
-    program,
-    model,
-    modelRegistry,
-    anonymousModelNames,
-  );
+function resolveModelName(context: BuildContext, model: Model): string {
+  if (model.name) return getName(context.program, model, getTypeName(model.name));
+  const existingNamedModel = findStructurallyEquivalentNamedModel(context, model);
   if (existingNamedModel) return existingNamedModel;
-  const existing = anonymousModelNames.get(model);
+  // Anonymous TypeSpec models all have an empty name, so identity is the only stable cache key.
+  const existing = context.anonymousModelNamesByType.get(model);
   if (existing) return existing;
-  let candidate =
-    modelRegistry.size === 0 ? "AnonymousModel" : `AnonymousModel${modelRegistry.size}`;
-  while (modelRegistry.has(candidate)) {
-    candidate = `AnonymousModel${modelRegistry.size}_${anonymousModelNames.size}`;
+  let candidate = anonymousModelName(context.nextAnonymousModelId++);
+  while (context.modelRegistry.has(candidate)) {
+    candidate = anonymousModelName(context.nextAnonymousModelId++);
   }
-  anonymousModelNames.set(model, candidate);
+  context.anonymousModelNamesByType.set(model, candidate);
   return candidate;
 }
 
+function anonymousModelName(id: number): string {
+  return id === 1 ? "AnonymousModel" : `AnonymousModel${id}`;
+}
+
 function findStructurallyEquivalentNamedModel(
-  program: Program,
+  context: BuildContext,
   model: Model,
-  modelRegistry: Map<string, ServerDataModel>,
-  anonymousModelNames: Map<Model, string>,
 ): string | undefined {
-  const tk = $(program);
+  const tk = $(context.program);
   const anonymousProperties = [...tk.model.getProperties(model).values()];
-  for (const candidate of modelRegistry.values()) {
+  for (const candidate of context.modelRegistry.values()) {
     if (candidate.name.startsWith("AnonymousModel")) continue;
     if (candidate.properties.length !== anonymousProperties.length) continue;
     const candidateProperties = new Map(candidate.properties.map((prop) => [prop.name, prop]));
     let matches = true;
     for (const prop of anonymousProperties) {
-      const name = getName(program, prop, prop.name);
+      const name = getName(context.program, prop, prop.name);
       const candidateProp = candidateProperties.get(name);
       if (
         candidateProp === undefined ||
         candidateProp.optional !== prop.optional ||
-        candidateProp.wireName !== $(program).type.getEncodedName(prop, "application/xml")
+        candidateProp.wireName !== $(context.program).type.getEncodedName(prop, "application/xml")
       ) {
         matches = false;
         break;
       }
-      const typeRef = getTypeMetadata(
-        program,
-        prop.type,
-        modelRegistry,
-        anonymousModelNames,
-      ).runtime;
+      const typeRef = getTypeMetadata(context, prop.type).runtime;
       if (JSON.stringify(candidateProp.type) !== JSON.stringify(typeRef)) {
         matches = false;
         break;
@@ -518,22 +472,20 @@ function findStructurallyEquivalentNamedModel(
 }
 
 function buildModelProperty(
-  program: Program,
+  context: BuildContext,
   prop: ModelProperty,
   declarationModel: Model,
-  modelRegistry: Map<string, ServerDataModel>,
-  anonymousModelNames: Map<Model, string>,
 ): ServerModelProperty {
-  const type = getTypeMetadata(program, prop.type, modelRegistry, anonymousModelNames, prop);
-  createDeclarationProperty(program, prop, declarationModel, type);
+  const type = getTypeMetadata(context, prop.type, prop);
+  createDeclarationProperty(context.program, prop, declarationModel, type);
   return {
-    name: getName(program, prop, prop.name),
-    wireName: $(program).type.getEncodedName(prop, "application/xml"),
+    name: getName(context.program, prop, prop.name),
+    wireName: $(context.program).type.getEncodedName(prop, "application/xml"),
     type: type.runtime,
     optional: prop.optional,
-    xmlAttribute: isAttribute(program, prop),
-    xmlUnwrapped: isUnwrapped(program, prop),
-    doc: getDocHelper(program, prop),
+    xmlAttribute: isAttribute(context.program, prop),
+    xmlUnwrapped: isUnwrapped(context.program, prop),
+    doc: getDocHelper(context.program, prop),
   };
 }
 

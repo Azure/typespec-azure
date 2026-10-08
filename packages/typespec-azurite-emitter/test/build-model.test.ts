@@ -143,6 +143,13 @@ describe("buildServerModel", () => {
     expect(props.publicAccess).toMatchObject({ optional: true, type: { kind: "boolean" } });
   });
 
+  it("does not emit anonymous declarations for the Queue fixture", async () => {
+    const { program } = await ApiTester.compile(loadQueuePilotFixture());
+    const serverModel = buildServerModel(program);
+
+    expect(serverModel.models.some((model) => model.name.startsWith("AnonymousModel"))).toBe(false);
+  });
+
   it("resolves array-of-model types for nested list bodies", async () => {
     const { program } = await ApiTester.compile(loadQueuePilotFixture());
     const serverModel = buildServerModel(program);
@@ -296,6 +303,74 @@ describe("buildServerModel", () => {
     const anonymousModels = serverModel.models.filter((m) => m.name.startsWith("AnonymousModel"));
     expect(anonymousModels.length).toBeGreaterThanOrEqual(2);
     expect(new Set(anonymousModels.map((m) => m.name)).size).toBe(anonymousModels.length);
+  });
+
+  it("reuses the same anonymous model identity each time it is referenced", async () => {
+    const { program } = await ApiTester.compile({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace AnonymousIdentityDemo;
+
+        alias InlineBody = {
+          value: string;
+        };
+
+        @route("/items")
+        @post
+        op create(@body body: InlineBody): {
+          @statusCode statusCode: 200;
+          @body body: InlineBody;
+        };
+      `,
+    });
+    const serverModel = buildServerModel(program);
+
+    const anonymousModels = serverModel.models.filter((m) => m.name.startsWith("AnonymousModel"));
+    expect(anonymousModels).toHaveLength(1);
+
+    const create = serverModel.operations.find((op) => op.name === "Create")!;
+    expect(create.requestBody?.type).toEqual({ kind: "model", name: anonymousModels[0].name });
+    expect(create.responses[0].body?.type).toEqual({
+      kind: "model",
+      name: anonymousModels[0].name,
+    });
+  });
+
+  it("terminates when anonymous models participate in reference cycles", async () => {
+    const { program } = await ApiTester.compile({
+      "main.tsp": `
+        import "@typespec/http";
+        using Http;
+
+        @service
+        namespace AnonymousCycleDemo;
+
+        model Node {
+          child?: {
+            parent?: Node;
+            value: string;
+          };
+        }
+
+        @route("/nodes")
+        @get
+        op getNode(): Node;
+      `,
+    });
+    const serverModel = buildServerModel(program);
+
+    const node = serverModel.models.find((model) => model.name === "Node")!;
+    const child = node.properties.find((prop) => prop.name === "child")!;
+    expect(child.type).toMatchObject({ kind: "model", name: "AnonymousModel" });
+
+    const anonymous = serverModel.models.find((model) => model.name === "AnonymousModel")!;
+    expect(anonymous.properties.find((prop) => prop.name === "parent")?.type).toEqual({
+      kind: "model",
+      name: "Node",
+    });
   });
 
   it("does not register default error bodies as handler response models", async () => {
