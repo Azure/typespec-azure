@@ -697,12 +697,22 @@ interface Temporaries {
     const repeatedV1 = resolveArmResources(program, { version: "2024-01-01" });
     const namedV1 = resolveArmResources(program, {
       version: "2024-01-01",
-      nameResolver: ({ kind, defaultName }) =>
-        kind === "operation" ? `client${defaultName}` : `Client${defaultName}`,
+      nameResolver: ({ kind, defaultName }) => {
+        switch (kind) {
+          case "resource-model":
+          case "operation-group":
+            return `Client${defaultName}`;
+          case "operation":
+            return `client${defaultName}`;
+          case "resource":
+            return undefined;
+        }
+      },
     });
     const differentlyNamedV1 = resolveArmResources(program, {
       version: "2024-01-01",
-      nameResolver: ({ defaultName }) => `Other${defaultName}`,
+      nameResolver: ({ kind, defaultName }) =>
+        kind === "resource" ? `Other${defaultName}` : undefined,
     });
     const v2 = resolveArmResources(program, { version: "2025-01-01" });
     const v3 = resolveArmResources(program, { version: "2026-01-01" });
@@ -889,6 +899,8 @@ interface Children {
           resourceInstancePath: request.resourceInstancePath,
         });
         switch (request.kind) {
+          case "resource-model":
+            return undefined;
           case "resource":
             return `Client${request.defaultName}`;
           case "operation":
@@ -925,6 +937,15 @@ interface Children {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}",
     });
 
+    expect(requests).toContainEqual({
+      kind: "resource-model",
+      defaultName: "Child",
+      typeName: "Child",
+      resourceModel: undefined,
+      resourceType: "Microsoft.ContosoProviderHub/parents/children",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/parents/{parentName}/children/{childName}",
+    });
     expect(requests).toContainEqual({
       kind: "resource",
       defaultName: "Child",
@@ -963,6 +984,212 @@ interface Children {
       resourceName: "Child",
       resourceModelName: "Child",
     });
+  }, 30_000);
+
+  it("applies model names only to derived resource names before direct overrides", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+model Employee is ExtensionResource<{}> {
+  ...ResourceNameParameter<Employee>;
+}
+
+interface EmployeeOperations<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+  get is Extension.Read<Scope, Employee>;
+}
+
+@armResourceOperations
+interface Tenants extends EmployeeOperations<Extension.Tenant> {}
+
+@armResourceOperations
+interface Subscriptions extends EmployeeOperations<Extension.Subscription> {}
+`);
+
+    const subscriptionPath =
+      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}";
+    const provider = resolveArmResources(program, {
+      nameResolver: ({ kind, resourceInstancePath, type }) => {
+        if (kind === "resource-model" && type.name === "Employee") return "ClientEmployee";
+        if (kind === "resource-model" && type.name === "Tenant") return "ClientTenant";
+        if (kind === "resource" && resourceInstancePath === subscriptionPath) {
+          return "SubscriptionWorker";
+        }
+        return undefined;
+      },
+    });
+
+    const tenant = provider.resources?.find(
+      (resource) =>
+        resource.resourceInstancePath ===
+        "/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    );
+    const subscription = provider.resources?.find(
+      (resource) => resource.resourceInstancePath === subscriptionPath,
+    );
+    ok(tenant);
+    ok(subscription);
+    expect(tenant.resourceName).toBe("ClientTenantClientEmployee");
+    expect(tenant.operations.lifecycle.read?.[0]).toMatchObject({
+      resourceName: "ClientTenantClientEmployee",
+      resourceModelName: "ClientTenantClientEmployee",
+    });
+    expect(subscription.resourceName).toBe("SubscriptionWorker");
+    expect(subscription.operations.lifecycle.read?.[0]).toMatchObject({
+      resourceName: "SubscriptionWorker",
+      resourceModelName: "SubscriptionWorker",
+    });
+  }, 30_000);
+
+  it("preserves explicit and path-derived resource names when resolving model names", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+@subscriptionResource
+model Employee is ProxyResource<{}> {
+  ...ResourceNameParameter<Employee>;
+}
+
+alias LegacyEmployeeOperations = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+  },
+  {
+    @segment("employees")
+    @key
+    @TypeSpec.Http.path
+    employeeName: string;
+  },
+  ResourceName = "ExplicitEmployees"
+>;
+
+@armResourceOperations
+interface Employees {
+  get is LegacyEmployeeOperations.Read<Employee>;
+}
+
+@subscriptionResource
+model Incident is ProxyResource<{}> {
+  ...ResourceNameParameter<Incident>;
+}
+
+alias LegacyTicketOperations = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+  },
+  {
+    @segment("supportTickets")
+    @key
+    @TypeSpec.Http.path
+    supportTicketName: string;
+  }
+>;
+
+alias RepeatedIncidentOperations = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+    @segment("incidents")
+    @key
+    @TypeSpec.Http.path
+    parentIncidentName: string;
+  },
+  {
+    @segment("incidents")
+    @key
+    @TypeSpec.Http.path
+    incidentName: string;
+  }
+>;
+
+@armResourceOperations
+interface SupportTickets {
+  get is LegacyTicketOperations.Read<Incident>;
+}
+
+@armResourceOperations
+interface RepeatedIncidents {
+  get is RepeatedIncidentOperations.Read<Incident>;
+}
+`);
+
+    const provider = resolveArmResources(program, {
+      nameResolver: ({ kind, type }) =>
+        kind === "resource-model" ? `Client${type.name}` : undefined,
+    });
+
+    const employee = provider.resources?.find((resource) => resource.type.name === "Employee");
+    const incidents = provider.resources?.filter((resource) => resource.type.name === "Incident");
+    ok(employee);
+    expect(employee.resourceName).toBe("ExplicitEmployees");
+    expect(incidents?.map((resource) => resource.resourceName).sort()).toEqual([
+      "Incident",
+      "IncidentsIncidents",
+      "SupportTickets",
+    ]);
+  }, 30_000);
+
+  it("updates every model operand in a built-in default but preserves an explicit override", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+model Employee is TrackedResource<{}> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model Department is TrackedResource<{}> {
+  ...ResourceNameParameter<Department>;
+}
+
+model PrivateEndpointConnection is PrivateEndpointConnectionResource;
+alias DefaultPrivateEndpoints = PrivateEndpoints<PrivateEndpointConnection>;
+alias ExplicitPrivateEndpoints = PrivateEndpoints<
+  PrivateEndpointConnection,
+  ResourceName = "DepartmentConnection"
+>;
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  getDefaultConnection is DefaultPrivateEndpoints.Read<Employee>;
+}
+
+@armResourceOperations
+interface Departments {
+  get is ArmResourceRead<Department>;
+  getExplicitConnection is ExplicitPrivateEndpoints.Read<Department>;
+}
+`);
+
+    const provider = resolveArmResources(program, {
+      nameResolver: ({ kind, type }) => {
+        if (kind !== "resource-model") return undefined;
+        if (type.name === "Employee") return "Worker";
+        if (type.name === "PrivateEndpointConnection") return "ClientConnection";
+        return undefined;
+      },
+    });
+
+    const connections = provider.resources?.filter(
+      (resource) => resource.type.name === "PrivateEndpointConnection",
+    );
+    expect(connections?.map((resource) => resource.resourceName).sort()).toEqual([
+      "DepartmentConnection",
+      "WorkerClientConnection",
+    ]);
   }, 30_000);
 
   it("customizes one extension resource occurrence by instance path", async () => {
@@ -1214,10 +1441,15 @@ interface Employees {
       resourceInstancePath?: string;
       typeName?: string;
     }> = [];
+    const resourceModelRequests: string[] = [];
     const divisionPath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/divisions/{divisionId}";
     const provider = resolveArmResources(program, {
       nameResolver: ({ kind, defaultName, resourceInstancePath, type }) => {
+        if (kind === "resource-model") {
+          resourceModelRequests.push(defaultName);
+          return undefined;
+        }
         if (kind !== "resource") return undefined;
         requests.push({ defaultName, resourceInstancePath, typeName: type?.name });
         if (defaultName === "Group") return "BusinessGroup";
@@ -1243,6 +1475,7 @@ interface Employees {
     expect(employee.resourceName).toBe("Employee");
     expect(group.parent).toBe(division);
     expect(employee.parent).toBe(group);
+    expect(resourceModelRequests).toEqual(["Employee"]);
     expect(requests).toContainEqual({
       defaultName: "Division",
       resourceInstancePath: divisionPath,
@@ -1297,8 +1530,17 @@ interface Employees {
 
     const original = resolveArmResources(program);
     const named = resolveArmResources(program, {
-      nameResolver: ({ kind, defaultName }) =>
-        kind === "operation" ? `client${defaultName}` : `Client${defaultName}`,
+      nameResolver: ({ kind, defaultName }) => {
+        switch (kind) {
+          case "resource-model":
+            return undefined;
+          case "operation":
+            return `client${defaultName}`;
+          case "resource":
+          case "operation-group":
+            return `Client${defaultName}`;
+        }
+      },
     });
 
     const originalEmployee = original.resources?.find((x) => x.type.name === "Employee");
@@ -1414,7 +1656,8 @@ interface ExtensionWidgets {
 
     const original = resolveArmResources(program);
     const named = resolveArmResources(program, {
-      nameResolver: ({ defaultName }) => `Client${defaultName}`,
+      nameResolver: ({ kind, defaultName }) =>
+        kind === "resource-model" ? undefined : `Client${defaultName}`,
     });
 
     const parent = named.resources?.find((x) => x.type.name === "Parent");

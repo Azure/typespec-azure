@@ -122,6 +122,7 @@ Treat these as registration state:
 - `armResourceOperations`
 - `resourceOperationList`
 - `armResourceOperationData`
+- `armResourceNameExpression`
 - `armProviderNamespaces`
 - `armSingletonResources`
 - `resourceBaseType`
@@ -147,7 +148,7 @@ The ARM package must not import TCGC.
 
 Expose or use a dependency-neutral callback that receives:
 
-- name kind;
+- name kind, including separate `resource-model` and full `resource` phases;
 - projected TypeSpec declaration;
 - current ARM logical name;
 - selected version;
@@ -179,6 +180,16 @@ the ARM resource type string formatted as `${provider}/${types.join("/")}`. Do n
 `resourceType` to refer to a TypeSpec model.
 
 Keep `ArmResourceOperation.resourceName` and `resourceModelName` consistent with resource naming.
+Retain a deferred expression at the decorator boundary instead of reconstructing or editing an
+eager string. Expressions distinguish explicit values, literals, model operands, concatenation,
+and legacy path algorithms. Extension and built-in formulas must retain every contributing model.
+Evaluate the same expression with original model names for grouping and with `resource-model`
+results for final output. The complete `resource` result runs afterward and has final precedence.
+
+Explicit decorator and template names are opaque expressions. Treat undefined and empty template
+sentinel values as omitted. If multiple identity operations contribute to an occurrence,
+conservatively retain the explicit expression if any of them supplied the name.
+
 Include both the ARM resource type string and instance path in resource naming requests because
 one model and one resource type can produce several resolved resource occurrences. For example,
 subscription-scoped and tenant-scoped resources can share the same resource type string while
@@ -191,6 +202,7 @@ Track synthetic parents internally and invoke the name resolver with `type: unde
 synthetic parents reuse the child model in their stored `type` field, but that model is not an
 authoritative declaration for the synthetic resource. Consumers can use `defaultName`,
 `resourceType`, or `resourceInstancePath` to name synthetic occurrences explicitly.
+Do not issue `resource-model` requests for synthetic resources.
 
 For a TCGC integration test, let the consumer call `getLibraryName` or
 `getClientNameOverride`. Do not duplicate TCGC precedence in ARM.
@@ -200,7 +212,8 @@ The implemented consumer adapter is:
 ```ts
 resolveArmResources(program, {
   version,
-  nameResolver: ({ type }) => (type === undefined ? undefined : getLibraryName(tcgcContext, type)),
+  nameResolver: ({ kind, type }) =>
+    kind === "resource" || type === undefined ? undefined : getLibraryName(tcgcContext, type),
 });
 ```
 
@@ -244,10 +257,15 @@ realm ownership separately. No custom name may leak to another call.
 
 ### Naming
 
+- Rename every model operand in standard, extension, built-in, and legacy derived names.
+- Verify explicit names remain opaque and complete resource overrides have final precedence.
+- Verify baseline grouping is unchanged by resolver-produced names.
+- Verify a full, path-specific resource override wins over model-derived naming.
 - Rename a resource model, operation, and operation interface.
 - Verify all aliases of one operation receive the same name.
 - Verify paths and resource type segments remain unchanged.
 - Verify synthetic parents receive `type: undefined` and can be renamed by default name or path.
+- Verify synthetic parents receive no `resource-model` request.
 - Verify empty callback results produce the intended diagnostic behavior.
 
 ## Common failure modes

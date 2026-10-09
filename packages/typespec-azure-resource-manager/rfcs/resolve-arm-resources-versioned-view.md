@@ -114,17 +114,18 @@ Its high-level sequence is:
 
 ARM decorators register metadata while the TypeSpec program is checked. Important state includes:
 
-| State key                  | Key type    | Purpose                                                         |
-| -------------------------- | ----------- | --------------------------------------------------------------- |
-| `armResources`             | `Model`     | Registered ARM resource details and the resource TypeSpec model |
-| `armResourceOperations`    | `Model`     | Lifecycle, list, and action operation metadata                  |
-| `resourceOperationList`    | `Model`     | Operation identifiers associated with a resource                |
-| `armResourceOperationData` | `Operation` | Identifies operations marked as ARM resource operations         |
-| `armProviderNamespaces`    | `Namespace` | ARM provider namespace metadata                                 |
-| `armSingletonResources`    | `Model`     | Singleton resource metadata                                     |
-| `resourceBaseType`         | `Model`     | Resolved ARM resource base kind                                 |
-| `armBuiltInResource`       | `Model`     | Virtual or built-in resource metadata                           |
-| `customAzureResource`      | `Model`     | Custom resource metadata                                        |
+| State key                   | Key type    | Purpose                                                         |
+| --------------------------- | ----------- | --------------------------------------------------------------- |
+| `armResources`              | `Model`     | Registered ARM resource details and the resource TypeSpec model |
+| `armResourceOperations`     | `Model`     | Lifecycle, list, and action operation metadata                  |
+| `resourceOperationList`     | `Model`     | Operation identifiers associated with a resource                |
+| `armResourceOperationData`  | `Operation` | Identifies operations marked as ARM resource operations         |
+| `armResourceNameExpression` | `Operation` | Deferred logical resource-name formula                          |
+| `armProviderNamespaces`     | `Namespace` | ARM provider namespace metadata                                 |
+| `armSingletonResources`     | `Model`     | Singleton resource metadata                                     |
+| `resourceBaseType`          | `Model`     | Resolved ARM resource base kind                                 |
+| `armBuiltInResource`        | `Model`     | Virtual or built-in resource metadata                           |
+| `customAzureResource`       | `Model`     | Custom resource metadata                                        |
 
 Derived caches include:
 
@@ -263,47 +264,49 @@ export interface ResolveArmResourcesOptions {
 Use one discriminated callback rather than callbacks tied to TCGC concepts:
 
 ```ts
-export type ArmMetadataNameKind = "resource" | "operation" | "operation-group";
-
-export interface ArmMetadataNameRequest {
-  kind: ArmMetadataNameKind;
+interface ArmMetadataNameRequestBase {
   program: Program;
   version?: string;
   defaultName: string;
+}
 
-  /**
-   * TypeSpec declaration that owns the logical name.
-   *
-   * - declared resource: Model
-   * - synthetic resource: undefined
-   * - operation: Operation
-   * - operation-group: Interface
-   */
-  type?: Model | Operation | Interface;
+interface ArmResourceNameRequestBase extends ArmMetadataNameRequestBase {
+  resourceType: string;
+  resourceInstancePath: string;
+}
 
-  /**
-   * Resource model associated with operation metadata, when available.
-   */
+export interface ArmResourceModelNameRequest extends ArmResourceNameRequestBase {
+  kind: "resource-model";
+  type: Model;
+}
+
+export interface ArmResourceNameRequest extends ArmResourceNameRequestBase {
+  kind: "resource";
+  type: Model | undefined;
+}
+
+interface ArmOperationNameRequestBase extends ArmMetadataNameRequestBase {
   resourceModel?: Model;
-
-  /**
-   * ARM resource type string, when available.
-   *
-   * Formatted as `${provider}/${types.join("/")}`.
-   */
   resourceType?: string;
-
-  /**
-   * Instance path of the resolved resource occurrence, when available.
-   *
-   * Resource type does not uniquely identify an occurrence because the same
-   * type can be exposed at multiple scopes or beneath different parents.
-   * Parameter segments preserve their HTTP metadata names, such as
-   * `{subscriptionId}`; `{}` normalization is internal to identity comparison.
-   */
   resourceInstancePath?: string;
 }
 
+export interface ArmOperationNameRequest extends ArmOperationNameRequestBase {
+  kind: "operation";
+  type: Operation;
+}
+
+export interface ArmOperationGroupNameRequest extends ArmOperationNameRequestBase {
+  kind: "operation-group";
+  type: Interface;
+}
+
+export type ArmMetadataNameRequest =
+  | ArmResourceModelNameRequest
+  | ArmResourceNameRequest
+  | ArmOperationNameRequest
+  | ArmOperationGroupNameRequest;
+export type ArmMetadataNameKind = ArmMetadataNameRequest["kind"];
 export type ArmMetadataNameResolver = (request: ArmMetadataNameRequest) => string | undefined;
 ```
 
@@ -315,7 +318,9 @@ Reasons for this shape:
 - One callback gives future name kinds an additive extension path.
 - `defaultName` makes fallback behavior explicit.
 - `type` is the projected type in a selected-version call.
-- The discriminator prevents a resolver from accidentally treating operation groups as models.
+- The discriminator gives each phase an exact declaration type.
+- Resource phases require both ARM resource type and instance path because a model can produce
+  multiple resolved occurrences.
 
 The callback contract should state:
 
@@ -339,9 +344,9 @@ const tcgcContext = createTCGCContext(program, emitterName);
 const provider = resolveArmResources(program, {
   version: selectedVersion,
   nameResolver: ({ kind, type }) => {
-    if (type === undefined) return undefined;
+    if (kind === "resource" || type === undefined) return undefined;
     switch (kind) {
-      case "resource":
+      case "resource-model":
       case "operation":
       case "operation-group":
         return getLibraryName(tcgcContext, type, languageScope);
@@ -357,6 +362,11 @@ belongs to the consumer, not the ARM library.
 The consumer is responsible for aligning the TCGC context's selected API version with the
 `version` passed to `resolveArmResources`. The ARM package cannot validate TCGC context options
 without introducing the dependency this hook is intended to avoid.
+
+`resource-model` and `resource` are intentionally separate. The former resolves each model operand
+retained in a deferred ARM naming formula. The latter replaces the complete logical name for one
+resolved occurrence. A generic TCGC adapter should therefore return `undefined` for `resource`
+unless it intentionally owns the complete occurrence name.
 
 ### Names that can change
 
@@ -664,7 +674,8 @@ realm identity and must store only the uncustomized provider.
 ### Avoid mutating cached results
 
 The current result contains object references between child resources, parents, and scope
-resources. A naming pass must not mutate a cached structural `Provider`.
+resources. Structural resolution therefore produces a cached internal graph with deferred naming
+expressions. A mandatory finalizer must not mutate that graph.
 
 Implement a graph-preserving copy:
 
@@ -672,32 +683,59 @@ Implement a graph-preserving copy:
 2. Copy operation records that contain customizable fields.
 3. Reconnect `parent` and resource-valued `scope` through an old-to-new resource map.
 4. Preserve TypeSpec and immutable HTTP metadata references.
-5. Apply names to the copied graph.
+5. Evaluate and apply names to the copied graph.
 
-Alternatively, build an uncached result whenever `nameResolver` is supplied. The graph-preserving
-copy is preferred because it avoids repeating HTTP and resource association work for the legacy
-view.
+The no-resolver result is also produced by this finalizer and may be cached to preserve repeated
+call identity. Customized results are never cached.
 
 ## Naming transformation details
 
 ### Resource names
 
-For each returned `ResolvedResource`, invoke:
+Registration retains a typed expression instead of only an eager string:
+
+```ts
+type ResourceNameExpression =
+  | { kind: "explicit"; value: string }
+  | { kind: "literal"; value: string }
+  | { kind: "model"; model: Model }
+  | { kind: "concat"; parts: readonly ResourceNameExpression[] }
+  | { kind: "legacy-resource"; model: Model }
+  | { kind: "legacy-extension"; model: Model };
+```
+
+Standard defaults retain the resource model operand. Extension defaults retain target and
+extension model operands. Built-in defaults retain parent and built-in model operands. Legacy
+expressions retain their path algorithm and model fallback. Explicit decorator values are opaque
+and synthetic names are path-derived literals.
+
+Grouping evaluates the same expressions in baseline mode with original projected model names.
+This preserves existing case-insensitive association, explicit-name, and cross-scope behavior.
+Names returned by `nameResolver` never participate in grouping.
+
+Finalization evaluates each expression in resolved mode. Every `model` operand invokes a
+`resource-model` request with the occurrence's resource type and instance path. Repeated operands
+for the same model are memoized within the occurrence. Explicit and literal expressions do not
+issue model requests.
+
+Then invoke:
 
 ```ts
 nameResolver({
   kind: "resource",
   program,
   version,
-  defaultName: resource.resourceName,
+  defaultName: evaluatedResourceName,
   type: isSyntheticResource(resource) ? undefined : resource.type,
   resourceType: `${resource.resourceType.provider}/${resource.resourceType.types.join("/")}`,
   resourceInstancePath: resource.resourceInstancePath,
 });
 ```
 
-A non-empty callback result replaces only `ResolvedResource.resourceName` and corresponding
-logical operation metadata. It does not replace resource type segments.
+A non-empty `resource` result replaces only `ResolvedResource.resourceName` and corresponding
+logical operation metadata. It has final precedence over the evaluated expression and does not
+replace resource type segments. Synthetic resources receive only the `resource` request because
+their literal expressions contain no authoritative model.
 
 ### Operation names
 
@@ -737,10 +775,15 @@ guard in the naming pass so the callback remains safe if that prerequisite chang
 
 ### Naming precedence
 
-The ARM package defines only this precedence:
+The ARM package defines this precedence:
 
-1. Non-empty custom resolver result.
-2. Existing ARM resolver name.
+1. Non-empty full `resource` result for the occurrence.
+2. An explicitly supplied decorator or template resource name.
+3. A derived expression evaluated with all `resource-model` results.
+4. The original ARM default when no resolver changes a model operand.
+
+An explicitly supplied ARM resource name contains no model operand and is therefore never changed
+by `resource-model`.
 
 TCGC-specific precedence remains in TCGC. For example, `getLibraryName` currently incorporates
 language-scoped `@clientName`, unscoped `@clientName`, `@friendlyName`, generated template names,

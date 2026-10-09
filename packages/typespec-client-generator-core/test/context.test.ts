@@ -299,6 +299,18 @@ it("uses TCGC library names when supplied to resolveArmResources", async () => {
       ...ResourceNameParameter<Widget>;
     }
 
+    model Department is TrackedResource<{}> {
+      ...ResourceNameParameter<Department>;
+    }
+
+    @clientName("ClientConnection")
+    model PrivateEndpointConnection is PrivateEndpointConnectionResource;
+    alias DefaultPrivateEndpoints = PrivateEndpoints<PrivateEndpointConnection>;
+    alias ExplicitPrivateEndpoints = PrivateEndpoints<
+      PrivateEndpointConnection,
+      ResourceName = "DepartmentConnection"
+    >;
+
     interface Operations extends Azure.ResourceManager.Operations {}
 
     @clientName("ClientWidgets", "csharp")
@@ -306,6 +318,13 @@ it("uses TCGC library names when supplied to resolveArmResources", async () => {
     interface Widgets {
       @clientName("fetchWidget", "csharp")
       get is ArmResourceRead<Widget>;
+      getConnection is DefaultPrivateEndpoints.Read<Widget>;
+    }
+
+    @armResourceOperations
+    interface Departments {
+      get is ArmResourceRead<Department>;
+      getConnection is ExplicitPrivateEndpoints.Read<Department>;
     }
   `);
 
@@ -313,7 +332,8 @@ it("uses TCGC library names when supplied to resolveArmResources", async () => {
     emitterName: "@azure-tools/typespec-csharp",
   });
   const provider = resolveArmResources(program, {
-    nameResolver: ({ type }) => (type === undefined ? undefined : getLibraryName(context, type)),
+    nameResolver: ({ kind, type }) =>
+      kind === "resource" || type === undefined ? undefined : getLibraryName(context, type),
   });
 
   const widget = provider.resources?.find((x) => x.type.name === "Widget");
@@ -323,6 +343,20 @@ it("uses TCGC library names when supplied to resolveArmResources", async () => {
   strictEqual(widget.operations.lifecycle.read?.[0].operationGroup, "ClientWidgets");
   strictEqual(widget.operations.lifecycle.read?.[0].resourceName, "ClientWidget");
   strictEqual(widget.operations.lifecycle.read?.[0].resourceModelName, "ClientWidget");
+  strictEqual(
+    provider.resources?.find(
+      (x) =>
+        x.type.name === "PrivateEndpointConnection" &&
+        x.resourceName === "ClientWidgetClientConnection",
+    )?.operations.lifecycle.read?.[0].resourceName,
+    "ClientWidgetClientConnection",
+  );
+  ok(
+    provider.resources?.some(
+      (x) =>
+        x.type.name === "PrivateEndpointConnection" && x.resourceName === "DepartmentConnection",
+    ),
+  );
 });
 
 it("uses TCGC library names for selected ARM resource versions", async () => {
@@ -403,7 +437,8 @@ it("uses TCGC library names for selected ARM resource versions", async () => {
   const resolveVersion = (version: string) =>
     resolveArmResources(program, {
       version,
-      nameResolver: ({ type }) => (type === undefined ? undefined : getLibraryName(context, type)),
+      nameResolver: ({ kind, type }) =>
+        kind === "resource" || type === undefined ? undefined : getLibraryName(context, type),
     });
 
   const v1 = resolveVersion("2024-01-01");
