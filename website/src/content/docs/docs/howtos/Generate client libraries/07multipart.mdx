@@ -47,7 +47,18 @@ def upload(
 ```
 
 ```csharp
-# TODO
+namespace TestService
+{
+  // The C# emitter currently generates only the protocol method (RequestContent) for
+  // multipart operations; no convenience overload or `MultipartRequest` model class
+  // is produced.
+  public partial class TestServiceClient
+  {
+    public TestServiceClient(Uri endpoint);
+    public virtual Response Upload(RequestContent content, string contentType, RequestContext context = null);
+    public virtual Task<Response> UploadAsync(RequestContent content, string contentType, RequestContext context = null);
+  }
+}
 ```
 
 ```typescript

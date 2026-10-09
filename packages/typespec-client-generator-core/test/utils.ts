@@ -1,5 +1,5 @@
 import { strictEqual } from "assert";
-import {
+import type {
   SdkClientType,
   SdkHttpOperation,
   SdkPackage,

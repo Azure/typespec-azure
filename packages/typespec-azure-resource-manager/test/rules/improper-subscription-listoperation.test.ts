@@ -1,7 +1,7 @@
 import { Tester } from "#test/tester.js";
 import {
-  LinterRuleTester,
-  TesterInstance,
+  type LinterRuleTester,
+  type TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
@@ -24,33 +24,17 @@ it("Emits a warning if a tenant or extension resource lists by subscription", as
   await tester
     .expect(
       `
-      @service
       @armProviderNamespace
       namespace Microsoft.Foo;
 
       @tenantResource
-      model FooResource is ProxyResource<FooProperties> {
-        @visibility(Lifecycle.Read)
-        @key("foo")
-        @segment("foo")
-        @path
-        name: string;
+      model FooResource is ProxyResource<{}> {
+        ...ResourceNameParameter<FooResource>;
       }
 
       @armResourceOperations(FooResource)
       interface FooResources extends ResourceRead<FooResource> {
         op listBySubscription is ArmListBySubscription<FooResource>;
-      }
-
-      enum ResourceState {
-        Succeeded,
-        Canceled,
-        Failed
-      }
-
-      model FooProperties {
-        displayName?: string = "default";
-        provisioningState: ResourceState;
       }
   `,
     )

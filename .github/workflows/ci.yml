@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        node-version: ["22.x", "24.x"]
+        node-version: ["22.x", "24.x", "26.x"]
     env:
       TYPESPEC_VS_CI_BUILD: true
       TYPESPEC_SKIP_WEBSITE_BUILD: true
@@ -31,7 +31,7 @@ jobs:
         if: runner.os == 'Windows'
         run: git config --global core.longpaths true
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
 
@@ -40,21 +40,18 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: 8.0.x
 
       - name: Install dependencies
         run: pnpm install
 
-      - name: Restore .NET dependencies
-        run: dotnet restore core/packages/typespec-vs
-
       - name: Build
         run: pnpm run build
 
       - name: Test
-        run: pnpm vitest run --config ./vitest.config.fast.ts --coverage --reporter=github-actions --reporter=default
+        run: pnpm vitest run --config ./vitest.config.fast.ts --coverage=${{ runner.os != 'Windows' }} --reporter=github-actions --reporter=default
 
       - name: Regen samples
         run: pnpm run regen-samples
@@ -66,7 +63,7 @@ jobs:
     name: Website
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
 
@@ -91,22 +88,19 @@ jobs:
       TYPESPEC_VS_CI_BUILD: true
       TYPESPEC_SKIP_WEBSITE_BUILD: true
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
 
       - uses: ./.github/actions/setup
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: 8.0.x
 
       - name: Install dependencies
         run: pnpm install
-
-      - name: Restore .NET dependencies
-        run: dotnet restore core/packages/typespec-vs
 
       - name: Install playwright browsers
         run: |
@@ -129,7 +123,7 @@ jobs:
     name: Autorest Checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
 

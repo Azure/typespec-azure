@@ -72,6 +72,7 @@ model UserExportParams {
   format: string;
 }
 
+#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
 @scenario
 @doc("Creates or updates a User")
 @summary("Adds a user or updates a user's fields.")

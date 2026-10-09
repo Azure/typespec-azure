@@ -21,4 +21,5 @@ allowedPaths:
   - packages/azure-http-specs/specs/
   - packages/azure-http-specs/spec-summary.md
   - eng/scripts/doc-updater/knowledge/
+  - .chronus/changes/
   - cspell.yaml

@@ -428,6 +428,69 @@ resp, err := client.Get(context.TODO(), "name", &PetStoreNamespaceClientGetOptio
 
 </ClientTabs>
 
+### Preserving exact casing
+
+By default, language emitters adapt names to idiomatic casing conventions (e.g., `snake_case` for Python, `PascalCase` for C#). `@clientName` also allows emitters to apply language-specific casing transformations to the provided name. To prevent this and preserve the name exactly as specified, wrap it with the `exact()` function.
+
+The `exact()` function marks a client name so that the TCGC type graph sets `isExactName: true` on the corresponding type or property. Language emitters that check this flag will preserve the name exactly as specified, without any automatic casing conversion.
+
+`exact()` supports language scoping, so you can preserve exact casing for a specific language while letting others apply their own conventions.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+@service
+namespace ExactNameService;
+
+model ScopedModel {
+  name: string;
+}
+
+@route("/property")
+@post
+op sendProperty(@body body: ScopedModel): ScopedModel;
+```
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// Scoped renames: per-language exact names with underscore prefix to verify
+// that language naming logic does not strip or recase the name
+#suppress "experimental-feature" "exact"
+@@clientName(ExactNameService.ScopedModel.name, exact("_my_name"), "python");
+@@clientName(ExactNameService.ScopedModel.name, exact("_myName"), "java");
+@@clientName(ExactNameService.ScopedModel.name, exact("_MyName"), "csharp");
+@@clientName(ExactNameService.ScopedModel.name, exact("_myName"), "javascript");
+@@clientName(ExactNameService.ScopedModel.name, exact("_MyName"), "go");
+```
+
+```python
+# not supported
+```
+
+```csharp
+// not supported
+```
+
+```typescript
+// not supported
+```
+
+```java
+// not supported
+```
+
+```go
+// not supported
+```
+
+</ClientTabs>
+
+In this example, the scoped renames on `ScopedModel.name` use an underscore-prefixed name per language to verify that each emitter preserves the name as-is, without stripping or re-casing it. Language emitter support for `isExactName` is not yet available.
+
 ## Implementation
 
 ### Order of Operations

@@ -6,6 +6,38 @@ https://github.com/microsoft/typespec/blob/main/CONTRIBUTING.md for most common
 day-to-day operations. The rest of this document only covers the things that
 are unique to this repo.
 
+# Prerequisites
+
+[mise](https://mise.jdx.dev/getting-started.html) is the recommended way to
+install the repository's development tools consistently across platforms.
+Install mise and [activate it for your shell](https://mise.jdx.dev/getting-started.html#activate-mise),
+then, after [cloning the repository recursively](#cloning-recursively), run:
+
+```bash
+mise install
+pnpm install
+```
+
+`mise install` installs the tool versions recorded in `mise.toml` and
+`mise.lock`, including Node.js, pnpm, Python, uv, Go, Java, and Maven. Using
+mise is recommended but not required; if you use another version manager,
+install the versions declared in `mise.toml` and the pnpm version declared by
+the `packageManager` field in `package.json`.
+
+The Python CI setup action uses the Python and uv versions declared in
+`mise.toml`. After updating either version, run `pnpm deps fix` to sync the
+action. `pnpm deps check` reports version drift as part of the CI consistency
+checks.
+
+Workspace builds use native TypeScript 7 through the root `typescript-native`
+dependency, which provides `tsc` to package scripts. The `typescript` catalog entry
+aliases `@typescript/typescript6` for tools that require the JavaScript compiler
+API, and provides the separate `tsc6` command. Package manifests keep using
+`"typescript": "catalog:"`; no pnpm hook is needed. Tools and editor integrations
+that load the `typescript` package see TypeScript 6. A workspace package extension
+also gives Alloy's CLI native TypeScript because it resolves `typescript/bin/tsc`
+directly.
+
 # Testing a change in repo azure-rest-api-specs
 
 If you are proposing a change that is likely to impact existing specs, it's
@@ -45,6 +77,10 @@ recommended to test a private of the change before merging.
      the course of action.
 
 Example: https://github.com/Azure/azure-rest-api-specs/pull/26684
+
+# Breaking changes
+
+See [docs/breaking-changes.md](docs/breaking-changes.md) for guidelines on rolling out breaking changes across TypeSpec, the spec repo, and SDK repos.
 
 # Working with the core submodule
 
@@ -200,7 +236,7 @@ The package also needs a `vitest.config.ts` — the root vitest workspace config
 ```json
 {
   "scripts": {
-    "test": "npm run test:vitest && npm run test:extra",
+    "test": "pnpm test:vitest && pnpm test:extra",
     "test:vitest": "vitest run",
     "test:extra": "dotnet test"
   }
@@ -279,39 +315,33 @@ Do the following to publish a new release:
 
 2. Make sure the core submodule is up to date and `typespec-next` validations are passing.
 
-3. Make sure your working copy is clean and you are up-to-date and on the
-   main branch (both typespec-azure and core should point to main).
+3. Make sure your working copy is clean and you are up-to-date and core submodules are both up to date with `upstream/main`.
+   1. Can [trigger](https://github.com/Azure/typespec-azure/network/updates/18647270/jobs) dependabot via `Insights > Dependency graph > Dependabot`.
 
 4. Generate release notes for TypeSpec once the full list of changes are in.
-   1. In your fork of the core (typespec) repo, run `npx chronus changelog --policy typespec > out.md`.
+   1. In your fork of the core (typespec) repo, run `pnpm exec chronus ai-release-notes --policy typespec-stable --policy typespec-preview > out.md`.
    2. Create a new entry in `./core/website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/microsoft/typespec/pull/4102
 
 5. Generate release notes for TypeSpec Azure once the full list of changes are in.
-   1. In your fork of the typespec-azure repo, run `npx chronus changelog --policy typespec-azure > out.md`.
+   1. In your fork of the typespec-azure repo, run `pnpm exec chronus changelog --policy typespec-azure > out.md`.
    2. Create a new entry in `./website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/Azure/typespec-azure/pull/1306
+   3. Merge the TypeSpec and TypeSpec Azure release notes PRs. This is not a blocker for the following steps and can be done at any point after they are opened.
 
-6. Once all PRs are merged, update TypeSpec-Azure core submodule (things will run more smoothly if TypeSpec-Azure core points to HEAD of TypeSpec).
-   1. Can [trigger](https://github.com/Azure/typespec-azure/network/updates/18647270/jobs) dependabot via `Insights > Dependency graph > Dependabot`.
-
-7. Double-check that typespec-azure and core submodules are both up to date with `upstream/main`.
-
-8. Regenerate documentation via `pnpm regen-docs` in TypeSpec-Azure.
-
-9. Run `pnpm prepare-publish` in TypeSpec-Azure repo to stage the publishing changes.
+6. Run `pnpm prepare-publish` in TypeSpec-Azure repo to stage the publishing changes.
    - This creates `publish/xxxxxx` branches for TypeSpec-Azure and TypeSpec repos.
    - If it works you'll get a message like this: `Success! Push publish/kvd01q9v branches and send PRs.`
 
    - Double-check that updated version numbers are correct. Running the tool multiple times will increment the version number multiple times as well.
 
-10. Push and merge TypeSpec (core) PR.
+7. Push and merge TypeSpec (core) PR.
 
-11. Update core submodule to use `main` in TypeSpec-Azure `publish/` branch and push/merge PR.
+8. Update core submodule to use `main` in TypeSpec-Azure `publish/` branch and push/merge PR.
 
-12. Make sure release pipeline completed and packages are on NPM.
-    - [Core Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=3226)
-    - [TypeSpec Azure Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=1793)
+9. Make sure release pipeline completed and packages are on NPM.
+   - [Core Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=3226)
+   - [TypeSpec Azure Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=1793)
 
 ### Followups
 
@@ -319,22 +349,18 @@ Do the following to publish a new release:
    1. Example PR: https://github.com/Azure/azure-rest-api-specs/pull/30122
 2. Upgrade https://github.com/Azure/azure-rest-api-specs-pr to use new versions of TypeSpec.
    1. Example PR: https://github.com/Azure/azure-rest-api-specs-pr/pull/20878
-3. Send an email to the `TypeSpec Partners` group announcing the release.
-   - Include the TypeSpec/TypeSpec-Azure release notes (links plus contents) as part of the announcement.
-     Example:
-4. Run `pnpm upgrade --latest -r -i` on each repo and create PR to update dependencies and vulnerabilities.
-5. After update PRs have been merged, review any remaining reported vulnerabilities in both the Repos' `Security` tabs and initiate a discussion on the `Engineering` channel regarding potential mitigations. `Security` tab links: [typespec](https://github.com/microsoft/typespec/security) and [typespec-azure](https://github.com/Azure/typespec-azure/security).
+   2. Merge the `typespec-next` changes into the `RPSaasMaster` branch for the `-pr` repository.
+3. Use the [bidirectional specification upgrade prompt](https://github.com/Azure/azure-rest-api-specs/blob/main/.github/prompts/bidirectional-spec-upgrade.prompt.md) to synchronize `main` and `typespec-next`.
+4. Send an email to the `TypeSpec Partners` group, with the `TypeSpec Team` in CC, announcing the release and linking to the TypeSpec and TypeSpec Azure release notes. Include highlights when appropriate rather than duplicating the complete release notes.
+5. Run `pnpm upgrade --latest -r -i` on each repo and create PRs to update dependencies and vulnerabilities. Update as many dependencies as possible to avoid debt, but defer version upgrades that require substantial changes to separate PRs.
+6. After update PRs have been merged, review any remaining reported vulnerabilities in both the Repos' `Security` tabs and initiate a discussion on the `Engineering` channel regarding potential mitigations. `Security` tab links: [typespec](https://github.com/microsoft/typespec/security) and [typespec-azure](https://github.com/Azure/typespec-azure/security).
 
 ```md
 TypeSpec X.X and Azure libraries Y.Y were just released
 [TypeSpec X.X Release Notes](link/to/published/release-notes)
 [TypeSpec Azure Y.Y Release Notes](link/to/published/release-notes)
 
-Take a look at what's included in TypeSpec X.X!
-<-- Copy of release notes -->
-
-And here's what changed with TypeSpec Azure Y.Y libraries!
-<-- Copy of release notes -->
+See the release notes for the complete list of changes.
 ```
 
 **NOTE**: The reason for step 1 to ask for folks to avoid merging while
@@ -433,11 +459,16 @@ Area of the codebase
 | `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library                                 |
 | `lib:azure-http-specs`       | #c7aee6 | For issues/prs related to the @azure-tools/typespec-azure-http-specs package        |
 | `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter                                   |
+| `emitter:python`             | #957300 | Issues for @azure-tools/typespec-python emitter                                     |
+| `emitter:go`                 | #957300 | Issues for @azure-tools/typespec-go emitter                                         |
+| `emitter:typescript`         | #957300 | Issues for @azure-tools/typespec-ts emitter                                         |
+| `emitter:java`               | #0096c7 | Issues for @azure-tools/typespec-java emitter                                       |
 | `emitter:client:all`         | #957300 | General client emitter issues that do not involve TCGC or typespec-azure-http-specs |
 | `eng`                        | #65bfff |                                                                                     |
 | `ide`                        | #846da1 | Issues for Azure specific ide features                                              |
 | `cli/psh`                    | #9EB120 | Issues for Azure CLI/PSH features                                                   |
 | `meta:website`               | #007dc8 | TypeSpec.io updates                                                                 |
+| `linter`                     | #65bfff | Issues related to linter rules                                                      |
 
 #### issue_kinds
 
@@ -484,11 +515,12 @@ Process labels
 
 Misc labels
 
-| Name                | Color   | Description                                        |
-| ------------------- | ------- | -------------------------------------------------- |
-| `good first issue`  | #7057ff | Good for newcomers                                 |
-| `int:azure-specs`   | #0e8a16 | Run integration tests against azure-rest-api-specs |
-| `agentic-workflows` | #000000 | Issues/PR created by github agentic workflows      |
+| Name                | Color   | Description                                                      |
+| ------------------- | ------- | ---------------------------------------------------------------- |
+| `good first issue`  | #7057ff | Good for newcomers                                               |
+| `int:azure-specs`   | #0e8a16 | Run integration tests against azure-rest-api-specs               |
+| `agentic-workflows` | #000000 | Issues/PR created by github agentic workflows                    |
+| `auto-merge`        | #0e8a16 | Automatically merge the pull request after all requirements pass |
 
 #### external
 

@@ -1,8 +1,8 @@
-import {
+import type {
   AzureClientGeneratorCoreDecorators,
   AzureClientGeneratorCoreFunctions,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
-import { AzureClientGeneratorCoreLegacyDecorators } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
+import type { AzureClientGeneratorCoreLegacyDecorators } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   $access,
   $alternateType,
@@ -33,7 +33,15 @@ import {
   $usage,
   $useSystemTextJsonConverter,
 } from "./decorators.js";
-import { addParameter, removeParameter, reorderParameters, replaceParameter } from "./functions.js";
+import {
+  addParameter,
+  exact,
+  removeParameter,
+  reorderParameters,
+  replaceParameter,
+  replaceResponseWithBytes,
+  replaceResponseWithVoid,
+} from "./functions.js";
 
 export { $lib } from "./lib.js";
 export { $onValidate } from "./validate.js";
@@ -85,5 +93,10 @@ export const $functions: Record<string, AzureClientGeneratorCoreFunctions> = {
     removeParameter: removeParameter as AzureClientGeneratorCoreFunctions["removeParameter"],
     addParameter: addParameter as AzureClientGeneratorCoreFunctions["addParameter"],
     reorderParameters: reorderParameters as AzureClientGeneratorCoreFunctions["reorderParameters"],
+    replaceResponseWithVoid:
+      replaceResponseWithVoid as AzureClientGeneratorCoreFunctions["replaceResponseWithVoid"],
+    replaceResponseWithBytes:
+      replaceResponseWithBytes as AzureClientGeneratorCoreFunctions["replaceResponseWithBytes"],
+    exact: exact as AzureClientGeneratorCoreFunctions["exact"],
   },
 };

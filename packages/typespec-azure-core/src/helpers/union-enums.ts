@@ -1,9 +1,9 @@
 import {
-  Diagnostic,
-  EnumMember,
-  Type,
-  Union,
-  UnionVariant,
+  type Diagnostic,
+  type EnumMember,
+  type Type,
+  type Union,
+  type UnionVariant,
   createDiagnosticCollector,
   isNullType,
 } from "@typespec/compiler";

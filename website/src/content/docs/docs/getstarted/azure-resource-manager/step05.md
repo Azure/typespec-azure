@@ -32,7 +32,7 @@ using Azure.ResourceManager;
 
 /** Contoso Resource Provider management API */
 @armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient", version: "2021-01-01-preview" })
+@service(#{ title: "ContosoProviderHubClient" })
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Microsoft.ContosoProviderHub;
 
@@ -71,11 +71,7 @@ model UserProperties {
 
 /** A User Resource */
 model User is TrackedResource<UserProperties> {
-  /** Address name */
-  @key("userName")
-  @segment("users")
-  @path
-  name: string;
+  ...ResourceNameParameter<User>;
 }
 
 /** The details of a user notification */

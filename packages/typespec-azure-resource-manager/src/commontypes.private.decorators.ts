@@ -1,4 +1,4 @@
-import {
+import type {
   DecoratorContext,
   Enum,
   EnumValue,
@@ -8,7 +8,7 @@ import {
   Union,
 } from "@typespec/compiler";
 import { useStateMap } from "@typespec/compiler/utils";
-import {
+import type {
   ArmCommonDefinitionDecorator,
   ArmCommonParameterDecorator,
   ArmCommonTypesVersionsDecorator,

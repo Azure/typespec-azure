@@ -24,6 +24,25 @@ ignorePaths:
   - .editorconfig
   - .github/CODEOWNERS
   - "*.lock.yml"
+  # temp ignore typespec-ts while repo move is inflight
+  - packages/typespec-ts/**
+  # Go emitter generated test outputs, synced upstream specs, and build scripts
+  # contain many Go package / Azure service names that aren't worth maintaining
+  # in the global dictionary.
+  - packages/typespec-go/test/**
+  - packages/typespec-go/temp/**
+  - packages/typespec-go/.scripts/**
+  # Go spector configs carry Go module names (moved out of .scripts/tspcompile.js).
+  - packages/typespec-go/spector.config.*.yaml
+  # typespec-java specs and hand-written tests are synced verbatim from
+  # core / autorest.java; don't spell-check upstream-sourced content.
+  - packages/typespec-java/emitter-tests/tsp/**
+  - packages/typespec-java/emitter-tests/src/**
+  # Developer/user docs ported verbatim from autorest.java's typespec-extension.
+  - packages/typespec-java/docs/**
+  # Round-trip proof fixtures are copied verbatim from azure-rest-api-specs
+  # (Microsoft.Contoso) and carry randomized example data, not real words.
+  - packages/typespec-azure-examples/test/roundtrip/fixtures/**
 useGitignore: true
 enableFiletypes:
   - tsp
@@ -37,7 +56,9 @@ words:
   - azsdk
   - Bazs
   - byos
+  - chartjs
   - clsx
+  - contosobenchmark
   - contosowidgetmanager
   - Chenjie
   - DMSS
@@ -50,6 +71,7 @@ words:
   - healthdataaiservices
   - horiz
   - Howtos
+  - incentivizes
   - infile
   - kvset
   - kwargs
@@ -67,6 +89,7 @@ words:
   - mobo
   - msazure
   - msdata
+  - msinternal
   - mylocation
   - nsps
   - nupkg
@@ -74,28 +97,76 @@ words:
   - Onco
   - oncophenotype
   - PAYG
+  - pipx
+  - popd
   - prismjs
   - psscriptanalyzer
+  - pushd
   - pystac
   - pytest
   - qnas
   - regionality
   - responseasbool
+  - retarget
+  - reinjectable
   - reinjected
+  - reinjecting
+  - reinjection
   - Reranker
   - rpaasoneboxacr
   - rpass
   - SERVICERP
   - seti
   - stac
+  - strconv
+  - stretchr
   - tcgc
   - tsmv
   - userrp
   - vnet
+  - VMSS
   - WINDOWSVMIMAGE
   - azcore
   - azkeys
   - azsecrets
   - byval
+  - devcenter
   - petstoreopgrp
   - pypi
+  - Tsps
+  # Go emitter
+  - addl
+  - azfake
+  - azidentity
+  - errorf
+  - fatalf
+  - gomod
+  - gopath
+  - polymorphics
+  - respr
+  - retriable
+  - unmarshaller
+  - unmarshallers
+  - unmarshalling
+  - unmarshals
+  - unpopulate
+  - ervices
+  - lient
+  - onfig
+  - ossible
+  - pchars
+  - sliceof
+  - tcgcadapter
+  - uninstantiable
+  - unmarshalled
+  - cmplx
+  - fcgi
+  - flate
+  - gofmt
+  - golangci
+  - gomodtidy
+  - gosym
+  - iotest
+  - mbcs
+  - msan
+  - pkix

@@ -1,3 +1,3 @@
-import { TCGCContext } from "../interfaces.js";
+import type { TCGCContext } from "../interfaces.js";
 
 export function validateClients(context: TCGCContext) {}

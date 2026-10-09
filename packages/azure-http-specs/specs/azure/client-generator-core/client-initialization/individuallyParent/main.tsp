@@ -98,7 +98,9 @@ model BlobQueryParam {
 @doc("Operations for nested default -> individually and parent")
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: PathParamClientOptions,
-  initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
+  initializedBy:
+    | global.Azure.ClientGenerator.Core.InitializedBy.individually
+    | global.Azure.ClientGenerator.Core.InitializedBy.parent,
 })
 @route("/nested-default-individually-parent")
 interface IndividuallyParentNestedWithPathClient {
@@ -148,7 +150,9 @@ interface IndividuallyParentNestedWithPathClient {
 @doc("Operations for nested default -> individually and parent with query parameters")
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: BlobQueryParamClientOptions,
-  initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
+  initializedBy:
+    | global.Azure.ClientGenerator.Core.InitializedBy.individually
+    | global.Azure.ClientGenerator.Core.InitializedBy.parent,
 })
 @route("/nested-default-individually-parent-query")
 interface IndividuallyParentNestedWithQueryClient {
@@ -198,7 +202,9 @@ interface IndividuallyParentNestedWithQueryClient {
 @doc("Operations for nested default -> individually and parent header parameters")
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: HeaderParamClientOptions,
-  initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
+  initializedBy:
+    | global.Azure.ClientGenerator.Core.InitializedBy.individually
+    | global.Azure.ClientGenerator.Core.InitializedBy.parent,
 })
 @route("/nested-default-individually-parent-header")
 interface IndividuallyParentNestedWithHeaderClient {
@@ -251,7 +257,9 @@ interface IndividuallyParentNestedWithHeaderClient {
 @doc("Operations for nested default -> individually and parent multiple parameters")
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: MultipleParamsClientOptions,
-  initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
+  initializedBy:
+    | global.Azure.ClientGenerator.Core.InitializedBy.individually
+    | global.Azure.ClientGenerator.Core.InitializedBy.parent,
 })
 @route("/nested-default-individually-parent-multiple")
 interface IndividuallyParentNestedWithMultipleClient {
@@ -304,7 +312,9 @@ interface IndividuallyParentNestedWithMultipleClient {
 @doc("Operations for nested default -> individually and parent mixed parameters")
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: MixedParamsClientOptions,
-  initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
+  initializedBy:
+    | global.Azure.ClientGenerator.Core.InitializedBy.individually
+    | global.Azure.ClientGenerator.Core.InitializedBy.parent,
 })
 @route("/nested-default-individually-parent-mixed")
 interface IndividuallyParentNestedWithMixedClient {
@@ -353,7 +363,9 @@ interface IndividuallyParentNestedWithMixedClient {
 @doc("Operations for nested default -> individually and parent param alias")
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: ParamAliasClientOptions,
-  initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
+  initializedBy:
+    | global.Azure.ClientGenerator.Core.InitializedBy.individually
+    | global.Azure.ClientGenerator.Core.InitializedBy.parent,
 })
 @route("/nested-default-individually-parent-param-alias")
 interface IndividuallyParentNestedWithParamAliasClient {

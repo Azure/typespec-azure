@@ -1,26 +1,29 @@
-import { UnionEnum, getLroMetadata, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
+import { type UnionEnum, getLroMetadata, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
-  BooleanLiteral,
-  Diagnostic,
-  EncodeData,
-  Enum,
-  EnumMember,
-  IntrinsicScalarName,
-  IntrinsicType,
-  Model,
-  ModelProperty,
-  Namespace,
-  NumericLiteral,
-  Operation,
-  Scalar,
-  StringLiteral,
-  Tuple,
-  Type,
-  Union,
+  type BooleanLiteral,
+  type Diagnostic,
+  type EncodeData,
+  type Enum,
+  type EnumMember,
+  type IntrinsicScalarName,
+  type IntrinsicType,
+  type Model,
+  type ModelProperty,
+  type Namespace,
+  type NumericLiteral,
+  type Operation,
+  type Program,
+  type Scalar,
+  type StringLiteral,
+  type Tuple,
+  type Type,
+  type Union,
+  compilerAssert,
   createDiagnosticCollector,
   getDiscriminator,
   getEncode,
   getLifecycleVisibilityEnum,
+  getMediaTypeHint,
   getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
@@ -30,11 +33,13 @@ import {
   isTemplateDeclaration,
   resolveEncodedName,
 } from "@typespec/compiler";
+import { isEvents } from "@typespec/events";
+import { unsafe_getEventDefinitions as getEventDefinitions } from "@typespec/events/experimental";
 import {
-  Authentication,
-  HttpOperationFileBody,
-  HttpOperationMultipartBody,
-  HttpPayloadBody,
+  type Authentication,
+  type HttpOperationFileBody,
+  type HttpOperationMultipartBody,
+  type HttpPayloadBody,
   Visibility,
   getAuthentication,
   getServers,
@@ -62,35 +67,35 @@ import {
   shouldGenerateConvenient,
 } from "./decorators.js";
 import {
-  AccessFlags,
-  ArrayKnownEncoding,
-  SdkArrayType,
-  SdkBuiltInKinds,
-  SdkBuiltInType,
-  SdkClientType,
-  SdkConstantType,
-  SdkCredentialParameter,
-  SdkCredentialType,
-  SdkDateTimeType,
-  SdkDictionaryType,
-  SdkDurationType,
-  SdkEnumType,
-  SdkEnumValueType,
-  SdkHeaderParameter,
-  SdkHttpOperation,
-  SdkModelPropertyType,
-  SdkModelPropertyTypeBase,
-  SdkModelType,
-  SdkNullableType,
-  SdkTupleType,
-  SdkType,
-  SdkUnionType,
-  TCGCContext,
+  type AccessFlags,
+  type ArrayKnownEncoding,
+  type SdkArrayType,
+  type SdkBuiltInKinds,
+  type SdkBuiltInType,
+  type SdkClientType,
+  type SdkConstantType,
+  type SdkCredentialParameter,
+  type SdkCredentialType,
+  type SdkDateTimeType,
+  type SdkDictionaryType,
+  type SdkDurationType,
+  type SdkEnumType,
+  type SdkEnumValueType,
+  type SdkHeaderParameter,
+  type SdkHttpOperation,
+  type SdkModelPropertyType,
+  type SdkModelPropertyTypeBase,
+  type SdkModelType,
+  type SdkNullableType,
+  type SdkTupleType,
+  type SdkType,
+  type SdkUnionType,
+  type TCGCContext,
   UsageFlags,
   isSdkIntKind,
 } from "./interfaces.js";
 import {
-  ContextNode,
+  type ContextNode,
   createGeneratedName,
   filterPreviewVersion,
   getAvailableApiVersions,
@@ -118,6 +123,7 @@ import {
   getHttpOperationWithCache,
   getLibraryName,
   getPropertyNames,
+  isExactClientName,
 } from "./public-utils.js";
 
 import { $ } from "@typespec/compiler/typekit";
@@ -216,17 +222,30 @@ export function addEncodeInfo(
       // for model property bytes with specific content type, will change to bytes for non-text content type
       innerType.encode = "bytes";
     }
+    if (encodeData?.type) {
+      innerType.wireType = getSdkBuiltInType(context, encodeData.type) as SdkBuiltInType;
+    }
   }
-  if (isSdkIntKind(innerType.kind)) {
-    // only integer type is allowed to be encoded as string
+  if (
+    isSdkIntKind(innerType.kind) ||
+    innerType.kind === "boolean" ||
+    innerType.kind === "string" ||
+    innerType.kind === "url"
+  ) {
+    // built-in types can be encoded as other types (e.g., string encoded as int32, int encoded as string)
+    const builtInType = innerType as SdkBuiltInType;
     if (encodeData) {
       if (encodeData?.encoding) {
-        (innerType as any).encode = encodeData.encoding;
+        builtInType.encode = encodeData.encoding;
       }
       if (encodeData?.type) {
+        const wireType = getSdkBuiltInType(context, encodeData.type) as SdkBuiltInType;
         // if we specify the encoding type in the decorator, we set the `.encode` string
-        // to the kind of the encoding type
-        (innerType as any).encode = getSdkBuiltInType(context, encodeData.type).kind;
+        // to the kind of the encoding type when there's no explicit encoding name
+        if (!encodeData.encoding) {
+          builtInType.encode = wireType.kind;
+        }
+        builtInType.wireType = wireType;
       }
     }
   }
@@ -562,6 +581,7 @@ export function getSdkUnionWithDiagnostics(
           ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
           name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
           isGeneratedName: !type.name,
+          isExactName: false,
           crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
           type: diagnostics.pipe(getUnknownType(context, type)),
           access: "public",
@@ -592,6 +612,7 @@ export function getSdkUnionWithDiagnostics(
               ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
               name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
               isGeneratedName: !type.name,
+              isExactName: false,
               crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
               type: retval,
               access: "public",
@@ -609,6 +630,7 @@ export function getSdkUnionWithDiagnostics(
           ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
           name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
           isGeneratedName: nullOption !== undefined ? true : !type.name, // if nullable, always set inner union type as generated name
+          isExactName: false,
           namespace,
           variantTypes: [],
           crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
@@ -632,6 +654,7 @@ export function getSdkUnionWithDiagnostics(
             ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
             name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
             isGeneratedName: !type.name,
+            isExactName: false,
             crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
             type: retval,
             access: "public",
@@ -680,6 +703,7 @@ function getEmptyUnionType(
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
     name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
     isGeneratedName: !type.name,
+    isExactName: false,
     namespace,
     clientNamespace: namespace,
     variantTypes: [],
@@ -723,6 +747,7 @@ function getSdkConstantWithDiagnostics(
         valueType,
         name: getGeneratedName(context, type, operation),
         isGeneratedName: true,
+        isExactName: false,
       });
   }
 }
@@ -761,42 +786,31 @@ function addDiscriminatorToModelType(
       for (const property of childModelSdkType.properties) {
         if (property.kind === "property") {
           if (property.__raw?.name === discriminator?.propertyName) {
-            if (property.type.kind !== "constant" && property.type.kind !== "enumvalue") {
-              diagnostics.add(
-                createDiagnostic({
-                  code: "discriminator-not-constant",
-                  target: childModel,
-                  format: { discriminator: property.name },
-                }),
-              );
-            } else if (typeof property.type.value !== "string") {
-              diagnostics.add(
-                createDiagnostic({
-                  code: "discriminator-not-string",
-                  target: type,
-                  format: {
-                    discriminator: property.name,
-                    discriminatorValue: String(property.type.value),
-                  },
-                }),
-              );
-            } else {
-              // map string value type to enum value type
-              if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
-                for (const value of discriminatorType.values) {
-                  if (value.value === property.type.value) {
-                    property.type = value;
-                  }
+            compilerAssert(
+              property.type.kind === "constant" || property.type.kind === "enumvalue",
+              `Discriminator "${property.name}" has to be constant`,
+              childModel,
+            );
+            compilerAssert(
+              typeof property.type.value === "string",
+              `Value of discriminator "${property.name}" has to be a string`,
+              type,
+            );
+            // map string value type to enum value type
+            if (property.type.kind === "constant" && discriminatorType?.kind === "enum") {
+              for (const value of discriminatorType.values) {
+                if (value.value === property.type.value) {
+                  property.type = value;
                 }
               }
-              childModelSdkType.discriminatorValue = property.type.value as string;
-              property.discriminator = true;
-              if (model.discriminatedSubtypes === undefined) {
-                model.discriminatedSubtypes = {};
-              }
-              model.discriminatedSubtypes[property.type.value as string] = childModelSdkType;
-              discriminatorProperty = property;
             }
+            childModelSdkType.discriminatorValue = property.type.value as string;
+            property.discriminator = true;
+            if (model.discriminatedSubtypes === undefined) {
+              model.discriminatedSubtypes = {};
+            }
+            model.discriminatedSubtypes[property.type.value as string] = childModelSdkType;
+            discriminatorProperty = property;
           }
         }
       }
@@ -825,6 +839,7 @@ function addDiscriminatorToModelType(
       doc: `Discriminator property for ${model.name}.`,
       optional: false,
       discriminator: true,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       serializedName: discriminatorProperty
         ? discriminatorProperty.serializedName // eslint-disable-line @typescript-eslint/no-deprecated
         : discriminator.propertyName,
@@ -832,11 +847,13 @@ function addDiscriminatorToModelType(
       type: discriminatorType!,
       name,
       isGeneratedName: false,
+      isExactName: false,
       onClient: false,
       apiVersions: discriminatorProperty
         ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
         : model.apiVersions,
       isApiVersionParam: false,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
       crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
@@ -871,6 +888,7 @@ export function getSdkModelWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
       isGeneratedName: !type.name,
+      isExactName: isExactClientName(context, type),
       namespace: getClientNamespace(context, type),
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
@@ -939,8 +957,7 @@ export function getSdkModelWithDiagnostics(
     const rawBaseModel = getLegacyHierarchyBuilding(context, type) || type.baseModel;
     if (rawBaseModel) {
       sdkType.baseModel = context.__referencedTypeCache.get(rawBaseModel) as
-        | SdkModelType
-        | undefined;
+        SdkModelType | undefined;
 
       if (sdkType.baseModel === undefined) {
         // Use "AdditionalProperty" label for Record base models
@@ -1022,6 +1039,7 @@ function getSdkEnumValueWithDiagnostics(
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enumvalue")),
     name: getLibraryName(context, type),
+    isExactName: isExactClientName(context, type),
     value: type.value ?? type.name,
     enumType,
     valueType: enumType.valueType,
@@ -1045,6 +1063,7 @@ function getSdkEnumWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enum")),
       name: getLibraryName(context, type),
       isGeneratedName: false,
+      isExactName: isExactClientName(context, type),
       namespace: getClientNamespace(context, type),
       valueType: diagnostics.pipe(
         getSdkEnumValueType(
@@ -1084,6 +1103,7 @@ function getSdkUnionEnumValues(
     values.push({
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, member.type, "enumvalue")),
       name: name ? name : `${member.value}`,
+      isExactName: isExactClientName(context, member.type),
       value: member.value,
       valueType: enumType.valueType,
       enumType,
@@ -1109,6 +1129,7 @@ export function getSdkUnionEnumWithDiagnostics(
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type.union, "enum")),
     name,
     isGeneratedName: !type.union.name,
+    isExactName: isExactClientName(context, type.union),
     namespace: getClientNamespace(context, type.union),
     valueType:
       diagnostics.pipe(getUnionAsEnumValueType(context, type.union)) ??
@@ -1282,6 +1303,7 @@ function getSdkCredentialType(
       variantTypes: credentialTypes,
       name: createGeneratedName(context, service, "CredentialUnion"),
       isGeneratedName: true,
+      isExactName: false,
       namespace: client.namespace,
       clientNamespace: client.namespace,
       crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.CredentialUnion`,
@@ -1306,6 +1328,7 @@ export function getSdkCredentialParameter(
     kind: "credential",
     name: "credential",
     isGeneratedName: true,
+    isExactName: false,
     doc: "Credential used to authenticate requests to the service.",
     apiVersions: client.apiVersions,
     onClient: true,
@@ -1331,6 +1354,7 @@ export function getSdkModelPropertyTypeBase(
     diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
   diagnostics.pipe(addEncodeInfo(context, type, propertyType));
   const name = getPropertyNames(context, type)[0];
+  const isExactName = isExactClientName(context, type);
   const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
   let encode: ArrayKnownEncoding | undefined = undefined;
 
@@ -1354,6 +1378,7 @@ export function getSdkModelPropertyTypeBase(
     type: propertyType,
     name,
     isGeneratedName: false,
+    isExactName,
     optional: type.optional,
     ...updateWithApiVersionInformation(
       context,
@@ -1403,7 +1428,9 @@ export function getSdkModelPropertyType(
       kind: "property",
       optional: type.optional,
       discriminator: false,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- kept for backward compatibility alongside serializationOptions
       serializedName: getPropertyNames(context, type)[1],
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- kept for backward compatibility alongside multipartOptions
       isMultipartFileInput: false,
       serializationOptions: {},
     };
@@ -1475,6 +1502,14 @@ function addMultipartPropertiesToModelType(
     }
     popNamingContext(context);
 
+    // re-apply encoding with the part's default content type so that e.g. bytes
+    // in multipart/form-data gets encode "bytes" instead of the default "base64"
+    const partDefaultContentType =
+      part.body.contentTypes.length > 0 ? part.body.contentTypes[0] : undefined;
+    const typeToEncode =
+      clientProperty.type.kind === "array" ? clientProperty.type.valueType : clientProperty.type;
+    diagnostics.pipe(addEncodeInfo(context, part.property!, typeToEncode, partDefaultContentType));
+
     clientProperty.serializationOptions.multipart = {
       isFilePart: isFilePart(context, clientProperty.type),
       isMulti: part.multi,
@@ -1523,6 +1558,66 @@ interface PropagationOptions {
   // this is used to prevent propagation usage from subtype to base type's other subtypes
   ignoreSubTypeStack?: boolean[];
   isOverride?: boolean;
+}
+
+/**
+ * Infers the default content type for an event type, mirroring the HTTP lib behavior:
+ * - Models → "application/json"
+ * - Scalars → "text/plain"
+ * - Literals/constants → undefined (no serialization needed)
+ */
+function inferEventContentType(program: Program, type: Type): string | undefined {
+  // Use @mediaTypeHint if explicitly set on the type, otherwise fall back to kind-based default
+  const hint = getMediaTypeHint(program, type);
+  if (hint) return hint;
+  if (type.kind === "Model") return "application/json";
+  if (type.kind === "Scalar") return "text/plain";
+  return undefined;
+}
+
+/**
+ * Propagates `UsageFlags.Json` and serialization options to individual SSE event `type` and
+ * `payloadType` based on their per-event content type. When no explicit content type is set,
+ * infers a default using the same logic as the HTTP lib (model → application/json,
+ * scalar → text/plain).
+ */
+function propagateSseEventUsage(
+  context: TCGCContext,
+  streamType: Type,
+  operation: Operation,
+  diagnostics: ReturnType<typeof createDiagnosticCollector>,
+): void {
+  if (streamType.kind !== "Union" || !isEvents(context.program, streamType)) {
+    return;
+  }
+  const eventDefinitions = diagnostics.pipe(getEventDefinitions(context.program, streamType));
+  for (const event of eventDefinitions) {
+    const effectiveContentType =
+      event.contentType ?? inferEventContentType(context.program, event.type);
+    const effectivePayloadContentType =
+      event.payloadContentType ?? inferEventContentType(context.program, event.payloadType);
+
+    if (effectiveContentType) {
+      const sdkType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, event.type, operation),
+      );
+      if (isMediaTypeJson(effectiveContentType)) {
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
+      }
+      diagnostics.pipe(updateSerializationOptions(context, sdkType, [effectiveContentType]));
+    }
+    if (effectivePayloadContentType) {
+      const sdkPayloadType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, event.payloadType, operation),
+      );
+      if (isMediaTypeJson(effectivePayloadContentType)) {
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkPayloadType));
+      }
+      diagnostics.pipe(
+        updateSerializationOptions(context, sdkPayloadType, [effectivePayloadContentType]),
+      );
+    }
+  }
 }
 
 export function updateUsageOrAccess(
@@ -1644,11 +1739,17 @@ export function updateUsageOrAccess(
   }
   for (const property of type.properties) {
     options.ignoreSubTypeStack.push(false);
-    if (property.kind === "property" && isReadOnly(property) && value === UsageFlags.Input) {
-      continue;
-    }
     if (typeof value === "number") {
-      diagnostics.pipe(updateUsageOrAccess(context, value, property.type, options));
+      let effectiveValue = value;
+      // Strip Input flag for readonly properties - readonly properties only appear in output
+      if (property.kind === "property" && isReadOnly(property)) {
+        effectiveValue = value & ~UsageFlags.Input;
+        if (effectiveValue === 0) {
+          options.ignoreSubTypeStack.pop();
+          continue;
+        }
+      }
+      diagnostics.pipe(updateUsageOrAccess(context, effectiveValue, property.type, options));
     } else {
       // by default, we set property access value to parent. If there's an override though, we override.
       let propertyAccess = value;
@@ -1704,6 +1805,23 @@ function updateTypesFromOperation(
       // Otherwise use the body type directly
       const bodyTypeOrProperty = httpBody.property ?? getHttpBodyType(httpBody);
       const bodyType = getHttpBodyType(httpBody);
+      // For file bodies with multiple content types, pre-warm the cache for the
+      // `contentType` property's union under the operation naming context so that
+      // the resulting SdkEnumType is named after the operation (e.g.
+      // `UploadFileMultipleContentTypesContentType`) and is the same instance later
+      // reused by both the File model's `contentType` property and the synthetic
+      // `contentType` header parameter created in `createContentTypeOrAcceptHeader`.
+      if (
+        httpBody.bodyKind === "file" &&
+        httpBody.contentTypes.length > 1 &&
+        httpBody.contentTypeProperty.type.kind === "Union"
+      ) {
+        pushNamingContext(context, "ContentType", undefined);
+        diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, httpBody.contentTypeProperty.type, operation),
+        );
+        popNamingContext(context);
+      }
       // For named unions, pass undefined so anonymous types inside get named relative
       // to the operation (e.g., "PostRequest") rather than the union (e.g., "A1")
       const bodyContextType =
@@ -1741,7 +1859,16 @@ function updateTypesFromOperation(
         }
 
         // add serialization options to model type
-        updateSerializationOptions(context, sdkType, httpBody.contentTypes, undefined, httpBody);
+        diagnostics.pipe(
+          updateSerializationOptions(
+            context,
+            sdkType,
+            httpBody.contentTypes,
+            undefined,
+            httpBody,
+            operation,
+          ),
+        );
 
         // after completion of usage calculation for httpBody, check whether it has
         // conflicting usage between multipart and regular body
@@ -1778,6 +1905,8 @@ function updateTypesFromOperation(
       }
       const access = getAccessOverride(context, operation) ?? "public";
       diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
+      // Propagate Json usage to individual SSE event types based on per-event content type
+      propagateSseEventUsage(context, requestStreamMeta.streamType, operation, diagnostics);
     }
 
     // Push "Parameter" context for operation parameters
@@ -1883,12 +2012,15 @@ function updateTypesFromOperation(
             }
 
             // add serialization options to model type
-            updateSerializationOptions(
-              context,
-              sdkType,
-              innerResponse.body.contentTypes,
-              undefined,
-              innerResponse.body,
+            diagnostics.pipe(
+              updateSerializationOptions(
+                context,
+                sdkType,
+                innerResponse.body.contentTypes,
+                undefined,
+                innerResponse.body,
+                operation,
+              ),
             );
           }
           const access = getAccessOverride(context, operation) ?? "public";
@@ -1906,6 +2038,8 @@ function updateTypesFromOperation(
           }
           const access = getAccessOverride(context, operation) ?? "public";
           diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
+          // Propagate Json usage to individual SSE event types based on per-event content type
+          propagateSseEventUsage(context, responseStreamMeta.streamType, operation, diagnostics);
         }
       }
     }
@@ -2074,6 +2208,13 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
       }
     }
 
+    if (legacyHierarchyBuilding) {
+      // Reconcile properties on the rebased model: drop duplicates that the
+      // new base chain already supplies, and lift in properties contributed
+      // by removed intermediate parents.
+      diagnostics.pipe(reconcilePropertiesAfterRebase(context, sdkType, legacyHierarchyBuilding));
+    }
+
     // must be done after discriminator is added
     // Populate discriminated subtypes for legacy hierarchy building
     if (legacyHierarchyBuilding && sdkType.discriminatorValue) {
@@ -2087,6 +2228,11 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
         currBaseModel = currBaseModel.baseModel;
       }
 
+      // Propagate serialization options to the newly added subtype.
+      // This is needed because updateSerializationOptions may have already run
+      // on the parent model before this subtype was added to discriminatedSubtypes.
+      propagateSerializationToSubtype(context, sdkType);
+
       // Filter out legacy hierarchy building properties
       sdkType.properties = sdkType.properties.filter((property) => {
         return (
@@ -2096,6 +2242,191 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
     }
   }
   return diagnostics.wrap(undefined);
+}
+
+/**
+ * Propagate serialization options from a parent model to a newly added subtype.
+ * This handles the case where updateSerializationOptions already ran on the parent
+ * before the subtype was added via @hierarchyBuilding.
+ */
+function propagateSerializationToSubtype(context: TCGCContext, sdkType: SdkModelType): void {
+  // Find the nearest ancestor with serialization options to determine content types
+  let ancestor: SdkModelType | undefined = sdkType.baseModel;
+  const contentTypes: string[] = [];
+  while (ancestor) {
+    if (ancestor.serializationOptions.json) {
+      contentTypes.push("application/json");
+    }
+    if (ancestor.serializationOptions.xml) {
+      contentTypes.push("application/xml");
+    }
+    if (contentTypes.length > 0) break;
+    ancestor = ancestor.baseModel;
+  }
+
+  if (contentTypes.length > 0) {
+    updateSerializationOptions(context, sdkType, contentTypes);
+  }
+}
+
+/**
+ * Reconcile properties on a rebased model after `@hierarchyBuilding(oldBase, newBase)`.
+ *
+ * Rule:
+ *   1. Compute `oldBaseEffective` = properties already on `oldBase` (its own
+ *      `properties` Map) plus properties contributed by every removed
+ *      intermediate ancestor. When the same name appears more than once,
+ *      the nearest contributor wins (own > nearest intermediate > farther).
+ *   2. Compute `newBaseSupplied` = every property name supplied anywhere in
+ *      the new base chain (newBase + its ancestors).
+ *   3. For each name in `oldBaseEffective` that also appears in
+ *      `newBaseSupplied`: drop it. If the types are assignable in either
+ *      direction, drop silently; otherwise emit
+ *      `legacy-hierarchy-building-conflict` (`property-type-mismatch`).
+ *   4. Whatever remains becomes the rebased model's own SDK properties.
+ *      Properties already materialized on the SDK model are preserved
+ *      as-is; properties contributed only by removed intermediates are
+ *      materialized via `getSdkModelPropertyType`.
+ */
+function reconcilePropertiesAfterRebase(
+  context: TCGCContext,
+  sdkType: SdkModelType,
+  newBase: Model,
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const oldBase = sdkType.__raw as Model;
+
+  const oldBaseChain = walkBaseChain(oldBase);
+  const newBaseChain = walkBaseChain(newBase);
+  const newBaseIndex = oldBaseChain.indexOf(newBase);
+  const removed = newBaseIndex >= 0 ? oldBaseChain.slice(1, newBaseIndex) : oldBaseChain.slice(1);
+
+  // Names supplied anywhere in the new base chain → first ModelProperty seen.
+  // Apply the same SDK-shape filters as `addPropertiesToModelType` so the
+  // "supplied by the new base chain" view matches what the SDK actually sees.
+  const newBaseSupplied = new Map<string, ModelProperty>();
+  for (const m of newBaseChain) {
+    for (const [name, prop] of m.properties) {
+      if (newBaseSupplied.has(name)) continue;
+      if (!isVisibleSdkProperty(context, prop)) continue;
+      newBaseSupplied.set(name, prop);
+    }
+  }
+
+  // Effective properties on the rebased model before reconciliation: oldBase's
+  // own first (they win), then nearest-removed-ancestor first.
+  const oldBaseEffective = new Map<string, ModelProperty>();
+  for (const [name, prop] of oldBase.properties) {
+    oldBaseEffective.set(name, prop);
+  }
+  for (const intermediate of removed) {
+    for (const [name, prop] of intermediate.properties) {
+      if (!oldBaseEffective.has(name)) oldBaseEffective.set(name, prop);
+    }
+  }
+
+  // Identify the discriminator property name (if any) on the rebased model —
+  // it must be preserved across the rebase even when the new base supplies a
+  // wider-typed property with the same name.
+  const discriminatorPropName = sdkType.properties.find((p) => p.discriminator)?.__raw?.name;
+
+  const keptProps: SdkModelPropertyType[] = [];
+  const sdkPropByRawName = new Map<string, SdkModelPropertyType>();
+  for (const prop of sdkType.properties) {
+    if (prop.__raw?.name) sdkPropByRawName.set(prop.__raw.name, prop);
+  }
+
+  for (const [name, rawProp] of oldBaseEffective) {
+    if (!isVisibleSdkProperty(context, rawProp)) {
+      continue;
+    }
+
+    const fromOwn = oldBase.properties.has(name);
+    const isDiscriminator = name === discriminatorPropName;
+    const newBaseProp = newBaseSupplied.get(name);
+
+    if (newBaseProp && !isDiscriminator) {
+      if (areTypesIncompatible(context, rawProp.type, newBaseProp.type)) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "legacy-hierarchy-building-conflict",
+            messageId: "property-type-mismatch",
+            format: {
+              propertyName: name,
+              childModel: oldBase.name,
+              parentModel: newBase.name,
+            },
+            target: oldBase,
+          }),
+        );
+      }
+      // Drop either way: the new base chain owns this name.
+      continue;
+    }
+
+    if (fromOwn) {
+      const existing = sdkPropByRawName.get(name);
+      if (existing) keptProps.push(existing);
+      continue;
+    }
+
+    // Lift from a removed intermediate. Mirror the contextType logic used in
+    // `addPropertiesToModelType`: for named unions, pass `undefined` so any
+    // anonymous variants get named relative to the property rather than
+    // relative to the union.
+    const propType = rawProp.type;
+    const contextType =
+      propType.kind === "Union" && propType.name ? undefined : (propType as ContextNode["type"]);
+    pushNamingContext(context, name, contextType);
+    const lifted = diagnostics.pipe(getSdkModelPropertyType(context, rawProp));
+    popNamingContext(context);
+    keptProps.push(lifted);
+  }
+
+  sdkType.properties = keptProps;
+  return diagnostics.wrap(undefined);
+}
+
+/**
+ * Apply the same predicates as `addPropertiesToModelType` so our view of the
+ * SDK-observable property set stays aligned with the actual SDK shape.
+ */
+function isVisibleSdkProperty(context: TCGCContext, property: ModelProperty): boolean {
+  return (
+    !isStatusCode(context.program, property) &&
+    !isNeverOrVoidType(property.type) &&
+    !hasNoneVisibility(context, property) &&
+    isInScope(context, property)
+  );
+}
+
+/**
+ * Check if two property types are incompatible during `@hierarchyBuilding`
+ * reconciliation. They are considered compatible (no diagnostic) when either
+ * is assignable to the other under TypeSpec's type system.
+ */
+function areTypesIncompatible(context: TCGCContext, targetType: Type, newBaseType: Type): boolean {
+  if (targetType === newBaseType) return false;
+  const typekit = $(context.program).type;
+  if (typekit.isAssignableTo(targetType, newBaseType, targetType)) return false;
+  if (typekit.isAssignableTo(newBaseType, targetType, newBaseType)) return false;
+  return true;
+}
+
+/**
+ * Walk a model's raw inheritance chain, returning [model, model.baseModel, ...]
+ * along the original (pre-rebase) parent links.
+ */
+function walkBaseChain(model: Model): Model[] {
+  const chain: Model[] = [];
+  const seen = new Set<Model>();
+  let current: Model | undefined = model;
+  while (current && !seen.has(current)) {
+    seen.add(current);
+    chain.push(current);
+    current = current.baseModel;
+  }
+  return chain;
 }
 
 interface UsageFilteringOptions {
@@ -2223,8 +2554,12 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       } else {
         sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, versionEnum));
       }
-      filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "");
+      filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "", service);
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
+      if (!context.__serviceToVersionsSdkEnum) {
+        context.__serviceToVersionsSdkEnum = new Map();
+      }
+      context.__serviceToVersionsSdkEnum.set(service, sdkVersionsEnum);
     }
   }
   // update for orphan models/enums/unions
@@ -2253,22 +2588,31 @@ function updateSerializationOptions(
   contentTypes: string[],
   options?: PropagationOptions,
   httpBody?: HttpPayloadBody,
-) {
+  operation?: Operation,
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   options = options ?? {};
   options.seenTypes = options.seenTypes ?? new Set<SdkType>();
   options.propagation = options?.propagation ?? true;
   options.ignoreSubTypeStack = options.ignoreSubTypeStack ?? [];
 
   if (options.seenTypes.has(type)) {
-    return; // avoid circular references
+    return diagnostics.wrap(undefined); // avoid circular references
   }
 
   if (type.kind === "array" || type.kind === "dict") {
+    // An array/dict only needs its own serialization options when it is a named model
+    // with explicit serialization decorators (e.g. `@Xml.name("Foo") model Foo is Bar[];`);
+    // otherwise the wrapping element name comes from the property/model that references it.
+    // Passing an empty content type list ensures only explicitly-defined info is captured,
+    // avoiding spurious names on anonymous inline arrays/dicts.
+    setSerializationOptions(context, type, []);
     updateSerializationOptions(context, type.valueType, contentTypes, options);
-    return;
+    return diagnostics.wrap(undefined);
   }
 
-  if (type.kind !== "model" && type.kind !== "union" && type.kind !== "nullable") return;
+  if (type.kind !== "model" && type.kind !== "union" && type.kind !== "nullable")
+    return diagnostics.wrap(undefined);
 
   if (options.ignoreSubTypeStack.length === 0 || !options.ignoreSubTypeStack.at(-1)) {
     options.seenTypes.add(type);
@@ -2278,11 +2622,11 @@ function updateSerializationOptions(
     for (const unionType of type.variantTypes) {
       updateSerializationOptions(context, unionType, contentTypes, options);
     }
-    return;
+    return diagnostics.wrap(undefined);
   }
   if (type.kind === "nullable") {
     updateSerializationOptions(context, type.type, contentTypes, options);
-    return;
+    return diagnostics.wrap(undefined);
   }
 
   // Handle file body serialization - if it's a file, set binary options and skip json/xml
@@ -2292,9 +2636,12 @@ function updateSerializationOptions(
       isFile: true,
       isText: fileBody.isText,
       contentTypes: fileBody.contentTypes,
-      filename: fileBody.filename,
+      filename:
+        fileBody.filename && operation
+          ? diagnostics.pipe(getSdkModelPropertyType(context, fileBody.filename, operation))
+          : undefined,
     };
-    return; // No need to add json/xml serialization for file types
+    return diagnostics.wrap(undefined); // No need to add json/xml serialization for file types
   }
 
   setSerializationOptions(context, type, contentTypes);
@@ -2341,38 +2688,38 @@ function updateSerializationOptions(
     updateSerializationOptions(context, property.type, contentTypes, options);
     options.ignoreSubTypeStack.pop();
   }
-  return;
+  return diagnostics.wrap(undefined);
 }
 
 function setSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
   contentTypes: string[],
 ) {
   for (const contentType of contentTypes) {
-    if (isMediaTypeJson(contentType) && !type.serializationOptions.json) {
+    if (isMediaTypeJson(contentType) && !type.serializationOptions?.json) {
       updateJsonSerializationOptions(context, type);
     }
 
-    if (isMediaTypeXml(contentType) && !type.serializationOptions.xml) {
+    if (isMediaTypeXml(contentType) && !type.serializationOptions?.xml) {
       updateXmlSerializationOptions(context, type);
     }
   }
   if (
-    !type.serializationOptions.json &&
+    !type.serializationOptions?.json &&
     type.__raw &&
     hasExplicitlyDefinedJsonSerializationInfo(context, type.__raw)
   ) {
     updateJsonSerializationOptions(context, type);
   }
   if (
-    !type.serializationOptions.xml &&
+    !type.serializationOptions?.xml &&
     type.__raw &&
     hasExplicitlyDefinedXmlSerializationInfo(context, type.__raw)
   ) {
     updateXmlSerializationOptions(context, type);
   }
-  const defaultContentTypes = type.serializationOptions.multipart?.defaultContentTypes;
+  const defaultContentTypes = type.serializationOptions?.multipart?.defaultContentTypes;
   if (defaultContentTypes && type.kind === "property" && type.type.kind === "model") {
     for (const prop of type.type.properties) {
       if (prop.kind === "property") {
@@ -2384,25 +2731,31 @@ function setSerializationOptions(
 
 function updateJsonSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
 ) {
-  type.serializationOptions.json = {
+  const serializationOptions = (type.serializationOptions ??= {});
+  serializationOptions.json = {
     name:
       type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
         ? resolveEncodedName(context.program, type.__raw, "application/json")
-        : type.name,
+        : "name" in type
+          ? type.name
+          : "",
   };
 }
 
 function updateXmlSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType | SdkArrayType | SdkDictionaryType,
 ) {
-  type.serializationOptions.xml = {
+  const serializationOptions = (type.serializationOptions ??= {});
+  serializationOptions.xml = {
     name:
       type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
         ? resolveEncodedName(context.program, type.__raw, "application/xml")
-        : type.name,
+        : "name" in type
+          ? type.name
+          : "",
     attribute: type.__raw?.kind === "ModelProperty" && isAttribute(context.program, type.__raw),
     ns: type.__raw ? getNs(context.program, type.__raw) : undefined,
     unwrapped: type.__raw?.kind === "ModelProperty" && isUnwrapped(context.program, type.__raw),
@@ -2414,26 +2767,26 @@ function updateXmlSerializationOptions(
     type.__raw.type.kind === "Model" &&
     isArrayModelType(type.__raw.type)
   ) {
-    if (!type.serializationOptions.xml.unwrapped) {
+    if (!serializationOptions.xml.unwrapped) {
       // if wrapped, set itemsName and itemsNS according to the array item type
       const itemType = type.__raw.type.indexer.value;
       if ("name" in itemType) {
         // if the type has name then get the name
-        type.serializationOptions.xml.itemsName = resolveEncodedName(
+        serializationOptions.xml.itemsName = resolveEncodedName(
           context.program,
           itemType as Type & { name: string },
           "application/xml",
         );
-        type.serializationOptions.xml.itemsNs = getNs(context.program, itemType);
+        serializationOptions.xml.itemsNs = getNs(context.program, itemType);
       } else {
         // otherwise use the property name
-        type.serializationOptions.xml.itemsName = type.serializationOptions.xml.name;
-        type.serializationOptions.xml.itemsNs = type.serializationOptions.xml.ns;
+        serializationOptions.xml.itemsName = serializationOptions.xml.name;
+        serializationOptions.xml.itemsNs = serializationOptions.xml.ns;
       }
     } else {
       // if unwrapped, always set itemName to property name
-      type.serializationOptions.xml.itemsName = type.serializationOptions.xml.name;
-      type.serializationOptions.xml.itemsNs = type.serializationOptions.xml.ns;
+      serializationOptions.xml.itemsName = serializationOptions.xml.name;
+      serializationOptions.xml.itemsNs = serializationOptions.xml.ns;
     }
   }
 }

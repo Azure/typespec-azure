@@ -1,4 +1,4 @@
-import { Namespace } from "@typespec/compiler";
+import type { Namespace } from "@typespec/compiler";
 import { t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";

@@ -1,14 +1,16 @@
 import {
-  DecoratedType,
-  Decorator,
-  Type,
+  type DecoratedType,
+  type Decorator,
+  type Type,
   createRule,
+  fileRef,
   getTypeName,
   paramMessage,
 } from "@typespec/compiler";
 
 export const noOpenAPIRule = createRule({
   name: "no-openapi",
+  docs: fileRef.fromPackageRoot("src/rules/no-openapi.md"),
   description:
     "Azure specs should not be using decorators from @typespec/openapi or @azure-tools/typespec-autorest",
   severity: "warning",
@@ -25,6 +27,11 @@ export const noOpenAPIRule = createRule({
     function checkDecorators(type: DecoratedType & Type) {
       for (const dec of type.decorators) {
         if (dec.definition) {
+          // `@extension` is allowed by this rule. Client-altering extensions are
+          // handled by the `no-openapi-client-extensions` rule instead.
+          if (dec.definition.name === "@extension") {
+            continue;
+          }
           const id = getTypeName(dec.definition.namespace);
           if (id === "TypeSpec.OpenAPI" || id === "Autorest") {
             context.reportDiagnostic({

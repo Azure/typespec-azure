@@ -1,52 +1,56 @@
 import {
   createDiagnosticCollector,
-  EmitContext,
+  type EmitContext,
   emitFile,
-  Enum,
+  type Enum,
   getRelativePathFromDirectory,
-  Interface,
-  Model,
-  ModelProperty,
-  Namespace,
+  type Interface,
+  isPathAbsolute,
+  type Model,
+  type ModelProperty,
+  type Namespace,
   normalizePath,
-  Operation,
-  Program,
+  NoTarget,
+  type Operation,
+  type Program,
   resolvePath,
-  Type,
-  Union,
+  type Type,
+  type Union,
 } from "@typespec/compiler";
-import { HttpOperation } from "@typespec/http";
-import { isAbsolute } from "path";
+import type { Authentication, HttpAuth, HttpOperation } from "@typespec/http";
 import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
 import { handleClientExamples } from "./example.js";
 import {
-  SdkArrayType,
-  SdkClient,
-  SdkContext,
-  SdkDictionaryType,
-  SdkEnumType,
-  SdkHttpOperation,
-  SdkMethodParameter,
-  SdkModelPropertyType,
-  SdkModelType,
-  SdkNullableType,
-  SdkServiceOperation,
-  SdkServiceResponseHeader,
-  SdkUnionType,
-  TCGCContext,
+  type SdkArrayType,
+  type SdkClient,
+  type SdkClientType,
+  type SdkContext,
+  type SdkDictionaryType,
+  type SdkEnumType,
+  type SdkHttpOperation,
+  type SdkMethodParameter,
+  type SdkModelPropertyType,
+  type SdkModelType,
+  type SdkNullableType,
+  type SdkServiceMethod,
+  type SdkServiceOperation,
+  type SdkServiceResponseHeader,
+  type SdkUnionType,
+  type TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
 import {
-  BrandedSdkEmitterOptionsInterface,
+  type BrandedSdkEmitterOptionsInterface,
   handleVersioningMutationForGlobalNamespace,
   parseEmitterName,
-  TCGCEmitterOptions,
-  TspLiteralType,
+  type TCGCEmitterOptions,
+  type TspLiteralType,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { createSdkPackage } from "./package.js";
+import { createDuplicateClientNameDiagnostic } from "./validations/diagnostics.js";
 
 interface CreateTCGCContextOptions {
   mutateNamespace?: boolean; // whether to mutate global namespace for versioning
@@ -122,17 +126,20 @@ export function createTCGCContext(
       }
       return this.__packageVersionEnum!;
     },
+    getPackageVersionSdkEnum(): Map<Namespace, SdkEnumType> {
+      return this.__serviceToVersionsSdkEnum ?? new Map();
+    },
     getClients(): SdkClient[] {
       if (!this.__rawClientsCache) {
         prepareClientAndOperationCache(this);
       }
-      return Array.from(this.__rawClientsCache!.values());
+      return [...new Set(this.__rawClientsCache!.values())];
     },
     getRootClients(): SdkClient[] {
       if (!this.__rawClientsCache) {
         prepareClientAndOperationCache(this);
       }
-      return Array.from(this.__rawClientsCache!.values()).filter((item) => !item.parent);
+      return [...new Set(this.__rawClientsCache!.values())].filter((item) => !item.parent);
     },
     getClient(type: Namespace | Interface): SdkClient | undefined {
       if (!this.__rawClientsCache) {
@@ -185,6 +192,38 @@ export async function createSdkContext<
     context.options["generate-protocol-methods"] ?? tcgcContext.generateProtocolMethods;
   const generateConvenienceMethods =
     context.options["generate-convenience-methods"] ?? tcgcContext.generateConvenienceMethods;
+
+  // Warn if non-java/csharp emitter sets convenience/protocol options
+  const resolvedEmitterName = emitterName ?? context.options["emitter-name"] ?? "";
+  const [parsedLanguage] = parseEmitterName(context.program, resolvedEmitterName);
+  const isJavaOrCsharp = parsedLanguage === "java" || parsedLanguage === "csharp";
+  if (!isJavaOrCsharp) {
+    if (context.options["generate-convenience-methods"] !== undefined) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "unnecessary-emitter-option",
+          format: {
+            optionName: "generate-convenience-methods",
+            emitterName: resolvedEmitterName || "unknown",
+          },
+          target: NoTarget,
+        }),
+      );
+    }
+    if (context.options["generate-protocol-methods"] !== undefined) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "unnecessary-emitter-option",
+          format: {
+            optionName: "generate-protocol-methods",
+            emitterName: resolvedEmitterName || "unknown",
+          },
+          target: NoTarget,
+        }),
+      );
+    }
+  }
+
   const sdkContext: SdkContext<TOptions, TServiceOperation> = {
     ...tcgcContext,
     emitContext: context,
@@ -192,7 +231,7 @@ export async function createSdkContext<
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
     namespaceFlag: context.options["namespace"],
-    apiVersion: context.options["api-version"],
+    apiVersion: context.options["api-version"] as TCGCContext["apiVersion"],
     license: context.options["license"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
@@ -203,7 +242,7 @@ export async function createSdkContext<
 
   if (context.options["examples-dir"]) {
     const normalizeExamplesDir = normalizePath(context.options["examples-dir"]);
-    if (isAbsolute(normalizeExamplesDir)) {
+    if (isPathAbsolute(normalizeExamplesDir)) {
       sdkContext.examplesDir = getRelativePathFromDirectory(
         context.program.projectRoot,
         normalizeExamplesDir,
@@ -213,12 +252,14 @@ export async function createSdkContext<
       sdkContext.examplesDir = normalizeExamplesDir;
     }
   }
-  sdkContext.sdkPackage = diagnostics.pipe(createSdkPackage(sdkContext));
+  sdkContext.sdkPackage = diagnostics.pipe(await createSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
   // Validate duplicate names within each type kind in each namespace (cross-kind duplicates are allowed).
   diagnostics.pipe(validateNamesUnderNamespaces(sdkContext));
+  // Validate duplicate operation names in clients (e.g., from multi-service merge or sub-client merge).
+  diagnostics.pipe(validateOperationNamesInClients(sdkContext));
   sdkContext.diagnostics = [...sdkContext.diagnostics, ...diagnostics.diagnostics];
 
   if (options?.exportTCGCoutput) {
@@ -262,7 +303,62 @@ function validateNamesUnderNamespaces(context: SdkContext) {
   return diagnostics.wrap(undefined);
 }
 
+function validateOperationNamesInClients(context: SdkContext) {
+  const diagnostics = createDiagnosticCollector();
+
+  const reportDuplicateMethodName = (method: SdkServiceMethod<SdkHttpOperation>) => {
+    diagnostics.add(
+      createDuplicateClientNameDiagnostic(
+        method.name,
+        context.emitterName,
+        method.__raw ?? context.program.getGlobalNamespaceType(),
+        true,
+        "nonDecorator",
+      ),
+    );
+  };
+
+  const validateClient = (client: SdkClientType<SdkHttpOperation>) => {
+    if (client.methods.length > 1) {
+      const seen = new Map<string, SdkServiceMethod<SdkHttpOperation>>();
+      const reported = new Set<string>();
+      for (const method of client.methods) {
+        const first = seen.get(method.name);
+        if (first) {
+          if (!reported.has(method.name)) {
+            reported.add(method.name);
+            reportDuplicateMethodName(first);
+          }
+          reportDuplicateMethodName(method);
+        } else {
+          seen.set(method.name, method);
+        }
+      }
+    }
+
+    for (const child of client.children ?? []) {
+      validateClient(child);
+    }
+  };
+
+  for (const client of context.sdkPackage.clients) {
+    validateClient(client);
+  }
+
+  return diagnostics.wrap(undefined);
+}
+
 async function exportTCGCOutput(context: SdkContext) {
+  const serializeAuthScheme = (auth: HttpAuth) => {
+    const { model, ...rest } = auth;
+    return rest;
+  };
+  const serializeAuthentication = (authentication: Authentication) => ({
+    options: authentication.options.map((option) => ({
+      schemes: option.schemes.map(serializeAuthScheme),
+    })),
+  });
+
   await emitFile(context.program, {
     path: resolvePath(context.emitContext.emitterOutputDir, "tcgc-output.yaml"),
     content: stringify(
@@ -271,12 +367,23 @@ async function exportTCGCOutput(context: SdkContext) {
         if (typeof k === "string" && k.startsWith("__")) {
           return undefined; // skip keys starting with "__" from the output
         }
-        if (k === "scheme") {
+        if (
+          k === "authentication" &&
+          typeof v === "object" &&
+          v !== null &&
+          Array.isArray(v.options)
+        ) {
+          return serializeAuthentication(v);
+        }
+        if (k === "scheme" && typeof v === "object" && v !== null && "model" in v) {
           const { model, ...rest } = v;
           return rest; // remove credential schema's model property
         }
         if (k === "rawExample") {
           return undefined; // remove raw example
+        }
+        if (v instanceof Map) {
+          return Object.fromEntries(v);
         }
         return v;
       },

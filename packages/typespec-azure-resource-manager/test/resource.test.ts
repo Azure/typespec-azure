@@ -1,13 +1,15 @@
-import { Model, Operation } from "@typespec/compiler";
+import type { Model, Operation } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics, t } from "@typespec/compiler/testing";
+import { $ } from "@typespec/compiler/typekit";
 import { getHttpOperation } from "@typespec/http";
 import { ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
-import { ArmLifecycleOperationKind } from "../src/operations.js";
+import type { ArmLifecycleOperationKind } from "../src/operations.js";
 import {
-  ArmResourceDetails,
+  type ArmResourceDetails,
   getArmResources,
   getFeature,
+  getFeatureFileSet,
   getResourceFeature,
   getResourceFeatureSet,
 } from "../src/resource.js";
@@ -34,16 +36,7 @@ describe("ARM resource model:", () => {
       @armProviderNamespace
       namespace Microsoft.Test;
 
-      enum ResourceState {
-       Succeeded,
-       Canceled,
-       Failed
-     }
-
-      model FooResourceProperties {
-        iAmFoo: string;
-        provisioningState: ResourceState;
-      }
+      model FooResourceProperties {}
 
       model FooResource is TrackedResource<FooResourceProperties> {
         @key("fooName")
@@ -81,18 +74,7 @@ describe("ARM resource model:", () => {
       
           namespace Microsoft.Test {
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      enum ResourceState {
-       Succeeded,
-       Canceled,
-       Failed
-     }
-
-     model FooResourceProperties {
-       displayName?: string = "default";
-       provisioningState: ResourceState;
-     }
+      model FooResourceProperties {}
 
       model FooResource is TrackedResource<FooResourceProperties> {
         @key("fooName")
@@ -119,16 +101,7 @@ describe("ARM resource model:", () => {
       @armProviderNamespace
       namespace Microsoft.Test;
 
-      enum ResourceState {
-       Succeeded,
-       Canceled,
-       Failed
-     }
-
-     model FooResourceProperties {
-       displayName?: string = "default";
-       provisioningState: ResourceState;
-     }
+      model FooResourceProperties {}
 
       model FooResource is TrackedResource<FooResourceProperties> {
         @key("fooName")
@@ -140,10 +113,7 @@ describe("ARM resource model:", () => {
       interface Foos extends TrackedResourceOperations<FooResource,FooResourceProperties> {
       }
 
-      model BarResourceProperties {
-        iAmBar: string;
-        provisioningState: ResourceState;
-      }
+      model BarResourceProperties {}
 
       @parentResource(FooResource)
       model BarResource is ProxyResource<BarResourceProperties> {
@@ -179,16 +149,7 @@ describe("ARM resource model:", () => {
       @armProviderNamespace
       namespace Microsoft.Test;
 
-      enum ResourceState {
-       Succeeded,
-       Canceled,
-       Failed
-     }
-
-     model BazResourceProperties {
-       displayName?: string = "default";
-       provisioningState: ResourceState;
-     }
+      model BazResourceProperties {}
 
       model BazResource is ExtensionResource<BazResourceProperties> {
         @key("bazName")
@@ -224,18 +185,7 @@ describe("ARM resource model:", () => {
       @armProviderNamespace
       namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      enum ResourceState {
-       Succeeded,
-       Canceled,
-       Failed
-     }
-
-     model FooResourceProperties {
-       displayName?: string = "default";
-       provisioningState: ResourceState;
-     }
+      model FooResourceProperties {}
 
       model FooResource is TrackedResource<FooResourceProperties> {
         @key("fooName")
@@ -248,10 +198,7 @@ describe("ARM resource model:", () => {
       #suppress "deprecated" "test"
       interface Foos extends ResourceCreate<FooResource>,ResourceRead<FooResource>,ResourceDelete<FooResource> {}
 
-      model BarResourceProperties {
-        iAmBar: string;
-       provisioningState: ResourceState;
-      }
+      model BarResourceProperties {}
 
       @singleton
       @parentResource(FooResource)
@@ -290,16 +237,7 @@ describe("ARM resource model:", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      enum ResourceState {
-       Succeeded,
-       Canceled,
-       Failed
-     }
-
-      model FooResourceProperties {
-        iAmFoo: string;
-        provisioningState: ResourceState;
-      }
+      model FooResourceProperties {}
 
       model FooResource is TrackedResource<FooResourceProperties> {
         @key("fooName")
@@ -310,6 +248,7 @@ describe("ARM resource model:", () => {
 
       @armResourceOperations
       interface Foos extends TrackedResourceOperations<FooResource, FooResourceProperties> {
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmTagsPatchAsync<FooResource, FooResourceProperties>;
       }
     `);
@@ -420,20 +359,13 @@ describe("ARM resource model:", () => {
   it("resources with armResourceIdentifier property types", async () => {
     const { program } = await Tester.compile(`
       @armProviderNamespace
-              namespace Microsoft.Test;
-
-      enum ResourceState {
-        Succeeded,
-        Canceled,
-        Failed
-     }
+      namespace Microsoft.Test;
 
       model FooResourceProperties {
         simpleArmId: Azure.Core.armResourceIdentifier;
         armIdWithType: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type"}]>;
         armIdWithTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["Tenant", "ResourceGroup"]}]>;
         armIdWithMultipleTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["Tenant", "ResourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["Tenant", "ResourceGroup"]}]>;
-        provisioningState: ResourceState;
       }
 
       model FooResource is TrackedResource<FooResourceProperties> {
@@ -466,25 +398,30 @@ describe("ARM resource model:", () => {
     });
   });
   describe("features support", () => {
+    it("returns undefined when feature files are not configured", async () => {
+      const { program, MSTest } = await Tester.compile(t.code`
+        @armProviderNamespace("Microsoft.Test")
+        namespace ${t.namespace("MSTest")};
+      `);
+
+      strictEqual(getFeatureFileSet(program, MSTest), undefined);
+    });
+
     it("sets standard features and feature options", async () => {
       const [result, diagnostics] = await Tester.compileAndDiagnose(t.code`
 
-@Azure.ResourceManager.Legacy.features(Features)
+@Azure.ResourceManager.featureFiles(Features)
 @versioned(Versions)
 @armProviderNamespace("Microsoft.Test")
 namespace ${t.namespace("MSTest")};
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   v2025_11_19_preview: "2025-11-19-preview",
 }
 enum Features {
-  /** Feature A */
   FeatureA: "FeatureA",
-  /** Feature B */
   FeatureB: "FeatureB",
 }
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.featureFile(Features.FeatureA)
       model ${t.model("FooResource")} is TrackedResource<FooResourceProperties> {
          ...ResourceNameParameter<FooResource>;
       }
@@ -492,7 +429,7 @@ enum Features {
       ...DefaultProvisioningStateProperty;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @Azure.ResourceManager.featureFile(Features.FeatureB)
       model ${t.model("BarResource")} is ProxyResource<BarResourceProperties> {
           ...ResourceNameParameter<BarResource>;
       }
@@ -501,6 +438,10 @@ enum Features {
       }
       `);
       expectDiagnosticEmpty(diagnostics);
+      strictEqual(
+        getFeatureFileSet(result.program, result.MSTest),
+        result.MSTest.enums.get("Features"),
+      );
       const features = getResourceFeatureSet(result.program, result.MSTest);
       expect(features).toBeDefined();
       ok(features);
@@ -530,28 +471,23 @@ enum Features {
     it("allows customizing features and feature options", async () => {
       const [result, diagnostics] = await Tester.compileAndDiagnose(t.code`
 
-@Azure.ResourceManager.Legacy.features(Features)
+@Azure.ResourceManager.featureFiles(Features)
 @versioned(Versions)
 @armProviderNamespace("Microsoft.Test")
 namespace ${t.namespace("MSTest")};
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   v2025_11_19_preview: "2025-11-19-preview",
 }
 enum Features {
-  /** Feature A */
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureA", fileName: "feature-a", description: "The data for feature A"})
+  @Azure.ResourceManager.featureFileOptions(#{featureName: "FeatureA", fileName: "feature-a", description: "The data for feature A"})
   FeatureA: "Feature A",
-  /** Feature B */
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureB", fileName: "feature-b", description: "The data for feature B"})
+  @Azure.ResourceManager.featureFileOptions(#{featureName: "FeatureB", fileName: "feature-b", description: "The data for feature B"})
   FeatureB: "Feature B",
 
-  /** Common feature */
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "Common", fileName: "common", description: "The data in common for all features", title: "Common types for FeatureA and FeatureB", termsOfService: "MIT License"})
+  @Azure.ResourceManager.featureFileOptions(#{featureName: "Common", fileName: "common", description: "The data in common for all features", title: "Common types for FeatureA and FeatureB", termsOfService: "MIT License"})
   Common: "Common",
 }
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.featureFile(Features.FeatureA)
       model ${t.model("FooResource")} is TrackedResource<FooResourceProperties> {
          ...ResourceNameParameter<FooResource>;
       }
@@ -559,7 +495,7 @@ enum Features {
       ...DefaultProvisioningStateProperty;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @Azure.ResourceManager.featureFile(Features.FeatureB)
       model ${t.model("BarResource")} is ProxyResource<BarResourceProperties> {
           ...ResourceNameParameter<BarResource>;
       }
@@ -599,38 +535,34 @@ enum Features {
     it("reports correct features for child types", async () => {
       const [result, diagnostics] = await Tester.compileAndDiagnose(t.code`
 
-@Azure.ResourceManager.Legacy.features(Features)
+@Azure.ResourceManager.featureFiles(Features)
 @versioned(Versions)
 @armProviderNamespace("Microsoft.Test")
 namespace ${t.namespace("MSTest")};
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   v2025_11_19_preview: "2025-11-19-preview",
 }
 enum Features {
-  /** Feature A */
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureA", fileName: "feature-a", description: "The data for feature A"})
+  @Azure.ResourceManager.featureFileOptions(#{featureName: "FeatureA", fileName: "feature-a", description: "The data for feature A"})
   FeatureA: "Feature A",
-  /** Feature B */
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureB", fileName: "feature-b", description: "The data for feature B"})
+  @Azure.ResourceManager.featureFileOptions(#{featureName: "FeatureB", fileName: "feature-b", description: "The data for feature B"})
   FeatureB: "Feature B",
 }
       @secret
       scalar secretString extends string;
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.featureFile(Features.FeatureA)
       model ${t.model("FooResource")} is TrackedResource<FooResourceProperties> {
          ...ResourceNameParameter<FooResource>;
       }
       
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.featureFile(Features.FeatureA)
       model ${t.model("FooResourceProperties")} { 
         ...DefaultProvisioningStateProperty;
         password: secretString;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @Azure.ResourceManager.featureFile(Features.FeatureB)
       model ${t.model("BarResource")} is ProxyResource<BarResourceProperties> {
           ...ResourceNameParameter<BarResource>;
       }
@@ -639,11 +571,11 @@ enum Features {
         password: secretString;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.featureFile(Features.FeatureA)
       @armResourceOperations
       interface ${t.interface("Foos")} extends Azure.ResourceManager.TrackedResourceOperations<FooResource, FooResourceProperties> {}
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @Azure.ResourceManager.featureFile(Features.FeatureB)
       @armResourceOperations
       interface ${t.interface("Bars")} extends Azure.ResourceManager.TrackedResourceOperations<BarResource, BarResourceProperties> {}
       `);
@@ -713,9 +645,7 @@ enum Features {
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.Test;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   v2025_11_19_preview: "2025-11-19-preview",
 }
 
@@ -731,9 +661,7 @@ enum Versions {
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.Test;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
   v2025_11_19_preview: "2025-11-19-preview",
 }
@@ -750,9 +678,7 @@ enum Versions {
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.Test;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
   v2025_11_19_preview: "2025-11-19-preview",
 }
@@ -769,9 +695,7 @@ enum Versions {
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.Test;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2025_11_19_preview: "2025-11-19-preview",
 }
@@ -786,9 +710,7 @@ enum Versions {
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.Test;
-/** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v6)
   v2025_11_19_preview: "2025-11-19-preview",
 }
@@ -1023,7 +945,8 @@ interface RestorePointOperations {
 });
 
 it("allows extension of foreign resources", async () => {
-  const { program, Employees, ManagementGroups, VirtualMachines } = await Tester.compile(t.code`
+  const { program, Employees, ManagementGroups, ServiceGroups, VirtualMachines } =
+    await Tester.compile(t.code`
 using Azure.Core;
 
 @armProviderNamespace
@@ -1036,7 +959,6 @@ model Employee is ExtensionResource<EmployeeProperties> {
 
 model EmployeeProperties {
   age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -1073,14 +995,14 @@ alias VirtualMachine = Extension.ExternalResource<
   Description = "The name of the virtual machine"
 >;
 
-
 @armResourceOperations
 interface ${t.interface("Employees")} extends EmplOps<Extension.ScopeParameter> {}
 @armResourceOperations
 interface ${t.interface("ManagementGroups")} extends EmplOps<Extension.ManagementGroup> {}
 @armResourceOperations
+interface ${t.interface("ServiceGroups")} extends EmplOps<Extension.ServiceGroup> {}
+@armResourceOperations
 interface ${t.interface("VirtualMachines")} extends EmplOps<VirtualMachine> {}
-
 
 model MoveRequest {
   from: string;
@@ -1104,6 +1026,12 @@ model MoveResponse {
   const [managementGetHttp, _m] = getHttpOperation(program, managementGet);
   expect(managementGetHttp.path).toBe(
     "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+  );
+  const serviceGroupGet: Operation | undefined = ServiceGroups?.operations?.get("get");
+  ok(serviceGroupGet);
+  const [serviceGroupGetHttp, _sg] = getHttpOperation(program, serviceGroupGet);
+  expect(serviceGroupGetHttp.path).toBe(
+    "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
   );
   const virtualMachinesGet: Operation | undefined = VirtualMachines?.operations?.get("get");
   ok(virtualMachinesGet);
@@ -1148,7 +1076,6 @@ alias BaseParams = {
     ...SubscriptionIdParameter;
     ...Azure.ResourceManager.Legacy.Provider;
   };
-
 
 @armResourceOperations
 interface Employees {
@@ -1256,7 +1183,6 @@ alias BaseParams = {
     ...Azure.ResourceManager.Legacy.Provider;
   };
 
-
 @armResourceOperations
 interface Employees {
   @armResourceRead(Employee)
@@ -1311,7 +1237,6 @@ alias BaseParams = {
     ...SubscriptionIdParameter;
     ...Azure.ResourceManager.Legacy.Provider;
   };
-
 
 @armResourceOperations
 interface Employees {
@@ -1506,5 +1431,29 @@ describe("multiple services", () => {
     expect(ResA.armProviderNamespace).toEqual("Provider.A");
     expect(ResB.name).toEqual("ResB");
     expect(ResB.armProviderNamespace).toEqual("Provider.B");
+  });
+});
+
+describe("decorator re-application", () => {
+  // Emitters (and versioning) create copies of the resource types through the mutator
+  // framework, which re-runs the decorators on the copy. Those decorators must be
+  // idempotent, otherwise sealing the visibility of `name` a second time reports
+  // `visibility-sealed`.
+  it("does not report diagnostics when the resource decorators are applied again", async () => {
+    const { program, FooResource } = await Tester.compile(t.code`
+      @armProviderNamespace
+      namespace Microsoft.Test;
+
+      model FooResourceProperties {}
+
+      model ${t.model("FooResource")} is TrackedResource<FooResourceProperties> {
+        ...ResourceNameParameter<FooResource>;
+      }
+    `);
+
+    const tk = $(program);
+    tk.type.finishType(tk.type.clone(FooResource));
+
+    expectDiagnosticEmpty(program.diagnostics);
   });
 });

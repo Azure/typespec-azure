@@ -7,7 +7,7 @@ import {
   type Namespace,
   type Program,
 } from "@typespec/compiler";
-import { LanguagePackageMetadata, TypeSpecMetadata } from "./metadata.js";
+import type { LanguagePackageMetadata, TypeSpecMetadata } from "./metadata.js";
 
 const PACKAGE_NAME_KEYS = ["package-name", "packageName", "package"];
 const NAMESPACE_KEYS = ["namespace", "namespace-name", "namespaceName"];
@@ -257,7 +257,10 @@ function parseTypeScript(
 
 /**
  * Go-specific metadata parser.
- * Extracts from module path, looking for azure-sdk-for-go suffix.
+ * Extracts from module path, looking for azure-sdk-for-go suffix, as a fallback.
+ * The primary derivation of package name from the emitter output directory is handled
+ * by the caller (createLanguageMetadata) after the relative output path is computed,
+ * because it requires knowledge of the base output directory.
  */
 function parseGo(
   options: Record<string, unknown>,
@@ -318,6 +321,8 @@ export interface LanguageCollectionResult {
 export async function collectLanguagePackages(
   program: Program,
   baseOutputDir: string,
+  fallbackApiVersion?: string,
+  resolvedSdkType?: "preview" | "stable",
 ): Promise<LanguageCollectionResult> {
   const optionMap = program.compilerOptions.options ?? {};
   const params = extractParameters(optionMap);
@@ -333,7 +338,14 @@ export async function collectLanguagePackages(
   }
 
   return {
-    languages: buildLanguageMetadata(optionMap, params, baseOutputDir, defaultServiceDir),
+    languages: buildLanguageMetadata(
+      optionMap,
+      params,
+      baseOutputDir,
+      defaultServiceDir,
+      fallbackApiVersion,
+      resolvedSdkType,
+    ),
     sourceConfigPath: program.compilerOptions.config,
   };
 }
@@ -480,6 +492,8 @@ export function buildLanguageMetadata(
   params: Record<string, unknown>,
   baseOutputDir: string,
   defaultServiceDir?: string,
+  fallbackApiVersion?: string,
+  resolvedSdkType?: "preview" | "stable",
 ): Record<string, LanguagePackageMetadata[]> {
   const languagesDict: Record<string, LanguagePackageMetadata[]> = {};
 
@@ -490,6 +504,8 @@ export function buildLanguageMetadata(
       params,
       baseOutputDir,
       defaultServiceDir,
+      fallbackApiVersion,
+      resolvedSdkType,
     );
     const language = inferLanguageFromEmitterName(emitterName);
     if (!languagesDict[language]) {
@@ -507,6 +523,8 @@ function createLanguageMetadata(
   params: Record<string, unknown>,
   baseOutputDir: string,
   defaultServiceDir?: string,
+  fallbackApiVersion?: string,
+  resolvedSdkType?: "preview" | "stable",
 ): LanguagePackageMetadata {
   const normalizedOptions = normalizeOptionsObject(emitterOptions);
 
@@ -560,6 +578,31 @@ function createLanguageMetadata(
     relativeOutputDir = relativeOutputDir.replace(/\{namespace\}/g, namespace);
   }
 
+  // For Go, prefer the emitter output directory over the module path for package name derivation.
+  // The output directory gives the correct repo-relative path (e.g., sdk/resourcemanager/redisenterprise/armredisenterprise)
+  // without version suffixes that may appear in the module path (e.g., /v4).
+  if (heuristicLang === "go" && relativeOutputDir?.startsWith("{output-dir}/")) {
+    const explicitPackageName =
+      normalizedOptions["package-name"] ?? normalizedOptions["package_name"];
+    if (!explicitPackageName) {
+      const outputDirPackageName = relativeOutputDir.substring("{output-dir}/".length);
+      packageName = outputDirPackageName;
+      if (!normalizedOptions["namespace"]) {
+        namespace = outputDirPackageName;
+      }
+    }
+  }
+
+  // Read api-version from this emitter's options first; fall back to TCGC resolution.
+  // "multiple-versions" (from TCGC multi-service detection) always supersedes any per-emitter value.
+  const emitterApiVersion = normalizedOptions["api-version"];
+  const apiVersion =
+    fallbackApiVersion === "multiple-versions"
+      ? "multiple-versions"
+      : typeof emitterApiVersion === "string"
+        ? emitterApiVersion
+        : fallbackApiVersion;
+
   return {
     emitterName,
     packageName,
@@ -567,6 +610,8 @@ function createLanguageMetadata(
     outputDir: relativeOutputDir,
     flavor: flavor ? String(flavor) : undefined,
     serviceDir,
+    apiVersion,
+    sdkType: resolvedSdkType,
   };
 }
 

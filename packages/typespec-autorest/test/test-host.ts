@@ -1,13 +1,13 @@
-import { Diagnostic, resolvePath } from "@typespec/compiler";
+import { type Diagnostic, resolvePath } from "@typespec/compiler";
 import {
   createTester,
-  EmitterTesterInstance,
+  type EmitterTesterInstance,
   expectDiagnosticEmpty,
   resolveVirtualPath,
 } from "@typespec/compiler/testing";
 import { ok } from "assert";
-import { AutorestEmitterOptions } from "../src/lib.js";
-import { OpenAPI2Document, OpenAPI2Schema } from "../src/openapi2-document.js";
+import type { AutorestEmitterOptions } from "../src/lib.js";
+import type { OpenAPI2Document, OpenAPI2Schema } from "../src/openapi2-document.js";
 
 export const ApiTester = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
@@ -100,7 +100,9 @@ export async function compileMultipleOpenAPI<K extends string>(
   files: Record<K, string>,
   options: CompileOpenAPIOptions = {},
 ): Promise<Record<K, OpenAPI2Document>> {
-  const [{ outputs }, diagnostics] = await Tester.compileAndDiagnose(code, {
+  const tester =
+    options?.tester ?? (await (options.preset === "azure" ? AzureTester : Tester).createInstance());
+  const [{ outputs }, diagnostics] = await tester.compileAndDiagnose(code, {
     compilerOptions: options?.options
       ? {
           options: {

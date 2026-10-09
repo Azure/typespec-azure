@@ -1,0 +1,106 @@
+name: "go / emitter diff commenter"
+
+# Posts the sticky PR comment for the "go / emitter diff" workflow.
+# Runs in the privileged repo context (not the fork) so it can write PR comments.
+# See https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+#
+# SECURITY: the downloaded artifact is produced by the unprivileged fork run and
+# is fully attacker-controlled. Only the comment *body* is read from it; the
+# target PR is resolved from the trusted workflow_run head repository, branch,
+# and SHA, and the sticky marker is hardcoded, so a crafted payload can't
+# retarget another PR or overwrite an unrelated comment.
+
+on:
+  workflow_run:
+    workflows: ["go / emitter diff"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  # DO NOT BUILD ANYTHING FROM A PR HERE https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+  commenter:
+    if: github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download comment artifact
+        id: download
+        continue-on-error: true
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: emitter-diff-go-comment
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/emitter-diff-comment
+
+      - name: Post PR comment
+        if: steps.download.outcome == 'success'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const { owner, repo } = context.repo;
+
+            // Hardcoded (NOT read from the untrusted artifact) so a crafted
+            // payload can't retarget/overwrite an unrelated sticky comment.
+            const marker = "<!-- emitter-diff-go -->";
+
+            // Resolve the PR from TRUSTED workflow_run fields. Don't use
+            // workflow_run.pull_requests: it is empty for fork PRs. Looking up
+            // the head SHA in the base repo also returns no PR until the fork
+            // commit is merged.
+            const run = context.payload.workflow_run;
+            const headSha = run.head_sha;
+            const headBranch = run.head_branch;
+            const headRepo = run.head_repository?.full_name;
+            const headOwner = run.head_repository?.owner?.login;
+            if (!headSha || !headBranch || !headRepo || !headOwner) {
+              throw new Error('workflow_run payload is missing trusted head repository information.');
+            }
+
+            const { data: prs } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              head: `${headOwner}:${headBranch}`,
+              per_page: 100,
+            });
+            const matches = prs.filter(
+              (p) =>
+                p.head.sha === headSha &&
+                p.head.ref === headBranch &&
+                p.head.repo?.full_name === headRepo &&
+                p.base.repo.full_name === `${owner}/${repo}`,
+            );
+            if (matches.length !== 1) {
+              core.info(
+                `Expected one open PR for ${headRepo}:${headBranch} at ${headSha}; found ${matches.length}.`,
+              );
+              return;
+            }
+            const [pr] = matches;
+            const issue_number = pr.number;
+
+            // Only the body is taken from the (untrusted) artifact; force our
+            // marker onto it so the sticky-comment lookup stays idempotent.
+            const commentDir = path.join(process.env.RUNNER_TEMP, 'emitter-diff-comment');
+            const payload = JSON.parse(fs.readFileSync(path.join(commentDir, 'comment.json'), 'utf8'));
+            let body = String(payload.body ?? '');
+            if (!body.includes(marker)) {
+              body = `${marker}\n${body}`;
+            }
+
+            // Paginate so the sticky comment is found on PRs with >30 comments.
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number, per_page: 100,
+            });
+            const hit = comments.find((c) => c.body && c.body.includes(marker));
+            if (hit) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: hit.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }

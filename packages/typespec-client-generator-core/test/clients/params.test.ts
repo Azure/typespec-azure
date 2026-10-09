@@ -1,7 +1,7 @@
-import { ApiKeyAuth, Oauth2Auth, OAuth2Flow } from "@typespec/http";
+import type { ApiKeyAuth, Oauth2Auth, OAuth2Flow } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import {
+import type {
   SdkCredentialParameter,
   SdkCredentialType,
   SdkEndpointParameter,
@@ -224,6 +224,115 @@ it("initialization default endpoint with union auth", async () => {
   strictEqual(oauth2Scheme.flows[0].scopes[0].value, "https://security.microsoft.com/.default");
 });
 
+it("preserves OR authentication requirements", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key"> | OAuth2Auth<[MyFlow]>)
+    namespace My.Service;
+
+    op myOp(): void;
+
+    model MyFlow {
+      type: OAuth2FlowType.implicit;
+      authorizationUrl: "https://login.microsoftonline.com/common/oauth2/authorize";
+      scopes: ["https://security.microsoft.com/.default"];
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const client = context.sdkPackage.clients[0];
+
+  ok(client.authentication);
+  strictEqual(client.authentication.options.length, 2);
+  strictEqual(client.authentication.options[0].schemes.length, 1);
+  strictEqual(client.authentication.options[1].schemes.length, 1);
+  strictEqual(client.authentication.options[0].schemes[0].type, "apiKey");
+  strictEqual(client.authentication.options[1].schemes[0].type, "oauth2");
+});
+
+it("preserves AND authentication requirements", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @useAuth([
+      ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">,
+      OAuth2Auth<[MyFlow]>
+    ])
+    namespace My.Service;
+
+    op myOp(): void;
+
+    model MyFlow {
+      type: OAuth2FlowType.implicit;
+      authorizationUrl: "https://login.microsoftonline.com/common/oauth2/authorize";
+      scopes: ["https://security.microsoft.com/.default"];
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const client = context.sdkPackage.clients[0];
+
+  ok(client.authentication);
+  strictEqual(client.authentication.options.length, 1);
+  strictEqual(client.authentication.options[0].schemes.length, 2);
+  strictEqual(client.authentication.options[0].schemes[0].type, "apiKey");
+  strictEqual(client.authentication.options[0].schemes[1].type, "oauth2");
+});
+
+it("preserves the required credential projection when NoAuth is an alternative", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @useAuth(
+      NoAuth
+      | ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">
+      | OAuth2Auth<[MyFlow]>
+    )
+    namespace My.Service;
+
+    op myOp(): void;
+
+    model MyFlow {
+      type: OAuth2FlowType.implicit;
+      authorizationUrl: "https://login.microsoftonline.com/common/oauth2/authorize";
+      scopes: ["https://security.microsoft.com/.default"];
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const client = context.sdkPackage.clients[0];
+  const credentialParam = client.clientInitialization.parameters.find(
+    (parameter): parameter is SdkCredentialParameter => parameter.kind === "credential",
+  );
+
+  ok(credentialParam);
+  strictEqual(credentialParam.optional, false);
+  strictEqual(credentialParam.type.kind, "union");
+  strictEqual(credentialParam.type.variantTypes.length, 3);
+  strictEqual(credentialParam.type.variantTypes[0].scheme.type, "noAuth");
+  ok(client.authentication);
+  strictEqual(client.authentication.options.length, 3);
+  strictEqual(client.authentication.options[0].schemes[0].type, "noAuth");
+});
+
+it("preserves the credential parameter when only NoAuth is configured", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @useAuth(NoAuth)
+    namespace My.Service;
+
+    op myOp(): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const client = context.sdkPackage.clients[0];
+  const credentialParam = client.clientInitialization.parameters.find(
+    (parameter): parameter is SdkCredentialParameter => parameter.kind === "credential",
+  );
+
+  ok(credentialParam);
+  strictEqual(credentialParam.optional, false);
+  strictEqual(credentialParam.type.kind, "credential");
+  strictEqual(credentialParam.type.scheme.type, "noAuth");
+  ok(client.authentication);
+  strictEqual(client.authentication.options.length, 1);
+  strictEqual(client.authentication.options[0].schemes[0].type, "noAuth");
+});
+
 it("initialization one server parameter with apikey auth", async () => {
   const { program } = await SimpleTester.compile(`
         @server(
@@ -285,10 +394,10 @@ it("initialization multiple server parameters with apikey auth", async () => {
           "{endpoint}/server/path/multiple/{apiVersion}",
           "Test server with path parameters.",
           {
-            @doc("Pass in http://localhost:3000 for endpoint.")
+            
             endpoint: url,
 
-            @doc("Pass in v1.0 for API version.")
+            
             apiVersion: Versions,
           }
         )
@@ -298,7 +407,7 @@ it("initialization multiple server parameters with apikey auth", async () => {
         op myOp(): void;
 
         enum Versions {
-          @doc("Version 1.0")
+          
           v1_0: "v1.0",
         }
       `);
@@ -376,10 +485,10 @@ it("non-versioning service with api version param in endpoint", async () => {
           "{endpoint}/server/path/multiple/{apiVersion}",
           "Test server with path parameters.",
           {
-            @doc("Pass in http://localhost:3000 for endpoint.")
+            
             endpoint: url = "http://localhost:3000",
 
-            @doc("Pass in v1.0 for API version.")
+            
             apiVersion: string = "v1",
           }
         )
@@ -478,9 +587,6 @@ function getServiceNoDefaultApiVersion(op: string) {
       "{endpoint}",
       "Testserver endpoint",
       {
-        /**
-         * Need to be set as 'http://localhost:3000' in client.
-         */
         endpoint: url,
       }
     )
@@ -682,10 +788,10 @@ it("endpoint template argument with default value of enum member", async () => {
       "{endpoint}/client/structure/{client}",
       "",
       {
-        @doc("Need to be set as 'http://localhost:3000' in client.")
+        
         endpoint: url,
     
-        @doc("Need to be set as 'default', 'multi-client', 'renamed-operation', 'two-operation-group' in client.")
+        
         client: ClientType = ClientType.Default,
       }
     )
@@ -726,7 +832,7 @@ it("client level signatures by default", async () => {
   const { program } = await ArmTesterWithService.compile(`
     model MyProperties {
       @visibility(Lifecycle.Read)
-      @doc("Display name of the Azure Extended Zone.")
+      
       displayName: string;
     }
 

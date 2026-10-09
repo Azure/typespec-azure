@@ -1,7 +1,7 @@
 import { Tester } from "#test/tester.js";
 import {
-  LinterRuleTester,
-  TesterInstance,
+  type LinterRuleTester,
+  type TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
@@ -27,8 +27,7 @@ it("emit warning if updateable properties bag is empty", async () => {
           @armProviderNamespace
       namespace Microsoft.Foo;
       model FooResource is ProxyResource<FooResourceProperties> {
-        @key("foo") @segment("foo") @path @visibility(Lifecycle.Read)
-        name: string;
+        ...ResourceNameParameter<FooResource>;
       }
       model FooResourceProperties {
         @visibility(Lifecycle.Read)

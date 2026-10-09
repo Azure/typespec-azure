@@ -1,6 +1,6 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import {
+import type {
   SdkHttpOperation,
   SdkMethodResponse,
   SdkServiceMethod,
@@ -332,11 +332,13 @@ it("protocol response usage", async () => {
       prop: string;
     }
 
-    @convenientAPI(false)
+    @convenientAPI(false, "java")
     op get(): Test;
     `,
   );
-  const context = await createSdkContextForTester(program);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 0);
   const method = getServiceMethodOfClient(sdkPackage);

@@ -2,7 +2,7 @@ import {
   expectDiagnosticEmpty,
   expectDiagnostics,
   t,
-  TesterInstance,
+  type TesterInstance,
 } from "@typespec/compiler/testing";
 import { deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";

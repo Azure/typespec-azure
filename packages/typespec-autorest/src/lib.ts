@@ -1,4 +1,4 @@
-import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
+import { createTypeSpecLibrary, type JSONSchemaType, paramMessage } from "@typespec/compiler";
 
 export interface AutorestEmitterOptions {
   /**
@@ -118,6 +118,58 @@ export interface AutorestEmitterOptions {
    * which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.
    */
   "output-splitting"?: "legacy-feature-files";
+
+  /**
+   * When enabled, the emitter will not copy example files to the output directory.
+   * Instead, it will reference the source example files using relative file paths.
+   * @default false
+   */
+  "skip-example-copying"?: boolean;
+
+  /**
+   * Strategy for naming the OpenAPI names derived from TypeSpec types (definition/schema
+   * names, parameter keys, inline names, `x-typespec-name`, etc.).
+   *
+   * - `"namespaced"`: Include the namespace prefix when a type lives outside the service namespace
+   *   (e.g. `LiftrBase.Foo`). The service (and root `TypeSpec`) namespace is always stripped. This
+   *   is the current/default behavior.
+   * - `"name-only"`: Use only the type name without any namespace prefix (e.g. `Foo`). When two
+   *   types from different namespaces collapse to the same name, the conflict is reported as an
+   *   error (`@typespec/openapi/duplicate-type-name`).
+   *
+   * @default "namespaced"
+   */
+  "type-name-strategy"?: "namespaced" | "name-only";
+
+  /**
+   * Controls emission of a `service.yaml` manifest (declaring the service's API versions)
+   * at the project root, next to `tspconfig.yaml`.
+   *
+   * - `"auto"`: Emit/update `service.yaml` only if the file already exists. (default)
+   * - `"always"`: Always emit `service.yaml`.
+   * - `"never"`: Never emit `service.yaml`.
+   *
+   * When an existing file is present it is updated in place, preserving comments and unrelated keys.
+   *
+   * @default "auto"
+   */
+  "service-yaml"?: "auto" | "always" | "never";
+
+  /**
+   * Controls how the emitter sources `x-ms-examples`.
+   *
+   * - `"auto"`: Use the unified `examples.yaml` format when a `examples.yaml` (or
+   *   `examples/*.yaml`) file is present at the project root; otherwise fall back to loading legacy
+   *   per-version `x-ms-examples` JSON files from `examples-dir`. (default)
+   * - `"legacy"`: Only load legacy per-version `x-ms-examples` JSON files.
+   * - `"unified"`: Only load the unified `examples.yaml` format, resolving and materializing the
+   *   applicable example for each operation at the emitted API version and writing the resulting
+   *   legacy `x-ms-examples` JSON files. Enables a smooth rollout of the new format without
+   *   changing downstream consumers.
+   *
+   * @default "auto"
+   */
+  "examples-format"?: "auto" | "legacy" | "unified";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -254,6 +306,37 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       description:
         'Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files", which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.',
     },
+    "skip-example-copying": {
+      type: "boolean",
+      nullable: true,
+      default: false,
+      description:
+        "When enabled, the emitter will not copy example files to the output directory. Instead, it will reference the source example files using relative file paths.",
+    },
+    "type-name-strategy": {
+      type: "string",
+      enum: ["namespaced", "name-only"],
+      nullable: true,
+      default: "namespaced",
+      description:
+        'Strategy for naming the OpenAPI names derived from TypeSpec types. "namespaced" (default) includes the namespace prefix for types outside the service namespace (e.g. `LiftrBase.Foo`). "name-only" uses only the type name without any namespace prefix (e.g. `Foo`), reporting an error when two types collapse to the same name.',
+    },
+    "service-yaml": {
+      type: "string",
+      enum: ["auto", "always", "never"],
+      nullable: true,
+      default: "auto",
+      description:
+        'Controls emission of a `service.yaml` manifest at the project root. "auto" (default) emits it only if the file already exists, "always" always emits it, "never" disables it. When an existing file is present it is updated in place, preserving comments and unrelated keys.',
+    },
+    "examples-format": {
+      type: "string",
+      enum: ["auto", "legacy", "unified"],
+      nullable: true,
+      default: "auto",
+      description:
+        'Controls how the emitter sources `x-ms-examples`. "auto" (default) uses the unified `examples.yaml` format when present and otherwise loads legacy per-version JSON files, "legacy" only loads legacy JSON files, and "unified" only reads `examples.yaml`, materializing the applicable legacy `x-ms-examples` files for the emitted API version.',
+    },
   },
   required: [],
 };
@@ -286,6 +369,12 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: paramMessage`Example file ${"filename"} uses duplicate title '${"title"}' for operationId '${"operationId"}'`,
+      },
+    },
+    "duplicate-operation-id": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Operation ID '${"operationId"}' is duplicated across operations. OpenAPI requires operationId values to be globally unique.`,
       },
     },
     "invalid-schema": {
@@ -334,6 +423,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Skipped loading invalid example file: ${"filename"}. Error: ${"error"}`,
         noDirectory: paramMessage`Skipping example loading from ${"directory"} because there was an error reading the directory.`,
         noOperationId: paramMessage`Skipping example file ${"filename"} because it does not contain an operationId and/or title.`,
+      },
+    },
+    "unified-example-loading": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`${"message"}`,
       },
     },
     "unsupported-http-auth-scheme": {
@@ -390,6 +485,19 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default:
           "The emitter did not emit any files because the specified version option does not match any versions of the service.",
+      },
+    },
+    "service-yaml-multiple-services": {
+      severity: "warning",
+      messages: {
+        default:
+          "Cannot emit service.yaml because the project defines multiple services. Only the first service will be included.",
+      },
+    },
+    "inconsistent-client-api-version-override": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Operations emitted to the same OpenAPI document must specify one consistent \`@overrideApiVersion\` value. Found values: ${"values"}. The normal document version ${"fallback"} will be retained.`,
       },
     },
   },

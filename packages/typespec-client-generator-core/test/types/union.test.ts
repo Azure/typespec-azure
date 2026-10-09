@@ -2,7 +2,7 @@ import type { Type, Union } from "@typespec/compiler";
 import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { SdkArrayType, SdkMethodResponse, UsageFlags } from "../../src/interfaces.js";
+import { type SdkArrayType, type SdkMethodResponse, UsageFlags } from "../../src/interfaces.js";
 import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 import { getSdkTypeHelper } from "./utils.js";
 

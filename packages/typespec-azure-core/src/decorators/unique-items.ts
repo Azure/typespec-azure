@@ -1,10 +1,10 @@
 import {
-  DecoratorContext,
+  type DecoratorContext,
   isArrayModelType,
   isNullType,
-  Model,
-  ModelProperty,
-  Type,
+  type Model,
+  type ModelProperty,
+  type Type,
 } from "@typespec/compiler";
 import { useStateMap } from "@typespec/compiler/utils";
 import type { UniqueItemsDecorator } from "../../generated-defs/Azure.Core.js";

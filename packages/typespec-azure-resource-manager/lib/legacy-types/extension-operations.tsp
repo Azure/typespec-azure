@@ -11,7 +11,7 @@ using Azure.ResourceManager.Private;
 /**
  * DEPRECATED: Use CreateOrReplaceAsync instead.
  * A long-running resource CreateOrUpdate (PUT)
- * @template TargetResource the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
+ * @template TargetResource the target resource, e.g. Extension.Subscription, Extension.ManagementGroup, Extension.ServiceGroup or Extension.ResourceGroup
  * @template ExtensionResource the resource being created or updated
  * @template Request Optional. The request body for the createOrUpdate operation
  * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
@@ -28,10 +28,9 @@ alias CreateOrUpdateAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = ExtensionResource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedResponse<
-    ExtensionResource,
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<ExtensionResource>
+    | ArmResourceCreatedResponse<ExtensionResource, LroHeaders>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false,
   OverrideResourceName extends valueof string = ""
@@ -48,7 +47,7 @@ alias CreateOrUpdateAsync<
 >;
 
 /** A long-running resource CreateOrUpdate (PUT)
- * @template TargetResource the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
+ * @template TargetResource the target resource, e.g. Extension.Subscription, Extension.ManagementGroup, Extension.ServiceGroup or Extension.ResourceGroup
  * @template ExtensionResource the resource being created or updated
  * @template Request Optional. The request body for the createOrUpdate operation
  * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
@@ -77,10 +76,9 @@ op CreateOrReplaceAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = ExtensionResource> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedResponse<
-    ExtensionResource,
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<ExtensionResource>
+    | ArmResourceCreatedResponse<ExtensionResource, LroHeaders>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false,
   OverrideResourceName extends valueof string = ""
@@ -95,7 +93,7 @@ op CreateOrReplaceAsync<
 
 /**
  * Synchronous PUT operation for Azure Resource Manager resources
- * @template TargetResource the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
+ * @template TargetResource the target resource, e.g. Extension.Subscription, Extension.ManagementGroup, Extension.ServiceGroup or Extension.ResourceGroup
  * @template ExtensionResource the resource being created or replaced
  * @template Request Optional. The request body for the createOrUpdate operation
  * @template Parameters Optional. Additional parameters after the path parameters
@@ -120,7 +118,9 @@ op CreateOrReplaceSync<
   ExtensionResource extends Foundations.SimpleResource,
   Request extends {} | void = ExtensionResource,
   Parameters extends {} = {},
-  Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedSyncResponse<ExtensionResource>,
+  Response extends {} =
+    | ArmResourceUpdatedResponse<ExtensionResource>
+    | ArmResourceCreatedSyncResponse<ExtensionResource>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false,
   OverrideResourceName extends valueof string = ""
@@ -135,7 +135,7 @@ op CreateOrReplaceSync<
 
 /**
  * A long-running resource update using a custom PATCH payload (Asynchronous)
- * @template TargetResource the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
+ * @template TargetResource the target resource, e.g. Extension.Subscription, Extension.ManagementGroup, Extension.ServiceGroup or Extension.ResourceGroup
  * @template ExtensionResource the resource being patched
  * @template PatchModel The input model for the PATCH request
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
@@ -162,10 +162,9 @@ op CustomPatchAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Response extends {} = ArmResponse<ExtensionResource> | ArmAcceptedLroResponse<
-    "Resource update request accepted.",
-    LroHeaders
-  >,
+  Response extends {} =
+    | ArmResponse<ExtensionResource>
+    | ArmAcceptedLroResponse<"Resource update request accepted.", LroHeaders>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false,
   OverrideResourceName extends valueof string = ""
@@ -180,7 +179,7 @@ op CustomPatchAsync<
 
 /**
  * A resource update using a custom PATCH payload (synchronous)
- * @template TargetResource the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
+ * @template TargetResource the target resource, e.g. Extension.Subscription, Extension.ManagementGroup, Extension.ServiceGroup or Extension.ResourceGroup
  * @template ExtensionResource the resource being patched
  * @template PatchModel The input model for the PATCH request
  * @template Parameters Optional. Additional parameters after the path parameters

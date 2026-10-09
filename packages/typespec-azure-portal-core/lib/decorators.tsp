@@ -30,6 +30,7 @@ extern dec marketplaceOffer(target: Model, options: MarketplaceOfferOptions);
 
 /**
  * Provides a Model Property a display name
+ * @param name The display name to show for the property.
  */
 extern dec displayName(target: ModelProperty, name: valueof string);
 
@@ -73,18 +74,27 @@ model AboutOptions {
 
 /** Options for promotion of ARM resource. */
 model PromotionOptions {
+  /** The API version to promote, either a literal version string or a version enum member. */
   apiVersion: string | EnumMember;
+
+  /** Whether the promoted API version should be updated automatically. */
   autoUpdate?: boolean;
 }
 
 /** Options for learnMoreDocs of ARM resources. */
 model LearnMoreDocsOptions {
+  /** The title of the documentation link. */
   title: string;
+
+  /** The URI of the documentation link. */
   uri: string;
 }
 
 /** Options for displayNames of ARM resources. */
 model DisplayNamesOptions {
+  /** The singular display name of the resource. */
   singular: string;
+
+  /** The plural display name of the resource. */
   plural: string;
 }

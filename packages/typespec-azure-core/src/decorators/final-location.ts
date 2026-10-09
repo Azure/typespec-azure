@@ -1,12 +1,12 @@
 import {
-  IntrinsicType,
+  type DecoratorContext,
+  type IntrinsicType,
   isNeverType,
   isUnknownType,
   isVoidType,
-  Scalar,
-  type DecoratorContext,
   type Model,
   type ModelProperty,
+  type Scalar,
   type Type,
 } from "@typespec/compiler";
 import { useStateMap, useStateSet } from "@typespec/compiler/utils";

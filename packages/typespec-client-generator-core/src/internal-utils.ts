@@ -1,15 +1,16 @@
 import {
   FinalStateValue,
+  getEffectiveApiVersionOverride,
   getLroMetadata,
   isPreviewVersion,
-  LroMetadata,
+  type LroMetadata,
 } from "@azure-tools/typespec-azure-core";
 import {
-  BooleanLiteral,
+  type BooleanLiteral,
   compilerAssert,
   createDiagnosticCollector,
-  Diagnostic,
-  Enum,
+  type Diagnostic,
+  type Enum,
   getDeprecationDetails,
   getDoc,
   getLifecycleVisibilityEnum,
@@ -17,39 +18,39 @@ import {
   getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
-  Interface,
+  type Interface,
   isNeverType,
   isNullType,
   isTemplateDeclaration,
   isVoidType,
   listServices,
-  Model,
-  ModelProperty,
-  Namespace,
+  type Model,
+  type ModelProperty,
+  type Namespace,
   Numeric,
-  NumericLiteral,
-  Operation,
-  Program,
-  StringLiteral,
-  Type,
-  Union,
-  Value,
+  type NumericLiteral,
+  type Operation,
+  type Program,
+  type StringLiteral,
+  type Type,
+  type Union,
+  type Value,
 } from "@typespec/compiler";
 import {
   unsafe_mutateSubgraphWithNamespace,
-  unsafe_MutatorWithNamespace,
+  type unsafe_MutatorWithNamespace,
   unsafe_Realm,
 } from "@typespec/compiler/experimental";
 import { $ } from "@typespec/compiler/typekit";
 import {
-  Authentication,
+  type Authentication,
   getHeaderFieldOptions,
   getPathParamOptions,
   getQueryParamOptions,
-  HttpOperation,
-  HttpOperationResponseContent,
-  HttpPayloadBody,
-  HttpServer,
+  type HttpOperation,
+  type HttpOperationResponseContent,
+  type HttpPayloadBody,
+  type HttpServer,
   isHeader,
   isPathParam,
   isQueryParam,
@@ -60,20 +61,22 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import assert from "assert";
 import {
   getAlternateType,
   getClientDocExplicit,
   getClientLocation,
-  getLegacyHierarchyBuilding,
+  getIsApiVersion,
   getMarkAsLro,
   getOverriddenClientMethod,
   getParamAlias,
-  getUsageOverride,
 } from "./decorators.js";
-import {
+import type {
+  ApiVersionConfig,
+  ApiVersionServiceMap,
   DecoratorInfo,
+  DecoratorOptions,
   ExternalTypeInfo,
+  LanguageScopes,
   SdkBuiltInType,
   SdkClient,
   SdkClientType,
@@ -100,7 +103,7 @@ export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
 export interface UnbrandedSdkEmitterOptionsInterface {
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
-  "api-version"?: string;
+  "api-version"?: ApiVersionConfig;
   license?: {
     name: string;
     company?: string;
@@ -125,6 +128,7 @@ export const clientKey = createStateSymbol("client");
 export const clientLocationKey = createStateSymbol("clientLocation");
 export const omitOperation = createStateSymbol("omitOperation");
 export const overrideKey = createStateSymbol("override");
+export const responseOverrideKey = createStateSymbol("responseOverride");
 export const usageKey = createStateSymbol("usage");
 export const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
@@ -183,6 +187,42 @@ export function getScopedDecoratorData(
     }
   }
   return retval[AllScopes]; // in this case it applies to all languages
+}
+
+/**
+ * Centralizes normalization of the `scope` argument accepted by scoped TCGC decorators. Decorator
+ * implementations should call this instead of independently handling both the legacy plain-string
+ * form and the typed `DecoratorOptions` bag form, so any future evolution of the accepted shapes only
+ * needs to be implemented in one place.
+ *
+ * @param scope Either the legacy plain-string scope value, or a typed options bag (whose own
+ * decorator-specific model may extend `DecoratorOptions`) containing a `scope` property.
+ * @returns The plain-string scope value, or `undefined` if none was specified.
+ */
+export function normalizeScope(scope?: LanguageScopes | DecoratorOptions): string | undefined {
+  if (scope === undefined) return undefined;
+  if (typeof scope === "string") return scope;
+  return scope.scope;
+}
+
+/**
+ * Whether a decorator's `scope` argument is one of the marshalled forms handled by
+ * {@link normalizeScope}: a legacy plain string, or a `valueof DecoratorOptions` value (a plain
+ * JavaScript object). Compiler entities - a string-literal type from a custom decorator that
+ * declares a type-level `scope` parameter, or any other `Type`/`Value` - carry a `kind`/`entityKind`
+ * discriminator and are excluded so they keep their normal `getDecoratorArgValue` conversion. Arrays
+ * are excluded as well: no scoped decorator declares an array-valued `scope`, and treating one as a
+ * marshalled bag would silently drop it to `undefined`.
+ */
+function isMarshalledScopeArg(value: unknown): value is LanguageScopes | DecoratorOptions {
+  if (typeof value === "string") return true;
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    !("kind" in value) &&
+    !("entityKind" in value)
+  );
 }
 
 /**
@@ -333,7 +373,29 @@ export function updateWithApiVersionInformation(
   clientDefaultValue?: string;
 } {
   const isApiVersionParam = isApiVersion(context, type);
-  if (!isApiVersionParam || !client) {
+  if (!isApiVersionParam) {
+    return { isApiVersionParam, clientDefaultValue: undefined };
+  }
+
+  let apiVersionOverride: string | undefined;
+  if (operation) {
+    let declaration: Operation | undefined = operation;
+    while (declaration && apiVersionOverride === undefined) {
+      apiVersionOverride = getEffectiveApiVersionOverride(context.program, declaration);
+      declaration = declaration.sourceOperation;
+    }
+  } else if (client) {
+    apiVersionOverride = getEffectiveApiVersionOverride(
+      context.program,
+      getActualClientType(client),
+    );
+  }
+
+  if (apiVersionOverride !== undefined) {
+    return { isApiVersionParam, clientDefaultValue: apiVersionOverride };
+  }
+
+  if (!client) {
     return { isApiVersionParam, clientDefaultValue: undefined };
   }
 
@@ -366,6 +428,16 @@ export function filterApiVersionsWithDecorators(
   type: Type,
   apiVersions: string[],
 ): string[] {
+  // The service namespace is only needed to resolve a per-service version map.
+  const isMultiService = context.getPackageVersions().size > 1;
+  const serviceNamespace =
+    typeof context.apiVersion === "object" ? getServiceNamespaceForType(context, type) : undefined;
+  const apiVersion = resolveApiVersionForService(context, serviceNamespace, isMultiService);
+  // index of the explicitly specified version in the list; -1 means latest / not found
+  const apiVersionIndex =
+    apiVersion === undefined || apiVersion === "latest" || apiVersion === "all"
+      ? -1
+      : apiVersions.indexOf(apiVersion);
   const addedOnVersions = getAddedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
   const removedOnVersions = getRemovedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
   let added: boolean = addedOnVersions.length ? false : true;
@@ -383,13 +455,8 @@ export function filterApiVersionsWithDecorators(
       removeCounter++;
     }
     if (added) {
-      // only add version smaller than config
-      if (
-        context.apiVersion === undefined ||
-        context.apiVersion === "latest" ||
-        context.apiVersion === "all" ||
-        apiVersions.indexOf(context.apiVersion) >= i
-      ) {
+      // only add version smaller than config (or all versions when no explicit version applies)
+      if (apiVersionIndex < 0 || apiVersionIndex >= i) {
         retval.push(version);
       }
     }
@@ -519,13 +586,35 @@ export function getTypeDecorators(
           arguments: {},
         };
         for (let i = 0; i < decorator.args.length; i++) {
-          decoratorInfo.arguments[decorator.definition.parameters[i].name] = diagnostics.pipe(
+          const parameterName = decorator.definition.parameters[i].name;
+          // The `scope` argument is emitter-selection metadata, not a client type. When it is
+          // provided in one of its marshalled forms - the legacy plain string or a typed options bag
+          // (`DecoratorOptions`) - store it as-is instead of running it through `getDecoratorArgValue`
+          // (which converts a bag to an SDK model and later crashes the string-only
+          // `isScopeApplicable` with `scope.match is not a function`). Keeping the raw value also
+          // preserves any additional `DecoratorOptions` fields the bag may carry in the future rather
+          // than collapsing it to just the scope string; the applicability filter below normalizes to
+          // the scope string only where a string is actually required.
+          //
+          // A custom decorator may instead declare a *type-level* `scope` parameter (e.g.
+          // `scope: string`), which surfaces here as a compiler string-literal type rather than a
+          // marshalled value. That must go through the normal `getDecoratorArgValue` conversion so
+          // its string value is preserved instead of being lost as `scope: undefined`.
+          if (parameterName === "scope" && isMarshalledScopeArg(decorator.args[i].jsValue)) {
+            decoratorInfo.arguments[parameterName] = decorator.args[i].jsValue;
+            continue;
+          }
+          decoratorInfo.arguments[parameterName] = diagnostics.pipe(
             getDecoratorArgValue(context, decorator.args[i].jsValue, type, decoratorName),
           );
         }
 
-        // Filter by scope - only include decorators that match the current emitter or have no scope
-        const scopeArg = decoratorInfo.arguments["scope"];
+        // Filter by scope - only include decorators that match the current emitter or have no scope.
+        // Normalize here so both the legacy string and the options-bag form resolve to the scope
+        // string that `isScopeApplicable` expects, without disturbing the full value stored above.
+        const scopeArg = normalizeScope(
+          decoratorInfo.arguments["scope"] as LanguageScopes | DecoratorOptions | undefined,
+        );
         if (scopeArg !== undefined && !isScopeApplicable(scopeArg, context.emitterName)) {
           // Skip this decorator if its scope is not applicable to the current emitter
           continue;
@@ -541,21 +630,16 @@ export function getTypeDecorators(
 function getDecoratorArgValue(
   context: TCGCContext,
   arg:
-    | Type
-    | Record<string, unknown>
-    | Value
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | Numeric
-    | null,
+    Type | Record<string, unknown> | Value | unknown[] | string | number | boolean | Numeric | null,
   type: Type,
   decoratorName: string,
 ): [any, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof arg === "object" && arg !== null && "kind" in arg) {
-    if (arg.kind === "EnumMember") {
+    if (
+      arg.kind === "EnumMember" ||
+      (arg.kind === "Model" && decoratorName === "Azure.ClientGenerator.Core.@clientOption")
+    ) {
       return diagnostics.wrap(diagnostics.pipe(getClientTypeWithDiagnostics(context, arg as any)));
     }
     if (
@@ -673,14 +757,13 @@ export function getHttpOperationResponseHeaders(
 export function removeVersionsLargerThanExplicitlySpecified(
   context: TCGCContext,
   versions: { value: string | number }[],
+  serviceNamespace: Namespace | undefined,
+  isMultiService: boolean,
 ): void {
   // filter with specific api version
-  if (
-    context.apiVersion !== undefined &&
-    context.apiVersion !== "latest" &&
-    context.apiVersion !== "all"
-  ) {
-    const index = versions.findIndex((version) => version.value === context.apiVersion);
+  const apiVersion = resolveApiVersionForService(context, serviceNamespace, isMultiService);
+  if (apiVersion !== undefined && apiVersion !== "latest" && apiVersion !== "all") {
+    const index = versions.findIndex((version) => version.value === apiVersion);
     if (index >= 0) {
       versions.splice(index + 1, versions.length - index - 1);
     }
@@ -691,9 +774,15 @@ export function filterPreviewVersion(
   context: TCGCContext,
   sdkVersionsEnum: SdkEnumType,
   defaultApiVersion: string,
+  serviceNamespace?: Namespace,
 ): void {
   // if they explicitly set an api version, remove larger versions
-  removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
+  removeVersionsLargerThanExplicitlySpecified(
+    context,
+    sdkVersionsEnum.values,
+    serviceNamespace,
+    context.getPackageVersions().size > 1,
+  );
   if (!context.previewStringRegex.test(defaultApiVersion)) {
     sdkVersionsEnum.values = sdkVersionsEnum.values.filter((v) => {
       if (typeof v.value !== "string") {
@@ -783,6 +872,22 @@ export function isOnClient(
     // if the type has explicitly been moved to the operation, it is not on the client
     return false;
   }
+  // When using @override, @clientLocation might be on the override operation's parameter
+  // rather than on the original operation's parameter. Check the override's corresponding
+  // parameter for @clientLocation targeting the override operation.
+  if (operation) {
+    const override = getOverriddenClientMethod(context, operation);
+    if (override) {
+      for (const [, overrideParam] of override.parameters.properties) {
+        if (
+          compareModelProperties(context.program, overrideParam, type) &&
+          getClientLocation(context, overrideParam) === override
+        ) {
+          return false;
+        }
+      }
+    }
+  }
   return (
     isSubscriptionId(context, type) ||
     (isApiVersion(context, type) && versioning) ||
@@ -820,7 +925,14 @@ export function getCorrespondingClientParam(
   const correspondingClientParam = clientParams?.find((x) =>
     twoParamsEquivalent(context, x.__raw, type),
   );
-  if (correspondingClientParam) return correspondingClientParam;
+  if (correspondingClientParam) {
+    // If the parameter is explicitly marked as not an API version parameter via @apiVersion(false),
+    // it should not be matched to a client API version parameter.
+    if (getIsApiVersion(context, type) === false && correspondingClientParam.isApiVersionParam) {
+      return undefined;
+    }
+    return correspondingClientParam;
+  }
   return undefined;
 }
 
@@ -921,16 +1033,15 @@ function getVersioningMutator(
 export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
 
-  // First consider explicit clients
+  // Compute the set of service namespaces the SDK targets. This runs before the
+  // client/operation cache (and thus context.getPackageVersions()) is available,
+  // so the set is derived directly from explicit `@client`s or `@service`s.
   const servicesNs = new Set<Namespace>();
   listScopedDecoratorData(context, clientKey).forEach((v, k) => {
-    // See all explicit clients that in TypeSpec program
     if (!unsafe_Realm.realmForType.has(k)) {
       (v as SdkClient).services.forEach((s) => servicesNs.add(s));
     }
   });
-
-  // Then see the original services
   if (servicesNs.size === 0) {
     listServices(context.program).map((v) => servicesNs.add(v.type));
   }
@@ -938,49 +1049,38 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   // No service, thus no versioning mutation needed
   if (servicesNs.size === 0) return globalNamespace;
 
-  // Multi services' client should not honor the specific api-version set in config
-  if (
-    servicesNs.size > 1 &&
-    context.apiVersion !== undefined &&
-    context.apiVersion !== "latest" &&
-    context.apiVersion !== "all"
-  ) {
-    context.apiVersion = undefined;
-  }
-
-  // Explicit all API version setting, thus no versioning mutation needed
-  if (context.apiVersion === "all") return globalNamespace;
+  const isMultiService = servicesNs.size > 1;
 
   // Compose service mutators
   const mutators: unsafe_MutatorWithNamespace[] = [];
 
   for (const serviceNs of servicesNs) {
-    const versions = getVersions(context.program, serviceNs)[1]?.getVersions();
-    // If the service has no versioning, no mutation needed
-    if (!versions || versions.length === 0) return globalNamespace;
+    // Resolve the api-version config that applies to this specific service.
+    const serviceApiVersion = resolveApiVersionForService(context, serviceNs, isMultiService);
 
-    // Single service needs to filter versions based on `apiVersion` config
-    if (servicesNs.size === 1) {
-      removeVersionsLargerThanExplicitlySpecified(context, versions);
-    }
+    // Explicit `all` setting for this service, keep all its versions (no mutation).
+    if (serviceApiVersion === "all") continue;
+
+    const versions = getVersions(context.program, serviceNs)[1]?.getVersions();
+    // If the service has no versioning, no mutation needed for it
+    if (!versions || versions.length === 0) continue;
+
+    // Filter versions based on the `apiVersion` config resolved for this service
+    removeVersionsLargerThanExplicitlySpecified(context, versions, serviceNs, isMultiService);
 
     const versionsValues = versions.map((v) => v.value);
 
-    // Fix apiVersion setting problem only if there's only one service
-    if (servicesNs.size === 1) {
-      if (
-        context.apiVersion !== undefined &&
-        context.apiVersion !== "latest" &&
-        context.apiVersion !== "all" &&
-        !versionsValues.includes(context.apiVersion)
-      ) {
-        reportDiagnostic(context.program, {
-          code: "api-version-undefined",
-          format: { version: context.apiVersion },
-          target: serviceNs,
-        });
-        context.apiVersion = versionsValues[versionsValues.length - 1];
-      }
+    // Report when the explicitly specified version does not exist; fall back to the latest
+    if (
+      serviceApiVersion !== undefined &&
+      serviceApiVersion !== "latest" &&
+      !versionsValues.includes(serviceApiVersion)
+    ) {
+      reportDiagnostic(context.program, {
+        code: "api-version-undefined",
+        format: { version: serviceApiVersion },
+        target: serviceNs,
+      });
     }
 
     // Get service mutator according to the version setting
@@ -997,6 +1097,91 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   compilerAssert(subgraph.realm !== null, "Should have a realm after mutation");
   context.__mutatedRealm = subgraph.realm;
   return subgraph.type;
+}
+
+/**
+ * Resolve the `api-version` config that applies to a specific service namespace.
+ *
+ * - When the option is a string: `latest` is a global keyword; any other string
+ *   (a specific version or `all`) applies only to the single service case and is
+ *   ignored for multi-service packages.
+ * - When the option is a map, the version is looked up first by the service
+ *   namespace's full name and then by traversing nested namespace segments.
+ *   Services that are not listed return `undefined` (meaning "use the latest
+ *   version").
+ *
+ * Multi-service packages do not support the special `all` value (in either the
+ * string or the record form); it is ignored and treated as `undefined` (use the
+ * latest version of each service).
+ *
+ * The returned value can be a specific version, the special values `latest` /
+ * `all`, or `undefined`.
+ */
+export function resolveApiVersionForService(
+  context: TCGCContext,
+  serviceNamespace: Namespace | undefined,
+  isMultiService: boolean,
+): string | undefined {
+  const config = context.apiVersion;
+  if (config === undefined) return undefined;
+  if (typeof config === "string") {
+    // `latest` is a global keyword that applies regardless of how many services
+    // the package targets.
+    if (config === "latest") return "latest";
+    // `all` and specific version strings only apply to the single service case;
+    // multi-service packages do not support `all`.
+    return isMultiService ? undefined : config;
+  }
+  // Map case: map each service namespace's full name or nested segments to a version.
+  if (serviceNamespace === undefined) return undefined;
+  const version = resolveApiVersionFromServiceMap(
+    config as ApiVersionServiceMap,
+    getNamespaceFullName(serviceNamespace),
+  );
+  // Multi-service packages do not support `all`; fall back to the latest version.
+  if (version === "all" && isMultiService) return undefined;
+  return version;
+}
+
+function resolveApiVersionFromServiceMap(
+  config: ApiVersionServiceMap,
+  namespaceName: string,
+): string | undefined {
+  const flatVersion = config[namespaceName];
+  if (typeof flatVersion === "string") return flatVersion;
+
+  let current: string | ApiVersionServiceMap | undefined = config;
+  for (const segment of namespaceName.split(".")) {
+    if (typeof current !== "object" || current === null || Array.isArray(current)) {
+      return undefined;
+    }
+    current = current[segment];
+  }
+  return typeof current === "string" ? current : undefined;
+}
+
+/**
+ * Find the service namespace that owns the given type. Starts from the type's
+ * versioned namespace and walks up the enclosing namespaces until it reaches a
+ * known service namespace. Returns `undefined` if none is found.
+ *
+ * Must only be called after the client/operation cache is prepared, since the
+ * service namespaces are read from `context.getPackageVersions()`.
+ */
+function getServiceNamespaceForType(
+  context: TCGCContext,
+  type: Type | undefined,
+): Namespace | undefined {
+  if (type === undefined) return undefined;
+  const services = context.getPackageVersions();
+  if (services.size === 0) return undefined;
+
+  let current: Namespace | undefined = getVersions(context.program, type)[0];
+  while (current) {
+    if (services.has(current)) return current;
+    current = current.namespace;
+  }
+  return undefined;
 }
 
 export function resolveDuplicateGenearatedName(
@@ -1221,19 +1406,19 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
       }
       switch (leftScheme.type) {
         case "http":
-          assert(rightScheme.type === "http");
+          compilerAssert(rightScheme.type === "http", "Unexpected auth scheme type mismatch");
           if (leftScheme.scheme !== rightScheme.scheme) {
             return false;
           }
           break;
         case "apiKey":
-          assert(rightScheme.type === "apiKey");
+          compilerAssert(rightScheme.type === "apiKey", "Unexpected auth scheme type mismatch");
           if (leftScheme.name !== rightScheme.name || leftScheme.in !== rightScheme.in) {
             return false;
           }
           break;
         case "oauth2":
-          assert(rightScheme.type === "oauth2");
+          compilerAssert(rightScheme.type === "oauth2", "Unexpected auth scheme type mismatch");
           if (leftScheme.flows.length !== rightScheme.flows.length) {
             return false;
           }
@@ -1253,7 +1438,10 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
             }
             switch (leftFlow.type) {
               case "authorizationCode":
-                assert(rightFlow.type === "authorizationCode");
+                compilerAssert(
+                  rightFlow.type === "authorizationCode",
+                  "Unexpected auth scheme type mismatch",
+                );
                 if (
                   leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
                   leftFlow.tokenUrl !== rightFlow.tokenUrl ||
@@ -1263,7 +1451,10 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
                 }
                 break;
               case "clientCredentials":
-                assert(rightFlow.type === "clientCredentials");
+                compilerAssert(
+                  rightFlow.type === "clientCredentials",
+                  "Unexpected auth scheme type mismatch",
+                );
                 if (
                   leftFlow.tokenUrl !== rightFlow.tokenUrl ||
                   leftFlow.refreshUrl !== rightFlow.refreshUrl
@@ -1272,7 +1463,10 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
                 }
                 break;
               case "implicit":
-                assert(rightFlow.type === "implicit");
+                compilerAssert(
+                  rightFlow.type === "implicit",
+                  "Unexpected auth scheme type mismatch",
+                );
                 if (
                   leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
                   leftFlow.refreshUrl !== rightFlow.refreshUrl
@@ -1281,7 +1475,10 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
                 }
                 break;
               case "password":
-                assert(rightFlow.type === "password");
+                compilerAssert(
+                  rightFlow.type === "password",
+                  "Unexpected auth scheme type mismatch",
+                );
                 if (
                   leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
                   leftFlow.refreshUrl !== rightFlow.refreshUrl
@@ -1293,7 +1490,10 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
           }
           break;
         case "openIdConnect":
-          assert(rightScheme.type === "openIdConnect");
+          compilerAssert(
+            rightScheme.type === "openIdConnect",
+            "Unexpected auth scheme type mismatch",
+          );
           if (leftScheme.openIdConnectUrl !== rightScheme.openIdConnectUrl) {
             return false;
           }
@@ -1313,35 +1513,75 @@ export function isTypeNeedsHandling(context: TCGCContext, type: Type): boolean {
 
 export function listOrphanTypes(context: TCGCContext): (Model | Enum | Union)[] {
   if (context.__orphanTypesCache) return context.__orphanTypesCache;
-  const result: (Model | Enum | Union)[] = [];
-  const userDefinedNamespaces = listAllUserDefinedNamespaces(context);
-  for (const currNamespace of userDefinedNamespaces) {
-    const namespaces = [currNamespace];
+  const seen = new Set<Model | Enum | Union>();
+
+  // Collect types into separate buckets to maintain a stable ordering:
+  // models first, then enums, then unions. This ordering matters because
+  // anonymous types (e.g. anonymous model variants inside unions) get their
+  // generated name from the first context that processes them. Models must
+  // come first so their property-context names win over union-context names.
+  const models: Model[] = [];
+  const enums: Enum[] = [];
+  const unions: Union[] = [];
+
+  function addType(type: Model | Enum | Union) {
+    if (seen.has(type)) return;
+    if ((type.kind === "Model" || type.kind === "Union") && isTemplateDeclaration(type)) return;
+    if (!isTypeNeedsHandling(context, type)) return;
+    seen.add(type);
+    if (type.kind === "Model") models.push(type);
+    else if (type.kind === "Enum") enums.push(type);
+    else unions.push(type);
+  }
+
+  function addNamespace(namespace: Namespace) {
+    const namespaces = [namespace];
     let currentIndex = 0;
     while (currentIndex < namespaces.length) {
-      const namespace = namespaces[currentIndex];
-      // orphan models
-      for (const model of namespace.models.values()) {
-        if (isTemplateDeclaration(model)) continue;
-        if (!getUsageOverride(context, model) && !getLegacyHierarchyBuilding(context, model))
-          continue;
-        result.push(model);
+      const ns = namespaces[currentIndex];
+      for (const model of ns.models.values()) {
+        addType(model);
       }
-      // orphan enums
-      for (const enumType of namespace.enums.values()) {
-        if (!getUsageOverride(context, enumType)) continue;
-        result.push(enumType);
+      for (const enumType of ns.enums.values()) {
+        addType(enumType);
       }
-      // orphan unions
-      for (const unionType of namespace.unions.values()) {
-        if (isTemplateDeclaration(unionType)) continue;
-        if (!getUsageOverride(context, unionType)) continue;
-        result.push(unionType);
+      for (const unionType of ns.unions.values()) {
+        addType(unionType);
       }
-      namespaces.push(...namespace.namespaces.values());
+      namespaces.push(...ns.namespaces.values());
       currentIndex++;
     }
   }
+
+  // Iterate all types/namespaces with an explicit @usage decorator. This covers
+  // models, enums, and unions defined anywhere (including imported libraries),
+  // not only those declared inside user-defined namespaces.
+  for (const [type] of listScopedDecoratorData(context, usageKey)) {
+    if (type.kind === "Namespace") {
+      // @@usage applied to a namespace propagates to its member types,
+      // recursively descending into sub-namespaces.
+      addNamespace(type);
+    } else if (type.kind === "Model" || type.kind === "Enum" || type.kind === "Union") {
+      addType(type);
+    }
+  }
+
+  // Iterate all models with an explicit @hierarchyBuilding decorator (only
+  // honored when legacy hierarchy building is enabled).
+  if (context.enableLegacyHierarchyBuilding) {
+    for (const [type] of listScopedDecoratorData(context, legacyHierarchyBuildingKey)) {
+      if (type.kind === "Model") {
+        addType(type);
+      }
+    }
+  }
+
+  const result: (Model | Enum | Union)[] = [...models, ...enums, ...unions];
   context.__orphanTypesCache = result;
   return result;
 }
+
+/**
+ * Prefix used to mark a client name as exact.
+ */
+export const EXACT_NAME_PREFIX = "_exact_:";

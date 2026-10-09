@@ -38,7 +38,13 @@ foo = Foo(prop="hello")
 <ClientTabItem lang="csharp" >
 
 ```csharp
-// TODO
+namespace Service
+{
+  public partial class Foo
+  {
+    public string Prop { get; }
+  }
+}
 ```
 
 </ClientTabItem>
@@ -107,7 +113,13 @@ foo = Foo(prop="hello")
 <ClientTabItem lang="csharp" >
 
 ```csharp
-// TODO
+namespace Service.Container
+{
+  public partial class Foo
+  {
+    public string Prop { get; }
+  }
+}
 ```
 
 </ClientTabItem>
@@ -177,7 +189,13 @@ foo = Foo(prop="hello")
 <ClientTabItem lang="csharp" >
 
 ```csharp
-// TODO
+namespace Service.Container
+{
+  public partial class Foo
+  {
+    public string Prop { get; }
+  }
+}
 ```
 
 </ClientTabItem>
@@ -505,6 +523,10 @@ The `@clientDefaultValue` decorator is legacy functionality that should **only**
 :::
 
 The `@Azure.ClientGenerator.Core.Legacy.clientDefaultValue` decorator allows you to set a client-level default value for a model property or operation parameter. This is primarily intended for maintaining backward compatibility with existing SDK users who may rely on default values that were previously generated from Swagger definitions.
+
+:::note
+The default value type must match the type of the property or parameter it is applied to. If it does not, TCGC emits the `client-default-value-type-mismatch` warning. When `@alternateType` is present, the default value is validated against the alternate type instead — so you can use `@alternateType` to make an otherwise-mismatched default valid. If the mismatch is intentional, suppress the diagnostic with `#suppress "@azure-tools/typespec-client-generator-core/client-default-value-type-mismatch"`; the mismatched value is still applied to the generated SDKs.
+:::
 
 ### Model Property Default Values
 
@@ -1085,7 +1107,13 @@ public final class Animal implements JsonSerializable<Animal> {
 <ClientTabItem lang="go" >
 
 ```go
-// NOT_SUPPORTED
+type Animal struct {
+    // REQUIRED
+    Kind *string
+    // REQUIRED
+    Name                 *string
+    AdditionalProperties map[string]*string
+}
 ```
 
 </ClientTabItem>
@@ -1333,7 +1361,28 @@ class Foo(_model_base.Model):
 </ClientTabItem>
 <ClientTabItem lang="csharp" >
 
-TODO
+```csharp
+namespace TestService
+{
+  public partial class Foo
+  {
+    public string BasicNullableProperty { get; }
+    public Bar ModelNullableProperty { get; }
+    public LR? EnumNullableProperty { get; }
+  }
+
+  public partial class Bar
+  {
+    public string Prop { get; }
+  }
+
+  public enum LR
+  {
+    Left,
+    Right
+  }
+}
+```
 
 </ClientTabItem>
 <ClientTabItem lang="typescript" >
@@ -1353,7 +1402,23 @@ export type LR = "left" | "right";
 </ClientTabItem>
 <ClientTabItem lang="java" >
 
-TODO
+```java
+// All Java reference type is nullable.
+public final class Foo implements JsonSerializable<Foo> {
+    public String getBasicNullableProperty();
+    public Bar getModelNullableProperty();
+    public LR getEnumNullableProperty();
+}
+
+public final class Bar implements JsonSerializable<Bar> {
+    public String getProp();
+}
+
+public enum LR {
+    LEFT("left"),
+    RIGHT("right");
+}
+```
 
 </ClientTabItem>
 <ClientTabItem lang="go" >
@@ -2591,10 +2656,21 @@ serialized_prop = json.dumps(prop, cls=SdkJSONEncoder, format="string")
 <ClientTabItem lang="csharp" >
 
 ```csharp
-TODO
+// The property is exposed as `long`; serialization writes it as a JSON string.
+namespace TestService
+{
+  public partial class Test
+  {
+    public long Prop { get; }
+  }
+}
+
+// Internal implementation
+writer.WriteStringValue(Prop.ToString());
 ```
 
 </ClientTabItem>
+
 <ClientTabItem lang="typescript" >
 
 ```typescript
@@ -2623,8 +2699,20 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 
 </ClientTabItem>
 <ClientTabItem lang="go" >
+
 ```go
-// NOT_SUPPORTED
+type Test struct {
+    // REQUIRED
+    Prop *int64
+}
+
+// Custom MarshalJSON converts int64 to a JSON string.
+func (t Test) MarshalJSON() ([]byte, error) {
+    objectMap := make(map[string]any)
+    populate(objectMap, "prop", to.Ptr(strconv.FormatInt(*t.Prop, 10)))
+    return json.Marshal(objectMap)
+}
 ```
+
 </ClientTabItem>
 </ClientTabs>

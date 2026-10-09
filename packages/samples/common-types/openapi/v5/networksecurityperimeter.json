@@ -17,7 +17,8 @@
           "description": "Name of the access rule"
         },
         "properties": {
-          "$ref": "#/definitions/AccessRuleProperties"
+          "$ref": "#/definitions/AccessRuleProperties",
+          "description": "Properties of the access rule"
         }
       }
     },
@@ -50,7 +51,8 @@
       "description": "Properties of Access Rule",
       "properties": {
         "direction": {
-          "$ref": "#/definitions/AccessRuleDirection"
+          "$ref": "#/definitions/AccessRuleDirection",
+          "description": "Direction of the access rule"
         },
         "addressPrefixes": {
           "type": "array",
@@ -175,7 +177,8 @@
       "description": "Network security perimeter (NSP) configuration resource",
       "properties": {
         "properties": {
-          "$ref": "#/definitions/NetworkSecurityPerimeterConfigurationProperties"
+          "$ref": "#/definitions/NetworkSecurityPerimeterConfigurationProperties",
+          "description": "Network security configuration properties."
         }
       },
       "allOf": [
@@ -208,6 +211,7 @@
       "properties": {
         "provisioningState": {
           "$ref": "#/definitions/NetworkSecurityPerimeterConfigurationProvisioningState",
+          "description": "Provisioning state of the network security perimeter configuration",
           "readOnly": true
         },
         "provisioningIssues": {
@@ -220,13 +224,16 @@
           "x-ms-identifiers": []
         },
         "networkSecurityPerimeter": {
-          "$ref": "#/definitions/NetworkSecurityPerimeter"
+          "$ref": "#/definitions/NetworkSecurityPerimeter",
+          "description": "Information about the network security perimeter (NSP)"
         },
         "resourceAssociation": {
-          "$ref": "#/definitions/ResourceAssociation"
+          "$ref": "#/definitions/ResourceAssociation",
+          "description": "Information about the resource association"
         },
         "profile": {
-          "$ref": "#/definitions/NetworkSecurityProfile"
+          "$ref": "#/definitions/NetworkSecurityProfile",
+          "description": "Network security perimeter configuration profile"
         }
       }
     },
@@ -248,31 +255,38 @@
         "values": [
           {
             "name": "Succeeded",
-            "value": "Succeeded"
+            "value": "Succeeded",
+            "description": "The configuration was provisioned successfully."
           },
           {
             "name": "Creating",
-            "value": "Creating"
+            "value": "Creating",
+            "description": "The configuration is being created."
           },
           {
             "name": "Updating",
-            "value": "Updating"
+            "value": "Updating",
+            "description": "The configuration is being updated."
           },
           {
             "name": "Deleting",
-            "value": "Deleting"
+            "value": "Deleting",
+            "description": "The configuration is being deleted."
           },
           {
             "name": "Accepted",
-            "value": "Accepted"
+            "value": "Accepted",
+            "description": "The configuration request was accepted and provisioning has not started yet."
           },
           {
             "name": "Failed",
-            "value": "Failed"
+            "value": "Failed",
+            "description": "The configuration failed to provision."
           },
           {
             "name": "Canceled",
-            "value": "Canceled"
+            "value": "Canceled",
+            "description": "The configuration provisioning was canceled."
           }
         ]
       }
@@ -325,6 +339,7 @@
         },
         "properties": {
           "$ref": "#/definitions/ProvisioningIssueProperties",
+          "description": "Details of the provisioning issue",
           "readOnly": true
         }
       }
@@ -408,7 +423,8 @@
           "description": "Name of the resource association"
         },
         "accessMode": {
-          "$ref": "#/definitions/ResourceAssociationAccessMode"
+          "$ref": "#/definitions/ResourceAssociationAccessMode",
+          "description": "Access mode of the resource association"
         }
       }
     },
@@ -455,11 +471,13 @@
         "values": [
           {
             "name": "Warning",
-            "value": "Warning"
+            "value": "Warning",
+            "description": "The issue is a warning and does not prevent the configuration from being applied."
           },
           {
             "name": "Error",
-            "value": "Error"
+            "value": "Error",
+            "description": "The issue is an error and prevents the configuration from being applied."
           }
         ]
       }

@@ -5,24 +5,41 @@ title: x-ms-examples example files
 import { FileTree } from "@astrojs/starlight/components";
 
 The `x-ms-examples` is automatically populated in the generated OpenAPI 2.0 when using the `typespec-autorest` emitter.
-The examples must be placed in the `examples-directory` (default to `{project-root}/examples`) and have the `operationdId` property.
+If you use the `skip-example-copying` in typespec-autorest configuration as suggested below, examples will automatically be picked up from the examples directory adjacent to the spec. If you do not use this option, the examples must be placed in the `examples-dir` directory (default `{project-root}/examples`). Examples must all have the `operationId` property, allowing each example to be matched with the appropriate operation.
 
 :::caution
 Do not use `@extension("x-ms-examples", "<value>")`.
 :::
 
+## Recommended configuration
+
+We recommend using `skip-example-copying` together with an `examples-dir` that places examples under the versioned output folder. This keeps example files co-located with the generated swagger and avoids copying files during compilation.
+
+```yaml
+options:
+  "@azure-tools/typespec-autorest":
+    emitter-output-dir: "{project-root}"
+    output-file: "{emitter-output-dir}/{version-status}/{version}/openapi.json"
+    examples-dir: "{emitter-output-dir}/{version-status}/{version}/examples"
+    skip-example-copying: true
+```
+
+With this configuration, example files live alongside the generated swagger at `{version-status}/{version}/examples/` and are referenced via relative paths (e.g., `examples/getPet.json`).
+
 ## Example structure
 
-Example below assume `example-directory` is `{project-root}/examples`.
-
-- Single version structure
+- Single version structure (versioned API with examples co-located in output)
 
 {/* prettier-ignore */}
 <FileTree>
 - main.tsp
-- examples/
-  - example1.json
-  - example2.json
+- tspconfig.yaml
+- stable/
+  - 2021-01-01/
+    - openapi.json
+    - examples/
+      - example1.json
+      - example2.json
 </FileTree>
 
 - Multi version structure
@@ -30,13 +47,18 @@ Example below assume `example-directory` is `{project-root}/examples`.
 {/* prettier-ignore */}
 <FileTree>
 - main.tsp
-- examples/
+- tspconfig.yaml
+- stable/
   - 2021-01-01/
-    - example1.json
-    - example2.json
+    - openapi.json
+    - examples/
+      - example1.json
+      - example2.json
   - 2021-01-02/
-    - example1.json
-    - example2.json
+    - openapi.json
+    - examples/
+      - example1.json
+      - example2.json
 </FileTree>
 
 ## Generate the examples
@@ -54,6 +76,6 @@ Note, latest OAV tool should automatically generate the following. However, if y
 - include `title` field and make sure it is descriptive and unique for each operation.
 - include `operationId`. This is used to match with declared operations in TypeSpec and correctly output in swagger.
 
-:::caution
-The examples are now in the examples directory relative to the output openapi.json. You must now copy them to the examples directory in the project root. The typespec-autorest emitter will then copy them back to the correct location when generating the OpenAPI 2.0.
+:::note
+When using `skip-example-copying: true` with `examples-dir` set to the versioned output folder, `oav generate-examples` will generate examples in the correct location alongside the swagger output. No additional file moves are needed.
 :::

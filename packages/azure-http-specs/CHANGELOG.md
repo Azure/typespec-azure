@@ -1,5 +1,80 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.46
+
+### Features
+
+- [#5513](https://github.com/Azure/typespec-azure/pull/5513) Customize the existing alternate-type scenarios for C# by mapping `Geometry` to `Azure.Core.GeoJson.GeoPoint` from `Azure.Core` 1.61.0 or later instead of the invalid Feature mapping. Preserve all existing scenarios and payloads.
+- [#5176](https://github.com/Azure/typespec-azure/pull/5176) Add an Azure HTTP scenario verifying that @Azure.Core.Legacy.overrideApiVersion supplies the default API-version query value for a child client.
+
+### Bug Fixes
+
+- [#5517](https://github.com/Azure/typespec-azure/pull/5517) Update the ARM multi-service and multi-service shared-model scenarios to use modern ARM common types so resource IDs project as `armResourceIdentifier`.
+- [#5471](https://github.com/Azure/typespec-azure/pull/5471) Add Spector coverage for client response replacement.
+
+
+## 0.1.0-alpha.45
+
+### Bug Fixes
+
+- [#5214](https://github.com/Azure/typespec-azure/pull/5214) Add the missing nextLink decorator to the ARM operation template paging scenario.
+
+
+## 0.1.0-alpha.44
+
+### Features
+
+- [#4959](https://github.com/Azure/typespec-azure/pull/4959) Add e2e scenario for `@clientApiVersions` decorator to verify clients can send api-version from an extended client enum.
+- [#4891](https://github.com/Azure/typespec-azure/pull/4891) Add built-in support for Azure service groups as extension resource targets and ARM resource identifier scopes.
+- [#4632](https://github.com/Azure/typespec-azure/pull/4632) Add tests for ARM `getLro`, `postActionPaging`, `markAsPageable`, `postPagingLroWithBody`, `routedGet`, and `createOrReplaceOptionalBody`
+
+### Bug Fixes
+
+- [#4981](https://github.com/Azure/typespec-azure/pull/4981) Fix `ResponseAsBool_HeadAsBoolean` scenario coverage always failing. Split it into two scenarios (`exists` and `notExists`) so the intentional `404` response of `notExists` is validated with `passOnCode(404)` instead of `passOnSuccess` (which requires all endpoints to return 2xx). Endpoint paths are unchanged.
+- [#4991](https://github.com/Azure/typespec-azure/pull/4991) Fix the `postPagingLroWithBody` ARM scenario to declare the LRO final result (`ArmLroLocationHeader<FinalResult = ProductListResult>`) so the accepted response's `location` header points at the paged result type.
+
+
+## 0.1.0-alpha.43
+
+### Bump dependencies
+
+- Republish aligned with the TypeSpec `1.14.0` / TypeSpec Azure `0.70.0` release. Peer dependencies now resolve to `@azure-tools/typespec-azure-core@^0.70.0`, `@typespec/compiler@^1.14.0`, `@typespec/http@^1.14.0`, `@typespec/rest@^0.84.0`, `@typespec/versioning@^0.84.0`, and `@typespec/xml@^0.84.0`, so downstream emitters (e.g. `@typespec/http-client-python`) can install against the `0.70.0` line.
+
+## 0.1.0-alpha.42
+
+### Features
+
+- [#4535](https://github.com/Azure/typespec-azure/pull/4535) Add ARM spector test scenario for ArmResourceDeploymentScope (armResourceIdentifier with scopes)
+- [#4543](https://github.com/Azure/typespec-azure/pull/4543) Add ARM spector test scenario for management group scoped resources
+
+
+## 0.1.0-alpha.41
+
+### Features
+
+- [#4493](https://github.com/Azure/typespec-azure/pull/4493) Add Spector scenario for `@usage` applied to a namespace, demonstrating recursive propagation to nested models.
+- [#4577](https://github.com/Azure/typespec-azure/pull/4577) add test for `exact` enum member names
+- [#4430](https://github.com/Azure/typespec-azure/pull/4430) Add Spector spec for the `exact()` function used with `@clientName` to preserve exact naming without casing transformations.
+
+
+## 0.1.0-alpha.40
+
+### Features
+
+- [#4323](https://github.com/Azure/typespec-azure/pull/4323) Add `@clientName` csharp-scoped renames for the nested sub-clients of `IndividuallyParentClient` in the `client-initialization/individually-parent` spec. The original names (e.g. `IndividuallyParentNestedWithParamAliasClient`) combined with the deeply-nested test project path produced generated file paths exceeding the 260-character Windows path limit in downstream csharp emitters.
+- [#4298](https://github.com/Azure/typespec-azure/pull/4298) Add `@clientName` C#-scoped renames for `Operations` and `SubNamespace` in the multiple-services spec to avoid name collisions in C# codegen.
+- [#4221](https://github.com/Azure/typespec-azure/pull/4221) Add `@clientName` Java-scoped renames for `Operations` and `SubNamespace` in the multiple-services spec to avoid name collisions in Java codegen.
+- [#4328](https://github.com/Azure/typespec-azure/pull/4328) Add Python client namespace to response-as-bool spec
+- [#4336](https://github.com/Azure/typespec-azure/pull/4336) Add test for etags with `Azure.Core.eTag` definition and non-standard wire names
+- [#4268](https://github.com/Azure/typespec-azure/pull/4268) Add Spector specs for @responseAsBool and @clientDoc decorators
+
+### Bug Fixes
+
+- [#4339](https://github.com/Azure/typespec-azure/pull/4339) Fix client customization warning.
+- [#4220](https://github.com/Azure/typespec-azure/pull/4220) Remove "!javascript" scope from @@override for GroupParameters.group
+- [#4300](https://github.com/Azure/typespec-azure/pull/4300) Fix client-default-value mock to always include client defaults in putModelProperty request body
+
+
 ## 0.1.0-alpha.39
 
 ### Breaking Changes

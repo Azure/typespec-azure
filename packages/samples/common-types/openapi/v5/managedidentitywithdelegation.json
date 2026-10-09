@@ -41,7 +41,8 @@
       "description": "Managed service identity (system assigned and/or user assigned identities and/or delegated identities) - internal use only.",
       "properties": {
         "delegatedResources": {
-          "$ref": "#/definitions/DelegatedResources"
+          "$ref": "#/definitions/DelegatedResources",
+          "description": "The delegated resources of the identity - internal use only."
         }
       },
       "allOf": [

@@ -140,29 +140,37 @@ alias TenantParentScope<Resource extends Foundations.SimpleResource> = TenantSco
  * Parameter model for listing a resource at the tenant scope
  * @template Resource The type of the resource.
  */
-model TenantScope<Resource extends Foundations.SimpleResource>
-  is ResourceParentParameters<Resource, TenantBaseParameters>;
+model TenantScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  TenantBaseParameters
+>;
 
 /**
  * Parameter model for listing a resource at the subscription scope
  * @template Resource The type of the resource.
  */
-model SubscriptionScope<Resource extends Foundations.SimpleResource>
-  is ResourceParentParameters<Resource, SubscriptionBaseParameters>;
+model SubscriptionScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  SubscriptionBaseParameters
+>;
 
 /**
  * Parameter model for listing a resource at the location scope
  * @template Resource The type of the resource.
  */
-model LocationScope<Resource extends Foundations.SimpleResource>
-  is ResourceParentParameters<Resource, LocationBaseParameters>;
+model LocationScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  LocationBaseParameters
+>;
 
 /**
  * Parameter model for listing an extension resource
  * @template Resource The type of the resource.
  */
-model ExtensionScope<Resource extends Foundations.SimpleResource>
-  is ResourceParentParameters<Resource, ExtensionBaseParameters>;
+model ExtensionScope<Resource extends Foundations.SimpleResource> is ResourceParentParameters<
+  Resource,
+  ExtensionBaseParameters
+>;
 
 /**
  * Parameter model for listing a resource at the resource group scope
@@ -182,6 +190,7 @@ model ProxyResourceUpdateModel<
   Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model
 > {
+  /** The resource-specific properties for this resource. */
   properties?: ResourceUpdateModelProperties<Resource, Properties>;
 }
 
@@ -240,40 +249,41 @@ op checkNameAvailability<
 ): Response | ErrorResponse;
 
 /**
- * @dev The base template for Azure Resource Manager GET and HEAD Operations.
+ * The base template for Azure Resource Manager GET and HEAD Operations.
  * @template Parameters The parameter object for the operation.
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
  */
+@doc("")
 op ArmReadOperation<Parameters extends {}, Response extends {}, ErrorResponse extends {}>(
   ...Parameters,
 ): Response | ErrorResponse;
 
 /**
- * @dev The base template for Azure Resource Manager PUT Operations.
+ * The base template for Azure Resource Manager PUT Operations.
  * @template HttpParameters The parameter object for the operation.
  * @template BodyParameter The body parameter
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
  */
+@doc("")
 op ArmCreateOperation<
   HttpParameters extends {},
   BodyParameter extends {},
   Response extends {},
   ErrorResponse extends {}
->(
-  ...HttpParameters,
-  @doc("Resource create parameters.") @bodyRoot resource: BodyParameter,
-): Response | ErrorResponse;
+>(...HttpParameters, @doc("Resource create parameters.") @bodyRoot resource: BodyParameter):
+  | Response
+  | ErrorResponse;
 
 /**
- * @dev The base template for Azure Resource Manager PATCH Operations.
+ * The base template for Azure Resource Manager PATCH Operations.
  * @template HttpParameters The parameter object for the operation.
  * @template BodyParameter The body parameter
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
- * @template RequestBody Optional. ENables changing the name, documentation, or optionality of the request body parameter
  */
+@doc("")
 op ArmUpdateOperation<
   HttpParameters extends {},
   BodyParameter extends {},

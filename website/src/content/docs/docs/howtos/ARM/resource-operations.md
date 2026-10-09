@@ -147,6 +147,14 @@ resource type and your custom PATCH request type as parameters, giving you full 
 PATCH schema. The `ArmTagsPatch*` templates take the resource type as a parameter and only allow
 updating ARM tags.
 
+> **Note:** The `ArmTagsPatch*` and `ArmResourcePatch*` templates use implicit optionality, which
+> requires a suppression at the usage site:
+>
+> ```tsp
+> #suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"
+> update is ArmTagsPatchSync<ResourceType>;
+> ```
+
 > **Note:** The `ArmResourcePatch*` templates are **not recommended**. They rely on Lifecycle.Update
 > visibility analysis to automatically determine which properties are included in the PATCH schema,
 > but this analysis is only performed by the typespec-autorest emitter and will not be replicated in
@@ -191,6 +199,22 @@ Arm Resource list operations return a list of Tracked or Proxy Resources at a pa
 The `ArmListBySubscriptionScope` template is used for listing a resource directly at the subscription
 scope, generating a flat subscription-level path regardless of the resource's parent hierarchy.
 Use this instead of `ArmListBySubscription` when you need a subscription-level list operation for a child resource.
+
+#### Adding standard `$top`, `$filter`, and `$skip` query parameters
+
+Pass ARM's standard list query parameters through the `Parameters` template argument instead of
+defining custom `@query("$top")`, `@query("$filter")`, or `@query("$skip")` properties yourself.
+Compose the reusable ARM parameter models for the options your operation supports.
+
+```typespec
+@armResourceOperations
+interface Employees {
+  listBySubscription is ArmListBySubscription<
+    Employee,
+    Parameters = ArmTopParameter & ArmFilterParameter & ArmSkipParameter
+  >;
+}
+```
 
 The `ArmResourceListAtScope` template is used when the scope of the list operation is determined by
 the `BaseParameters` type parameter. This is useful for resources with custom scope requirements
@@ -367,9 +391,10 @@ building blocks.
 op ArmResourceListActionAsync<
   TResource extends Foundations.SimpleResource,
   TResponse extends object
->(
-  ...ResourceInstanceParameters<TResource>,
-): ArmResponse<TResponse> | ArmAcceptedResponse | ErrorResponse;
+>(...ResourceInstanceParameters<TResource>):
+  | ArmResponse<TResponse>
+  | ArmAcceptedResponse
+  | ErrorResponse;
 
 // Usage
 
@@ -390,6 +415,13 @@ interface MyResourceOperations {
 ARM long-running operations (LROs) use operation status endpoints to allow clients to poll for the
 status of an async operation. The `GetResourceOperationStatus` operation template provides a
 standard way to expose these endpoints, and `ArmOperationStatus` provides the response model.
+
+:::note
+These templates can represent existing ARM operation-status endpoints. Use them when they
+reproduce the existing wire contract; otherwise, preserve the contract with an explicit status
+model. ARM's complete LRO polling flow, particularly `Azure-AsyncOperation`, is not yet
+standardized enough for this to be blanket guidance for new APIs.
+:::
 
 ### ArmOperationStatus
 
@@ -445,6 +477,13 @@ interface OperationStatuses {
 ### Custom response properties
 
 To add custom properties to the operation status response, use the `ArmOperationStatus` template:
+
+:::caution
+`ArmOperationStatus<Properties>` is not a literal drop-in for every converted custom model. If your
+existing operation-status payload has extra top-level members (for example `operations` or
+`resourceId`) or different wire semantics, keep or author an explicit status model that matches the
+existing contract.
+:::
 
 ```typespec
 model WidgetOperationStatus is ArmOperationStatus<WidgetOperationStatusProperties>;

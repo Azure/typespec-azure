@@ -11,7 +11,7 @@ const argv = parseArgs({
 
 if (argv.values.help) {
   console.log(`
-${pc.bold("Usage:")} tsx lint.ts [options]
+${pc.bold("Usage:")} node lint.ts [options]
 
 ${pc.bold("Description:")}
   Run extra linting checks beyond what tox provides.

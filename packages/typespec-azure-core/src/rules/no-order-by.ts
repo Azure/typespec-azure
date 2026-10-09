@@ -1,4 +1,4 @@
-import { Operation, createRule } from "@typespec/compiler";
+import { type Operation, createRule } from "@typespec/compiler";
 import { getResourceOperation } from "@typespec/rest";
 import { isExcludedCoreType } from "./utils.js";
 

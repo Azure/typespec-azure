@@ -1,17 +1,19 @@
 import {
-  DiagnosticTarget,
-  ModelProperty,
-  Operation,
-  Program,
-  Scalar,
-  Type,
-  UnionVariant,
+  type DiagnosticTarget,
+  type ModelProperty,
+  type Operation,
+  type Program,
+  type Scalar,
+  type Type,
+  type UnionVariant,
   createRule,
+  fileRef,
 } from "@typespec/compiler";
 import { isExcludedCoreType } from "./utils.js";
 
 export const noOffsetDateTimeRule = createRule({
   name: "no-offsetdatetime",
+  docs: fileRef.fromPackageRoot("src/rules/no-offsetdatetime.md"),
   description:
     "Prefer using `utcDateTime` when representing a datetime unless an offset is necessary.",
   severity: "warning",

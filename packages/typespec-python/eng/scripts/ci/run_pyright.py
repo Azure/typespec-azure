@@ -13,7 +13,7 @@ from subprocess import check_output, CalledProcessError
 import logging
 import sys
 import time
-from util import run_check
+from util import run_check, get_package_namespace_dir
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -27,51 +27,39 @@ def get_pyright_config_file_location():
     return os.path.join(os.path.dirname(__file__), "config/pyrightconfig.json")
 
 
-def _has_python_files(directory):
-    """Check if a directory contains any .py files recursively."""
-    return any(directory.rglob("*.py"))
-
-
 def _single_dir_pyright(mod):
-    try:
-        inner_class = next(
-            (d for d in mod.iterdir() if d.is_dir() and d.name not in ("build", "generated_tests", "specs", "generated_samples") and not str(d).endswith("egg-info") and _has_python_files(d)),
-            None
-        )
-        if inner_class is None:
-            logging.warning("No valid source directory found in %s, skipping", mod)
-            return True
-        retries = 3
-        while retries:
-            try:
-                # After fully support client hierarchy, we can remove this check
-                if "azure-client-generator-core-client-initialization" in str(inner_class.absolute()):
-                    return True
-
-                check_output(
-                    [
-                        sys.executable,
-                        "-m",
-                        "pyright",
-                        "-p",
-                        get_pyright_config_file_location(),
-                        str(inner_class.absolute()),
-                    ],
-                    text=True,
-                )
+    inner_class = get_package_namespace_dir(mod)
+    if not inner_class:
+        logging.info(f"No package directory found in {mod}, skipping")
+        return True
+    retries = 3
+    while retries:
+        try:
+            # After fully support client hierarchy, we can remove this check
+            if "azure-client-generator-core-client-initialization" in str(inner_class.absolute()):
                 return True
-            except CalledProcessError as e:
-                logging.exception("{} exited with pyright error {}".format(inner_class.stem, e.returncode))
-                logging.error(f"PyRight stdout:\n{e.stdout}\n===========")
-                logging.error(f"PyRight stderr:\n{e.stderr}\n===========")
-                # PyRight has shown to randomly failed with a 217, retry the same folder 3 times should help
-                retries -= 1
-                time.sleep(5)
 
-        return False
-    except Exception as e:
-        logging.error("Unexpected error processing %s: %s", mod, e)
-        return False
+            check_output(
+                [
+                    sys.executable,
+                    "-m",
+                    "pyright",
+                    "-p",
+                    get_pyright_config_file_location(),
+                    str(inner_class.absolute()),
+                ],
+                text=True,
+            )
+            return True
+        except CalledProcessError as e:
+            logging.exception("{} exited with pyright error {}".format(inner_class.stem, e.returncode))
+            logging.error(f"PyRight stdout:\n{e.stdout}\n===========")
+            logging.error(f"PyRight stderr:\n{e.stderr}\n===========")
+            # PyRight has shown to randomly failed with a 217, retry the same folder 3 times should help
+            retries -= 1
+            time.sleep(5)
+
+    return False
 
 
 if __name__ == "__main__":

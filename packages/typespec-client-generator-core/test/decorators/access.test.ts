@@ -1,4 +1,4 @@
-import { Model } from "@typespec/compiler";
+import type { Model } from "@typespec/compiler";
 import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { describe, it } from "vitest";

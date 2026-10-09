@@ -1,16 +1,16 @@
 import { getFeature } from "@azure-tools/typespec-azure-resource-manager";
 import {
   compilerAssert,
-  Program,
   type ModelProperty,
   type Operation,
+  type Program,
   type Service,
   type SourceFile,
   type Type,
 } from "@typespec/compiler";
-import { HttpOperation, Visibility } from "@typespec/http";
-import { AdditionalInfo } from "@typespec/openapi";
-import { AutorestEmitterContext } from "./index.js";
+import { type HttpOperation, Visibility } from "@typespec/http";
+import type { AdditionalInfo } from "@typespec/openapi";
+import type { AutorestEmitterContext } from "./index.js";
 import type {
   OpenAPI2Document,
   OpenAPI2Operation,
@@ -24,8 +24,7 @@ import type {
  * a particular service definition.
  */
 export type AutorestServiceRecord =
-  | AutorestUnversionedServiceRecord
-  | AutorestVersionedServiceRecord;
+  AutorestUnversionedServiceRecord | AutorestVersionedServiceRecord;
 
 export interface AutorestUnversionedServiceRecord extends AutorestEmitterResult {
   /** The service that generated this OpenAPI document */
@@ -62,12 +61,43 @@ export interface OperationExamples {
   readonly examples: LoadedExample[];
 }
 
+/**
+ * Machine-readable per-service manifest (`service.yaml`) that declares the ordered
+ * list of API versions for a service. See {@link ServiceYamlVersion}.
+ */
+export interface ServiceYaml {
+  /** The API versions of the service, ordered oldest to newest. */
+  readonly versions: ServiceYamlVersion[];
+}
+
+/** A single API version entry in a {@link ServiceYaml} manifest. */
+export interface ServiceYamlVersion {
+  /** The API version value (e.g. `2023-11-01`). */
+  readonly version: string;
+
+  /**
+   * Whether this version is generated from TypeSpec or is a legacy swagger version.
+   * The autorest emitter only ever produces `typespec` versions.
+   */
+  readonly source: "typespec" | "swagger";
+
+  /** Paths to the swagger/openapi file(s) for this version, relative to `service.yaml`. */
+  readonly "swagger-files": string[];
+}
+
 export interface AutorestEmitterResult {
   /** The OpenAPI document*/
   readonly document: OpenAPI2Document;
 
   /** The examples */
   readonly operationExamples: OperationExamples[];
+
+  /**
+   * Whether the emitter generated (materialized) the example files from the unified
+   * `examples.yaml` format. When true, the files must always be written to the output even if
+   * `skip-example-copying` is set, since there is no on-disk source file to reference.
+   */
+  readonly examplesGenerated?: boolean;
 
   /** Output file used */
   readonly outputFile: string;

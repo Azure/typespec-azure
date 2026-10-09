@@ -35,15 +35,15 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",
-    "build": " tsc -p tsconfig.build.json && npm run lint-typespec-library",
+    "build": " tsc -p tsconfig.build.json && pnpm lint-typespec-library",
     "watch": "tsc -p tsconfig.build.json --watch",
     "lint-typespec-library": "tsp compile . --warn-as-error --import @typespec/library-linter --no-emit",
     "test": "vitest run",
     "test:watch": "vitest -w",
     "test:ui": "vitest --ui",
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
-    "lint": "eslint .  --max-warnings=0",
-    "lint:fix": "eslint . --fix ",
+    "lint": "oxlint . --deny-warnings",
+    "lint:fix": "oxlint . --fix",
     "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../website/src/content/docs/docs/emitters/typespec-autorest-canonical/reference"
   },
   "files": [

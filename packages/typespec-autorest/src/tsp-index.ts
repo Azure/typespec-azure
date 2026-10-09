@@ -1,4 +1,4 @@
-import { AutorestDecorators } from "../generated-defs/Autorest.js";
+import type { AutorestDecorators } from "../generated-defs/Autorest.js";
 import { $example, $useRef } from "./decorators.js";
 
 export { $lib } from "./lib.js";

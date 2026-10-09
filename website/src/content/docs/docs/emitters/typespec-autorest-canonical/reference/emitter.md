@@ -71,6 +71,8 @@ Path to the common-types.json file folder. Default: '${project-root}/../../commo
 
 **Type:** `"crlf" | "lf"`
 
+**Default:** `"lf"`
+
 Set the newline character for emitting files.
 
 ### `omit-unreachable-types`
@@ -83,11 +85,15 @@ Omit unreachable types. By default all types declared under the service namespac
 
 **Type:** `"inline-only" | "never"`
 
+**Default:** `"never"`
+
 If the generated openapi types should have the `x-typespec-name` extension set with the name of the TypeSpec type that created it.
 This extension is meant for debugging and should not be depended on.
 
 ### `xml-strategy`
 
 **Type:** `"xml-service" | "none"`
+
+**Default:** `"xml-service"`
 
 Strategy for applying XML serialization metadata to schemas.

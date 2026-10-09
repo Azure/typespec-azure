@@ -35,6 +35,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-azure-core/byos`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/byos)                                                                       | Use the BYOS pattern recommended for Azure Services.                                                                                                 |
 | [`@azure-tools/typespec-azure-core/casing-style`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/casing-style)                                                       | Ensure proper casing style.                                                                                                                          |
 | [`@azure-tools/typespec-azure-core/composition-over-inheritance`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/composition-over-inheritance)                       | Check that if a model is used in an operation and has derived models that it has a discriminator or recommend to use composition via spread or `is`. |
+| [`@azure-tools/typespec-azure-core/no-boolean`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-boolean)                                                           | Boolean properties should use descriptive extensible enums when semantic values matter.                                                              |
 | [`@azure-tools/typespec-azure-core/known-encoding`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/known-encoding)                                                   | Check for supported encodings.                                                                                                                       |
 | [`@azure-tools/typespec-azure-core/long-running-polling-operation-required`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/long-running-polling-operation-required) | Long-running operations should have a linked polling operation.                                                                                      |
 | [`@azure-tools/typespec-azure-core/no-case-mismatch`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-case-mismatch)                                               | Validate that no two types have the same name with different casing.                                                                                 |
@@ -49,9 +50,9 @@ Available ruleSets:
 | [`@azure-tools/typespec-azure-core/no-response-body`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-response-body)                                               | Ensure that the body is set correctly for the response type.                                                                                         |
 | [`@azure-tools/typespec-azure-core/no-rpc-path-params`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-rpc-path-params)                                           | Operations defined using RpcOperation should not have path parameters.                                                                               |
 | [`@azure-tools/typespec-azure-core/no-openapi`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-openapi)                                                           | Azure specs should not be using decorators from @typespec/openapi or @azure-tools/typespec-autorest                                                  |
-| [`@azure-tools/typespec-azure-core/no-unnamed-union`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-unnamed-union)                                               | Azure services should not define a union expression but create a declaration.                                                                        |
+| [`@azure-tools/typespec-azure-core/no-unnamed-types`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-unnamed-types)                                               | Azure services should not have anonymous models, union expressions, enum expressions, or scalar expressions. Define them as named declarations.      |
 | [`@azure-tools/typespec-azure-core/no-header-explode`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-header-explode)                                             | It is recommended to serialize header parameter without explode: true                                                                                |
-| [`@azure-tools/typespec-azure-core/no-format`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/prevent-format)                                                        | Azure services should not use the `@format` decorator.                                                                                               |
+| [`@azure-tools/typespec-azure-core/no-format`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-format)                                                             | Azure services should not use the `@format` decorator.                                                                                               |
 | [`@azure-tools/typespec-azure-core/no-multiple-discriminator`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-multiple-discriminator)                             | Classes should have at most one discriminator.                                                                                                       |
 | [`@azure-tools/typespec-azure-core/no-rest-library-interfaces`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-rest-library-interfaces)                           | Resource interfaces from the TypeSpec.Rest.Resource library are incompatible with Azure.Core.                                                        |
 | [`@azure-tools/typespec-azure-core/no-unknown`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-unknown)                                                           | Azure services must not have properties of type `unknown`.                                                                                           |
@@ -70,6 +71,7 @@ Available ruleSets:
 | [`@azure-tools/typespec-azure-core/no-legacy-usage`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-legacy-usage)                                                 | Linter warning against using elements from the Legacy namespace                                                                                      |
 | [`@azure-tools/typespec-azure-core/no-query-explode`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-query-explode)                                               | It is recommended to serialize query parameter without explode: true                                                                                 |
 | [`@azure-tools/typespec-azure-core/no-route-parameter-name-mismatch`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-route-parameter-name-mismatch)               | Ensure that operations with the same path use consistent path parameter names.                                                                       |
+| [`@azure-tools/typespec-azure-core/no-openapi-client-extensions`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-openapi-client-extensions)                       | Azure specs should not use @typespec/openapi @extension to emit client-altering x-ms-* extensions                                                    |
 
 ## Decorators
 
@@ -433,6 +435,47 @@ Identifies a property on _all_ non-error response models that serve as a linked 
 | Name | Type             | Description                 |
 | ---- | ---------------- | --------------------------- |
 | name | `valueof string` | Property name on the target |
+
+### Azure.Core.Legacy
+
+- [`@overrideApiVersion`](#@overrideapiversion)
+
+#### `@overrideApiVersion`
+
+Overrides the API-version wire value used for operations within a namespace or interface.
+
+The value is opaque and does not need to be declared by the service version enum. The override
+is inherited by enclosed namespaces, interfaces, and operations, with the nearest override taking
+precedence.
+
+This decorator is considered legacy functionality and should only be used to preserve
+compatibility with an existing SDK.
+
+```typespec
+@Azure.Core.Legacy.overrideApiVersion(version: valueof string)
+```
+
+##### Target
+
+The namespace or interface whose operations use the API-version override.
+`Namespace | Interface`
+
+##### Parameters
+
+| Name    | Type             | Description                           |
+| ------- | ---------------- | ------------------------------------- |
+| version | `valueof string` | The non-empty API-version wire value. |
+
+##### Examples
+
+###### Override an interface API version
+
+```typespec
+@Azure.Core.Legacy.overrideApiVersion("2021-11-01")
+interface Widgets {
+  get(): void;
+}
+```
 
 ### Azure.Core.Traits
 

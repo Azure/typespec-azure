@@ -8,15 +8,19 @@ using global.Azure.ClientGenerator.Core;
 @clientNamespace("azure.clientgenerator.core.methodoverride", "java")
 namespace Customization;
 
-@@clientNamespace(_Specs_.Azure.ClientGenerator.Core.Override,
+@@clientNamespace(
+  _Specs_.Azure.ClientGenerator.Core.Override,
   "azure.clientgenerator.core.methodoverride",
   "java"
 );
 
-op reorderCustomized(@path param1: string, @path param2: string): void;
-
-@@override(_Specs_.Azure.ClientGenerator.Core.Override.ReorderParameters.reorder,
-  reorderCustomized
+#suppress "experimental-feature" "Testing the reorderParameters function"
+@@override(
+  _Specs_.Azure.ClientGenerator.Core.Override.ReorderParameters.reorder,
+  reorderParameters(
+    _Specs_.Azure.ClientGenerator.Core.Override.ReorderParameters.reorder,
+    #["param1", "param2"]
+  )
 );
 
 model GroupParametersOptions {
@@ -28,14 +32,28 @@ op groupCustomized(options: GroupParametersOptions): void;
 
 @@override(_Specs_.Azure.ClientGenerator.Core.Override.GroupParameters.group, groupCustomized);
 
-op requireOptionalCustomized(@path param1: string, @path param2: string): void;
+model RequiredParameters {
+  @path param2: string;
+}
 
-@@override(_Specs_.Azure.ClientGenerator.Core.Override.RequireOptionalParameter.requireOptional,
-  requireOptionalCustomized
+#suppress "experimental-feature" "Testing the replaceParameter function"
+@@override(
+  _Specs_.Azure.ClientGenerator.Core.Override.RequireOptionalParameter.requireOptional,
+  replaceParameter(
+    _Specs_.Azure.ClientGenerator.Core.Override.RequireOptionalParameter.requireOptional,
+    "param2",
+    RequiredParameters.param2
+  )
 );
 
-op removeOptionalCustomized(@path param1: string, @query param2?: string): void;
-
-@@override(_Specs_.Azure.ClientGenerator.Core.Override.RemoveOptionalParameter.removeOptional,
-  removeOptionalCustomized
+#suppress "experimental-feature" "Testing the removeParameter function"
+@@override(
+  _Specs_.Azure.ClientGenerator.Core.Override.RemoveOptionalParameter.removeOptional,
+  removeParameter(
+    removeParameter(
+      _Specs_.Azure.ClientGenerator.Core.Override.RemoveOptionalParameter.removeOptional,
+      "param3"
+    ),
+    "param4"
+  )
 );

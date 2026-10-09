@@ -73,7 +73,7 @@ union WidgetColor {
 
 ❌ **DON'T** import or use `@azure-tools/typespec-client-generator-core` in files other than `client.tsp` or `back-compat.tsp`
 
-❌ **DON'T** reference `client.tsp` in `main.tsp`
+✅ **DO** reference `client.tsp` in `main.tsp` (add `import "./client.tsp";` so `main.tsp` is the single entrypoint)
 
 ✅ **DO** reference `back-compat.tsp` in `main.tsp`
 

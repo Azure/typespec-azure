@@ -1,29 +1,31 @@
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   compilerAssert,
-  DecoratorContext,
-  DecoratorFunction,
-  Enum,
-  EnumMember,
+  type DecoratorContext,
+  type DecoratorFunction,
+  type DecoratorValidatorCallbacks,
+  type DiagnosticTarget,
+  type Enum,
+  type EnumMember,
   getDiscriminator,
   getNamespaceFullName,
   ignoreDiagnostics,
-  Interface,
+  type Interface,
   isErrorModel,
   isList,
   isNumeric,
-  Model,
-  ModelProperty,
-  Namespace,
+  type Model,
+  type ModelProperty,
+  type Namespace,
   Numeric,
-  Operation,
-  Program,
-  RekeyableMap,
-  Scalar,
-  Type,
-  Union,
+  type Operation,
+  type Program,
+  type RekeyableMap,
+  type Scalar,
+  type Type,
+  type Union,
 } from "@typespec/compiler";
-import { SyntaxKind, type Node } from "@typespec/compiler/ast";
+import { type Node, SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
 import {
   getAuthentication,
@@ -31,8 +33,10 @@ import {
   getServers,
   isBody,
   isBodyRoot,
+  isPathParam,
 } from "@typespec/http";
-import {
+import { getVersion, resolveVersions, type Version } from "@typespec/versioning";
+import type {
   AccessDecorator,
   AlternateTypeDecorator,
   ApiVersionDecorator,
@@ -52,7 +56,7 @@ import {
   ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
-import {
+import type {
   ClientDefaultValueDecorator,
   DisablePageableDecorator,
   FlattenPropertyDecorator,
@@ -62,12 +66,14 @@ import {
   NextLinkVerbDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
-  AccessFlags,
-  ClientInitializationOptions,
-  ExternalTypeInfo,
-  LanguageScopes,
-  SdkClient,
-  TCGCContext,
+  type AccessFlags,
+  type ClientInitializationOptions,
+  type DecoratorOptions,
+  type ExternalTypeInfo,
+  InitializedByFlags,
+  type LanguageScopes,
+  type SdkClient,
+  type TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
 import {
@@ -85,16 +91,106 @@ import {
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
+  normalizeScope,
   omitOperation,
   overrideKey,
   parseScopes,
+  responseOverrideKey,
   scopeKey,
   usageKey,
 } from "./internal-utils.js";
-import { createStateSymbol, reportDiagnostic } from "./lib.js";
+import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
+
+/**
+ * The set of emitters a scope string effectively selects.
+ * - `all-except`: applies to every emitter except the excluded ones.
+ * - `only`: applies solely to the included emitters.
+ */
+type EffectiveScope = { kind: "all-except"; scopes: string[] } | { kind: "only"; scopes: string[] };
+
+/**
+ * Canonicalize a scope string into the set of emitters it actually selects, mirroring how
+ * `setScopedDecoratorData` and `getScopedDecoratorData` resolve scopes. A scope with any negation
+ * applies to all emitters minus the negated ones, and explicitly listed positive scopes take
+ * precedence over an overlapping negation.
+ */
+function getEffectiveScope(scope: string): EffectiveScope {
+  const [negationScopes, scopes] = parseScopes(scope);
+  const positives = normalizeScopeList(scopes);
+  const negations = normalizeScopeList(negationScopes);
+  if (negations.length > 0) {
+    // positive scopes are already covered by "all", they only cancel an overlapping negation
+    return { kind: "all-except", scopes: negations.filter((s) => !positives.includes(s)) };
+  }
+  // no positive and no negative scope means the value applies everywhere
+  return positives.length === 0
+    ? { kind: "all-except", scopes: [] }
+    : { kind: "only", scopes: positives };
+}
+
+function isSemanticallyEqualScope(left: string, right: string): boolean {
+  const leftEffective = getEffectiveScope(left);
+  const rightEffective = getEffectiveScope(right);
+  return (
+    leftEffective.kind === rightEffective.kind &&
+    leftEffective.scopes.length === rightEffective.scopes.length &&
+    leftEffective.scopes.every((scope, index) => scope === rightEffective.scopes[index])
+  );
+}
+
+function normalizeScopeList(scopes: string[] | undefined): string[] {
+  return [...new Set(scopes?.filter((scope) => scope !== "") ?? [])].sort();
+}
+
+/**
+ * Reconcile the scope for a decorator that has its own options bag (a model that extends
+ * `DecoratorOptions`). The scope can be provided in two ways during migration:
+ * - inside the options bag via its `scope` property (the preferred, evolvable form), or
+ * - through the legacy positional `scope` argument (kept for backward compatibility).
+ *
+ * When both are provided and select a different set of emitters, a `conflicting-scope` diagnostic
+ * is reported and the options bag value wins. This centralizes the compatibility behavior so
+ * individual decorators do not each re-implement it.
+ *
+ * @param context The decorator context.
+ * @param decoratorName The decorator name, used for diagnostics.
+ * @param options The options bag argument, if any.
+ * @param legacyScope The legacy positional scope argument, if any.
+ * @returns The effective scope string, or `undefined` when no scope was specified.
+ */
+function resolveScopeFromOptions(
+  context: DecoratorContext,
+  decoratorName: string,
+  options: Type | undefined,
+  legacyScope?: string,
+): string | undefined {
+  const optionsScopeConfig =
+    options?.kind === "Model" ? getInheritedOptionType(options, "scope") : undefined;
+  const optionsScope: string | undefined =
+    optionsScopeConfig?.kind === "String" ? optionsScopeConfig.value : undefined;
+
+  if (
+    optionsScope !== undefined &&
+    legacyScope !== undefined &&
+    !isSemanticallyEqualScope(optionsScope, legacyScope)
+  ) {
+    reportDiagnostic(context.program, {
+      code: "conflicting-scope",
+      format: {
+        decoratorName,
+        optionsScope,
+        legacyScope,
+      },
+      target: context.decoratorTarget,
+    });
+  }
+  // Prefer the options bag scope when both are set (ignoring the legacy positional argument in
+  // that case), otherwise use whichever one was set.
+  return optionsScope ?? legacyScope;
+}
 
 function setScopedDecoratorData(
   context: DecoratorContext,
@@ -102,8 +198,9 @@ function setScopedDecoratorData(
   key: symbol,
   target: Type,
   value: unknown,
-  scope?: LanguageScopes,
+  scopeArg?: LanguageScopes | DecoratorOptions,
 ) {
+  const scope = normalizeScope(scopeArg);
   const targetEntry = context.program.stateMap(key).get(target);
   // if no scope specified, then set with the new value
   if (!scope) {
@@ -160,14 +257,21 @@ export const $client: ClientDecorator = (
     });
     return;
   }
+  // Every `ClientOptions` setting is read through `getInheritedOptionType` so a user model that
+  // `extends` `ClientOptions` (or an intermediate options model) has its base-declared settings
+  // honored, consistently with how `scope` resolves below.
   const explicitName =
-    options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
+    options?.kind === "Model" ? getInheritedOptionType(options, "name") : undefined;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
   let services: Namespace[];
   const serviceConfig =
-    options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
+    options?.kind === "Model" ? getInheritedOptionType(options, "service") : undefined;
   const autoMergeServiceConfig =
-    options?.kind === "Model" ? options?.properties.get("autoMergeService")?.type : undefined;
+    options?.kind === "Model" ? getInheritedOptionType(options, "autoMergeService") : undefined;
+  // `@client` has no legacy raw-parameters model form (its `options` is always a `ClientOptions`
+  // bag), so - unlike `$clientInitialization` - it does not need to gate on
+  // `isClientInitializationOptionsBag` before resolving the options-bag scope.
+  const effectiveScope = resolveScopeFromOptions(context, "client", options, scope);
 
   if (serviceConfig?.kind === "Namespace") {
     // Explicit single service
@@ -220,6 +324,15 @@ export const $client: ClientDecorator = (
       });
       return;
     }
+    // For clients merging multiple services, ensure all services agree on the
+    // version of any shared library dependency (e.g. ARM common-types).
+    // Diverging versions cause TCGC to emit duplicated/diverged models.
+    validateMultipleServiceDependencyVersions(
+      context.program,
+      name,
+      services,
+      context.decoratorTarget,
+    );
   } else {
     // No explicit service - store empty array. Cache.ts will either:
     // - inherit from parent client (if nested)
@@ -237,8 +350,65 @@ export const $client: ClientDecorator = (
     autoMergeService:
       autoMergeServiceConfig?.kind === "Boolean" ? autoMergeServiceConfig.value : false,
   };
-  setScopedDecoratorData(context, $client, clientKey, target, client, scope);
+  setScopedDecoratorData(context, $client, clientKey, target, client, effectiveScope);
 };
+
+/**
+ * Validate that all services merged into the same client agree on the version
+ * of every shared library dependency. Diverging versions silently produce
+ * duplicated/diverged models in the generated SDK.
+ */
+function validateMultipleServiceDependencyVersions(
+  program: Program,
+  clientName: string,
+  services: Namespace[],
+  target: DiagnosticTarget,
+): void {
+  // For each shared dependency namespace, collect the set of versions picked
+  // across all merged services.
+  const depVersions = new Map<Namespace, Set<string>>();
+  const serviceSet: ReadonlySet<Namespace> = new Set<Namespace>(services);
+
+  for (const service of services) {
+    const resolutions = resolveVersions(program, service);
+    if (resolutions.length === 0) continue;
+    // Use the latest resolved version of this service (matches what TCGC picks).
+    for (const [depNs, depVersion] of resolutions[resolutions.length - 1].versions) {
+      // Ignore versions of the merged services themselves.
+      if (serviceSet.has(depNs)) continue;
+      // When the service does not specify a version for the depended library
+      // (e.g. the latest service version has no `@useDependency` mapping for it),
+      // fall back to the latest version of the depended library, matching the
+      // behavior expected by downstream emitters.
+      let resolvedDepVersion: Version | undefined = depVersion;
+      if (resolvedDepVersion === undefined) {
+        const depVersionMap = getVersion(program, depNs);
+        const allDepVersions = depVersionMap?.getVersions();
+        if (allDepVersions && allDepVersions.length > 0) {
+          resolvedDepVersion = allDepVersions[allDepVersions.length - 1];
+        }
+      }
+      if (resolvedDepVersion === undefined) continue;
+      const versions = depVersions.get(depNs) ?? new Set<string>();
+      versions.add(resolvedDepVersion.value ?? resolvedDepVersion.name);
+      depVersions.set(depNs, versions);
+    }
+  }
+
+  // Report any dependency that resolved to more than one version.
+  for (const [depNs, versions] of depVersions) {
+    if (versions.size <= 1) continue;
+    reportDiagnostic(program, {
+      code: "inconsistent-multiple-service-dependency",
+      format: {
+        clientName,
+        dependencyName: getNamespaceFullName(depNs),
+        versions: [...versions].map((v) => `"${v}"`).join(", "),
+      },
+      target,
+    });
+  }
+}
 
 /**
  * Return the client object for the given namespace or interface, or undefined if the given namespace or interface is not a client.
@@ -271,10 +441,12 @@ export function listClients(context: TCGCContext): SdkClient[] {
 export const $operationGroup: OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
-  // Delegate to $client - @operationGroup is now just an alias for @client
-  context.call($client, target, undefined, scope);
+  // Delegate to $client - @operationGroup is now just an alias for @client. `@operationGroup` does
+  // not have its own options bag, so normalize the accepted `DecoratorOptions | string` scope to
+  // the plain-string form that $client's legacy positional scope argument expects.
+  context.call($client, target, undefined, normalizeScope(scope));
 };
 
 /**
@@ -335,13 +507,80 @@ export function listOperationsInClient(
 
 const protocolAPIKey = createStateSymbol("protocolAPI");
 
+const VALID_SCOPES = ["java", "csharp"];
+
+function validateJavaCsharpScope(
+  decoratorName: string,
+  entity: DiagnosticTarget,
+  scopeArg?: LanguageScopes | DecoratorOptions,
+): DecoratorValidatorCallbacks | void {
+  const scope = normalizeScope(scopeArg);
+  return {
+    onTargetFinish: () => {
+      if (scope === undefined) {
+        return [
+          createDiagnostic({
+            code: "decorator-requires-scope",
+            format: {
+              decoratorName,
+              allowedScopes: `"${VALID_SCOPES.join('" or "')}"`,
+            },
+            target: entity,
+          }),
+        ];
+      }
+
+      const [negationScopes, positiveScopes] = parseScopes(scope);
+
+      // Negation scopes like "!(python)" implicitly include java/csharp, so they're valid.
+      // But if ALL valid scopes are negated, it's invalid.
+      if (negationScopes && negationScopes.length > 0) {
+        const allValidNegated = VALID_SCOPES.every((s) => negationScopes.includes(s));
+        if (allValidNegated) {
+          return [
+            createDiagnostic({
+              code: "decorator-requires-scope",
+              format: {
+                decoratorName,
+                allowedScopes: `"${VALID_SCOPES.join('" or "')}"`,
+              },
+              target: entity,
+            }),
+          ];
+        }
+        return [];
+      }
+
+      // Positive scopes: at least one must be java or csharp
+      if (positiveScopes && positiveScopes.length > 0) {
+        const hasValidScope = positiveScopes.some((s) => VALID_SCOPES.includes(s));
+        if (!hasValidScope) {
+          return [
+            createDiagnostic({
+              code: "decorator-requires-scope",
+              format: {
+                decoratorName,
+                allowedScopes: `"${VALID_SCOPES.join('" or "')}"`,
+              },
+              target: entity,
+            }),
+          ];
+        }
+      }
+
+      return [];
+    },
+  };
+}
+
 export const $protocolAPI: ProtocolAPIDecorator = (
   context: DecoratorContext,
   entity: Operation | Namespace | Interface,
   value?: boolean,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   setScopedDecoratorData(context, $protocolAPI, protocolAPIKey, entity, value, scope);
+  return validateJavaCsharpScope("protocolAPI", entity, scope);
 };
 
 const convenientAPIKey = createStateSymbol("convenientAPI");
@@ -350,9 +589,10 @@ export const $convenientAPI: ConvenientAPIDecorator = (
   context: DecoratorContext,
   entity: Operation | Namespace | Interface,
   value?: boolean,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   setScopedDecoratorData(context, $convenientAPI, convenientAPIKey, entity, value, scope);
+  return validateJavaCsharpScope("convenientAPI", entity, scope);
 };
 
 function getConvenientOrProtocolValue(
@@ -401,7 +641,7 @@ export const $usage: UsageDecorator = (
   context: DecoratorContext,
   entity: Model | Enum | Union | Namespace,
   value: EnumMember | Union,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   const isValidValue = (value: number): boolean => {
     // Allow the new usage values: input(2), output(4), json(256), xml(512)
@@ -461,11 +701,11 @@ export const $usage: UsageDecorator = (
 
 export function getUsageOverride(
   context: TCGCContext,
-  entity: Model | Enum | Union,
+  entity: Model | Enum | Union | Namespace,
 ): number | undefined {
   const usageFlags = getScopedDecoratorData(context, usageKey, entity);
   if (usageFlags || entity.namespace === undefined) return usageFlags;
-  return getScopedDecoratorData(context, usageKey, entity.namespace);
+  return getUsageOverride(context, entity.namespace);
 }
 
 export function getUsage(context: TCGCContext, entity: Model | Enum | Union): UsageFlags {
@@ -489,7 +729,7 @@ export const $access: AccessDecorator = (
   context: DecoratorContext,
   entity: Model | Enum | Operation | Union | Namespace | ModelProperty,
   value: EnumMember,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   if (typeof value.value !== "string" || (value.value !== "public" && value.value !== "internal")) {
     reportDiagnostic(context.program, {
@@ -550,7 +790,7 @@ const flattenPropertyKey = createStateSymbol("flattenProperty");
 export const $flattenProperty: FlattenPropertyDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   if (getDiscriminator(context.program, target.type)) {
     reportDiagnostic(context.program, {
@@ -578,7 +818,7 @@ export const $clientName: ClientNameDecorator = (
   context: DecoratorContext,
   entity: Type,
   value: string,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   // workaround for current lack of functionality in compiler
   // https://github.com/microsoft/typespec/issues/2717
@@ -620,7 +860,8 @@ export function getClientNameOverride(
   return getScopedDecoratorData(context, clientNameKey, entity, languageScope);
 }
 
-// Recursive function to collect parameter names
+// Recursive function to collect all (possibly nested) leaf parameters of an operation,
+// used to structurally compare the original and override parameter lists.
 function collectParams(
   program: Program,
   properties: RekeyableMap<string, ModelProperty>,
@@ -640,29 +881,78 @@ function collectParams(
   return params;
 }
 
+// Collect the names of the parameters that are realized as `path` parameters in the
+// operation's actual HTTP route. This is the ground truth for "is a path parameter":
+// a `@path` decorator in the type graph (isPathParam) is not sufficient because a
+// parameter can carry `@path` without being part of the realized route (for example an
+// ARM key surfaced by a templated provider action), and conversely a `@path` nested
+// inside a plain model or `@bodyRoot` is realized. Resolving the HTTP route handles
+// both cases correctly.
+function getRealizedPathParamNames(program: Program, operation: Operation): Set<string> {
+  const result = new Set<string>();
+  const httpOperation = ignoreDiagnostics(getHttpOperation(program, operation));
+  for (const parameter of httpOperation.parameters.parameters) {
+    if (parameter.type === "path") {
+      result.add(parameter.param.name);
+    }
+  }
+  return result;
+}
+
 export const $override = (
   context: DecoratorContext,
   original: Operation,
   override: Operation,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   // omit all override operation
   context.program.stateMap(omitOperation).set(override, true);
 
-  // Extract and sort parameter names
-  const originalParams = collectParams(context.program, original.parameters.properties).sort(
-    (a, b) => a.name.localeCompare(b.name),
-  );
-  const overrideParams = collectParams(context.program, override.parameters.properties).sort(
-    (a, b) => a.name.localeCompare(b.name),
+  // Collect the parameters of both operations. Parameters are matched by name (see
+  // below) rather than by position: overrides are allowed to add, remove, or regroup
+  // parameters (for example wrapping several parameters in a customization model), so
+  // comparing the two lists by sorted position produces false mismatches whenever the
+  // parameter sets differ in shape.
+  const originalParams = collectParams(context.program, original.parameters.properties);
+  const overrideParams = collectParams(context.program, override.parameters.properties);
+  // Group override parameters by name so that parameters can be matched by name
+  // rather than by position (overrides may add or reorder parameters). Parameters
+  // that share a name (for example a realized path parameter and a body property of
+  // the same name) are matched in declaration order.
+  const overrideParamsByName = new Map<string, ModelProperty[]>();
+  for (const param of overrideParams) {
+    const existing = overrideParamsByName.get(param.name);
+    if (existing) {
+      existing.push(param);
+    } else {
+      overrideParamsByName.set(param.name, [param]);
+    }
+  }
+  const consumedOverrideParams = new Map<string, number>();
+
+  // A `@clientLocation` on any override parameter indicates an intentional customization
+  // where non-path params are just pass-throughs, so the `@path` preservation check is
+  // skipped in that case.
+  const overrideHasClientLocation = overrideParams.some((p) =>
+    p.decorators.some((d) => d.decorator.name === "$clientLocation"),
   );
 
-  // Check if the sorted parameter names arrays are equal, omit optional parameters
+  // Check that every required original parameter has a matching override parameter,
+  // omitting optional parameters. While matching, collect the parameters that carry
+  // `@path` in the original but lost it in the override; these are the only candidates
+  // for an `override-parameters-mismatch`, and only they require resolving the (more
+  // expensive) HTTP route to confirm they are realized path parameters.
   let parametersMatch = true;
   let checkParameter: ModelProperty | undefined = undefined;
-  let index = 0;
+  const droppedPathParamNames: string[] = [];
   for (const originalParam of originalParams) {
-    if (index > overrideParams.length - 1) {
+    const candidates = overrideParamsByName.get(originalParam.name);
+    const consumed = consumedOverrideParams.get(originalParam.name) ?? 0;
+    const overrideParam = candidates?.[consumed];
+    if (
+      overrideParam === undefined ||
+      !compareModelProperties(context.program, originalParam, overrideParam)
+    ) {
       if (!originalParam.optional) {
         parametersMatch = false;
         checkParameter = originalParam;
@@ -671,18 +961,21 @@ export const $override = (
         continue;
       }
     }
-    if (!compareModelProperties(context.program, originalParam, overrideParams[index])) {
-      if (!originalParam.optional) {
-        parametersMatch = false;
-        checkParameter = originalParam;
-        break;
-      } else {
-        continue;
-      }
+    consumedOverrideParams.set(originalParam.name, consumed + 1);
+
+    // Gating on `isPathParam(originalParam)` selects the realized path parameter over a
+    // body property that shares its name. The realized-route confirmation is deferred
+    // (see below) so the HTTP route is only resolved when an override actually drops a
+    // `@path`.
+    if (
+      isPathParam(context.program, originalParam) &&
+      !isPathParam(context.program, overrideParam) &&
+      !overrideHasClientLocation
+    ) {
+      droppedPathParamNames.push(overrideParam.name);
     }
 
     // Apply the alternate type to the original parameter
-    const overrideParam = overrideParams[index];
     overrideParam.decorators
       .filter(
         (d) =>
@@ -697,8 +990,28 @@ export const $override = (
           d.args[1]?.jsValue as string | undefined,
         ),
       );
+  }
 
-    index++;
+  // Only resolve the original operation's HTTP route (which is comparatively expensive)
+  // when at least one parameter dropped its `@path`, and report the ones that are
+  // actually realized path parameters of the route. A `@path` decorator in the type
+  // graph is not sufficient on its own: it can be carried by a parameter that is not
+  // part of the realized route (for example an ARM key surfaced by a templated provider
+  // action), which must not be reported.
+  if (droppedPathParamNames.length > 0) {
+    const originalRealizedPathParamNames = getRealizedPathParamNames(context.program, original);
+    for (const name of droppedPathParamNames) {
+      if (originalRealizedPathParamNames.has(name)) {
+        reportDiagnostic(context.program, {
+          code: "override-parameters-mismatch",
+          target: context.decoratorTarget,
+          format: {
+            methodName: original.name,
+            checkParameter: name,
+          },
+        });
+      }
+    }
   }
 
   if (!parametersMatch) {
@@ -708,6 +1021,25 @@ export const $override = (
       format: {
         methodName: original.name,
         checkParameter: checkParameter?.name ?? "",
+      },
+    });
+  }
+
+  // `@override` is primarily used to customize a method's parameters, and the override
+  // operation's declared return type is otherwise ignored (a customization operation
+  // commonly declares `void` just to satisfy the signature). Only operations produced by
+  // `replaceResponseWithVoid` / `replaceResponseWithBytes`, which mark themselves in
+  // `responseOverrideKey`, intentionally replace the client method response, so only those
+  // emit the response-replacement warning. Inferring intent from the return type instead
+  // would flag ordinary parameter-only overrides as accidental response changes.
+  const isIntentionalResponseReplacement =
+    context.program.stateMap(responseOverrideKey).get(override) === true;
+  if (isIntentionalResponseReplacement) {
+    reportDiagnostic(context.program, {
+      code: "override-response-replacement",
+      target: context.decoratorTarget,
+      format: {
+        methodName: original.name,
       },
     });
   }
@@ -773,7 +1105,7 @@ export const $alternateType: AlternateTypeDecorator = (
   context: DecoratorContext,
   source: ModelProperty | Scalar | Model | Enum | Union,
   alternate: Type,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   let alternateInput: Type | ExternalTypeInfo = alternate;
   if (alternate.kind === "Model" && isExternalType(alternate)) {
@@ -881,10 +1213,98 @@ export function getAlternateType(
 export const $useSystemTextJsonConverter: DecoratorFunction = (
   context: DecoratorContext,
   entity: Model,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {};
 
 const clientInitializationKey = createStateSymbol("clientInitialization");
+
+/**
+ * Distinguish a real `ClientInitializationOptions` options bag from the legacy form where a raw
+ * client-parameters model is passed directly as the second argument.
+ *
+ * Detection is based on model provenance rather than the model name alone:
+ * - The structural options `parameters` and `initializedBy` are declared only on
+ *   `ClientInitializationOptions`, so their presence unambiguously identifies the options bag
+ *   (this covers the common inline literal form `{ parameters: ..., scope: ... }`).
+ * - A *named* model that explicitly derives from `ClientInitializationOptions` through its
+ *   inheritance chain is an options bag even when it only sets `scope` (e.g. `model Foo extends
+ *   ClientInitializationOptions { scope: "csharp"; }`).
+ *
+ * The provenance check follows `baseModel` (`extends`) as well as `sourceModel`/`sourceModels`
+ * (`model is`, `PickProperties`/`OmitProperties` and other spread-based transformations), so a named
+ * model derived from `ClientInitializationOptions` through any of those is still recognized.
+ *
+ * Anonymous model expressions are intentionally excluded from the provenance check: the compiler links
+ * an inline literal to the expected `ClientInitializationOptions` parameter type, so an anonymous
+ * legacy parameters model such as `{ scope: "https://management.azure.com/.default" }` would
+ * otherwise look like an options bag. Treating the anonymous scope-only shape as a legacy raw
+ * client-parameters model keeps its `scope` property a real client parameter, preserving backward
+ * compatibility for that previously supported form.
+ */
+function isClientInitializationOptionsBag(options: Type): boolean {
+  if (options.kind !== "Model") {
+    return false;
+  }
+  if (options.properties.has("parameters") || options.properties.has("initializedBy")) {
+    return true;
+  }
+  if (options.name === "") {
+    return false;
+  }
+  return derivesFromClientInitializationOptions(options);
+}
+
+/**
+ * Whether a model is `ClientInitializationOptions` (from `Azure.ClientGenerator.Core`) or derives
+ * from it through any combination of `extends` (`baseModel`) and `model is` / spread provenance
+ * (`sourceModel`/`sourceModels`).
+ */
+function derivesFromClientInitializationOptions(model: Model): boolean {
+  const visited = new Set<Model>();
+  const stack: (Model | undefined)[] = [model];
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (current === undefined || visited.has(current)) {
+      continue;
+    }
+    visited.add(current);
+    if (
+      current.name === "ClientInitializationOptions" &&
+      current.namespace !== undefined &&
+      getNamespaceFullName(current.namespace) === "Azure.ClientGenerator.Core"
+    ) {
+      return true;
+    }
+    stack.push(current.baseModel, current.sourceModel);
+    for (const source of current.sourceModels) {
+      stack.push(source.model);
+    }
+  }
+  return false;
+}
+
+/**
+ * Resolve the nearest effective option property of an options bag by name, walking the `extends`
+ * (`baseModel`) inheritance chain so that a property declared on a base model is honored even when the
+ * leaf model only adds other properties (e.g. `model Final extends Base { parameters: Params }`).
+ *
+ * All scoped options bags (`ClientOptions`, `ClientInitializationOptions`, and any user model that
+ * extends them) are read through this helper so every setting - `scope`, `service`, `parameters`,
+ * etc. - resolves consistently across the inheritance chain rather than only `scope` doing so.
+ */
+function getInheritedOptionType(model: Model, propertyName: string): Type | undefined {
+  const visited = new Set<Model>();
+  let current: Model | undefined = model;
+  while (current !== undefined && !visited.has(current)) {
+    visited.add(current);
+    const property = current.properties.get(propertyName);
+    if (property !== undefined) {
+      return property.type;
+    }
+    current = current.baseModel;
+  }
+  return undefined;
+}
 
 export const $clientInitialization: ClientInitializationDecorator = (
   context: DecoratorContext,
@@ -945,7 +1365,12 @@ export const $clientInitialization: ClientInitializationDecorator = (
       clientInitializationKey,
       target,
       options,
-      scope,
+      resolveScopeFromOptions(
+        context,
+        "clientInitialization",
+        isClientInitializationOptionsBag(options) ? options : undefined,
+        scope,
+      ),
     );
   }
 };
@@ -964,30 +1389,37 @@ export function getClientInitializationOptions(
   const options = getScopedDecoratorData(context, clientInitializationKey, entity);
 
   // backward compatibility
-  if (
-    options &&
-    options.properties.get("initializedBy") === undefined &&
-    options.properties.get("parameters") === undefined
-  ) {
+  // A legacy raw client-parameters model was passed directly (rather than a `ClientInitializationOptions`
+  // options bag). Treat the whole model as the parameters model. A scope-only options bag (e.g.
+  // `{ scope: "csharp" }`) is NOT the legacy form, so it must not be surfaced as client parameters.
+  if (options && !isClientInitializationOptionsBag(options)) {
     return {
       parameters: options,
     };
   }
 
-  let initializedBy = undefined;
+  let initializedBy: InitializedByFlags | undefined = undefined;
 
-  if (options?.properties.get("initializedBy")) {
-    if (options.properties.get("initializedBy").type.kind === "EnumMember") {
-      initializedBy = options.properties.get("initializedBy").type.value;
-    } else if (options.properties.get("initializedBy").type.kind === "Union") {
+  // Read through the inheritance chain so a user model that `extends` `ClientInitializationOptions`
+  // has its base-declared `initializedBy`/`parameters` honored, consistently with `scope`.
+  const optionsModel: Model | undefined = options?.kind === "Model" ? options : undefined;
+  const initializedByType = optionsModel
+    ? getInheritedOptionType(optionsModel, "initializedBy")
+    : undefined;
+  if (initializedByType) {
+    if (initializedByType.kind === "EnumMember") {
+      initializedBy = initializedByType.value as InitializedByFlags;
+    } else if (initializedByType.kind === "Union") {
       initializedBy = 0;
-      for (const variant of options.properties.get("initializedBy").type.variants.values()) {
-        initializedBy |= variant.type.value;
+      for (const variant of initializedByType.variants.values()) {
+        initializedBy |= (variant.type as EnumMember).value as number;
       }
     }
   }
 
-  let parametersModel = options?.properties.get("parameters")?.type;
+  let parametersModel: Model | undefined = optionsModel
+    ? (getInheritedOptionType(optionsModel, "parameters") as Model | undefined)
+    : undefined;
   let currEntity: Namespace | Interface | undefined = entity;
   while (currEntity) {
     const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(
@@ -1029,10 +1461,11 @@ export const $paramAlias: ParamAliasDecorator = (
   context: DecoratorContext,
   original: ModelProperty,
   paramAlias: string,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
+  const normalizedScope = normalizeScope(scope);
   const paramAliasDec = context.program.stateMap(paramAliasKey).get(original);
-  const paramAliasVal = paramAliasDec?.[scope || AllScopes] ?? paramAliasDec?.[AllScopes];
+  const paramAliasVal = paramAliasDec?.[normalizedScope || AllScopes] ?? paramAliasDec?.[AllScopes];
   if (paramAliasVal) {
     reportDiagnostic(context.program, {
       code: "multiple-param-alias",
@@ -1057,7 +1490,7 @@ export const $apiVersion: ApiVersionDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   value?: boolean,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   setScopedDecoratorData(context, $apiVersion, apiVersionKey, target, value ?? true, scope);
 };
@@ -1070,7 +1503,7 @@ export const $clientNamespace: ClientNamespaceDecorator = (
   context: DecoratorContext,
   entity: Namespace | Interface | Model | Enum | Union,
   value: string,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   if (value.trim() === "") {
     reportDiagnostic(context.program, {
@@ -1189,9 +1622,10 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
 export const $scope: ScopeDecorator = (
   context: DecoratorContext,
   entity: Operation | ModelProperty,
-  scope?: LanguageScopes,
+  scopeArg?: LanguageScopes | DecoratorOptions,
 ) => {
-  const [negationScopes, scopes] = parseScopes(scope);
+  const normalizedScope = normalizeScope(scopeArg);
+  const [negationScopes, scopes] = parseScopes(normalizedScope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // for negation scope, override the previous value
     setScopedDecoratorData(context, $scope, negationScopesKey, entity, negationScopes);
@@ -1223,7 +1657,7 @@ export const $clientApiVersions: ClientApiVersionsDecorator = (
   context: DecoratorContext,
   target: Namespace,
   value: Enum,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   setScopedDecoratorData(context, $clientApiVersions, clientApiVersionsKey, target, value, scope);
 };
@@ -1244,7 +1678,7 @@ export function getExplicitClientApiVersions(
 export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   if (target.type.kind !== "Scalar") {
     reportDiagnostic(context.program, {
@@ -1277,7 +1711,7 @@ const responseAsBoolKey = createStateSymbol("responseAsBool");
 export const $responseAsBool: ResponseAsBoolDecorator = (
   context: DecoratorContext,
   target: Operation,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   if (!target.decorators.some((d) => d.definition?.name === "@head")) {
     reportDiagnostic(context.program, {
@@ -1311,7 +1745,7 @@ export const $clientDoc: ClientDocDecorator = (
   target: Type,
   documentation: string,
   mode: EnumMember,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   const docMode = mode.value as string;
   // Validate the mode value
@@ -1350,7 +1784,7 @@ export const $clientLocation = (
   context: DecoratorContext,
   source: Operation | ModelProperty,
   target: Interface | Namespace | Operation | string,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   if (source.kind === "Operation") {
     // can only move parameters to an operation, not another operation
@@ -1428,79 +1862,12 @@ export function getClientLocation(
   return getScopedDecoratorData(context, clientLocationKey, input);
 }
 
-interface PropertyConflict {
-  propertyName: string;
-  reason: "missing" | "type-mismatch";
-}
-
-function isPropertySuperset(program: Program, target: Model, value: Model): PropertyConflict[] {
-  const conflicts: PropertyConflict[] = [];
-
-  // Check if all properties in value exist in target
-  for (const name of value.properties.keys()) {
-    if (!target.properties.has(name)) {
-      conflicts.push({
-        propertyName: name,
-        reason: "missing",
-      });
-      continue;
-    }
-    const targetProperty = target.properties.get(name)!;
-    const valueProperty = value.properties.get(name)!;
-    // Compare properties to handle envelope/spread semantics correctly
-    // Properties match if they come from the same source OR if they have the same type
-    // This ensures properties from envelopes (e.g., ...ArmTagsProperty) are recognized
-    // as equivalent to directly defined properties with the same name and type
-    if (targetProperty.sourceProperty !== valueProperty.sourceProperty) {
-      // Different sources - check if they have the same type
-      if (targetProperty.type !== valueProperty.type) {
-        conflicts.push({
-          propertyName: name,
-          reason: "type-mismatch",
-        });
-      }
-    }
-  }
-  return conflicts;
-}
-
 export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
   context: DecoratorContext,
   target: Model,
   value: Model,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
-  // Validate that target has all properties from value
-  const conflicts = isPropertySuperset(context.program, target, value);
-  if (conflicts.length > 0) {
-    for (const conflict of conflicts) {
-      if (conflict.reason === "missing") {
-        reportDiagnostic(context.program, {
-          code: "legacy-hierarchy-building-conflict",
-          messageId: "property-missing",
-          format: {
-            childModel: target.name,
-            parentModel: value.name,
-            propertyName: conflict.propertyName,
-          },
-          target: context.decoratorTarget,
-        });
-      } else if (conflict.reason === "type-mismatch") {
-        reportDiagnostic(context.program, {
-          code: "legacy-hierarchy-building-conflict",
-          messageId: "type-mismatch",
-          format: {
-            childModel: target.name,
-            parentModel: value.name,
-            propertyName: conflict.propertyName,
-          },
-          target: context.decoratorTarget,
-        });
-      }
-    }
-    return;
-  }
-
   setScopedDecoratorData(
     context,
     $legacyHierarchyBuilding,
@@ -1523,7 +1890,7 @@ const markAsLroKey = createStateSymbol("markAsLro");
 export const $markAsLro: MarkAsLroDecorator = (
   context: DecoratorContext,
   target: Operation,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
   const hasModelResponse = httpOperation.responses.filter(
@@ -1562,7 +1929,7 @@ const markAsPageableKey = createStateSymbol("markAsPageable");
 export const $markAsPageable: MarkAsPageableDecorator = (
   context: DecoratorContext,
   target: Operation,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
   const modelResponse = httpOperation.responses.filter(
@@ -1659,7 +2026,7 @@ const disablePageableKey = createStateSymbol("disablePageable");
 export const $disablePageable: DisablePageableDecorator = (
   context: DecoratorContext,
   target: Operation,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   setScopedDecoratorData(context, $disablePageable, disablePageableKey, target, true, scope);
 };
@@ -1688,7 +2055,7 @@ export const $nextLinkVerb: NextLinkVerbDecorator = (
   context: DecoratorContext,
   target: Operation,
   verb: Type,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   compilerAssert(
     verb.kind === "String" && (verb.value === "POST" || verb.value === "GET"),
@@ -1713,7 +2080,7 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   value: string | boolean | Numeric,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   const actualValue = isNumeric(value) ? value.asNumber() : value;
   setScopedDecoratorData(
@@ -1724,6 +2091,41 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
     actualValue,
     scope,
   );
+
+  return {
+    onTargetFinish: () => {
+      const tk = $(context.program);
+
+      // Check if there's an alternate type set on this property (respecting scope)
+      const alternateType = getScopedDecoratorData(
+        { program: context.program } as TCGCContext,
+        alternateTypeKey,
+        target,
+        normalizeScope(scope) ?? AllScopes,
+      );
+      const effectiveType =
+        alternateType !== undefined && alternateType.kind !== "externalTypeInfo"
+          ? alternateType
+          : target.type;
+
+      // Create a literal type from the value and check assignability to the property type
+      const literal = tk.literal.create(actualValue as string | number | boolean);
+      if (tk.type.isAssignableTo(literal, effectiveType)) return [];
+
+      const valueType = typeof actualValue;
+      const valueTypeLabel = valueType === "number" ? "numeric" : valueType;
+      return [
+        createDiagnostic({
+          code: "client-default-value-type-mismatch",
+          format: {
+            valueType: valueTypeLabel,
+            propertyType: tk.scalar.is(effectiveType) ? effectiveType.name : effectiveType.kind,
+          },
+          target: target,
+        }),
+      ];
+    },
+  };
 };
 
 /**
@@ -1777,7 +2179,7 @@ export const $clientOption: ClientOptionDecorator = (
   target: Type,
   name: string,
   value: unknown,
-  scope?: LanguageScopes,
+  scope?: LanguageScopes | DecoratorOptions,
 ) => {
   // Always emit warning that this is experimental
   reportDiagnostic(context.program, {
@@ -1785,17 +2187,50 @@ export const $clientOption: ClientOptionDecorator = (
     target: context.decoratorTarget,
   });
 
-  // Emit additional warning if scope is not provided
-  if (scope === undefined) {
-    reportDiagnostic(context.program, {
-      code: "client-option-requires-scope",
-      target: context.decoratorTarget,
-    });
+  const normalizedScope = normalizeScope(scope);
+
+  if (scope !== undefined && normalizedScope === undefined) {
+    return {
+      onTargetFinish: () => [
+        createDiagnostic({
+          code: "decorator-requires-scope",
+          format: {
+            decoratorName: "clientOption",
+            allowedScopes: "a language scope",
+          },
+          target: context.decoratorTarget,
+        }),
+      ],
+    };
   }
 
   // Store the option data - each decorator application is stored separately
   // The decorator info will be exposed via the decorators array on SDK types
-  setScopedDecoratorData(context, $clientOption, clientOptionKey, target, { name, value }, scope);
+  setScopedDecoratorData(
+    context,
+    $clientOption,
+    clientOptionKey,
+    target,
+    { name, value },
+    normalizedScope,
+  );
+
+  // clientOption must be scoped to any language
+  if (scope === undefined) {
+    return {
+      onTargetFinish: () => [
+        createDiagnostic({
+          code: "decorator-requires-scope",
+          format: {
+            decoratorName: "clientOption",
+            allowedScopes: "a language scope",
+          },
+          target: context.decoratorTarget,
+        }),
+      ],
+    };
+  }
+  return undefined;
 };
 
 /**
@@ -1809,8 +2244,7 @@ export function getClientOptionValue(
 ): unknown | undefined {
   // Check operation directly
   const opOption = getScopedDecoratorData(context, clientOptionKey, target) as
-    | { name: string; value: unknown }
-    | undefined;
+    { name: string; value: unknown } | undefined;
   if (opOption?.name === optionName) {
     return opOption.value;
   }
@@ -1818,8 +2252,7 @@ export function getClientOptionValue(
   // Check interface if operation is in one
   if (target.interface) {
     const ifaceOption = getScopedDecoratorData(context, clientOptionKey, target.interface) as
-      | { name: string; value: unknown }
-      | undefined;
+      { name: string; value: unknown } | undefined;
     if (ifaceOption?.name === optionName) {
       return ifaceOption.value;
     }
@@ -1829,8 +2262,7 @@ export function getClientOptionValue(
   let ns = target.namespace;
   while (ns) {
     const nsOption = getScopedDecoratorData(context, clientOptionKey, ns) as
-      | { name: string; value: unknown }
-      | undefined;
+      { name: string; value: unknown } | undefined;
     if (nsOption?.name === optionName) {
       return nsOption.value;
     }

@@ -1,4 +1,4 @@
-import { dyn, dynItem, json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import { dyn, dynItem, json, passOnSuccess, type ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 const validUser = { id: 1, name: "Madge", etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59" };

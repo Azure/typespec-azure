@@ -1,8 +1,12 @@
 import { defineLinter } from "@typespec/compiler";
+import { armAgentBaseTypeChildResourcesRule } from "./rules/arm-agent-base-type-child-resources.js";
+import { armAgentBaseTypeLifecycleOperationsRule } from "./rules/arm-agent-base-type-lifecycle-operations.js";
 import { armCommonTypesVersionRule } from "./rules/arm-common-types-version.js";
 import { armCustomResourceNoKey } from "./rules/arm-custom-resource-no-key.js";
 import { armCustomResourceUsageDiscourage } from "./rules/arm-custom-resource-usage-discourage.js";
 import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js";
+import { armFeatureFileUsageDiscourage } from "./rules/arm-feature-file-usage-discourage.js";
+import { armNoPathCasingConflictsRule } from "./rules/arm-no-path-casing-conflicts.js";
 import { armNoRecordRule } from "./rules/arm-no-record.js";
 import { armPostResponseCodesRule } from "./rules/arm-post-response-codes.js";
 import { armPutResponseCodesRule } from "./rules/arm-put-response-codes.js";
@@ -19,27 +23,48 @@ import { patchOperationsRule } from "./rules/arm-resource-patch.js";
 import { armResourcePathInvalidCharsRule } from "./rules/arm-resource-path-invalid-chars.js";
 import { armResourceProvisioningStateRule } from "./rules/arm-resource-provisioning-state-rule.js";
 import { beyondNestingRule } from "./rules/beyond-nesting-levels.js";
-import { coreOperationsRule } from "./rules/core-operations.js";
 import { envelopePropertiesRules } from "./rules/envelope-properties.js";
 import { improperSubscriptionListOperationRule } from "./rules/improper-subscription-list-operation.js";
+import { listOperationMissingPageableRule } from "./rules/list-operation-missing-pageable.js";
+import { listResponseEnvelopeRule } from "./rules/list-response-envelope.js";
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
+import { lroResponseMismatchRule } from "./rules/lro-response-mismatch.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
+import { noOverridePropsRule } from "./rules/no-override-props.js";
+import { noQueryInCollectionRule } from "./rules/no-query-in-collection.js";
+import { noQueryInPointOpRule } from "./rules/no-query-in-point-op.js";
+import { noQueryInPostRule } from "./rules/no-query-in-post.js";
+import { noReservedResourcePropertyRule } from "./rules/no-reserved-resource-property.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
+import { noTenantLevelApisRule } from "./rules/no-tenant-level-apis.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
 import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
+import { useApiVersionRule } from "./rules/use-api-version.js";
+import { useApplicationJsonContentTypeRule } from "./rules/use-application-json-content-type.js";
+import { useInterfaceRule } from "./rules/use-interface.js";
+import { useModelRequestBodyRule } from "./rules/use-model-request-body.js";
+import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
+import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
+import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
+  armAgentBaseTypeChildResourcesRule,
+  armAgentBaseTypeLifecycleOperationsRule,
+  useRelationshipRequiredPropertiesRule,
   armNoRecordRule,
+  armNoPathCasingConflictsRule,
+  noOverridePropsRule,
   armCommonTypesVersionRule,
   armDeleteResponseCodesRule,
   armPutResponseCodesRule,
   armPostResponseCodesRule,
+  lroResponseMismatchRule,
   armResourceActionNoSegmentRule,
   armResourceDuplicatePropertiesRule,
   armResourceEnvelopeProperties,
@@ -47,28 +72,41 @@ const rules = [
   armResourceKeyInvalidCharsRule,
   armResourceNamePatternRule,
   armResourceOperationsRule,
+  useApiVersionRule,
+  useApplicationJsonContentTypeRule,
+  useOperationDecoratorRule,
   armResourcePathInvalidCharsRule,
   armResourceProvisioningStateRule,
+  versionProgressionRule,
   armCustomResourceNoKey,
   armCustomResourceUsageDiscourage,
+  armFeatureFileUsageDiscourage,
   beyondNestingRule,
-  coreOperationsRule,
+  listResponseEnvelopeRule,
+  noQueryInCollectionRule,
+  useInterfaceRule,
   deleteOperationMissingRule,
   envelopePropertiesRules,
   interfacesRule,
   armResourceInvalidActionVerbRule,
   improperSubscriptionListOperationRule,
   lroLocationHeaderRule,
+  listOperationMissingPageableRule,
   missingXmsIdentifiersRule,
   noResponseBodyRule,
+  noQueryInPostRule,
   operationsInterfaceMissingRule,
   patchEnvelopePropertiesRules,
   patchOperationsRule,
   resourceNameRule,
   retryAfterRule,
   unsupportedTypeRule,
+  useModelRequestBodyRule,
   secretProprule,
   noEmptyModel,
+  noReservedResourcePropertyRule,
+  noTenantLevelApisRule,
+  noQueryInPointOpRule,
 ];
 
 export const $linter = defineLinter({

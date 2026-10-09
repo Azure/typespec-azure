@@ -1,6 +1,6 @@
 import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { it } from "vitest";
+import { describe, it } from "vitest";
 import { getAllModels } from "../../src/types.js";
 import {
   AzureCoreTester,
@@ -305,4 +305,161 @@ it("mixed with @alternateType", async () => {
   const pageSizeParam = method.parameters.find((p) => p.name === "pageSize")!;
   ok(pageSizeParam);
   strictEqual(pageSizeParam.clientDefaultValue, "10");
+});
+
+describe("type mismatch diagnostics", () => {
+  it("reports warning when string default value is used on numeric property", async () => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        @route("/func1")
+        op func1(
+          @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("10")
+          @query pageSize?: int32
+        ): void;
+      }
+    `);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/client-default-value-type-mismatch",
+      message:
+        'Client default value type "string" does not match property type "int32". The default value type should match the property type.',
+    });
+  });
+
+  it("reports warning when numeric default value is used on string property", async () => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        @route("/func1")
+        op func1(
+          @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(123)
+          @query sortOrder?: string
+        ): void;
+      }
+    `);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/client-default-value-type-mismatch",
+      message:
+        'Client default value type "numeric" does not match property type "string". The default value type should match the property type.',
+    });
+  });
+
+  it("reports warning when numeric default value is used on boolean property", async () => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        @route("/func1")
+        op func1(
+          @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(1)
+          @query flag?: boolean
+        ): void;
+      }
+    `);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/client-default-value-type-mismatch",
+      message:
+        'Client default value type "numeric" does not match property type "boolean". The default value type should match the property type.',
+    });
+  });
+
+  it("reports warning when string default value is used on boolean property", async () => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        model Config {
+          @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("true")
+          enableCache?: boolean;
+        }
+
+        @route("/func1")
+        op func1(@body body: Config): void;
+      }
+    `);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/client-default-value-type-mismatch",
+      message:
+        'Client default value type "string" does not match property type "boolean". The default value type should match the property type.',
+    });
+  });
+
+  it("does not report warning when types match", async () => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        model RequestOptions {
+          @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
+          timeout?: int32;
+
+          @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("standard")
+          tier?: string;
+
+          @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(false)
+          enableCache?: boolean;
+        }
+
+        @route("/func1")
+        op func1(@body body: RequestOptions): void;
+      }
+    `);
+    expectDiagnostics(diagnostics, []);
+  });
+
+  it("does not report warning for numeric subtypes like float32, int64", async () => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        model Config {
+          @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(3.14)
+          ratio?: float32;
+
+          @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(100)
+          bigNum?: int64;
+        }
+
+        @route("/func1")
+        op func1(@body body: Config): void;
+      }
+    `);
+    expectDiagnostics(diagnostics, []);
+  });
+
+  it("reports warning when boolean default value is used on string property", async () => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        model Config {
+          @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(true)
+          name?: string;
+        }
+
+        @route("/func1")
+        op func1(@body body: Config): void;
+      }
+    `);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/client-default-value-type-mismatch",
+      message:
+        'Client default value type "boolean" does not match property type "string". The default value type should match the property type.',
+    });
+  });
+
+  it("reports warning when boolean default value is used on numeric property", async () => {
+    const diagnostics = await SimpleTester.diagnose(`
+      @service
+      namespace MyService {
+        model Config {
+          @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(false)
+          count?: int32;
+        }
+
+        @route("/func1")
+        op func1(@body body: Config): void;
+      }
+    `);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/client-default-value-type-mismatch",
+      message:
+        'Client default value type "boolean" does not match property type "int32". The default value type should match the property type.',
+    });
+  });
 });

@@ -1,11 +1,12 @@
 import {
-  DiagnosticMessages,
-  LinterRuleContext,
-  Model,
-  ModelProperty,
-  Operation,
-  Program,
+  type DiagnosticMessages,
+  type LinterRuleContext,
+  type Model,
+  type ModelProperty,
+  type Operation,
+  type Program,
   createRule,
+  fileRef,
   getEffectiveModelType,
   getProperty,
   isErrorType,
@@ -26,6 +27,7 @@ import { getSourceModel, isInternalTypeSpec } from "./utils.js";
 
 export const patchOperationsRule = createRule({
   name: "arm-resource-patch",
+  docs: fileRef.fromPackageRoot("src/rules/arm-resource-patch.md"),
   severity: "warning",
   description: "Validate ARM PATCH operations.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-patch",

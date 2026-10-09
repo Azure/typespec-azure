@@ -1,0 +1,30 @@
+import { ClientOptions } from '@azure-rest/core-client';
+import { isRestError } from '@azure/core-rest-pipeline';
+import { KeyCredential } from '@azure/core-auth';
+import { OperationOptions } from '@azure-rest/core-client';
+import { Pipeline } from '@azure/core-rest-pipeline';
+import { RestError } from '@azure/core-rest-pipeline';
+import { TokenCredential } from '@azure/core-auth';
+
+export { isRestError }
+
+export { RestError }
+
+export declare class UnionClient {
+    private _client;
+    readonly pipeline: Pipeline;
+    constructor(credential: KeyCredential | TokenCredential, options?: UnionClientOptionalParams);
+    validToken(options?: ValidTokenOptionalParams): Promise<void>;
+    validKey(options?: ValidKeyOptionalParams): Promise<void>;
+}
+
+export declare interface UnionClientOptionalParams extends ClientOptions {
+}
+
+export declare interface ValidKeyOptionalParams extends OperationOptions {
+}
+
+export declare interface ValidTokenOptionalParams extends OperationOptions {
+}
+
+export { }

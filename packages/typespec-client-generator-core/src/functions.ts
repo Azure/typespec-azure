@@ -1,5 +1,6 @@
-import { FunctionContext, ModelProperty, Operation, Type } from "@typespec/compiler";
+import type { FunctionContext, ModelProperty, Operation, Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
+import { EXACT_NAME_PREFIX, responseOverrideKey } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
 
 // Helper function to clone an operation with new parameters and/or return type
@@ -20,6 +21,8 @@ function cloneOperation(
   // Copy decorators from the original operation
   if (operation.decorators) {
     newOp.decorators = [...operation.decorators];
+    // Re-finish the type so the copied decorators are applied
+    tk.type.finishType(newOp);
   }
 
   // Set the source operation for tracing
@@ -40,6 +43,8 @@ function cloneModelProperty(tk: ReturnType<typeof $>, prop: ModelProperty): Mode
   if (prop.decorators) {
     clonedProp.decorators = [...prop.decorators];
   }
+  // Finish the type so decorators are applied
+  tk.type.finishType(clonedProp);
   return clonedProp;
 }
 
@@ -233,4 +238,84 @@ export function reorderParameters(
   }
 
   return cloneOperation(tk, operation, { parameters: newProperties });
+}
+
+/**
+ * Replace the method response type of an operation with `void`.
+ *
+ * The operation's HTTP response metadata is preserved; only the client method
+ * return type is changed when the operation is used with `@override`.
+ *
+ * @param context The function context provided by TypeSpec
+ * @param operation The operation to transform
+ * @returns A new operation whose method response type is `void`
+ */
+export function replaceResponseWithVoid(context: FunctionContext, operation: Operation): Operation {
+  const tk = $(context.program);
+  const replacement = cloneOperation(tk, operation, {
+    returnType: tk.intrinsic.void,
+  });
+  context.program.stateMap(responseOverrideKey).set(replacement, true);
+  return replacement;
+}
+
+/**
+ * Replace the method response type of an operation with the raw bytes of the HTTP response body.
+ *
+ * The operation's HTTP response metadata is preserved; only the client method
+ * return type is changed when the operation is used with `@override`.
+ *
+ * @param context The function context provided by TypeSpec
+ * @param operation The operation to transform
+ * @returns A new operation whose method response type is `bytes`
+ */
+export function replaceResponseWithBytes(
+  context: FunctionContext,
+  operation: Operation,
+): Operation {
+  const tk = $(context.program);
+  const replacement = cloneOperation(tk, operation, {
+    returnType: tk.builtin.bytes,
+  });
+  context.program.stateMap(responseOverrideKey).set(replacement, true);
+  return replacement;
+}
+
+/**
+ * Mark a client name as exact, preventing language emitters from applying
+ * their usual casing transformations.
+ *
+ * @param context The function context provided by TypeSpec
+ * @param name The exact name to preserve
+ * @returns The name prefixed with an internal marker
+ */
+export function exact(context: FunctionContext, name: string): string {
+  return `${EXACT_NAME_PREFIX}${name}`;
+}
+
+/**
+ * Check whether a name string carries the exact-name marker.
+ *
+ * @param name The name to check
+ * @returns true if the name was produced by the `exact()` function
+ */
+export function hasExactNameMarker(name: string): boolean {
+  return name.startsWith(EXACT_NAME_PREFIX);
+}
+
+/**
+ * Strip the exact-name marker from a name string and return both
+ * the clean name and whether the marker was present.
+ *
+ * @param name The name to normalize
+ * @returns An object with the clean name and whether it was marked as exact
+ */
+export function normalizeExactName(name: string): {
+  name: string;
+  isExactName: boolean;
+} {
+  if (name.startsWith(EXACT_NAME_PREFIX)) {
+    return { name: name.slice(EXACT_NAME_PREFIX.length), isExactName: true };
+  }
+  return { name, isExactName: false };
 }

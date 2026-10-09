@@ -1,5 +1,5 @@
 ---
-title: 'Emitter usage'
+title: "Emitter usage"
 ---
 
 ## Emitter usage
@@ -14,16 +14,16 @@ tsp compile . --emit=@azure-tools/typespec-go
 
 ```yaml
 emit:
-  - '@azure-tools/typespec-go'
+  - "@azure-tools/typespec-go"
 ```
 
 The config can be extended with options as follows:
 
 ```yaml
 emit:
-  - '@azure-tools/typespec-go'
+  - "@azure-tools/typespec-go"
 options:
-  '@azure-tools/typespec-go':
+  "@azure-tools/typespec-go":
     option: value
 ```
 
@@ -54,11 +54,17 @@ The module into which the package is being emitted. Mutually exclusive with modu
 
 When true, unmarshalers will return an error when an unknown field is encountered in the payload. The default is false.
 
+### `emit-content-type-header`
+
+**Type:** `boolean`
+
+Includes the Content-Type header in response envelopes for modeled responses. The default is false.
+
 ### `file-prefix`
 
 **Type:** `string`
 
-Optional prefix to file names. For example, if you set your file prefix to "zzz*", all generated code files will begin with "zzz*".
+Optional prefix to file names. For example, if you set your file prefix to "zzz_", all generated code files will begin with "zzz_".
 
 ### `generate-fakes`
 
@@ -89,6 +95,12 @@ Enables generation of spans for distributed tracing. The default is false.
 **Type:** `string`
 
 The module identity to use in go.mod. Mutually exclusive with containing-module.
+
+### `omit-constructors`
+
+**Type:** `boolean`
+
+When true, client constructors are not emitted. The default is false.
 
 ### `rawjson-as-bytes`
 
@@ -135,5 +147,7 @@ When true, generate example tests. The default is false.
 ### `factory-gather-all-params`
 
 **Type:** `boolean`
+
+**Default:** `true`
 
 When true, the `NewClientFactory` constructor gathers all parameters. When false, it only gathers common parameters of clients. The default is true.

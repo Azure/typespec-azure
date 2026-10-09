@@ -1,14 +1,14 @@
 import {
   createDiagnosticCollector,
-  Diagnostic,
+  type Diagnostic,
   getNamespaceFullName,
   ignoreDiagnostics,
 } from "@typespec/compiler";
-import { createHash } from "node:crypto";
+
 import { prepareClientAndOperationCache } from "./cache.js";
 import { createSdkClientType } from "./clients.js";
 import { listClients } from "./decorators.js";
-import {
+import type {
   SdkClientType,
   SdkEnumType,
   SdkModelType,
@@ -29,9 +29,9 @@ import { getLicenseInfo } from "./license.js";
 import { getCrossLanguagePackageId, getNamespaceFromType } from "./public-utils.js";
 import { getAllReferencedTypes, handleAllTypes } from "./types.js";
 
-export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
+export async function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
-): [SdkPackage<TServiceOperation>, readonly Diagnostic[]] {
+): Promise<[SdkPackage<TServiceOperation>, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
   populateApiVersionInformation(context);
   diagnostics.pipe(handleAllTypes(context));
@@ -64,6 +64,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
     namespaces: [],
     licenseInfo: getLicenseInfo(context),
     metadata: {
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       apiVersion:
         context.apiVersion === "all" && versions.size === 1
           ? "all"
@@ -76,7 +77,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   organizeNamespaces(context, sdkPackage);
 
   // Compute cross-language version hash from source files
-  sdkPackage.crossLanguageVersion = computeCrossLanguageVersion(context);
+  sdkPackage.crossLanguageVersion = await computeCrossLanguageVersion(context);
 
   return diagnostics.wrap(sdkPackage);
 }
@@ -184,7 +185,7 @@ function populateApiVersionInformation(context: TCGCContext): void {
  * - Unions
  * - HTTP operation details (verb, path, parameter locations)
  */
-function computeCrossLanguageVersion(context: TCGCContext): string {
+async function computeCrossLanguageVersion(context: TCGCContext): Promise<string> {
   // Concatenate all source file contents
   const content = [...context.program.sourceFiles.values()]
     .filter((script) => {
@@ -194,7 +195,10 @@ function computeCrossLanguageVersion(context: TCGCContext): string {
     .map((script) => script.file.text)
     .join("");
 
-  // Hash the combined content
-  const hash = createHash("sha256").update(content).digest("hex");
-  return hash.substring(0, 12);
+  // Hash the combined content using Web Crypto API (browser-compatible)
+  const encoded = new TextEncoder().encode(content);
+  const hashBuffer = await globalThis.crypto.subtle.digest("SHA-256", encoded);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  return hex.substring(0, 12);
 }

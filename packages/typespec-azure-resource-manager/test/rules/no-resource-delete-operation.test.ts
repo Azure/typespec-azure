@@ -1,7 +1,7 @@
 import { Tester } from "#test/tester.js";
 import {
-  LinterRuleTester,
-  TesterInstance,
+  type LinterRuleTester,
+  type TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
@@ -28,7 +28,7 @@ it("is valid if arm resource has a delete operation", async () => {
         namespace Microsoft.Foo;
 
         model Foo is TrackedResource<{}> {
-          @key @path @segment("foos") name: string;
+          ...ResourceNameParameter<Foo>;
         }
 
         @armResourceOperations
@@ -49,7 +49,7 @@ it("emit warnings if TrackedResource is missing a delete operation", async () =>
       namespace Microsoft.Foo;
 
       model Foo is TrackedResource<{}> {
-        @key @path @segment("foos") name: string;
+        ...ResourceNameParameter<Foo>;
       }
 
       @armResourceOperations
@@ -72,10 +72,10 @@ it("emit warnings if the delete operation is for another resource", async () => 
       namespace Microsoft.Foo;
 
       model Foo is TrackedResource<{}> {
-        @key @path @segment("foos") name: string;
+        ...ResourceNameParameter<Foo>;
       }
       model Bar is TrackedResource<{}> {
-        @key @path @segment("bars") name: string;
+        ...ResourceNameParameter<Bar>;
       }
 
       @armResourceOperations

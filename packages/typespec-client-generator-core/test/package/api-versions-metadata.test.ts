@@ -1,5 +1,8 @@
+import { getDirectoryPath, resolveCompilerOptions } from "@typespec/compiler";
+import { resolveVirtualPath } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
+import { parse } from "yaml";
 import {
   createClientCustomizationInput,
   createSdkContextForTester,
@@ -34,6 +37,84 @@ it("single service with versioning should populate apiVersions map", async () =>
   ok(sdkPackage.metadata.apiVersions);
   strictEqual(sdkPackage.metadata.apiVersions.size, 1);
   strictEqual(sdkPackage.metadata.apiVersions.get("WidgetService"), "v3");
+});
+
+it("supports nested service namespaces in tspconfig.yaml", async () => {
+  const tester = await SimpleBaseTester.createInstance();
+  const spec = createClientCustomizationInput(
+    `
+      @service
+      @versioned(Microsoft.Network.Versions)
+      namespace Microsoft.Network {
+        enum Versions {
+          v1,
+          v2,
+        }
+        op networkTest(): void;
+      }
+
+      @service
+      @versioned(Microsoft.Compute.Versions)
+      namespace Microsoft.Compute {
+        enum Versions {
+          v1,
+          v2,
+        }
+        op computeTest(): void;
+      }
+    `,
+    `
+      @client({
+        name: "CombinedClient",
+        service: [Microsoft.Network, Microsoft.Compute],
+        autoMergeService: true,
+      })
+      namespace Combined;
+    `,
+  );
+  tester.fs.addTypeSpecFile("main.tsp", "");
+  tester.fs.addTypeSpecFile(
+    "tspconfig.yaml",
+    `
+emit:
+  - "@azure-tools/typespec-client-generator-core"
+options:
+  "@azure-tools/typespec-client-generator-core":
+    api-version:
+      Microsoft:
+        Network: v1
+        Compute: v1
+`,
+  );
+
+  const entrypoint = resolveVirtualPath("main.tsp");
+  const [compilerOptions, configDiagnostics] = await resolveCompilerOptions(
+    tester.fs.compilerHost,
+    {
+      cwd: getDirectoryPath(entrypoint),
+      entrypoint,
+    },
+  );
+  strictEqual(configDiagnostics.length, 0);
+
+  const [, diagnostics] = await tester.compileAndDiagnose(spec, {
+    compilerOptions,
+  });
+  strictEqual(
+    diagnostics.length,
+    0,
+    diagnostics.map((diagnostic) => diagnostic.message).join("\n"),
+  );
+
+  const output = [...tester.fs.fs.entries()].find(([path]) =>
+    path.endsWith("tcgc-output.yaml"),
+  )?.[1];
+  ok(output);
+  const sdkPackage = parse(output);
+  deepStrictEqual(sdkPackage.metadata.apiVersions, {
+    "Microsoft.Network": "v1",
+    "Microsoft.Compute": "v1",
+  });
 });
 
 it("multiple services should populate apiVersions map with all services", async () => {
@@ -215,4 +296,119 @@ it("apiVersion 'all' should populate apiVersions with 'all'", async () => {
   ok(sdkPackage.metadata.apiVersions);
   strictEqual(sdkPackage.metadata.apiVersions.size, 1);
   strictEqual(sdkPackage.metadata.apiVersions.get("WidgetService"), "all");
+});
+
+const multiServiceSpec = createClientCustomizationInput(
+  `
+  @service
+  @versioned(VersionsA)
+  namespace ServiceA {
+    enum VersionsA {
+      av1,
+      av2,
+    }
+    interface AI {
+      @route("/aTest")
+      aTest(@query("api-version") apiVersion: VersionsA): void;
+    }
+  }
+  @service
+  @versioned(VersionsB)
+  namespace ServiceB {
+    enum VersionsB {
+      bv1,
+      bv2,
+    }
+    interface BI {
+      @route("/bTest")
+      bTest(@query("api-version") apiVersion: VersionsB): void;
+    }
+  }`,
+  `
+  @client(
+    {
+      name: "CombineClient",
+      service: [ServiceA, ServiceB],
+      autoMergeService: true,
+    }
+  )
+  namespace CombineClient;
+`,
+);
+
+it("multiple services with api-version map should apply per-service versions", async () => {
+  const { program } = await SimpleBaseTester.compile(multiServiceSpec);
+
+  const context = await createSdkContextForTester(program, {
+    "api-version": { ServiceA: "av1", ServiceB: "bv1" },
+  });
+  const sdkPackage = context.sdkPackage;
+
+  // For multi-service, deprecated apiVersion should be undefined
+  strictEqual(sdkPackage.metadata.apiVersion, undefined);
+
+  // Each service should map to its specified version
+  ok(sdkPackage.metadata.apiVersions);
+  strictEqual(sdkPackage.metadata.apiVersions.size, 2);
+  strictEqual(sdkPackage.metadata.apiVersions.get("ServiceA"), "av1");
+  strictEqual(sdkPackage.metadata.apiVersions.get("ServiceB"), "bv1");
+
+  const client = sdkPackage.clients[0];
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  deepStrictEqual(aiClient.apiVersions, ["av1"]);
+  strictEqual(aiClient.clientInitialization.parameters[1].clientDefaultValue, "av1");
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  deepStrictEqual(biClient.apiVersions, ["bv1"]);
+  strictEqual(biClient.clientInitialization.parameters[1].clientDefaultValue, "bv1");
+});
+
+it("multiple services with api-version map should fall back to latest for unspecified services", async () => {
+  const { program } = await SimpleBaseTester.compile(multiServiceSpec);
+
+  const context = await createSdkContextForTester(program, {
+    "api-version": { ServiceA: "av1" },
+  });
+  const sdkPackage = context.sdkPackage;
+
+  // ServiceA uses the specified version, ServiceB falls back to its latest
+  ok(sdkPackage.metadata.apiVersions);
+  strictEqual(sdkPackage.metadata.apiVersions.size, 2);
+  strictEqual(sdkPackage.metadata.apiVersions.get("ServiceA"), "av1");
+  strictEqual(sdkPackage.metadata.apiVersions.get("ServiceB"), "bv2");
+
+  const client = sdkPackage.clients[0];
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  deepStrictEqual(aiClient.apiVersions, ["av1"]);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+});
+
+it("multiple services with api-version map does not support 'all' (falls back to latest)", async () => {
+  const { program } = await SimpleBaseTester.compile(multiServiceSpec);
+
+  const context = await createSdkContextForTester(program, {
+    "api-version": { ServiceA: "all", ServiceB: "bv1" },
+  });
+  const sdkPackage = context.sdkPackage;
+
+  // Multi-service does not support `all`; ServiceA falls back to its latest version.
+  ok(sdkPackage.metadata.apiVersions);
+  strictEqual(sdkPackage.metadata.apiVersions.size, 2);
+  strictEqual(sdkPackage.metadata.apiVersions.get("ServiceA"), "av2");
+  strictEqual(sdkPackage.metadata.apiVersions.get("ServiceB"), "bv1");
+
+  const client = sdkPackage.clients[0];
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2"]);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  deepStrictEqual(biClient.apiVersions, ["bv1"]);
 });

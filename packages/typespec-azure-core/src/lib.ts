@@ -1,4 +1,4 @@
-import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
+import { createTypeSpecLibrary, fileRef, paramMessage } from "@typespec/compiler";
 
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azure-core",
@@ -43,8 +43,16 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         badValue: paramMessage`Specified final state value '${"finalStateValue"}' is not valid. It must be one of ("operation-location", "original-uri", "location", "azure-async-operation")`,
-        notPut: "The final state value 'original-uri' can only be used in http PUT operations",
+        notPut:
+          "The final state value 'original-uri' can only be used in http PUT, PATCH, or POST operations",
         noHeader: paramMessage`There was no header corresponding to the desired final-state-via value '${"finalStateValue"}'.`,
+      },
+    },
+    "no-operation-at-original-uri": {
+      severity: "warning",
+      messages: {
+        default:
+          "The 'original-uri' final state is specified, but there is no GET operation at the original URI. The final result will be treated as 'void'.",
       },
     },
     "bad-record-type": {
@@ -255,6 +263,13 @@ export const $lib = createTypeSpecLibrary({
         default: `@uniqueItems can only be applied to arrays and array-valued model properties.`,
       },
     },
+    "invalid-api-version-override": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/invalid-api-version-override.md"),
+      severity: "error",
+      messages: {
+        default: "The API version override must be a non-empty string.",
+      },
+    },
     "experimental-feature": {
       severity: "warning",
       messages: {
@@ -296,6 +311,9 @@ export const $lib = createTypeSpecLibrary({
     },
     previewVersion: {
       description: "Data for `@previewVersion` decorator",
+    },
+    apiVersionOverride: {
+      description: "Data for `@overrideApiVersion` decorator",
     },
   },
   // AzureCoreStateKeys.traitLocation

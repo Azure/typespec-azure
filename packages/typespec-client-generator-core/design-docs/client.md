@@ -376,7 +376,8 @@ namespace MyCustomizations {
     blobName: string;
   }
 
-  @@clientInitialization(MyService.InnerGroup,
+  @@clientInitialization(
+    MyService.InnerGroup,
     {
       parameters: InnerGroupClientOptions,
       initializedBy: InitializedBy.parent | InitializedBy.individually,
@@ -472,7 +473,8 @@ model SubClientOptions {
   subName: string;
 }
 
-@@clientInitialization(TestClient.SubClient,
+@@clientInitialization(
+  TestClient.SubClient,
   {
     parameters: SubClientOptions,
   }
@@ -493,7 +495,8 @@ namespace TestClient {
   }
 }
 
-@@clientInitialization(TestClient.SubClient,
+@@clientInitialization(
+  TestClient.SubClient,
   {
     intializedBy: InitializedBy.individually | InitializedBy.parent,
   }
@@ -516,7 +519,8 @@ model SubClientOptions {
   subName: string;
 }
 
-@@clientInitialization(TestClient.SubClient,
+@@clientInitialization(
+  TestClient.SubClient,
   {
     parameters: SubClientOptions,
     intializedBy: InitializedBy.individually | InitializedBy.parent,

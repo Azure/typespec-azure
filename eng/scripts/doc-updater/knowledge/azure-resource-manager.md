@@ -1,0 +1,175 @@
+# Azure Resource Manager Documentation Knowledge Base
+
+## Envelope Property Names
+
+The current (non-deprecated) envelope property spread models are:
+
+- `...ResourceSkuProperty` (not `ResourceSku`)
+- `...EntityTagProperty` (not `EntityTag`)
+- `...ResourcePlanProperty` (not `ResourcePlan`)
+- `...ResourceKindProperty` (not `ResourceKind`)
+- `...ManagedByProperty` (not `ManagedBy`)
+- `...ManagedServiceIdentityProperty` (not `ManagedServiceIdentity`)
+- `...ManagedSystemAssignedIdentityProperty` (not `ManagedSystemAssignedIdentity`)
+- `...ExtendedLocationProperty`
+
+The deprecated aliases are defined in `lib/models.tsp` with `#deprecated` markers.
+
+## Resource Name Pattern
+
+Always use `...ResourceNameParameter<ModelName>` in resource model definitions instead of manual `@key/@segment/@visibility/@path name` patterns. The template auto-generates camelCased key names and pluralized segment names from the model name. Custom key/segment names can be overridden via `KeyName` and `SegmentName` template parameters.
+
+## Resource Model Naming
+
+Do **not** add a `Resource` suffix to user-defined ARM resource models when using one of the resource templates (`TrackedResource<>`, `ProxyResource<>`, `ExtensionResource<>`). Name the model after the entity itself (e.g., `Employee`, `Job`, `EmployeeAgreement`) — not `EmployeeResource`, `JobResource`, etc. This is an anti-pattern because:
+
+- It makes the auto-derived key and segment names (from `ResourceNameParameter<Model>`) easy to derive correctly (e.g., `Employee` → `employeeName`/`employees`). With a `Resource` suffix, the defaults become `employeeResourceName`/`employeeResources`, which forces every example to override `KeyName`/`SegmentName` unnecessarily.
+- It follows the standard naming pattern used across Azure resource provider specs.
+
+Examples and docs should consistently use the unsuffixed form:
+
+```typespec
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+```
+
+## Rule Documentation Files
+
+Rule documentation is authored beside each rule in `packages/typespec-azure-resource-manager/src/rules/*.md` and associated with the rule through its `docs` field. `pnpm regen-docs` passes `--rules-dir ../rules` and generates the website rule pages under `website/src/content/docs/docs/libraries/azure-resource-manager/rules/`. That website directory is ignored by Git and must not be edited manually.
+
+The `use-relationship-required-properties`, `use-api-version`, `use-operation-decorator`, and `use-interface` rules currently have adjacent Markdown source but no `docs` field in their TypeScript rule definitions. `regen-docs` therefore warns that their documentation is missing and emits description-only rule pages. Fixing those associations requires an edit under `src/`.
+
+## Reference Documentation Generation
+
+- `pnpm regen-docs` from `packages/typespec-azure-resource-manager/` generates reference files (data-types.md, decorators.md, interfaces.md, index.mdx, linter.md) and ignored rule pages under `rules/`.
+- Rule content changes must be made in `packages/typespec-azure-resource-manager/src/rules/*.md`, not in the generated website pages.
+- The package must be built before running `pnpm regen-docs`.
+
+## Sample Paths
+
+Canonical ARM samples are under `packages/samples/specs/resource-manager/`:
+
+- `resource-types/tracked/` — TrackedResource
+- `resource-types/proxy/` — ProxyResource child
+- `resource-types/tenant/` — @tenantResource
+- `resource-types/extension/` — ExtensionResource multi-scope
+- `resource-types/specific-extension/` — ExternalResource targets
+- `resource-types/singleton/` — @singleton
+- `resource-types/virtual-resource/` — @armVirtualResource
+- `resource-types/location/` — ArmLocationResource parent
+- `resource-types/private-endpoints/` — PrivateEndpointConnection
+- `resource-types/private-links/` — PrivateLink
+- `resource-types/nsp/` — Network Security Perimeter
+
+Old paths like `dynatrace/`, `tenantResource/`, `arm-scenarios/singleton/`, `operationsTest/` no longer exist.
+
+## TSP Doc Comment Patterns
+
+- `@dev` comments are intentional and must never be removed or converted to regular doc comments.
+- The `@defaultResourceKeySegmentName` decorator on `ResourceNameParameter` auto-generates key and segment names.
+- Ghost `@template` or `@param` tags in doc comments (referencing non-existent parameters) should be removed.
+- The `nsp-operations.tsp` file has Action/ActionAsync templates that are POST operations, not GET — doc comments must reflect this.
+- List operations (`ArmListBySubscription`, `ArmResourceListByParent`, `ArmResourceListAtScope`) must say "the resource being listed" — NOT "being patched" (copy-paste error from patch templates).
+- `CreateOrReplace*` operations should say "createOrReplace" in their @template Response description. The deprecated `CreateOrUpdate*` ops say "createOrUpdate" (correct for them). In `legacy-types/`, operations named `CreateOrReplace*` still use "createOrUpdate" because the `@armResourceCreateOrUpdate` decorator confirms the ARM-level semantics.
+- In `lib/extension/operations.tsp`, template doc comments use `Extension.Subscription`, `Extension.ManagementGroup`, `Extension.ResourceGroup` (dot-separated, not `>`).
+
+## Build Requirements
+
+- Node.js >= 22 is required for `pnpm install` and `pnpm build`.
+- Build the ARM package with: `pnpm -r --filter "@azure-tools/typespec-azure-resource-manager..." build`
+- Format with: `pnpm format`
+- If the default Node.js is too old, download Node 22 manually and prepend to PATH.
+
+## Operation Templates (Not Deprecated)
+
+`ArmResourcePatchAsync` and `ArmResourcePatchSync` exist and are not deprecated, though they are noted as "not recommended" in resource-operations.md. `ArmCustomPatchSync` and `ArmCustomPatchAsync` are the preferred alternatives.
+
+`TrackedResourceOperations` interface is current. `ResourceOperations` is deprecated (use `TrackedResourceOperations` instead).
+
+## ArmTagsPatch Suppress Requirement
+
+`ArmTagsPatchSync`, `ArmTagsPatchAsync`, `ArmResourcePatchSync`, and `ArmResourcePatchAsync` use `@patch(#{ implicitOptionality: true })` which triggers a deprecation warning. Users must add `#suppress "@typespec/http/deprecated-implicit-optionality" "Legacy"` at the usage site. This is documented in `resource-operations.md`.
+
+## Getting-Started Guide Style
+
+The `@service` decorator should NOT include a `version` parameter (version comes from `@versioned` when used). The guide uses `ArmCustomPatchSync` (not ArmTagsPatch) because that is the recommendation, based on the requirements of the ARM RPC (Resource Provider Contract).
+
+## Envelope Properties Placement
+
+All standard envelope properties (`EntityTagProperty`, `ExtendedLocationProperty`, `ManagedByProperty`, `ManagedServiceIdentityProperty`, `ResourceKindProperty`, `ResourcePlanProperty`, `ResourceSkuProperty`) must be spread on the **resource model** itself — NOT inside the properties bag model. The canonical sample `resource-common-properties/common-properties/main.tsp` demonstrates this pattern with all seven properties on the resource model.
+
+`AvailabilityZonesProperty` is also spread on the resource model and adds the optional `zones` envelope property. `BillingDataProperty` is different: spread it into the resource **properties bag**, as shown by `resource-common-properties/billing-data/main.tsp`.
+
+## ResourceNameParameter NamePattern
+
+`ResourceNameParameter` has a `NamePattern` template parameter with default value `"^[a-zA-Z0-9-]{3,24}$"`. In documentation examples, omit `NamePattern` when the value equals the default. Only show it when demonstrating a custom pattern.
+
+## Feedback Corrections Applied
+
+- `step03.md`: Use `...ResourceNameParameter<AddressResource, KeyName = "addressName", SegmentName = "addresses">` instead of manual `@key/@segment name` fields for child resources.
+- `step04.md`: Use individual operation declarations (not `TrackedResourceOperations<User, UserProperties>`) in the interface example, with `ArmCustomPatchSync` for the update operation.
+- `step05.md`: Remove `version` from `@service` decorator; use `...ResourceNameParameter<User>` instead of manual key/segment/path.
+- `deprecation.tsp`: The ExtensionResourceBase deprecation message must say "Foundations.ExtensionResource" (not "ProxyResource").
+- `arm-legacy-operations-discourage` rule was removed from linter registration; its rule doc file and linter.md entry should not exist.
+- Knowledge base: The reason for using `ArmCustomPatchSync` in docs is "because that is the recommendation, based on the requirements of the ARM RPC" — NOT "to avoid the suppress complexity".
+
+## Agent Base Type (Experimental)
+
+The library provides an experimental **Agent** base type in `lib/base-types/agent.tsp` (namespaces `Azure.ResourceManager.BaseTypes` and `Azure.ResourceManager.BaseTypes.Agents`). Key facts:
+
+- `@azureBaseType(#{ baseType, version })` (from `base-types.tsp`, `Azure.ResourceManager.BaseTypes`) marks a properties model as conforming to a base type. `BaseTypeInfo` has `baseType` and `version` fields. Applying it in a non-`Azure.ResourceManager` namespace emits the `basetypes-experimental` warning, so user specs must `#suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "..."`.
+- `Agent<Properties>` is a `TrackedResource` template that applies `@azureBaseType` automatically. Child templates: `AgentConversation<Properties, AgentResource>` and `AgentResponse<Properties, AgentResource>` (both `ProxyResource`, `@parentResource(AgentResource)`).
+- Two deployment variants differ only by property visibility: **Appliance** (service-owned, read-only) and **Platform** (client-owned, writable; `baseTypes` always read-only). Models: `AgentDefinitionAppliance<HasInstructions>`/`AgentDefinitionPlatform<HasModelDeploymentRef, HasInstructions>` (boolean value params gate the optional properties), `AgentPropertiesAppliance`/`AgentPropertiesPlatform<AgentDefinitionType>`, `AgentToolTypeAppliance`/`AgentToolTypePlatform`. `modelDeploymentRef` exists only in the Platform variant; the Appliance variant has no such property and `AgentPropertiesAppliance.definition` is `@visibility(Lifecycle.Read)`.
+- Child property bases: `ConversationProperties`, `ResponseProperties`; both require `input: InputItem` on create. `InputItem` replaced the former `ConversationItem` name, and its `id`, `role`, and `status` properties are read-only. Mix-ins include `PreviousResponseProperty`, `ResponseOutputProperty`, `ResponseInstructionsProperty`, and `InputTypeProperty`.
+- `@baseTypeOptional(isPresent, isAppliance)` (private decorator) controls base-type property visibility (invisible when not present; read-only when appliance). `AgentDefinitionPlatform.modelDeploymentRef` passes `isAppliance: false` so it stays writable for the client.
+- The Agent base type contract version is `2026-04-01`.
+- New linting rules (registered in `src/linter.ts`, docs already exist under `rules/`): `arm-agent-base-type-child-resources` (Agent must have both a Conversation and a Response child), `arm-agent-base-type-lifecycle-operations` (those children need full CRUD), `no-reserved-resource-property`, `arm-custom-resource-usage-discourage`, `arm-feature-file-usage-discourage`.
+- Canonical sample: `packages/samples/specs/resource-manager/resource-types/agent/main.tsp`.
+- How-to guide added: `website/src/content/docs/docs/howtos/ARM/agent-base-type.mdx`.
+- The ARM howtos sidebar is auto-generated from the directory (`current-sidebar.ts` → `autogenerate` on `howtos`), so new how-to files need no manual sidebar registration.
+- Reference docs (`reference/*.md`) for these lib additions were already regenerated in-commit; no `regen-docs` diff was needed for this batch.
+
+## Relationship Base Type (Experimental)
+
+- `Azure.ResourceManager.BaseTypes.Relationships.Relationship<Properties>` defines an extension resource and automatically applies `@azureBaseType` for the Relationship contract version `2026-04-01`.
+- Relationship property bags extend `RelationshipProperties<ProvisioningState>`, which supplies the required `baseTypes`, `sourceId`, `sourceTenant`, `targetId`, `targetTenant`, and optional read-only `provisioningState` properties.
+- The canonical sample is `packages/samples/specs/resource-manager/resource-types/relationship/main.tsp`. It uses `Extension.Read`, `Extension.CreateOrReplaceAsync`, `Extension.CustomPatchAsync`, `Extension.DeleteWithoutOkAsync`, and `Extension.ListByTarget`.
+- Applying the base type in a provider namespace requires suppressing the experimental base-types warning.
+- The `use-relationship-required-properties` rule validates that direct Relationship base-type declarations use an extension resource with the required schema.
+
+## Billing Data and Availability Zones
+
+- `BillingDataProperty` adds required `billingData: CommonTypes.BillingData` to a resource properties bag. It is available with ARM common types v6.
+- `BillingData` represents product, quantity, billing state, term dates, tokens, renewal, and scheduled billing changes for prepaid resources.
+- `AvailabilityZonesProperty` adds optional `zones: string[]` to the resource envelope.
+
+## Resource Operation Rules
+
+The former multi-purpose `arm-resource-operation` checks are represented by three focused rules:
+
+- `use-interface` requires ARM resource operations to be declared in an interface.
+- `use-operation-decorator` requires the ARM decorator matching the HTTP verb.
+- `use-api-version` requires `Azure.ResourceManager.CommonTypes.ApiVersionParameter`.
+
+## Resource Identity Resolution
+
+Concrete ARM resource identities are seeded only by registered read or createOrUpdate operations with valid ARM resource instance paths. List, action, update, delete, and check-existence operations can attach to an existing resolved resource but do not create resource identities by themselves.
+
+## ARM Request and Response Rules
+
+- `no-query-in-collection` allows only `api-version` and case-sensitive `$filter` on collection GET operations.
+- `no-query-in-point-op` allows only `api-version` on point GET, PUT, PATCH, and DELETE operations.
+- `no-query-in-post` allows only `api-version` on POST operations; other inputs belong in the request body.
+- `list-operation-missing-pageable` requires collection GET operations to use TypeSpec paging metadata with a continuation link.
+- `list-response-envelope` requires collection GET response models to contain exactly `value` and `nextLink`.
+- `use-application-json-content-type` requires `application/json` request and response bodies in ARM provider namespaces.
+- `use-model-request-body` requires non-multipart request bodies to use plain models without indexers.
+- `no-tenant-level-apis` reports ARM PUT routes beginning with `/providers`, except the `/operations` endpoint.
+- `lro-response-mismatch` validates that PUT and PATCH final results match the resource type, DELETE final results are `void`, and POST final results match successful response bodies.
+
+The `lro-response-mismatch` implementation has a detailed adjacent Markdown file but no `docs` association in its TypeScript rule definition. Consequently, `pnpm regen-docs` generates only its short description. Fixing the association requires an edit under `packages/typespec-azure-resource-manager/src/rules/`.
+
+## Relationship Documentation Feedback
+
+Use the defaults from `...ResourceNameParameter<RelationshipModel>` unless the API truly requires custom key, segment, or pattern values. Link to canonical samples through the published samples site (`https://azure.github.io/typespec-azure/docs/samples/...`) rather than the repository source tree.

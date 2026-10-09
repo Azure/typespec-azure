@@ -1,5 +1,5 @@
-import { DecoratorContext, Model, ModelProperty, Program, Type } from "@typespec/compiler";
-import { ExampleDecorator, UseRefDecorator } from "../generated-defs/Autorest.js";
+import type { DecoratorContext, Model, ModelProperty, Program, Type } from "@typespec/compiler";
+import type { ExampleDecorator, UseRefDecorator } from "../generated-defs/Autorest.js";
 import { AutorestStateKeys, reportDiagnostic } from "./lib.js";
 
 export const namespace = "Autorest";

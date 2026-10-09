@@ -1,5 +1,67 @@
 # Release
 
+## 0.63.9
+
+- Bump @typespec/http-client-python to 0.38.1 and bump latest typespec lib version
+
+## 0.63.8
+
+- Bump @typespec/http-client-python to 0.37.3
+
+## 0.63.7
+
+- Bump @typespec/http-client-python to 0.37.2
+
+## 0.63.6
+
+### Bug Fixes
+
+- [#5225](https://github.com/Azure/typespec-azure/pull/5225) Ship the install/prepare setup scripts as native ESM `.js` instead of raw `.ts` so the emitter runs correctly when installed as a dependency. Node.js refuses to type-strip `.ts` files under `node_modules` (`ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING`), which broke consumers of 0.63.4+.
+
+
+## 0.63.5
+
+### Bug Fixes
+
+- [#5225](https://github.com/Azure/typespec-azure/pull/5225) Ship the install/prepare setup scripts as native ESM `.js` instead of raw `.ts` so the emitter runs correctly when installed as a dependency. Node.js refuses to type-strip `.ts` files under `node_modules` (`ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING`), which broke consumers of 0.63.4+.
+
+## 0.63.4
+
+- Bump @typespec/http-client-python to 0.36.0
+
+## 0.63.3
+
+- Bump @typespec/http-client-python to 0.34.2
+
+## 0.63.2
+
+- Bump @typespec/http-client-python to 0.33.0
+
+## 0.63.1
+
+- Bump @typespec/http-client-python to 0.30.1
+
+## 0.63.0
+
+- [#4503](https://github.com/Azure/typespec-azure/pull/4503) Bump @typespec/http-client-python to 0.30.0
+
+## 0.62.1
+
+### Bump dependencies
+
+- [#4418](https://github.com/Azure/typespec-azure/pull/4418) Bump @typespec/http-client-python to 0.29.1
+
+## 0.62.0
+
+### Features
+
+- [#4263](https://github.com/Azure/typespec-azure/pull/4263) Add `@azure-tools/typespec-python` to `typespec-azure` repo
+
+### Bug Fixes
+
+- [#4305](https://github.com/Azure/typespec-azure/pull/4305) Fix DEP0190 deprecation warning in Python emitter setup script
+
+
 ## 0.61.2
 
 ### Bug Fixes

@@ -1,5 +1,200 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.73.0
+
+### Features
+
+- [#5176](https://github.com/Azure/typespec-azure/pull/5176) Add a `version` option to `@featureFileOptions` for overriding the generated client API version.
+- [#5361](https://github.com/Azure/typespec-azure/pull/5361) Add the `use-model-request-body` ARM lint rule, an idiomatic TypeSpec migration of the Swagger `ParametersSchemaAsTypeObject` validator rule.
+
+
+## 0.72.0
+
+### Features
+
+- [#4145](https://github.com/Azure/typespec-azure/pull/4145) Add linter rule `lro-response-mismatch` to warn when a long-running operation's final result type does not match the expected response
+- [#5358](https://github.com/Azure/typespec-azure/pull/5358) Add the `list-response-envelope` rule for ARM collection GET response envelopes.
+- [#5302](https://github.com/Azure/typespec-azure/pull/5302) Add the `use-application-json-content-type` rule to require JSON request and response bodies for ARM operations.
+- [#5281](https://github.com/Azure/typespec-azure/pull/5281) Add the `no-query-in-post` ARM lint rule to warn when POST operations declare query parameters other than `api-version`.
+- [#5318](https://github.com/Azure/typespec-azure/pull/5318) Add the `no-query-in-collection` ARM lint rule, disabled by default in the resource-manager ruleset.
+- [#5420](https://github.com/Azure/typespec-azure/pull/5420) Add the `no-tenant-level-apis` ARM linter rule.
+- [#5273](https://github.com/Azure/typespec-azure/pull/5273) Add an ARM lint rule that warns when point GET, PUT, PATCH, or DELETE operations declare query parameters other than `api-version`.
+- [#5379](https://github.com/Azure/typespec-azure/pull/5379) Add the `list-operation-missing-pageable` lint rule for ARM collection GET operations that do not define TypeSpec paging metadata.
+
+### Bug Fixes
+
+- [#4851](https://github.com/Azure/typespec-azure/pull/4851) Fix `resolveArmResources` resource identity detection to seed resources from strict ARM resource instance paths instead of inferring resource IDs from list or action operation paths.
+- [#5383](https://github.com/Azure/typespec-azure/pull/5383) Do not emit empty legacy feature files, apply `version-enum-strategy` to feature enums, and return the configured enum from the ARM feature-file accessor.
+
+
+## 0.71.0
+
+### Breaking Changes
+
+- [#5197](https://github.com/Azure/typespec-azure/pull/5197) Remove `modelDeploymentRef` from the experimental Agent base type `AgentDefinitionAppliance` model. The appliance owns the entire agent definition, so the property is now Platform-only and remains available on `AgentDefinitionPlatform`. As a result `AgentDefinitionAppliance` takes a single template parameter (`AgentDefinitionAppliance<HasInstructions>` instead of `AgentDefinitionAppliance<HasModelDeploymentRef, HasInstructions>`), and `AgentPropertiesAppliance.definition` is read-only again since it no longer needs to carry a client-writable field.
+
+### Features
+
+- [#4892](https://github.com/Azure/typespec-azure/pull/4892) Add the experimental Relationship base type for Azure Resource Manager extension resources. `RelationshipProperties` provides the `baseTypes` descriptor, source and target resource and tenant identifiers, and provisioning state. Resource providers can extend this property bag with relationship-specific information and expose the relationship against any ARM resource scope.
+  
+  Example of creating a dependency relationship with RP-specific metadata and operations:
+  
+  ```typespec
+  using Azure.ResourceManager;
+  using Azure.ResourceManager.BaseTypes.Relationships;
+  
+  model DependencyOfMetadata {
+    sourceType: string;
+    targetType: string;
+    description?: string;
+  }
+  
+  model DependencyOfProperties is RelationshipProperties {
+    metadata: DependencyOfMetadata;
+  }
+  
+  #suppress "@azure-tools/typespec-azure-resource-manager/basetypes-experimental" "Experimental BaseTypes"
+  model DependencyOf is Relationship<DependencyOfProperties> {
+    ...ResourceNameParameter<
+      Resource = DependencyOf,
+      KeyName = "relationshipName",
+      SegmentName = "dependencyOf",
+      NamePattern = "^[a-zA-Z0-9_.-]{1,64}$"
+    >;
+  }
+  
+  interface DependencyOfOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+    get is Extension.Read<Scope, DependencyOf>;
+    create is Extension.CreateOrReplaceAsync<Scope, DependencyOf>;
+    update is Extension.CustomPatchAsync<
+      Scope,
+      DependencyOf,
+      Azure.ResourceManager.Foundations.ResourceUpdateModel<DependencyOf, DependencyOfProperties>
+    >;
+    delete is Extension.DeleteWithoutOkAsync<Scope, DependencyOf>;
+    list is Extension.ListByTarget<Scope, DependencyOf>;
+  }
+  ```
+- [#4891](https://github.com/Azure/typespec-azure/pull/4891) Add built-in support for Azure service groups as extension resource targets and ARM resource identifier scopes.
+- [#5169](https://github.com/Azure/typespec-azure/pull/5169) Adding a new billing-data common type. This provides standardization of billing properties in e.g. prepaid resource types.
+- [#4808](https://github.com/Azure/typespec-azure/pull/4808) Split `arm-resource-operation` lint rule: add `use-operation-decorator`, `use-api-version`, and `use-interface` as separate rules replacing the original combined rule.
+
+### Bug Fixes
+
+- [#4904](https://github.com/Azure/typespec-azure/pull/4904) Constrain the `baseType` field of the experimental `BaseTypeInfo` to a new `BaseType` extensible enum (a union of `Agent` and `Relationship` with a `string` variant) instead of a free-form `string`, following the Azure `no-enum` / `no-closed-literal-union` conventions.
+- [#5100](https://github.com/Azure/typespec-azure/pull/5100) Refine the experimental Agent base type input model: add an `input` property to `ConversationProperties` (mirroring `ResponseProperties.input`, required on create), rename `ConversationItem` to `InputItem`, make its `role` property read-only, and change the `content` field on `InputItem`/`ResponseItem` to `Record<unknown>` to support polymorphic content.
+- [#5178](https://github.com/Azure/typespec-azure/pull/5178) Make `modelDeploymentRef` writable in the experimental Agent base type `AgentDefinitionAppliance` model instead of read-only, so the client can select the underlying model deployment in both the Appliance and Platform deployment models. `AgentPropertiesAppliance.definition` is no longer read-only either, since a read-only container would keep every nested field unsettable; the service-owned fields inside the definition remain read-only.
+- [#4978](https://github.com/Azure/typespec-azure/pull/4978) Fix the Agent base type contract version in the `@azureBaseType` decorator on the `Agent` resource template, correcting a typo where it was set to `2024-06-01` instead of `2026-04-01`.
+- [#5126](https://github.com/Azure/typespec-azure/pull/5126) Fix `visibility-sealed` errors reported for the resource `name` property when emitters or versioning re-apply the ARM resource decorators on a copy of the resource type
+
+
+## 0.70.0
+
+### Features
+
+- [#4842](https://github.com/Azure/typespec-azure/pull/4842) Add `no-reserved-resource-property` linter rule that flags reserved property names (matched case-insensitively, e.g. `billingData`) present in an ARM resource's property bag. The reserved-name list and diagnostic reason are extensible.
+- [#4664](https://github.com/Azure/typespec-azure/pull/4664) Add `@featureFile`, `@featureFiles`, and `@featureFileOptions` decorators in `Azure.ResourceManager` namespace as alternatives to the Legacy `@feature`, `@features`, and `@featureOptions` decorators. Add `arm-feature-file-usage-discourage` linting rule. Fix `arm-custom-resource-usage-discourage` rule to propagate suppressions from model templates to their instantiations.
+
+### Bug Fixes
+
+- [#4884](https://github.com/Azure/typespec-azure/pull/4884) Refine the experimental Agent base type conversation and response items: remove the redundant `conversationId` and `responseId` properties (inferred from the resource `name`), model the message author `role` as a `MessageRole` enum (`Developer`, `User`, `Assistant`, `Tool`), and extend `ConversationItem` and `ResponseItem` with a `type` discriminator (`message`, `function_call`, `function_call_output`, `compaction`) whose variant-specific fields are all optional.
+- [#4855](https://github.com/Azure/typespec-azure/pull/4855) Align the experimental Agent base type with ARM naming and datatype guidelines: use PascalCase values for the `ResponseStatus` enum (for example `Completed`, `InProgress`), and use `utcDateTime` instead of `unixTimestamp32` for the `createdAt` timestamp properties (on `ConversationProperties` and `ResponseProperties`) to match other ARM datetime properties.
+- [#4857](https://github.com/Azure/typespec-azure/pull/4857) Make `ArmTopParameter`, `ArmFilterParameter`, and `ArmSkipParameter` properties optional as query parameters should be.
+
+
+## 0.69.2
+
+### Bug Fixes
+
+- [#4627](https://github.com/Azure/typespec-azure/pull/4627) Remove `@armCommonDefinition` decorators from `CustomerManagedKeyEncryption` and `Encryption` types so they are emitted inline rather than as common-types `$ref` entries in OpenAPI output.
+  
+  ```tsp
+  // These types are now emitted inline in specs that reference them:
+  model MyEncryptionConfig {
+    customerManagedKeyEncryption?: Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption;
+  }
+  ```
+
+
+## 0.69.1
+
+### Bug Fixes
+
+- [#4621](https://github.com/Azure/typespec-azure/pull/4621) Adding Azure Resource Manager Base Types, including the Agent base type.
+  
+  Base types provide structured constraints for resources including required and optional
+  properties in their RP-specific property bags. The `@azureBaseType` decorator attaches
+  base type metadata to resource models for validation.
+  
+  Example of creating an Agent resource:
+  
+  ```typespec
+  using Azure.ResourceManager;
+  using Azure.ResourceManager.BaseTypes;
+  using Azure.ResourceManager.BaseTypes.Agents;
+  
+  model MyDefinition is AgentDefinitionPlatform<true, true> {}
+  
+  model MyAgentProperties is AgentPropertiesPlatform<MyDefinition> {
+    ...DefaultProvisioningStateProperty;
+  }
+  
+  model MyAgent is Agent<MyAgentProperties> {
+    ...ResourceNameParameter<MyAgent>;
+  }
+  
+  model MyConversationProperties is ConversationProperties {
+    ...DefaultProvisioningStateProperty;
+  }
+  
+  model MyConversation is AgentConversation<MyConversationProperties, MyAgent> {
+    ...ResourceNameParameter<MyConversation>;
+  }
+  
+  model MyResponseProperties is ResponseProperties {
+    ...DefaultProvisioningStateProperty;
+  }
+  
+  model MyResponse is AgentResponse<MyResponseProperties, MyAgent> {
+    ...ResourceNameParameter<MyResponse>;
+  }
+  ```
+
+
+## 0.69.0
+
+### Features
+
+- [#4384](https://github.com/Azure/typespec-azure/pull/4384) Add new linting rule `no-override-props` that warns when a model redefines a property that is already defined in one of its base models. The 'name' property of an ARM resource and properties redefined as part of a model marked with `@discriminator` are not flagged by this rule.
+- [#4530](https://github.com/Azure/typespec-azure/pull/4530) Add optional `Tag` template parameter to `Azure.ResourceManager.Legacy.Operations` to allow overriding the openapi tag value.
+
+### Bug Fixes
+
+- [#4433](https://github.com/Azure/typespec-azure/pull/4433) Fix doc comment typos in ARM library: list operations incorrectly said "patched", CreateOrReplace operations said "createOrUpdate", extension operations had `>` instead of `.`, and @doc tag had malformed string interpolation.
+
+
+## 0.68.0
+
+### Features
+
+- [#4185](https://github.com/Azure/typespec-azure/pull/4185) Add `ArmListBySubscriptionScope` operation template for listing resources at the subscription scope with a flat path, useful for child resources that need a subscription-level list operation without parent path segments.
+- [#4347](https://github.com/Azure/typespec-azure/pull/4347) Add new `version-progression` linter rule that validates ARM service versions all use unique dates and are declared in strictly increasing chronological order. Two api-versions sharing the same `YYYY-MM-DD` date (for example, `2026-04-28` and `2026-04-28-preview`) are not allowed.
+- [#4379](https://github.com/Azure/typespec-azure/pull/4379) Add new linter rule `arm-no-path-casing-conflicts` that flags ARM operation paths which differ only by character casing. The rule is enabled in the `@azure-tools/typespec-azure-rulesets` resource-manager ruleset.
+
+### Bug Fixes
+
+- [#4322](https://github.com/Azure/typespec-azure/pull/4322) Fix `@armProviderNamespace` to inject the canonical absolute ARM scope `https://management.azure.com/.default` as the default OAuth2 scope instead of the bare relative `user_impersonation` value. For backwards compatibility with existing ARM Swagger, the `@azure-tools/typespec-autorest` emitter now rewrites this scope back to `user_impersonation` when emitting OpenAPI v2 for namespaces decorated with `@armProviderNamespace`.
+- [#4369](https://github.com/Azure/typespec-azure/pull/4369) Fix doc comment typos and errors in ARM foundations library.
+- [#4357](https://github.com/Azure/typespec-azure/pull/4357) Fix `AzureEntityResource` emitting `TrackedResource` reference in OpenAPI. It now correctly references the `AzureEntityResource` definition in the ARM common-types schema.
+
+
+## 0.67.1
+
+### Bug Fixes
+
+- [#4252](https://github.com/Azure/typespec-azure/pull/4252) Remove the type constraint on the `Properties` parameter in `Azure.ResourceManager.Legacy.GenericResource`, allowing `unknown` and `Record<unknown>` as property types.
+
+
 ## 0.67.0
 
 ### Deprecations

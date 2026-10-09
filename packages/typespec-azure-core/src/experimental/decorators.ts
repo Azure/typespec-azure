@@ -1,11 +1,23 @@
-import { DecoratorContext, Enum, Model, ModelProperty, Scalar, Union } from "@typespec/compiler";
+import type {
+  DecoratorContext,
+  Enum,
+  Model,
+  ModelProperty,
+  Scalar,
+  Union,
+} from "@typespec/compiler";
+import type {
+  ChangePropertyTypeDecorator,
+  CopyPropertiesDecorator,
+  CopyVariantsDecorator,
+} from "../../generated-defs/experimental/Azure.Core.Experimental.js";
 import { reportDiagnostic } from "../lib.js";
 
-export function $changePropertyType(
+export const $changePropertyType: ChangePropertyTypeDecorator = (
   ctx: DecoratorContext,
   target: ModelProperty,
   newType: Model | Union | Scalar | Enum,
-) {
+) => {
   reportDiagnostic(ctx.program, {
     code: "experimental-feature",
     messageId: "dangerous",
@@ -15,9 +27,13 @@ export function $changePropertyType(
     target: ctx.decoratorTarget,
   });
   target.type = newType;
-}
+};
 
-export function $copyProperties(ctx: DecoratorContext, target: Model, baseModel: Model) {
+export const $copyProperties: CopyPropertiesDecorator = (
+  ctx: DecoratorContext,
+  target: Model,
+  baseModel: Model,
+) => {
   reportDiagnostic(ctx.program, {
     code: "experimental-feature",
     messageId: "dangerous",
@@ -33,9 +49,13 @@ export function $copyProperties(ctx: DecoratorContext, target: Model, baseModel:
     }
     target.properties.set(propName, prop);
   }
-}
+};
 
-export function $copyVariants(ctx: DecoratorContext, target: Union, sourceUnion: Union) {
+export const $copyVariants: CopyVariantsDecorator = (
+  ctx: DecoratorContext,
+  target: Union,
+  sourceUnion: Union,
+) => {
   reportDiagnostic(ctx.program, {
     code: "experimental-feature",
     messageId: "dangerous",
@@ -51,4 +71,4 @@ export function $copyVariants(ctx: DecoratorContext, target: Union, sourceUnion:
     }
     target.variants.set(variantName, variantType);
   }
-}
+};

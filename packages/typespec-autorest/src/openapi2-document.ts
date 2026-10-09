@@ -1,4 +1,4 @@
-import { ExtensionKey } from "@typespec/openapi";
+import type { ExtensionKey } from "@typespec/openapi";
 
 export type Extensions = {
   [key in ExtensionKey]?: unknown;
@@ -222,6 +222,9 @@ export type OpenAPI2Schema = Extensions & {
    *
    * "default" has no meaning for required parameters.) See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-6.2. Unlike JSON Schema this value MUST conform to the defined type for this parameter. */
   default?: string | boolean | number | Record<string, unknown>;
+
+  /** Example value represented as JSON. */
+  example?: unknown;
 
   /**
    * the maximum value for the property

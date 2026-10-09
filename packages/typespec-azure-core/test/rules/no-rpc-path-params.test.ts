@@ -1,5 +1,5 @@
 import { Tester } from "#test/test-host.js";
-import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
+import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { noRpcPathParamsRule } from "../../src/rules/no-rpc-path-params.js";
 
@@ -61,15 +61,15 @@ describe("cannot contain path parameters", () => {
     await tester
       .expect(
         `
-          @doc("get lro status")
+          
           @route("/lrRpcOp/{operationId}")
-          @get op getStatus(@doc("The operation") @path operationId: string): PollingStatus;
+          @get op getStatus(@path operationId: string): PollingStatus;
 
           model PollingStatus {
-            @doc("PollingLocation")
+            
             @header location?: ResourceLocation<PollingStatus>;
 
-            @doc("The status of the operation")
+            
             @Azure.Core.lroStatus
             statusValue: "Succeeded" | "Canceled" | "Failed" | "Running";
           }

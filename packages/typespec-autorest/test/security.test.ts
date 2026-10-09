@@ -159,3 +159,55 @@ it("emits a diagnostic for unsupported HTTP authentication schemes", async () =>
     code: "@azure-tools/typespec-autorest/unsupported-http-auth-scheme",
   });
 });
+
+it("does not emit a custom auth scheme model under definitions", async () => {
+  // A custom auth scheme model declared inside the service namespace
+  // belongs only in `securityDefinitions`. Previously
+  // `processUnreferencedSchemas` also emitted it under
+  // `definitions` because no payload references it.
+  const res = await openApiFor(
+    `
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-api-key">)
+    @service
+    namespace MyService;
+
+    @route("/ping")
+    op ping(): { @statusCode _: 200; ok: boolean };
+    `,
+  );
+  deepStrictEqual(res.securityDefinitions, {
+    ApiKeyAuth: {
+      type: "apiKey",
+      in: "header",
+      name: "x-api-key",
+    },
+  });
+  expect(res.definitions?.ApiKeyAuth).toBeUndefined();
+});
+
+it("does not emit a custom auth scheme model declared in service namespace under definitions", async () => {
+  const res = await openApiFor(
+    `
+    @useAuth(myApiKey)
+    @service
+    namespace MyService;
+
+    model myApiKey {
+      type: AuthType.apiKey;
+      in: ApiKeyLocation.header;
+      name: "x-my-key";
+    }
+
+    @route("/ping")
+    op ping(): { @statusCode _: 200; ok: boolean };
+    `,
+  );
+  deepStrictEqual(res.securityDefinitions, {
+    myApiKey: {
+      type: "apiKey",
+      in: "header",
+      name: "x-my-key",
+    },
+  });
+  expect(res.definitions?.myApiKey).toBeUndefined();
+});

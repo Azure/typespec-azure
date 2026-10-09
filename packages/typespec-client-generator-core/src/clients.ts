@@ -1,6 +1,11 @@
-import { createDiagnosticCollector, Diagnostic, getDoc, getSummary } from "@typespec/compiler";
+import { createDiagnosticCollector, type Diagnostic, getDoc, getSummary } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { getServers, HttpServer } from "@typespec/http";
+import {
+  type Authentication,
+  getAuthentication,
+  getServers,
+  type HttpServer,
+} from "@typespec/http";
 import {
   getClientInitializationOptions,
   getClientNameOverride,
@@ -8,18 +13,19 @@ import {
 } from "./decorators.js";
 import { getSdkHttpParameter } from "./http.js";
 import {
-  ClientInitializationOptions,
+  type ClientInitializationOptions,
   InitializedByFlags,
-  SdkClient,
-  SdkClientInitializationType,
-  SdkClientType,
-  SdkEndpointParameter,
-  SdkEndpointType,
-  SdkHttpOperation,
-  SdkPathParameter,
-  SdkServiceOperation,
-  SdkUnionType,
-  TCGCContext,
+  type SdkClient,
+  type SdkClientInitializationType,
+  type SdkClientType,
+  type SdkEndpointParameter,
+  type SdkEndpointType,
+  type SdkEnumType,
+  type SdkHttpOperation,
+  type SdkPathParameter,
+  type SdkServiceOperation,
+  type SdkUnionType,
+  type TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
 import {
@@ -33,8 +39,23 @@ import {
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { createSdkMethods, getSdkMethodParameter } from "./methods.js";
-import { getCrossLanguageDefinitionId } from "./public-utils.js";
+import { getCrossLanguageDefinitionId, getLibraryName, isExactClientName } from "./public-utils.js";
 import { getSdkBuiltInType, getSdkCredentialParameter, getTypeSpecBuiltInType } from "./types.js";
+
+function getVersionsEnum(context: TCGCContext, client: SdkClient): SdkEnumType | undefined {
+  if (client.services.length !== 1) {
+    return undefined;
+  }
+  return context.getPackageVersionSdkEnum().get(client.services[0]);
+}
+
+function getClientAuthentication(
+  context: TCGCContext,
+  client: SdkClient,
+): Authentication | undefined {
+  const service = client.services[0];
+  return service ? getAuthentication(context.program, service) : undefined;
+}
 
 function getEndpointTypeFromSingleServer<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
@@ -52,6 +73,7 @@ function getEndpointTypeFromSingleServer<
       {
         name: "endpoint",
         isGeneratedName: true,
+        isExactName: false,
         doc: "Service host",
         kind: "path",
         onClient: true,
@@ -60,6 +82,7 @@ function getEndpointTypeFromSingleServer<
         allowReserved: true,
         optional: false,
         serializedName: "endpoint",
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
         correspondingMethodParams: [],
         methodParameterSegments: [],
         type: getSdkBuiltInType(context, $(context.program).builtin.url),
@@ -153,6 +176,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       variantTypes: types,
       name: createGeneratedName(context, service, "Endpoint"),
       isGeneratedName: true,
+      isExactName: false,
       apiVersions: client.apiVersions,
       crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.Endpoint`,
       namespace: getClientNamespace(context, service),
@@ -166,6 +190,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     type,
     name: "endpoint",
     isGeneratedName: true,
+    isExactName: false,
     doc: "Service host",
     onClient: true,
     urlEncode: false,
@@ -187,25 +212,27 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   let name = client.name;
-  if (client.type) {
-    const override = getClientNameOverride(context, client.type);
-    if (override) {
-      name = override;
-    }
+  if (client.type && getClientNameOverride(context, client.type)) {
+    name = getLibraryName(context, client.type);
   }
   const clientType = getActualClientType(client);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
     name,
+    isExactName: client.type ? isExactClientName(context, client.type) : false,
     doc: client.type ? getClientDoc(context, client.type) : undefined,
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
     apiVersions: context.getApiVersionsForType(clientType),
+    versionsEnum: getVersionsEnum(context, client),
     namespace: getClientNamespace(context, clientType),
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),
     ),
+    // Multiple services currently use the first service for client-level endpoint and credential
+    // metadata. Keep authentication aligned with that behavior.
+    authentication: getClientAuthentication(context, client),
     decorators: client.type ? diagnostics.pipe(getTypeDecorators(context, client.type)) : [],
     parent,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, clientType),
@@ -314,6 +341,7 @@ function createSdkClientInitializationType<
     initializedBy: isRootClient ? InitializedByFlags.Individually : InitializedByFlags.Default,
     name,
     isGeneratedName: true,
+    isExactName: false,
     decorators: [],
   };
   let initializationOptions: ClientInitializationOptions | undefined = undefined;

@@ -15,7 +15,7 @@ extends:
           - job: publish_playground
             displayName: Publish playground & website
             variables:
-              TYPESPEC_WEBSITE_BASE_PATH: "typespec-azure/prs/$(System.PullRequest.PullRequestNumber)/"
+              TYPESPEC_WEBSITE_BASE_PATH: "/typespec-azure/prs/$(System.PullRequest.PullRequestNumber)/"
             pool:
               name: $(LINUXPOOL)
               image: $(LINUXVMIMAGE)
@@ -32,10 +32,11 @@ extends:
               - script: pnpm run build
                 displayName: Build
 
-              - task: AzureCLI@1
+              - task: AzureCLI@2
                 displayName: "Publish playground to PR endpoint"
                 inputs:
                   azureSubscription: "Azure SDK Engineering System"
+                  scriptType: "bash"
                   scriptLocation: inlineScript
                   inlineScript: |
                     az storage blob upload-batch \
@@ -46,10 +47,11 @@ extends:
                       --source "./packages/typespec-azure-playground-website/dist/" \
                       --overwrite
 
-              - task: AzureCLI@1
+              - task: AzureCLI@2
                 displayName: "Publish website to PR endpoint"
                 inputs:
                   azureSubscription: "Azure SDK Engineering System"
+                  scriptType: "bash"
                   scriptLocation: inlineScript
                   inlineScript: |
                     az storage blob upload-batch \
@@ -60,21 +62,9 @@ extends:
                       --source "./website/dist/" \
                       --overwrite
 
-              - script: npx tsx core/eng/tsp-core/scripts/create-tryit-comment.ts "typespec-azure"
+              - template: /eng/common/pipelines/templates/steps/login-to-github.yml
+
+              - script: node core/eng/tsp-core/scripts/create-tryit-comment.ts "typespec-azure"
                 displayName: Check already commented
                 env:
-                  GH_TOKEN: $(azuresdk-github-pat)
-          - job: change_comment
-            displayName: Describe changes on PR
-            condition: and(succeeded(), eq(startsWith(variables['System.PullRequest.SourceBranch'], 'publish/'), false))
-            pool:
-              name: $(LINUXPOOL)
-              image: $(LINUXVMIMAGE)
-              os: linux
-            steps:
-              - checkout: self
-
-              - script: npx -p @chronus/github-pr-commenter@0.5.0 chronus-github-pr-commenter
-                displayName: Make comment about changes
-                env:
-                  GITHUB_TOKEN: $(azuresdk-github-pat)
+                  GH_TOKEN: $(GH_TOKEN)

@@ -1,6 +1,13 @@
+import { resolvePath } from "@typespec/compiler";
+import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { expect, it } from "vitest";
-import { compileOpenAPI, CompileOpenApiWithFeatures } from "../test-host.js";
+import {
+  AzureTester,
+  compileOpenAPI,
+  CompileOpenApiWithFeatures,
+  ignoreDiagnostics,
+} from "../test-host.js";
 
 it("can share types with a library namespace", async () => {
   const openapi: any = await compileOpenAPI(
@@ -228,7 +235,6 @@ it("can use ResourceNameParameter for custom name parameter definition", async (
         ...ResourceNameParameter<PrivateEndpointConnectionResource, "privateEndpointConnectionName", "privateEndpointConnections", "/[a-zA-Z]*">;
       }
       
-      /** Private connection operations */
       @armResourceOperations(PrivateEndpointConnectionResource)
       interface PrivateEndpointConnections {
         listConnections is ArmResourceListByParent<PrivateEndpointConnectionResource>;
@@ -343,7 +349,6 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
       
       interface Operations extends Azure.ResourceManager.Operations {}
       
-      /** The all properties resource */
       model AllPropertiesResource is TrackedResource<AllPropertiesProperties> {
         ...ResourceNameParameter<AllPropertiesResource>;
         ...EncryptionProperty;
@@ -355,24 +360,17 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
         ...ResourceSkuProperty;
         ...ManagedServiceIdentityProperty;
       }
-      /** rp-specific property bag */
       model AllPropertiesProperties {
         ...DefaultProvisioningStateProperty;
-        /** An optional Property */
         optProp?: string;
-        /** A required property */
         reqProperty: string;
       }
-      /** rp-specific property bag */
       model SystemAssignedProperties {
         ...DefaultProvisioningStateProperty;
-        /** An optional Property */
         optProp?: string;
-        /** A required property */
         reqProperty: string;
       }
       
-      /** The SystemAssignedResource */
       model SystemAssignedResource is TrackedResource<SystemAssignedProperties> {
         ...ResourceNameParameter<SystemAssignedResource>;
         ...ManagedSystemAssignedIdentityProperty;
@@ -382,6 +380,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
       interface AllProperties {
         get is ArmResourceRead<AllPropertiesResource>;
         put is ArmResourceCreateOrReplaceAsync<AllPropertiesResource>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
          @patch(#{ implicitOptionality: true })
         update is ArmCustomPatchAsync<AllPropertiesResource, AllPropertiesResource>;
         delete is ArmResourceDeleteWithoutOkAsync<AllPropertiesResource>;
@@ -390,6 +389,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
       interface AssignedOperations {
         get is ArmResourceRead<SystemAssignedResource>;
         put is ArmResourceCreateOrReplaceAsync<SystemAssignedResource>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         @patch(#{ implicitOptionality: true })
         update is ArmCustomPatchAsync<SystemAssignedResource, SystemAssignedResource>;
         delete is ArmResourceDeleteWithoutOkAsync<SystemAssignedResource>;
@@ -439,7 +439,6 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
       
       interface Operations extends Azure.ResourceManager.Operations {}
       
-      /** The all properties resource */
       model AllPropertiesResource is TrackedResource<AllPropertiesProperties> {
         ...ResourceNameParameter<AllPropertiesResource>;
         ...EncryptionProperty;
@@ -451,24 +450,17 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
         ...ResourceSkuProperty;
         ...ManagedServiceIdentityProperty;
       }
-      /** rp-specific property bag */
       model AllPropertiesProperties {
         ...DefaultProvisioningStateProperty;
-        /** An optional Property */
         optProp?: string;
-        /** A required property */
         reqProperty: string;
       }
-      /** rp-specific property bag */
       model SystemAssignedProperties {
         ...DefaultProvisioningStateProperty;
-        /** An optional Property */
         optProp?: string;
-        /** A required property */
         reqProperty: string;
       }
       
-      /** The SystemAssignedResource */
       model SystemAssignedResource is TrackedResource<SystemAssignedProperties> {
         ...ResourceNameParameter<SystemAssignedResource>;
         ...ManagedSystemAssignedIdentityProperty;
@@ -478,6 +470,7 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
       interface AllProperties {
         get is ArmResourceRead<AllPropertiesResource>;
         put is ArmResourceCreateOrReplaceAsync<AllPropertiesResource>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchAsync<AllPropertiesResource, AllPropertiesProperties>;
         delete is ArmResourceDeleteWithoutOkAsync<AllPropertiesResource>;
       }
@@ -485,6 +478,7 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
       interface AssignedOperations {
         get is ArmResourceRead<SystemAssignedResource>;
         put is ArmResourceCreateOrReplaceAsync<SystemAssignedResource>;
+        #suppress "@typespec/http/deprecated-implicit-optionality" "For test"
         update is ArmResourcePatchAsync<SystemAssignedResource, SystemAssignedProperties>;
         delete is ArmResourceDeleteWithoutOkAsync<SystemAssignedResource>;
       }
@@ -522,7 +516,7 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
 it("can split resources and operations by feature", async () => {
   const { privateLink, privateEndpoint } = await CompileOpenApiWithFeatures(
     `
-      @Azure.ResourceManager.Legacy.features(Features)
+      @Azure.ResourceManager.featureFiles(Features)
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
@@ -535,7 +529,7 @@ it("can split resources and operations by feature", async () => {
       
       interface Operations extends Azure.ResourceManager.Operations {}
       
-      @Azure.ResourceManager.Legacy.feature(Features.privateEndpoint)
+      @Azure.ResourceManager.featureFile(Features.privateEndpoint)
       @tenantResource
       model PrivateEndpointConnectionResource is ProxyResource<PrivateEndpointConnectionProperties> {
         @path
@@ -544,7 +538,7 @@ it("can split resources and operations by feature", async () => {
         name: string;
       }
       
-      @Azure.ResourceManager.Legacy.feature(Features.privateEndpoint)
+      @Azure.ResourceManager.featureFile(Features.privateEndpoint)
       @armResourceOperations(PrivateEndpointConnectionResource)
       interface PrivateEndpointConnections {
         #suppress "deprecated" "PrivateLinkResourceListResultV5 validation"
@@ -552,12 +546,12 @@ it("can split resources and operations by feature", async () => {
          Response = ArmResponse<Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5>>;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.privateLink)
+      @Azure.ResourceManager.featureFile(Features.privateLink)
       model PrivateLinkResource is ProxyResource<PrivateLinkResourceProperties> {
         ...PrivateLinkResourceParameter;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.privateLink)
+      @Azure.ResourceManager.featureFile(Features.privateLink)
       @armResourceOperations(PrivateLinkResource)
       interface PrivateLinkResources {
         #suppress "deprecated" "PrivateLinkResourceListResultV5 validation"
@@ -585,56 +579,151 @@ it("can split resources and operations by feature", async () => {
     "../../common-types/resource-management/v5/privatelinks.json#/definitions/PrivateLinkResourceListResult",
   );
 });
+it("does not emit empty feature files for versions without feature content", async () => {
+  const runner = await AzureTester.createInstance();
+  const [{ outputs }, diagnostics] = await runner.compileAndDiagnose(
+    `
+      @versioned(Versions)
+      @Azure.ResourceManager.featureFiles(Features)
+      @service
+      namespace Microsoft.Contoso;
+
+      enum Features {
+        Student: "student",
+        Teacher: "teacher",
+      }
+
+      enum Versions {
+        v1,
+        v2,
+      }
+
+      @Azure.ResourceManager.featureFile(Features.Student)
+      @added(Versions.v2)
+      @route("/students")
+      op getStudent(): string;
+
+      @Azure.ResourceManager.featureFile(Features.Teacher)
+      @route("/teachers")
+      op getTeacher(): string;
+    `,
+    {
+      compilerOptions: {
+        options: {
+          "@azure-tools/typespec-autorest": {
+            "output-splitting": "legacy-feature-files",
+            "output-file": "{emitter-output-dir}/{version-status}/{version}/{feature}.json",
+          },
+        },
+      },
+    },
+  );
+
+  expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
+  ok(!outputs[resolvePath("stable", "v1", "student.json")]);
+  ok(outputs[resolvePath("stable", "v2", "student.json")]);
+  ok(outputs[resolvePath("stable", "v1", "teacher.json")]);
+  ok(outputs[resolvePath("stable", "v2", "teacher.json")]);
+});
+
+it.each([
+  ["omit", false],
+  ["include", true],
+] as const)(
+  "applies version enum strategy '%s' to the feature enum",
+  async (strategy, included) => {
+    const runner = await AzureTester.createInstance();
+    const [{ outputs }, diagnostics] = await runner.compileAndDiagnose(
+      `
+      @versioned(Versions)
+      @Azure.ResourceManager.featureFiles(Features)
+      @service
+      namespace Microsoft.Contoso;
+
+      enum Features {
+        Student: "student",
+        Teacher: "teacher",
+      }
+
+      enum Versions {
+        v1,
+        v2,
+      }
+
+      @route("/health")
+      op getHealth(): string;
+
+      @Azure.ResourceManager.featureFile(Features.Student)
+      @route("/students")
+      op getStudent(): string;
+    `,
+      {
+        compilerOptions: {
+          options: {
+            "@azure-tools/typespec-autorest": {
+              "output-splitting": "legacy-feature-files",
+              "output-file": "{emitter-output-dir}/{feature}.json",
+              "version-enum-strategy": strategy,
+            },
+          },
+        },
+      },
+    );
+
+    expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
+    const common = JSON.parse(outputs["common.json"]);
+    strictEqual("Features" in common.definitions, included);
+    strictEqual("Versions" in common.definitions, included);
+  },
+);
+
 it("can represent type references within and between features", async () => {
   const { featureA, featureB, shared } = await CompileOpenApiWithFeatures(
     `
 
-@Azure.ResourceManager.Legacy.features(Features)
+@Azure.ResourceManager.featureFiles(Features)
 @armProviderNamespace("Microsoft.Test")
 namespace Microsoft.Test;
 enum Features {
-  /** Common */
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "Common", fileName: "shared", description: "The data for common features"})
+  @Azure.ResourceManager.featureFileOptions(#{featureName: "Common", fileName: "shared", description: "The data for common features"})
   Common: "Common",
-  /** Feature A */
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureA", fileName: "featureA", description: "The data for feature A"})
+  @Azure.ResourceManager.featureFileOptions(#{featureName: "FeatureA", fileName: "featureA", description: "The data for feature A"})
   FeatureA: "Feature A",
-  /** Feature B */
-  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureB", fileName: "featureB", description: "The data for feature B"})
+  @Azure.ResourceManager.featureFileOptions(#{featureName: "FeatureB", fileName: "featureB", description: "The data for feature B"})
   FeatureB: "Feature B",
 }
       @secret
       scalar secretString extends string;
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.featureFile(Features.FeatureA)
       model FooResource is TrackedResource<FooResourceProperties> {
          ...ResourceNameParameter<FooResource>;
       }
       
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.featureFile(Features.FeatureA)
       model FooResourceProperties { 
         ...DefaultProvisioningStateProperty;
         password: secretString;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @Azure.ResourceManager.featureFile(Features.FeatureB)
       model BarResource is ProxyResource<BarResourceProperties> {
           ...ResourceNameParameter<BarResource>;
       }
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @Azure.ResourceManager.featureFile(Features.FeatureB)
       model BarResourceProperties { 
         ...DefaultProvisioningStateProperty;
         password: secretString;
       }
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @Azure.ResourceManager.featureFile(Features.FeatureA)
       @armResourceOperations
       interface Foos extends Azure.ResourceManager.TrackedResourceOperations<FooResource, FooResourceProperties> {}
 
-      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @Azure.ResourceManager.featureFile(Features.FeatureB)
       @armResourceOperations
       interface Bars extends Azure.ResourceManager.TrackedResourceOperations<BarResource, BarResourceProperties> {}
-      @@Azure.ResourceManager.Legacy.feature(Bars.get, Features.FeatureA);
+      @@Azure.ResourceManager.featureFile(Bars.get, Features.FeatureA);
       `,
     ["featureA", "featureB", "shared"],
     { preset: "azure" },

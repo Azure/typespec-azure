@@ -1,9 +1,10 @@
 import {
   createRule,
-  DecoratedType,
-  DiagnosticTarget,
+  type DecoratedType,
+  type DiagnosticTarget,
+  fileRef,
   paramMessage,
-  Type,
+  type Type,
 } from "@typespec/compiler";
 import {
   checkDecoratorsInDisallowedNamespace,
@@ -12,6 +13,7 @@ import {
 
 export const noPrivateUsage = createRule({
   name: "no-private-usage",
+  docs: fileRef.fromPackageRoot("src/rules/no-private-usage.md"),
   description: "Verify that elements inside Private namespace are not referenced.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-private-usage",

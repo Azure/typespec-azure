@@ -1,5 +1,80 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.73.0
+
+### Features
+
+- [#5602](https://github.com/Azure/typespec-azure/pull/5602) Configure `casing-style` per declaration category, including opt-in `snake_case` properties,
+  operation parameters, union variants, and enum members. Existing Azure defaults remain unchanged.
+  
+  ```yaml
+  linter:
+    enable:
+      "@azure-tools/typespec-azure-core/casing-style":
+        modelProperty: snake_case
+        union: PascalCase
+        unionVariant: snake_case
+        enum: PascalCase
+        enumMember: snake_case
+        scalar: PascalCase
+  ```
+- [#5176](https://github.com/Azure/typespec-azure/pull/5176) Add the legacy `@Azure.Core.Legacy.overrideApiVersion` decorator for overriding inherited
+  API-version wire defaults on namespaces and interfaces.
+  
+  ```typespec
+  @Azure.Core.Legacy.overrideApiVersion("2021-11-01")
+  interface Widgets {
+    get(): void;
+  }
+  ```
+
+
+## 0.72.0
+
+### Features
+
+- [#5265](https://github.com/Azure/typespec-azure/pull/5265) Add the `no-boolean` lint rule that recommends descriptive extensible enums instead of boolean API shapes when semantic values matter.
+
+
+## 0.71.0
+
+### Features
+
+- [#5109](https://github.com/Azure/typespec-azure/pull/5109) Add `no-openapi-client-extensions` linter rule that flags use of the `@typespec/openapi` `@extension` decorator to emit client-altering `x-ms-*`/`x-nullable` OpenAPI extensions (e.g. `x-ms-long-running-operation`, `x-ms-pageable`, `x-ms-enum`, `x-ms-client-name`, `x-ms-secret`). These extensions only affect the OpenAPI output, so other emitters produce an incorrect representation of the API; use the equivalent TypeSpec construct instead.
+- [#4891](https://github.com/Azure/typespec-azure/pull/4891) Add built-in support for Azure service groups as extension resource targets and ARM resource identifier scopes.
+- [#4880](https://github.com/Azure/typespec-azure/pull/4880) Replace the `no-unnamed-union` linter rule with `no-unnamed-types` in `@azure-tools/typespec-azure-core`. The new rule flags anonymous models in addition to unnamed unions, walking the type graph from operations to detect anonymous models on the client surface. The `no-unnamed-types` rule has been removed from `@azure-tools/typespec-client-generator-core`.
+
+### Bug Fixes
+
+- [#5109](https://github.com/Azure/typespec-azure/pull/5109) The `no-openapi` rule no longer flags the `@extension` decorator. Client-altering `x-ms-*` extensions emitted through `@extension` are handled by the `no-openapi-client-extensions` rule instead.
+
+
+## 0.70.0
+
+No changes, version bump only.
+
+## 0.69.0
+
+No changes, version bump only.
+
+## 0.68.0
+
+### Features
+
+- [#4144](https://github.com/Azure/typespec-azure/pull/4144) Add `no-route-parameter-name-mismatch` linting rule that detects when two operation routes differ only by path parameter name.
+
+### Bug Fixes
+
+- [#4394](https://github.com/Azure/typespec-azure/pull/4394) Make `@useFinalStateVia` validation decorator-order independent for PUT operations.
+
+
+## 0.67.1
+
+### Bug Fixes
+
+- [#4277](https://github.com/Azure/typespec-azure/pull/4277) Allow `@useFinalStateVia("original-uri")` for long-running POST operations, even when there is no GET operation modeled at the POST url.
+
+
 ## 0.67.0
 
 No changes, version bump only.

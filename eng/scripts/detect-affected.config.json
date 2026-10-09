@@ -1,0 +1,24 @@
+{
+  "submodulePath": "core",
+  "ignore": ["**/*.md"],
+  "ignoreUpstream": ["**/test/**", "**/tests/**", "**/*.test.ts"],
+  "sharedExtra": [".github/actions/setup/**", "pnpm-workspace.yaml"],
+  "targets": {
+    "python": {
+      "package": "@azure-tools/typespec-python",
+      "extra": [".github/workflows/ci-python.yml", ".github/actions/setup-python/**"]
+    },
+    "java": {
+      "package": "@azure-tools/typespec-java",
+      "extra": [".github/workflows/ci-java.yml", ".github/actions/setup-java/**"]
+    },
+    "typescript": {
+      "package": "@azure-tools/typespec-ts",
+      "extra": [".github/workflows/ci-typescript.yml"]
+    },
+    "go": {
+      "package": "@azure-tools/typespec-go",
+      "extra": [".github/workflows/ci-go.yml", ".github/actions/setup-go/**"]
+    }
+  }
+}

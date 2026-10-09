@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
+import type { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import {
   createClientCustomizationInput,
   createSdkContextForTester,
@@ -10,24 +10,6 @@ import {
 } from "../tester.js";
 
 it("example config", async () => {
-  const instance = await SimpleTester.createInstance();
-  await instance.fs.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
-  const { program } = await instance.compile(`
-    @service
-    namespace TestClient {
-      op get(): string;
-    }
-  `);
-  const context = await createSdkContextForTester(program);
-
-  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
-    .operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
-  strictEqual(operation.examples![0].filePath, "get.json");
-});
-
-it("example default config", async () => {
   const instance = await SimpleTester.createInstance();
   await instance.fs.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
   const { program } = await instance.compile(`
@@ -59,24 +41,6 @@ it("no example folder found", async () => {
   expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-loading",
   });
-});
-
-it("load example without version", async () => {
-  const instance = await SimpleTester.createInstance();
-  await instance.fs.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
-  const { program } = await instance.compile(`
-    @service
-    namespace TestClient {
-      op get(): string;
-    }
-  `);
-  const context = await createSdkContextForTester(program);
-
-  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
-    .operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
-  strictEqual(operation.examples![0].filePath, "get.json");
 });
 
 it("load example with version", async () => {
@@ -351,6 +315,46 @@ it("load example with @clientLocation root client", async () => {
   strictEqual(operation.examples?.length, 1);
 });
 
+it("load example with per-language @clientLocation falls back to autorest scope", async () => {
+  // Example files come from autorest and have a single canonical operationId.
+  // Per-language @clientLocation overrides (e.g. moving an op to a different group
+  // only for one language) should not break example linkage for the other languages.
+  // Here the example file references the autorest-resolved id `AnotherInterface_clientLocation`,
+  // and the JS emitter has a conflicting per-language relocation to `JsGroup`.
+  // Example matching must still succeed using the autorest scope.
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
+    "./examples/clientLocationAnotherInterface.json",
+    `${__dirname}/load/clientLocationAnotherInterface.json`,
+  );
+  const { program } = await instance.compile(`
+    @service
+    namespace TestClient {
+      interface OriginalInterface {
+        @clientLocation(AnotherInterface, "!javascript")
+        @clientLocation("JsGroup", "javascript")
+        op clientLocation(): string;
+      }
+
+      interface AnotherInterface {
+      }
+    }
+  `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-ts",
+  });
+
+  // For the JS emitter, the operation is relocated to `JsGroup`, but the example file
+  // uses the autorest-resolved id `AnotherInterface_clientLocation`. The example should
+  // still be linked because example matching resolves under the autorest scope.
+  const mainClient = context.sdkPackage.clients[0];
+  const jsClient = mainClient.children?.find((c) => c.name === "JsGroup");
+  ok(jsClient);
+  const operation = (jsClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+});
+
 it("nested examples", async () => {
   const instance = await SimpleTester.createInstance();
   await instance.fs.addRealTypeSpecFile("./examples/nested/get.json", `${__dirname}/load/get.json`);
@@ -463,6 +467,101 @@ it("multiple services without versioning", async () => {
   strictEqual(biMethod.operation.examples.length, 1);
   strictEqual(biMethod.operation.examples[0].filePath, "BI_bTest.json");
   strictEqual(biMethod.operation.examples[0].name, "Test operation from ServiceB");
+});
+
+it("multiple nested services use configured api versions to find examples", async () => {
+  const instance = await SimpleBaseTester.createInstance();
+  instance.fs.addTypeSpecFile(
+    "./Network/examples/v1/NetworkOperations_get.json",
+    JSON.stringify({
+      operationId: "NetworkOperations_get",
+      title: "Network v1",
+      responses: { "200": { body: "network-v1" } },
+    }),
+  );
+  instance.fs.addTypeSpecFile(
+    "./Network/examples/v2/NetworkOperations_get.json",
+    JSON.stringify({
+      operationId: "NetworkOperations_get",
+      title: "Network v2",
+      responses: { "200": { body: "network-v2" } },
+    }),
+  );
+  instance.fs.addTypeSpecFile(
+    "./Compute/examples/v1/ComputeOperations_get.json",
+    JSON.stringify({
+      operationId: "ComputeOperations_get",
+      title: "Compute v1",
+      responses: { "200": { body: "compute-v1" } },
+    }),
+  );
+  instance.fs.addTypeSpecFile(
+    "./Compute/examples/v2/ComputeOperations_get.json",
+    JSON.stringify({
+      operationId: "ComputeOperations_get",
+      title: "Compute v2",
+      responses: { "200": { body: "compute-v2" } },
+    }),
+  );
+
+  const { program } = await instance.compile(
+    createClientCustomizationInput(
+      `
+      @service
+      @versioned(Microsoft.Network.Versions)
+      namespace Microsoft.Network {
+        enum Versions {
+          v1,
+          v2,
+        }
+        interface NetworkOperations {
+          op get(): string;
+        }
+      }
+
+      @service
+      @versioned(Microsoft.Compute.Versions)
+      namespace Microsoft.Compute {
+        enum Versions {
+          v1,
+          v2,
+        }
+        interface ComputeOperations {
+          op get(): string;
+        }
+      }
+    `,
+      `
+      @client({
+        name: "CombinedClient",
+        service: [Microsoft.Network, Microsoft.Compute],
+        autoMergeService: true,
+      })
+      namespace Combined;
+    `,
+    ),
+  );
+  const context = await createSdkContextForTester(program, {
+    "api-version": {
+      Microsoft: {
+        Network: "v1",
+        Compute: "v1",
+      },
+    },
+  });
+
+  const client = context.sdkPackage.clients[0];
+  const networkClient = client.children?.find((child) => child.name === "NetworkOperations");
+  ok(networkClient);
+  const networkMethod = networkClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
+  strictEqual(networkMethod.operation.examples?.[0].filePath, "v1/NetworkOperations_get.json");
+  strictEqual(networkMethod.operation.examples?.[0].name, "Network v1");
+
+  const computeClient = client.children?.find((child) => child.name === "ComputeOperations");
+  ok(computeClient);
+  const computeMethod = computeClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
+  strictEqual(computeMethod.operation.examples?.[0].filePath, "v1/ComputeOperations_get.json");
+  strictEqual(computeMethod.operation.examples?.[0].name, "Compute v1");
 });
 
 it("multiple services without examples", async () => {

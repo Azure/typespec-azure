@@ -1,4 +1,4 @@
-import { DecoratorFunction } from "@typespec/compiler";
+import type { DecoratorFunction } from "@typespec/compiler";
 import { useStateSet } from "@typespec/compiler/utils";
 
 export function createMarkerDecorator<T extends DecoratorFunction>(

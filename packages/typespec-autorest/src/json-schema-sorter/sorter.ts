@@ -8,10 +8,7 @@ export type JsonSchema = {
 export type ResolvedJsonSchemaType = Exclude<JsonSchemaType, JsonSchemaRef>;
 
 export type JsonSchemaType =
-  | JsonSchemaObject
-  | JsonSchemaArray
-  | JsonSchemaPrimitive
-  | JsonSchemaRef;
+  JsonSchemaObject | JsonSchemaArray | JsonSchemaPrimitive | JsonSchemaRef;
 
 export interface JsonSchemaBase {
   $id?: string;

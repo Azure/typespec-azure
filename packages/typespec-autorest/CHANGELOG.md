@@ -1,5 +1,84 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.73.0
+
+### Features
+
+- [#5176](https://github.com/Azure/typespec-azure/pull/5176) Honor inherited Azure Core API-version overrides in emitted OpenAPI documents and warn when a document has inconsistent overrides.
+- [#5465](https://github.com/Azure/typespec-azure/pull/5465) Add an `examples-format` option that lets the emitter read the unified `examples.yaml` format and materialize the legacy `x-ms-examples` files for the emitted API version. `"auto"` (default) uses `examples.yaml` when present and otherwise loads the legacy per-version JSON files. Materialized files follow the Azure naming convention (`<OperationId>.json`, keyed by `<OperationId>`) and honor the original file name and key when preserved in `examples.yaml`, so the rollout keeps the specs-repo diff minimal without changing downstream consumers.
+
+
+## 0.72.0
+
+### Bug Fixes
+
+- [#5383](https://github.com/Azure/typespec-azure/pull/5383) Do not emit empty legacy feature files, apply `version-enum-strategy` to feature enums, and return the configured enum from the ARM feature-file accessor.
+- [#5340](https://github.com/Azure/typespec-azure/pull/5340) Sanitize spec-provided service names and versions used in output and example paths so they cannot escape their configured directories.
+
+
+## 0.71.0
+
+No changes, version bump only.
+
+## 0.70.1
+
+### Bug Fixes
+
+- [#4974](https://github.com/Azure/typespec-azure/pull/4974) Preserve non-TypeSpec `service.yaml` versions when updating an existing manifest. Versions the emitter no longer produces are now kept when they are not TypeSpec-generated (for example legacy swagger-only versions migrated from `readme.md`), while stale `source: typespec` versions the emitter no longer produces are still removed. This makes re-running the emitter idempotent for manifests that carry historical versions.
+
+
+## 0.70.0
+
+### Features
+
+- [#4846](https://github.com/Azure/typespec-azure/pull/4846) Add `service-yaml` emitter option to generate a `service.yaml` manifest at the project root declaring the service's API versions (derived from the `@versioned` enum). The option controls emission: `"auto"` (default) writes the file only when it already exists, `"always"` always writes it, and `"never"` disables it. When an existing `service.yaml` is present it is updated in place, preserving comments and unrelated keys.
+  
+  ```yaml
+  versions:
+    - version: 2023-11-01
+      source: typespec
+      swagger-files:
+        - resource-manager/Contoso/stable/2023-11-01/openapi.json
+  ```
+- [#4660](https://github.com/Azure/typespec-azure/pull/4660) Add `type-name-strategy` emitter option to control how OpenAPI names are derived from TypeSpec types. The new `"name-only"` strategy removes the namespace prefix from names (e.g. `Foo` instead of `LiftrBase.Foo`), matching the names used by client emitters. The default `"namespaced"` keeps the current behavior. When two types collapse to the same name, a `duplicate-type-name` error is reported.
+  
+  ```yaml
+  options:
+    "@azure-tools/typespec-autorest":
+      type-name-strategy: "name-only"
+  ```
+- [#4664](https://github.com/Azure/typespec-azure/pull/4664) Add `@featureFile`, `@featureFiles`, and `@featureFileOptions` decorators in `Azure.ResourceManager` namespace as alternatives to the Legacy `@feature`, `@features`, and `@featureOptions` decorators. Add `arm-feature-file-usage-discourage` linting rule. Fix `arm-custom-resource-usage-discourage` rule to propagate suppressions from model templates to their instantiations.
+
+
+## 0.69.1
+
+### Bug Fixes
+
+- Add support for the `@scope` TCGC decorator. Operations, model properties, and parameters that are scoped out of the autorest emitter are now omitted from the generated swagger output.
+
+
+## 0.69.0
+
+### Features
+
+- [#4190](https://github.com/Azure/typespec-azure/pull/4190) Added `skip-example-copying` emitter option. When enabled, example files are not copied to the output directory and `x-ms-examples` `$ref` values point directly to the source example files via relative paths.
+
+### Bug Fixes
+
+- [#4549](https://github.com/Azure/typespec-azure/pull/4549) Fix custom auth scheme models leaking into `definitions` when declared inside the service namespace. They are now emitted only under `securityDefinitions` as expected.
+- [#4421](https://github.com/Azure/typespec-azure/pull/4421) Ensure there are no examples emitted for parameters
+
+
+## 0.68.0
+
+### Bug Fixes
+
+- [#4397](https://github.com/Azure/typespec-azure/pull/4397) Add an autorest emitter warning when multiple operations resolve to the same OpenAPI `operationId`, and report the warning on each conflicting operation.
+- [#4322](https://github.com/Azure/typespec-azure/pull/4322) Fix `@armProviderNamespace` to inject the canonical absolute ARM scope `https://management.azure.com/.default` as the default OAuth2 scope instead of the bare relative `user_impersonation` value. For backwards compatibility with existing ARM Swagger, the `@azure-tools/typespec-autorest` emitter now rewrites this scope back to `user_impersonation` when emitting OpenAPI v2 for namespaces decorated with `@armProviderNamespace`.
+- [#4357](https://github.com/Azure/typespec-azure/pull/4357) Fix crash in autorest emitter when no `@service` is declared but a spec references a model from a versioned namespace (e.g. `CommonTypes.AzureEntityResource`).
+- [#4393](https://github.com/Azure/typespec-azure/pull/4393) Emit intrinsic `@TypeSpec.example(...)` on model properties in the autorest OpenAPI2 emitter so property `example` values are preserved in generated definitions.
+
+
 ## 0.67.0
 
 ### Bug Fixes

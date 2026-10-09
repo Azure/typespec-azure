@@ -1,9 +1,9 @@
 import {
   json,
-  MockApiDefinition,
-  MockBody,
+  type MockApiDefinition,
+  type MockBody,
   passOnSuccess,
-  ScenarioMockApi,
+  type ScenarioMockApi,
 } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};

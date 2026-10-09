@@ -10,6 +10,10 @@ llmstxt: true
 
 Client initialization customization options.
 
+In addition to the properties below, this inherits `scope` from `DecoratorOptions`, so
+`options.scope` can select which language emitters the `@clientInitialization` customization
+applies to.
+
 ```typespec
 model Azure.ClientGenerator.Core.ClientInitializationOptions
 ```
@@ -25,6 +29,9 @@ model Azure.ClientGenerator.Core.ClientInitializationOptions
 
 Client customization options.
 
+In addition to the properties below, this inherits `scope` from `DecoratorOptions`, so
+`options.scope` can select which language emitters the `@client` customization applies to.
+
 ```typespec
 model Azure.ClientGenerator.Core.ClientOptions
 ```
@@ -36,6 +43,32 @@ model Azure.ClientGenerator.Core.ClientOptions
 | service?          | `Namespace \| Namespace[]` | The services that this client is generated for. The root explicit client must have `service` config.<br />The namespace should be decorated with `@service`. |
 | name?             | `string`                   | The name of the client. If not specified, the default name will be `<Name of the target>Client`.                                                             |
 | autoMergeService? | `boolean`                  | Auto-merge service's things into current client.                                                                                                             |
+
+### `DecoratorOptions` {#Azure.ClientGenerator.Core.DecoratorOptions}
+
+Common typed options bag for the `scope` argument accepted by scoped TCGC decorators.
+
+Every scoped decorator's own options model can extend this base so new, decorator-specific
+settings can be added over time without breaking the legacy plain-string scope argument.
+
+**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language
+emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+
+**Valid patterns for `scope`:**
+
+- Single language: `"python"`
+- Multiple languages (comma-separated): `"python, java"`
+- Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
+
+```typespec
+model Azure.ClientGenerator.Core.DecoratorOptions
+```
+
+#### Properties
+
+| Name   | Type     | Description                                                                                                                                          |
+| ------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope? | `string` | Specifies the target language emitters that a decorator should apply to. If not set, the<br />decorator applies to all language emitters by default. |
 
 ### `ExternalType` {#Azure.ClientGenerator.Core.ExternalType}
 

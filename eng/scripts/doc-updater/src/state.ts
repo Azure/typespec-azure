@@ -171,6 +171,50 @@ export function getCommitDiff(sha: string, paths?: string[]): string {
 }
 
 /**
+ * Get the unified diff for a specific commit via the GitHub API.
+ *
+ * Used for commits that may not exist in the local clone (e.g. commits on
+ * deleted PR branches). Optionally filters to a set of path prefixes.
+ * Returns empty string on error.
+ */
+export function getCommitDiffFromApi(sha: string, paths?: string[]): string {
+  try {
+    const raw = execSync(`gh api repos/{owner}/{repo}/commits/${sha}`, {
+      encoding: "utf-8",
+      cwd: REPO_ROOT,
+      maxBuffer: 20 * 1024 * 1024,
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    const data = JSON.parse(raw) as {
+      files?: Array<{ filename: string; patch?: string; status: string }>;
+    };
+    if (!data.files || data.files.length === 0) return "";
+
+    const matchesPath = (filename: string): boolean => {
+      if (!paths || paths.length === 0) return true;
+      return paths.some(
+        (p) => filename === p || filename.startsWith(p.endsWith("/") ? p : `${p}/`),
+      );
+    };
+
+    const parts: string[] = [];
+    for (const file of data.files) {
+      if (!matchesPath(file.filename)) continue;
+      if (!file.patch) continue;
+      parts.push(`diff --git a/${file.filename} b/${file.filename}`);
+      parts.push(file.patch);
+    }
+    let diff = parts.join("\n").trim();
+    if (diff.length > MAX_DIFF_SIZE) {
+      diff = diff.slice(0, MAX_DIFF_SIZE) + "\n\n[... diff truncated at 100KB ...]";
+    }
+    return diff;
+  } catch {
+    return "";
+  }
+}
+
+/**
  * Find the latest merged automated doc-update PR for a config.
  *
  * Uses the PR title prefix added by the agentic workflow safe output:
@@ -234,8 +278,9 @@ export function getHumanFeedback(prNumber: number): HumanFeedback | null {
       authors: Array<{ login: string }>;
     }>;
 
-    // Bot commits match the automated pattern; everything else is human
-    const humanCommits = commits.filter((c) => !c.messageHeadline.startsWith("docs: automated"));
+    // The first commit on the PR is the bot's initial documentation update;
+    // every subsequent commit is treated as a human modification.
+    const humanCommits = commits.slice(1);
 
     // Get review comments
     const reviewsJson = execSync(`gh pr view ${prNumber} --json reviews --jq ".reviews"`, {

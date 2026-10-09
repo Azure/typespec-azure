@@ -1,18 +1,18 @@
 import {
-  Diagnostic,
+  type Diagnostic,
   listServices,
-  Model,
-  Namespace,
-  Program,
+  type Model,
+  type Namespace,
+  type Program,
   resolvePath,
 } from "@typespec/compiler";
 import { unsafe_mutateSubgraphWithNamespace } from "@typespec/compiler/experimental";
-import { createTester, TesterInstance } from "@typespec/compiler/testing";
+import { createTester, type TesterInstance } from "@typespec/compiler/testing";
 import {
   getAllHttpServices,
-  HttpOperation,
-  HttpOperationParameter,
-  HttpVerb,
+  type HttpOperation,
+  type HttpOperationParameter,
+  type HttpVerb,
 } from "@typespec/http";
 import { getVersioningMutators } from "@typespec/versioning";
 import { strictEqual } from "assert";

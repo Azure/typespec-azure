@@ -27,23 +27,11 @@ it("with azure and versioning decorators", async () => {
         v2018_01_01: "2018-01-01",
         v2024_01_01: "2024-01-01",
       }
-      /**
-       * CloudEvent comments
-       */
       model CloudEvent {
-        /**
-         * id comments
-         */
         id: string;
       }
 
-      /**
-       * Healthcare comments
-       */
       model HealthcareFhirResourceCreatedEventData {
-        /**
-         * resourceVersionId comments
-         */
         @added(ServiceApiVersions.v2024_01_01)
         resourceVersionId: int64;
       }

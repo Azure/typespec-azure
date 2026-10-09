@@ -9,7 +9,8 @@ test.describe("typespec-azure-playground-website UI tests", () => {
     await page.goto(host);
     const samplesButton = page.locator('button[aria-label="Browse samples"]');
     await samplesButton.click();
-    await page.locator("text=Azure Resource Manager framework").first().click();
-    await expect(page.getByText(`"title": "ContosoProviderHubClient"`)).toBeVisible();
+    await page.locator("text=Azure Core Scalars").first().click();
+    // Check the version is there
+    await expect(page.getByText(`"title": "Azure Core Scalars"`)).toBeVisible();
   });
 });

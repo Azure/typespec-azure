@@ -1,0 +1,33 @@
+---
+import BaseLayout from "../layouts/base-layout.astro";
+import { BenchmarkDashboard } from "../components/benchmarks/benchmark-dashboard";
+---
+
+<BaseLayout>
+  <div class="page">
+    <h1 class="title">Benchmarks</h1>
+    <p class="subtitle">
+      Compilation performance for the TypeSpec Azure pipeline, recorded on every push to <code
+        >main</code
+      >.
+    </p>
+    <BenchmarkDashboard client:only="react" />
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .title {
+    margin: 0 0 0.25rem;
+  }
+
+  .subtitle {
+    margin: 0 0 1rem;
+    color: var(--colorNeutralForeground3);
+  }
+</style>

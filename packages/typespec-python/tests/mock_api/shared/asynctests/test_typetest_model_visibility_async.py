@@ -4,11 +4,12 @@
 # license information.
 # --------------------------------------------------------------------------
 import pytest
+import pytest_asyncio
 from typetest.model.visibility.aio import VisibilityClient
 from typetest.model.visibility import models
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client():
     async with VisibilityClient() as client:
         yield client
@@ -18,6 +19,11 @@ async def client():
 async def test_get_model(client):
     result = await client.get_model(models.VisibilityModel(), query_prop=123)
     assert result == models.VisibilityModel(read_prop="abc")
+
+
+@pytest.mark.asyncio
+async def test_head_model(client):
+    assert await client.head_model(models.VisibilityModel(), query_prop=123)
 
 
 @pytest.mark.asyncio

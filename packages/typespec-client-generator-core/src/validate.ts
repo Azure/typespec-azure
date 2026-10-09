@@ -1,4 +1,4 @@
-import { Program } from "@typespec/compiler";
+import type { Program } from "@typespec/compiler";
 import { createTCGCContext } from "./context.js";
 import { validateClients } from "./validations/clients.js";
 import { validateHttp } from "./validations/http.js";

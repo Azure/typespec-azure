@@ -74,27 +74,31 @@ alias ResourceCreatedResponse<Resource extends TypeSpec.Reflection.Model> = Type
 
 alias ResourceOkResponse<Resource> = TypeSpec.Http.Response<200> & Resource;
 
-alias ResourceCreatedOrOkResponse<Resource extends TypeSpec.Reflection.Model> = ResourceCreatedResponse<Resource> | ResourceOkResponse<Resource>;
+alias ResourceCreatedOrOkResponse<Resource extends TypeSpec.Reflection.Model> =
+  | ResourceCreatedResponse<Resource>
+  | ResourceOkResponse<Resource>;
 
 /**
  * Response describing the location of a created resource.
- * @template T The type of the created resource.
+ * @template Resource The type of the created resource.
  */
 model LocationOfCreatedResourceResponse<Resource extends TypeSpec.Reflection.Model>
   is TypeSpec.Http.CreatedResponse {
   @finalLocation
   @TypeSpec.Http.header("Location")
+  @doc("The location of an instance of {name}", Resource)
   location: ResourceLocation<Resource>;
 }
 
 /**
  * Response describing the location of a resource created with a service-provided name.
- * @template T The type of the created resource.
+ * @template Resource The type of the created resource.
  */
 model LocationOfCreatedResourceWithServiceProvidedNameResponse<Resource extends TypeSpec.Reflection.Model>
   is TypeSpec.Http.AcceptedResponse {
   @finalLocation
   @TypeSpec.Http.header("Location")
+  @doc("The location of an instance of {name} created with a service-provided name", Resource)
   location: ResourceLocation<Resource>;
 }
 
@@ -349,7 +353,7 @@ op GetOperationStatus<
 op ResourceOperation<
   Resource extends TypeSpec.Reflection.Model,
   Parameters extends TypeSpec.Reflection.Model,
-  Response,  // No constraint here on purpose, some responses are unions
+  Response, // No constraint here on purpose, some responses are unions
   Traits extends TypeSpec.Reflection.Model = {},
   ErrorResponse = Azure.Core.Foundations.ErrorResponse
 > is Operation<Foundations.ItemKeysOf<Resource> & Parameters, Response, Traits, ErrorResponse>;

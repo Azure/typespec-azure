@@ -1,6 +1,6 @@
-import { EmitContext } from "@typespec/compiler";
+import type { EmitContext } from "@typespec/compiler";
 import { $onEmit as httpClientPythonOnEmit } from "@typespec/http-client-python";
-import { PythonAzureEmitterOptions } from "./lib.js";
+import type { PythonAzureEmitterOptions } from "./lib.js";
 
 export async function $onEmit(context: EmitContext<PythonAzureEmitterOptions>) {
   // set flavor to azure if not set for python azure emitter

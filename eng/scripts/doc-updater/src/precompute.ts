@@ -7,14 +7,15 @@
  * language instructions and thus resist prompt injection.
  *
  * Usage:
- *   npx tsx src/precompute.ts --config <name> --output <path> [--full-rebuild]
+ *   node src/precompute.ts --config <name> --output <path> [--full-rebuild]
  */
 
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
-import { loadConfig } from "./config.js";
+import { loadConfig } from "./config.ts";
 import {
   getCommitDiff,
+  getCommitDiffFromApi,
   getCurrentCommit,
   getHumanFeedback,
   getKnowledgeRelativePath,
@@ -22,7 +23,7 @@ import {
   listCommitsSince,
   readKnowledge,
   readMeta,
-} from "./state.js";
+} from "./state.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -118,9 +119,7 @@ function parsePrecomputeArgs(): PrecomputeArgs {
   }
 
   if (!parsed.config || !parsed.output) {
-    console.error(
-      "Usage: npx tsx src/precompute.ts --config <name> --output <path> [--full-rebuild]",
-    );
+    console.error("Usage: node src/precompute.ts --config <name> --output <path> [--full-rebuild]");
     process.exit(1);
   }
 
@@ -189,17 +188,21 @@ async function main(): Promise<void> {
         log(`Found ${feedback.commits.length} human commit(s). Extracting diffs...`);
         context.feedback = {
           prNumber: feedback.prNumber,
-          // Extract only code diffs — no commit messages, no review comments
+          // Extract only code diffs — no commit messages, no review comments.
+          // Use the GitHub API: PR commits may not exist in the local clone
+          // (e.g. squash-merged PRs whose head branch was deleted).
           humanCommitDiffs: feedback.commits
             .map((c) => ({
               sha: c.sha,
-              diff: getCommitDiff(c.sha),
+              diff: getCommitDiffFromApi(c.sha),
             }))
             .filter((c) => c.diff.length > 0),
         };
         if (context.feedback.humanCommitDiffs.length === 0) {
           context.feedback = undefined;
           log("Human commits had no extractable diffs.");
+        } else {
+          log(`Extracted diffs for ${context.feedback.humanCommitDiffs.length} human commit(s).`);
         }
       } else {
         log(`No human feedback detected on merged PR #${latestMergedPr}.`);

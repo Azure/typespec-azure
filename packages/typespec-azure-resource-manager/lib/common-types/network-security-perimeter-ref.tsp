@@ -5,108 +5,126 @@ using Azure.ResourceManager.CommonTypes.Private;
 namespace Azure.ResourceManager.CommonTypes;
 
 /** Direction of Access Rule */
-@@armCommonDefinition(AccessRuleDirection,
+@@armCommonDefinition(
+  AccessRuleDirection,
   "AccessRuleDirection",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(AccessRuleDirection,
+@@armCommonDefinition(
+  AccessRuleDirection,
   "AccessRuleDirection",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"
 );
 
 /** Provisioning state of a network security perimeter configuration that is being created or updated. */
-@@armCommonDefinition(NetworkSecurityPerimeterConfigurationProvisioningState,
+@@armCommonDefinition(
+  NetworkSecurityPerimeterConfigurationProvisioningState,
   "NetworkSecurityPerimeterConfigurationProvisioningState",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(NetworkSecurityPerimeterConfigurationProvisioningState,
+@@armCommonDefinition(
+  NetworkSecurityPerimeterConfigurationProvisioningState,
   "NetworkSecurityPerimeterConfigurationProvisioningState",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"
 );
 
 /** Type of issue */
-@@armCommonDefinition(IssueType,
+@@armCommonDefinition(
+  IssueType,
   "IssueType",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(IssueType,
+@@armCommonDefinition(
+  IssueType,
   "IssueType",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"
 );
 
 /** Severity of the issue. */
-@@armCommonDefinition(Severity,
+@@armCommonDefinition(
+  Severity,
   "Severity",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(Severity,
+@@armCommonDefinition(
+  Severity,
   "Severity",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"
 );
 
 /** Access mode of the resource association */
-@@armCommonDefinition(ResourceAssociationAccessMode,
+@@armCommonDefinition(
+  ResourceAssociationAccessMode,
   "ResourceAssociationAccessMode",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(ResourceAssociationAccessMode,
+@@armCommonDefinition(
+  ResourceAssociationAccessMode,
   "ResourceAssociationAccessMode",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"
 );
 
 /** Allow, disallow, or let network security perimeter configuration control public network access to the protected resource. */
-@@armCommonDefinition(PublicNetworkAccess,
+@@armCommonDefinition(
+  PublicNetworkAccess,
   "PublicNetworkAccess",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(PublicNetworkAccess,
+@@armCommonDefinition(
+  PublicNetworkAccess,
   "PublicNetworkAccess",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"
 );
 
 /** Access rule in a network security perimeter configuration profile */
-@@armCommonDefinition(AccessRule,
+@@armCommonDefinition(
+  AccessRule,
   "AccessRule",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(AccessRule,
+@@armCommonDefinition(
+  AccessRule,
   "AccessRule",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"
 );
 
 /** Properties of Access Rule */
-@@armCommonDefinition(AccessRuleDirection,
+@@armCommonDefinition(
+  AccessRuleDirection,
   "AccessRuleDirection",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(AccessRuleDirection,
+@@armCommonDefinition(
+  AccessRuleDirection,
   "AccessRuleDirection",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"
 );
 
 /** Information about a network security perimeter */
-@@armCommonDefinition(NetworkSecurityPerimeter,
+@@armCommonDefinition(
+  NetworkSecurityPerimeter,
   "NetworkSecurityPerimeter",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(NetworkSecurityPerimeter,
+@@armCommonDefinition(
+  NetworkSecurityPerimeter,
   "NetworkSecurityPerimeter",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"
@@ -114,84 +132,98 @@ namespace Azure.ResourceManager.CommonTypes;
 
 @@Versioning.added(NetworkSecurityPerimeterConfiguration, Versions.v5);
 /** Network security perimeter configuration resource */
-@@armCommonDefinition(NetworkSecurityPerimeterConfiguration,
+@@armCommonDefinition(
+  NetworkSecurityPerimeterConfiguration,
   "NetworkSecurityPerimeterConfiguration",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(NetworkSecurityPerimeterConfiguration,
+@@armCommonDefinition(
+  NetworkSecurityPerimeterConfiguration,
   "NetworkSecurityPerimeterConfiguration",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"
 );
 
 /** Network security configuration properties. */
-@@armCommonDefinition(NetworkSecurityPerimeterConfigurationProperties,
+@@armCommonDefinition(
+  NetworkSecurityPerimeterConfigurationProperties,
   "NetworkSecurityPerimeterConfigurationProperties",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(NetworkSecurityPerimeterConfigurationProperties,
+@@armCommonDefinition(
+  NetworkSecurityPerimeterConfigurationProperties,
   "NetworkSecurityPerimeterConfigurationProperties",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"
 );
 
 /** Describes a provisioning issue for a network security perimeter configuration */
-@@armCommonDefinition(ProvisioningIssue,
+@@armCommonDefinition(
+  ProvisioningIssue,
   "ProvisioningIssue",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(ProvisioningIssue,
+@@armCommonDefinition(
+  ProvisioningIssue,
   "ProvisioningIssue",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"
 );
 
 /** Details of a provisioning issue for a network security perimeter configuration. */
-@@armCommonDefinition(ProvisioningIssueProperties,
+@@armCommonDefinition(
+  ProvisioningIssueProperties,
   "ProvisioningIssueProperties",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(ProvisioningIssueProperties,
+@@armCommonDefinition(
+  ProvisioningIssueProperties,
   "ProvisioningIssueProperties",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"
 );
 
 /** Information about resource association */
-@@armCommonDefinition(ResourceAssociation,
+@@armCommonDefinition(
+  ResourceAssociation,
   "ResourceAssociation",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(ResourceAssociation,
+@@armCommonDefinition(
+  ResourceAssociation,
   "ResourceAssociation",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"
 );
 
 /** Network security perimeter configuration profile */
-@@armCommonDefinition(NetworkSecurityProfile,
+@@armCommonDefinition(
+  NetworkSecurityProfile,
   "NetworkSecurityProfile",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(NetworkSecurityProfile,
+@@armCommonDefinition(
+  NetworkSecurityProfile,
   "NetworkSecurityProfile",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"
 );
 
 /** Result of a list NSP (network security perimeter) configurations request. */
-@@armCommonDefinition(NetworkSecurityPerimeterConfigurationListResult,
+@@armCommonDefinition(
+  NetworkSecurityPerimeterConfigurationListResult,
   "NetworkSecurityPerimeterConfigurationListResult",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "networksecurityperimeter.json"
 );
-@@armCommonDefinition(NetworkSecurityPerimeterConfigurationListResult,
+@@armCommonDefinition(
+  NetworkSecurityPerimeterConfigurationListResult,
   "NetworkSecurityPerimeterConfigurationListResult",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "networksecurityperimeter.json"

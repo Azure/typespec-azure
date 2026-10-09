@@ -1,7 +1,7 @@
 import { Tester } from "#test/tester.js";
 import {
-  LinterRuleTester,
-  TesterInstance,
+  type LinterRuleTester,
+  type TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
@@ -99,8 +99,7 @@ it("valid if a 2xx response has no body for head", async () => {
           namespace Microsoft.Foo;
           
           model Employee is TrackedResource<{}> {
-          @key("employeeName") @segment("employeeName") @path
-            name: string;
+          ...ResourceNameParameter<Employee>;
            }
            
           @armResourceOperations
