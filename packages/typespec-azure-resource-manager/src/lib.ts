@@ -68,6 +68,36 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`No @armResource registration found for type ${"type"}`,
       },
     },
+    "arm-resource-version-not-found": {
+      severity: "error",
+      messages: {
+        default: paramMessage`API version '${"version"}' was not found. Available versions: ${"availableVersions"}.`,
+      },
+    },
+    "arm-resource-version-not-supported": {
+      severity: "error",
+      messages: {
+        default: paramMessage`API version '${"version"}' cannot be selected because the ARM service is not versioned.`,
+      },
+    },
+    "arm-resource-version-transient": {
+      severity: "error",
+      messages: {
+        default: paramMessage`API version '${"version"}' cannot be selected because the ARM service uses transient versioning.`,
+      },
+    },
+    "arm-resource-version-projection-failed": {
+      severity: "error",
+      messages: {
+        default: paramMessage`API version '${"version"}' could not be projected.`,
+      },
+    },
+    "arm-resource-invalid-metadata-name": {
+      severity: "error",
+      messages: {
+        default: paramMessage`The metadata name resolver returned an empty ${"kind"} name for '${"name"}'.`,
+      },
+    },
     "arm-common-types-incompatible-version": {
       severity: "warning",
       messages: {
