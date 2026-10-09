@@ -616,6 +616,18 @@ Choose the change kind separately for each package:
   that user-facing ruleset change accordingly instead of using this
   internal-only guidance.
 
+Use `pnpm change add` and verify that the expected change files were created.
+Before any package changes are committed, Chronus can report
+`No package changed. Exiting.` even with explicit package, kind and message
+arguments. A zero exit status in that case does not satisfy the change-entry
+requirement. Do not create an early commit to make package detection work.
+Instead, inspect existing `.chronus/changes/` entries and `.chronus/config.yaml`,
+then create only the required task-owned entries using their front-matter
+format, package names and change kinds.
+
+Validate with plain `pnpm chronus status`; do not assume `status` accepts
+`--since`. Check the installed command's help before adding options.
+
 Chronus change files must use LF line endings. Do not run Prettier directly on a
 new change file when the Windows checkout would rewrite it with CRLF. Normalize
 only the explicitly named task-owned change files before the first
