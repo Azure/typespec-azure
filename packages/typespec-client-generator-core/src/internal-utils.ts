@@ -11,6 +11,7 @@ import {
   createDiagnosticCollector,
   type Diagnostic,
   type Enum,
+  type EnumMember,
   getDeprecationDetails,
   getDoc,
   getLifecycleVisibilityEnum,
@@ -31,6 +32,7 @@ import {
   type NumericLiteral,
   type Operation,
   type Program,
+  resolveEncodedEnumMemberValue,
   type StringLiteral,
   type Type,
   type Union,
@@ -65,6 +67,7 @@ import {
   getAlternateType,
   getClientDocExplicit,
   getClientLocation,
+  getExplicitClientApiVersions,
   getIsApiVersion,
   getMarkAsLro,
   getOverriddenClientMethod,
@@ -936,12 +939,34 @@ export function getCorrespondingClientParam(
   return undefined;
 }
 
+/**
+ * The value an enum member is serialized as: its `application/json` `@encodedName` if it has one,
+ * otherwise its value, otherwise its name. Members of an api version enum keep their value, since
+ * that is the api version sent and the one versions are compared against.
+ */
+export function getEnumMemberValue(context: TCGCContext, member: EnumMember): string | number {
+  if (isApiVersionEnum(context, member.enum)) {
+    return member.value ?? member.name;
+  }
+  return resolveEncodedEnumMemberValue(context.program, member, "application/json");
+}
+
+function isApiVersionEnum(context: TCGCContext, type: Enum): boolean {
+  for (const [service, versionEnum] of context.getPackageVersionEnum()) {
+    if (versionEnum === type || getExplicitClientApiVersions(context, service) === type) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function getValueTypeValue(
+  context: TCGCContext,
   value: Value,
 ): string | boolean | null | number | Array<unknown> | object | undefined {
   switch (value.valueKind) {
     case "ArrayValue":
-      return value.values.map((x) => getValueTypeValue(x));
+      return value.values.map((x) => getValueTypeValue(context, x));
     case "BooleanValue":
     case "StringValue":
     case "NullValue":
@@ -949,12 +974,12 @@ export function getValueTypeValue(
     case "NumericValue":
       return value.value.asNumber();
     case "EnumValue":
-      return value.value.value ?? value.value.name;
+      return getEnumMemberValue(context, value.value);
     case "ObjectValue":
       return Object.fromEntries(
         [...value.properties.keys()].map((x) => [
           x,
-          getValueTypeValue(value.properties.get(x)!.value),
+          getValueTypeValue(context, value.properties.get(x)!.value),
         ]),
       );
     default:

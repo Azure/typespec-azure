@@ -100,6 +100,7 @@ import {
   filterPreviewVersion,
   getAvailableApiVersions,
   getClientDoc,
+  getEnumMemberValue,
   getHttpBodyType,
   getHttpOperationResponseHeaders,
   getNonNullOptions,
@@ -1027,7 +1028,7 @@ function getSdkEnumValueWithDiagnostics(
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enumvalue")),
     name: getLibraryName(context, type),
     isExactName: isExactClientName(context, type),
-    value: type.value ?? type.name,
+    value: getEnumMemberValue(context, type),
     enumType,
     valueType: enumType.valueType,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
@@ -1055,7 +1056,12 @@ function getSdkEnumWithDiagnostics(
       valueType: diagnostics.pipe(
         getSdkEnumValueType(
           context,
-          [...type.members.values()].map((v) => v.value),
+          [...type.members.values()].map((v) => {
+            // A member without a value still adds nothing to the value type, unless an encoded name
+            // gives it one.
+            const value = getEnumMemberValue(context, v);
+            return value === (v.value ?? v.name) ? v.value : value;
+          }),
         ),
       ),
       values: [],
@@ -1091,7 +1097,8 @@ function getSdkUnionEnumValues(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, member.type, "enumvalue")),
       name: name ? name : `${member.value}`,
       isExactName: isExactClientName(context, member.type),
-      value: member.value,
+      value:
+        member.type.kind === "EnumMember" ? getEnumMemberValue(context, member.type) : member.value,
       valueType: enumType.valueType,
       enumType,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, member.type),
@@ -1123,7 +1130,9 @@ export function getSdkUnionEnumWithDiagnostics(
       diagnostics.pipe(
         getSdkEnumValueType(
           context,
-          [...type.flattenedMembers.values()].map((v) => v.value),
+          [...type.flattenedMembers.values()].map((v) =>
+            v.type.kind === "EnumMember" ? getEnumMemberValue(context, v.type) : v.value,
+          ),
         ),
       ),
     values: [],

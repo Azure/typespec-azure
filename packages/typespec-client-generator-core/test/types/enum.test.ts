@@ -772,3 +772,198 @@ it("spread and union as enum", async () => {
   strictEqual(testModel.access, "public");
   strictEqual(testModel.usage, UsageFlags.Input | UsageFlags.Json);
 });
+
+it("int enum with encoded names", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    enum ConversationStatus {
+      @encodedName("application/json", "unknown")
+      CONVERSATION_STATUS_UNSPECIFIED: 0,
+
+      @encodedName("application/json", "ready")
+      CONVERSATION_STATUS_READY: 1,
+    }
+
+    model Conversation {
+      status: ConversationStatus;
+    }
+
+    op get(): Conversation;
+  `);
+  const context = await createSdkContextForTester(program);
+  strictEqual(context.sdkPackage.enums.length, 1);
+  const sdkType = context.sdkPackage.enums[0];
+  strictEqual(sdkType.valueType.kind, "string");
+  deepStrictEqual(
+    sdkType.values.map((x) => x.name),
+    ["CONVERSATION_STATUS_UNSPECIFIED", "CONVERSATION_STATUS_READY"],
+  );
+  deepStrictEqual(
+    sdkType.values.map((x) => x.value),
+    ["unknown", "ready"],
+  );
+});
+
+it("int enum with some members encoded", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    enum Status {
+      @encodedName("application/json", "ready")
+      READY: 1,
+
+      ZERO: 0,
+    }
+
+    model Test {
+      status: Status;
+    }
+
+    op get(): Test;
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkType = context.sdkPackage.enums[0];
+  strictEqual(sdkType.valueType.kind, "string");
+  deepStrictEqual(
+    sdkType.values.map((x) => x.value),
+    ["ready", 0],
+  );
+});
+
+it("string enum with encoded names", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    enum Shape {
+      @encodedName("application/json", "round")
+      circle: "circle",
+
+      square: "square",
+      plain,
+
+      @encodedName("application/xml", "tri")
+      triangle: "triangle",
+    }
+
+    model Test {
+      shape: Shape;
+    }
+
+    op get(): Test;
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkType = context.sdkPackage.enums[0];
+  strictEqual(sdkType.valueType.kind, "string");
+  deepStrictEqual(
+    sdkType.values.map((x) => x.name),
+    ["circle", "square", "plain", "triangle"],
+  );
+  deepStrictEqual(
+    sdkType.values.map((x) => x.value),
+    ["round", "square", "plain", "triangle"],
+  );
+});
+
+it("int enum with a member without value keeps int value type", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    enum Mixed {
+      a: 1,
+      b,
+    }
+
+    model Test {
+      mixed: Mixed;
+    }
+
+    op get(): Test;
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkType = context.sdkPackage.enums[0];
+  strictEqual(sdkType.valueType.kind, "int32");
+  deepStrictEqual(
+    sdkType.values.map((x) => x.value),
+    [1, "b"],
+  );
+});
+
+it("union as enum with an enum with encoded names", async () => {
+  const { program, Test } = await SimpleTester.compile(t.code`
+      @service
+      namespace N {
+        union ${t.union("Test")} {
+          Shape,
+          string,
+        }
+
+        enum Shape {
+          @encodedName("application/json", "round")
+          circle: "circle",
+
+          square: "square",
+        }
+
+        op x(body: Test): void;
+      }
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const enumType = getClientType(context, Test);
+  strictEqual(enumType.kind, "enum");
+  strictEqual(enumType.isUnionAsEnum, true);
+  deepStrictEqual(
+    enumType.values.map((x) => x.value),
+    ["round", "square"],
+  );
+});
+
+it("api version enum ignores encoded names", async () => {
+  const { program } = await SimpleTester.compile(`
+    @versioned(Versions)
+    @service
+    namespace DemoService;
+
+    enum Versions {
+      @encodedName("application/json", "first")
+      v1: "2024-01-01",
+
+      v2: "2025-01-01",
+    }
+
+    op test(): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const enums = context.sdkPackage.enums;
+  strictEqual(enums.length, 1);
+  strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+  deepStrictEqual(
+    enums[0].values.map((x) => x.value),
+    ["2024-01-01", "2025-01-01"],
+  );
+  deepStrictEqual(context.sdkPackage.clients[0].apiVersions, ["2024-01-01", "2025-01-01"]);
+});
+
+it("client api versions enum ignores encoded names", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(Versions)
+    namespace My.Service {
+      enum Versions { v4, v5 };
+      op func(): void;
+    }
+  `,
+      `
+    @@clientApiVersions(My.Service, ClientApiVersions);
+    enum ClientApiVersions {
+      @encodedName("application/json", "first")
+      v1,
+      ...My.Service.Versions
+    };
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const apiVersionEnum = context.sdkPackage.enums.find((x) => x.usage & UsageFlags.ApiVersionEnum);
+  ok(apiVersionEnum);
+  strictEqual(apiVersionEnum.name, "ClientApiVersions");
+  deepStrictEqual(
+    apiVersionEnum.values.map((x) => x.value),
+    ["v1", "v4", "v5"],
+  );
+});
