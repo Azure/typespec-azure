@@ -543,6 +543,11 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   namespace: string;
   kind: "union";
   variantTypes: TValueType[];
+  /**
+   * Type declared by the union's `extends` clause. This constrains the variants but does not imply inheritance.
+   * Usage, access, and serialization information propagate to this referenced type.
+   */
+  baseType?: SdkType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
   /** Whether the type has public or private accessibility. */

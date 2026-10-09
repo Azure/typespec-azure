@@ -673,6 +673,19 @@ export function getSdkUnionWithDiagnostics(
         }
       }
     }
+
+    const sdkUnionType =
+      retval?.kind === "union"
+        ? retval
+        : retval?.kind === "nullable" && retval.type.kind === "union"
+          ? retval.type
+          : undefined;
+    const baseType = type.baseType;
+    if (sdkUnionType && baseType) {
+      sdkUnionType.baseType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, baseType, operation),
+      );
+    }
   }
 
   return diagnostics.wrap(retval);
@@ -1690,6 +1703,12 @@ export function updateUsageOrAccess(
     for (const unionType of type.variantTypes) {
       diagnostics.pipe(updateUsageOrAccess(context, value, unionType, options));
     }
+    if (type.baseType) {
+      // A constraint must not pull in unrelated discriminated subtypes.
+      options.ignoreSubTypeStack.push(true);
+      diagnostics.pipe(updateUsageOrAccess(context, value, type.baseType, options));
+      options.ignoreSubTypeStack.pop();
+    }
     return diagnostics.wrap(undefined);
   }
   if (type.kind === "nullable") {
@@ -2608,6 +2627,11 @@ function updateSerializationOptions(
   if (type.kind === "union") {
     for (const unionType of type.variantTypes) {
       updateSerializationOptions(context, unionType, contentTypes, options);
+    }
+    if (type.baseType) {
+      options.ignoreSubTypeStack.push(true);
+      diagnostics.pipe(updateSerializationOptions(context, type.baseType, contentTypes, options));
+      options.ignoreSubTypeStack.pop();
     }
     return diagnostics.wrap(undefined);
   }

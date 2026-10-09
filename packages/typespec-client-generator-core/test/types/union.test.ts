@@ -466,6 +466,370 @@ it("model with named union", async function () {
   deepStrictEqual(context.sdkPackage.unions[0], sdkType);
 });
 
+it("preserves an explicit union base type", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    model BaseModel {
+      name: string;
+    }
+    model Model1 extends BaseModel {
+      prop1: int32;
+    }
+    model Model2 extends BaseModel {
+      prop2: int32;
+    }
+    @usage(Usage.input | Usage.output)
+    union MyNamedUnion extends BaseModel {
+      one: Model1,
+      two: Model2,
+    }
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const sdkType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
+  ok(sdkType);
+  strictEqual(sdkType.kind, "union");
+  ok(sdkType.baseType);
+  strictEqual(sdkType.baseType.kind, "model");
+  strictEqual(sdkType.baseType.name, "BaseModel");
+  strictEqual(
+    sdkType.baseType,
+    context.sdkPackage.models.find((x) => x.name === "BaseModel"),
+  );
+  strictEqual(sdkType.baseType.usage, sdkType.usage);
+});
+
+it.each([
+  {
+    name: "input",
+    operation: "@post op send(@body body: MyNamedUnion): void;",
+    usage: UsageFlags.Input | UsageFlags.Json,
+  },
+  {
+    name: "output",
+    operation: "op get(): MyNamedUnion;",
+    usage: UsageFlags.Output | UsageFlags.Json,
+  },
+  {
+    name: "input and output",
+    operation: "@post op echo(@body body: MyNamedUnion): MyNamedUnion;",
+    usage: UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
+  },
+])("propagates $name usage and access to a union base constraint", async ({ operation, usage }) => {
+  const { program } = await SimpleTesterWithService.compile(`
+    model BaseModel {
+      name: string;
+    }
+    model Model1 {
+      name: string;
+      prop1: int32;
+    }
+    model Model2 {
+      name: string;
+      prop2: int32;
+    }
+    union MyNamedUnion extends BaseModel {
+      one: Model1,
+      two: Model2,
+    }
+    @access(Access.internal)
+    ${operation}
+  `);
+
+  const context = await createSdkContextForTester(program);
+  expectDiagnostics(
+    context.diagnostics.filter(
+      (x) => x.code !== "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+    ),
+    [],
+  );
+  const sdkType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
+  ok(sdkType);
+  strictEqual(sdkType.kind, "union");
+  strictEqual(sdkType.usage, usage);
+  strictEqual(sdkType.access, "internal");
+  const baseType = sdkType.baseType;
+  ok(baseType);
+  strictEqual(baseType.kind, "model");
+  strictEqual(baseType.usage, usage);
+  strictEqual(baseType.access, "internal");
+  strictEqual(
+    baseType,
+    context.sdkPackage.models.find((x) => x.name === "BaseModel"),
+  );
+  strictEqual(baseType.serializationOptions.json?.name, "BaseModel");
+  strictEqual(baseType.properties[0].serializationOptions.json?.name, "name");
+});
+
+it.each([false, true])(
+  "propagates orphan union overrides to its explicit base with disableUsageAccessPropagationToBase=%s",
+  async (disableUsageAccessPropagationToBase) => {
+    const { program } = await SimpleTesterWithService.compile(`
+      model BaseModel {
+        name: string;
+      }
+      model Model1 {
+        name: string;
+        prop1: int32;
+      }
+      model Model2 {
+        name: string;
+        prop2: int32;
+      }
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
+      union MyNamedUnion extends BaseModel {
+        one: Model1,
+        two: Model2,
+      }
+    `);
+
+    const context = await createSdkContextForTester(
+      program,
+      {},
+      { disableUsageAccessPropagationToBase },
+    );
+    expectDiagnostics(
+      context.diagnostics.filter(
+        (x) => x.code !== "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+      ),
+      [],
+    );
+    const sdkType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
+    ok(sdkType);
+    strictEqual(sdkType.kind, "union");
+    const baseType = sdkType.baseType;
+    ok(baseType);
+    strictEqual(baseType.kind, "model");
+    strictEqual(baseType.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(baseType.access, "public");
+    strictEqual(
+      baseType,
+      context.sdkPackage.models.find((x) => x.name === "BaseModel"),
+    );
+  },
+);
+
+it("honors an explicit access override on the union base constraint", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    @access(Access.public)
+    model BaseModel {
+      name: string;
+    }
+    model Model1 {
+      name: string;
+      prop1: int32;
+    }
+    model Model2 {
+      name: string;
+      prop2: int32;
+    }
+    union MyNamedUnion extends BaseModel {
+      one: Model1,
+      two: Model2,
+    }
+    @access(Access.internal)
+    op get(): MyNamedUnion;
+  `);
+
+  const context = await createSdkContextForTester(program);
+  expectDiagnostics(
+    context.diagnostics.filter(
+      (x) => x.code !== "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+    ),
+    [],
+  );
+  const sdkType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
+  ok(sdkType);
+  strictEqual(sdkType.kind, "union");
+  strictEqual(sdkType.access, "internal");
+  ok(sdkType.baseType);
+  strictEqual(sdkType.baseType.kind, "model");
+  strictEqual(sdkType.baseType.access, "public");
+  strictEqual(sdkType.baseType.usage, UsageFlags.Output | UsageFlags.Json);
+});
+
+it("propagates usage through a union base constraint chain", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    model BaseModel {
+      name: string;
+    }
+    model BaseVariant1 {
+      name: string;
+      prop1: int32;
+    }
+    model BaseVariant2 {
+      name: string;
+      prop2: int32;
+    }
+    union BaseConstraint extends BaseModel {
+      one: BaseVariant1,
+      two: BaseVariant2,
+    }
+    model Model1 {
+      name: string;
+      prop1: int32;
+      extra: boolean;
+    }
+    model Model2 {
+      name: string;
+      prop2: int32;
+      extra: boolean;
+    }
+    union MyNamedUnion extends BaseConstraint {
+      one: Model1,
+      two: Model2,
+    }
+    @access(Access.internal)
+    op get(): MyNamedUnion;
+  `);
+
+  const context = await createSdkContextForTester(program);
+  expectDiagnostics(
+    context.diagnostics.filter(
+      (x) => x.code !== "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+    ),
+    [],
+  );
+  const sdkType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
+  ok(sdkType);
+  strictEqual(sdkType.kind, "union");
+  const baseType = sdkType.baseType;
+  ok(baseType);
+  strictEqual(baseType.kind, "union");
+  strictEqual(baseType.usage, UsageFlags.Output | UsageFlags.Json);
+  strictEqual(baseType.access, "internal");
+  strictEqual(
+    baseType,
+    context.sdkPackage.unions.find((x) => x.name === "BaseConstraint"),
+  );
+  ok(baseType.baseType);
+  strictEqual(baseType.baseType.kind, "model");
+  strictEqual(baseType.baseType.usage, UsageFlags.Output | UsageFlags.Json);
+  strictEqual(baseType.baseType.access, "internal");
+  strictEqual(
+    baseType.baseType,
+    context.sdkPackage.models.find((x) => x.name === "BaseModel"),
+  );
+  strictEqual(baseType.baseType.serializationOptions.json?.name, "BaseModel");
+  for (const variant of baseType.variantTypes) {
+    strictEqual(variant.kind, "model");
+    strictEqual(variant.usage, UsageFlags.Output | UsageFlags.Json);
+    strictEqual(variant.access, "internal");
+    strictEqual(variant.serializationOptions.json?.name, variant.name);
+  }
+});
+
+it("preserves a scalar union base constraint", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    @usage(Usage.input | Usage.output)
+    union MyNamedUnion extends numeric {
+      int32,
+      float32,
+    }
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const sdkType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
+  ok(sdkType);
+  strictEqual(sdkType.kind, "union");
+  strictEqual(sdkType.baseType?.kind, "numeric");
+});
+
+it("does not propagate union base usage to unrelated discriminated subtypes", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    @discriminator("kind")
+    model BaseModel {
+      kind: string;
+    }
+    model Model1 extends BaseModel {
+      kind: "one";
+    }
+    model Model2 extends BaseModel {
+      kind: "two";
+    }
+    model Unused extends BaseModel {
+      kind: "unused";
+    }
+    union MyNamedUnion extends BaseModel {
+      one: Model1,
+      two: Model2,
+    }
+    op get(): MyNamedUnion;
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const sdkType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
+  ok(sdkType);
+  strictEqual(sdkType.kind, "union");
+  ok(sdkType.baseType);
+  strictEqual(sdkType.baseType.kind, "model");
+  strictEqual(sdkType.baseType.usage, UsageFlags.Output | UsageFlags.Json);
+  strictEqual(
+    context.sdkPackage.models.find((x) => x.name === "Unused"),
+    undefined,
+  );
+  deepStrictEqual(Object.keys(sdkType.baseType.discriminatedSubtypes ?? {}), ["one", "two"]);
+});
+
+it("handles a union base model that references the union", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    model BaseModel {
+      name: string;
+      choice?: MyNamedUnion;
+    }
+    model Model1 extends BaseModel {
+      prop1: int32;
+    }
+    model Model2 extends BaseModel {
+      prop2: int32;
+    }
+    union MyNamedUnion extends BaseModel {
+      one: Model1,
+      two: Model2,
+    }
+    @post op echo(@body body: MyNamedUnion): MyNamedUnion;
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const sdkType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
+  ok(sdkType);
+  strictEqual(sdkType.kind, "union");
+  ok(sdkType.baseType);
+  strictEqual(sdkType.baseType.kind, "model");
+  strictEqual(
+    sdkType.baseType,
+    context.sdkPackage.models.find((x) => x.name === "BaseModel"),
+  );
+  strictEqual(sdkType.baseType.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+  strictEqual(sdkType.baseType.properties.find((x) => x.name === "choice")?.type, sdkType);
+});
+
+it("does not infer a union base type from a common model ancestor", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    @usage(Usage.input | Usage.output)
+    model BaseModel {
+      name: string;
+    }
+    model Model1 extends BaseModel {
+      prop1: int32;
+    }
+    model Model2 extends BaseModel {
+      prop2: int32;
+    }
+    @usage(Usage.input | Usage.output)
+    union MyNamedUnion {
+      one: Model1,
+      two: Model2,
+    }
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const sdkType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
+  ok(sdkType);
+  strictEqual(sdkType.kind, "union");
+  strictEqual(sdkType.baseType, undefined);
+});
+
 it("model with nullable named union", async function () {
   const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
@@ -528,6 +892,61 @@ it("model with nullable named union", async function () {
   );
 
   deepStrictEqual(context.sdkPackage.unions[0], sdkType);
+});
+
+it("preserves an explicit union base type inside a nullable wrapper", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    model BaseModel {
+      name: string;
+    }
+    model Model1 extends BaseModel {
+      prop1: int32;
+    }
+    model Model2 extends BaseModel {
+      prop2: int32;
+    }
+    union BaseConstraint {
+      base: BaseModel,
+      null,
+    }
+    union MyNamedUnion extends BaseConstraint {
+      one: Model1,
+      two: Model2,
+      null,
+    }
+    @access(Access.internal)
+    @post op echo(@body body: MyNamedUnion): MyNamedUnion;
+  `);
+
+  const context = await createSdkContextForTester(program);
+  expectDiagnostics(
+    context.diagnostics.filter(
+      (x) => x.code !== "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+    ),
+    [],
+  );
+  const nullableType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
+  ok(nullableType);
+  strictEqual(nullableType.kind, "nullable");
+  strictEqual(nullableType.type.kind, "union");
+  ok(nullableType.type.baseType);
+  strictEqual(nullableType.type.baseType.kind, "nullable");
+  strictEqual(nullableType.type.baseType.name, "BaseConstraint");
+  strictEqual(
+    nullableType.type.baseType.usage,
+    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
+  );
+  strictEqual(nullableType.type.baseType.access, "internal");
+  strictEqual(
+    nullableType.type.baseType,
+    context.sdkPackage.unions.find((x) => x.name === "BaseConstraint"),
+  );
+  strictEqual(nullableType.type.baseType.type.kind, "model");
+  strictEqual(nullableType.type.baseType.type.name, "BaseModel");
+  strictEqual(
+    nullableType.type.baseType.type,
+    context.sdkPackage.models.find((x) => x.name === "BaseModel"),
+  );
 });
 
 it("model with nullable enum property", async function () {

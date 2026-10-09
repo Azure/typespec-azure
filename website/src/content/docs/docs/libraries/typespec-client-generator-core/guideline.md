@@ -238,6 +238,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 **Union Types:**
 
 - [`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type.
+- When a TypeSpec union declares an `extends` constraint, `SdkUnionType.baseType` preserves that explicit constraint. TCGC does not infer `baseType` merely because all variants share a common ancestor. Usage, access, and serialization information propagate from the union to its explicit base type, including through nullable wrappers and other union constraints. This propagation does not include unrelated discriminated subtypes of a base model.
 
 **Model Types:**
 
