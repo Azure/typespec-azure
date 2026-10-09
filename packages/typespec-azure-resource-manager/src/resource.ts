@@ -74,10 +74,15 @@ import {
   type ArmResourceOperations,
   getArmResourceOperationData,
   getArmResourceOperationList,
-  getResourceNameForOperation,
   resolveResourceOperations,
 } from "./operations.js";
 import { getArmResource, listArmResources, registerArmResource } from "./private.decorators.js";
+import {
+  evaluateResourceNameExpression,
+  getResourceNameExpression,
+  getResourceNameExpressionModels,
+  type ResourceNameExpression,
+} from "./resource-name.js";
 import { ArmStateKeys } from "./state.js";
 
 export type ArmResourceKind =
@@ -162,8 +167,8 @@ export interface Provider {
  * ```ts
  * const provider = resolveArmResources(program, {
  *   version: "2025-01-01",
- *   nameResolver: ({ type, defaultName }) =>
- *     type === undefined ? undefined : getConsumerName(type) ?? defaultName,
+ *   nameResolver: ({ kind, type }) =>
+ *     kind === "resource" || type === undefined ? undefined : getConsumerName(type),
  * });
  * ```
  */
@@ -180,30 +185,66 @@ export interface ResolveArmResourcesOptions {
  * These names are metadata only and do not change HTTP paths, serialized names, or ARM
  * resource-type segments.
  */
-export type ArmMetadataNameKind = "resource" | "operation" | "operation-group";
+export type ArmMetadataNameKind = ArmMetadataNameRequest["kind"];
 
-/** Context supplied when resolving a logical ARM metadata name. */
-export interface ArmMetadataNameRequest {
-  /** The kind of logical name being resolved. */
-  kind: ArmMetadataNameKind;
+/**
+ * Context supplied when resolving a logical ARM metadata name.
+ *
+ * `resource-model` resolves the projected TypeSpec model name used inside non-explicit ARM
+ * defaults. `resource` resolves the complete occurrence name afterward and has final precedence.
+ */
+interface ArmMetadataNameRequestBase {
   /** The TypeSpec program being resolved. */
   program: Program;
   /** The selected API version, or undefined for the declaration view. */
   version?: string;
-  /** The logical name produced by the ARM resolver. */
+  /** The logical name to customize. */
   defaultName: string;
-  /** The TypeSpec declaration that owns the logical name. Undefined for synthetic resources. */
-  type?: Model | Operation | Interface;
-  /** The associated resource model for operation metadata. */
-  resourceModel?: Model;
+}
+
+interface ArmResourceNameRequestBase extends ArmMetadataNameRequestBase {
   /** The canonical ARM resource type formatted as `${provider}/${types.join("/")}`. */
-  resourceType?: string;
+  resourceType: string;
   /**
    * The instance path that distinguishes this resolved resource occurrence.
    * Path parameters retain their HTTP metadata names, for example `{subscriptionId}`.
    */
+  resourceInstancePath: string;
+}
+
+export interface ArmResourceModelNameRequest extends ArmResourceNameRequestBase {
+  kind: "resource-model";
+  type: Model;
+}
+
+export interface ArmResourceNameRequest extends ArmResourceNameRequestBase {
+  kind: "resource";
+  /** Undefined when the resolved resource is synthetic. */
+  type: Model | undefined;
+}
+
+interface ArmOperationNameRequestBase extends ArmMetadataNameRequestBase {
+  /** The associated resource model when the operation belongs to a resolved resource. */
+  resourceModel?: Model;
+  resourceType?: string;
   resourceInstancePath?: string;
 }
+
+export interface ArmOperationNameRequest extends ArmOperationNameRequestBase {
+  kind: "operation";
+  type: Operation;
+}
+
+export interface ArmOperationGroupNameRequest extends ArmOperationNameRequestBase {
+  kind: "operation-group";
+  type: Interface;
+}
+
+export type ArmMetadataNameRequest =
+  | ArmResourceModelNameRequest
+  | ArmResourceNameRequest
+  | ArmOperationNameRequest
+  | ArmOperationGroupNameRequest;
 
 /**
  * Resolves a logical ARM metadata name without changing wire API metadata.
@@ -226,8 +267,6 @@ export interface ResolvedResourceInfo {
   resourceInstancePath: string;
   /** The name of the resource at this instance path  */
   resourceName: string;
-  /** Whether the resource name was explicitly provided as a parameter */
-  resourceNameIsExplicit?: boolean;
 }
 
 export type ArmResourceScope =
@@ -245,8 +284,8 @@ interface ResolvedResourceOperations {
   associatedOperations?: ArmResourceOperation[];
   /** The name of the resource at this instance path  */
   resourceName: string;
-  /** Whether the resource name was explicitly provided as a parameter */
-  resourceNameIsExplicit?: boolean;
+  resourceNameExpression: ResourceNameExpression;
+  resourceNameIsExplicit: boolean;
   /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
   resourceType: ResourceType;
   /** The path to the resource instance, preserving named HTTP path parameters. */
@@ -577,7 +616,20 @@ const armResourceVersionSnapshots = new WeakMap<
   Program,
   Map<Namespace, Map<string, ArmResourceVersionSnapshot>>
 >();
-const syntheticResources = new WeakSet<ResolvedResource>();
+interface UnfinalizedResolvedResource extends ResolvedResource {
+  resourceNameExpression: ResourceNameExpression;
+  resourceNameIsExplicit: boolean;
+  parent?: UnfinalizedResolvedResource;
+  scope?: ArmResourceScope | UnfinalizedResolvedResource;
+}
+
+interface UnfinalizedProvider {
+  resources: UnfinalizedResolvedResource[];
+  providerOperations: ArmResourceOperation[];
+}
+
+const unfinalizedProviders = new WeakMap<Program, Map<Namespace, UnfinalizedProvider>>();
+const syntheticResources = new WeakSet<UnfinalizedResolvedResource>();
 
 /**
  * Resolves ARM resources and operations.
@@ -598,10 +650,15 @@ export function resolveArmResources(
       ? { program, providerNamespace }
       : resolveArmResourceVersionContext(program, providerNamespace, options.version);
   if (context === undefined) return {};
-  const provider = resolveArmResourcesForContext(context);
-  return options.nameResolver === undefined
-    ? provider
-    : applyArmMetadataNames(program, provider, options);
+  const source = resolveArmResourcesForContext(context);
+  if (options.nameResolver === undefined) {
+    const cached = getResolvedResources(program, context.providerNamespace);
+    if (cached !== undefined) return cached;
+    const provider = finalizeArmProvider(program, source, options);
+    setResolvedResources(program, context.providerNamespace, provider);
+    return provider;
+  }
+  return finalizeArmProvider(program, source, options);
 }
 
 function resolveArmResourceVersionContext(
@@ -677,22 +734,26 @@ function resolveArmResourceVersionContext(
   return { program, ...resolvedSnapshot };
 }
 
-function resolveArmResourcesForContext(context: ArmResourceResolutionContext): Provider {
+function resolveArmResourcesForContext(context: ArmResourceResolutionContext): UnfinalizedProvider {
   const { program, providerNamespace, realm } = context;
-  const resolvedResources = getResolvedResources(program, providerNamespace);
-  if (resolvedResources?.resources !== undefined && resolvedResources.resources.length > 0) {
-    // Return the cached resource details
-    return resolvedResources;
+  let programProviders = unfinalizedProviders.get(program);
+  if (programProviders === undefined) {
+    programProviders = new Map();
+    unfinalizedProviders.set(program, programProviders);
   }
+  const cached = programProviders.get(providerNamespace);
+  if (cached !== undefined) return cached;
 
   // We haven't generated the full resource details yet
-  const resources: ResolvedResource[] = [];
+  const resources: UnfinalizedResolvedResource[] = [];
   for (const resource of listArmResources(program, realm)) {
     const operations = resolveArmResourceOperations(program, resource.typespecType);
     const singletonKeyValues = getSingletonKeyValues(program, resource.typespecType);
     for (const op of operations) {
-      const fullResource: ResolvedResource = {
+      const fullResource: UnfinalizedResolvedResource = {
         ...op,
+        parent: undefined,
+        scope: undefined,
         type: resource.typespecType,
         kind:
           getPublicResourceKind(resource.typespecType) ??
@@ -713,27 +774,28 @@ function resolveArmResourcesForContext(context: ArmResourceResolutionContext): P
   }
 
   // Add the unmarked operations
-  const resolved: Provider = {
+  const resolved: UnfinalizedProvider = {
     resources: resources,
     providerOperations: getUnassociatedOperationsForContainer(program, providerNamespace).filter(
       (op) => !isArmResourceOperation(program, op.operation),
     ),
   };
 
-  setResolvedResources(program, providerNamespace, resolved);
+  programProviders.set(providerNamespace, resolved);
   return resolved;
 }
 
-function applyArmMetadataNames(
+function finalizeArmProvider(
   program: Program,
-  provider: Provider,
+  provider: UnfinalizedProvider,
   options: ResolveArmResourcesOptions,
 ): Provider {
-  const nameResolver = options.nameResolver!;
+  const nameResolver = options.nameResolver;
   const resourceCopies = new Map<ResolvedResource, ResolvedResource>();
-  const resources = provider.resources?.map((resource) => {
+  const resources = provider.resources.map((resource) => {
+    const { resourceNameExpression, resourceNameIsExplicit, ...resourceMetadata } = resource;
     const copy: ResolvedResource = {
-      ...resource,
+      ...resourceMetadata,
       operations: { lifecycle: {}, lists: [], actions: [] },
       associatedOperations: undefined,
       parent: undefined,
@@ -743,41 +805,59 @@ function applyArmMetadataNames(
     return copy;
   });
 
-  if (resources !== undefined && provider.resources !== undefined) {
-    for (let i = 0; i < provider.resources.length; i++) {
-      const source = provider.resources[i];
-      const target = resources[i];
-      target.resourceName = resolveArmMetadataName(program, nameResolver, {
-        kind: "resource",
-        program,
-        version: options.version,
-        defaultName: source.resourceName,
-        type: syntheticResources.has(source) ? undefined : source.type,
-        resourceType: formatResourceType(source.resourceType),
-        resourceInstancePath: source.resourceInstancePath,
-      });
-      target.operations = copyResolvedOperations(
+  for (let i = 0; i < provider.resources.length; i++) {
+    const source = provider.resources[i];
+    const target = resources[i];
+    const requestContext = {
+      program,
+      version: options.version,
+      resourceType: formatResourceType(source.resourceType),
+      resourceInstancePath: source.resourceInstancePath,
+    };
+    const modelNames = new Map<Model, string>();
+    for (const model of getResourceNameExpressionModels(source.resourceNameExpression)) {
+      modelNames.set(
+        model,
+        resolveArmMetadataName(program, nameResolver, {
+          ...requestContext,
+          kind: "resource-model",
+          defaultName: model.name,
+          type: model,
+        }),
+      );
+    }
+    const defaultName = evaluateResourceNameExpression(
+      source.resourceNameExpression,
+      source.resourceInstancePath,
+      (model) => modelNames.get(model)!,
+    );
+    target.resourceName = resolveArmMetadataName(program, nameResolver, {
+      ...requestContext,
+      kind: "resource",
+      defaultName,
+      type: syntheticResources.has(source) ? undefined : source.type,
+    });
+    target.operations = copyResolvedOperations(
+      program,
+      nameResolver,
+      source.operations,
+      source,
+      target.resourceName,
+      options.version,
+    );
+    target.associatedOperations = source.associatedOperations?.map((operation) =>
+      copyArmResourceOperation(
         program,
         nameResolver,
-        source.operations,
+        operation,
         source,
         target.resourceName,
         options.version,
-      );
-      target.associatedOperations = source.associatedOperations?.map((operation) =>
-        copyArmResourceOperation(
-          program,
-          nameResolver,
-          operation,
-          source,
-          target.resourceName,
-          options.version,
-        ),
-      );
-      target.parent = source.parent === undefined ? undefined : resourceCopies.get(source.parent);
-      target.scope =
-        typeof source.scope === "object" ? resourceCopies.get(source.scope) : source.scope;
-    }
+      ),
+    );
+    target.parent = source.parent === undefined ? undefined : resourceCopies.get(source.parent);
+    target.scope =
+      typeof source.scope === "object" ? resourceCopies.get(source.scope) : source.scope;
   }
 
   return {
@@ -797,7 +877,7 @@ function applyArmMetadataNames(
 
 function copyResolvedOperations(
   program: Program,
-  nameResolver: ArmMetadataNameResolver,
+  nameResolver: ArmMetadataNameResolver | undefined,
   operations: ArmResolvedOperationsForResource,
   resource: ResolvedResource,
   resourceName: string,
@@ -833,7 +913,7 @@ function copyResolvedOperations(
 
 function copyArmResourceOperation(
   program: Program,
-  nameResolver: ArmMetadataNameResolver,
+  nameResolver: ArmMetadataNameResolver | undefined,
   operation: ArmResourceOperation,
   resource: ResolvedResource | undefined,
   resourceName: string | undefined,
@@ -876,9 +956,10 @@ function copyArmResourceOperation(
 
 function resolveArmMetadataName(
   program: Program,
-  nameResolver: ArmMetadataNameResolver,
+  nameResolver: ArmMetadataNameResolver | undefined,
   request: ArmMetadataNameRequest,
 ): string {
+  if (nameResolver === undefined) return request.defaultName;
   const name = nameResolver(request);
   if (name === undefined) return request.defaultName;
   if (name.length > 0) return name;
@@ -895,10 +976,10 @@ function formatResourceType(resourceType: ResourceType): string {
 }
 
 function getResourceParent(
-  knownResources: ResolvedResource[],
-  child: ResolvedResource,
-  resourcesToProcess: ResolvedResource[],
-): ResolvedResource | undefined {
+  knownResources: UnfinalizedResolvedResource[],
+  child: UnfinalizedResolvedResource,
+  resourcesToProcess: UnfinalizedResolvedResource[],
+): UnfinalizedResolvedResource | undefined {
   if (child.resourceType.types.length < 2) return undefined;
   for (const resource of knownResources) {
     if (
@@ -909,7 +990,8 @@ function getResourceParent(
       return resource;
     }
   }
-  const parent: ResolvedResource = {
+  const resourceName = getParentName(child.resourceType.types[child.resourceType.types.length - 2]);
+  const parent: UnfinalizedResolvedResource = {
     type: child.type,
     kind: "Other",
     providerNamespace: child.providerNamespace,
@@ -917,7 +999,9 @@ function getResourceParent(
       provider: child.resourceType.provider,
       types: child.resourceType.types.slice(0, -1),
     },
-    resourceName: getParentName(child.resourceType.types[child.resourceType.types.length - 2]),
+    resourceName,
+    resourceNameExpression: { kind: "literal", value: resourceName },
+    resourceNameIsExplicit: false,
     resourceInstancePath: `/${child.resourceInstancePath
       .split("/")
       .filter((s) => s.length > 0)
@@ -939,10 +1023,10 @@ function getParentName(typeName: string): string {
 }
 
 function getResourceScope(
-  knownResources: ResolvedResource[],
-  resource: ResolvedResource,
-  resourcesToProcess: ResolvedResource[],
-): ResolvedResource | ArmResourceScope | undefined {
+  knownResources: UnfinalizedResolvedResource[],
+  resource: UnfinalizedResolvedResource,
+  resourcesToProcess: UnfinalizedResolvedResource[],
+): UnfinalizedResolvedResource | ArmResourceScope | undefined {
   if (resource.scope !== undefined) return resource.scope;
   if (resource.parent !== undefined)
     return getResourceScope(knownResources, resource.parent, resourcesToProcess);
@@ -1007,7 +1091,8 @@ function getResourceScope(
         return "ExternalResource";
       }
     }
-    const parent: ResolvedResource = {
+    const resourceName = getParentName(types[types.length - 1]);
+    const parent: UnfinalizedResolvedResource = {
       type: resource.type,
       kind: "Other",
       providerNamespace: provider,
@@ -1015,7 +1100,9 @@ function getResourceScope(
         provider: provider,
         types: types,
       },
-      resourceName: getParentName(types[types.length - 1]),
+      resourceName,
+      resourceNameExpression: { kind: "literal", value: resourceName },
+      resourceNameIsExplicit: false,
       resourceInstancePath: `/${segments.join("/")}`,
       operations: { lifecycle: {}, actions: [], lists: [] },
     };
@@ -1534,20 +1621,33 @@ export function resolveArmResourceOperations(
     .map((operation) => resolveArmResourceOperationCandidate(program, resourceType, operation))
     .filter((operation) => operation !== undefined);
 
-  for (const { armOperation, resourceInfo, resourceNameIsExplicit } of candidates) {
+  for (const {
+    armOperation,
+    resourceInfo,
+    resourceNameExpression,
+    resourceNameIsExplicit,
+  } of candidates) {
     if (!isResourceIdentityOperation(armOperation.kind)) continue;
     if (resourceInfo === undefined) continue;
     let matched = false;
     for (const resolvedOp of resolvedOperations) {
       if (isResourceIdentityMatch(resourceInfo, resolvedOp)) {
         matched = true;
+        resolvedOp.resourceNameIsExplicit ||= resourceNameIsExplicit;
+        if (resourceNameIsExplicit) {
+          resolvedOp.resourceNameExpression = resourceNameExpression;
+        }
         tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, resolvedOp);
         continue;
       }
     }
 
     if (matched) continue;
-    const newResource = createResolvedResourceOperations(resourceInfo, resourceNameIsExplicit);
+    const newResource = createResolvedResourceOperations(
+      resourceInfo,
+      resourceNameExpression,
+      resourceNameIsExplicit,
+    );
     tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, newResource);
     resolvedOperations.add(newResource);
   }
@@ -1584,6 +1684,7 @@ export function resolveArmResourceOperations(
 interface ArmResourceOperationCandidate {
   armOperation: ArmResourceOperation;
   resourceInfo?: ResolvedResourceInfo;
+  resourceNameExpression: ResourceNameExpression;
   resourceNameIsExplicit: boolean;
 }
 
@@ -1607,29 +1708,42 @@ function resolveArmResourceOperationCandidate(
 
   armOperation.name = operation.name;
   armOperation.resourceKind = operation.resourceKind;
-  const resourceNameIsExplicit = operation.resourceName !== undefined;
+  const resourceNameExpression =
+    getResourceNameExpression(program, operation.operation) ??
+    (operation.resourceName !== undefined && operation.resourceName.length > 0
+      ? { kind: "explicit", value: operation.resourceName }
+      : operation.resourceKind === "legacy-extension"
+        ? { kind: "legacy-extension", model: operation.resource ?? resourceType }
+        : operation.resourceKind === "legacy"
+          ? { kind: "legacy-resource", model: operation.resource ?? resourceType }
+          : { kind: "model", model: operation.resource ?? resourceType });
+  const resourceNameIsExplicit = resourceNameExpression.kind === "explicit";
   if (resourceInfo !== undefined) {
-    resourceInfo.resourceName =
-      operation.resourceName ??
-      getResourceNameForOperation(program, armOperation, resourceInfo.resourceInstancePath) ??
-      armOperation.resourceModelName;
-    resourceInfo.resourceNameIsExplicit = resourceNameIsExplicit;
+    resourceInfo.resourceName = evaluateResourceNameExpression(
+      resourceNameExpression,
+      resourceInfo.resourceInstancePath,
+    );
     armOperation.resourceName = resourceInfo.resourceName;
   } else {
-    armOperation.resourceName = operation.resourceName ?? armOperation.resourceModelName;
+    armOperation.resourceName = evaluateResourceNameExpression(
+      resourceNameExpression,
+      armOperation.path,
+    );
   }
 
-  return { armOperation, resourceInfo, resourceNameIsExplicit };
+  return { armOperation, resourceInfo, resourceNameExpression, resourceNameIsExplicit };
 }
 
 function createResolvedResourceOperations(
   resourceInfo: ResolvedResourceInfo,
+  resourceNameExpression: ResourceNameExpression,
   resourceNameIsExplicit: boolean,
 ): ResolvedResourceOperations {
   return {
     resourceType: resourceInfo.resourceType,
     resourceInstancePath: resourceInfo.resourceInstancePath,
     resourceName: resourceInfo.resourceName,
+    resourceNameExpression,
     resourceNameIsExplicit: resourceNameIsExplicit,
     operations: {
       lifecycle: {
