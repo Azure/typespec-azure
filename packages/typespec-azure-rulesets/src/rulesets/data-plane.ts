@@ -20,6 +20,7 @@ export default {
     "@azure-tools/typespec-azure-core/no-nullable": true,
     "@azure-tools/typespec-azure-core/no-offsetdatetime": true,
     "@azure-tools/typespec-azure-core/no-unnamed-types": true,
+    "@azure-tools/typespec-azure-core/no-unnamed-response-bodies": false,
     "@azure-tools/typespec-azure-core/no-response-body": true,
     "@azure-tools/typespec-azure-core/no-rpc-path-params": true,
     "@azure-tools/typespec-azure-core/no-openapi": true,
