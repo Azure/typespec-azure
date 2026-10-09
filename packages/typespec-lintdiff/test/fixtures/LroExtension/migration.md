@@ -11,7 +11,7 @@ or legacy prerequisites, and two handwritten POSTs suppress interface and
 Location-header requirements. They are not supported-provider misses.
 
 The completed update checks supported PATCH and provider/collection POST
-customizations returning `202` without native polling metadata. Fourteen native
+customizations returning `202` without native polling metadata. Sixteen native
 tests and all 51 affected fixtures pass. Six unrelated, pre-existing compiler
 failures limit the assessed corpus to 462 projects; none prevents assessment of
 the 14 Swagger-firing projects. No unexplained in-contract discrepancy remains.
@@ -57,13 +57,14 @@ data-plane rule.
 
 ## Focused validation and emission evidence
 
-The native suite contains 14 tests, runs without AutoRest or TCGC, and proves:
+The native suite contains 16 tests, runs without AutoRest or TCGC, and proves:
 
 - sync PATCH accepted-response customization and async PATCH plain-header
   customization each report on the authored operation;
 - sync/async provider POST plain-header customizations report even though they
   are outside registered resource operations;
-- standard/semantic-header PATCH and provider templates pass;
+- standard/semantic-header PATCH and provider templates pass, including
+  synchronous accepted responses with `ArmLroLocationHeader`;
 - synchronous templates without `202` pass;
 - the lintdiff-only service guard reaches nested ARM operations and excludes
   a data-plane PATCH with `202`;
@@ -187,19 +188,26 @@ in 14 projects. Raw TypeSpec diagnostics can include declarations from older API
 versions; any one-sided projects require selected-version attribution before a
 behavioral conclusion.
 
-The historical `docs/coverage_old.md` aggregate reports 450 compiled projects
-and 14/14 firing projects. The later pre-change full TypeSpec report uses
-468 projects, 462 successful compilations, and 39/39 diagnostics in 14/14
-projects. These are different report populations; the earlier equality included
-the broader, extension-based implementation and does not establish native
-equivalence.
+The historical [`docs/coverage_old.md`](../../../docs/coverage_old.md) aggregate
+reports 450 compiled projects. Its LroExtension row records 14 validator-fired
+projects, 14 projects with the local lint, and zero projects covered by an
+official rule. The checked-in pre-change
+[`specs/coverage-breakdown.md`](../../../specs/coverage-breakdown.md) uses 468
+projects with 462 successful compilations; its row records 14 validator
+projects, 14 TypeSpec projects, 14 overlapping projects, zero validator-only
+and zero TypeSpec-only projects, with 39 validator and 39 raw TypeSpec
+diagnostics. Neither report records its generation timestamp or generator code
+revision, so the reports cannot identify the exact generator implementation
+that produced them. These are different report populations; their observed
+equality included the broader, extension-based implementation and does not
+establish native equivalence or replace the fresh post-change run below.
 
 ## Fresh full-corpus results
 
 The post-review full resource-manager rerun completed on October 8, 2026,
 exit 0, using the pinned specs commit above. Its result index was generated at
-`2026-10-08T09:34:46Z`, schema 7, `partial: false`. The runner processed all
-468 projects, with 462 successes and six failures; analysis took 1,134,169 ms.
+`2026-10-08T11:40:42Z`, schema 7, `partial: false`. The runner processed all
+468 projects, with 462 successes and six failures; analysis took 1,149,890 ms.
 A literal Advisor filter first selected exactly one project and passed.
 
 The earlier full run completed at 15:14:39 +08:00, before the supported

@@ -13,7 +13,7 @@ export const lroExtensionRule = createRule({
   severity: "warning",
   messages: {
     default:
-      "ARM operations returning 202 must have native polling metadata. Retain the async template's standard LRO headers.",
+      "ARM operations returning 202 must have native polling metadata. Use an asynchronous ARM template or preserve supported semantic LRO headers.",
   },
   create(context) {
     return {

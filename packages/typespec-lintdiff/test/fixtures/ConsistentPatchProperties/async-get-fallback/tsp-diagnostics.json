@@ -2,7 +2,7 @@
   {
     "code": "tsp-lintdiff-local-linter/lro-extension",
     "severity": "warning",
-    "message": "ARM operations returning 202 must have native polling metadata. Retain the async template's standard LRO headers."
+    "message": "ARM operations returning 202 must have native polling metadata. Use an asynchronous ARM template or preserve supported semantic LRO headers."
   },
   {
     "code": "tsp-lintdiff-local-linter/description-must-not-be-node-name",

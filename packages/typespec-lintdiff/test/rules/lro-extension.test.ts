@@ -123,6 +123,7 @@ describe("lro-extension", () => {
     "update is ArmCustomPatchAsync<Widget, Widget>;",
     "update is ArmCustomPatchAsync<Widget, Widget, LroHeaders = ArmLroLocationHeader<FinalResult = Widget> & Azure.Core.Foundations.RetryAfterHeader>;",
     "update is ArmCustomPatchSync<Widget, Widget>;",
+    "update is ArmCustomPatchSync<Widget, Widget, Response = ArmResponse<Widget> | ArmAcceptedResponse<ExtraHeaders = ArmLroLocationHeader<FinalResult = Widget>>>;",
   ])("accepts PATCH with native polling metadata or no 202: %s", async (operation) => {
     await (
       await tester()
@@ -134,6 +135,7 @@ describe("lro-extension", () => {
   it.each([
     "startProvider is ArmProviderActionAsync<Request = void, Response = void>;",
     "startProvider is ArmProviderActionSync<Request = void, Response = void>;",
+    "startProvider is ArmProviderActionSync<Request = void, Response = ArmAcceptedResponse<ExtraHeaders = ArmLroLocationHeader>>;",
   ])("accepts provider actions with native polling metadata or no 202: %s", async (operation) => {
     await (
       await tester()
