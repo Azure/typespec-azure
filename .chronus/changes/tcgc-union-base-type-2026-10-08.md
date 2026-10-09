@@ -4,7 +4,7 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Expose a union's explicit `extends` constraint through `SdkUnionType.baseType`. TCGC leaves `baseType` undefined when variants only happen to share a common ancestor.
+Expose a union's explicit `extends` constraint through `SdkUnionType.baseType`. The base type receives the union's usage, access, and serialization information. TCGC leaves `baseType` undefined when variants only happen to share a common ancestor.
 
 ```typespec
 model PetBase {
