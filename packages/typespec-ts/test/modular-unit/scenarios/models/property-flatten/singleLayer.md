@@ -452,7 +452,7 @@ export function fooPropertiesDeserializer(item: any): FooProperties {
 
 /** model interface Baz */
 export interface Baz {
-  readonly readOnlyProp: string;
+  readonly readOnlyProp?: string;
   baz: string;
 }
 
@@ -611,7 +611,7 @@ export function testIdentifiersDeserializer(item: any): TestIdentifiers {
 
 /** model interface Baz */
 export interface Baz {
-  readonly readOnlyProp: string;
+  readonly readOnlyProp?: string;
   baz: string;
 }
 
