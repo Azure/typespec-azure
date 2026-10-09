@@ -22,5 +22,6 @@ namespace Azure.ResourceManager.CommonProperties;
 @doc("Azure API versions.")
 enum Versions {
   @doc("Preview API version 2023-12-01-preview.")
+  @armCommonTypesVersion(CommonTypes.Versions.v5)
   v2023_12_01_preview: "2023-12-01-preview",
 }
