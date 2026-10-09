@@ -75,6 +75,7 @@ function packPackages() {
     "@typespec/spec-api": resolvePackage("typespec-spec-api-"),
     "@typespec/spec-coverage-sdk": resolvePackage("typespec-spec-coverage-sdk-"),
     "@azure-tools/typespec-azure-core": resolvePackage("azure-tools-typespec-azure-core-"),
+    "@azure-tools/typespec-azure-examples": resolvePackage("azure-tools-typespec-azure-examples-"),
     "@azure-tools/typespec-azure-resource-manager": resolvePackage(
       "azure-tools-typespec-azure-resource-manager-",
     ),
@@ -124,6 +125,7 @@ function testAzureHttpSpecs(packages) {
       "@typespec/spec-api": packages["@typespec/spec-api"],
       "@typespec/spec-coverage-sdk": packages["@typespec/spec-coverage-sdk"],
       "@azure-tools/typespec-azure-core": packages["@azure-tools/typespec-azure-core"],
+      "@azure-tools/typespec-azure-examples": packages["@azure-tools/typespec-azure-examples"],
       "@azure-tools/typespec-azure-resource-manager":
         packages["@azure-tools/typespec-azure-resource-manager"],
       "@azure-tools/typespec-client-generator-core":

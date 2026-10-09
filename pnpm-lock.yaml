@@ -3735,6 +3735,9 @@ importers:
 
   packages/typespec-client-generator-core:
     dependencies:
+      '@azure-tools/typespec-azure-examples':
+        specifier: workspace:^
+        version: link:../typespec-azure-examples
       '@typespec/versioning':
         specifier: workspace:^
         version: link:../../core/packages/versioning
