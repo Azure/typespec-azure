@@ -21,7 +21,7 @@
 
 ## Detail
 
-- Current proof point: the harness covers 223 test cases. It currently shows 33 direct native mappings, 5 template-only coverage cases, 1 partial mapping, 89 confirmed gaps with no TypeSpec diagnostics, and 32 possible gaps with unmapped TypeSpec diagnostics.
+- Current proof point: the harness covers 596 test cases. It currently shows 218 cases covered by direct native lints, 12 settled template-enforced cases, 45 partial cases, 14 settled prerequisite-blocked cases, and 20 unresolved gaps. The generated report also records 72 snapshot mismatches for follow-up rather than presenting the corpus as fully reconciled.
 - The harness compiles TypeSpec, emits OpenAPI, runs Azure OpenAPI Validator, captures TypeSpec diagnostics, and groups results into confidence buckets in `validate-report.md`.
 - Scope is API governance migration first. SDK-specific rules are tracked separately and may require different ownership or follow-on work.
 - Delivery plan: finish classification and ambiguity removal this week, land the highest-priority native gap work next week, prove full migration scope by mid-April, and demonstrate the integration workflow by the first week of May.

@@ -32,8 +32,9 @@ migration workflow.
 
 ## Migration status (from `docs/validate-report.md`)
 
-- 223 total test cases · 33 direct native lints · 5 template-only · 1 partial · 89 confirmed gaps ·
-  32 possible gaps · plus test-quality buckets.
+- 596 total test cases · 218 covered by direct native lints · 12 settled template-enforced ·
+  45 partial · 14 settled prerequisite-blocked · 20 unresolved gaps · plus test-quality and
+  compliance-proof buckets. The report also records 72 snapshot mismatches for follow-up.
 - Covered-rule confidence and per-rule rationale, plus rules intentionally **not** migrated
   (template-enforced / infallible / concept-not-applicable), are documented in the source repo's
   `notes/` (`phase1-assessment-report.md`, `phase2b-equivalence-analysis.md`,
