@@ -80,7 +80,7 @@ export declare interface StandardClientOptionalParams extends ClientOptions {
 }
 
 export declare interface User {
-    readonly name: string;
+    readonly name?: string;
     role: string;
 }
 

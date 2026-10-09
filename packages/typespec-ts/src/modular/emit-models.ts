@@ -68,6 +68,7 @@ import {
   getAllProperties,
 } from "./helpers/operation-helpers.js";
 import { getDirectSubtypes } from "./helpers/type-helpers.js";
+import { isOptionalModelProperty } from "./helpers/visibility-helpers.js";
 import {
   buildModelDeserializer,
   buildPropertyDeserializer,
@@ -947,8 +948,8 @@ function buildModelProperty(
     kind: StructureKind.PropertySignature,
     name: normalizedPropName,
     type: typeExpression,
-    hasQuestionToken: property.optional,
-    isReadonly: isReadOnly(property as SdkModelPropertyType),
+    hasQuestionToken: isOptionalModelProperty(context, property, model),
+    isReadonly: isReadOnly(property),
   };
 
   if (property.doc) {
