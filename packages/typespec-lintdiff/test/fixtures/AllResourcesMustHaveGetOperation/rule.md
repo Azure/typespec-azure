@@ -48,8 +48,10 @@ service declaration, and a `TrackedResource<{}>` model with `ResourceNameParamet
 - **Concept and API:** inspect resources registered with the ARM library using `getArmResources`.
   A `createOrUpdate` or `update` lifecycle operation requires a `read` lifecycle operation.
 - **Diagnostic:** one warning per offending resource, on the concrete interface that declares its
-  registered `createOrUpdate` or `update` lifecycle operation. Having both PUT and PATCH does not
-  produce two warnings.
+  registered `createOrUpdate` lifecycle operation, otherwise its `update` interface. Having both PUT
+  and PATCH does not produce two warnings. With split operation interfaces, declaration order does
+  not redirect the warning to DELETE; place any intentional suppression on the selected write
+  interface.
 - **Applicability:** native ARM resource metadata, not provider-name or generated-route guessing.
   Resource operations can be composed individually; using the composite
   `TrackedResourceOperations` interface is not required.
@@ -62,7 +64,9 @@ service declaration, and a `TrackedResource<{}>` model with `ResourceNameParamet
   by the production check.
 - **Coverage:** native tests prove PUT-only, PATCH-only, PUT+PATCH deduplication, exact interface
   targeting, GET compliance, DELETE-only compliance, list-versus-read distinction, and distinct
-  resources sharing an interface. Comparison fixtures additionally retain nested-resource evidence.
+  resources sharing an interface. Split-interface regressions cover DELETE-first create/update
+  targets, create/update priority, and write-interface suppression through the full linter.
+  Comparison fixtures additionally retain nested-resource evidence.
 
 ## LintDiff equivalent
 

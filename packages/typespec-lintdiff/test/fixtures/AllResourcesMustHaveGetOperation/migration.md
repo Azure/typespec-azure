@@ -2,7 +2,7 @@
 
 ## Result and gap summary
 
-The full corpus refresh assesses 462 successfully compiled projects out of 468 and records **23
+The repaired full corpus refresh assesses 462 successfully compiled projects out of 468 and records **23
 Swagger diagnostics in 11 projects versus 3 native diagnostics in 2 projects**, with one overlapping
 project. Swagger associates writes and reads through emitted response definitions; the native rule
 checks registered ARM lifecycle operations. Twenty Swagger findings concern response payloads without
@@ -10,11 +10,11 @@ registered native writes; three concern registered reads with different or empty
 The three native findings concern legacy GETs without registered read metadata, all present in the
 selected latest versions. Conservative deduplication leaves both counts unchanged.
 
-**Decision:** no production-rule update is justified for the native contract. Add native predicate,
-target/count, and documentation-example tests, and review the compliant fixtures' ambient warnings.
-The standard-template behavior is covered; **universal Swagger equivalence is partial, not proven**.
-Six compiler-error projects are excluded from both sides; polymorphic authoring remains a fixture
-limitation, and converted/customized shapes are not universally covered.
+**Decision:** diagnostic targeting was repaired: DELETE-first split interfaces now target
+`createOrUpdate`, otherwise `update`, making write-interface suppression effective. Predicate,
+population, and corpus targets are unchanged; supported split interfaces are proved by regressions,
+not corpus overlap. **Swagger equivalence remains partial.** Six unchanged compiler-error projects
+are excluded; clean polymorphic fixture coverage remains unproven.
 
 ## Contract and official coverage gate
 
@@ -36,7 +36,9 @@ The generic requirement is a native coverage gap on the fetched canonical
 - The maintained ARM RPC coverage inventory explicitly identifies missing complete-operation
   enforcement under RPC006 / section 2.2.
 
-No exact-head/base development PR or merged migration title candidate existed at the coverage gate.
+No exact-head/base development PR or merged migration title candidate existed at the initial
+coverage gate. This repair reuses the open source PR rather than duplicating that migration; the
+uncovered split-interface target defect is also present in the unmerged official promotion.
 The native check remains scoped to registered lifecycle roles, not a new overlapping Agent-specific
 rule or a schema-shape heuristic. See [the native contract](rule.md#native-rule-contract).
 
@@ -46,6 +48,8 @@ rule or a schema-shape heuristic. See [the native contract](rule.md#native-rule-
   `f6b53f105b95da05276530a0754a1c71b4f16397`, ARM/resource-manager dataset.
 - Source baseline: `Azure/typespec-azure`,
   `b4fdf202afdda010789557603b571f046f0ca70c`.
+- Source repair is based on reviewed commit `e39ac7fc2a10668f14e8160b56a69f83d4d1631d`.
+  The repaired source and compiled-rule fingerprints accompany the fresh external corpus evidence.
 - Validator research checkout: `6243cb01c16c7535cd3b8df6f45fbeb3c095ed7f`.
   Focused execution uses installed `@microsoft.azure/openapi-validator-rulesets` 2.2.5.
 - Swagger dataset generation: `test/harness/spec-dataset.ts`,
@@ -57,7 +61,7 @@ rule or a schema-shape heuristic. See [the native contract](rule.md#native-rule-
 - [Observed coverage](../../../specs/coverage-breakdown.md): the retained report includes only
   successfully compiled projects, 462 of 468. It measures same-project diagnostic overlap, not
   whether a mapping exists. The full refresh reproduces this population and the rule row.
-- Full TypeSpec refresh: `2026-10-09T04:33:27.534Z`, duration 1,091,427 ms, no filter or limit,
+- Repaired full TypeSpec refresh: `2026-10-09T08:12:06.318Z`, duration 1,130,742 ms, no filter or limit,
   concurrency 6, ruleset `tsp-lintdiff-local-linter/all`. The runner and its source revision are
   `test/harness/typespec-results.ts` at the source baseline above; this task does not change it.
   The existing latest-version Swagger inputs are retained, not regenerated. Ordinary native lint
@@ -65,11 +69,15 @@ rule or a schema-shape heuristic. See [the native contract](rule.md#native-rule-
   Generated reports, shards, raw outputs, and extraction receipts are archived in the queue's
   external corpus evidence, not committed. The linked checked-in report is the retained baseline,
   not a claim that refreshed generated data is part of this PR.
+- The earlier cycle-0 refresh (`2026-10-09T04:33:27.534Z`, duration 1,091,427 ms) had the same
+  successful/failed project sets, rule counts, project sets, and all three source targets.
+  The new full run independently re-establishes that observation after the target-selector repair.
 
 | Report                   | Category / mode               | Validator projects | Native projects | Official credit |      Overlap |      Validator-only |         Native-only | Diagnostics  |
 | ------------------------ | ----------------------------- | -----------------: | --------------: | --------------: | -----------: | ------------------: | ------------------: | ------------ |
 | External snapshot        | Validator never fired, mapped |                  0 |    Not reported |    Not reported | Not reported | Not reconstructible | Not reconstructible | Not reported |
 | Retained observed report | Native lint / production      |                 11 |               2 |              No |            1 |                  10 |                   1 | 23 / 3       |
+| Cycle-0 full refresh     | Native lint / production      |                 11 |               2 |              No |            1 |                  10 |                   1 | 23 / 3       |
 | Final full refresh       | Native lint / production      |                 11 |               2 |              No |            1 |                  10 |                   1 | 23 / 3       |
 
 The external row receives mapping credit despite never firing; the observed report requires a
@@ -86,7 +94,9 @@ polymorphic definitions with a discriminator in their `allOf` ancestry.
 
 The native rule consumes `getArmResources(program)`. For each registered resource with
 `lifecycle.createOrUpdate` or `lifecycle.update`, it requires `lifecycle.read`. It reports once per
-resource on its operation interface, with a model fallback. It does not resolve emitted references,
+resource on its create/update interface, preferring create when both exist. Only when neither write
+has an interface does it retain the existing lifecycle/list/action interface and model fallbacks.
+It does not resolve emitted references,
 predict response encoding, inspect OpenAPI extensions, or import an emitter/client-generator API.
 Its existing discriminator-ancestor exemption is retained; the fixture suite documents that the
 corresponding polymorphic ARM shape lacks a clean supported authoring fixture. This is a test
@@ -341,14 +351,47 @@ This attribution is local to these targets, not a claim that the full runner pro
 
 ## Validation and final conclusion
 
-Native unit tests compile without an emitter and validate nine cases, including the exact
+Native unit tests compile without an emitter and validate fifteen cases, including the exact
 published incorrect/correct documentation snippets. The test host registers the OpenAPI library
 only as a transitive ARM/Core prerequisite; the snippets do not use its decorators.
+
+### Split-interface diagnostic regression
+
+Supported standard templates can register DELETE first on `Deletes`, then a create or update on
+`Writes`, with no read. Before repair, four exact-target regressions fail because the selector uses
+the first lifecycle interface, and two full-linter tests fail because suppression on `Writes` leaves
+the warning. The existing nine cases pass. After repair, all fifteen cases pass. The full-linter
+tests compile create-only and update-only inputs under three conditions each: no suppression gives
+one warning, suppression on `Writes` gives none, and suppression on `Deletes` still gives one.
+They validate all compiler diagnostics, not only a filtered target-rule result, and use no private
+metadata injection.
+
+```typespec
+@armResourceOperations
+interface Deletes {
+  delete is ArmResourceDeleteSync<Widget>;
+}
+@armResourceOperations
+interface Writes {
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+}
+```
+
+This native target defect does not change the missing-read predicate or establish any new Swagger
+equivalence. The create-over-update regression also registers update first on a separate interface,
+proving the preference is semantic rather than declaration order.
 
 Focused strict comparison validates five fixtures: three violations and two compliant controls,
 all existing snapshots matching. The controls' unrelated common-types-version, description,
 examples, and path-length diagnostics are explicitly reviewed by code/count, rather than falsely
 reported as warning-free.
+
+The affected `ParametersInPointGet` group also validates its one fixture. The complete affected
+`XmsResourceInPutResponse` group validates all seven fixtures after an explicitly authorized narrow
+baseline correction: `global-put-ignored` no longer expects `put-in-operation-name` on the global
+`globalPut` operation outside the ARM service. Only that stale code/count expectation and matching
+diagnostic snapshot entry were removed; the unrelated production rule was not changed. The original
+failed receipt and passing corrective whole-group receipt are preserved externally.
 
 The supplemental `audit:noise` run completed all 238 selected violation cases, but is not evidence
 of local-rule coverage: `analyze-noise.ts` omits the fourth worker argument, while `compile-worker.ts`
@@ -360,7 +403,8 @@ audit invocation defect is disclosed, not repaired or retried in this rule chang
 The literal representative filter `Microsoft.RecoveryServices/RecoveryServices` selected and
 successfully processed **two**, not one, projects: RecoveryServices and RecoveryServicesBackup.
 The subsequent required full run completed with exit 0 and processed all 468 projects; 462 compiled
-successfully and six failed with compiler errors. Both engines' behavioral comparison excludes
+successfully and six failed with compiler errors. The repaired full run completed at
+`2026-10-09T16:14:36.7258733+08:00`. Both engines' behavioral comparison excludes
 those six projects, rather than treating them as compliant or counting their partial diagnostics.
 
 | Excluded project (under `specification/`)                                                  | Observed compiler error                                                       |
@@ -378,8 +422,10 @@ unassessed. Exact command errors, diagnostic excerpts, raw-output paths, and agg
 remain in machine-readable external evidence. These are corpus limitations, not task-introduced
 test failures, and no failed project was retried or silently discarded.
 
-**Required changes:** no production TypeSpec rule change. Add the native tests and revise the two
-compliant fixtures' explicit ambient expectations; existing diagnostic snapshots remain unchanged.
+**Required changes:** prioritize the registered create/update interface in the production target
+selector. Add DELETE-first split-interface create/update and create-over-update target regressions,
+plus full-linter suppression controls. Preserve the reviewed compliant fixtures' ambient expectations
+and existing predicate behavior.
 The native operation-set contract is established for the tested supported standard-template shapes.
 The migrated rule is **not functionally equal to the full executable Swagger rule**: unregistered
 converted response models, customized read responses, and legacy read roles intentionally differ
