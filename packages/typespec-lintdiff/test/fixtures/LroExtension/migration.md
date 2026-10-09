@@ -144,12 +144,166 @@ suppressions.
 does not duplicate the official POST response check. Its zero local warnings are
 an intentional exclusion, not evidence that a supported provider action passes.
 
-Real-service examples include API Management's `reconnect` resource action
-(`BackendContract.tsp`), Attestation's `ArmResourceDeleteSync` response override
-(`AttestationProvider.tsp`), and Relay's `ArmResourceCreateOrReplaceSync` response
-override (`PrivateEndpointConnection.tsp`). Each explicitly suppresses its
-respective official response-code diagnostic. These conversion shapes cannot
-establish a missing native check on clean maintained-ruleset authoring.
+The following excerpts preserve the pinned source text with only enclosing
+interface indentation removed, at specs revision
+`f6b53f105b95da05276530a0754a1c71b4f16397`.
+
+API Management
+`specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/BackendContract.tsp`:
+
+```typespec
+#suppress "@azure-tools/typespec-azure-resource-manager/lro-location-header" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+reconnect is BackendContractOps.ActionSync<
+  BackendContract,
+  BackendReconnectContract,
+  AcceptedResponse,
+  OptionalRequestBody = true
+>;
+```
+
+Attestation
+`specification/attestation/resource-manager/Microsoft.Attestation/Attestation/AttestationProvider.tsp`:
+
+```typespec
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+#suppress "@azure-tools/typespec-azure-resource-manager/lro-location-header" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+delete is ArmResourceDeleteSync<
+  AttestationProvider,
+  Response =
+    | ArmDeletedResponse
+    | AcceptedResponse
+    | ArmDeletedNoContentResponse,
+  Error = CloudError
+>;
+```
+
+Relay
+`specification/relay/resource-manager/Microsoft.Relay/Relay/PrivateEndpointConnection.tsp`:
+
+```typespec
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+createOrUpdate is ArmResourceCreateOrReplaceSync<
+  PrivateEndpointConnection,
+  Response =
+    | ArmResourceUpdatedResponse<PrivateEndpointConnection>
+    | ArmResourceCreatedSyncResponse<PrivateEndpointConnection>
+    | (AcceptedResponse & {
+        @bodyRoot
+        _: PrivateEndpointConnection;
+      })
+>;
+```
+
+These are selected fields copied from the retained session artifact
+`lro-corpus-cleanup-observer-stop/fresh-corpus/LroExtension.json`
+(`schemaVersion: 4`, `specsCommit:
+f6b53f105b95da05276530a0754a1c71b4f16397`). Omitted result fields are not
+claims about the generated Swagger bodies.
+
+```json
+[
+  {
+    "project": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement",
+    "swaggerFile": "projects/specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/swagger/preview/2025-09-01-preview/openapi.json",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/backends/{backendId}/reconnect",
+      "post"
+    ],
+    "details": {
+      "range": {
+        "start": { "line": 13407, "column": 13 },
+        "end": { "line": 13465, "column": 67 }
+      }
+    }
+  },
+  {
+    "project": "specification/attestation/resource-manager/Microsoft.Attestation/Attestation",
+    "swaggerFile": "projects/specification/attestation/resource-manager/Microsoft.Attestation/Attestation/swagger/stable/2021-06-01/attestation.json",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Attestation/attestationProviders/{providerName}",
+      "delete"
+    ],
+    "details": {
+      "range": {
+        "start": { "line": 390, "column": 15 },
+        "end": { "line": 434, "column": 64 }
+      }
+    }
+  },
+  {
+    "project": "specification/relay/resource-manager/Microsoft.Relay/Relay",
+    "swaggerFile": "projects/specification/relay/resource-manager/Microsoft.Relay/Relay/swagger/preview/2026-07-01-preview/relay.json",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/privateEndpointConnections/{privateEndpointConnectionName}",
+      "put"
+    ],
+    "details": {
+      "range": {
+        "start": { "line": 2119, "column": 12 },
+        "end": { "line": 2192, "column": 97 }
+      }
+    }
+  },
+  {
+    "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+    "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/refreshContainers",
+      "post"
+    ],
+    "details": {
+      "range": {
+        "start": { "line": 4195, "column": 13 },
+        "end": { "line": 4246, "column": 62 }
+      }
+    }
+  },
+  {
+    "project": "specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup",
+    "swaggerFile": "projects/specification/recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup/swagger/preview/2026-05-31-preview/bms.json",
+    "path": [
+      "paths",
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupJobsExport",
+      "post"
+    ],
+    "details": {
+      "range": {
+        "start": { "line": 4546, "column": 13 },
+        "end": { "line": 4590, "column": 62 }
+      }
+    }
+  }
+]
+```
+
+Each retained object has this exact `message` value:
+``Operations with a 202 response must specify `x-ms-long-running-operation: true`.  GET operation is excluded from the validation as GET will have 202 only if it is a polling action & hence x-ms-long-running-operation wouldn't be defined``.
+That proves the validator observed its `202` predicate and did not observe the
+extension value `true`; without the archived generated body it does not
+distinguish an absent extension from a present falsy value or preserve the
+complete generated response set.
+
+The following operation IDs, response keys, and absent-extension facts are
+separately parsed from the pinned checked-in Swagger at the same API versions.
+They corroborate the operation shapes but are **not** reconstructed corpus
+output.
+
+| Project / selected API                | Checked-in Swagger selected fields                                                                                      | Native and official result                                                                   | Disposition                                       |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| API Management / `2025-09-01-preview` | `Backend_Reconnect`; responses `202/default`; no `x-ms-long-running-operation` property                                 | Zero native LroExtension findings; official POST response-code check explicitly suppressed   | Registered POST prerequisite, intentionally out   |
+| Attestation / `2021-06-01`            | `AttestationProviders_Delete`; responses `200/202/204/default`; no `x-ms-long-running-operation` property               | Zero native LroExtension findings; official DELETE response-code check explicitly suppressed | Registered DELETE prerequisite, intentionally out |
+| Relay / `2026-07-01-preview`          | `PrivateEndpointConnections_CreateOrUpdate`; responses `200/201/202/default`; no `x-ms-long-running-operation` property | Zero native LroExtension findings; official PUT response-code check explicitly suppressed    | Registered PUT prerequisite, intentionally out    |
+
+The checked-in documents' complete-file hashes differ from the corpus cleanup
+manifest's generated files. The retained validator paths, ranges, message, and
+API-version attribution are the corpus evidence; the checked-in selected fields
+are only corroboration. These conversion shapes cannot establish a missing
+native check on clean maintained-ruleset authoring.
 
 ### Unmarked converted POSTs are not supported provider customizations
 
@@ -164,6 +318,87 @@ conversion shapes are intentionally outside the contract, rather than evidence
 that a supported provider customization is missed. The public provider fixtures
 prove the supported case independently.
 
+The exact pinned source declarations are:
+
+```typespec
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+interface Jobs {
+  /**
+   * Triggers export of jobs specified by filters and returns an OperationID to track.
+   */
+  #suppress "@azure-tools/typespec-azure-resource-manager/lro-location-header" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupJobsExport")
+  @post
+  @tag("Jobs")
+  export(
+    ...ApiVersionParameter,
+
+    /**
+     * The name of the recovery services vault.
+     */
+    @path
+    vaultName: string,
+
+    ...ResourceGroupParameter,
+    ...SubscriptionIdParameter,
+
+    /**
+     * OData filter options.
+     */
+    @query("$filter")
+    $filter?: string,
+  ): ArmAcceptedResponse<ExtraHeaders = {}> | ErrorResponse;
+}
+```
+
+```typespec
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+interface ProtectionContainersOperationGroup {
+  /**
+   * Discovers all the containers in the subscription that can be backed up to Recovery Services Vault. This is an
+   * asynchronous operation. To know the status of the operation, call GetRefreshOperationResult API.
+   */
+  #suppress "@azure-tools/typespec-azure-resource-manager/lro-location-header" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupFabrics/{fabricName}/refreshContainers")
+  @post
+  @tag("ProtectionContainers")
+  refresh(
+    ...ApiVersionParameter,
+
+    /**
+     * The name of the recovery services vault.
+     */
+    @path
+    vaultName: string,
+
+    ...ResourceGroupParameter,
+    ...SubscriptionIdParameter,
+
+    /**
+     * Fabric name associated the container.
+     */
+    @path
+    fabricName: string,
+
+    /**
+     * OData filter options.
+     */
+    @query("$filter")
+    $filter?: string,
+  ): ArmAcceptedResponse<ExtraHeaders = {}> | ErrorResponse;
+}
+```
+
+The retained `2026-05-31-preview` objects above identify the two POST paths,
+ranges, and validator message. They prove that the validator's `202` predicate
+fired and the extension value was not `true`, but do not preserve the complete
+generated response set or distinguish absence from a falsy value. Separately,
+the pinned checked-in Swagger identifies those operations as `Jobs_Export` and
+`ProtectionContainers_Refresh`; each has response keys `202/default` and no
+`x-ms-long-running-operation` property. The native shard has zero Recovery
+Services Backup findings. Their disposition is therefore the two unmarked
+converted POST exclusions, not two supported collection-action misses.
+
 ### Emitted overrides are not native compliance
 
 The ConsistentPatchProperties `async-get-fallback` fixture sets the emitted LRO
@@ -177,6 +412,43 @@ true independently of Core polling metadata. Their emitter branches are
 research evidence only; this ARM rule intentionally has no TCGC dependency.
 Native authoring should retain semantic polling headers. This is a contract
 difference, not a claim of exhaustive SDK-marker corpus coverage.
+
+The checked-in fixture preserves both sides of that difference. This
+`output.json` fragment selects only the `202` response and LRO fields; the
+operation's other fields and `default` response are intentionally omitted from
+the excerpt.
+
+```typespec
+#suppress "@azure-tools/typespec-azure-core/no-openapi" "Need explicit LRO extensions for async PATCH."
+@extension("x-ms-long-running-operation", true)
+@extension("x-ms-long-running-operation-options", #{ `final-state-via`: "location" })
+@patch
+@armResourceUpdate(Widget)
+update(
+  ...ResourceInstanceParameters<Widget>,
+  @doc("The request body") @body body: WidgetPatchBody,
+): Accepted202WithLocation | ErrorResponse;
+```
+
+```json
+"responses": {
+  "202": {
+    "description": "Accepted LRO polling response."
+  }
+},
+"x-ms-long-running-operation-options": {
+  "final-state-via": "location"
+},
+"x-ms-long-running-operation": true
+```
+
+For API version `2024-01-01`, `validator-diagnostics.json` is `[]`, while
+`tsp-diagnostics.json` contains one
+`tsp-lintdiff-local-linter/lro-extension` warning on `Widgets.update`: native
+polling metadata is absent despite the explicit emitted boolean. This
+emitter-specific parity difference is not one of the 25
+missing-extension validator-only occurrences; it demonstrates why reading
+OpenAPI overrides would violate the native contract.
 
 ## Corpus scope and historical reports
 
