@@ -132,6 +132,7 @@ specs:
   azure/client-generator-core/response-as-bool: true
   azure/client-generator-core/exact-name: true
   documentation: true
+  streaming/sse: true
 
   type/model/visibility: true
   # Disabled: Http.File generates unresolved __PLACEHOLDER types and identifiers.

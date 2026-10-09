@@ -16,9 +16,10 @@ import {
   type SdkModelType,
   type SdkPagingServiceMethod,
   type SdkServiceResponseHeader,
+  type SdkSseEventMetadata,
   type SdkType,
 } from "@azure-tools/typespec-client-generator-core";
-import { NoTarget, type Program } from "@typespec/compiler";
+import { getMediaTypeHint, NoTarget, type Program } from "@typespec/compiler";
 import { isHeader, isMetadata } from "@typespec/http";
 import {
   type FunctionDeclarationStructure,
@@ -28,7 +29,7 @@ import {
   type TypeAliasDeclarationStructure,
 } from "ts-morph";
 import { useContext } from "../../context-manager.js";
-import { useSdkTypes } from "../../framework/hooks/sdk-types.js";
+import { getAllOperationsFromClient, useSdkTypes } from "../../framework/hooks/sdk-types.js";
 import { useDependencies } from "../../framework/hooks/use-dependencies.js";
 import { resolveReference } from "../../framework/reference.js";
 import { refkey } from "../../framework/refkey.js";
@@ -39,6 +40,7 @@ import {
   formatOptionalPropertyAccess,
   formatPropertyAccess,
   NameType,
+  normalizeName,
   normalizeSdkName,
   normalizeSdkPropertyName,
 } from "../../utils/name-utils.js";
@@ -69,6 +71,7 @@ import {
   hasXmlSerialization,
 } from "../serialization/build-xml-serializer-function.js";
 import {
+  getAllDiscriminatedValues,
   getPropertyWithOverrides,
   isNormalUnion,
   isSpecialHandledUnion,
@@ -78,7 +81,9 @@ import {
   PagingHelpers,
   PollingHelpers,
   SerializationHelpers,
+  SseStreamingHelpers,
   StorageCompatHelpers,
+  StreamingHelpers,
   UrlTemplateHelpers,
   XmlHelpers,
 } from "../static-helpers-metadata.js";
@@ -96,7 +101,13 @@ import {
   getClassicalLayerPrefix,
   getOperationName,
 } from "./naming-helpers.js";
-import { getNullableValidType, isSpreadBodyParameter, isTypeNullable } from "./type-helpers.js";
+import { getStructuredStreamKind } from "./structured-stream-helpers.js";
+import {
+  getNullableValidType,
+  isNumericTypeKind,
+  isSpreadBodyParameter,
+  isTypeNullable,
+} from "./type-helpers.js";
 
 /**
  * Checks whether a header should be skipped during serialization/deserialization.
@@ -177,6 +188,11 @@ export function getDeserializePrivateFunction(
   const { name } = getOperationName(operation, context, method[0]);
   const dependencies = useDependencies();
   const PathUncheckedResponseReference = resolveReference(dependencies.PathUncheckedResponse);
+
+  const structuredStreamInfo = getStructuredStreamInfo(context, operation);
+  if (structuredStreamInfo) {
+    return getStructuredStreamDeserializeFunction(context, method, structuredStreamInfo);
+  }
 
   // Check if we need to wrap the non-model return type
   const { shouldWrap, isBinary } = checkWrapNonModelReturn(context, operation);
@@ -920,6 +936,16 @@ export function getOperationFunction(
     );
   }
 
+  const structuredStreamInfo = getStructuredStreamInfo(context, operation);
+  if (structuredStreamInfo) {
+    return getStructuredStreamOperationFunction(
+      context,
+      [method[0], operation],
+      clientType,
+      structuredStreamInfo,
+    );
+  }
+
   // TODO: Support operation overloads
   const response = operation.response;
   const responseHeaders = getResponseHeaders(operation.operation.responses);
@@ -1107,6 +1133,421 @@ export function getOperationFunction(
     ...functionStatement,
     statements,
   } as FunctionDeclarationStructure & { propertyName?: string };
+}
+
+/**
+ * Describes a single Server-Sent Event variant for the generated SSE deserializer.
+ */
+interface StructuredStreamEvent {
+  eventName?: string;
+  isTerminal: boolean;
+  terminalValue?: string;
+  discriminator?: { propertyName: string; values: string[] };
+  contentType?: string;
+  deserializeExpression: string;
+}
+
+/**
+ * Structured-streaming metadata resolved for an operation whose response is a JSONL or SSE stream.
+ */
+interface StructuredStreamInfo {
+  kind: "jsonl" | "sse";
+  itemType: string;
+  itemDeserializerName?: string;
+  events?: StructuredStreamEvent[];
+  /**
+   * Maps SSE event names to their payload types, producing the discriminated union
+   * `{ event: "name1"; data: Type1 } | { event: "name2"; data: Type2 }`. Present only when every
+   * non-terminal event is named; unnamed terminals use the default `message` event name.
+   */
+  namedEventTypes?: Map<string, string>;
+}
+
+function getSsePayloadContentType(
+  context: SdkContext,
+  event: SdkSseEventMetadata,
+): string | undefined {
+  if (event.payloadContentType !== undefined) {
+    return event.payloadContentType;
+  }
+  // Infer from the payload itself; an envelope's format does not apply to its @data property.
+  const type = event.payloadType.__raw;
+  if (!type) {
+    return undefined;
+  }
+  const hint = getMediaTypeHint(context.program, type);
+  if (hint) {
+    return hint;
+  }
+  if (type.kind === "Model") {
+    return "application/json";
+  }
+  if (type.kind === "Scalar") {
+    return "text/plain";
+  }
+  return undefined;
+}
+
+function getSseScalarDeserializeExpression(context: SdkContext, type: SdkType): string {
+  if (type.kind === "nullable") {
+    return `data === null ? null : ${getSseScalarDeserializeExpression(context, type.type)}`;
+  }
+  if (type.kind === "enum" || type.kind === "enumvalue") {
+    return getSseScalarDeserializeExpression(context, type.valueType);
+  }
+  if (type.kind === "duration") {
+    return getSseScalarDeserializeExpression(context, type.wireType);
+  }
+  if (isNumericTypeKind(type.kind) || type.kind === "boolean") {
+    return deserializeResponseHeadersValue(
+      context,
+      type,
+      type.kind === "boolean" ? "String(data)" : "data",
+      true,
+      getEncodeForType(type),
+    );
+  }
+  if (type.kind === "utcDateTime" || type.kind === "plainDate" || type.kind === "bytes") {
+    return deserializeResponseValue(context, type, "data", true, getEncodeForType(type));
+  }
+  return "data";
+}
+
+/**
+ * Resolves structured JSONL/SSE streaming metadata for an operation, or `undefined` when the
+ * operation is not a structured stream.
+ *
+ * An operation is treated as a structured stream when:
+ * - Its response carries `streamMetadata` with a recognized content type:
+ *   - SSE (text/event-stream) with `sseMetadata`, returning an AsyncIterable of event payloads
+ *   - JSONL (application/jsonl) with a model/union `streamType`, returning an AsyncIterable of items
+ * - The operation is not paging-only, LRO-only, or combined paging+LRO
+ *
+ * Custom stream templates with non-standard content types are not treated as structured streams.
+ */
+export function getStructuredStreamInfo(
+  context: SdkContext,
+  operation: ServiceOperation,
+): StructuredStreamInfo | undefined {
+  const response = operation.response;
+  const streamMetadata = response.streamMetadata;
+  const kind = getStructuredStreamKind(operation);
+  if (!kind || !streamMetadata) {
+    return undefined;
+  }
+
+  const sseMetadata = response.sseMetadata;
+  if (sseMetadata && kind === "sse") {
+    const events: StructuredStreamEvent[] = [];
+    const payloadTypeExpressions: string[] = [];
+    const namedEventTypes = new Map<string, string>();
+    let everyPayloadEventIsNamed = true;
+    let hasNamedEvent = false;
+    for (const sseEvent of sseMetadata.events) {
+      hasNamedEvent ||= sseEvent.eventType !== undefined;
+      const event: StructuredStreamEvent = {
+        eventName: sseEvent.eventType,
+        isTerminal: sseEvent.isTerminalEvent,
+        deserializeExpression: "data",
+      };
+      const contentType = getSsePayloadContentType(context, sseEvent);
+      event.contentType = contentType;
+      if (
+        sseEvent.eventType === undefined &&
+        sseEvent.payloadType.kind === "model" &&
+        (contentType === undefined || /\bjson\b/i.test(contentType))
+      ) {
+        const property = getAllAncestors(sseEvent.payloadType).find(
+          (model): model is SdkModelType =>
+            model.kind === "model" && model.discriminatorProperty !== undefined,
+        )?.discriminatorProperty;
+        if (property) {
+          const values = getAllDiscriminatedValues(sseEvent.payloadType, property);
+          if (values.length > 0) {
+            event.discriminator = {
+              propertyName: getPropertySerializedName(property),
+              values,
+            };
+          }
+        }
+      }
+      if (sseEvent.payloadType.kind === "constant") {
+        event.deserializeExpression = JSON.stringify(sseEvent.payloadType.value);
+        if (sseEvent.isTerminalEvent) {
+          event.terminalValue =
+            contentType !== undefined && /\bjson\b/i.test(contentType)
+              ? event.deserializeExpression
+              : String(sseEvent.payloadType.value);
+        }
+      } else {
+        const deserializerName = buildModelDeserializer(context, sseEvent.payloadType, {
+          nameOnly: true,
+          skipDiscriminatedUnionSuffix: false,
+        });
+        if (typeof deserializerName === "string") {
+          event.deserializeExpression = `${deserializerName}(data)`;
+        } else {
+          event.deserializeExpression = getSseScalarDeserializeExpression(
+            context,
+            sseEvent.payloadType,
+          );
+        }
+      }
+      const payloadType = getTypeExpression(context, sseEvent.payloadType);
+      payloadTypeExpressions.push(payloadType);
+      const eventName = sseEvent.eventType ?? (sseEvent.isTerminalEvent ? "message" : undefined);
+      if (eventName === undefined) {
+        everyPayloadEventIsNamed = false;
+      } else {
+        const existingType = namedEventTypes.get(eventName);
+        namedEventTypes.set(
+          eventName,
+          existingType ? `${existingType} | ${payloadType}` : payloadType,
+        );
+      }
+      events.push(event);
+    }
+    const itemType =
+      payloadTypeExpressions.length > 0
+        ? Array.from(new Set(payloadTypeExpressions)).join(" | ")
+        : getTypeExpression(context, streamMetadata.streamType);
+    const result: StructuredStreamInfo = { kind: "sse", itemType, events };
+    // Preserve payload-only unnamed streams; named streams give unnamed terminals the default name.
+    if (everyPayloadEventIsNamed && hasNamedEvent) {
+      result.namedEventTypes = namedEventTypes;
+    }
+    return result;
+  }
+
+  const streamType = streamMetadata.streamType;
+  const deserializerName = buildModelDeserializer(context, streamType, {
+    nameOnly: true,
+    skipDiscriminatedUnionSuffix: false,
+  });
+  return {
+    kind: "jsonl",
+    itemType: getTypeExpression(context, streamType),
+    itemDeserializerName: typeof deserializerName === "string" ? deserializerName : undefined,
+  };
+}
+
+/**
+ * Builds the public operation function for a structured JSONL/SSE streaming operation. It connects
+ * eagerly (so HTTP status/errors surface at call time) and returns a `Promise<AsyncIterable<T>>`
+ * whose body is decoded lazily by the paired deserializer.
+ */
+function getStructuredStreamOperationFunction(
+  context: SdkContext,
+  method: [string[], ServiceOperation],
+  clientType: string,
+  info: StructuredStreamInfo,
+): FunctionDeclarationStructure & { propertyName?: string } {
+  const operation = method[1];
+  const parameters: OptionalKind<ParameterDeclarationStructure>[] = getOperationSignatureParameters(
+    context,
+    method,
+    clientType,
+  );
+  const { name, fixme = [] } = getOperationName(operation, context, method[0]);
+
+  const paramNames = new Set(parameters.map((p) => p.name));
+  const resultVarName = generateLocallyUniqueName("result", paramNames);
+  const parameterList = parameters.map((p) => p.name).join(", ");
+  const statements: string[] = [];
+
+  if (info.kind === "jsonl") {
+    const getStreamResponseRef = resolveReference(StreamingHelpers.getStreamResponse);
+    statements.push(
+      `const ${resultVarName} = await ${getStreamResponseRef}(_${name}Send(${parameterList}), ${getExpectedStatuses(operation)});`,
+      `return _${name}Deserialize(${resultVarName});`,
+    );
+  } else {
+    const responseVarName = generateLocallyUniqueName("response", paramNames);
+    const expectedStatusesVarName = generateLocallyUniqueName("expectedStatuses", paramNames);
+    const contentTypeVarName = generateLocallyUniqueName("contentType", paramNames);
+    const descriptorVarName = generateLocallyUniqueName("descriptors", paramNames);
+    const eventStreamVarName = generateLocallyUniqueName("eventStream", paramNames);
+    const getSseResponseRef = resolveReference(SseStreamingHelpers.getSseResponse);
+    const parseSseErrorResponseRef = resolveReference(SseStreamingHelpers.parseSseErrorResponse);
+    const cancelSseResponseRef = resolveReference(SseStreamingHelpers.cancelSseResponse);
+    const descriptorRef = resolveReference(SseStreamingHelpers.SseEventDescriptor);
+    const createSseStreamRef = resolveReference(AzureCoreDependencies["createSseStream"]);
+    const createRestErrorRef = resolveReference(useDependencies().createRestError);
+    const descriptors = buildSseDescriptors(info);
+
+    statements.push(
+      `const ${responseVarName} = await ${getSseResponseRef}(_${name}Send(${parameterList}));`,
+      `const ${expectedStatusesVarName} = ${getExpectedStatuses(operation)};`,
+      `if (!${expectedStatusesVarName}.includes(${responseVarName}.status)) {
+        const result = await ${parseSseErrorResponseRef}(${responseVarName});
+        ${getExceptionThrowStatement(context, method)}
+      }`,
+      `const ${contentTypeVarName} = Object.entries(${responseVarName}.headers)
+        .find(([name]) => name.toLowerCase() === "content-type")?.[1]
+        ?.split(";", 1)[0].trim().toLowerCase();`,
+      `if (${contentTypeVarName} !== "text/event-stream" || !${responseVarName}.body) {
+        const error = ${createRestErrorRef}(${responseVarName});
+        try {
+          await ${cancelSseResponseRef}(${responseVarName});
+        } catch (cleanupError) {
+          throw new AggregateError([error, cleanupError], "Unable to cancel invalid SSE response.", { cause: error });
+        }
+        throw error;
+      }`,
+      `const ${descriptorVarName}: ${descriptorRef}<${buildStreamReturnType(info)}> [] = [${descriptors}];`,
+      `const ${eventStreamVarName} = ${createSseStreamRef}(${responseVarName}.body);`,
+      `return _${name}Deserialize(${eventStreamVarName}, ${descriptorVarName});`,
+    );
+  }
+
+  return {
+    kind: StructureKind.Function,
+    docs: [...getDocsFromDescription(operation.doc), ...getFixmeForMultilineDocs(fixme)],
+    isAsync: true,
+    isExported: true,
+    name,
+    propertyName: normalizeName(operation.name, NameType.Property),
+    parameters,
+    returnType: `Promise<AsyncIterable<${buildStreamReturnType(info)}>>`,
+    statements,
+  } as FunctionDeclarationStructure & { propertyName?: string };
+}
+
+/**
+ * Builds the item type yielded by a streaming operation. Named SSE streams keep the event name in
+ * a discriminated union (`{ event: "name"; data: Type }`) so callers can narrow by event; JSONL and
+ * unnamed SSE streams yield the payload directly.
+ */
+function buildStreamReturnType(info: StructuredStreamInfo): string {
+  if (!info.namedEventTypes) {
+    return info.itemType;
+  }
+  return Array.from(info.namedEventTypes)
+    .map(([eventName, dataType]) => `{ event: ${JSON.stringify(eventName)}; data: ${dataType} }`)
+    .join(" | ");
+}
+
+function buildSseDescriptors(info: StructuredStreamInfo): string {
+  const useEventEnvelope = info.namedEventTypes !== undefined;
+  return (info.events ?? [])
+    .map((event) => {
+      const parts: string[] = [];
+      if (event.eventName !== undefined) {
+        parts.push(`eventName: ${JSON.stringify(event.eventName)}`);
+      }
+      parts.push(`isTerminal: ${event.isTerminal}`);
+      if (event.terminalValue !== undefined) {
+        parts.push(`terminalValue: ${JSON.stringify(event.terminalValue)}`);
+      }
+      if (event.discriminator) {
+        parts.push(`discriminator: ${JSON.stringify(event.discriminator)}`);
+      }
+      const yielded = useEventEnvelope
+        ? `({ event: ${JSON.stringify(event.eventName ?? "message")}, data: ${event.deserializeExpression} })`
+        : event.deserializeExpression;
+      parts.push(`deserialize: (data) => ${yielded}`);
+      if (event.contentType !== undefined) {
+        parts.push(`contentType: ${JSON.stringify(event.contentType)}`);
+      }
+      return `{ ${parts.join(", ")} }`;
+    })
+    .join(", ");
+}
+
+/**
+ * Builds the private deserialize function for a structured JSONL/SSE streaming operation. It
+ * validates the response status (reusing the standard error handling) and returns an
+ * `AsyncIterable<T>` that lazily decodes the streamed body via the generated streaming helpers.
+ */
+function getStructuredStreamDeserializeFunction(
+  context: SdkContext,
+  method: [string[], ServiceOperation],
+  info: StructuredStreamInfo,
+): OptionalKind<FunctionDeclarationStructure> {
+  const operation = method[1];
+  const { name } = getOperationName(operation, context, method[0]);
+
+  const statements: string[] = [];
+
+  if (info.kind === "jsonl") {
+    const streamResponseRef = resolveReference(StreamingHelpers.StreamResponse);
+    statements.push(`const expectedStatuses = ${getExpectedStatuses(operation)};`);
+    statements.push(
+      `if(!expectedStatuses.includes(result.status)){`,
+      `${getExceptionThrowStatement(context, method)}`,
+      "}",
+    );
+    const readJsonlStreamRef = resolveReference(StreamingHelpers.readJsonlStream);
+    const deserializeCallback = info.itemDeserializerName
+      ? `(e) => ${info.itemDeserializerName}(e)`
+      : `(e) => e`;
+    statements.push(`return ${readJsonlStreamRef}(result.body, ${deserializeCallback});`);
+    return {
+      isAsync: true,
+      isExported: true,
+      name: `_${name}Deserialize`,
+      parameters: [{ name: "result", type: streamResponseRef }],
+      returnType: `Promise<AsyncIterable<${buildStreamReturnType(info)}>>`,
+      statements,
+    };
+  }
+
+  const readSseStreamRef = resolveReference(SseStreamingHelpers.readSseStream);
+  const eventMessageRef = resolveReference(AzureCoreDependencies["EventMessage"]);
+  const descriptorRef = resolveReference(SseStreamingHelpers.SseEventDescriptor);
+  statements.push(`return ${readSseStreamRef}(events, descriptors);`);
+  return {
+    isAsync: true,
+    isExported: true,
+    name: `_${name}Deserialize`,
+    parameters: [
+      { name: "events", type: `AsyncIterable<${eventMessageRef}>` },
+      {
+        name: "descriptors",
+        type: `${descriptorRef}<${buildStreamReturnType(info)}>[]`,
+      },
+    ],
+    returnType: `Promise<AsyncIterable<${buildStreamReturnType(info)}>>`,
+    statements,
+  };
+}
+
+/**
+ * Returns true when the package contains at least one SSE (`text/event-stream`) streaming
+ * operation. Used to add the `@azure/core-sse` runtime dependency to the generated package
+ * only when the shared structured-stream classification selects SSE.
+ */
+export function packageHasSseStreaming(context: SdkContext): boolean {
+  for (const client of context.sdkPackage.clients) {
+    for (const rawMethod of getAllOperationsFromClient(client)) {
+      const method = rawMethod as ServiceOperation;
+      if (getStructuredStreamKind(method) === "sse") {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * Returns true when the package contains at least one structured streaming operation (JSONL or
+ * SSE). Used to load the streaming static helpers into the generated
+ * package only when they are actually needed.
+ *
+ * This is a side-effect-free metadata check (it does not build deserializers), so it is safe to
+ * call during helper loading, before the binder and serializers are wired up. It mirrors the
+ * shared classification used by code generation, including MIME and paging/LRO exclusions.
+ */
+export function packageHasStructuredStreaming(context: SdkContext): boolean {
+  for (const client of context.sdkPackage.clients) {
+    for (const rawMethod of getAllOperationsFromClient(client)) {
+      const method = rawMethod as ServiceOperation;
+      if (getStructuredStreamKind(method) !== undefined) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 function getLroOnlyOperationFunction(
