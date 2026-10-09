@@ -72,4 +72,10 @@ describe("expect all rules to be defined", () => {
       ok(!$linter.ruleSets?.[rulesetName].enable?.[ruleName]);
     }
   });
+
+  it("keeps ARM response status guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/use-standard-response-codes";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    strictEqual($linter.ruleSets?.["data-plane"].enable?.[ruleName], undefined);
+  });
 });
