@@ -12,6 +12,8 @@ rule's scope.
 Without a read operation, clients cannot retrieve the state of a resource they can create or update.
 The rule reports one warning per resource, on the concrete interface declaring its registered
 create/update operation. Having both create and update operations does not produce two warnings.
+When writes are split across interfaces, the create operation's interface takes priority over
+the update operation's interface. A separate delete interface is not the diagnostic target.
 
 ## ❌ Incorrect
 
@@ -47,6 +49,8 @@ with a named properties model such as `model WidgetProperties { label?: string; 
 Prefer adding the standard read operation. Suppress this rule only when an ARM reviewer approves
 a resource design that intentionally cannot be read; include the approval reason in the
 `#suppress` directive on the resource operation interface.
+Place suppression on the concrete create interface, or on the update interface when there is no
+create operation. Suppression on a separate delete interface does not suppress this warning.
 
 ## LintDiff Equivalent
 

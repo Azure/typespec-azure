@@ -60,6 +60,8 @@ function hasDiscriminatorAncestor(program: Program, model: Model): boolean {
 
 function getDiagnosticTarget(resource: ArmResourceDetails): Interface | Model {
   return (
+    resource.operations.lifecycle.createOrUpdate?.operation.interface ??
+    resource.operations.lifecycle.update?.operation.interface ??
     getInterface(resource) ??
     getOperationInterface(Object.values(resource.operations.lists)) ??
     getOperationInterface(Object.values(resource.operations.actions)) ??

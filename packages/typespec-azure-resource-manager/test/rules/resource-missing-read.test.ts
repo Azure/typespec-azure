@@ -1,5 +1,9 @@
 import { Tester } from "#test/tester.js";
-import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
+import {
+  createLinterRuleTester,
+  expectDiagnostics,
+  type LinterRuleTester,
+} from "@typespec/compiler/testing";
 import { readFile } from "node:fs/promises";
 import { beforeEach, it } from "vitest";
 import { resourceMissingReadRule } from "../../src/rules/resource-missing-read.js";
@@ -152,4 +156,100 @@ it("requires a read for a nested resource independently of its parent", async ()
     `,
     )
     .toEmitDiagnostics((x) => ({ ...diagnostic("WidgetPart"), pos: x.pos.target.pos }));
+});
+
+it("targets create writes when delete is registered first", async () => {
+  await tester
+    .expect(
+      `${service}
+      @armResourceOperations interface Deletes {
+        delete is ArmResourceDeleteSync<Widget>;
+      }
+      /*target*/@armResourceOperations interface Writes {
+        createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+      }
+    `,
+    )
+    .toEmitDiagnostics((x) => ({ ...diagnostic(), pos: x.pos.target.pos }));
+});
+
+it("targets update writes when delete is registered first", async () => {
+  await tester
+    .expect(
+      `${service}
+      @armResourceOperations interface Deletes {
+        delete is ArmResourceDeleteSync<Widget>;
+      }
+      /*target*/@armResourceOperations interface Writes {
+        update is ArmResourcePatchSync<Widget, WidgetProperties>;
+      }
+    `,
+    )
+    .toEmitDiagnostics((x) => ({ ...diagnostic(), pos: x.pos.target.pos }));
+});
+
+it("targets shared writes when delete is registered first", async () => {
+  await tester
+    .expect(
+      `${service}
+      @armResourceOperations interface Deletes {
+        delete is ArmResourceDeleteSync<Widget>;
+      }
+      /*target*/@armResourceOperations interface Writes {
+        createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+        update is ArmResourcePatchSync<Widget, WidgetProperties>;
+      }
+    `,
+    )
+    .toEmitDiagnostics((x) => ({ ...diagnostic(), pos: x.pos.target.pos }));
+});
+
+it("prefers createOrUpdate over update on separate interfaces", async () => {
+  await tester
+    .expect(
+      `${service}
+      @armResourceOperations interface Updates {
+        update is ArmResourcePatchSync<Widget, WidgetProperties>;
+      }
+      /*target*/@armResourceOperations interface Creates {
+        createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+      }
+    `,
+    )
+    .toEmitDiagnostics((x) => ({ ...diagnostic(), pos: x.pos.target.pos }));
+});
+
+async function expectWriteSuppression(operations: string) {
+  for (const suppressOn of [undefined, "Writes", "Deletes"]) {
+    const suppression = (name: string) =>
+      suppressOn === name
+        ? `#suppress "${diagnostic().code}" "Missing read is intentional for this test."`
+        : "";
+    const diagnostics = await Tester.diagnose(
+      `${service}
+      ${suppression("Deletes")}
+      @armResourceOperations interface Deletes {
+        delete is ArmResourceDeleteSync<Widget>;
+      }
+      ${suppression("Writes")}
+      @armResourceOperations interface Writes {
+        ${operations}
+      }
+    `,
+      {
+        compilerOptions: {
+          linterRuleSet: { enable: { [diagnostic().code]: true } },
+        },
+      },
+    );
+    expectDiagnostics(diagnostics, suppressOn === "Writes" ? [] : [diagnostic()]);
+  }
+}
+
+it("applies create suppression to the write interface, not delete", async () => {
+  await expectWriteSuppression("createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;");
+});
+
+it("applies update suppression to the write interface, not delete", async () => {
+  await expectWriteSuppression("update is ArmResourcePatchSync<Widget, WidgetProperties>;");
 });
