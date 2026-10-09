@@ -1440,8 +1440,10 @@ export interface DecoratorOptions {
 
 interface SdkExampleBase {
   kind: string;
+  /** Unique example name within the operation. */
   name: string;
   doc: string;
+  /** Path to the source JSON or YAML file containing the example. */
   filePath: string;
   rawExample: any;
 }

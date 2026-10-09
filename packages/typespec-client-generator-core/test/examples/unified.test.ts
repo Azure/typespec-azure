@@ -395,6 +395,66 @@ Widgets.get:
     strictEqual(byPath.get("/b")?.filePath, "B/examples.yaml");
   });
 
+  it("loads unified and legacy examples independently for different services", async () => {
+    const instance = await SimpleBaseTester.createInstance();
+    instance.fs.addTypeSpecFile(
+      "A/examples.yaml",
+      `
+$namespace: Test.A
+Widgets.get:
+  - request: {}
+    responses: {200: {body: "A-base"}}
+  - since: "v2"
+    request: {}
+    responses: {200: {body: "A-v2"}}
+`,
+    );
+    instance.fs.addTypeSpecFile(
+      "B/examples/v2/get.json",
+      JSON.stringify({
+        operationId: "Widgets_get",
+        title: "B-v2",
+        responses: { "200": { body: "B-v2" } },
+      }),
+    );
+    const { program } = await instance.compile(
+      createClientCustomizationInput(
+        `
+      @service @versioned(Versions) namespace Test.A {
+        enum Versions { v1, v2 }
+        @clientName("AWidgets", "python")
+        interface Widgets { @route("/a") @get op get(): string; }
+      }
+      @service @versioned(Versions) namespace Test.B {
+        enum Versions { v1, v2 }
+        @clientName("BWidgets", "python")
+        interface Widgets { @route("/b") @get op get(): string; }
+      }
+    `,
+        `
+      @client({name: "Combined", service: [Test.A, Test.B], autoMergeService: true})
+      namespace Combined {}
+    `,
+      ),
+    );
+    const context = await createSdkContextForTester(program, {
+      "api-version": { Test: { A: "v1", B: "v2" } },
+    });
+    expectDiagnostics(context.diagnostics, []);
+    const methods = context.sdkPackage.clients[0]
+      .children!.flatMap((client) => client.methods)
+      .map(httpMethod);
+    const byPath = new Map(
+      methods.map((method) => [method.operation.path, method.operation.examples![0]]),
+    );
+    strictEqual(byPath.get("/a")?.name, "Widgets_get");
+    strictEqual(byPath.get("/a")?.responses[0].bodyValue?.value, "A-base");
+    strictEqual(byPath.get("/a")?.filePath, "A/examples.yaml");
+    strictEqual(byPath.get("/b")?.name, "B-v2");
+    strictEqual(byPath.get("/b")?.responses[0].bodyValue?.value, "B-v2");
+    strictEqual(byPath.get("/b")?.filePath, "v2/get.json");
+  });
+
   it.each(["Widgets.get", "Renamed.fetch"])(
     "matches %s across language-specific client names and locations",
     async (key) => {
