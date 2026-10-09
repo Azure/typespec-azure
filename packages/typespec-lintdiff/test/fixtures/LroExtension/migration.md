@@ -2,22 +2,21 @@
 
 ## Result and gap summary
 
-The fresh 468-project ARM comparison reports **39 Swagger diagnostics in 14
-projects versus 14 native diagnostics in five projects**: five shared projects,
-nine validator-only, and no TypeSpec-only projects. The 25 excluded occurrences
-are 14 POST, six PUT, and five DELETE operations outside the supported native
-contract: registered resource/template cases already have official enforcement
-or legacy prerequisites, and two handwritten POSTs suppress interface and
-Location-header requirements. They are not supported-provider misses.
+The October 9 source-repair ARM comparison reports **39 Swagger diagnostics in
+14 projects versus 14 native diagnostics in five projects**: five shared
+projects, nine validator-only, no TypeSpec-only. The 25 excluded occurrences
+(14 POST, six PUT, five DELETE) lie outside the native contract: registered
+resource/template cases have official enforcement or legacy prerequisites,
+and two handwritten POSTs suppress interface and Location-header requirements.
 
-The completed update checks supported PATCH and provider/collection POST
-customizations returning `202` without native polling metadata. Sixteen native
-tests and all 51 affected fixtures pass. Six unrelated, pre-existing compiler
-failures limit the assessed corpus to 462 projects; none prevents assessment of
-the 14 Swagger-firing projects. No unexplained in-contract discrepancy remains.
+The rule checks supported PATCH and provider/collection POST customizations
+returning `202` without native polling metadata. The repair visits operations
+before metadata resolution, preventing duplicate Core diagnostics while
+preserving the 14 local targets. All 17 native tests and 51 affected fixtures
+pass. Six unchanged compiler failures limit assessment to 462 projects; none
+affects a Swagger-firing project. No unexplained in-contract discrepancy remains.
 This is **partial Swagger coverage**, not universal equivalence or all-version
-parity. The [population accounting](#fresh-full-corpus-results) explains the
-intentional exclusions separately from the supported-shape evidence.
+parity. See the [population accounting](#fresh-full-corpus-results).
 
 ## Native contract and official coverage
 
@@ -55,9 +54,51 @@ operation examples in the ARM resource-operations and long-running-operations
 guides. Catalog applicability Both does not expand this ARM migration into a
 data-plane rule.
 
+## Source-repair regression: metadata diagnostics before deduplication
+
+Promotion review found a second diagnostic-unit defect in the source rule at
+`f0973f43bffa73169fdde0436566c2534bdab595`. Warning-only deduplication ran
+**after** `getLroMetadata`, and operations with metadata were never marked.
+That helper can append Azure Core diagnostics while still returning metadata.
+Recursive parent/child service traversals therefore resolved one compliant
+operation twice.
+
+The registered source-linter regression uses this supported provider operation
+inside nested services, each independently marked with `@armProviderNamespace`:
+
+```typespec
+@armResourceOperations
+interface ProviderOperations {
+  @Azure.Core.useFinalStateVia("original-uri")
+  startProvider is ArmProviderActionAsync<Request = void, Response = void>;
+}
+```
+
+The complete test supplies version dependencies and distinct `/parent` and
+`/child` Operations routes, but no GET at the provider action's original URI.
+Before the repair, its exact-one-Core-diagnostic assertion failed with **two**
+`@azure-tools/typespec-azure-core/no-operation-at-original-uri` diagnostics.
+After the repair, the actual registered linter produces **exactly one Core
+diagnostic and zero local `lro-extension` warnings**, with no other diagnostics,
+mocked metadata helper, diagnostic suppression, or emission.
+
+The fix marks each eligible semantic Operation visited before metadata
+resolution, including compliant operations. It preserves the service guard,
+PATCH/marked-provider-or-collection POST selector, exact `202`, warning message,
+severity, and authored operation target. The original missing-metadata overlap
+control still produces one local warning; distinct provider operations sharing
+headers still produce two. All 17 cases across the original suite and the new
+`lro-extension-registered.test.ts` pass. The separate registered test loads the
+actual package registration; the original direct-rule suite retains its guards
+against loading AutoRest or TCGC.
+
+This is a source defect, not the promotion's providerless adaptation: both
+services pass the source guard. The partial ARM migration boundary is unchanged.
+
 ## Focused validation and emission evidence
 
-The native suite contains 16 tests, runs without AutoRest or TCGC, and proves:
+The original direct-rule suite contains 16 tests, runs without AutoRest or TCGC,
+and proves:
 
 - sync PATCH accepted-response customization and async PATCH plain-header
   customization each report on the authored operation;
@@ -476,24 +517,30 @@ establish native equivalence or replace the fresh post-change run below.
 
 ## Fresh full-corpus results
 
-The post-review full resource-manager rerun completed on October 8, 2026,
+The cycle-1 source-repair full resource-manager rerun completed on October 9, 2026,
 exit 0, using the pinned specs commit above. Its result index was generated at
-`2026-10-08T11:40:42Z`, schema 7, `partial: false`. The runner processed all
-468 projects, with 462 successes and six failures; analysis took 1,149,890 ms.
+`2026-10-09T06:51:56.322Z`, schema 7, `partial: false`. The runner processed all
+468 projects, with 462 successes and six failures; analysis took 1,185,622 ms.
 A literal Advisor filter first selected exactly one project and passed.
 
-The earlier full run completed at 15:14:39 +08:00, before the supported
-nested-service deduplication fix. The required post-review full run preserved
-the same project populations, six compiler failures, and all 14 native target
-identities. Corpus stability does not establish nested-service coverage; the
-supported maintained-ruleset reproducer and new native regression prove the
-duplicate-warning correction.
+The October 8 full runs established the supported-shape population and the
+earlier missing-metadata overlap correction. The October 9 repair run preserves
+their project populations, six compiler failure identities and error counts,
+and all 14 native target identities: no targets were added or removed.
+Corpus stability does not establish compliant nested-service coverage; the new
+registered source-linter regression proves the helper-diagnostic correction
+independently.
 
 The retained Swagger population has 39 distinct project/file/method/path
-identities. The raw native population has 14 distinct authored
-project/source-file/line/column targets. All 14 target identities occurred in
-the previous native population; 25 previous targets were deliberately removed.
-The observed five shared projects contain all 14 current targets.
+identities, also 39 after removing file identity. The raw native population has
+14 distinct authored project/source-file/line/column targets. All 14 target
+identities occurred in the previous repaired population; the initial
+extension-based population had 25 additional intentionally excluded targets.
+The observed five shared projects contain all 14 current targets. Over the 14
+Swagger-firing projects, one has equal counts, 13 have higher validator counts,
+and none has higher native counts: positive differences total 25 and negative
+differences total zero. These different identity domains do not establish
+one-to-one semantic equivalence.
 
 The table gives the complete Swagger-firing population. Paths are relative to
 `specification/`. Rows with native count zero are the complete nine
@@ -581,7 +628,7 @@ failed projects.
 
 ```powershell
 mise exec -- pnpm --dir packages\typespec-lintdiff build
-mise exec -- pnpm --dir packages\typespec-lintdiff exec vitest run test\rules\lro-extension.test.ts
+mise exec -- pnpm --dir packages\typespec-lintdiff exec vitest run test\rules\lro-extension.test.ts test\rules\lro-extension-registered.test.ts
 mise exec -- pnpm --dir packages\typespec-lintdiff validate LroExtension --parallelism=6
 mise exec -- pnpm --dir packages\typespec-lintdiff validate ConsistentResponseSchemaForPut --parallelism=6
 mise exec -- pnpm --dir packages\typespec-lintdiff validate ConsistentPatchProperties --parallelism=6
@@ -595,3 +642,13 @@ PR. Its immutable Swagger input, fresh native shard, complete population and
 source-target accounting, raw logs, and manifest-based cleanup archive are
 retained in the task handoff. Explicit changed-surface format/lint and an
 independent complete-diff review gate publication.
+
+Cycle 1 retains the prepared source profile: integrated base
+`adf0d2865887d9e12609d7a4d398b96211510a85`, source Core gitlink
+`a6137cac43a727ce0c2656364fd72d50c272ee4a`, and unchanged dependency
+fingerprints. Canonical `feature/lintdiff-migration-new` was freshly fetched at
+`b4fdf202afdda010789557603b571f046f0ca70c` without moving the task branch;
+its newer harness changes are not integrated or claimed as validated here.
+The retained 596-case baseline report has 72 snapshot mismatches and three
+expectation mismatches proven noncausal during cycle 0; it is not full-suite
+green. Cycle 1 reruns the 51 affected strict cases, not that unrelated baseline.

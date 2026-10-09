@@ -77,6 +77,9 @@ already provides the necessary semantics.
   of how many response alternatives contain `202` or how many parent/child
   service traversals include it. Deduplication uses semantic operation identity,
   not shared response types, so distinct operations remain distinct targets.
+  Eligible operations are marked visited before resolving polling metadata,
+  including compliant operations, so overlapping traversals do not repeat
+  diagnostics emitted by Azure Core metadata resolution.
   Template declarations are not independently diagnosed.
 - **Exemptions:** operations without exact `202`, other verbs, resource-instance
   POST, and operations with native LRO metadata.
