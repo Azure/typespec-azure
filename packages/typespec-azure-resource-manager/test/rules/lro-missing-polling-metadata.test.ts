@@ -1,6 +1,10 @@
 import { Tester } from "#test/tester.js";
 import { getSourceLocation } from "@typespec/compiler";
-import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
+import {
+  createLinterRuleTester,
+  type LinterRuleTester,
+  type TesterInstance,
+} from "@typespec/compiler/testing";
 import { readFileSync } from "node:fs";
 import { beforeEach, expect, it, vi } from "vitest";
 import { lroMissingPollingMetadataRule } from "../../src/rules/lro-missing-polling-metadata.js";
@@ -51,11 +55,13 @@ const examples = Array.from(
   documentation.matchAll(/```tsp\n([\s\S]*?)\n```/g),
   (match) => match[1],
 );
+let rawTester: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
+  rawTester = await Tester.createInstance();
   tester = createLinterRuleTester(
-    await Tester.createInstance(),
+    rawTester,
     lroMissingPollingMetadataRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
@@ -259,4 +265,59 @@ it("ignores unmarked POST accepted responses", async () => {
     `,
     )
     .toBeValid();
+});
+
+it("resolves a compliant operation once before reporting Core diagnostics across overlapping services", async () => {
+  const diagnostics = await rawTester.diagnose(
+    `
+      @armProviderNamespace
+      @service
+      @versioned(Versions)
+      namespace Microsoft.Parent;
+      enum Versions {
+        @useDependency(Azure.ResourceManager.CommonTypes.Versions.v5)
+        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
+        v2024_01_01: "2024-01-01",
+      }
+      @route("/parent")
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      @armProviderNamespace("Microsoft.Nested")
+      @service
+      @versioned(Versions)
+      namespace Nested {
+        @route("/child")
+        interface Operations extends Azure.ResourceManager.Operations {}
+        @armResourceOperations
+        interface ProviderOperations {
+          @Azure.Core.useFinalStateVia("original-uri")
+          startProvider is ArmProviderActionAsync<Request = void, Response = void>;
+        }
+      }
+    `,
+    {
+      compilerOptions: {
+        linterRuleSet: {
+          enable: {
+            "@azure-tools/typespec-azure-resource-manager/lro-missing-polling-metadata": true,
+          },
+        },
+      },
+    },
+  );
+
+  expect(
+    diagnostics.filter(
+      (diagnostic) =>
+        diagnostic.code === "@azure-tools/typespec-azure-core/no-operation-at-original-uri",
+    ),
+  ).toHaveLength(1);
+  expect(
+    diagnostics.filter(
+      (diagnostic) =>
+        diagnostic.code ===
+        "@azure-tools/typespec-azure-resource-manager/lro-missing-polling-metadata",
+    ),
+  ).toHaveLength(0);
+  expect(diagnostics).toHaveLength(1);
 });

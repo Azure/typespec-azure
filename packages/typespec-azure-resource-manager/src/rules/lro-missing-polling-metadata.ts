@@ -17,7 +17,7 @@ export const lroMissingPollingMetadataRule = createRule({
   create(context) {
     return {
       root() {
-        const reportedOperations = new Set<Operation>();
+        const visitedOperations = new Set<Operation>();
         for (const service of listServices(context.program)) {
           const [httpService] = getHttpService(context.program, service.type);
           for (const httpOperation of httpService.operations) {
@@ -28,11 +28,13 @@ export const lroMissingPollingMetadataRule = createRule({
             if (
               uncovered &&
               httpOperation.responses.some((response) => response.statusCodes === 202) &&
-              getLroMetadata(context.program, operation) === undefined &&
-              !reportedOperations.has(operation)
+              !visitedOperations.has(operation)
             ) {
-              reportedOperations.add(operation);
-              context.reportDiagnostic({ target: operation });
+              // Metadata resolution can report Core diagnostics even for compliant operations.
+              visitedOperations.add(operation);
+              if (getLroMetadata(context.program, operation) === undefined) {
+                context.reportDiagnostic({ target: operation });
+              }
             }
           }
         }

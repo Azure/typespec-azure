@@ -15,6 +15,10 @@ no native LRO metadata. Operations without `202` or with native polling metadata
 are compliant. Registered resource-instance POST, PUT, and DELETE response
 requirements are covered by the existing ARM response-code rules.
 
+Operations reached through overlapping service declarations are checked once,
+including compliant operations. This avoids repeating diagnostics from native
+polling-metadata resolution.
+
 The rule is available but disabled by default in the resource-manager ruleset.
 
 ## Impact
@@ -92,3 +96,10 @@ on the affected operation.
 
 This rule originates from
 [LroExtension](https://github.com/Azure/azure-openapi-validator/blob/main/docs/lro-extension.md).
+
+The native implementation follows the reviewed
+[lintdiff source rule](https://github.com/Azure/typespec-azure/blob/feature/lintdiff-lro-extension/packages/typespec-lintdiff/src/rules/lro-extension.ts)
+at `9afb5818fba089835296258049ad7104e8a92c50`, refreshed from
+`f0973f43bffa73169fdde0436566c2534bdab595` to visit eligible operations before
+resolving polling metadata. The official ARM rule preserves the destination's
+providerless applicability adaptation and remains disabled by default.
