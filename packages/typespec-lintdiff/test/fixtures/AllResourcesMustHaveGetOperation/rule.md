@@ -47,9 +47,9 @@ service declaration, and a `TrackedResource<{}>` model with `ResourceNameParamet
 
 - **Concept and API:** inspect resources registered with the ARM library using `getArmResources`.
   A `createOrUpdate` or `update` lifecycle operation requires a `read` lifecycle operation.
-- **Diagnostic:** one warning per offending resource, on its lifecycle operation's interface;
-  fall back to a list/action interface and then the resource model when necessary. Having both
-  PUT and PATCH does not produce two warnings.
+- **Diagnostic:** one warning per offending resource, on the concrete interface that declares its
+  registered `createOrUpdate` or `update` lifecycle operation. Having both PUT and PATCH does not
+  produce two warnings.
 - **Applicability:** native ARM resource metadata, not provider-name or generated-route guessing.
   Resource operations can be composed individually; using the composite
   `TrackedResourceOperations` interface is not required.
