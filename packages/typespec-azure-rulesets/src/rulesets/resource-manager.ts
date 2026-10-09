@@ -90,6 +90,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/use-operation-decorator": true,
     "@azure-tools/typespec-azure-resource-manager/use-api-version": true,
     "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation": true,
+    "@azure-tools/typespec-azure-resource-manager/resource-missing-read": false,
     "@azure-tools/typespec-azure-resource-manager/empty-updateable-properties": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb": true,
