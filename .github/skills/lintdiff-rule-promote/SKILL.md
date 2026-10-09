@@ -641,6 +641,9 @@ assuming every front-matter failure is a line-ending issue.
 Use the repo's mise-managed toolchain when available. Before the first command,
 record the shared
 [validation gate plan](../shared/recovery-context.md#validation-gates-and-supplemental-checks).
+Use the shared [validation receipt parsing](../shared/recovery-context.md#validation-receipt-parsing)
+procedure for command evidence and PR-body drafting, preserving raw receipts
+separately from normalized parsing copies.
 The applicable checks in steps 0-8, Chronus status and diff hygiene are required.
 Step 9 is supplemental unless the user or repository explicitly requires it.
 No phase handoff or generic failure rule changes that classification.

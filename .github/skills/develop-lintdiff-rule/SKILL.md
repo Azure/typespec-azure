@@ -759,7 +759,12 @@ After restoring generated corpus data and removing temporary fixture links:
    not as a guessed fixed-number assertion that can prevent formatting.
 2. Run Prettier with those explicit paths only. Do not include harness-owned
    `output.json`, `tsp-diagnostics.json`, or `validator-diagnostics.json`
-   snapshots, and never use `prettier --write .`.
+   snapshots or generator-owned catalog outputs such as `catalog/CATALOG.md`,
+   and never use `prettier --write .`. Validate generated catalog consistency
+   through its generator/invariants, not an extra whole-file formatting gate.
+   Format eligible files with `--write` before running `--check`.
+   For an isolated entry in a maintained file with pre-existing formatting
+   drift, use the fragment procedure below instead of whole-file/range formatting.
 3. Run the package build and invoke `oxlint` only on the changed TypeScript
    source and test files. Do not use package- or repository-wide lint as a
    proxy when it has unrelated baseline warnings.
@@ -774,6 +779,33 @@ After restoring generated corpus data and removing temporary fixture links:
 This procedure satisfies the repository formatting and linting requirement for
 lintdiff worker PRs while preserving generated snapshot fidelity and keeping
 validation scoped to the change.
+
+#### Isolated-entry formatting
+
+Use this only when the reviewed change is an independently identifiable entry
+and formatting the surrounding maintained file would introduce unrelated churn:
+
+1. Preserve the current file bytes, the exact entry boundary, and any existing
+   task/user edits. Do not reconstruct the entire file from HEAD over those edits.
+2. Copy the entry into a session artifact outside the repository with the minimal
+   syntactic context needed by its parser, such as an object around a TS property.
+   Use the repository's `.prettierrc.json` explicitly via `--config`; a fragment
+   outside the worktree does not reliably discover repository settings/plugins.
+   Run from the dependency-ready repository root so configured plugin packages
+   resolve, passing the artifact's absolute path rather than changing into its
+   directory. Do not initialize/build missing tools solely for fragment formatting.
+3. Run the installed Prettier with `--write`, then `--check`, on that artifact
+   using the same config and parser. Preserve both command receipts.
+4. Apply only the formatted entry back to the maintained file, excluding any
+   temporary wrapper. Verify bytes outside the entry equal the preserved file
+   and inspect the complete diff, including pre-existing edits.
+5. Run the remaining required scoped checks. Fragment formatting does not replace
+   build, changed-file lint, catalog consistency, fixture checks, or diff hygiene.
+
+An unexpected broader rewrite is a draft/invocation failure under the existing
+correction budget, not permission to accept unrelated formatting. This lintdiff
+procedure does not override promotion's explicitly required regeneration and
+empty-ignore formatting of official-library generated documentation.
 
 ### 8. Run an independent code review
 

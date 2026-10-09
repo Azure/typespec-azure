@@ -588,6 +588,8 @@ Before execution, record each planned command's working directory, exact
 command, covered files/behavior, and whether it is required or supplemental,
 with the instruction that determines its scope. Record every executed command's
 exit code, outcome, and output or durable log path, including failed attempts.
+Apply the shared [validation receipt parsing](../shared/recovery-context.md#validation-receipt-parsing)
+procedure instead of assuming uncolored summaries or LF-only decoded PR bodies.
 Also record whether corpus validation is required, why, and its results when
 applicable.
 
