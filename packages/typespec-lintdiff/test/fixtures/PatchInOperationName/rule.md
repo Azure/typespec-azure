@@ -73,8 +73,8 @@ HTTP verb, not the authored operation name.
 
 ## LintDiff Equivalent
 
-- linter code: [PatchInOperationName](https://github.com/Azure/azure-openapi-validator/blob/main/packages/rulesets/src/spectral/functions/patch-in-operation-name.ts)
-- linter doc: [patch-in-operation-name.md](https://github.com/Azure/azure-openapi-validator/blob/main/docs/patch-in-operation-name.md)
+- linter code: [PatchInOperationName](https://github.com/Azure/azure-openapi-validator/blob/aec54e95e52338d0afa911a92958541d5624c105/packages/rulesets/src/spectral/functions/patch-in-operation-name.ts)
+- linter doc: [patch-in-operation-name.md](https://github.com/Azure/azure-openapi-validator/blob/aec54e95e52338d0afa911a92958541d5624c105/docs/patch-in-operation-name.md)
 
 The validator checks grouped Swagger operation IDs with a case-sensitive
 `Update` prefix. The native rule deliberately checks authored ARM endpoint names

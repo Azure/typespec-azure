@@ -69,6 +69,12 @@ counts in `patch-cycle0-latest-counts.json`.
 - Specs revision: `f6b53f105b95da05276530a0754a1c71b4f16397`.
 - Development base/HEAD before unpublished changes:
   `46608a56288eb2f777dcd8a58e758012ce3caaa5`.
+- Validator source research revision:
+  `aec54e95e52338d0afa911a92958541d5624c105`. The pinned implementation and
+  documentation match the selector and regular expressions described below.
+  The retained dataset records its validator command but not the resolved
+  validator package or commit, so the exact generator-side validator revision
+  is unavailable.
 - Retained Swagger dataset generation: `2026-08-06T08:03:27.940Z`; generator
   `test/harness/spec-dataset.ts`. It selects the dataset's latest API version,
   runs the ARM AutoRest validator pipeline and does not apply readme suppressions.
@@ -96,7 +102,8 @@ archive are retained in the queue session artifacts, not the PR. Key evidence:
 `patch-cycle0-analysis.log`, `patch-cycle0-sql-emission-evidence.log` and
 `patch-cycle0-corpus-full.log`. Generator commit identity is not embedded in the
 old reports; the current source revision above and unpublished reviewed diff
-identify this run's generator context.
+identify this run's generator context but do not recover the validator revision
+used for the retained dataset.
 
 ## Diagnostic identities and complete project sets
 

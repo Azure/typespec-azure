@@ -94,15 +94,15 @@ describe("patch-in-operation-name", () => {
         `
         using TypeSpec.Http;
         using Azure.ResourceManager;
-        @service namespace DataPlane { @patch @route("/data") op modify(): string; }
+        @service namespace DataPlane { @patch @route("/data") op modifyData(): string; }
         @service @armProviderNamespace
         @armCommonTypesVersion(CommonTypes.Versions.v5)
         namespace Arm {
-          namespace Nested { @patch @route("/arm") op modify(): string; }
+          namespace Nested { @patch @route("/arm") op modifyArm(): string; }
         }
       `,
       )
-      .toEmitDiagnostics([diagnostic("modify")]);
+      .toEmitDiagnostics([diagnostic("modifyArm")]);
   });
 
   it.each(["modify", "update"])("validates the documented ARM template name %s", async (name) => {
