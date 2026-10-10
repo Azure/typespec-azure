@@ -1,0 +1,40 @@
+[
+  {
+    "code": "DescriptionMustNotBeNodeName",
+    "message": "Description must not match the name of the node it is supposed to describe. Node name:'Active' Description:'Active.'",
+    "path": [
+      "definitions",
+      "Mode",
+      "x-ms-enum",
+      "values",
+      "0",
+      "description"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "DescriptionMustNotBeNodeName",
+    "message": "Description must not match the name of the node it is supposed to describe. Node name:'Ready' Description:'Ready.'",
+    "path": [
+      "definitions",
+      "State",
+      "x-ms-enum",
+      "values",
+      "0",
+      "description"
+    ],
+    "severity": 0
+  },
+  {
+    "code": "DescriptionMustNotBeNodeName",
+    "message": "Description must not match the name of the node it is supposed to describe. Node name:'id' Description:'id.'",
+    "path": [
+      "definitions",
+      "Widget",
+      "properties",
+      "id",
+      "description"
+    ],
+    "severity": 0
+  }
+]

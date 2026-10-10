@@ -1,39 +1,39 @@
 import {
   createRule,
   getDoc,
-  isKey,
+  ignoreDiagnostics,
+  isArrayModelType,
   paramMessage,
+  resolveEncodedName,
   type Enum,
+  type EnumMember,
   type Model,
   type ModelProperty,
   type Operation,
   type Scalar,
   type Union,
+  type UnionVariant,
 } from "@typespec/compiler";
 import {
   getHeaderFieldName,
-  getOperationVerb,
+  getHttpOperation,
+  getHttpPart,
   getPathParamName,
   getQueryParamName,
   isStatusCode,
 } from "@typespec/http";
 
-type NamedTarget = Enum | Model | Scalar | Union;
+type NamedTarget = Enum | EnumMember | Model | Scalar | Union;
 
 export const descriptionMustNotBeNodeNameRule = createRule({
   name: "description-must-not-be-node-name",
-  description:
-    "Explicit documentation must not repeat the emitted OpenAPI node name.",
+  description: "Explicit documentation should describe a declaration rather than repeat its name.",
   severity: "warning",
   messages: {
-    default:
-      paramMessage`Description must not match the name of the node it describes. Node name:'${"name"}' Description:'${"description"}'`,
+    default: paramMessage`Description must not match the name of the node it describes. Node name:'${"name"}' Description:'${"description"}'`,
   },
   create(context) {
-    const checkTarget = (
-      target: Parameters<typeof getDoc>[1],
-      nodeName: string | undefined,
-    ) => {
+    const checkTarget = (target: Parameters<typeof getDoc>[1], nodeName: string | undefined) => {
       const doc = getDoc(context.program, target);
       if (doc === undefined) {
         return;
@@ -47,8 +47,7 @@ export const descriptionMustNotBeNodeNameRule = createRule({
       const normalizedNodeName = nodeName ? normalize(nodeName) : undefined;
       if (
         normalizedDescription !== "description" &&
-        (normalizedNodeName === undefined ||
-          normalizedNodeName !== normalizedDescription)
+        (normalizedNodeName === undefined || normalizedNodeName !== normalizedDescription)
       ) {
         return;
       }
@@ -74,10 +73,27 @@ export const descriptionMustNotBeNodeNameRule = createRule({
     return {
       model: checkNamedTarget,
       scalar: checkNamedTarget,
-      enum: checkNamedTarget,
+      enum: (target: Enum) => {
+        checkNamedTarget(target);
+        for (const member of target.members.values()) {
+          checkNamedTarget(member);
+        }
+      },
       union: checkNamedTarget,
+      unionVariant: (target: UnionVariant) => {
+        checkTarget(
+          target,
+          typeof target.name === "string"
+            ? target.name
+            : target.type.kind === "String"
+              ? target.type.value
+              : undefined,
+        );
+      },
       operation: (target: Operation) => {
-        checkTarget(target, getOperationVerb(context.program, target));
+        // HTTP validation owns resolution diagnostics; this rule only checks documentation.
+        const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
+        checkTarget(target, httpOperation.verb);
       },
       modelProperty: (target: ModelProperty) => {
         if (isStatusCode(context.program, target)) {
@@ -94,13 +110,16 @@ export const descriptionMustNotBeNodeNameRule = createRule({
           return;
         }
 
-        if (isKey(context.program, target)) {
-          return;
-        }
-
+        const partType =
+          target.type.kind === "Model" && isArrayModelType(target.type)
+            ? target.type.indexer.value
+            : target.type;
+        const httpPart = getHttpPart(context.program, partType);
         checkTarget(
           target,
-          target.name,
+          httpPart
+            ? (httpPart.options.name ?? target.name)
+            : resolveEncodedName(context.program, target, "application/json"),
         );
       },
     };

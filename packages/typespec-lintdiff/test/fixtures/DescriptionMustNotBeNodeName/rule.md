@@ -16,8 +16,84 @@ coverageKind: lint
 
 ## Description
 
-Description must not match the name of the node it describes. Using @doc with the
-same text as the property name triggers this rule.
+Documentation should explain a declaration's meaning rather than repeat its
+name. The rule checks explicit `@doc` text and doc comments, ignoring surrounding
+whitespace, periods, and case. The placeholder text `description` is also
+uninformative.
+
+For example, `@doc("Ready") Ready` does not explain an enum member, whereas
+`@doc("The widget is ready for use.") Ready` does. Missing or empty documentation
+is outside this rule; use `documentation-required` for missing documentation.
+
+## Native rule contract
+
+- **Concept:** explicit documentation quality, not predicted emitted schemas.
+- **Targets:** named models, scalars, enums, unions, enum members, union variants,
+  properties (including keys), and operations. HTTP parameters use the supported
+  path/query/header wire-name metadata, taking precedence over JSON encoded names.
+  Multipart properties use authored `HttpPart` names or the source property name
+  when no part name is authored, including arrays of repeated parts. JSON encoded
+  names do not rename multipart parts. Ordinary non-part properties compare
+  `resolveEncodedName(..., "application/json")`,
+  falling back to the source name when no JSON override exists. Operations compare
+  the effective HTTP verb, including inferred GET without a body and POST with one.
+- **Union variants:** compare a string variant name, or an unnamed string literal's
+  value. Other unnamed variants have only the placeholder check.
+- **Exemptions:** missing, empty, or period-only text, anonymous type names, and
+  HTTP status-code properties. Keys are not exempt from documentation quality.
+- **Diagnostic:** one warning per offending semantic target, located on the
+  declaration. Standard compiler traversal is used; enum members are enumerated
+  from their enum because the installed walker does not dispatch member events.
+- **APIs/prior art:** compiler `getDoc`, `resolveEncodedName`, native names, and
+  HTTP `getHttpOperation`, `getHttpPart`, and parameter
+  metadata; official `documentation-required` demonstrates enum member iteration
+  but checks missing text only. No emitter, OpenAPI, or SDK dependency is used.
+  HTTP resolution diagnostics are explicitly ignored here because the HTTP
+  library's validation owns them; they are not documentation diagnostics.
+- **Ownership:** ARM catalog audience, without a redundant provider guard. The
+  concept can be implemented in Azure Core; no ARM dependency is needed.
+- **Tests:** native predicate tests cover all target kinds, normalization, literal
+  placeholder, wire-name controls, key properties, and exact diagnostic locations.
+  Multipart regressions cover string and custom scalar payloads, array-valued
+  payloads, repeated parts, renamed source-only and meaningful controls, default
+  part names, isolation from JSON naming, and exact property locations.
+
+## Intentional migration differences
+
+The native rule does not predict visibility-suffixed or friendly schema names,
+SDK name overrides, generated response descriptions, or external referenced
+Swagger declarations. It checks explicit source documentation, not synthesized
+text. Named union variants are checked directly even when their descriptions are
+not emitted as enum metadata. These are documented native-contract differences,
+not a claim of universal executable Swagger parity.
+
+## Native and emitted shape matrix
+
+All native test rows compile with compiler/HTTP libraries and only this rule
+enabled. Enum syntax is compiler-supported, although Azure's separate `no-enum`
+rule recommends extensible unions. The comparison fixtures additionally exercise
+real emission; emitted field presence is research, not an implementation input.
+
+| Authored shape                                                                     | Support                                | Native check                                                            | Description field and Swagger result                                                                               | Evidence                                                                                 |
+| ---------------------------------------------------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| Named model, scalar, enum, or union with matching documentation                    | Supported native types                 | Compare the native type name                                            | Type schema description is populated by `getDoc`; ordinary unsuffixed schema names match                           | Native target-kind tests; model-name comparison fixture                                  |
+| Documented enum member or named string union variant                               | Supported native types                 | Compare the member/variant name, not its literal value                  | `getSchemaForEnum` / `getSchemaForUnionEnum` emit explicit text in `x-ms-enum.values`; matching names violate      | `member-and-key-documentation` emits matching `Ready` and `Active` entries               |
+| Unnamed documented string union variant                                            | Supported native type                  | Compare the string literal value                                        | Union enum emission uses the literal value when there is no string variant name                                    | Native unnamed-string test; `getSchemaForUnionEnum` value-name fallback                  |
+| Ordinary property, including a non-HTTP key                                        | Supported native model property        | Compare the JSON encoded name, or source-name fallback                  | Matching property descriptions violate; a JSON-renamed source-name-only description is compliant                   | `member-and-key-documentation`, `json-encoded-property`, `json-encoded-source-name-only` |
+| Path/query/header parameter with an explicit wire-name override                    | Supported HTTP customization           | Compare supported HTTP name metadata                                    | Matching parameter descriptions violate; source-name-only text does not                                            | Parameter comparison fixtures and three native wire-name tests                           |
+| Authored multipart name on `HttpPart<string>` or a custom scalar payload           | Supported HTTP multipart model         | Compare `getHttpPart(...).options.name`                                 | Scalar form-data parameter has the authored part name; matching docs violate                                       | `multipart-authored-names`, `multipart-source-name-only`; native scalar matrix           |
+| Array-valued payload or repeated `HttpPart` array                                  | Supported HTTP multipart model         | Resolve direct or array-element HTTP-part metadata; target the property | HTTP resolves the authored name; scalar-array/repeated Swagger behavior is not claimed solely from scalar fixtures | Four native multipart type-family cases; HTTP `resolvePartOrParts` prior art             |
+| Multipart part without an authored name                                            | Supported HTTP multipart model         | Compare the source property name; ignore JSON encoded names             | Default form-data name matches the property name and matching docs violate                                         | `multipart-authored-names`; native default-name and JSON-isolation controls              |
+| Explicit HTTP operation verb                                                       | Supported HTTP operation               | Compare verb metadata                                                   | `put` operation description `put.` violates, while `createOrUpdate.` does not                                      | Both operation comparison fixtures                                                       |
+| Inferred HTTP GET without a body or POST with a body                               | Supported HTTP operation               | Resolve effective verb through `getHttpOperation`                       | `get`/`post` operation keys match normalized documentation and violate                                             | `inferred-http-verbs`; native inferred-verb and explicit-override controls               |
+| Status-code property                                                               | Supported HTTP metadata                | Exempt                                                                  | Status metadata is not a documented payload property                                                               | Native status-code exclusion test                                                        |
+| Missing, empty, or period-only text                                                | Supported authoring                    | No diagnostic                                                           | No description or normalized empty text does not satisfy the validator predicate                                   | Native compliant tests                                                                   |
+| Namespace-qualified or visibility-renamed schema                                   | Supported source type                  | Compare native name                                                     | Description may differ from the generated schema key; native warning can be intentional extra coverage             | Fleet's `ClusterSelector` is emitted as `Placement.V1.ClusterSelector`                   |
+| Generated response text, external Swagger references, or SDK/schema-name overrides | Outside the native comparison boundary | Do not synthesize or resolve output descriptions                        | Swagger can select output nodes with no equivalent editable native documentation target                            | Emitter research only; not claimed as native parity                                      |
+
+The corpus is observational evidence for its represented shapes, not universal
+equivalence proof. See `migration.md` for population alignment and remaining
+comparison limitations.
 
 ## Source-of-truth notes
 
@@ -44,21 +120,28 @@ same text as the property name triggers this rule.
 
 The local TypeSpec lint mirrors the upstream normalization and covers:
 
-- named schema targets (`model`, `scalar`, `enum`, `union`)
+- named type targets (`model`, `scalar`, `enum`, `union`) and their enum members
+  and union variants
 - model properties, including emitted path/query/header parameter names
 - HTTP operations, using the emitted HTTP verb instead of the TypeSpec symbol name
 - the special-case literal `description`
 
 ## Test Cases
 
-| ID                                            | Violation | Description |
-| --------------------------------------------- | --------- | ----------- |
-| `description-matches-name`                    | true      | Property named `description` keeps the original repro where the literal text and node name both match. |
-| `model-description-matches-model-name`        | true      | Model description matches the emitted schema name after normalization. |
-| `property-description-matches-property-name`  | true      | Regular model property description matches the property name. |
-| `parameter-description-matches-emitted-name`  | true      | Resource path parameter description matches its emitted OpenAPI parameter name, not the TypeSpec source identifier. |
-| `operation-description-matches-http-verb`     | true      | Resource operation description matches the emitted HTTP verb. |
-| `literal-description`                         | true      | The special-case literal `description` still violates when the node name differs. |
-| `parameter-description-matches-source-name-only` | false  | Path parameter description matches the TypeSpec property name but not the emitted OpenAPI parameter name. |
-| `operation-description-matches-typespec-name-only` | false | Resource operation description matches the TypeSpec operation name but not the emitted HTTP verb. |
-| `descriptive-docs`                            | false     | Comparable descriptions stay descriptive and avoid node-name echoes. |
+| ID                                                 | Violation | Description                                                                                                         |
+| -------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------- |
+| `description-matches-name`                         | true      | Property named `description` keeps the original repro where the literal text and node name both match.              |
+| `model-description-matches-model-name`             | true      | Model description matches the emitted schema name after normalization.                                              |
+| `property-description-matches-property-name`       | true      | Regular model property description matches the property name.                                                       |
+| `parameter-description-matches-emitted-name`       | true      | Resource path parameter description matches its emitted OpenAPI parameter name, not the TypeSpec source identifier. |
+| `operation-description-matches-http-verb`          | true      | Resource operation description matches the emitted HTTP verb.                                                       |
+| `literal-description`                              | true      | The special-case literal `description` still violates when the node name differs.                                   |
+| `parameter-description-matches-source-name-only`   | false     | Path parameter description matches the TypeSpec property name but not the emitted OpenAPI parameter name.           |
+| `operation-description-matches-typespec-name-only` | false     | Resource operation description matches the TypeSpec operation name but not the emitted HTTP verb.                   |
+| `descriptive-docs`                                 | false     | Comparable descriptions stay descriptive and avoid node-name echoes.                                                |
+| `member-and-key-documentation`                     | true      | Explicit enum member, union variant, and keyed payload property documentation repeats the native name.              |
+| `inferred-http-verbs`                              | true      | Effective GET and POST documentation repeats the inferred HTTP verb.                                                |
+| `json-encoded-property`                            | true      | Ordinary property documentation repeats its JSON encoded wire name.                                                 |
+| `json-encoded-source-name-only`                    | false     | Documentation repeats only the source name of a JSON-renamed property.                                              |
+| `multipart-authored-names`                         | true      | Renamed multipart and default part documentation repeats each effective name.                                       |
+| `multipart-source-name-only`                       | false     | Renamed multipart source-only and meaningful documentation are compliant.                                           |

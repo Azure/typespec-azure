@@ -1,0 +1,58 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test Service",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [],
+  "paths": {
+    "/uploads": {
+      "post": {
+        "operationId": "Upload",
+        "description": "Submit text for processing.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "part_name",
+            "in": "formData",
+            "description": "propName",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "propName"
+          },
+          {
+            "name": "meaningful_part",
+            "in": "formData",
+            "description": "The text submitted for processing.",
+            "required": true,
+            "type": "string",
+            "x-ms-client-name": "meaningfulPart"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "There is no content to send for this request, but the headers may be useful. "
+          }
+        }
+      }
+    }
+  },
+  "definitions": {},
+  "parameters": {}
+}
