@@ -114,11 +114,110 @@ describe("no-uninformative-doc", () => {
     await tester.expect('@get @doc("read") op read(): string;').toBeValid();
   });
 
-  it("checks operations without an explicit HTTP verb only for placeholder text", async () => {
+  it("checks inferred operation verbs for placeholder text", async () => {
     await tester
       .expect('@doc("description") op read(): string;')
-      .toEmitDiagnostics([diagnostic("description", "description")]);
+      .toEmitDiagnostics([diagnostic("get", "description")]);
     await tester.expect('@doc("read") op read(): string;').toBeValid();
+  });
+
+  it("compares inferred GET operations with their effective HTTP verb", async () => {
+    await tester
+      .expect('@route("/widgets") @doc(" GET. ") op read(): string;')
+      .toEmitDiagnostics([diagnostic("get", " GET. ")]);
+    await tester.expect('@route("/widgets") @doc("read") op read(): string;').toBeValid();
+  });
+
+  it("compares inferred POST operations with their effective HTTP verb", async () => {
+    await tester
+      .expect('@route("/widgets") @doc("post") op create(@body body: string): string;')
+      .toEmitDiagnostics([diagnostic("post", "post")]);
+    await tester
+      .expect('@route("/widgets") @doc("create") op create(@body body: string): string;')
+      .toBeValid();
+  });
+
+  it("preserves explicit HTTP verbs over inference", async () => {
+    await tester.expect('@route("/widgets") @get @doc("post") op read(): string;').toBeValid();
+    await tester.expect('@route("/widgets") @post @doc("get") op create(): string;').toBeValid();
+  });
+
+  it("compares ordinary properties with their JSON encoded names", async () => {
+    await tester
+      .expect(
+        'model Widget { @encodedName("application/json", "wire-name") @doc(" Wire-Name. ") sourceName: string; }',
+      )
+      .toEmitDiagnostics([diagnostic("wire-name", " Wire-Name. ")]);
+  });
+
+  it("accepts JSON-renamed property documentation matching only its source name", async () => {
+    await tester
+      .expect(
+        'model Widget { @encodedName("application/json", "wire-name") @doc("sourceName") sourceName: string; }',
+      )
+      .toBeValid();
+  });
+
+  it("checks JSON-renamed properties for placeholder text", async () => {
+    await tester
+      .expect(
+        'model Widget { @encodedName("application/json", "wire-name") @doc("description.") sourceName: string; }',
+      )
+      .toEmitDiagnostics([diagnostic("wire-name", "description.")]);
+  });
+
+  it("ignores non-JSON encoded names for ordinary properties", async () => {
+    await tester
+      .expect(
+        'model Widget { @encodedName("application/xml", "wire-name") @doc("wire-name") sourceName: string; }',
+      )
+      .toBeValid();
+  });
+
+  it("preserves HTTP parameter names over JSON encoded names", async () => {
+    for (const kind of ["path", "query", "header"]) {
+      const route = kind === "path" ? '@route("/widgets/{wireName}")' : "";
+      await tester
+        .expect(
+          `${route} @get op read(@${kind}("wireName") @encodedName("application/json", "jsonName") @doc("wireName.") source: string): string;`,
+        )
+        .toEmitDiagnostics([diagnostic("wireName", "wireName.")]);
+      await tester
+        .expect(
+          `${route} @get op read(@${kind}("wireName") @encodedName("application/json", "jsonName") @doc("jsonName") source: string): string;`,
+        )
+        .toBeValid();
+    }
+  });
+
+  it("targets inferred operations and JSON-renamed properties", async () => {
+    await tester
+      .expect(
+        `
+        @route("/widgets") @doc("get") op /*read*/read(): string;
+        @route("/widgets") @doc("post") op /*create*/create(@body body: string): string;
+        model Widget {
+          @encodedName("application/json", "wire-name")
+          @doc("wire-name")
+          /*source*/sourceName: string;
+        }
+      `,
+      )
+      .toEmitDiagnostics(({ read, create, source }) =>
+        [
+          [source, "wire-name"],
+          [read, "get"],
+          [create, "post"],
+        ].map(([target, name]) => {
+          const location = getSourceLocation(target as Parameters<typeof getSourceLocation>[0]);
+          return {
+            ...diagnostic(name as string, name as string),
+            file: location.file.path,
+            pos: location.pos,
+            end: location.end,
+          };
+        }),
+      );
   });
 
   it("compares path parameters with their wire names", async () => {
@@ -173,6 +272,11 @@ describe("no-uninformative-doc", () => {
 
   it("exempts HTTP status-code properties", async () => {
     await tester.expect('model Response { @statusCode @doc("status") status: 200; }').toBeValid();
+    await tester
+      .expect(
+        'model Response { @statusCode @encodedName("application/json", "wire-status") @doc("wire-status") status: 200; }',
+      )
+      .toBeValid();
   });
 
   it("targets each offending declaration without an aggregate diagnostic", async () => {
