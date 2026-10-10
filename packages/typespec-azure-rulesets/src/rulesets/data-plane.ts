@@ -30,6 +30,7 @@ export default {
     "@azure-tools/typespec-azure-core/no-unknown": true,
     "@azure-tools/typespec-azure-core/bad-record-type": true,
     "@azure-tools/typespec-azure-core/documentation-required": true,
+    "@azure-tools/typespec-azure-core/no-uninformative-doc": false,
     "@azure-tools/typespec-azure-core/key-visibility-required": true,
     "@azure-tools/typespec-azure-core/response-schema-problem": true,
     "@azure-tools/typespec-azure-core/rpc-operation-request-body": true,
