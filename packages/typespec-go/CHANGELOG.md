@@ -1,5 +1,12 @@
 # Release History
 
+## 0.17.6
+
+### Bug Fixes
+
+- [#5650](https://github.com/Azure/typespec-azure/pull/5650) Escape reserved words in private long-running operation helper names without changing public method, options, or response names.
+
+
 ## 0.17.5
 
 ### Bug Fixes
