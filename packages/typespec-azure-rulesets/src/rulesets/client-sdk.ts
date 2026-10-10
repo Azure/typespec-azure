@@ -8,6 +8,7 @@ export default {
     "@azure-tools/typespec-client-generator-core/csharp-model-suffix": true,
     "@azure-tools/typespec-client-generator-core/use-union-hierarchy": true,
     "@azure-tools/typespec-client-generator-core/get-operation-name": false,
+    "@azure-tools/typespec-client-generator-core/use-update-for-patch": false,
   },
   disable: {
     "@azure-tools/typespec-client-generator-core/use-create-for-put":
