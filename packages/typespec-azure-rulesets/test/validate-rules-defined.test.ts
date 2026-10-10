@@ -72,4 +72,11 @@ describe("expect all rules to be defined", () => {
       ok(!$linter.ruleSets?.[rulesetName].enable?.[ruleName]);
     }
   });
+
+  it("keeps documentation-quality guidance disabled by default", () => {
+    const ruleName = "@azure-tools/typespec-azure-core/no-uninformative-doc";
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], false);
+    }
+  });
 });

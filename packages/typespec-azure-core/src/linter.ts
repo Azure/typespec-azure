@@ -27,6 +27,7 @@ import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRouteParameterNameMismatchRule } from "./rules/no-route-parameter-name-mismatch.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
 import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
+import { noUninformativeDocRule } from "./rules/no-uninformative-doc.js";
 import { noUnnamedTypesRule } from "./rules/no-unnamed-types.js";
 import { nonBreakingVersioningRule } from "./rules/non-breaking-versioning.js";
 import { apiVersionRule } from "./rules/operation-missing-api-version.js";
@@ -66,6 +67,7 @@ const rules = [
   noRpcPathParamsRule,
   noOpenAPIRule,
   noUnnamedTypesRule,
+  noUninformativeDocRule,
   noHeaderExplodeRule,
   preventFormatRule,
   noMultipleDiscriminatorRule,
