@@ -64,6 +64,14 @@ tests, documentation, generated official-library references, ruleset
 registration, or change metadata. They must not silently change the source
 rule's semantics only in the promoted copy.
 
+For the [common SDK operation naming family](../lintdiff-rule-promote/SKILL.md#common-sdk-operation-naming-family),
+consume the promotion handoff's explicit adaptation authorization and pinned
+source contract. The documented change from authored names to common SDK names
+is the approved promotion contract, not an unfixed source defect. Assess fixes
+against that contract; changes beyond its limited authorization retain the
+source-semantic stop policy. Do not rewrite the source or claim that its corpus
+counts validate the adapted SDK-name behavior.
+
 ### Queue-controlled source-repair handoff
 
 When the caller is `/do-linter-development-task-one-by-one` and provides the

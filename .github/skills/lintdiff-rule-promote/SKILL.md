@@ -60,7 +60,9 @@ behavior-preserving destination adaptation can be made only in the promotion
 worktree with supporting evidence and documentation. A source-semantic defect
 blocks promotion and returns to the authorized repair workflow; this boundary
 does not authorize modifying the immutable source or silently changing semantics
-only in the official copy. Architectural coupling alone is not proof of an
+only in the official copy. The explicitly authorized common SDK naming
+adaptation below is a separate, documented promotion contract, not source repair.
+Architectural coupling alone is not proof of an
 affected service or a source-semantic defect; report uncertain findings as such.
 See the
 [review on PR #5271](https://github.com/Azure/typespec-azure/pull/5271#issuecomment-5661318416).
@@ -339,6 +341,58 @@ confirmation, wait for their selection before continuing. If the evidence cannot
 support a safe recommendation, stop and report the blocker under the confirmation
 policy.
 
+#### Common SDK operation naming family
+
+For operation-name policies such as `DeleteInOperationName`,
+`ListInOperationName`, and `PatchInOperationName`, follow the TCGC pattern
+established by [PUT promotion #5457](https://github.com/Azure/typespec-azure/pull/5457)
+and [PATCH promotion #5665](https://github.com/Azure/typespec-azure/pull/5665).
+This family-specific instruction authorizes adapting an authored-name lintdiff
+source to the **common SDK method name** during promotion, without reopening
+source repair or asking for routine approval. It does not authorize changing
+the immutable source, unrelated predicates, or enabling new diagnostics.
+
+- Select TCGC when the intended rule checks SDK operation names, even for an
+  ARM-origin validator. Do not route it to ARM merely because its fixtures use
+  ARM templates. Check existing TCGC rules first; for LIST, compare
+  `get-operation-name` but do not assume that allowing both `get` and `list`
+  satisfies a list-only policy.
+- Create the native TCGC context with `createTCGCContext(...,
+{ mutateNamespace: false })` and resolve names using
+  `getLibraryName(tcgcContext, operation, AllScopes)`. Honor unscoped
+  `@clientName`, exact names, and the supported friendly-name fallback; ignore
+  emitter-scoped overrides and explicit OpenAPI operation IDs for this common
+  naming contract. Do not hand-roll name resolution.
+- Preserve the source's operation selection, verb/paging conditions, prefix
+  policy, severity, and operation diagnostic targets apart from this approved
+  name-domain adaptation and justified lintdiff-only isolation removal. In
+  particular, do not turn a collection/LIST rule into a rule for every GET
+  operation. Use concrete HTTP service endpoints when that matches the source
+  contract, following `use-create-for-put` and `use-update-for-patch`; do not
+  copy another rule's traversal or predicates mechanically.
+- An opt-in ARM SDK naming rule need not require provider metadata when
+  selecting the rule supplies its intended audience. Verify this against the
+  source and neighboring rule contract, and test a minimal service without
+  provider metadata. Package ownership alone never filters services.
+- Register a new rule under `client-sdk` with plain `enable: false`, not in
+  ARM/data-plane rulesets solely because of its Swagger origin. Include native
+  docs, generated TCGC references, appropriate ARM guidance links, and separate
+  destination-feature and disabled-registration internal Chronus entries.
+- Prove override behavior in both directions: a valid common override fixes an
+  invalid authored name, and an invalid common override warns on the original
+  operation even when its authored name passes. Cover emitter-scoped overrides
+  in both directions, mixed common/scoped names, exact names, friendly-name
+  fallback, and rule-specific compliant/violating endpoint selection.
+- Record this authorized adaptation, the immutable source SHA and original
+  authored-name contract in the PR and review handoffs. Source corpus counts
+  remain evidence for that source, not fresh counts or exact equivalence for
+  the SDK-name adaptation. Do not rerun the lintdiff corpus during promotion.
+
+This authorization is limited to the naming family and supported name
+resolution above. A different or uncertain semantic change still follows the
+source-repair stop policy. An explicit user-selected different name domain takes
+precedence; document it rather than silently applying the family default.
+
 ### 3. Verify the prepared environment
 
 Use the [shared preparation contract](../do-linter-development-task-one-by-one/preparation.md)
@@ -375,8 +429,9 @@ Place the rule in the selected package:
 Check the source contract against the
 [implementation checkpoints](../typespec-lint-implement/SKILL.md#implementation-checkpoints).
 Classify any proposed semantic change under the existing source-repair policy
-before editing; selecting a better destination does not authorize divergence
-from the immutable source.
+before editing. The [common SDK naming family](#common-sdk-operation-naming-family)
+has its explicit, limited adaptation authorization; selecting a better
+destination alone does not authorize other divergence from the immutable source.
 
 Then adapt it to the destination package:
 
