@@ -5,6 +5,11 @@
     "message": "ARM operations returning 202 must have native polling metadata. Use an asynchronous ARM template or preserve supported semantic LRO headers."
   },
   {
+    "code": "tsp-lintdiff-local-linter/patch-in-operation-name",
+    "severity": "warning",
+    "message": "ARM PATCH operation 'patchWidgets' should start with 'update'."
+  },
+  {
     "code": "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",
     "severity": "warning",
     "message": "Arm namespace TestService is missing the Operations interface. Add \"interface Operations extends Azure.ResourceManager.Operations {}\"."
@@ -78,11 +83,6 @@
     "code": "tsp-lintdiff-local-linter/list-in-operation-name",
     "severity": "warning",
     "message": "Operation 'patchWidgets' returns a list/pageable response and should use method name starting with 'list'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/patch-in-operation-name",
-    "severity": "warning",
-    "message": "'PATCH' operation 'patchWidgets' should use method name 'update'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
   },
   {
     "code": "tsp-lintdiff-local-linter/pageable-requires-200-response",
