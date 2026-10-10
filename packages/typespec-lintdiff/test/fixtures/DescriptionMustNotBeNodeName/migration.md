@@ -40,8 +40,9 @@ not an intentional native limitation.
 
 Cycle2 repairs authored multipart part names confirmed during promotion review.
 HTTP `getHttpPart(program, type)?.options.name` supplies a renamed part's native
-name before the ordinary JSON name fallback. Repeated parts use compiler
-`isArrayModelType` to read the element's HTTP part metadata. Direct strings,
+name; an unnamed part keeps its source property name rather than using JSON
+encoded-name metadata. Repeated parts use compiler `isArrayModelType` to read the
+element's HTTP part metadata. Direct strings,
 custom scalar payloads, array-valued payloads, and repeated parts have native
 violation, source-name-only compliance, meaningful-documentation, and placeholder
 controls. Default part names still fall back to the property name. Explicit
@@ -654,12 +655,13 @@ The fixture's emitted form-data parameters have names `part_name` and
 `defaultPart`, respectively, with descriptions `" Part_Name. "` and
 `"defaultPart"`. Both engines report exactly two target-rule findings.
 The native diagnostic targets the authored `propName` property and displays
-`part_name`, not its source name or JSON fallback. In
+`part_name`, not its source name or JSON encoded name. In
 `multipart-source-name-only`, the renamed part's `@doc("propName")` and another
 part's meaningful description are compliant in both engines. Previously the
 native JSON fallback missed the renamed-part violation and falsely diagnosed
 the source-name-only control.
-**Disposition:** use public HTTP part metadata before compiler JSON naming;
+**Disposition:** use public HTTP part metadata and the source property fallback
+for multipart parts; reserve compiler JSON naming for ordinary non-part properties;
 preserve path/query/header precedence, status-code exemption, inferred/explicit
 verbs, normalization, placeholders, and authored diagnostic targets. This is
 native metadata resolution, not emitted form-data simulation.

@@ -31,8 +31,9 @@ is outside this rule; use `documentation-required` for missing documentation.
 - **Targets:** named models, scalars, enums, unions, enum members, union variants,
   properties (including keys), and operations. HTTP parameters use the supported
   path/query/header wire-name metadata, taking precedence over JSON encoded names.
-  Multipart properties use authored `HttpPart` names before the ordinary JSON
-  fallback, including arrays of repeated parts. Ordinary properties compare
+  Multipart properties use authored `HttpPart` names or the source property name
+  when no part name is authored, including arrays of repeated parts. JSON encoded
+  names do not rename multipart parts. Ordinary non-part properties compare
   `resolveEncodedName(..., "application/json")`,
   falling back to the source name when no JSON override exists. Operations compare
   the effective HTTP verb, including inferred GET without a body and POST with one.
@@ -55,7 +56,7 @@ is outside this rule; use `documentation-required` for missing documentation.
   placeholder, wire-name controls, key properties, and exact diagnostic locations.
   Multipart regressions cover string and custom scalar payloads, array-valued
   payloads, repeated parts, renamed source-only and meaningful controls, default
-  part names, JSON-name precedence, and exact property locations.
+  part names, isolation from JSON naming, and exact property locations.
 
 ## Intentional migration differences
 
@@ -80,9 +81,9 @@ real emission; emitted field presence is research, not an implementation input.
 | Unnamed documented string union variant                                            | Supported native type                  | Compare the string literal value                                        | Union enum emission uses the literal value when there is no string variant name                                    | Native unnamed-string test; `getSchemaForUnionEnum` value-name fallback                  |
 | Ordinary property, including a non-HTTP key                                        | Supported native model property        | Compare the JSON encoded name, or source-name fallback                  | Matching property descriptions violate; a JSON-renamed source-name-only description is compliant                   | `member-and-key-documentation`, `json-encoded-property`, `json-encoded-source-name-only` |
 | Path/query/header parameter with an explicit wire-name override                    | Supported HTTP customization           | Compare supported HTTP name metadata                                    | Matching parameter descriptions violate; source-name-only text does not                                            | Parameter comparison fixtures and three native wire-name tests                           |
-| Authored multipart name on `HttpPart<string>` or a custom scalar payload           | Supported HTTP multipart model         | Compare `getHttpPart(...).options.name` before JSON fallback            | Scalar form-data parameter has the authored part name; matching docs violate                                       | `multipart-authored-names`, `multipart-source-name-only`; native scalar matrix           |
+| Authored multipart name on `HttpPart<string>` or a custom scalar payload           | Supported HTTP multipart model         | Compare `getHttpPart(...).options.name`                                 | Scalar form-data parameter has the authored part name; matching docs violate                                       | `multipart-authored-names`, `multipart-source-name-only`; native scalar matrix           |
 | Array-valued payload or repeated `HttpPart` array                                  | Supported HTTP multipart model         | Resolve direct or array-element HTTP-part metadata; target the property | HTTP resolves the authored name; scalar-array/repeated Swagger behavior is not claimed solely from scalar fixtures | Four native multipart type-family cases; HTTP `resolvePartOrParts` prior art             |
-| Multipart part without an authored name                                            | Supported HTTP multipart model         | Existing property-name fallback                                         | Default form-data name matches the property name and matching docs violate                                         | `multipart-authored-names`; native default-name control                                  |
+| Multipart part without an authored name                                            | Supported HTTP multipart model         | Compare the source property name; ignore JSON encoded names             | Default form-data name matches the property name and matching docs violate                                         | `multipart-authored-names`; native default-name and JSON-isolation controls              |
 | Explicit HTTP operation verb                                                       | Supported HTTP operation               | Compare verb metadata                                                   | `put` operation description `put.` violates, while `createOrUpdate.` does not                                      | Both operation comparison fixtures                                                       |
 | Inferred HTTP GET without a body or POST with a body                               | Supported HTTP operation               | Resolve effective verb through `getHttpOperation`                       | `get`/`post` operation keys match normalized documentation and violate                                             | `inferred-http-verbs`; native inferred-verb and explicit-override controls               |
 | Status-code property                                                               | Supported HTTP metadata                | Exempt                                                                  | Status metadata is not a documented payload property                                                               | Native status-code exclusion test                                                        |

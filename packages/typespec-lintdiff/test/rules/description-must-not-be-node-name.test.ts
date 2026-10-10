@@ -190,17 +190,20 @@ describe("description-must-not-be-node-name", () => {
       .toEmitDiagnostics([diagnostic("part_name", "description.")]);
   });
 
-  it("uses the default multipart property name when no part name is authored", async () => {
+  it("uses the source property name for an unnamed multipart part", async () => {
+    const operation = (doc: string) => `
+      op upload(
+        @header contentType: "multipart/form-data",
+        @multipartBody body: {
+          @encodedName("application/json", "jsonName")
+          @doc("${doc}") propName: HttpPart<string>;
+        }
+      ): void;
+    `;
     await tester
-      .expect(
-        `
-        op upload(
-          @header contentType: "multipart/form-data",
-          @multipartBody body: { @doc("propName") propName: HttpPart<string>; }
-        ): void;
-      `,
-      )
+      .expect(operation("propName"))
       .toEmitDiagnostics([diagnostic("propName", "propName")]);
+    await tester.expect(operation("jsonName")).toBeValid();
   });
 
   it("preserves authored multipart names over JSON encoded names", async () => {

@@ -114,10 +114,12 @@ export const descriptionMustNotBeNodeNameRule = createRule({
           target.type.kind === "Model" && isArrayModelType(target.type)
             ? target.type.indexer.value
             : target.type;
+        const httpPart = getHttpPart(context.program, partType);
         checkTarget(
           target,
-          getHttpPart(context.program, partType)?.options.name ??
-            resolveEncodedName(context.program, target, "application/json"),
+          httpPart
+            ? (httpPart.options.name ?? target.name)
+            : resolveEncodedName(context.program, target, "application/json"),
         );
       },
     };
