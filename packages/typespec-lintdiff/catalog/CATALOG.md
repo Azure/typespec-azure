@@ -12,8 +12,8 @@ Total rules: 209
 | Known TSP equivalent | 16 |
 | **Infallible** (no action needed) | 29 |
 | **Template-enforced** (low priority) | 45 |
-| **Prerequisite-blocked** (investigate existing TypeSpec diagnostics first) | 4 |
-| **Unconstrained** (high priority) | 131 |
+| **Prerequisite-blocked** (investigate existing TypeSpec diagnostics first) | 3 |
+| **Unconstrained** (high priority) | 132 |
 
 ## Classification Key
 
@@ -179,7 +179,7 @@ Total rules: 209
 | InvalidVerbUsed | error | — | — | Infallible | ✓ |
 | ListInOperationName | warn | — | — | Template-enforced | ✓ |
 | LongRunningOperationsOptionsValidator | warn | — | — | Template-enforced | ✓ |
-| LroExtension | error | — | — | Prerequisite-blocked | ✓ |
+| LroExtension | error | — | — | Unconstrained | ✓ |
 | LroStatusCodesReturnTypeSchema | error | — | — | Template-enforced | ✓ |
 | MutabilityWithReadOnly | error | — | — | Prerequisite-blocked | ✓ |
 | NamePropertyDefinitionInParameter | error | — | — | Infallible | ✓ |
@@ -247,4 +247,3 @@ Total rules: 209
 | SuccessResponseBody | warn | — | — | Unconstrained | ✓ |
 | VersionConvention | warn | — | — | Unconstrained | ✓ |
 | VersionPolicy | warn | — | — | Unconstrained | ✓ |
-

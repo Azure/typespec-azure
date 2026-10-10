@@ -1,9 +1,7 @@
 {
   "violation": false,
-  "validatorDiagnostics": [{ "code": "LroExtension", "count": 1 }],
   "ambientDiagnostics": [
     { "code": "tsp-lintdiff-local-linter/latest-version-of-common-types-must-be-used", "count": 1 },
-    { "code": "tsp-lintdiff-local-linter/operation-id-noun-verb", "count": 1 },
     { "code": "tsp-lintdiff-local-linter/path-parameter-schema", "count": 10 },
     { "code": "tsp-lintdiff-local-linter/xms-examples-required", "count": 7 }
   ]
