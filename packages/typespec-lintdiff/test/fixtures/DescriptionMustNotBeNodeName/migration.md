@@ -2,21 +2,21 @@
 
 ## Result and gap summary
 
-The full ARM corpus has **70,815 Swagger findings in 105 successfully compiled
-projects**, versus **7,523 TypeSpec findings in 143 projects**. All 105
-validator-affected projects now overlap (previously only two).
-Selected-version mutation retains **7,501 findings in 142 projects**; 22 belong
-to removed or later-version declarations. The remaining 37 TypeSpec-only
-projects contain unused/shared or client-only documented types, version enum
-members not emitted for the selected version, namespace-qualified schema names,
-template-renamed keys, or constant path parameters removed by emission.
-Swagger additionally repeats enum documentation across referenced files and
-inline parameter schemas. The required native update is complete: enum members,
-union variants, and non-HTTP keys are checked. Native predicate coverage is
-supported by 28 tests and ten comparison fixtures. **Exact executable Swagger
-equivalence remains partial**, not established by project overlap: emission-only
-names and generated/reference nodes are outside the native contract, and
-source-to-output identities do not establish one-to-one diagnostic parity.
+The full ARM corpus has **70,815 Swagger findings / 105 successfully compiled
+projects**, versus **7,523 TypeSpec findings / 143 projects**, with all 105
+validator projects overlapping. Verified selected-version attribution retains
+**7,501 findings / 142 projects**; 22 are removed/later-version declarations.
+The 37 TypeSpec-only projects involve unused/shared or client-only types,
+unemitted version members, qualified schema names, template-renamed keys, or
+constant parameters erased during emission. Swagger repeats documentation across
+referenced files and inline schemas. Cycle1 fixes inferred HTTP verbs and JSON
+encoded property names, preserving earlier member/key coverage; 41 native tests
+and 13 fixtures pass. Regenerated corpus diagnostics are unchanged: its shapes
+did not expose these two misses. **Exact executable Swagger equivalence remains
+partial**: emission-only names and generated/reference nodes remain outside the
+native contract. Project overlap does not establish one-to-one parity;
+excluded invalid programs and universal source/output correspondence remain
+unassessed.
 
 ## Decision and native scope
 
@@ -26,6 +26,17 @@ native targets that supply `x-ms-enum.values[*].description`. It also exempted
 all keys, including documented ordinary payload keys. The production change
 checks those targets without an emitter, OpenAPI, SDK, or ARM dependency.
 Missing documentation remains the responsibility of `documentation-required`.
+
+Cycle1 repairs two further supported native omissions confirmed during promotion
+review: inferred HTTP operation verbs and JSON encoded property names.
+`getHttpOperation` supplies effective GET/POST verbs, including operations without
+an explicit verb decorator. Compiler `resolveEncodedName` supplies ordinary JSON
+property names without inspecting emitter output. Path/query/header names still
+take precedence, status-code properties remain exempt, and a JSON-renamed property's
+source-name-only documentation no longer triggers name equality. Placeholder
+normalization, exact authored targets, and explicit HTTP verbs remain covered.
+The earlier explicit-verb-only/source-property-name-only contract was incomplete,
+not an intentional native limitation.
 
 The native guideline is documentation quality on authored semantic
 declarations, not documentation quality only on reachable emitted schemas.
@@ -39,8 +50,8 @@ The maintained ARM RPC coverage inventory does not map R3011 to an enabled
 equivalent rule or template prohibition.
 
 See [rule.md](./rule.md) for the native target/exemption contract and supported
-shape matrix. The directly related changes are the production rule, 28 native
-predicate tests, and the `member-and-key-documentation` comparison fixture.
+shape matrix. The directly related changes are the production rule, 41 native
+predicate tests, `member-and-key-documentation`, and three cycle1 fixtures.
 No validator, emitter, report generator, dataset, or normalization change is
 required or included.
 
@@ -51,7 +62,7 @@ required or included.
 - Development base: `5843b339a3f1c7580ec809277b1e2e238cc98096`,
   `feature/lintdiff-migration-new`.
 - Full run: 468 projects attempted, 462 successful, six compiler failures.
-  Final analysis generated `2026-10-10T03:56:14.972Z`, duration 1,232,739 ms.
+  Cycle1 analysis generated `2026-10-10T06:40:53.872Z`, duration 1,157,903 ms.
   The corpus command exited successfully; failed project compilations are
   retained and excluded from both sides of behavioral comparisons.
 - Retained production validator dataset generated `2026-08-06T08:03:27.940Z`;
@@ -65,6 +76,14 @@ required or included.
   `tsp-lintdiff-local-linter/all` ruleset, source compilation with `--no-emit`,
   `--warn-as-error=false`, six workers, and existing source suppressions.
   This rule has no built-in projected HTTP-reachability filter.
+- The cycle1 full run rebuilt and directly linked this worktree's changed
+  linter. Its complete local-linter input fingerprint is
+  `sha256:b7fed84319d56629ed325f355b3c37ffa05886ba0782a3a63049b70b6e665541`;
+  the repaired rule source SHA256 is
+  `d4ce56b9f9f44333f95bc83d377c6436bf117c6f70e5899d0b29a5cdb0bdc84f`.
+  The run precedes the repair commit, so its recorded Git HEAD
+  `8da6857aafe62d9c0f7d4f55ef90978b34dac97d` alone does not identify the changed
+  source. These content fingerprints bind the validation to the repaired code.
 - Additional selected-version research used the compiler's version snapshot
   mutator, following the existing projected-worker approach. It reran the
   same native predicate on the selected semantic graph, then retained only
@@ -74,6 +93,16 @@ required or included.
   and dependencies were unchanged. Shared source locations cannot distinguish
   every transformed semantic instance, so this is conservative attribution,
   not an emitter-equivalence adapter or a stronger canonical identity.
+- That selected-version investigation was performed in cycle0, not rerun in
+  cycle1. Reuse is justified by an exact comparison against the archived cycle0
+  shard: all 8,499 diagnostic records (including message, project, source file,
+  line, and column) and their multiplicities are unchanged, with zero additions
+  or removals, the identical six failed-project identities, identical specs pin,
+  and identical 38 raw native-only projects. Intersecting the freshly regenerated
+  diagnostics with the verified prior selected source identities again retains
+  7,501 findings in 142 projects. The one-sided source/emission witnesses and
+  version exclusions therefore remain applicable; this is not a new projection
+  run or proof that the old source already covered the repaired shapes.
 
 ### Report reconciliation
 
@@ -94,12 +123,12 @@ change is `bf4e84189edc4ebcfcd2fc6ef881e74e3f485ece`. Generated corpus reports
 are archived validation evidence and intentionally excluded from this PR;
 the checked-in report therefore continues to show the earlier implementation.
 
-| Report/population                                             |        Validator projects | TypeSpec projects |      Overlap |      Validator-only |       TypeSpec-only | Validator findings | TypeSpec findings |
-| ------------------------------------------------------------- | ------------------------: | ----------------: | -----------: | ------------------: | ------------------: | -----------------: | ----------------: |
-| External aggregate disposition                                | Not reported for this row |      Not reported | Not reported | Not reconstructable | Not reconstructable |       Not reported |      Not reported |
-| Earlier checked-in observed report, 462 successful projects   |                       105 |                 5 |            2 |                 103 |                   3 |             70,815 |                19 |
-| Updated full source-program run, same 462 successful projects |                       105 |               143 |          105 |                   0 |                  38 |             70,815 |             7,523 |
-| Updated selected-version semantic attribution                 |                       105 |               142 |          105 |                   0 |                  37 |             70,815 |             7,501 |
+| Report/population                                            |        Validator projects | TypeSpec projects |      Overlap |      Validator-only |       TypeSpec-only | Validator findings | TypeSpec findings |
+| ------------------------------------------------------------ | ------------------------: | ----------------: | -----------: | ------------------: | ------------------: | -----------------: | ----------------: |
+| External aggregate disposition                               | Not reported for this row |      Not reported | Not reported | Not reconstructable | Not reconstructable |       Not reported |      Not reported |
+| Earlier checked-in observed report, 462 successful projects  |                       105 |                 5 |            2 |                 103 |                   3 |             70,815 |                19 |
+| Cycle1 full source-program run, same 462 successful projects |                       105 |               143 |          105 |                   0 |                  38 |             70,815 |             7,523 |
+| Cycle1 reuse of verified selected-version attribution        |                       105 |               142 |          105 |                   0 |                  37 |             70,815 |             7,501 |
 
 The external/observed discrepancy is a different population and definition:
 mapping credit for a never-fired disposition versus successful-project
@@ -535,18 +564,75 @@ enum member `Ready` and union variant `Active`; both engines emit exactly
 three target-rule findings. The nine earlier fixture snapshots remain
 byte-identical.
 
+### Gap example: inferred HTTP verbs
+
+- **Classification/status:** supported native miss fixed in cycle1.
+- **Source:** `inferred-http-verbs/main.tsp`, `read` and `create`.
+- **Scope:** generic supported HTTP authoring; the POST fixture uses a model body
+  rather than relying on an ARM-invalid scalar payload.
+
+```typespec
+@route("/widgets")
+@doc(" GET. ")
+op read(): string;
+
+@route("/widgets")
+@doc("post")
+op create(@body body: Widget): Widget;
+```
+
+The fixture defines `Widget` with a descriptively documented string property.
+Its emitted operation descriptions are `" GET. "` on
+`paths["/widgets"].get.description` and `"post"` on
+`paths["/widgets"].post.description`. The validator snapshots report exactly
+these two target-rule findings. Native source diagnostics now report the authored
+`read` and `create` declarations using names `get` and `post`, respectively.
+Previously `getOperationVerb` returned no explicit metadata and both were missed.
+**Disposition:** resolve native effective HTTP semantics; no emitter simulation.
+
+### Gap example: JSON encoded property name
+
+- **Classification/status:** supported native miss fixed in cycle1, with compliant
+  renamed source-name-only control.
+- **Source:** `json-encoded-property/main.tsp`, `Widget.sourceName`.
+
+```typespec
+model Widget {
+  @encodedName("application/json", "wire-name")
+  @doc(" Wire-Name. ")
+  sourceName: string;
+}
+```
+
+The fixture's emitted `Widget.properties["wire-name"].description` is
+`" Wire-Name. "`. The validator reports that JSON property key, and the repaired
+native rule reports the authored `sourceName` property with resolved name
+`wire-name`. In `json-encoded-source-name-only`, identical encoding with
+`@doc("sourceName")` is compliant in both engines; the earlier source-name
+comparison would incorrectly diagnose this control.
+**Disposition:** use compiler JSON serialization metadata with source-name
+fallback; preserve HTTP parameter-name precedence and status-code exemption.
+An existing `PatchPropertiesCorrespondToPutProperties/encoded-name-mismatch`
+placeholder finding retains its count and target but now displays
+`patchDescription` instead of `description`, its correct JSON property name.
+
 ## Validation and remaining limits
 
-- Native predicate tests: 28 passed, zero failed/skipped, checked-in Vitest
+- Native predicate tests: 41 passed, zero failed/skipped, checked-in Vitest
   limits, compiler/HTTP only; exact target/count assertions included.
-- Strict comparison suite: ten cases, seven covered violating cases, three
+- Strict comparison suite: 13 cases, nine covered violating cases, four
   validator-clean controls with reviewed ambient diagnostics, zero unresolved
   fixture gaps. Snapshot update followed by strict validation passed.
+  The affected 14-case `PatchPropertiesCorrespondToPutProperties` suite also
+  passed strict validation; only the JSON-renamed placeholder's displayed name
+  changed, without target or count changes.
 - Production package build, explicit maintained-file Prettier, changed-TS
   oxlint, and diff hygiene passed. Generated snapshots are not formatted.
 - Representative corpus `AlertProcessingRules`: one successful project;
   subsequent full corpus processed all 468 and preserved six exclusions.
-- Selected-version extraction: 143 successful projects. Initial Windows
+- Cycle0 selected-version extraction: 143 successful projects, reused in cycle1
+  only after the complete current-versus-archived diagnostic comparison above.
+  Initial Windows
   loader-path and oversized metadata-argument failures were preserved; two
   separately coordinator-authorized invocation-only corrections completed the
   original scope. The latter ran only 29 unspawned projects and retained the

@@ -41,6 +41,19 @@ describe("description-must-not-be-node-name", () => {
     ['model Widget { @doc("sku") sku: string; }', "sku", "sku"],
     ['@doc("description.") model Widget {}', "Widget", "description."],
     ['@get @doc("get.") op read(): string;', "get", "get."],
+    ['@route("/widgets") @doc(" GET. ") op read(): string;', "get", " GET. "],
+    ['@route("/widgets") @doc("post") op create(@body body: string): string;', "post", "post"],
+    [
+      'model Widget { @encodedName("application/json", "wire-name") @doc(" Wire-Name. ") sourceName: string; }',
+      "wire-name",
+      " Wire-Name. ",
+    ],
+    [
+      'model Widget { @encodedName("application/json", "wire-name") @doc("description.") sourceName: string; }',
+      "wire-name",
+      "description.",
+    ],
+    ['@route("/widgets") @doc("description.") op read(): string;', "get", "description."],
   ])("reports uninformative documentation: %s", async (code, name, doc) => {
     await tester.expect(code).toEmitDiagnostics([diagnostic(name, doc)]);
   });
@@ -54,6 +67,16 @@ describe("description-must-not-be-node-name", () => {
       .toEmitDiagnostics([diagnostic("wireName", "wireName.")]);
     await tester
       .expect(`${route} @get op read(@${kind}("wireName") @doc("source") source: string): string;`)
+      .toBeValid();
+    await tester
+      .expect(
+        `${route} @get op read(@${kind}("wireName") @encodedName("application/json", "jsonName") @doc("wireName.") source: string): string;`,
+      )
+      .toEmitDiagnostics([diagnostic("wireName", "wireName.")]);
+    await tester
+      .expect(
+        `${route} @get op read(@${kind}("wireName") @encodedName("application/json", "jsonName") @doc("jsonName") source: string): string;`,
+      )
       .toBeValid();
   });
 
@@ -69,6 +92,13 @@ describe("description-must-not-be-node-name", () => {
     'union State { Ready: "ready", string }',
     'model Response { @statusCode @doc("status") status: 200; }',
     '@get @doc("read") op read(): string;',
+    '@route("/widgets") @doc("read") op read(): string;',
+    '@route("/widgets") @doc("create") op create(@body body: string): string;',
+    '@route("/widgets") @get @doc("post") op read(): string;',
+    '@route("/widgets") @post @doc("get") op create(): string;',
+    'model Widget { @encodedName("application/json", "wire-name") @doc("sourceName") sourceName: string; }',
+    'model Widget { @encodedName("application/xml", "wire-name") @doc("wire-name") sourceName: string; }',
+    'model Response { @statusCode @encodedName("application/json", "wire-status") @doc("wire-status") status: 200; }',
   ])("accepts compliant or excluded documentation: %s", async (code) => {
     await tester.expect(code).toBeValid();
   });
@@ -85,6 +115,36 @@ describe("description-must-not-be-node-name", () => {
         [
           [id, "id"],
           [ready, "Ready"],
+        ].map(([target, name]) => {
+          const location = getSourceLocation(target as Parameters<typeof getSourceLocation>[0]);
+          return {
+            ...diagnostic(name as string, name as string),
+            file: location.file.path,
+            pos: location.pos,
+            end: location.end,
+          };
+        }),
+      );
+  });
+
+  it("targets inferred operations and JSON-renamed properties", async () => {
+    await tester
+      .expect(
+        `
+        @route("/widgets") @doc("get") op /*read*/read(): string;
+        @route("/widgets") @doc("post") op /*create*/create(@body body: string): string;
+        model Widget {
+          @encodedName("application/json", "wire-name")
+          @doc("wire-name")
+          /*source*/sourceName: string;
+        }
+      `,
+      )
+      .toEmitDiagnostics(({ read, create, source }) =>
+        [
+          [source, "wire-name"],
+          [read, "get"],
+          [create, "post"],
         ].map(([target, name]) => {
           const location = getSourceLocation(target as Parameters<typeof getSourceLocation>[0]);
           return {

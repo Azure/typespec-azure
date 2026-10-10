@@ -1,7 +1,9 @@
 import {
   createRule,
   getDoc,
+  ignoreDiagnostics,
   paramMessage,
+  resolveEncodedName,
   type Enum,
   type EnumMember,
   type Model,
@@ -13,7 +15,7 @@ import {
 } from "@typespec/compiler";
 import {
   getHeaderFieldName,
-  getOperationVerb,
+  getHttpOperation,
   getPathParamName,
   getQueryParamName,
   isStatusCode,
@@ -87,7 +89,9 @@ export const descriptionMustNotBeNodeNameRule = createRule({
         );
       },
       operation: (target: Operation) => {
-        checkTarget(target, getOperationVerb(context.program, target));
+        // HTTP validation owns resolution diagnostics; this rule only checks documentation.
+        const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
+        checkTarget(target, httpOperation.verb);
       },
       modelProperty: (target: ModelProperty) => {
         if (isStatusCode(context.program, target)) {
@@ -104,7 +108,7 @@ export const descriptionMustNotBeNodeNameRule = createRule({
           return;
         }
 
-        checkTarget(target, target.name);
+        checkTarget(target, resolveEncodedName(context.program, target, "application/json"));
       },
     };
   },
