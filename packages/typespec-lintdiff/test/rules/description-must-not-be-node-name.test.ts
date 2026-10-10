@@ -35,7 +35,7 @@ describe("description-must-not-be-node-name", () => {
     ['@doc("State") enum State { Ready }', "State", "State"],
     ['@doc("State") union State { Ready: "ready", string }', "State", "State"],
     ['enum State { @doc("Ready.") Ready: "ready" }', "Ready", "Ready."],
-    ['union State { @doc("Ready.") Ready: "ready", string }', "Ready", "Ready."],
+    ['union State { @doc("Ready.") Ready: "available", string }', "Ready", "Ready."],
     ['union State { @doc("ready") "ready", string }', "ready", "ready"],
     ['model Widget { @key @doc("id") id: string; }', "id", "id"],
     ['model Widget { @doc("sku") sku: string; }', "sku", "sku"],
