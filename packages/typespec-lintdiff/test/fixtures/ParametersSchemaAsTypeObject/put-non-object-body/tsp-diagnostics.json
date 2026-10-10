@@ -5,6 +5,11 @@
     "message": "Use the latest ARM common-types version 'v6' instead of 'v3'."
   },
   {
+    "code": "tsp-lintdiff-local-linter/put-in-operation-name",
+    "severity": "warning",
+    "message": "'PUT' operation 'setWidgetConfig' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
+  },
+  {
     "code": "tsp-lintdiff-local-linter/even-segmented-path-for-put-operation",
     "severity": "warning",
     "message": "ARM PUT path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TestService/widgets/{widgetName}/config' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace."
@@ -18,11 +23,6 @@
     "code": "tsp-lintdiff-local-linter/parameters-schema-as-type-object",
     "severity": "warning",
     "message": "Request bodies must resolve to object schemas. Replace this non-object body type with a model."
-  },
-  {
-    "code": "tsp-lintdiff-local-linter/put-in-operation-name",
-    "severity": "warning",
-    "message": "'PUT' operation 'setWidgetConfig' should use method name 'create'. Note: If you have already shipped an SDK on top of this spec, fixing this warning may introduce a breaking change."
   },
   {
     "code": "tsp-lintdiff-local-linter/put-request-response-scheme-arm",

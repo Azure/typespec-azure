@@ -9,10 +9,10 @@ validator projects overlapping. Verified selected-version attribution retains
 The 37 TypeSpec-only projects involve unused/shared or client-only types,
 unemitted version members, qualified schema names, template-renamed keys, or
 constant parameters erased during emission. Swagger repeats documentation across
-referenced files and inline schemas. Cycle1 fixes inferred HTTP verbs and JSON
-encoded property names, preserving earlier member/key coverage; 41 native tests
-and 13 fixtures pass. Regenerated corpus diagnostics are unchanged: its shapes
-did not expose these two misses. **Exact executable Swagger equivalence remains
+referenced files and inline schemas. Cycle2 adds native multipart part-name
+resolution, preserving cycle1 inferred-verb/JSON-name and earlier member/key
+fixes; 47 native tests and 15 fixtures pass. Regenerated corpus diagnostics are
+unchanged: its shapes did not expose these misses. **Exact executable Swagger equivalence remains
 partial**: emission-only names and generated/reference nodes remain outside the
 native contract. Project overlap does not establish one-to-one parity;
 excluded invalid programs and universal source/output correspondence remain
@@ -38,6 +38,17 @@ normalization, exact authored targets, and explicit HTTP verbs remain covered.
 The earlier explicit-verb-only/source-property-name-only contract was incomplete,
 not an intentional native limitation.
 
+Cycle2 repairs authored multipart part names confirmed during promotion review.
+HTTP `getHttpPart(program, type)?.options.name` supplies a renamed part's native
+name before the ordinary JSON name fallback. Repeated parts use compiler
+`isArrayModelType` to read the element's HTTP part metadata. Direct strings,
+custom scalar payloads, array-valued payloads, and repeated parts have native
+violation, source-name-only compliance, meaningful-documentation, and placeholder
+controls. Default part names still fall back to the property name. Explicit
+path/query/header metadata retains precedence, and no emitter is loaded by the
+production check. This was a supported native miss, not an intentional
+Swagger-only naming difference.
+
 The native guideline is documentation quality on authored semantic
 declarations, not documentation quality only on reachable emitted schemas.
 Unused project types and client compatibility declarations are consequently
@@ -50,8 +61,9 @@ The maintained ARM RPC coverage inventory does not map R3011 to an enabled
 equivalent rule or template prohibition.
 
 See [rule.md](./rule.md) for the native target/exemption contract and supported
-shape matrix. The directly related changes are the production rule, 41 native
-predicate tests, `member-and-key-documentation`, and three cycle1 fixtures.
+shape matrix. The directly related changes are the production rule, 47 native
+predicate tests, `member-and-key-documentation`, three cycle1 fixtures, and two
+cycle2 multipart fixtures.
 No validator, emitter, report generator, dataset, or normalization change is
 required or included.
 
@@ -61,8 +73,14 @@ required or included.
   `f6b53f105b95da05276530a0754a1c71b4f16397`](https://github.com/Azure/azure-rest-api-specs/tree/f6b53f105b95da05276530a0754a1c71b4f16397).
 - Development base: `5843b339a3f1c7580ec809277b1e2e238cc98096`,
   `feature/lintdiff-migration-new`.
+- Fresh fetched target: `888ccb9ce7e9f49320d47af514611006610aba6c`.
+  The two later target commits modify another naming rule and promotion/review
+  instructions; they are not integrated into this update-existing repair.
+  Fetching is not merging, and the unchanged pinned local contracts remain the
+  worker authority. Independent review compares against that fresh remote
+  target while distinguishing its unrelated target-only changes.
 - Full run: 468 projects attempted, 462 successful, six compiler failures.
-  Cycle1 analysis generated `2026-10-10T06:40:53.872Z`, duration 1,157,903 ms.
+  Cycle2 analysis generated `2026-10-10T10:03:03.852Z`, duration 1,196,671 ms.
   The corpus command exited successfully; failed project compilations are
   retained and excluded from both sides of behavioral comparisons.
 - Retained production validator dataset generated `2026-08-06T08:03:27.940Z`;
@@ -76,13 +94,13 @@ required or included.
   `tsp-lintdiff-local-linter/all` ruleset, source compilation with `--no-emit`,
   `--warn-as-error=false`, six workers, and existing source suppressions.
   This rule has no built-in projected HTTP-reachability filter.
-- The cycle1 full run rebuilt and directly linked this worktree's changed
+- The cycle2 full run rebuilt and directly linked this worktree's changed
   linter. Its complete local-linter input fingerprint is
-  `sha256:b7fed84319d56629ed325f355b3c37ffa05886ba0782a3a63049b70b6e665541`;
+  `sha256:da0fcf6c00f1227d0f68deb3eb027e0e9f82299286fd93d2f2d39cf82b98a7c5`;
   the repaired rule source SHA256 is
-  `d4ce56b9f9f44333f95bc83d377c6436bf117c6f70e5899d0b29a5cdb0bdc84f`.
+  `86a56678d0abeb74f70785dcc974c268a4131046125d625bdee930fceabbc441`.
   The run precedes the repair commit, so its recorded Git HEAD
-  `8da6857aafe62d9c0f7d4f55ef90978b34dac97d` alone does not identify the changed
+  `b55c6c13bfc4f88a3a7a2e78faf49ca4f58e0dc4` alone does not identify the changed
   source. These content fingerprints bind the validation to the repaired code.
 - Additional selected-version research used the compiler's version snapshot
   mutator, following the existing projected-worker approach. It reran the
@@ -94,7 +112,7 @@ required or included.
   every transformed semantic instance, so this is conservative attribution,
   not an emitter-equivalence adapter or a stronger canonical identity.
 - That selected-version investigation was performed in cycle0, not rerun in
-  cycle1. Reuse is justified by an exact comparison against the archived cycle0
+  cycle2. Reuse is justified by an exact comparison against the archived cycle0
   shard: all 8,499 diagnostic records (including message, project, source file,
   line, and column) and their multiplicities are unchanged, with zero additions
   or removals, the identical six failed-project identities, identical specs pin,
@@ -127,8 +145,8 @@ the checked-in report therefore continues to show the earlier implementation.
 | ------------------------------------------------------------ | ------------------------: | ----------------: | -----------: | ------------------: | ------------------: | -----------------: | ----------------: |
 | External aggregate disposition                               | Not reported for this row |      Not reported | Not reported | Not reconstructable | Not reconstructable |       Not reported |      Not reported |
 | Earlier checked-in observed report, 462 successful projects  |                       105 |                 5 |            2 |                 103 |                   3 |             70,815 |                19 |
-| Cycle1 full source-program run, same 462 successful projects |                       105 |               143 |          105 |                   0 |                  38 |             70,815 |             7,523 |
-| Cycle1 reuse of verified selected-version attribution        |                       105 |               142 |          105 |                   0 |                  37 |             70,815 |             7,501 |
+| Cycle2 full source-program run, same 462 successful projects |                       105 |               143 |          105 |                   0 |                  38 |             70,815 |             7,523 |
+| Cycle2 reuse of verified selected-version attribution        |                       105 |               142 |          105 |                   0 |                  37 |             70,815 |             7,501 |
 
 The external/observed discrepancy is a different population and definition:
 mapping credit for a never-fired disposition versus successful-project
@@ -616,21 +634,69 @@ An existing `PatchPropertiesCorrespondToPutProperties/encoded-name-mismatch`
 placeholder finding retains its count and target but now displays
 `patchDescription` instead of `description`, its correct JSON property name.
 
+### Gap example: authored multipart part name
+
+- **Classification/status:** supported native miss fixed in cycle2, with
+  source-name-only and meaningful-documentation controls.
+- **Source:** `multipart-authored-names/main.tsp`, `upload`'s multipart body.
+- **Scope:** supported HTTP multipart authoring; direct scalar, custom scalar,
+  array payload, and repeated-part forms have native predicate coverage.
+
+```typespec
+@doc(" Part_Name. ")
+propName: HttpPart<string, #{ name: "part_name" }>;
+
+@doc("defaultPart")
+defaultPart: HttpPart<string>;
+```
+
+The fixture's emitted form-data parameters have names `part_name` and
+`defaultPart`, respectively, with descriptions `" Part_Name. "` and
+`"defaultPart"`. Both engines report exactly two target-rule findings.
+The native diagnostic targets the authored `propName` property and displays
+`part_name`, not its source name or JSON fallback. In
+`multipart-source-name-only`, the renamed part's `@doc("propName")` and another
+part's meaningful description are compliant in both engines. Previously the
+native JSON fallback missed the renamed-part violation and falsely diagnosed
+the source-name-only control.
+**Disposition:** use public HTTP part metadata before compiler JSON naming;
+preserve path/query/header precedence, status-code exemption, inferred/explicit
+verbs, normalization, placeholders, and authored diagnostic targets. This is
+native metadata resolution, not emitted form-data simulation.
+
 ## Validation and remaining limits
 
-- Native predicate tests: 41 passed, zero failed/skipped, checked-in Vitest
+- Native predicate tests: 47 passed, zero failed/skipped, checked-in Vitest
   limits, compiler/HTTP only; exact target/count assertions included.
-- Strict comparison suite: 13 cases, nine covered violating cases, four
+- Strict comparison suite: 15 cases, ten covered violating cases, five
   validator-clean controls with reviewed ambient diagnostics, zero unresolved
   fixture gaps. Snapshot update followed by strict validation passed.
   The affected 14-case `PatchPropertiesCorrespondToPutProperties` suite also
   passed strict validation; only the JSON-renamed placeholder's displayed name
   changed, without target or count changes.
+- The cycle2 multipart-shaped affected groups
+  `ConsistentResponseSchemaForPut`, `GetCollectionOnlyHasValueAndNextLink`,
+  `LroErrorContent`, `ParametersSchemaAsTypeObject`, and
+  `PatchBodyParametersSchema` passed strict validation. The latter groups retain
+  their existing reviewed partial/compliance classifications; an exit-zero
+  snapshot/coverage gate does not mean every mapped rule has full equivalence.
+  The 17-case parameters suite required exactly one explained snapshot-order
+  correction: its seven warning records were identical, while the preexisting
+  PUT naming root listener runs before operation listeners. Only that warning's
+  position changed from fifth to second; messages, counts, and predicates were
+  unchanged. The original failed gate and single-case non-writing capture are
+  retained externally.
+- `Formdata` originally failed its predeclared required gate because its unchanged
+  data-plane rule is unmapped and prerequisite-blocked. The failure is retained,
+  not presented as passing. Explicit user authorization prospectively excluded
+  this unrelated unmapped group while preserving all genuinely affected groups,
+  multipart regressions, full corpus, and both independent reviews. No Formdata
+  retry, source edit, or retrospective waiver was performed.
 - Production package build, explicit maintained-file Prettier, changed-TS
   oxlint, and diff hygiene passed. Generated snapshots are not formatted.
 - Representative corpus `AlertProcessingRules`: one successful project;
   subsequent full corpus processed all 468 and preserved six exclusions.
-- Cycle0 selected-version extraction: 143 successful projects, reused in cycle1
+- Cycle0 selected-version extraction: 143 successful projects, reused in cycle2
   only after the complete current-versus-archived diagnostic comparison above.
   Initial Windows
   loader-path and oversized metadata-argument failures were preserved; two

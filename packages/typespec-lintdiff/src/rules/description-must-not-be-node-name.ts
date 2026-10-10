@@ -2,6 +2,7 @@ import {
   createRule,
   getDoc,
   ignoreDiagnostics,
+  isArrayModelType,
   paramMessage,
   resolveEncodedName,
   type Enum,
@@ -16,6 +17,7 @@ import {
 import {
   getHeaderFieldName,
   getHttpOperation,
+  getHttpPart,
   getPathParamName,
   getQueryParamName,
   isStatusCode,
@@ -108,7 +110,15 @@ export const descriptionMustNotBeNodeNameRule = createRule({
           return;
         }
 
-        checkTarget(target, resolveEncodedName(context.program, target, "application/json"));
+        const partType =
+          target.type.kind === "Model" && isArrayModelType(target.type)
+            ? target.type.indexer.value
+            : target.type;
+        checkTarget(
+          target,
+          getHttpPart(context.program, partType)?.options.name ??
+            resolveEncodedName(context.program, target, "application/json"),
+        );
       },
     };
   },

@@ -156,4 +156,66 @@ describe("description-must-not-be-node-name", () => {
         }),
       );
   });
+
+  it.each([
+    'HttpPart<string, #{name: "part_name"}>',
+    'HttpPart<UploadText, #{name: "part_name"}>',
+    'HttpPart<string[], #{name: "part_name"}>',
+    'HttpPart<string, #{name: "part_name"}>[]',
+  ])("compares authored multipart names on %s", async (partType) => {
+    const operation = (doc: string) => `
+      scalar UploadText extends string;
+      op upload(
+        @header contentType: "multipart/form-data",
+        @multipartBody body: {
+          @doc("${doc}") /*part*/propName: ${partType};
+        }
+      ): void;
+    `;
+    await tester.expect(operation(" Part_Name. ")).toEmitDiagnostics(({ part }) => {
+      const location = getSourceLocation(part);
+      return [
+        {
+          ...diagnostic("part_name", " Part_Name. "),
+          file: location.file.path,
+          pos: location.pos,
+          end: location.end,
+        },
+      ];
+    });
+    await tester.expect(operation("propName")).toBeValid();
+    await tester.expect(operation("The text submitted for processing.")).toBeValid();
+    await tester
+      .expect(operation("description."))
+      .toEmitDiagnostics([diagnostic("part_name", "description.")]);
+  });
+
+  it("uses the default multipart property name when no part name is authored", async () => {
+    await tester
+      .expect(
+        `
+        op upload(
+          @header contentType: "multipart/form-data",
+          @multipartBody body: { @doc("propName") propName: HttpPart<string>; }
+        ): void;
+      `,
+      )
+      .toEmitDiagnostics([diagnostic("propName", "propName")]);
+  });
+
+  it("preserves authored multipart names over JSON encoded names", async () => {
+    const operation = (doc: string) => `
+      op upload(
+        @header contentType: "multipart/form-data",
+        @multipartBody body: {
+          @encodedName("application/json", "jsonName")
+          @doc("${doc}") propName: HttpPart<string, #{name: "part_name"}>;
+        }
+      ): void;
+    `;
+    await tester
+      .expect(operation("part_name"))
+      .toEmitDiagnostics([diagnostic("part_name", "part_name")]);
+    await tester.expect(operation("jsonName")).toBeValid();
+  });
 });
