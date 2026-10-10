@@ -3,6 +3,7 @@ import {
   fileRef,
   getDoc,
   ignoreDiagnostics,
+  isArrayModelType,
   paramMessage,
   resolveEncodedName,
   type Enum,
@@ -17,6 +18,7 @@ import {
 import {
   getHeaderFieldName,
   getHttpOperation,
+  getHttpPart,
   getPathParamName,
   getQueryParamName,
   isStatusCode,
@@ -111,7 +113,17 @@ export const noUninformativeDocRule = createRule({
           return;
         }
 
-        checkTarget(target, resolveEncodedName(context.program, target, "application/json"));
+        const partType =
+          target.type.kind === "Model" && isArrayModelType(target.type)
+            ? target.type.indexer.value
+            : target.type;
+        const httpPart = getHttpPart(context.program, partType);
+        checkTarget(
+          target,
+          httpPart
+            ? (httpPart.options.name ?? target.name)
+            : resolveEncodedName(context.program, target, "application/json"),
+        );
       },
     };
   },

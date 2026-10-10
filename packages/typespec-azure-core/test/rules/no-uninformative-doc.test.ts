@@ -23,6 +23,71 @@ function diagnostic(name: string, description: string) {
 }
 
 describe("no-uninformative-doc", () => {
+  for (const partType of [
+    'HttpPart<string, #{name: "part_name"}>',
+    'HttpPart<UploadText, #{name: "part_name"}>',
+    'HttpPart<string[], #{name: "part_name"}>',
+    'HttpPart<string, #{name: "part_name"}>[]',
+  ]) {
+    it(`compares multipart documentation with its authored name for ${partType}`, async () => {
+      const operation = (doc: string) => `
+        scalar UploadText extends string;
+        op upload(
+          @header contentType: "multipart/form-data",
+          @multipartBody body: { @doc("${doc}") /*part*/propName: ${partType}; }
+        ): void;
+      `;
+      await tester.expect(operation(" Part_Name. ")).toEmitDiagnostics(({ part }) => {
+        const location = getSourceLocation(part);
+        return [
+          {
+            ...diagnostic("part_name", " Part_Name. "),
+            file: location.file.path,
+            pos: location.pos,
+            end: location.end,
+          },
+        ];
+      });
+      await tester.expect(operation("propName")).toBeValid();
+      await tester.expect(operation("The text submitted for processing.")).toBeValid();
+      await tester
+        .expect(operation("description."))
+        .toEmitDiagnostics([diagnostic("part_name", "description.")]);
+    });
+  }
+
+  it("uses the source property name for an unnamed multipart part", async () => {
+    const operation = (doc: string) => `
+      op upload(
+        @header contentType: "multipart/form-data",
+        @multipartBody body: {
+          @encodedName("application/json", "jsonName")
+          @doc("${doc}") propName: HttpPart<string>;
+        }
+      ): void;
+    `;
+    await tester
+      .expect(operation("propName"))
+      .toEmitDiagnostics([diagnostic("propName", "propName")]);
+    await tester.expect(operation("jsonName")).toBeValid();
+  });
+
+  it("preserves authored multipart names over JSON encoded names", async () => {
+    const operation = (doc: string) => `
+      op upload(
+        @header contentType: "multipart/form-data",
+        @multipartBody body: {
+          @encodedName("application/json", "jsonName")
+          @doc("${doc}") propName: HttpPart<string, #{name: "part_name"}>;
+        }
+      ): void;
+    `;
+    await tester
+      .expect(operation("part_name"))
+      .toEmitDiagnostics([diagnostic("part_name", "part_name")]);
+    await tester.expect(operation("jsonName")).toBeValid();
+  });
+
   it("reports model documentation matching its name", async () => {
     await tester
       .expect('@doc("Widget") model Widget {}')

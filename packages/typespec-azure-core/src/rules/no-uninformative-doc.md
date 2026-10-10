@@ -9,6 +9,9 @@ periods, and case when comparing text. The placeholder `description` also produc
 HTTP path, query, and header parameters are compared with their configured wire names.
 Ordinary properties are compared with their JSON encoded name, falling back to their source
 name when no JSON override exists. Parameter wire names take precedence over JSON encoded names.
+Multipart properties use their authored `HttpPart` name, or their source property name when
+the part has no explicit name. JSON encoded names do not rename multipart parts. This includes
+scalar payloads, array payloads, and repeated parts; HTTP parameter names still take precedence.
 Operations are compared with their effective HTTP verb, not their operation name, including
 inferred GET for operations without a body and POST for operations with a body.
 Named union variants are compared with their variant name; unnamed string variants are compared
