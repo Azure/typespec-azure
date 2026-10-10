@@ -531,6 +531,14 @@ deterministic draft/command failure with a finite additional correction allowanc
 A generic queue invocation, "continue", or pasted failure history is not such
 authorization. This is not an automatic retry or a new source-repair cycle.
 
+Before requesting this authorization, complete the shared
+[read-only blocker reconciliation](../shared/recovery-context.md#read-only-blocker-reconciliation).
+Ask once for the named correction and finite allowance in plain language.
+An unambiguous acceptance of that specific request is sufficient; preserve both
+messages rather than requiring a verbatim sentence. Access approval alone,
+ambiguous assent, or a generic continuation without the named bounded request
+does not grant additional attempts.
+
 1. Record the authorization text, failed command/evidence, task/cycle/phase,
    preserved state manifest, and exact additional allowance before doing work.
    Keep the original exhausted counter unchanged; track supplemental attempts

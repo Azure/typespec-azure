@@ -588,6 +588,8 @@ Before execution, record each planned command's working directory, exact
 command, covered files/behavior, and whether it is required or supplemental,
 with the instruction that determines its scope. Record every executed command's
 exit code, outcome, and output or durable log path, including failed attempts.
+Apply the shared [validation receipt parsing](../shared/recovery-context.md#validation-receipt-parsing)
+procedure instead of assuming uncolored summaries or LF-only decoded PR bodies.
 Also record whether corpus validation is required, why, and its results when
 applicable.
 
@@ -759,6 +761,11 @@ After all required validation succeeds, return `ready-for-publication` with:
   files, plus a digest or equivalent content identity for the proposed changes
 - the validation scope and complete command/corpus evidence described above
 
+For refreshed diagnostic snapshots, inspect the complete actual changed set
+against the harness results and accepted source change. Do not substitute a
+guessed snapshot-file count for that inspection. Keep the required test
+population and assertions unchanged.
+
 The parent independently inspects the proposed diff and evidence, confirms that
 the required scope is satisfied, every earlier required failure has verified
 corrective evidence, and no unresolved required check or task defect remains.
@@ -771,6 +778,10 @@ not an additional user approval prompt. It applies to backlog fixes and every
 counted round, including round five.
 
 ### Commit and push
+
+Follow the shared
+[publication command safety](../do-linter-development-task-one-by-one/app-session-execution.md#publication-command-safety)
+guidance when issuing rooted mutation commands; it grants no additional retries.
 
 Only after receiving the parent's explicit publication approval:
 

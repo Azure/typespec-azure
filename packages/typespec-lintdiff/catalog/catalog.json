@@ -1407,8 +1407,8 @@
     "sources": [
       "arm"
     ],
-    "tier": "Template-enforced",
-    "tierRationale": "ARM templates enforce specific POST response codes; custom operations can override."
+    "tier": "Unconstrained",
+    "tierRationale": "Partial native coverage: official rules check status sets and async/202/204 bodies, but synchronous resource POST 200 without a body is authorable through ArmResourceActionSync Response customization. The opt-in local no-empty-post-response rule covers only that gap."
   },
   {
     "id": "PreviewVersionOverOneYear",

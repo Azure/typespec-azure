@@ -143,10 +143,51 @@ green, increase timeouts, skip tests, or fix unrelated code. A failed required
 check cannot be demoted after the fact, and missing prior classification must
 not be filled in opportunistically.
 
+## Validation receipt parsing
+
+Use these rules for development, promotion and review handoffs; do not build a
+new success/failure detector around an assumed human-readable output layout:
+
+- Capture command, working directory, input identity, exit status and raw
+  stdout/stderr independently of receipt parsing. Prefer the installed runner's
+  documented structured report when it includes the required counts and outcomes;
+  preserve raw output as well. Do not invent flags or change the selected tests.
+- When a structured report is unavailable, normalize CRLF to LF and remove ANSI
+  presentation escapes only in a derived parsing copy. Never overwrite raw
+  receipts, globally strip content, or convert GitHub's raw UTC timestamps.
+  Verify counts, failures/skips and nonempty selection; an exit code alone does
+  not prove the intended test population ran.
+- Before relying on a new parser, exercise it offline against representative
+  plain and ANSI-colored summaries, CRLF/LF text, a failure, and a missing or
+  malformed summary. Missing evidence must fail explicitly, not default to zero
+  failures or a passing count. Prefer an existing tested parser over inline code.
+- For PR-body drafting from API JSON, normalize decoded body line endings before
+  matching headings, verify each required section exists, and preserve the
+  original body. A failed heading match must not publish a truncated replacement.
+- Distinguish a command failure from an artifact-parser failure. Preserve both
+  statuses, establish side effects and identity, and apply the existing bounded
+  correction policy. An understood parser correction may reuse unchanged passing
+  command receipts; it must rerun the failed evidence-processing scope. It grants
+  no new allowance, blind rerun, gate waiver, or publication approval.
+
+This guidance does not replace the bundled review collector or its stricter
+raw-UTC, complete-pagination and parent-authorized recovery contract.
+
 ## Read-only blocker reconciliation
 
 Before declaring a terminal stop or requesting renewed permission, the
 coordinator checks the original operation, evidence and applicable contract.
+This checkpoint is mandatory, including when a worker reports exhausted
+correction allowances. Record the following before escalating:
+
+1. The exact failed component, command/exit, affected paths, and original gate
+   authority; separate components of combined commands without erasing their exit.
+2. Current content identity and side effects, including whether commands and
+   agents have stopped and earlier passing evidence still matches the draft.
+3. Remaining ordinary/shared/explicit allowances, retaining every failed attempt.
+4. Whether the next unfinished action is already permitted, needs a bounded
+   correction, or genuinely requires new permission/capability.
+
 Do not require the user to debug policy selection. Separate these cases:
 
 - **Actual permission/capability missing:** name the repository, operation and
@@ -169,6 +210,12 @@ the same idle phase owner only if the next action was already authorized and
 no failed required gate, task defect or side-effect uncertainty remains. This
 does not launch a fresh worker, reset counters, renew deadlines or retry an
 external operation. Otherwise retain the normal stop and recovery policy.
+
+If new permission is genuinely needed, explain the named failure and exact finite
+action in plain language. Accept an unambiguous affirmative response to that
+specific request; do not require the user to repeat a prescribed authorization
+sentence. Record the request and response together. Generic access approval or
+"continue" outside that specific bounded request still does not renew a budget.
 
 Use these decision cases when reviewing changes to the contracts:
 

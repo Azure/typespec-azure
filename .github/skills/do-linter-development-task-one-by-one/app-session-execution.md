@@ -585,6 +585,29 @@ review owners after a failure or reuse a review pair/budget across invocations.
 Keep no-skill-edits/no-skill-update-PR constraints in both prompts and all
 subagent handoffs. Each review loop may use its two required nested agents.
 
+## Publication command safety
+
+Apply this guidance to both execution backends and to creation and existing-PR
+updates. Keep read-only identity verification separate from short staging,
+commit, push and publication steps. Every shell call still selects and verifies
+its recorded root; splitting commands does not waive any ownership, approved
+content, staged-blob or destination check.
+
+On Windows, prefer short rooted PowerShell calls over one large mutation
+wrapper. Before executing a multi-line publication script, validate its syntax
+read-only with the installed PowerShell parser. Syntax validation must not
+execute the script or change its approved inputs. Reuse the verified content
+manifest, then verify staged paths and blobs before committing.
+
+Check a native Git command's `$LASTEXITCODE` immediately, rather than treating
+its output as a Boolean result. Commands such as `git diff --quiet` can succeed
+without output; do not call string methods on an assumed non-null response.
+
+A parser-rejected script has zero native staging, commit or push attempts, but
+remains a command failure governed by the existing finite correction policy.
+Publication approval does not renew that allowance. Do not split or replace a
+failed wrapper to bypass an exhausted budget or retry an external operation.
+
 ## Publication checks
 
 First reverify the selected worktree's physical containment under the inherited

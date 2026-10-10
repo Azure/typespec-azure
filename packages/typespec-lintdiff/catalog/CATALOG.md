@@ -11,9 +11,9 @@ Total rules: 209
 | Both (common) | 41 |
 | Known TSP equivalent | 16 |
 | **Infallible** (no action needed) | 29 |
-| **Template-enforced** (low priority) | 46 |
+| **Template-enforced** (low priority) | 45 |
 | **Prerequisite-blocked** (investigate existing TypeSpec diagnostics first) | 3 |
-| **Unconstrained** (high priority) | 131 |
+| **Unconstrained** (high priority) | 132 |
 
 ## Classification Key
 
@@ -110,7 +110,7 @@ Total rules: 209
 | PathResourceProviderNamePascalCase | error | — | — | Template-enforced | ✓ |
 | PathResourceTypeNameCamelCase | error | — | — | Unconstrained | ✓ |
 | PostOperationIdContainsUrlVerb | warning | — | — | Unconstrained | ✓ |
-| PostResponseCodes | error | RPC-Async-V1-11, RPC-Async-V1-14, RPC-POST-V1-02, RPC-POST-V1-03 | `@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes` | Template-enforced | ✓ |
+| PostResponseCodes | error | RPC-Async-V1-11, RPC-Async-V1-14, RPC-POST-V1-02, RPC-POST-V1-03 | `@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes` | Unconstrained | ✓ |
 | PreviewVersionOverOneYear | warning | — | — | Unconstrained | ✓ |
 | PrivateEndpointResourceSchemaValidation | error | — | — | Unconstrained | ✓ |
 | PropertiesTypeObjectNoDefinition | error | RPC-Policy-V1-03 | — | Unconstrained | ✓ |
