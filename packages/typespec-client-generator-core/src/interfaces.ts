@@ -1181,7 +1181,7 @@ interface SdkLroServiceMethodOptions {
  * Long running operation metadata.
  */
 export interface SdkLroServiceMetadata {
-  /** LRO metadata from TypeSpec core library */
+  /** Core-compatible raw metadata with TCGC-selected client result fields. */
   __raw: LroMetadata;
   /** Legacy `finalStateVia` value */
   finalStateVia: FinalStateValue;
