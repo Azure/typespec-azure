@@ -616,20 +616,20 @@ const armResourceVersionSnapshots = new WeakMap<
   Program,
   Map<Namespace, Map<string, ArmResourceVersionSnapshot>>
 >();
-interface UnfinalizedResolvedResource extends ResolvedResource {
+interface StructuralResolvedResource extends ResolvedResource {
   resourceNameExpression: ResourceNameExpression;
   resourceNameIsExplicit: boolean;
-  parent?: UnfinalizedResolvedResource;
-  scope?: ArmResourceScope | UnfinalizedResolvedResource;
+  parent?: StructuralResolvedResource;
+  scope?: ArmResourceScope | StructuralResolvedResource;
 }
 
-interface UnfinalizedProvider {
-  resources: UnfinalizedResolvedResource[];
+interface StructuralProvider {
+  resources: StructuralResolvedResource[];
   providerOperations: ArmResourceOperation[];
 }
 
-const unfinalizedProviders = new WeakMap<Program, Map<Namespace, UnfinalizedProvider>>();
-const syntheticResources = new WeakSet<UnfinalizedResolvedResource>();
+const structuralProviders = new WeakMap<Program, Map<Namespace, StructuralProvider>>();
+const syntheticResources = new WeakSet<StructuralResolvedResource>();
 
 /**
  * Resolves ARM resources and operations.
@@ -734,23 +734,23 @@ function resolveArmResourceVersionContext(
   return { program, ...resolvedSnapshot };
 }
 
-function resolveArmResourcesForContext(context: ArmResourceResolutionContext): UnfinalizedProvider {
+function resolveArmResourcesForContext(context: ArmResourceResolutionContext): StructuralProvider {
   const { program, providerNamespace, realm } = context;
-  let programProviders = unfinalizedProviders.get(program);
+  let programProviders = structuralProviders.get(program);
   if (programProviders === undefined) {
     programProviders = new Map();
-    unfinalizedProviders.set(program, programProviders);
+    structuralProviders.set(program, programProviders);
   }
   const cached = programProviders.get(providerNamespace);
   if (cached !== undefined) return cached;
 
   // We haven't generated the full resource details yet
-  const resources: UnfinalizedResolvedResource[] = [];
+  const resources: StructuralResolvedResource[] = [];
   for (const resource of listArmResources(program, realm)) {
     const operations = resolveArmResourceOperations(program, resource.typespecType);
     const singletonKeyValues = getSingletonKeyValues(program, resource.typespecType);
     for (const op of operations) {
-      const fullResource: UnfinalizedResolvedResource = {
+      const fullResource: StructuralResolvedResource = {
         ...op,
         parent: undefined,
         scope: undefined,
@@ -774,7 +774,7 @@ function resolveArmResourcesForContext(context: ArmResourceResolutionContext): U
   }
 
   // Add the unmarked operations
-  const resolved: UnfinalizedProvider = {
+  const resolved: StructuralProvider = {
     resources: resources,
     providerOperations: getUnassociatedOperationsForContainer(program, providerNamespace).filter(
       (op) => !isArmResourceOperation(program, op.operation),
@@ -787,7 +787,7 @@ function resolveArmResourcesForContext(context: ArmResourceResolutionContext): U
 
 function finalizeArmProvider(
   program: Program,
-  provider: UnfinalizedProvider,
+  provider: StructuralProvider,
   options: ResolveArmResourcesOptions,
 ): Provider {
   const nameResolver = options.nameResolver;
@@ -976,10 +976,10 @@ function formatResourceType(resourceType: ResourceType): string {
 }
 
 function getResourceParent(
-  knownResources: UnfinalizedResolvedResource[],
-  child: UnfinalizedResolvedResource,
-  resourcesToProcess: UnfinalizedResolvedResource[],
-): UnfinalizedResolvedResource | undefined {
+  knownResources: StructuralResolvedResource[],
+  child: StructuralResolvedResource,
+  resourcesToProcess: StructuralResolvedResource[],
+): StructuralResolvedResource | undefined {
   if (child.resourceType.types.length < 2) return undefined;
   for (const resource of knownResources) {
     if (
@@ -991,7 +991,7 @@ function getResourceParent(
     }
   }
   const resourceName = getParentName(child.resourceType.types[child.resourceType.types.length - 2]);
-  const parent: UnfinalizedResolvedResource = {
+  const parent: StructuralResolvedResource = {
     type: child.type,
     kind: "Other",
     providerNamespace: child.providerNamespace,
@@ -1023,10 +1023,10 @@ function getParentName(typeName: string): string {
 }
 
 function getResourceScope(
-  knownResources: UnfinalizedResolvedResource[],
-  resource: UnfinalizedResolvedResource,
-  resourcesToProcess: UnfinalizedResolvedResource[],
-): UnfinalizedResolvedResource | ArmResourceScope | undefined {
+  knownResources: StructuralResolvedResource[],
+  resource: StructuralResolvedResource,
+  resourcesToProcess: StructuralResolvedResource[],
+): StructuralResolvedResource | ArmResourceScope | undefined {
   if (resource.scope !== undefined) return resource.scope;
   if (resource.parent !== undefined)
     return getResourceScope(knownResources, resource.parent, resourcesToProcess);
@@ -1092,7 +1092,7 @@ function getResourceScope(
       }
     }
     const resourceName = getParentName(types[types.length - 1]);
-    const parent: UnfinalizedResolvedResource = {
+    const parent: StructuralResolvedResource = {
       type: resource.type,
       kind: "Other",
       providerNamespace: provider,
