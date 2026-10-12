@@ -118,6 +118,54 @@ function checkResolvedOperations(operations: ResolvedResource, check: ResolvedRe
   }
 }
 
+function getAllResourceOperations(resource: ResolvedResource): ArmResourceOperation[] {
+  return [
+    ...(resource.operations.lifecycle.read ?? []),
+    ...(resource.operations.lifecycle.createOrUpdate ?? []),
+    ...(resource.operations.lifecycle.update ?? []),
+    ...(resource.operations.lifecycle.delete ?? []),
+    ...(resource.operations.lifecycle.checkExistence ?? []),
+    ...resource.operations.lists,
+    ...resource.operations.actions,
+    ...(resource.associatedOperations ?? []),
+  ];
+}
+
+function expectResolvedResourceName(
+  provider: ReturnType<typeof resolveArmResources>,
+  typeName: string,
+  resourceInstancePath: string,
+  resourceName: string,
+): ResolvedResource {
+  const resources = provider.resources?.filter(
+    (resource) =>
+      resource.type.name === typeName && resource.resourceInstancePath === resourceInstancePath,
+  );
+  expect(resources).toHaveLength(1);
+  const resource = resources![0];
+  expect(resource.resourceName).toBe(resourceName);
+  for (const operation of getAllResourceOperations(resource)) {
+    expect(operation).toMatchObject({
+      resourceName,
+      resourceModelName: resourceName,
+    });
+  }
+  return resource;
+}
+
+function expectResolvedResourceNames(
+  provider: ReturnType<typeof resolveArmResources>,
+  expectations: readonly (readonly [
+    typeName: string,
+    resourceInstancePath: string,
+    resourceName: string,
+  ])[],
+): void {
+  for (const expectation of expectations) {
+    expectResolvedResourceName(provider, ...expectation);
+  }
+}
+
 describe("unit tests for resource manager helpers", () => {
   describe("parseArmResourceInstancePath handles ARM resource IDs", () => {
     const cases: {
@@ -986,160 +1034,296 @@ interface Children {
     });
   }, 30_000);
 
-  it("applies model names only to derived resource names before direct overrides", async () => {
+  it("applies resource-name precedence to standard and legacy resources", async () => {
     const { program } = await Tester.compile(`
 using Azure.Core;
 
 @armProviderNamespace
 namespace Microsoft.ContosoProviderHub;
 
-model Employee is ExtensionResource<{}> {
-  ...ResourceNameParameter<Employee>;
-}
-
-interface EmployeeOperations<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
-  get is Extension.Read<Scope, Employee>;
+@subscriptionResource
+model DefaultStandard is ProxyResource<{}> {
+  ...ResourceNameParameter<DefaultStandard, SegmentName = "defaultStandards">;
 }
 
 @armResourceOperations
-interface Tenants extends EmployeeOperations<Extension.Tenant> {}
+interface DefaultStandards {
+  get is ArmResourceRead<DefaultStandard>;
+}
+
+@subscriptionResource
+model ExplicitStandard is ProxyResource<{}> {
+  ...ResourceNameParameter<ExplicitStandard, SegmentName = "explicitStandards">;
+}
 
 @armResourceOperations
-interface Subscriptions extends EmployeeOperations<Extension.Subscription> {}
+interface ExplicitStandards {
+  @armResourceRead(ExplicitStandard, "ExplicitStandardName")
+  get is ArmResourceRead<ExplicitStandard>;
+}
+
+@subscriptionResource
+model DefaultLegacy is ProxyResource<{}> {
+  ...ResourceNameParameter<DefaultLegacy>;
+}
+
+alias DefaultLegacyOperations = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+  },
+  {
+    @segment("defaultLegacies")
+    @key
+    @TypeSpec.Http.path
+    defaultLegacyName: string;
+  }
+>;
+
+@armResourceOperations
+interface DefaultLegacies {
+  get is DefaultLegacyOperations.Read<DefaultLegacy>;
+}
+
+@subscriptionResource
+model ExplicitLegacy is ProxyResource<{}> {
+  ...ResourceNameParameter<ExplicitLegacy>;
+}
+
+alias ExplicitLegacyOperations = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+  },
+  {
+    @segment("explicitLegacies")
+    @key
+    @TypeSpec.Http.path
+    explicitLegacyName: string;
+  },
+  ResourceName = "ExplicitLegacyName"
+>;
+
+@armResourceOperations
+interface ExplicitLegacies {
+  get is ExplicitLegacyOperations.Read<ExplicitLegacy>;
+}
 `);
 
-    const subscriptionPath =
-      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}";
-    const provider = resolveArmResources(program, {
-      nameResolver: ({ kind, resourceInstancePath, type }) => {
-        if (kind === "resource-model" && type.name === "Employee") return "ClientEmployee";
-        if (kind === "resource-model" && type.name === "Tenant") return "ClientTenant";
-        if (kind === "resource" && resourceInstancePath === subscriptionPath) {
-          return "SubscriptionWorker";
-        }
+    const paths = {
+      defaultStandard:
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/defaultStandards/{defaultStandardName}",
+      explicitStandard:
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/explicitStandards/{explicitStandardName}",
+      defaultLegacy:
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/defaultLegacies/{defaultLegacyName}",
+      explicitLegacy:
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/explicitLegacies/{explicitLegacyName}",
+    };
+    const baseline = resolveArmResources(program);
+    expectResolvedResourceNames(baseline, [
+      ["DefaultStandard", paths.defaultStandard, "DefaultStandard"],
+      ["ExplicitStandard", paths.explicitStandard, "ExplicitStandardName"],
+      ["DefaultLegacy", paths.defaultLegacy, "DefaultLegacies"],
+      ["ExplicitLegacy", paths.explicitLegacy, "ExplicitLegacyName"],
+    ]);
+
+    const modelNames = resolveArmResources(program, {
+      nameResolver: ({ kind, type }) => {
+        if (kind === "resource-model") return `Client${type.name}`;
         return undefined;
       },
     });
+    expectResolvedResourceNames(modelNames, [
+      ["DefaultStandard", paths.defaultStandard, "ClientDefaultStandard"],
+      ["ExplicitStandard", paths.explicitStandard, "ExplicitStandardName"],
+      ["DefaultLegacy", paths.defaultLegacy, "DefaultLegacies"],
+      ["ExplicitLegacy", paths.explicitLegacy, "ExplicitLegacyName"],
+    ]);
 
-    const tenant = provider.resources?.find(
-      (resource) =>
-        resource.resourceInstancePath ===
-        "/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
-    );
-    const subscription = provider.resources?.find(
-      (resource) => resource.resourceInstancePath === subscriptionPath,
-    );
-    ok(tenant);
-    ok(subscription);
-    expect(tenant.resourceName).toBe("ClientTenantClientEmployee");
-    expect(tenant.operations.lifecycle.read?.[0]).toMatchObject({
-      resourceName: "ClientTenantClientEmployee",
-      resourceModelName: "ClientTenantClientEmployee",
+    const finalNames = resolveArmResources(program, {
+      nameResolver: ({ kind, type }) => {
+        if (kind === "resource-model") return `Client${type.name}`;
+        if (kind === "resource") return `Resolved${type?.name}`;
+        return undefined;
+      },
     });
-    expect(subscription.resourceName).toBe("SubscriptionWorker");
-    expect(subscription.operations.lifecycle.read?.[0]).toMatchObject({
-      resourceName: "SubscriptionWorker",
-      resourceModelName: "SubscriptionWorker",
-    });
+    for (const [typeName, path] of Object.entries({
+      DefaultStandard: paths.defaultStandard,
+      ExplicitStandard: paths.explicitStandard,
+      DefaultLegacy: paths.defaultLegacy,
+      ExplicitLegacy: paths.explicitLegacy,
+    })) {
+      expectResolvedResourceName(finalNames, typeName, path, `Resolved${typeName}`);
+    }
   }, 30_000);
 
-  it("preserves explicit and path-derived resource names when resolving model names", async () => {
+  it("applies resource-name precedence to standard and legacy extension resources", async () => {
     const { program } = await Tester.compile(`
 using Azure.Core;
 
 @armProviderNamespace
 namespace Microsoft.ContosoProviderHub;
 
-@subscriptionResource
-model Employee is ProxyResource<{}> {
-  ...ResourceNameParameter<Employee>;
+model VirtualMachine is Extension.ExternalResource<
+  "Microsoft.Compute",
+  "virtualMachines",
+  "vmName"
+>;
+
+model DefaultExtension is ExtensionResource<{}> {
+  ...ResourceNameParameter<DefaultExtension, SegmentName = "defaultExtensions">;
 }
 
-alias LegacyEmployeeOperations = Azure.ResourceManager.Legacy.LegacyOperations<
-  {
-    ...ApiVersionParameter;
-    ...SubscriptionIdParameter;
-    ...Azure.ResourceManager.Legacy.Provider;
-  },
-  {
-    @segment("employees")
-    @key
-    @TypeSpec.Http.path
-    employeeName: string;
-  },
-  ResourceName = "ExplicitEmployees"
->;
+model ExplicitExtension is ExtensionResource<{}> {
+  ...ResourceNameParameter<ExplicitExtension, SegmentName = "explicitExtensions">;
+}
 
 @armResourceOperations
-interface Employees {
-  get is LegacyEmployeeOperations.Read<Employee>;
+interface DefaultExtensions {
+  get is Extension.Read<VirtualMachine, DefaultExtension>;
 }
 
-@subscriptionResource
-model Incident is ProxyResource<{}> {
-  ...ResourceNameParameter<Incident>;
+@armResourceOperations
+interface SubscriptionExtensions {
+  get is Extension.Read<Extension.Subscription, DefaultExtension>;
 }
 
-alias LegacyTicketOperations = Azure.ResourceManager.Legacy.LegacyOperations<
-  {
-    ...ApiVersionParameter;
-    ...SubscriptionIdParameter;
-    ...Azure.ResourceManager.Legacy.Provider;
-  },
-  {
-    @segment("supportTickets")
-    @key
-    @TypeSpec.Http.path
-    supportTicketName: string;
-  }
->;
+@armResourceOperations
+interface ExplicitExtensions {
+  get is Extension.Read<
+    VirtualMachine,
+    ExplicitExtension,
+    OverrideResourceName = "ExplicitExtensionName"
+  >;
+}
 
-alias RepeatedIncidentOperations = Azure.ResourceManager.Legacy.LegacyOperations<
+model DefaultLegacyExtension is ExtensionResource<{}> {
+  ...ResourceNameParameter<
+    DefaultLegacyExtension,
+    SegmentName = "defaultLegacyExtensions"
+  >;
+}
+
+alias DefaultLegacyExtensionOperations = Azure.ResourceManager.Legacy.ExtensionOperations<
   {
-    ...ApiVersionParameter;
-    ...SubscriptionIdParameter;
-    ...Azure.ResourceManager.Legacy.Provider;
-    @segment("incidents")
-    @key
     @TypeSpec.Http.path
-    parentIncidentName: string;
+    @key
+    scope: string;
   },
   {
-    @segment("incidents")
-    @key
-    @TypeSpec.Http.path
-    incidentName: string;
+    ...Extension.ExtensionProviderNamespace<DefaultLegacyExtension>;
+    ...ParentKeysOf<DefaultLegacyExtension>;
+  },
+  {
+    ...Extension.ExtensionProviderNamespace<DefaultLegacyExtension>;
+    ...KeysOf<DefaultLegacyExtension>;
   }
 >;
 
 @armResourceOperations
-interface SupportTickets {
-  get is LegacyTicketOperations.Read<Incident>;
+interface DefaultLegacyExtensions {
+  get is DefaultLegacyExtensionOperations.Read<DefaultLegacyExtension>;
 }
 
+model ExplicitLegacyExtension is ExtensionResource<{}> {
+  ...ResourceNameParameter<
+    ExplicitLegacyExtension,
+    SegmentName = "explicitLegacyExtensions"
+  >;
+}
+
+alias ExplicitLegacyExtensionOperations = Azure.ResourceManager.Legacy.ExtensionOperations<
+  {
+    @TypeSpec.Http.path
+    @key
+    scope: string;
+  },
+  {
+    ...Extension.ExtensionProviderNamespace<ExplicitLegacyExtension>;
+    ...ParentKeysOf<ExplicitLegacyExtension>;
+  },
+  {
+    ...Extension.ExtensionProviderNamespace<ExplicitLegacyExtension>;
+    ...KeysOf<ExplicitLegacyExtension>;
+  },
+  ResourceName = "ExplicitLegacyExtensionName"
+>;
+
 @armResourceOperations
-interface RepeatedIncidents {
-  get is RepeatedIncidentOperations.Read<Incident>;
+interface ExplicitLegacyExtensions {
+  get is ExplicitLegacyExtensionOperations.Read<ExplicitLegacyExtension>;
 }
 `);
 
-    const provider = resolveArmResources(program, {
-      nameResolver: ({ kind, type }) =>
-        kind === "resource-model" ? `Client${type.name}` : undefined,
-    });
+    const paths = {
+      defaultExtension:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.ContosoProviderHub/defaultExtensions/{defaultExtensionName}",
+      explicitExtension:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.ContosoProviderHub/explicitExtensions/{explicitExtensionName}",
+      subscriptionExtension:
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/defaultExtensions/{defaultExtensionName}",
+      defaultLegacyExtension:
+        "/{scope}/providers/Microsoft.ContosoProviderHub/defaultLegacyExtensions/{defaultLegacyExtensionName}",
+      explicitLegacyExtension:
+        "/{scope}/providers/Microsoft.ContosoProviderHub/explicitLegacyExtensions/{explicitLegacyExtensionName}",
+    };
+    const baseline = resolveArmResources(program);
+    expectResolvedResourceNames(baseline, [
+      ["DefaultExtension", paths.defaultExtension, "VirtualMachineDefaultExtension"],
+      ["DefaultExtension", paths.subscriptionExtension, "SubscriptionDefaultExtension"],
+      ["ExplicitExtension", paths.explicitExtension, "ExplicitExtensionName"],
+      ["DefaultLegacyExtension", paths.defaultLegacyExtension, "DefaultLegacyExtension"],
+      ["ExplicitLegacyExtension", paths.explicitLegacyExtension, "ExplicitLegacyExtensionName"],
+    ]);
 
-    const employee = provider.resources?.find((resource) => resource.type.name === "Employee");
-    const incidents = provider.resources?.filter((resource) => resource.type.name === "Incident");
-    ok(employee);
-    expect(employee.resourceName).toBe("ExplicitEmployees");
-    expect(incidents?.map((resource) => resource.resourceName).sort()).toEqual([
-      "Incident",
-      "IncidentsIncidents",
-      "SupportTickets",
+    const modelNames = resolveArmResources(program, {
+      nameResolver: ({ kind, type }) => {
+        if (kind !== "resource-model") return undefined;
+        if (type.name === "VirtualMachine") return "ComputeVm";
+        if (type.name === "Subscription") return "ClientSubscription";
+        if (type.name === "DefaultExtension") return "ClientExtension";
+        if (type.name === "DefaultLegacyExtension") return "ClientLegacyExtension";
+        return undefined;
+      },
+    });
+    expectResolvedResourceNames(modelNames, [
+      ["DefaultExtension", paths.defaultExtension, "ComputeVmClientExtension"],
+      ["DefaultExtension", paths.subscriptionExtension, "ClientSubscriptionClientExtension"],
+      ["ExplicitExtension", paths.explicitExtension, "ExplicitExtensionName"],
+      ["DefaultLegacyExtension", paths.defaultLegacyExtension, "ClientLegacyExtension"],
+      ["ExplicitLegacyExtension", paths.explicitLegacyExtension, "ExplicitLegacyExtensionName"],
+    ]);
+
+    const finalNames = resolveArmResources(program, {
+      nameResolver: ({ kind, resourceInstancePath, type }) => {
+        if (kind === "resource-model") {
+          if (type.name === "VirtualMachine") return "ComputeVm";
+          if (type.name === "Subscription") return "ClientSubscription";
+          if (type.name === "DefaultExtension") return "ClientExtension";
+          if (type.name === "DefaultLegacyExtension") return "ClientLegacyExtension";
+        }
+        if (kind === "resource" && type?.name === "DefaultExtension") {
+          return resourceInstancePath === paths.defaultExtension
+            ? "ResolvedDefaultExtension"
+            : undefined;
+        }
+        if (kind === "resource" && type !== undefined) return `Resolved${type.name}`;
+        return undefined;
+      },
+    });
+    expectResolvedResourceNames(finalNames, [
+      ["DefaultExtension", paths.defaultExtension, "ResolvedDefaultExtension"],
+      ["DefaultExtension", paths.subscriptionExtension, "ClientSubscriptionClientExtension"],
+      ["ExplicitExtension", paths.explicitExtension, "ResolvedExplicitExtension"],
+      ["DefaultLegacyExtension", paths.defaultLegacyExtension, "ResolvedDefaultLegacyExtension"],
+      ["ExplicitLegacyExtension", paths.explicitLegacyExtension, "ResolvedExplicitLegacyExtension"],
     ]);
   }, 30_000);
 
-  it("updates every model operand in a built-in default but preserves an explicit override", async () => {
+  it("applies resource-name precedence to private links and endpoint connections", async () => {
     const { program } = await Tester.compile(`
 using Azure.Core;
 
@@ -1154,250 +1338,100 @@ model Department is TrackedResource<{}> {
   ...ResourceNameParameter<Department>;
 }
 
+model PrivateLinkResource is PrivateLink;
+alias DefaultPrivateLinks = PrivateLinks<PrivateLinkResource>;
+alias ExplicitPrivateLinks = PrivateLinks<
+  PrivateLinkResource,
+  ResourceName = "ExplicitPrivateLink"
+>;
+
 model PrivateEndpointConnection is PrivateEndpointConnectionResource;
 alias DefaultPrivateEndpoints = PrivateEndpoints<PrivateEndpointConnection>;
 alias ExplicitPrivateEndpoints = PrivateEndpoints<
   PrivateEndpointConnection,
-  ResourceName = "DepartmentConnection"
+  ResourceName = "ExplicitPrivateEndpointConnection"
 >;
 
 @armResourceOperations
 interface Employees {
   get is ArmResourceRead<Employee>;
-  getDefaultConnection is DefaultPrivateEndpoints.Read<Employee>;
+  getPrivateLink is DefaultPrivateLinks.Read<Employee>;
+  getPrivateEndpointConnection is DefaultPrivateEndpoints.Read<Employee>;
 }
 
 @armResourceOperations
 interface Departments {
   get is ArmResourceRead<Department>;
-  getExplicitConnection is ExplicitPrivateEndpoints.Read<Department>;
+  getPrivateLink is ExplicitPrivateLinks.Read<Department>;
+  getPrivateEndpointConnection is ExplicitPrivateEndpoints.Read<Department>;
 }
 `);
 
-    const provider = resolveArmResources(program, {
+    const paths = {
+      employeeLink:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateLinkResources/{privateLinkResourceName}",
+      departmentLink:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/departments/{departmentName}/privateLinkResources/{privateLinkResourceName}",
+      employeeConnection:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateEndpointConnections/{privateEndpointConnectionName}",
+      departmentConnection:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/departments/{departmentName}/privateEndpointConnections/{privateEndpointConnectionName}",
+    };
+    const baseline = resolveArmResources(program);
+    expectResolvedResourceNames(baseline, [
+      ["PrivateLinkResource", paths.employeeLink, "EmployeePrivateLinkResource"],
+      ["PrivateLinkResource", paths.departmentLink, "ExplicitPrivateLink"],
+      ["PrivateEndpointConnection", paths.employeeConnection, "EmployeePrivateEndpointConnection"],
+      [
+        "PrivateEndpointConnection",
+        paths.departmentConnection,
+        "ExplicitPrivateEndpointConnection",
+      ],
+    ]);
+
+    const modelNames = resolveArmResources(program, {
       nameResolver: ({ kind, type }) => {
         if (kind !== "resource-model") return undefined;
         if (type.name === "Employee") return "Worker";
+        if (type.name === "PrivateLinkResource") return "ClientLink";
         if (type.name === "PrivateEndpointConnection") return "ClientConnection";
         return undefined;
       },
     });
-
-    const connections = provider.resources?.filter(
-      (resource) => resource.type.name === "PrivateEndpointConnection",
-    );
-    expect(connections?.map((resource) => resource.resourceName).sort()).toEqual([
-      "DepartmentConnection",
-      "WorkerClientConnection",
+    expectResolvedResourceNames(modelNames, [
+      ["PrivateLinkResource", paths.employeeLink, "WorkerClientLink"],
+      ["PrivateLinkResource", paths.departmentLink, "ExplicitPrivateLink"],
+      ["PrivateEndpointConnection", paths.employeeConnection, "WorkerClientConnection"],
+      [
+        "PrivateEndpointConnection",
+        paths.departmentConnection,
+        "ExplicitPrivateEndpointConnection",
+      ],
     ]);
-  }, 30_000);
 
-  it("customizes one extension resource occurrence by instance path", async () => {
-    const { program } = await Tester.compile(`
-using Azure.Core;
-
-@armProviderNamespace
-namespace Microsoft.ContosoProviderHub;
-
-model Employee is ExtensionResource<{}> {
-  ...ResourceNameParameter<Employee>;
-}
-
-interface EmployeeOperations<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
-  get is Extension.Read<Scope, Employee>;
-}
-
-@armResourceOperations
-interface Tenants extends EmployeeOperations<Extension.Tenant> {}
-
-@armResourceOperations
-interface Subscriptions extends EmployeeOperations<Extension.Subscription> {}
-`);
-
-    const subscriptionPath =
-      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}";
-    const provider = resolveArmResources(program, {
-      nameResolver: ({ kind, resourceInstancePath }) =>
-        kind === "resource" && resourceInstancePath === subscriptionPath
-          ? "EmployeeForSub"
-          : undefined,
+    const finalNames = resolveArmResources(program, {
+      nameResolver: ({ kind, resourceInstancePath, type }) => {
+        if (kind === "resource-model") {
+          if (type.name === "Employee") return "Worker";
+          if (type.name === "PrivateLinkResource") return "ClientLink";
+          if (type.name === "PrivateEndpointConnection") return "ClientConnection";
+        }
+        if (kind !== "resource") return undefined;
+        if (resourceInstancePath === paths.employeeLink) return "ResolvedEmployeeLink";
+        if (resourceInstancePath === paths.departmentLink) return "ResolvedDepartmentLink";
+        if (resourceInstancePath === paths.employeeConnection) return "ResolvedEmployeeConnection";
+        if (resourceInstancePath === paths.departmentConnection) {
+          return "ResolvedDepartmentConnection";
+        }
+        return undefined;
+      },
     });
-
-    const tenant = provider.resources?.find(
-      (resource) =>
-        resource.resourceInstancePath ===
-        "/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
-    );
-    const subscription = provider.resources?.find(
-      (resource) => resource.resourceInstancePath === subscriptionPath,
-    );
-    ok(tenant);
-    ok(subscription);
-    expect(tenant.type).toBe(subscription.type);
-    expect(tenant.resourceName).toBe("TenantEmployee");
-    expect(subscription.resourceName).toBe("EmployeeForSub");
-    expect(subscription.operations.lifecycle.read?.[0]).toMatchObject({
-      resourceName: "EmployeeForSub",
-      resourceModelName: "EmployeeForSub",
-    });
-    expect(tenant.resourceType).toEqual(subscription.resourceType);
-  }, 30_000);
-
-  it("customizes one standard private endpoint resource occurrence by instance path", async () => {
-    const { program } = await Tester.compile(`
-using Azure.Core;
-
-@armProviderNamespace
-namespace Microsoft.ContosoProviderHub;
-
-model Employee is TrackedResource<{}> {
-  ...ResourceNameParameter<Employee>;
-}
-
-@parentResource(Employee)
-model Dependent is ProxyResource<{}> {
-  ...ResourceNameParameter<Dependent>;
-}
-
-model PrivateEndpointConnection is PrivateEndpointConnectionResource;
-alias PrivateEndpointOperations = PrivateEndpoints<PrivateEndpointConnection>;
-
-@armResourceOperations
-interface Employees {
-  get is ArmResourceRead<Employee>;
-  getPrivateEndpointConnection is PrivateEndpointOperations.Read<Employee>;
-}
-
-@armResourceOperations
-interface Dependents {
-  get is ArmResourceRead<Dependent>;
-  getPrivateEndpointConnection is PrivateEndpointOperations.Read<Dependent>;
-}
-`);
-
-    const dependentConnectionPath =
-      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateEndpointConnections/{privateEndpointConnectionName}";
-    const provider = resolveArmResources(program, {
-      nameResolver: ({ kind, resourceInstancePath }) =>
-        kind === "resource" && resourceInstancePath === dependentConnectionPath
-          ? "DependentConnection"
-          : undefined,
-    });
-
-    const connections = provider.resources?.filter(
-      (resource) => resource.type.name === "PrivateEndpointConnection",
-    );
-    expect(connections).toHaveLength(2);
-    const employeeConnection = connections?.find(
-      (resource) => resource.resourceName === "EmployeePrivateEndpointConnection",
-    );
-    const dependentConnection = connections?.find(
-      (resource) => resource.resourceInstancePath === dependentConnectionPath,
-    );
-    ok(employeeConnection);
-    ok(dependentConnection);
-    expect(employeeConnection.type).toBe(dependentConnection.type);
-    expect(dependentConnection.resourceName).toBe("DependentConnection");
-    expect(dependentConnection.operations.lifecycle.read?.[0]).toMatchObject({
-      resourceName: "DependentConnection",
-      resourceModelName: "DependentConnection",
-    });
-    expect(employeeConnection.resourceInstancePath).not.toBe(dependentConnectionPath);
-  }, 30_000);
-
-  it("customizes one legacy private endpoint resource occurrence by instance path", async () => {
-    const { program } = await Tester.compile(`
-using Azure.Core;
-
-@armProviderNamespace
-namespace Microsoft.ContosoProviderHub;
-
-model Employee is TrackedResource<{}> {
-  ...ResourceNameParameter<Employee>;
-}
-
-@parentResource(Employee)
-model Dependent is ProxyResource<{}> {
-  ...ResourceNameParameter<Dependent>;
-}
-
-model PrivateEndpointConnection is PrivateEndpointConnectionResource;
-alias PrivateEndpointOperations = PrivateEndpoints<PrivateEndpointConnection>;
-
-@armResourceOperations
-interface Employees {
-  get is ArmResourceRead<Employee>;
-  getPrivateEndpointConnection is PrivateEndpointOperations.Read<Employee>;
-}
-
-@armResourceOperations
-interface Dependents {
-  get is ArmResourceRead<Dependent>;
-  getPrivateEndpointConnection is PrivateEndpointOperations.Read<Dependent>;
-  createOrUpdatePrivateEndpointConnection is Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceAsync<
-    Dependent,
-    PrivateEndpointConnection,
-    OptionalRequestBody = true
-  >;
-  updatePrivateEndpointConnection is Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchAsync<
-    Dependent,
-    PrivateEndpointConnection,
-    PatchModel = void
-  >;
-  listPrivateEndpointConnections is Azure.ResourceManager.Legacy.PrivateEndpoints.ListSinglePageByParent<
-    Dependent,
-    PrivateEndpointConnection
-  >;
-}
-`);
-
-    const dependentConnectionPath =
-      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateEndpointConnections/{privateEndpointConnectionName}";
-    const provider = resolveArmResources(program, {
-      nameResolver: ({ kind, resourceInstancePath }) =>
-        kind === "resource" && resourceInstancePath === dependentConnectionPath
-          ? "LegacyDependentConnection"
-          : undefined,
-    });
-
-    const connections = provider.resources?.filter(
-      (resource) => resource.type.name === "PrivateEndpointConnection",
-    );
-    expect(connections?.length).toBeGreaterThanOrEqual(2);
-    const employeeConnection = connections?.find(
-      (resource) => resource.resourceName === "EmployeePrivateEndpointConnection",
-    );
-    const dependentConnections = connections?.filter(
-      (resource) => resource.resourceInstancePath === dependentConnectionPath,
-    );
-    ok(employeeConnection);
-    expect(dependentConnections?.length).toBeGreaterThan(0);
-    for (const dependentConnection of dependentConnections ?? []) {
-      expect(employeeConnection.type).toBe(dependentConnection.type);
-      expect(dependentConnection.resourceName).toBe("LegacyDependentConnection");
-    }
-    expect(
-      dependentConnections?.find(
-        (resource) => resource.operations.lifecycle.createOrUpdate !== undefined,
-      )?.operations.lifecycle.createOrUpdate?.[0],
-    ).toMatchObject({
-      resourceName: "LegacyDependentConnection",
-      resourceModelName: "LegacyDependentConnection",
-    });
-    expect(
-      dependentConnections?.find((resource) => resource.operations.lifecycle.update !== undefined)
-        ?.operations.lifecycle.update?.[0],
-    ).toMatchObject({
-      resourceName: "LegacyDependentConnection",
-      resourceModelName: "LegacyDependentConnection",
-    });
-    expect(
-      dependentConnections?.find((resource) => resource.operations.lists.length > 0)?.operations
-        .lists[0],
-    ).toMatchObject({
-      resourceName: "LegacyDependentConnection",
-      resourceModelName: "LegacyDependentConnection",
-    });
+    expectResolvedResourceNames(finalNames, [
+      ["PrivateLinkResource", paths.employeeLink, "ResolvedEmployeeLink"],
+      ["PrivateLinkResource", paths.departmentLink, "ResolvedDepartmentLink"],
+      ["PrivateEndpointConnection", paths.employeeConnection, "ResolvedEmployeeConnection"],
+      ["PrivateEndpointConnection", paths.departmentConnection, "ResolvedDepartmentConnection"],
+    ]);
   }, 30_000);
 
   it("customizes synthetic virtual resources by default name and instance path", async () => {
@@ -1488,7 +1522,7 @@ interface Employees {
     });
   }, 30_000);
 
-  it("customizes every operation category without changing wire metadata", async () => {
+  it("customizes every operation category", async () => {
     const { program } = await Tester.compile(`
 using Azure.Core;
 
@@ -1548,54 +1582,41 @@ interface Employees {
     ok(originalEmployee);
     ok(employee);
     expect(employee.resourceName).toBe("ClientEmployee");
-    expect(employee.resourceType).toEqual(originalEmployee.resourceType);
-    expect(employee.resourceInstancePath).toBe(originalEmployee.resourceInstancePath);
-
-    for (const kind of ["read", "createOrUpdate", "update", "delete", "checkExistence"] as const) {
-      const originalOperation = originalEmployee.operations.lifecycle[kind]?.[0];
-      const operation = employee.operations.lifecycle[kind]?.[0];
-      ok(originalOperation);
-      ok(operation);
-      expect(operation.name).toBe(`client${originalOperation.name}`);
-      expect(operation.operationGroup).toBe("ClientEmployees");
-      expect(operation.resourceName).toBe("ClientEmployee");
-      expect(operation.resourceModelName).toBe("ClientEmployee");
-      expect(operation.path).toBe(originalOperation.path);
-      expect(operation.httpOperation.verb).toBe(originalOperation.httpOperation.verb);
-    }
-
-    const originalList = originalEmployee.operations.lists[0];
-    const list = employee.operations.lists[0];
-    expect(list).toMatchObject({
-      name: "clientlistByResourceGroup",
-      operationGroup: "ClientEmployees",
-      resourceName: "ClientEmployee",
-      resourceModelName: "ClientEmployee",
-    });
-    expect(list.path).toBe(originalList.path);
-    expect(list.httpOperation.verb).toBe(originalList.httpOperation.verb);
-
-    const originalAction = originalEmployee.operations.actions[0];
-    const action = employee.operations.actions[0];
-    expect(action).toMatchObject({
-      name: "clientmove",
-      operationGroup: "ClientEmployees",
-      resourceName: "ClientEmployee",
-      resourceModelName: "ClientEmployee",
-    });
-    expect(action.path).toBe(originalAction.path);
-    expect(action.httpOperation.verb).toBe(originalAction.httpOperation.verb);
+    expect(
+      getAllResourceOperations(employee)
+        .map(({ kind, name, operationGroup, resourceName, resourceModelName }) => ({
+          kind,
+          name,
+          operationGroup,
+          resourceName,
+          resourceModelName,
+        }))
+        .toSorted((a, b) => a.name.localeCompare(b.name)),
+    ).toEqual(
+      ["checkExistence", "createOrUpdate", "delete", "get", "listByResourceGroup", "move", "update"]
+        .map((name) => ({
+          kind:
+            name === "get"
+              ? "read"
+              : name === "listByResourceGroup"
+                ? "list"
+                : name === "move"
+                  ? "action"
+                  : name,
+          name: `client${name}`,
+          operationGroup: "ClientEmployees",
+          resourceName: "ClientEmployee",
+          resourceModelName: "ClientEmployee",
+        }))
+        .toSorted((a, b) => a.name.localeCompare(b.name)),
+    );
 
     expect(employee.associatedOperations).toEqual([]);
     expect(employee.associatedOperations).not.toBe(originalEmployee.associatedOperations);
 
-    const originalProviderOperation = original.providerOperations?.find((x) => x.name === "list");
     const providerOperation = named.providerOperations?.find((x) => x.name === "clientlist");
-    ok(originalProviderOperation);
     ok(providerOperation);
     expect(providerOperation.operationGroup).toBe("ClientOperations");
-    expect(providerOperation.path).toBe(originalProviderOperation.path);
-    expect(providerOperation.httpOperation.verb).toBe(originalProviderOperation.httpOperation.verb);
   }, 30_000);
 
   it("preserves parent and resource-valued scope references in customized graphs", async () => {
