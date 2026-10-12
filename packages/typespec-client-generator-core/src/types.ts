@@ -116,7 +116,7 @@ import {
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { getNativeLroMetadata } from "./lro-metadata.js";
+import { getRawLroMetadata } from "./lro-metadata.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -1934,7 +1934,7 @@ function updateTypesFromOperation(
     }
     popNamingContext(context);
 
-    const lroMetaData = getNativeLroMetadata(program, operation);
+    const lroMetaData = getRawLroMetadata(program, operation);
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         // Process headers BEFORE body so header types get cached with header naming context first.

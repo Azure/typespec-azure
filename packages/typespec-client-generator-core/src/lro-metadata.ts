@@ -70,11 +70,8 @@ export function resolveLroClientResult(protocol: LroProtocolMetadata): LroClient
   };
 }
 
-/** Native LRO metadata only; the legacy @markAsLro fallback is handled separately. */
-export function getNativeLroMetadata(
-  program: Program,
-  operation: Operation,
-): LroMetadata | undefined {
+/** Raw LRO metadata only; the legacy @markAsLro fallback is handled separately. */
+export function getRawLroMetadata(program: Program, operation: Operation): LroMetadata | undefined {
   const protocol = getLroProtocolMetadata(program, operation);
   if (!protocol) return undefined;
   return {

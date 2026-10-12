@@ -87,7 +87,7 @@ import type {
   TCGCContext,
 } from "./interfaces.js";
 import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getNativeLroMetadata } from "./lro-metadata.js";
+import { getRawLroMetadata } from "./lro-metadata.js";
 import { getSdkBasicServiceMethod } from "./methods.js";
 import {
   getCrossLanguageDefinitionId,
@@ -1332,7 +1332,7 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): LroMetadata | undefined {
-  const lroMetaData = getNativeLroMetadata(context.program, operation);
+  const lroMetaData = getRawLroMetadata(context.program, operation);
   if (lroMetaData) {
     return lroMetaData;
   }

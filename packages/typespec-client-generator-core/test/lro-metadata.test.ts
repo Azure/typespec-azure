@@ -3,7 +3,7 @@ import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/tes
 import { getAllHttpServices } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { getNativeLroMetadata, resolveLroClientResult } from "../src/lro-metadata.js";
+import { getRawLroMetadata, resolveLroClientResult } from "../src/lro-metadata.js";
 import { AzureCoreTester } from "./tester.js";
 
 const prefix = `
@@ -71,7 +71,7 @@ it.each([
   Object.freeze(protocol.completion);
   if (protocol.completion.finalStep) Object.freeze(protocol.completion.finalStep);
   const selected = resolveLroClientResult(protocol);
-  const native = getNativeLroMetadata(program, operation);
+  const native = getRawLroMetadata(program, operation);
   const legacy = getLroMetadata(program, operation);
   ok(native);
   ok(legacy);
@@ -95,11 +95,11 @@ it("does not synthesize native LRO metadata for an ordinary operation", async ()
     prefix + '@get @route("/widgets") op start(): Widget;',
   );
   const [services] = getAllHttpServices(program);
-  strictEqual(getNativeLroMetadata(program, services[0].operations[0].operation), undefined);
+  strictEqual(getRawLroMetadata(program, services[0].operations[0].operation), undefined);
   expectDiagnosticEmpty(program.diagnostics);
 });
 
-it.each([getLroMetadata, getNativeLroMetadata])(
+it.each([getLroMetadata, getRawLroMetadata])(
   "preserves explicit-original-uri diagnostics in %s",
   async (getMetadata) => {
     const { program } = await AzureCoreTester.compile(
@@ -124,7 +124,7 @@ it.each([getLroMetadata, getNativeLroMetadata])(
   },
 );
 
-describe.each([getLroMetadata, getNativeLroMetadata])(
+describe.each([getLroMetadata, getRawLroMetadata])(
   "%s with a result-bearing original-uri monitor",
   (getMetadata) => {
     it.each([false, true])("selects the result when a same-path GET exists: %s", async (hasGet) => {
