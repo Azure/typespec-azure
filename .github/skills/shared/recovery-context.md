@@ -380,6 +380,19 @@ allowance debit before the same owner executes. No publication is allowed until
 the full required scope passes. A confirmed source defect still follows the
 source-repair protocol, never a promotion-only semantic fix.
 
+For index-preserving isolation, archive both the exact index bytes and its staged
+mode/blob/path entries. Verify exact index restoration before subsequent Git
+inspection, and use `git --no-optional-locks` for read-only `status`, `diff` and
+`ls-files` checks: ordinary `git status` can refresh cached stat metadata even
+when no staged content changes. Do not assume that a later index-byte hash
+difference means restoration failed. Preserve the original guard failure and
+compare every staged entry, task-owned file and loaded compiled-output hash
+against the archived manifest under read-only blocker reconciliation. Continue
+only when the original exact restoration is established and the current
+semantic index, draft and runtime remain unchanged; missing restoration evidence
+or any content difference still blocks. This grants no mutation, failed-command
+rerun, new allowance or test retry.
+
 ### Local recovery decision cases
 
 | Case                                                                                                   | Expected outcome                                                                                            |
