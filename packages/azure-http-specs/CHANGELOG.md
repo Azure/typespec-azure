@@ -1,5 +1,18 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.46
+
+### Features
+
+- [#5513](https://github.com/Azure/typespec-azure/pull/5513) Customize the existing alternate-type scenarios for C# by mapping `Geometry` to `Azure.Core.GeoJson.GeoPoint` from `Azure.Core` 1.61.0 or later instead of the invalid Feature mapping. Preserve all existing scenarios and payloads.
+- [#5176](https://github.com/Azure/typespec-azure/pull/5176) Add an Azure HTTP scenario verifying that @Azure.Core.Legacy.overrideApiVersion supplies the default API-version query value for a child client.
+
+### Bug Fixes
+
+- [#5517](https://github.com/Azure/typespec-azure/pull/5517) Update the ARM multi-service and multi-service shared-model scenarios to use modern ARM common types so resource IDs project as `armResourceIdentifier`.
+- [#5471](https://github.com/Azure/typespec-azure/pull/5471) Add Spector coverage for client response replacement.
+
+
 ## 0.1.0-alpha.45
 
 ### Bug Fixes

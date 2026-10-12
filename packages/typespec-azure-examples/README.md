@@ -1,7 +1,8 @@
 # @azure-tools/typespec-azure-examples
 
 Tooling for the Azure **unified examples format** (`examples.yaml`): the published JSON Schema
-and the `tsp-examples` CLI, plus the transitional `tsp-examples-migrate` tool.
+and the `tsp-examples` CLI, plus the transitional `tsp-examples-migrate` and
+`tsp-examples-legacy-expand` tools.
 
 The unified examples format replaces the ~282K per-version `x-ms-examples` JSON files with a
 single version-aware `examples.yaml` per service (or `examples/<Interface>.yaml` for large
@@ -113,17 +114,62 @@ lineage with an `example-removed-before-latest` **warning** so the author can co
 applies to later versions, or delete it. Services that rely on removing examples across versions are
 not yet fully supported.
 
+## `tsp-examples-legacy-expand`
+
+> **Transitional tool.** Expands the unified format back into the classic per-version examples so
+> downstream consumers keep working during rollout; it will be removed once consumers read
+> `examples.yaml` directly.
+
+Expand the unified examples into the concrete example for each operation at a target API version:
+
+```bash
+tsp-examples-legacy-expand <service-dir> --api-version <version>
+```
+
+It reads the linear version order from the adjacent `service.yaml`, discovers `examples.yaml` /
+`examples/*.yaml`, and for each operation lineage selects the entry with the greatest `since` that
+is `<=` the target (the base entry applies from the earliest version). The `{api-version}`
+placeholder is substituted with the target version, and each resolved example is reconstructed into a
+classic `x-ms-examples` document — the `title`/`operationId` envelope and the flat `parameters` bag
+(with `api-version` re-added and the body under its Swagger parameter name), read from the service's
+Swagger. Files are named by their preserved `legacyFilename` (or the conventional
+`<OperationId>.json`). With `--out <dir>` each document is written as a separate JSON file; otherwise
+a `filename → document` map is printed. Operations with no matching Swagger operation are reported
+and skipped.
+
+Options: `--api-version <v>` (required), `--out <dir>`.
+
 ## API
+
+The package's default entrypoint is browser-compatible. It provides the JSON Schema and in-memory
+parsing, validation, resolution, and materialization helpers without Node.js globals or polyfills:
+
+```ts
+import {
+  loadExampleFile,
+  validateExampleFiles,
+  resolveExampleFiles,
+} from "@azure-tools/typespec-azure-examples";
+
+const file = loadExampleFile("examples.yaml", yamlContent);
+const diagnostics = validateExampleFiles([file]);
+const { examples } = resolveExampleFiles([file], "2024-06-01", ["2024-06-01"]);
+```
+
+Filesystem discovery, migration, and terminal diagnostic formatting require Node.js. They are
+available from the explicit `/node` entrypoint; Node.js also automatically selects this entrypoint
+for imports from the package root, preserving existing Node.js usage. The CLI commands are unchanged.
 
 ```ts
 import {
   validateExamplesDir,
-  validateExampleFiles,
-  loadExampleFile,
   migrate,
-} from "@azure-tools/typespec-azure-examples";
+  resolveExamplesDir,
+} from "@azure-tools/typespec-azure-examples/node";
 
 const { diagnostics } = await validateExamplesDir("path/to/service");
 
 const { files } = await migrate("path/to/specs", { namespace: "Microsoft.EventGrid" });
+
+const { examples } = await resolveExamplesDir("path/to/service", "2024-06-01");
 ```
