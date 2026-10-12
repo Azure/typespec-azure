@@ -62,8 +62,15 @@ Import `@azure-tools/typespec-client-generator-core` to use `@clientName`.
 Suppression is appropriate when preserving an already-shipped SDK method name
 requires an exception approved by the API reviewer. For new methods, fix the
 name instead, either by renaming the operation or using an unscoped `@clientName`.
-Use `#suppress "@azure-tools/typespec-client-generator-core/use-delete-for-delete"`
-on the operation with a justification for the compatibility exception.
+Use `#suppress` on the operation with a justification for the compatibility
+exception:
+
+```typespec
+#suppress "@azure-tools/typespec-client-generator-core/use-delete-for-delete" "Preserve the already-shipped SDK method name."
+@delete
+@route("/widgets/{id}")
+op remove(@path id: string): void;
+```
 
 ## LintDiff Equivalent
 
