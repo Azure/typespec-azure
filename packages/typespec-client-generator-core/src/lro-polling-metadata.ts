@@ -1,4 +1,8 @@
-import { getLroMetadata, type LroMetadata } from "@azure-tools/typespec-azure-core";
+import {
+  getLroMetadata,
+  type LroMetadata,
+  type OperationLink,
+} from "@azure-tools/typespec-azure-core";
 import {
   createDiagnosticCollector,
   type Diagnostic,
@@ -21,6 +25,17 @@ export interface ResolvedLroPollingMetadata {
   raw: LroMetadata;
   operationId: boolean;
   properties: ModelProperty[];
+}
+
+/** @internal */
+export function getLroOperationIdLink(
+  statusMonitorStep: LroMetadata["statusMonitorStep"],
+): OperationLink | undefined {
+  const link =
+    statusMonitorStep?.kind === "nextOperationLink"
+      ? statusMonitorStep.target
+      : statusMonitorStep?.target.link;
+  return link?.location === "Self" ? undefined : link;
 }
 
 interface CachedResolution {
@@ -84,11 +99,7 @@ function resolve(
   }
 
   let operationId = operationIdDecorators.length > 0;
-  if (
-    operationId &&
-    (raw.statusMonitorStep?.kind !== "nextOperationLink" ||
-      raw.statusMonitorStep.target.location === "Self")
-  ) {
+  if (operationId && !getLroOperationIdLink(raw.statusMonitorStep)) {
     diagnostics.add(
       createDiagnostic({
         code: "lro-operation-id-missing-link",

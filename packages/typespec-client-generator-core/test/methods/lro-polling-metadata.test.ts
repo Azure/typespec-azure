@@ -1,6 +1,8 @@
 import { ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
 import { type SdkLroServiceMethod, UsageFlags } from "../../src/interfaces.js";
+import { getLroOperationIdLink } from "../../src/lro-polling-metadata.js";
+import { getSdkLroOperationIdSource } from "../../src/methods.js";
 import { AzureCoreTester, createSdkContextForTester } from "../tester.js";
 
 const Tester = AzureCoreTester.wrap(
@@ -76,6 +78,40 @@ op start is Azure.Core.Foundations.LongRunningOperation<
 `;
 
 describe("LRO polling metadata", () => {
+  it("accepts a next-operation reference with a status-monitor link", () => {
+    const rawLink = {
+      kind: "link",
+      location: "ResponseHeader",
+      property: {} as any,
+    } as const;
+    const rawStep = {
+      kind: "nextOperationReference",
+      responseModel: {} as any,
+      target: {
+        kind: "reference",
+        operation: {} as any,
+        link: rawLink,
+      },
+    } as const;
+    strictEqual(getLroOperationIdLink(rawStep), rawLink);
+
+    const sdkLink = {
+      kind: "link",
+      location: "ResponseHeader",
+      property: {} as any,
+    } as const;
+    const sdkStep = {
+      kind: "nextOperationReference",
+      responseModel: {} as any,
+      target: {
+        kind: "reference",
+        operation: {} as any,
+        link: sdkLink,
+      },
+    } as const;
+    strictEqual(getSdkLroOperationIdSource(sdkStep), sdkLink);
+  });
+
   it("exposes the URI-derived ID source and exact typed polling properties", async () => {
     const { program } = await Tester.compile(operation);
     const context = await createSdkContextForTester(
@@ -251,8 +287,19 @@ op ordinary(): Value;
         code: operation.replace("@lroOperationId", "@lroOperationId\n@lroOperationId"),
         diagnostic: "lro-operation-id-duplicate",
       },
-      {
-        code: `
+    ];
+
+    for (const testCase of invalidCases) {
+      const { program } = await Tester.compile(testCase.code);
+      const context = await createSdkContextForTester(program);
+      expect(context.diagnostics.map((x) => x.code)).toContain(
+        `@azure-tools/typespec-client-generator-core/${testCase.diagnostic}`,
+      );
+    }
+  });
+
+  it("rejects a next-operation reference without a status-monitor link", async () => {
+    const { program } = await Tester.compile(`
 model PollingStatus {
   @lroStatus status: LroStatus;
 }
@@ -270,18 +317,19 @@ op createWidget(@path id: string): {
   @header id: string;
   @header("operation-id") operationId: string;
 };
-`,
-        diagnostic: "lro-operation-id-missing-link",
-      },
-    ];
-
-    for (const testCase of invalidCases) {
-      const { program } = await Tester.compile(testCase.code);
-      const context = await createSdkContextForTester(program);
-      expect(context.diagnostics.map((x) => x.code)).toContain(
-        `@azure-tools/typespec-client-generator-core/${testCase.diagnostic}`,
-      );
+`);
+    const context = await createSdkContextForTester(program);
+    const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "createWidget");
+    ok(method);
+    strictEqual(method.kind, "lro");
+    strictEqual(method.lroMetadata.statusMonitorStep?.kind, "nextOperationReference");
+    if (method.lroMetadata.statusMonitorStep?.kind === "nextOperationReference") {
+      strictEqual(method.lroMetadata.statusMonitorStep.target.link, undefined);
     }
+    strictEqual(method.lroMetadata.operationId, undefined);
+    expect(context.diagnostics.map((x) => x.code)).toContain(
+      "@azure-tools/typespec-client-generator-core/lro-operation-id-missing-link",
+    );
   });
 
   it("does not change undecorated LRO metadata", async () => {

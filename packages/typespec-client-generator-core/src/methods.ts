@@ -130,6 +130,16 @@ function getSdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperat
   });
 }
 
+/** @internal */
+export function getSdkLroOperationIdSource(
+  statusMonitorStep: SdkNextOperationLink | SdkNextOperationReference | undefined,
+): SdkOperationLink | undefined {
+  if (statusMonitorStep?.kind === "nextOperationLink") {
+    return statusMonitorStep.target;
+  }
+  return statusMonitorStep?.target.link;
+}
+
 function getPageSizeParameterSegments<TServiceOperation extends SdkServiceOperation>(
   baseServiceMethod: SdkServiceMethod<TServiceOperation>,
 ): (SdkModelPropertyType | SdkMethodParameter)[] {
@@ -410,6 +420,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
 
   const finalResponse = getFinalResponse();
   const statusMonitorStep = getStatusMonitorStep(context, rawMetadata.statusMonitorStep);
+  const operationIdSource = getSdkLroOperationIdSource(statusMonitorStep);
   const pollingCustomization = diagnostics.pipe(resolveLroPollingMetadata(context, operation));
   const pollingMetadata =
     pollingCustomization?.properties.map((property) =>
@@ -439,10 +450,10 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     logicalPath: rawMetadata.logicalPath,
     finalEnvelopeResult: finalResponse ? finalResponse.envelopeResult : "void",
     finalResultPath: rawMetadata.finalResultPath,
-    ...(pollingCustomization?.operationId && statusMonitorStep?.kind === "nextOperationLink"
+    ...(pollingCustomization?.operationId && operationIdSource
       ? {
           operationId: {
-            source: statusMonitorStep.target,
+            source: operationIdSource,
             extractionStrategy: "last-non-empty-path-segment",
           } as const,
         }
