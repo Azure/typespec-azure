@@ -199,6 +199,57 @@ export const $lib = createTypeSpecLibrary({
         default: `Usage value must be one of: 2 (input), 4 (output), 256 (json), or 512 (xml).`,
       },
     },
+    "lro-polling-metadata-non-lro": {
+      ...doc("lro-polling-metadata-non-lro"),
+      severity: "error",
+      messages: {
+        default:
+          "@lroOperationId and @lroPollingMetadata can only be applied to a native long-running operation with status-monitor metadata.",
+      },
+    },
+    "lro-operation-id-duplicate": {
+      ...doc("lro-operation-id-duplicate"),
+      severity: "error",
+      messages: {
+        default: "@lroOperationId is specified more than once in the active emitter scope.",
+      },
+    },
+    "lro-operation-id-missing-link": {
+      ...doc("lro-operation-id-missing-link"),
+      severity: "error",
+      messages: {
+        default:
+          "@lroOperationId requires a status-monitor URI supplied by a response header or body property.",
+      },
+    },
+    "lro-polling-metadata-duplicate": {
+      ...doc("lro-polling-metadata-duplicate"),
+      severity: "error",
+      messages: {
+        default: paramMessage`Polling metadata property '${"propertyName"}' is specified more than once in the active emitter scope.`,
+      },
+    },
+    "lro-polling-metadata-unreachable": {
+      ...doc("lro-polling-metadata-unreachable"),
+      severity: "error",
+      messages: {
+        default: paramMessage`Polling metadata property '${"propertyName"}' is not a direct or inherited property of the status-monitor response model.`,
+      },
+    },
+    "lro-polling-metadata-name-conflict": {
+      ...doc("lro-polling-metadata-name-conflict"),
+      severity: "error",
+      messages: {
+        default: paramMessage`Polling metadata has more than one entry with the projected client name '${"clientName"}'.`,
+      },
+    },
+    "lro-polling-metadata-internal-conflict": {
+      ...doc("lro-polling-metadata-internal-conflict"),
+      severity: "error",
+      messages: {
+        default: paramMessage`Public operation polling metadata '${"propertyName"}' references an explicitly internal property or type. Make the operation internal or expose a public metadata type.`,
+      },
+    },
     "conflicting-multipart-model-usage": {
       ...doc("conflicting-multipart-model-usage"),
       severity: "error",

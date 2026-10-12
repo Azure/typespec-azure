@@ -268,7 +268,7 @@ export function parseScopes(scope?: string): [string[]?, string[]?] {
  * @param emitterName The current emitter name
  * @returns true if the decorator should be included, false otherwise
  */
-function isScopeApplicable(scopeArg: string, emitterName: string): boolean {
+export function isScopeApplicable(scopeArg: string, emitterName: string): boolean {
   const [negationScopes, positiveScopes] = parseScopes(scopeArg);
 
   // If there are positive scopes specified

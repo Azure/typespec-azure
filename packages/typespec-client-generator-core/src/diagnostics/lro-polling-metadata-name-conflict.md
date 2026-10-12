@@ -1,0 +1,7 @@
+This diagnostic is issued when selected polling metadata entries have the same projected SDK name.
+The reserved generated name `operationId` also participates when `@lroOperationId` is active.
+
+## How to fix
+
+Use scoped `@clientName` values that are unique for the active emitter, remove a duplicate
+selection, or remove `@lroOperationId` when its accessor is not needed.

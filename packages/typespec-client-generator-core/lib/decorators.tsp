@@ -25,6 +25,30 @@ model DecoratorOptions {
 }
 
 /**
+ * Exposes an SDK operation identifier derived from the status-monitor URI of a long-running
+ * operation. The identifier is the last non-empty URI path segment. Emitters choose their
+ * idiomatic accessor and storage and must not assume percent-decoding.
+ *
+ * @param target The native long-running operation.
+ * @param scope Specifies the target language emitters.
+ */
+extern dec lroOperationId(target: Operation, scope?: valueof DecoratorOptions | string);
+
+/**
+ * Exposes a typed property from the status-monitor response as SDK polling metadata.
+ * This decorator is repeatable; entries are returned in declaration order.
+ *
+ * @param target The native long-running operation.
+ * @param property A direct or inherited property of the status-monitor response model.
+ * @param scope Specifies the target language emitters.
+ */
+extern dec lroPollingMetadata(
+  target: Operation,
+  property: ModelProperty,
+  scope?: valueof DecoratorOptions | string
+);
+
+/**
  * Overrides the generated name for client SDK elements including clients, methods, parameters,
  * unions, models, enums, and model properties.
  *

@@ -49,6 +49,8 @@ import type {
   ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
+  LroOperationIdDecorator,
+  LroPollingMetadataDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
@@ -88,6 +90,7 @@ import {
   getScopedDecoratorData,
   isSameAuth,
   isSameServers,
+  isScopeApplicable,
   legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
@@ -103,6 +106,69 @@ import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js"
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
+
+interface ScopedLroOperationId {
+  scope?: string;
+  target: DiagnosticTarget;
+}
+
+interface ScopedLroPollingMetadata {
+  property: ModelProperty;
+  scope?: string;
+  target: DiagnosticTarget;
+}
+
+const lroOperationIdKey = createStateSymbol("lroOperationId");
+const lroPollingMetadataKey = createStateSymbol("lroPollingMetadata");
+
+export const $lroOperationId: LroOperationIdDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  const entries =
+    (context.program.stateMap(lroOperationIdKey).get(target) as
+      ScopedLroOperationId[] | undefined) ?? [];
+  entries.unshift({ scope: normalizeScope(scope), target: context.decoratorTarget });
+  context.program.stateMap(lroOperationIdKey).set(target, entries);
+};
+
+export const $lroPollingMetadata: LroPollingMetadataDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  property: ModelProperty,
+  scope?: LanguageScopes | DecoratorOptions,
+) => {
+  const entries =
+    (context.program.stateMap(lroPollingMetadataKey).get(target) as
+      ScopedLroPollingMetadata[] | undefined) ?? [];
+  entries.unshift({ property, scope: normalizeScope(scope), target: context.decoratorTarget });
+  context.program.stateMap(lroPollingMetadataKey).set(target, entries);
+};
+
+export function getLroOperationIdDecorators(
+  context: TCGCContext,
+  target: Operation,
+): ScopedLroOperationId[] {
+  const entries =
+    (context.program.stateMap(lroOperationIdKey).get(target) as
+      ScopedLroOperationId[] | undefined) ?? [];
+  return entries.filter(
+    (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
+  );
+}
+
+export function getLroPollingMetadataDecorators(
+  context: TCGCContext,
+  target: Operation,
+): ScopedLroPollingMetadata[] {
+  const entries =
+    (context.program.stateMap(lroPollingMetadataKey).get(target) as
+      ScopedLroPollingMetadata[] | undefined) ?? [];
+  return entries.filter(
+    (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
+  );
+}
 
 /**
  * The set of emitters a scope string effectively selects.

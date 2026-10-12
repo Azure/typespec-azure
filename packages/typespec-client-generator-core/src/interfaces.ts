@@ -1202,6 +1202,26 @@ export interface SdkLroServiceMetadata {
   finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType | "void";
   finalResultPath?: string;
+  /**
+   * SDK operation identifier derived from the status-monitor URI, when requested with
+   * `@lroOperationId`.
+   */
+  operationId?: SdkLroOperationIdMetadata;
+  /**
+   * Typed status-monitor properties selected with `@lroPollingMetadata`, in declaration order.
+   * Entries are the exact cached properties from `pollingInfo.responseModel`.
+   */
+  pollingMetadata?: SdkModelPropertyType[];
+}
+
+export interface SdkLroOperationIdMetadata {
+  /** Exact status-monitor operation link from `statusMonitorStep.target`. */
+  source: SdkOperationLink;
+  /**
+   * Extract the last non-empty path segment from the URI. This strategy does not imply
+   * percent-decoding or a runtime lifecycle/storage contract.
+   */
+  extractionStrategy: "last-non-empty-path-segment";
 }
 
 export interface SdkNextOperationReference extends SdkLogicalOperationStep {

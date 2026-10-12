@@ -117,6 +117,7 @@ import {
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { getRawLroMetadata } from "./lro-metadata.js";
+import { resolveLroPollingMetadata } from "./lro-polling-metadata.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -1954,6 +1955,7 @@ function updateTypesFromOperation(
     popNamingContext(context);
 
     const lroMetaData = getRawLroMetadata(program, operation);
+    const lroPollingMetadata = diagnostics.pipe(resolveLroPollingMetadata(context, operation));
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         // Process headers BEFORE body so header types get cached with header naming context first.
@@ -2068,6 +2070,18 @@ function updateTypesFromOperation(
         UsageFlags.LroPolling,
         "PollingResponse",
       );
+    }
+
+    if (lroMetaData) {
+      for (const property of lroPollingMetadata?.properties ?? []) {
+        pushNamingContext(context, `PollingMetadata${pascalCase(property.name)}`, undefined);
+        const sdkProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
+        popNamingContext(context);
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkProperty.type));
+        const access = getAccessOverride(context, operation) ?? "public";
+        diagnostics.pipe(updateUsageOrAccess(context, access, sdkProperty.type));
+        updateSerializationOptions(context, sdkProperty.type, ["application/json"]);
+      }
     }
   } finally {
     popNamingContext(context); // pop operation

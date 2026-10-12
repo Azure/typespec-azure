@@ -853,6 +853,48 @@ model MyModel {
 }
 ```
 
+### `@lroOperationId` {#@Azure.ClientGenerator.Core.lroOperationId}
+
+Exposes an SDK operation identifier derived from the status-monitor URI of a long-running
+operation. The identifier is the last non-empty URI path segment. Emitters choose their
+idiomatic accessor and storage and must not assume percent-decoding.
+
+```typespec
+@Azure.ClientGenerator.Core.lroOperationId(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+#### Target
+
+The native long-running operation.
+`Operation`
+
+#### Parameters
+
+| Name  | Type                                                            | Description                             |
+| ----- | --------------------------------------------------------------- | --------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. |
+
+### `@lroPollingMetadata` {#@Azure.ClientGenerator.Core.lroPollingMetadata}
+
+Exposes a typed property from the status-monitor response as SDK polling metadata.
+This decorator is repeatable; entries are returned in declaration order.
+
+```typespec
+@Azure.ClientGenerator.Core.lroPollingMetadata(property: ModelProperty, scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+```
+
+#### Target
+
+The native long-running operation.
+`Operation`
+
+#### Parameters
+
+| Name     | Type                                                            | Description                                                          |
+| -------- | --------------------------------------------------------------- | -------------------------------------------------------------------- |
+| property | `ModelProperty`                                                 | A direct or inherited property of the status-monitor response model. |
+| scope    | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters.                              |
+
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
 
 Define the sub client generated in the client SDK.

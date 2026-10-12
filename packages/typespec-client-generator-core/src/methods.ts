@@ -78,6 +78,7 @@ import {
   responseOverrideKey,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { resolveLroPollingMetadata } from "./lro-polling-metadata.js";
 import {
   getCrossLanguageDefinitionId,
   getHttpOperationWithCache,
@@ -408,6 +409,12 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   }
 
   const finalResponse = getFinalResponse();
+  const statusMonitorStep = getStatusMonitorStep(context, rawMetadata.statusMonitorStep);
+  const pollingCustomization = diagnostics.pipe(resolveLroPollingMetadata(context, operation));
+  const pollingMetadata =
+    pollingCustomization?.properties.map((property) =>
+      diagnostics.pipe(getSdkModelPropertyType(context, property)),
+    ) ?? [];
 
   return diagnostics.wrap({
     __raw: rawMetadata,
@@ -424,7 +431,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     operation: diagnostics.pipe(getSdkBasicServiceMethod(context, rawMetadata.operation, client))
       .operation,
     logicalResult: diagnostics.pipe(getSdkModelWithDiagnostics(context, rawMetadata.logicalResult)),
-    statusMonitorStep: getStatusMonitorStep(context, rawMetadata.statusMonitorStep),
+    statusMonitorStep,
     pollingInfo: getPollingInfo(context, rawMetadata.pollingInfo),
     envelopeResult: diagnostics.pipe(
       getSdkModelWithDiagnostics(context, rawMetadata.envelopeResult),
@@ -432,6 +439,15 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     logicalPath: rawMetadata.logicalPath,
     finalEnvelopeResult: finalResponse ? finalResponse.envelopeResult : "void",
     finalResultPath: rawMetadata.finalResultPath,
+    ...(pollingCustomization?.operationId && statusMonitorStep?.kind === "nextOperationLink"
+      ? {
+          operationId: {
+            source: statusMonitorStep.target,
+            extractionStrategy: "last-non-empty-path-segment",
+          } as const,
+        }
+      : {}),
+    ...(pollingMetadata.length > 0 ? { pollingMetadata } : {}),
   });
 
   function getSdkLroServiceFinalStep(

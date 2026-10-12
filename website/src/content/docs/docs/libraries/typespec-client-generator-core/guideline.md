@@ -340,6 +340,30 @@ The Core `getLroMetadata` API, `lroMetadata.__raw`, and the method's `__raw_lro_
 
 The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native Core protocol metadata and is not included in the native-only LRO usage calculation.
 
+#### LRO polling metadata
+
+TCGC-only `@lroOperationId` and repeatable `@lroPollingMetadata` decorators let an SDK expose
+selected status-monitor metadata without changing Azure.Core polling protocol semantics or the
+normal method response:
+
+```typespec
+@lroOperationId
+@lroPollingMetadata(OperationStatus.percentComplete)
+@lroPollingMetadata(OperationStatus.requestId)
+op begin is MyLongRunningOperation;
+```
+
+`SdkLroServiceMetadata.operationId` contains the exact `SdkOperationLink` used by the status
+monitor and the explicit `last-non-empty-path-segment` extraction strategy. The strategy does not
+promise percent-decoding, storage, or a common runtime lifecycle; each emitter implements an
+idiomatic accessor while preserving that semantic.
+
+`SdkLroServiceMetadata.pollingMetadata` contains the exact cached `SdkModelPropertyType` objects
+from the polling response model, in decorator declaration order. Consequently, client and wire
+names, optionality, decorators, serialization, and property types are preserved. A selected
+property must be direct or inherited; nested paths are intentionally unsupported. TCGC retains
+only selected type graphs for output and continues to honor scoped `@usage` and `@access`.
+
 ### HTTP Operation Parameters Handling
 
 The HTTP operation's parameters are inferred from TypeSpec HTTP lib type [`HttpOperationParameters`](https://typespec.io/docs/libraries/http/reference/js-api/interfaces/httpoperationparameters/). Different HTTP parameters are handled by specific logic based on the info from TypeSpec HTTP lib type [`HttpOperationParameter`](https://typespec.io/docs/libraries/http/reference/js-api/type-aliases/httpoperationparameter/).
