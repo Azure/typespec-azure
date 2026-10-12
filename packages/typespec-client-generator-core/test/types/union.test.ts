@@ -536,12 +536,18 @@ it.each([
   `);
 
   const context = await createSdkContextForTester(program);
-  expectDiagnostics(
-    context.diagnostics.filter(
-      (x) => x.code !== "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
-    ),
-    [],
-  );
+  expectDiagnostics(context.diagnostics, [
+    {
+      code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+      severity: "warning",
+      message: "Kind Model prevents this union from being resolved as an enum.",
+    },
+    {
+      code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+      severity: "warning",
+      message: "Kind Model prevents this union from being resolved as an enum.",
+    },
+  ]);
   const sdkType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
   ok(sdkType);
   strictEqual(sdkType.kind, "union");
@@ -588,12 +594,18 @@ it.each([false, true])(
       {},
       { disableUsageAccessPropagationToBase },
     );
-    expectDiagnostics(
-      context.diagnostics.filter(
-        (x) => x.code !== "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
-      ),
-      [],
-    );
+    expectDiagnostics(context.diagnostics, [
+      {
+        code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+        severity: "warning",
+        message: "Kind Model prevents this union from being resolved as an enum.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+        severity: "warning",
+        message: "Kind Model prevents this union from being resolved as an enum.",
+      },
+    ]);
     const sdkType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
     ok(sdkType);
     strictEqual(sdkType.kind, "union");
@@ -632,12 +644,18 @@ it("honors an explicit access override on the union base constraint", async () =
   `);
 
   const context = await createSdkContextForTester(program);
-  expectDiagnostics(
-    context.diagnostics.filter(
-      (x) => x.code !== "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
-    ),
-    [],
-  );
+  expectDiagnostics(context.diagnostics, [
+    {
+      code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+      severity: "warning",
+      message: "Kind Model prevents this union from being resolved as an enum.",
+    },
+    {
+      code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+      severity: "warning",
+      message: "Kind Model prevents this union from being resolved as an enum.",
+    },
+  ]);
   const sdkType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
   ok(sdkType);
   strictEqual(sdkType.kind, "union");
@@ -684,12 +702,28 @@ it("propagates usage through a union base constraint chain", async () => {
   `);
 
   const context = await createSdkContextForTester(program);
-  expectDiagnostics(
-    context.diagnostics.filter(
-      (x) => x.code !== "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
-    ),
-    [],
-  );
+  expectDiagnostics(context.diagnostics, [
+    {
+      code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+      severity: "warning",
+      message: "Kind Model prevents this union from being resolved as an enum.",
+    },
+    {
+      code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+      severity: "warning",
+      message: "Kind Model prevents this union from being resolved as an enum.",
+    },
+    {
+      code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+      severity: "warning",
+      message: "Kind Model prevents this union from being resolved as an enum.",
+    },
+    {
+      code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+      severity: "warning",
+      message: "Kind Model prevents this union from being resolved as an enum.",
+    },
+  ]);
   const sdkType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
   ok(sdkType);
   strictEqual(sdkType.kind, "union");
@@ -919,12 +953,18 @@ it("preserves an explicit union base type inside a nullable wrapper", async func
   `);
 
   const context = await createSdkContextForTester(program);
-  expectDiagnostics(
-    context.diagnostics.filter(
-      (x) => x.code !== "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
-    ),
-    [],
-  );
+  expectDiagnostics(context.diagnostics, [
+    {
+      code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+      severity: "warning",
+      message: "Kind Model prevents this union from being resolved as an enum.",
+    },
+    {
+      code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+      severity: "warning",
+      message: "Kind Model prevents this union from being resolved as an enum.",
+    },
+  ]);
   const nullableType = context.sdkPackage.unions.find((x) => x.name === "MyNamedUnion");
   ok(nullableType);
   strictEqual(nullableType.kind, "nullable");
