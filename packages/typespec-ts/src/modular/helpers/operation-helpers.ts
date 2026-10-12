@@ -985,22 +985,21 @@ export function getOperationFunction(
       responseHeaders.length > 0
         ? buildHeaderOnlyResponseType(context, responseHeaders)
         : "Record<string, unknown>";
+    const emptyBodyType = hasResponseBody && response.optional ? "void" : "undefined";
+    const emptyResponseType =
+      responseHeaders.length > 0
+        ? `${headersType} & ${storageCompatInfoRef}<${emptyBodyType}, ${headersType}>`
+        : `${storageCompatInfoRef}<${emptyBodyType}, ${headersType}>`;
     if (!hasResponseBody) {
-      if (responseHeaders.length > 0) {
-        // Void with headers — headers at top level + StorageCompatResponseInfo
-        finalReturnType = `${headersType} & ${storageCompatInfoRef}<undefined, ${headersType}>`;
-      } else {
-        // Void without headers — just StorageCompatResponseInfo
-        finalReturnType = `${storageCompatInfoRef}<undefined, ${headersType}>`;
-      }
+      finalReturnType = emptyResponseType;
     } else {
-      if (responseHeaders.length > 0) {
-        // Body with headers — headers + body + StorageCompatResponseInfo at top level
-        finalReturnType = `${headersType} & ${bodyType} & ${storageCompatInfoRef}<${bodyType}, ${headersType}>`;
-      } else {
-        // Body without headers — body + StorageCompatResponseInfo
-        finalReturnType = `${bodyType} & ${storageCompatInfoRef}<${bodyType}, ${headersType}>`;
-      }
+      const bodyResponseType =
+        responseHeaders.length > 0
+          ? `${headersType} & ${bodyType} & ${storageCompatInfoRef}<${bodyType}, ${headersType}>`
+          : `${bodyType} & ${storageCompatInfoRef}<${bodyType}, ${headersType}>`;
+      finalReturnType = response.optional
+        ? `${bodyResponseType} | ${emptyResponseType}`
+        : bodyResponseType;
     }
   }
 

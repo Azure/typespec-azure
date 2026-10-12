@@ -1,12 +1,49 @@
 # Change Log - @azure-tools/typespec-java
 
-## 0.46.3
+## 0.48.0
+
+### Features
+
+- Update TypeSpec dependencies to their October minor versions and sync core to commit `545ec91fc`. Includes upstream library behavior changes ([microsoft/typespec#12137](https://github.com/microsoft/typespec/pull/12137)) and the Java generator Jackson dependency update ([microsoft/typespec#12056](https://github.com/microsoft/typespec/pull/12056)).
+
+
+## 0.47.1
 
 ### Bug Fixes
 
-- [#5394](https://github.com/Azure/typespec-azure/pull/5394) Sync core to microsoft/typespec commit `890cad64c`. Support collection header prefixes for
+- Sync core to commit `057557b68`. Includes fixes for casting null parameters in generated samples and
+  tests ([microsoft/typespec#11967](https://github.com/microsoft/typespec/pull/11967)), redundant casts
+  in generated XML serializers ([microsoft/typespec#11982](https://github.com/microsoft/typespec/pull/11982)),
+  and generated Java path-length limits
+  ([microsoft/typespec#11983](https://github.com/microsoft/typespec/pull/11983)).
+
+
+## 0.47.0
+
+### Features
+
+- Update TypeSpec dependencies to their September minor versions. Includes behavior changes from upstream libraries such as TCGC ([microsoft/typespec#11936](https://github.com/microsoft/typespec/pull/11936)).
+
+
+## 0.46.4
+
+### Features
+
+- Support collection prefixes for request headers in generated Java clients.
+
+### Bug Fixes
+
+- Avoid duplicate inherited discriminator fields in generated Java models.
+
+
+## 0.46.3
+
+### Features
+
+- Sync core to microsoft/typespec commit `890cad64c`. Support collection header prefixes for
   map-valued response headers and document the Java emitter and client options (core,
   [microsoft/typespec#11860](https://github.com/microsoft/typespec/pull/11860)).
+
 
 ## 0.46.2
 

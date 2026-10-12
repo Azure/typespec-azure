@@ -46,6 +46,8 @@ specs:
   "azure/client-generator-core/next-link-verb":
     { options: { module: nextlinkverbgroup, slice-elements-byval: true } }
   "azure/client-generator-core/override/client.tsp": { options: { module: overridegroup } }
+  # Disabled until all language emitters support response replacement.
+  "azure/client-generator-core/response-replacement/client.tsp": false
   "azure/client-generator-core/response-as-bool": { options: { module: headasboolgroup } }
   "azure/client-generator-core/usage": { options: { module: coreusagegroup } }
   "azure/core/basic": { options: { module: basicgroup } }

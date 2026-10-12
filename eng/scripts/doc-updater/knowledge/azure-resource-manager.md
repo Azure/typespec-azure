@@ -158,15 +158,21 @@ Concrete ARM resource identities are seeded only by registered read or createOrU
 
 Identity paths are matched case-insensitively for literal segments and by position for variable segments. A createOrUpdate operation can establish a resource without a read operation; list-only and action-only operation sets cannot.
 
-## ARM Collection and Content-Type Rules
+## ARM Request and Response Rules
 
-- `no-query-in-collection` allows only the case-sensitive `api-version` and `$filter` query parameter names on collection GET operations.
+- `no-query-in-collection` allows only `api-version` and case-sensitive `$filter` on collection GET operations.
 - `no-query-in-point-op` allows only `api-version` (case-insensitively) on GET, PUT, PATCH, and DELETE resource-instance paths.
-- `list-response-envelope` requires model response envelopes for collection GET operations to declare exactly `value` and `nextLink`.
-- `list-operation-missing-pageable` requires collection GET operations to have TypeSpec list metadata, page items, and a next-link property. Standard ARM list operation templates supply this metadata.
-- `use-application-json-content-type` checks resolved request and response body content types for operations in ARM provider namespaces.
+- `no-query-in-post` allows only `api-version` on POST operations; other inputs belong in the request body.
+- `list-operation-missing-pageable` requires collection GET operations to use TypeSpec paging metadata with a continuation link. Standard ARM list operation templates supply this metadata.
+- `list-response-envelope` requires collection GET response models to contain exactly `value` and `nextLink`.
+- `use-application-json-content-type` requires `application/json` request and response bodies in ARM provider namespaces.
+- `use-model-request-body` requires non-multipart request bodies to use plain models without indexers.
+- `no-tenant-level-apis` reports ARM PUT routes beginning with `/providers`, except the `/operations` endpoint.
+- `lro-response-mismatch` validates that PUT and PATCH final results match the resource type, DELETE final results are `void`, and POST final results match successful response bodies.
 
 When these rules are added or promoted, update both the generated linter reference and the manually maintained rule evaluation and RPC coverage guides.
+
+The `lro-response-mismatch` implementation has a detailed adjacent Markdown file but no `docs` association in its TypeScript rule definition. Consequently, `pnpm regen-docs` generates only its short description. Fixing the association requires an edit under `packages/typespec-azure-resource-manager/src/rules/`.
 
 ## Feature Files
 
@@ -174,4 +180,4 @@ The internal `getFeatureFileSet` accessor returns the enum configured by `@featu
 
 ## Documentation Feedback
 
-Use rendered documentation URLs for canonical sample links. In examples, omit every template argument that is equal to its declared default, including inferred `ResourceNameParameter` key, segment, and name-pattern values.
+Use rendered documentation URLs for canonical sample links and link to canonical samples through the published samples site (`https://azure.github.io/typespec-azure/docs/samples/...`) rather than the repository source tree. In examples, omit every template argument that is equal to its declared default, including inferred `ResourceNameParameter` key, segment, and name-pattern values.

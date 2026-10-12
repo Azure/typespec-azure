@@ -298,7 +298,7 @@ function generateConstructors(
     ): string {
       imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
       let bodyText = `${indent.get()}if options == nil {\n`;
-      bodyText += `${indent.push().get()}options = &${optionsTypeName}{}\n`;
+      bodyText += `${indent.push().get()}options = ${optionsTypeName}{}\n`;
       bodyText += `${indent.pop().get()}}\n`;
       let apiVersionConfig = "";
       // check if there's an api version parameter
@@ -410,7 +410,7 @@ function generateConstructors(
               const tokenPolicy = `\n${indent.get()}PerCall: []policy.Policy{\n${indent.get()}runtime.NewBearerTokenPolicy(credential, []string{c.Audience + "${helpers.splitScope(credentialParam.type.scopes[0]).scope}"}, ${tokenPolicyOpts}),\n${indent.get()}},\n`;
               indent.pop(); // back to level 1
               prolog = emitProlog(
-                go.getTypeDeclaration(clientOptions, client.pkg),
+                go.getTypeDeclaration(clientOptions, client.pkg, true),
                 true,
                 tokenPolicy,
               );
@@ -434,7 +434,7 @@ function generateConstructors(
           break;
       }
     } else {
-      prolog = emitProlog(go.getTypeDeclaration(clientOptions, client.pkg), false);
+      prolog = emitProlog(go.getTypeDeclaration(clientOptions, client.pkg, true), false);
     }
 
     // add client options last
@@ -466,7 +466,7 @@ function generateConstructors(
         }
         ctorText += `${indent.get()}${param.name} := ${helpers.formatLiteralValue(param.style.defaultValue, false)}\n`;
         ctorText += `${indent.get()}if options.${name} != ${helpers.zeroValue(param)} {\n`;
-        ctorText += `${indent.push().get()}${param.name} = ${helpers.star(param.byValue)}options.${name}\n`;
+        ctorText += `${indent.push().get()}${param.name} = options.${name}\n`;
         ctorText += `${indent.pop().get()}}\n`;
       }
     };
@@ -647,7 +647,7 @@ function emitPagerDefinition(
   text += `${indent.get()}Fetcher: func(ctx context.Context, page *${method.returns.name}) (${method.returns.name}, error) {\n`;
   indent.push();
   if (options["generate-fakes"]) {
-    text += `${indent.get()}ctx = context.WithValue(ctx, runtime.CtxAPINameKey{}, "${method.receiver.type.name}.${helpers.fixUpMethodName(method)}")\n`;
+    text += `${indent.get()}ctx = context.WithValue(ctx, runtime.CtxAPINameKey{}, "${method.receiver.type.name}.${method.name}")\n`;
   }
 
   let nextLinkParam: string | undefined;
@@ -739,10 +739,9 @@ function generateOperation(
 ): string {
   const params = getAPIParametersSig(method, imports);
   const returns = generateReturnsInfo(method, "op");
-  let methodName = method.name;
-  if (method.kind === "pageableMethod") {
-    methodName = helpers.fixUpMethodName(method);
-  }
+  const methodName = go.isLROMethod(method)
+    ? naming.getEscapedReservedName(method.naming.operationMethod, "Operation")
+    : method.name;
   let text = "";
   const respErrDoc = genRespErrorDoc(method);
   if (method.docs.summary || method.docs.description) {
@@ -754,9 +753,7 @@ function generateOperation(
     text += `// ${methodName} -\n`;
   }
   text += respErrDoc;
-  if (go.isLROMethod(method)) {
-    methodName = method.naming.internalMethod;
-  } else {
+  if (!go.isLROMethod(method)) {
     for (const param of helpers.getMethodParameters(method)) {
       text += helpers.formatCommentAsBulletItem(param.name, param.docs);
     }
@@ -769,7 +766,7 @@ function generateOperation(
     return text;
   }
   text += `${indent.get()}var err error\n`;
-  let operationName = `"${method.receiver.type.name}.${helpers.fixUpMethodName(method)}"`;
+  let operationName = `"${method.receiver.type.name}.${method.name}"`;
   if (options["generate-fakes"] && options["inject-spans"]) {
     text += `${indent.get()}const operationName = ${operationName}\n`;
     operationName = "operationName";
@@ -927,7 +924,7 @@ function generateLROBeginMethod(
   imports.add("github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime");
   let text = "";
   if (method.docs.summary || method.docs.description) {
-    text += helpers.formatDocCommentWithPrefix(helpers.fixUpMethodName(method), method.docs);
+    text += helpers.formatDocCommentWithPrefix(method.name, method.docs);
     text += genRespErrorDoc(method);
   }
   const zeroResp = getZeroReturnValue(method, false);
@@ -935,7 +932,7 @@ function generateLROBeginMethod(
   for (const param of methodParams) {
     text += helpers.formatCommentAsBulletItem(param.name, param.docs);
   }
-  text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${helpers.fixUpMethodName(method)}(${params}) (${returns.join(", ")}) {\n`;
+  text += `func ${helpers.getClientReceiverDefinition(method.receiver)} ${method.name}(${params}) (${returns.join(", ")}) {\n`;
   let pollerType = "nil";
   let pollerTypeParam = `[${method.returns.name}]`;
   if (method.kind === "lroPageableMethod") {
@@ -951,7 +948,7 @@ function generateLROBeginMethod(
 
   // creating the poller from response branch
 
-  const opName = method.naming.internalMethod;
+  const opName = naming.getEscapedReservedName(method.naming.operationMethod, "Operation");
   text += `${indent.get()}resp, err := client.${opName}(${helpers.getCreateRequestParameters(method)})\n`;
   text += `${indent.get()}if err != nil {\n`;
   text += `${indent.push().get()}return ${zeroResp}, err\n`;

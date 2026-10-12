@@ -205,7 +205,6 @@ it("union of union as enum float type", async function () {
 
 it("string fixed", async function () {
   const { program } = await AzureCoreTesterWithService.compile(`
-    #suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
     @usage(Usage.input | Usage.output)
     enum DaysOfWeekFixedEnum {
       Monday,

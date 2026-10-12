@@ -270,13 +270,14 @@ model Azure.ResourceManager.ArmFeatureFileOptions
 
 #### Properties
 
-| Name            | Type     | Description                               |
-| --------------- | -------- | ----------------------------------------- |
-| featureName     | `string` | The feature name                          |
-| fileName        | `string` | The associated file name for the features |
-| description     | `string` | The feature description in Swagger        |
-| title?          | `string` | The feature title in Swagger              |
-| termsOfService? | `string` | The feature terms of service in Swagger   |
+| Name            | Type     | Description                                                         |
+| --------------- | -------- | ------------------------------------------------------------------- |
+| featureName     | `string` | The feature name                                                    |
+| fileName        | `string` | The associated file name for the features                           |
+| description     | `string` | The feature description in Swagger                                  |
+| title?          | `string` | The feature title in Swagger                                        |
+| termsOfService? | `string` | The feature terms of service in Swagger                             |
+| version?        | `string` | The API version to use for clients generated from this feature file |
 
 ### `ArmFilterParameter` {#Azure.ResourceManager.ArmFilterParameter}
 
@@ -2068,7 +2069,7 @@ model Azure.ResourceManager.CommonTypes.AccessRuleProperties
 | -------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
 | direction?                 | [`AccessRuleDirection`](./data-types.md#Azure.ResourceManager.CommonTypes.AccessRuleDirection) | Direction of the access rule                           |
 | addressPrefixes?           | `string[]`                                                                                     | Address prefixes in the CIDR format for inbound rules  |
-| subscriptions?             | `Azure.ResourceManager.CommonTypes.{ id: Azure.Core.armResourceIdentifier }[]`                 | Subscriptions for inbound rules                        |
+| subscriptions?             | `{ id: Azure.Core.armResourceIdentifier }[]`                                                   | Subscriptions for inbound rules                        |
 | networkSecurityPerimeters? | `Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeter[]`                                 | Network security perimeters for inbound rules          |
 | fullyQualifiedDomainNames? | `string[]`                                                                                     | Fully qualified domain names (FQDN) for outbound rules |
 | emailAddresses?            | `string[]`                                                                                     | Email addresses for outbound rules                     |

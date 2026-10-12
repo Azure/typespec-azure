@@ -1,0 +1,120 @@
+---
+title: 0.72.0
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+<LinkCard
+  title="TypeSpec Core 1.16"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/release-notes/typespec-1-16-0/"
+/>
+
+# 0.72.0
+
+This release is dominated by linting: eight new ARM rules and a new Azure.Core rule encode guidance that previously lived only in review feedback. On the client side, `@override` gains response customization and scoped TCGC decorators move to an evolvable options bag.
+
+## Highlights
+
+### A wave of new ARM linter rules
+
+The `@azure-tools/typespec-azure-resource-manager` library gains eight rules covering long-running operations, collection endpoints, and content types:
+
+| Rule                                | Flags                                                                        |
+| ----------------------------------- | ---------------------------------------------------------------------------- |
+| `lro-response-mismatch`             | A long-running operation whose final result type doesn't match its response  |
+| `list-response-envelope`            | ARM collection GET responses that don't use the standard envelope            |
+| `list-operation-missing-pageable`   | Collection GET operations without TypeSpec paging metadata                   |
+| `use-application-json-content-type` | ARM operations with non-JSON request or response bodies                      |
+| `no-query-in-post`                  | POST operations declaring query parameters other than `api-version`          |
+| `no-query-in-collection`            | Collection operations declaring extra query parameters                       |
+| `no-query-in-point-op`              | Point GET, PUT, PATCH, or DELETE operations declaring extra query parameters |
+| `no-tenant-level-apis`              | Tenant-level API paths                                                       |
+
+`@azure-tools/typespec-azure-core` also adds `no-boolean`, which recommends a descriptive extensible enum over a boolean when the values carry semantic meaning.
+
+All of these rules are registered as **disabled by default** — the eight ARM rules in the `resource-manager` ruleset, and `no-boolean` in both `resource-manager` and `data-plane` — so no existing spec starts reporting new diagnostics. Opt in per rule through `linter.enable` in `tspconfig.yaml`:
+
+```yaml
+linter:
+  extends:
+    - "@azure-tools/typespec-azure-rulesets/resource-manager"
+  enable:
+    "@azure-tools/typespec-azure-resource-manager/no-tenant-level-apis": true
+```
+
+### `@override` can now replace a client method response
+
+`@override` is no longer limited to reshaping parameters. It can replace a method's response, with two dedicated customization functions for the common cases:
+
+```typespec
+alias DownloadResponse = replaceResponseWithBytes(MyService.download);
+@@override(MyService.download, DownloadResponse);
+```
+
+A response type mismatch is now reported as an error, while an intentional `void` or `bytes` replacement is reported as a warning so the customization stays visible.
+
+### Evolvable `scope` for TCGC decorators
+
+Every scoped TCGC decorator now accepts either the legacy plain-string scope or a typed options bag built on the shared `Azure.ClientGenerator.Core.DecoratorOptions` model:
+
+```typespec
+@@clientName(MyService.Foo, "Bar", #{ scope: "csharp" });
+```
+
+This lets individual decorators grow their own options without breaking others. If the options bag scope disagrees with the legacy positional argument, TCGC reports a `conflicting-scope` warning and prefers the options bag. See `design-docs/decorator-options-migration.md` for migration guidance.
+
+## Features
+
+### @azure-tools/typespec-azure-core
+
+- [#5265](https://github.com/Azure/typespec-azure/pull/5265) Add the `no-boolean` lint rule that recommends descriptive extensible enums instead of boolean API shapes when semantic values matter.
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#4145](https://github.com/Azure/typespec-azure/pull/4145) Add linter rule `lro-response-mismatch` to warn when a long-running operation's final result type does not match the expected response
+- [#5358](https://github.com/Azure/typespec-azure/pull/5358) Add the `list-response-envelope` rule for ARM collection GET response envelopes.
+- [#5302](https://github.com/Azure/typespec-azure/pull/5302) Add the `use-application-json-content-type` rule to require JSON request and response bodies for ARM operations.
+- [#5281](https://github.com/Azure/typespec-azure/pull/5281) Add the `no-query-in-post` ARM lint rule to warn when POST operations declare query parameters other than `api-version`.
+- [#5318](https://github.com/Azure/typespec-azure/pull/5318) Add the `no-query-in-collection` ARM lint rule, disabled by default in the resource-manager ruleset.
+- [#5420](https://github.com/Azure/typespec-azure/pull/5420) Add the `no-tenant-level-apis` ARM linter rule.
+- [#5273](https://github.com/Azure/typespec-azure/pull/5273) Add an ARM lint rule that warns when point GET, PUT, PATCH, or DELETE operations declare query parameters other than `api-version`.
+- [#5379](https://github.com/Azure/typespec-azure/pull/5379) Add the `list-operation-missing-pageable` lint rule for ARM collection GET operations that do not define TypeSpec paging metadata.
+
+### @azure-tools/typespec-client-generator-core
+
+- [#5276](https://github.com/Azure/typespec-azure/pull/5276) `@clientOption`'s `value` can now reference a TypeSpec model, in addition to `string`, `boolean`, and `number` literal values. The referenced model (including customizations such as `@alternateType`) is preserved and resolved so scoped emitters can access it via `getClientOptions`.
+- [#5173](https://github.com/Azure/typespec-azure/pull/5173) Allow `@override` to replace a client method response and add the `replaceResponseWithVoid` and `replaceResponseWithBytes` customization functions. Report response type mismatches as errors and intentional `void` or `bytes` replacements as warnings.
+- [#5305](https://github.com/Azure/typespec-azure/pull/5305) Make the `scope` argument accepted by scoped TCGC decorators evolvable via a shared, typed `Azure.ClientGenerator.Core.DecoratorOptions` model. Every scoped decorator now accepts either the legacy plain-string scope (e.g. `"csharp"`) or a typed options bag (e.g. `#{ scope: "csharp" }`), and individual decorators can later grow their own options model that extends `DecoratorOptions` without breaking others.
+
+  `@client`'s `ClientOptions` and `@clientInitialization`'s `ClientInitializationOptions` now also accept `scope` directly (both extend `DecoratorOptions`). If the options bag scope disagrees with the legacy positional argument, TCGC reports a `conflicting-scope` warning and prefers the options bag value. Decorators that already have an options bag keep a single options bag — the legacy positional `scope` stays a plain string purely for backward compatibility. See `design-docs/decorator-options-migration.md` for migration guidance and deprecation policy.
+
+### @azure-tools/typespec-azure-rulesets
+
+- [#5265](https://github.com/Azure/typespec-azure/pull/5265) Add the `no-boolean` lint rule that recommends descriptive extensible enums instead of boolean API shapes when semantic values matter.
+- [#4145](https://github.com/Azure/typespec-azure/pull/4145) Add linter rule `lro-response-mismatch` to warn when a long-running operation's final result type does not match the expected response
+- [#5358](https://github.com/Azure/typespec-azure/pull/5358) Register the ARM collection response envelope rule as disabled by default.
+- [#5302](https://github.com/Azure/typespec-azure/pull/5302) Add the `use-application-json-content-type` rule to require JSON request and response bodies for ARM operations.
+- [#5318](https://github.com/Azure/typespec-azure/pull/5318) Add the `no-query-in-collection` ARM lint rule, disabled by default in the resource-manager ruleset.
+- [#5273](https://github.com/Azure/typespec-azure/pull/5273) Add an ARM lint rule that warns when point GET, PUT, PATCH, or DELETE operations declare query parameters other than `api-version`.
+- [#5379](https://github.com/Azure/typespec-azure/pull/5379) Add the `list-operation-missing-pageable` lint rule for ARM collection GET operations that do not define TypeSpec paging metadata.
+
+## Bug Fixes
+
+### @azure-tools/typespec-autorest
+
+- [#5383](https://github.com/Azure/typespec-azure/pull/5383) Do not emit empty legacy feature files, apply `version-enum-strategy` to feature enums, and return the configured enum from the ARM feature-file accessor.
+- [#5340](https://github.com/Azure/typespec-azure/pull/5340) Sanitize spec-provided service names and versions used in output and example paths so they cannot escape their configured directories.
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#4851](https://github.com/Azure/typespec-azure/pull/4851) Fix `resolveArmResources` resource identity detection to seed resources from strict ARM resource instance paths instead of inferring resource IDs from list or action operation paths.
+- [#5383](https://github.com/Azure/typespec-azure/pull/5383) Do not emit empty legacy feature files, apply `version-enum-strategy` to feature enums, and return the configured enum from the ARM feature-file accessor.
+
+### @azure-tools/typespec-client-generator-core
+
+- [#5306](https://github.com/Azure/typespec-azure/pull/5306) Use an optional string with an `application/octet-stream` client default for file uploads without an explicit content type.
+
+### @azure-tools/azure-http-specs
+
+- [#5214](https://github.com/Azure/typespec-azure/pull/5214) Add the missing nextLink decorator to the ARM operation template paging scenario.

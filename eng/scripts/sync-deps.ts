@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from "fs";
 import { join, relative, resolve } from "path";
 import pc from "picocolors";
 import { coreRepoRoot, repoRoot } from "./helpers.js";
+import { syncCiToolVersions } from "./sync-ci-tool-versions.ts";
 
 const WorkspaceYamlFile = "pnpm-workspace.yaml";
 
@@ -321,12 +322,27 @@ function main() {
   if (mode !== "check" && mode !== "fix") {
     console.error("Usage: pnpm deps <check|fix>");
     console.error(
-      "  check  - Verify catalog & overrides sync with core and enforce catalog: usage (exits non-zero if any issues)",
+      "  check  - Verify catalog & overrides sync with core, catalog: usage, and CI tool versions against mise.toml",
     );
     console.error(
-      "  fix    - Sync catalog & overrides from core, align packageManager, and remove unused entries",
+      "  fix    - Sync catalog & overrides from core, align packageManager and CI tool versions, and remove unused entries",
     );
     process.exit(1);
+  }
+
+  const toolMismatches = syncCiToolVersions(repoRoot, mode);
+  if (toolMismatches.length > 0) {
+    console.log("CI tool version mismatch(es) with mise.toml:");
+    for (const { tool, currentVersion, expectedVersion } of toolMismatches) {
+      console.log(`  ${pc.cyan(tool)}: ${pc.red(currentVersion)} → ${pc.green(expectedVersion)}`);
+    }
+    if (mode === "check") {
+      console.log(`\nRun ${pc.cyan("pnpm deps fix")} to sync CI tool versions.`);
+      process.exit(1);
+    }
+    console.log(pc.green("✓") + " Updated CI tool versions from mise.toml.");
+  } else {
+    console.log(pc.green("✓") + " CI tool versions are in sync with mise.toml.");
   }
 
   const repoWorkspaceYaml = resolve(repoRoot, WorkspaceYamlFile);

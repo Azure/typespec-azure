@@ -886,8 +886,10 @@ interface MyInterface {}
 ### `@override` {#@Azure.ClientGenerator.Core.override}
 
 Customize a method's signature in the generated client SDK.
-Currently, only parameter signature customization is supported.
-This decorator allows you to specify a different method signature for the client SDK than the original definition.
+The override operation defines the client method parameters, but its declared return type is
+ignored. To intentionally replace the generated method response, pass an operation returned by
+`replaceResponseWithVoid` or `replaceResponseWithBytes`; these functions preserve the original
+HTTP response metadata.
 
 ```typespec
 @Azure.ClientGenerator.Core.override(override: Operation, scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)

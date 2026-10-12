@@ -81,7 +81,7 @@ Most TCGC types share the following common properties:
 - **`namespace`**: Indicates the type's namespace.
 - **`doc` and `summary`**: Contain documentation-related information.
 - **`apiVersions`**: Indicates which API versions the type exists in.
-- **`decorators`**: Stores TypeSpec decorator information for advanced use cases. Decorator arguments that reference TypeSpec models are converted to TCGC SDK types. For example, a model-reference value passed to `@clientOption` preserves scoped transformations such as `@alternateType`.
+- **`decorators`**: Stores TypeSpec decorator information for advanced use cases. Model-reference arguments are converted to TCGC SDK types only for `@clientOption`, preserving scoped transformations such as `@alternateType`. Model-reference arguments on other decorators are unsupported: TCGC reports `unsupported-generic-decorator-arg-type` and records the argument as `undefined`.
 - **`crossLanguageDefinitionId`**: A unique ID for a TCGC type that can be used for output mapping across different emitters. When `@alternateType` replaces a union, model, enum, scalar, or model property, the original type uses the replacement type's ID. This is resolved recursively, so a chain of alternate types has one identity.
 - **`name`** and **`isGeneratedName`**: The type's name and whether the name was created by TCGC.
 - **`isExactName`**: Indicates that the name was set via `@clientName` with the `exact()` function and must be used as-is by language emitters, without applying any casing transformations (e.g., no snake_case for Python, no camelCase for JavaScript).
@@ -101,7 +101,7 @@ Most TCGC types share the following common properties:
   - `LroFinalEnvelope` (8192): Type is used in the final envelope of an LRO.
   - `External` (16384): Type is only referenced through external alternate types. When a type has the `External` flag and no `Input` or `Output` flags, it means emitters do not need to generate serialization/deserialization code for it — the external package handles that. TCGC blocks propagation of non-`External` usage flags (such as `Input`, `Output`, `Json`) through types marked as external.
 - **`deprecation`**: Indicates whether the type is deprecated and provides the deprecation message.
-- **`clientDefaultValue`**: The type's default value if provided. Set via the `@clientDefaultValue` decorator or auto-set for endpoint and API version parameters.
+- **`clientDefaultValue`**: The type's default value if provided. Set via the `@clientDefaultValue` decorator or auto-set for endpoint and API version parameters. For an API-version parameter, an effective `@Azure.Core.Legacy.overrideApiVersion` value takes precedence over the selected service version. TCGC resolves the override from the operation's declaration scope, including its source-operation chain, rather than from a client to which `@clientLocation` moved the operation. The override changes the parameter default only; it does not change the client's `apiVersions` metadata.
 
 ### Package
 
@@ -147,6 +147,10 @@ export async function $onEmit(context: EmitContext<SdkEmitterOptions>) {
 Emitters can get first-level clients of a client package from `SdkPackage.clients`. An [`SdkClientType`](../reference/js-api/interfaces/sdkclienttype/) represents a client in the package. Emitters can use `SdkClientType.children` to get nested sub clients, and use `SdkClientType.parent` to trace back.
 
 `SdkClientType.versionsEnum` is the [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) describing the API versions supported by this client's service (its `usage` includes the `ApiVersionEnum` flag, and it is the same object that appears in `SdkPackage.enums`). It is `undefined` for unversioned services and for multi-service root clients (which span more than one service). Sub clients that map to a single service still expose their own service's `versionsEnum`.
+
+`SdkClientType.authentication` preserves the service's HTTP authentication requirements as an `Authentication` object. Each entry in `authentication.options` is an alternative authentication option (OR), while every scheme within one option is required together (AND). `NoAuth` remains an explicit scheme, including when it is the only option. The property is `undefined` when the client has no associated service or the service does not declare authentication. For a client that combines multiple services, it describes the first service, consistent with the client's endpoint and credential metadata.
+
+When `exportTCGCoutput` generates `tcgc-output.yaml`, the serialized authentication value preserves the option and scheme grouping but omits each scheme's compiler `model` reference.
 
 `SdkClientType.clientInitialization` tells emitters how to initialize the client. [`SdkClientInitializationType`](../reference/js-api/interfaces/sdkclientinitializationtype/) contains info about the client's initialization parameters and how the client can be initialized, controlled by the `initializedBy` flags:
 
@@ -317,6 +321,7 @@ Parameters used in client (either API version parameter or client parameter defi
 The method's return type is determined by the underlying operation's normal responses:
 
 - If `@responseAsBool` is on the method, then the response is a `boolean` (never optional). In this case, the underlying HTTP response objects have `type: undefined` — the boolean return type is a client-side concept handled at the method response level, not at the HTTP response level.
+- If `@override` uses `replaceResponseWithVoid` or `replaceResponseWithBytes`, the method response is respectively empty or `bytes`, while the underlying HTTP responses and exceptions keep their original wire types and metadata. Either replacement disables pageable-method classification and reports `override-response-replacement`. For any other override operation, TCGC ignores its declared return type, preserves the response calculated from the original operation, and does not perform response compatibility validation.
 - If the responses contain multiple return types, the return type is a union of all the types.
 - If the responses contain empty return type, the return type is wrapped with a nullable type.
 
@@ -333,6 +338,8 @@ TCGC infers the body parameter type from TypeSpec HTTP lib type [`HttpOperationB
 TCGC creates the `Content-Type` header parameter for any operation with body parameter if it doesn't exist, and creates the `Accept` header parameter for any operation with response that contains body. TCGC also creates corresponding method parameters for the operation's upper layer method for each case.
 
 For request bodies with multiple content types, the `Content-Type` parameter is modeled as an enum with one value per content type. For responses with multiple content types, the `Accept` header parameter is modeled as a single constant whose value is a comma-joined string of all response content types. Structured content types (JSON, XML, `text/plain`) are sorted before unstructured ones. For example, if a response can return `image/png` or `application/json`, the `Accept` constant value is `"application/json, image/png"`.
+
+For a `File` request body without an explicit content type, the HTTP library reports the unconstrained marker `*/*`. TCGC exposes the generated method and HTTP `Content-Type` parameters as optional strings with `clientDefaultValue: "application/octet-stream"` rather than generating a required `"*/*"` constant. This special case applies only to uploads; a `File` response without an explicit content type still has a constant `Accept: "*/*"` parameter.
 
 TCGC uses several ways to find an HTTP operation's parameter's corresponding method parameter or model property:
 

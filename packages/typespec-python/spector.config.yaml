@@ -34,8 +34,11 @@ specs:
   "azure/client-generator-core/hierarchy-building": true
   "azure/client-generator-core/next-link-verb": true
   "azure/client-generator-core/override": true
+  # Disabled until all language emitters support response replacement.
+  "azure/client-generator-core/response-replacement": false
   "azure/client-generator-core/response-as-bool": true
   "azure/client-generator-core/usage": true
+  "azure/core/api-version-override": true
   "azure/core/basic": true
   "azure/core/lro/rpc": true
   "azure/core/lro/standard": true

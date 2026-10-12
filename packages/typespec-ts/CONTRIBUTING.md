@@ -42,6 +42,12 @@ The package is tested through three vitest projects (configured in `vitest.confi
 | `unit-modular`              | `test/modular-unit/**`              | Modular unit tests               | `pnpm unit-test`           |
 | `integration-azure-modular` | `test/azure-modular-integration/**` | Modular spector end-to-end tests | `pnpm integration-test-ci` |
 
+Repo-wide runs (`vitest.config.ts` and `vitest.config.fast.ts` at the repository root)
+use this package's `vitest.config.repo.ts` to run only the `test-next` smoke suite.
+The heavier modular unit tests and Spector tests run through the package commands
+above and the dedicated TypeScript CI jobs. Keep suite-specific `include` patterns
+on the individual projects: Vitest 5 inherits and merges parent-level patterns.
+
 `pnpm lint` runs ESLint with `--max-warnings=0`.
 
 The integration suite generates real clients from specs and runs them against a local spector

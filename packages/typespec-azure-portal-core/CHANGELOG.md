@@ -1,5 +1,13 @@
 # Changelog - @azure-tools/typespec-azure-portal-core
 
+## 0.73.0
+
+No changes, version bump only.
+
+## 0.72.0
+
+No changes, version bump only.
+
 ## 0.71.0
 
 No changes, version bump only.
