@@ -15,5 +15,5 @@ async def client():
 
 
 @pytest.mark.asyncio
-async def test_legacy_client_get(client: ApiVersionOverrideClient):
+async def test_legacy_client_api_version_override(client: ApiVersionOverrideClient):
     await client.legacy_client.get()
