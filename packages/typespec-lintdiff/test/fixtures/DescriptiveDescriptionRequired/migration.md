@@ -52,6 +52,12 @@ this small additional traversal is required.
 
 - Specs repository: `Azure/azure-rest-api-specs`, commit
   `f6b53f105b95da05276530a0754a1c71b4f16397`.
+- TypeSpec Azure repository HEAD during the corpus run:
+  `11eff404b2e58dbb0e5075dd081ea404f8e6b383`. The worktree was dirty with
+  the uncommitted nine-file rule draft and generated corpus output; the
+  production rule used by the run had SHA-256
+  `41061ACFE1DD55D13C61344E33FF0D2A52B39B20BF7C48C908045768C888D5FB`.
+  The corpus harness was unchanged from that HEAD.
 - TypeSpec analysis generated at `2026-10-12T05:53:15.715Z`; full runner duration
   `1092229 ms`. All 468 dataset projects were attempted, with 462 successes.
 - Scope: resource-manager projects, all local lint rules enabled, concurrency 6.
@@ -65,6 +71,20 @@ this small additional traversal is required.
   raw shard is retained separately from successful-project coverage.
 - Production source uses only compiler documentation metadata. The emitter and
   validator investigations below are comparison evidence, not implementation.
+
+The representative and full runs used these exact commands from the TypeSpec
+Azure repository root:
+
+```powershell
+mise exec -- pnpm --dir packages\typespec-lintdiff specs:typespec --specs-repo C:\dev\worktrees\azure-rest-api-specs-lintdiff-descriptive-description-required --filter AppConfiguration --limit 1 --concurrency 6
+mise exec -- pnpm --dir packages\typespec-lintdiff specs:typespec --specs-repo C:\dev\worktrees\azure-rest-api-specs-lintdiff-descriptive-description-required --concurrency 6
+```
+
+The queue retained the raw run receipts outside the repository as
+`descriptive-cycle-0-corpus-representative.txt` and
+`descriptive-cycle-0-corpus-full.txt`, with the parsed result and limitations in
+`descriptive-cycle-0-corpus-evidence.json`. Generated corpus files were restored
+after analysis and are intentionally absent from this PR.
 
 Original sources:
 
@@ -170,6 +190,24 @@ find is BackupInstanceResourceOps.ActionSync<
   OverrideErrorType = CloudError
 >;
 ```
+
+A deterministic compiler inspection of this successfully compiled project used
+the compiler's `getDoc` API and retained this result in
+`descriptive-cycle-0-native-metadata.txt`:
+
+```json
+{
+  "kind": "Operation",
+  "name": "find",
+  "doc": "",
+  "file": "BackupInstanceResource.tsp",
+  "line": 286
+}
+```
+
+The same inspection recorded `configErrors: 0`, tying the `ActionSync`
+instantiation above to the effective empty documentation metadata consumed by
+the native rule.
 
 The selected-version POST at the `findRestorableTimeRanges` path contains:
 

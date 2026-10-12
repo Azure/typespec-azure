@@ -28,7 +28,6 @@ describe("descriptive-description-required", () => {
     'model Widget { @doc(" ") name: string; }',
     '@doc(" ") scalar Label extends string;',
     '@doc(" ") enum State { Ready }',
-    'enum State { @doc(" ") Ready }',
     '@doc(" ") union State { ready: "ready", string }',
     'union State { @doc(" ") ready: "ready", string }',
     'op read(@doc(" ") name: string): string;',
@@ -73,5 +72,27 @@ describe("descriptive-description-required", () => {
           };
         }),
       );
+  });
+
+  it("targets offending enum members rather than their containing enum", async () => {
+    await tester
+      .expect(
+        `
+        enum State {
+          @doc(" ") /*ready*/Ready
+        }
+      `,
+      )
+      .toEmitDiagnostics(({ ready }) => {
+        const location = getSourceLocation(ready);
+        return [
+          {
+            ...diagnostic,
+            file: location.file.path,
+            pos: location.pos,
+            end: location.end,
+          },
+        ];
+      });
   });
 });
