@@ -342,14 +342,21 @@ The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native C
 
 #### LRO polling metadata
 
-TCGC-only `@lroOperationId` and repeatable `@lroPollingMetadata` decorators let an SDK expose
-selected status-monitor metadata without changing Azure.Core polling protocol semantics or the
-normal method response:
+TCGC-only `@lroOperationId` and `@lroPollingMetadata` decorators let an SDK expose status-monitor
+metadata without changing Azure.Core polling protocol semantics or the normal method response:
 
 ```typespec
+model OperationStatus {
+  status: OperationState;
+
+  @lroPollingMetadata
+  percentComplete?: int32;
+
+  @lroPollingMetadata
+  requestId?: string;
+}
+
 @lroOperationId
-@lroPollingMetadata(OperationStatus.percentComplete)
-@lroPollingMetadata(OperationStatus.requestId)
 op begin is MyLongRunningOperation;
 ```
 
@@ -359,10 +366,13 @@ promise percent-decoding, storage, or a common runtime lifecycle; each emitter i
 idiomatic accessor while preserving that semantic.
 
 `SdkLroServiceMetadata.pollingMetadata` contains the exact cached `SdkModelPropertyType` objects
-from the polling response model, in decorator declaration order. Consequently, client and wire
-names, optionality, decorators, serialization, and property types are preserved. A selected
-property must be direct or inherited; nested paths are intentionally unsupported. TCGC retains
-only selected type graphs for output and continues to honor scoped `@usage` and `@access`.
+from the polling response model, in deterministic direct-then-inherited model/property order.
+Consequently, client and wire names, optionality, decorators, serialization, and property types
+are preserved. Each active decorated direct or inherited property applies to every LRO that uses
+that status-monitor model. Nested properties are not scanned; decorate the direct property to
+expose its typed graph. A decorated property unused by an LRO has no generation effect. TCGC
+retains only decorated type graphs for output and continues to honor scoped `@usage`, `@access`,
+and inclusion or negation on each property.
 
 ### HTTP Operation Parameters Handling
 

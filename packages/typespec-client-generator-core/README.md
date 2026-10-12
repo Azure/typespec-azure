@@ -1025,24 +1025,23 @@ The native long-running operation.
 
 #### `@lroPollingMetadata`
 
-Exposes a typed property from the status-monitor response as SDK polling metadata.
-This decorator is repeatable; entries are returned in declaration order.
+Exposes a status-monitor model property as typed SDK polling metadata when the property is used
+directly or through inheritance by a native long-running operation.
 
 ```typespec
-@Azure.ClientGenerator.Core.lroPollingMetadata(property: ModelProperty, scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+@Azure.ClientGenerator.Core.lroPollingMetadata(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
 ```
 
 ##### Target
 
-The native long-running operation.
-`Operation`
+The status-monitor model property.
+`ModelProperty`
 
 ##### Parameters
 
-| Name     | Type                                                            | Description                                                          |
-| -------- | --------------------------------------------------------------- | -------------------------------------------------------------------- |
-| property | `ModelProperty`                                                 | A direct or inherited property of the status-monitor response model. |
-| scope    | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters.                              |
+| Name  | Type                                                            | Description                             |
+| ----- | --------------------------------------------------------------- | --------------------------------------- |
+| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. |
 
 #### `@operationGroup`
 

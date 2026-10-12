@@ -1208,8 +1208,9 @@ export interface SdkLroServiceMetadata {
    */
   operationId?: SdkLroOperationIdMetadata;
   /**
-   * Typed status-monitor properties selected with `@lroPollingMetadata`, in declaration order.
-   * Entries are the exact cached properties from `pollingInfo.responseModel`.
+   * Typed status-monitor properties marked with `@lroPollingMetadata`, in deterministic
+   * direct-then-inherited model/property order. Entries are the exact cached properties from
+   * `pollingInfo.responseModel`.
    */
   pollingMetadata?: SdkModelPropertyType[];
 }

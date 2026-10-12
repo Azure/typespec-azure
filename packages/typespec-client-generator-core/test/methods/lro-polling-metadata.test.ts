@@ -37,14 +37,17 @@ model JobState extends PollingMetadataBase {
   @doc("Completion percentage")
   @encode(string)
   @encodedName("application/json", "percent_complete")
+  @lroPollingMetadata
   percentComplete?: int32;
 
+  @lroPollingMetadata
   details: Details;
   sibling: Sibling;
 }
 
 model PollingMetadataBase {
   @clientName("requestToken")
+  @lroPollingMetadata
   request_token: string;
 }
 
@@ -66,9 +69,6 @@ op getJobStatus is ResourceOperations.ResourceRead<JobState>;
 @route("/jobs")
 @pollingOperation(getJobStatus)
 @lroOperationId
-@lroPollingMetadata(JobState.request_token)
-@lroPollingMetadata(JobState.percentComplete)
-@lroPollingMetadata(JobState.details)
 op start is Azure.Core.Foundations.LongRunningOperation<
   {},
   AcceptedResponse,
@@ -140,9 +140,9 @@ describe("LRO polling metadata", () => {
     const pollingMetadata = lro.lroMetadata.pollingMetadata;
     ok(pollingMetadata);
     expect(pollingMetadata).toEqual([
-      pollingProperties.find((x) => x.name === "requestToken"),
       pollingProperties.find((x) => x.name === "percentComplete"),
       pollingProperties.find((x) => x.name === "details"),
+      pollingProperties.find((x) => x.name === "requestToken"),
     ]);
     for (const property of pollingMetadata) {
       strictEqual(
@@ -151,7 +151,7 @@ describe("LRO polling metadata", () => {
       );
     }
 
-    const percent = pollingMetadata[1];
+    const percent = pollingMetadata[0];
     strictEqual(percent.name, "percentComplete");
     strictEqual(percent.serializationOptions.json?.name, "percent_complete");
     strictEqual(percent.optional, true);
@@ -163,7 +163,9 @@ describe("LRO polling metadata", () => {
     const { program } = await Tester.compile(operation);
     const context = await createSdkContextForTester(program);
     const { program: undecoratedProgram } = await Tester.compile(
-      operation.replace("@lroOperationId\n", "").replaceAll(/@lroPollingMetadata\([^)]+\)\n/g, ""),
+      operation
+        .replace("@lroOperationId\n", "")
+        .replaceAll(/ {2}@lroPollingMetadata(?:\([^)]*\))?\n/g, ""),
     );
     const undecoratedContext = await createSdkContextForTester(undecoratedProgram);
     const details = context.sdkPackage.models.find((x) => x.name === "Details");
@@ -186,12 +188,12 @@ describe("LRO polling metadata", () => {
     const { program } = await Tester.compile(
       operation
         .replace(
-          "@lroPollingMetadata(JobState.request_token)",
-          '@lroPollingMetadata(JobState.request_token, "python")',
+          "@lroPollingMetadata\n  request_token",
+          '@lroPollingMetadata("python")\n  request_token',
         )
         .replace(
-          "@lroPollingMetadata(JobState.percentComplete)",
-          '@lroPollingMetadata(JobState.percentComplete, "!python")',
+          "@lroPollingMetadata\n  percentComplete",
+          '@lroPollingMetadata("!python")\n  percentComplete',
         ),
     );
     const context = await createSdkContextForTester(program, {
@@ -201,8 +203,8 @@ describe("LRO polling metadata", () => {
     ok(method);
     strictEqual(method.kind, "lro");
     expect(method.lroMetadata.pollingMetadata?.map((x) => x.name)).toEqual([
-      "requestToken",
       "details",
+      "requestToken",
     ]);
   });
 
@@ -240,7 +242,7 @@ describe("LRO polling metadata", () => {
     expect(csharpDetails.usage & UsageFlags.Input).toBe(0);
   });
 
-  it("reports invalid targets, duplicates, conflicts, and explicit internal exposure", async () => {
+  it("reports invalid operation IDs, duplicates, conflicts, and explicit internal exposure", async () => {
     const invalidCases = [
       {
         code: `
@@ -250,23 +252,14 @@ model Value { value: string; }
 @route("/ordinary")
 op ordinary(): Value;
 `,
-        diagnostic: "lro-polling-metadata-non-lro",
+        diagnostic: "lro-operation-id-non-lro",
       },
       {
         code: operation.replace(
-          "@lroPollingMetadata(JobState.request_token)",
-          "@lroPollingMetadata(JobState.sibling)\n@lroPollingMetadata(JobState.sibling)",
+          "@lroPollingMetadata\n  request_token",
+          "@lroPollingMetadata\n  @lroPollingMetadata\n  request_token",
         ),
         diagnostic: "lro-polling-metadata-duplicate",
-      },
-      {
-        code: operation
-          .replace("model Sibling {", "model Other { value: string; }\nmodel Sibling {")
-          .replace(
-            "@lroPollingMetadata(JobState.request_token)",
-            "@lroPollingMetadata(Other.value)",
-          ),
-        diagnostic: "lro-polling-metadata-unreachable",
       },
       {
         code: operation.replace(
@@ -296,6 +289,87 @@ op ordinary(): Value;
         `@azure-tools/typespec-client-generator-core/${testCase.diagnostic}`,
       );
     }
+  });
+
+  it("ignores decorated properties that are not used by an LRO", async () => {
+    const code = operation.replace(
+      "model Sibling {",
+      `model Other {
+  @lroPollingMetadata
+  value: string;
+}
+
+model Sibling {`,
+    );
+    const { program } = await Tester.compile(code);
+    const context = await createSdkContextForTester(program);
+    expect(context.diagnostics).toHaveLength(0);
+    expect(context.sdkPackage.models.find((x) => x.name === "Other")).toBeUndefined();
+  });
+
+  it("applies a shared decorated property to every LRO monitor model that inherits it", async () => {
+    const { program } = await Tester.compile(
+      `${operation}
+
+@resource("secondJobs")
+model SecondJobState extends PollingMetadataBase {
+  @key
+  @visibility(Lifecycle.Read)
+  jobId: string;
+
+  status: LroStatus;
+}
+
+op getSecondJobStatus is ResourceOperations.ResourceRead<SecondJobState>;
+
+@route("/jobs/second")
+@pollingOperation(getSecondJobStatus)
+op startSecond is Azure.Core.Foundations.LongRunningOperation<
+  {},
+  AcceptedResponse,
+  {},
+  {}
+>;
+`,
+    );
+    const context = await createSdkContextForTester(program);
+    const start = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
+    const startSecond = context.sdkPackage.clients[0].methods.find((x) => x.name === "startSecond");
+    ok(start);
+    ok(startSecond);
+    strictEqual(start.kind, "lro");
+    strictEqual(startSecond.kind, "lro");
+    expect(start.lroMetadata.pollingMetadata?.map((x) => x.name)).toEqual([
+      "percentComplete",
+      "details",
+      "requestToken",
+    ]);
+    expect(startSecond.lroMetadata.pollingMetadata?.map((x) => x.name)).toEqual(["requestToken"]);
+    strictEqual(
+      start.lroMetadata.pollingMetadata?.[2],
+      startSecond.lroMetadata.pollingMetadata?.[0],
+    );
+  });
+
+  it("reports only overlapping active scoped property decorators", async () => {
+    const { program } = await Tester.compile(
+      operation.replace(
+        "@lroPollingMetadata\n  request_token",
+        '@lroPollingMetadata\n  @lroPollingMetadata("python")\n  request_token',
+      ),
+    );
+    const pythonContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const csharpContext = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    expect(pythonContext.diagnostics.map((x) => x.code)).toContain(
+      "@azure-tools/typespec-client-generator-core/lro-polling-metadata-duplicate",
+    );
+    expect(csharpContext.diagnostics.map((x) => x.code)).not.toContain(
+      "@azure-tools/typespec-client-generator-core/lro-polling-metadata-duplicate",
+    );
   });
 
   it("rejects a next-operation reference without a status-monitor link", async () => {
@@ -334,7 +408,9 @@ op createWidget(@path id: string): {
 
   it("does not change undecorated LRO metadata", async () => {
     const { program } = await Tester.compile(
-      operation.replace("@lroOperationId\n", "").replaceAll(/@lroPollingMetadata\([^)]+\)\n/g, ""),
+      operation
+        .replace("@lroOperationId\n", "")
+        .replaceAll(/ {2}@lroPollingMetadata(?:\([^)]*\))?\n/g, ""),
     );
     const context = await createSdkContextForTester(program);
     const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
@@ -376,9 +452,9 @@ op start(): StartResponse;`,
     strictEqual(method.kind, "lropaging");
     strictEqual(method.lroMetadata.operationId?.extractionStrategy, "last-non-empty-path-segment");
     expect(method.lroMetadata.pollingMetadata?.map((x) => x.name)).toEqual([
-      "requestToken",
       "percentComplete",
       "details",
+      "requestToken",
     ]);
   });
 });

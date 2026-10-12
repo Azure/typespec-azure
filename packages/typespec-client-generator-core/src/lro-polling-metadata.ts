@@ -73,19 +73,17 @@ function resolve(
 ): [ResolvedLroPollingMetadata | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const operationIdDecorators = getLroOperationIdDecorators(context, operation);
-  const metadataDecorators = getLroPollingMetadataDecorators(context, operation);
-  if (operationIdDecorators.length === 0 && metadataDecorators.length === 0) {
-    return diagnostics.wrap(undefined);
-  }
 
   const raw = getLroMetadata(context.program, operation);
   if (!raw) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "lro-polling-metadata-non-lro",
-        target: operation,
-      }),
-    );
+    if (operationIdDecorators.length > 0) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "lro-operation-id-non-lro",
+          target: operation,
+        }),
+      );
+    }
     return diagnostics.wrap(undefined);
   }
 
@@ -110,75 +108,66 @@ function resolve(
   }
 
   const properties: ModelProperty[] = [];
-  const seenProperties = new Set<ModelProperty>();
   const seenNames = new Map<string, DiagnosticTarget>();
   if (operationId) {
     seenNames.set("operationId", operationIdDecorators[0].target);
   }
 
-  for (const entry of metadataDecorators) {
-    if (seenProperties.has(entry.property)) {
+  for (const property of getDirectAndInheritedProperties(raw.pollingInfo.responseModel)) {
+    const metadataDecorators = getLroPollingMetadataDecorators(context, property);
+    if (metadataDecorators.length === 0) continue;
+
+    if (metadataDecorators.length > 1) {
       diagnostics.add(
         createDiagnostic({
           code: "lro-polling-metadata-duplicate",
-          format: { propertyName: entry.property.name },
-          target: entry.target,
+          format: { propertyName: property.name },
+          target: metadataDecorators[1].target,
         }),
       );
-      continue;
-    }
-    seenProperties.add(entry.property);
-
-    if (!isDirectOrInheritedProperty(raw.pollingInfo.responseModel, entry.property)) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "lro-polling-metadata-unreachable",
-          format: { propertyName: entry.property.name },
-          target: entry.target,
-        }),
-      );
-      continue;
     }
 
-    const clientName = getLibraryName(context, entry.property);
+    const clientName = getLibraryName(context, property);
     if (seenNames.has(clientName)) {
       diagnostics.add(
         createDiagnostic({
           code: "lro-polling-metadata-name-conflict",
           format: { clientName },
-          target: entry.target,
+          target: metadataDecorators[0].target,
         }),
       );
       continue;
     }
-    seenNames.set(clientName, entry.target);
+    seenNames.set(clientName, metadataDecorators[0].target);
 
     if (
       (getAccessOverride(context, operation) ?? "public") === "public" &&
-      hasExplicitInternalAccess(context, entry.property, new Set())
+      hasExplicitInternalAccess(context, property, new Set())
     ) {
       diagnostics.add(
         createDiagnostic({
           code: "lro-polling-metadata-internal-conflict",
-          format: { propertyName: entry.property.name },
-          target: entry.target,
+          format: { propertyName: property.name },
+          target: metadataDecorators[0].target,
         }),
       );
       continue;
     }
-    properties.push(entry.property);
+    properties.push(property);
   }
 
+  if (!operationId && properties.length === 0 && diagnostics.diagnostics.length === 0) {
+    return diagnostics.wrap(undefined);
+  }
   return diagnostics.wrap({ raw, operationId, properties });
 }
 
-function isDirectOrInheritedProperty(model: Model, property: ModelProperty): boolean {
+function* getDirectAndInheritedProperties(model: Model): Iterable<ModelProperty> {
   let current: Model | undefined = model;
   while (current) {
-    if ([...current.properties.values()].includes(property)) return true;
+    yield* current.properties.values();
     current = current.baseModel;
   }
-  return false;
 }
 
 function hasExplicitInternalAccess(context: TCGCContext, type: Type, visited: Set<Type>): boolean {

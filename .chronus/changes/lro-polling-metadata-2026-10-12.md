@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Add scoped `@lroOperationId` and repeatable `@lroPollingMetadata` decorators with exact typed SDK metadata for selected LRO status-monitor values.
+Add scoped `@lroOperationId` and property-level `@lroPollingMetadata` decorators with exact typed SDK metadata for LRO status-monitor values.

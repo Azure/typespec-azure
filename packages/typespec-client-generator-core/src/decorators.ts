@@ -113,7 +113,6 @@ interface ScopedLroOperationId {
 }
 
 interface ScopedLroPollingMetadata {
-  property: ModelProperty;
   scope?: string;
   target: DiagnosticTarget;
 }
@@ -135,14 +134,13 @@ export const $lroOperationId: LroOperationIdDecorator = (
 
 export const $lroPollingMetadata: LroPollingMetadataDecorator = (
   context: DecoratorContext,
-  target: Operation,
-  property: ModelProperty,
+  target: ModelProperty,
   scope?: LanguageScopes | DecoratorOptions,
 ) => {
   const entries =
     (context.program.stateMap(lroPollingMetadataKey).get(target) as
       ScopedLroPollingMetadata[] | undefined) ?? [];
-  entries.unshift({ property, scope: normalizeScope(scope), target: context.decoratorTarget });
+  entries.unshift({ scope: normalizeScope(scope), target: context.decoratorTarget });
   context.program.stateMap(lroPollingMetadataKey).set(target, entries);
 };
 
@@ -160,7 +158,7 @@ export function getLroOperationIdDecorators(
 
 export function getLroPollingMetadataDecorators(
   context: TCGCContext,
-  target: Operation,
+  target: ModelProperty,
 ): ScopedLroPollingMetadata[] {
   const entries =
     (context.program.stateMap(lroPollingMetadataKey).get(target) as

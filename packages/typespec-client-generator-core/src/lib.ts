@@ -199,12 +199,12 @@ export const $lib = createTypeSpecLibrary({
         default: `Usage value must be one of: 2 (input), 4 (output), 256 (json), or 512 (xml).`,
       },
     },
-    "lro-polling-metadata-non-lro": {
-      ...doc("lro-polling-metadata-non-lro"),
+    "lro-operation-id-non-lro": {
+      ...doc("lro-operation-id-non-lro"),
       severity: "error",
       messages: {
         default:
-          "@lroOperationId and @lroPollingMetadata can only be applied to a native long-running operation with status-monitor metadata.",
+          "@lroOperationId can only be applied to a native long-running operation with status-monitor metadata.",
       },
     },
     "lro-operation-id-duplicate": {
@@ -226,14 +226,7 @@ export const $lib = createTypeSpecLibrary({
       ...doc("lro-polling-metadata-duplicate"),
       severity: "error",
       messages: {
-        default: paramMessage`Polling metadata property '${"propertyName"}' is specified more than once in the active emitter scope.`,
-      },
-    },
-    "lro-polling-metadata-unreachable": {
-      ...doc("lro-polling-metadata-unreachable"),
-      severity: "error",
-      messages: {
-        default: paramMessage`Polling metadata property '${"propertyName"}' is not a direct or inherited property of the status-monitor response model.`,
+        default: paramMessage`@lroPollingMetadata is applied more than once to property '${"propertyName"}' in the active emitter scope.`,
       },
     },
     "lro-polling-metadata-name-conflict": {

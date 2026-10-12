@@ -35,18 +35,13 @@ model DecoratorOptions {
 extern dec lroOperationId(target: Operation, scope?: valueof DecoratorOptions | string);
 
 /**
- * Exposes a typed property from the status-monitor response as SDK polling metadata.
- * This decorator is repeatable; entries are returned in declaration order.
+ * Exposes a status-monitor model property as typed SDK polling metadata when the property is used
+ * directly or through inheritance by a native long-running operation.
  *
- * @param target The native long-running operation.
- * @param property A direct or inherited property of the status-monitor response model.
+ * @param target The status-monitor model property.
  * @param scope Specifies the target language emitters.
  */
-extern dec lroPollingMetadata(
-  target: Operation,
-  property: ModelProperty,
-  scope?: valueof DecoratorOptions | string
-);
+extern dec lroPollingMetadata(target: ModelProperty, scope?: valueof DecoratorOptions | string);
 
 /**
  * Overrides the generated name for client SDK elements including clients, methods, parameters,
