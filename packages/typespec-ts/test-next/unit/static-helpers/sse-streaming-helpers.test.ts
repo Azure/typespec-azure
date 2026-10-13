@@ -359,6 +359,191 @@ describe("SSE event mapping", () => {
 });
 
 describe("single-connection SSE mapping", () => {
+  it.each(["Node", "Web"] as const)(
+    "does not pull a trailing %s frame while delivering a terminal",
+    async (platform) => {
+      const encoder = new TextEncoder();
+      const terminal = encoder.encode('event: done\ndata: {"final":true}\n\n');
+      const trailing = encoder.encode('event: done\ndata: {"final":false}\n\n');
+      const pulledTrailing = vi.fn();
+      const closed = vi.fn();
+      let sentTerminal = false;
+      // Zero buffering isolates core-sse read-ahead from native transport buffering.
+      const body =
+        platform === "Node"
+          ? Readable.from(
+              (async function* () {
+                try {
+                  yield terminal;
+                  pulledTrailing();
+                  yield trailing;
+                } finally {
+                  closed();
+                }
+              })(),
+              { highWaterMark: 0 },
+            )
+          : new ReadableStream<Uint8Array>(
+              {
+                pull(controller) {
+                  if (!sentTerminal) {
+                    sentTerminal = true;
+                    controller.enqueue(terminal);
+                  } else {
+                    pulledTrailing();
+                    controller.enqueue(trailing);
+                  }
+                },
+                cancel: closed,
+              },
+              { highWaterMark: 0 },
+            );
+      const stream = body instanceof Readable ? createSseStream(body) : createSseStream(body);
+      const iterator = readSseStream(stream, [
+        { eventName: "done", isTerminal: true, deserialize: (data) => data },
+      ])[Symbol.asyncIterator]();
+
+      expect(await iterator.next()).toEqual({ done: false, value: { final: true } });
+      expect(pulledTrailing).not.toHaveBeenCalled();
+      if (body instanceof Readable) {
+        expect(body.destroyed).toBe(true);
+        expect(closed).toHaveBeenCalledOnce();
+        expect(await iterator.next()).toEqual({ done: true, value: undefined });
+      } else {
+        await expect(iterator.next()).rejects.toThrow("ReadableStream is locked");
+        expect(closed).not.toHaveBeenCalled();
+        expect(body.locked).toBe(true);
+      }
+      expect(pulledTrailing).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each(["sentinel", "named", "discriminated"] as const)(
+    "closes the native Node body before delivering a %s terminal to a paused consumer",
+    async (kind) => {
+      const source =
+        kind === "sentinel"
+          ? "data: [DONE]\n\n"
+          : kind === "named"
+            ? 'event: done\ndata: {"final":true}\n\n'
+            : 'data: {"kind":"complete","result":"final"}\n\n';
+      const descriptors: SseEventDescriptor<unknown>[] =
+        kind === "sentinel"
+          ? unnamedWithSentinel
+          : kind === "named"
+            ? [{ eventName: "done", isTerminal: true, deserialize: (data) => data }]
+            : unnamedDiscriminated;
+      const body = nodeSseBody(source, true);
+      const iterator = readSseStream(createSseStream(body), descriptors)[Symbol.asyncIterator]();
+
+      try {
+        expect(await iterator.next()).toEqual({
+          done: false,
+          value:
+            kind === "sentinel"
+              ? "[DONE]"
+              : kind === "named"
+                ? { final: true }
+                : { kind: "complete", result: "final" },
+        });
+        expect(body.destroyed).toBe(true);
+        expect(await iterator.next()).toEqual({ done: true, value: undefined });
+      } finally {
+        await iterator.return?.();
+      }
+    },
+  );
+
+  it.each(["next", "return"] as const)(
+    "closes a terminal iterator only once when the consumer calls %s",
+    async (action) => {
+      const close = vi.fn(async () => ({ done: true as const, value: undefined }));
+      const source: AsyncIterable<EventMessage> = {
+        [Symbol.asyncIterator]: () => ({
+          next: vi.fn(async () => ({
+            done: false as const,
+            value: { id: "", event: "", data: "[DONE]" },
+          })),
+          return: close,
+        }),
+      };
+      const iterator = readSseStream(source, unnamedWithSentinel)[Symbol.asyncIterator]();
+
+      expect(await iterator.next()).toEqual({ done: false, value: "[DONE]" });
+      expect(close).toHaveBeenCalledOnce();
+      if (action === "next") {
+        expect(await iterator.next()).toEqual({ done: true, value: undefined });
+      } else {
+        expect(await iterator.return?.()).toEqual({ done: true, value: undefined });
+      }
+      expect(close).toHaveBeenCalledOnce();
+    },
+  );
+
+  it.each(
+    [false, true].flatMap((synchronous) =>
+      (["next", "return"] as const).map((action) => ({ synchronous, action })),
+    ),
+  )(
+    "yields a terminal before surfacing its cleanup failure: %j",
+    async ({ synchronous, action }) => {
+      const failure = new Error("terminal cleanup failed");
+      const close = vi.fn(() => {
+        if (synchronous) {
+          throw failure;
+        }
+        return Promise.reject(failure);
+      });
+      const source: AsyncIterable<EventMessage> = {
+        [Symbol.asyncIterator]: () => ({
+          next: vi.fn(async () => ({
+            done: false as const,
+            value: { id: "", event: "", data: "[DONE]" },
+          })),
+          return: close,
+        }),
+      };
+      const iterator = readSseStream(source, unnamedWithSentinel)[Symbol.asyncIterator]();
+
+      expect(await iterator.next()).toEqual({ done: false, value: "[DONE]" });
+      expect(close).toHaveBeenCalledOnce();
+      await expect(action === "next" ? iterator.next() : iterator.return?.()).rejects.toBe(failure);
+      expect(close).toHaveBeenCalledOnce();
+    },
+  );
+
+  it("does not close a nonterminal iterator until its consumer returns", async () => {
+    const close = vi.fn(async () => ({ done: true as const, value: undefined }));
+    const source: AsyncIterable<EventMessage> = {
+      [Symbol.asyncIterator]: () => ({
+        next: vi.fn(async () => ({
+          done: false as const,
+          value: { id: "", event: "", data: '{"id":"a"}' },
+        })),
+        return: close,
+      }),
+    };
+    const iterator = readSseStream(source, unnamedWithSentinel)[Symbol.asyncIterator]();
+
+    expect(await iterator.next()).toEqual({ done: false, value: { id: "a" } });
+    expect(close).not.toHaveBeenCalled();
+    await iterator.return?.();
+    expect(close).toHaveBeenCalledOnce();
+  });
+
+  it("does not return an iterator that completed naturally", async () => {
+    const close = vi.fn(async () => ({ done: true as const, value: undefined }));
+    const source: AsyncIterable<EventMessage> = {
+      [Symbol.asyncIterator]: () => ({
+        next: vi.fn(async () => ({ done: true as const, value: undefined })),
+        return: close,
+      }),
+    };
+
+    expect(await collect(unnamedWithSentinel, source)).toEqual([]);
+    expect(close).not.toHaveBeenCalled();
+  });
+
   it("buffers split UTF-8 error bytes while preserving response metadata", async () => {
     const headers = {
       "Content-Type": "application/problem+json; charset=utf-8",
@@ -513,6 +698,27 @@ describe("single-connection SSE mapping", () => {
       collect(unnamedWithSentinel, createSseStream(sseBody('data: {"id":"a"}\n\n'))),
     ).resolves.toEqual([{ id: "a" }]);
   });
+
+  it.each(["next", "return"] as const)(
+    "attempts native Web terminal cancellation before yielding and defers its error until %s",
+    async (action) => {
+      const canceled = vi.fn();
+      const body = sseBody('event: done\ndata: {"final":true}\n\n', canceled);
+      const cancel = vi.spyOn(body, "cancel");
+      const iterator = readSseStream(createSseStream(body), [
+        { eventName: "done", isTerminal: true, deserialize: (data) => data },
+      ])[Symbol.asyncIterator]();
+
+      expect(await iterator.next()).toEqual({ done: false, value: { final: true } });
+      expect(cancel).toHaveBeenCalledOnce();
+      await expect(action === "next" ? iterator.next() : iterator.return?.()).rejects.toThrow(
+        "ReadableStream is locked",
+      );
+      expect(cancel).toHaveBeenCalledOnce();
+      expect(canceled).not.toHaveBeenCalled();
+      expect(body.locked).toBe(true);
+    },
+  );
 
   it("exposes the published 2.4 native Web-stream early-exit limitation", async () => {
     const canceled = vi.fn();
