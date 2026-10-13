@@ -1,0 +1,15 @@
+{
+  "violation": false,
+  "validatorDiagnostics": [
+    {
+      "code": "SubscriptionsAndResourceGroupCasing",
+      "count": 1
+    }
+  ],
+  "ambientDiagnostics": [
+    {
+      "code": "@azure-tools/typespec-azure-core/no-openapi",
+      "count": 1
+    }
+  ]
+}
