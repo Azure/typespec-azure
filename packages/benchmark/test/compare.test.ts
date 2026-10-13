@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
-import { hasNotableChanges, isNotableMetricChange } from "../src/compare.js";
+import { compareBenchmarks, hasNotableChanges, isNotableMetricChange } from "../src/compare.js";
 import { formatPrComment } from "../src/format-comment.js";
-import type { ComparisonResult, MetricComparison } from "../src/types.js";
+import type { BenchmarkResult, ComparisonResult, MetricComparison } from "../src/types.js";
 
 function createMetric(label: string, baseline: number, current: number): MetricComparison {
   const change = current - baseline;
@@ -64,4 +64,40 @@ it("keeps descriptive baseline labels in comments", () => {
 
   expect(comment).toContain("rolling baseline (20 main runs)");
   expect(comment).toContain("<code>1234567</code>");
+});
+
+function result(total: number, measurementMode?: "split"): BenchmarkResult {
+  const stats = {
+    complexity: { createdTypes: 1, finishedTypes: 1 },
+    runtime: {
+      total,
+      loader: total,
+      resolver: 0,
+      checker: 0,
+      validation: { total: 0, validators: {} },
+      linter: { total: 0, rules: {} },
+      emit: { total: 0, emitters: {} },
+    },
+  };
+  return {
+    commit: "commit",
+    timestamp: "2026-09-22T00:00:00Z",
+    measurementMode,
+    runner: { os: "test", arch: "test", nodeVersion: "test" },
+    specs: { sample: { name: "sample", iterations: 1, stats, rawIterations: [stats] } },
+  };
+}
+
+it("rejects incompatible measurement methods in either comparison direction", () => {
+  expect(() => compareBenchmarks(result(100), result(20, "split"))).toThrow(
+    /incompatible measurement/i,
+  );
+  expect(() => compareBenchmarks(result(20, "split"), result(100))).toThrow(
+    /incompatible measurement/i,
+  );
+});
+
+it.each([undefined, "split"] as const)("still compares matching %s measurements", (mode) => {
+  const comparison = compareBenchmarks(result(100, mode), result(120, mode));
+  expect(comparison[0].metrics.find((metric) => metric.label === "total")?.percentChange).toBe(20);
 });
