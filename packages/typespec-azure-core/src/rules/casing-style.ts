@@ -1,17 +1,50 @@
 import {
-  type Interface,
-  type Model,
-  type ModelProperty,
-  type Namespace,
-  type Operation,
+  type Type,
   createRule,
   fileRef,
   isTemplateDeclarationOrInstance,
   paramMessage,
 } from "@typespec/compiler";
-import { isCamelCaseNoAcronyms, isPascalCaseWithAcceptedAcronyms } from "./utils.js";
+import { isCamelCaseNoAcronyms, isPascalCaseWithAcceptedAcronyms, isSnakeCase } from "./utils.js";
 
 const acceptedAzureAcronyms = ["AI", "VM", "OS", "IP", "CPU", "GPU", "LRO"];
+
+export type CasingStyle = "camelCase" | "PascalCase" | "snake_case" | false;
+
+export interface CasingStyleOptions {
+  model?: CasingStyle;
+  modelProperty?: CasingStyle;
+  operation?: CasingStyle;
+  operationTemplate?: CasingStyle;
+  interface?: CasingStyle;
+  namespace?: CasingStyle;
+  union?: CasingStyle;
+  unionVariant?: CasingStyle;
+  enum?: CasingStyle;
+  enumMember?: CasingStyle;
+  scalar?: CasingStyle;
+}
+
+const defaultOptions: Required<CasingStyleOptions> = {
+  model: "PascalCase",
+  modelProperty: "camelCase",
+  operation: "camelCase",
+  operationTemplate: "PascalCase",
+  interface: "PascalCase",
+  namespace: "PascalCase",
+  union: false,
+  unionVariant: false,
+  enum: false,
+  enumMember: false,
+  scalar: false,
+};
+
+const predicates = {
+  camelCase: isCamelCaseNoAcronyms,
+  PascalCase: (name: string) => isPascalCaseWithAcceptedAcronyms(name, acceptedAzureAcronyms),
+  snake_case: isSnakeCase,
+};
+
 export const casingRule = createRule({
   name: "casing-style",
   docs: fileRef.fromPackageRoot("src/rules/casing-style.md"),
@@ -21,56 +54,58 @@ export const casingRule = createRule({
   messages: {
     default: paramMessage`The names of ${"type"} types must use ${"casing"}`,
   },
+  defaultOptions,
+  optionSchema: {
+    type: "object",
+    properties: Object.fromEntries(
+      Object.keys(defaultOptions).map((category) => [
+        category,
+        { enum: ["camelCase", "PascalCase", "snake_case", false] },
+      ]),
+    ),
+    additionalProperties: false,
+  },
   create(context) {
+    function check(
+      target: Type & { name?: string | symbol },
+      category: keyof CasingStyleOptions,
+      type: string,
+    ) {
+      const casing = context.options[category];
+      if (casing === false || typeof target.name !== "string" || target.name === "") return;
+      if (!predicates[casing](target.name)) {
+        context.reportDiagnostic({
+          format: { type, casing },
+          target,
+        });
+      }
+    }
+
     return {
-      model: (model: Model) => {
-        if (!isPascalCaseWithAcceptedAcronyms(model.name, acceptedAzureAcronyms)) {
-          context.reportDiagnostic({
-            format: { type: "Model", casing: "PascalCase" },
-            target: model,
-          });
-        }
+      model: (model) => check(model, "model", "Model"),
+      modelProperty: (property) => {
+        if (context.options.modelProperty === "camelCase" && property.name === "_") return;
+        check(property, "modelProperty", "Property");
       },
-      modelProperty: (property: ModelProperty) => {
-        if (property.name === "_") return;
-        if (!isCamelCaseNoAcronyms(property.name)) {
-          context.reportDiagnostic({
-            format: { type: "Property", casing: "camelCase" },
-            target: property,
-          });
-        }
-      },
-      operation: (operation: Operation) => {
+      operation: (operation) => {
         if (isTemplateDeclarationOrInstance(operation)) {
-          if (!isPascalCaseWithAcceptedAcronyms(operation.name, acceptedAzureAcronyms)) {
-            context.reportDiagnostic({
-              format: { type: "Operation Template", casing: "PascalCase" },
-              target: operation,
-            });
-          }
-        } else if (!isCamelCaseNoAcronyms(operation.name)) {
-          context.reportDiagnostic({
-            format: { type: "Operation", casing: "camelCase" },
-            target: operation,
-          });
+          check(operation, "operationTemplate", "Operation Template");
+        } else {
+          check(operation, "operation", "Operation");
         }
       },
-      interface: (operationGroup: Interface) => {
-        if (!isPascalCaseWithAcceptedAcronyms(operationGroup.name, acceptedAzureAcronyms)) {
-          context.reportDiagnostic({
-            format: { type: "Interface", casing: "PascalCase" },
-            target: operationGroup,
-          });
+      interface: (operationGroup) => check(operationGroup, "interface", "Interface"),
+      namespace: (namespace) => check(namespace, "namespace", "Namespace"),
+      union: (union) => check(union, "union", "Union"),
+      unionVariant: (variant) => check(variant, "unionVariant", "Union Variant"),
+      enum: (enumType) => {
+        check(enumType, "enum", "Enum");
+        // Semantic navigation does not visit enum members.
+        for (const member of enumType.members.values()) {
+          check(member, "enumMember", "Enum Member");
         }
       },
-      namespace: (namespace: Namespace) => {
-        if (!isPascalCaseWithAcceptedAcronyms(namespace.name, acceptedAzureAcronyms)) {
-          context.reportDiagnostic({
-            format: { type: "Namespace", casing: "PascalCase" },
-            target: namespace,
-          });
-        }
-      },
+      scalar: (scalar) => check(scalar, "scalar", "Scalar"),
     };
   },
 });
