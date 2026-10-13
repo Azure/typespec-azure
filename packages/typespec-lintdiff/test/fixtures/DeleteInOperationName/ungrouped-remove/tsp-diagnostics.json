@@ -1,0 +1,12 @@
+[
+  {
+    "code": "tsp-lintdiff-local-linter/delete-in-operation-name",
+    "severity": "warning",
+    "message": "DELETE operation 'remove' should start with 'delete'."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/xms-examples-required",
+    "severity": "warning",
+    "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  }
+]

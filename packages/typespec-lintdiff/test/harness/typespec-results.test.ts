@@ -391,7 +391,7 @@ describe("validator and TypeSpec comparison", () => {
         "tsp-lintdiff-local-linter/no-empty-post-response",
       ]),
     );
-    expect(metadata.get("DeleteInOperationName")?.coverageKind).toBe("lint");
+    expect(metadata.get("DeleteInOperationName")?.coverageKind).toBe("partial");
     expect(metadata.get("PostResponseCodes")?.tspLints).toEqual(mappings.get("PostResponseCodes"));
     expect(metadata.get("PatchBodyParametersSchema")?.projectionScope).toBe("http-reachable");
     expect(metadata.get("ValidQueryParametersForPointOperations")?.projectionScope).toBe(
