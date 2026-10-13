@@ -2,12 +2,10 @@ import { createRule, getDoc } from "@typespec/compiler";
 
 export const descriptiveDescriptionRequiredRule = createRule({
   name: "descriptive-description-required",
-  description:
-    "Explicit documentation strings must contain non-whitespace content.",
+  description: "Explicit documentation strings must contain non-whitespace content.",
   severity: "warning",
   messages: {
-    default:
-      "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string.",
+    default: "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string.",
   },
   create(context) {
     const checkDoc = (target: Parameters<typeof getDoc>[1]) => {
@@ -32,8 +30,12 @@ export const descriptiveDescriptionRequiredRule = createRule({
       model: checkDoc,
       modelProperty: checkDoc,
       scalar: checkDoc,
-      enum: checkDoc,
-      enumMember: checkDoc,
+      enum: (target) => {
+        checkDoc(target);
+        for (const member of target.members.values()) {
+          checkDoc(member);
+        }
+      },
       union: checkDoc,
       unionVariant: checkDoc,
     };
