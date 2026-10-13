@@ -119,11 +119,14 @@ describe("unified examples format", () => {
     expect(Object.keys(file).slice(0, 2)).toEqual(["title", "operationId"]);
   });
 
-  it("preserves the original legacy file name and derives the key from it", async () => {
-    const withFileName = `
+  it.each(["id", "legacyFilename"])(
+    "preserves the filename and derives its key (%s)",
+    async (field) => {
+      const value = field === "id" ? "Get_Widget_Original" : "Get_Widget_Original.json";
+      const withFileName = `
 $namespace: WidgetService
 Widgets.get:
-  - legacyFilename: Get_Widget_Original.json
+  - ${field}: ${value}
     request:
       path:
         id: "1"
@@ -132,18 +135,19 @@ Widgets.get:
         body:
           name: base
 `;
-    const { v1 } = await compileVersioned(withFileName);
+      const { v1 } = await compileVersioned(withFileName);
 
-    // With no explicit title, the x-ms-examples key defaults to the legacy file name (no ext).
-    expect(v1.paths["/widgets/{id}"]?.get?.["x-ms-examples"]).toEqual({
-      Get_Widget_Original: { $ref: "./examples/Get_Widget_Original.json" },
-    });
-    expect(
-      tester.fs.fs.has(
-        resolveVirtualPath("./tsp-output/stable/2023-01-01/examples/Get_Widget_Original.json"),
-      ),
-    ).toBe(true);
-  });
+      // With no explicit title, the x-ms-examples key defaults to the legacy file name (no ext).
+      expect(v1.paths["/widgets/{id}"]?.get?.["x-ms-examples"]).toEqual({
+        Get_Widget_Original: { $ref: "./examples/Get_Widget_Original.json" },
+      });
+      expect(
+        tester.fs.fs.has(
+          resolveVirtualPath("./tsp-output/stable/2023-01-01/examples/Get_Widget_Original.json"),
+        ),
+      ).toBe(true);
+    },
+  );
 
   it("keeps an explicit title as the x-ms-examples key alongside the legacy file name", async () => {
     const withTitle = `
