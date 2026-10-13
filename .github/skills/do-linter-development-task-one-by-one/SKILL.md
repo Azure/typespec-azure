@@ -753,6 +753,14 @@ one session to execute both publication phases.
 > active command, elapsed time, and last completed milestone. During an operation
 > expected to exceed 10 minutes, run it in a form that permits monitoring and
 > append another heartbeat at least every 10 minutes until it ends.
+> Guard optional progress directories with `Test-Path -LiteralPath` before
+> enumerating them. Corpus capture/plan inventory can run before an `objects`
+> archive directory exists; its absence alone is not a stalled or failed
+> operation. Use the exact tracked process status, CPU-time changes and available
+> artifact timestamps for read-only progress evidence. Do not stop a healthy
+> operation merely because it has not reached the archive stage. Actual monitor
+> errors still follow the existing finite correction and reconciliation policy;
+> monitoring grants no new retry or cleanup allowance.
 >
 > For agent-introduced draft or validation-command errors, apply the local
 > draft-correction policy above. Record the causal evidence and attempt count, correct eligible failures
