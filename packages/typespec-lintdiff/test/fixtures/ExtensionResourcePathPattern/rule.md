@@ -92,6 +92,8 @@ checked by the native documentation-example test.
 
 Each offending operation gets one warning, even if its path contains three or
 more provider segments. Two verbs on one path get two operation warnings.
+Uninstantiated operation and generic-interface templates are skipped because
+they do not represent emitted endpoints; instantiated operations remain checked.
 The rule checks declarations in the supplied semantic program, not a
 latest-API-version projection or a historical emitted schema. Literal matching
 is case-sensitive, consistent with the standard lowercase ARM `providers`

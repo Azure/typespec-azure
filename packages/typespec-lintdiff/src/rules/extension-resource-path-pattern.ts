@@ -1,4 +1,9 @@
-import { createRule, paramMessage } from "@typespec/compiler";
+import {
+  createRule,
+  isTemplateDeclaration,
+  isTemplateDeclarationOrInstance,
+  paramMessage,
+} from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 
 export const extensionResourcePathPatternRule = createRule({
@@ -11,6 +16,13 @@ export const extensionResourcePathPatternRule = createRule({
   create(context) {
     return {
       operation: (operation) => {
+        if (
+          isTemplateDeclarationOrInstance(operation) ||
+          (operation.interface !== undefined && isTemplateDeclaration(operation.interface))
+        ) {
+          return;
+        }
+
         const [httpOperation] = getHttpOperation(context.program, operation);
         if (countProviderSegments(httpOperation.path) <= 1) {
           return;

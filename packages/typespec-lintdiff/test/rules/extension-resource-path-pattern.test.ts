@@ -107,6 +107,68 @@ describe("extension-resource-path-pattern native opt-in predicate", () => {
       .toEmitDiagnostics([diagnostic(), diagnostic()]);
   });
 
+  it("skips an uninstantiated operation template", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `
+      using TypeSpec.Http;
+      @get @route("${path}") op read<T>(@path parentName: string, @path bindingName: string): T;
+    `,
+      )
+      .toBeValid();
+  });
+
+  it("skips operations declared by an uninstantiated generic interface", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `
+      using TypeSpec.Http;
+      interface Reads<T> {
+        @get @route("${path}") read(@path parentName: string, @path bindingName: string): T;
+      }
+    `,
+      )
+      .toBeValid();
+  });
+
+  it("reports only the instantiated endpoint from a generic interface", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        `
+      using TypeSpec.Http;
+      interface Reads<T> {
+        @get @route("${path}") read(@path parentName: string, @path bindingName: string): T;
+      }
+      interface StringReads extends Reads<string> {}
+    `,
+      )
+      .toEmitDiagnostics([diagnostic()]);
+  });
+
+  it("still reports an instantiated operation template endpoint", async () => {
+    await (
+      await tester()
+    )
+      .expect(
+        t.code`
+      using TypeSpec.Http;
+      @get @route("${path}") op read<T>(@path parentName: string, @path bindingName: string): T;
+      op ${t.op("concrete")} is read<string>;
+    `,
+      )
+      .toEmitDiagnostics(({ concrete }) => ({
+        ...diagnostic(),
+        pos: getSourceLocation(concrete).pos,
+        end: getSourceLocation(concrete).end,
+      }));
+  });
+
   it("matches literal lowercase provider segments, not lookalikes", async () => {
     const value = path.replace("/providers/Microsoft.Parent", "/Providers/Microsoft.Parent");
     await (

@@ -84,7 +84,9 @@ the native applicability contract; see [rule documentation](./rule.md).
 - **Predicate:** more than one literal, case-sensitive `/providers/` segment.
   Zero or one is permitted; three segments still produce one operation warning.
 - **Unit and target:** one warning targeted at each offending `Operation`.
-  Distinct HTTP verbs on one path are not deduplicated.
+  Distinct HTTP verbs on one path are not deduplicated. Uninstantiated operation
+  and generic-interface templates are excluded before HTTP metadata resolution;
+  instantiated endpoint operations remain in scope.
 - **Versions:** declarations in the supplied semantic program. The rule does
   not project to a selected latest API version or reconstruct historical Swagger.
 - **Audience:** explicit enablement of `extension-resource-path-pattern`.
@@ -126,8 +128,9 @@ expand the native contract.
 
 Native tests additionally cover zero/one provider segments, three provider
 segments, literal case-sensitive matching, a precise operation diagnostic target,
-and applicable operations without provider-namespace metadata. Both published
-template snippets in `rule.md` are compiled and tested directly.
+applicable operations without provider-namespace metadata, template declarations,
+and instantiated template endpoints. Both published template snippets in `rule.md`
+are compiled and tested directly.
 
 ### Default inactivity is independently tested
 
