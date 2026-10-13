@@ -1,4 +1,6 @@
 import type { LoadedExampleFile } from "../loader.js";
+import { exampleLineageKey } from "../naming.js";
+import { checkExampleIds } from "../rules.js";
 import type { ExampleDiagnostic } from "../types.js";
 import { substituteApiVersion } from "./materialize.js";
 import { selectApplicable } from "./select.js";
@@ -7,9 +9,11 @@ import { selectApplicable } from "./select.js";
 export interface ResolvedExample {
   /** The operation key (e.g. `CaCertificates.get`). */
   readonly operation: string;
-  /** The lineage title, when the operation has more than one lineage. */
+  /** Stable example identifier shared by all version variants, when provided. */
+  readonly id?: string;
+  /** Optional display title of the selected variant. */
   readonly title?: string;
-  /** The original legacy `x-ms-examples` file name, when preserved during migration. */
+  /** @deprecated Use `id` or `getExampleFilename`; retained for existing consumers. */
   readonly legacyFilename?: string;
   readonly request?: unknown;
   readonly responses?: unknown;
@@ -47,6 +51,9 @@ export function resolveExampleFiles(
     return { apiVersion, examples, diagnostics };
   }
 
+  diagnostics.push(...checkExampleIds(files));
+  if (diagnostics.length > 0) return { apiVersion, examples, diagnostics };
+
   for (const file of files) {
     const data = file.data;
     if (data === null || typeof data !== "object" || Array.isArray(data)) continue;
@@ -54,15 +61,27 @@ export function resolveExampleFiles(
     for (const [operation, value] of Object.entries(data)) {
       if (operation.startsWith("$") || !Array.isArray(value)) continue;
 
-      for (const [title, entries] of groupByLineage(value)) {
+      for (const entries of groupByLineage(value).values()) {
         const selected = selectApplicable(entries, apiVersion, order);
         if (selected === undefined) continue;
+        const legacyFilename =
+          typeof selected.id === "string"
+            ? `${selected.id}.json`
+            : typeof selected.legacyFilename === "string"
+              ? selected.legacyFilename
+              : undefined;
         examples.push({
           operation,
-          ...(title === "" ? {} : { title }),
-          ...(typeof selected.legacyFilename === "string"
-            ? { legacyFilename: selected.legacyFilename }
+          ...(typeof selected.id === "string" ? { id: selected.id } : {}),
+          ...(typeof selected.title === "string" && selected.title !== ""
+            ? { title: selected.title }
             : {}),
+          ...(legacyFilename === undefined
+            ? {}
+            : {
+                // eslint-disable-next-line @typescript-eslint/no-deprecated -- Keep existing SDK consumers compatible.
+                legacyFilename,
+              }),
           request: substituteApiVersion(selected.request, apiVersion),
           responses: substituteApiVersion(selected.responses, apiVersion),
         });
@@ -72,13 +91,15 @@ export function resolveExampleFiles(
 
   examples.sort(
     (a, b) =>
-      a.operation.localeCompare(b.operation) || (a.title ?? "").localeCompare(b.title ?? ""),
+      a.operation.localeCompare(b.operation) ||
+      (a.id ?? a.title ?? "").localeCompare(b.id ?? b.title ?? ""),
   );
 
   return { apiVersion, examples, diagnostics };
 }
 
 interface Variant {
+  readonly id?: unknown;
   readonly title?: unknown;
   readonly since?: unknown;
   readonly legacyFilename?: unknown;
@@ -86,16 +107,16 @@ interface Variant {
   readonly responses?: unknown;
 }
 
-/** Group an operation's variants into lineages keyed by `title` (untitled => the default `""`). */
+/** IDs define modern lineages; title-based grouping remains compatible with existing files. */
 function groupByLineage(variants: readonly unknown[]): Map<string, Variant[]> {
   const lineages = new Map<string, Variant[]>();
   for (const variant of variants) {
     if (variant === null || typeof variant !== "object" || Array.isArray(variant)) continue;
     const v = variant as Variant;
-    const title = typeof v.title === "string" ? v.title : "";
-    const group = lineages.get(title);
+    const key = exampleLineageKey(v);
+    const group = lineages.get(key);
     if (group) group.push(v);
-    else lineages.set(title, [v]);
+    else lineages.set(key, [v]);
   }
   return lineages;
 }

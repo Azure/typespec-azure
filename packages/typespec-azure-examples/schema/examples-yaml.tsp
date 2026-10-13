@@ -40,9 +40,17 @@ model ExamplesYaml is Record<Example[] | string> {
 /** A single example variant representing one complete API interaction. */
 model Example {
   /**
-   * Optional human-readable title. Omit for the single-example case; provide it only to
-   * disambiguate multiple distinct examples on the same operation. Entries sharing a `title`
-   * form one lineage; untitled entries all belong to the single default lineage.
+   * Stable example identifier, unique within the service and shared by all version variants.
+   * Omit the `.json` extension; SDK and Swagger examples use `<id>.json` as the file name.
+   */
+  @minLength(1)
+  @pattern("^[^/\\\\]+$")
+  id?: string;
+
+  /**
+   * Optional human-readable title. When `id` is provided, this is display text and may change
+   * between version variants. Without `id`, entries sharing a title form a legacy lineage;
+   * untitled entries belong to the default lineage.
    */
   title?: string;
 
@@ -50,10 +58,8 @@ model Example {
   description?: string;
 
   /**
-   * Legacy `x-ms-examples` file name (e.g. `CaCertificates_Get.json`) this variant was migrated
-   * from. Preserved so an emitter can re-materialize the legacy file under its original name,
-   * keeping the diff minimal during rollout. When omitted, the emitter derives the file name (and
-   * the `x-ms-examples` key) from the operation id and `title`.
+   * Deprecated compatibility spelling for the example file name, including `.json`.
+   * Prefer `id` without the extension. Existing files retain their title-based lineage behavior.
    */
   legacyFilename?: string;
 

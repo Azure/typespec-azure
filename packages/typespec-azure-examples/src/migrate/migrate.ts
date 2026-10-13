@@ -1,5 +1,5 @@
 import type { ExampleDiagnostic } from "../types.js";
-import { buildLineages, type CollectedExample } from "./dedup.js";
+import { buildLineages, groupCollectedExamples, type CollectedExample } from "./dedup.js";
 import { planFiles, type EmittedFile, type OperationEntry } from "./emit.js";
 import { normalizeApiVersion } from "./normalize.js";
 import { deriveOperationKey } from "./operation-key.js";
@@ -88,6 +88,7 @@ export async function migrate(root: string, options: MigrateOptions = {}): Promi
   }
 
   const entries: OperationEntry[] = [];
+  const usedIds = new Set<string>();
   for (const [operationKey, collected] of byOperation) {
     entries.push({
       operationKey,
@@ -95,6 +96,7 @@ export async function migrate(root: string, options: MigrateOptions = {}): Promi
         operationId: operationIds.get(operationKey)!,
         compareVersions,
         baselineVersion,
+        usedIds,
       }),
     });
   }
@@ -124,14 +126,12 @@ function collectRemovalDiagnostics(
 
   const diagnostics: ExampleDiagnostic[] = [];
   for (const [operationKey, collected] of byOperation) {
-    const lastByLineage = new Map<string, string>();
-    for (const example of collected) {
-      const current = lastByLineage.get(example.exampleName);
-      if (current === undefined || compareVersions(example.version, current) > 0) {
-        lastByLineage.set(example.exampleName, example.version);
-      }
-    }
-    for (const [lineage, lastSeen] of lastByLineage) {
+    for (const group of groupCollectedExamples(collected)) {
+      const lastSeen = latestVersion(
+        group.map((example) => example.version),
+        compareVersions,
+      )!;
+      const lineage = group[0].exampleName;
       if (compareVersions(lastSeen, latest) < 0) {
         diagnostics.push({
           code: "example-removed-before-latest",

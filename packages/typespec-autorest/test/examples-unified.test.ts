@@ -145,6 +145,38 @@ Widgets.get:
     ).toBe(true);
   });
 
+  it("keeps an ID-based filename stable when display titles change across versions", async () => {
+    const { v1, v2 } = await compileVersioned(`
+$namespace: WidgetService
+Widgets.get:
+  - id: Get_Widget
+    title: Original title
+    request: { path: { id: "1" } }
+    responses: { 200: { body: { name: base } } }
+  - id: Get_Widget
+    title: Updated title
+    since: "2023-06-01"
+    request: { path: { id: "1" } }
+    responses: { 200: { body: { name: v2 } } }
+`);
+    expect(v1.paths["/widgets/{id}"]?.get?.["x-ms-examples"]).toEqual({
+      "Original title": { $ref: "./examples/Get_Widget.json" },
+    });
+    expect(v2.paths["/widgets/{id}"]?.get?.["x-ms-examples"]).toEqual({
+      "Updated title": { $ref: "./examples/Get_Widget.json" },
+    });
+    for (const [version, title] of [
+      ["2023-01-01", "Original title"],
+      ["2023-06-01", "Updated title"],
+    ]) {
+      const content = tester.fs.fs.get(
+        resolveVirtualPath(`./tsp-output/stable/${version}/examples/Get_Widget.json`),
+      );
+      expect(content).toBeDefined();
+      expect(JSON.parse(content!).title).toBe(title);
+    }
+  });
+
   it("keeps an explicit title as the x-ms-examples key alongside the legacy file name", async () => {
     const withTitle = `
 $namespace: WidgetService

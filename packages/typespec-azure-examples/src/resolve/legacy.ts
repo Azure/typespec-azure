@@ -11,7 +11,7 @@ import { materializeLegacyExample } from "../legacy.js";
 import { deriveOperationKey } from "../migrate/operation-key.js";
 import { HTTP_METHODS, type ParameterLocation } from "../migrate/swagger-types.js";
 import { collectParamLocations, discoverSwaggerFiles } from "../migrate/swagger.js";
-import { defaultLegacyExampleFilename, stripJsonExtension } from "../naming.js";
+import { getExampleFilename, stripJsonExtension } from "../naming.js";
 import type { ExampleDiagnostic } from "../types.js";
 import { resolveExamplesDir } from "./resolve-dir.js";
 
@@ -63,9 +63,7 @@ export async function resolveLegacyExamples(
       apiVersion,
       bodyParameterName: meta.bodyParameterName,
     });
-    const base = stripJsonExtension(
-      example.legacyFilename ?? defaultLegacyExampleFilename(meta.operationId, example.title),
-    );
+    const base = stripJsonExtension(getExampleFilename(meta.operationId, example));
     files.push({ fileName: uniqueFileName(base, usedNames), document });
   }
 

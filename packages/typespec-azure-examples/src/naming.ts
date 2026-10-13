@@ -1,3 +1,5 @@
+import type { ExampleVariant } from "./types.js";
+
 /**
  * Shared naming convention for legacy `x-ms-examples` files, used both by `tsp-examples-migrate`
  * (to decide when the original name/key can be reconstructed and therefore omitted from
@@ -25,4 +27,32 @@ export function stripJsonExtension(fileName: string): string {
  */
 export function defaultLegacyExampleFilename(operationId: string, title?: string): string {
   return title ? `${operationId}_${slugify(title)}.json` : `${operationId}.json`;
+}
+
+/** Derive the shared SDK/Swagger file name, preserving older filename metadata when no ID exists. */
+export function getExampleFilename(
+  operationId: string,
+  example: Pick<ExampleVariant, "id" | "title" | "legacyFilename">,
+): string {
+  if (example.id !== undefined) return `${example.id}.json`;
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- Older source files use this compatibility field.
+  return example.legacyFilename ?? defaultLegacyExampleFilename(operationId, example.title);
+}
+
+export function exampleLineageKey(example: {
+  readonly id?: unknown;
+  readonly title?: unknown;
+}): string {
+  return typeof example.id === "string"
+    ? `id:${example.id}`
+    : `title:${typeof example.title === "string" ? example.title : ""}`;
+}
+
+export function isValidExampleId(id: unknown): id is string {
+  return (
+    typeof id === "string" &&
+    id.length > 0 &&
+    !/[/\\<>:"|?*\u0000-\u001f]/.test(id) &&
+    !/\.json$/i.test(id)
+  );
 }

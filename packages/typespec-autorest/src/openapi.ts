@@ -10,7 +10,7 @@ import {
   getUnionAsEnum,
   hasUniqueItems,
 } from "@azure-tools/typespec-azure-core";
-import { materializeLegacyExample } from "@azure-tools/typespec-azure-examples";
+import { getExampleFilename, materializeLegacyExample } from "@azure-tools/typespec-azure-examples";
 import {
   type ArmFeatureFileOptions,
   getArmCommonTypeOpenAPIRef,
@@ -735,7 +735,7 @@ export async function getOpenAPIForService(
         operationId,
         resolved.title,
         usedUnifiedFileNames,
-        resolved.legacyFilename,
+        getExampleFilename(operationId, resolved),
       );
       const key = uniqueExampleKey(doc.title, usedTitles);
       const text = JSON.stringify(doc, null, 2);

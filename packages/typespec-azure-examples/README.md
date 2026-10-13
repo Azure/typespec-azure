@@ -15,7 +15,8 @@ $schema: https://raw.githubusercontent.com/Azure/azure-rest-api-specs/main/schem
 $namespace: Microsoft.EventGrid
 
 CaCertificates.get:
-  - request:
+  - id: GetCaCertificate
+    request:
       path:
         subscriptionId: 8f6b6269-84f2-4d09-9e31-1127efcd1e40
         resourceGroupName: myResourceGroup
@@ -25,7 +26,8 @@ CaCertificates.get:
           name: exampleCaCertificate
           properties:
             provisioningState: Succeeded
-  - since: "2023-12-15-preview"
+  - id: GetCaCertificate
+    since: "2023-12-15-preview"
     request:
       path:
         subscriptionId: 8f6b6269-84f2-4d09-9e31-1127efcd1e40
@@ -43,6 +45,12 @@ CaCertificates.get:
   operation, identified by its interface-relative name (`Interface.operation`).
 - Each operation maps to a list of example variants. The base variant has no `since`; later
   variants carry a quoted `since` and restate the full request/response.
+- `id` is a stable, service-wide example identifier without the `.json` extension. SDK and Swagger
+  writers derive `<id>.json`; variants with the same ID form one lineage even if their display
+  `title` changes. IDs must be filename-safe and unique across operations (case-insensitively).
+- Existing `legacyFilename` metadata remains accepted for compatibility. Files without IDs retain
+  their title-based lineage behavior. Prefer `id: GetCaCertificate` over
+  `legacyFilename: GetCaCertificate.json`.
 - Response status codes are bare integer keys. `api-version` is implicit; use the
   `{api-version}` placeholder where a version must be embedded in a value.
 
@@ -64,8 +72,8 @@ found (use `--warn-as-error` to also fail on warnings).
   list of examples.
 - Response keys are integer status codes; range keys (`2XX`) and `default` are rejected.
 - `since` must be a quoted string and a version listed in `service.yaml`.
-- Per lineage (entries grouped by `title`; untitled entries form the default lineage): at most one
-  entry without `since`, and `since` values are unique.
+- Per lineage (grouped by `id`, or by `title` for older files): at most one entry without `since`,
+  and `since` values are unique. ID and compatibility filename metadata must agree when both exist.
 - An operation's full example set lives in a single file, and each interface appears in exactly
   one file.
 - `{api-version}` is the only supported placeholder, and `api-version` must not appear as a
@@ -101,6 +109,9 @@ What it does:
 - Normalizes embedded version strings (in `Location`, `Azure-AsyncOperation`, `nextLink`, ...) to
   the `{api-version}` placeholder, then dedupes identical examples across versions into `since`
   lineages — one base entry plus a `since` variant whenever the content changes.
+- Emits IDs derived from original filenames, disambiguating collisions across operations. Historical
+  filenames that change across versions, or cannot be used as safe IDs, retain `legacyFilename`
+  metadata so their existing names remain recoverable.
 
 Options: `--out <dir>` (default `.`), `--namespace <ns>`, `--service <path>`,
 `--split-by-interface`, `--dry-run`, `--warn-as-error`.
@@ -132,8 +143,8 @@ is `<=` the target (the base entry applies from the earliest version). The `{api
 placeholder is substituted with the target version, and each resolved example is reconstructed into a
 classic `x-ms-examples` document — the `title`/`operationId` envelope and the flat `parameters` bag
 (with `api-version` re-added and the body under its Swagger parameter name), read from the service's
-Swagger. Files are named by their preserved `legacyFilename` (or the conventional
-`<OperationId>.json`). With `--out <dir>` each document is written as a separate JSON file; otherwise
+Swagger. Files are named `<id>.json`, by the compatibility `legacyFilename`, or by the conventional
+`<OperationId>.json`. With `--out <dir>` each document is written as a separate JSON file; otherwise
 a `filename → document` map is printed. Operations with no matching Swagger operation are reported
 and skipped.
 
@@ -155,6 +166,10 @@ const file = loadExampleFile("examples.yaml", yamlContent);
 const diagnostics = validateExampleFiles([file]);
 const { examples } = resolveExampleFiles([file], "2024-06-01", ["2024-06-01"]);
 ```
+
+`getExampleFilename(operationId, example)` is the shared filename helper for SDK and Swagger
+consumers. Resolved ID-based examples also retain a derived `legacyFilename` compatibility property
+for consumers that have not switched to IDs yet.
 
 Filesystem discovery, migration, and terminal diagnostic formatting require Node.js. They are
 available from the explicit `/node` entrypoint; Node.js also automatically selects this entrypoint
