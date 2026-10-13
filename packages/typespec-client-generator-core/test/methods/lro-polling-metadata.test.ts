@@ -1,3 +1,4 @@
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
 import { type SdkLroServiceMethod, UsageFlags } from "../../src/interfaces.js";
@@ -67,7 +68,7 @@ op getJobStatus is ResourceOperations.ResourceRead<JobState>;
 
 @route("/jobs")
 @pollingOperation(getJobStatus)
-@lroOperationId
+@lroInstanceId("lastPathSegment")
 op start is Azure.Core.Foundations.LongRunningOperation<
   {},
   AcceptedResponse,
@@ -111,7 +112,14 @@ describe("LRO polling metadata", () => {
     strictEqual(getStatusMonitorLink(sdkStep), sdkLink);
   });
 
-  it("exposes the URI-derived ID source and exact typed polling properties", async () => {
+  it("requires a supported instance ID strategy", async () => {
+    const diagnostics = await Tester.diagnose(
+      operation.replace("lastPathSegment", "firstPathSegment"),
+    );
+    expectDiagnostics(diagnostics, { code: "invalid-argument" });
+  });
+
+  it("exposes the URI-derived instance ID source and exact typed polling properties", async () => {
     const { program } = await Tester.compile(operation);
     const context = await createSdkContextForTester(
       program,
@@ -123,9 +131,9 @@ describe("LRO polling metadata", () => {
     strictEqual(method.kind, "lro");
 
     const lro = method as SdkLroServiceMethod<any>;
-    strictEqual(lro.lroMetadata.operationId?.extractionStrategy, "last-non-empty-path-segment");
+    strictEqual(lro.lroMetadata.instanceId?.strategy, "lastPathSegment");
     strictEqual(
-      lro.lroMetadata.operationId?.source,
+      lro.lroMetadata.instanceId?.source,
       lro.lroMetadata.statusMonitorStep?.kind === "nextOperationLink"
         ? lro.lroMetadata.statusMonitorStep.target
         : undefined,
@@ -163,7 +171,7 @@ describe("LRO polling metadata", () => {
     const context = await createSdkContextForTester(program);
     const { program: undecoratedProgram } = await Tester.compile(
       operation
-        .replace("@lroOperationId\n", "")
+        .replace('@lroInstanceId("lastPathSegment")\n', "")
         .replaceAll(/ {2}@lroPollingMetadata(?:\([^)]*\))?\n/g, ""),
     );
     const undecoratedContext = await createSdkContextForTester(undecoratedProgram);
@@ -241,17 +249,17 @@ describe("LRO polling metadata", () => {
     expect(csharpDetails.usage & UsageFlags.Input).toBe(0);
   });
 
-  it("reports invalid operation IDs, duplicates, conflicts, and explicit internal exposure", async () => {
+  it("reports invalid instance IDs, duplicates, conflicts, and explicit internal exposure", async () => {
     const invalidCases = [
       {
         code: `
 model Value { value: string; }
 @Azure.ClientGenerator.Core.Legacy.markAsLro
-@lroOperationId
+@lroInstanceId("lastPathSegment")
 @route("/ordinary")
 op ordinary(): Value;
 `,
-        diagnostic: "lro-operation-id-non-lro",
+        diagnostic: "lro-instance-id-non-lro",
       },
       {
         code: operation.replace(
@@ -268,7 +276,7 @@ op ordinary(): Value;
         diagnostic: "lro-polling-metadata-name-conflict",
       },
       {
-        code: operation.replace('@clientName("requestToken")', '@clientName("operationId")'),
+        code: operation.replace('@clientName("requestToken")', '@clientName("instanceId")'),
         diagnostic: "lro-polling-metadata-name-conflict",
       },
       {
@@ -276,8 +284,11 @@ op ordinary(): Value;
         diagnostic: "conflict-access-override",
       },
       {
-        code: operation.replace("@lroOperationId", "@lroOperationId\n@lroOperationId"),
-        diagnostic: "lro-operation-id-duplicate",
+        code: operation.replace(
+          '@lroInstanceId("lastPathSegment")',
+          '@lroInstanceId("lastPathSegment")\n@lroInstanceId("lastPathSegment")',
+        ),
+        diagnostic: "lro-instance-id-duplicate",
       },
     ];
 
@@ -352,7 +363,7 @@ op startSecond is Azure.Core.Foundations.LongRunningOperation<
 
   it("ignores an overridden decorated base property", async () => {
     const { program } = await Tester.compile(
-      operation.replace('@clientName("requestToken")', '@clientName("operationId")').replace(
+      operation.replace('@clientName("requestToken")', '@clientName("instanceId")').replace(
         "model JobState extends PollingMetadataBase {",
         `model JobState extends PollingMetadataBase {
   request_token: string;`,
@@ -405,7 +416,7 @@ model PollingStatus {
 })
 @route("/widgets/{id}")
 @put
-@lroOperationId
+@lroInstanceId("lastPathSegment")
 op createWidget(@path id: string): {
   @statusCode _: 202;
   @header id: string;
@@ -420,23 +431,23 @@ op createWidget(@path id: string): {
     if (method.lroMetadata.statusMonitorStep?.kind === "nextOperationReference") {
       strictEqual(method.lroMetadata.statusMonitorStep.target.link, undefined);
     }
-    strictEqual(method.lroMetadata.operationId, undefined);
+    strictEqual(method.lroMetadata.instanceId, undefined);
     expect(context.diagnostics.map((x) => x.code)).toContain(
-      "@azure-tools/typespec-client-generator-core/lro-operation-id-missing-link",
+      "@azure-tools/typespec-client-generator-core/lro-instance-id-missing-link",
     );
   });
 
   it("does not change undecorated LRO metadata", async () => {
     const { program } = await Tester.compile(
       operation
-        .replace("@lroOperationId\n", "")
+        .replace('@lroInstanceId("lastPathSegment")\n', "")
         .replaceAll(/ {2}@lroPollingMetadata(?:\([^)]*\))?\n/g, ""),
     );
     const context = await createSdkContextForTester(program);
     const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
     ok(method);
     strictEqual(method.kind, "lro");
-    strictEqual(method.lroMetadata.operationId, undefined);
+    strictEqual(method.lroMetadata.instanceId, undefined);
     strictEqual(method.lroMetadata.pollingMetadata, undefined);
   });
 
@@ -470,7 +481,7 @@ op start(): StartResponse;`,
     const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
     ok(method);
     strictEqual(method.kind, "lropaging");
-    strictEqual(method.lroMetadata.operationId?.extractionStrategy, "last-non-empty-path-segment");
+    strictEqual(method.lroMetadata.instanceId?.strategy, "lastPathSegment");
     expect(method.lroMetadata.pollingMetadata?.map((x) => x.name)).toEqual([
       "percentComplete",
       "details",

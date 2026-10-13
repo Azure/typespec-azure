@@ -853,14 +853,14 @@ model MyModel {
 }
 ```
 
-### `@lroOperationId` {#@Azure.ClientGenerator.Core.lroOperationId}
+### `@lroInstanceId` {#@Azure.ClientGenerator.Core.lroInstanceId}
 
-Exposes an SDK operation identifier derived from the status-monitor URI of a long-running
-operation. The identifier is the last non-empty URI path segment. Emitters choose their
-idiomatic accessor and storage and must not assume percent-decoding.
+Exposes an SDK long-running operation instance identifier derived from the status-monitor URI.
+With the `lastPathSegment` strategy, `/analyzerResults/abc123` produces `abc123`. Emitters choose
+their idiomatic accessor and storage and must not assume percent-decoding.
 
 ```typespec
-@Azure.ClientGenerator.Core.lroOperationId(scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
+@Azure.ClientGenerator.Core.lroInstanceId(strategy: valueof "lastPathSegment", scope?: valueof Azure.ClientGenerator.Core.DecoratorOptions | string)
 ```
 
 #### Target
@@ -870,9 +870,10 @@ The native long-running operation.
 
 #### Parameters
 
-| Name  | Type                                                            | Description                             |
-| ----- | --------------------------------------------------------------- | --------------------------------------- |
-| scope | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters. |
+| Name     | Type                                                            | Description                                                                       |
+| -------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| strategy | `valueof "lastPathSegment"`                                     | The strategy used to extract the instance identifier from the status-monitor URI. |
+| scope    | `valueof Azure.ClientGenerator.Core.DecoratorOptions \| string` | Specifies the target language emitters.                                           |
 
 ### `@lroPollingMetadata` {#@Azure.ClientGenerator.Core.lroPollingMetadata}
 

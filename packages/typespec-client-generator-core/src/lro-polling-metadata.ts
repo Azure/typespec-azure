@@ -10,13 +10,13 @@ import {
   type Operation,
   walkPropertiesInherited,
 } from "@typespec/compiler";
-import { getLroOperationIdDecorators, getLroPollingMetadataDecorators } from "./decorators.js";
+import { getLroInstanceIdDecorators, getLroPollingMetadataDecorators } from "./decorators.js";
 import type { TCGCContext } from "./interfaces.js";
 import { createDiagnostic } from "./lib.js";
 import { getLibraryName } from "./public-utils.js";
 
 export interface ResolvedLroPollingMetadata {
-  operationId: boolean;
+  instanceIdStrategy?: "lastPathSegment";
   properties: ModelProperty[];
 }
 
@@ -33,7 +33,7 @@ export function getStatusMonitorLink<TLink>(
     : statusMonitorStep?.target.link;
 }
 
-function getLroOperationIdLink(
+function getLroInstanceIdLink(
   statusMonitorStep: LroMetadata["statusMonitorStep"],
 ): OperationLink | undefined {
   const link = getStatusMonitorLink(statusMonitorStep);
@@ -69,14 +69,14 @@ function resolve(
   operation: Operation,
 ): [ResolvedLroPollingMetadata | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const operationIdDecorators = getLroOperationIdDecorators(context, operation);
+  const instanceIdDecorators = getLroInstanceIdDecorators(context, operation);
 
   const raw = getLroMetadata(context.program, operation);
   if (!raw) {
-    if (operationIdDecorators.length > 0) {
+    if (instanceIdDecorators.length > 0) {
       diagnostics.add(
         createDiagnostic({
-          code: "lro-operation-id-non-lro",
+          code: "lro-instance-id-non-lro",
           target: operation,
         }),
       );
@@ -84,30 +84,30 @@ function resolve(
     return diagnostics.wrap(undefined);
   }
 
-  if (operationIdDecorators.length > 1) {
+  if (instanceIdDecorators.length > 1) {
     diagnostics.add(
       createDiagnostic({
-        code: "lro-operation-id-duplicate",
-        target: operationIdDecorators[1].target,
+        code: "lro-instance-id-duplicate",
+        target: instanceIdDecorators[1].target,
       }),
     );
   }
 
-  let operationId = operationIdDecorators.length > 0;
-  if (operationId && !getLroOperationIdLink(raw.statusMonitorStep)) {
+  let instanceIdStrategy: "lastPathSegment" | undefined = instanceIdDecorators[0]?.strategy;
+  if (instanceIdStrategy && !getLroInstanceIdLink(raw.statusMonitorStep)) {
     diagnostics.add(
       createDiagnostic({
-        code: "lro-operation-id-missing-link",
-        target: operationIdDecorators[0].target,
+        code: "lro-instance-id-missing-link",
+        target: instanceIdDecorators[0].target,
       }),
     );
-    operationId = false;
+    instanceIdStrategy = undefined;
   }
 
   const properties: ModelProperty[] = [];
   const seenNames = new Set<string>();
-  if (operationId) {
-    seenNames.add("operationId");
+  if (instanceIdStrategy) {
+    seenNames.add("instanceId");
   }
 
   for (const property of walkPropertiesInherited(raw.pollingInfo.responseModel)) {
@@ -139,8 +139,8 @@ function resolve(
     properties.push(property);
   }
 
-  if (!operationId && properties.length === 0 && diagnostics.diagnostics.length === 0) {
+  if (!instanceIdStrategy && properties.length === 0 && diagnostics.diagnostics.length === 0) {
     return diagnostics.wrap(undefined);
   }
-  return diagnostics.wrap({ operationId, properties });
+  return diagnostics.wrap({ instanceIdStrategy, properties });
 }

@@ -410,7 +410,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
 
   const finalResponse = getFinalResponse();
   const statusMonitorStep = getStatusMonitorStep(context, rawMetadata.statusMonitorStep);
-  const operationIdSource = getStatusMonitorLink(statusMonitorStep);
+  const instanceIdSource = getStatusMonitorLink(statusMonitorStep);
   const pollingCustomization = diagnostics.pipe(resolveLroPollingMetadata(context, operation));
   const pollingMetadata =
     pollingCustomization?.properties.map((property) =>
@@ -440,11 +440,11 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     logicalPath: rawMetadata.logicalPath,
     finalEnvelopeResult: finalResponse ? finalResponse.envelopeResult : "void",
     finalResultPath: rawMetadata.finalResultPath,
-    ...(pollingCustomization?.operationId && operationIdSource
+    ...(pollingCustomization?.instanceIdStrategy && instanceIdSource
       ? {
-          operationId: {
-            source: operationIdSource,
-            extractionStrategy: "last-non-empty-path-segment",
+          instanceId: {
+            source: instanceIdSource,
+            strategy: pollingCustomization.instanceIdStrategy,
           } as const,
         }
       : {}),

@@ -19,16 +19,18 @@ export interface DecoratorOptions {
 }
 
 /**
- * Exposes an SDK operation identifier derived from the status-monitor URI of a long-running
- * operation. The identifier is the last non-empty URI path segment. Emitters choose their
- * idiomatic accessor and storage and must not assume percent-decoding.
+ * Exposes an SDK long-running operation instance identifier derived from the status-monitor URI.
+ * With the `lastPathSegment` strategy, `/analyzerResults/abc123` produces `abc123`. Emitters choose
+ * their idiomatic accessor and storage and must not assume percent-decoding.
  *
  * @param target The native long-running operation.
+ * @param strategy The strategy used to extract the instance identifier from the status-monitor URI.
  * @param scope Specifies the target language emitters.
  */
-export type LroOperationIdDecorator = (
+export type LroInstanceIdDecorator = (
   context: DecoratorContext,
   target: Operation,
+  strategy: "lastPathSegment",
   scope?: DecoratorOptions | string,
 ) => DecoratorValidatorCallbacks | void;
 
@@ -1163,7 +1165,7 @@ export type ClientOptionDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 export type AzureClientGeneratorCoreDecorators = {
-  lroOperationId: LroOperationIdDecorator;
+  lroInstanceId: LroInstanceIdDecorator;
   lroPollingMetadata: LroPollingMetadataDecorator;
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
