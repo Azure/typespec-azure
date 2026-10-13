@@ -119,6 +119,18 @@ describe("unified examples format", () => {
     expect(Object.keys(file).slice(0, 2)).toEqual(["title", "operationId"]);
   });
 
+  it.each([
+    { name: "LF by default", options: {}, newline: "\n" },
+    { name: "configured CRLF", options: { "new-line": "crlf" }, newline: "\r\n" },
+  ])("ends materialized examples with a trailing newline ($name)", async ({ options, newline }) => {
+    await compileVersioned(versionedExamplesYaml, options);
+
+    const text = tester.fs.fs.get(
+      resolveVirtualPath("./tsp-output/stable/2023-01-01/examples/Widgets_Get.json"),
+    )!;
+    expect(text.endsWith(`}${newline}`)).toBe(true);
+  });
+
   it.each(["id", "legacyFilename"])(
     "preserves the filename and derives its key (%s)",
     async (field) => {
