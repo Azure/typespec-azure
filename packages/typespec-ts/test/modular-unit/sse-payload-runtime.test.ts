@@ -526,6 +526,80 @@ describe("generated SSE payload formats", () => {
     expect(fixture.nodeBody.destroyed).toBe(true);
   });
 
+  it.each([
+    ["receiveModelTerminal", "complete", '{"wire_value":"finished"}', { value: "finished" }],
+    ["receiveNumericTerminal", "complete", "42", 42],
+    ["receiveBooleanTerminal", "complete", "false", false],
+    ["receiveScalarTerminal", "complete", "false", false],
+    ["receiveJsonTerminal", "complete", '"finished"', "finished"],
+    ["receiveOnlyTerminal", "", "[DONE]", "[DONE]"],
+  ] as const)(
+    "closes the generated %s response before delivering its terminal payload",
+    async (operation, event, data, value) => {
+      const fixture = transport(
+        "Node",
+        `${event ? `event: ${event}\n` : ""}data: ${data}\n\n`,
+        "200",
+        undefined,
+        true,
+      );
+      const iterator = (await operations[operation](fixture.context))[Symbol.asyncIterator]();
+
+      try {
+        expect(await iterator.next()).toEqual({
+          done: false,
+          value: event ? { event, data: value } : value,
+        });
+        expect(fixture.nodeBody.destroyed).toBe(true);
+        expect(await iterator.next()).toEqual({ done: true, value: undefined });
+        expect(fixture.send).toHaveBeenCalledOnce();
+      } finally {
+        await iterator.return?.();
+      }
+    },
+  );
+
+  it("does not pull a trailing native Node frame through the generated terminal operation", async () => {
+    const pulledTrailing = vi.fn();
+    const closed = vi.fn();
+    const body = Readable.from(
+      (async function* () {
+        try {
+          yield Buffer.from('event: complete\ndata: {"wire_value":"finished"}\n\n');
+          pulledTrailing();
+          yield Buffer.from('event: complete\ndata: {"wire_value":"too late"}\n\n');
+        } finally {
+          closed();
+        }
+      })(),
+      { highWaterMark: 0 },
+    );
+    const send = vi.fn().mockResolvedValue({
+      status: "200",
+      headers: { "content-type": "text/event-stream" },
+      body,
+    });
+    const stream = await operations.receiveModelTerminal({
+      path: () => ({ get: () => ({ asNodeStream: send }) }),
+    });
+    const iterator = stream[Symbol.asyncIterator]();
+
+    try {
+      expect(await iterator.next()).toEqual({
+        done: false,
+        value: { event: "complete", data: { value: "finished" } },
+      });
+      expect(pulledTrailing).not.toHaveBeenCalled();
+      expect(body.destroyed).toBe(true);
+      expect(closed).toHaveBeenCalledOnce();
+      expect(await iterator.next()).toEqual({ done: true, value: undefined });
+      expect(pulledTrailing).not.toHaveBeenCalled();
+      expect(send).toHaveBeenCalledOnce();
+    } finally {
+      await iterator.return?.();
+    }
+  });
+
   it("yields a raw constant when an unnamed stream contains only a terminal", async () => {
     const fixture = transport("Node", "data: [DONE]\n\n");
     const values: "[DONE]"[] = [];

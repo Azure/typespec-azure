@@ -11,7 +11,7 @@ export interface SseEventDescriptor<T> {
    */
   eventName?: string;
   /**
-   * Whether receiving this event terminates the stream after yielding its payload.
+   * Whether receiving this event closes the source and yields one final payload.
    */
   isTerminal: boolean;
   /**
@@ -106,9 +106,9 @@ function parseJsonEvent(event: EventMessage): unknown {
  * event to the matching {@link SseEventDescriptor} by its `event:` name and yielding the
  * deserialized payload.
  *
- * All terminal payloads are yielded before disconnecting. A constant sentinel is only compared against
- * events with the same `event:` name, so an unrelated event carrying the same `data` cannot end
- * the stream.
+ * The source is closed before delivering a terminal payload, with cleanup failures reported after
+ * yielding it. A constant sentinel is only compared against events with the same `event:` name,
+ * so an unrelated event carrying the same `data` cannot end the stream.
  *
  * Events whose name or payload discriminator matches no descriptor are ignored. A generic payload
  * descriptor can handle unknown discriminator values without selecting an unrelated model variant.
@@ -119,13 +119,31 @@ export async function* readSseStream<T>(
   events: AsyncIterable<EventMessage>,
   descriptors: SseEventDescriptor<T>[],
 ): AsyncIterable<T> {
-  for await (const event of events) {
+  const iterator = events[Symbol.asyncIterator]();
+  let closePromise: Promise<IteratorResult<EventMessage>> | undefined;
+  // Explicit terminal cleanup and for-await cleanup share the same iterator return.
+  const close = () =>
+    (closePromise ??= (async () =>
+      iterator.return ? iterator.return() : { done: true, value: undefined })());
+  const source: AsyncIterable<EventMessage> = {
+    [Symbol.asyncIterator]: () => ({ next: () => iterator.next(), return: close }),
+  };
+  for await (const event of source) {
     const resolved = resolveDescriptor(event, descriptors);
     if (!resolved) {
       continue;
     }
     const { descriptor, payload } = resolved;
-    yield descriptor.deserialize(payload);
+    const item = descriptor.deserialize(payload);
+    if (descriptor.isTerminal) {
+      try {
+        await close();
+      } catch (error) {
+        yield item;
+        throw error;
+      }
+    }
+    yield item;
     if (descriptor.isTerminal) {
       return;
     }
