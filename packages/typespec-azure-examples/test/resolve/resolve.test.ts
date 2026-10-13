@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { loadExampleFile } from "../../src/loader.js";
-import { getExampleFilename } from "../../src/naming.js";
 import { resolveExampleFiles } from "../../src/resolve/resolve.js";
 
 const order = ["2023-01-01", "2024-06-01"];
@@ -66,76 +65,6 @@ Foo.get:
   it("reports an error when the target version is unknown", () => {
     const result = resolve(doc, "2099-01-01");
     expect(result.diagnostics.map((d) => d.code)).toContain("unknown-target-version");
-    expect(result.examples).toEqual([]);
-  });
-
-  it("selects one ID lineage when its display title changes between versions", () => {
-    const result = resolve(
-      `
-Things.get:
-  - id: GetThing
-    title: Original title
-    request: {}
-    responses: { 200: { body: { tier: base } } }
-  - id: GetThing
-    title: Updated title
-    since: "2024-06-01"
-    request: {}
-    responses: { 200: { body: { tier: premium } } }
-`,
-      "2024-06-01",
-    );
-    expect(result.diagnostics).toEqual([]);
-    expect(result.examples).toMatchObject([
-      {
-        id: "GetThing",
-        title: "Updated title",
-        legacyFilename: "GetThing.json",
-        responses: { 200: { body: { tier: "premium" } } },
-      },
-    ]);
-    expect(result.examples).toHaveLength(1);
-    expect(getExampleFilename("Things_Get", result.examples[0])).toBe("GetThing.json");
-  });
-
-  it("reports duplicate IDs instead of resolving colliding output names", () => {
-    const result = resolve(
-      `
-Things.get:
-  - id: Shared
-    request: {}
-    responses: { 200: {} }
-Others.get:
-  - id: Shared
-    request: {}
-    responses: { 200: {} }
-`,
-      "2023-01-01",
-    );
-    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
-      "duplicate-example-id",
-    );
-    expect(result.examples).toEqual([]);
-  });
-
-  it("does not silently select one of two base variants sharing an ID", () => {
-    const result = resolve(
-      `
-Things.get:
-  - id: GetThing
-    title: First title
-    request: {}
-    responses: { 200: {} }
-  - id: GetThing
-    title: Second title
-    request: {}
-    responses: { 200: {} }
-`,
-      "2023-01-01",
-    );
-    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
-      "multiple-base-variants",
-    );
     expect(result.examples).toEqual([]);
   });
 });

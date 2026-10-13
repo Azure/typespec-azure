@@ -35,12 +35,7 @@ export {
   earliestVersion,
   latestVersion,
 } from "./migrate/version-order.js";
-export {
-  defaultLegacyExampleFilename,
-  getExampleFilename,
-  slugify,
-  stripJsonExtension,
-} from "./naming.js";
+export { defaultLegacyExampleFilename, slugify, stripJsonExtension } from "./naming.js";
 export { substituteApiVersion } from "./resolve/materialize.js";
 export {
   resolveExampleFiles,

@@ -35,9 +35,9 @@ describe("buildLineages", () => {
       ],
       "Widgets_Get",
     );
+    // Key and file name both follow the default convention => neither title nor id.
     expect(result).toEqual([
       {
-        id: "Widgets_Get",
         request: { path: { id: "1" } },
         responses: { "200": { body: { name: "a" } } },
       },
@@ -79,7 +79,32 @@ describe("buildLineages", () => {
     expect(result[0].since).toBe("2024-06-01");
   });
 
-  it("stores an extension-free ID when the key is recoverable from the file name", () => {
+  it("orders keys as title, since, id, request, responses", () => {
+    const result = build(
+      [
+        collected("2023-01-01", "A", { v: 1 }),
+        collected("2024-06-01", "A", { v: 2 }),
+        collected("2023-01-01", "B", { v: 9 }),
+      ],
+      "Ops_List",
+    );
+    const sinceVariant = result.find((v) => v.since !== undefined);
+    expect(sinceVariant && Object.keys(sinceVariant)).toEqual([
+      "title",
+      "since",
+      "id",
+      "request",
+      "responses",
+    ]);
+  });
+
+  it("omits both title and id when they follow the default convention", () => {
+    const result = build([collected("2023-01-01", "Widgets_Get", { name: "a" })], "Widgets_Get");
+    expect(result[0].title).toBeUndefined();
+    expect(result[0].id).toBeUndefined();
+  });
+
+  it("stores only id when the key is recoverable from the file name", () => {
     // Key differs from operationId but equals the file name (minus extension) => file name only.
     const result = build(
       [
@@ -90,7 +115,6 @@ describe("buildLineages", () => {
     );
     expect(result.map((v) => v.title)).toEqual([undefined, undefined]);
     expect(result.map((v) => v.id)).toEqual(["Custom_Name", "Custom_Name"]);
-    expect(result.every((v) => v.legacyFilename === undefined)).toBe(true);
   });
 
   it("stores a title when the key cannot be recovered from the file name", () => {
@@ -102,60 +126,12 @@ describe("buildLineages", () => {
     expect(result[0].id).toBe("Widgets_Get");
   });
 
-  it("preserves the filename independently of the display title", () => {
+  it("omits id when the file follows the operationId + title default", () => {
     const result = build(
       [collected("2023-01-01", "With Filter", { name: "a" }, "Widgets_Get_With_Filter.json")],
       "Widgets_Get",
     );
     expect(result[0].title).toBe("With Filter");
-    expect(result[0].id).toBe("Widgets_Get_With_Filter");
-    expect(result[0].legacyFilename).toBeUndefined();
-  });
-
-  it("preserves historical filename changes even when the payload is unchanged", () => {
-    const result = build(
-      [
-        collected("2023-01-01", "Get a widget", { name: "a" }, "First.json"),
-        collected("2024-06-01", "Get a widget", { name: "a" }, "Later.json"),
-      ],
-      "Widgets_Get",
-    );
-    expect(
-      result.map((entry) => [entry.id, entry.title, entry.since, entry.legacyFilename]),
-    ).toEqual([
-      [undefined, "Get a widget", undefined, "First.json"],
-      [undefined, "Get a widget", "2024-06-01", "Later.json"],
-    ]);
-  });
-
-  it("keeps a filename-based ID when only the legacy display title changes", () => {
-    const result = build(
-      [
-        collected("2023-01-01", "Original title", { name: "a" }, "Get_Widget.json"),
-        collected("2024-06-01", "Updated title", { name: "a" }, "Get_Widget.json"),
-      ],
-      "Widgets_Get",
-    );
-    expect(result.map((entry) => [entry.id, entry.title, entry.since])).toEqual([
-      ["Get_Widget", "Original title", undefined],
-      ["Get_Widget", "Updated title", "2024-06-01"],
-    ]);
-  });
-
-  it("assigns unique IDs when operations share an original filename", () => {
-    const usedIds = new Set<string>();
-    const first = buildLineages([collected("2023-01-01", "Shared", {}, "Shared.json")], {
-      operationId: "First_Get",
-      compareVersions,
-      usedIds,
-    });
-    const second = buildLineages([collected("2023-01-01", "Shared", {}, "Shared.json")], {
-      operationId: "Second_Get",
-      compareVersions,
-      usedIds,
-    });
-    expect(first[0].id).toBe("Shared");
-    expect(second[0].id).toBe("Shared_2");
-    expect(second[0].title).toBe("Shared");
+    expect(result[0].id).toBeUndefined();
   });
 });

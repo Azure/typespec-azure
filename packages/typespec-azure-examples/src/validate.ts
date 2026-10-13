@@ -1,11 +1,6 @@
 import { Ajv2020, type ErrorObject, type ValidateFunction } from "ajv/dist/2020.js";
 import { type LoadedExampleFile, positionAt } from "./loader.js";
-import {
-  checkExampleIds,
-  checkFilePlacement,
-  checkSemantics,
-  type SemanticContext,
-} from "./rules.js";
+import { checkFilePlacement, checkSemantics, type SemanticContext } from "./rules.js";
 import { ExamplesYamlSchema } from "./schema.js";
 import type { ExampleDiagnostic } from "./types.js";
 
@@ -76,7 +71,6 @@ export function validateExampleFiles(
   }
 
   diagnostics.push(...checkFilePlacement(files));
-  diagnostics.push(...checkExampleIds(files));
 
   return diagnostics;
 }

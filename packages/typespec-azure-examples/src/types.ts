@@ -26,11 +26,11 @@ export interface ExampleDiagnostic {
 
 /** A single example variant (`Example` in the schema). */
 export interface ExampleVariant {
-  /** Stable, service-wide example identifier without the `.json` extension. */
-  readonly id?: string;
   readonly title?: string;
   readonly description?: string;
-  /** @deprecated Use `id` without the `.json` extension instead. */
+  /** Example filename stem, without the `.json` extension. */
+  readonly id?: string;
+  /** Legacy `x-ms-examples` file name this variant was migrated from, when preserved. */
   readonly legacyFilename?: string;
   readonly since?: string;
   readonly request?: ExampleRequest;

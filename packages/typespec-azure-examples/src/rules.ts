@@ -1,5 +1,4 @@
 import { isQuotedScalar, locationAt, type LoadedExampleFile } from "./loader.js";
-import { exampleLineageKey, isValidExampleId, stripJsonExtension } from "./naming.js";
 import type { ExampleDiagnostic } from "./types.js";
 
 /** File-level metadata keys allowed to be `$`-prefixed. */
@@ -12,12 +11,6 @@ export interface SemanticContext {
    * `since ∈ service.yaml` check is skipped (e.g. no `service.yaml` was found).
    */
   readonly serviceVersions?: readonly string[];
-}
-
-interface LineageEntry {
-  index: number;
-  since?: string;
-  hasSince: boolean;
 }
 
 /** Run all per-file semantic rules (RFC §3) against a single loaded file. */
@@ -73,7 +66,7 @@ function checkOperation(
   variants: unknown[],
   diagnostics: ExampleDiagnostic[],
 ): void {
-  const lineages = new Map<string, LineageEntry[]>();
+  const lineages = new Map<string, { index: number; since?: string; hasSince: boolean }[]>();
 
   variants.forEach((variant, i) => {
     if (variant === null || typeof variant !== "object" || Array.isArray(variant)) {
@@ -86,14 +79,12 @@ function checkOperation(
     checkExplicitApiVersion(file, operation, i, v.request, diagnostics);
     checkPlaceholders(file, operation, i, v, diagnostics);
 
-    if (typeof v.id === "string") return;
-
-    const key = exampleLineageKey(v);
+    const title = typeof v.title === "string" ? v.title : "";
     const hasSince = typeof v.since === "string";
     const entry = { index: i, since: hasSince ? (v.since as string) : undefined, hasSince };
-    const group = lineages.get(key);
+    const group = lineages.get(title);
     if (group) group.push(entry);
-    else lineages.set(key, [entry]);
+    else lineages.set(title, [entry]);
   });
 
   checkLineages(file, operation, lineages, diagnostics);
@@ -240,14 +231,11 @@ function checkPlaceholders(
 function checkLineages(
   file: LoadedExampleFile,
   operation: string,
-  lineages: Map<string, LineageEntry[]>,
+  lineages: Map<string, { index: number; since?: string; hasSince: boolean }[]>,
   diagnostics: ExampleDiagnostic[],
 ): void {
-  for (const [key, entries] of lineages) {
-    const label =
-      key === "title:"
-        ? "the default lineage"
-        : `lineage '${key.slice(key.startsWith("id:") ? 3 : 6)}'`;
+  for (const [title, entries] of lineages) {
+    const label = title === "" ? "the default lineage" : `lineage '${title}'`;
 
     const baseEntries = entries.filter((e) => !e.hasSince);
     if (baseEntries.length > 1) {
@@ -286,85 +274,6 @@ function checkLineages(
       }
     }
   }
-}
-
-/** Validate stable IDs before they become filenames in either SDK or Swagger consumers. */
-export function checkExampleIds(files: readonly LoadedExampleFile[]): ExampleDiagnostic[] {
-  const diagnostics: ExampleDiagnostic[] = [];
-  const owners = new Map<string, { id: string; operation: string; file: string }>();
-
-  for (const file of files) {
-    if (file.data === null || typeof file.data !== "object" || Array.isArray(file.data)) continue;
-    for (const [operation, variants] of Object.entries(file.data)) {
-      if (operation.startsWith("$") || !Array.isArray(variants)) continue;
-      const lineages = new Map<string, LineageEntry[]>();
-      variants.forEach((variant, index) => {
-        if (variant === null || typeof variant !== "object" || Array.isArray(variant)) return;
-        const value = variant as Record<string, unknown>;
-        if (value.id === undefined) return;
-        const id = value.id;
-        if (!isValidExampleId(id)) {
-          diagnostics.push(
-            diag(
-              file,
-              [operation, index, "id"],
-              "error",
-              "invalid-example-id",
-              () =>
-                "'id' must be a non-empty filename-safe identifier without the '.json' extension.",
-              operation,
-            ),
-          );
-          return;
-        }
-        const key = exampleLineageKey(value);
-        const entry: LineageEntry = {
-          index,
-          since: typeof value.since === "string" ? value.since : undefined,
-          hasSince: typeof value.since === "string",
-        };
-        const entries = lineages.get(key);
-        if (entries === undefined) lineages.set(key, [entry]);
-        else entries.push(entry);
-        if (
-          typeof value.legacyFilename === "string" &&
-          stripJsonExtension(value.legacyFilename) !== id
-        ) {
-          diagnostics.push(
-            diag(
-              file,
-              [operation, index, "id"],
-              "error",
-              "conflicting-example-id",
-              () => "'id' and 'legacyFilename' must identify the same example file.",
-              operation,
-            ),
-          );
-        }
-        const owner = owners.get(id.toLowerCase());
-        if (
-          owner !== undefined &&
-          (owner.operation !== operation || owner.id !== id || owner.file !== file.path)
-        ) {
-          diagnostics.push(
-            diag(
-              file,
-              [operation, index, "id"],
-              "error",
-              "duplicate-example-id",
-              () =>
-                `Example id '${id}' conflicts with '${owner.id}' on operation '${owner.operation}'. IDs must be unique within the service.`,
-              operation,
-            ),
-          );
-        } else {
-          owners.set(id.toLowerCase(), { id, operation, file: file.path });
-        }
-      });
-      checkLineages(file, operation, lineages, diagnostics);
-    }
-  }
-  return diagnostics;
 }
 
 /**

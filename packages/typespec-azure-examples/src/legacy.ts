@@ -25,7 +25,7 @@ interface RequestBuckets {
  * `request` buckets (`path` / `query` / `headers` / `body`) are flattened back into the single flat
  * `parameters` bag the classic format uses: the implicit `api-version` parameter is re-added, and the
  * request body is placed under the operation's body parameter name. The `x-ms-examples` `title`
- * defaults to the display title, else the stable ID, else the preserved file name (sans extension), else the
+ * defaults to the preserved title, else the preserved file name (sans extension), else the
  * `operationId` — the same rule the file name uses — so the envelope round-trips too.
  *
  * This is the shared inverse of {@link transformExample} (the migration side) and the core of the
@@ -53,12 +53,10 @@ export function materializeLegacyExample(
       ? (resolved.responses as Record<string, unknown>)
       : {};
 
-  // eslint-disable-next-line @typescript-eslint/no-deprecated -- Preserve titles from older filename metadata.
-  const legacyFilename = resolved.legacyFilename;
   const title =
     resolved.title ??
     resolved.id ??
-    (legacyFilename ? stripJsonExtension(legacyFilename) : undefined) ??
+    (resolved.legacyFilename ? stripJsonExtension(resolved.legacyFilename) : undefined) ??
     options.operationId;
 
   return { title, operationId: options.operationId, parameters, responses };
