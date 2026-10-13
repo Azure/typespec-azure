@@ -35,7 +35,14 @@ publication binding in durable session artifacts:
   completion channel; for reviews, selected owner and persistent capabilities
 
 Resolve repository identity from actual remote fetch/push URLs and GitHub
-metadata, never a remote's name. New development, migration and promotion heads,
+metadata, never a remote's name. Compare the resolved owner/repository, not a
+guessed exact URL spelling: `https://github.com/Azure/typespec-azure` and
+`https://github.com/Azure/typespec-azure.git` identify the same repository. The
+optional `.git` suffix is not a publication or permission gate. Still record the
+actual effective push URL/refspec and verify GitHub repository identity and push
+permission; URL equivalence alone does not establish the publication binding.
+
+New development, migration and promotion heads,
 and all skill-update PR heads, must live in canonical
 `Azure/typespec-azure`, not a personal fork. An Azure base repository alone does
 not satisfy this requirement. Verify push permission for the authorized head
