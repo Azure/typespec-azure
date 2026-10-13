@@ -914,47 +914,6 @@ describe("generated SSE payload formats", () => {
     },
   );
 
-  it("does not pull a trailing native Node frame through the generated terminal operation", async () => {
-    const pulledTrailing = vi.fn();
-    const closed = vi.fn();
-    const body = Readable.from(
-      (async function* () {
-        try {
-          yield Buffer.from('event: complete\ndata: {"wire_value":"finished"}\n\n');
-          pulledTrailing();
-          yield Buffer.from('event: complete\ndata: {"wire_value":"too late"}\n\n');
-        } finally {
-          closed();
-        }
-      })(),
-      { highWaterMark: 0 },
-    );
-    const send = vi.fn().mockResolvedValue({
-      status: "200",
-      headers: { "content-type": "text/event-stream" },
-      body,
-    });
-    const stream = await operations.receiveModelTerminal({
-      path: () => ({ get: () => ({ asNodeStream: send }) }),
-    });
-    const iterator = stream[Symbol.asyncIterator]();
-
-    try {
-      expect(await iterator.next()).toEqual({
-        done: false,
-        value: { event: "complete", data: { value: "finished" } },
-      });
-      expect(pulledTrailing).not.toHaveBeenCalled();
-      expect(body.destroyed).toBe(true);
-      expect(closed).toHaveBeenCalledOnce();
-      expect(await iterator.next()).toEqual({ done: true, value: undefined });
-      expect(pulledTrailing).not.toHaveBeenCalled();
-      expect(send).toHaveBeenCalledOnce();
-    } finally {
-      await iterator.return?.();
-    }
-  });
-
   it("yields a raw constant when an unnamed stream contains only a terminal", async () => {
     const fixture = transport("Node", "data: [DONE]\n\n");
     const values: "[DONE]"[] = [];

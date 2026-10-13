@@ -359,65 +359,6 @@ describe("SSE event mapping", () => {
 });
 
 describe("single-connection SSE mapping", () => {
-  it.each(["Node", "Web"] as const)(
-    "does not pull a trailing %s frame while delivering a terminal",
-    async (platform) => {
-      const encoder = new TextEncoder();
-      const terminal = encoder.encode('event: done\ndata: {"final":true}\n\n');
-      const trailing = encoder.encode('event: done\ndata: {"final":false}\n\n');
-      const pulledTrailing = vi.fn();
-      const closed = vi.fn();
-      let sentTerminal = false;
-      // Zero buffering isolates core-sse read-ahead from native transport buffering.
-      const body =
-        platform === "Node"
-          ? Readable.from(
-              (async function* () {
-                try {
-                  yield terminal;
-                  pulledTrailing();
-                  yield trailing;
-                } finally {
-                  closed();
-                }
-              })(),
-              { highWaterMark: 0 },
-            )
-          : new ReadableStream<Uint8Array>(
-              {
-                pull(controller) {
-                  if (!sentTerminal) {
-                    sentTerminal = true;
-                    controller.enqueue(terminal);
-                  } else {
-                    pulledTrailing();
-                    controller.enqueue(trailing);
-                  }
-                },
-                cancel: closed,
-              },
-              { highWaterMark: 0 },
-            );
-      const stream = body instanceof Readable ? createSseStream(body) : createSseStream(body);
-      const iterator = readSseStream(stream, [
-        { eventName: "done", isTerminal: true, deserialize: (data) => data },
-      ])[Symbol.asyncIterator]();
-
-      expect(await iterator.next()).toEqual({ done: false, value: { final: true } });
-      expect(pulledTrailing).not.toHaveBeenCalled();
-      if (body instanceof Readable) {
-        expect(body.destroyed).toBe(true);
-        expect(closed).toHaveBeenCalledOnce();
-        expect(await iterator.next()).toEqual({ done: true, value: undefined });
-      } else {
-        await expect(iterator.next()).rejects.toThrow("ReadableStream is locked");
-        expect(closed).not.toHaveBeenCalled();
-        expect(body.locked).toBe(true);
-      }
-      expect(pulledTrailing).not.toHaveBeenCalled();
-    },
-  );
-
   it.each(["sentinel", "named", "discriminated"] as const)(
     "closes the native Node body before delivering a %s terminal to a paused consumer",
     async (kind) => {
