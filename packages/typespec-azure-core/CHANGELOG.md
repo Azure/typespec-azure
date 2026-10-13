@@ -1,5 +1,34 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.73.0
+
+### Features
+
+- [#5602](https://github.com/Azure/typespec-azure/pull/5602) Configure `casing-style` per declaration category, including opt-in `snake_case` properties,
+  operation parameters, union variants, and enum members. Existing Azure defaults remain unchanged.
+  
+  ```yaml
+  linter:
+    enable:
+      "@azure-tools/typespec-azure-core/casing-style":
+        modelProperty: snake_case
+        union: PascalCase
+        unionVariant: snake_case
+        enum: PascalCase
+        enumMember: snake_case
+        scalar: PascalCase
+  ```
+- [#5176](https://github.com/Azure/typespec-azure/pull/5176) Add the legacy `@Azure.Core.Legacy.overrideApiVersion` decorator for overriding inherited
+  API-version wire defaults on namespaces and interfaces.
+  
+  ```typespec
+  @Azure.Core.Legacy.overrideApiVersion("2021-11-01")
+  interface Widgets {
+    get(): void;
+  }
+  ```
+
+
 ## 0.72.0
 
 ### Features
