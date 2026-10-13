@@ -1,5 +1,13 @@
-import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
-import { beforeEach, describe, it, vi } from "vitest";
+import { resolvePath } from "@typespec/compiler";
+import {
+  LinterRuleTester,
+  TesterInstance,
+  createLinterRuleTester,
+  createTester,
+  expectDiagnosticEmpty,
+} from "@typespec/compiler/testing";
+import { readFileSync } from "node:fs";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useDeleteForDeleteRule } from "../../src/rules/use-delete-for-delete.js";
 import { ArmTester, SimpleTester } from "../tester.js";
 
@@ -29,7 +37,7 @@ describe("use-delete-for-delete", () => {
     );
   });
 
-  it("reports the documented incorrect HTTP SDK name", async () => {
+  it("reports an invalid HTTP SDK name", async () => {
     await tester
       .expect(
         `${header}
@@ -41,7 +49,7 @@ describe("use-delete-for-delete", () => {
       .toEmitDiagnostics([diagnostic("remove")]);
   });
 
-  it("accepts the documented correct HTTP SDK name", async () => {
+  it("accepts a valid HTTP SDK name", async () => {
     await tester
       .expect(
         `${header}
@@ -53,7 +61,7 @@ describe("use-delete-for-delete", () => {
       .toBeValid();
   });
 
-  it("accepts the documented common SDK name override", async () => {
+  it("accepts a common SDK name override", async () => {
     await tester
       .expect(
         `${header}
@@ -328,5 +336,68 @@ describe("use-delete-for-delete with standard ARM operations", () => {
       `,
       )
       .toBeValid();
+  });
+
+  describe("published template documentation examples", () => {
+    let documentationRunner: TesterInstance;
+    let setup: string;
+    let examples: string[];
+
+    beforeEach(async () => {
+      const runner = await createTester(resolvePath(import.meta.dirname, "..", ".."), {
+        libraries: [
+          "@typespec/http",
+          "@typespec/rest",
+          "@typespec/versioning",
+          "@typespec/openapi",
+          "@azure-tools/typespec-azure-core",
+          "@azure-tools/typespec-azure-resource-manager",
+          "@azure-tools/typespec-client-generator-core",
+        ],
+      }).createInstance();
+      documentationRunner = runner;
+      tester = createLinterRuleTester(
+        runner,
+        useDeleteForDeleteRule,
+        "@azure-tools/typespec-client-generator-core",
+      );
+      const documentation = readFileSync(
+        new URL("../../src/rules/use-delete-for-delete.md", import.meta.url),
+        "utf8",
+      );
+      const snippets = [...documentation.matchAll(/```typespec\r?\n([\s\S]*?)```/g)].map(
+        (match) => match[1],
+      );
+      expect(snippets).toHaveLength(5);
+      [setup, ...examples] = snippets;
+    });
+
+    it("reports the published incorrect template alias", async () => {
+      await tester.expect(`${setup}\n${examples[0]}`).toEmitDiagnostics([diagnostic("remove")]);
+    });
+
+    it("accepts the published correct template alias", async () => {
+      await tester.expect(`${setup}\n${examples[1]}`).toBeValid();
+    });
+
+    it("accepts the published template client name override", async () => {
+      await tester.expect(`${setup}\n${examples[2]}`).toBeValid();
+    });
+
+    it("accepts the published template suppression", async () => {
+      const [, diagnostics] = await documentationRunner.compileAndDiagnose(
+        `${setup}\n${examples[3]}`,
+        {
+          compilerOptions: {
+            linterRuleSet: {
+              enable: {
+                "@azure-tools/typespec-client-generator-core/use-delete-for-delete": true,
+              },
+            },
+          },
+        },
+      );
+      expectDiagnosticEmpty(diagnostics);
+    });
   });
 });

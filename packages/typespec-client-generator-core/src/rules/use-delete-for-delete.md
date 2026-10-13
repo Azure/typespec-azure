@@ -15,27 +15,52 @@ Overrides applying only to a particular language, such as
 The source program is checked without selecting an emitter or an API-version
 projection. Historical names supplied through `@renamedFrom` are not reconstructed.
 
-The following examples use generic HTTP authoring: import `@typespec/http`, use
-`TypeSpec.Http`, and place the operation in a `@service` namespace. For ARM
-resources, use the standard
-[resource delete operation templates](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-operations#resource-delete-operations-delete),
-with a name beginning with `delete`, such as
-`delete is ArmResourceDeleteSync<Widget>;`.
+The following ARM examples use the standard
+[resource delete operation template](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-operations#resource-delete-operations-delete).
+The template supplies the DELETE route and response; the operation alias supplies
+the SDK method name. The same naming requirement applies to data-plane services.
+
+Use this shared setup before each example:
+
+```typespec
+import "@typespec/http";
+import "@typespec/rest";
+import "@azure-tools/typespec-azure-resource-manager";
+import "@azure-tools/typespec-client-generator-core";
+
+using TypeSpec.Http;
+using TypeSpec.Rest;
+using Azure.ResourceManager;
+using Azure.ClientGenerator.Core;
+
+@armProviderNamespace
+@service
+@armCommonTypesVersion(CommonTypes.Versions.v5)
+namespace Example;
+
+model Widget is ProxyResource<WidgetProperties> {
+  @key("widgetName") @segment("widgets") name: string;
+}
+
+model WidgetProperties {}
+```
 
 #### ❌ Incorrect
 
 ```typespec
-@delete
-@route("/widgets/{id}")
-op remove(@path id: string): void;
+@armResourceOperations
+interface Widgets {
+  remove is ArmResourceDeleteSync<Widget>;
+}
 ```
 
 #### ✅ Correct
 
 ```typespec
-@delete
-@route("/widgets/{id}")
-op deleteWidget(@path id: string): void;
+@armResourceOperations
+interface Widgets {
+  delete is ArmResourceDeleteSync<Widget>;
+}
 ```
 
 ## Impact
@@ -49,13 +74,15 @@ An unscoped `@clientName` can provide the correct SDK name without renaming the
 TypeSpec operation:
 
 ```typespec
-@Azure.ClientGenerator.Core.clientName("deleteWidget")
-@delete
-@route("/widgets/{id}")
-op remove(@path id: string): void;
+@armResourceOperations
+interface Widgets {
+  @clientName("deleteWidget")
+  remove is ArmResourceDeleteSync<Widget>;
+}
 ```
 
-Import `@azure-tools/typespec-client-generator-core` to use `@clientName`.
+The shared setup imports `@azure-tools/typespec-client-generator-core` and uses
+`Azure.ClientGenerator.Core` to make `@clientName` available.
 
 ## Suppression
 
@@ -66,10 +93,11 @@ Use `#suppress` on the operation with a justification for the compatibility
 exception:
 
 ```typespec
-#suppress "@azure-tools/typespec-client-generator-core/use-delete-for-delete" "Preserve the already-shipped SDK method name."
-@delete
-@route("/widgets/{id}")
-op remove(@path id: string): void;
+@armResourceOperations
+interface Widgets {
+  #suppress "@azure-tools/typespec-client-generator-core/use-delete-for-delete" "Preserve the already-shipped SDK method name."
+  remove is ArmResourceDeleteSync<Widget>;
+}
 ```
 
 ## LintDiff Equivalent
