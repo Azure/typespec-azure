@@ -135,12 +135,12 @@ export async function receive(
     throw createRestError(result);
   }
 
-  const contentType = Object.entries(response.headers)
+  const responseContentType = Object.entries(response.headers)
     .find(([name]) => name.toLowerCase() === "content-type")?.[1]
     ?.split(";", 1)[0]
     .trim()
     .toLowerCase();
-  if (contentType !== "text/event-stream" || !response.body) {
+  if (responseContentType !== "text/event-stream" || !response.body) {
     const error = createRestError(response);
     try {
       await cancelSseResponse(response);
@@ -285,12 +285,12 @@ export async function receive(
     throw createRestError(result);
   }
 
-  const contentType = Object.entries(response.headers)
+  const responseContentType = Object.entries(response.headers)
     .find(([name]) => name.toLowerCase() === "content-type")?.[1]
     ?.split(";", 1)[0]
     .trim()
     .toLowerCase();
-  if (contentType !== "text/event-stream" || !response.body) {
+  if (responseContentType !== "text/event-stream" || !response.body) {
     const error = createRestError(response);
     try {
       await cancelSseResponse(response);
@@ -416,12 +416,12 @@ export async function receive(
     throw createRestError(result);
   }
 
-  const contentType_1 = Object.entries(response.headers)
+  const responseContentType = Object.entries(response.headers)
     .find(([name]) => name.toLowerCase() === "content-type")?.[1]
     ?.split(";", 1)[0]
     .trim()
     .toLowerCase();
-  if (contentType_1 !== "text/event-stream" || !response.body) {
+  if (responseContentType !== "text/event-stream" || !response.body) {
     const error = createRestError(response);
     try {
       await cancelSseResponse(response);
@@ -548,12 +548,12 @@ export async function receive(
     throw createRestError(result);
   }
 
-  const contentType = Object.entries(response.headers)
+  const responseContentType = Object.entries(response.headers)
     .find(([name]) => name.toLowerCase() === "content-type")?.[1]
     ?.split(";", 1)[0]
     .trim()
     .toLowerCase();
-  if (contentType !== "text/event-stream" || !response.body) {
+  if (responseContentType !== "text/event-stream" || !response.body) {
     const error = createRestError(response);
     try {
       await cancelSseResponse(response);
@@ -678,12 +678,12 @@ export async function receive(
     throw createRestError(result);
   }
 
-  const contentType = Object.entries(response.headers)
+  const responseContentType = Object.entries(response.headers)
     .find(([name]) => name.toLowerCase() === "content-type")?.[1]
     ?.split(";", 1)[0]
     .trim()
     .toLowerCase();
-  if (contentType !== "text/event-stream" || !response.body) {
+  if (responseContentType !== "text/event-stream" || !response.body) {
     const error = createRestError(response);
     try {
       await cancelSseResponse(response);

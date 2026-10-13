@@ -40,7 +40,6 @@ import {
   formatOptionalPropertyAccess,
   formatPropertyAccess,
   NameType,
-  normalizeName,
   normalizeSdkName,
   normalizeSdkPropertyName,
 } from "../../utils/name-utils.js";
@@ -1188,15 +1187,19 @@ function getSsePayloadContentType(
   return undefined;
 }
 
-function getSseScalarDeserializeExpression(context: SdkContext, type: SdkType): string {
-  if (type.kind === "nullable") {
-    return `data === null ? null : ${getSseScalarDeserializeExpression(context, type.type)}`;
+function getSsePayloadDeserializeExpression(context: SdkContext, type: SdkType): string {
+  const deserializerName = buildModelDeserializer(context, type, {
+    nameOnly: true,
+    skipDiscriminatedUnionSuffix: false,
+  });
+  if (typeof deserializerName === "string") {
+    return `${deserializerName}(data)`;
   }
   if (type.kind === "enum" || type.kind === "enumvalue") {
-    return getSseScalarDeserializeExpression(context, type.valueType);
+    return getSsePayloadDeserializeExpression(context, type.valueType);
   }
   if (type.kind === "duration") {
-    return getSseScalarDeserializeExpression(context, type.wireType);
+    return getSsePayloadDeserializeExpression(context, type.wireType);
   }
   if (isNumericTypeKind(type.kind) || type.kind === "boolean") {
     return deserializeResponseHeadersValue(
@@ -1211,6 +1214,48 @@ function getSseScalarDeserializeExpression(context: SdkContext, type: SdkType): 
     return deserializeResponseValue(context, type, "data", true, getEncodeForType(type));
   }
   return "data";
+}
+
+function getSharedUnnamedConstantDecoder(
+  context: SdkContext,
+  events: SdkSseEventMetadata[],
+): { contentType: string; deserializeExpression: string } | undefined {
+  // Terminal constants keep their matchers; other unnamed payloads must share the decoder.
+  const payloadEvents = events.filter(
+    (event) =>
+      event.eventType === undefined &&
+      !(event.isTerminalEvent && event.payloadType.kind === "constant"),
+  );
+  const first = payloadEvents[0];
+  if (!first || first.isTerminalEvent || first.payloadType.kind !== "constant") {
+    return undefined;
+  }
+  const contentType = getSsePayloadContentType(context, first) ?? "text/plain";
+  const deserializeExpression = getSsePayloadDeserializeExpression(
+    context,
+    first.payloadType.valueType,
+  ).trim();
+  if (
+    !payloadEvents.every(
+      (event) =>
+        !event.isTerminalEvent &&
+        event.payloadType.kind === "constant" &&
+        /\bjson\b/i.test(getSsePayloadContentType(context, event) ?? "text/plain") ===
+          /\bjson\b/i.test(contentType) &&
+        getSsePayloadDeserializeExpression(context, event.payloadType.valueType).trim() ===
+          deserializeExpression,
+    )
+  ) {
+    return undefined;
+  }
+  const payloadType = Array.from(
+    new Set(payloadEvents.map((event) => getTypeExpression(context, event.payloadType))),
+  ).join(" | ");
+  return {
+    contentType,
+    deserializeExpression:
+      deserializeExpression === "data" ? "data" : `(${deserializeExpression}) as ${payloadType}`,
+  };
 }
 
 /**
@@ -1238,12 +1283,18 @@ export function getStructuredStreamInfo(
 
   const sseMetadata = response.sseMetadata;
   if (sseMetadata && kind === "sse") {
+    const sharedConstantDecoder = getSharedUnnamedConstantDecoder(context, sseMetadata.events);
+    let sharedConstantEmitted = false;
     const events: StructuredStreamEvent[] = [];
     const payloadTypeExpressions: string[] = [];
     const namedEventTypes = new Map<string, string>();
     let everyPayloadEventIsNamed = true;
     let hasNamedEvent = false;
     for (const sseEvent of sseMetadata.events) {
+      const useSharedConstant =
+        sharedConstantDecoder !== undefined &&
+        sseEvent.eventType === undefined &&
+        !sseEvent.isTerminalEvent;
       hasNamedEvent ||= sseEvent.eventType !== undefined;
       const event: StructuredStreamEvent = {
         eventName: sseEvent.eventType,
@@ -1271,27 +1322,20 @@ export function getStructuredStreamInfo(
           }
         }
       }
-      if (sseEvent.payloadType.kind === "constant") {
+      if (useSharedConstant) {
+        event.contentType = sharedConstantDecoder.contentType;
+        event.deserializeExpression = sharedConstantDecoder.deserializeExpression;
+      } else if (sseEvent.payloadType.kind === "constant") {
         event.deserializeExpression = JSON.stringify(sseEvent.payloadType.value);
-        if (sseEvent.isTerminalEvent) {
-          event.terminalValue =
-            contentType !== undefined && /\bjson\b/i.test(contentType)
-              ? event.deserializeExpression
-              : String(sseEvent.payloadType.value);
-        }
+        event.terminalValue =
+          contentType !== undefined && /\bjson\b/i.test(contentType)
+            ? event.deserializeExpression
+            : String(sseEvent.payloadType.value);
       } else {
-        const deserializerName = buildModelDeserializer(context, sseEvent.payloadType, {
-          nameOnly: true,
-          skipDiscriminatedUnionSuffix: false,
-        });
-        if (typeof deserializerName === "string") {
-          event.deserializeExpression = `${deserializerName}(data)`;
-        } else {
-          event.deserializeExpression = getSseScalarDeserializeExpression(
-            context,
-            sseEvent.payloadType,
-          );
-        }
+        event.deserializeExpression = getSsePayloadDeserializeExpression(
+          context,
+          sseEvent.payloadType,
+        );
       }
       const payloadType = getTypeExpression(context, sseEvent.payloadType);
       payloadTypeExpressions.push(payloadType);
@@ -1305,7 +1349,10 @@ export function getStructuredStreamInfo(
           existingType ? `${existingType} | ${payloadType}` : payloadType,
         );
       }
-      events.push(event);
+      if (!useSharedConstant || !sharedConstantEmitted) {
+        events.push(event);
+      }
+      sharedConstantEmitted ||= useSharedConstant;
     }
     const itemType =
       payloadTypeExpressions.length > 0
@@ -1348,7 +1395,7 @@ function getStructuredStreamOperationFunction(
     method,
     clientType,
   );
-  const { name, fixme = [] } = getOperationName(operation, context, method[0]);
+  const { name, propertyName, fixme = [] } = getOperationName(operation, context, method[0]);
 
   const paramNames = new Set(parameters.map((p) => p.name));
   const resultVarName = generateLocallyUniqueName("result", paramNames);
@@ -1364,7 +1411,7 @@ function getStructuredStreamOperationFunction(
   } else {
     const responseVarName = generateLocallyUniqueName("response", paramNames);
     const expectedStatusesVarName = generateLocallyUniqueName("expectedStatuses", paramNames);
-    const contentTypeVarName = generateLocallyUniqueName("contentType", paramNames);
+    const contentTypeVarName = generateLocallyUniqueName("responseContentType", paramNames);
     const descriptorVarName = generateLocallyUniqueName("descriptors", paramNames);
     const eventStreamVarName = generateLocallyUniqueName("eventStream", paramNames);
     const getSseResponseRef = resolveReference(SseStreamingHelpers.getSseResponse);
@@ -1374,6 +1421,13 @@ function getStructuredStreamOperationFunction(
     const createSseStreamRef = resolveReference(AzureCoreDependencies["createSseStream"]);
     const createRestErrorRef = resolveReference(useDependencies().createRestError);
     const descriptors = buildSseDescriptors(info);
+    const noBodyStatuses = Array.from(
+      new Set(
+        operation.operation.responses
+          .filter((response) => response.type === undefined)
+          .map((response) => String(response.statusCodes)),
+      ),
+    );
 
     statements.push(
       `const ${responseVarName} = await ${getSseResponseRef}(_${name}Send(${parameterList}));`,
@@ -1382,6 +1436,18 @@ function getStructuredStreamOperationFunction(
         const result = await ${parseSseErrorResponseRef}(${responseVarName});
         ${getExceptionThrowStatement(context, method)}
       }`,
+    );
+    if (noBodyStatuses.length > 0) {
+      statements.push(`if (${JSON.stringify(noBodyStatuses)}.includes(${responseVarName}.status)) {
+        await ${cancelSseResponseRef}(${responseVarName});
+        return {
+          [Symbol.asyncIterator]: () => ({
+            next: async () => ({ done: true as const, value: undefined }),
+          }),
+        };
+      }`);
+    }
+    statements.push(
       `const ${contentTypeVarName} = Object.entries(${responseVarName}.headers)
         .find(([name]) => name.toLowerCase() === "content-type")?.[1]
         ?.split(";", 1)[0].trim().toLowerCase();`,
@@ -1406,7 +1472,7 @@ function getStructuredStreamOperationFunction(
     isAsync: true,
     isExported: true,
     name,
-    propertyName: normalizeName(operation.name, NameType.Property),
+    propertyName,
     parameters,
     returnType: `Promise<AsyncIterable<${buildStreamReturnType(info)}>>`,
     statements,

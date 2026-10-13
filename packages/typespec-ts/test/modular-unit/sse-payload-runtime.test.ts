@@ -1,4 +1,5 @@
 import { Readable } from "node:stream";
+import { Project, type SourceFile, SyntaxKind } from "ts-morph";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { clearContexts, useContext } from "../../src/context-manager.js";
 import { emitModularOperationsFromTypeSpec } from "../util/emit-util.js";
@@ -26,6 +27,21 @@ interface GeneratedOperations {
   receiveScalars(context: unknown): Promise<AsyncIterable<EventPayload>>;
   receiveScalarTerminal(context: unknown): Promise<AsyncIterable<EventPayload>>;
   receiveUnnamedScalar(context: unknown): Promise<AsyncIterable<number>>;
+  receiveConstants(context: unknown): Promise<AsyncIterable<"cat" | "dog" | "[DONE]">>;
+  receiveUnannotatedConstants(context: unknown): Promise<AsyncIterable<"cat" | "dog">>;
+  receiveJsonConstants(context: unknown): Promise<AsyncIterable<"cat" | "dog">>;
+  receiveNumericConstants(context: unknown): Promise<AsyncIterable<1 | 2>>;
+  receiveBooleanConstants(context: unknown): Promise<AsyncIterable<true | false>>;
+  receivePrimitiveConstants(context: unknown): Promise<AsyncIterable<1 | 2 | false>>;
+  receiveMixedFormatConstants(context: unknown): Promise<AsyncIterable<"cat" | "dog">>;
+  receiveConstantsAndModels(
+    context: unknown,
+  ): Promise<AsyncIterable<"cat" | "dog" | { value: string }>>;
+  receiveConstantsAndTerminalModel(
+    context: unknown,
+  ): Promise<AsyncIterable<"cat" | "dog" | { value: string }>>;
+  receiveNamedConstants(context: unknown): Promise<AsyncIterable<EventPayload>>;
+  receiveOptional(context: unknown): Promise<AsyncIterable<EventPayload>>;
 }
 
 describe("generated SSE payload formats", () => {
@@ -33,6 +49,7 @@ describe("generated SSE payload formats", () => {
   let browserOperations: GeneratedOperations;
   let reactNativeOperations: GeneratedOperations;
   let payloadContentTypes: (string | undefined)[] | undefined;
+  let operationsFile: SourceFile;
 
   beforeAll(async () => {
     const files = await emitModularOperationsFromTypeSpec(
@@ -175,6 +192,109 @@ describe("generated SSE payload formats", () => {
       union UnnamedScalarEvents { int32 }
       @route("receiveUnnamedScalar")
       op receiveUnnamedScalar(): SSEStream<UnnamedScalarEvents>;
+
+      @events
+      union ConstantEvents {
+        @Events.contentType("text/plain")
+        "cat",
+        @Events.contentType("text/plain")
+        "dog",
+        @terminalEvent
+        "[DONE]",
+      }
+      @route("receiveConstants")
+      op receiveConstants(): SSEStream<ConstantEvents>;
+
+      @events
+      union UnannotatedConstantEvents { "cat", "dog" }
+      @route("receiveUnannotatedConstants")
+      op receiveUnannotatedConstants(): SSEStream<UnannotatedConstantEvents>;
+
+      @events
+      union JsonConstantEvents {
+        @Events.contentType("application/json")
+        "cat",
+        @Events.contentType("application/json")
+        "dog",
+      }
+      @route("receiveJsonConstants")
+      op receiveJsonConstants(): SSEStream<JsonConstantEvents>;
+
+      @events
+      union NumericConstantEvents { 1, 2 }
+      @route("receiveNumericConstants")
+      op receiveNumericConstants(): SSEStream<NumericConstantEvents>;
+
+      @events
+      union BooleanConstantEvents {
+        @Events.contentType("application/json")
+        true,
+        @Events.contentType("application/json")
+        false,
+      }
+      @route("receiveBooleanConstants")
+      op receiveBooleanConstants(): SSEStream<BooleanConstantEvents>;
+
+      @events
+      union PrimitiveConstantEvents {
+        @Events.contentType("text/plain")
+        1,
+        @Events.contentType("text/plain")
+        2,
+        @Events.contentType("application/json")
+        false,
+      }
+      @route("receivePrimitiveConstants")
+      op receivePrimitiveConstants(): SSEStream<PrimitiveConstantEvents>;
+
+      @events
+      union MixedFormatConstantEvents {
+        @Events.contentType("text/plain")
+        "cat",
+        @Events.contentType("application/json")
+        "dog",
+      }
+      @route("receiveMixedFormatConstants")
+      op receiveMixedFormatConstants(): SSEStream<MixedFormatConstantEvents>;
+
+      @events
+      union ConstantsAndModels {
+        @Events.contentType("text/plain")
+        "cat",
+        @Events.contentType("text/plain")
+        "dog",
+        Payload,
+      }
+      @route("receiveConstantsAndModels")
+      op receiveConstantsAndModels(): SSEStream<ConstantsAndModels>;
+
+      @events
+      union ConstantsAndTerminalModel {
+        @Events.contentType("text/plain")
+        "cat",
+        @Events.contentType("text/plain")
+        "dog",
+        @terminalEvent
+        Payload,
+      }
+      @route("receiveConstantsAndTerminalModel")
+      op receiveConstantsAndTerminalModel(): SSEStream<ConstantsAndTerminalModel>;
+
+      @events
+      union NamedConstantEvents {
+        @Events.contentType("text/plain")
+        first: "cat",
+        @Events.contentType("text/plain")
+        second: "dog",
+      }
+      @route("receiveNamedConstants")
+      op receiveNamedConstants(): SSEStream<NamedConstantEvents>;
+
+      model AcceptedWithoutBody {
+        @statusCode status: 202;
+      }
+      @route("receiveOptional")
+      op receiveOptional(): SSEStream<MessageTerminalEvents> | NoContentResponse | AcceptedWithoutBody | ApiError;
     `,
       { "include-headers-in-response": true, needTCGC: true },
     );
@@ -187,6 +307,7 @@ describe("generated SSE payload formats", () => {
       }
     }
     const file = files![0]!;
+    operationsFile = file;
     const sources = file
       .getProject()
       .getSourceFiles()
@@ -252,6 +373,240 @@ describe("generated SSE payload formats", () => {
     }
     return result;
   }
+
+  it.each([
+    ["receiveConstants", "dog", "cat", ["dog", "cat"]],
+    ["receiveUnannotatedConstants", "dog", "cat", ["dog", "cat"]],
+    ["receiveJsonConstants", '"dog"', '"cat"', ["dog", "cat"]],
+    ["receiveNumericConstants", "2", "1", [2, 1]],
+    ["receiveBooleanConstants", "false", "true", [false, true]],
+  ] as const)(
+    "uses the primitive decoder for homogeneous nonterminal constants in %s",
+    async (operation, first, second, expected) => {
+      const fixture = transport("Node", `data: ${first}\n\ndata: ${second}\n\n`);
+      const values = [];
+      for await (const item of await operations[operation](fixture.context)) {
+        values.push(item);
+      }
+      expect(values).toEqual(expected);
+    },
+  );
+
+  it.each([
+    ["receiveConstants", 1, "data", '"cat" | "dog" | "[DONE]"'],
+    ["receiveUnannotatedConstants", 0, "data", '"cat" | "dog"'],
+    ["receiveJsonConstants", 0, "data", '"cat" | "dog"'],
+    ["receiveNumericConstants", 0, "(Number(data)) as 1 | 2", "1 | 2"],
+    [
+      "receiveBooleanConstants",
+      0,
+      '(String(data).trim().toLowerCase() === "true") as true | false',
+      "true | false",
+    ],
+  ] as const)(
+    "generates one shared nonterminal decoder for %s",
+    (operation, matchers, expression, type) => {
+      const source = operationsFile.getFunctionOrThrow(operation).getText().replace(/\s+/g, " ");
+      expect(source.match(/isTerminal: false/g)).toHaveLength(1);
+      expect(source.match(/terminalValue:/g) ?? []).toHaveLength(matchers);
+      expect(source).toContain(`deserialize: (data) => ${expression}`);
+      expect(source).toContain(`Promise<AsyncIterable<${type}>>`);
+    },
+  );
+
+  it("type-checks shared constant descriptors against their declared literal unions", () => {
+    const project = new Project({
+      useInMemoryFileSystem: true,
+      compilerOptions: { strict: true },
+    });
+    const descriptor = operationsFile
+      .getProject()
+      .getSourceFiles()
+      .flatMap((file) => file.getInterfaces())
+      .find((type) => type.getName() === "SseEventDescriptor");
+    if (!descriptor) {
+      throw new Error("SseEventDescriptor was not emitted.");
+    }
+    const declarations = [
+      "receiveConstants",
+      "receiveUnannotatedConstants",
+      "receiveJsonConstants",
+      "receiveNumericConstants",
+      "receiveBooleanConstants",
+    ].map((operation) => {
+      const declaration = operationsFile
+        .getFunctionOrThrow(operation)
+        .getDescendantsOfKind(SyntaxKind.VariableDeclaration)
+        .find((declaration) => declaration.getName() === "descriptors");
+      if (!declaration) {
+        throw new Error(`SSE descriptors were not emitted for ${operation}.`);
+      }
+      return `{ const ${declaration.getText()}; }`;
+    });
+    project.createSourceFile(
+      "constant-descriptors.ts",
+      `${descriptor.getText()}\n${declarations.join("\n")}`,
+    );
+    expect(
+      project.getPreEmitDiagnostics().map((diagnostic) => diagnostic.getMessageText()),
+    ).toEqual([]);
+  });
+
+  it("does not replace an actual string payload with a declared nonterminal constant", async () => {
+    const fixture = transport("Node", "data: actual-wire-value\n\n");
+    const values = [];
+    for await (const item of await operations.receiveConstants(fixture.context)) {
+      values.push(item);
+    }
+    expect(values).toEqual(["actual-wire-value"]);
+  });
+
+  it("preserves malformed JSON errors with the shared primitive decoder", async () => {
+    const fixture = transport("Node", "data: {invalid\n\n");
+    const stream = await operations.receiveJsonConstants(fixture.context);
+    await expect(stream[Symbol.asyncIterator]().next()).rejects.toThrow(
+      'Unable to deserialize event "message".',
+    );
+  });
+
+  it("retains value matching when unnamed constants need different primitive decoding", async () => {
+    const fixture = transport("Node", "data: 3\n\ndata: 2\n\ndata: false\n\n");
+    const values = [];
+    for await (const item of await operations.receivePrimitiveConstants(fixture.context)) {
+      values.push(item);
+    }
+    expect(values).toEqual([2, false]);
+  });
+
+  it("retains value matching when unnamed constants use different wire formats", async () => {
+    const fixture = transport("Node", 'data: cat\n\ndata: "dog"\n\n');
+    const values = [];
+    for await (const item of await operations.receiveMixedFormatConstants(fixture.context)) {
+      values.push(item);
+    }
+    expect(values).toEqual(["cat", "dog"]);
+  });
+
+  it("preserves model selection when unnamed constants compete with a model", async () => {
+    const fixture = transport("Node", 'data: dog\n\ndata: {"wire_value":"model"}\n\ndata: cat\n\n');
+    const values = [];
+    for await (const item of await operations.receiveConstantsAndModels(fixture.context)) {
+      values.push(item);
+    }
+    expect(values).toEqual(["dog", { value: "model" }, "cat"]);
+  });
+
+  it("preserves an unnamed terminal model alongside nonterminal constants", async () => {
+    const fixture = transport("Node", 'data: dog\n\ndata: {"wire_value":"final"}\n\ndata: cat\n\n');
+    const values = [];
+    for await (const item of await operations.receiveConstantsAndTerminalModel(fixture.context)) {
+      values.push(item);
+    }
+    expect(values).toEqual(["dog", { value: "final" }]);
+    expect(fixture.nodeBody.destroyed).toBe(true);
+  });
+
+  it("closes the source before yielding a terminal after shared constant decoding", async () => {
+    const fixture = transport(
+      "Node",
+      "data: dog\n\ndata: cat\n\ndata: [DONE]\n\ndata: dog\n\n",
+      "200",
+      undefined,
+      true,
+    );
+    const stream = await operations.receiveConstants(fixture.context);
+    const iterator = stream[Symbol.asyncIterator]();
+    expect(await iterator.next()).toEqual({ done: false, value: "dog" });
+    expect(await iterator.next()).toEqual({ done: false, value: "cat" });
+    expect(await iterator.next()).toEqual({ done: false, value: "[DONE]" });
+    expect(fixture.nodeBody.destroyed).toBe(true);
+    expect(await iterator.next()).toEqual({ done: true, value: undefined });
+  });
+
+  it("matches a named nonterminal constant by both event name and payload", async () => {
+    const fixture = transport(
+      "Node",
+      "event: first\ndata: dog\n\nevent: second\ndata: dog\n\nevent: first\ndata: cat\n\n",
+    );
+    expect(await collect(await operations.receiveNamedConstants(fixture.context))).toEqual([
+      { event: "second", data: "dog" },
+      { event: "first", data: "cat" },
+    ]);
+  });
+
+  it.each(
+    (["Node", "browser", "react-native"] as const).flatMap((platform) =>
+      ["202", "204"].flatMap((status) =>
+        [false, true].map((hasBody) => ({ platform, status, hasBody })),
+      ),
+    ),
+  )("accepts a declared no-content response as an empty iterable: %j", async (testCase) => {
+    const { platform, status, hasBody } = testCase;
+    const fixture = transport(platform === "Node" ? "Node" : "browser", "", status, {}, hasBody);
+    fixture.send.mockResolvedValueOnce({
+      status,
+      headers: {},
+      body: hasBody ? fixture.body : undefined,
+    });
+    const runtime =
+      platform === "Node"
+        ? operations
+        : platform === "browser"
+          ? browserOperations
+          : reactNativeOperations;
+
+    const stream = await runtime.receiveOptional(fixture.context);
+    expect(await collect(stream)).toEqual([]);
+    expect(fixture.send).toHaveBeenCalledOnce();
+    if (hasBody) {
+      if (platform === "Node") {
+        expect(fixture.nodeBody.destroyed).toBe(true);
+      } else {
+        expect(fixture.cancel).toHaveBeenCalledOnce();
+        expect(fixture.body).toHaveProperty("locked", false);
+      }
+    }
+  });
+
+  it.each(["Node", "browser"] as const)(
+    "still rejects a missing streaming body on %s when only other statuses are bodyless",
+    async (platform) => {
+      const fixture = transport(platform, "", "200", {});
+      fixture.send.mockResolvedValueOnce({
+        status: "200",
+        headers: { "content-type": "text/event-stream" },
+        body: undefined,
+      });
+      const runtime = platform === "Node" ? operations : browserOperations;
+
+      await expect(runtime.receiveOptional(fixture.context)).rejects.toMatchObject({
+        statusCode: 200,
+      });
+    },
+  );
+
+  it("preserves cleanup failures for a declared no-content response", async () => {
+    const failure = new Error("no-content body cancellation failed");
+    const body = new ReadableStream<Uint8Array>({
+      cancel() {
+        throw failure;
+      },
+    });
+    const send = vi.fn().mockResolvedValue({ status: "204", headers: {}, body });
+
+    await expect(
+      browserOperations.receiveOptional({
+        path: () => ({ get: () => ({ asBrowserStream: send }) }),
+      }),
+    ).rejects.toBe(failure);
+  });
+
+  it("preserves the streaming branch of an operation with a no-content alternative", async () => {
+    const fixture = transport("Node", 'event: message\ndata: {"wire_value":"streamed"}\n\n');
+    expect(await collect(await operations.receiveOptional(fixture.context))).toEqual([
+      { event: "message", data: { value: "streamed" } },
+    ]);
+  });
 
   it("infers payload formats without modifying TCGC's explicit SSE metadata", () => {
     expect(payloadContentTypes).toEqual([

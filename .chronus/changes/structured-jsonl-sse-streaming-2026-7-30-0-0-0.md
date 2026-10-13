@@ -4,10 +4,4 @@ packages:
   - "@azure-tools/typespec-ts"
 ---
 
-Generate structured JSONL and SSE streaming operations as `Promise<AsyncIterable<T>>` of deserialized items/events instead of raw binary `Uint8Array` bodies. Connection and modeled HTTP error validation are eager; payload deserialization is lazy. Generate streaming helpers only for supported MIME types and non-paging, non-LRO operations. Deserialize scalar SSE payloads into their declared client types. Dispatch unnamed discriminated SSE model variants by their payload discriminator and yield terminal payloads before stopping.
-
-SSE uses the published `@azure/core-sse` `createSseStream` API. Close the SSE source before delivering a terminal payload, preserving the terminal item and reporting cleanup failures after yielding it.
-
-JSONL decodes lines incrementally, flushes UTF-8 decoding at EOF, and cancels browser readers on early exit or decoding failures. Per-item deserialization uses existing TCGC serialization metadata.
-
-Recognize standalone `TypeSpec.Streams` decorators in the shared test compiler and cover custom streams without incidental SSE imports.
+Generate JSONL and SSE operations returning `Promise<AsyncIterable<T>>` of deserialized items or events instead of raw byte streams, with eager HTTP validation and terminal-event handling.

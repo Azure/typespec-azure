@@ -15,9 +15,8 @@ export interface SseEventDescriptor<T> {
    */
   isTerminal: boolean;
   /**
-   * For terminal events carrying a constant sentinel value, the raw `data` string that marks
-   * termination. When set, only events matching this descriptor whose `data` equals this value
-   * end the stream.
+   * The raw `data` string required to match a constant payload, including nonterminal constants.
+   * A match ends the stream only when `isTerminal` is true.
    */
   terminalValue?: string;
   /**
@@ -32,7 +31,7 @@ export interface SseEventDescriptor<T> {
   contentType?: string;
   /**
    * Deserializes the event's `data` payload into the target type. The input is the JSON-parsed
-   * value for JSON payloads, or the raw `data` string otherwise. Matched constant terminal values
+   * value for JSON payloads, or the raw `data` string otherwise. Matched constant values
    * are passed through as raw strings so their generated deserializers can return the typed constant.
    */
   deserialize: (data: any) => T;
