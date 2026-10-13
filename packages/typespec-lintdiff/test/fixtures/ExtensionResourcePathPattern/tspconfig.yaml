@@ -1,0 +1,3 @@
+linter:
+  enable:
+    tsp-lintdiff-local-linter/extension-resource-path-pattern: true

@@ -143,7 +143,6 @@ const enabledRules = {
   [`tsp-lintdiff-local-linter/${avoidAnonymousTypesRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${consistentResponseSchemaForPutRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${deleteInOperationNameRule.name}`]: true,
-  [`tsp-lintdiff-local-linter/${extensionResourcePathPatternRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${evenSegmentedPathForPutOperationRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${descriptionMustNotBeNodeNameRule.name}`]: true,
   [`tsp-lintdiff-local-linter/${enumInsteadOfBooleanRule.name}`]: true,
