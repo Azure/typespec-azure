@@ -1,8 +1,7 @@
 import { ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
 import { type SdkLroServiceMethod, UsageFlags } from "../../src/interfaces.js";
-import { getLroOperationIdLink } from "../../src/lro-polling-metadata.js";
-import { getSdkLroOperationIdSource } from "../../src/methods.js";
+import { getStatusMonitorLink } from "../../src/lro-polling-metadata.js";
 import { AzureCoreTester, createSdkContextForTester } from "../tester.js";
 
 const Tester = AzureCoreTester.wrap(
@@ -93,7 +92,7 @@ describe("LRO polling metadata", () => {
         link: rawLink,
       },
     } as const;
-    strictEqual(getLroOperationIdLink(rawStep), rawLink);
+    strictEqual(getStatusMonitorLink(rawStep), rawLink);
 
     const sdkLink = {
       kind: "link",
@@ -109,7 +108,7 @@ describe("LRO polling metadata", () => {
         link: sdkLink,
       },
     } as const;
-    strictEqual(getSdkLroOperationIdSource(sdkStep), sdkLink);
+    strictEqual(getStatusMonitorLink(sdkStep), sdkLink);
   });
 
   it("exposes the URI-derived ID source and exact typed polling properties", async () => {

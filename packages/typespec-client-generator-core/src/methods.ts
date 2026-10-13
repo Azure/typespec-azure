@@ -78,7 +78,7 @@ import {
   responseOverrideKey,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { resolveLroPollingMetadata } from "./lro-polling-metadata.js";
+import { getStatusMonitorLink, resolveLroPollingMetadata } from "./lro-polling-metadata.js";
 import {
   getCrossLanguageDefinitionId,
   getHttpOperationWithCache,
@@ -128,16 +128,6 @@ function getSdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperat
     ...diagnostics.pipe(getSdkPagingServiceMethod<TServiceOperation>(context, operation, client)),
     kind: "lropaging",
   });
-}
-
-/** @internal */
-export function getSdkLroOperationIdSource(
-  statusMonitorStep: SdkNextOperationLink | SdkNextOperationReference | undefined,
-): SdkOperationLink | undefined {
-  if (statusMonitorStep?.kind === "nextOperationLink") {
-    return statusMonitorStep.target;
-  }
-  return statusMonitorStep?.target.link;
 }
 
 function getPageSizeParameterSegments<TServiceOperation extends SdkServiceOperation>(
@@ -420,7 +410,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
 
   const finalResponse = getFinalResponse();
   const statusMonitorStep = getStatusMonitorStep(context, rawMetadata.statusMonitorStep);
-  const operationIdSource = getSdkLroOperationIdSource(statusMonitorStep);
+  const operationIdSource = getStatusMonitorLink(statusMonitorStep);
   const pollingCustomization = diagnostics.pipe(resolveLroPollingMetadata(context, operation));
   const pollingMetadata =
     pollingCustomization?.properties.map((property) =>

@@ -27,6 +27,7 @@ import {
 } from "@typespec/compiler";
 import { type Node, SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
+import { useStateMap } from "@typespec/compiler/utils";
 import {
   getAuthentication,
   getHttpOperation,
@@ -107,29 +108,30 @@ import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
-interface ScopedLroOperationId {
-  scope?: string;
-  target: DiagnosticTarget;
-}
-
-interface ScopedLroPollingMetadata {
+interface ScopedLroDecorator {
   scope?: string;
   target: DiagnosticTarget;
 }
 
 const lroOperationIdKey = createStateSymbol("lroOperationId");
 const lroPollingMetadataKey = createStateSymbol("lroPollingMetadata");
+const [getLroOperationIdEntries, setLroOperationIdEntries] = useStateMap<
+  Operation,
+  ScopedLroDecorator[]
+>(lroOperationIdKey);
+const [getLroPollingMetadataEntries, setLroPollingMetadataEntries] = useStateMap<
+  ModelProperty,
+  ScopedLroDecorator[]
+>(lroPollingMetadataKey);
 
 export const $lroOperationId: LroOperationIdDecorator = (
   context: DecoratorContext,
   target: Operation,
   scope?: LanguageScopes | DecoratorOptions,
 ) => {
-  const entries =
-    (context.program.stateMap(lroOperationIdKey).get(target) as
-      ScopedLroOperationId[] | undefined) ?? [];
+  const entries = getLroOperationIdEntries(context.program, target) ?? [];
   entries.unshift({ scope: normalizeScope(scope), target: context.decoratorTarget });
-  context.program.stateMap(lroOperationIdKey).set(target, entries);
+  setLroOperationIdEntries(context.program, target, entries);
 };
 
 export const $lroPollingMetadata: LroPollingMetadataDecorator = (
@@ -137,21 +139,16 @@ export const $lroPollingMetadata: LroPollingMetadataDecorator = (
   target: ModelProperty,
   scope?: LanguageScopes | DecoratorOptions,
 ) => {
-  const entries =
-    (context.program.stateMap(lroPollingMetadataKey).get(target) as
-      ScopedLroPollingMetadata[] | undefined) ?? [];
+  const entries = getLroPollingMetadataEntries(context.program, target) ?? [];
   entries.unshift({ scope: normalizeScope(scope), target: context.decoratorTarget });
-  context.program.stateMap(lroPollingMetadataKey).set(target, entries);
+  setLroPollingMetadataEntries(context.program, target, entries);
 };
 
 export function getLroOperationIdDecorators(
   context: TCGCContext,
   target: Operation,
-): ScopedLroOperationId[] {
-  const entries =
-    (context.program.stateMap(lroOperationIdKey).get(target) as
-      ScopedLroOperationId[] | undefined) ?? [];
-  return entries.filter(
+): ScopedLroDecorator[] {
+  return (getLroOperationIdEntries(context.program, target) ?? []).filter(
     (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
   );
 }
@@ -159,11 +156,8 @@ export function getLroOperationIdDecorators(
 export function getLroPollingMetadataDecorators(
   context: TCGCContext,
   target: ModelProperty,
-): ScopedLroPollingMetadata[] {
-  const entries =
-    (context.program.stateMap(lroPollingMetadataKey).get(target) as
-      ScopedLroPollingMetadata[] | undefined) ?? [];
-  return entries.filter(
+): ScopedLroDecorator[] {
+  return (getLroPollingMetadataEntries(context.program, target) ?? []).filter(
     (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
   );
 }

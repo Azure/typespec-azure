@@ -6,7 +6,6 @@ import {
 import {
   createDiagnosticCollector,
   type Diagnostic,
-  type DiagnosticTarget,
   type ModelProperty,
   type Operation,
   walkPropertiesInherited,
@@ -17,29 +16,34 @@ import { createDiagnostic } from "./lib.js";
 import { getLibraryName } from "./public-utils.js";
 
 export interface ResolvedLroPollingMetadata {
-  raw: LroMetadata;
   operationId: boolean;
   properties: ModelProperty[];
 }
 
+type StatusMonitorLinkStep<TLink> =
+  | { kind: "nextOperationLink"; target: TLink }
+  | { kind: "nextOperationReference"; target: { link?: TLink } };
+
 /** @internal */
-export function getLroOperationIdLink(
+export function getStatusMonitorLink<TLink>(
+  statusMonitorStep: StatusMonitorLinkStep<TLink> | undefined,
+): TLink | undefined {
+  return statusMonitorStep?.kind === "nextOperationLink"
+    ? statusMonitorStep.target
+    : statusMonitorStep?.target.link;
+}
+
+function getLroOperationIdLink(
   statusMonitorStep: LroMetadata["statusMonitorStep"],
 ): OperationLink | undefined {
-  const link =
-    statusMonitorStep?.kind === "nextOperationLink"
-      ? statusMonitorStep.target
-      : statusMonitorStep?.target.link;
+  const link = getStatusMonitorLink(statusMonitorStep);
   return link?.location === "Self" ? undefined : link;
 }
 
-interface CachedResolution {
-  value: ResolvedLroPollingMetadata | undefined;
-  diagnostics: readonly Diagnostic[];
-  diagnosticsReturned: boolean;
-}
-
-const resolutionCache = new WeakMap<TCGCContext, Map<Operation, CachedResolution>>();
+const resolutionCache = new WeakMap<
+  TCGCContext,
+  Map<Operation, ResolvedLroPollingMetadata | undefined>
+>();
 
 export function resolveLroPollingMetadata(
   context: TCGCContext,
@@ -51,14 +55,12 @@ export function resolveLroPollingMetadata(
     resolutionCache.set(context, contextCache);
   }
   const cached = contextCache.get(operation);
-  if (cached) {
-    if (cached.diagnosticsReturned) return [cached.value, []];
-    cached.diagnosticsReturned = true;
-    return [cached.value, cached.diagnostics];
+  if (contextCache.has(operation)) {
+    return [cached, []];
   }
 
   const [value, diagnostics] = resolve(context, operation);
-  contextCache.set(operation, { value, diagnostics, diagnosticsReturned: true });
+  contextCache.set(operation, value);
   return [value, diagnostics];
 }
 
@@ -103,9 +105,9 @@ function resolve(
   }
 
   const properties: ModelProperty[] = [];
-  const seenNames = new Map<string, DiagnosticTarget>();
+  const seenNames = new Set<string>();
   if (operationId) {
-    seenNames.set("operationId", operationIdDecorators[0].target);
+    seenNames.add("operationId");
   }
 
   for (const property of walkPropertiesInherited(raw.pollingInfo.responseModel)) {
@@ -133,12 +135,12 @@ function resolve(
       );
       continue;
     }
-    seenNames.set(clientName, metadataDecorators[0].target);
+    seenNames.add(clientName);
     properties.push(property);
   }
 
   if (!operationId && properties.length === 0 && diagnostics.diagnostics.length === 0) {
     return diagnostics.wrap(undefined);
   }
-  return diagnostics.wrap({ raw, operationId, properties });
+  return diagnostics.wrap({ operationId, properties });
 }
