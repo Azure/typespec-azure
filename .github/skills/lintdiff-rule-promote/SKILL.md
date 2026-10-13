@@ -576,9 +576,11 @@ library documentation following the
   mechanics merely to explain the migration
 - include realistic TypeSpec incorrect and correct examples
 - apply the shared [example authoring policy](../typespec-lint-implement/SKILL.md#example-authoring):
-  choose the example audience independently of the destination package, use
-  standard templates with named customizations for ARM resource scenarios, and
-  justify any handwritten ARM exception
+  use supported standard templates for the incorrect/correct pair whenever they
+  can preserve the diagnostic contrast, rather than raw routes; choose the
+  audience independently of the destination package, but do not use generic HTTP
+  labeling to omit a supported ARM template pair for an ARM-applicable rule;
+  justify handwritten exceptions with the inspected template limitation
 - pass the [documentation example validation](../typespec-lint-validate/SKILL.md#documentation-example-validation)
   gate for the actual incorrect/correct snippets; preserve the diagnostic
   contrast rather than substituting an exempt default template response
@@ -939,9 +941,10 @@ promotion diff. The review should inspect:
   rationale, and any Swagger/LintDiff provenance being confined to a provenance
   section
 - example audience and template selection under the shared authoring policy,
-  justified handwritten ARM exceptions, and diagnostic evidence for the final
-  incorrect/correct snippets with the target rule enabled; compilation or a
-  passing exempt default-template example alone does not satisfy this gate
+  template-based incorrect/correct examples whenever supported, justified
+  handwritten exceptions, and diagnostic evidence for the final snippets with
+  the target rule enabled; generic HTTP labeling, compilation, or a passing
+  exempt default-template example alone does not satisfy this gate
 - generated docs and formatting drift, especially after rule renames:
   `packages/<target>/README.md`,
   `website/src/content/docs/docs/libraries/<library>/reference/linter.md`, and

@@ -836,6 +836,14 @@ one session to execute both publication phases.
 > and ruleset enablement unless the evidence requires reporting a blocker.
 > Pass the same no-skill-edits/no-skill-update-PR ownership constraint.
 >
+> Enforce the shared
+> [example authoring policy](../typespec-lint-implement/SKILL.md#example-authoring)
+> in promotion documentation: use supported standard templates instead of raw
+> routes whenever they can demonstrate both incorrect and correct behavior.
+> Require a documented template limitation for handwritten exceptions; a generic
+> HTTP audience does not waive an available ARM template pair. Verify diagnostic
+> evidence for the actual final snippets before publication and review handoff.
+>
 > Follow promotion through draft PR creation or update. Record the absolute
 > promotion worktree and canonical promotion PR URL. A confirmed source defect
 > returns `source-repair-required` with the complete cycle handoff immediately;
