@@ -117,6 +117,10 @@ do not replace the published operation or response shape with an easier test.
   or made the correction pass only through an exemption. For implicit response
   examples, preserve implicit payloads rather than switching to explicit
   `@body` or `@bodyRoot` bodies outside the rule's scope.
+- Enforce the template-first authoring policy: when supported templates can
+  demonstrate the incorrect/correct pair, require those templates instead of raw
+  routes. A generic HTTP audience or successful compilation is not an exception;
+  require a documented template limitation for any handwritten fallback.
 - Record the example audience, chosen template/customization or justified
   handwritten exception, and diagnostic evidence in the validation handoff or
   PR notes. Reuse existing example infrastructure or a scratch workflow instead

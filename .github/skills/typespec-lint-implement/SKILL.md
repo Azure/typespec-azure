@@ -103,12 +103,19 @@ audience: a shared Core rule can still need an ARM resource example.
 - For ARM resource scenarios, use standard ARM operation templates in both the
   incorrect and correct examples. Express the violation through supported named
   customization arguments and omit unchanged defaults.
-- For data-plane or generic examples, use authoring patterns appropriate to that
-  audience; do not introduce ARM solely because the rule also applies to ARM.
-- Before using a handwritten ARM route or operation, inspect the relevant
-  template's customization points. If none can express the rule-owned behavior
-  being explained, record that limitation and the reason for the handwritten
-  example in validation evidence or PR notes. Brevity alone is not a reason.
+- For every audience, prefer supported standard operation templates over raw
+  routes or handwritten operations whenever templates can demonstrate both the
+  incorrect and correct behavior. Inspect the relevant template's customization
+  points before choosing handwritten examples. Use the template appropriate to
+  the audience; do not introduce ARM solely because the rule also applies to ARM.
+- Choosing a generic HTTP audience does not waive template selection. If an
+  ARM-applicable rule can demonstrate its behavior with standard ARM templates,
+  include that template-based incorrect/correct pair rather than using only raw
+  routes. Additional audience-specific examples may supplement it.
+- Use handwritten routes or operations only when no suitable supported template
+  can preserve the rule-owned diagnostic contrast. Record the inspected
+  template/customization limitation and the reason for the exception in validation
+  evidence or PR notes. Brevity or destination package alone is not a reason.
 - Preserve the semantic contrast when adopting templates. Both examples must
   reach the rule's intended check; the correction should fix the violation,
   not merely switch to an exempt construct. For an implicit-response-body rule,
