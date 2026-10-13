@@ -21,6 +21,19 @@ on:
         required: false
         type: number
         default: 3
+      emitter-iterations:
+        required: false
+        type: number
+        default: 3
+      emitter-warmup:
+        required: false
+        type: number
+        default: 1
+      specs:
+        description: "Optional comma-separated spec filter for focused runs"
+        required: false
+        type: string
+        default: ""
       noise-cv:
         required: false
         type: number
@@ -38,6 +51,14 @@ on:
         required: false
         type: string
         default: ""
+      backfill_to:
+        required: false
+        type: string
+        default: ""
+      backfill_force:
+        required: false
+        type: boolean
+        default: false
       branch:
         description: "Data branch to store results"
         required: false
@@ -48,9 +69,11 @@ permissions:
   contents: write
 
 jobs:
-  benchmark:
-    name: Run Benchmarks
+  prepare:
+    name: ${{ inputs.backfill_from != '' && 'Backfill' || 'Prepare benchmarks' }}
     runs-on: ${{ inputs.runner }}
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
     env:
       TYPESPEC_VS_CI_BUILD: true
       TYPESPEC_SKIP_WEBSITE_BUILD: true
@@ -83,32 +106,160 @@ jobs:
         run: pnpm -r --filter "@azure-tools/typespec-benchmark..." build
 
       - name: Install C# emitter from npm
-        if: ${{ inputs.backfill_from == '' }}
         run: node packages/benchmark/scripts/setup-csharp.ts
 
       - name: Run backfill
         if: ${{ inputs.backfill_from != '' }}
+        env:
+          BACKFILL_FROM: ${{ inputs.backfill_from }}
+          BACKFILL_TO: ${{ inputs.backfill_to }}
+          BACKFILL_FORCE: ${{ inputs.backfill_force }}
+          SPECS_DIR: ${{ inputs.specs-dir }}
+          SPECS: ${{ inputs.specs }}
+          RESULTS_DIR: ${{ inputs.results-dir }}
+          DATA_BRANCH: ${{ inputs.branch }}
+          ITERATIONS: ${{ inputs.iterations }}
+          WARMUP: ${{ inputs.warmup }}
+          EMITTER_ITERATIONS: ${{ inputs.emitter-iterations }}
+          EMITTER_WARMUP: ${{ inputs.emitter-warmup }}
+          NOISE_CV: ${{ inputs.noise-cv }}
+          RERUN_ITERATIONS: ${{ inputs.rerun-iterations }}
         run: |
-          node packages/benchmark/dist/src/cli.js backfill \
-            --from ${{ inputs.backfill_from }} \
-            --specs-dir ${{ inputs.specs-dir }} \
-            --iterations ${{ inputs.iterations }} \
-            --warmup ${{ inputs.warmup }} \
-            --branch ${{ inputs.branch }} \
-            --push
+          args=(--from "$BACKFILL_FROM" --specs-dir "$SPECS_DIR"
+            --results-dir "$RESULTS_DIR" --branch "$DATA_BRANCH"
+            --iterations "$ITERATIONS" --warmup "$WARMUP"
+            --emitter-iterations "$EMITTER_ITERATIONS" --emitter-warmup "$EMITTER_WARMUP"
+            --noise-cv-threshold "$NOISE_CV" --max-reruns 1 --rerun-iterations "$RERUN_ITERATIONS" --push)
+          if [ -n "$BACKFILL_TO" ]; then args+=(--to "$BACKFILL_TO"); fi
+          if [ "$BACKFILL_FORCE" = "true" ]; then args+=(--force); fi
+          if [ -n "$SPECS" ]; then args+=(--specs "$SPECS"); fi
+          node packages/benchmark/dist/src/cli.js backfill "${args[@]}"
 
-      - name: Run benchmarks
+      - name: Upload backfill results and logs
+        if: ${{ always() && inputs.backfill_from != '' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: backfill-results
+          path: /tmp/bench-backfill-results-*/
+          if-no-files-found: ignore
+
+      - name: Prepare workload plan and snapshot sources
+        id: plan
         if: ${{ inputs.backfill_from == '' }}
+        env:
+          SPECS: ${{ inputs.specs }}
+          SPECS_DIR: ${{ inputs.specs-dir }}
         run: |
-          node packages/benchmark/dist/src/cli.js run \
-            --specs-dir ${{ inputs.specs-dir }} \
+          args=(--specs-dir "$SPECS_DIR")
+          if [ -n "$SPECS" ]; then args+=(--specs "$SPECS"); fi
+          node packages/benchmark/dist/src/cli.js plan "${args[@]}" \
             --iterations ${{ inputs.iterations }} \
             --warmup ${{ inputs.warmup }} \
+            --emitter-iterations ${{ inputs.emitter-iterations }} \
+            --emitter-warmup ${{ inputs.emitter-warmup }} \
             --noise-cv-threshold ${{ inputs.noise-cv }} \
             --max-reruns 1 \
             --rerun-iterations ${{ inputs.rerun-iterations }} \
             --commit ${{ github.sha }} \
-            --output /tmp/benchmark-results.json
+            --output /tmp/benchmark-plan.json \
+            --github-output "$GITHUB_OUTPUT"
+
+      - name: Archive prepared build
+        if: ${{ inputs.backfill_from == '' }}
+        run: node packages/benchmark/scripts/archive-build.ts /tmp/benchmark-build.tar.gz
+
+      - name: Upload prepared build
+        if: ${{ inputs.backfill_from == '' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: benchmark-build
+          path: |
+            /tmp/benchmark-plan.json
+            /tmp/benchmark-build.tar.gz
+          compression-level: 0
+          retention-days: 1
+
+  measure:
+    name: ${{ matrix.spec }} / ${{ matrix.emitter || 'compiler' }}
+    if: ${{ inputs.backfill_from == '' }}
+    needs: prepare
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    env:
+      NODE_OPTIONS: --max-old-space-size=12288
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/setup
+        with:
+          node-version: 24.15.0
+      - uses: ./.github/actions/setup-python
+        if: matrix.emitter == '@azure-tools/typespec-python'
+      - uses: ./.github/actions/setup-java
+        if: matrix.emitter == '@azure-tools/typespec-java'
+      - uses: ./.github/actions/setup-go
+        if: matrix.emitter == '@azure-tools/typespec-go'
+      - name: Setup .NET
+        if: matrix.emitter == '@azure-typespec/http-client-csharp'
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: benchmark-build
+          path: /tmp/benchmark-build
+      - name: Restore prepared build
+        run: tar -xzf /tmp/benchmark-build/benchmark-build.tar.gz
+      - name: Measure workload
+        env:
+          WORKLOAD: ${{ matrix.id }}
+        run: |
+          node packages/benchmark/dist/src/cli.js run-workload \
+            --plan /tmp/benchmark-build/benchmark-plan.json \
+            --workload "$WORKLOAD" --output "/tmp/benchmark-shard-${WORKLOAD}.json"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: benchmark-result-${{ matrix.id }}
+          path: /tmp/benchmark-shard-*.json
+          retention-days: 1
+
+  publish:
+    name: Combine and publish
+    needs: [prepare, measure]
+    if: ${{ inputs.backfill_from == '' }}
+    runs-on: ${{ inputs.runner }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+        with:
+          node-version: 24.15.0
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: benchmark-build
+          path: /tmp/benchmark-build
+      - name: Restore prepared build
+        run: tar -xzf /tmp/benchmark-build/benchmark-build.tar.gz
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: benchmark-result-*
+          path: /tmp/benchmark-shards
+          merge-multiple: true
+      - name: Combine complete workload results
+        run: |
+          node packages/benchmark/dist/src/cli.js merge \
+            --plan /tmp/benchmark-build/benchmark-plan.json \
+            --shards-dir /tmp/benchmark-shards --output /tmp/benchmark-results.json
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: benchmark-results
+          path: /tmp/benchmark-results.json
 
       # On push to main: store results to the data branch.
       - name: Store benchmark results
@@ -117,4 +268,5 @@ jobs:
           node packages/benchmark/dist/src/cli.js store-results \
             --results /tmp/benchmark-results.json \
             --commit ${{ github.sha }} \
+            --branch ${{ inputs.branch }} \
             --results-dir ${{ inputs.results-dir }}
