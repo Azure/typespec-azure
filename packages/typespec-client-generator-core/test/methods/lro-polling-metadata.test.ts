@@ -274,7 +274,7 @@ op ordinary(): Value;
       },
       {
         code: operation.replace("model Details {", "@access(Access.internal)\nmodel Details {"),
-        diagnostic: "lro-polling-metadata-internal-conflict",
+        diagnostic: "conflict-access-override",
       },
       {
         code: operation.replace("@lroOperationId", "@lroOperationId\n@lroOperationId"),
@@ -348,6 +348,27 @@ op startSecond is Azure.Core.Foundations.LongRunningOperation<
     strictEqual(
       start.lroMetadata.pollingMetadata?.[2],
       startSecond.lroMetadata.pollingMetadata?.[0],
+    );
+  });
+
+  it("ignores an overridden decorated base property", async () => {
+    const { program } = await Tester.compile(
+      operation.replace('@clientName("requestToken")', '@clientName("operationId")').replace(
+        "model JobState extends PollingMetadataBase {",
+        `model JobState extends PollingMetadataBase {
+  request_token: string;`,
+      ),
+    );
+    const context = await createSdkContextForTester(program);
+    const start = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
+    ok(start);
+    strictEqual(start.kind, "lro");
+    expect(start.lroMetadata.pollingMetadata?.map((x) => x.name)).toEqual([
+      "percentComplete",
+      "details",
+    ]);
+    expect(context.diagnostics.map((x) => x.code)).not.toContain(
+      "@azure-tools/typespec-client-generator-core/lro-polling-metadata-name-conflict",
     );
   });
 

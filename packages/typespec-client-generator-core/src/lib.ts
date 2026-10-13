@@ -236,13 +236,6 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Polling metadata has more than one entry with the projected client name '${"clientName"}'.`,
       },
     },
-    "lro-polling-metadata-internal-conflict": {
-      ...doc("lro-polling-metadata-internal-conflict"),
-      severity: "error",
-      messages: {
-        default: paramMessage`Public operation polling metadata '${"propertyName"}' references an explicitly internal property or type. Make the operation internal or expose a public metadata type.`,
-      },
-    },
     "conflicting-multipart-model-usage": {
       ...doc("conflicting-multipart-model-usage"),
       severity: "error",

@@ -7,16 +7,11 @@ import {
   createDiagnosticCollector,
   type Diagnostic,
   type DiagnosticTarget,
-  type Model,
   type ModelProperty,
   type Operation,
-  type Type,
+  walkPropertiesInherited,
 } from "@typespec/compiler";
-import {
-  getAccessOverride,
-  getLroOperationIdDecorators,
-  getLroPollingMetadataDecorators,
-} from "./decorators.js";
+import { getLroOperationIdDecorators, getLroPollingMetadataDecorators } from "./decorators.js";
 import type { TCGCContext } from "./interfaces.js";
 import { createDiagnostic } from "./lib.js";
 import { getLibraryName } from "./public-utils.js";
@@ -113,7 +108,7 @@ function resolve(
     seenNames.set("operationId", operationIdDecorators[0].target);
   }
 
-  for (const property of getDirectAndInheritedProperties(raw.pollingInfo.responseModel)) {
+  for (const property of walkPropertiesInherited(raw.pollingInfo.responseModel)) {
     const metadataDecorators = getLroPollingMetadataDecorators(context, property);
     if (metadataDecorators.length === 0) continue;
 
@@ -139,20 +134,6 @@ function resolve(
       continue;
     }
     seenNames.set(clientName, metadataDecorators[0].target);
-
-    if (
-      (getAccessOverride(context, operation) ?? "public") === "public" &&
-      hasExplicitInternalAccess(context, property, new Set())
-    ) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "lro-polling-metadata-internal-conflict",
-          format: { propertyName: property.name },
-          target: metadataDecorators[0].target,
-        }),
-      );
-      continue;
-    }
     properties.push(property);
   }
 
@@ -160,48 +141,4 @@ function resolve(
     return diagnostics.wrap(undefined);
   }
   return diagnostics.wrap({ raw, operationId, properties });
-}
-
-function* getDirectAndInheritedProperties(model: Model): Iterable<ModelProperty> {
-  let current: Model | undefined = model;
-  while (current) {
-    yield* current.properties.values();
-    current = current.baseModel;
-  }
-}
-
-function hasExplicitInternalAccess(context: TCGCContext, type: Type, visited: Set<Type>): boolean {
-  if (visited.has(type)) return false;
-  visited.add(type);
-
-  if (
-    (type.kind === "ModelProperty" ||
-      type.kind === "Model" ||
-      type.kind === "Enum" ||
-      type.kind === "Union") &&
-    getAccessOverride(context, type) === "internal"
-  ) {
-    return true;
-  }
-
-  switch (type.kind) {
-    case "ModelProperty":
-      return hasExplicitInternalAccess(context, type.type, visited);
-    case "Model":
-      return (
-        (type.baseModel !== undefined &&
-          hasExplicitInternalAccess(context, type.baseModel, visited)) ||
-        [...type.properties.values()].some((property) =>
-          hasExplicitInternalAccess(context, property, visited),
-        ) ||
-        (type.indexer !== undefined &&
-          hasExplicitInternalAccess(context, type.indexer.value, visited))
-      );
-    case "Union":
-      return [...type.variants.values()].some((variant) =>
-        hasExplicitInternalAccess(context, variant.type, visited),
-      );
-    default:
-      return false;
-  }
 }
