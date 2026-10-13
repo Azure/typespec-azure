@@ -135,6 +135,7 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 ## Common Mistakes to Avoid
 
 - Don't copy @param descriptions between decorators — @clientApiVersions had @apiVersion's description.
+- Model-reference arguments are converted to SDK types only for `@clientOption`. For other decorators captured through `additionalDecorators`, TCGC reports `unsupported-generic-decorator-arg-type` and records the argument as `undefined`.
 - The 03client.mdx file had a typo "@clientLocaton" (missing 'i') — fixed to "@clientLocation".
 - In mockapi.ts files, query parameters use `query:` not `params:` in the request object.
 - The guideline.md previously said `encode` is set only when `@encode` exists — this was inaccurate since encode can also be set contextually (e.g., multipart).
@@ -188,6 +189,23 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - `@apiVersion(false)` prevents a parameter from matching to a client API version parameter, keeping it on the method.
 - Body model properties named "apiVersion" are NOT treated as API version params — only HTTP metadata params (header/query/path/cookie) and server URL template parameters (from `@server`) are matched by name.
 - Server URL template parameters (declared in `@server` decorator's parameter model) named `apiVersion`/`api-version` are recognized as API version params, even with plain `string` type in versioned services.
+
+## Legacy API-Version Overrides
+
+- `@Azure.Core.Legacy.overrideApiVersion` changes an operation API-version parameter's `clientDefaultValue` without changing client `apiVersions` metadata.
+- Override lookup follows the operation's declaration scope and source-operation chain. Moving an operation with `@clientLocation` does not make it inherit the destination client's override.
+- The Spector scenario under `azure/core/api-version-override` verifies the overridden wire query value. Detailed inheritance and metadata behavior remain unit-test concerns.
+
+## Human Feedback Lessons (September 2026)
+
+- A plain `@override` operation controls the generated method parameters, but its declared return type is ignored. Response replacement must use `replaceResponseWithVoid` or `replaceResponseWithBytes`, which preserve the original HTTP response metadata. Keep this distinction explicit in generated decorator documentation.
+- For `@Azure.Core.Legacy.overrideApiVersion`, use Spector only for the observable overridden query value. Keep declaration-scope inheritance, source-operation traversal, and unchanged client version metadata in unit tests.
+
+## SDK Method Naming Rules
+
+- `get-operation-name` checks the common TCGC SDK name of concrete GET operations and requires a `get` or `list` prefix. It honors unscoped `@clientName`, ignores emitter-scoped overrides and OpenAPI operation IDs, and skips template declarations/artifacts and non-GET operations.
+- `use-create-for-put` checks concrete PUT endpoints and requires the common TCGC SDK name to start with `create`, case-insensitively. It uses the same common-name resolution, applies without requiring ARM provider metadata, and is disabled by default in the `client-sdk` ruleset.
+- Linter-only naming rules do not alter the generated client graph or wire behavior, so their unit tests and generated rule reference pages are the appropriate coverage; do not add Spector carrier scenarios for them.
 
 ## isExactName Property (May 2026)
 
@@ -332,3 +350,11 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 ## @operationGroup doc comment (Aug 2026)
 
 - The `@deprecated` JSDoc tag on `@operationGroup` in `lib/decorators.tsp` was changed to plain prose ("Deprecated: use `@client` instead.") because the leading `@deprecated` tag was breaking the generated reference doc layout. Reference docs regenerate to the same info; no manual reference edit.
+
+## SdkClientType.authentication (September 2026)
+
+- `SdkClientType.authentication?: Authentication` exposes the HTTP authentication requirements declared on the client's service. `authentication.options` preserves OR alternatives, and `option.schemes` preserves schemes that must be used together (AND).
+- `NoAuth` remains an explicit scheme both as an alternative and when used alone. This does not make the projected `SdkCredentialParameter` optional; the credential parameter remains required and carries the `noAuth` credential variant.
+- The value is `undefined` when there is no associated service or no service authentication. Multi-service clients use the first service, matching existing endpoint and credential metadata behavior.
+- `tcgc-output.yaml` preserves authentication option/scheme grouping but strips each `HttpAuth.model` compiler reference. An operation-level `@useAuth` does not replace the client-level service authentication metadata.
+- This is emitter-consumed type-graph metadata with no new generated SDK or wire behavior. Document it in `guideline.md`; do not add a Spector carrier scenario.

@@ -40,6 +40,9 @@ ignorePaths:
   - packages/typespec-java/emitter-tests/src/**
   # Developer/user docs ported verbatim from autorest.java's typespec-extension.
   - packages/typespec-java/docs/**
+  # Round-trip proof fixtures are copied verbatim from azure-rest-api-specs
+  # (Microsoft.Contoso) and carry randomized example data, not real words.
+  - packages/typespec-azure-examples/test/roundtrip/fixtures/**
 useGitignore: true
 enableFiletypes:
   - tsp

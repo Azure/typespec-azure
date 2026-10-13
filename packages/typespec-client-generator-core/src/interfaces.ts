@@ -22,6 +22,7 @@ import type {
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
+  type Authentication,
   type HttpAuth,
   type HttpOperation,
   type HttpOperationResponse,
@@ -230,6 +231,8 @@ export interface SdkClientType<
   summary?: string;
   /** Client initialization way. */
   clientInitialization: SdkClientInitializationType;
+  /** HTTP authentication requirements declared on the service. */
+  authentication?: Authentication;
   /** Methods of the client. */
   methods: SdkMethod<TServiceOperation>[];
   /** API versions supported for current type. */
@@ -540,6 +543,11 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   namespace: string;
   kind: "union";
   variantTypes: TValueType[];
+  /**
+   * Type declared by the union's `extends` clause. This constrains the variants but does not imply inheritance.
+   * Usage, access, and serialization information propagate to this referenced type.
+   */
+  baseType?: SdkType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
   /** Whether the type has public or private accessibility. */
@@ -1173,7 +1181,7 @@ interface SdkLroServiceMethodOptions {
  * Long running operation metadata.
  */
 export interface SdkLroServiceMetadata {
-  /** LRO metadata from TypeSpec core library */
+  /** Core-compatible raw metadata with TCGC-selected client result fields. */
   __raw: LroMetadata;
   /** Legacy `finalStateVia` value */
   finalStateVia: FinalStateValue;

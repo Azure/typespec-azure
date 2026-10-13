@@ -330,28 +330,6 @@ export function getParamName(param: go.MethodParameter): string {
   return paramName;
 }
 
-export function fixUpMethodName(method: go.MethodType): string {
-  switch (method.kind) {
-    case "lroMethod":
-    case "lroPageableMethod":
-      return `Begin${method.name}`;
-    case "pageableMethod": {
-      let N = "N";
-      let name = method.name;
-      if (method.name[0] !== method.name[0].toUpperCase()) {
-        // the method isn't exported; don't export the pager ctor
-        N = "n";
-        // ensure correct casing of the emitted function name e.g.,
-        // "listThings" -> "newListThingsPager"
-        name = name[0].toUpperCase() + name.substring(1);
-      }
-      return `${N}ew${name}Pager`;
-    }
-    case "method":
-      return method.name;
-  }
-}
-
 // converts the Go code model encoding type to the type name in the standard library
 export function formatBytesEncoding(enc: go.BytesEncoding): string {
   if (enc === "URL") {
@@ -392,7 +370,7 @@ export function formatParamValue(
         return content;
       };
 
-      const unwrappedElement = go.unwrapPtr(param.type.elementType);
+      const unwrappedElement = go.unwrapPtr(param.type.itemType);
       switch (unwrappedElement.kind) {
         case "encodedBytes":
           imports.add("encoding/base64");
@@ -663,9 +641,8 @@ export function getResultFieldName(method: go.MethodType): string {
     case "monomorphicResult":
       return result.fieldName;
     case "modelResult":
-      return result.modelType.name;
     case "polymorphicResult":
-      return result.interface.name;
+      return result.type.name;
   }
 }
 
@@ -992,11 +969,10 @@ export function getBitSizeForNumber(
 export function recursiveUnwrapMapSlice(item: go.WireType): go.WireType {
   switch (item.kind) {
     case "map":
-      return recursiveUnwrapMapSlice(item.valueType);
+    case "slice":
+      return recursiveUnwrapMapSlice(item.itemType);
     case "ptr":
       return recursiveUnwrapMapSlice(item.ptrType);
-    case "slice":
-      return recursiveUnwrapMapSlice(item.elementType);
     default:
       return item;
   }
@@ -1103,15 +1079,13 @@ export function getSerDeFormat(
           }
           break;
         case "modelResult":
-          recursiveWalkModelFields(resultType.modelType, resultType.format);
+        case "polymorphicResult":
+          recursiveWalkModelFields(resultType.type, resultType.format);
           break;
         case "monomorphicResult":
           if (resultType.format === "JSON" || resultType.format === "XML") {
-            recursiveWalkModelFields(resultType.monomorphicType, resultType.format);
+            recursiveWalkModelFields(resultType.type, resultType.format);
           }
-          break;
-        case "polymorphicResult":
-          recursiveWalkModelFields(resultType.interface, resultType.format);
           break;
       }
     }
