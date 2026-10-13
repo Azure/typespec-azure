@@ -143,6 +143,15 @@ already compiler-rejected route shapes do not enlarge the contract.
   `test/harness/typespec-results.ts`, schema version seven.
   Duration: 1,371,339 ms. The full command completed with exit zero.
 
+The full run was launched from the repository root with:
+
+```powershell
+mise exec -- pnpm --dir packages\typespec-lintdiff specs:typespec --specs-repo C:\dev\worktrees\azure-rest-api-specs-lintdiff-subscriptions-and-resource-group-casing --concurrency 6
+```
+
+That runner writes `coverage-breakdown.json` and `coverage-breakdown.md`. No
+separate `specs:coverage` command was run for the final result.
+
 | Report                           | Population / mode                      | Validator projects | Local TypeSpec projects |     Official credit |  Same-project overlap | Raw diagnostics            |
 | -------------------------------- | -------------------------------------- | -----------------: | ----------------------: | ------------------: | --------------------: | -------------------------- |
 | External snapshot row            | 450 compiled / no separate staging row |                  6 |                       6 |                   0 | Aggregate credit only | Not reported               |
