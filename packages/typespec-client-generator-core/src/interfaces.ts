@@ -1,5 +1,8 @@
 import {
   FinalStateValue,
+  type AzureAuthenticationAudience,
+  type AzureServiceEnvironment,
+  type AzureTokenAuthentication,
   type LroMetadata,
   type ParameterSource,
 } from "@azure-tools/typespec-azure-core";
@@ -22,13 +25,13 @@ import type {
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
+  Visibility,
   type Authentication,
   type HttpAuth,
   type HttpOperation,
   type HttpOperationResponse,
   type HttpStatusCodeRange,
   type HttpVerb,
-  Visibility,
 } from "@typespec/http";
 import type { ContextNode } from "./internal-utils.js";
 
@@ -616,6 +619,28 @@ export interface SdkCredentialType extends SdkTypeBase {
   kind: "credential";
   /** Auth scheme. Reuse TypeSpec Http types. */
   scheme: HttpAuth;
+  /** Additional Azure semantics for this exact authentication-model alternative. */
+  azureAuthentication?: SdkAzureAuthentication;
+}
+
+/** An Entra resource family projected with ordinary SDK enum naming and usage. */
+export interface SdkAzureAuthenticationAudience extends Omit<AzureAuthenticationAudience, "type"> {
+  type: SdkEnumType;
+}
+
+export type SdkAzureTokenAuthenticationProfile =
+  | {
+      kind: "entraDefaultScope";
+      audience: SdkAzureAuthenticationAudience;
+      defaultScopes: string[];
+    }
+  | Exclude<AzureTokenAuthentication, { kind: "entraDefaultScope" }>;
+
+/** Token-request semantics and client-local deployment data, not runtime algorithms. */
+export interface SdkAzureAuthentication {
+  profile: SdkAzureTokenAuthenticationProfile;
+  environments: AzureServiceEnvironment[];
+  defaultEnvironment?: string;
 }
 
 /**

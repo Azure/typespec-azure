@@ -4,6 +4,15 @@ export { $lib } from "./lib.js";
 export { $linter } from "./linter.js";
 
 export * from "./decorators.js";
+export {
+  getAzureServiceEnvironmentAuthenticationModels,
+  getAzureServiceEnvironments,
+  getAzureTokenAuthentication,
+  type AzureAuthenticationAudience,
+  type AzureServiceEnvironment,
+  type AzureServiceEnvironments,
+  type AzureTokenAuthentication,
+} from "./decorators/azure-authentication.js";
 export { extractLroStates } from "./decorators/lro-status.js";
 export {
   getOperationLinks,

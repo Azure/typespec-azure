@@ -2,6 +2,41 @@ using Reflection;
 
 namespace Azure.Core {
   /**
+   * Adds audience or named challenge semantics to an existing OAuth authentication model.
+   * An Entra audience is a string enum or union of resource values, with an optional open
+   * `string` branch for custom resources. Every OAuth flow must already use the scope
+   * derived from the named default member. Resource values are preserved exactly.
+   * Ordinary explicit scopes need no annotation and remain in the OAuth declaration.
+   *
+   * @param target The OAuth authentication model.
+   * @param profile The Entra default-scope or named challenge profile.
+   * @param audienceType The resource-valued enum or union for an Entra profile.
+   */
+  extern dec azureTokenAuthentication(
+    target: Model,
+    profile: valueof AzureTokenAuthenticationOptions,
+    audienceType?: unknown
+  );
+
+  /**
+   * Associates named deployment data with an Entra authentication model.
+   * Environments reference audience member names, not duplicate resource values.
+   * The optional default environment must use the default audience.
+   * Authority and tenant configuration remain the credential's responsibility.
+   *
+   * @param target The namespace or interface using the authentication model.
+   * @param authentication The annotated Entra authentication model.
+   * @param environments The named audience and optional endpoint records.
+   * @param defaultEnvironment The name of the default environment, if any.
+   */
+  extern dec azureServiceEnvironments(
+    target: Namespace | Interface,
+    authentication: Model,
+    environments: valueof Record<AzureServiceEnvironment>,
+    defaultEnvironment?: valueof string
+  );
+
+  /**
    * Decorator that marks a Version EnumMember as a preview version.
    * This is used to indicate that the version is not yet stable and may change in future releases.
 

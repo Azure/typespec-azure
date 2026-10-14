@@ -3,6 +3,13 @@ import { createTypeSpecLibrary, fileRef, paramMessage } from "@typespec/compiler
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azure-core",
   diagnostics: {
+    "azure-authentication-invalid": {
+      docs: fileRef.fromPackageRoot("src/diagnostics/azure-authentication-invalid.md"),
+      severity: "error",
+      messages: {
+        default: paramMessage`${"reason"}`,
+      },
+    },
     "lro-status-union-non-string": {
       severity: "error",
       messages: {
@@ -280,6 +287,8 @@ export const $lib = createTypeSpecLibrary({
   },
 
   state: {
+    azureTokenAuthentication: { description: "Azure token-request profiles" },
+    azureServiceEnvironments: { description: "Client-local Azure service environments" },
     lroStatus: { description: "Data for `@lroStatus` decorator" },
     lroSucceeded: { description: "Data for `@lroSucceeded` decorator" },
     lroCanceled: { description: "Data for `@lroCanceled` decorator" },

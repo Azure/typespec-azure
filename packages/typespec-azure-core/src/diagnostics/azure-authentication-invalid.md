@@ -1,0 +1,3 @@
+`@azureTokenAuthentication` requires an OAuth authentication model. An `entraDefaultScope` profile requires a non-nullable string enum or union and a default audience member name. Each flow's existing scopes must equal the default resource followed by `/.default`; resources, including trailing slashes, are preserved exactly. A `challengeBased` profile requires a nonempty runtime contract and does not accept an audience type.
+
+`@azureServiceEnvironments` requires an annotated Entra authentication model. Each environment must reference a named audience member and, when provided, an absolute HTTP or HTTPS endpoint without credentials or a fragment. A default environment must exist and use the authentication model's default audience.

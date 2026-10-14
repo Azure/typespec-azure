@@ -5,6 +5,10 @@ import type { AzureCoreLegacyDecorators } from "../generated-defs/Azure.Core.Leg
 import type { AzureCoreTraitsDecorators } from "../generated-defs/Azure.Core.Traits.js";
 import type { AzureCoreTraitsPrivateDecorators } from "../generated-defs/Azure.Core.Traits.Private.js";
 import { $requestParameter, $responseProperty } from "./decorators.js";
+import {
+  $azureServiceEnvironments,
+  $azureTokenAuthentication,
+} from "./decorators/azure-authentication.js";
 import { $finalLocation } from "./decorators/final-location.js";
 import { $finalOperation } from "./decorators/final-operation.js";
 import { $omitKeyProperties } from "./decorators/foundations/omit-key-properties.js";
@@ -50,6 +54,8 @@ export { $onValidate } from "./validate.js";
 /** @internal */
 export const $decorators = {
   "Azure.Core": {
+    azureTokenAuthentication: $azureTokenAuthentication,
+    azureServiceEnvironments: $azureServiceEnvironments,
     lroStatus: $lroStatus,
     finalLocation: $finalLocation,
     pollingLocation: $pollingLocation,

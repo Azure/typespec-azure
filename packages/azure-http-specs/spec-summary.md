@@ -1425,6 +1425,129 @@ Verifies that an API-version override on a child client replaces the default ser
 The client call takes no API-version argument and must send the overridden query parameter
 `api-version=2022-10-01` instead of the service version `2025-01-01`.
 
+### Azure_Core_Authentication_Audience_apiKey
+
+- Endpoint: `get /azure/core/authentication/audience/key`
+
+Use API-key authentication with key valid-key, without selecting an audience.
+Expect header api-key: valid-key and response 204.
+
+### Azure_Core_Authentication_Audience_customAudience
+
+- Endpoint: `get /azure/core/authentication/audience/custom`
+
+Select custom resource https://custom.example.com with a recording credential
+that echoes requested scopes as its access token. Expect scope
+https://custom.example.com/.default and response 204.
+
+### Azure_Core_Authentication_Audience_defaultAudience
+
+- Endpoint: `get /azure/core/authentication/audience/default`
+
+Use token authentication without selecting an audience. The named Public default is
+not the first union member. A recording credential must return the requested scopes
+joined by a space as its access token. Expect scope https://search.azure.com/.default,
+the matching Bearer authorization header, and response 204.
+
+### Azure_Core_Authentication_Audience_knownAudience
+
+- Endpoint: `get /azure/core/authentication/audience/known`
+
+Select the Government audience with a recording credential that echoes requested
+scopes as its access token. Expect scope https://search.azure.us/.default and
+response 204. The service endpoint remains the mock server, not the resource URI.
+
+### Azure_Core_Authentication_Audience_trailingSlash
+
+- Endpoint: `get /azure/core/authentication/audience/trailing-slash`
+
+Select the TrailingSlash resource https://trailing.example.com/ with a recording
+credential that echoes requested scopes as its access token. Preserve the resource
+slash: expect scope https://trailing.example.com//.default and response 204.
+
+### Azure_Core_Authentication_Challenge_resourceChallenge
+
+- Endpoint: `get /azure/core/authentication/challenge/resource`
+
+Use a recording credential that echoes requested scopes as its access token.
+Permit the fixed mock challenge resource for this local-server test only.
+An initial unauthenticated request returns 401 with WWW-Authenticate:
+Bearer authorization="https://login.microsoftonline.com/common",
+resource="https://vault.azure.net".
+The named challenge runtime must request https://vault.azure.net/.default and retry
+with the matching Bearer authorization header. Expect the final response 204.
+
+### Azure_Core_Authentication_ClosedAudience_defaultAudience
+
+- Endpoint: `get /azure/core/authentication/closed-audience/default`
+
+Do not select an audience. Use a recording credential that echoes requested scopes
+as its access token. Expect scope https://service.azure.com/.default and response 204.
+
+### Azure_Core_Authentication_ClosedAudience_knownAudience
+
+- Endpoint: `get /azure/core/authentication/closed-audience/known`
+
+Select the Government enum member. Use a recording credential that echoes requested
+scopes as its access token. Expect scope https://service.azure.us/.default and
+response 204. The audience API represents only the declared enum values.
+
+### Azure_Core_Authentication_Environments_defaultEnvironment
+
+- Endpoint: `get /public/azure/core/authentication/environments/default`
+
+Supply no environment or endpoint override. The Public default selects
+http://localhost:3000/public and resource https://service.azure.com. Use a recording
+credential that echoes requested scopes as its access token. Expect scope
+https://service.azure.com/.default, request path
+/public/azure/core/authentication/environments/default, and response 204.
+
+### Azure_Core_Authentication_Environments_endpointOverride
+
+- Endpoint: `get /public/azure/core/authentication/environments/endpoint-override`
+
+Select Government and explicitly override the endpoint with http://localhost:3000/custom.
+Retain the Government resource. Use a recording credential that echoes requested
+scopes as its access token. Expect scope https://service.azure.us/.default,
+request path /custom/azure/core/authentication/environments/endpoint-override,
+and response 204.
+
+### Azure_Core_Authentication_Environments_governmentEnvironment
+
+- Endpoint: `get /public/azure/core/authentication/environments/government`
+
+Select the Government environment without an endpoint override. Its pair selects
+http://localhost:3000/government and resource https://service.azure.us. Use a recording credential
+that echoes requested scopes as its access token. Expect scope
+https://service.azure.us/.default, request path
+/government/azure/core/authentication/environments/government, and response 204.
+
+### Azure_Core_Authentication_Requirements_anonymous
+
+- Endpoint: `get /azure/core/authentication/requirements/anonymous`
+
+Select the NoAuth alternative. Supply no credentials and send neither api-key nor
+Authorization headers. Expect response 204. The Azure profile on the authenticated
+alternative must not introduce token requests for anonymous access.
+
+### Azure_Core_Authentication_Requirements_combinedCredentials
+
+- Endpoint: `get /azure/core/authentication/requirements/combined`
+
+Select the authenticated alternative and supply both key valid-key and a recording
+token credential that echoes requested scopes as its access token. Expect both
+api-key: valid-key and Authorization: Bearer https://service.azure.com/.default.
+Neither credential alone satisfies this alternative. Expect response 204.
+
+### Azure_Core_Authentication_Scopes_explicitScopes
+
+- Endpoint: `get /azure/core/authentication/scopes/explicit`
+
+Use a recording credential that echoes requested scopes joined by a space as its
+access token. Expect exactly [https://service.example.com/read,
+https://service.example.com/write], in that order, with no /.default completion.
+Expect the matching Bearer authorization header and response 204.
+
 ### Azure_Core_Basic_createOrReplace
 
 - Endpoint: `get /azure/core/basic`

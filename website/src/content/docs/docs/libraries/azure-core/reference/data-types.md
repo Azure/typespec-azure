@@ -86,6 +86,21 @@ model Azure.Core.AzureApiKeyAuthentication
 | in   | `TypeSpec.Http.ApiKeyLocation.header` | location of the API key |
 | name | `"Ocp-Apim-Subscription-Key"`         | name of the API key     |
 
+### `AzureServiceEnvironment` {#Azure.Core.AzureServiceEnvironment}
+
+A service deployment's audience and optional default HTTP endpoint.
+
+```typespec
+model Azure.Core.AzureServiceEnvironment
+```
+
+#### Properties
+
+| Name             | Type     | Description                                                               |
+| ---------------- | -------- | ------------------------------------------------------------------------- |
+| audience         | `string` | A member name from the authentication model's audience enum or union.     |
+| defaultEndpoint? | `string` | An absolute HTTP or HTTPS endpoint, independent of the audience resource. |
+
 ### `ClientRequestIdHeader` {#Azure.Core.ClientRequestIdHeader}
 
 Provides the 'x-ms-client-request-id' header to enable request correlation in requests and responses.
@@ -480,6 +495,21 @@ The deployment scopes in which an Azure Resource Manager resource identifier may
 ```typespec
 union Azure.Core.ArmResourceDeploymentScope
 ```
+
+### `AzureTokenAuthenticationOptions` {#Azure.Core.AzureTokenAuthenticationOptions}
+
+Additional token-request semantics for an existing OAuth authentication model.
+
+```typespec
+union Azure.Core.AzureTokenAuthenticationOptions
+```
+
+#### Variants
+
+| Name              | Type    | Description                                                              |
+| ----------------- | ------- | ------------------------------------------------------------------------ |
+| entraDefaultScope | `{...}` | Derive an Entra scope by appending `/.default` to the selected resource. |
+| challengeBased    | `{...}` | Delegate challenge processing to a named SDK runtime contract.           |
 
 ### `PollingOptionKind` {#Azure.Core.PollingOptionKind}
 
