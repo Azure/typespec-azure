@@ -17,6 +17,7 @@ import {
   type HttpPayloadBody,
 } from "@typespec/http";
 import { getArmResource } from "../resource.js";
+import { matchesStatusCode, selectResponseBody } from "./http-response-utils.js";
 import { isInternalTypeSpec } from "./utils.js";
 
 export const putResourceSchemaConsistencyRule = createRule({
@@ -73,8 +74,8 @@ export const putResourceSchemaConsistencyRule = createRule({
         if (request !== undefined) bodies.push({ label: "request", model: request });
 
         for (const status of [200, 201]) {
-          const response = httpOperation.responses.find(
-            (response) => response.statusCodes === status,
+          const response = httpOperation.responses.find(({ statusCodes }) =>
+            matchesStatusCode(statusCodes, status),
           );
           if (response === undefined) continue;
           const model = getResourceModel(getUnambiguousBody(response), Visibility.Read);
@@ -113,17 +114,10 @@ export const putResourceSchemaConsistencyRule = createRule({
 });
 
 function getUnambiguousBody(response: HttpOperationResponse): HttpPayloadBody | undefined {
-  let body: HttpPayloadBody | undefined;
-  for (const content of response.responses) {
-    if (content.body === undefined || isVoidType(content.body.type)) continue;
-    // Do not choose an arbitrary variant or infer equality for an ambiguous status.
-    if (
-      body !== undefined &&
-      (body.type !== content.body.type || body.bodyKind !== content.body.bodyKind)
-    ) {
-      return undefined;
-    }
-    body = content.body;
-  }
-  return body;
+  const selection = selectResponseBody(
+    response.responses.flatMap(({ body }) =>
+      body === undefined || isVoidType(body.type) ? [] : [body],
+    ),
+  );
+  return selection.kind === "body" ? selection.body : undefined;
 }

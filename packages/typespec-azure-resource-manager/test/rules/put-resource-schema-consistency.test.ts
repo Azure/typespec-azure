@@ -1,6 +1,6 @@
 import { Tester } from "#test/tester.js";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
-import { readFileSync } from "node:fs";
+
 import { beforeEach, it } from "vitest";
 import { armResourceOperationsRule } from "../../src/rules/arm-resource-operation-response.js";
 import { putResourceSchemaConsistencyRule } from "../../src/rules/put-resource-schema-consistency.js";
@@ -50,6 +50,36 @@ it.each([200, 201])("compares the request with a lone %s response", async (statu
   `,
     )
     .toEmitDiagnostics([diagnostic(`request: Other; ${status} response: Widget`)]);
+});
+
+it.each([200, 201])("compares a singleton %s response range", async (status) => {
+  await tester
+    .expect(
+      `
+      ${models}
+      model Result {
+        @statusCode @minValue(${status}) @maxValue(${status}) code: int32;
+        @body body: Widget;
+      }
+      @put op put(@body body: Other): Result;
+    `,
+    )
+    .toEmitDiagnostics([diagnostic(`request: Other; ${status} response: Widget`)]);
+});
+
+it("does not select a non-singleton range as an exact response", async () => {
+  await tester
+    .expect(
+      `
+      ${models}
+      model Result {
+        @statusCode @minValue(200) @maxValue(202) code: int32;
+        @body body: Other;
+      }
+      @put op put(@body body: Widget): Result;
+    `,
+    )
+    .toBeValid();
 });
 
 it.each([
@@ -536,17 +566,81 @@ it("checks inherited concrete interface operations", async () => {
 });
 
 const examples = [
-  ...readFileSync(
-    new URL("../../src/rules/put-resource-schema-consistency.md", import.meta.url),
-    "utf8",
-  ).matchAll(/```typespec\r?\n([\s\S]*?)```/g),
-].map((match) => match[1]);
+  `@armProviderNamespace
+namespace Microsoft.Example;
 
-it("compiles the documented standard template", async () => {
+model Widget
+  is TrackedResource<{
+    value?: string;
+  }> {
+  ...ResourceNameParameter<Widget>;
+}
+
+@armResourceOperations
+interface Widgets {
+  createOrReplace is ArmResourceCreateOrReplaceSync<Widget>;
+}
+`,
+  `@armProviderNamespace
+namespace Microsoft.Example;
+
+model Widget
+  is TrackedResource<{
+    value?: string;
+  }> {
+  ...ResourceNameParameter<Widget>;
+}
+
+model WidgetInput {
+  value?: string;
+}
+
+@armResourceOperations
+interface Widgets {
+  @put
+  @armResourceCreateOrUpdate(Widget)
+  createOrReplace is Azure.ResourceManager.Foundations.ArmCreateOperation<
+    ResourceInstanceParameters<Widget>,
+    WidgetInput,
+    ArmResponse<Widget> | ArmCreatedResponse<Widget>,
+    ErrorResponse
+  >;
+}
+`,
+  `@armProviderNamespace
+namespace Microsoft.Example;
+
+model Widget
+  is TrackedResource<{
+    value?: string;
+  }> {
+  ...ResourceNameParameter<Widget>;
+}
+
+model WidgetInput {
+  value?: string;
+}
+
+@armResourceOperations
+interface Widgets {
+  #suppress "@azure-tools/typespec-azure-resource-manager/put-resource-schema-consistency" "Existing API uses a separate request model."
+  @put
+  @armResourceCreateOrUpdate(Widget)
+  createOrReplace is Azure.ResourceManager.Foundations.ArmCreateOperation<
+    ResourceInstanceParameters<Widget>,
+    WidgetInput,
+    ArmResponse<Widget> | ArmCreatedResponse<Widget>,
+    ErrorResponse
+  >;
+}
+`,
+];
+
+it("compiles the standard standard template", async () => {
   await tester.expect(examples[0]).toBeValid();
 });
 
-it("diagnoses the documented request override", async () => {
+it("diagnoses the standard request override", async () => {
   await tester.expect(examples[1]).toEmitDiagnostics([
     {
       code,
@@ -556,7 +650,7 @@ it("diagnoses the documented request override", async () => {
   ]);
 });
 
-it("honors the documented suppression through the compiler pipeline", async () => {
+it("honors the standard suppression through the compiler pipeline", async () => {
   await Tester.compile(examples[2], {
     compilerOptions: { linterRuleSet: { enable: { [code]: true } } },
   });
