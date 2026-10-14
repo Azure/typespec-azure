@@ -1,7 +1,7 @@
-import { getSourceLocation } from "@typespec/compiler";
+import { getDoc, getSourceLocation } from "@typespec/compiler";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { noUninformativeDocRule } from "../../src/rules/no-uninformative-doc.js";
+import { requireDocumentation } from "../../src/rules/require-docs.js";
 import { Tester } from "../test-host.js";
 
 let tester: LinterRuleTester;
@@ -10,19 +10,71 @@ beforeEach(async () => {
   const runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    noUninformativeDocRule,
+    {
+      ...requireDocumentation,
+      create(context) {
+        return requireDocumentation.create({
+          ...context,
+          // Missing-doc behavior is covered by require-docs.test.ts; these fixtures isolate authored docs.
+          reportDiagnostic(diagnostic) {
+            if (
+              getDoc(context.program, diagnostic.target as Parameters<typeof getDoc>[1]) !==
+              undefined
+            ) {
+              context.reportDiagnostic(diagnostic);
+            }
+          },
+        });
+      },
+    },
     "@azure-tools/typespec-azure-core",
   );
 });
 
 function diagnostic(name: string, description: string) {
   return {
-    code: "@azure-tools/typespec-azure-core/no-uninformative-doc",
+    code: "@azure-tools/typespec-azure-core/documentation-required",
     message: `Description must not match the name of the node it describes. Node name:'${name}' Description:'${description}'`,
   };
 }
 
-describe("no-uninformative-doc", () => {
+describe("documentation-required: uninformative documentation", () => {
+  it("reports source-name, verb, and missing-doc diagnostics through the unfiltered rule", async () => {
+    const fullTester = createLinterRuleTester(
+      await Tester.createInstance(),
+      requireDocumentation,
+      "@azure-tools/typespec-azure-core",
+    );
+    await fullTester
+      .expect(
+        `
+      @route("/read") @get @doc(" READ. ") op read(): string;
+      @route("/fetch") @get @doc("get") op fetch(): string;
+      @route("/undocumented") op undocumented(): string;
+    `,
+      )
+      .toEmitDiagnostics([
+        diagnostic("read", " READ. "),
+        diagnostic("get", "get"),
+        {
+          code: "@azure-tools/typespec-azure-core/documentation-required",
+          message:
+            "The Operation named 'undocumented' should have a documentation or description, use doc comment /** */ to provide it.",
+        },
+      ]);
+  });
+
+  it("checks explicit docs on declarations exempt from missing-doc requirements", async () => {
+    await tester
+      .expect(
+        `
+      @versioned(Widgets.Versions) namespace Widgets;
+      @doc("Versions") enum Versions { @doc("v1") v1: "2026-01-01" }
+    `,
+      )
+      .toEmitDiagnostics([diagnostic("Versions", "Versions"), diagnostic("v1", "v1")]);
+  });
+
   for (const partType of [
     'HttpPart<string, #{name: "part_name"}>',
     'HttpPart<UploadText, #{name: "part_name"}>',
@@ -175,22 +227,28 @@ describe("no-uninformative-doc", () => {
       .toEmitDiagnostics([diagnostic("get", "get.")]);
   });
 
-  it("accepts operation documentation matching only its source name", async () => {
-    await tester.expect('@get @doc("read") op read(): string;').toBeValid();
+  it("rejects operation documentation matching its source name", async () => {
+    await tester
+      .expect('@get @doc("read") op read(): string;')
+      .toEmitDiagnostics([diagnostic("read", "read")]);
   });
 
   it("checks inferred operation verbs for placeholder text", async () => {
     await tester
       .expect('@doc("description") op read(): string;')
       .toEmitDiagnostics([diagnostic("get", "description")]);
-    await tester.expect('@doc("read") op read(): string;').toBeValid();
+    await tester
+      .expect('@doc("read") op read(): string;')
+      .toEmitDiagnostics([diagnostic("read", "read")]);
   });
 
   it("compares inferred GET operations with their effective HTTP verb", async () => {
     await tester
       .expect('@route("/widgets") @doc(" GET. ") op read(): string;')
       .toEmitDiagnostics([diagnostic("get", " GET. ")]);
-    await tester.expect('@route("/widgets") @doc("read") op read(): string;').toBeValid();
+    await tester
+      .expect('@route("/widgets") @doc("read") op read(): string;')
+      .toEmitDiagnostics([diagnostic("read", "read")]);
   });
 
   it("compares inferred POST operations with their effective HTTP verb", async () => {
@@ -199,7 +257,7 @@ describe("no-uninformative-doc", () => {
       .toEmitDiagnostics([diagnostic("post", "post")]);
     await tester
       .expect('@route("/widgets") @doc("create") op create(@body body: string): string;')
-      .toBeValid();
+      .toEmitDiagnostics([diagnostic("create", "create")]);
   });
 
   it("preserves explicit HTTP verbs over inference", async () => {
@@ -316,9 +374,15 @@ describe("no-uninformative-doc", () => {
       .toBeValid();
   });
 
-  it("ignores missing or normalized-empty documentation", async () => {
+  it("keeps missing documentation separate and rejects explicit empty documentation", async () => {
     await tester.expect("model Widget {}").toBeValid();
-    await tester.expect('@doc("") model Widget {}').toBeValid();
+    await tester.expect('@doc("") model Widget {}').toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-core/documentation-required",
+        message:
+          "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string.",
+      },
+    ]);
     await tester.expect('@doc("  ...  ") model Widget {}').toBeValid();
     await tester.expect('enum State { Ready } union Mode { Active: "active", string }').toBeValid();
   });
