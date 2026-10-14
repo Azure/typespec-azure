@@ -72,4 +72,13 @@ describe("expect all rules to be defined", () => {
       ok(!$linter.ruleSets?.[rulesetName].enable?.[ruleName]);
     }
   });
+
+  it("keeps consolidated ARM PUT body checks opt-in pending rollout", () => {
+    const ruleName = "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response";
+    strictEqual($linter.ruleSets?.["resource-manager"].enable?.[ruleName], false);
+    ok(ResourceManagerLinter.rules.some((rule) => rule.name === "arm-resource-operation-response"));
+    ok(
+      !ResourceManagerLinter.rules.some((rule) => rule.name === "put-resource-schema-consistency"),
+    );
+  });
 });
