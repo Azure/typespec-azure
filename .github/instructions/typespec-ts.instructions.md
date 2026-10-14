@@ -85,6 +85,12 @@ Integration (spector) tests generate real clients from specs, then assert on the
      declaration regen, keeping the (slow) api-extractor work off the test critical path.
 3. The vitest `integration-azure-modular` project then runs the `*.test.ts` assertions.
 
+`spector-test.ts` owns the server lifecycle: it waits for readiness before generation
+and always requests a graceful shutdown to flush coverage, including on failure or
+interruption. `generate-and-run.ts` runs the tests and declaration generation in
+parallel, cancels sibling processes on failure, and waits for both on success.
+Both use the shared native Node process helpers from `core/eng/common/scripts/`.
+
 `pnpm regen-test-baselines` (alias of `generate-tsp-only`, which runs both phases)
 regenerates all Azure baselines.
 
