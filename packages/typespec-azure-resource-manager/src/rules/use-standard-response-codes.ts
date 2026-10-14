@@ -5,6 +5,7 @@ import {
   paramMessage,
 } from "@typespec/compiler";
 import { getHttpOperation, type HttpStatusCodeRange } from "@typespec/http";
+import { isStatusCodeAllowed } from "./http-response-utils.js";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 
 const allowedStatusCodes = new Set<number | "*">([200, 201, 202, 204, "*"]);
@@ -30,7 +31,7 @@ export const useStandardResponseCodesRule = createRule({
 
         const [httpOperation] = getHttpOperation(context.program, operation);
         for (const response of httpOperation.responses) {
-          if (isDisallowedStatusCode(response.statusCodes)) {
+          if (!isStatusCodeAllowed(response.statusCodes, allowedStatusCodes)) {
             context.reportDiagnostic({
               target: operation,
               format: {
@@ -44,18 +45,6 @@ export const useStandardResponseCodesRule = createRule({
     };
   },
 });
-
-function isDisallowedStatusCode(statusCode: number | "*" | HttpStatusCodeRange): boolean {
-  if (statusCode === "*") {
-    return false;
-  }
-
-  if (typeof statusCode === "number") {
-    return !allowedStatusCodes.has(statusCode);
-  }
-
-  return statusCode.start !== statusCode.end || !allowedStatusCodes.has(statusCode.start);
-}
 
 function formatStatusCode(statusCode: number | "*" | HttpStatusCodeRange): string {
   if (statusCode === "*") {

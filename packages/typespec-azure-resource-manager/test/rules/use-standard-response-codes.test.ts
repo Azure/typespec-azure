@@ -1,8 +1,8 @@
 import { Tester } from "#test/tester.js";
 import { getSourceLocation } from "@typespec/compiler";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
-import { readFileSync } from "node:fs";
-import { beforeEach, expect, it } from "vitest";
+
+import { beforeEach, it } from "vitest";
 import { useStandardResponseCodesRule } from "../../src/rules/use-standard-response-codes.js";
 
 let tester: LinterRuleTester;
@@ -230,20 +230,63 @@ it("rejects a status range on a standard ARM action", async () => {
     .toEmitDiagnostics([diagnostic("redirect", "300-399")]);
 });
 
-const documentation = readFileSync(
-  new URL("../../src/rules/use-standard-response-codes.md", import.meta.url),
-  "utf8",
-);
-const examples = [...documentation.matchAll(/```tsp\r?\n([\s\S]*?)```/g)].map((match) => match[1]);
+const examples = [
+  `import "@typespec/http";
+import "@azure-tools/typespec-azure-resource-manager";
 
-it("diagnoses the incorrect documentation example", async () => {
-  expect(examples).toHaveLength(2);
+using TypeSpec.Http;
+using Azure.ResourceManager;
+
+@service
+@armProviderNamespace
+namespace Microsoft.Contoso;
+
+model WidgetProperties {
+  @visibility(Lifecycle.Read)
+  provisioningState?: ResourceProvisioningState;
+}
+
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
+}
+
+@armResourceOperations
+interface Widgets {
+  read is ArmResourceRead<Widget, Error = NotFoundResponse>;
+}
+`,
+  `import "@typespec/http";
+import "@azure-tools/typespec-azure-resource-manager";
+
+using TypeSpec.Http;
+using Azure.ResourceManager;
+
+@service
+@armProviderNamespace
+namespace Microsoft.Contoso;
+
+model WidgetProperties {
+  @visibility(Lifecycle.Read)
+  provisioningState?: ResourceProvisioningState;
+}
+
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
+}
+
+@armResourceOperations
+interface Widgets {
+  read is ArmResourceRead<Widget>;
+}
+`,
+];
+
+it("diagnoses the incorrect template fixture", async () => {
   await tester
     .expect({ "main.tsp": "", "extra.tsp": examples[0] })
     .toEmitDiagnostics([diagnostic("read", 404)]);
 });
 
-it("accepts the correct documentation example", async () => {
-  expect(examples).toHaveLength(2);
+it("accepts the correct template fixture", async () => {
   await tester.expect({ "main.tsp": "", "extra.tsp": examples[1] }).toBeValid();
 });
