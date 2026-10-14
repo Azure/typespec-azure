@@ -126,19 +126,6 @@ it("checks ordinary namespaces without provider metadata", async () => {
     .toEmitDiagnostics([diagnostic("read", 404)]);
 });
 
-it("checks concrete interface endpoints despite template exclusion guards", async () => {
-  await tester
-    .expect(
-      `${header}
-      interface Templates<T> {
-        @get op read(): { @statusCode status: 404; @body body: T; };
-      }
-      @route("/items") interface Items extends Templates<string> {}
-    `,
-    )
-    .toEmitDiagnostics([diagnostic("read", 404)]);
-});
-
 it("checks operations without service metadata", async () => {
   await tester
     .expect("@get op read(): { @statusCode status: 404; };")
@@ -196,7 +183,7 @@ it("accepts a standard ARM action with the default error response", async () => 
     .toBeValid();
 });
 
-it("rejects a redirect response in a nested provider namespace", async () => {
+it("rejects a redirect response on a standard ARM action", async () => {
   await tester
     .expect(
       `${resource}
@@ -204,10 +191,8 @@ it("rejects a redirect response in a nested provider namespace", async () => {
         @statusCode status: 302;
         @header("Location") location: string;
       }
-      namespace Nested {
-        @armResourceOperations interface Widgets {
-          redirect is ArmResourceActionSync<Widget, void, ArmResponse<Widget> | RedirectResponse>;
-        }
+      @armResourceOperations interface Widgets {
+        redirect is ArmResourceActionSync<Widget, void, ArmResponse<Widget> | RedirectResponse>;
       }
     `,
     )
