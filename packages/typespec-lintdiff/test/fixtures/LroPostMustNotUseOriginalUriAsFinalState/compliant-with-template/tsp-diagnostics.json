@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "code": "duplicate-suppression",
+    "severity": "warning",
+    "message": "Diagnostic \"@azure-tools/typespec-azure-core/no-openapi\" is already suppressed on this node."
+  }
+]
