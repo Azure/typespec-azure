@@ -132,10 +132,18 @@ missing native checks. Classify each requested rule as:
 
 For `already covered` or `template-enforced`, stop before preparing the
 comparison harness or changing the temporary lintdiff implementation. Report
-the official rule or template and the code-backed equivalence evidence. For
-`partial`, only continue when the proposed work is explicitly limited to the
+the official rule or template and the code-backed equivalence evidence. This
+stops duplicate implementation work, not the
+[existing-rule coverage documentation obligation](../lintdiff-rule-migration-overseer/SKILL.md#existing-rule-coverage-contract):
+update the owning official rule's authored provenance docs through the
+authorized worktree/publication path, or return an explicit documentation
+handoff if that scope is unavailable. For template-only enforcement, record
+the actual control in its guidance or coverage inventory, not an unrelated lint.
+For `partial`, only continue when the proposed work is explicitly limited to the
 uncovered behavior; reuse or extend the official rule when that is the correct
-ownership instead of creating an overlapping temporary rule. For `uncertain`,
+ownership instead of creating an overlapping temporary rule. Record why an
+extension fits the existing contract or why a distinct rule is necessary, and
+preserve existing behavior with focused regression coverage. For `uncertain`,
 stop and surface the missing evidence rather than assuming a gap. Only `gap`
 and well-scoped `partial` rules proceed to development.
 

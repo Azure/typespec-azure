@@ -29,8 +29,18 @@ If the task is specifically about a named LintDiff or `azure-openapi-validator` 
    - severity expectations
    - likely false-positive / false-negative risks
    - validation and testability constraints
-5. Decide whether existing coverage already exists or whether a new lint still appears justified.
-6. End with a rule brief that is ready for `/typespec-lint-implement` or, if the repository already has the rule, `/typespec-lint-validate`.
+5. Decide whether to reuse an existing rule, extend it for evidenced missing
+   behavior, or add a distinct new rule. Compare intent, ownership, applicability,
+   enablement, exemptions, and diagnostics rather than names alone. Prefer an
+   extension when those contracts remain coherent; otherwise explain why a
+   separate rule is needed and how duplicate findings will be avoided.
+   For Swagger/LintDiff migrations, apply the
+   [existing-rule coverage contract](../lintdiff-rule-migration-overseer/SKILL.md#existing-rule-coverage-contract),
+   including the existing rule's documentation update when a duplicate is omitted.
+6. End with a rule brief that is ready for `/typespec-lint-implement` or, if the
+   repository already has the rule, the required documentation update and any
+   focused `/typespec-lint-validate` follow-up. Full coverage is not a reason to
+   invent implementation changes.
 
 ## Native rule contract
 
@@ -71,7 +81,8 @@ Produce a compact brief with these sections:
 
 - Problem statement
 - Native rule contract and intentional migration differences, when applicable
-- Existing coverage or prior art
+- Existing coverage or prior art, reuse/extension/new-rule decision, and any
+  required coverage documentation update
 - Candidate implementation surface
 - Candidate diagnostics/messages
 - Validation strategy
