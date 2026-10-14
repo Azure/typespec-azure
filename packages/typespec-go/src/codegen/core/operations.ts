@@ -739,7 +739,9 @@ function generateOperation(
 ): string {
   const params = getAPIParametersSig(method, imports);
   const returns = generateReturnsInfo(method, "op");
-  const methodName = go.isLROMethod(method) ? method.naming.operationMethod : method.name;
+  const methodName = go.isLROMethod(method)
+    ? naming.getEscapedReservedName(method.naming.operationMethod, "Operation")
+    : method.name;
   let text = "";
   const respErrDoc = genRespErrorDoc(method);
   if (method.docs.summary || method.docs.description) {
@@ -946,7 +948,7 @@ function generateLROBeginMethod(
 
   // creating the poller from response branch
 
-  const opName = method.naming.operationMethod;
+  const opName = naming.getEscapedReservedName(method.naming.operationMethod, "Operation");
   text += `${indent.get()}resp, err := client.${opName}(${helpers.getCreateRequestParameters(method)})\n`;
   text += `${indent.get()}if err != nil {\n`;
   text += `${indent.push().get()}return ${zeroResp}, err\n`;
