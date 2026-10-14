@@ -81,10 +81,10 @@ Prepare a release PR for `@azure-tools/typespec-python` from the repository root
    pnpm install
    ```
 
-2. Regenerate documentation:
+2. Regenerate documentation only for `packages/typespec-python`, immediately after installation. Run this command from the repository root; `--dir` runs the script in the Python package:
 
    ```bash
-   pnpm run regen-docs
+   pnpm --dir packages/typespec-python run regen-docs
    ```
 
 3. Inspect `git diff --check`, `git diff --stat`, and `git status --short`.
