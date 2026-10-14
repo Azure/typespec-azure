@@ -29,20 +29,19 @@ index e9b1e0a49..18955e7d7 100644
  import com.microsoft.typespec.http.client.generator.core.extension.base.util.FileUtils;
  import com.microsoft.typespec.http.client.generator.core.extension.plugin.JavaSettings;
  import com.microsoft.typespec.http.client.generator.core.extension.plugin.NewPlugin;
-diff --git a/http-client-generator/src/main/resources/readme/pom.xml b/http-client-generator/src/main/resources/readme/pom.xml
-index 58fc6b54d..09804e3f0 100644
---- a/http-client-generator/src/main/resources/readme/pom.xml
-+++ b/http-client-generator/src/main/resources/readme/pom.xml
-@@ -16,9 +16,9 @@
- 
-   <dependencies>
-     <dependency>
--      <groupId>com.microsoft.typespec</groupId>
--      <artifactId>http-client-generator-core</artifactId>
--      <version>1.0.0-beta.1</version>
-+      <groupId>com.azure.tools</groupId>
-+      <artifactId>azure-autorest-customization</artifactId>
-+      <version>1.0.0-beta.11</version>
-     </dependency>
-   </dependencies>
- </project>
+diff --git a/http-client-generator-core/src/test/java/com/microsoft/typespec/http/client/generator/core/postprocessor/PostprocessorTests.java b/http-client-generator-core/src/test/java/com/microsoft/typespec/http/client/generator/core/postprocessor/PostprocessorTests.java
+--- a/http-client-generator-core/src/test/java/com/microsoft/typespec/http/client/generator/core/postprocessor/PostprocessorTests.java
++++ b/http-client-generator-core/src/test/java/com/microsoft/typespec/http/client/generator/core/postprocessor/PostprocessorTests.java
+@@ -11,2 +11,2 @@
+-import com.microsoft.typespec.http.client.generator.core.customization.Customization;
++import com.azure.autorest.customization.Customization;
+ import org.junit.jupiter.api.Test;
+@@ -17,6 +17,6 @@
+         String source
+-            = String.join("\n", "import com.microsoft.typespec.http.client.generator.core.customization.Customization;",
+-                "import com.microsoft.typespec.http.client.generator.core.customization.LibraryCustomization;",
++            = String.join("\n", "import com.azure.autorest.customization.Customization;",
++                "import com.azure.autorest.customization.LibraryCustomization;",
+                 "import org.slf4j.Logger;", "public class TestCustomization extends Customization {", "    @Override",
+                 "    public void customize(LibraryCustomization customization, Logger logger) {",
+                 "        logger.info(\"compiled\");", "    }", "}");

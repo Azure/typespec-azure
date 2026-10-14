@@ -45,6 +45,8 @@ CaCertificates.get:
   variants carry a quoted `since` and restate the full request/response.
 - Response status codes are bare integer keys. `api-version` is implicit; use the
   `{api-version}` placeholder where a version must be embedded in a value.
+- Optional `id` is the filename stem: `id: GetWidget` generates `GetWidget.json`.
+  Existing `legacyFilename: GetWidget.json` remains supported. Lineages still use titles.
 
 ## `tsp-examples validate`
 
@@ -132,8 +134,8 @@ is `<=` the target (the base entry applies from the earliest version). The `{api
 placeholder is substituted with the target version, and each resolved example is reconstructed into a
 classic `x-ms-examples` document — the `title`/`operationId` envelope and the flat `parameters` bag
 (with `api-version` re-added and the body under its Swagger parameter name), read from the service's
-Swagger. Files are named by their preserved `legacyFilename` (or the conventional
-`<OperationId>.json`). With `--out <dir>` each document is written as a separate JSON file; otherwise
+Swagger. Files are named `<id>.json`, by the compatibility `legacyFilename`, or by the conventional
+`<OperationId>.json`. With `--out <dir>` each document is written as a separate JSON file; otherwise
 a `filename → document` map is printed. Operations with no matching Swagger operation are reported
 and skipped.
 

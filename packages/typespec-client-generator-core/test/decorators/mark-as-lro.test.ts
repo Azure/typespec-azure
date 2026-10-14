@@ -1,7 +1,14 @@
-import { FinalStateValue } from "@azure-tools/typespec-azure-core";
+import { FinalStateValue, getLroMetadata } from "@azure-tools/typespec-azure-core";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { ArmTesterWithService, createSdkContextForTester, SimpleTester } from "../tester.js";
+import { UsageFlags } from "../../src/interfaces.js";
+import {
+  ArmTesterWithService,
+  AzureCoreTester,
+  createSdkContextForTester,
+  SimpleTester,
+} from "../tester.js";
 
 it("should mark regular operation as LRO when decorated with @markAsLro", async () => {
   const { program } = await SimpleTester.compile(`
@@ -46,6 +53,26 @@ it("should mark regular operation as LRO when decorated with @markAsLro", async 
   ok(responseType);
   strictEqual(responseType.kind, "model");
   strictEqual(responseType.name, "DeploymentResult");
+  strictEqual(getLroMetadata(program, metadata.__raw.operation), undefined);
+  strictEqual(responseType.usage & UsageFlags.Output, UsageFlags.Output);
+  strictEqual(
+    responseType.usage &
+      (UsageFlags.LroInitial | UsageFlags.LroPolling | UsageFlags.LroFinalEnvelope),
+    0,
+  );
+});
+
+it("warns when a native LRO is marked as LRO", async () => {
+  const diagnostics = await AzureCoreTester.diagnose(`
+    @service namespace TestService;
+    alias Operations = ResourceOperations<NoConditionalRequests & NoRepeatableRequests & NoClientRequestId>;
+    @resource("jobs") model Job { @key name: string; }
+    @Azure.ClientGenerator.Core.Legacy.markAsLro
+    op start is Operations.LongRunningResourceCreateOrReplace<Job>;
+  `);
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/mark-as-lro-ineffective",
+  });
 });
 
 it("should apply @markAsLro with language scope", async () => {
