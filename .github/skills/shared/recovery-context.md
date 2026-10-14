@@ -161,6 +161,11 @@ new success/failure detector around an assumed human-readable output layout:
   plain and ANSI-colored summaries, CRLF/LF text, a failure, and a missing or
   malformed summary. Missing evidence must fail explicitly, not default to zero
   failures or a passing count. Prefer an existing tested parser over inline code.
+- Hash receipt files only after their producing commands have completed and
+  closed the captures. Exclude the inventory command's own live stdout/stderr
+  captures from its input set; hash those separately after completion if needed.
+  A quiescent audit must not compare finalized bytes with a digest of an earlier
+  partial capture.
 - For PR-body drafting from API JSON, normalize decoded body line endings before
   matching headings, verify each required section exists, and preserve the
   original body. A failed heading match must not publish a truncated replacement.
