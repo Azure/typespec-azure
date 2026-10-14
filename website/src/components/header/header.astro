@@ -118,32 +118,46 @@ import Search from "./search.astro";
 <nav aria-label="Main" class="navbar">
   <li class="brand-item">
     <Link href="/" class="brand">
-      <img class="brand-icon" src={baseUrl("/azure.svg")} alt="Brand icon" /><b>TypeSpec Azure</b
-      ></Link
-    >
+      <img class="brand-icon" src={baseUrl("/azure.svg")} alt="Brand icon" />
+      <b>TypeSpec Azure</b>
+    </Link>
   </li>
 
   <div id="header-nav-content" class="nav-content">
     <div class="items">
-      <Link class="item link" href="/docs/intro">Docs</Link>
-      <Link class="item link" href="/playground">Playground</Link>
-      <Link class="item link" href="https://typespec.io">TypeSpec Core Docs</Link>
-      <Link class="item link" href="/can-i-use/http">Can I Use (Azure Client)</Link>
-      <Link class="item link" href="/benchmarks">Benchmarks</Link>
+      <Link class="item link" href="/docs/intro">
+        Docs
+      </Link>
+      <Link class="item link" href="/playground">
+        Playground
+      </Link>
+      <Link class="item link" href="https://typespec.io">
+        TypeSpec Core Docs
+      </Link>
+      <Link class="item link" href="/can-i-use/http">
+        Can I Use (Azure Client)
+      </Link>
+      <Link class="item link" href="/benchmarks">
+        Benchmarks
+      </Link>
     </div>
     <div class="items right">
       <Link
         class="item icon link"
         href="https://github.com/microsoft/typespec"
         target="_blank"
-        rel="noopener noreferrer"><Icon name="github" /></Link
+        rel="noopener noreferrer"
       >
+        <Icon name="github" />
+      </Link>
       <Link
         class="item icon link"
         href="https://aka.ms/typespec/discord"
         target="_blank"
-        rel="noopener noreferrer"><Icon name="discord" /></Link
+        rel="noopener noreferrer"
       >
+        <Icon name="discord" />
+      </Link>
       <div class="item">
         <ThemePicker />
       </div>

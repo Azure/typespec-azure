@@ -97,11 +97,12 @@ function sortValue(value: unknown): unknown {
   return value;
 }
 
-/** Present keys in the canonical emission order: title, since, legacyFilename, request, responses. */
+/** Present keys in the canonical emission order: title, since, id, request, responses. */
 function orderKeys(variant: MigratedVariant): MigratedVariant {
   return {
     ...(variant.title !== undefined ? { title: variant.title } : {}),
     ...(variant.since !== undefined ? { since: variant.since } : {}),
+    ...(variant.id !== undefined ? { id: variant.id } : {}),
     ...(variant.legacyFilename !== undefined ? { legacyFilename: variant.legacyFilename } : {}),
     request: variant.request,
     responses: variant.responses,
@@ -109,7 +110,7 @@ function orderKeys(variant: MigratedVariant): MigratedVariant {
 }
 
 /**
- * Assign the minimal `title` / `legacyFilename` needed for the emitter to reconstruct the original
+ * Assign the minimal `title` / `id` needed for the emitter to reconstruct the original
  * x-ms-examples key and file name. Both are omitted whenever they follow the default convention
  * (key = `operationId`, file = `<operationId>.json`), so the common case stays clean.
  */
@@ -126,7 +127,7 @@ function assignNaming(
     }
     // The key is recoverable from the file name (`Foo.json` -> key `Foo`) => store only the file.
     if (key === stripJsonExtension(fileName)) {
-      variant.legacyFilename = fileName;
+      variant.id = stripJsonExtension(fileName);
       return;
     }
   }
@@ -135,6 +136,6 @@ function assignNaming(
   // the file name only needs storing when it deviates from the `operationId`+`title` default.
   variant.title = key;
   if (fileName !== defaultLegacyExampleFilename(operationId, key)) {
-    variant.legacyFilename = fileName;
+    variant.id = stripJsonExtension(fileName);
   }
 }
