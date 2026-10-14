@@ -6,8 +6,8 @@ import {
   createTester,
   expectDiagnosticEmpty,
 } from "@typespec/compiler/testing";
-import { readFileSync } from "node:fs";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { beforeEach, describe, it, vi } from "vitest";
 import { useDeleteForDeleteRule } from "../../src/rules/use-delete-for-delete.js";
 import { ArmTester, SimpleTester } from "../tester.js";
 
@@ -338,7 +338,7 @@ describe("use-delete-for-delete with standard ARM operations", () => {
       .toBeValid();
   });
 
-  describe("published template documentation examples", () => {
+  describe("standard template template fixtures", () => {
     let documentationRunner: TesterInstance;
     let setup: string;
     let examples: string[];
@@ -361,30 +361,69 @@ describe("use-delete-for-delete with standard ARM operations", () => {
         useDeleteForDeleteRule,
         "@azure-tools/typespec-client-generator-core",
       );
-      const documentation = readFileSync(
-        new URL("../../src/rules/use-delete-for-delete.md", import.meta.url),
-        "utf8",
-      );
-      const snippets = [...documentation.matchAll(/```typespec\r?\n([\s\S]*?)```/g)].map(
-        (match) => match[1],
-      );
-      expect(snippets).toHaveLength(5);
+
+      const snippets = [
+        `import "@typespec/http";
+import "@typespec/rest";
+import "@azure-tools/typespec-azure-resource-manager";
+import "@azure-tools/typespec-client-generator-core";
+
+using TypeSpec.Http;
+using TypeSpec.Rest;
+using Azure.ResourceManager;
+using Azure.ClientGenerator.Core;
+
+@armProviderNamespace
+@service
+@armCommonTypesVersion(CommonTypes.Versions.v5)
+namespace Example;
+
+model Widget is ProxyResource<WidgetProperties> {
+  @key("widgetName") @segment("widgets") name: string;
+}
+
+model WidgetProperties {}
+`,
+        `@armResourceOperations
+interface Widgets {
+  remove is ArmResourceDeleteSync<Widget>;
+}
+`,
+        `@armResourceOperations
+interface Widgets {
+  delete is ArmResourceDeleteSync<Widget>;
+}
+`,
+        `@armResourceOperations
+interface Widgets {
+  @clientName("deleteWidget")
+  remove is ArmResourceDeleteSync<Widget>;
+}
+`,
+        `@armResourceOperations
+interface Widgets {
+  #suppress "@azure-tools/typespec-client-generator-core/use-delete-for-delete" "Preserve the already-shipped SDK method name."
+  remove is ArmResourceDeleteSync<Widget>;
+}
+`,
+      ];
+
       [setup, ...examples] = snippets;
     });
 
-    it("reports the published incorrect template alias", async () => {
+    it("reports the standard incorrect template alias", async () => {
       await tester.expect(`${setup}\n${examples[0]}`).toEmitDiagnostics([diagnostic("remove")]);
     });
 
-    it("accepts the published correct template alias", async () => {
+    it("accepts the standard correct template alias", async () => {
       await tester.expect(`${setup}\n${examples[1]}`).toBeValid();
     });
 
-    it("accepts the published template client name override", async () => {
+    it("accepts the standard template client name override", async () => {
       await tester.expect(`${setup}\n${examples[2]}`).toBeValid();
     });
 
-    it("accepts the published template suppression", async () => {
+    it("accepts the standard template suppression", async () => {
       const [, diagnostics] = await documentationRunner.compileAndDiagnose(
         `${setup}\n${examples[3]}`,
         {

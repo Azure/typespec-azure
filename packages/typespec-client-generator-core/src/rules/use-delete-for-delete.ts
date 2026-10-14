@@ -1,8 +1,6 @@
 import { createRule, fileRef, paramMessage } from "@typespec/compiler";
-import { getAllHttpServices } from "@typespec/http";
 import { createTCGCContext } from "../context.js";
-import { AllScopes } from "../internal-utils.js";
-import { getLibraryName } from "../public-utils.js";
+import { getOperationsWithIncorrectVerbPrefix } from "./verb-prefix.js";
 
 export const useDeleteForDeleteRule = createRule({
   name: "use-delete-for-delete",
@@ -22,23 +20,15 @@ export const useDeleteForDeleteRule = createRule({
 
     return {
       root: () => {
-        const [services] = getAllHttpServices(context.program);
-        for (const service of services) {
-          for (const { operation, verb } of service.operations) {
-            if (verb !== "delete") {
-              continue;
-            }
-
-            const operationName = getLibraryName(tcgcContext, operation, AllScopes);
-            if (operationName.toLowerCase().startsWith("delete")) {
-              continue;
-            }
-
-            context.reportDiagnostic({
-              target: operation,
-              format: { operationName },
-            });
-          }
+        for (const { operation, operationName } of getOperationsWithIncorrectVerbPrefix(
+          tcgcContext,
+          "delete",
+          "delete",
+        )) {
+          context.reportDiagnostic({
+            target: operation,
+            format: { operationName },
+          });
         }
       },
     };
