@@ -738,7 +738,7 @@ export async function getOpenAPIForService(
         resolved.legacyFilename,
       );
       const key = uniqueExampleKey(doc.title, usedTitles);
-      const text = JSON.stringify(doc, null, 2);
+      const text = JSON.stringify(doc, null, 2) + "\n";
       record[key] = {
         relativePath,
         file: createSourceFile(text, relativePath),
