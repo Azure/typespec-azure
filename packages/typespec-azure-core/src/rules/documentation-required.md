@@ -34,7 +34,16 @@ These explicit-description checks also apply to scalars and inline properties, a
 
 This rule corresponds to the LintDiff rule [SummaryOrDescription](https://github.com/Azure/azure-openapi-validator/blob/main/docs/operation-summary-or-description.md).
 
-Its descriptive-documentation checks also cover [DescriptionMustNotBeNodeName](https://github.com/Azure/azure-openapi-validator/blob/main/docs/description-must-not-be-node-name.md).
+### Consolidated documentation coverage
+
+The checks formerly proposed as `no-uninformative-doc` are part of the existing `documentation-required` rule, not a separate opt-in rule.
+
+| Migrated lintdiff rule                                                                                                               | Coverage in this existing TypeSpec rule                                                                                                                                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [SummaryOrDescription](https://github.com/Azure/azure-openapi-validator/blob/main/docs/operation-summary-or-description.md)          | Existing documentation requirements for types, operations, and members, with the existing missing-documentation scopes and exemptions retained.                                                                                 |
+| [DescriptionMustNotBeNodeName](https://github.com/Azure/azure-openapi-validator/blob/main/docs/description-must-not-be-node-name.md) | Rejects explicit descriptions that repeat effective declaration/member names or placeholder text, using the JSON/HTTP/multipart/member naming rules above. Operations are checked against both their source name and HTTP verb. |
+
+The operation-source-name comparison intentionally strengthens the migrated HTTP-verb comparison. Explicit-description checks do not newly require documentation on declarations otherwise exempt from missing-doc requirements. These mappings concern compiler-exposed documentation metadata, not acceptance of emitted Swagger summary/description fields.
 
 #### ❌ Incorrect
 
