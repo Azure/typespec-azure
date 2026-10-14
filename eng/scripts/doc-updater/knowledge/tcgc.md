@@ -61,21 +61,21 @@
 
 ## Documentation File Map
 
-| File                        | Topics                                                                                                                                          |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| 00howtogen.mdx              | Overview, language emitter setup                                                                                                                |
-| 01setup.mdx                 | TCGC customization setup                                                                                                                        |
-| 02package.mdx               | @service, @clientNamespace, license                                                                                                             |
-| 03client.mdx                | @client, @clientLocation, @clientInitialization, @clientName, @clientNamespace, InitializedBy                                                   |
-| 04method.mdx                | @convenientAPI, @protocolAPI, @override, @access, @usage, functions, @responseAsBool                                                            |
-| 05pagingOperations.mdx      | @list, @pageItems, @nextLink, @continuationToken, @markAsPageable, @disablePageable, @nextLinkVerb                                              |
-| 06longRunningOperations.mdx | LRO patterns, @pollingOperation, @markAsLro                                                                                                     |
-| 07multipart.mdx             | @multipartBody, HttpPart, file upload                                                                                                           |
-| 08types.mdx                 | @clientNamespace, @clientDefaultValue, @clientName, @discriminator, @alternateType, @clientDoc, @flattenProperty, @deserializeEmptyStringAsNull |
-| 09renaming.mdx              | @clientName, @encodedName, exact()                                                                                                              |
-| 10versioning.mdx            | @versioned, @added, @removed, @apiVersion, @clientApiVersions                                                                                   |
-| 11hierarchyBuilding.mdx     | @hierarchyBuilding (Legacy)                                                                                                                     |
-| 12clientOptions.mdx         | @clientOption                                                                                                                                   |
+| File                        | Topics                                                                                                                                                                    |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 00howtogen.mdx              | Overview, language emitter setup                                                                                                                                          |
+| 01setup.mdx                 | TCGC customization setup                                                                                                                                                  |
+| 02package.mdx               | @service, @clientNamespace, license                                                                                                                                       |
+| 03client.mdx                | @client, @clientLocation, @clientInitialization, @clientName, @clientNamespace, InitializedBy                                                                             |
+| 04method.mdx                | @convenientAPI, @protocolAPI, @override, @access, @usage, functions, @responseAsBool                                                                                      |
+| 05pagingOperations.mdx      | @list, @pageItems, @nextLink, @continuationToken, @markAsPageable, @disablePageable, @nextLinkVerb                                                                        |
+| 06longRunningOperations.mdx | LRO patterns, @pollingOperation, @markAsLro                                                                                                                               |
+| 07multipart.mdx             | @multipartBody, HttpPart, file upload                                                                                                                                     |
+| 08types.mdx                 | @clientNamespace, @clientDefaultValue, @clientName, @discriminator, @alternateType, @clientDoc, @flattenProperty, @deserializeEmptyStringAsNull, union hierarchy guidance |
+| 09renaming.mdx              | @clientName, @encodedName, exact()                                                                                                                                        |
+| 10versioning.mdx            | @versioned, @added, @removed, @apiVersion, @clientApiVersions                                                                                                             |
+| 11hierarchyBuilding.mdx     | @hierarchyBuilding (Legacy)                                                                                                                                               |
+| 12clientOptions.mdx         | @clientOption                                                                                                                                                             |
 
 ## Documentation Patterns
 
@@ -196,6 +196,11 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - Override lookup follows the operation's declaration scope and source-operation chain. Moving an operation with `@clientLocation` does not make it inherit the destination client's override.
 - The Spector scenario under `azure/core/api-version-override` verifies the overridden wire query value. Detailed inheritance and metadata behavior remain unit-test concerns.
 
+## Human Feedback Lessons (September 2026)
+
+- A plain `@override` operation controls the generated method parameters, but its declared return type is ignored. Response replacement must use `replaceResponseWithVoid` or `replaceResponseWithBytes`, which preserve the original HTTP response metadata. Keep this distinction explicit in generated decorator documentation.
+- For `@Azure.Core.Legacy.overrideApiVersion`, use Spector only for the observable overridden query value. Keep declaration-scope inheritance, source-operation traversal, and unchanged client version metadata in unit tests.
+
 ## SDK Method Naming Rules
 
 - `get-operation-name` checks the common TCGC SDK name of concrete GET operations and requires a `get` or `list` prefix. It honors unscoped `@clientName`, ignores emitter-scoped overrides and OpenAPI operation IDs, and skips template declarations/artifacts and non-GET operations.
@@ -267,6 +272,14 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 - Linter rules live in `packages/typespec-client-generator-core/src/rules/` and are registered in `src/linter.ts` (both the general `rules` array and the `csharpRules` array for C#-specific rules).
 - Each rule has a user-facing doc page under `website/src/content/docs/docs/libraries/typespec-client-generator-core/rules/<rule-name>.md` and a row in the auto-listed `reference/linter.md` table. These are typically added by the rule's own source PR — verify they exist before adding.
 - Rule doc page format: frontmatter `title:`, a `Full name` code block with the fully-qualified rule id, a one-line description, then `#### ❌ Incorrect` and `#### ✅ Correct` `tsp` examples (no `<ClientTabs>` needed — rule docs use plain `tsp` blocks).
+
+### use-union-hierarchy
+
+- The rule is part of the general TCGC rule list and therefore the `all` ruleset; it is not part of `best-practices:csharp`.
+- Every named union that is not wholly assignable to `string` needs an `extends` constraint. This includes numeric, boolean, model, nullable, mixed, and empty unions. Named string unions and anonymous union expressions are exempt.
+- When the constraint is a model, each model variant must be that exact model or have it in its `baseModel` chain. Structural compatibility, model spread, and `model is` do not establish the required nominal hierarchy.
+- A model variant can belong to only one union with a model constraint. Unions with non-model constraints do not participate in this ownership check.
+- This is diagnostic-only behavior: document it as a caution in the howto union section and rely on unit tests for invalid cases. Do not add a Spector scenario, because a valid carrier would exercise pre-existing emitter behavior rather than the linter diagnostic.
 
 ### csharp-no-url-suffix (PR #4541)
 
@@ -345,3 +358,11 @@ namespace (@clientNamespace), naming (@clientName), overload, structure (@client
 ## @operationGroup doc comment (Aug 2026)
 
 - The `@deprecated` JSDoc tag on `@operationGroup` in `lib/decorators.tsp` was changed to plain prose ("Deprecated: use `@client` instead.") because the leading `@deprecated` tag was breaking the generated reference doc layout. Reference docs regenerate to the same info; no manual reference edit.
+
+## SdkClientType.authentication (September 2026)
+
+- `SdkClientType.authentication?: Authentication` exposes the HTTP authentication requirements declared on the client's service. `authentication.options` preserves OR alternatives, and `option.schemes` preserves schemes that must be used together (AND).
+- `NoAuth` remains an explicit scheme both as an alternative and when used alone. This does not make the projected `SdkCredentialParameter` optional; the credential parameter remains required and carries the `noAuth` credential variant.
+- The value is `undefined` when there is no associated service or no service authentication. Multi-service clients use the first service, matching existing endpoint and credential metadata behavior.
+- `tcgc-output.yaml` preserves authentication option/scheme grouping but strips each `HttpAuth.model` compiler reference. An operation-level `@useAuth` does not replace the client-level service authentication metadata.
+- This is emitter-consumed type-graph metadata with no new generated SDK or wire behavior. Document it in `guideline.md`; do not add a Spector carrier scenario.
