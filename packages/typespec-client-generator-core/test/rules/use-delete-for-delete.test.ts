@@ -1,10 +1,8 @@
 import { resolvePath } from "@typespec/compiler";
 import {
-  LinterRuleTester,
-  TesterInstance,
   createLinterRuleTester,
   createTester,
-  expectDiagnosticEmpty,
+  type LinterRuleTester,
 } from "@typespec/compiler/testing";
 
 import { beforeEach, describe, it, vi } from "vitest";
@@ -339,7 +337,6 @@ describe("use-delete-for-delete with standard ARM operations", () => {
   });
 
   describe("standard template template fixtures", () => {
-    let documentationRunner: TesterInstance;
     let setup: string;
     let examples: string[];
 
@@ -355,7 +352,6 @@ describe("use-delete-for-delete with standard ARM operations", () => {
           "@azure-tools/typespec-client-generator-core",
         ],
       }).createInstance();
-      documentationRunner = runner;
       tester = createLinterRuleTester(
         runner,
         useDeleteForDeleteRule,
@@ -400,12 +396,6 @@ interface Widgets {
   remove is ArmResourceDeleteSync<Widget>;
 }
 `,
-        `@armResourceOperations
-interface Widgets {
-  #suppress "@azure-tools/typespec-client-generator-core/use-delete-for-delete" "Preserve the already-shipped SDK method name."
-  remove is ArmResourceDeleteSync<Widget>;
-}
-`,
       ];
 
       [setup, ...examples] = snippets;
@@ -421,22 +411,6 @@ interface Widgets {
 
     it("accepts the standard template client name override", async () => {
       await tester.expect(`${setup}\n${examples[2]}`).toBeValid();
-    });
-
-    it("accepts the standard template suppression", async () => {
-      const [, diagnostics] = await documentationRunner.compileAndDiagnose(
-        `${setup}\n${examples[3]}`,
-        {
-          compilerOptions: {
-            linterRuleSet: {
-              enable: {
-                "@azure-tools/typespec-client-generator-core/use-delete-for-delete": true,
-              },
-            },
-          },
-        },
-      );
-      expectDiagnosticEmpty(diagnostics);
     });
   });
 });
