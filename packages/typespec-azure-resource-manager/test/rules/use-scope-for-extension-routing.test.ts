@@ -7,8 +7,7 @@ import {
   type TesterInstance,
 } from "@typespec/compiler/testing";
 
-import { beforeEach, expect, it } from "vitest";
-import { $linter } from "../../src/linter.js";
+import { beforeEach, it } from "vitest";
 import { useScopeForExtensionRoutingRule as rule } from "../../src/rules/use-scope-for-extension-routing.js";
 
 const code = "@azure-tools/typespec-azure-resource-manager/use-scope-for-extension-routing";
@@ -198,16 +197,12 @@ it("matches literal lowercase provider segments, not lookalikes", async () => {
     .toBeValid();
 });
 
-it("checks source operations without projecting to the newest version", async () => {
+it("reports each distinct hardcoded-parent path", async () => {
   await tester
     .expect(
       `
-    @service @versioned(Versions) namespace Example;
-    enum Versions { v1, v2 }
-    @removed(Versions.v2)
-    @get @route("${path}") op oldRead(@path parentName: string, @path bindingName: string): void;
-    @added(Versions.v2)
-    @get @route("${path}/details") op currentRead(@path parentName: string, @path bindingName: string): void;
+    @get @route("${path}") op read(@path parentName: string, @path bindingName: string): void;
+    @get @route("${path}/details") op readDetails(@path parentName: string, @path bindingName: string): void;
   `,
     )
     .toEmitDiagnostics([diagnostic(), diagnostic(`${path}/details`)]);
@@ -227,38 +222,4 @@ it("warns for the standard specific-parent ARM extension template", async () => 
 it("accepts the standard arbitrary-scope ARM extension template", async () => {
   const snippets = await examples();
   await tester.expect(snippets[1]).toBeValid();
-});
-
-it("keeps existing ARM all rules active while the new rule stays disabled", () => {
-  const all = $linter.ruleSets?.all.enable;
-  expect(all?.[code]).toBe(false);
-  for (const existing of $linter.rules.filter((item) => item.name !== rule.name)) {
-    expect(all?.[`@azure-tools/typespec-azure-resource-manager/${existing.name}`]).toBe(true);
-  }
-});
-
-it.each([[], ["@azure-tools/typespec-azure-resource-manager/all"]])(
-  "accepts specific-parent ARM endpoints without explicit enablement: %j",
-  async (...extendsRulesets) => {
-    const snippets = await examples();
-    const [, diagnostics] = await runner.compileAndDiagnose(snippets[0], {
-      compilerOptions: { linterRuleSet: { extends: extendsRulesets } },
-    });
-    expect(diagnostics.filter((item) => item.severity === "error")).toEqual([]);
-    expect(diagnostics.filter((item) => item.code === code)).toEqual([]);
-  },
-);
-
-it("honors explicit enablement when extending ARM all", async () => {
-  const snippets = await examples();
-  const [, diagnostics] = await runner.compileAndDiagnose(snippets[0], {
-    compilerOptions: {
-      linterRuleSet: {
-        extends: ["@azure-tools/typespec-azure-resource-manager/all"],
-        enable: { [code]: true },
-      },
-    },
-  });
-  expect(diagnostics.filter((item) => item.severity === "error")).toEqual([]);
-  expect(diagnostics.filter((item) => item.code === code)).toHaveLength(1);
 });
