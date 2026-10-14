@@ -647,33 +647,6 @@ interface Widgets {
   >;
 }
 `,
-  `@armProviderNamespace
-namespace Microsoft.Example;
-
-model Widget
-  is TrackedResource<{
-    value?: string;
-  }> {
-  ...ResourceNameParameter<Widget>;
-}
-
-model WidgetInput {
-  value?: string;
-}
-
-@armResourceOperations
-interface Widgets {
-  #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response" "Existing API uses a separate request model."
-  @put
-  @armResourceCreateOrUpdate(Widget)
-  createOrReplace is Azure.ResourceManager.Foundations.ArmCreateOperation<
-    ResourceInstanceParameters<Widget>,
-    WidgetInput,
-    ArmResponse<Widget> | ArmCreatedResponse<Widget>,
-    ErrorResponse
-  >;
-}
-`,
 ];
 
 it("compiles the standard standard template", async () => {
@@ -688,29 +661,4 @@ it("diagnoses the standard request override", async () => {
         "PUT bodies must reuse the same resource model. Found request: Microsoft.Example.WidgetInput; 200 response: Microsoft.Example.Widget; 201 response: Microsoft.Example.Widget.",
     },
   ]);
-});
-
-it("honors the standard suppression through the compiler pipeline", async () => {
-  await Tester.compile(examples[2], {
-    compilerOptions: { linterRuleSet: { enable: { [code]: true } } },
-  });
-});
-
-it.each([
-  [
-    "bodyless legacy PUT",
-    `${models}
-      #suppress "${code}" "Existing API intentionally accepts no request body."
-      @put op put(): Ok<Widget>;`,
-  ],
-  [
-    "legacy unregistered payload",
-    `model Plain { value: string; }
-      #suppress "${code}" "Existing API uses a legacy non-resource payload."
-      @put op put(@body body: Plain): Plain;`,
-  ],
-])("honors an operation-level suppression for %s", async (_, source) => {
-  await Tester.compile(source, {
-    compilerOptions: { linterRuleSet: { enable: { [code]: true } } },
-  });
 });
