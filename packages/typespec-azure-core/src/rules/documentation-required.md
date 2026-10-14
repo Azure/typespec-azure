@@ -12,17 +12,6 @@ Missing documentation produces poor SDK reference docs and API documentation.
 
 This rule corresponds to the LintDiff rule [SummaryOrDescription](https://github.com/Azure/azure-openapi-validator/blob/main/docs/operation-summary-or-description.md).
 
-### Consolidated documentation coverage
-
-The checks formerly proposed as `no-empty-doc` are part of the existing `documentation-required` rule, not a separate opt-in rule.
-
-| Migrated lintdiff rule                                                                                                                | Coverage in this existing TypeSpec rule                                                                                                                                     |
-| ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [SummaryOrDescription](https://github.com/Azure/azure-openapi-validator/blob/main/docs/operation-summary-or-description.md)           | Existing documentation requirements for types, operations, and members, with the existing missing-documentation scopes and exemptions retained.                             |
-| [DescriptiveDescriptionRequired](https://github.com/Azure/azure-openapi-validator/blob/main/docs/descriptive-description-required.md) | Rejects empty or whitespace-only explicit documentation on the additional targets listed below, without newly requiring documentation where absence was previously allowed. |
-
-This intentionally strengthens the previous truthiness check, which accepted whitespace-only strings. It uses compiler-exposed documentation metadata rather than inspecting emitted Swagger fields; uninstantiated template documentation unavailable from the compiler remains outside its coverage.
-
 #### ❌ Incorrect
 
 Model without documentation:
@@ -94,7 +83,16 @@ scalar Label extends string;
 scalar Label extends string;
 ```
 
-This blank-documentation check corresponds to LintDiff's [DescriptiveDescriptionRequired](https://github.com/Azure/azure-openapi-validator/blob/main/docs/descriptive-description-required.md).
+### Consolidated blank-documentation coverage
+
+The checks formerly proposed as `no-empty-doc` are part of the existing `documentation-required` rule, not a separate opt-in rule.
+
+| Migrated lintdiff rule                                                                                                                | Coverage in this existing TypeSpec rule                                                                                                                                     |
+| ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [SummaryOrDescription](https://github.com/Azure/azure-openapi-validator/blob/main/docs/operation-summary-or-description.md)           | Existing documentation requirements for types, operations, and members, with the existing missing-documentation scopes and exemptions retained.                             |
+| [DescriptiveDescriptionRequired](https://github.com/Azure/azure-openapi-validator/blob/main/docs/descriptive-description-required.md) | Rejects empty or whitespace-only explicit documentation on the additional targets listed above, without newly requiring documentation where absence was previously allowed. |
+
+This intentionally strengthens the previous truthiness check, which accepted whitespace-only strings. It uses compiler-exposed documentation metadata rather than inspecting emitted Swagger fields; uninstantiated template documentation unavailable from the compiler remains outside its coverage.
 
 ## Suppression
 
