@@ -501,7 +501,11 @@ existing tester helper:
 Apply the [contract-driven coverage](../typespec-lint-validate/SKILL.md#contract-driven-coverage)
 checklist and [rule-test responsibility boundary](../typespec-lint-validate/SKILL.md#rule-test-responsibility-boundary)
 before fixture conversion. Do not port framework-only cases merely because they
-exist in the source suite or migration harness. Apply the
+exist in the source suite or migration harness. Do not add raw-source import
+inspection tests or port emitted-reference-only matrices when the native rule
+does not inspect those references. Preserve the underlying native compliant or
+violating case without legacy emitter metadata; check dependency constraints in
+review and existing repository tooling. Apply the
 [example authoring policy](../typespec-lint-implement/SKILL.md#example-authoring)
 to representative ARM resource scenarios without rewriting focused handwritten
 semantic tests or introducing ARM coupling into shared Core test setup. For SDK
@@ -533,14 +537,16 @@ to prove standard framework behavior. Test custom declaration filtering only
 when it implements a rule-specific policy, with included and excluded cases.
 Any discovered source defect returns to the queue.
 
-For metadata-resolution or reference-based logic, explicitly cover relevant
+For native metadata-resolution logic, explicitly cover rule-owned
 version-selection/fallback behavior, returned resolution diagnostics, and
-diagnostic targets. Prove that checking a resolved record does not depend on
-its generated reference matching the old path or regex layout. Use supported
-native inputs or existing test infrastructure, not production adapters or
-unsupported authoring shapes added solely for testing. Fixture conversion alone
-does not close a missing regression case; classify any newly exposed source
-defect before making changes.
+diagnostic targets. Establish reference-format independence by reviewing the
+rule and its reachable helpers for structured metadata use, with behavioral
+tests for the record fields the rule actually checks. Do not require a matrix
+of generated reference strings or a raw-source assertion to prove that
+independence. Use supported native inputs or existing test infrastructure, not
+production adapters or unsupported authoring shapes added solely for testing.
+Fixture conversion alone does not close a missing regression case; classify any
+newly exposed source defect before making changes.
 
 Use this standard fixture-to-native-test mapping:
 
@@ -966,7 +972,8 @@ promotion diff. The review should inspect:
   independence and preserved version-selection, fallback, and diagnostic targets
 - test conversion fidelity from lintdiff fixtures
 - adherence to the rule-test responsibility boundary: remove framework-only
-  cases, preserve distinct rule coverage, and explain fixtures not ported
+  cases, raw-source architecture assertions, and emitted-reference-only matrices;
+  preserve distinct native rule coverage and explain fixtures not ported
 - docs accuracy, including front matter, full-name block, TypeSpec/SDK-focused
   rationale, and any Swagger/LintDiff provenance being confined to a provenance
   section

@@ -55,6 +55,19 @@ linter framework, or shared test harness in every rule suite.
 - Keep migration fixtures and corpus comparisons that explain Swagger/TypeSpec
   differences in the migration harness. They do not automatically become native
   rule unit tests; record why a framework-only fixture is not ported.
+- Do not add per-rule tests that read or parse implementation source to assert
+  import lists, forbidden dependencies/APIs, helper names, or source layout.
+  These assert implementation structure, not the rule's diagnostic contract,
+  and can miss dependencies through reachable helpers. Check architectural
+  constraints in review and existing repository-wide lint/dependency tooling;
+  do not invent a source-inspection test or new harness for each rule.
+- Do not turn emitted-reference strings or legacy emitter metadata into a native
+  test matrix when the rule does not inspect them. For a native standard-type
+  requirement, test the standard type and a custom type directly; varying an
+  external reference's path, version, or definition adds no predicate coverage.
+  Keep reference-format parity evidence in migration fixtures or PR notes.
+  Cover version selection or metadata only when a rule-owned decision depends
+  on it, rather than treating every migration constraint as a unit-test case.
 
 For example, a summary/documentation equality rule needs equality, inequality,
 missing-value, normalization, and supported-declaration cases. A fake imported
@@ -63,7 +76,9 @@ that predicate. A rule that implements its own service guard does need included
 and excluded service cases.
 
 This boundary incorporates the
-[review feedback on #5507](https://github.com/Azure/typespec-azure/pull/5507#discussion_r4093555025).
+[review feedback on #5507](https://github.com/Azure/typespec-azure/pull/5507#discussion_r4093555025)
+and the [review on #5451](https://github.com/Azure/typespec-azure/pull/5451#pullrequestreview-5507879303),
+which rejected external-reference-only cases and raw-source import inspection.
 
 ## Contract-driven coverage
 
