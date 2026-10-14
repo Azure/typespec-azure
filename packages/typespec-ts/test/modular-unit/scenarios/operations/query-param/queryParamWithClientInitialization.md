@@ -130,7 +130,10 @@ export function createBillingBenefits(
   const endpointUrl = options.endpoint ?? String(endpointParam);
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
 
@@ -356,7 +359,10 @@ export function createBillingBenefits(
   const endpointUrl = options.endpoint ?? String(endpointParam);
   const { apiVersion: _, ...updatedOptions } = {
     ...options,
-    loggingOptions: { logger: options.loggingOptions?.logger ?? logger.info },
+    loggingOptions: {
+      ...options.loggingOptions,
+      logger: options.loggingOptions?.logger ?? logger.info,
+    },
   };
   const clientContext = getClient(endpointUrl, undefined, updatedOptions);
 
