@@ -3,18 +3,17 @@ import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compile
 
 import { beforeEach, it } from "vitest";
 import { armResourceOperationsRule } from "../../src/rules/arm-resource-operation-response.js";
-import { putResourceSchemaConsistencyRule } from "../../src/rules/put-resource-schema-consistency.js";
 
 let tester: LinterRuleTester;
 beforeEach(async () => {
   tester = createLinterRuleTester(
     await Tester.createInstance(),
-    putResourceSchemaConsistencyRule,
+    armResourceOperationsRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
 
-const code = "@azure-tools/typespec-azure-resource-manager/put-resource-schema-consistency";
+const code = "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response";
 const models = `
   @armProviderNamespace namespace Resources {
     model Widget is TrackedResource<{}> { ...ResourceNameParameter<Widget>; }
@@ -39,6 +38,17 @@ it("accepts the same model across the request and both responses", async () => {
   `,
     )
     .toBeValid();
+});
+
+it("does not assume a REST resource decorator enables ARM lifecycle response validation", async () => {
+  await tester
+    .expect(
+      `${models}
+    @put @createsOrReplacesResource(Widget)
+    op put(@body body: Widget): Ok<Other>;
+  `,
+    )
+    .toEmitDiagnostics([diagnostic("request: Widget; 200 response: Other")]);
 });
 
 it.each([200, 201])("compares the request with a lone %s response", async (status) => {
@@ -435,6 +445,29 @@ it("accepts standard ARM create-or-replace templates", async () => {
     .toBeValid();
 });
 
+it("keeps resource identity when PUT uses Create visibility and PATCH exposes Update input", async () => {
+  await tester
+    .expect(
+      `
+    @service @armProviderNamespace namespace Microsoft.TestService;
+    model Widget is TrackedResource<{
+      common?: string;
+      @visibility(Lifecycle.Update) updateOnly?: string;
+    }> { ...ResourceNameParameter<Widget>; }
+    model WidgetPatch {
+      tags?: Record<string>;
+      properties?: { updateOnly?: string; };
+    }
+    @armResourceOperations interface Widgets {
+      @parameterVisibility(Lifecycle.Create)
+      create is ArmResourceCreateOrReplaceSync<Widget>;
+      update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+    }
+  `,
+    )
+    .toBeValid();
+});
+
 it.each(["TrackedResource", "ProxyResource"])(
   "accepts %s with both success statuses",
   async (base) => {
@@ -452,7 +485,7 @@ it.each(["TrackedResource", "ProxyResource"])(
   },
 );
 
-it("keeps canonical-resource validation in the existing lifecycle rule", async () => {
+it("keeps canonical-resource validation without duplicate lifecycle diagnostics", async () => {
   const source = `${models}
     @armProviderNamespace namespace Operations {
       @armResourceOperations interface Widgets {
@@ -462,7 +495,6 @@ it("keeps canonical-resource validation in the existing lifecycle rule", async (
       }
     }
   `;
-  await tester.expect(source).toBeValid();
   await createLinterRuleTester(
     await Tester.createInstance(),
     armResourceOperationsRule,
@@ -473,6 +505,21 @@ it("keeps canonical-resource validation in the existing lifecycle rule", async (
       code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
       message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
     });
+});
+
+it("checks the canonical PUT resource when no success body can establish its identity", async () => {
+  await tester
+    .expect(
+      `${models}
+    @armProviderNamespace namespace Operations {
+      @armResourceOperations interface Widgets {
+        @put @armResourceCreateOrUpdate(Resources.Widget)
+        put(...ResourceInstanceParameters<Resources.Widget>, @bodyRoot body: Other): void;
+      }
+    }
+  `,
+    )
+    .toEmitDiagnostics([diagnostic("request: Other; resource: Widget")]);
 });
 
 it.each([
@@ -490,7 +537,7 @@ it.each([
     unregistered("request: Operations.Plain; 200 response: Operations.Plain"),
   ],
 ] as const)(
-  "covers %s not checked by the lifecycle rule",
+  "covers %s through the consolidated lifecycle rule",
   async (_, request, response, expected) => {
     const source = `${models}
     @armProviderNamespace namespace Operations {
@@ -502,13 +549,6 @@ it.each([
       }
     }
   `;
-    await createLinterRuleTester(
-      await Tester.createInstance(),
-      armResourceOperationsRule,
-      "@azure-tools/typespec-azure-resource-manager",
-    )
-      .expect(source)
-      .toBeValid();
     await tester.expect(source).toEmitDiagnostics([expected]);
   },
 );
@@ -623,7 +663,7 @@ model WidgetInput {
 
 @armResourceOperations
 interface Widgets {
-  #suppress "@azure-tools/typespec-azure-resource-manager/put-resource-schema-consistency" "Existing API uses a separate request model."
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response" "Existing API uses a separate request model."
   @put
   @armResourceCreateOrUpdate(Widget)
   createOrReplace is Azure.ResourceManager.Foundations.ArmCreateOperation<

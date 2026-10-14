@@ -12,19 +12,23 @@ import {
 
 import { type ArmLifecycleOperationKind, resolveResourceOperations } from "../operations.js";
 import { getArmResource } from "../resource.js";
+import { createPutBodyListener, putBodyMessages } from "./arm-resource-operation-response-body.js";
 import { isInternalTypeSpec } from "./utils.js";
 
 export const armResourceOperationsRule = createRule({
   name: "arm-resource-operation-response",
   docs: fileRef.fromPackageRoot("src/rules/arm-resource-operation-response.md"),
   severity: "warning",
-  description: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+  description:
+    "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema, and PUT input must match the resource.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-operation-response",
   messages: {
     default: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+    ...putBodyMessages,
   },
   create(context) {
     return {
+      ...createPutBodyListener(context),
       model: (model: Model) => {
         if (!isInternalTypeSpec(context.program, model)) {
           const armResource = getArmResource(context.program, model);
