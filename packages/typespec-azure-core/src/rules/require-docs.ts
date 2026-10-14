@@ -31,6 +31,8 @@ import {
   isTemplatedOperationSignature,
 } from "./utils.js";
 
+import { createEmptyDocumentationValidator } from "./documentation-empty.js";
+
 /** Versioning enums are self-documenting and don't need separate documentation. */
 function isExcludedVersionEnum(program: Program, enumObj: Enum): boolean {
   const versions = getVersionsForEnum(program, enumObj);
@@ -85,6 +87,8 @@ function getUnionName(union: Union): string | undefined {
   }
   return undefined;
 }
+
+documentationValidators.push(createEmptyDocumentationValidator);
 
 function getVariantName(variant: UnionVariant): string | undefined {
   if (variant.name !== undefined && typeof variant.name === "string") {

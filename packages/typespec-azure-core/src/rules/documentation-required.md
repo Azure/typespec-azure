@@ -36,12 +36,13 @@ This rule corresponds to the LintDiff rule [SummaryOrDescription](https://github
 
 ### Consolidated documentation coverage
 
-The checks formerly proposed as `no-uninformative-doc` are part of the existing `documentation-required` rule, not a separate opt-in rule.
+The checks formerly proposed as `no-uninformative-doc` and `no-empty-doc` are part of the existing `documentation-required` rule, not separate opt-in rules.
 
-| Migrated lintdiff rule                                                                                                               | Coverage in this existing TypeSpec rule                                                                                                                                                                                         |
-| ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [SummaryOrDescription](https://github.com/Azure/azure-openapi-validator/blob/main/docs/operation-summary-or-description.md)          | Existing documentation requirements for types, operations, and members, with the existing missing-documentation scopes and exemptions retained.                                                                                 |
-| [DescriptionMustNotBeNodeName](https://github.com/Azure/azure-openapi-validator/blob/main/docs/description-must-not-be-node-name.md) | Rejects explicit descriptions that repeat effective declaration/member names or placeholder text, using the JSON/HTTP/multipart/member naming rules above. Operations are checked against both their source name and HTTP verb. |
+| Migrated lintdiff rule                                                                                                                | Coverage in this existing TypeSpec rule                                                                                                                                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [SummaryOrDescription](https://github.com/Azure/azure-openapi-validator/blob/main/docs/operation-summary-or-description.md)           | Existing documentation requirements for types, operations, and members, with the existing missing-documentation scopes and exemptions retained.                                                                                 |
+| [DescriptionMustNotBeNodeName](https://github.com/Azure/azure-openapi-validator/blob/main/docs/description-must-not-be-node-name.md)  | Rejects explicit descriptions that repeat effective declaration/member names or placeholder text, using the JSON/HTTP/multipart/member naming rules above. Operations are checked against both their source name and HTTP verb. |
+| [DescriptiveDescriptionRequired](https://github.com/Azure/azure-openapi-validator/blob/main/docs/descriptive-description-required.md) | Rejects empty or whitespace-only explicit documentation, including on declarations exempt from missing-doc requirements when the compiler exposes their documentation.                                                          |
 
 The operation-source-name comparison intentionally strengthens the migrated HTTP-verb comparison. Explicit-description checks do not newly require documentation on declarations otherwise exempt from missing-doc requirements. These mappings concern compiler-exposed documentation metadata, not acceptance of emitted Swagger summary/description fields.
 
@@ -93,8 +94,30 @@ enum PetKind {
 ```
 
 :::note
-Version enums and discriminator enums/unions are exempt from this rule as they are considered self-documenting.
+Version enums and discriminator enums/unions are exempt from missing-documentation requirements as they are considered self-documenting. Explicit descriptions on these declarations are still checked for blank or uninformative content.
 :::
+
+## Explicit documentation
+
+Every explicit `@doc` string must contain non-whitespace content. In addition to the existing required targets, this includes namespaces, interfaces, scalars, inline model properties, all union variants, and explicitly documented declarations exempt from missing-doc requirements. Enum members are checked individually.
+
+Checks use documentation metadata exposed by the compiler. Uninstantiated template declarations whose documentation is not exposed remain exempt.
+
+Documentation is not newly required on these additional targets: absent documentation remains allowed where it was previously allowed. However, an explicit blank description now warns for existing rule users without a configuration change. Whitespace-only strings previously passed the rule's truthiness check.
+
+```tsp
+// Incorrect.
+@doc(" \t")
+scalar Label extends string;
+```
+
+```tsp
+// Correct.
+@doc("A display label shown to users.")
+scalar Label extends string;
+```
+
+This intentionally strengthens the previous truthiness check, which accepted whitespace-only strings. It uses compiler-exposed documentation metadata rather than inspecting emitted Swagger fields; uninstantiated template documentation unavailable from the compiler remains outside its coverage.
 
 ## Suppression
 
