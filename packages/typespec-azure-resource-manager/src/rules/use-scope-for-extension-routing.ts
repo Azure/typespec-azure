@@ -1,11 +1,11 @@
 import {
   createRule,
   fileRef,
-  isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   paramMessage,
 } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
+import { isTemplatedInterfaceOperation } from "./utils.js";
 
 export const useScopeForExtensionRoutingRule = createRule({
   name: "use-scope-for-extension-routing",
@@ -21,7 +21,7 @@ export const useScopeForExtensionRoutingRule = createRule({
       operation: (operation) => {
         if (
           isTemplateDeclarationOrInstance(operation) ||
-          (operation.interface !== undefined && isTemplateDeclaration(operation.interface))
+          isTemplatedInterfaceOperation(operation)
         ) {
           return;
         }

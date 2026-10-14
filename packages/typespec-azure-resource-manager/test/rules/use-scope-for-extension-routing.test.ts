@@ -6,7 +6,7 @@ import {
   type LinterRuleTester,
   type TesterInstance,
 } from "@typespec/compiler/testing";
-import { readFile } from "node:fs/promises";
+
 import { beforeEach, expect, it } from "vitest";
 import { $linter } from "../../src/linter.js";
 import { useScopeForExtensionRoutingRule as rule } from "../../src/rules/use-scope-for-extension-routing.js";
@@ -27,12 +27,59 @@ beforeEach(async () => {
   tester = createLinterRuleTester(runner, rule, "@azure-tools/typespec-azure-resource-manager");
 });
 
-async function examples() {
-  const document = await readFile(
-    new URL("../../src/rules/use-scope-for-extension-routing.md", import.meta.url),
-    "utf8",
-  );
-  return [...document.matchAll(/```tsp\r?\n([\s\S]*?)```/g)].map((match) => match[1]);
+function examples() {
+  return [
+    `@armProviderNamespace
+@service
+@versioned(Versions)
+@armCommonTypesVersion(CommonTypes.Versions.v6)
+namespace Microsoft.Test;
+
+enum Versions {
+  @useDependency(Azure.ResourceManager.CommonTypes.Versions.v6)
+  v2024: "2024-01-01",
+}
+
+model Binding is ExtensionResource<BindingProperties> {
+  ...ResourceNameParameter<Binding>;
+}
+
+model BindingProperties {
+  label?: string;
+}
+
+alias VirtualMachine = Extension.ExternalResource<"Microsoft.Compute", "virtualMachines", "vmName">;
+
+@armResourceOperations
+interface Bindings {
+  read is Extension.Read<VirtualMachine, Binding>;
+}
+`,
+    `@armProviderNamespace
+@service
+@versioned(Versions)
+@armCommonTypesVersion(CommonTypes.Versions.v6)
+namespace Microsoft.Test;
+
+enum Versions {
+  @useDependency(Azure.ResourceManager.CommonTypes.Versions.v6)
+  v2024: "2024-01-01",
+}
+
+model Binding is ExtensionResource<BindingProperties> {
+  ...ResourceNameParameter<Binding>;
+}
+
+model BindingProperties {
+  label?: string;
+}
+
+@armResourceOperations
+interface Bindings {
+  read is Extension.Read<Extension.ScopeParameter, Binding>;
+}
+`,
+  ];
 }
 
 it("accepts a route without provider segments", async () => {
@@ -166,7 +213,7 @@ it("checks source operations without projecting to the newest version", async ()
     .toEmitDiagnostics([diagnostic(), diagnostic(`${path}/details`)]);
 });
 
-it("warns for the documented specific-parent ARM extension template", async () => {
+it("warns for the standard specific-parent ARM extension template", async () => {
   const snippets = await examples();
   await tester
     .expect(snippets[0])
@@ -177,7 +224,7 @@ it("warns for the documented specific-parent ARM extension template", async () =
     ]);
 });
 
-it("accepts the documented arbitrary-scope ARM extension template", async () => {
+it("accepts the standard arbitrary-scope ARM extension template", async () => {
   const snippets = await examples();
   await tester.expect(snippets[1]).toBeValid();
 });

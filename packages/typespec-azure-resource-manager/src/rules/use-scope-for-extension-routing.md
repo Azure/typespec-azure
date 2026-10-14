@@ -107,6 +107,8 @@ on the offending operation with a reason documenting that approval.
 ## LintDiff Equivalent
 
 This rule corresponds to
+[R4038 ExtensionResourcePathPattern](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r4038).
+The original validator implementation is documented in
 [ExtensionResourcePathPattern](https://github.com/Azure/azure-openapi-validator/blob/1198225afecbb818c3050d4d2a91da92e14e56ce/docs/extension-resource-path-pattern.md).
 The native rule reports per authored concrete operation rather than per emitted
 path, so separate verbs on one path can produce separate warnings.
