@@ -18,7 +18,19 @@ The resource operation returns a response schema that violates the RPC contract.
 
 This rule corresponds to the LintDiff rule [PutGetPatchResponseSchema](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/openapi-authoring-automated-guidelines.md#r3007) (the TypeSpec rule also covers `list`).
 
-It also covers [PutRequestResponseSchemeArm](https://github.com/Azure/azure-openapi-validator/blob/main/docs/put-request-response-scheme-arm.md), [ConsistentResponseSchemaForPut](https://github.com/Azure/azure-openapi-validator/blob/main/docs/consistent-response-schema-for-put.md), and [XmsResourceInPutResponse](https://github.com/Azure/azure-openapi-validator/blob/main/docs/xms-resource-in-put-response.md), in combination with `use-operation-decorator`.
+### Consolidated PUT coverage
+
+The PUT checks formerly proposed as `put-resource-schema-consistency` are part of this existing rule, not a separate rule to enable.
+
+| Migrated lintdiff rule                                                                                                                  | Coverage in the existing TypeSpec rules                                                                                                                                                                             |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [PutRequestResponseSchemeArm](https://github.com/Azure/azure-openapi-validator/blob/main/docs/put-request-response-scheme-arm.md)       | Requires a PUT request body and compares its effective resource model with each eligible exact 200/201 response body, using request and read visibility respectively.                                               |
+| [ConsistentResponseSchemaForPut](https://github.com/Azure/azure-openapi-validator/blob/main/docs/consistent-response-schema-for-put.md) | Requires participating 200 and 201 response bodies to reuse the same registered resource model. Existing lifecycle response checks also prevent returning a different registered resource.                          |
+| [XmsResourceInPutResponse](https://github.com/Azure/azure-openapi-validator/blob/main/docs/xms-resource-in-put-response.md)             | Participating bodies must be registered ARM resource models. `use-operation-decorator` separately checks registration of the resource operation; matching unregistered models do not establish resource compliance. |
+
+The added body checks include custom authored PUT operations, rather than relying only on lifecycle registration. Exact status matching includes singleton 200/201 ranges, not broader ranges. Comparisons use eligible named, non-indexed, single-body models; bodyless response variants are ignored and ambiguous content variants are not chosen arbitrarily.
+
+This coverage uses native model identity, visibility, and resource metadata. It does not inspect emitted Swagger schema references or the `x-ms-azure-resource` extension. Consolidation preserves the checks needed for the migrated intent; it does not mean resource registration alone proves request/response consistency.
 
 ## ❌ Incorrect
 
