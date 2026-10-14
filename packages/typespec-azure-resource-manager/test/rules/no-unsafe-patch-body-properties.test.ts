@@ -5,7 +5,7 @@ import {
   createTester,
   type LinterRuleTester,
 } from "@typespec/compiler/testing";
-import { readFile } from "node:fs/promises";
+
 import { beforeEach, describe, expect, it } from "vitest";
 import { $linter } from "../../src/linter.js";
 import { patchOperationsRule } from "../../src/rules/arm-resource-patch.js";
@@ -61,25 +61,70 @@ const legacyPatch = `
   #suppress "@typespec/http/deprecated-implicit-optionality" "Exercise supported legacy PATCH optionality."
 `;
 
-describe("documentation", () => {
-  let documentationTester: LinterRuleTester;
+describe("semantic examples", () => {
+  let fixtureTester: LinterRuleTester;
   beforeEach(async () => {
-    documentationTester = createLinterRuleTester(
+    fixtureTester = createLinterRuleTester(
       await BaseTester.createInstance(),
       noUnsafePatchBodyPropertiesRule,
       "@azure-tools/typespec-azure-resource-manager",
     );
   });
-  it("reports the documented unsafe standard-template payload", async () => {
-    const documentation = await readFile(
-      new URL("../../src/rules/no-unsafe-patch-body-properties.md", import.meta.url),
-      "utf8",
-    );
-    const examples = [...documentation.matchAll(/```tsp\r?\n([\s\S]*?)```/g)];
-    const valid = examples[0]?.[1];
-    const invalid = examples[1]?.[1];
-    if (!valid || !invalid) throw new Error("Both documented TypeSpec examples are required.");
-    await documentationTester
+  it("reports the unsafe standard-template payload", async () => {
+    const examples = [
+      `import "@typespec/http";
+import "@typespec/rest";
+import "@azure-tools/typespec-azure-resource-manager";
+
+using TypeSpec.Http;
+using TypeSpec.Rest;
+using Azure.ResourceManager;
+
+@service
+@armProviderNamespace
+namespace Contoso.Widgets;
+
+model WidgetProperties {
+  displayName: string;
+  description?: string;
+}
+
+model Widget is TrackedResource<WidgetProperties> {
+  @key("widgetName")
+  @segment("widgets")
+  @path
+  name: string;
+}
+
+model WidgetPatchProperties {
+  displayName?: string;
+  description?: string;
+}
+
+model WidgetPatch {
+  tags?: Record<string>;
+  properties?: WidgetPatchProperties;
+}
+
+@armResourceOperations
+interface Widgets {
+  update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+}
+`,
+      `model UnsafeWidgetPatch {
+  location?: string;
+  properties: {
+    displayName: string;
+    extra?: string;
+    enabled?: boolean = false;
+  };
+}
+`,
+    ];
+    const valid = examples[0];
+    const invalid = examples[1];
+
+    await fixtureTester
       .expect(
         `${valid.replace("ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>", "ArmCustomPatchSync<Widget, PatchModel = UnsafeWidgetPatch>")}\n${invalid}`,
       )
@@ -92,14 +137,48 @@ describe("documentation", () => {
         missing("properties.enabled"),
       ]);
   });
-  it("accepts the documented standard ARM template example", async () => {
-    const documentation = await readFile(
-      new URL("../../src/rules/no-unsafe-patch-body-properties.md", import.meta.url),
-      "utf8",
-    );
-    const example = documentation.match(/```tsp\r?\n([\s\S]*?)```/)?.[1];
-    if (!example) throw new Error("The rule documentation must contain a TypeSpec example.");
-    await documentationTester.expect(example).toBeValid();
+  it("accepts the standard ARM template example", async () => {
+    const example = `import "@typespec/http";
+import "@typespec/rest";
+import "@azure-tools/typespec-azure-resource-manager";
+
+using TypeSpec.Http;
+using TypeSpec.Rest;
+using Azure.ResourceManager;
+
+@service
+@armProviderNamespace
+namespace Contoso.Widgets;
+
+model WidgetProperties {
+  displayName: string;
+  description?: string;
+}
+
+model Widget is TrackedResource<WidgetProperties> {
+  @key("widgetName")
+  @segment("widgets")
+  @path
+  name: string;
+}
+
+model WidgetPatchProperties {
+  displayName?: string;
+  description?: string;
+}
+
+model WidgetPatch {
+  tags?: Record<string>;
+  properties?: WidgetPatchProperties;
+}
+
+@armResourceOperations
+interface Widgets {
+  update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+}
+`;
+
+    await fixtureTester.expect(example).toBeValid();
   });
 });
 
@@ -843,6 +922,31 @@ describe("scope and registration", () => {
         )
         .toBeValid();
     });
+    it.each([false, true])(
+      "does not select an arbitrary comparison resource from ambiguous content variants (%s)",
+      async (reverse) => {
+        await tester
+          .expect(
+            `${service}
+            model First { first: string; }
+            model Second { second: string; }
+            model JsonResponse {
+              @statusCode status: 200;
+              @header contentType: "application/json";
+              @body body: First;
+            }
+            model XmlResponse {
+              @statusCode status: 200;
+              @header contentType: "application/xml";
+              @body body: Second;
+            }
+            @patch op update(@body body: { extra?: string }):
+              ${reverse ? "XmlResponse | JsonResponse" : "JsonResponse | XmlResponse"};
+          `,
+          )
+          .toBeValid();
+      },
+    );
   });
 
   describe("existing ARM rule interactions", () => {

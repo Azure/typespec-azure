@@ -6,10 +6,7 @@ import {
   getVisibilityForClass,
   isArrayModelType,
   isNeverType,
-  isNullType,
   paramMessage,
-  resolveEncodedName,
-  walkPropertiesInherited,
   type DiagnosticTarget,
   type Model,
   type ModelProperty,
@@ -26,6 +23,12 @@ import {
   type HttpOperationResponse,
 } from "@typespec/http";
 import { getResourceOperation } from "@typespec/rest";
+import {
+  containsStatusCode,
+  matchesStatusCode,
+  selectResponseBody,
+} from "./http-response-utils.js";
+import { getSingleNonNullMember, walkJsonProperties } from "./model-utils.js";
 
 export const noUnsafePatchBodyPropertiesRule = createRule({
   name: "no-unsafe-patch-body-properties",
@@ -53,8 +56,7 @@ export const noUnsafePatchBodyPropertiesRule = createRule({
       let properties = resourceProperties.get(model);
       if (properties === undefined) {
         properties = new Map();
-        for (const property of walkPropertiesInherited(model)) {
-          const name = resolveEncodedName(program, property, "application/json");
+        for (const [name, property] of walkJsonProperties(program, model)) {
           if (!isNeverType(property.type) && !properties.has(name)) {
             properties.set(name, property);
           }
@@ -233,8 +235,8 @@ function isImmutablePath(path: string[]): boolean {
 function objectModel(type: Type | undefined): Model | undefined {
   if (type?.kind === "Model") return type;
   if (type?.kind !== "Union") return undefined;
-  const variants = [...type.variants.values()].map((v) => v.type).filter((t) => !isNullType(t));
-  return variants.length === 1 && variants[0].kind === "Model" ? variants[0] : undefined;
+  const member = getSingleNonNullMember(type);
+  return member?.kind === "Model" ? member : undefined;
 }
 
 function responseBody(
@@ -242,15 +244,14 @@ function responseBody(
   status: number,
 ): ComparisonBody | undefined {
   const response =
-    responses?.find((r) => r.statusCodes === status) ??
-    responses?.find(
-      (r) =>
-        typeof r.statusCodes === "object" &&
-        status >= r.statusCodes.start &&
-        status <= r.statusCodes.end,
-    );
-  const body = response?.responses.find((r) => r.body?.bodyKind === "single")?.body;
-  return body?.bodyKind === "single" ? body : undefined;
+    responses?.find((r) => matchesStatusCode(r.statusCodes, status)) ??
+    responses?.find((r) => containsStatusCode(r.statusCodes, status));
+  const selection = selectResponseBody(
+    response?.responses.flatMap(({ body }) => (body === undefined ? [] : [body])) ?? [],
+  );
+  return selection.kind === "body" && selection.body.bodyKind === "single"
+    ? selection.body
+    : undefined;
 }
 
 interface ComparisonBody {

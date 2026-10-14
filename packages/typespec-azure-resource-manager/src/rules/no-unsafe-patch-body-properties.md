@@ -51,6 +51,9 @@ asynchronous PATCH operations. Otherwise comparison uses, in order:
 4. Same-service, same-path GET 201 response body.
 
 Exact status codes take precedence over ranges containing the same code.
+Singleton ranges are exact status codes. Content variants with different body
+types, body kinds, or explicit-body metadata are ambiguous and are not used as
+comparison resources; identical body variants may be used.
 Without a comparison resource, only layout validation is skipped; immutable and
 partial-update safety checks still run.
 
