@@ -1,11 +1,11 @@
 import {
-  createRule,
-  fileRef,
   getLocationContext,
   isNeverType,
   isVoidType,
   paramMessage,
+  type DiagnosticMessages,
   type DiagnosticTarget,
+  type LinterRuleContext,
   type Model,
   type Operation,
   type Program,
@@ -28,123 +28,117 @@ import {
 } from "@typespec/versioning";
 import { getSingleNonNullMember, walkJsonProperties } from "./model-utils.js";
 
-export const patchPropertiesCorrespondToPutRule = createRule({
-  name: "patch-properties-correspond-to-put",
-  docs: fileRef.fromPackageRoot("src/rules/patch-properties-correspond-to-put.md"),
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/patch-properties-correspond-to-put",
-  description: "ARM PATCH body properties must correspond to properties in the PUT request body.",
-  severity: "warning",
-  messages: {
-    missingPatchBody: "The PATCH operation must have a request body.",
-    emptyPatchBody: "The PATCH request body must contain at least one property.",
-    missingProperty: paramMessage`The property '${"propertyName"}' in the PATCH body does not correspond to a property in the PUT body.`,
-  },
-  create(context) {
-    const metadataInfo = createMetadataInfo(context.program);
-    return {
-      root: (program) => {
-        const [services] = getAllHttpServices(program);
-        const missingProperties = new Map<DiagnosticTarget, Set<string>>();
-        for (const service of services) {
-          const missingPatchBodies = new Set<Operation>();
-          const emptyPatchBodies = new Set<Operation>();
+export const patchBodyMessages = {
+  missingPatchBody: "The PATCH operation must have a request body.",
+  emptyPatchBody: "The PATCH request body must contain at least one property.",
+  missingProperty: paramMessage`The property '${"propertyName"}' in the PATCH body does not correspond to a property in the PUT body.`,
+};
 
-          for (const version of resolveVersions(program, service.namespace)) {
-            const operationsByPath = new Map<
-              string,
-              { patch?: HttpOperation; put?: HttpOperation }
-            >();
-            for (const httpOperation of service.operations) {
-              if (
-                getLocationContext(program, httpOperation.operation).type !== "project" ||
-                !isAvailableAtVersion(program, httpOperation.operation, version) ||
-                (httpOperation.overloading !== undefined &&
-                  isOverloadSameEndpoint(
-                    httpOperation as HttpOperation & { overloading: HttpOperation },
-                  ))
-              ) {
-                continue;
-              }
-              if (httpOperation.verb !== "patch" && httpOperation.verb !== "put") {
-                continue;
-              }
-              const pair = operationsByPath.get(httpOperation.path) ?? {};
-              pair[httpOperation.verb] = httpOperation;
-              operationsByPath.set(httpOperation.path, pair);
+export function createPatchBodyListener(context: LinterRuleContext<DiagnosticMessages>) {
+  const metadataInfo = createMetadataInfo(context.program);
+  return {
+    root: (program: Program) => {
+      const [services] = getAllHttpServices(program);
+      const missingProperties = new Map<DiagnosticTarget, Set<string>>();
+      for (const service of services) {
+        const missingPatchBodies = new Set<Operation>();
+        const emptyPatchBodies = new Set<Operation>();
+
+        for (const version of resolveVersions(program, service.namespace)) {
+          const operationsByPath = new Map<
+            string,
+            { patch?: HttpOperation; put?: HttpOperation }
+          >();
+          for (const httpOperation of service.operations) {
+            if (
+              getLocationContext(program, httpOperation.operation).type !== "project" ||
+              !isAvailableAtVersion(program, httpOperation.operation, version) ||
+              (httpOperation.overloading !== undefined &&
+                isOverloadSameEndpoint(
+                  httpOperation as HttpOperation & { overloading: HttpOperation },
+                ))
+            ) {
+              continue;
             }
+            if (httpOperation.verb !== "patch" && httpOperation.verb !== "put") {
+              continue;
+            }
+            const pair = operationsByPath.get(httpOperation.path) ?? {};
+            pair[httpOperation.verb] = httpOperation;
+            operationsByPath.set(httpOperation.path, pair);
+          }
 
-            for (const { patch, put } of operationsByPath.values()) {
-              if (patch === undefined || put === undefined) {
-                continue;
-              }
-              const patchBody = getBodyAtVersion(program, patch, version);
-              if (patchBody === undefined || isVoidType(patchBody)) {
-                if (!missingPatchBodies.has(patch.operation)) {
-                  missingPatchBodies.add(patch.operation);
-                  context.reportDiagnostic({
-                    target: patch.operation,
-                    messageId: "missingPatchBody",
-                  });
-                }
-                continue;
-              }
-              if (patch.parameters.body?.bodyKind !== "single" || !isObjectBody(patchBody)) {
-                continue;
-              }
-
-              const patchProperties = collectLeafProperties(
-                program,
-                patchBody,
-                patch,
-                metadataInfo,
-                version,
-              );
-              if (patchProperties.length === 0) {
-                if (!emptyPatchBodies.has(patch.operation)) {
-                  emptyPatchBodies.add(patch.operation);
-                  context.reportDiagnostic({
-                    target: patch.operation,
-                    messageId: "emptyPatchBody",
-                  });
-                }
-                continue;
-              }
-              const putBody = getBodyAtVersion(program, put, version);
-              if (
-                putBody === undefined ||
-                put.parameters.body?.bodyKind !== "single" ||
-                !isObjectBody(putBody)
-              ) {
-                continue;
-              }
-              const putPropertyNames = new Set(
-                collectLeafProperties(program, putBody, put, metadataInfo, version).map(
-                  (property) => property.jsonName,
-                ),
-              );
-              for (const patchProperty of patchProperties) {
-                if (putPropertyNames.has(patchProperty.jsonName)) {
-                  continue;
-                }
-                const reportedNames = missingProperties.get(patchProperty.target) ?? new Set();
-                if (reportedNames.has(patchProperty.jsonName)) {
-                  continue;
-                }
-                reportedNames.add(patchProperty.jsonName);
-                missingProperties.set(patchProperty.target, reportedNames);
+          for (const { patch, put } of operationsByPath.values()) {
+            if (patch === undefined || put === undefined) {
+              continue;
+            }
+            const patchBody = getBodyAtVersion(program, patch, version);
+            if (patchBody === undefined || isVoidType(patchBody)) {
+              if (!missingPatchBodies.has(patch.operation)) {
+                missingPatchBodies.add(patch.operation);
                 context.reportDiagnostic({
-                  target: patchProperty.target,
-                  messageId: "missingProperty",
-                  format: { propertyName: patchProperty.jsonName },
+                  target: patch.operation,
+                  messageId: "missingPatchBody",
                 });
               }
+              continue;
+            }
+            if (patch.parameters.body?.bodyKind !== "single" || !isObjectBody(patchBody)) {
+              continue;
+            }
+
+            const patchProperties = collectLeafProperties(
+              program,
+              patchBody,
+              patch,
+              metadataInfo,
+              version,
+            );
+            if (patchProperties.length === 0) {
+              if (!emptyPatchBodies.has(patch.operation)) {
+                emptyPatchBodies.add(patch.operation);
+                context.reportDiagnostic({
+                  target: patch.operation,
+                  messageId: "emptyPatchBody",
+                });
+              }
+              continue;
+            }
+            const putBody = getBodyAtVersion(program, put, version);
+            if (
+              putBody === undefined ||
+              put.parameters.body?.bodyKind !== "single" ||
+              !isObjectBody(putBody)
+            ) {
+              continue;
+            }
+            const putPropertyNames = new Set(
+              collectLeafProperties(program, putBody, put, metadataInfo, version).map(
+                (property) => property.jsonName,
+              ),
+            );
+            for (const patchProperty of patchProperties) {
+              if (putPropertyNames.has(patchProperty.jsonName)) {
+                continue;
+              }
+              const reportedNames = missingProperties.get(patchProperty.target) ?? new Set();
+              if (reportedNames.has(patchProperty.jsonName)) {
+                continue;
+              }
+              reportedNames.add(patchProperty.jsonName);
+              missingProperties.set(patchProperty.target, reportedNames);
+              context.reportDiagnostic({
+                target: patchProperty.target,
+                messageId: "missingProperty",
+                format: { propertyName: patchProperty.jsonName },
+              });
             }
           }
         }
-      },
-    };
-  },
-});
+      }
+    },
+  };
+}
 
 type LeafProperty = {
   jsonName: string;

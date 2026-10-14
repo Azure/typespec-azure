@@ -7,9 +7,11 @@ import {
 } from "@typespec/compiler/testing";
 
 import { beforeEach, describe, it } from "vitest";
-import { patchPropertiesCorrespondToPutRule } from "../../src/rules/patch-properties-correspond-to-put.js";
+import { armResourceOperationsRule } from "../../src/rules/arm-resource-operation-response.js";
+import { patchOperationsRule } from "../../src/rules/arm-resource-patch.js";
+import { useOperationDecoratorRule } from "../../src/rules/use-operation-decorator.js";
 
-const code = "@azure-tools/typespec-azure-resource-manager/patch-properties-correspond-to-put";
+const code = "@azure-tools/typespec-azure-resource-manager/arm-resource-patch";
 
 let tester: LinterRuleTester;
 
@@ -17,12 +19,44 @@ beforeEach(async () => {
   const runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    patchPropertiesCorrespondToPutRule,
+    patchOperationsRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
 
-describe("patch-properties-correspond-to-put", () => {
+describe("arm-resource-patch input properties", () => {
+  it("does not assume resource identity and registration imply writable-input transitivity", async () => {
+    const source = `
+      @service @armProviderNamespace namespace Microsoft.TestService;
+      model Widget is TrackedResource<{
+        common?: string;
+        @visibility(Lifecycle.Update) updateOnly?: string;
+      }> { ...ResourceNameParameter<Widget>; }
+      model WidgetPatch {
+        tags?: Record<string>;
+        properties?: { updateOnly?: string; };
+      }
+      @armResourceOperations interface Widgets {
+        @parameterVisibility(Lifecycle.Create)
+        create is ArmResourceCreateOrReplaceSync<Widget>;
+        update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+      }
+    `;
+    for (const rule of [armResourceOperationsRule, useOperationDecoratorRule]) {
+      await createLinterRuleTester(
+        await Tester.createInstance(),
+        rule,
+        "@azure-tools/typespec-azure-resource-manager",
+      )
+        .expect(source)
+        .toBeValid();
+    }
+    await tester.expect(source).toEmitDiagnostics({
+      ...missingProperty("updateOnly"),
+      target: "updateOnly",
+    });
+  });
+
   describe("semantic examples", () => {
     const FixtureTester = createTester(resolvePath(import.meta.dirname, "../.."), {
       libraries: [
@@ -112,7 +146,7 @@ interface Widgets {
     beforeEach(async () => {
       fixtureTester = createLinterRuleTester(
         await FixtureTester.createInstance(),
-        patchPropertiesCorrespondToPutRule,
+        patchOperationsRule,
         "@azure-tools/typespec-azure-resource-manager",
       );
     });
