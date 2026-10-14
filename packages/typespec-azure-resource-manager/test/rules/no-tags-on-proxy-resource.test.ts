@@ -175,6 +175,22 @@ describe("valid cases", () => {
       )
       .toBeValid();
   });
+  it("uses the derived property's JSON name instead of a shadowed base property", async () => {
+    const diagnostics = await runner.diagnose(
+      `
+      @armProviderNamespace namespace MyService;
+      model TaggedResource<T extends {}> is ProxyResource<T> {
+        @key @segment("widgets") name: string;
+        tags?: Record<string>;
+      }
+      model Widget extends TaggedResource<{}> {
+        @encodedName("application/json", "labels") tags?: Record<string>;
+      }
+    `,
+      { compilerOptions: { linterRuleSet: { enable: { [ruleCode]: true } } } },
+    );
+    expectDiagnostics(diagnostics, [{ code: ruleCode, message: /'TaggedResource'/ }]);
+  });
 
   it("is valid for a tracked resource with tags", async () => {
     await tester

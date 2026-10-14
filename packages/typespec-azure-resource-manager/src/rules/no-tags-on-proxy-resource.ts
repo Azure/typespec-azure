@@ -2,7 +2,6 @@ import {
   createRule,
   fileRef,
   paramMessage,
-  resolveEncodedName,
   type CodeFix,
   type Model,
   type ModelProperty,
@@ -12,6 +11,7 @@ import { SyntaxKind } from "@typespec/compiler/ast";
 
 import { createDeletePropertyCodeFix } from "../codefixes/delete-property.js";
 import { getArmResources } from "../resource.js";
+import { walkJsonProperties } from "./model-utils.js";
 
 export const noTagsOnProxyResourceRule = createRule({
   name: "no-tags-on-proxy-resource",
@@ -73,11 +73,9 @@ function getPropertyInHierarchy(
   model: Model,
   jsonName: string,
 ): ModelProperty | undefined {
-  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
-    for (const property of current.properties.values()) {
-      if (resolveEncodedName(program, property, "application/json") === jsonName) {
-        return property;
-      }
+  for (const [name, property] of walkJsonProperties(program, model)) {
+    if (name === jsonName) {
+      return property;
     }
   }
 
