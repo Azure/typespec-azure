@@ -695,3 +695,22 @@ it("honors the standard suppression through the compiler pipeline", async () => 
     compilerOptions: { linterRuleSet: { enable: { [code]: true } } },
   });
 });
+
+it.each([
+  [
+    "bodyless legacy PUT",
+    `${models}
+      #suppress "${code}" "Existing API intentionally accepts no request body."
+      @put op put(): Ok<Widget>;`,
+  ],
+  [
+    "legacy unregistered payload",
+    `model Plain { value: string; }
+      #suppress "${code}" "Existing API uses a legacy non-resource payload."
+      @put op put(@body body: Plain): Plain;`,
+  ],
+])("honors an operation-level suppression for %s", async (_, source) => {
+  await Tester.compile(source, {
+    compilerOptions: { linterRuleSet: { enable: { [code]: true } } },
+  });
+});

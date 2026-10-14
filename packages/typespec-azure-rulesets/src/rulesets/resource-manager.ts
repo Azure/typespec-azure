@@ -78,8 +78,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-no-key": true,
     "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage": true,
     "@azure-tools/typespec-azure-resource-manager/arm-feature-file-usage-discourage": true,
-    // Consolidated PUT body checks require rollout across existing ARM specifications.
-    "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response": false,
+    "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": true,
     "@azure-tools/typespec-azure-resource-manager/no-reserved-resource-property": true,
