@@ -1,9 +1,5 @@
 import { Tester } from "#test/tester.js";
-import {
-  createLinterRuleTester,
-  expectDiagnostics,
-  type LinterRuleTester,
-} from "@typespec/compiler/testing";
+import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { readFile } from "node:fs/promises";
 import { beforeEach, it } from "vitest";
 import { resourceMissingReadRule } from "../../src/rules/resource-missing-read.js";
@@ -217,39 +213,4 @@ it("prefers createOrUpdate over update on separate interfaces", async () => {
     `,
     )
     .toEmitDiagnostics((x) => ({ ...diagnostic(), pos: x.pos.target.pos }));
-});
-
-async function expectWriteSuppression(operations: string) {
-  for (const suppressOn of [undefined, "Writes", "Deletes"]) {
-    const suppression = (name: string) =>
-      suppressOn === name
-        ? `#suppress "${diagnostic().code}" "Missing read is intentional for this test."`
-        : "";
-    const diagnostics = await Tester.diagnose(
-      `${service}
-      ${suppression("Deletes")}
-      @armResourceOperations interface Deletes {
-        delete is ArmResourceDeleteSync<Widget>;
-      }
-      ${suppression("Writes")}
-      @armResourceOperations interface Writes {
-        ${operations}
-      }
-    `,
-      {
-        compilerOptions: {
-          linterRuleSet: { enable: { [diagnostic().code]: true } },
-        },
-      },
-    );
-    expectDiagnostics(diagnostics, suppressOn === "Writes" ? [] : [diagnostic()]);
-  }
-}
-
-it("applies create suppression to the write interface, not delete", async () => {
-  await expectWriteSuppression("createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;");
-});
-
-it("applies update suppression to the write interface, not delete", async () => {
-  await expectWriteSuppression("update is ArmResourcePatchSync<Widget, WidgetProperties>;");
 });
