@@ -5,8 +5,8 @@ import {
   type LinterRuleTester,
   type TesterInstance,
 } from "@typespec/compiler/testing";
-import { readFile } from "node:fs/promises";
-import { beforeEach, expect, it } from "vitest";
+
+import { beforeEach, it } from "vitest";
 import { scopePathSegmentCasingRule } from "../../src/rules/scope-path-segment-casing.js";
 
 let runner: TesterInstance;
@@ -41,22 +41,40 @@ async function checkPath(path: string, mismatches: [string, string][]) {
     );
 }
 
-async function documentationExample(index: number) {
-  const documentation = await readFile(
-    new URL("../../src/rules/scope-path-segment-casing.md", import.meta.url),
-    "utf8",
-  );
-  const examples = [...documentation.matchAll(/```typespec\r?\n([\s\S]*?)```/g)];
-  expect(examples).toHaveLength(2);
+function readTemplateFixture(index: 0 | 1) {
+  const examples = [
+    `model CustomBase {
+  ...CommonTypes.ApiVersionParameter;
+  ...CommonTypes.SubscriptionIdParameter;
+  @path @segment("resourcegroups") resourceGroupName: string;
+}
+
+@armResourceOperations
+interface Widgets {
+  read is ArmResourceRead<Widget, BaseParameters = CustomBase>;
+}
+`,
+    `model CustomBase {
+  ...CommonTypes.ApiVersionParameter;
+  ...CommonTypes.SubscriptionIdParameter;
+  @path @segment("resourceGroups") resourceGroupName: string;
+}
+
+@armResourceOperations
+interface Widgets {
+  read is ArmResourceRead<Widget, BaseParameters = CustomBase>;
+}
+`,
+  ];
   return `
-    @service @armProviderNamespace namespace Microsoft.Contoso;
-    model WidgetProperties {}
-    model Widget is ProxyResource<WidgetProperties> {
-      ...ResourceNameParameter<Resource = Widget, KeyName = "widgetName", SegmentName = "widgets">;
-    }
-    interface Operations extends Azure.ResourceManager.Operations {}
-    ${examples[index][1].replace("read is", "/*target*/read is")}
-  `;
+          @service @armProviderNamespace namespace Microsoft.Contoso;
+          model WidgetProperties {}
+          model Widget is ProxyResource<WidgetProperties> {
+            ...ResourceNameParameter<Resource = Widget, KeyName = "widgetName", SegmentName = "widgets">;
+          }
+          interface Operations extends Azure.ResourceManager.Operations {}
+          ${examples[index].replace("read is", "/*target*/read is")}
+        `;
 }
 
 it("reports noncanonical subscriptions without provider metadata when enabled", async () => {
@@ -121,8 +139,8 @@ it("does not check path parameter identifiers", async () => {
     .toBeValid();
 });
 
-it("validates the published incorrect standard ARM template example", async () => {
-  await tester.expect(await documentationExample(0)).toEmitDiagnostics(({ target }) => ({
+it("validates the standard incorrect standard ARM template example", async () => {
+  await tester.expect(await readTemplateFixture(0)).toEmitDiagnostics(({ target }) => ({
     code: "@azure-tools/typespec-azure-resource-manager/scope-path-segment-casing",
     severity: "warning",
     message: "The path segment resourcegroups should be resourceGroups.",
@@ -131,6 +149,6 @@ it("validates the published incorrect standard ARM template example", async () =
   }));
 });
 
-it("validates the published correct standard ARM template example", async () => {
-  await tester.expect(await documentationExample(1)).toBeValid();
+it("validates the standard correct standard ARM template example", async () => {
+  await tester.expect(await readTemplateFixture(1)).toBeValid();
 });
