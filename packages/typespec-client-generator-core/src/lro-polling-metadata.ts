@@ -10,13 +10,15 @@ import {
   type Operation,
   walkPropertiesInherited,
 } from "@typespec/compiler";
-import { getLroInstanceIdDecorators, getLroPollingMetadataDecorators } from "./decorators.js";
+import { $ } from "@typespec/compiler/typekit";
+import { getLroOperationIdDecorators, getLroPollingMetadataDecorators } from "./decorators.js";
 import type { TCGCContext } from "./interfaces.js";
 import { createDiagnostic } from "./lib.js";
 import { getLibraryName } from "./public-utils.js";
+import type { SdkPropertyVisibilityPredicate } from "./types.js";
 
 export interface ResolvedLroPollingMetadata {
-  instanceIdStrategy?: "lastPathSegment";
+  operationIdStrategy?: "lastPathSegment";
   properties: ModelProperty[];
 }
 
@@ -33,11 +35,14 @@ export function getStatusMonitorLink<TLink>(
     : statusMonitorStep?.target.link;
 }
 
-function getLroInstanceIdLink(
+/** @internal */
+export function getLroOperationIdLink(
+  context: TCGCContext,
   statusMonitorStep: LroMetadata["statusMonitorStep"],
 ): OperationLink | undefined {
   const link = getStatusMonitorLink(statusMonitorStep);
-  return link?.location === "Self" ? undefined : link;
+  if (link?.location !== "Self") return link;
+  return $(context.program).scalar.extendsUrl(link.property.type) ? link : undefined;
 }
 
 const resolutionCache = new WeakMap<
@@ -48,6 +53,7 @@ const resolutionCache = new WeakMap<
 export function resolveLroPollingMetadata(
   context: TCGCContext,
   operation: Operation,
+  isPropertyVisible: SdkPropertyVisibilityPredicate,
 ): [ResolvedLroPollingMetadata | undefined, readonly Diagnostic[]] {
   let contextCache = resolutionCache.get(context);
   if (!contextCache) {
@@ -59,7 +65,7 @@ export function resolveLroPollingMetadata(
     return [cached, []];
   }
 
-  const [value, diagnostics] = resolve(context, operation);
+  const [value, diagnostics] = resolve(context, operation, isPropertyVisible);
   contextCache.set(operation, value);
   return [value, diagnostics];
 }
@@ -67,16 +73,17 @@ export function resolveLroPollingMetadata(
 function resolve(
   context: TCGCContext,
   operation: Operation,
+  isPropertyVisible: SdkPropertyVisibilityPredicate,
 ): [ResolvedLroPollingMetadata | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const instanceIdDecorators = getLroInstanceIdDecorators(context, operation);
+  const operationIdDecorators = getLroOperationIdDecorators(context, operation);
 
   const raw = getLroMetadata(context.program, operation);
   if (!raw) {
-    if (instanceIdDecorators.length > 0) {
+    if (operationIdDecorators.length > 0) {
       diagnostics.add(
         createDiagnostic({
-          code: "lro-instance-id-non-lro",
+          code: "lro-operation-id-non-lro",
           target: operation,
         }),
       );
@@ -84,33 +91,34 @@ function resolve(
     return diagnostics.wrap(undefined);
   }
 
-  if (instanceIdDecorators.length > 1) {
+  if (operationIdDecorators.length > 1) {
     diagnostics.add(
       createDiagnostic({
-        code: "lro-instance-id-duplicate",
-        target: instanceIdDecorators[1].target,
+        code: "lro-operation-id-duplicate",
+        target: operationIdDecorators[1].target,
       }),
     );
   }
 
-  let instanceIdStrategy: "lastPathSegment" | undefined = instanceIdDecorators[0]?.strategy;
-  if (instanceIdStrategy && !getLroInstanceIdLink(raw.statusMonitorStep)) {
+  let operationIdStrategy: "lastPathSegment" | undefined = operationIdDecorators[0]?.strategy;
+  if (operationIdStrategy && !getLroOperationIdLink(context, raw.statusMonitorStep)) {
     diagnostics.add(
       createDiagnostic({
-        code: "lro-instance-id-missing-link",
-        target: instanceIdDecorators[0].target,
+        code: "lro-operation-id-missing-link",
+        target: operationIdDecorators[0].target,
       }),
     );
-    instanceIdStrategy = undefined;
+    operationIdStrategy = undefined;
   }
 
   const properties: ModelProperty[] = [];
   const seenNames = new Set<string>();
-  if (instanceIdStrategy) {
-    seenNames.add("instanceId");
+  if (operationIdStrategy) {
+    seenNames.add("operationId");
   }
 
   for (const property of walkPropertiesInherited(raw.pollingInfo.responseModel)) {
+    if (!isPropertyVisible(context, property)) continue;
     const metadataDecorators = getLroPollingMetadataDecorators(context, property);
     if (metadataDecorators.length === 0) continue;
 
@@ -139,8 +147,8 @@ function resolve(
     properties.push(property);
   }
 
-  if (!instanceIdStrategy && properties.length === 0 && diagnostics.diagnostics.length === 0) {
+  if (!operationIdStrategy && properties.length === 0 && diagnostics.diagnostics.length === 0) {
     return diagnostics.wrap(undefined);
   }
-  return diagnostics.wrap({ instanceIdStrategy, properties });
+  return diagnostics.wrap({ operationIdStrategy, properties });
 }

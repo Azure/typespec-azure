@@ -21,7 +21,7 @@ import {
   $disablePageable,
   $flattenProperty,
   $legacyHierarchyBuilding,
-  $lroInstanceId,
+  $lroOperationId,
   $lroPollingMetadata,
   $markAsLro,
   $markAsPageable,
@@ -73,7 +73,7 @@ export const $decorators = {
     clientDoc: $clientDoc,
     clientLocation: $clientLocation,
     clientOption: $clientOption,
-    lroInstanceId: $lroInstanceId,
+    lroOperationId: $lroOperationId,
     lroPollingMetadata: $lroPollingMetadata,
   } satisfies AzureClientGeneratorCoreDecorators,
 

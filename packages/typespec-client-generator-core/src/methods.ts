@@ -92,6 +92,7 @@ import {
   getSdkModelPropertyType,
   getSdkModelPropertyTypeBase,
   getSdkModelWithDiagnostics,
+  isVisibleSdkProperty,
 } from "./types.js";
 
 function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
@@ -410,8 +411,10 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
 
   const finalResponse = getFinalResponse();
   const statusMonitorStep = getStatusMonitorStep(context, rawMetadata.statusMonitorStep);
-  const instanceIdSource = getStatusMonitorLink(statusMonitorStep);
-  const pollingCustomization = diagnostics.pipe(resolveLroPollingMetadata(context, operation));
+  const operationIdSource = getStatusMonitorLink(statusMonitorStep);
+  const pollingCustomization = diagnostics.pipe(
+    resolveLroPollingMetadata(context, operation, isVisibleSdkProperty),
+  );
   const pollingMetadata =
     pollingCustomization?.properties.map((property) =>
       diagnostics.pipe(getSdkModelPropertyType(context, property)),
@@ -440,11 +443,11 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     logicalPath: rawMetadata.logicalPath,
     finalEnvelopeResult: finalResponse ? finalResponse.envelopeResult : "void",
     finalResultPath: rawMetadata.finalResultPath,
-    ...(pollingCustomization?.instanceIdStrategy && instanceIdSource
+    ...(pollingCustomization?.operationIdStrategy && operationIdSource
       ? {
-          instanceId: {
-            source: instanceIdSource,
-            strategy: pollingCustomization.instanceIdStrategy,
+          operationId: {
+            source: operationIdSource,
+            strategy: pollingCustomization.operationIdStrategy,
           } as const,
         }
       : {}),

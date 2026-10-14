@@ -2,7 +2,7 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
 import { type SdkLroServiceMethod, UsageFlags } from "../../src/interfaces.js";
-import { getStatusMonitorLink } from "../../src/lro-polling-metadata.js";
+import { getLroOperationIdLink, getStatusMonitorLink } from "../../src/lro-polling-metadata.js";
 import { AzureCoreTester, createSdkContextForTester } from "../tester.js";
 
 const Tester = AzureCoreTester.wrap(
@@ -68,7 +68,7 @@ op getJobStatus is ResourceOperations.ResourceRead<JobState>;
 
 @route("/jobs")
 @pollingOperation(getJobStatus)
-@lroInstanceId("lastPathSegment")
+@lroOperationId("lastPathSegment")
 op start is Azure.Core.Foundations.LongRunningOperation<
   {},
   AcceptedResponse,
@@ -112,14 +112,14 @@ describe("LRO polling metadata", () => {
     strictEqual(getStatusMonitorLink(sdkStep), sdkLink);
   });
 
-  it("requires a supported instance ID strategy", async () => {
+  it("requires a supported operation ID strategy", async () => {
     const diagnostics = await Tester.diagnose(
       operation.replace("lastPathSegment", "firstPathSegment"),
     );
     expectDiagnostics(diagnostics, { code: "invalid-argument" });
   });
 
-  it("exposes the URI-derived instance ID source and exact typed polling properties", async () => {
+  it("exposes the URI-derived operation ID source and exact typed polling properties", async () => {
     const { program } = await Tester.compile(operation);
     const context = await createSdkContextForTester(
       program,
@@ -131,9 +131,9 @@ describe("LRO polling metadata", () => {
     strictEqual(method.kind, "lro");
 
     const lro = method as SdkLroServiceMethod<any>;
-    strictEqual(lro.lroMetadata.instanceId?.strategy, "lastPathSegment");
+    strictEqual(lro.lroMetadata.operationId?.strategy, "lastPathSegment");
     strictEqual(
-      lro.lroMetadata.instanceId?.source,
+      lro.lroMetadata.operationId?.source,
       lro.lroMetadata.statusMonitorStep?.kind === "nextOperationLink"
         ? lro.lroMetadata.statusMonitorStep.target
         : undefined,
@@ -171,7 +171,7 @@ describe("LRO polling metadata", () => {
     const context = await createSdkContextForTester(program);
     const { program: undecoratedProgram } = await Tester.compile(
       operation
-        .replace('@lroInstanceId("lastPathSegment")\n', "")
+        .replace('@lroOperationId("lastPathSegment")\n', "")
         .replaceAll(/ {2}@lroPollingMetadata(?:\([^)]*\))?\n/g, ""),
     );
     const undecoratedContext = await createSdkContextForTester(undecoratedProgram);
@@ -215,6 +215,46 @@ describe("LRO polling metadata", () => {
     ]);
   });
 
+  it("excludes scoped-out polling properties and their type graphs", async () => {
+    const { program } = await Tester.compile(
+      operation.replace(
+        "@lroPollingMetadata\n  details",
+        '@scope("!python")\n  @lroPollingMetadata\n  details',
+      ),
+    );
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
+    ok(method);
+    strictEqual(method.kind, "lro");
+    expect(
+      method.lroMetadata.pollingInfo.responseModel.properties.map((x) => x.name),
+    ).not.toContain("details");
+    expect(method.lroMetadata.pollingMetadata?.map((x) => x.name)).not.toContain("details");
+    expect(context.sdkPackage.models.find((x) => x.name === "Details")).toBeUndefined();
+    expect(context.sdkPackage.enums.find((x) => x.name === "DetailMode")).toBeUndefined();
+  });
+
+  it("excludes lifecycle-invisible polling properties and their type graphs", async () => {
+    const { program } = await Tester.compile(
+      operation.replace(
+        "@lroPollingMetadata\n  details",
+        "@invisible(Lifecycle)\n  @lroPollingMetadata\n  details",
+      ),
+    );
+    const context = await createSdkContextForTester(program);
+    const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
+    ok(method);
+    strictEqual(method.kind, "lro");
+    expect(
+      method.lroMetadata.pollingInfo.responseModel.properties.map((x) => x.name),
+    ).not.toContain("details");
+    expect(method.lroMetadata.pollingMetadata?.map((x) => x.name)).not.toContain("details");
+    expect(context.sdkPackage.models.find((x) => x.name === "Details")).toBeUndefined();
+    expect(context.sdkPackage.enums.find((x) => x.name === "DetailMode")).toBeUndefined();
+  });
+
   it("preserves internal access for internal operations", async () => {
     const { program } = await Tester.compile(
       operation
@@ -227,6 +267,33 @@ describe("LRO polling metadata", () => {
     strictEqual(details.access, "internal");
     expect(context.diagnostics.map((x) => x.code)).not.toContain(
       "@azure-tools/typespec-client-generator-core/lro-polling-metadata-internal-conflict",
+    );
+  });
+
+  it("preserves a selected property's scoped internal access through its graph", async () => {
+    const { program } = await Tester.compile(
+      operation.replace(
+        "@lroPollingMetadata\n  details",
+        '@access(Access.internal, "python")\n  @lroPollingMetadata\n  details',
+      ),
+    );
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
+    const details = context.sdkPackage.models.find((x) => x.name === "Details");
+    const detailMode = context.sdkPackage.enums.find((x) => x.name === "DetailMode");
+    ok(method);
+    ok(details);
+    ok(detailMode);
+    strictEqual(method.kind, "lro");
+    const property = method.lroMetadata.pollingMetadata?.find((x) => x.name === "details");
+    ok(property);
+    strictEqual(property.type, details);
+    strictEqual(details.access, "internal");
+    strictEqual(detailMode.access, "internal");
+    expect(context.diagnostics.map((x) => x.code)).not.toContain(
+      "@azure-tools/typespec-client-generator-core/conflict-access-override",
     );
   });
 
@@ -249,17 +316,17 @@ describe("LRO polling metadata", () => {
     expect(csharpDetails.usage & UsageFlags.Input).toBe(0);
   });
 
-  it("reports invalid instance IDs, duplicates, conflicts, and explicit internal exposure", async () => {
+  it("reports invalid operation IDs, duplicates, conflicts, and explicit internal exposure", async () => {
     const invalidCases = [
       {
         code: `
 model Value { value: string; }
 @Azure.ClientGenerator.Core.Legacy.markAsLro
-@lroInstanceId("lastPathSegment")
+@lroOperationId("lastPathSegment")
 @route("/ordinary")
 op ordinary(): Value;
 `,
-        diagnostic: "lro-instance-id-non-lro",
+        diagnostic: "lro-operation-id-non-lro",
       },
       {
         code: operation.replace(
@@ -276,7 +343,7 @@ op ordinary(): Value;
         diagnostic: "lro-polling-metadata-name-conflict",
       },
       {
-        code: operation.replace('@clientName("requestToken")', '@clientName("instanceId")'),
+        code: operation.replace('@clientName("requestToken")', '@clientName("operationId")'),
         diagnostic: "lro-polling-metadata-name-conflict",
       },
       {
@@ -285,10 +352,10 @@ op ordinary(): Value;
       },
       {
         code: operation.replace(
-          '@lroInstanceId("lastPathSegment")',
-          '@lroInstanceId("lastPathSegment")\n@lroInstanceId("lastPathSegment")',
+          '@lroOperationId("lastPathSegment")',
+          '@lroOperationId("lastPathSegment")\n@lroOperationId("lastPathSegment")',
         ),
-        diagnostic: "lro-instance-id-duplicate",
+        diagnostic: "lro-operation-id-duplicate",
       },
     ];
 
@@ -363,7 +430,7 @@ op startSecond is Azure.Core.Foundations.LongRunningOperation<
 
   it("ignores an overridden decorated base property", async () => {
     const { program } = await Tester.compile(
-      operation.replace('@clientName("requestToken")', '@clientName("instanceId")').replace(
+      operation.replace('@clientName("requestToken")', '@clientName("operationId")').replace(
         "model JobState extends PollingMetadataBase {",
         `model JobState extends PollingMetadataBase {
   request_token: string;`,
@@ -416,7 +483,7 @@ model PollingStatus {
 })
 @route("/widgets/{id}")
 @put
-@lroInstanceId("lastPathSegment")
+@lroOperationId("lastPathSegment")
 op createWidget(@path id: string): {
   @statusCode _: 202;
   @header id: string;
@@ -431,23 +498,81 @@ op createWidget(@path id: string): {
     if (method.lroMetadata.statusMonitorStep?.kind === "nextOperationReference") {
       strictEqual(method.lroMetadata.statusMonitorStep.target.link, undefined);
     }
-    strictEqual(method.lroMetadata.instanceId, undefined);
+    strictEqual(method.lroMetadata.operationId, undefined);
     expect(context.diagnostics.map((x) => x.code)).toContain(
-      "@azure-tools/typespec-client-generator-core/lro-instance-id-missing-link",
+      "@azure-tools/typespec-client-generator-core/lro-operation-id-missing-link",
+    );
+  });
+
+  it("accepts a URL-valued polling location in the response body", async () => {
+    const { program } = await Tester.compile(`
+model Monitor {
+  @lroStatus status: LroStatus;
+}
+
+@route("/widgets")
+@post
+@lroOperationId("lastPathSegment")
+op createWidget(): {
+  @statusCode _: 202;
+  @pollingLocation
+  @body
+  location: ResourceLocation<Monitor>;
+};
+`);
+    const context = await createSdkContextForTester(program);
+    const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "createWidget");
+    ok(method);
+    strictEqual(method.kind, "lro");
+    strictEqual(method.lroMetadata.statusMonitorStep?.kind, "nextOperationLink");
+    if (method.lroMetadata.statusMonitorStep?.kind === "nextOperationLink") {
+      strictEqual(method.lroMetadata.statusMonitorStep.target.location, "Self");
+      strictEqual(
+        method.lroMetadata.operationId?.source,
+        method.lroMetadata.statusMonitorStep.target,
+      );
+    }
+    strictEqual(method.lroMetadata.operationId?.strategy, "lastPathSegment");
+    expect(context.diagnostics.map((x) => x.code)).not.toContain(
+      "@azure-tools/typespec-client-generator-core/lro-operation-id-missing-link",
+    );
+  });
+
+  it("rejects a stepwise Self link whose body value is not a URI", async () => {
+    const { program, Monitor } = await Tester.compile(`
+@test model Monitor {
+  @lroStatus status: LroStatus;
+}
+`);
+    const context = await createSdkContextForTester(program);
+    const property = Monitor.properties.get("status");
+    ok(property);
+    const link = {
+      kind: "link",
+      location: "Self",
+      property,
+    } as const;
+    strictEqual(
+      getLroOperationIdLink(context, {
+        kind: "nextOperationLink",
+        responseModel: Monitor,
+        target: link,
+      }),
+      undefined,
     );
   });
 
   it("does not change undecorated LRO metadata", async () => {
     const { program } = await Tester.compile(
       operation
-        .replace('@lroInstanceId("lastPathSegment")\n', "")
+        .replace('@lroOperationId("lastPathSegment")\n', "")
         .replaceAll(/ {2}@lroPollingMetadata(?:\([^)]*\))?\n/g, ""),
     );
     const context = await createSdkContextForTester(program);
     const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
     ok(method);
     strictEqual(method.kind, "lro");
-    strictEqual(method.lroMetadata.instanceId, undefined);
+    strictEqual(method.lroMetadata.operationId, undefined);
     strictEqual(method.lroMetadata.pollingMetadata, undefined);
   });
 
@@ -481,7 +606,7 @@ op start(): StartResponse;`,
     const method = context.sdkPackage.clients[0].methods.find((x) => x.name === "start");
     ok(method);
     strictEqual(method.kind, "lropaging");
-    strictEqual(method.lroMetadata.instanceId?.strategy, "lastPathSegment");
+    strictEqual(method.lroMetadata.operationId?.strategy, "lastPathSegment");
     expect(method.lroMetadata.pollingMetadata?.map((x) => x.name)).toEqual([
       "percentComplete",
       "details",

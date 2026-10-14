@@ -50,7 +50,7 @@ import type {
   ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
-  LroInstanceIdDecorator,
+  LroOperationIdDecorator,
   LroPollingMetadataDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
@@ -113,30 +113,30 @@ interface ScopedLroDecorator {
   target: DiagnosticTarget;
 }
 
-interface ScopedLroInstanceIdDecorator extends ScopedLroDecorator {
+interface ScopedLroOperationIdDecorator extends ScopedLroDecorator {
   strategy: "lastPathSegment";
 }
 
-const lroInstanceIdKey = createStateSymbol("lroInstanceId");
+const lroOperationIdKey = createStateSymbol("lroOperationId");
 const lroPollingMetadataKey = createStateSymbol("lroPollingMetadata");
-const [getLroInstanceIdEntries, setLroInstanceIdEntries] = useStateMap<
+const [getLroOperationIdEntries, setLroOperationIdEntries] = useStateMap<
   Operation,
-  ScopedLroInstanceIdDecorator[]
->(lroInstanceIdKey);
+  ScopedLroOperationIdDecorator[]
+>(lroOperationIdKey);
 const [getLroPollingMetadataEntries, setLroPollingMetadataEntries] = useStateMap<
   ModelProperty,
   ScopedLroDecorator[]
 >(lroPollingMetadataKey);
 
-export const $lroInstanceId: LroInstanceIdDecorator = (
+export const $lroOperationId: LroOperationIdDecorator = (
   context: DecoratorContext,
   target: Operation,
   strategy: "lastPathSegment",
   scope?: LanguageScopes | DecoratorOptions,
 ) => {
-  const entries = getLroInstanceIdEntries(context.program, target) ?? [];
+  const entries = getLroOperationIdEntries(context.program, target) ?? [];
   entries.unshift({ strategy, scope: normalizeScope(scope), target: context.decoratorTarget });
-  setLroInstanceIdEntries(context.program, target, entries);
+  setLroOperationIdEntries(context.program, target, entries);
 };
 
 export const $lroPollingMetadata: LroPollingMetadataDecorator = (
@@ -149,11 +149,11 @@ export const $lroPollingMetadata: LroPollingMetadataDecorator = (
   setLroPollingMetadataEntries(context.program, target, entries);
 };
 
-export function getLroInstanceIdDecorators(
+export function getLroOperationIdDecorators(
   context: TCGCContext,
   target: Operation,
-): ScopedLroInstanceIdDecorator[] {
-  return (getLroInstanceIdEntries(context.program, target) ?? []).filter(
+): ScopedLroOperationIdDecorator[] {
+  return (getLroOperationIdEntries(context.program, target) ?? []).filter(
     (entry) => !entry.scope || isScopeApplicable(entry.scope, context.emitterName),
   );
 }

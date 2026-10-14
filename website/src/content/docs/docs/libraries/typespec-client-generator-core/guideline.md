@@ -342,7 +342,7 @@ The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native C
 
 #### LRO polling metadata
 
-TCGC-only `@lroInstanceId` and `@lroPollingMetadata` decorators let an SDK expose status-monitor
+TCGC-only `@lroOperationId` and `@lroPollingMetadata` decorators let an SDK expose status-monitor
 metadata without changing Azure.Core polling protocol semantics or the normal method response:
 
 ```typespec
@@ -356,13 +356,15 @@ model OperationStatus {
   requestId?: string;
 }
 
-@lroInstanceId("lastPathSegment")
+@lroOperationId("lastPathSegment")
 op begin is MyLongRunningOperation;
 ```
 
-`SdkLroServiceMetadata.instanceId` contains the exact `SdkOperationLink` used by the status monitor
+`SdkLroServiceMetadata.operationId` contains the exact `SdkOperationLink` used by the status monitor
 and the selected `lastPathSegment` strategy. For example, `/analyzerResults/abc123` produces
-`abc123`. The strategy does not promise percent-decoding, storage, or a common runtime lifecycle;
+`abc123`. This is the server-issued operation ID represented by the final status-monitor URL path
+segment. It does not drive polling and is distinct from a caller-supplied `Operation-Id` API
+parameter. The strategy does not promise percent-decoding, storage, or a common runtime lifecycle;
 each emitter implements an idiomatic accessor while preserving that semantic.
 
 `SdkLroServiceMetadata.pollingMetadata` contains the exact cached `SdkModelPropertyType` objects

@@ -199,27 +199,27 @@ export const $lib = createTypeSpecLibrary({
         default: `Usage value must be one of: 2 (input), 4 (output), 256 (json), or 512 (xml).`,
       },
     },
-    "lro-instance-id-non-lro": {
-      ...doc("lro-instance-id-non-lro"),
+    "lro-operation-id-non-lro": {
+      ...doc("lro-operation-id-non-lro"),
       severity: "error",
       messages: {
         default:
-          "@lroInstanceId can only be applied to a native long-running operation with status-monitor metadata.",
+          "@lroOperationId can only be applied to a native long-running operation with status-monitor metadata.",
       },
     },
-    "lro-instance-id-duplicate": {
-      ...doc("lro-instance-id-duplicate"),
+    "lro-operation-id-duplicate": {
+      ...doc("lro-operation-id-duplicate"),
       severity: "error",
       messages: {
-        default: "@lroInstanceId is specified more than once in the active emitter scope.",
+        default: "@lroOperationId is specified more than once in the active emitter scope.",
       },
     },
-    "lro-instance-id-missing-link": {
-      ...doc("lro-instance-id-missing-link"),
+    "lro-operation-id-missing-link": {
+      ...doc("lro-operation-id-missing-link"),
       severity: "error",
       messages: {
         default:
-          "@lroInstanceId requires a status-monitor URI supplied by a response header or body property.",
+          "@lroOperationId requires a status-monitor URI supplied by a response header or URL-valued body property.",
       },
     },
     "lro-polling-metadata-duplicate": {

@@ -25,15 +25,17 @@ model DecoratorOptions {
 }
 
 /**
- * Exposes an SDK long-running operation instance identifier derived from the status-monitor URI.
- * With the `lastPathSegment` strategy, `/analyzerResults/abc123` produces `abc123`. Emitters choose
- * their idiomatic accessor and storage and must not assume percent-decoding.
+ * Exposes the server-issued SDK long-running operation identifier derived from the status-monitor
+ * URI. With the `lastPathSegment` strategy, `/analyzerResults/abc123` produces `abc123`. This
+ * identifier does not drive polling and is distinct from a caller-supplied `Operation-Id` API
+ * parameter. Emitters choose their idiomatic accessor and storage and must not assume
+ * percent-decoding.
  *
  * @param target The native long-running operation.
- * @param strategy The strategy used to extract the instance identifier from the status-monitor URI.
+ * @param strategy The strategy used to extract the operation identifier from the status-monitor URI.
  * @param scope Specifies the target language emitters.
  */
-extern dec lroInstanceId(
+extern dec lroOperationId(
   target: Operation,
   strategy: valueof "lastPathSegment",
   scope?: valueof DecoratorOptions | string
