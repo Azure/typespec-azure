@@ -181,12 +181,20 @@ are eligible for `/develop-lintdiff-rule`. Record the observed applicability as
 the blocker. This is a read-only eligibility check, not target synchronization
 or worktree verification.
 
+Catalog eligibility is deliberately coarse. The worker must establish the
+[validator audience contract](../lintdiff-rule-intake/SKILL.md#validator-audience-contract)
+before semantic classification; `ARM`/`Both` does not erase upstream RPaaS
+registration or require automatic native RPaaS detection. Preserve that contract
+through development, promotion, and both reviews.
+
 ## Queue state
 
 Keep an ordered ledger with one entry per parsed queue entry:
 
 - 1-based task number
 - rule ID
+- upstream/native audience contract and evidence once intake establishes it,
+  including external selection, enablement policy, and comparison limitations
 - original input, input form and effective worker command (once prepared)
 - resolved `worktrees_folder`, target repository root/project, authoritative
   instruction source and canonical/physical containment evidence for every path
@@ -647,6 +655,11 @@ fresh repair worker. It is an orchestration contract, not a new public CLI flag:
   pinned source SHA for that promotion attempt
 - selected destination package, official rule name, ruleset enablement decision,
   and existing promotion adaptations that must be preserved on refresh
+- upstream registration/audience selection, native applicability and diagnostic
+  unit, default/opt-in enablement, ordinary ARM counterexamples, and validator/
+  native comparison profiles with their limitations; mark pending intake on the
+  initial dispatch, then supply the established contract before classification
+  and every subsequent phase/review
 - all completed phase outcomes, review-round counts, reviewed SHAs, and previous
   repair reasons; do not overwrite earlier results when a later cycle fails
 - task-wide native-test timeout-diagnosis allowance and usage, including failed
@@ -780,6 +793,10 @@ one session to execute both publication phases.
 > Acknowledge the task-scoped recovery context before commands. Reuse exact
 > applicable fork-update permissions and validation profiles; do not infer new
 > authorization, reset counters, or independently roll over a merged source PR.
+> Establish and preserve the validator audience contract above. An evidenced
+> external RPaaS opt-in is a valid native boundary, not permission for blanket
+> ARM enforcement. Carry actual activation/comparison profiles into both reviews
+> and promotion; a disabled target's corpus `0/0` is not equivalence evidence.
 > Do not recreate worktrees, rerun dispatcher mode or repeat passing dependency
 > setup. The development skill revalidates the prepared state and may repair only
 > invalidated layers under the shared preparation contract. Never pull, reset,

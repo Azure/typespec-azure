@@ -111,6 +111,12 @@ nor completion. Inspect all of the following:
 
 Assess material validator behavior against valid supported TypeSpec inputs and
 the native implementation boundary below, not exact executable Swagger behavior.
+First establish the
+[validator audience contract](../lintdiff-rule-intake/SKILL.md#validator-audience-contract):
+catalog eligibility does not establish upstream RPaaS versus ordinary ARM
+selection. Consider an evidenced, default-disabled external opt-in contract
+before declaring the absence of an automatic native audience selector a blocker.
+Retain genuine guideline/applicability uncertainty and the native boundary.
 Record Swagger-only or already-invalid shapes as intentional parity gaps, not
 missing native checks. Classify each requested rule as:
 
@@ -531,10 +537,21 @@ the final complete-diff review.
 
 Do not change Swagger validator code, emitters, or unrelated TypeSpec rules.
 
+For endpoint listeners that resolve HTTP metadata or implement template guards,
+run focused diagnostic-unit regressions before the expensive corpus: generic
+operation declarations and template companions, generic-interface declarations,
+and authored concrete/inherited instantiated endpoints. Assert exact counts and
+targets, excluding non-endpoint companions without excluding real endpoints.
+Use installed compiler/destination helpers and guard before HTTP resolution when
+required by their contract. These cases must exercise the rule's own traversal
+decision or count regression, not duplicate framework-only filtering tests.
+
 #### ARM applicability without redundant namespace guards
 
-ARM-only catalog eligibility selects the rule's audience; it does not imply that
-every visited operation must carry provider namespace metadata. Before adding an
+ARM-only catalog eligibility admits a migration candidate; the
+[audience contract](../lintdiff-rule-intake/SKILL.md#validator-audience-contract)
+establishes its actual audience. Neither implies that every visited operation
+must carry provider namespace metadata. Before adding an
 ARM applicability check, inspect the actual ruleset/runner selection and
 neighboring rules in the intended official destination.
 
@@ -598,6 +615,16 @@ The command runs all local rules and rewrites canonical TypeSpec results and
 coverage files in this development worktree. Use the refreshed rule row and
 rule shard to verify project overlap, validator-only projects, TypeSpec-only
 projects, and compile failures.
+
+Record the validator audience/subtype and the runner's actual rule enablement
+before interpreting that row. Follow the
+[audience evidence contract](../lintdiff-rule-intake/SKILL.md#validator-audience-contract)
+for RPaaS/opt-in rules: a general `all` run with the target disabled is regression
+and default-inactivity evidence, not enabled-target parity. Retain required
+representative/full runs, but supplement them with explicitly enabled focused
+evidence using supported existing harness controls. Do not invent runner flags
+or a per-rule runner to manufacture RPaaS corpus coverage; disclose when the
+available corpus cannot assess the target audience.
 
 The retained Swagger corpus represents the dataset-selected latest API version,
 while ordinary TypeSpec lint output may contain diagnostics from every declared
