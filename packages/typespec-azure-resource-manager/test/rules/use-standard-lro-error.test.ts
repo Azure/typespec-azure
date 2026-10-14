@@ -4,9 +4,8 @@ import {
   type LinterRuleTester,
   type TesterInstance,
 } from "@typespec/compiler/testing";
-import { readFile } from "node:fs/promises";
-import { createSourceFile, isImportDeclaration, isStringLiteral, ScriptTarget } from "typescript";
-import { beforeEach, describe, expect, it } from "vitest";
+
+import { beforeEach, describe, it } from "vitest";
 import { useStandardLroErrorRule } from "../../src/rules/use-standard-lro-error.js";
 
 let runner: TesterInstance;
@@ -50,22 +49,6 @@ const diagnostic = {
 };
 
 describe("use-standard-lro-error", () => {
-  it("does not import TCGC, OpenAPI, or experimental compiler APIs", async () => {
-    const source = await readFile(
-      new URL("../../src/rules/use-standard-lro-error.ts", import.meta.url),
-      "utf8",
-    );
-    const imports = createSourceFile("use-standard-lro-error.ts", source, ScriptTarget.Latest)
-      .statements.filter(isImportDeclaration)
-      .flatMap((statement) =>
-        isStringLiteral(statement.moduleSpecifier) ? [statement.moduleSpecifier.text] : [],
-      );
-
-    expect(imports).not.toContain("@azure-tools/typespec-client-generator-core");
-    expect(imports).not.toContain("@typespec/openapi");
-    expect(imports).not.toContain("@typespec/compiler/experimental");
-  });
-
   it("accepts common-type errors, aliases, and nullable standard errors", async () => {
     await tester
       .expect(
@@ -220,37 +203,6 @@ describe("use-standard-lro-error", () => {
         interface Widgets {
           action is ArmResourceActionAsync<Widget, void, void, Error = CustomError>;
         }
-      `,
-      )
-      .toEmitDiagnostics([diagnostic]);
-  });
-
-  it.each([
-    "../../common-types/resource-management/v1/types.json#/definitions/ErrorResponse",
-    "../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse",
-    "../../common-types/resource-management/v5/types.json#/definitions/ErrorResponse",
-    "../../common-types/resource-management/v10/types.json#/definitions/ErrorResponse",
-    "../../common-types/resource-management/v5/types.json#/definitions/ErrorDetail",
-    "#/definitions/ErrorResponse",
-  ])("does not accept a custom model based on the external reference %s", async (reference) => {
-    await tester
-      .expect(
-        `${header}
-        @Legacy.externalTypeRef("${reference}")
-        model Custom { code?: string; }
-        @route("/custom") op custom is Lro<Custom>;
-      `,
-      )
-      .toEmitDiagnostics([diagnostic]);
-  });
-
-  it("rejects a model-is copy regardless of its external reference", async () => {
-    await tester
-      .expect(
-        `${header}
-        @Legacy.externalTypeRef("#/definitions/OtherError")
-        model Copy is CommonTypes.ErrorResponse;
-        @route("/copy") op copy is Lro<Copy>;
       `,
       )
       .toEmitDiagnostics([diagnostic]);

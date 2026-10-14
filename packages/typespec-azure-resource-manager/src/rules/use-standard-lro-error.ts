@@ -3,12 +3,12 @@ import {
   createRule,
   fileRef,
   getNamespaceFullName,
-  isNullType,
   isTemplateDeclarationOrInstance,
   type Operation,
   type Type,
 } from "@typespec/compiler";
 import { getHttpOperation, type HttpStatusCodeRange } from "@typespec/http";
+import { getSingleNonNullMember } from "./model-utils.js";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 
 export const useStandardLroErrorRule = createRule({
@@ -70,10 +70,8 @@ export const useStandardLroErrorRule = createRule({
 
 function isStandardError(type: Type): boolean {
   if (type.kind === "Union") {
-    const members = [...type.variants.values()]
-      .map((variant) => variant.type)
-      .filter((member) => !isNullType(member));
-    return members.length === 1 && isStandardError(members[0]);
+    const member = getSingleNonNullMember(type);
+    return member !== undefined && isStandardError(member);
   }
   return (
     type.kind === "Model" &&
