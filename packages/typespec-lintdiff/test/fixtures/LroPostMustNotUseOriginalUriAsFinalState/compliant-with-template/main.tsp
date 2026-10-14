@@ -39,9 +39,8 @@ interface Widgets {
   delete is ArmResourceDeleteWithoutOkAsync<Widget>;
 
   #suppress "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes" "LRO POST needs 202 response"
-  #suppress "@azure-tools/typespec-azure-core/no-openapi" "Need x-ms-long-running-operation to test original-uri final-state-via"
+  #suppress "@azure-tools/typespec-azure-core/no-openapi" "Need OpenAPI extensions to test original-uri final-state-via"
   @extension("x-ms-long-running-operation", true)
-  #suppress "@azure-tools/typespec-azure-core/no-openapi" "Need x-ms-long-running-operation-options to test original-uri"
   @extension("x-ms-long-running-operation-options", #{ `final-state-via`: "original-uri" })
   @doc("Restart widget")
   @route("restart")
