@@ -15,11 +15,6 @@
     "message": "Each resource interface must have an @armResourceOperations decorator."
   },
   {
-    "code": "tsp-lintdiff-local-linter/extension-resource-path-pattern",
-    "severity": "warning",
-    "message": "Extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.TestService/extensions/{extensionName}' should use {scope}/providers/... instead of hardcoding the parent scope."
-  },
-  {
     "code": "tsp-lintdiff-local-linter/operation-id-noun-verb",
     "severity": "warning",
     "message": "Per the Noun_Verb convention for Operation Ids, the noun 'Extensions' should not appear after the underscore."
@@ -28,5 +23,10 @@
     "code": "tsp-lintdiff-local-linter/xms-examples-required",
     "severity": "warning",
     "message": "Please provide x-ms-examples describing minimum/maximum property set for response/request payloads for operations."
+  },
+  {
+    "code": "tsp-lintdiff-local-linter/extension-resource-path-pattern",
+    "severity": "warning",
+    "message": "RPaaS extension resource path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.TestService/extensions/{extensionName}' must use {scope}/providers/... instead of hardcoding the parent scope."
   }
 ]
