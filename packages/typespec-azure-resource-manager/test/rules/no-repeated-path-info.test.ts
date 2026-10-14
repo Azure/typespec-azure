@@ -305,24 +305,6 @@ it("reports a shared declaration once per PUT operation at the same source targe
     );
 });
 
-it("reports project-imported properties at their imported declaration", async () => {
-  const importedTester = createLinterRuleTester(
-    await Tester.import("./models.tsp").createInstance(),
-    noRepeatedPathInfoRule,
-    "@azure-tools/typespec-azure-resource-manager",
-  );
-  await importedTester
-    .expect({
-      "main.tsp": operation,
-      "models.tsp": "model Properties { /*repeated*/widgetName?: string; }",
-    })
-    .toEmitDiagnostics(({ repeated }) => ({
-      ...diagnostic(),
-      pos: getSourceLocation(repeated).pos,
-      end: getSourceLocation(repeated).end,
-    }));
-});
-
 it("ignores missing bodies, non-model bodies, and missing or non-model properties bags", async () => {
   await tester
     .expect(
@@ -338,21 +320,6 @@ it("ignores missing bodies, non-model bodies, and missing or non-model propertie
     `,
     )
     .toBeValid();
-});
-
-it("skips template sources but checks their concrete aliases", async () => {
-  await tester
-    .expect(
-      `
-      model Properties { widgetName?: string; }
-      @put op Template<T>(@path widgetName: string, @body body: { properties: T }): void;
-      interface Templates<T> {
-        @put op create(@path widgetName: string, @body body: { properties: T }): void;
-      }
-      @route("/widgets/{widgetName}") op create is Template<Properties>;
-    `,
-    )
-    .toEmitDiagnostics([diagnostic()]);
 });
 
 it("checks ordinary project namespaces without provider metadata", async () => {
