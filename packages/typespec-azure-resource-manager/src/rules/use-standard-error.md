@@ -15,6 +15,8 @@ consistent error shape across operations.
 
 Success payloads are not checked. An error response with no body is rejected:
 declaring an error status alone does not provide the standard error contract.
+HEAD is the exception because HTTP forbids a response body; its errors may be
+bodyless, but it must still declare a default, 4xx, or 5xx error response.
 
 ## Suppression
 
@@ -54,4 +56,4 @@ This rule promotes the LintDiff migration of the Swagger validator rule
 [LroErrorContent](https://github.com/Azure/azure-openapi-validator/blob/a970d991d2785184d2786b85e0a345dc3f37bc25/docs/lro-error-content.md).
 Unlike the historical rule, the native rule applies to all operations and also
 rejects operations with no default, 4xx, or 5xx error response or with a bodyless
-error response.
+error response outside HEAD.

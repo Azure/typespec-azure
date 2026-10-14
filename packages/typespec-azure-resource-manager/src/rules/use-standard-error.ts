@@ -49,9 +49,10 @@ export const useStandardErrorRule = createRule({
         }
 
         const invalidBody = errorResponses.some((response) =>
-          response.responses.some(
-            ({ body }) =>
-              body === undefined || body.bodyKind !== "single" || !isStandardError(body.type),
+          response.responses.some(({ body }) =>
+            body === undefined
+              ? httpOperation.verb !== "head"
+              : body.bodyKind !== "single" || !isStandardError(body.type),
           ),
         );
         if (invalidBody) {

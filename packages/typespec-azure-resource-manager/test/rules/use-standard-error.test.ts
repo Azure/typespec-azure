@@ -392,7 +392,7 @@ describe("use-standard-error", () => {
         .toEmitDiagnostics(diagnostic);
     },
   );
-  it.each(["get", "post", "put", "patch", "delete"])(
+  it.each(["get", "post", "put", "patch", "delete", "head"])(
     "requires an error response on synchronous %s operations",
     async (verb) => {
       await tester
@@ -407,7 +407,7 @@ describe("use-standard-error", () => {
         });
     },
   );
-  it.each(["get", "post"])("rejects bodyless %s errors", async (verb) => {
+  it.each(["get", "post", "put", "patch", "delete"])("rejects bodyless %s errors", async (verb) => {
     await tester
       .expect(
         `${header}
@@ -416,12 +416,39 @@ describe("use-standard-error", () => {
       )
       .toEmitDiagnostics(diagnostic);
   });
-  it.each(["get", "post"])("accepts standard synchronous %s errors", async (verb) => {
+  it.each(["get", "post", "put", "patch", "delete"])(
+    "accepts standard synchronous %s errors",
+    async (verb) => {
+      await tester
+        .expect(
+          `${header}
+      @route("/sync") @${verb} op sync(): Accepted | Failure<CommonTypes.ErrorResponse>;
+    `,
+        )
+        .toBeValid();
+    },
+  );
+
+  it.each([400, 404, 500])("accepts bodyless HEAD %s errors", async (status) => {
     await tester
       .expect(
         `${header}
-      @route("/sync") @${verb} op sync(): Accepted | Failure<CommonTypes.ErrorResponse>;
-    `,
+        @head @route("/exists")
+        op exists(): { @statusCode statusCode: 204; } |
+          { @statusCode statusCode: ${status}; };
+      `,
+      )
+      .toBeValid();
+  });
+
+  it("accepts a bodyless default HEAD error", async () => {
+    await tester
+      .expect(
+        `${header}
+        @error model HeadError { @header requestId?: string; }
+        @head @route("/exists")
+        op exists(): { @statusCode statusCode: 204; } | HeadError;
+      `,
       )
       .toBeValid();
   });
