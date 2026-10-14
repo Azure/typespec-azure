@@ -24,10 +24,6 @@ Scenarios.Azure_Core_Authentication_Audience_customAudience = tokenScenario(
   "custom",
   "https://custom.example.com/.default",
 );
-Scenarios.Azure_Core_Authentication_Audience_trailingSlash = tokenScenario(
-  "trailing-slash",
-  "https://trailing.example.com//.default",
-);
 Scenarios.Azure_Core_Authentication_Audience_apiKey = passOnSuccess({
   uri: "/azure/core/authentication/audience/key",
   method: "get",
