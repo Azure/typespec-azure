@@ -1,7 +1,7 @@
 import { getSourceLocation } from "@typespec/compiler";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
-import { readFileSync } from "node:fs";
-import { beforeEach, describe, expect, it } from "vitest";
+
+import { beforeEach, describe, it } from "vitest";
 import { noEmptyDocRule } from "../../src/rules/no-empty-doc.js";
 import { Tester } from "../test-host.js";
 
@@ -82,15 +82,22 @@ describe("no-empty-doc", () => {
       .toBeValid();
   });
 
-  it("validates the documented incorrect and correct examples", async () => {
-    const documentation = readFileSync(
-      new URL("../../src/rules/no-empty-doc.md", import.meta.url),
-      "utf8",
-    );
-    const examples = [...documentation.matchAll(/```tsp\r?\n([\s\S]*?)```/g)];
-    expect(examples).toHaveLength(2);
-    await tester.expect(examples[0][1]).toEmitDiagnostics([diagnostic]);
-    await tester.expect(examples[1][1]).toBeValid();
+  it("validates the standard incorrect and correct examples", async () => {
+    const examples = [
+      `model Widget {
+  @doc(" ")
+  name: string;
+}
+`,
+      `model Widget {
+  @doc("The widget name.")
+  name: string;
+}
+`,
+    ];
+
+    await tester.expect(examples[0]).toEmitDiagnostics([diagnostic]);
+    await tester.expect(examples[1]).toBeValid();
   });
 
   it("targets offending properties rather than their containing model", async () => {
