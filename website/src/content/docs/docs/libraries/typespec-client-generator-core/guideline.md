@@ -148,6 +148,10 @@ Emitters can get first-level clients of a client package from `SdkPackage.client
 
 `SdkClientType.versionsEnum` is the [`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) describing the API versions supported by this client's service (its `usage` includes the `ApiVersionEnum` flag, and it is the same object that appears in `SdkPackage.enums`). It is `undefined` for unversioned services and for multi-service root clients (which span more than one service). Sub clients that map to a single service still expose their own service's `versionsEnum`.
 
+`SdkClientType.authentication` preserves the service's HTTP authentication requirements as an `Authentication` object. Each entry in `authentication.options` is an alternative authentication option (OR), while every scheme within one option is required together (AND). `NoAuth` remains an explicit scheme, including when it is the only option. The property is `undefined` when the client has no associated service or the service does not declare authentication. For a client that combines multiple services, it describes the first service, consistent with the client's endpoint and credential metadata.
+
+When `exportTCGCoutput` generates `tcgc-output.yaml`, the serialized authentication value preserves the option and scheme grouping but omits each scheme's compiler `model` reference.
+
 `SdkClientType.clientInitialization` tells emitters how to initialize the client. [`SdkClientInitializationType`](../reference/js-api/interfaces/sdkclientinitializationtype/) contains info about the client's initialization parameters and how the client can be initialized, controlled by the `initializedBy` flags:
 
 - `Individually` (1): The client can be instantiated directly by the user.
@@ -234,6 +238,7 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 **Union Types:**
 
 - [`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type.
+- When a TypeSpec union declares an `extends` constraint, `SdkUnionType.baseType` preserves that explicit constraint. TCGC does not infer `baseType` merely because all variants share a common ancestor. Usage, access, and serialization information propagate from the union to its explicit base type, including through nullable wrappers and other union constraints. This propagation does not include unrelated discriminated subtypes of a base model.
 
 **Model Types:**
 
@@ -323,7 +328,17 @@ The method's return type is determined by the underlying operation's normal resp
 
 The paging method's return type is an array type of the page items type. It is inferred from `@pageItems` or `@items` decorator.
 
-The LRO method's return type is the final response type. It is inferred from `LroMetadata`.
+The LRO method's return type is `lroMetadata.finalResponse.result`, or absent when there is no final response. For native LROs, TCGC selects this client result from Azure.Core's `getLroProtocolMetadata` facts, then translates the selected types into the SDK type graph. The same TCGC selection supplies native LRO model usage, access, and naming.
+
+`LroProtocolMetadata` keeps `operation` at the top level and groups facts into required `initial`, `polling`, and `completion` objects. `initial` contains `initialResponse`, `resourceOperation?`, and `isAction`; `polling` contains `statusMonitorStep?`, `pollingInfo`, and `statusMonitorResult?`; `completion` contains `finalStateVia`, `finalStep?`, and `originalUriHasGetOperation?`. This grouping preserves every leaf's type and semantics; the combined `LroMetadata` and raw compatibility projections remain flat.
+
+Azure.Core remains responsible for polling links, parameter bindings, terminal states, `finalStateVia`, and required final HTTP requests. Client-result selection must not replace or discard a `finalOperationLink` or `finalOperationReference`. The `finalStep` union also retains success-property and no-result variants.
+
+`lroMetadata.finalResponse.envelopeResult` is the intact response type and `resultSegments` describes extraction of the client result. Existing LRO-only extraction uses a single result property; nested paging paths belong to the paging metadata and remain separate when an operation combines LRO and paging.
+
+The Core `getLroMetadata` API, `lroMetadata.__raw`, and the method's `__raw_lro_metadata` remain compatible. TCGC assembles the raw-compatible fields from protocol facts and its client-result policy; new emitter logic should use the SDK metadata rather than assume raw compatibility fields are an independent client contract. Existing result defaults and even inconsistent resource PUT result/envelope/path combinations are preserved by this separation.
+
+The legacy `@markAsLro` synthetic fallback remains TCGC-only. It is not native Core protocol metadata and is not included in the native-only LRO usage calculation.
 
 ### HTTP Operation Parameters Handling
 
