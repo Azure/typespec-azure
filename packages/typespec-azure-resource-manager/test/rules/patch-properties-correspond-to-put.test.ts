@@ -5,8 +5,8 @@ import {
   createTester,
   type LinterRuleTester,
 } from "@typespec/compiler/testing";
-import { readFileSync } from "node:fs";
-import { beforeEach, describe, expect, it } from "vitest";
+
+import { beforeEach, describe, it } from "vitest";
 import { patchPropertiesCorrespondToPutRule } from "../../src/rules/patch-properties-correspond-to-put.js";
 
 const code = "@azure-tools/typespec-azure-resource-manager/patch-properties-correspond-to-put";
@@ -23,8 +23,8 @@ beforeEach(async () => {
 });
 
 describe("patch-properties-correspond-to-put", () => {
-  describe("documentation", () => {
-    const DocumentationTester = createTester(resolvePath(import.meta.dirname, "../.."), {
+  describe("semantic examples", () => {
+    const FixtureTester = createTester(resolvePath(import.meta.dirname, "../.."), {
       libraries: [
         "@typespec/http",
         "@typespec/rest",
@@ -34,31 +34,97 @@ describe("patch-properties-correspond-to-put", () => {
       ],
     });
     const examples = [
-      ...readFileSync(
-        new URL("../../src/rules/patch-properties-correspond-to-put.md", import.meta.url),
-        "utf8",
-      ).matchAll(/```typespec\r?\n([\s\S]*?)```/g),
-    ].map((match) => match[1]);
-    let documentationTester: LinterRuleTester;
+      `import "@typespec/http";
+import "@azure-tools/typespec-azure-resource-manager";
+
+using TypeSpec.Http;
+using Azure.ResourceManager;
+
+@service
+@armProviderNamespace
+namespace Contoso.Widgets;
+
+model WidgetProperties {
+  displayName?: string;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ResourceProvisioningState;
+}
+
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
+}
+
+model WidgetPatchProperties {
+  label?: string;
+}
+
+model WidgetPatch {
+  tags?: Record<string>;
+  properties?: WidgetPatchProperties;
+}
+
+@armResourceOperations
+interface Widgets {
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+  update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+}
+`,
+      `import "@typespec/http";
+import "@azure-tools/typespec-azure-resource-manager";
+
+using TypeSpec.Http;
+using Azure.ResourceManager;
+
+@service
+@armProviderNamespace
+namespace Contoso.Widgets;
+
+model WidgetProperties {
+  displayName?: string;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ResourceProvisioningState;
+}
+
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget>;
+}
+
+model WidgetPatchProperties {
+  displayName?: string;
+}
+
+model WidgetPatch {
+  tags?: Record<string>;
+  properties?: WidgetPatchProperties;
+}
+
+@armResourceOperations
+interface Widgets {
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+  update is ArmCustomPatchSync<Widget, PatchModel = WidgetPatch>;
+}
+`,
+    ];
+    let fixtureTester: LinterRuleTester;
 
     beforeEach(async () => {
-      documentationTester = createLinterRuleTester(
-        await DocumentationTester.createInstance(),
+      fixtureTester = createLinterRuleTester(
+        await FixtureTester.createInstance(),
         patchPropertiesCorrespondToPutRule,
         "@azure-tools/typespec-azure-resource-manager",
       );
     });
 
-    it("diagnoses the incorrect ARM documentation example", async () => {
-      expect(examples).toHaveLength(2);
-      await documentationTester
+    it("diagnoses the incorrect ARM template fixture", async () => {
+      await fixtureTester
         .expect(examples[0])
         .toEmitDiagnostics([{ ...missingProperty("label"), target: "label" }]);
     });
 
-    it("accepts the correct ARM documentation example", async () => {
-      expect(examples).toHaveLength(2);
-      await documentationTester.expect(examples[1]).toBeValid();
+    it("accepts the correct ARM template fixture", async () => {
+      await fixtureTester.expect(examples[1]).toBeValid();
     });
   });
 

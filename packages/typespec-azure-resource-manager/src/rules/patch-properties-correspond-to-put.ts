@@ -3,13 +3,10 @@ import {
   fileRef,
   getLocationContext,
   isNeverType,
-  isNullType,
   isVoidType,
   paramMessage,
-  resolveEncodedName,
   type DiagnosticTarget,
   type Model,
-  type ModelProperty,
   type Operation,
   type Program,
   type Type,
@@ -29,6 +26,7 @@ import {
   resolveVersions,
   type VersionResolution,
 } from "@typespec/versioning";
+import { getSingleNonNullMember, walkJsonProperties } from "./model-utils.js";
 
 export const patchPropertiesCorrespondToPutRule = createRule({
   name: "patch-properties-correspond-to-put",
@@ -187,10 +185,8 @@ function collectLeafProperties(
 
 function isObjectBody(type: Type): boolean {
   if (type.kind === "Union") {
-    const variants = [...type.variants.values()]
-      .map((variant) => variant.type)
-      .filter((variant) => !isNullType(variant));
-    return variants.length === 1 && isObjectBody(variants[0]);
+    const member = getSingleNonNullMember(type);
+    return member !== undefined && isObjectBody(member);
   }
   if (type.kind !== "Model") return false;
   for (let model: Model | undefined = type; model !== undefined; model = model.baseModel) {
@@ -210,13 +206,11 @@ function collectTypeLeaves(
   visiting: Set<Model>,
 ): LeafProperty[] {
   if (type.kind === "Union") {
-    const variants = [...type.variants.values()]
-      .map((variant) => variant.type)
-      .filter((variant) => !isNullType(variant));
-    return variants.length === 1
+    const member = getSingleNonNullMember(type);
+    return member !== undefined
       ? collectTypeLeaves(
           program,
-          variants[0],
+          member,
           diagnosticTarget,
           metadataInfo,
           visibility,
@@ -230,16 +224,15 @@ function collectTypeLeaves(
     return [];
   }
 
-  const properties = getModelProperties(type).filter(
-    (property) =>
+  const properties = [...walkJsonProperties(program, type)].filter(
+    ([, property]) =>
       isAvailableAtVersion(program, property, version) &&
       metadataInfo.isPayloadProperty(property, visibility, inExplicitBody) &&
       !isNeverType(property.type),
   );
   visiting.add(type);
   const leaves: LeafProperty[] = [];
-  for (const property of properties) {
-    const jsonName = resolveEncodedName(program, property, "application/json");
+  for (const [jsonName, property] of properties) {
     const target =
       getLocationContext(program, property).type === "project" ? property : diagnosticTarget;
     const nested = hasDirectPayloadProperties(
@@ -280,19 +273,10 @@ function hasDirectPayloadProperties(
   version: VersionResolution,
 ): boolean {
   if (type.kind === "Union") {
-    const variants = [...type.variants.values()]
-      .map((variant) => variant.type)
-      .filter((variant) => !isNullType(variant));
+    const member = getSingleNonNullMember(type);
     return (
-      variants.length === 1 &&
-      hasDirectPayloadProperties(
-        program,
-        variants[0],
-        metadataInfo,
-        visibility,
-        inExplicitBody,
-        version,
-      )
+      member !== undefined &&
+      hasDirectPayloadProperties(program, member, metadataInfo, visibility, inExplicitBody, version)
     );
   }
   if (type.kind !== "Model") {
@@ -339,16 +323,4 @@ function isAvailableAtVersion(
     }
   }
   return available;
-}
-
-function getModelProperties(model: Model): ModelProperty[] {
-  const properties = new Map<string, ModelProperty>();
-  for (let current: Model | undefined = model; current !== undefined; current = current.baseModel) {
-    for (const property of current.properties.values()) {
-      if (!properties.has(property.name)) {
-        properties.set(property.name, property);
-      }
-    }
-  }
-  return [...properties.values()];
 }
