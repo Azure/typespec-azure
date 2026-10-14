@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.48.1
+
+### Bug Fixes
+
+- [#5699](https://github.com/Azure/typespec-azure/pull/5699) Update the Java generator to the latest TypeSpec core.
+
+
 ## 0.48.0
 
 ### Features
