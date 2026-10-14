@@ -1,20 +1,20 @@
 import { Tester } from "#test/tester.js";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { listResponseValueArrayRule } from "../../src/rules/list-response-value-array.js";
+import { listResponseEnvelopeRule } from "../../src/rules/list-response-envelope.js";
 
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
   tester = createLinterRuleTester(
     await Tester.createInstance(),
-    listResponseValueArrayRule,
+    listResponseEnvelopeRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 }, 30_000);
 
 const diagnostic = {
-  code: "@azure-tools/typespec-azure-resource-manager/list-response-value-array",
+  code: "@azure-tools/typespec-azure-resource-manager/list-response-envelope",
   message: "Paged ARM list responses must declare a 'value' property of array type.",
 };
 
@@ -85,7 +85,7 @@ it("reports a non-array value even when another property supplies page items", a
     .toEmitDiagnostics({ ...diagnostic, target: "value" });
 });
 
-it("accepts a value array with a custom next-link property", async () => {
+it("rejects a non-standard next-link property in the combined envelope check", async () => {
   await tester
     .expect(
       listResourceWithResponse(`
@@ -95,7 +95,7 @@ it("accepts a value array with a custom next-link property", async () => {
         }
       `),
     )
-    .toBeValid();
+    .toEmitDiagnostics({ code: diagnostic.code, target: "nextPage" });
 });
 
 it("accepts a value array with the standard next link", async () => {
@@ -154,7 +154,7 @@ it("accepts the standard ARM list response template", async () => {
     .toBeValid();
 });
 
-it("ignores a list without a next link", async () => {
+it("retains the collection-path envelope requirement without paging next-link metadata", async () => {
   await tester
     .expect(
       listResourceWithResponse(`
@@ -163,7 +163,7 @@ it("ignores a list without a next link", async () => {
         }
       `),
     )
-    .toBeValid();
+    .toEmitDiagnostics({ code: diagnostic.code, target: "items" });
 });
 
 it("ignores an operation without the list decorator", async () => {
