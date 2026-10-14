@@ -73,7 +73,7 @@ Prepare a release PR for `@azure-tools/typespec-python` from the repository root
 
 5. If the manual fallback was used, confirm the final package version is exactly one patch version above the recorded version. Otherwise, confirm Chronus versioned only `@azure-tools/typespec-python`.
 
-### 4. Update and Validate the Lockfile
+### 4. Update Documentation and Validate the Lockfile
 
 1. Update dependencies and `pnpm-lock.yaml`:
 
@@ -81,12 +81,20 @@ Prepare a release PR for `@azure-tools/typespec-python` from the repository root
    pnpm install
    ```
 
-2. Inspect `git diff --check`, `git diff --stat`, and `git status --short`.
-3. Verify the release includes only expected files:
+2. Regenerate documentation:
+
+   ```bash
+   pnpm run regen-docs
+   ```
+
+3. Inspect `git diff --check`, `git diff --stat`, and `git status --short`.
+4. Verify the release includes only expected files:
    - `pnpm-workspace.yaml`, when its dependency range changed
    - `pnpm-lock.yaml`
    - `packages/typespec-python/package.json`
    - `packages/typespec-python/CHANGELOG.md`
+   - `packages/typespec-python/README.md`
+   - `website/src/content/docs/docs/emitters/clients/typespec-python/reference/emitter.md`
    - TypeSpec Python change files consumed by Chronus, if any
 
    Stop and investigate before committing if other packages were versioned or unrelated files changed.
