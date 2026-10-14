@@ -1,8 +1,8 @@
-import { getSourceLocation } from "@typespec/compiler";
+import { getDoc, getSourceLocation } from "@typespec/compiler";
 import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 
 import { beforeEach, describe, it } from "vitest";
-import { noEmptyDocRule } from "../../src/rules/no-empty-doc.js";
+import { requireDocumentation } from "../../src/rules/require-docs.js";
 import { Tester } from "../test-host.js";
 
 let tester: LinterRuleTester;
@@ -10,17 +10,52 @@ let tester: LinterRuleTester;
 beforeEach(async () => {
   tester = createLinterRuleTester(
     await Tester.createInstance(),
-    noEmptyDocRule,
+    {
+      ...requireDocumentation,
+      create(context) {
+        return requireDocumentation.create({
+          ...context,
+          // Missing-doc behavior is covered by require-docs.test.ts; these fixtures isolate authored docs.
+          reportDiagnostic(diagnostic) {
+            if (
+              getDoc(context.program, diagnostic.target as Parameters<typeof getDoc>[1]) !==
+              undefined
+            ) {
+              context.reportDiagnostic(diagnostic);
+            }
+          },
+        });
+      },
+    },
     "@azure-tools/typespec-azure-core",
   );
 });
 
 const diagnostic = {
-  code: "@azure-tools/typespec-azure-core/no-empty-doc",
+  code: "@azure-tools/typespec-azure-core/documentation-required",
   message: "Descriptions cannot be empty or whitespace-only. Provide a meaningful doc string.",
 };
 
-describe("no-empty-doc", () => {
+describe("documentation-required: empty documentation", () => {
+  it.each([
+    '@doc("Payload data.") model Payload { data: { @doc(" ") value: string }; }',
+    '@doc("Available values.") union Values { @doc(" ") int32, string }',
+    '@versioned(Widgets.Versions) namespace Widgets; @doc(" ") enum Versions { @doc(" ") v1: "2026-01-01" }',
+  ])("checks explicit blanks beyond missing-doc requirements: %s", async (code) => {
+    await tester
+      .expect(code)
+      .toEmitDiagnostics(code.includes("enum Versions") ? [diagnostic, diagnostic] : [diagnostic]);
+  });
+
+  it("preserves the uninstantiated template exemption when the compiler exposes no doc metadata", async () => {
+    await tester.expect('@doc(" ") model Template<T> {}').toBeValid();
+  });
+
+  it("does not treat names or placeholders as blank documentation", async () => {
+    await tester.expect('@doc("Widget") model Widget {}').toBeValid();
+    await tester.expect('@doc("description") model Widget {}').toBeValid();
+  });
+
   it.each([
     '@doc(" ") namespace Widgets {}',
     '@doc(" ") interface Widgets {}',

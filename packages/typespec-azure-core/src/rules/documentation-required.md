@@ -1,4 +1,6 @@
-Enums, models, operations, and their members/properties should have documentation. Use doc comments (`/** */`) to provide descriptions.
+Enums, models, operations, and their members/properties should have meaningful, nonblank documentation. Use doc comments (`/** */`) to provide descriptions.
+
+This strengthens the existing `documentation-required` rule, already enabled in the data-plane and resource-manager rulesets; no separate opt-in rule is needed. Empty and whitespace-only strings do not satisfy existing documentation requirements. Missing-documentation scopes and exemptions are unchanged.
 
 ## Impact
 
@@ -60,6 +62,28 @@ enum PetKind {
 :::note
 Version enums and discriminator enums/unions are exempt from this rule as they are considered self-documenting.
 :::
+
+## Explicit documentation
+
+Every explicit `@doc` string must contain non-whitespace content. In addition to the existing required targets, this includes namespaces, interfaces, scalars, inline model properties, all union variants, and explicitly documented declarations exempt from missing-doc requirements. Enum members are checked individually.
+
+Checks use documentation metadata exposed by the compiler. Uninstantiated template declarations whose documentation is not exposed remain exempt.
+
+Documentation is not newly required on these additional targets: absent documentation remains allowed where it was previously allowed. However, an explicit blank description now warns for existing rule users without a configuration change. Whitespace-only strings previously passed the rule's truthiness check.
+
+```tsp
+// Incorrect.
+@doc(" \t")
+scalar Label extends string;
+```
+
+```tsp
+// Correct.
+@doc("A display label shown to users.")
+scalar Label extends string;
+```
+
+This blank-documentation check corresponds to LintDiff's [DescriptiveDescriptionRequired](https://github.com/Azure/azure-openapi-validator/blob/main/docs/descriptive-description-required.md).
 
 ## Suppression
 
