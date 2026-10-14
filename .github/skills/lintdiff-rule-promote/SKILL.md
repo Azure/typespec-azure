@@ -304,10 +304,13 @@ Use these signals:
   Azure REST or data-plane authoring: it depends only on compiler/http/core
   APIs, checks common Azure style, versioning, auth, LRO, response, parameter,
   or model patterns, and does not need ARM helpers.
-- Treat validator metadata such as `applicability: Both`, `sources: ["common"]`,
-  or fixture text that says "Both ARM and DataPlane" as strong evidence for
-  `@azure-tools/typespec-azure-core`, unless the native contract governs SDK APIs
-  or needs ARM-only helpers or ARM-specific semantics.
+- Verify the
+  [validator audience contract](../lintdiff-rule-intake/SKILL.md#validator-audience-contract)
+  before interpreting catalog `applicability: Both`, `sources: ["common"]`, or
+  fixture text that says "Both ARM and DataPlane". Importer fallback can hide
+  RPaaS-only registration. These labels support Core ownership only when the
+  actual audience and native guideline support shared Azure REST semantics;
+  SDK ownership or ARM/RPaaS-specific policy takes precedence over the label.
 - `@azure-tools/typespec-azure-core` must not take a dependency on
   `@azure-tools/typespec-azure-resource-manager`. If a candidate core rule
   currently imports ARM helpers, either recommend ARM or explain the rewrite
@@ -599,6 +602,13 @@ library documentation following the
 - check the generated docs page path and title match the official TypeSpec rule
   name, not the source validator slug, when the names differ
 
+Bind the authored Markdown through the installed compiler's supported rule
+`docs` metadata, following destination rules and scaffolding (for example,
+`fileRef.fromPackageRoot(...)`). A public documentation URL alone is not an
+authored-file binding. After regeneration, verify that the new page contains
+the authored rationale/examples and has no new-rule missing-documentation
+warning; an exit-zero command or generated index entry alone does not prove this.
+
 Regenerate docs for the affected library after the rule docs are in place. Let
 the command complete; `tspd doc` can be quiet for several minutes after printing
 the experimental banner, and stopping it early can leave generated rule indexes
@@ -622,6 +632,17 @@ it in the explicit formatting and diff review scope.
 
 Update `packages/typespec-azure-rulesets` so all official rules remain
 explicitly listed.
+
+Preserve the source's audience/activation contract, not just its predicate.
+For externally selected RPaaS rules, check library default/recommended/`all`
+enablement as well as official rulesets, including framework-generated `all`
+behavior. Keep the target inactive wherever enablement would imply ordinary
+ARM applicability; use supported registration controls and preserve every
+existing rule's enablement. Keep explicit opt-in instructions and ordinary ARM
+counterexamples in native docs and fixture-to-native evidence. Destination
+ownership does not supply an automatic RPaaS selector or turn disabled corpus
+counts into parity. A required change to the source contract follows source
+repair, not a promotion-only semantic rewrite.
 
 - Newly promoted rules must be registered with a plain `false` value by default.
   Promotion adds official rule availability without enabling new diagnostics for

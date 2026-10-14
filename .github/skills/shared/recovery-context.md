@@ -6,6 +6,13 @@ global preference. The outer queue owns it; standalone callers own their context
 Every dispatch carries the artifact path/content identity and acknowledges the
 applicable settings before side effects.
 
+Readiness is a preparation snapshot, not the authority for a later coordinator
+grant. Carry the exact later decision, scope and updated counters in the durable
+recovery context and continuation handoff; verify that evidence directly rather
+than requiring an older readiness mirror to already contain the grant. A stale
+mirror grants nothing by itself, and this does not waive acknowledgement,
+instruction/configuration fingerprints, ownership, or budget checks.
+
 ## Explicit authorization, recorded once
 
 Record the exact user authorization, task/rule scope, publication binding and
@@ -152,6 +159,14 @@ new success/failure detector around an assumed human-readable output layout:
   stdout/stderr independently of receipt parsing. Prefer the installed runner's
   documented structured report when it includes the required counts and outcomes;
   preserve raw output as well. Do not invent flags or change the selected tests.
+- Derive metadata locations, configuration filenames and supported invocation
+  syntax from the actual checkout/installed runner before composing capture or
+  fingerprint commands; do not make guessed paths into new readiness gates.
+- Create raw capture artifacts independently of stdout events. A successful
+  quiet lint/format command can have empty output, and `Tee-Object` may create no
+  file when nothing is emitted. Preserve a verified empty capture and the actual
+  exit status; do not invent a passing summary or rerun the command merely to
+  obtain text. Missing required test selection/count evidence still fails.
 - When a structured report is unavailable, normalize CRLF to LF and remove ANSI
   presentation escapes only in a derived parsing copy. Never overwrite raw
   receipts, globally strip content, or convert GitHub's raw UTC timestamps.

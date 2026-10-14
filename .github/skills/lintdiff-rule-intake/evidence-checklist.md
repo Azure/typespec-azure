@@ -9,6 +9,11 @@ A high-quality intake should account for all of these when they are available:
 - implementation logic and notable edge cases
 - upstream tests or examples
 - registration metadata such as severity, selectors, and `disableForTypeSpec*` hints
+- registered `openapiType`/category and caller-selected subtype, compared with
+  the catalog label; identify importer loss of RPaaS audience information
+- the [validator audience contract](SKILL.md#validator-audience-contract):
+  native selection or documented external opt-in, enablement/default policy,
+  supported ordinary ARM counterexamples, and actual comparison profiles
 
 ## Local migration evidence
 
