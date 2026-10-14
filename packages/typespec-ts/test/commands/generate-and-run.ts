@@ -1,34 +1,24 @@
-import {
-  resolveNodeBin,
-  runMain,
-  runNode,
-  runParallel,
-} from "../../../../core/eng/common/scripts/node-process.ts";
+import { run } from "../../../../core/eng/common/scripts/run.ts";
 import { spectorPort } from "./start-test-server.ts";
 
-export async function generateAndRun(signal: AbortSignal): Promise<void> {
-  await runNode(["./test/commands/gen-spector.js", "--phase=client"], signal);
-  await runParallel(
-    [
-      [resolveNodeBin("vitest", "vitest"), "run", "--project", "integration-azure-modular"],
-      ["./test/commands/gen-spector.js", "--phase=declarations"],
-    ],
-    signal,
-  );
+export async function generateAndRun(): Promise<void> {
+  await run(process.execPath, ["./test/commands/gen-spector.js", "--phase=client"]);
+  const tasks = [
+    run("vitest", ["run", "--project", "integration-azure-modular"]),
+    run(process.execPath, ["./test/commands/gen-spector.js", "--phase=declarations"]),
+  ];
+  try {
+    await Promise.all(tasks);
+  } finally {
+    for (const task of tasks) task.kill();
+    await Promise.allSettled(tasks);
+  }
 }
 
 if (import.meta.main) {
-  await runMain(async (signal) => {
-    try {
-      await generateAndRun(signal);
-    } finally {
-      await runNode([
-        resolveNodeBin("@typespec/spector", "tsp-spector"),
-        "server",
-        "stop",
-        "--port",
-        String(spectorPort),
-      ]);
-    }
-  });
+  try {
+    await generateAndRun();
+  } finally {
+    await run("tsp-spector", ["server", "stop", "--port", String(spectorPort)]);
+  }
 }

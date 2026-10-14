@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-ts"
 ---
 
-Replace concurrently in Spector test orchestration with native Node lifecycle helpers, preserving parallel generation and graceful coverage shutdown.
+Replace concurrently in Spector test orchestration with existing process tooling, preserving parallel generation and graceful coverage shutdown.
