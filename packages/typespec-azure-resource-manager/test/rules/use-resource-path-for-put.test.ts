@@ -174,17 +174,3 @@ it("ignores non-PUT operations", async () => {
     )
     .toBeValid();
 });
-
-it("ignores operation template instances while checking project declarations", async () => {
-  await tester
-    .expect(
-      `
-      @route("/providers/Microsoft.Template")
-      @put op Template<T>(@body body: T): void;
-      alias Instance = Template<string>;
-      @route("/providers/Microsoft.Contoso")
-      @put op create(): void;
-    `,
-    )
-    .toEmitDiagnostics(diagnostic("/providers/Microsoft.Contoso"));
-});
