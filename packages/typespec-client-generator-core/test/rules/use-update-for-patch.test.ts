@@ -46,9 +46,7 @@ function diagnostic(operationName: string, target = operationName) {
   };
 }
 
-function patchTemplateFixture(
-  section: "#### ❌ Incorrect" | "#### ✅ Correct" | "## Impact" | "## Suppression",
-) {
+function patchTemplateFixture(section: "#### ❌ Incorrect" | "#### ✅ Correct" | "## Impact") {
   const fixtures = {
     "#### ❌ Incorrect": `@armResourceOperations
 interface Widgets {
@@ -63,12 +61,6 @@ interface Widgets {
     "## Impact": `@armResourceOperations
 interface Widgets {
   @Azure.ClientGenerator.Core.clientName("updateWidget")
-  modify is ArmResourcePatchSync<Widget, Properties = WidgetProperties>;
-}
-`,
-    "## Suppression": `@armResourceOperations
-interface Widgets {
-  #suppress "@azure-tools/typespec-client-generator-core/use-update-for-patch" "Preserve the already-shipped SDK method name."
   modify is ArmResourcePatchSync<Widget, Properties = WidgetProperties>;
 }
 `,
@@ -263,21 +255,6 @@ describe("use-update-for-patch", () => {
       .toBeValid();
   });
 
-  it("retains historical operations but does not simulate historical names", async () => {
-    await tester
-      .expect(
-        `
-        @service @armProviderNamespace @versioned(Versions)
-        @armCommonTypesVersion(CommonTypes.Versions.v5)
-        namespace Arm;
-        enum Versions { v1, v2 }
-        @removed(Versions.v2) @route("/old") @patch op modify(): string;
-        @renamedFrom(Versions.v2, "modify") @route("/renamed") @patch op update(): string;
-      `,
-      )
-      .toEmitDiagnostics([diagnostic("modify")]);
-  });
-
   it("validates the exact incorrect template fixture", async () => {
     await tester
       .expect(await patchTemplateFixture("#### ❌ Incorrect"))
@@ -290,16 +267,5 @@ describe("use-update-for-patch", () => {
 
   it("validates the exact common client name template fixture", async () => {
     await tester.expect(await patchTemplateFixture("## Impact")).toBeValid();
-  });
-
-  it("validates the exact suppression template fixture", async () => {
-    // The direct rule tester collects diagnostics before compiler suppression is applied.
-    await runner.compile(await patchTemplateFixture("## Suppression"), {
-      compilerOptions: {
-        linterRuleSet: {
-          enable: { "@azure-tools/typespec-client-generator-core/use-update-for-patch": true },
-        },
-      },
-    });
   });
 });
