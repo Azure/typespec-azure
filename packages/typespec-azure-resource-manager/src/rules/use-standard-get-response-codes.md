@@ -1,5 +1,8 @@
 ARM GET operations must return a `200` response. They may also return a `202` response and a default error response, but no other status codes. Use the successful resource response when reading a resource so callers and generated SDKs can access its representation.
 
+A status range with identical lower and upper bounds is equivalent to that
+literal status. Broader ranges are not substitutes for the permitted exact codes.
+
 ## Impact
 
 - **Area:** API, SDK

@@ -1,14 +1,15 @@
 import { createRule, fileRef, getService } from "@typespec/compiler";
-import { getHttpOperation, type HttpStatusCodeRange } from "@typespec/http";
+import { getHttpOperation } from "@typespec/http";
+import { isStatusCodeAllowed, matchesStatusCode } from "./http-response-utils.js";
 
 const allowedResponseCodes = new Set<number | "*">([200, 202, "*"]);
 
-export const armGetResponseCodesRule = createRule({
-  name: "arm-get-operation-response-codes",
+export const useStandardGetResponseCodesRule = createRule({
+  name: "use-standard-get-response-codes",
   description:
     "ARM GET operations must include a 200 response and may only use 202 and default as additional response codes.",
-  docs: fileRef.fromPackageRoot("src/rules/arm-get-operation-response-codes.md"),
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-get-operation-response-codes",
+  docs: fileRef.fromPackageRoot("src/rules/use-standard-get-response-codes.md"),
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-standard-get-response-codes",
   severity: "warning",
   messages: {
     default:
@@ -39,9 +40,11 @@ export const armGetResponseCodesRule = createRule({
           return;
         }
 
-        const has200 = httpOperation.responses.some((response) => response.statusCodes === 200);
+        const has200 = httpOperation.responses.some(({ statusCodes }) =>
+          matchesStatusCode(statusCodes, 200),
+        );
         const hasOnlyAllowedCodes = httpOperation.responses.every((response) =>
-          isAllowedResponseCode(response.statusCodes),
+          isStatusCodeAllowed(response.statusCodes, allowedResponseCodes),
         );
 
         if (!has200 || !hasOnlyAllowedCodes) {
@@ -53,7 +56,3 @@ export const armGetResponseCodesRule = createRule({
     };
   },
 });
-
-function isAllowedResponseCode(statusCode: number | "*" | HttpStatusCodeRange): boolean {
-  return typeof statusCode === "number" ? allowedResponseCodes.has(statusCode) : statusCode === "*";
-}

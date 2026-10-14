@@ -6,7 +6,6 @@ import { armCustomResourceNoKey } from "./rules/arm-custom-resource-no-key.js";
 import { armCustomResourceUsageDiscourage } from "./rules/arm-custom-resource-usage-discourage.js";
 import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js";
 import { armFeatureFileUsageDiscourage } from "./rules/arm-feature-file-usage-discourage.js";
-import { armGetResponseCodesRule } from "./rules/arm-get-operation-response-codes.js";
 import { armNoPathCasingConflictsRule } from "./rules/arm-no-path-casing-conflicts.js";
 import { armNoRecordRule } from "./rules/arm-no-record.js";
 import { armPostResponseCodesRule } from "./rules/arm-post-response-codes.js";
@@ -52,6 +51,7 @@ import { useInterfaceRule } from "./rules/use-interface.js";
 import { useModelRequestBodyRule } from "./rules/use-model-request-body.js";
 import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
+import { useStandardGetResponseCodesRule } from "./rules/use-standard-get-response-codes.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
@@ -63,7 +63,7 @@ const rules = [
   noOverridePropsRule,
   armCommonTypesVersionRule,
   armDeleteResponseCodesRule,
-  armGetResponseCodesRule,
+  useStandardGetResponseCodesRule,
   armPutResponseCodesRule,
   armPostResponseCodesRule,
   lroResponseMismatchRule,

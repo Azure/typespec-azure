@@ -6,10 +6,10 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
-import { armGetResponseCodesRule } from "../../src/rules/arm-get-operation-response-codes.js";
+import { useStandardGetResponseCodesRule } from "../../src/rules/use-standard-get-response-codes.js";
 
 const diagnosticCode =
-  "@azure-tools/typespec-azure-resource-manager/arm-get-operation-response-codes";
+  "@azure-tools/typespec-azure-resource-manager/use-standard-get-response-codes";
 
 const resource = `
   @armProviderNamespace
@@ -27,7 +27,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    armGetResponseCodesRule,
+    useStandardGetResponseCodesRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
@@ -214,4 +214,51 @@ it("ignores operations other than GET", async () => {
       `,
     )
     .toBeValid();
+});
+
+it.each(["@statusCode @minValue(200) @maxValue(200) code: int32;", "@statusCode code: 200;"])(
+  "accepts equivalent literal and singleton 200 responses: %s",
+  async (status) => {
+    await tester
+      .expect(
+        `
+      @service namespace Microsoft.Contoso;
+      model Result { ${status} @body body: string; }
+      @get op read(): Result;
+    `,
+      )
+      .toBeValid();
+  },
+);
+
+it("accepts a singleton 202 range in addition to 200", async () => {
+  await tester
+    .expect(
+      `
+      @service namespace Microsoft.Contoso;
+      model Accepted {
+        @statusCode @minValue(202) @maxValue(202) code: int32;
+      }
+      @get op read(): { @statusCode code: 200; @body body: string; } | Accepted;
+    `,
+    )
+    .toBeValid();
+});
+
+it.each([
+  [200, 202],
+  [201, 201],
+  [204, 204],
+])("rejects disallowed status range %s-%s", async (start, end) => {
+  await tester
+    .expect(
+      `
+        @service namespace Microsoft.Contoso;
+        model Additional {
+          @statusCode @minValue(${start}) @maxValue(${end}) code: int32;
+        }
+        @get op read(): { @statusCode code: 200; @body body: string; } | Additional;
+      `,
+    )
+    .toEmitDiagnostics({ code: diagnosticCode, target: "read" });
 });
