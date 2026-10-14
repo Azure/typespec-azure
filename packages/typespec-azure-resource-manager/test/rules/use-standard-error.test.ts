@@ -6,7 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 
 import { beforeEach, describe, it } from "vitest";
-import { useStandardLroErrorRule } from "../../src/rules/use-standard-lro-error.js";
+import { useStandardErrorRule } from "../../src/rules/use-standard-error.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -15,7 +15,7 @@ beforeEach(async () => {
   runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    useStandardLroErrorRule,
+    useStandardErrorRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
@@ -26,7 +26,7 @@ const header = `
   namespace Arm;
 
   @route("/status")
-  op poll is Azure.Core.Foundations.GetOperationStatus;
+  op poll is Azure.Core.Foundations.GetOperationStatus<ErrorResponse = CommonTypes.ErrorResponse>;
 
   model Accepted {
     @statusCode statusCode: 202;
@@ -44,11 +44,11 @@ const header = `
 `;
 
 const diagnostic = {
-  code: "@azure-tools/typespec-azure-resource-manager/use-standard-lro-error",
-  message: useStandardLroErrorRule.messages.default,
+  code: "@azure-tools/typespec-azure-resource-manager/use-standard-error",
+  message: useStandardErrorRule.messages.default,
 };
 
-describe("use-standard-lro-error", () => {
+describe("use-standard-error", () => {
   it("accepts common-type errors, aliases, and nullable standard errors", async () => {
     await tester
       .expect(
@@ -364,27 +364,64 @@ describe("use-standard-lro-error", () => {
       .toEmitDiagnostics([
         {
           ...diagnostic,
-          message: useStandardLroErrorRule.messages.missingErrorResponse,
+          message: useStandardErrorRule.messages.missingErrorResponse,
         },
       ]);
   });
 
-  it("ignores success responses, absent error bodies, synchronous operations, and GET operations", async () => {
+  it("ignores success bodies when errors use the standard contract", async () => {
     await tester
       .expect(
         `${header}
-        @Azure.Core.pollingOperation(poll) @route("/no-body") @post
-        op noBody(): Accepted | { @statusCode statusCode: 400; };
         @Azure.Core.pollingOperation(poll) @route("/success") @post
         op success(): Accepted | { @statusCode statusCode: 200; @body body: string; } |
           Failure<CommonTypes.ErrorResponse>;
-        @route("/sync") @post op sync(): Accepted | Failure<string>;
-        @route("/sync-no-error") @post op syncNoError(): Accepted;
-        @Azure.Core.pollingOperation(poll) @route("/get") @get
-        op getOperation(): Accepted | Failure<string>;
-        @Azure.Core.pollingOperation(poll) @route("/get-no-error") @get
-        op getNoError(): Accepted;
       `,
+      )
+      .toBeValid();
+  });
+  it.each(["get", "post", "put", "patch", "delete"])(
+    "checks synchronous %s error responses",
+    async (verb) => {
+      await tester
+        .expect(
+          `${header}
+        @route("/sync") @${verb} op sync(): Accepted | Failure<string>;
+      `,
+        )
+        .toEmitDiagnostics(diagnostic);
+    },
+  );
+  it.each(["get", "post", "put", "patch", "delete"])(
+    "requires an error response on synchronous %s operations",
+    async (verb) => {
+      await tester
+        .expect(
+          `${header}
+        @route("/sync") @${verb} op sync(): Accepted;
+      `,
+        )
+        .toEmitDiagnostics({
+          ...diagnostic,
+          message: useStandardErrorRule.messages.missingErrorResponse,
+        });
+    },
+  );
+  it.each(["get", "post"])("rejects bodyless %s errors", async (verb) => {
+    await tester
+      .expect(
+        `${header}
+      @route("/sync") @${verb} op sync(): Accepted | { @statusCode statusCode: 400; };
+    `,
+      )
+      .toEmitDiagnostics(diagnostic);
+  });
+  it.each(["get", "post"])("accepts standard synchronous %s errors", async (verb) => {
+    await tester
+      .expect(
+        `${header}
+      @route("/sync") @${verb} op sync(): Accepted | Failure<CommonTypes.ErrorResponse>;
+    `,
       )
       .toBeValid();
   });

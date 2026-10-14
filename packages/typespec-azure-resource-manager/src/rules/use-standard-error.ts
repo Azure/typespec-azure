@@ -1,4 +1,3 @@
-import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   createRule,
   fileRef,
@@ -11,18 +10,18 @@ import { getHttpOperation, type HttpStatusCodeRange } from "@typespec/http";
 import { getSingleNonNullMember } from "./model-utils.js";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 
-export const useStandardLroErrorRule = createRule({
-  name: "use-standard-lro-error",
-  docs: fileRef.fromPackageRoot("src/rules/use-standard-lro-error.md"),
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-standard-lro-error",
+export const useStandardErrorRule = createRule({
+  name: "use-standard-error",
+  docs: fileRef.fromPackageRoot("src/rules/use-standard-error.md"),
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/use-standard-error",
   description:
-    "Long-running operations must define an error response and use ErrorResponse from ARM common types for error payloads.",
+    "Operations must define an error response and use ErrorResponse from ARM common types for error payloads.",
   severity: "warning",
   messages: {
     default:
-      "Error payloads of long-running operations must use `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload.",
+      "Error responses must have a body using `Azure.ResourceManager.CommonTypes.ErrorResponse` instead of a custom error payload.",
     missingErrorResponse:
-      "Long-running operations must define at least one default, 4xx, or 5xx error response.",
+      "Operations must define at least one default, 4xx, or 5xx error response.",
   },
   create(context) {
     const program = context.program;
@@ -40,10 +39,6 @@ export const useStandardLroErrorRule = createRule({
         }
 
         const [httpOperation] = getHttpOperation(program, operation);
-        if (httpOperation.verb === "get" || getLroMetadata(program, operation) === undefined) {
-          return;
-        }
-
         const errorResponses = httpOperation.responses.filter((response) =>
           isErrorResponse(response.statusCodes),
         );
@@ -56,7 +51,7 @@ export const useStandardLroErrorRule = createRule({
         const invalidBody = errorResponses.some((response) =>
           response.responses.some(
             ({ body }) =>
-              body !== undefined && (body.bodyKind !== "single" || !isStandardError(body.type)),
+              body === undefined || body.bodyKind !== "single" || !isStandardError(body.type),
           ),
         );
         if (invalidBody) {
