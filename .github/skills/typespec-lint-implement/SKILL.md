@@ -80,6 +80,12 @@ validator or migration history:
 - Keep historical provenance and parity comparisons in a dedicated migration
   section (such as `## LintDiff Equivalent`), migration evidence, and the PR
   description, not the main explanation or incorrect/correct examples.
+- When an existing rule replaces a proposed Swagger/LintDiff migration, add
+  the original validator's linked name and evidenced coverage boundaries to
+  that existing rule's provenance section, even if no implementation changes
+  are needed. Preserve other mappings and distinguish partial coverage from
+  full equivalence under the
+  [existing-rule coverage contract](../lintdiff-rule-migration-overseer/SKILL.md#existing-rule-coverage-contract).
 - Mention OpenAPI or emitter behavior in the main documentation only when it
   explains an actual user-facing requirement or consequence of the native rule,
   not merely how the migrated validator worked. This is an audience/content

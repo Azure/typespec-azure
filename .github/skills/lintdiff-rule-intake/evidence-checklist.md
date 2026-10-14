@@ -24,6 +24,10 @@ A high-quality intake should account for all of these when they are available:
 - stored TypeSpec diagnostics
 - catalog or inventory classification
 - validation report evidence
+- existing native-rule implementations, registration/enablement, and authored
+  documentation; per-check coverage, remaining gaps, and candidate extensions
+- required existing-rule provenance mappings when a duplicate is omitted,
+  following the [coverage contract](../lintdiff-rule-migration-overseer/SKILL.md#existing-rule-coverage-contract)
 
 ## Prerequisite and blocking evidence
 

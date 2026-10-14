@@ -33,6 +33,10 @@ Use the [evidence checklist](./evidence-checklist.md) to make sure the intake is
    - `#suppress` directives
    - unrelated TypeSpec diagnostics that would already forbid the construct
    - template-enforced behavior
+   - existing native rules and their registration/enablement, including
+     semantic matches under different names; map each material validator check
+     to its current owner or an evidenced gap under the
+     [existing-rule coverage contract](../lintdiff-rule-migration-overseer/SKILL.md#existing-rule-coverage-contract)
 4. Draft the [native rule contract](../typespec-lint-discovery/SKILL.md#native-rule-contract)
    from that evidence. Separate the intended guideline from the Swagger
    selector/emitted representation, and distinguish native violation coverage,
@@ -60,6 +64,8 @@ Produce:
   differences or unresolved questions; do not invent emission-simulation work
   solely to match Swagger artifacts or counts
 - the strongest current classification hypothesis
+- candidate existing-rule reuse or extension, and the authored documentation
+  that needs a validator coverage mapping if a duplicate is omitted
 - the recommended next skill, usually `/lintdiff-rule-migration-overseer` or `/typespec-lint-discovery`
 
 ## Repository adaptation notes

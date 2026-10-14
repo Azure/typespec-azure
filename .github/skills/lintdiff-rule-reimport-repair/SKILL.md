@@ -79,6 +79,11 @@ Standalone repair remains a single-rule investigation, not an implicit queue run
    - violating/compliant/ignored-edge fixtures needed to represent the upstream semantics
    - `expect.json` files when harness intent needs correction
    - focused snapshots and validation report artifacts
+   - the owning existing rule's authored coverage/provenance documentation when
+     reclassification replaces a duplicate, under the
+     [existing-rule coverage contract](../lintdiff-rule-migration-overseer/SKILL.md#existing-rule-coverage-contract);
+     evaluate coherent extensions for partial coverage before another rule,
+     preserving authorized worktree and source-repair boundaries
 8. Validate the repaired rule against the semantic matrix:
    - ensure each meaningful upstream semantic case is covered by one or more local fixtures, or explain why it cannot be authorably represented in TypeSpec
    - do not call the re-import complete if coverage only proves a single violating example while leaving the rest of the upstream behavior untested

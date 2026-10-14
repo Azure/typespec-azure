@@ -318,8 +318,17 @@ Use these signals:
 - Use fixture front matter and validation-report ruleset inference as evidence,
   not as the sole authority.
 - Check for existing official rules with equivalent coverage before promoting.
-  If the official rule already exists, recommend updating that rule instead of
-  adding a duplicate.
+  Apply the
+  [existing-rule coverage contract](../lintdiff-rule-migration-overseer/SKILL.md#existing-rule-coverage-contract):
+  for full coverage, update the existing rule's authored provenance documentation
+  rather than adding a duplicate; this can be a documentation-only promotion.
+  For partial coverage, evaluate a coherent extension before a separate rule
+  and record the exact gap and compatibility/enablement effects. Source-semantic
+  changes still require the authorized repair workflow; this check does not
+  permit divergent destination-only semantics or editing the immutable source.
+  For a documentation-only outcome, skip new-rule implementation, registration,
+  and ruleset additions, while retaining applicable documentation generation,
+  validation, change metadata, review, and publication requirements.
 - Identify applicability guards that exist only because the lintdiff package
   enables ARM and data-plane rules together. Record whether the destination
   package and official ruleset already provide the same applicability boundary,

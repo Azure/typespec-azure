@@ -6,6 +6,11 @@ Use these categories consistently when reporting a migration outcome.
 
 A native TypeSpec lint or equivalent repository-native diagnostic already covers the validator rule strongly enough that new lint work is unnecessary.
 
+Apply the [existing-rule coverage contract](SKILL.md#existing-rule-coverage-contract):
+prove the scope and activation, and add the validator mapping to the owning
+existing rule's documentation when a duplicate is omitted. No new lint does not
+mean no documentation work.
+
 ## Template-enforced
 
 The violating shape is prevented by templates, framework helpers, or generated conventions, so a dedicated native lint is not the main control.
@@ -17,6 +22,10 @@ The local repro only works by suppressing unrelated TypeSpec diagnostics, or ano
 ## Partial
 
 A native rule exists or can exist, but the current evidence shows intentional or unavoidable mismatches in scope.
+
+Name the covered and uncovered checks. Evaluate an extension of the existing
+rule before a separate lint, but do not broaden its intent or audience merely
+to reproduce Swagger output/counts. Document partial coverage honestly.
 
 ## True gap
 
