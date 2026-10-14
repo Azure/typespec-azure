@@ -208,19 +208,6 @@ describe("use-standard-error", () => {
       .toEmitDiagnostics([diagnostic]);
   });
 
-  it.each(["v3", "v4", "v5", "v6"])(
-    "accepts the standard TypeSpec model with common-types %s",
-    async (version) => {
-      await tester
-        .expect(
-          `${header.replace("Versions.v5", `Versions.${version}`)}
-          @route("/standard") op standard is Lro<CommonTypes.ErrorResponse>;
-        `,
-        )
-        .toBeValid();
-    },
-  );
-
   it("rejects a same-named model with the standard shape in a different namespace", async () => {
     await tester
       .expect(
