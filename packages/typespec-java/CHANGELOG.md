@@ -1,5 +1,19 @@
 # Change Log - @azure-tools/typespec-java
 
+## 0.48.1
+
+### Bug Fixes
+
+- [#5699](https://github.com/Azure/typespec-azure/pull/5699) Update the Java generator to the latest TypeSpec core.
+
+
+## 0.48.0
+
+### Features
+
+- Update TypeSpec dependencies to their October minor versions and sync core to commit `545ec91fc`. Includes upstream library behavior changes ([microsoft/typespec#12137](https://github.com/microsoft/typespec/pull/12137)) and the Java generator Jackson dependency update ([microsoft/typespec#12056](https://github.com/microsoft/typespec/pull/12056)).
+
+
 ## 0.47.1
 
 ### Bug Fixes
