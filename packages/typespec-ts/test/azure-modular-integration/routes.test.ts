@@ -8,6 +8,7 @@ describe("Routes Client", () => {
     client = new RoutesClient({
       allowInsecureConnection: true,
       endpoint: "http://localhost:3002",
+      retryOptions: { maxRetries: 0 },
     });
   });
 
@@ -152,6 +153,12 @@ describe("Routes Client", () => {
   it("Routes_QueryParameters_QueryExpansion_Standard_record", async () => {
     await client.queryParameters.queryExpansion.standard.record({ a: 1, b: 2 });
   });
+  it("Routes_QueryParameters_QueryExpansion_Standard_model", async () => {
+    await client.queryParameters.queryExpansion.standard.model({
+      field: "status",
+      value: "active",
+    });
+  });
   it("Routes_QueryParameters_QueryExpansion_Explode_primitive", async () => {
     await client.queryParameters.queryExpansion.explode.primitive("a");
   });
@@ -179,6 +186,12 @@ describe("Routes Client", () => {
       b: 2,
     });
   });
+  it("Routes_QueryParameters_QueryContinuation_Standard_model", async () => {
+    await client.queryParameters.queryContinuation.standard.model({
+      field: "status",
+      value: "active",
+    });
+  });
   it("Routes_QueryParameters_QueryContinuation_Explode_primitive", async () => {
     await client.queryParameters.queryContinuation.explode.primitive("a");
   });
@@ -189,6 +202,12 @@ describe("Routes Client", () => {
     await client.queryParameters.queryContinuation.explode.record({
       a: 1,
       b: 2,
+    });
+  });
+  it("Routes_QueryParameters_QueryContinuation_Explode_model", async () => {
+    await client.queryParameters.queryContinuation.explode.model({
+      field: "status",
+      value: "active",
     });
   });
 });

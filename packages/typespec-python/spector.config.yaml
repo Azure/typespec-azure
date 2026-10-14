@@ -101,6 +101,7 @@ specs:
   "payload/multipart": true
   "payload/pageable": true
   "payload/xml": true
+  "response/body-or-no-content": true
   "response/status-code-range": true
   routes: true
   "serialization/encoded-name/json": true

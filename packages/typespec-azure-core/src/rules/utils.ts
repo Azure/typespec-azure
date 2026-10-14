@@ -154,6 +154,14 @@ export function isCamelCaseNoAcronyms(name: string): boolean {
   return /^[^a-zA-Z0-9]?[a-z][a-z0-9]*([A-Z][a-z0-9]+)*[A-Z]?$/.test(name);
 }
 
+/**
+ * Checks for lowercase ASCII words separated by single underscores.
+ * Digits are allowed after the first letter, including immediately after an underscore.
+ */
+export function isSnakeCase(name: string): boolean {
+  return /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/.test(name);
+}
+
 export function checkReferenceInDisallowedNamespace(
   context: LinterRuleContext<{ readonly default: CallableMessage<["ns"]> }>,
   origin: Type,
