@@ -3,7 +3,7 @@ import {
   type LinterRuleTester,
   type TesterInstance,
 } from "@typespec/compiler/testing";
-import { readFile } from "node:fs/promises";
+
 import { beforeEach, describe, it, vi } from "vitest";
 import { useUpdateForPatchRule } from "../../src/rules/use-update-for-patch.js";
 import { ArmTester } from "../tester.js";
@@ -46,19 +46,34 @@ function diagnostic(operationName: string, target = operationName) {
   };
 }
 
-async function documentationSnippet(section: string) {
-  const source = await readFile(
-    new URL("../../src/rules/use-update-for-patch.md", import.meta.url),
-    "utf8",
-  );
-  const snippet = source
-    .replace(/\r\n/g, "\n")
-    .split(section)[1]
-    ?.match(/```typespec\n([\s\S]*?)```/)?.[1];
-  if (!snippet) {
-    throw new Error(`Missing documentation snippet: ${section}`);
-  }
-  return `${header} ${widget} ${snippet}`;
+function patchTemplateFixture(
+  section: "#### ❌ Incorrect" | "#### ✅ Correct" | "## Impact" | "## Suppression",
+) {
+  const fixtures = {
+    "#### ❌ Incorrect": `@armResourceOperations
+interface Widgets {
+  modify is ArmResourcePatchSync<Widget, Properties = WidgetProperties>;
+}
+`,
+    "#### ✅ Correct": `@armResourceOperations
+interface Widgets {
+  update is ArmResourcePatchSync<Widget, Properties = WidgetProperties>;
+}
+`,
+    "## Impact": `@armResourceOperations
+interface Widgets {
+  @Azure.ClientGenerator.Core.clientName("updateWidget")
+  modify is ArmResourcePatchSync<Widget, Properties = WidgetProperties>;
+}
+`,
+    "## Suppression": `@armResourceOperations
+interface Widgets {
+  #suppress "@azure-tools/typespec-client-generator-core/use-update-for-patch" "Preserve the already-shipped SDK method name."
+  modify is ArmResourcePatchSync<Widget, Properties = WidgetProperties>;
+}
+`,
+  };
+  return `${header} ${widget} ${fixtures[section]}`;
 }
 
 describe("use-update-for-patch", () => {
@@ -263,23 +278,23 @@ describe("use-update-for-patch", () => {
       .toEmitDiagnostics([diagnostic("modify")]);
   });
 
-  it("validates the exact incorrect documentation example", async () => {
+  it("validates the exact incorrect template fixture", async () => {
     await tester
-      .expect(await documentationSnippet("#### ❌ Incorrect"))
+      .expect(await patchTemplateFixture("#### ❌ Incorrect"))
       .toEmitDiagnostics([diagnostic("modify")]);
   });
 
-  it("validates the exact correct documentation example", async () => {
-    await tester.expect(await documentationSnippet("#### ✅ Correct")).toBeValid();
+  it("validates the exact correct template fixture", async () => {
+    await tester.expect(await patchTemplateFixture("#### ✅ Correct")).toBeValid();
   });
 
-  it("validates the exact common client name documentation example", async () => {
-    await tester.expect(await documentationSnippet("## Impact")).toBeValid();
+  it("validates the exact common client name template fixture", async () => {
+    await tester.expect(await patchTemplateFixture("## Impact")).toBeValid();
   });
 
-  it("validates the exact suppression documentation example", async () => {
+  it("validates the exact suppression template fixture", async () => {
     // The direct rule tester collects diagnostics before compiler suppression is applied.
-    await runner.compile(await documentationSnippet("## Suppression"), {
+    await runner.compile(await patchTemplateFixture("## Suppression"), {
       compilerOptions: {
         linterRuleSet: {
           enable: { "@azure-tools/typespec-client-generator-core/use-update-for-patch": true },
