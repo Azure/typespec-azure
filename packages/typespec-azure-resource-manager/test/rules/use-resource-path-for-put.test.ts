@@ -1,8 +1,8 @@
 import { Tester } from "#test/tester.js";
 import { type LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
-import { readFileSync } from "node:fs";
+
 import { beforeEach, it } from "vitest";
-import { useEvenSegmentedPutPathRule } from "../../src/rules/use-even-segmented-put-path.js";
+import { useResourcePathForPutRule } from "../../src/rules/use-resource-path-for-put.js";
 
 let tester: LinterRuleTester;
 
@@ -10,14 +10,14 @@ beforeEach(async () => {
   const runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
-    useEvenSegmentedPutPathRule,
+    useResourcePathForPutRule,
     "@azure-tools/typespec-azure-resource-manager",
   );
 });
 
 function diagnostic(path: string) {
   return {
-    code: "@azure-tools/typespec-azure-resource-manager/use-even-segmented-put-path",
+    code: "@azure-tools/typespec-azure-resource-manager/use-resource-path-for-put",
     severity: "warning" as const,
     message: `ARM PUT path '${path}' must end in repeated /{resourceType}/{resourceName} or /{resourceType}/default pairs after the provider namespace.`,
   };
@@ -77,15 +77,38 @@ it("accepts standard ARM create-or-update templates", async () => {
     .toBeValid();
 });
 
-it("validates the published ARM template examples", async () => {
-  const doc = readFileSync(
-    new URL("../../src/rules/use-even-segmented-put-path.md", import.meta.url),
-    "utf8",
-  );
-  const examples = [...doc.matchAll(/```tsp\r?\n([\s\S]*?)\r?\n```/g)].map((match) => match[1]);
-  if (examples.length !== 2) {
-    throw new Error(`Expected exactly two published TypeSpec examples, got ${examples.length}`);
-  }
+it("validates the standard ARM template examples", async () => {
+  const examples = [
+    `@armProviderNamespace
+namespace Microsoft.Contoso;
+
+model Widget is TrackedResource<{}> {
+  ...ResourceNameParameter<Widget>;
+}
+
+@armResourceOperations
+interface Widgets {
+  createOrUpdate is ArmResourceCreateOrReplaceSync<
+    Widget,
+    Parameters = {
+      @path configurationName: string;
+    }
+  >;
+}
+`,
+    `@armProviderNamespace
+namespace Microsoft.Contoso;
+
+model Widget is TrackedResource<{}> {
+  ...ResourceNameParameter<Widget>;
+}
+
+@armResourceOperations
+interface Widgets {
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+}
+`,
+  ];
 
   await tester.expect(examples[0]).toEmitDiagnostics((result) => {
     const main = [...result.program.sourceFiles.values()].find((file) =>
@@ -93,7 +116,7 @@ it("validates the published ARM template examples", async () => {
     );
     const pos = main?.file.text.indexOf("createOrUpdate is ArmResourceCreateOrReplaceSync");
     if (!main || pos === undefined || pos < 0) {
-      throw new Error("The published createOrUpdate operation was not compiled");
+      throw new Error("The standard createOrUpdate operation was not compiled");
     }
     return {
       ...diagnostic(

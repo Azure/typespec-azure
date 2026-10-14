@@ -47,11 +47,11 @@ import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 import { useApiVersionRule } from "./rules/use-api-version.js";
 import { useApplicationJsonContentTypeRule } from "./rules/use-application-json-content-type.js";
-import { useEvenSegmentedPutPathRule } from "./rules/use-even-segmented-put-path.js";
 import { useInterfaceRule } from "./rules/use-interface.js";
 import { useModelRequestBodyRule } from "./rules/use-model-request-body.js";
 import { useOperationDecoratorRule } from "./rules/use-operation-decorator.js";
 import { useRelationshipRequiredPropertiesRule } from "./rules/use-relationship-required-properties.js";
+import { useResourcePathForPutRule } from "./rules/use-resource-path-for-put.js";
 import { versionProgressionRule } from "./rules/version-progression.js";
 
 const rules = [
@@ -108,7 +108,7 @@ const rules = [
   noReservedResourcePropertyRule,
   noTenantLevelApisRule,
   noQueryInPointOpRule,
-  useEvenSegmentedPutPathRule,
+  useResourcePathForPutRule,
 ];
 
 export const $linter = defineLinter({
