@@ -235,6 +235,54 @@ export interface PollingSuccessNoResult extends LogicalOperationStep {
 }
 
 /**
+ * Protocol and declaration facts for a long-running operation, before selecting
+ * a client-facing result. Required final requests remain part of `completion.finalStep`.
+ */
+export interface LroProtocolMetadata {
+  /** The operation that was processed. */
+  operation: Operation;
+  /** Initial response and operation classification. */
+  initial: {
+    /** The successful initial response model, before client projection. */
+    initialResponse: Model;
+    /** REST resource metadata, including inferred DELETE resource metadata. */
+    resourceOperation?: ResourceOperation;
+    /** Whether the operation has REST action metadata. */
+    isAction: boolean;
+  };
+  /** Status-monitor access and polling declarations. */
+  polling: {
+    /** How to reach the status monitor. */
+    statusMonitorStep?: NextOperationLink | NextOperationReference;
+    /** The polling response and its status, result, and error declarations. */
+    pollingInfo: PollingOperationStep;
+    /**
+     * Success information from a fallback status monitor. Absent means no usable
+     * monitor was found; a void type means the monitor has no success value.
+     */
+    statusMonitorResult?: {
+      type: Model | Scalar | UnknownType | VoidType;
+      property?: ModelProperty;
+    };
+  };
+  /** Completion strategy and final-step declarations. */
+  completion: {
+    /** The protocol strategy, including any explicit final-state override. */
+    finalStateVia: FinalStateValue;
+    /**
+     * A required final request, a declared polling success property, or an explicit
+     * absence of polling results. This is not a client result projection.
+     */
+    finalStep?: FinalOperationStep;
+    /**
+     * Whether a GET exists when original-uri was explicitly requested.
+     * Undefined means this validation was not applicable.
+     */
+    originalUriHasGetOperation?: boolean;
+  };
+}
+
+/**
  * Information about long-running operations
  * For standard Lro Patterns, only the 'logicalResult' and 'finalStateVia' will be used.
  */
@@ -288,6 +336,20 @@ export interface LroMetadata {
  * cannot be processed.
  */
 export function getLroMetadata(program: Program, operation: Operation): LroMetadata | undefined {
+  const protocol = getLroProtocolMetadata(program, operation);
+  return protocol && resolveLegacyLroMetadata(protocol);
+}
+
+/**
+ * Analyzes polling, completion requests, and wire declarations without choosing
+ * a client result or envelope. Returns undefined for operations without usable
+ * LRO protocol information. Existing combined metadata is available through
+ * {@link getLroMetadata}.
+ */
+export function getLroProtocolMetadata(
+  program: Program,
+  operation: Operation,
+): LroProtocolMetadata | undefined {
   const context: LroContext | undefined = ensureContext(program, operation, undefined);
   if (context === undefined) return undefined;
   processFinalReference(program, operation, context);
@@ -304,11 +366,11 @@ export function getLroMetadata(program: Program, operation: Operation): LroMetad
     processFinalReference(program, linkedOperation, context);
     processFinalLink(program, linkedOperation, context);
     context.pollingStep = getPollingStep(program, nextReference.responseModel, context);
-    return createLroMetadata(program, operation, context);
+    return createLroProtocolMetadata(program, operation, context);
   }
 
   if (processStatusMonitorLink(program, operation, context)) {
-    return createLroMetadata(program, operation, context);
+    return createLroProtocolMetadata(program, operation, context);
   }
 
   return undefined;
@@ -328,6 +390,7 @@ interface LroContext {
   statusMonitorStep?: nextOperationStep;
   statusMonitorInfo?: StatusMonitorMetadata;
   pollingStep?: PollingOperationStep;
+  statusMonitorResult?: LroProtocolMetadata["polling"]["statusMonitorResult"];
 }
 
 /** Contains all relevant data about a StatusMonitor, including
@@ -396,70 +459,99 @@ function createFinalOperationLink(
   };
 }
 
-function createLroMetadata(
+function createLroProtocolMetadata(
   program: Program,
   operation: Operation,
   context: LroContext,
-): LroMetadata | undefined {
-  const [finalState, model] = getFinalStateVia(program, operation, context);
+): LroProtocolMetadata | undefined {
+  const resourceOperation = getLogicalResourceOperation(program, operation, context.originalModel);
+  const isAction = getActionDetails(program, operation) !== undefined;
+  const finalState = getFinalStateVia(program, operation, context, resourceOperation, isAction);
   if (finalState === undefined || context.pollingStep === undefined) return undefined;
 
   // If original-uri is explicitly specified via @useFinalStateVia and there's no GET
-  // operation at the same path, emit a warning and treat the final result as void.
+  // operation at the same path, report that fact for result projection.
   // We check both finalState and finalStateOverride to only emit the diagnostic when
   // the user explicitly opted into original-uri (via @useFinalStateVia), not when
   // original-uri is the natural computed state (e.g., for standard resource create operations).
-  let resolvedModel = model;
+  let originalUriHasGetOperation: boolean | undefined;
   const finalStateOverride = getFinalStateOverride(program, operation);
   if (
     finalState === FinalStateValue.originalUri &&
     finalStateOverride === FinalStateValue.originalUri
   ) {
-    if (!hasGetOperationAtSamePath(program, context.httpOperation)) {
+    originalUriHasGetOperation = hasGetOperationAtSamePath(program, context.httpOperation);
+    if (!originalUriHasGetOperation) {
       reportDiagnostic(program, {
         code: "no-operation-at-original-uri",
         target: operation,
       });
-      // When there's no GET at the original URI, treat the final result as void
-      resolvedModel = $(program).intrinsic.void;
     }
   }
 
-  if (resolvedModel === undefined) return undefined;
+  return {
+    operation,
+    initial: {
+      initialResponse: context.originalModel,
+      resourceOperation,
+      isAction,
+    },
+    polling: {
+      statusMonitorStep: context.statusMonitorStep,
+      pollingInfo: context.pollingStep,
+      statusMonitorResult: context.statusMonitorResult,
+    },
+    completion: {
+      finalStateVia: finalState,
+      finalStep: context.finalStep,
+      originalUriHasGetOperation,
+    },
+  };
+}
+
+/** Compatibility result policy for callers of the combined Core API. */
+function resolveLegacyLroMetadata(protocol: LroProtocolMetadata): LroMetadata {
+  const { finalStep, originalUriHasGetOperation } = protocol.completion;
+  const { pollingInfo, statusMonitorResult } = protocol.polling;
+  const { initialResponse, resourceOperation, isAction } = protocol.initial;
+  let model: Model | Scalar | UnknownType | VoidType | "void" =
+    isAction || resourceOperation?.operation === "delete"
+      ? pollingInfo.responseModel
+      : initialResponse;
+  if (
+    finalStep &&
+    finalStep.kind !== "noPollingResult" &&
+    (finalStep.kind !== "pollingSuccessProperty" ||
+      resourceOperation?.operation !== "createOrReplace")
+  ) {
+    model = finalStep.responseModel;
+  } else if (resourceOperation?.operation === "createOrReplace") {
+    model = resourceOperation.resourceType;
+  } else if (statusMonitorResult) {
+    model = statusMonitorResult.type;
+  }
+  if (originalUriHasGetOperation === false) model = "void";
+
   const logicalPathName =
-    context.finalStep?.kind === "pollingSuccessProperty"
-      ? context.finalStep.target.name
-      : undefined;
+    finalStep?.kind === "pollingSuccessProperty" ? finalStep.target.name : undefined;
 
   let finalResult: Model | Scalar | UnknownType | "void" =
-    resolvedModel.kind === "Model" ||
-    resolvedModel.kind === "Scalar" ||
-    (resolvedModel.kind === "Intrinsic" && !isVoidType(resolvedModel))
-      ? resolvedModel
-      : "void";
-  let finalEnvelopeResult: Model | Scalar | UnknownType | "void" =
-    resolvedModel.kind === "Model" ||
-    resolvedModel.kind === "Scalar" ||
-    (resolvedModel.kind === "Intrinsic" && !isVoidType(resolvedModel))
-      ? resolvedModel
-      : "void";
-  if (context.finalStep && context.finalStep.kind === "pollingSuccessProperty") {
-    finalEnvelopeResult = context.pollingStep.responseModel;
-  } else if (context.finalStep && context.finalStep.kind === "noPollingResult") {
+    model === "void" || isVoidType(model) ? "void" : model;
+  let finalEnvelopeResult = finalResult;
+  if (finalStep?.kind === "pollingSuccessProperty") {
+    finalEnvelopeResult = pollingInfo.responseModel;
+  } else if (finalStep?.kind === "noPollingResult") {
     finalResult = "void";
     finalEnvelopeResult = "void";
   }
   return {
-    operation: operation,
-    logicalResult:
-      resolvedModel.kind === "Intrinsic" || resolvedModel.kind === "Scalar"
-        ? context.pollingStep.responseModel
-        : resolvedModel,
-    finalStateVia: finalState,
-    statusMonitorStep: context.statusMonitorStep,
-    pollingInfo: context.pollingStep,
-    finalStep: context.finalStep,
-    envelopeResult: context.pollingStep.responseModel,
+    operation: protocol.operation,
+    logicalResult: model !== "void" && model.kind === "Model" ? model : pollingInfo.responseModel,
+    finalStateVia: protocol.completion.finalStateVia,
+    statusMonitorStep: protocol.polling.statusMonitorStep,
+    pollingInfo,
+    finalStep,
+    envelopeResult: pollingInfo.responseModel,
     logicalPath: logicalPathName,
     finalResult: finalResult,
     finalEnvelopeResult: finalEnvelopeResult,
@@ -589,17 +681,14 @@ function getFinalStateVia(
   program: Program,
   operation: Operation,
   context: LroContext,
-): [FinalStateValue, Model | Scalar | UnknownType | VoidType | undefined] {
-  const operationAction = getActionDetails(program, operation);
-  let model: Model | Scalar | UnknownType | VoidType | undefined =
-    context.originalModel?.name !== undefined ? context.originalModel : undefined;
+  resOp: ResourceOperation | undefined,
+  isAction: boolean,
+): FinalStateValue {
   let finalState: FinalStateValue = FinalStateValue.originalUri;
   const finalStateOverride = getFinalStateOverride(program, operation);
-  const resOp = getLogicalResourceOperation(program, operation, model);
 
-  if (operationAction !== undefined || resOp?.operation === "delete") {
+  if (isAction || resOp?.operation === "delete") {
     finalState = FinalStateValue.operationLocation;
-    model = context.pollingStep?.responseModel ?? context.originalModel;
   }
 
   if (
@@ -609,7 +698,6 @@ function getFinalStateVia(
       resOp?.operation === undefined ||
       resOp.operation !== "createOrReplace")
   ) {
-    model = context.finalStep.responseModel;
     if (
       context.finalStep.kind === "pollingSuccessProperty" &&
       context.statusMonitorStep !== undefined
@@ -633,7 +721,7 @@ function getFinalStateVia(
     } else {
       finalState = getStatusFromLinkOrReference(program, operation, context.finalStep.target);
     }
-    return [finalStateOverride || finalState, model];
+    return finalStateOverride || finalState;
   }
 
   if (
@@ -642,29 +730,26 @@ function getFinalStateVia(
     resOp.operation === "createOrReplace" &&
     resOp.resourceType !== undefined
   ) {
-    model = resOp.resourceType;
-    return [
-      finalStateOverride || FinalStateValue.originalUri,
-      model && !isVoidType(model) ? model : undefined,
-    ];
+    return finalStateOverride || FinalStateValue.originalUri;
   }
 
   // handle actions and delete operations
   if (
-    (operationAction !== undefined &&
-      operationAction !== null &&
-      context.statusMonitorStep !== undefined) ||
+    (isAction && context.statusMonitorStep !== undefined) ||
     (resOp?.operation === "delete" &&
       context.pollingStep !== undefined &&
       context.statusMonitorStep !== undefined) ||
-    (operationAction === undefined &&
+    (!isAction &&
       resOp === undefined &&
       context.pollingStep !== undefined &&
       context.statusMonitorStep !== undefined)
   ) {
     const info = getStatusMonitorInfo(program, context.statusMonitorStep.responseModel);
     if (info !== undefined) {
-      model = info.successType ?? $(program).intrinsic.void;
+      context.statusMonitorResult = {
+        type: info.successType ?? $(program).intrinsic.void,
+        property: info.successProperty,
+      };
       finalState = getStatusFromLinkOrReference(
         program,
         operation,
@@ -676,7 +761,7 @@ function getFinalStateVia(
     }
   }
 
-  return [finalStateOverride || finalState, model];
+  return finalStateOverride || finalState;
 }
 
 function getLroStatusFromHeaderProperty(

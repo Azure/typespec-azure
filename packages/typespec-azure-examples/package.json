@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-examples",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Microsoft Corporation",
   "description": "Tooling for the Azure unified examples format (examples.yaml): JSON Schema and the tsp-examples CLI",
   "homepage": "https://azure.github.io/typespec-azure",
