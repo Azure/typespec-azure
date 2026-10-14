@@ -7,12 +7,8 @@ import {
   paramMessage,
   resolveEncodedName,
   type Enum,
-  type EnumMember,
-  type Model,
   type ModelProperty,
   type Operation,
-  type Scalar,
-  type Union,
   type UnionVariant,
 } from "@typespec/compiler";
 import {
@@ -24,8 +20,6 @@ import {
   isStatusCode,
 } from "@typespec/http";
 
-type NamedTarget = Enum | EnumMember | Model | Scalar | Union;
-
 export const noUninformativeDocRule = createRule({
   name: "no-uninformative-doc",
   docs: fileRef.fromPackageRoot("src/rules/no-uninformative-doc.md"),
@@ -36,7 +30,22 @@ export const noUninformativeDocRule = createRule({
     default: paramMessage`Description must not match the name of the node it describes. Node name:'${"name"}' Description:'${"description"}'`,
   },
   create(context) {
-    const checkTarget = (target: Parameters<typeof getDoc>[1], nodeName: string | undefined) => {
+    const checkTarget = (
+      target: Parameters<typeof getDoc>[1],
+      nodeName: string | undefined = "name" in target && typeof target.name === "string"
+        ? target.name
+        : undefined,
+    ) => {
+      if (
+        !nodeName &&
+        (target.kind === "Model" ||
+          target.kind === "Scalar" ||
+          target.kind === "Enum" ||
+          target.kind === "EnumMember" ||
+          target.kind === "Union")
+      ) {
+        return;
+      }
       const doc = getDoc(context.program, target);
       if (doc === undefined) {
         return;
@@ -64,25 +73,16 @@ export const noUninformativeDocRule = createRule({
       });
     };
 
-    const checkNamedTarget = (target: NamedTarget) => {
-      const { name } = target;
-      if (!name || name.length === 0) {
-        return;
-      }
-
-      checkTarget(target, name);
-    };
-
     return {
-      model: checkNamedTarget,
-      scalar: checkNamedTarget,
+      model: checkTarget,
+      scalar: checkTarget,
       enum: (target: Enum) => {
-        checkNamedTarget(target);
+        checkTarget(target);
         for (const member of target.members.values()) {
-          checkNamedTarget(member);
+          checkTarget(member);
         }
       },
-      union: checkNamedTarget,
+      union: checkTarget,
       unionVariant: (target: UnionVariant) => {
         checkTarget(
           target,
