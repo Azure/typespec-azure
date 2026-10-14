@@ -1,14 +1,14 @@
-import type { Model, Operation } from "@typespec/compiler";
+import type { Model } from "@typespec/compiler";
 import {
   createRule,
   fileRef,
-  isTemplateDeclaration,
+  getProperty,
   isTemplateInstance,
   paramMessage,
   walkPropertiesInherited,
 } from "@typespec/compiler";
-import { SyntaxKind } from "@typespec/compiler/ast";
 import { getHttpOperation } from "@typespec/http";
+import { isTemplatedInterfaceOperation } from "./utils.js";
 
 export const noRepeatedPathInfoRule = createRule({
   name: "no-repeated-path-info",
@@ -74,21 +74,6 @@ export const noRepeatedPathInfoRule = createRule({
 });
 
 function getPropertiesModel(model: Model): Model | undefined {
-  for (const property of walkPropertiesInherited(model)) {
-    if (property.name !== "properties" || property.type.kind !== "Model") {
-      continue;
-    }
-
-    return property.type;
-  }
-
-  return undefined;
-}
-
-function isTemplatedInterfaceOperation(target: Operation): boolean {
-  return (
-    target.node?.kind === SyntaxKind.OperationStatement &&
-    target.interface !== undefined &&
-    isTemplateDeclaration(target.interface)
-  );
+  const property = getProperty(model, "properties");
+  return property?.type.kind === "Model" ? property.type : undefined;
 }

@@ -6,7 +6,7 @@ import {
   type LinterRuleTester,
   type TesterInstance,
 } from "@typespec/compiler/testing";
-import { readFileSync } from "node:fs";
+
 import { beforeEach, expect, it, vi } from "vitest";
 import { noRepeatedPathInfoRule } from "../../src/rules/no-repeated-path-info.js";
 
@@ -54,23 +54,48 @@ function armResource(properties: string, parameters?: string) {
   `;
 }
 
-it("compiles the published incorrect and correct examples with the rule enabled", async () => {
-  const documentation = readFileSync(
-    new URL("../../src/rules/no-repeated-path-info.md", import.meta.url),
-    "utf8",
-  );
-  const incorrect = documentation
-    .split("## ❌ Incorrect")[1]
-    ?.split("## ✅ Correct")[0]
-    ?.match(/```tsp\s*([\s\S]*?)```/)?.[1];
-  const correct = documentation
-    .split("## ✅ Correct")[1]
-    ?.split("## Suppression")[0]
-    ?.match(/```tsp\s*([\s\S]*?)```/)?.[1];
-  expect(incorrect).toBeDefined();
-  expect(correct).toBeDefined();
+it("compiles the standard incorrect and correct examples with the rule enabled", async () => {
+  const incorrect = `@armProviderNamespace
+namespace Microsoft.Contoso;
 
-  const [, diagnostics] = await runner.compileAndDiagnose(incorrect!, {
+model Widget is TrackedResource<WidgetProperties> {
+  @key("widgetName")
+  @segment("widgets")
+  @path
+  name: string;
+}
+
+model WidgetProperties {
+  widgetName?: string;
+  description?: string;
+}
+
+@armResourceOperations
+interface Widgets {
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+}
+`;
+  const correct = `@armProviderNamespace
+namespace Microsoft.Contoso;
+
+model Widget is TrackedResource<WidgetProperties> {
+  @key("widgetName")
+  @segment("widgets")
+  @path
+  name: string;
+}
+
+model WidgetProperties {
+  description?: string;
+}
+
+@armResourceOperations
+interface Widgets {
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
+}
+`;
+
+  const [, diagnostics] = await runner.compileAndDiagnose(incorrect, {
     compilerOptions: {
       linterRuleSet: {
         enable: {
@@ -83,7 +108,7 @@ it("compiles the published incorrect and correct examples with the rule enabled"
   const location = getSourceLocation(diagnostics[0].target);
   expect(location.file.text.slice(location.pos, location.end)).toContain("widgetName?: string");
 
-  await tester.expect(correct!).toBeValid();
+  await tester.expect(correct).toBeValid();
 });
 
 const operation = `
