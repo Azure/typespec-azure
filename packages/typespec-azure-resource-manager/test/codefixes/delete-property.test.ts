@@ -5,20 +5,26 @@ import { describe, it } from "vitest";
 import { createDeletePropertyCodeFix } from "../../src/codefixes/delete-property.js";
 
 describe("delete property", () => {
-  it.each([";", ",", " /* comment; , */;", " // comment; ,\n;", " // comment; ,\r\n,"])(
-    "deletes a property and its separator: %j",
-    async (separator) => {
-      await expectCodeFixOnAst(
-        `model Example { \u2506value: string${separator} next: string; }`,
-        (node) => {
-          const property = node.parent;
-          ok(property);
-          strictEqual(property.kind, SyntaxKind.ModelProperty);
-          return createDeletePropertyCodeFix(property);
-        },
-      ).toChangeTo("model Example {  next: string; }");
-    },
-  );
+  it.each([
+    ";",
+    ",",
+    " /* comment; , */;",
+    " // comment; ,\n;",
+    " // comment; ,\r\n,",
+    " /* comment */\u0085;",
+    " /* comment */\u200e;",
+    " /* comment */\u200f,",
+  ])("deletes a property and its separator: %j", async (separator) => {
+    await expectCodeFixOnAst(
+      `model Example { \u2506value: string${separator} next: string; }`,
+      (node) => {
+        const property = node.parent;
+        ok(property);
+        strictEqual(property.kind, SyntaxKind.ModelProperty);
+        return createDeletePropertyCodeFix(property);
+      },
+    ).toChangeTo("model Example {  next: string; }");
+  });
 
   it.each([
     " /* first */",
