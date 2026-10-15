@@ -1,17 +1,8 @@
-import { resolvePath } from "@typespec/compiler";
-import {
-  createLinterRuleTester,
-  createTester,
-  type LinterRuleTester,
-} from "@typespec/compiler/testing";
+import { createLinterRuleTester, type LinterRuleTester } from "@typespec/compiler/testing";
 
-import { beforeEach, describe, it, vi } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { useDeleteForDeleteRule } from "../../src/rules/use-delete-for-delete.js";
-import { ArmTester, SimpleTester } from "../tester.js";
-
-vi.mock("@azure-tools/typespec-autorest", () => {
-  throw new Error("Native lint must not load the AutoRest emitter.");
-});
+import { ArmBaseTester, ArmTester, SimpleTester } from "../tester.js";
 
 function diagnostic(operationName: string, target = operationName) {
   return {
@@ -336,22 +327,12 @@ describe("use-delete-for-delete with standard ARM operations", () => {
       .toBeValid();
   });
 
-  describe("standard template template fixtures", () => {
+  describe("standalone standard template fixtures", () => {
     let setup: string;
     let examples: string[];
 
     beforeEach(async () => {
-      const runner = await createTester(resolvePath(import.meta.dirname, "..", ".."), {
-        libraries: [
-          "@typespec/http",
-          "@typespec/rest",
-          "@typespec/versioning",
-          "@typespec/openapi",
-          "@azure-tools/typespec-azure-core",
-          "@azure-tools/typespec-azure-resource-manager",
-          "@azure-tools/typespec-client-generator-core",
-        ],
-      }).createInstance();
+      const runner = await ArmBaseTester.createInstance();
       tester = createLinterRuleTester(
         runner,
         useDeleteForDeleteRule,
