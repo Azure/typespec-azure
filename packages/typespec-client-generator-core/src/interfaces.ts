@@ -545,8 +545,11 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   /** SDK types of the alternatives, in the same order as `variants.values()`. */
   variantTypes: TValueType[];
   /**
-   * Non-null alternatives in source order, keyed by their declared TypeSpec names without casing transformations.
-   * Unnamed/default variants retain their compiler symbol keys; synthesized variants use unique symbols.
+   * Maps variant keys to SDK types, in the same iteration order as `variantTypes`.
+   * Declared alternatives retain TypeSpec source order and their original string or symbol keys.
+   * String keys are declared names without casing transformations; symbols identify unnamed/default variants.
+   * Synthesized alternatives use new, unique symbol keys.
+   * Explicit null alternatives are excluded and represented by an `SdkNullableType` wrapper.
    * Distinct keys may reference the same SDK type.
    */
   variants: Map<string | symbol, TValueType>;
