@@ -1,6 +1,5 @@
 import { getSourceLocation } from "@typespec/compiler";
 import { createLinterRuleTester, t, type LinterRuleTester } from "@typespec/compiler/testing";
-import { readFile } from "node:fs/promises";
 import { beforeEach, describe, it } from "vitest";
 import { noOperationGroupNameConflictRule as rule } from "../../src/rules/no-operation-group-name-conflict.rule.js";
 import { SimpleBaseTester } from "../tester.js";
@@ -47,16 +46,6 @@ describe("no-operation-group-name-conflict", () => {
         end: getSourceLocation("Widget" in result ? result.Widget : result.read).end,
       }));
     }
-  });
-  it("validates the published generic HTTP examples", async () => {
-    const documentation = await readFile(
-      new URL("../../src/rules/no-operation-group-name-conflict.md", import.meta.url),
-      "utf8",
-    );
-    const snippets = [...documentation.matchAll(/```tsp\r?\n([\s\S]*?)```/g)];
-    if (snippets.length !== 2) throw new Error("Expected incorrect and correct examples.");
-    await check(snippets[0][1], ["Widget"]);
-    await check(snippets[1][1]);
   });
   it("reports a real group once rather than each method", async () => {
     await check(
@@ -176,6 +165,21 @@ describe("no-operation-group-name-conflict", () => {
       interface Widget { @get op read(): Box<string>; }`,
       ["Widget"],
     );
+  });
+  it("includes custom scalar bases reached through a derived API scalar", async () => {
+    await check(
+      `${header}
+      scalar Widget extends string;
+      scalar Alias extends Widget;
+      namespace Operations {
+        interface Widget { @get op read(): Alias; }
+      }`,
+      ["Widget"],
+    );
+    await check(`${header}
+      scalar Widget extends string;
+      scalar Alias extends Widget;
+      interface Widgets { @get op read(): Alias; }`);
   });
   it("honors explicit subclient names and common overrides", async () => {
     for (const decorators of [

@@ -5,6 +5,6 @@ vi.mock("@azure-tools/typespec-azure-resource-manager", () => {
 });
 
 it("loads the TCGC public entry point without importing ARM", async () => {
-  const { $linter } = await import("../../src/index.js");
+  const { $linter } = await import("../src/index.js");
   expect($linter).toBeDefined();
 });
