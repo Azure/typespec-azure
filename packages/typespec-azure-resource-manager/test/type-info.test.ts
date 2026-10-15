@@ -27,6 +27,7 @@ describe("arm: $provideTypeInfo", () => {
     expect(info?.content).toContain("`Collection`: `widgets`");
     expect(info?.content).toContain("`Scope`: `ResourceGroup`");
     expect(info?.content).toContain(
+      // cspell: disable-next-line
       "- `read`: `Microsoft.Test.Widgets.get` — `GET /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}{?api%2Dversion}`",
     );
     expect(info?.content).toContain(
