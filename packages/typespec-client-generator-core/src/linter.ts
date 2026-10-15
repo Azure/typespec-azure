@@ -7,9 +7,11 @@ import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
 import { useCreateForPutRule } from "./rules/use-create-for-put.js";
 import { useUnionHierarchyRule } from "./rules/use-union-hierarchy.js";
+import { useUpdateForPatchRule } from "./rules/use-update-for-patch.js";
 
 const rules = [
   useCreateForPutRule,
+  useUpdateForPatchRule,
   requireClientSuffixRule,
   propertyNameConflictRule,
   csharpNoUrlSuffixRule,

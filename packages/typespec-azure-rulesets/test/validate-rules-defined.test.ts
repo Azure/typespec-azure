@@ -72,4 +72,18 @@ describe("expect all rules to be defined", () => {
       ok(!$linter.ruleSets?.[rulesetName].enable?.[ruleName]);
     }
   });
+
+  it("keeps PATCH SDK naming guidance opt-in", () => {
+    const ruleName = "@azure-tools/typespec-client-generator-core/use-update-for-patch";
+    strictEqual($linter.ruleSets?.["client-sdk"].enable?.[ruleName], false);
+    for (const rulesetName of ["data-plane", "resource-manager"]) {
+      strictEqual($linter.ruleSets?.[rulesetName].enable?.[ruleName], undefined);
+      strictEqual(
+        $linter.ruleSets?.[rulesetName].enable?.[
+          "@azure-tools/typespec-azure-resource-manager/use-update-for-patch"
+        ],
+        undefined,
+      );
+    }
+  });
 });
