@@ -54,18 +54,18 @@ interface Widgets {
   listBySubscription is ArmListBySubscription<Widget>;
 
   /** Start the widget. */
-  @armResourceAction(Widget)
   @action("start")
-  @post
-  startWidget(...ResourceInstanceParameters<Widget>): StartWidgetResponse | ErrorResponse;
+  startWidget is ArmResourceActionSync<Widget, Request = void, Response = StartWidgetResponse>;
 }
 
 /** Response for the start widget operation. */
 model StartWidgetResponse {
   /** The status code. */
   @statusCode statusCode: 200;
+
   /** The location header. */
   @header("Location") location?: string;
+
   /** The updated widget. */
   @body body: Widget;
 }

@@ -54,16 +54,15 @@ interface Widgets {
   listBySubscription is ArmListBySubscription<Widget>;
 
   /** Stop the widget. */
-  @armResourceAction(Widget)
   @action("stop")
-  @post
-  stopWidget(...ResourceInstanceParameters<Widget>): StopWidgetResponse | ErrorResponse;
+  stopWidget is ArmResourceActionSync<Widget, Request = void, Response = StopWidgetResponse>;
 }
 
 /** Response for the stop widget operation. */
 model StopWidgetResponse {
   /** The status code. */
   @statusCode statusCode: 204;
+
   /** The async-operation header. */
   @header("Azure-AsyncOperation") azureAsyncOperation?: string;
 }
