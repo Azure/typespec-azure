@@ -108,6 +108,13 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
           // operation with `@clientLocation` decorator is placed in another client
           if (context.__rawClientsCache.has(clientLocation)) {
             pushClient = context.__rawClientsCache.get(clientLocation)!;
+            const operationService =
+              client.services.length > 1
+                ? findServiceForOperation(client.services, op)
+                : client.services[0];
+            if (operationService && !pushClient.services.includes(operationService)) {
+              pushClient.services.push(operationService);
+            }
           } else {
             reportDiagnostic(context.program, {
               code: "client-location-wrong-type",

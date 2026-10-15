@@ -1,5 +1,12 @@
 # Changelog - @azure-tools/typespec-azure-examples
 
+## 0.2.1
+
+### Bug Fixes
+
+- [#5690](https://github.com/Azure/typespec-azure/pull/5690) Use `id` instead of `legacyFilename` for example filename metadata, omitting the `.json` extension. Existing filename metadata and title-based lineages remain supported.
+
+
 
 
 ## 0.2.0
