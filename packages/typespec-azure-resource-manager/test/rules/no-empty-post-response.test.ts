@@ -1,13 +1,11 @@
 import { Tester } from "#test/tester.js";
-import { getLroMetadata } from "@azure-tools/typespec-azure-core";
-import { getSourceLocation, type Program } from "@typespec/compiler";
+import { getSourceLocation, type Operation } from "@typespec/compiler";
 import {
   createLinterRuleTester,
   type LinterRuleTester,
   type TesterInstance,
 } from "@typespec/compiler/testing";
-import { beforeEach, describe, expect, it } from "vitest";
-import { getArmResources } from "../../src/resource.js";
+import { beforeEach, describe, it } from "vitest";
 import { noEmptyPostResponseRule } from "../../src/rules/no-empty-post-response.js";
 
 const header = `
@@ -35,18 +33,12 @@ function action(response: string, verb = "post") {
     @armResourceOperations
     interface Employees {
       @${verb} @armResourceAction(Employee)
-      hire(...ApiVersionParameter): ${response} | ErrorResponse;
+      /*hire*/hire(...ApiVersionParameter): ${response} | ErrorResponse;
     }
   `;
 }
 
-function expected(program: Program) {
-  const operation = program
-    .getGlobalNamespaceType()
-    .namespaces.get("Microsoft")!
-    .namespaces.get("Contoso")!
-    .interfaces.get("Employees")!
-    .operations.get("hire")!;
+function expected(operation: Operation) {
   const location = getSourceLocation(operation);
   return {
     code: "@azure-tools/typespec-azure-resource-manager/no-empty-post-response",
@@ -66,7 +58,7 @@ describe("no-empty-post-response", () => {
       "{ @statusCode _: 200; result: string; } | { @statusCode _: 200; @header etag: string; }",
     ],
   ])("rejects a synchronous 200 %s", async (_name, response) => {
-    await tester.expect(action(response)).toEmitDiagnostics(({ program }) => expected(program));
+    await tester.expect(action(response)).toEmitDiagnostics(({ hire }) => expected(hire));
   });
 
   it.each([
@@ -95,11 +87,11 @@ describe("no-empty-post-response", () => {
         `${header}
         @armResourceOperations
         interface Employees {
-          hire is ArmResourceActionSync<Employee, void, Response = { @statusCode _: 200; }>;
+          /*hire*/hire is ArmResourceActionSync<Employee, void, Response = { @statusCode _: 200; }>;
         }
       `,
       )
-      .toEmitDiagnostics(({ program }) => expected(program));
+      .toEmitDiagnostics(({ hire }) => expected(hire));
   });
 
   it("accepts the documented 204 response customization", async () => {
@@ -125,18 +117,7 @@ describe("no-empty-post-response", () => {
         }
       `,
       )
-      .toEmitDiagnostics(({ program }) => {
-        const operation = getArmResources(program)[0].operations.actions.hire;
-        expect(getLroMetadata(program, operation.operation)).toBeDefined();
-        expect(
-          operation.httpOperation.responses.some(
-            (response) =>
-              response.statusCodes === 200 &&
-              response.responses.some((variant) => variant.body === undefined),
-          ),
-        ).toBe(true);
-        return [];
-      });
+      .toBeValid();
   });
 
   it("rejects an explicit void body in the synchronous ARM action response", async () => {
@@ -145,10 +126,10 @@ describe("no-empty-post-response", () => {
         `${header}
         @armResourceOperations
         interface Employees {
-          hire is ArmResourceActionSync<Employee, void, Response = { @statusCode _: 200; @body result: void; }>;
+          /*hire*/hire is ArmResourceActionSync<Employee, void, Response = { @statusCode _: 200; @body result: void; }>;
         }
       `,
       )
-      .toEmitDiagnostics(({ program }) => expected(program));
+      .toEmitDiagnostics(({ hire }) => expected(hire));
   });
 });
