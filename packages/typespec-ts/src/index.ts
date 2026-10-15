@@ -89,12 +89,12 @@ import { emitNonModelResponseTypes, emitTypes } from "./modular/emit-models.js";
 import { emitSamples } from "./modular/emit-samples.js";
 import { emitTests } from "./modular/emit-tests.js";
 import { getClassicalClientName } from "./modular/helpers/naming-helpers.js";
-import type { ModularEmitterOptions } from "./modular/interfaces.js";
-import { packageUsesXmlSerialization } from "./modular/serialization/build-xml-serializer-function.js";
 import {
   packageHasSseStreaming,
   packageHasStructuredStreaming,
 } from "./modular/helpers/operation-helpers.js";
+import type { ModularEmitterOptions } from "./modular/interfaces.js";
+import { packageUsesXmlSerialization } from "./modular/serialization/build-xml-serializer-function.js";
 import { transformClientOptions } from "./transform/transform-client-options.js";
 import { transformClientModel } from "./transform/transform.js";
 import { getClientHierarchyMap, getClientModuleInfo, getClients } from "./utils/client-utils.js";
