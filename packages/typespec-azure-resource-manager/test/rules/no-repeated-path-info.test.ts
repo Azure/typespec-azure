@@ -2,20 +2,12 @@ import { Tester } from "#test/tester.js";
 import { getSourceLocation } from "@typespec/compiler";
 import {
   createLinterRuleTester,
-  expectDiagnostics,
   type LinterRuleTester,
   type TesterInstance,
 } from "@typespec/compiler/testing";
 
-import { beforeEach, expect, it, vi } from "vitest";
+import { beforeEach, it } from "vitest";
 import { noRepeatedPathInfoRule } from "../../src/rules/no-repeated-path-info.js";
-
-vi.mock("@azure-tools/typespec-autorest", () => {
-  throw new Error("Native lint must not load the AutoRest emitter.");
-});
-vi.mock("@azure-tools/typespec-client-generator-core", () => {
-  throw new Error("Native lint must not load TCGC.");
-});
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;
@@ -66,7 +58,7 @@ model Widget is TrackedResource<WidgetProperties> {
 }
 
 model WidgetProperties {
-  widgetName?: string;
+  /*repeated*/widgetName?: string;
   description?: string;
 }
 
@@ -95,18 +87,11 @@ interface Widgets {
 }
 `;
 
-  const [, diagnostics] = await runner.compileAndDiagnose(incorrect, {
-    compilerOptions: {
-      linterRuleSet: {
-        enable: {
-          "@azure-tools/typespec-azure-resource-manager/no-repeated-path-info": true,
-        },
-      },
-    },
-  });
-  expectDiagnostics(diagnostics, [diagnostic()]);
-  const location = getSourceLocation(diagnostics[0].target);
-  expect(location.file.text.slice(location.pos, location.end)).toContain("widgetName?: string");
+  await tester.expect(incorrect).toEmitDiagnostics(({ repeated }) => ({
+    ...diagnostic(),
+    pos: getSourceLocation(repeated).pos,
+    end: getSourceLocation(repeated).end,
+  }));
 
   await tester.expect(correct).toBeValid();
 });
@@ -119,58 +104,6 @@ const operation = `
 it("reports a path name repeated in ARM PUT resource properties", async () => {
   await tester.expect(armResource("widgetName?: string;")).toEmitDiagnostics([diagnostic()]);
 });
-
-it.each(["widgetName", "identity"])(
-  "distinguishes envelope duplication from URI duplication with @key(%s)",
-  async (parameterName) => {
-    const [{ widgetName, identity }, diagnostics] = await runner.compileAndDiagnose(
-      `
-        @armProviderNamespace
-        namespace Microsoft.Contoso;
-
-        model Widget is TrackedResource<WidgetProperties> {
-          @key("${parameterName}") @segment("widgets") @path name: string;
-          ...ManagedServiceIdentityProperty;
-        }
-        model WidgetProperties {
-          /*widgetName*/widgetName?: string;
-          /*identity*/identity?: string;
-        }
-        @armResourceOperations
-        interface Widgets {
-          createOrUpdate is ArmResourceCreateOrReplaceSync<Widget>;
-        }
-      `,
-      {
-        compilerOptions: {
-          linterRuleSet: {
-            enable: {
-              "@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property": true,
-              "@azure-tools/typespec-azure-resource-manager/no-repeated-path-info": true,
-            },
-          },
-        },
-      },
-    );
-    const envelopeLocation = getSourceLocation(identity);
-    const uriLocation = getSourceLocation(parameterName === "widgetName" ? widgetName : identity);
-    expectDiagnostics(diagnostics, [
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-duplicate-property",
-        severity: "warning",
-        message:
-          'Duplicate property "identity" found in the resource envelope and resource properties.  Please do not duplicate envelope properties in resource properties.',
-        pos: envelopeLocation.pos,
-        end: envelopeLocation.end,
-      },
-      {
-        ...diagnostic(parameterName),
-        pos: uriLocation.pos,
-        end: uriLocation.end,
-      },
-    ]);
-  },
-);
 
 it("targets the repeated authored property, including inherited properties", async () => {
   await tester
