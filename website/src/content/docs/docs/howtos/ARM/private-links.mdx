@@ -10,6 +10,15 @@ Private Link resources allow users to discover which connection types are availa
 Resource providers that support private link resources must declare a private link resource type in
 their provider namespace and use the standard `PrivateLinks` interface to expose operations.
 
+## Choosing a Template and Migrating Existing Resources
+
+For new resources adding private link, private endpoint, or Network Security Perimeter (NSP) support,
+prefer the newer templates and patterns documented for those features.
+
+For existing resources, evaluate compatibility before migrating from an older template to a newer
+one. A migration can rename private-link resource types, which can change the generated public SDK
+and other client-visible surface area. Migrate only when you understand and accept that impact.
+
 ## Defining a Private Link Resource
 
 To define a private link resource, create a model in your provider namespace that extends
