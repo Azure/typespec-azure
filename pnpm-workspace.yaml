@@ -50,9 +50,7 @@ catalog:
   "@astrojs/markdown-remark": ^7.3.0
   "@astrojs/react": ^7.0.1
   "@astrojs/starlight": ^0.42.0
-  "@autorest/codemodel": ~4.20.1
   "@azure-rest/core-client": ^2.8.0
-  "@azure-tools/codegen": ~2.10.1
   "@azure/abort-controller": ^2.2.0
   "@azure/core-auth": ^1.11.0
   "@azure/core-lro": ^3.4.0
@@ -115,7 +113,7 @@ catalog:
   "@types/swagger-ui-express": ^4.1.8
   "@types/which": ^3.0.4
   "@types/yargs": ^17.0.35
-  "@typespec/http-client-python": ">=0.38.1 <1.0.0"
+  "@typespec/http-client-python": ">=0.39.0 <1.0.0"
   "@typespec/ts-http-runtime": "0.3.9"
   "@vitejs/plugin-react": ^6.1.0
   "@vitest/coverage-v8": ^5.0.0
